@@ -7,9 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../import_utils.dart';
 import '../saropa_lint_rule.dart';
@@ -40,7 +37,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class RequireHttpStatusCheckRule extends SaropaLintRule {
-  const RequireHttpStatusCheckRule() : super(code: _code);
+  RequireHttpStatusCheckRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -50,21 +47,19 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_http_status_check',
-    problemMessage:
-        '[require_http_status_check] HTTP response body is used without first checking the status code. This can result in undetected failures, silent data corruption, or security issues if error responses are parsed as valid data. Always check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and errors are handled appropriately. {v5}',
+    'require_http_status_check',
+    '[require_http_status_check] HTTP response body is used without first checking the status code. This can result in undetected failures, silent data corruption, or security issues if error responses are parsed as valid data. Always check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and errors are handled appropriately. {v5}',
     correctionMessage:
         'Check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and error payloads are handled separately.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
@@ -83,7 +78,7 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
       // Check if statusCode is checked
       if (!bodySource.contains('statusCode') &&
           !bodySource.contains('isSuccessful')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -107,7 +102,7 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
 ///   Uri.parse('${ApiConfig.baseUrl}/users'));
 /// ```
 class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
-  const AvoidHardcodedApiUrlsRule() : super(code: _code);
+  AvoidHardcodedApiUrlsRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -117,12 +112,11 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_api_urls',
-    problemMessage:
-        '[avoid_hardcoded_api_urls] Hardcoded API URLs prevent switching between development, staging, and production environments, making code inflexible and error-prone. This practice also risks leaking sensitive endpoints and complicates maintenance. Always extract API URLs to configuration constants (e.g., ApiConfig.baseUrl) to enable environment switching and improve security. {v5}',
+    'avoid_hardcoded_api_urls',
+    '[avoid_hardcoded_api_urls] Hardcoded API URLs prevent switching between development, staging, and production environments, making code inflexible and error-prone. This practice also risks leaking sensitive endpoints and complicates maintenance. Always extract API URLs to configuration constants (e.g., ApiConfig.baseUrl) to enable environment switching and improve security. {v5}',
     correctionMessage:
         "Extract the URL to a configuration constant (e.g., ApiConfig.baseUrl) so endpoints can be switched per environment without code changes.",
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static final RegExp _apiUrlPattern = RegExp(
@@ -132,19 +126,18 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Skip config files
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
     if (path.contains('config') || path.contains('constants')) return;
 
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       if (_apiUrlPattern.hasMatch(value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -177,7 +170,7 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireRetryLogicRule extends SaropaLintRule {
-  const RequireRetryLogicRule() : super(code: _code);
+  RequireRetryLogicRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -187,21 +180,19 @@ class RequireRetryLogicRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_retry_logic',
-    problemMessage:
-        '[require_retry_logic] Network call does not implement retry logic, so transient failures (e.g., temporary network loss, server hiccups) will not recover automatically. This can lead to poor reliability and frustrated users. Always wrap network calls with retry() or implement exponential backoff for SocketException/TimeoutException to improve robustness. {v6}',
+    'require_retry_logic',
+    '[require_retry_logic] Network call does not implement retry logic, so transient failures (e.g., temporary network loss, server hiccups) will not recover automatically. This can lead to poor reliability and frustrated users. Always wrap network calls with retry() or implement exponential backoff for SocketException/TimeoutException to improve robustness. {v6}',
     correctionMessage:
         'Wrap with retry() or implement exponential backoff for SocketException/TimeoutException.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Check if this is an API/fetch method
       final String methodName = node.name.lexeme.toLowerCase();
       if (!methodName.startsWith('fetch') &&
@@ -226,7 +217,7 @@ class RequireRetryLogicRule extends SaropaLintRule {
       if (!bodySource.contains('retry') &&
           !bodySource.contains('Retry') &&
           !bodySource.contains('maxRetries')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -250,7 +241,7 @@ class RequireRetryLogicRule extends SaropaLintRule {
 /// final name = user.name; // Type-safe access
 /// ```
 class RequireTypedApiResponseRule extends SaropaLintRule {
-  const RequireTypedApiResponseRule() : super(code: _code);
+  RequireTypedApiResponseRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -260,21 +251,19 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_typed_api_response',
-    problemMessage:
-        '[require_typed_api_response] Untyped API access via dynamic keys '
+    'require_typed_api_response',
+    '[require_typed_api_response] Untyped API access via dynamic keys '
         'loses type safety. Typos cause runtime errors, not compile errors. {v4}',
     correctionMessage: 'Create a model class and use fromJson/fromMap.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName != 'jsonDecode' && methodName != 'decode') return;
@@ -302,7 +291,7 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
             // Check for dynamic access like data['key']
             if (bodySource.contains("$variableName['") ||
                 bodySource.contains('$variableName["')) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
           }
           return;
@@ -351,7 +340,7 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireConnectivityCheckRule extends SaropaLintRule {
-  const RequireConnectivityCheckRule() : super(code: _code);
+  RequireConnectivityCheckRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -361,21 +350,19 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_connectivity_check',
-    problemMessage:
-        '[require_connectivity_check] Network calls without connectivity check '
+    'require_connectivity_check',
+    '[require_connectivity_check] Network calls without connectivity check '
         'cause poor UX with long timeouts and unhelpful error messages. {v4}',
     correctionMessage: 'Use Connectivity package to check network status.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Check methods that do network operations
       final String methodName = node.name.lexeme.toLowerCase();
       // Use word-boundary-aware checks to avoid matching 'resync', 'async', etc.
@@ -406,7 +393,7 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
           !bodySource.contains('checkConnectivity') &&
           !bodySource.contains('isConnected') &&
           !bodySource.contains('hasConnection')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -438,7 +425,7 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireApiErrorMappingRule extends SaropaLintRule {
-  const RequireApiErrorMappingRule() : super(code: _code);
+  RequireApiErrorMappingRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -448,21 +435,19 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_api_error_mapping',
-    problemMessage:
-        '[require_api_error_mapping] Raw API exceptions are exposed to users, leaking implementation details and providing unhelpful error messages. This can confuse users and expose sensitive information such as server paths, stack traces, or internal status codes. Always catch specific exceptions and map them to domain errors with clear, actionable messages to protect against information disclosure and improve error recovery. {v4}',
+    'require_api_error_mapping',
+    '[require_api_error_mapping] Raw API exceptions are exposed to users, leaking implementation details and providing unhelpful error messages. This can confuse users and expose sensitive information such as server paths, stack traces, or internal status codes. Always catch specific exceptions and map them to domain errors with clear, actionable messages to protect against information disclosure and improve error recovery. {v4}',
     correctionMessage:
         'Catch specific exceptions (SocketException, TimeoutException, HttpException) and map each to a typed domain error with a user-facing message.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addTryStatement((TryStatement node) {
+    context.addTryStatement((TryStatement node) {
       final String trySource = node.body.toSource();
 
       // Check if try block contains API calls (specific client patterns only)
@@ -487,7 +472,7 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
       }
 
       if (!hasSpecificCatch) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -523,7 +508,7 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
 /// final response = await dio.get('https://api.example.com/data');
 /// ```
 class RequireRequestTimeoutRule extends SaropaLintRule {
-  const RequireRequestTimeoutRule() : super(code: _code);
+  RequireRequestTimeoutRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -533,12 +518,11 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_request_timeout',
-    problemMessage:
-        '[require_request_timeout] HTTP request is missing a timeout configuration, which means it may hang indefinitely if the server does not respond. This can cause the app to freeze, degrade user experience, and waste socket connections and memory. Always add .timeout(Duration(seconds: 30)) or configure timeout in client options to ensure requests fail gracefully and users are informed of network issues. {v4}',
+    'require_request_timeout',
+    '[require_request_timeout] HTTP request is missing a timeout configuration, which means it may hang indefinitely if the server does not respond. This can cause the app to freeze, degrade user experience, and waste socket connections and memory. Always add .timeout(Duration(seconds: 30)) or configure timeout in client options to ensure requests fail gracefully and users are informed of network issues. {v4}',
     correctionMessage:
         'Add .timeout(Duration(seconds: 30)) to the request or configure connectTimeout and receiveTimeout in your HTTP client options.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _httpMethods = <String>{
@@ -556,11 +540,10 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Only check HTTP methods
@@ -574,7 +557,8 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
 
       // cspell:ignore httpclient
       // Check if this is an HTTP-related call using exact target patterns
-      final bool isHttpCall = targetSource == 'http' ||
+      final bool isHttpCall =
+          targetSource == 'http' ||
           targetSource == 'dio' ||
           targetSource == 'client' ||
           targetSource.endsWith('.http') ||
@@ -620,7 +604,7 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
         depth++;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -661,7 +645,7 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireOfflineIndicatorRule extends SaropaLintRule {
-  const RequireOfflineIndicatorRule() : super(code: _code);
+  RequireOfflineIndicatorRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -671,21 +655,19 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_offline_indicator',
-    problemMessage:
-        '[require_offline_indicator] Connectivity is checked, but there is no offline indicator shown to users. Without a clear indicator, users may not understand why features are unavailable or why requests fail. Always show a banner, snackbar, or icon when connectivity is lost to improve transparency and user experience. {v4}',
+    'require_offline_indicator',
+    '[require_offline_indicator] Connectivity is checked, but there is no offline indicator shown to users. Without a clear indicator, users may not understand why features are unavailable or why requests fail. Always show a banner, snackbar, or icon when connectivity is lost to improve transparency and user experience. {v4}',
     correctionMessage:
         'Show a visible offline indicator (banner, snackbar, or status icon) when connectivity is lost so users understand why features are unavailable.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for connectivity stream listening
@@ -707,7 +689,8 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
       final String callbackSource = callback.toSource();
 
       // Look for common UI feedback patterns
-      final bool hasUiFeedback = callbackSource.contains('showSnackBar') ||
+      final bool hasUiFeedback =
+          callbackSource.contains('showSnackBar') ||
           callbackSource.contains('showDialog') ||
           callbackSource.contains('Banner') ||
           callbackSource.contains('Overlay') ||
@@ -746,7 +729,7 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
 /// await response.stream.pipe(file.openWrite()); // Streams to disk
 /// ```
 class PreferStreamingResponseRule extends SaropaLintRule {
-  const PreferStreamingResponseRule() : super(code: _code);
+  PreferStreamingResponseRule() : super(code: _code);
 
   /// Large file downloads without streaming can cause OOM crashes.
   @override
@@ -756,22 +739,20 @@ class PreferStreamingResponseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_streaming_response',
-    problemMessage:
-        '[prefer_streaming_response] bodyBytes loads entire file into memory, '
+    'prefer_streaming_response',
+    '[prefer_streaming_response] bodyBytes loads entire file into memory, '
         'causing OutOfMemoryError for large downloads. Stream to disk instead. {v2}',
     correctionMessage:
         'Use client.send() with StreamedResponse and pipe to file.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       final String propertyName = node.propertyName.name;
 
       // Check for bodyBytes access which loads entire response into memory
@@ -818,12 +799,12 @@ class PreferStreamingResponseRule extends SaropaLintRule {
       }
 
       if (isFileContext) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Also check for dio's response.data in file context
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for dio download without streaming
@@ -903,7 +884,7 @@ class PreferStreamingResponseRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferHttpConnectionReuseRule extends SaropaLintRule {
-  const PreferHttpConnectionReuseRule() : super(code: _code);
+  PreferHttpConnectionReuseRule() : super(code: _code);
 
   /// Performance issue - connection overhead adds latency.
   @override
@@ -913,21 +894,19 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_http_connection_reuse',
-    problemMessage:
-        '[prefer_http_connection_reuse] HTTP client created inside method. Connection overhead on every call. Each new HTTP client requires DNS lookup, TCP handshake, and TLS negotiation. Reusing connections is much more efficient. {v4}',
+    'prefer_http_connection_reuse',
+    '[prefer_http_connection_reuse] HTTP client created inside method. Connection overhead on every call. Each new HTTP client requires DNS lookup, TCP handshake, and TLS negotiation. Reusing connections is much more efficient. {v4}',
     correctionMessage:
         'Create HTTP client as a class field and reuse across requests. Test with slow and interrupted connections to verify network resilience.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
@@ -945,15 +924,14 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
           bodySource.contains('var dio = ')) {
         // Check if closed in same method (ephemeral pattern)
         if (bodySource.contains('.close()')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
 
     // Also check for inline Client() usage that isn't assigned to local variable
     // (The MethodDeclaration check above handles local variable + close pattern)
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'Client' && typeName != 'Dio') return;
@@ -970,7 +948,7 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
       while (current != null) {
         if (current is MethodDeclaration || current is FunctionDeclaration) {
           // Inline usage inside method - should reuse
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         if (current is FieldDeclaration ||
@@ -1015,7 +993,7 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidRedundantRequestsRule extends SaropaLintRule {
-  const AvoidRedundantRequestsRule() : super(code: _code);
+  AvoidRedundantRequestsRule() : super(code: _code);
 
   /// Performance and resource waste.
   @override
@@ -1025,21 +1003,19 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_redundant_requests',
-    problemMessage:
-        '[avoid_redundant_requests] API call in build() or similar may cause redundant requests. Multiple widgets or methods requesting the same data simultaneously wastes bandwidth and server resources. Deduplicate concurrent requests. {v5}',
+    'avoid_redundant_requests',
+    '[avoid_redundant_requests] API call in build() or similar may cause redundant requests. Multiple widgets or methods requesting the same data simultaneously wastes bandwidth and server resources. Deduplicate concurrent requests. {v5}',
     correctionMessage:
         'Cache results or use request deduplication pattern. Test with slow and interrupted connections to verify network resilience.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme;
 
       // Check methods that run frequently
@@ -1055,7 +1031,8 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
 
       // Check for HTTP API calls without caching
       // Note: Avoid matching generic .get() which could be Map.get() or Box.get()
-      final bool hasApiCall = bodySource.contains('http.get(') ||
+      final bool hasApiCall =
+          bodySource.contains('http.get(') ||
           bodySource.contains('client.get(') ||
           bodySource.contains('dio.get(') ||
           bodySource.contains('.post(') ||
@@ -1066,14 +1043,15 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
       if (!hasApiCall) return;
 
       // Check for caching patterns
-      final bool hasCaching = bodySource.contains('cache') ||
+      final bool hasCaching =
+          bodySource.contains('cache') ||
           bodySource.contains('Cache') ||
           bodySource.contains('_pending') ||
           bodySource.contains('putIfAbsent') ||
           bodySource.contains('memoize');
 
       if (!hasCaching) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1109,7 +1087,7 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireResponseCachingRule extends SaropaLintRule {
-  const RequireResponseCachingRule() : super(code: _code);
+  RequireResponseCachingRule() : super(code: _code);
 
   /// Caching depends on data freshness requirements - may not be appropriate.
   @override
@@ -1119,21 +1097,19 @@ class RequireResponseCachingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_response_caching',
-    problemMessage:
-        '[require_response_caching] GET request without caching. Static or rarely-changing data wastes bandwidth on every call. GET responses for static or slowly-changing data must be cached to reduce bandwidth usage and improve responsiveness. {v5}',
+    'require_response_caching',
+    '[require_response_caching] GET request without caching. Static or rarely-changing data wastes bandwidth on every call. GET responses for static or slowly-changing data must be cached to reduce bandwidth usage and improve responsiveness. {v5}',
     correctionMessage:
         'Add response caching with a TTL header or local cache layer for data that changes infrequently to reduce network load.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme.toLowerCase();
 
       // Check for getter methods that likely fetch data
@@ -1154,7 +1130,8 @@ class RequireResponseCachingRule extends SaropaLintRule {
       }
 
       // Check for caching patterns
-      final bool hasCaching = bodySource.contains('cache') ||
+      final bool hasCaching =
+          bodySource.contains('cache') ||
           bodySource.contains('Cache') ||
           bodySource.contains('_cached') ||
           bodySource.contains('cached') ||
@@ -1174,7 +1151,7 @@ class RequireResponseCachingRule extends SaropaLintRule {
       }
 
       if (!hasCaching) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1203,7 +1180,7 @@ class RequireResponseCachingRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferPaginationRule extends SaropaLintRule {
-  const PreferPaginationRule() : super(code: _code);
+  PreferPaginationRule() : super(code: _code);
 
   /// Performance and memory usage.
   @override
@@ -1213,21 +1190,19 @@ class PreferPaginationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_api_pagination',
-    problemMessage:
-        '[prefer_api_pagination] API fetches all items without pagination. May cause memory issues. Loading thousands of items at once is slow and memory-intensive. Use pagination with limit/offset or cursor-based pagination. {v2}',
+    'prefer_api_pagination',
+    '[prefer_api_pagination] API fetches all items without pagination. May cause memory issues. Loading thousands of items at once is slow and memory-intensive. Use pagination with limit/offset or cursor-based pagination. {v2}',
     correctionMessage:
         'Add pagination parameters: limit, offset, page, or cursor. Test with slow and interrupted connections to verify network resilience.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme.toLowerCase();
 
       // Check for methods that fetch collections
@@ -1259,7 +1234,8 @@ class PreferPaginationRule extends SaropaLintRule {
       }
 
       // Check for pagination patterns
-      final bool hasPagination = bodySource.contains('limit') ||
+      final bool hasPagination =
+          bodySource.contains('limit') ||
           bodySource.contains('offset') ||
           bodySource.contains('page') ||
           bodySource.contains('cursor') ||
@@ -1269,7 +1245,7 @@ class PreferPaginationRule extends SaropaLintRule {
           node.parameters?.toSource().contains('page') == true;
 
       if (!hasPagination) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1297,7 +1273,7 @@ class PreferPaginationRule extends SaropaLintRule {
 /// final user = await api.query('{ user(id: $id) { name } }');
 /// ```
 class AvoidOverFetchingRule extends SaropaLintRule {
-  const AvoidOverFetchingRule() : super(code: _code);
+  AvoidOverFetchingRule() : super(code: _code);
 
   /// Optimization depends on API design - may require backend changes.
   @override
@@ -1307,39 +1283,40 @@ class AvoidOverFetchingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_over_fetching',
-    problemMessage:
-        '[avoid_over_fetching] Fetching the full object but only using a few fields, wasting bandwidth and serialization time. This network pattern wastes bandwidth and server resources, increasing latency and data costs for users. {v5}',
+    'avoid_over_fetching',
+    '[avoid_over_fetching] Fetching the full object but only using a few fields, wasting bandwidth and serialization time. This network pattern wastes bandwidth and server resources, increasing latency and data costs for users. {v5}',
     correctionMessage:
         'Use field selection, sparse fieldsets, or a dedicated endpoint to fetch only the fields this call-site actually uses.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // This rule requires more sophisticated analysis
     // Detect patterns like: fetch full object, use 1-2 properties
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
       // Look for API fetch followed by single property access
-      final RegExp fetchPattern =
-          RegExp(r'await\s+\w+\.(get|fetch|query)\([^)]+\)');
+      final RegExp fetchPattern = RegExp(
+        r'await\s+\w+\.(get|fetch|query)\([^)]+\)',
+      );
 
       if (!fetchPattern.hasMatch(bodySource)) return;
 
       // Count property accesses on result vs fields available
       // This is a heuristic - if method is short and only accesses
       // one or two properties after fetch, might be over-fetching
-      final int propertyAccesses =
-          RegExp(r'\.\w+(?!\()').allMatches(bodySource).length;
-      final int apiCalls =
-          RegExp(r'\.(get|fetch|post|query)\(').allMatches(bodySource).length;
+      final int propertyAccesses = RegExp(
+        r'\.\w+(?!\()',
+      ).allMatches(bodySource).length;
+      final int apiCalls = RegExp(
+        r'\.(get|fetch|post|query)\(',
+      ).allMatches(bodySource).length;
 
       // If we have an API call and very few property accesses relative
       // to typical object size, might be over-fetching
@@ -1352,7 +1329,7 @@ class AvoidOverFetchingRule extends SaropaLintRule {
             r'\.(name|title|id|label|text)\b',
           ).allMatches(bodySource).length;
           if (totalProps >= 1 && totalProps <= 2) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -1395,7 +1372,7 @@ class AvoidOverFetchingRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireCancelTokenRule extends SaropaLintRule {
-  const RequireCancelTokenRule() : super(code: _code);
+  RequireCancelTokenRule() : super(code: _code);
 
   /// Resource management and avoiding errors.
   @override
@@ -1405,21 +1382,19 @@ class RequireCancelTokenRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_cancel_token',
-    problemMessage:
-        '[require_cancel_token] Async request without cancellation continues after a StatefulWidget disposes its State, wasting bandwidth and causing setState errors. Not canceling can lead to memory leaks, wasted network connections, and crashes from calling setState on a disposed State object after the parent removes the child from the widget tree. {v4}',
+    'require_cancel_token',
+    '[require_cancel_token] Async request without cancellation continues after a StatefulWidget disposes its State, wasting bandwidth and causing setState errors. Not canceling can lead to memory leaks, wasted network connections, and crashes from calling setState on a disposed State object after the parent removes the child from the widget tree. {v4}',
     correctionMessage:
         'Use CancelToken (Dio) or implement request cancellation in the State dispose() method to stop in-flight requests when the widget is removed.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if it's a State class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1430,7 +1405,8 @@ class RequireCancelTokenRule extends SaropaLintRule {
       final String classSource = node.toSource();
 
       // Check for HTTP calls
-      final bool hasHttpCalls = classSource.contains('.get(') ||
+      final bool hasHttpCalls =
+          classSource.contains('.get(') ||
           classSource.contains('.post(') ||
           classSource.contains('.fetch(') ||
           classSource.contains('http.') ||
@@ -1439,7 +1415,8 @@ class RequireCancelTokenRule extends SaropaLintRule {
       if (!hasHttpCalls) return;
 
       // Check for cancellation patterns
-      final bool hasCancellation = classSource.contains('CancelToken') ||
+      final bool hasCancellation =
+          classSource.contains('CancelToken') ||
           classSource.contains('cancelToken') ||
           classSource.contains('_cancelled') || // US spelling
           classSource.contains('isCancelled') || // US spelling
@@ -1448,11 +1425,12 @@ class RequireCancelTokenRule extends SaropaLintRule {
           classSource.contains('cancel()');
 
       // Check for mounted check (partial mitigation)
-      final bool hasMountedCheck = classSource.contains('if (mounted)') ||
+      final bool hasMountedCheck =
+          classSource.contains('if (mounted)') ||
           classSource.contains('if (!mounted)');
 
       if (!hasCancellation && !hasMountedCheck) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1483,7 +1461,7 @@ class RequireCancelTokenRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Adds an onError handler stub.
 class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
-  const RequireWebSocketErrorHandlingRule() : super(code: _code);
+  RequireWebSocketErrorHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1492,21 +1470,19 @@ class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_websocket_error_handling',
-    problemMessage:
-        '[require_websocket_error_handling] WebSocket stream.listen() is missing an onError handler. Unhandled errors can crash your app, disconnect users, and make debugging network issues difficult. All WebSocket listeners must handle errors to ensure robust, production-quality networking. {v3}',
+    'require_websocket_error_handling',
+    '[require_websocket_error_handling] WebSocket stream.listen() is missing an onError handler. Unhandled errors can crash your app, disconnect users, and make debugging network issues difficult. All WebSocket listeners must handle errors to ensure robust, production-quality networking. {v3}',
     correctionMessage:
         'Always provide an onError handler to WebSocket stream.listen(). Log errors, show user feedback, and attempt reconnection if appropriate. Audit your codebase for missing error handlers and add tests for network failure scenarios.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'listen') return;
 
       // Check if target is WebSocket-related
@@ -1532,42 +1508,8 @@ class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
       }
 
       if (!hasOnError) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddOnErrorHandlerFix()];
-}
-
-class _AddOnErrorHandlerFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'listen') return;
-
-      final ArgumentList args = node.argumentList;
-      if (args.arguments.isEmpty) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add onError handler',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert before closing parenthesis
-        final int insertOffset = args.rightParenthesis.offset;
-        builder.addSimpleInsertion(
-            insertOffset, ', onError: (error) { /* HACK: Handle error */ }');
-      });
     });
   }
 }
@@ -1595,7 +1537,7 @@ class _AddOnErrorHandlerFix extends DartFix {
 /// }
 /// ```
 class RequireContentTypeCheckRule extends SaropaLintRule {
-  const RequireContentTypeCheckRule() : super(code: _code);
+  RequireContentTypeCheckRule() : super(code: _code);
 
   /// Reliability issue - parsing may fail unexpectedly.
   @override
@@ -1605,21 +1547,19 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_content_type_check',
-    problemMessage:
-        '[require_content_type_check] Parsing response without Content-Type check. May fail on error responses. APIs may return different content types on error. Parsing JSON without checking Content-Type may fail unexpectedly. {v4}',
+    'require_content_type_check',
+    '[require_content_type_check] Parsing response without Content-Type check. May fail on error responses. APIs may return different content types on error. Parsing JSON without checking Content-Type may fail unexpectedly. {v4}',
     correctionMessage:
         'Check the Content-Type header before parsing the response body. APIs may return HTML error pages or plain text instead of JSON on failure, causing parse exceptions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       final methodName = node.methodName.name;
 
       // Check for JSON parsing
@@ -1663,7 +1603,7 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -1690,7 +1630,7 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
 /// channel.stream.listen((data) => handleData(data));
 /// ```
 class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
-  const AvoidWebsocketWithoutHeartbeatRule() : super(code: _code);
+  AvoidWebsocketWithoutHeartbeatRule() : super(code: _code);
 
   /// Reliability issue - dead connections go undetected.
   @override
@@ -1700,21 +1640,19 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_websocket_without_heartbeat',
-    problemMessage:
-        '[avoid_websocket_without_heartbeat] WebSocket without heartbeat/ping. Dead connections won\'t be detected. WebSocket connections can silently fail. Periodic pings help detect dead connections and keep firewalls from closing idle sockets. {v3}',
+    'avoid_websocket_without_heartbeat',
+    '[avoid_websocket_without_heartbeat] WebSocket without heartbeat/ping. Dead connections won\'t be detected. WebSocket connections can silently fail. Periodic pings help detect dead connections and keep firewalls from closing idle sockets. {v3}',
     correctionMessage:
         'Add periodic ping messages to detect connection failures. Test with slow and interrupted connections to verify network resilience.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       // Check for WebSocketChannel.connect
       final target = node.target;
       if (target is! SimpleIdentifier) {
@@ -1756,7 +1694,7 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -1789,7 +1727,7 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
-  const RequireUrlLauncherErrorHandlingRule() : super(code: _code);
+  RequireUrlLauncherErrorHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1798,21 +1736,19 @@ class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_url_launcher_error_handling',
-    problemMessage:
-        '[require_url_launcher_error_handling] Calling launchUrl without error handling can cause your app to crash or leave users stranded if the URL cannot be opened (e.g., missing browser, invalid URL, or platform restrictions). This results in a poor user experience and can break critical app flows. {v2}',
+    'require_url_launcher_error_handling',
+    '[require_url_launcher_error_handling] Calling launchUrl without error handling can cause your app to crash or leave users stranded if the URL cannot be opened (e.g., missing browser, invalid URL, or platform restrictions). This results in a poor user experience and can break critical app flows. {v2}',
     correctionMessage:
         'Always check canLaunchUrl before calling launchUrl, and wrap the call in a try-catch block to handle errors gracefully. Provide user feedback if the URL cannot be opened.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'launchUrl' &&
           node.methodName.name != 'launch') {
         return;
@@ -1875,7 +1811,7 @@ class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireImagePickerErrorHandlingRule extends SaropaLintRule {
-  const RequireImagePickerErrorHandlingRule() : super(code: _code);
+  RequireImagePickerErrorHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1884,21 +1820,19 @@ class RequireImagePickerErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_image_picker_error_handling',
-    problemMessage:
-        '[require_image_picker_error_handling] Using pickImage, pickVideo, or pickMultiImage without null checks or error handling can result in null dereference errors or unhandled exceptions if the user cancels the picker or a platform error occurs. This can crash your app or cause unpredictable UI states. {v2}',
+    'require_image_picker_error_handling',
+    '[require_image_picker_error_handling] Using pickImage, pickVideo, or pickMultiImage without null checks or error handling can result in null dereference errors or unhandled exceptions if the user cancels the picker or a platform error occurs. This can crash your app or cause unpredictable UI states. {v2}',
     correctionMessage:
         'Always check for null results and wrap picker calls in try-catch blocks. Provide user feedback for cancellations and handle errors to prevent crashes.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'pickImage' &&
           node.methodName.name != 'pickVideo' &&
           node.methodName.name != 'pickMultiImage') {
@@ -1947,7 +1881,7 @@ class RequireImagePickerErrorHandlingRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
-  const RequireImagePickerSourceChoiceRule() : super(code: _code);
+  RequireImagePickerSourceChoiceRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1956,21 +1890,19 @@ class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_image_picker_source_choice',
-    problemMessage:
-        '[require_image_picker_source_choice] Hardcoded ImageSource. Prefer offering user a choice. Users must be able to choose between camera and gallery. {v1}',
+    'require_image_picker_source_choice',
+    '[require_image_picker_source_choice] Hardcoded ImageSource. Prefer offering user a choice. Users must be able to choose between camera and gallery. {v1}',
     correctionMessage:
         'Show dialog letting user choose camera or gallery. Test with slow and interrupted connections to verify network resilience.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'pickImage') return;
 
       // Check for hardcoded ImageSource
@@ -2029,7 +1961,7 @@ class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireGeolocatorTimeoutRule extends SaropaLintRule {
-  const RequireGeolocatorTimeoutRule() : super(code: _code);
+  RequireGeolocatorTimeoutRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2038,21 +1970,19 @@ class RequireGeolocatorTimeoutRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_geolocator_timeout',
-    problemMessage:
-        '[require_geolocator_timeout] Calling getCurrentPosition without a timeLimit can cause the request to hang indefinitely if the device cannot acquire a location fix (e.g., poor GPS signal, airplane mode). This can freeze your UI and frustrate users. {v3}',
+    'require_geolocator_timeout',
+    '[require_geolocator_timeout] Calling getCurrentPosition without a timeLimit can cause the request to hang indefinitely if the device cannot acquire a location fix (e.g., poor GPS signal, airplane mode). This can freeze your UI and frustrate users. {v3}',
     correctionMessage:
         'Always set the timeLimit parameter (e.g., Duration(seconds: 10)) to ensure location requests fail gracefully and your app remains responsive.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'getCurrentPosition') return;
 
       // Only apply to files that import geolocator
@@ -2122,7 +2052,7 @@ class RequireGeolocatorTimeoutRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireConnectivitySubscriptionCancelRule extends SaropaLintRule {
-  const RequireConnectivitySubscriptionCancelRule() : super(code: _code);
+  RequireConnectivitySubscriptionCancelRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -2131,21 +2061,19 @@ class RequireConnectivitySubscriptionCancelRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_connectivity_subscription_cancel',
-    problemMessage:
-        '[require_connectivity_subscription_cancel] If you do not cancel your connectivity subscription, your app will leak memory and system resources. This can cause crashes, slowdowns, and unpredictable behavior, especially after repeated hot reloads or navigation. {v3}',
+    'require_connectivity_subscription_cancel',
+    '[require_connectivity_subscription_cancel] If you do not cancel your connectivity subscription, your app will leak memory and system resources. This can cause crashes, slowdowns, and unpredictable behavior, especially after repeated hot reloads or navigation. {v3}',
     correctionMessage:
         'Always store your connectivity subscription and call cancel() in dispose() to prevent memory leaks and keep your app stable.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'listen') return;
 
       // Only apply to files that import connectivity package
@@ -2212,7 +2140,7 @@ class RequireConnectivitySubscriptionCancelRule extends SaropaLintRule {
 /// FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 /// ```
 class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
-  const RequireNotificationHandlerTopLevelRule() : super(code: _code);
+  RequireNotificationHandlerTopLevelRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -2221,21 +2149,19 @@ class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_notification_handler_top_level',
-    problemMessage:
-        '[require_notification_handler_top_level] If your notification handler is not a top-level function, background messages will be silently dropped when the app is terminated or in the background. Users will miss important notifications and your app may fail compliance checks. {v3}',
+    'require_notification_handler_top_level',
+    '[require_notification_handler_top_level] If your notification handler is not a top-level function, background messages will be silently dropped when the app is terminated or in the background. Users will miss important notifications and your app may fail compliance checks. {v3}',
     correctionMessage:
         'Move your notification handler to a top-level function and annotate it with @pragma("vm:entry-point") to ensure background messages are always delivered.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'onBackgroundMessage') return;
 
       // Only apply to files that import firebase_messaging
@@ -2264,10 +2190,10 @@ class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
       // Check if handler is an instance method reference (contains dot but not a simple identifier)
       if (handler is PrefixedIdentifier) {
         // e.g., service.handleBackground - instance method
-        reporter.atNode(handler, code);
+        reporter.atNode(handler);
       } else if (handler is PropertyAccess) {
         // e.g., this.handleBackground or obj.method
-        reporter.atNode(handler, code);
+        reporter.atNode(handler);
       }
       // SimpleIdentifier like _handleBackground or handleBackground are OK (top-level or static)
     });
@@ -2301,7 +2227,7 @@ class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
 /// }
 /// ```
 class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
-  const RequirePermissionDeniedHandlingRule() : super(code: _code);
+  RequirePermissionDeniedHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2310,21 +2236,19 @@ class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_permission_denied_handling',
-    problemMessage:
-        '[require_permission_denied_handling] Requesting permissions without handling denied or permanently denied states leaves users unable to proceed, with no explanation or way to enable permissions. This can block critical app features and frustrate users. {v4}',
+    'require_permission_denied_handling',
+    '[require_permission_denied_handling] Requesting permissions without handling denied or permanently denied states leaves users unable to proceed, with no explanation or way to enable permissions. This can block critical app features and frustrate users. {v4}',
     correctionMessage:
         'Check for isDenied and isPermanentlyDenied states after requesting permissions. Show clear explanations and provide a link to app settings if needed.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'request') return;
 
       // Only apply to files that import permission_handler
@@ -2432,7 +2356,7 @@ class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
 /// final bytes = await image.readAsBytes();
 /// ```
 class RequireImagePickerResultHandlingRule extends SaropaLintRule {
-  const RequireImagePickerResultHandlingRule() : super(code: _code);
+  RequireImagePickerResultHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2441,21 +2365,19 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_image_picker_result_handling',
-    problemMessage:
-        '[require_image_picker_result_handling] pickImage returns null when '
+    'require_image_picker_result_handling',
+    '[require_image_picker_result_handling] pickImage returns null when '
         'user cancels. Missing null check causes NoSuchMethodError crash. {v2}',
     correctionMessage: 'Add null check: if (image == null) return;',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
       if (methodName != 'pickImage' && methodName != 'pickVideo') return;
 
@@ -2500,7 +2422,7 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
         parent = parent.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -2534,7 +2456,7 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidCachedImageInBuildRule extends SaropaLintRule {
-  const AvoidCachedImageInBuildRule() : super(code: _code);
+  AvoidCachedImageInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2543,22 +2465,19 @@ class AvoidCachedImageInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_cached_image_in_build',
-    problemMessage:
-        '[avoid_cached_image_in_build] Variable cacheKey in build method defeats caching. Using a changing cacheKey in build causes the image to reload on every rebuild, defeating the purpose of caching. {v2}',
+    'avoid_cached_image_in_build',
+    '[avoid_cached_image_in_build] Variable cacheKey in build method defeats caching. Using a changing cacheKey in build causes the image to reload on every rebuild, defeating the purpose of caching. {v2}',
     correctionMessage:
         'Use a stable cacheKey that does not change on rebuild. Test with slow and interrupted connections to verify network resilience.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'CachedNetworkImage') return;
 
@@ -2585,7 +2504,7 @@ class AvoidCachedImageInBuildRule extends SaropaLintRule {
               valueSource.contains('.v4()') ||
               valueSource.contains('.v1()') ||
               valueSource.contains('uuid')) {
-            reporter.atNode(arg, code);
+            reporter.atNode(arg);
           }
         }
       }
@@ -2621,7 +2540,7 @@ class AvoidCachedImageInBuildRule extends SaropaLintRule {
 /// };
 /// ```
 class RequireSqfliteMigrationRule extends SaropaLintRule {
-  const RequireSqfliteMigrationRule() : super(code: _code);
+  RequireSqfliteMigrationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2630,27 +2549,26 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_sqflite_migration',
-    problemMessage:
-        '[require_sqflite_migration] Implementing onUpgrade without checking oldVersion can cause all migrations to run for every upgrade, corrupting user data and breaking app updates. This is especially dangerous for users upgrading from recent versions. {v4}',
+    'require_sqflite_migration',
+    '[require_sqflite_migration] Implementing onUpgrade without checking oldVersion can cause all migrations to run for every upgrade, corrupting user data and breaking app updates. This is especially dangerous for users upgrading from recent versions. {v4}',
     correctionMessage:
         'Always check oldVersion and newVersion in onUpgrade, and only run migrations needed for the user’s upgrade path. Test migrations thoroughly before release.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionExpression((FunctionExpression node) {
+    context.addFunctionExpression((FunctionExpression node) {
       // Check if this is an onUpgrade callback (has oldVersion parameter)
       final params = node.parameters;
       if (params == null) return;
 
-      final paramNames =
-          params.parameters.map((p) => p.name?.lexeme ?? '').toList();
+      final paramNames = params.parameters
+          .map((p) => p.name?.lexeme ?? '')
+          .toList();
       if (!paramNames.contains('oldVersion') &&
           !paramNames.contains('old') &&
           !paramNames.any((p) => p.toLowerCase().contains('version'))) {
@@ -2675,14 +2593,14 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
           final leftSource = current.leftHandSide.toSource().toLowerCase();
           if (leftSource.contains('onupgrade') ||
               leftSource.contains('on_upgrade')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
         if (current is NamedExpression) {
           final name = current.name.label.name.toLowerCase();
           if (name.contains('onupgrade') || name.contains('on_upgrade')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -2718,7 +2636,7 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
 /// await Permission.camera.request();
 /// ```
 class RequirePermissionRationaleRule extends SaropaLintRule {
-  const RequirePermissionRationaleRule() : super(code: _code);
+  RequirePermissionRationaleRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2727,21 +2645,19 @@ class RequirePermissionRationaleRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_permission_rationale',
-    problemMessage:
-        '[require_permission_rationale] Permission request without checking shouldShowRequestRationale. Android established convention is to explain why the app needs a permission before requesting it using shouldShowRequestRationale. {v3}',
+    'require_permission_rationale',
+    '[require_permission_rationale] Permission request without checking shouldShowRequestRationale. Android established convention is to explain why the app needs a permission before requesting it using shouldShowRequestRationale. {v3}',
     correctionMessage:
         'Check shouldShowRequestRationale() before requesting permission. Test with slow and interrupted connections to verify network resilience.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
 
       // Check for permission request patterns
@@ -2772,7 +2688,7 @@ class RequirePermissionRationaleRule extends SaropaLintRule {
         return; // Has rationale check
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -2798,7 +2714,7 @@ class RequirePermissionRationaleRule extends SaropaLintRule {
 /// }
 /// ```
 class RequirePermissionStatusCheckRule extends SaropaLintRule {
-  const RequirePermissionStatusCheckRule() : super(code: _code);
+  RequirePermissionStatusCheckRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2807,12 +2723,11 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_permission_status_check',
-    problemMessage:
-        '[require_permission_status_check] Accessing camera, location, or other gated features without checking permission status can cause runtime exceptions or crashes if the user has denied permission. This can break critical app flows and frustrate users. {v4}',
+    'require_permission_status_check',
+    '[require_permission_status_check] Accessing camera, location, or other gated features without checking permission status can cause runtime exceptions or crashes if the user has denied permission. This can break critical app flows and frustrate users. {v4}',
     correctionMessage:
         'Always check permission.status.isGranted before accessing gated features. Handle denied permissions gracefully and inform the user.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const _gatedFeatures = <String>{
@@ -2833,11 +2748,10 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
 
       if (!_gatedFeatures.contains(methodName)) {
@@ -2862,7 +2776,7 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
         return; // Has permission check
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -2888,7 +2802,7 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
-  const RequireNotificationPermissionAndroid13Rule() : super(code: _code);
+  RequireNotificationPermissionAndroid13Rule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2897,12 +2811,11 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_notification_permission_android13',
-    problemMessage:
-        '[require_notification_permission_android13] Notification displayed without checking POST_NOTIFICATIONS permission on Android 13+. On API level 33 and above, notifications fail silently without this runtime permission, causing users to miss critical alerts, messages, and updates with no error feedback to the developer or the user. {v3}',
+    'require_notification_permission_android13',
+    '[require_notification_permission_android13] Notification displayed without checking POST_NOTIFICATIONS permission on Android 13+. On API level 33 and above, notifications fail silently without this runtime permission, causing users to miss critical alerts, messages, and updates with no error feedback to the developer or the user. {v3}',
     correctionMessage:
         'Check and request Permission.notification at runtime before calling any notification display method on Android 13+ (API 33+) devices.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const _notificationMethods = <String>{
@@ -2917,11 +2830,10 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
 
       if (!_notificationMethods.contains(methodName)) {
@@ -2968,7 +2880,7 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
         }
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -3032,7 +2944,7 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
 /// }
 /// ```
 class RequireSseSubscriptionCancelRule extends SaropaLintRule {
-  const RequireSseSubscriptionCancelRule() : super(code: _code);
+  RequireSseSubscriptionCancelRule() : super(code: _code);
 
   /// SSE connections are long-lived and must be properly closed.
   @override
@@ -3042,12 +2954,11 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_sse_subscription_cancel',
-    problemMessage:
-        '[require_sse_subscription_cancel] If a widget (such as a StatefulWidget managing a live data feed) opens a Server-Sent Events (SSE) or EventSource connection but does not cancel it in dispose(), the connection remains open after the widget is removed. This can result in orphaned network connections, wasted bandwidth, and memory leaks, especially in dashboards, chat clients, or any UI with dynamic SSE usage. Always close SSE/EventSource connections in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources. {v4}',
+    'require_sse_subscription_cancel',
+    '[require_sse_subscription_cancel] If a widget (such as a StatefulWidget managing a live data feed) opens a Server-Sent Events (SSE) or EventSource connection but does not cancel it in dispose(), the connection remains open after the widget is removed. This can result in orphaned network connections, wasted bandwidth, and memory leaks, especially in dashboards, chat clients, or any UI with dynamic SSE usage. Always close SSE/EventSource connections in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources. {v4}',
     correctionMessage:
         'In every State class that owns an SSE or EventSource connection, call connection.close() in the dispose() method before calling super.dispose(). This ensures the connection is properly terminated when the widget is removed, preventing leaks and network resource exhaustion. See https://docs.flutter.dev/perf/memory#dispose-resources for more details.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Types that represent SSE connections
@@ -3062,11 +2973,10 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State<T>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -3135,7 +3045,8 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
 
       // Report SSE fields not closed in dispose
       for (final String fieldName in sseFields) {
-        final bool isClosed = disposeBody != null &&
+        final bool isClosed =
+            disposeBody != null &&
             (disposeBody.contains('$fieldName.close()') ||
                 disposeBody.contains('$fieldName?.close()') ||
                 disposeBody.contains('$fieldName.dispose()') ||
@@ -3149,7 +3060,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
-                  reporter.atNode(variable, code);
+                  reporter.atNode(variable);
                 }
               }
             }
@@ -3180,7 +3091,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
 ///     .timeout(const Duration(seconds: 30));
 /// ```
 class PreferTimeoutOnRequestsRule extends SaropaLintRule {
-  const PreferTimeoutOnRequestsRule() : super(code: _code);
+  PreferTimeoutOnRequestsRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -3190,12 +3101,11 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_timeout_on_requests',
-    problemMessage:
-        '[prefer_timeout_on_requests] Making HTTP requests without a timeout can cause your app to hang indefinitely if the server is slow or unresponsive. This degrades user experience and can block critical app flows. {v3}',
+    'prefer_timeout_on_requests',
+    '[prefer_timeout_on_requests] Making HTTP requests without a timeout can cause your app to hang indefinitely if the server is slow or unresponsive. This degrades user experience and can block critical app flows. {v3}',
     correctionMessage:
         'Always set a timeout on HTTP requests (e.g., .timeout(Duration(seconds: 30))) or configure a client-wide timeout to ensure your app remains responsive.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _httpMethods = <String>{
@@ -3211,11 +3121,10 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_httpMethods.contains(methodName)) return;
 
@@ -3247,74 +3156,14 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
         }
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[
-        _AddTimeout30SecondsFix(),
-        _AddTimeout60SecondsFix(),
-      ];
 }
 
 /// Quick fix: adds `.timeout(const Duration(seconds: 30))` to HTTP requests.
-class _AddTimeout30SecondsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add .timeout(const Duration(seconds: 30))',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final int insertOffset = node.argumentList.rightParenthesis.end;
-        builder.addSimpleInsertion(
-          insertOffset,
-          '.timeout(const Duration(seconds: 30))',
-        );
-      });
-    });
-  }
-}
 
 /// Quick fix: adds `.timeout(const Duration(seconds: 60))` for slower APIs.
-class _AddTimeout60SecondsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add .timeout(const Duration(seconds: 60))',
-        priority: 2,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final int insertOffset = node.argumentList.rightParenthesis.end;
-        builder.addSimpleInsertion(
-          insertOffset,
-          '.timeout(const Duration(seconds: 60))',
-        );
-      });
-    });
-  }
-}
 
 // =============================================================================
 // WebSocket Rules (from v4.1.7)
@@ -3363,7 +3212,7 @@ class _AddTimeout60SecondsFix extends DartFix {
 /// }
 /// ```
 class RequireWebsocketReconnectionRule extends SaropaLintRule {
-  const RequireWebsocketReconnectionRule() : super(code: _code);
+  RequireWebsocketReconnectionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -3372,21 +3221,19 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_websocket_reconnection',
-    problemMessage:
-        '[require_websocket_reconnection] WebSocket connection without reconnection logic will stay permanently disconnected after network interruptions, server restarts, or mobile network handoffs. Users will see stale data, miss real-time updates, and have no indication that the live connection has dropped until they manually refresh or restart the app. {v4}',
+    'require_websocket_reconnection',
+    '[require_websocket_reconnection] WebSocket connection without reconnection logic will stay permanently disconnected after network interruptions, server restarts, or mobile network handoffs. Users will see stale data, miss real-time updates, and have no indication that the live connection has dropped until they manually refresh or restart the app. {v4}',
     correctionMessage:
         'Implement automatic reconnection with exponential backoff for WebSocket connections.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
 
       // Skip WebSocket class definitions — only check classes that USE
@@ -3402,14 +3249,15 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
       }
 
       // Check for reconnection logic indicators
-      final bool hasReconnection = classSource.contains('reconnect') ||
+      final bool hasReconnection =
+          classSource.contains('reconnect') ||
           classSource.contains('retry') ||
           classSource.contains('onDone:') ||
           classSource.contains('onError:') ||
           classSource.contains('backoff');
 
       if (!hasReconnection) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3434,7 +3282,7 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
 /// analytics.logEvent(name: 'user_signed_up');
 /// ```
 class RequireAnalyticsEventNamingRule extends SaropaLintRule {
-  const RequireAnalyticsEventNamingRule() : super(code: _code);
+  RequireAnalyticsEventNamingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -3443,16 +3291,16 @@ class RequireAnalyticsEventNamingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_analytics_event_naming',
-    problemMessage:
-        '[require_analytics_event_naming] Analytics event name does not '
+    'require_analytics_event_naming',
+    '[require_analytics_event_naming] Analytics event name does not '
         'follow snake_case convention. Inconsistent naming fragments '
         'dashboards, breaks funnel queries, and makes cross-platform '
         'analysis unreliable. Most analytics platforms recommend or '
         'require snake_case for event names. {v1}',
-    correctionMessage: 'Rename the event to snake_case (e.g., "user_signed_up" '
+    correctionMessage:
+        'Rename the event to snake_case (e.g., "user_signed_up" '
         'instead of "UserSignedUp" or "user-signed-up").',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Unambiguous analytics method names - always trigger without
@@ -3466,10 +3314,7 @@ class RequireAnalyticsEventNamingRule extends SaropaLintRule {
   /// Ambiguous method names that appear in non-analytics contexts.
   /// Require an analytics-like receiver to avoid false positives
   /// (e.g., shipment.track(), stateMachine.sendEvent()).
-  static const Set<String> _ambiguousMethods = <String>{
-    'track',
-    'sendEvent',
-  };
+  static const Set<String> _ambiguousMethods = <String>{'track', 'sendEvent'};
 
   /// Receivers that indicate an analytics context.
   static final RegExp _analyticsTargetPattern = RegExp(
@@ -3483,11 +3328,10 @@ class RequireAnalyticsEventNamingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (_ambiguousMethods.contains(methodName)) {

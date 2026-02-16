@@ -8,9 +8,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -39,7 +36,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class RequirePublicApiDocumentationRule extends SaropaLintRule {
-  const RequirePublicApiDocumentationRule() : super(code: _code);
+  RequirePublicApiDocumentationRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -49,31 +46,29 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_public_api_documentation',
-    problemMessage:
-        '[require_public_api_documentation] Public API must be documented. Public classes, methods, and properties must have doc comments to help other developers understand their purpose. {v4}',
+    'require_public_api_documentation',
+    '[require_public_api_documentation] Public API must be documented. Public classes, methods, and properties must have doc comments to help other developers understand their purpose. {v4}',
     correctionMessage:
         'Add a doc comment explaining the purpose and usage. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Skip private classes
       if (node.name.lexeme.startsWith('_')) return;
 
       // Check for documentation comment
       if (node.documentationComment == null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Skip private methods
       if (node.name.lexeme.startsWith('_')) return;
 
@@ -83,12 +78,12 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
       }
 
       // Check if in public class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl != null && classDecl.name.lexeme.startsWith('_')) return;
 
       if (node.documentationComment == null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -112,7 +107,7 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
 /// String getUserEmail() => user.email;
 /// ```
 class AvoidMisleadingDocumentationRule extends SaropaLintRule {
-  const AvoidMisleadingDocumentationRule() : super(code: _code);
+  AvoidMisleadingDocumentationRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -122,42 +117,42 @@ class AvoidMisleadingDocumentationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_misleading_documentation',
-    problemMessage:
-        '[avoid_misleading_documentation] Documentation does not match the method name or code behavior. Mismatched docs confuse maintainers and lead to incorrect usage. {v4}',
+    'avoid_misleading_documentation',
+    '[avoid_misleading_documentation] Documentation does not match the method name or code behavior. Mismatched docs confuse maintainers and lead to incorrect usage. {v4}',
     correctionMessage:
         'Update documentation to match the method name and actual code behavior. Example: If the method is getUserEmail(), the doc should describe returning the user email, not something else.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final Comment? docComment = node.documentationComment;
       if (docComment == null) return;
 
       final String methodName = node.name.lexeme.toLowerCase();
-      final String docText =
-          docComment.tokens.map((Token t) => t.lexeme).join(' ').toLowerCase();
+      final String docText = docComment.tokens
+          .map((Token t) => t.lexeme)
+          .join(' ')
+          .toLowerCase();
 
       // Check for common mismatches
       if (methodName.contains('get') && docText.contains('sets ')) {
-        reporter.atNode(docComment, code);
+        reporter.atNode(docComment);
       }
       if (methodName.contains('set') &&
           docText.contains('gets ') &&
           !docText.contains('sets ')) {
-        reporter.atNode(docComment, code);
+        reporter.atNode(docComment);
       }
       if (methodName.contains('delete') && docText.contains('creates ')) {
-        reporter.atNode(docComment, code);
+        reporter.atNode(docComment);
       }
       if (methodName.contains('create') && docText.contains('deletes ')) {
-        reporter.atNode(docComment, code);
+        reporter.atNode(docComment);
       }
     });
   }
@@ -181,7 +176,7 @@ class AvoidMisleadingDocumentationRule extends SaropaLintRule {
 /// void oldMethod() { ... }
 /// ```
 class RequireDeprecationMessageRule extends SaropaLintRule {
-  const RequireDeprecationMessageRule() : super(code: _code);
+  RequireDeprecationMessageRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -191,29 +186,23 @@ class RequireDeprecationMessageRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_deprecation_message',
-    problemMessage:
-        '[require_deprecation_message] Deprecated annotation should include migration guidance. Missing documentation makes the API harder to use correctly and increases onboarding time. {v6}',
+    'require_deprecation_message',
+    '[require_deprecation_message] Deprecated annotation should include migration guidance. Missing documentation makes the API harder to use correctly and increases onboarding time. {v6}',
     correctionMessage:
         'Use @Deprecated("message") with explanation of what to use instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
-
-  @override
-  List<Fix> get customFixes => [_UseDeprecatedWithMessageFix()];
-
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAnnotation((Annotation node) {
+    context.addAnnotation((Annotation node) {
       final String name = node.name.name;
 
       // Check for lowercase @deprecated (without message)
       if (name == 'deprecated') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -221,7 +210,7 @@ class RequireDeprecationMessageRule extends SaropaLintRule {
       if (name == 'Deprecated') {
         final ArgumentList? args = node.arguments;
         if (args == null || args.arguments.isEmpty) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
 
@@ -230,37 +219,9 @@ class RequireDeprecationMessageRule extends SaropaLintRule {
         if (msgLower.contains("'deprecated'") ||
             msgLower.contains('"deprecated"') ||
             message.length < 20) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
-    });
-  }
-}
-
-class _UseDeprecatedWithMessageFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addAnnotation((Annotation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.name.name != 'deprecated') return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: "Replace with @Deprecated('...')",
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          "@Deprecated('TODO: Add migration guidance.')",
-        );
-      });
     });
   }
 }
@@ -292,7 +253,7 @@ class _UseDeprecatedWithMessageFix extends DartFix {
 /// }
 /// ```
 class RequireComplexLogicCommentsRule extends SaropaLintRule {
-  const RequireComplexLogicCommentsRule() : super(code: _code);
+  RequireComplexLogicCommentsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -302,23 +263,21 @@ class RequireComplexLogicCommentsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_complex_logic_comments',
-    problemMessage:
-        '[require_complex_logic_comments] Complex method lacks explanatory comments. Complex logic must have comments explaining the reasoning. {v5}',
+    'require_complex_logic_comments',
+    '[require_complex_logic_comments] Complex method lacks explanatory comments. Complex logic must have comments explaining the reasoning. {v5}',
     correctionMessage:
         'Add comments explaining the logic, especially for chained operations. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _complexityThreshold = 3;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final FunctionBody body = node.body;
 
       // Count complexity indicators
@@ -340,7 +299,7 @@ class RequireComplexLogicCommentsRule extends SaropaLintRule {
         final bool hasComments =
             bodySource.contains('//') || bodySource.contains('/*');
         if (!hasComments && node.documentationComment == null) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -369,7 +328,7 @@ class RequireComplexLogicCommentsRule extends SaropaLintRule {
 /// Future<User> createUser(String name, String email, int age) { ... }
 /// ```
 class RequireParameterDocumentationRule extends SaropaLintRule {
-  const RequireParameterDocumentationRule() : super(code: _code);
+  RequireParameterDocumentationRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -379,23 +338,21 @@ class RequireParameterDocumentationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_parameter_documentation',
-    problemMessage:
-        '[require_parameter_documentation] Parameters must be documented. Parameters must be documented to explain their purpose. Parameter documentation is missing for public methods. {v5}',
+    'require_parameter_documentation',
+    '[require_parameter_documentation] Parameters must be documented. Parameters must be documented to explain their purpose. Parameter documentation is missing for public methods. {v5}',
     correctionMessage:
         'Add [paramName] documentation for each parameter. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _paramThreshold = 2;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Skip private methods
       if (node.name.lexeme.startsWith('_')) return;
 
@@ -408,15 +365,16 @@ class RequireParameterDocumentationRule extends SaropaLintRule {
       final Comment? docComment = node.documentationComment;
       if (docComment == null) return;
 
-      final String docText =
-          docComment.tokens.map((Token t) => t.lexeme).join(' ');
+      final String docText = docComment.tokens
+          .map((Token t) => t.lexeme)
+          .join(' ');
 
       // Check if parameters are documented
       for (final FormalParameter param in params.parameters) {
         final String? paramName = _getParameterName(param);
         if (paramName != null && !paramName.startsWith('_')) {
           if (!docText.contains('[$paramName]')) {
-            reporter.atNode(param, code);
+            reporter.atNode(param);
           }
         }
       }
@@ -456,7 +414,7 @@ class RequireParameterDocumentationRule extends SaropaLintRule {
 /// OrderResult processOrder(Order order) { ... }
 /// ```
 class RequireReturnDocumentationRule extends SaropaLintRule {
-  const RequireReturnDocumentationRule() : super(code: _code);
+  RequireReturnDocumentationRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -466,21 +424,19 @@ class RequireReturnDocumentationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_return_documentation',
-    problemMessage:
-        '[require_return_documentation] Return value must be documented. Non-void methods should document what they return. Return value documentation is missing. {v4}',
+    'require_return_documentation',
+    '[require_return_documentation] Return value must be documented. Non-void methods should document what they return. Return value documentation is missing. {v4}',
     correctionMessage:
         'Add documentation explaining what the method returns. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Skip private methods
       if (node.name.lexeme.startsWith('_')) return;
 
@@ -497,12 +453,14 @@ class RequireReturnDocumentationRule extends SaropaLintRule {
       final Comment? docComment = node.documentationComment;
       if (docComment == null) return;
 
-      final String docText =
-          docComment.tokens.map((Token t) => t.lexeme).join(' ').toLowerCase();
+      final String docText = docComment.tokens
+          .map((Token t) => t.lexeme)
+          .join(' ')
+          .toLowerCase();
 
       // Check for return documentation
       if (!docText.contains('return') && !docText.contains('yields')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -532,7 +490,7 @@ class RequireReturnDocumentationRule extends SaropaLintRule {
 /// User getUser(String id) { ... }
 /// ```
 class RequireExceptionDocumentationRule extends SaropaLintRule {
-  const RequireExceptionDocumentationRule() : super(code: _code);
+  RequireExceptionDocumentationRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -542,21 +500,19 @@ class RequireExceptionDocumentationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_exception_documentation',
-    problemMessage:
-        '[require_exception_documentation] Thrown exceptions must be documented. Methods that throw should document the exceptions. Exception documentation is missing. {v4}',
+    'require_exception_documentation',
+    '[require_exception_documentation] Thrown exceptions must be documented. Methods that throw should document the exceptions. Exception documentation is missing. {v4}',
     correctionMessage:
         'Add "Throws [ExceptionType]" to documentation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Skip private methods
       if (node.name.lexeme.startsWith('_')) return;
 
@@ -568,16 +524,18 @@ class RequireExceptionDocumentationRule extends SaropaLintRule {
 
       final Comment? docComment = node.documentationComment;
       if (docComment == null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
-      final String docText =
-          docComment.tokens.map((Token t) => t.lexeme).join(' ').toLowerCase();
+      final String docText = docComment.tokens
+          .map((Token t) => t.lexeme)
+          .join(' ')
+          .toLowerCase();
 
       // Check for throw documentation
       if (!docText.contains('throw')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -607,7 +565,7 @@ class RequireExceptionDocumentationRule extends SaropaLintRule {
 /// class UserRepository { ... }
 /// ```
 class RequireExampleInDocumentationRule extends SaropaLintRule {
-  const RequireExampleInDocumentationRule() : super(code: _code);
+  RequireExampleInDocumentationRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -617,12 +575,11 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_example_in_documentation',
-    problemMessage:
-        '[require_example_in_documentation] Public class documentation should include an example. Complex classes benefit from example usage in their docs. {v4}',
+    'require_example_in_documentation',
+    '[require_example_in_documentation] Public class documentation should include an example. Complex classes benefit from example usage in their docs. {v4}',
     correctionMessage:
         'Add an example code block showing typical usage. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _complexClassSuffixes = <String>{
@@ -638,11 +595,10 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Skip private classes
       if (node.name.lexeme.startsWith('_')) return;
 
@@ -660,12 +616,13 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
       final Comment? docComment = node.documentationComment;
       if (docComment == null) return;
 
-      final String docText =
-          docComment.tokens.map((Token t) => t.lexeme).join(' ');
+      final String docText = docComment.tokens
+          .map((Token t) => t.lexeme)
+          .join(' ');
 
       // Check for example code block
       if (!docText.contains('```') && !docText.contains('Example')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -694,7 +651,7 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
 /// Future<bool> fileRestore(String filePath) async { ... }
 /// ```
 class VerifyDocumentedParametersExistRule extends SaropaLintRule {
-  const VerifyDocumentedParametersExistRule() : super(code: _code);
+  VerifyDocumentedParametersExistRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -704,27 +661,25 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'verify_documented_parameters_exist',
-    problemMessage:
-        '[verify_documented_parameters_exist] Documentation references '
+    'verify_documented_parameters_exist',
+    '[verify_documented_parameters_exist] Documentation references '
         'a parameter that does not exist in the signature. {v3}',
     correctionMessage:
         'Remove the stale parameter reference or update it to match '
         'an actual parameter name.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Creates a [LintCode] with the specific ghost parameter name.
   static LintCode _codeForName(String name) => LintCode(
-        name: 'verify_documented_parameters_exist',
-        problemMessage:
-            '[verify_documented_parameters_exist] Documentation references '
-            "'[$name]' which does not exist in the signature. {v3}",
-        correctionMessage:
-            'Remove the stale parameter reference or update it to match '
-            'an actual parameter name.',
-        errorSeverity: DiagnosticSeverity.WARNING,
-      );
+    'verify_documented_parameters_exist',
+    '[verify_documented_parameters_exist] Documentation references '
+        "'[$name]' which does not exist in the signature. {v3}",
+    correctionMessage:
+        'Remove the stale parameter reference or update it to match '
+        'an actual parameter name.',
+    severity: DiagnosticSeverity.WARNING,
+  );
 
   /// Pattern to extract `[bracketedName]` from doc comments.
   ///
@@ -742,11 +697,10 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       _checkDeclaration(
         docComment: node.documentationComment,
         parameters: node.parameters,
@@ -755,7 +709,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
       );
     });
 
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       _checkDeclaration(
         docComment: node.documentationComment,
         parameters: node.functionExpression.parameters,
@@ -763,7 +717,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
       );
     });
 
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
       _checkDeclaration(
         docComment: node.documentationComment,
         parameters: node.parameters,
@@ -786,8 +740,9 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
     final Set<String> classFieldNames = _extractClassFieldNames(enclosingClass);
 
     // Joined text for semantic context (e.g. bullet/keyword detection).
-    final String docText =
-        docComment.tokens.map((Token t) => t.lexeme).join('\n');
+    final String docText = docComment.tokens
+        .map((Token t) => t.lexeme)
+        .join('\n');
 
     // Iterate per-token so reported offsets map to the correct source line.
     // Joining tokens into a single string loses inter-line gaps (non-doc
@@ -795,8 +750,9 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
     int docTextOffset = 0;
     for (final Token token in docComment.tokens) {
       final String lexeme = token.lexeme;
-      for (final RegExpMatch match
-          in _bracketedNamePattern.allMatches(lexeme)) {
+      for (final RegExpMatch match in _bracketedNamePattern.allMatches(
+        lexeme,
+      )) {
         final String name = match.group(1)!;
 
         if (paramNames.contains(name)) continue;
@@ -824,11 +780,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
 
   /// Returns true when the context around `[Name]` at [start]..[end] in
   /// [docText] confirms it is a parameter reference, not a type reference.
-  bool _isConfirmedParameterRef(
-    String docText,
-    int start,
-    int end,
-  ) {
+  bool _isConfirmedParameterRef(String docText, int start, int end) {
     // Bullet-style: `/// - [Name]`
     if (start >= 2) {
       final String before = docText.substring(start - 2, start).trimLeft();

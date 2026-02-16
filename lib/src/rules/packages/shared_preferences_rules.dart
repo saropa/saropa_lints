@@ -7,9 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -46,7 +43,7 @@ import '../../saropa_lint_rule.dart';
 /// prefs.setString('locale', 'en_US');
 /// ```
 class AvoidPrefsForLargeDataRule extends SaropaLintRule {
-  const AvoidPrefsForLargeDataRule() : super(code: _code);
+  AvoidPrefsForLargeDataRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -56,21 +53,19 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_prefs_for_large_data',
-    problemMessage:
-        '[avoid_prefs_for_large_data] SharedPreferences loads its entire file into memory on first access, making it unsuitable for large datasets. Storing collections or large JSON blobs here causes slow app startup, excessive memory consumption, UI freezes, and potential data corruption on write failures. {v3}',
+    'avoid_prefs_for_large_data',
+    '[avoid_prefs_for_large_data] SharedPreferences loads its entire file into memory on first access, making it unsuitable for large datasets. Storing collections or large JSON blobs here causes slow app startup, excessive memory consumption, UI freezes, and potential data corruption on write failures. {v3}',
     correctionMessage:
         'Use a database such as Hive, Isar, or SQLite for collections and large data. Reserve SharedPreferences for small, simple settings like booleans and locale strings.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for setStringList which is often misused for large data
@@ -106,7 +101,7 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
         ];
 
         if (largeDataPatterns.any((String p) => keySource.contains(p))) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -137,7 +132,7 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
 /// prefs.setString('theme', 'dark'); // Now prefixed as 'myapp_theme'
 /// ```
 class RequireSharedPrefsPrefixRule extends SaropaLintRule {
-  const RequireSharedPrefsPrefixRule() : super(code: _code);
+  RequireSharedPrefsPrefixRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -146,22 +141,20 @@ class RequireSharedPrefsPrefixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_shared_prefs_prefix',
-    problemMessage:
-        '[require_shared_prefs_prefix] SharedPreferences usage detected. '
+    'require_shared_prefs_prefix',
+    '[require_shared_prefs_prefix] SharedPreferences usage detected. '
         'Consider calling SharedPreferences.setPrefix() to avoid key conflicts. {v2}',
     correctionMessage:
         'Call SharedPreferences.setPrefix("myapp_") at app startup.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final target = node.target;
       if (target is! SimpleIdentifier) return;
       if (target.name != 'SharedPreferences') return;
@@ -169,7 +162,7 @@ class RequireSharedPrefsPrefixRule extends SaropaLintRule {
       // Check for getInstance() without setPrefix
       if (node.methodName.name == 'getInstance') {
         // This is an INFO-level reminder
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -198,7 +191,7 @@ class RequireSharedPrefsPrefixRule extends SaropaLintRule {
 /// await prefs.setString('key', 'value');
 /// ```
 class PreferSharedPrefsAsyncApiRule extends SaropaLintRule {
-  const PreferSharedPrefsAsyncApiRule() : super(code: _code);
+  PreferSharedPrefsAsyncApiRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -207,28 +200,26 @@ class PreferSharedPrefsAsyncApiRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_shared_prefs_async_api',
-    problemMessage:
-        '[prefer_shared_prefs_async_api] Legacy SharedPreferences.getInstance() '
+    'prefer_shared_prefs_async_api',
+    '[prefer_shared_prefs_async_api] Legacy SharedPreferences.getInstance() '
         'detected. Consider using SharedPreferencesAsync for new code. {v2}',
     correctionMessage:
         'Use SharedPreferencesAsync() instead of SharedPreferences.getInstance().',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final target = node.target;
       if (target is! SimpleIdentifier) return;
       if (target.name != 'SharedPreferences') return;
 
       if (node.methodName.name == 'getInstance') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -260,7 +251,7 @@ class PreferSharedPrefsAsyncApiRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidSharedPrefsInIsolateRule extends SaropaLintRule {
-  const AvoidSharedPrefsInIsolateRule() : super(code: _code);
+  AvoidSharedPrefsInIsolateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -269,22 +260,20 @@ class AvoidSharedPrefsInIsolateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_shared_prefs_in_isolate',
-    problemMessage:
-        '[avoid_shared_prefs_in_isolate] SharedPreferences used in isolate context. '
+    'avoid_shared_prefs_in_isolate',
+    '[avoid_shared_prefs_in_isolate] SharedPreferences used in isolate context. '
         'SharedPreferences does not work in isolates. {v2}',
     correctionMessage:
         'Pass required data through SendPort/ReceivePort instead.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final target = node.target;
       if (target is! SimpleIdentifier) return;
       if (target.name != 'SharedPreferences') return;
@@ -292,7 +281,7 @@ class AvoidSharedPrefsInIsolateRule extends SaropaLintRule {
       if (node.methodName.name == 'getInstance') {
         // Check if inside an isolate context
         if (_isInsideIsolateContext(node)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -389,7 +378,7 @@ class AvoidSharedPrefsInIsolateRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferTypedPrefsWrapperRule extends SaropaLintRule {
-  const PreferTypedPrefsWrapperRule() : super(code: _code);
+  PreferTypedPrefsWrapperRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -398,22 +387,20 @@ class PreferTypedPrefsWrapperRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_typed_prefs_wrapper',
-    problemMessage:
-        '[prefer_typed_prefs_wrapper] Direct SharedPreferences access with '
+    'prefer_typed_prefs_wrapper',
+    '[prefer_typed_prefs_wrapper] Direct SharedPreferences access with '
         'string literal key. Scattered keys are error-prone. {v2}',
     correctionMessage:
         'Create a typed wrapper class with properties for each preference.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for SharedPreferences set/get methods
@@ -437,7 +424,7 @@ class PreferTypedPrefsWrapperRule extends SaropaLintRule {
       final Expression keyArg = args.first;
       if (keyArg is SimpleStringLiteral) {
         // Direct string literal - suggests not using a wrapper
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -468,7 +455,7 @@ class PreferTypedPrefsWrapperRule extends SaropaLintRule {
 /// await secureStorage.write(key: 'session_id', value: sessionId);
 /// ```
 class AvoidAuthStateInPrefsRule extends SaropaLintRule {
-  const AvoidAuthStateInPrefsRule() : super(code: _code);
+  AvoidAuthStateInPrefsRule() : super(code: _code);
 
   /// Auth tokens in SharedPreferences are stored as plain text.
   /// Each occurrence exposes credentials on rooted devices.
@@ -480,18 +467,17 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m9},
-        web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m9},
+    web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_auth_state_in_prefs',
-    problemMessage:
-        '[avoid_auth_state_in_prefs] SharedPreferences stores tokens in '
+    'avoid_auth_state_in_prefs',
+    '[avoid_auth_state_in_prefs] SharedPreferences stores tokens in '
         'plaintext, exposing credentials on rooted devices or backups. {v2}',
     correctionMessage:
         'Use flutter_secure_storage or platform keychain for sensitive data.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _sensitiveKeys = <String>{
@@ -512,11 +498,10 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for SharedPreferences set methods
@@ -542,40 +527,10 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
       final String keySource = args.arguments.first.toSource().toLowerCase();
       for (final String sensitive in _sensitiveKeys) {
         if (keySource.contains(sensitive)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddSecureStorageTodoFix()];
-}
-
-class _AddSecureStorageTodoFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Use flutter_secure_storage instead',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Use flutter_secure_storage for auth tokens\n',
-        );
-      });
     });
   }
 }
@@ -606,7 +561,7 @@ class _AddSecureStorageTodoFix extends DartFix {
 /// // Or use encrypted_shared_preferences
 /// ```
 class PreferEncryptedPrefsRule extends SaropaLintRule {
-  const PreferEncryptedPrefsRule() : super(code: _code);
+  PreferEncryptedPrefsRule() : super(code: _code);
 
   /// Sensitive data in SharedPreferences is unencrypted.
   /// Each occurrence exposes personal data.
@@ -618,18 +573,17 @@ class PreferEncryptedPrefsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m9},
-        web: <OwaspWeb>{OwaspWeb.a02},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m9},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'prefer_encrypted_prefs',
-    problemMessage:
-        '[prefer_encrypted_prefs] Unencrypted sensitive data is exposed via '
+    'prefer_encrypted_prefs',
+    '[prefer_encrypted_prefs] Unencrypted sensitive data is exposed via '
         'device backup, file browser, or rooted device access. {v2}',
     correctionMessage:
         'Use flutter_secure_storage or encrypted_shared_preferences.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _sensitivePatterns = <String>{
@@ -653,11 +607,10 @@ class PreferEncryptedPrefsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (!methodName.startsWith('set') && !methodName.startsWith('get')) {
@@ -678,40 +631,10 @@ class PreferEncryptedPrefsRule extends SaropaLintRule {
       final String keySource = args.arguments.first.toSource().toLowerCase();
       for (final String sensitive in _sensitivePatterns) {
         if (keySource.contains(sensitive)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddEncryptedPrefsTodoFix()];
-}
-
-class _AddEncryptedPrefsTodoFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Use encrypted storage',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Use flutter_secure_storage or encrypted_shared_preferences\n',
-        );
-      });
     });
   }
 }
@@ -742,7 +665,7 @@ class _AddEncryptedPrefsTodoFix extends DartFix {
 /// await secureStorage.write(key: 'auth_token', value: jwt);
 /// ```
 class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
-  const AvoidSharedPrefsSensitiveDataRule() : super(code: _code);
+  AvoidSharedPrefsSensitiveDataRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -752,18 +675,17 @@ class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m9},
-        web: <OwaspWeb>{OwaspWeb.a02},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m9},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'avoid_shared_prefs_sensitive_data',
-    problemMessage:
-        '[avoid_shared_prefs_sensitive_data] SharedPreferences stores data '
+    'avoid_shared_prefs_sensitive_data',
+    '[avoid_shared_prefs_sensitive_data] SharedPreferences stores data '
         'as plaintext XML, readable via backup extraction or rooted device. {v3}',
     correctionMessage:
         'Use flutter_secure_storage for passwords, tokens, and API keys.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _sensitiveKeys = <String>{
@@ -790,11 +712,10 @@ class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check SharedPreferences setter methods
@@ -819,40 +740,10 @@ class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
 
       for (final String sensitiveKey in _sensitiveKeys) {
         if (keySource.contains(sensitiveKey)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UseSecureStorageFix()];
-}
-
-class _UseSecureStorageFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK: Use flutter_secure_storage',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Replace with FlutterSecureStorage().write()\n',
-        );
-      });
     });
   }
 }
@@ -880,7 +771,7 @@ class _UseSecureStorageFix extends DartFix {
 /// final String name = prefs.getString('name') ?? 'default';
 /// ```
 class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
-  const RequireSharedPrefsNullHandlingRule() : super(code: _code);
+  RequireSharedPrefsNullHandlingRule() : super(code: _code);
 
   /// Null assertion on SharedPreferences getter causes runtime crash
   /// when key doesn't exist - a common source of production crashes.
@@ -891,12 +782,11 @@ class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_shared_prefs_null_handling',
-    problemMessage:
-        '[require_shared_prefs_null_handling] SharedPreferences getter with null assertion (!) crashes with a NoSuchMethodError if the key does not exist. This is a common source of production crashes on first launch, after app updates that add new preference keys, or when storage is cleared by the OS under memory pressure. {v3}',
+    'require_shared_prefs_null_handling',
+    '[require_shared_prefs_null_handling] SharedPreferences getter with null assertion (!) crashes with a NoSuchMethodError if the key does not exist. This is a common source of production crashes on first launch, after app updates that add new preference keys, or when storage is cleared by the OS under memory pressure. {v3}',
     correctionMessage:
         'Use the null-aware operator (??) with a sensible default value, or handle the nullable return type explicitly to prevent null assertion crashes in production.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _getterMethods = <String>{
@@ -909,11 +799,10 @@ class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPostfixExpression((PostfixExpression node) {
+    context.addPostfixExpression((PostfixExpression node) {
       // Check for ! operator
       if (node.operator.lexeme != '!') return;
 
@@ -930,7 +819,7 @@ class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
       final String targetSource = target.toSource().toLowerCase();
       if (targetSource.contains('pref') ||
           targetSource.contains('sharedpreferences')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -960,7 +849,7 @@ class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
 /// prefs.setInt(PrefsKeys.loginCount, count);
 /// ```
 class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
-  const RequireSharedPrefsKeyConstantsRule() : super(code: _code);
+  RequireSharedPrefsKeyConstantsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -969,12 +858,11 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_shared_prefs_key_constants',
-    problemMessage:
-        '[require_shared_prefs_key_constants] String literal used as SharedPreferences key. Use named constants. Using string literals for keys is error-prone and makes refactoring difficult. Define keys as constants for type safety and easier maintenance. {v4}',
+    'require_shared_prefs_key_constants',
+    '[require_shared_prefs_key_constants] String literal used as SharedPreferences key. Use named constants. Using string literals for keys is error-prone and makes refactoring difficult. Define keys as constants for type safety and easier maintenance. {v4}',
     correctionMessage:
         'Define keys as constants (e.g., static const kUserName = "user_name"). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _prefsMethods = <String>{
@@ -994,11 +882,10 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_prefsMethods.contains(methodName)) return;
 
@@ -1018,7 +905,7 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
 
       final Expression keyArg = args.first;
       if (keyArg is SimpleStringLiteral || keyArg is AdjacentStrings) {
-        reporter.atNode(keyArg, code);
+        reporter.atNode(keyArg);
       }
     });
   }
@@ -1050,7 +937,7 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
 /// await box.put('user_data', largeObject);
 /// ```
 class AvoidSharedPrefsLargeDataRule extends SaropaLintRule {
-  const AvoidSharedPrefsLargeDataRule() : super(code: _code);
+  AvoidSharedPrefsLargeDataRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1059,12 +946,11 @@ class AvoidSharedPrefsLargeDataRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_shared_prefs_large_data',
-    problemMessage:
-        '[avoid_shared_prefs_large_data] SharedPreferences setString called with serialized data (jsonEncode, json.encode, toJson, toString). SharedPreferences loads the entire XML/plist file into memory on first access. Storing JSON blobs or serialized objects wastes memory, degrades app startup time, and risks exceeding platform limits. Use a proper database (Hive, Isar, sqflite) for structured or large data. {v1}',
+    'avoid_shared_prefs_large_data',
+    '[avoid_shared_prefs_large_data] SharedPreferences setString called with serialized data (jsonEncode, json.encode, toJson, toString). SharedPreferences loads the entire XML/plist file into memory on first access. Storing JSON blobs or serialized objects wastes memory, degrades app startup time, and risks exceeding platform limits. Use a proper database (Hive, Isar, sqflite) for structured or large data. {v1}',
     correctionMessage:
         'Use a local database (Hive, Isar, or sqflite) for storing serialized objects. SharedPreferences is intended for simple key-value pairs like booleans, small strings, and numbers.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Patterns in the value argument that indicate serialized data.
@@ -1080,11 +966,10 @@ class AvoidSharedPrefsLargeDataRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'setString' && methodName != 'setStringList') return;
 
@@ -1105,7 +990,7 @@ class AvoidSharedPrefsLargeDataRule extends SaropaLintRule {
       final String valueSource = args[1].toSource();
       for (final String pattern in _serializationPatterns) {
         if (valueSource.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }

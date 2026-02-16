@@ -114,7 +114,7 @@ class InfoPlistChecker {
     if (_infoPlistContent == null) return true;
 
     // Check for the key in plist format: <key>NSCameraUsageDescription</key>
-    return _infoPlistContent!.contains('<key>$key</key>');
+    return _infoPlistContent.contains('<key>$key</key>');
   }
 
   /// Checks if the Info.plist contains all specified [keys].

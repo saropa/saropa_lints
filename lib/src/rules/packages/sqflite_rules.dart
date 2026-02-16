@@ -7,8 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -50,7 +48,7 @@ import '../../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidSqfliteTypeMismatchRule extends SaropaLintRule {
-  const AvoidSqfliteTypeMismatchRule() : super(code: _code);
+  AvoidSqfliteTypeMismatchRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -59,13 +57,12 @@ class AvoidSqfliteTypeMismatchRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_sqflite_type_mismatch',
-    problemMessage:
-        '[avoid_sqflite_type_mismatch] SQLite type may not match Dart type. '
+    'avoid_sqflite_type_mismatch',
+    '[avoid_sqflite_type_mismatch] SQLite type may not match Dart type. '
         'Booleans are stored as INTEGER (0/1), DateTime as TEXT/INTEGER. {v2}',
     correctionMessage:
         'Convert types explicitly: bool = row["col"] == 1; DateTime = DateTime.parse(row["col"]).',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Column names that suggest boolean values
@@ -99,11 +96,10 @@ class AvoidSqfliteTypeMismatchRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIndexExpression((IndexExpression node) {
+    context.addIndexExpression((IndexExpression node) {
       // Check for row['column'] pattern
       final Expression? target = node.target;
       if (target == null) return;
@@ -156,11 +152,11 @@ class AvoidSqfliteTypeMismatchRule extends SaropaLintRule {
           final String? typeAnnotation = varList.type?.toSource();
           if (typeAnnotation != null) {
             if (isBoolColumn && typeAnnotation == 'bool') {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
             if (isDateColumn && typeAnnotation == 'DateTime') {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -178,7 +174,7 @@ class AvoidSqfliteTypeMismatchRule extends SaropaLintRule {
         if (parent is AsExpression) {
           final String castType = parent.type.toSource();
           if (castType == 'bool') {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
           return;
         }
@@ -205,7 +201,7 @@ class AvoidSqfliteTypeMismatchRule extends SaropaLintRule {
     });
 
     // Also check CREATE TABLE statements for documentation
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for execute/rawQuery with CREATE TABLE

@@ -7,9 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -39,7 +36,7 @@ import '../saropa_lint_rule.dart';
 ///
 /// **Quick fix available:** Adds a review comment for manual attention.
 class AvoidDoubleForMoneyRule extends SaropaLintRule {
-  const AvoidDoubleForMoneyRule() : super(code: _code);
+  AvoidDoubleForMoneyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -48,12 +45,11 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_double_for_money',
-    problemMessage:
-        '[avoid_double_for_money] Floating point causes rounding errors in '
+    'avoid_double_for_money',
+    '[avoid_double_for_money] Floating point causes rounding errors in '
         r'money calculations. $0.1 + $0.2 != $0.3, causing financial loss. {v4}',
     correctionMessage: 'Store money as int cents or use a Decimal package.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Only unambiguous money-related terms, matched as complete words.
@@ -79,16 +75,15 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       // Check type
       final VariableDeclarationList? parent =
           node.parent is VariableDeclarationList
-              ? node.parent as VariableDeclarationList
-              : null;
+          ? node.parent as VariableDeclarationList
+          : null;
       if (parent == null) return;
 
       final String? typeName = parent.type?.toSource();
@@ -97,18 +92,18 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
       // Check variable name for money indicators
       final String varName = node.name.lexeme;
       if (_containsMoneyIndicator(varName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       final String? typeName = node.fields.type?.toSource();
       if (typeName != 'double' && typeName != 'double?') return;
 
       for (final VariableDeclaration variable in node.fields.variables) {
         final String varName = variable.name.lexeme;
         if (_containsMoneyIndicator(varName)) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
@@ -147,52 +142,6 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
     }
 
     return false;
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddMoneyHackCommentFix()];
-}
-
-class _AddMoneyHackCommentFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for manual review',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* HACK: Use int cents or Decimal for money */ ',
-        );
-      });
-    });
-
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for manual review',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: Use int cents or Decimal for money\n  ',
-        );
-      });
-    });
   }
 }
 
@@ -236,7 +185,7 @@ class _AddMoneyHackCommentFix extends DartFix {
 /// }
 /// ```
 class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
-  const RequireCurrencyCodeWithAmountRule() : super(code: _code);
+  RequireCurrencyCodeWithAmountRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -245,12 +194,11 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_currency_code_with_amount',
-    problemMessage:
-        '[require_currency_code_with_amount] Money amount without currency information. Amounts without currency are ambiguous. Always pair amounts with currency codes. This monetary calculation can produce rounding errors that accumulate, causing financial discrepancies. {v2}',
+    'require_currency_code_with_amount',
+    '[require_currency_code_with_amount] Money amount without currency information. Amounts without currency are ambiguous. Always pair amounts with currency codes. This monetary calculation can produce rounding errors that accumulate, causing financial discrepancies. {v2}',
     correctionMessage:
         'Add currency field (String currency or CurrencyCode enum) alongside amount. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static final RegExp _moneyFieldPattern = RegExp(
@@ -260,11 +208,10 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
       // Skip if class name suggests it already handles currency
@@ -303,7 +250,7 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
       }
 
       if (hasMoneyField && !hasCurrencyField) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }

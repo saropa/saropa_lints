@@ -1,8 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when file read operations are used without exists() check or try-catch.
@@ -30,7 +28,7 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 /// }
 /// ```
 class RequireFileExistsCheckRule extends SaropaLintRule {
-  const RequireFileExistsCheckRule() : super(code: _code);
+  RequireFileExistsCheckRule() : super(code: _code);
 
   /// Important for robust file handling.
   @override
@@ -40,12 +38,11 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_file_exists_check',
-    problemMessage:
-        '[require_file_exists_check] File read operation should check exists() or use try-catch. File operations on non-existent files throw exceptions. Always verify the file exists or wrap in try-catch to handle missing files gracefully. {v2}',
+    'require_file_exists_check',
+    '[require_file_exists_check] File read operation should check exists() or use try-catch. File operations on non-existent files throw exceptions. Always verify the file exists or wrap in try-catch to handle missing files gracefully. {v2}',
     correctionMessage:
         'Wrap in if (await file.exists()) or try-catch block. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _fileReadMethods = <String>{
@@ -60,11 +57,10 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_fileReadMethods.contains(methodName)) return;
 
@@ -139,7 +135,7 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
 /// }
 /// ```
 class RequirePdfErrorHandlingRule extends SaropaLintRule {
-  const RequirePdfErrorHandlingRule() : super(code: _code);
+  RequirePdfErrorHandlingRule() : super(code: _code);
 
   /// Important for robust PDF handling.
   @override
@@ -149,12 +145,11 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_pdf_error_handling',
-    problemMessage:
-        '[require_pdf_error_handling] PDF loading operation lacks try-catch error handling. PDF files can be corrupted, missing, or have invalid format. Without error handling, failures crash the application instead of showing user-friendly error messages. {v3}',
+    'require_pdf_error_handling',
+    '[require_pdf_error_handling] PDF loading operation lacks try-catch error handling. PDF files can be corrupted, missing, or have invalid format. Without error handling, failures crash the application instead of showing user-friendly error messages. {v3}',
     correctionMessage:
         'Wrap the PDF loading call in a try-catch block to handle FormatException, FileSystemException, and other errors gracefully. Display appropriate user feedback and prevent app crashes when PDF loading fails.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _pdfLoadMethods = <String>{
@@ -173,17 +168,12 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
     'PDFView',
     'PdfViewer',
   };
-
-  @override
-  List<Fix> get customFixes => [WrapInTryCatchFix()];
-
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_pdfLoadMethods.contains(methodName)) return;
 
@@ -245,7 +235,7 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
 /// final data = result.data!['users'];
 /// ```
 class RequireGraphqlErrorHandlingRule extends SaropaLintRule {
-  const RequireGraphqlErrorHandlingRule() : super(code: _code);
+  RequireGraphqlErrorHandlingRule() : super(code: _code);
 
   /// Critical for robust GraphQL apps.
   @override
@@ -255,12 +245,11 @@ class RequireGraphqlErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_graphql_error_handling',
-    problemMessage:
-        '[require_graphql_error_handling] GraphQL query and mutation results must check hasException before accessing data. Failing to check for errors can cause runtime crashes, display incomplete or misleading data, and make debugging difficult. This is a common source of silent failures and poor user experience in apps using GraphQL. {v3}',
+    'require_graphql_error_handling',
+    '[require_graphql_error_handling] GraphQL query and mutation results must check hasException before accessing data. Failing to check for errors can cause runtime crashes, display incomplete or misleading data, and make debugging difficult. This is a common source of silent failures and poor user experience in apps using GraphQL. {v3}',
     correctionMessage:
         'Always check result.hasException before accessing result.data. Handle errors gracefully, provide user feedback, and log exceptions for troubleshooting.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// GraphQL result type names from graphql_flutter and similar packages.
@@ -273,11 +262,10 @@ class RequireGraphqlErrorHandlingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       // Check for .data access
       if (node.propertyName.name != 'data') return;
 
@@ -343,7 +331,7 @@ class RequireGraphqlErrorHandlingRule extends SaropaLintRule {
 /// db.rawQuery('SELECT * FROM users WHERE name = ?', [name]);
 /// ```
 class RequireSqfliteWhereArgsRule extends SaropaLintRule {
-  const RequireSqfliteWhereArgsRule() : super(code: _code);
+  RequireSqfliteWhereArgsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -352,12 +340,11 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_sqflite_whereargs',
-    problemMessage:
-        '[require_sqflite_whereargs] SQL queries using string interpolation are vulnerable to SQL injection attacks. User input can modify queries, leak data, or corrupt the database. Always use whereArgs to safely pass parameters. {v3}',
+    'require_sqflite_whereargs',
+    '[require_sqflite_whereargs] SQL queries using string interpolation are vulnerable to SQL injection attacks. User input can modify queries, leak data, or corrupt the database. Always use whereArgs to safely pass parameters. {v3}',
     correctionMessage:
         'Replace string interpolation in SQL queries with whereArgs to prevent injection and ensure query safety.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _sqlMethods = <String>{
@@ -372,11 +359,10 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_sqlMethods.contains(methodName)) return;
 
@@ -398,19 +384,19 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
           final String paramName = arg.name.label.name;
           if (paramName == 'where' || paramName == 'sql') {
             if (_hasInterpolation(arg.expression)) {
-              reporter.atNode(arg, code);
+              reporter.atNode(arg);
               return;
             }
           }
         }
         // Check positional arguments (for rawQuery, etc.)
         else if (arg is StringInterpolation) {
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
           return;
         } else if (arg is AdjacentStrings) {
           for (final StringLiteral part in arg.strings) {
             if (part is StringInterpolation) {
-              reporter.atNode(arg, code);
+              reporter.atNode(arg);
               return;
             }
           }
@@ -455,7 +441,7 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
 /// });
 /// ```
 class RequireSqfliteTransactionRule extends SaropaLintRule {
-  const RequireSqfliteTransactionRule() : super(code: _code);
+  RequireSqfliteTransactionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -464,12 +450,11 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_sqflite_transaction',
-    problemMessage:
-        '[require_sqflite_transaction] Multiple sequential writes should use transaction for atomicity. Multiple sequential writes should use transactions for atomicity and better performance. {v2}',
+    'require_sqflite_transaction',
+    '[require_sqflite_transaction] Multiple sequential writes should use transaction for atomicity. Multiple sequential writes should use transactions for atomicity and better performance. {v2}',
     correctionMessage:
         'Wrap writes in db.transaction() to improve performance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _writeMethods = <String>{
@@ -483,11 +468,10 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((Block node) {
+    context.addBlock((Block node) {
       // Count database write operations in this block
       int writeCount = 0;
       MethodInvocation? firstWrite;
@@ -564,7 +548,7 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
-  const RequireSqfliteErrorHandlingRule() : super(code: _code);
+  RequireSqfliteErrorHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -573,12 +557,11 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_sqflite_error_handling',
-    problemMessage:
-        '[require_sqflite_error_handling] All database operations (insert, update, query, etc.) must handle errors such as disk full, corruption, or constraint violations. Unhandled database errors will crash the app, cause data loss, and make recovery difficult. This is a critical reliability and data integrity issue. {v5}',
+    'require_sqflite_error_handling',
+    '[require_sqflite_error_handling] All database operations (insert, update, query, etc.) must handle errors such as disk full, corruption, or constraint violations. Unhandled database errors will crash the app, cause data loss, and make recovery difficult. This is a critical reliability and data integrity issue. {v5}',
     correctionMessage:
         'Wrap all database operations in try-catch blocks to handle DatabaseException and related errors. Provide user feedback and fallback logic to maintain app stability.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _dbMethods = <String>{
@@ -592,17 +575,12 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
     'rawDelete',
     'execute',
   };
-
-  @override
-  List<Fix> get customFixes => [WrapInTryCatchFix()];
-
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_dbMethods.contains(methodName)) return;
 
@@ -626,7 +604,7 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
         current = current.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -653,7 +631,7 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
 /// await batch.commit();
 /// ```
 class PreferSqfliteBatchRule extends SaropaLintRule {
-  const PreferSqfliteBatchRule() : super(code: _code);
+  PreferSqfliteBatchRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -662,29 +640,27 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sqflite_batch',
-    problemMessage:
-        '[prefer_sqflite_batch] Database insert in loop reduces throughput by 10-100x. Inserting rows one at a time is slow. Use batch operations for bulk inserts. Sqflite uses individual inserts in a loop instead of batch. {v3}',
+    'prefer_sqflite_batch',
+    '[prefer_sqflite_batch] Database insert in loop reduces throughput by 10-100x. Inserting rows one at a time is slow. Use batch operations for bulk inserts. Sqflite uses individual inserts in a loop instead of batch. {v3}',
     correctionMessage:
         'Use db.batch() with batch.insert() and batch.commit(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addForStatement((ForStatement node) {
+    context.addForStatement((ForStatement node) {
       _checkLoopBody(node.body, reporter);
     });
 
-    context.registry.addForElement((ForElement node) {
+    context.addForElement((ForElement node) {
       // ForElement is in list literals, less common for DB operations
     });
 
-    context.registry.addWhileStatement((WhileStatement node) {
+    context.addWhileStatement((WhileStatement node) {
       _checkLoopBody(node.body, reporter);
     });
   }
@@ -700,14 +676,16 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
       if (targetSource.contains('db') || targetSource.contains('database')) {
         // Check it's not already a batch
         if (!targetSource.contains('batch')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
   }
 
   void _visitStatements(
-      AstNode node, void Function(MethodInvocation) callback) {
+    AstNode node,
+    void Function(MethodInvocation) callback,
+  ) {
     if (node is MethodInvocation) {
       callback(node);
     }
@@ -742,7 +720,7 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireSqfliteCloseRule extends SaropaLintRule {
-  const RequireSqfliteCloseRule() : super(code: _code);
+  RequireSqfliteCloseRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -751,22 +729,20 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_sqflite_close',
-    problemMessage:
-        '[require_sqflite_close] Database connections must be closed when no longer needed. Leaving databases open causes resource leaks, file locks, and can prevent other apps or processes from accessing the database. This may lead to app crashes, data corruption, and degraded device performance. {v3}',
+    'require_sqflite_close',
+    '[require_sqflite_close] Database connections must be closed when no longer needed. Leaving databases open causes resource leaks, file locks, and can prevent other apps or processes from accessing the database. This may lead to app crashes, data corruption, and degraded device performance. {v3}',
     correctionMessage:
         'Always call db.close() in dispose() or a finally block. Document database cleanup to prevent resource leaks and ensure reliable data access.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check class fields that are databases
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Find fields that look like databases
       final List<VariableDeclaration> dbFields = <VariableDeclaration>[];
 
@@ -806,7 +782,7 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
 
       if (!hasClose) {
         for (final field in dbFields) {
-          reporter.atNode(field, code);
+          reporter.atNode(field);
         }
       }
     });
@@ -849,7 +825,7 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
 /// ''');
 /// ```
 class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
-  const AvoidSqfliteReservedWordsRule() : super(code: _code);
+  AvoidSqfliteReservedWordsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -858,12 +834,11 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_sqflite_reserved_words',
-    problemMessage:
-        '[avoid_sqflite_reserved_words] Using SQLite reserved words as column names in SQL statements can cause syntax errors, failed migrations, and data loss. This is a common source of hard-to-diagnose database bugs and can break schema upgrades or queries. {v3}',
+    'avoid_sqflite_reserved_words',
+    '[avoid_sqflite_reserved_words] Using SQLite reserved words as column names in SQL statements can cause syntax errors, failed migrations, and data loss. This is a common source of hard-to-diagnose database bugs and can break schema upgrades or queries. {v3}',
     correctionMessage:
         'Escape reserved words with double quotes ("column") or rename the column to avoid conflicts. Document schema changes and test migrations to ensure compatibility.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// SQLite reserved words that commonly cause issues when used as column names
@@ -997,11 +972,10 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for SQL execution methods
@@ -1049,7 +1023,7 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
               caseSensitive: false,
             );
             if (!escapedPattern.hasMatch(sqlSource)) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -1097,7 +1071,7 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
 /// );
 /// ```
 class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
-  const AvoidSqfliteReadAllColumnsRule() : super(code: _code);
+  AvoidSqfliteReadAllColumnsRule() : super(code: _code);
 
   /// Medium impact - performance issue, not a crash.
   @override
@@ -1107,28 +1081,24 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_sqflite_read_all_columns',
-    problemMessage:
-        '[avoid_sqflite_read_all_columns] SELECT * fetches unnecessary columns, wasting memory and bandwidth. Using SELECT * fetches all columns from the database, which: - Wastes memory by loading unused data - Increases network/disk bandwidth - Breaks when table schema changes (new columns appear unexpectedly) - Prevents SQLite query optimization. {v2}',
+    'avoid_sqflite_read_all_columns',
+    '[avoid_sqflite_read_all_columns] SELECT * fetches unnecessary columns, wasting memory and bandwidth. Using SELECT * fetches all columns from the database, which: - Wastes memory by loading unused data - Increases network/disk bandwidth - Breaks when table schema changes (new columns appear unexpectedly) - Prevents SQLite query optimization. {v2}',
     correctionMessage:
         'Specify only the columns you need: SELECT id, name, email FROM .. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Only check rawQuery - the method that takes raw SQL strings with SELECT.
   // query() uses column parameters, not raw SQL.
   // rawInsert/rawUpdate/rawDelete don't use SELECT.
-  static const Set<String> _sqfliteMethods = <String>{
-    'rawQuery',
-  };
+  static const Set<String> _sqfliteMethods = <String>{'rawQuery'};
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (!_sqfliteMethods.contains(node.methodName.name)) return;
 
       // Check the first argument (SQL string) for SELECT *
@@ -1162,7 +1132,7 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
         // Case-insensitive check for SELECT *
         final String upperSql = sqlString.toUpperCase();
         if (upperSql.contains('SELECT *') || upperSql.contains('SELECT  *')) {
-          reporter.atNode(sqlArg, code);
+          reporter.atNode(sqlArg);
         }
       }
     });
@@ -1201,7 +1171,7 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
-  const AvoidLoadingFullPdfInMemoryRule() : super(code: _code);
+  AvoidLoadingFullPdfInMemoryRule() : super(code: _code);
 
   /// High impact - can cause OOM crashes on mobile devices.
   @override
@@ -1211,12 +1181,11 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_loading_full_pdf_in_memory',
-    problemMessage:
-        '[avoid_loading_full_pdf_in_memory] Loading an entire PDF file into memory can cause out-of-memory errors, especially on mobile devices with limited RAM. This can crash the app, degrade performance, and prevent users from viewing large documents. {v3}',
+    'avoid_loading_full_pdf_in_memory',
+    '[avoid_loading_full_pdf_in_memory] Loading an entire PDF file into memory can cause out-of-memory errors, especially on mobile devices with limited RAM. This can crash the app, degrade performance, and prevent users from viewing large documents. {v3}',
     correctionMessage:
         'Use file path-based loading or streaming APIs to process PDFs incrementally. Avoid loading all bytes into memory; instead, read only the required pages or sections.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// PDF loading methods that load entire document into memory.
@@ -1238,11 +1207,10 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_memoryLoadMethods.contains(methodName)) return;
 
@@ -1261,13 +1229,11 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
 
       if (!isPdfOperation) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
 
     // Also check for patterns like PdfDocument.openData(await file.readAsBytes())
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_pdfTypes.contains(typeName)) return;
 
@@ -1288,7 +1254,7 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
             argSource.contains('readAsBytesSync') ||
             argSource.contains('rootBundle.load') ||
             argSource.contains('ByteData')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -1325,7 +1291,7 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSqfliteSingletonRule extends SaropaLintRule {
-  const PreferSqfliteSingletonRule() : super(code: _code);
+  PreferSqfliteSingletonRule() : super(code: _code);
 
   /// Database connection overhead and potential locking.
   @override
@@ -1335,28 +1301,26 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sqflite_singleton',
-    problemMessage:
-        '[prefer_sqflite_singleton] openDatabase called directly. May create multiple connections. Calling openDatabase repeatedly creates connection overhead and may cause locking issues. Use a singleton pattern. {v2}',
+    'prefer_sqflite_singleton',
+    '[prefer_sqflite_singleton] openDatabase called directly. May create multiple connections. Calling openDatabase repeatedly creates connection overhead and may cause locking issues. Use a singleton pattern. {v2}',
     correctionMessage:
         'Use a singleton pattern for database instance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'openDatabase') return;
 
       // Check if we're inside a non-singleton context
       // Look for common singleton patterns: static field, getter, or factory
-      final FunctionBody? enclosingBody =
-          node.thisOrAncestorOfType<FunctionBody>();
+      final FunctionBody? enclosingBody = node
+          .thisOrAncestorOfType<FunctionBody>();
       if (enclosingBody == null) return;
 
       // Check if enclosing function/method is a static getter or uses null-aware
@@ -1372,7 +1336,7 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
         }
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -1406,7 +1370,7 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
 /// await db.query(UserTable.table, columns: [UserTable.colId, ...]);
 /// ```
 class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
-  const PreferSqfliteColumnConstantsRule() : super(code: _code);
+  PreferSqfliteColumnConstantsRule() : super(code: _code);
 
   /// Runtime errors from column name typos.
   @override
@@ -1416,12 +1380,11 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_sqflite_column_constants',
-    problemMessage:
-        '[prefer_sqflite_column_constants] String literal column name may contain typos. String literals for column names are error-prone. Use constants for compile-time checking. This file handling can cause data corruption, resource leaks, or permission errors. {v2}',
+    'prefer_sqflite_column_constants',
+    '[prefer_sqflite_column_constants] String literal column name may contain typos. String literals for column names are error-prone. Use constants for compile-time checking. This file handling can cause data corruption, resource leaks, or permission errors. {v2}',
     correctionMessage:
         'Define column names as constants in a table class. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Database methods that take column parameters.
@@ -1438,11 +1401,10 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_dbMethods.contains(methodName)) return;
 
@@ -1465,7 +1427,7 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
           if (value is ListLiteral) {
             for (final CollectionElement element in value.elements) {
               if (element is SimpleStringLiteral) {
-                reporter.atNode(element, code);
+                reporter.atNode(element);
                 return;
               }
             }
@@ -1508,7 +1470,7 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
 ///     .forEach(processLine);
 /// ```
 class PreferStreamingForLargeFilesRule extends SaropaLintRule {
-  const PreferStreamingForLargeFilesRule() : super(code: _code);
+  PreferStreamingForLargeFilesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1517,13 +1479,12 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_streaming_for_large_files',
-    problemMessage:
-        '[prefer_streaming_for_large_files] Reading potentially large file '
+    'prefer_streaming_for_large_files',
+    '[prefer_streaming_for_large_files] Reading potentially large file '
         'into memory. Consider streaming for logs, media, or data exports. {v2}',
     correctionMessage:
         'Use file.openRead() with stream transformers for memory-efficient processing.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// File name patterns that suggest large files
@@ -1541,11 +1502,10 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for full-file read methods
@@ -1565,7 +1525,7 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
 
           for (final String pattern in _largeFilePatterns) {
             if (source.contains(pattern)) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -1580,7 +1540,7 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
         for (final String pattern in _largeFilePatterns) {
           if (bodySource.contains('${pattern}file') ||
               bodySource.contains('${pattern}_file')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -1628,7 +1588,7 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireFilePathSanitizationRule extends SaropaLintRule {
-  const RequireFilePathSanitizationRule() : super(code: _code);
+  RequireFilePathSanitizationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -1638,29 +1598,25 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m1},
-        web: <OwaspWeb>{OwaspWeb.a01},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m1},
+    web: <OwaspWeb>{OwaspWeb.a01},
+  );
 
   static const LintCode _code = LintCode(
-    name: 'require_file_path_sanitization',
-    problemMessage:
-        '[require_file_path_sanitization] File path constructed from parameter '
+    'require_file_path_sanitization',
+    '[require_file_path_sanitization] File path constructed from parameter '
         'without sanitization. Path traversal attack possible with ../ {v2}',
     correctionMessage:
         'Use path.basename() to extract filename and path.isWithin() to verify.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for File or Directory creation
@@ -1690,7 +1646,7 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
     InstanceCreationExpression node,
     String pathSource,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Get the function this is in
     final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
@@ -1709,10 +1665,10 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
     }
 
     // Get function parameters
-    final FunctionDeclaration? funcDecl =
-        node.thisOrAncestorOfType<FunctionDeclaration>();
-    final MethodDeclaration? methodDecl =
-        node.thisOrAncestorOfType<MethodDeclaration>();
+    final FunctionDeclaration? funcDecl = node
+        .thisOrAncestorOfType<FunctionDeclaration>();
+    final MethodDeclaration? methodDecl = node
+        .thisOrAncestorOfType<MethodDeclaration>();
 
     FormalParameterList? params;
     if (funcDecl != null) {
@@ -1728,7 +1684,7 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
       final String paramName = param.name?.lexeme ?? '';
       if (paramName.isNotEmpty && pathSource.contains(paramName)) {
         // Parameter used in file path without sanitization
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
     }

@@ -11,9 +11,6 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../async_context_utils.dart';
 import '../saropa_lint_rule.dart';
@@ -55,7 +52,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidStoringContextRule extends SaropaLintRule {
-  const AvoidStoringContextRule() : super(code: _code);
+  AvoidStoringContextRule() : super(code: _code);
 
   /// Storing context can cause crashes when widget is disposed.
   @override
@@ -65,22 +62,20 @@ class AvoidStoringContextRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_storing_context',
-    problemMessage:
-        '[avoid_storing_context] Storing a BuildContext in a field or variable for later use is dangerous because the context may become invalid after the widget is disposed or rebuilt. Using a stale context can cause exceptions, show dialogs on the wrong screen, or trigger subtle bugs. This is a common source of crashes and hard-to-diagnose UI issues in Flutter apps. {v4}',
+    'avoid_storing_context',
+    '[avoid_storing_context] Storing a BuildContext in a field or variable for later use is dangerous because the context may become invalid after the widget is disposed or rebuilt. Using a stale context can cause exceptions, show dialogs on the wrong screen, or trigger subtle bugs. This is a common source of crashes and hard-to-diagnose UI issues in Flutter apps. {v4}',
     correctionMessage:
         'Always use BuildContext directly where needed, and avoid storing it in fields or long-lived variables. If you must use context asynchronously, check if the widget is still mounted before using it. Audit your codebase for stored BuildContext references and refactor to use context safely.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Detect field declarations with BuildContext type
-    context.registry.addFieldDeclaration((node) {
+    context.addFieldDeclaration((node) {
       // Function types with BuildContext parameters are fine - they declare
       // callback signatures, not store actual context instances.
       // e.g., `Widget Function({required BuildContext context})` is safe.
@@ -91,13 +86,13 @@ class AvoidStoringContextRule extends SaropaLintRule {
       for (final variable in node.fields.variables) {
         final type = node.fields.type?.toSource() ?? '';
         if (_isContextType(type)) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
 
     // Detect assignments to fields with context
-    context.registry.addAssignmentExpression((node) {
+    context.addAssignmentExpression((node) {
       // Check if the right side is 'context'
       final rightSource = node.rightHandSide.toSource();
       if (rightSource != 'context') return;
@@ -106,7 +101,7 @@ class AvoidStoringContextRule extends SaropaLintRule {
       final left = node.leftHandSide;
       if (left is PrefixedIdentifier && left.prefix.name == 'this') {
         // this._context = context
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       } else if (left is SimpleIdentifier) {
         // Check if it's assigning to a field (starts with _ or is a known field)
         final name = left.name;
@@ -114,7 +109,7 @@ class AvoidStoringContextRule extends SaropaLintRule {
           // This is likely a field assignment
           // We need to verify it's inside a class method
           if (_isInsideClassMethod(node)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -217,7 +212,7 @@ class AvoidStoringContextRule extends SaropaLintRule {
 /// - `use_setstate_synchronously` - Similar rule for setState calls
 /// - `avoid_scaffold_messenger_after_await` - Similar rule for ScaffoldMessenger
 class AvoidContextAcrossAsyncRule extends SaropaLintRule {
-  const AvoidContextAcrossAsyncRule() : super(code: _code);
+  AvoidContextAcrossAsyncRule() : super(code: _code);
 
   /// Context after await can crash when widget is disposed.
   @override
@@ -228,26 +223,25 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
 
   /// Alias: require_build_context_scope (deprecated, use avoid_context_across_async)
   @override
-  List<String> get configAliases =>
-      const <String>['require_build_context_scope'];
+  List<String> get configAliases => const <String>[
+    'require_build_context_scope',
+  ];
 
   static const LintCode _code = LintCode(
-    name: 'avoid_context_across_async',
-    problemMessage:
-        '[avoid_context_across_async] BuildContext used after await crashes '
+    'avoid_context_across_async',
+    '[avoid_context_across_async] BuildContext used after await crashes '
         'if widget was disposed during the async gap. Check mounted first. {v6}',
     correctionMessage: 'Check "if (!mounted) return;" before using context.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check async method declarations
-    context.registry.addMethodDeclaration((node) {
+    context.addMethodDeclaration((node) {
       if (node.body is! BlockFunctionBody) return;
       final body = node.body as BlockFunctionBody;
       if (!body.isAsynchronous) return;
@@ -256,7 +250,7 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
     });
 
     // Check async function expressions (lambdas, callbacks)
-    context.registry.addFunctionExpression((node) {
+    context.addFunctionExpression((node) {
       if (node.body is! BlockFunctionBody) return;
       final body = node.body as BlockFunctionBody;
       if (!body.isAsynchronous) return;
@@ -285,8 +279,12 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
     for (final statement in block.statements) {
       // Try-catch: recurse into sub-blocks with proper await tracking
       if (statement is TryStatement) {
-        if (_checkTryBody(statement, reporter,
-            seenAwait: seenAwait, hasGuard: hasGuard)) {
+        if (_checkTryBody(
+          statement,
+          reporter,
+          seenAwait: seenAwait,
+          hasGuard: hasGuard,
+        )) {
           seenAwait = true;
           hasGuard = false;
         }
@@ -341,8 +339,12 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
   }) {
     final tryHasAwait = containsAwait(statement.body);
 
-    _checkAsyncBody(statement.body, reporter,
-        initialSeenAwait: seenAwait, initialHasGuard: hasGuard);
+    _checkAsyncBody(
+      statement.body,
+      reporter,
+      initialSeenAwait: seenAwait,
+      initialHasGuard: hasGuard,
+    );
 
     final catchInDanger = seenAwait || tryHasAwait;
     if (catchInDanger) {
@@ -350,8 +352,11 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
         _checkAsyncBody(clause.body, reporter, initialSeenAwait: true);
       }
       if (statement.finallyBlock != null) {
-        _checkAsyncBody(statement.finallyBlock!, reporter,
-            initialSeenAwait: true);
+        _checkAsyncBody(
+          statement.finallyBlock!,
+          reporter,
+          initialSeenAwait: true,
+        );
       }
     }
 
@@ -361,73 +366,12 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
   /// Finds and reports all context usages in the given statement.
   void _reportContextUsage(Statement stmt, SaropaDiagnosticReporter reporter) {
     stmt.visitChildren(
-      ContextUsageFinder(onContextFound: (node) => reporter.atNode(node, code)),
+      ContextUsageFinder(onContextFound: (node) => reporter.atNode(node)),
     );
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddMountedGuardFix()];
 }
 
 /// Quick fix that inserts `if (!mounted) return;` before context usage.
-class _AddMountedGuardFix extends DartFix {
-  // Cached regex for performance - matches any non-whitespace
-  static final RegExp _nonWhitespacePattern = RegExp(r'[^\s]');
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addSimpleIdentifier((node) {
-      if (node.name != 'context') return;
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Find the containing statement to insert guard before
-      final statement = _findContainingStatement(node);
-      if (statement == null) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add mounted guard before this statement',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Calculate indentation from original statement
-        final lineStart = resolver.lineInfo.getOffsetOfLine(
-          resolver.lineInfo.getLocation(statement.offset).lineNumber - 1,
-        );
-        final leadingText = resolver.source.contents.data.substring(
-          lineStart,
-          statement.offset,
-        );
-        // Extract whitespace only (the indentation)
-        final indent = leadingText.replaceAll(_nonWhitespacePattern, '');
-
-        // Insert guard before the statement
-        builder.addSimpleInsertion(
-          statement.offset,
-          'if (!mounted) return;\n$indent',
-        );
-      });
-    });
-  }
-
-  /// Walks up the AST to find the statement containing the node.
-  AstNode? _findContainingStatement(AstNode node) {
-    AstNode? current = node;
-    while (current != null) {
-      if (current is ExpressionStatement || current is ReturnStatement) {
-        return current;
-      }
-      current = current.parent;
-    }
-    return null;
-  }
-}
 
 // =============================================================================
 // STATIC METHOD CONTEXT RULES (3 tiers)
@@ -512,7 +456,7 @@ class _AddMountedGuardFix extends DartFix {
 /// }
 /// ```
 class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
-  const AvoidContextAfterAwaitInStaticRule() : super(code: _code);
+  AvoidContextAfterAwaitInStaticRule() : super(code: _code);
 
   /// Critical issue - causes crashes.
   @override
@@ -522,23 +466,21 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_context_after_await_in_static',
-    problemMessage:
-        '[avoid_context_after_await_in_static] BuildContext used after await in static method. Context may be '
+    'avoid_context_after_await_in_static',
+    '[avoid_context_after_await_in_static] BuildContext used after await in static method. Context may be '
         'invalid after async gap. {v4}',
     correctionMessage:
         'Pass an isMounted callback, use a navigator key, or restructure '
         'to avoid context after await.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((node) {
+    context.addMethodDeclaration((node) {
       // Only check async static methods
       if (!node.isStatic) return;
       if (node.body is! BlockFunctionBody) return;
@@ -558,7 +500,7 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
       _checkAsyncStaticBody(
         body.block,
         contextParamNames,
-        (node) => reporter.atNode(node, _code),
+        (node) => reporter.atNode(node),
       );
     });
   }
@@ -979,7 +921,7 @@ class _StaticContextUsageFinder extends RecursiveAstVisitor<void> {
 ///
 /// **Quick fix available:** Adds `bool Function() isMounted` parameter.
 class AvoidContextInAsyncStaticRule extends SaropaLintRule {
-  const AvoidContextInAsyncStaticRule() : super(code: _code);
+  AvoidContextInAsyncStaticRule() : super(code: _code);
 
   /// Risky pattern that can lead to crashes.
   @override
@@ -989,23 +931,21 @@ class AvoidContextInAsyncStaticRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_context_in_async_static',
-    problemMessage:
-        '[avoid_context_in_async_static] BuildContext in async static method may become invalid during '
+    'avoid_context_in_async_static',
+    '[avoid_context_in_async_static] BuildContext in async static method may become invalid during '
         'async operations. {v2}',
     correctionMessage:
         'Pass an isMounted callback, use a navigator key, or convert to '
         'instance method.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((node) {
+    context.addMethodDeclaration((node) {
       // Only check async static methods
       if (!node.isStatic) return;
       if (node.body is! BlockFunctionBody) return;
@@ -1016,52 +956,14 @@ class AvoidContextInAsyncStaticRule extends SaropaLintRule {
       // Check parameters for BuildContext
       for (final param in node.parameters?.parameters ?? <FormalParameter>[]) {
         if (isBuildContextParam(param)) {
-          reporter.atNode(param, _code);
+          reporter.atNode(param);
         }
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddIsMountedCallbackFix()];
 }
 
 /// Quick fix that adds an isMounted callback parameter after BuildContext.
-class _AddIsMountedCallbackFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (!node.isStatic) return;
-
-      // Find the BuildContext parameter
-      final params = node.parameters?.parameters ?? <FormalParameter>[];
-      for (final param in params) {
-        if (!param.sourceRange.intersects(analysisError.sourceRange)) continue;
-
-        final changeBuilder = reporter.createChangeBuilder(
-          message: 'Add isMounted callback parameter',
-          priority: 1,
-        );
-
-        changeBuilder.addDartFileEdit((builder) {
-          // Insert after the BuildContext parameter
-          builder.addSimpleInsertion(
-            param.end,
-            ', bool Function() isMounted',
-          );
-        });
-        return;
-      }
-    });
-  }
-}
 
 /// Warns when BuildContext is used in any static method.
 ///
@@ -1111,7 +1013,7 @@ class _AddIsMountedCallbackFix extends DartFix {
 /// }
 /// ```
 class AvoidContextInStaticMethodsRule extends SaropaLintRule {
-  const AvoidContextInStaticMethodsRule() : super(code: _code);
+  AvoidContextInStaticMethodsRule() : super(code: _code);
 
   /// Discouraged pattern but generally safe for sync methods.
   @override
@@ -1121,22 +1023,20 @@ class AvoidContextInStaticMethodsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_context_in_static_methods',
-    problemMessage:
-        '[avoid_context_in_static_methods] BuildContext in static method. Consider instance method or '
+    'avoid_context_in_static_methods',
+    '[avoid_context_in_static_methods] BuildContext in static method. Consider instance method or '
         'extension instead. {v3}',
     correctionMessage:
         'Use instance methods, extension methods, or a navigator key.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((node) {
+    context.addMethodDeclaration((node) {
       // Only check static methods
       if (!node.isStatic) return;
 
@@ -1149,7 +1049,7 @@ class AvoidContextInStaticMethodsRule extends SaropaLintRule {
       // Check parameters for BuildContext
       for (final param in node.parameters?.parameters ?? <FormalParameter>[]) {
         if (isBuildContextParam(param)) {
-          reporter.atNode(param, _code);
+          reporter.atNode(param);
         }
       }
     });
@@ -1186,7 +1086,7 @@ class AvoidContextInStaticMethodsRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidContextDependencyInCallbackRule extends SaropaLintRule {
-  const AvoidContextDependencyInCallbackRule() : super(code: _code);
+  AvoidContextDependencyInCallbackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1195,12 +1095,11 @@ class AvoidContextDependencyInCallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_context_dependency_in_callback',
-    problemMessage:
-        '[avoid_context_dependency_in_callback] BuildContext-dependent call (Theme.of, MediaQuery.of, Navigator.of, ScaffoldMessenger.of, etc.) is used inside an asynchronous callback such as Future.then(), Future.delayed(), or Timer. After an async gap the originating widget may have been unmounted, making the captured BuildContext stale and causing a "Looking up a deactivated widget\'s ancestor" exception at runtime. {v2}',
+    'avoid_context_dependency_in_callback',
+    '[avoid_context_dependency_in_callback] BuildContext-dependent call (Theme.of, MediaQuery.of, Navigator.of, ScaffoldMessenger.of, etc.) is used inside an asynchronous callback such as Future.then(), Future.delayed(), or Timer. After an async gap the originating widget may have been unmounted, making the captured BuildContext stale and causing a "Looking up a deactivated widget\'s ancestor" exception at runtime. {v2}',
     correctionMessage:
         'Capture the context-dependent value (e.g., final theme = Theme.of(context)) before the async gap and use the captured value inside the callback instead of accessing context directly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Known context-dependent static accessor methods.
@@ -1232,11 +1131,10 @@ class AvoidContextDependencyInCallbackRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Look for Xxx.of(context) pattern
       if (node.methodName.name != 'of') return;
 
@@ -1255,7 +1153,7 @@ class AvoidContextDependencyInCallbackRule extends SaropaLintRule {
             if (callParent is MethodInvocation) {
               final String methodName = callParent.methodName.name;
               if (_asyncCallbackMethods.contains(methodName)) {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
                 return;
               }
             }
@@ -1263,41 +1161,6 @@ class AvoidContextDependencyInCallbackRule extends SaropaLintRule {
         }
         current = current.parent;
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_CaptureContextBeforeAsyncFix()];
-}
-
-class _CaptureContextBeforeAsyncFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'of') return;
-
-      final Expression? target = node.target;
-      if (target is! SimpleIdentifier) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message:
-            'Add comment: capture ${target.name}.of(context) before async gap',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* TODO: capture ${target.name}.of(context) before the async gap */ ',
-        );
-      });
     });
   }
 }

@@ -11,6 +11,21 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+
+### Added
+- **Native plugin migration Phase 2**: Quick fix infrastructure and per-file filtering
+  - `SaropaFixProducer` base class for native quick fixes (`analysis_server_plugin`)
+  - `fixGenerators` getter on `SaropaLintRule` — rules declare their fixes for automatic registration
+  - Per-file filtering re-enabled in native plugin (applicableFileTypes, requiredPatterns, content requirements)
+  - PoC quick fixes: `CommentOutDebugPrintFix` (avoid_debug_print), `RemoveEmptySetStateFix` (avoid_empty_set_state)
+  - Native framework provides ignore-comment fixes automatically (no custom code needed)
+
+### Removed
+- Redundant PoC files from Phase 1 (`saropa_analysis_rule.dart`, `poc_rules.dart`, `saropa_reporter.dart`)
+- Old v4 ignore-fix classes (`AddIgnoreCommentFix`, `AddIgnoreForFileFix`, `WrapInTryCatchFix`) — superseded by native framework
+
+---
 ## [4.15.1]
 
 ### Added

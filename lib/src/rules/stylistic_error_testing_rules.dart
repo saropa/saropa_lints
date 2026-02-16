@@ -1,9 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -47,7 +44,7 @@ import '../saropa_lint_rule.dart';
 /// throw UserNotFoundException('User not found');
 /// ```
 class PreferSpecificExceptionsRule extends SaropaLintRule {
-  const PreferSpecificExceptionsRule() : super(code: _code);
+  PreferSpecificExceptionsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -56,26 +53,24 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_specific_exceptions',
-    problemMessage:
-        '[prefer_specific_exceptions] A generic Exception is thrown instead of a domain-specific type. Generic exceptions prevent callers from catching specific failures and limit targeted error recovery; define and throw a custom exception class. {v2}',
+    'prefer_specific_exceptions',
+    '[prefer_specific_exceptions] A generic Exception is thrown instead of a domain-specific type. Generic exceptions prevent callers from catching specific failures and limit targeted error recovery; define and throw a custom exception class. {v2}',
     correctionMessage:
         'Create a custom exception class so callers can catch specific failures and provide targeted error recovery.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addThrowExpression((node) {
+    context.addThrowExpression((node) {
       final expr = node.expression;
       if (expr is InstanceCreationExpression) {
         final typeName = expr.constructorName.type.element?.name;
         if (typeName == 'Exception') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -108,7 +103,7 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
 /// throw Exception('User not found');
 /// ```
 class PreferGenericExceptionRule extends SaropaLintRule {
-  const PreferGenericExceptionRule() : super(code: _code);
+  PreferGenericExceptionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -118,21 +113,19 @@ class PreferGenericExceptionRule extends SaropaLintRule {
 
   /// Alias: prefer_generic_exception_type
   static const LintCode _code = LintCode(
-    name: 'prefer_generic_exception',
-    problemMessage:
-        '[prefer_generic_exception] Custom exception classes add boilerplate without proportional benefit. Use generic Exception to keep error handling simple. {v1}',
+    'prefer_generic_exception',
+    '[prefer_generic_exception] Custom exception classes add boilerplate without proportional benefit. Use generic Exception to keep error handling simple. {v1}',
     correctionMessage:
         'Replace the custom exception with Exception to reduce class boilerplate while still conveying the error message.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addThrowExpression((node) {
+    context.addThrowExpression((node) {
       final expr = node.expression;
       if (expr is InstanceCreationExpression) {
         final typeName = expr.constructorName.type.element?.name;
@@ -144,7 +137,7 @@ class PreferGenericExceptionRule extends SaropaLintRule {
             typeName != 'StateError' &&
             typeName != 'FormatException' &&
             typeName.endsWith('Exception')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -178,7 +171,7 @@ class PreferGenericExceptionRule extends SaropaLintRule {
 /// class UserNotFoundException implements Exception {}
 /// ```
 class PreferExceptionSuffixRule extends SaropaLintRule {
-  const PreferExceptionSuffixRule() : super(code: _code);
+  PreferExceptionSuffixRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -187,21 +180,19 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_exception_suffix',
-    problemMessage:
-        '[prefer_exception_suffix] Exception classes missing the "Exception" suffix are harder to identify as throwable types during code review and IDE search. {v2}',
+    'prefer_exception_suffix',
+    '[prefer_exception_suffix] Exception classes missing the "Exception" suffix are harder to identify as throwable types during code review and IDE search. {v2}',
     correctionMessage:
         'Rename the class to end with "Exception" so it is immediately recognizable as a throwable type in code and search results.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((node) {
+    context.addClassDeclaration((node) {
       // Check if class implements Exception
       final implementsClause = node.implementsClause;
       if (implementsClause == null) return;
@@ -218,7 +209,7 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
 
       final className = node.name.lexeme;
       if (!className.endsWith('Exception') && !className.endsWith('Error')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -249,7 +240,7 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
 /// class UserNotFoundError implements Exception {}
 /// ```
 class PreferErrorSuffixRule extends SaropaLintRule {
-  const PreferErrorSuffixRule() : super(code: _code);
+  PreferErrorSuffixRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -258,21 +249,19 @@ class PreferErrorSuffixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_error_suffix',
-    problemMessage:
-        '[prefer_error_suffix] The "Exception" suffix is verbose and inconsistent with Dart core types like StateError and ArgumentError. Use "Error" for brevity. {v2}',
+    'prefer_error_suffix',
+    '[prefer_error_suffix] The "Exception" suffix is verbose and inconsistent with Dart core types like StateError and ArgumentError. Use "Error" for brevity. {v2}',
     correctionMessage:
         'Rename the class to end with "Error" instead of "Exception" to align with Dart core naming conventions and reduce verbosity.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((node) {
+    context.addClassDeclaration((node) {
       final implementsClause = node.implementsClause;
       if (implementsClause == null) return;
 
@@ -288,7 +277,7 @@ class PreferErrorSuffixRule extends SaropaLintRule {
 
       final className = node.name.lexeme;
       if (className.endsWith('Exception')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -331,7 +320,7 @@ class PreferErrorSuffixRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferOnOverCatchRule extends SaropaLintRule {
-  const PreferOnOverCatchRule() : super(code: _code);
+  PreferOnOverCatchRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -340,24 +329,22 @@ class PreferOnOverCatchRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_on_over_catch',
-    problemMessage:
-        '[prefer_on_over_catch] A bare "catch" clause catches all exception types indiscriminately, which can mask unexpected errors and hinder targeted recovery. Use "on ExceptionType" to restrict handling to known failures. {v1}',
+    'prefer_on_over_catch',
+    '[prefer_on_over_catch] A bare "catch" clause catches all exception types indiscriminately, which can mask unexpected errors and hinder targeted recovery. Use "on ExceptionType" to restrict handling to known failures. {v1}',
     correctionMessage:
         'Add an "on ExceptionType" clause to catch only expected failures and let unexpected errors propagate to the caller.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((node) {
+    context.addCatchClause((node) {
       // Flag catch clauses without on type
       if (node.exceptionType == null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -398,7 +385,7 @@ class PreferOnOverCatchRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferCatchOverOnRule extends SaropaLintRule {
-  const PreferCatchOverOnRule() : super(code: _code);
+  PreferCatchOverOnRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -407,66 +394,22 @@ class PreferCatchOverOnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_catch_over_on',
-    problemMessage:
-        '[prefer_catch_over_on] Typed "on" clauses add complexity and risk missing unexpected exception types. A bare catch ensures no failure goes unhandled. {v3}',
+    'prefer_catch_over_on',
+    '[prefer_catch_over_on] Typed "on" clauses add complexity and risk missing unexpected exception types. A bare catch ensures no failure goes unhandled. {v3}',
     correctionMessage:
         'Replace the "on ExceptionType" clause with a bare "catch (e)" to simplify error handling and ensure all exceptions are caught.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
-
-  @override
-  List<Fix> get customFixes => [_RemoveOnClauseFix()];
-
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((node) {
+    context.addCatchClause((node) {
       // Flag catch clauses with on type
       if (node.exceptionType != null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-}
-
-class _RemoveOnClauseFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addCatchClause((CatchClause node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.exceptionType == null) return;
-
-      final String source = node.toSource();
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Remove on clause',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        String newSource;
-        if (node.catchKeyword != null) {
-          // on Type catch (e) { ... } → catch (e) { ... }
-          final int relOffset = node.catchKeyword!.offset - node.offset;
-          newSource = source.substring(relOffset);
-        } else {
-          // on Type { ... } → catch (e) { ... }
-          final int bodyOffset = node.body.offset - node.offset;
-          newSource = 'catch (e) ${source.substring(bodyOffset)}';
-        }
-
-        builder.addSimpleReplacement(node.sourceRange, newSource);
-      });
     });
   }
 }
@@ -515,7 +458,7 @@ class _RemoveOnClauseFix extends DartFix {
 /// });
 /// ```
 class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
-  const PreferGivenWhenThenCommentsRule() : super(code: _code);
+  PreferGivenWhenThenCommentsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -524,24 +467,22 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_given_when_then_comments',
-    problemMessage:
-        '[prefer_given_when_then_comments] Test body has three or more statements but lacks structural comments. Without Arrange/Act/Assert or Given/When/Then markers, readers must infer the setup, action, and verification phases. Add phase comments for clarity. {v1}',
+    'prefer_given_when_then_comments',
+    '[prefer_given_when_then_comments] Test body has three or more statements but lacks structural comments. Without Arrange/Act/Assert or Given/When/Then markers, readers must infer the setup, action, and verification phases. Add phase comments for clarity. {v1}',
     correctionMessage:
         'Add "// Arrange", "// Act", "// Assert" (or Given/When/Then) comments to delineate setup, execution, and verification phases.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    if (!resolver.source.fullName.contains('_test.dart')) return;
+    if (!context.filePath.contains('_test.dart')) return;
 
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       if (node.methodName.name != 'test') return;
 
       final args = node.argumentList.arguments;
@@ -554,10 +495,11 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
       if (body is! BlockFunctionBody) return;
 
       // Check if body contains AAA or GWT comments
-      final source = resolver.source.contents.data;
+      final source = context.fileContent;
       final bodySource = source.substring(body.offset, body.end);
 
-      final hasStructure = bodySource.contains('// Arrange') ||
+      final hasStructure =
+          bodySource.contains('// Arrange') ||
           bodySource.contains('// Act') ||
           bodySource.contains('// Assert') ||
           bodySource.contains('// Given') ||
@@ -566,7 +508,7 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
 
       // Only flag if there are multiple statements (complex enough to warrant structure)
       if (!hasStructure && body.block.statements.length >= 3) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -609,7 +551,7 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferSelfDocumentingTestsRule extends SaropaLintRule {
-  const PreferSelfDocumentingTestsRule() : super(code: _code);
+  PreferSelfDocumentingTestsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -618,23 +560,21 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_self_documenting_tests',
-    problemMessage:
-        '[prefer_self_documenting_tests] Structure comments like Arrange/Act/Assert add noise to well-written tests. Self-documenting code with clear variable names and assertions is more maintainable. {v1}',
+    'prefer_self_documenting_tests',
+    '[prefer_self_documenting_tests] Structure comments like Arrange/Act/Assert add noise to well-written tests. Self-documenting code with clear variable names and assertions is more maintainable. {v1}',
     correctionMessage:
         'Remove the structure comments and use descriptive variable names and focused assertions to make the test self-documenting.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    if (!resolver.source.fullName.contains('_test.dart')) return;
+    if (!context.filePath.contains('_test.dart')) return;
 
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       if (node.methodName.name != 'test') return;
 
       final args = node.argumentList.arguments;
@@ -646,10 +586,11 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
       final body = callback.body;
       if (body is! BlockFunctionBody) return;
 
-      final source = resolver.source.contents.data;
+      final source = context.fileContent;
       final bodySource = source.substring(body.offset, body.end);
 
-      final hasStructure = bodySource.contains('// Arrange') ||
+      final hasStructure =
+          bodySource.contains('// Arrange') ||
           bodySource.contains('// Act') ||
           bodySource.contains('// Assert') ||
           bodySource.contains('// Given') ||
@@ -657,7 +598,7 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
           bodySource.contains('// Then');
 
       if (hasStructure) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -696,7 +637,7 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
-  const PreferExpectOverAssertInTestsRule() : super(code: _code);
+  PreferExpectOverAssertInTestsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -708,27 +649,21 @@ class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_expect_over_assert_in_tests',
-    problemMessage:
-        '[prefer_expect_over_assert_in_tests] An assert() call was found in test code. Assertions are silently skipped in release mode and provide poor failure messages; use expect() with matchers instead for reliable and descriptive test failures. {v3}',
+    'prefer_expect_over_assert_in_tests',
+    '[prefer_expect_over_assert_in_tests] An assert() call was found in test code. Assertions are silently skipped in release mode and provide poor failure messages; use expect() with matchers instead for reliable and descriptive test failures. {v3}',
     correctionMessage:
         'Use expect() for assertions in tests. Example: expect(user.name, "John"). This provides better error messages and matchers than assert.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
-
-  @override
-  List<Fix> get customFixes => [_ReplaceAssertWithExpectFix()];
-
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    if (!resolver.source.fullName.contains('_test.dart')) return;
+    if (!context.filePath.contains('_test.dart')) return;
 
-    context.registry.addAssertStatement((node) {
-      reporter.atNode(node, code);
+    context.addAssertStatement((node) {
+      reporter.atNode(node);
     });
   }
 }
@@ -773,7 +708,7 @@ class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferSingleExpectationPerTestRule extends SaropaLintRule {
-  const PreferSingleExpectationPerTestRule() : super(code: _code);
+  PreferSingleExpectationPerTestRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -785,23 +720,21 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_single_expectation_per_test',
-    problemMessage:
-        '[prefer_single_expectation_per_test] Test contains multiple logical assertions that verify unrelated behaviors. This is an opinionated rule - not included in any tier by default. {v4}',
+    'prefer_single_expectation_per_test',
+    '[prefer_single_expectation_per_test] Test contains multiple logical assertions that verify unrelated behaviors. This is an opinionated rule - not included in any tier by default. {v4}',
     correctionMessage:
         'Split into multiple focused tests, each verifying one behavior, so failures pinpoint exactly which expectation broke.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    if (!resolver.source.fullName.contains('_test.dart')) return;
+    if (!context.filePath.contains('_test.dart')) return;
 
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       if (node.methodName.name != 'test') return;
 
       final args = node.argumentList.arguments;
@@ -820,7 +753,7 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
       }
 
       if (expectCount > 1) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -877,7 +810,7 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferGroupedExpectationsRule extends SaropaLintRule {
-  const PreferGroupedExpectationsRule() : super(code: _code);
+  PreferGroupedExpectationsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -889,23 +822,21 @@ class PreferGroupedExpectationsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_grouped_expectations',
-    problemMessage:
-        '[prefer_grouped_expectations] Isolating every assertion into its own test duplicates setup logic and inflates the test suite. Group related assertions to reduce boilerplate. {v1}',
+    'prefer_grouped_expectations',
+    '[prefer_grouped_expectations] Isolating every assertion into its own test duplicates setup logic and inflates the test suite. Group related assertions to reduce boilerplate. {v1}',
     correctionMessage:
         'Combine related assertions into a single test to share setup logic, reduce duplication, and keep the test suite concise.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    if (!resolver.source.fullName.contains('_test.dart')) return;
+    if (!context.filePath.contains('_test.dart')) return;
 
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       if (node.methodName.name != 'test') return;
 
       final args = node.argumentList.arguments;
@@ -925,7 +856,7 @@ class PreferGroupedExpectationsRule extends SaropaLintRule {
 
       // Flag if only one expect (could potentially be grouped)
       if (expectCount == 1 && body.block.statements.length >= 2) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -973,7 +904,7 @@ class PreferGroupedExpectationsRule extends SaropaLintRule {
 /// test('should throw error when email is invalid', () { ... });
 /// ```
 class PreferTestNameShouldWhenRule extends SaropaLintRule {
-  const PreferTestNameShouldWhenRule() : super(code: _code);
+  PreferTestNameShouldWhenRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -982,23 +913,21 @@ class PreferTestNameShouldWhenRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_test_name_should_when',
-    problemMessage:
-        '[prefer_test_name_should_when] Test name does not follow the "should X when Y" pattern, making it harder to understand the expected behavior and triggering condition at a glance. Restructure as "should [behavior] when [condition]". {v2}',
+    'prefer_test_name_should_when',
+    '[prefer_test_name_should_when] Test name does not follow the "should X when Y" pattern, making it harder to understand the expected behavior and triggering condition at a glance. Restructure as "should [behavior] when [condition]". {v2}',
     correctionMessage:
         "Rename the test to follow the should-when pattern: test('should [behavior] when [condition]', ...) for clarity.",
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    if (!resolver.source.fullName.contains('_test.dart')) return;
+    if (!context.filePath.contains('_test.dart')) return;
 
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       if (node.methodName.name != 'test') return;
 
       final args = node.argumentList.arguments;
@@ -1011,7 +940,7 @@ class PreferTestNameShouldWhenRule extends SaropaLintRule {
 
       // Check for should/when pattern
       if (!testName.contains('should') || !testName.contains('when')) {
-        reporter.atNode(nameArg, code);
+        reporter.atNode(nameArg);
       }
     });
   }
@@ -1044,7 +973,7 @@ class PreferTestNameShouldWhenRule extends SaropaLintRule {
 /// test('valid user can authenticate', () { ... });
 /// ```
 class PreferTestNameDescriptiveRule extends SaropaLintRule {
-  const PreferTestNameDescriptiveRule() : super(code: _code);
+  PreferTestNameDescriptiveRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1053,23 +982,21 @@ class PreferTestNameDescriptiveRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_test_name_descriptive',
-    problemMessage:
-        '[prefer_test_name_descriptive] Test name is not descriptive. Rigid patterns make test failures harder to diagnose and understand. This is an opinionated rule - not included in any tier by default. {v1}',
+    'prefer_test_name_descriptive',
+    '[prefer_test_name_descriptive] Test name is not descriptive. Rigid patterns make test failures harder to diagnose and understand. This is an opinionated rule - not included in any tier by default. {v1}',
     correctionMessage:
         'Use natural, descriptive test names that explain the behavior being tested. Example: test("user can authenticate with valid credentials").',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    if (!resolver.source.fullName.contains('_test.dart')) return;
+    if (!context.filePath.contains('_test.dart')) return;
 
-    context.registry.addMethodInvocation((node) {
+    context.addMethodInvocation((node) {
       if (node.methodName.name != 'test') return;
 
       final args = node.argumentList.arguments;
@@ -1082,37 +1009,8 @@ class PreferTestNameDescriptiveRule extends SaropaLintRule {
 
       // Flag should/when pattern
       if (testName.contains('should') && testName.contains('when')) {
-        reporter.atNode(nameArg, code);
+        reporter.atNode(nameArg);
       }
-    });
-  }
-}
-
-class _ReplaceAssertWithExpectFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addAssertStatement((AssertStatement node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String condition = node.condition.toSource();
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with expect()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          'expect($condition, isTrue);',
-        );
-      });
     });
   }
 }

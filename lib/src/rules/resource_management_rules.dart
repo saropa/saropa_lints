@@ -7,9 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -45,7 +42,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class RequireFileCloseInFinallyRule extends SaropaLintRule {
-  const RequireFileCloseInFinallyRule() : super(code: _code);
+  RequireFileCloseInFinallyRule() : super(code: _code);
 
   /// Unclosed file handles leak system resources.
   /// Each occurrence is a resource leak.
@@ -56,13 +53,12 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_file_close_in_finally',
-    problemMessage:
-        '[require_file_close_in_finally] Unclosed file handle on exception '
+    'require_file_close_in_finally',
+    '[require_file_close_in_finally] Unclosed file handle on exception '
         'leaks file descriptor, exhausting system limits. {v4}',
     correctionMessage:
         'Use try-finally or convenience methods like readAsString().',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// File-specific open methods that are unlikely to have false positives.
@@ -82,11 +78,10 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
@@ -118,14 +113,14 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
 
       if (!hasFinally && hasClose) {
         // Close without finally - may leak on exception
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       } else if (!hasClose &&
           !bodySource.contains('readAsString') &&
           !bodySource.contains('readAsBytes') &&
           !bodySource.contains('writeAsString') &&
           !bodySource.contains('writeAsBytes')) {
         // No close at all
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -161,7 +156,7 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireDatabaseCloseRule extends SaropaLintRule {
-  const RequireDatabaseCloseRule() : super(code: _code);
+  RequireDatabaseCloseRule() : super(code: _code);
 
   /// Unclosed database connections exhaust connection pools.
   /// Each occurrence is a resource leak.
@@ -172,13 +167,12 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_database_close',
-    problemMessage:
-        '[require_database_close] Unclosed database connection leaks resources '
+    'require_database_close',
+    '[require_database_close] Unclosed database connection leaks resources '
         'and may exhaust connection pool, causing app failures. {v6}',
     correctionMessage:
         'Close database in finally block or use connection pool.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Patterns that indicate actual database instantiation.
@@ -189,11 +183,10 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
@@ -208,7 +201,7 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
           !bodySource.contains('.closeSafe(') &&
           !bodySource.contains('dispose') &&
           !bodySource.contains('disposeSafe')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -245,7 +238,7 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireHttpClientCloseRule extends SaropaLintRule {
-  const RequireHttpClientCloseRule() : super(code: _code);
+  RequireHttpClientCloseRule() : super(code: _code);
 
   /// Unclosed HttpClient holds connection pools and leaks sockets.
   /// Each occurrence is a resource leak.
@@ -256,21 +249,19 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_http_client_close',
-    problemMessage:
-        '[require_http_client_close] Unclosed HttpClient leaks socket '
+    'require_http_client_close',
+    '[require_http_client_close] Unclosed HttpClient leaks socket '
         'connections and memory, eventually exhausting system resources. {v5}',
     correctionMessage: 'Call client.close() in finally block.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
@@ -281,7 +272,7 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
       if (!bodySource.contains('.close(') &&
           !bodySource.contains('.closeSafe(') &&
           !bodySource.contains('.close;')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -314,7 +305,7 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireNativeResourceCleanupRule extends SaropaLintRule {
-  const RequireNativeResourceCleanupRule() : super(code: _code);
+  RequireNativeResourceCleanupRule() : super(code: _code);
 
   /// Unfreed native memory leaks outside Dart's garbage collector.
   /// Each occurrence is a memory leak.
@@ -325,12 +316,11 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_native_resource_cleanup',
-    problemMessage:
-        '[require_native_resource_cleanup] Unfreed native memory leaks '
+    'require_native_resource_cleanup',
+    '[require_native_resource_cleanup] Unfreed native memory leaks '
         'outside Dart GC, causing permanent memory loss until app restart. {v3}',
     correctionMessage: 'Call free() in finally block for native allocations.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _allocMethods = <String>{
@@ -342,11 +332,10 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
@@ -365,7 +354,7 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
       if (!bodySource.contains('.free(') &&
           !bodySource.contains('free(') &&
           !bodySource.contains('finally')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -410,7 +399,7 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireWebSocketCloseRule extends SaropaLintRule {
-  const RequireWebSocketCloseRule() : super(code: _code);
+  RequireWebSocketCloseRule() : super(code: _code);
 
   /// Unclosed WebSocket connections leak sockets and may cause errors.
   /// Each occurrence is a resource leak.
@@ -421,21 +410,19 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_websocket_close',
-    problemMessage:
-        '[require_websocket_close] Unclosed WebSocket leaks connections and '
+    'require_websocket_close',
+    '[require_websocket_close] Unclosed WebSocket leaks connections and '
         'continues receiving data after widget disposal, causing errors. {v5}',
     correctionMessage: 'Add _socket.close() in dispose method.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a State class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -468,7 +455,7 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
       }
 
       if (hasWebSocket && !hasDisposeClose) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -511,7 +498,7 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
 /// }
 /// ```
 class RequirePlatformChannelCleanupRule extends SaropaLintRule {
-  const RequirePlatformChannelCleanupRule() : super(code: _code);
+  RequirePlatformChannelCleanupRule() : super(code: _code);
 
   /// Platform channel handlers prevent garbage collection of State.
   /// Each occurrence is a memory leak.
@@ -522,21 +509,19 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_platform_channel_cleanup',
-    problemMessage:
-        '[require_platform_channel_cleanup] Active platform channel handler '
+    'require_platform_channel_cleanup',
+    '[require_platform_channel_cleanup] Active platform channel handler '
         'receives callbacks after dispose, causing setState on unmounted widget. {v5}',
     correctionMessage: 'Set handler to null in dispose method.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a State class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -569,7 +554,7 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
       }
 
       if (!hasDispose || classSource.contains('setMethodCallHandler')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -610,7 +595,7 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireIsolateKillRule extends SaropaLintRule {
-  const RequireIsolateKillRule() : super(code: _code);
+  RequireIsolateKillRule() : super(code: _code);
 
   /// Orphaned isolates consume memory and CPU resources.
   /// Each occurrence is a resource leak.
@@ -621,21 +606,19 @@ class RequireIsolateKillRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_isolate_kill',
-    problemMessage:
-        '[require_isolate_kill] Unkilled Isolate continues consuming CPU and '
+    'require_isolate_kill',
+    '[require_isolate_kill] Unkilled Isolate continues consuming CPU and '
         'memory, and may send messages to disposed handlers causing crashes. {v3}',
     correctionMessage: 'Call isolate.kill() in cleanup/dispose method.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String classSource = node.toSource();
 
       // Check for Isolate.spawn
@@ -646,7 +629,7 @@ class RequireIsolateKillRule extends SaropaLintRule {
 
       // Check for kill
       if (!classSource.contains('.kill(')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -694,7 +677,7 @@ class RequireIsolateKillRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireCameraDisposeRule extends SaropaLintRule {
-  const RequireCameraDisposeRule() : super(code: _code);
+  RequireCameraDisposeRule() : super(code: _code);
 
   /// Undisposed CameraController locks the camera and leaks native memory.
   /// Each occurrence is a critical resource leak.
@@ -708,22 +691,20 @@ class RequireCameraDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_camera_dispose',
-    problemMessage:
-        '[require_camera_dispose] Undisposed camera holds hardware exclusively, '
+    'require_camera_dispose',
+    '[require_camera_dispose] Undisposed camera holds hardware exclusively, '
         'blocking other apps from accessing camera until app restart. {v2}',
     correctionMessage:
         'Add _controller.dispose() in the dispose() method before super.dispose().',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State<T>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -758,7 +739,8 @@ class RequireCameraDisposeRule extends SaropaLintRule {
 
       // Check if controllers are disposed
       for (final String name in controllerNames) {
-        final bool isDisposed = disposeBody != null &&
+        final bool isDisposed =
+            disposeBody != null &&
             (disposeBody.contains('$name.dispose(') ||
                 disposeBody.contains('$name?.dispose('));
 
@@ -768,94 +750,12 @@ class RequireCameraDisposeRule extends SaropaLintRule {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
                 if (variable.name.lexeme == name) {
-                  reporter.atNode(variable, code);
+                  reporter.atNode(variable);
                 }
               }
             }
           }
         }
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddCameraDisposeFix()];
-}
-
-class _AddCameraDisposeFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String fieldName = node.name.lexeme;
-
-      // Find the containing class
-      AstNode? current = node.parent;
-      while (current != null && current is! ClassDeclaration) {
-        current = current.parent;
-      }
-      if (current is! ClassDeclaration) return;
-
-      final ClassDeclaration classNode = current;
-
-      // Find existing dispose method
-      MethodDeclaration? disposeMethod;
-      for (final ClassMember member in classNode.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeMethod = member;
-          break;
-        }
-      }
-
-      if (disposeMethod != null) {
-        // Insert dispose() call before super.dispose()
-        final String bodySource = disposeMethod.body.toSource();
-        final int superDisposeIndex = bodySource.indexOf('super.dispose()');
-
-        if (superDisposeIndex != -1) {
-          final int bodyOffset = disposeMethod.body.offset;
-          final int insertOffset = bodyOffset + superDisposeIndex;
-
-          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-            message: 'Add $fieldName.dispose()',
-            priority: 1,
-          );
-
-          changeBuilder.addDartFileEdit((builder) {
-            builder.addSimpleInsertion(
-              insertOffset,
-              '$fieldName.dispose();\n    ',
-            );
-          });
-        }
-      } else {
-        // Create new dispose method
-        int insertOffset = classNode.rightBracket.offset;
-
-        for (final ClassMember member in classNode.members) {
-          if (member is FieldDeclaration || member is ConstructorDeclaration) {
-            insertOffset = member.end;
-          }
-        }
-
-        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-          message: 'Add dispose() method with $fieldName.dispose()',
-          priority: 1,
-        );
-
-        changeBuilder.addDartFileEdit((builder) {
-          builder.addSimpleInsertion(
-            insertOffset,
-            '\n\n  @override\n  void dispose() {\n    $fieldName.dispose();\n    super.dispose();\n  }',
-          );
-        });
       }
     });
   }
@@ -885,7 +785,7 @@ class _AddCameraDisposeFix extends DartFix {
 /// await uploadFile(File(image!.path));
 /// ```
 class RequireImageCompressionRule extends SaropaLintRule {
-  const RequireImageCompressionRule() : super(code: _code);
+  RequireImageCompressionRule() : super(code: _code);
 
   /// Uncompressed camera images waste bandwidth and storage.
   /// Performance issue, not a bug.
@@ -896,21 +796,19 @@ class RequireImageCompressionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_image_compression',
-    problemMessage:
-        '[require_image_compression] Camera image captured without compression. Large files waste bandwidth. Phone cameras produce large images (5-20MB). Uploading uncompressed images wastes bandwidth and storage. Compress before upload. {v2}',
+    'require_image_compression',
+    '[require_image_compression] Camera image captured without compression. Large files waste bandwidth. Phone cameras produce large images (5-20MB). Uploading uncompressed images wastes bandwidth and storage. Compress before upload. {v2}',
     correctionMessage:
         'Add maxWidth, maxHeight, or imageQuality parameters to limit file size. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName != 'pickImage' && methodName != 'getImage') return;
@@ -936,41 +834,8 @@ class RequireImageCompressionRule extends SaropaLintRule {
       }
 
       if (isFromCamera && !hasCompression) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddImageCompressionFix()];
-}
-
-class _AddImageCompressionFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ArgumentList args = node.argumentList;
-      if (args.arguments.isEmpty) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add compression parameters',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          args.arguments.last.end,
-          ',\n      maxWidth: 1920,\n      maxHeight: 1080,\n      imageQuality: 85',
-        );
-      });
     });
   }
 }
@@ -1003,7 +868,7 @@ class _AddImageCompressionFix extends DartFix {
 /// );
 /// ```
 class PreferCoarseLocationRule extends SaropaLintRule {
-  const PreferCoarseLocationRule() : super(code: _code);
+  PreferCoarseLocationRule() : super(code: _code);
 
   /// High-precision GPS uses more battery than necessary.
   /// Optimization suggestion, not a bug.
@@ -1014,21 +879,19 @@ class PreferCoarseLocationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_coarse_location_when_sufficient',
-    problemMessage:
-        '[prefer_coarse_location_when_sufficient] High accuracy location uses more battery. Prefer coarse location. Precise GPS location uses more battery and feels more invasive to users. For city-level features (weather, local stores), use coarse location instead. {v2}',
+    'prefer_coarse_location_when_sufficient',
+    '[prefer_coarse_location_when_sufficient] High accuracy location uses more battery. Prefer coarse location. Precise GPS location uses more battery and feels more invasive to users. For city-level features (weather, local stores), use coarse location instead. {v2}',
     correctionMessage:
         'Use LocationAccuracy.low or .medium if you only need city-level location. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName != 'getCurrentPosition' && methodName != 'getPosition') {
@@ -1046,7 +909,7 @@ class PreferCoarseLocationRule extends SaropaLintRule {
             if (value.contains('.high') ||
                 value.contains('.best') ||
                 value.contains('.bestForNavigation')) {
-              reporter.atNode(arg, code);
+              reporter.atNode(arg);
             }
           }
         }
@@ -1074,7 +937,7 @@ class PreferCoarseLocationRule extends SaropaLintRule {
 /// final image = await ImagePicker().pickImage(source: ImageSource.gallery);
 /// ```
 class AvoidImagePickerWithoutSourceRule extends SaropaLintRule {
-  const AvoidImagePickerWithoutSourceRule() : super(code: _code);
+  AvoidImagePickerWithoutSourceRule() : super(code: _code);
 
   /// Missing source shows blank picker on some devices.
   /// UX bug that affects user experience.
@@ -1085,21 +948,19 @@ class AvoidImagePickerWithoutSourceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_image_picker_without_source',
-    problemMessage:
-        '[avoid_image_picker_without_source] ImagePicker called without specifying an ImageSource shows a blank or empty picker dialog on some Android devices and older iOS versions. Users see a non-functional dialog and cannot select or capture images, resulting in a broken feature that provides no error feedback or alternative selection path. {v2}',
+    'avoid_image_picker_without_source',
+    '[avoid_image_picker_without_source] ImagePicker called without specifying an ImageSource shows a blank or empty picker dialog on some Android devices and older iOS versions. Users see a non-functional dialog and cannot select or capture images, resulting in a broken feature that provides no error feedback or alternative selection path. {v2}',
     correctionMessage:
         'Explicitly specify source: ImageSource.camera or ImageSource.gallery, or present a chooser dialog that lets the user pick their preferred image source.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName != 'pickImage' &&
@@ -1118,54 +979,8 @@ class AvoidImagePickerWithoutSourceRule extends SaropaLintRule {
       }
 
       if (!hasSource) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddImageSourceFix()];
-}
-
-class _AddImageSourceFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String methodName = node.methodName.name;
-      if (methodName != 'pickImage' &&
-          methodName != 'pickVideo' &&
-          methodName != 'pickMultiImage') {
-        return;
-      }
-
-      final ArgumentList args = node.argumentList;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add source: ImageSource.gallery',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        if (args.arguments.isEmpty) {
-          builder.addSimpleInsertion(
-            args.leftParenthesis.end,
-            'source: ImageSource.gallery',
-          );
-        } else {
-          builder.addSimpleInsertion(
-            args.leftParenthesis.end,
-            'source: ImageSource.gallery, ',
-          );
-        }
-      });
     });
   }
 }
@@ -1195,7 +1010,7 @@ class _AddImageSourceFix extends DartFix {
 /// );
 /// ```
 class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
-  const PreferGeolocatorAccuracyAppropriateRule() : super(code: _code);
+  PreferGeolocatorAccuracyAppropriateRule() : super(code: _code);
 
   /// Battery drain from excessive GPS usage.
   @override
@@ -1205,21 +1020,19 @@ class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_geolocator_accuracy_appropriate',
-    problemMessage:
-        '[prefer_geolocator_accuracy_appropriate] LocationAccuracy.high uses GPS and drains battery significantly. LocationAccuracy.high uses GPS and significantly drains battery. For features that don\'t need precise location, use lower accuracy. {v2}',
+    'prefer_geolocator_accuracy_appropriate',
+    '[prefer_geolocator_accuracy_appropriate] LocationAccuracy.high uses GPS and drains battery significantly. LocationAccuracy.high uses GPS and significantly drains battery. For features that don\'t need precise location, use lower accuracy. {v2}',
     correctionMessage:
         'Prefer LocationAccuracy.low or .medium if precise location not needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'getCurrentPosition' &&
           methodName != 'getPositionStream') {
@@ -1239,7 +1052,7 @@ class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
           if (valueSource.contains('.high') ||
               valueSource.contains('.best') ||
               valueSource.contains('.bestForNavigation')) {
-            reporter.atNode(arg, code);
+            reporter.atNode(arg);
             return;
           }
         }
@@ -1267,7 +1080,7 @@ class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferGeolocatorLastKnownRule extends SaropaLintRule {
-  const PreferGeolocatorLastKnownRule() : super(code: _code);
+  PreferGeolocatorLastKnownRule() : super(code: _code);
 
   /// Battery optimization opportunity.
   @override
@@ -1277,21 +1090,19 @@ class PreferGeolocatorLastKnownRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_geolocator_last_known',
-    problemMessage:
-        '[prefer_geolocator_last_known] getCurrentPosition polls GPS. Prefer getLastKnownPosition for cached location. getLastKnownPosition returns cached location without GPS poll. Use it when fresh location isn\'t critical. {v2}',
+    'prefer_geolocator_last_known',
+    '[prefer_geolocator_last_known] getCurrentPosition polls GPS. Prefer getLastKnownPosition for cached location. getLastKnownPosition returns cached location without GPS poll. Use it when fresh location isn\'t critical. {v2}',
     correctionMessage:
         'Use Geolocator.getLastKnownPosition() when fresh location not critical. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'getCurrentPosition') return;
 
       // Check if target is Geolocator
@@ -1318,7 +1129,7 @@ class PreferGeolocatorLastKnownRule extends SaropaLintRule {
 
       // Only suggest for low-accuracy requests where cached might suffice
       if (hasLowAccuracy) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1347,7 +1158,7 @@ class PreferGeolocatorLastKnownRule extends SaropaLintRule {
 /// final images = await ImagePicker().pickMultiImage();
 /// ```
 class PreferImagePickerMultiSelectionRule extends SaropaLintRule {
-  const PreferImagePickerMultiSelectionRule() : super(code: _code);
+  PreferImagePickerMultiSelectionRule() : super(code: _code);
 
   /// Poor UX from repeated picker dialogs.
   @override
@@ -1357,27 +1168,25 @@ class PreferImagePickerMultiSelectionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_image_picker_multi_selection',
-    problemMessage:
-        '[prefer_image_picker_multi_selection] pickImage in loop. Use pickMultiImage for batch selection. Use pickMultiImage instead of loop calling pickImage. This can cause resource exhaustion, performance degradation, or application instability. {v2}',
+    'prefer_image_picker_multi_selection',
+    '[prefer_image_picker_multi_selection] pickImage in loop. Use pickMultiImage for batch selection. Use pickMultiImage instead of loop calling pickImage. This can cause resource exhaustion, performance degradation, or application instability. {v2}',
     correctionMessage:
         'Replace with ImagePicker().pickMultiImage(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'pickImage') return;
 
       // Check if inside a loop
       final ForStatement? forLoop = node.thisOrAncestorOfType<ForStatement>();
-      final WhileStatement? whileLoop =
-          node.thisOrAncestorOfType<WhileStatement>();
+      final WhileStatement? whileLoop = node
+          .thisOrAncestorOfType<WhileStatement>();
       final DoStatement? doLoop = node.thisOrAncestorOfType<DoStatement>();
       final ForElement? forElement = node.thisOrAncestorOfType<ForElement>();
 
@@ -1385,7 +1194,7 @@ class PreferImagePickerMultiSelectionRule extends SaropaLintRule {
           whileLoop != null ||
           doLoop != null ||
           forElement != null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }

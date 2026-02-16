@@ -8,8 +8,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -45,7 +43,7 @@ import '../../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidHooksOutsideBuildRule extends SaropaLintRule {
-  const AvoidHooksOutsideBuildRule() : super(code: _code);
+  AvoidHooksOutsideBuildRule() : super(code: _code);
 
   /// Critical - runtime error.
   @override
@@ -55,21 +53,19 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hooks_outside_build',
-    problemMessage:
-        '[avoid_hooks_outside_build] Hook function called outside of build method. '
+    'avoid_hooks_outside_build',
+    '[avoid_hooks_outside_build] Hook function called outside of build method. '
         'Hooks must only be called from build(). {v2}',
     correctionMessage: 'Move this hook call inside the build() method.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check if it's a hook function (use + PascalCase, e.g., useState, useEffect)
@@ -77,7 +73,7 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
 
       // Check if we're inside a build method
       if (!_isInsideBuildMethod(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -123,7 +119,7 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidConditionalHooksRule extends SaropaLintRule {
-  const AvoidConditionalHooksRule() : super(code: _code);
+  AvoidConditionalHooksRule() : super(code: _code);
 
   /// Critical - runtime error.
   @override
@@ -133,22 +129,20 @@ class AvoidConditionalHooksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_conditional_hooks',
-    problemMessage:
-        '[avoid_conditional_hooks] Hook function called conditionally. '
+    'avoid_conditional_hooks',
+    '[avoid_conditional_hooks] Hook function called conditionally. '
         'Hooks must be called unconditionally in the same order. {v2}',
     correctionMessage:
         'Move hook calls outside of conditionals. Use the hook value conditionally instead.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check if it's a hook function (use + PascalCase, e.g., useState, useEffect)
@@ -159,7 +153,7 @@ class AvoidConditionalHooksRule extends SaropaLintRule {
 
       // Check if inside a conditional
       if (_isInsideConditional(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -231,7 +225,7 @@ class AvoidConditionalHooksRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
-  const AvoidUnnecessaryHookWidgetsRule() : super(code: _code);
+  AvoidUnnecessaryHookWidgetsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -244,21 +238,19 @@ class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_hook_widgets',
-    problemMessage:
-        '[avoid_unnecessary_hook_widgets] HookWidget without any hook calls. Use StatelessWidget instead. If a widget extends HookWidget but doesn\'t call any hook functions, it must be a regular StatelessWidget instead. {v2}',
+    'avoid_unnecessary_hook_widgets',
+    '[avoid_unnecessary_hook_widgets] HookWidget without any hook calls. Use StatelessWidget instead. If a widget extends HookWidget but doesn\'t call any hook functions, it must be a regular StatelessWidget instead. {v2}',
     correctionMessage:
         'Change to StatelessWidget if no hooks are needed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends HookWidget
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -285,7 +277,7 @@ class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
       buildMethod.body.accept(visitor);
 
       if (!visitor.hasHookCall) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -364,7 +356,7 @@ bool _isHookFunction(String methodName) {
 /// }
 /// ```
 class PreferUseCallbackRule extends SaropaLintRule {
-  const PreferUseCallbackRule() : super(code: _code);
+  PreferUseCallbackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -373,17 +365,17 @@ class PreferUseCallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_use_callback',
-    problemMessage:
-        '[prefer_use_callback] Inline closure passed as callback in a '
+    'prefer_use_callback',
+    '[prefer_use_callback] Inline closure passed as callback in a '
         'HookWidget build method. Every rebuild creates a new closure '
         'instance, which breaks referential equality and defeats hook '
         'memoization. Child widgets receiving this callback will rebuild '
         'unnecessarily. Use useCallback to memoize the function and '
         'maintain stable references across rebuilds. {v1}',
-    correctionMessage: 'Extract the inline closure into a useCallback hook: '
+    correctionMessage:
+        'Extract the inline closure into a useCallback hook: '
         'final handler = useCallback(() { ... }, [dependencies]);',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Callback parameter names commonly used in Flutter widgets.
@@ -399,11 +391,10 @@ class PreferUseCallbackRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       // Check if enclosing class extends HookWidget
@@ -506,7 +497,7 @@ class _InlineCallbackVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidMisusedHooksRule extends SaropaLintRule {
-  const AvoidMisusedHooksRule() : super(code: _code);
+  AvoidMisusedHooksRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -515,9 +506,8 @@ class AvoidMisusedHooksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_misused_hooks',
-    problemMessage:
-        '[avoid_misused_hooks] Hook function is called inside a callback or '
+    'avoid_misused_hooks',
+    '[avoid_misused_hooks] Hook function is called inside a callback or '
         'closure, which violates the rules of hooks. Hooks must be called at '
         'the top level of the build method, never inside callbacks (onPressed, '
         'onTap), event handlers, or nested functions. Hooks called inside '
@@ -528,16 +518,15 @@ class AvoidMisusedHooksRule extends SaropaLintRule {
         'Move the hook call to the top level of the build() method, before '
         'any callbacks or closures. Store the hook result in a variable and '
         'use that variable inside the callback instead.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_isHookFunction(methodName)) return;
 
@@ -562,13 +551,13 @@ class AvoidMisusedHooksRule extends SaropaLintRule {
               funcParent.name.lexeme == 'build') {
             return; // OK
           }
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
 
         // If we hit a FunctionDeclaration (local function), also a violation
         if (current is FunctionDeclaration) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
 

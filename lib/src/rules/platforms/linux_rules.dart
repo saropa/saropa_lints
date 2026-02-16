@@ -22,9 +22,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -59,7 +56,7 @@ import '../../saropa_lint_rule.dart';
 /// ```
 class AvoidHardcodedUnixPathsRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidHardcodedUnixPathsRule].
-  const AvoidHardcodedUnixPathsRule() : super(code: _code);
+  AvoidHardcodedUnixPathsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -68,13 +65,13 @@ class AvoidHardcodedUnixPathsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_unix_paths',
-    problemMessage:
-        '[avoid_hardcoded_unix_paths] Hardcoded Unix path detected. '
+    'avoid_hardcoded_unix_paths',
+    '[avoid_hardcoded_unix_paths] Hardcoded Unix path detected. '
         'This breaks under different users, containers, or non-standard layouts. {v3}',
-    correctionMessage: 'Use path_provider (getApplicationSupportDirectory, '
+    correctionMessage:
+        'Use path_provider (getApplicationSupportDirectory, '
         'getTemporaryDirectory) or Platform.environment instead.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Unix path prefixes that indicate hardcoded system paths.
@@ -90,17 +87,16 @@ class AvoidHardcodedUnixPathsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       if (value.isEmpty) return;
 
       for (final String prefix in _unixPathPrefixes) {
         if (value.startsWith(prefix)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -139,7 +135,7 @@ class AvoidHardcodedUnixPathsRule extends SaropaLintRule {
 /// ```
 class PreferXdgDirectoryConventionRule extends SaropaLintRule {
   /// Creates a new instance of [PreferXdgDirectoryConventionRule].
-  const PreferXdgDirectoryConventionRule() : super(code: _code);
+  PreferXdgDirectoryConventionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -148,13 +144,13 @@ class PreferXdgDirectoryConventionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_xdg_directory_convention',
-    problemMessage:
-        '[prefer_xdg_directory_convention] Manual XDG directory path '
+    'prefer_xdg_directory_convention',
+    '[prefer_xdg_directory_convention] Manual XDG directory path '
         'construction detected. This ignores XDG environment overrides. {v3}',
-    correctionMessage: 'Use path_provider (getApplicationSupportDirectory, '
+    correctionMessage:
+        'Use path_provider (getApplicationSupportDirectory, '
         'getApplicationCacheDirectory) which respects XDG variables.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Patterns that indicate manual XDG directory construction.
@@ -167,17 +163,16 @@ class PreferXdgDirectoryConventionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       if (value.isEmpty) return;
 
       for (final String pattern in _xdgPatterns) {
         if (value.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -220,7 +215,7 @@ class PreferXdgDirectoryConventionRule extends SaropaLintRule {
 /// ```
 class AvoidX11OnlyAssumptionsRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidX11OnlyAssumptionsRule].
-  const AvoidX11OnlyAssumptionsRule() : super(code: _code);
+  AvoidX11OnlyAssumptionsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -229,13 +224,13 @@ class AvoidX11OnlyAssumptionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_x11_only_assumptions',
-    problemMessage: '[avoid_x11_only_assumptions] X11-specific code detected. '
+    'avoid_x11_only_assumptions',
+    '[avoid_x11_only_assumptions] X11-specific code detected. '
         'Most Linux distros now default to Wayland. {v3}',
     correctionMessage:
         'Use Flutter abstractions or check XDG_SESSION_TYPE before '
         'using display-server-specific APIs.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// X11-specific tool names commonly invoked via Process.run.
@@ -255,23 +250,22 @@ class AvoidX11OnlyAssumptionsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       if (value.isEmpty) return;
 
       // Detect X11 tool invocations
       if (_x11Tools.contains(value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
     });
 
     // Detect Platform.environment['DISPLAY'] access without session check
-    context.registry.addIndexExpression((IndexExpression node) {
+    context.addIndexExpression((IndexExpression node) {
       final Expression? target = node.target;
       if (target is! PrefixedIdentifier) return;
 
@@ -294,7 +288,7 @@ class AvoidX11OnlyAssumptionsRule extends SaropaLintRule {
 
         final String bodySource = current.toSource();
         if (!bodySource.contains('XDG_SESSION_TYPE')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -335,7 +329,7 @@ class AvoidX11OnlyAssumptionsRule extends SaropaLintRule {
 /// common cross-platform fonts.
 class RequireLinuxFontFallbackRule extends SaropaLintRule {
   /// Creates a new instance of [RequireLinuxFontFallbackRule].
-  const RequireLinuxFontFallbackRule() : super(code: _code);
+  RequireLinuxFontFallbackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -344,13 +338,13 @@ class RequireLinuxFontFallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_linux_font_fallback',
-    problemMessage:
-        '[require_linux_font_fallback] Platform-specific font used without '
+    'require_linux_font_fallback',
+    '[require_linux_font_fallback] Platform-specific font used without '
         'fontFamilyFallback. This font may not exist on Linux. {v3}',
-    correctionMessage: 'Add fontFamilyFallback with cross-platform fonts like '
+    correctionMessage:
+        'Add fontFamilyFallback with cross-platform fonts like '
         "'Roboto', 'Noto Sans', or 'Liberation Sans'.",
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Fonts that are NOT available on standard Linux installations.
@@ -380,13 +374,10 @@ class RequireLinuxFontFallbackRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'TextStyle') return;
 
@@ -415,57 +406,16 @@ class RequireLinuxFontFallbackRule extends SaropaLintRule {
       final String fontLower = fontFamilyValue.toLowerCase();
       for (final String font in _nonLinuxFonts) {
         if (font.toLowerCase() == fontLower) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddFontFallbackFix()];
 }
 
 /// Quick fix that adds a `fontFamilyFallback` parameter with common
 /// cross-platform fonts that are available on Linux.
-class _AddFontFallbackFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final NodeList<Expression> args = node.argumentList.arguments;
-
-      // Find the fontFamily argument to insert after it
-      for (final Expression arg in args) {
-        if (arg is! NamedExpression) continue;
-        if (arg.name.label.name != 'fontFamily') continue;
-
-        final changeBuilder = reporter.createChangeBuilder(
-          message: 'Add fontFamilyFallback with cross-platform fonts',
-          priority: 80,
-        );
-
-        changeBuilder.addDartFileEdit((builder) {
-          builder.addSimpleInsertion(
-            arg.end,
-            ",\n      fontFamilyFallback: "
-            "const <String>['Roboto', 'Noto Sans', 'Liberation Sans']",
-          );
-        });
-        return;
-      }
-    });
-  }
-}
 
 // =============================================================================
 // avoid_sudo_shell_commands
@@ -499,7 +449,7 @@ class _AddFontFallbackFix extends DartFix {
 /// **OWASP:** `M1:Improper-Platform-Usage`
 class AvoidSudoShellCommandsRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidSudoShellCommandsRule].
-  const AvoidSudoShellCommandsRule() : super(code: _code);
+  AvoidSudoShellCommandsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -508,19 +458,17 @@ class AvoidSudoShellCommandsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m1},
-      );
+  OwaspMapping get owasp =>
+      const OwaspMapping(mobile: <OwaspMobile>{OwaspMobile.m1});
 
   static const LintCode _code = LintCode(
-    name: 'avoid_sudo_shell_commands',
-    problemMessage:
-        '[avoid_sudo_shell_commands] Process invocation with elevated '
+    'avoid_sudo_shell_commands',
+    '[avoid_sudo_shell_commands] Process invocation with elevated '
         'privileges detected. Apps should not assume root access. {v3}',
     correctionMessage:
         'Use polkit for privilege escalation, or redesign to avoid '
         'needing elevated permissions. Sandboxed apps cannot use sudo.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Commands that imply root/elevated privilege usage.
@@ -534,11 +482,10 @@ class AvoidSudoShellCommandsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for Process.run or Process.start
@@ -557,7 +504,7 @@ class AvoidSudoShellCommandsRule extends SaropaLintRule {
       if (firstArg is! SimpleStringLiteral) return;
 
       if (_elevatedCommands.contains(firstArg.value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }

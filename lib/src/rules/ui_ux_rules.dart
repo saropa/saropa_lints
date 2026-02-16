@@ -1,9 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when MediaQuery width is compared to magic numbers.
@@ -24,7 +21,7 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 /// if (MediaQuery.of(context).size.width > kTabletBreakpoint) { ... }
 /// ```
 class RequireResponsiveBreakpointsRule extends SaropaLintRule {
-  const RequireResponsiveBreakpointsRule() : super(code: _code);
+  RequireResponsiveBreakpointsRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -34,21 +31,19 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_responsive_breakpoints',
-    problemMessage:
-        '[require_responsive_breakpoints] Using magic numbers for breakpoints in MediaQuery makes code unclear and hard to maintain. Readers won’t know what the number means. {v2}',
+    'require_responsive_breakpoints',
+    '[require_responsive_breakpoints] Using magic numbers for breakpoints in MediaQuery makes code unclear and hard to maintain. Readers won’t know what the number means. {v2}',
     correctionMessage:
         'Extract the number to a named constant (e.g., kTabletBreakpoint) and use that in your MediaQuery comparisons for clarity and maintainability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBinaryExpression((BinaryExpression node) {
+    context.addBinaryExpression((BinaryExpression node) {
       // Check for comparison operators
       final String operator = node.operator.lexeme;
       if (operator != '>' &&
@@ -87,7 +82,7 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
 
       // Only flag common breakpoint ranges (300-1400 for responsive design)
       if (value >= 300 && value <= 1400) {
-        reporter.atNode(numericLiteral, code);
+        reporter.atNode(numericLiteral);
       }
     });
   }
@@ -123,7 +118,7 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferCachedPaintObjectsRule extends SaropaLintRule {
-  const PreferCachedPaintObjectsRule() : super(code: _code);
+  PreferCachedPaintObjectsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -133,23 +128,19 @@ class PreferCachedPaintObjectsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_cached_paint_objects',
-    problemMessage:
-        '[prefer_cached_paint_objects] Creating Paint objects inside paint() causes new allocations every frame and hurts performance. Paint objects created in paint() are recreated every frame, causing unnecessary allocations. Move to class fields to improve performance. {v2}',
+    'prefer_cached_paint_objects',
+    '[prefer_cached_paint_objects] Creating Paint objects inside paint() causes new allocations every frame and hurts performance. Paint objects created in paint() are recreated every frame, causing unnecessary allocations. Move to class fields to improve performance. {v2}',
     correctionMessage:
         'Move Paint creation outside paint() and reuse a static or instance field. This reduces allocations and improves performance.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Paint') return;
 
@@ -208,7 +199,7 @@ class PreferCachedPaintObjectsRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
-  const RequireCustomPainterShouldRepaintRule() : super(code: _code);
+  RequireCustomPainterShouldRepaintRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -220,21 +211,19 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
   // cspell:ignore shouldrepaint
 
   static const LintCode _code = LintCode(
-    name: 'require_custom_painter_shouldrepaint',
-    problemMessage:
-        '[require_custom_painter_shouldrepaint] Always returning true from shouldRepaint causes unnecessary repaints and wastes resources. Always returning true from shouldRepaint causes unnecessary repaints. Compare relevant fields to determine if repaint is actually needed. {v2}',
+    'require_custom_painter_shouldrepaint',
+    '[require_custom_painter_shouldrepaint] Always returning true from shouldRepaint causes unnecessary repaints and wastes resources. Always returning true from shouldRepaint causes unnecessary repaints. Compare relevant fields to determine if repaint is actually needed. {v2}',
     correctionMessage:
         'Compare relevant fields in shouldRepaint and only return true when the painter’s output would change. Avoid always returning true.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'shouldRepaint') return;
 
       // Check if in CustomPainter subclass
@@ -294,7 +283,7 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
 /// NumberFormat.currency(locale: Localizations.localeOf(context).toString()).format(amount);
 /// ```
 class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
-  const RequireCurrencyFormattingLocaleRule() : super(code: _code);
+  RequireCurrencyFormattingLocaleRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -304,12 +293,11 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_currency_formatting_locale',
-    problemMessage:
-        '[require_currency_formatting_locale] NumberFormat.currency() without a locale can format currency inconsistently for users. Currency formatting depends heavily on locale. Without explicit locale, the format may not match user expectations. {v2}',
+    'require_currency_formatting_locale',
+    '[require_currency_formatting_locale] NumberFormat.currency() without a locale can format currency inconsistently for users. Currency formatting depends heavily on locale. Without explicit locale, the format may not match user expectations. {v2}',
     correctionMessage:
         'Always specify a locale for NumberFormat.currency() to ensure consistent formatting for all users.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _currencyConstructors = <String>{
@@ -321,13 +309,10 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -372,7 +357,7 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
 /// NumberFormat.decimal(locale: 'en_US').format(number);
 /// ```
 class RequireNumberFormattingLocaleRule extends SaropaLintRule {
-  const RequireNumberFormattingLocaleRule() : super(code: _code);
+  RequireNumberFormattingLocaleRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -382,12 +367,11 @@ class RequireNumberFormattingLocaleRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_number_formatting_locale',
-    problemMessage:
-        '[require_number_formatting_locale] Using NumberFormat or its named constructors without an explicit locale can lead to inconsistent number formatting, such as decimal separators and grouping, depending on the user’s device or system settings. This can cause confusion or misinterpretation of numbers. {v2}',
+    'require_number_formatting_locale',
+    '[require_number_formatting_locale] Using NumberFormat or its named constructors without an explicit locale can lead to inconsistent number formatting, such as decimal separators and grouping, depending on the user’s device or system settings. This can cause confusion or misinterpretation of numbers. {v2}',
     correctionMessage:
         'Provide an explicit locale parameter to NumberFormat or its named constructors to ensure numbers are formatted consistently and as intended for all users.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _numberConstructors = <String>{
@@ -401,13 +385,10 @@ class RequireNumberFormattingLocaleRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -465,7 +446,7 @@ class RequireNumberFormattingLocaleRule extends SaropaLintRule {
 /// ''';
 /// ```
 class RequireGraphqlOperationNamesRule extends SaropaLintRule {
-  const RequireGraphqlOperationNamesRule() : super(code: _code);
+  RequireGraphqlOperationNamesRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -475,12 +456,11 @@ class RequireGraphqlOperationNamesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_graphql_operation_names',
-    problemMessage:
-        '[require_graphql_operation_names] Defining anonymous GraphQL queries, mutations, or subscriptions (without an operation name) makes debugging, error tracking, and persisted queries more difficult. Operation names are essential for identifying and managing GraphQL operations in large codebases and production environments. {v2}',
+    'require_graphql_operation_names',
+    '[require_graphql_operation_names] Defining anonymous GraphQL queries, mutations, or subscriptions (without an operation name) makes debugging, error tracking, and persisted queries more difficult. Operation names are essential for identifying and managing GraphQL operations in large codebases and production environments. {v2}',
     correctionMessage:
         'Add a descriptive operation name immediately after the query, mutation, or subscription keyword in your GraphQL document. This improves maintainability, debugging, and compatibility with GraphQL tooling.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Patterns for anonymous queries/mutations
@@ -490,11 +470,10 @@ class RequireGraphqlOperationNamesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       // Check if this looks like a GraphQL document
@@ -504,7 +483,7 @@ class RequireGraphqlOperationNamesRule extends SaropaLintRule {
       if (_anonymousQuery.hasMatch(value) ||
           _anonymousMutation.hasMatch(value) ||
           _anonymousSubscription.hasMatch(value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -534,7 +513,7 @@ class RequireGraphqlOperationNamesRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidBadgeWithoutMeaningRule extends SaropaLintRule {
-  const AvoidBadgeWithoutMeaningRule() : super(code: _code);
+  AvoidBadgeWithoutMeaningRule() : super(code: _code);
 
   /// Minor UX improvement.
   @override
@@ -544,23 +523,19 @@ class AvoidBadgeWithoutMeaningRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_badge_without_meaning',
-    problemMessage:
-        '[avoid_badge_without_meaning] Displaying a badge with a count of 0 provides no useful information to users and can create visual noise or confusion. Badges are intended to highlight actionable or noteworthy items, and showing them when empty diminishes their value. {v2}',
+    'avoid_badge_without_meaning',
+    '[avoid_badge_without_meaning] Displaying a badge with a count of 0 provides no useful information to users and can create visual noise or confusion. Badges are intended to highlight actionable or noteworthy items, and showing them when empty diminishes their value. {v2}',
     correctionMessage:
         'Add isLabelVisible: count > 0 (or equivalent logic) to your Badge widget to hide the badge when the count is zero. This ensures badges only appear when there is something to notify the user about.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Badge') return;
 
@@ -611,7 +586,7 @@ class AvoidBadgeWithoutMeaningRule extends SaropaLintRule {
 /// log('User logged in: $userId', name: 'Auth');
 /// ```
 class PreferLoggerOverPrintRule extends SaropaLintRule {
-  const PreferLoggerOverPrintRule() : super(code: _code);
+  PreferLoggerOverPrintRule() : super(code: _code);
 
   /// Code quality improvement.
   @override
@@ -621,21 +596,19 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_logger_over_print',
-    problemMessage:
-        '[prefer_logger_over_print] Using print() for logging in production code is discouraged because print statements are not filterable, lack log levels, and may expose sensitive information in release builds. Proper logging allows for better control, filtering, and analysis of application events. {v3}',
+    'prefer_logger_over_print',
+    '[prefer_logger_over_print] Using print() for logging in production code is discouraged because print statements are not filterable, lack log levels, and may expose sensitive information in release builds. Proper logging allows for better control, filtering, and analysis of application events. {v3}',
     correctionMessage:
         'Replace print() statements with calls to dart:developer log() or a structured logging package. This provides better log management, filtering, and security in production environments.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'print') return;
 
       // Skip if target is specified (e.g., someObject.print())
@@ -644,9 +617,6 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
       reporter.atNode(node.methodName, code);
     });
   }
-
-  @override
-  List<Fix> getFixes() => [_PreferLoggerOverPrintFix()];
 }
 
 /// Quick fix for [PreferLoggerOverPrintRule].
@@ -654,32 +624,6 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
 /// Replaces `print()` with `log()` from dart:developer for better logging
 /// control. Note: Users will need to add `import 'dart:developer';` manually.
 /// Example: `print('message')` → `log('message')`
-class _PreferLoggerOverPrintFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-      if (node.methodName.name != 'print') return;
-      if (node.target != null) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace print with log from dart:developer',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Replace print with log
-        builder.addSimpleReplacement(node.methodName.sourceRange, 'log');
-      });
-    });
-  }
-}
 
 /// Warns when ListView.builder lacks itemExtent for uniform items.
 ///
@@ -706,7 +650,7 @@ class _PreferLoggerOverPrintFix extends DartFix {
 /// )
 /// ```
 class PreferItemExtentWhenKnownRule extends SaropaLintRule {
-  const PreferItemExtentWhenKnownRule() : super(code: _code);
+  PreferItemExtentWhenKnownRule() : super(code: _code);
 
   /// Performance optimization suggestion.
   @override
@@ -717,23 +661,19 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
 
   // cspell:ignore itemextent
   static const LintCode _code = LintCode(
-    name: 'prefer_itemextent_when_known',
-    problemMessage:
-        '[prefer_itemextent_when_known] Add itemExtent to improve scroll performance. When all list items have the same height, setting itemExtent allows Flutter to optimize layout calculations, improving scroll performance significantly. {v2}',
+    'prefer_itemextent_when_known',
+    '[prefer_itemextent_when_known] Add itemExtent to improve scroll performance. When all list items have the same height, setting itemExtent allows Flutter to optimize layout calculations, improving scroll performance significantly. {v2}',
     correctionMessage:
         'Set itemExtent when all list items have the same height. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -788,7 +728,7 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireTabStatePreservationRule extends SaropaLintRule {
-  const RequireTabStatePreservationRule() : super(code: _code);
+  RequireTabStatePreservationRule() : super(code: _code);
 
   /// UX issue - form state loss frustrates users.
   @override
@@ -798,23 +738,19 @@ class RequireTabStatePreservationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_tab_state_preservation',
-    problemMessage:
-        '[require_tab_state_preservation] TabBarView children may lose state on tab switch. By default, tab content is disposed when switching tabs. Use AutomaticKeepAliveClientMixin to preserve state across tab switches. {v2}',
+    'require_tab_state_preservation',
+    '[require_tab_state_preservation] TabBarView children may lose state on tab switch. By default, tab content is disposed when switching tabs. Use AutomaticKeepAliveClientMixin to preserve state across tab switches. {v2}',
     correctionMessage:
         'Use AutomaticKeepAliveClientMixin to preserve state. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TabBarView') return;
 
@@ -864,7 +800,7 @@ class RequireTabStatePreservationRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
-  const PreferSkeletonOverSpinnerRule() : super(code: _code);
+  PreferSkeletonOverSpinnerRule() : super(code: _code);
 
   /// UX improvement, not a bug. Track for later.
   @override
@@ -874,21 +810,19 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_skeleton_over_spinner',
-    problemMessage:
-        '[prefer_skeleton_over_spinner] CircularProgressIndicator for content loading. Prefer skeleton loaders. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v2}',
+    'prefer_skeleton_over_spinner',
+    '[prefer_skeleton_over_spinner] CircularProgressIndicator for content loading. Prefer skeleton loaders. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v2}',
     correctionMessage:
         'Use skeleton/shimmer loaders to improve perceived performance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'CircularProgressIndicator' &&
@@ -941,7 +875,7 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
 ///     );
 /// ```
 class RequireEmptyResultsStateRule extends SaropaLintRule {
-  const RequireEmptyResultsStateRule() : super(code: _code);
+  RequireEmptyResultsStateRule() : super(code: _code);
 
   /// UX issue that confuses users.
   @override
@@ -951,29 +885,21 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_empty_results_state',
-    problemMessage:
-        '[require_empty_results_state] List with search-related name missing empty state check. Search results should show a helpful message when no results are found. Empty ListView/GridView with no indicator confuses users. {v2}',
+    'require_empty_results_state',
+    '[require_empty_results_state] List with search-related name missing empty state check. Search results should show a helpful message when no results are found. Empty ListView/GridView with no indicator confuses users. {v2}',
     correctionMessage:
         'Add isEmpty check with empty state UI to improve UX. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
-  static const _searchTerms = [
-    'search',
-    'result',
-    'filter',
-    'query',
-    'found',
-  ];
+  static const _searchTerms = ['search', 'result', 'filter', 'query', 'found'];
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
       // Check list builders
@@ -994,8 +920,9 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
       final itemCountSource = itemCountArg.expression.toSource().toLowerCase();
 
       // Check if it's search-related
-      final isSearchRelated =
-          _searchTerms.any((term) => itemCountSource.contains(term));
+      final isSearchRelated = _searchTerms.any(
+        (term) => itemCountSource.contains(term),
+      );
 
       if (!isSearchRelated) {
         return;
@@ -1054,7 +981,7 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
-  const RequireSearchLoadingIndicatorRule() : super(code: _code);
+  RequireSearchLoadingIndicatorRule() : super(code: _code);
 
   /// UX issue that confuses users.
   @override
@@ -1064,21 +991,19 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_search_loading_indicator',
-    problemMessage:
-        '[require_search_loading_indicator] Search callback without loading state management. When triggering a search (API call), users need feedback that something is happening. Missing loading state causes confusion. {v2}',
+    'require_search_loading_indicator',
+    '[require_search_loading_indicator] Search callback without loading state management. When triggering a search (API call), users need feedback that something is happening. Missing loading state causes confusion. {v2}',
     correctionMessage:
         'Set loading state before search and clear it on completion. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
       // Check text fields
@@ -1109,7 +1034,7 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
             // cspell:ignore isloading
             !callbackSource.contains('isloading') &&
             !callbackSource.contains('isSearching')) {
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
         }
       }
     });
@@ -1145,7 +1070,7 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireSearchDebounceRule extends SaropaLintRule {
-  const RequireSearchDebounceRule() : super(code: _code);
+  RequireSearchDebounceRule() : super(code: _code);
 
   /// Performance and cost issue from excessive API calls.
   @override
@@ -1155,21 +1080,19 @@ class RequireSearchDebounceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_search_debounce',
-    problemMessage:
-        '[require_search_debounce] Calling a search API on every keystroke can overwhelm your backend, degrade performance, and create a poor user experience. Without debouncing, users may see lag, rate limits, or unnecessary network traffic. {v2}',
+    'require_search_debounce',
+    '[require_search_debounce] Calling a search API on every keystroke can overwhelm your backend, degrade performance, and create a poor user experience. Without debouncing, users may see lag, rate limits, or unnecessary network traffic. {v2}',
     correctionMessage:
         'Wrap your search trigger in a Debouncer or Timer so the API is only called after the user stops typing for a short period (e.g., 300ms). This reduces load and improves responsiveness.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'TextField' && typeName != 'TextFormField') {
@@ -1192,7 +1115,8 @@ class RequireSearchDebounceRule extends SaropaLintRule {
       final callbackSource = onChangedArg.expression.toSource().toLowerCase();
 
       // Check if it's search-related
-      final isSearchRelated = callbackSource.contains('search') ||
+      final isSearchRelated =
+          callbackSource.contains('search') ||
           callbackSource.contains('query') ||
           callbackSource.contains('find') ||
           callbackSource.contains('fetch') ||
@@ -1203,14 +1127,15 @@ class RequireSearchDebounceRule extends SaropaLintRule {
       }
 
       // Check for debounce mechanisms
-      final hasDebounce = callbackSource.contains('debounce') ||
+      final hasDebounce =
+          callbackSource.contains('debounce') ||
           callbackSource.contains('throttle') ||
           callbackSource.contains('timer') ||
           callbackSource.contains('delay') ||
           callbackSource.contains('cancellable');
 
       if (!hasDebounce) {
-        reporter.atNode(onChangedArg, code);
+        reporter.atNode(onChangedArg);
       }
     });
   }
@@ -1246,7 +1171,7 @@ class RequireSearchDebounceRule extends SaropaLintRule {
 /// );
 /// ```
 class RequirePaginationLoadingStateRule extends SaropaLintRule {
-  const RequirePaginationLoadingStateRule() : super(code: _code);
+  RequirePaginationLoadingStateRule() : super(code: _code);
 
   /// UX issue affecting user experience during loading.
   @override
@@ -1256,21 +1181,19 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_pagination_loading_state',
-    problemMessage:
-        '[require_pagination_loading_state] Paginated list triggers loadMore but shows no loading indicator. Infinite scroll lists should show a loading indicator when fetching the next page of results. {v2}',
+    'require_pagination_loading_state',
+    '[require_pagination_loading_state] Paginated list triggers loadMore but shows no loading indicator. Infinite scroll lists should show a loading indicator when fetching the next page of results. {v2}',
     correctionMessage:
         'Add +1 to itemCount when loading and show indicator at the end. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
       if (!typeName.contains('ListView') && !typeName.contains('GridView')) {
@@ -1298,7 +1221,8 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
       // cspell:ignore loadmore fetchmore nextpage loadnext
 
       // Check for pagination pattern (loadMore, fetchMore, nextPage)
-      final hasPagination = builderSource.contains('loadmore') ||
+      final hasPagination =
+          builderSource.contains('loadmore') ||
           builderSource.contains('fetchmore') ||
           builderSource.contains('nextpage') ||
           builderSource.contains('loadnext');
@@ -1320,7 +1244,8 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
       final itemCountSource = itemCountArg.expression.toSource().toLowerCase();
 
       // Check if itemCount includes loading state
-      final hasLoadingInCount = itemCountSource.contains('loading') ||
+      final hasLoadingInCount =
+          itemCountSource.contains('loading') ||
           itemCountSource.contains('+ 1') ||
           itemCountSource.contains('+1');
 
@@ -1375,7 +1300,7 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
-  const RequireWebViewProgressIndicatorRule() : super(code: _code);
+  RequireWebViewProgressIndicatorRule() : super(code: _code);
 
   /// Missing loading indicator creates poor UX.
   @override
@@ -1385,12 +1310,11 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_webview_progress_indicator',
-    problemMessage:
-        '[require_webview_progress_indicator] WebView without progress indicator. Users see no loading feedback. WebView page loads can take significant time. Without a progress indicator, users may think the app is frozen or broken. Show loading state while content loads. {v2}',
+    'require_webview_progress_indicator',
+    '[require_webview_progress_indicator] WebView without progress indicator. Users see no loading feedback. WebView page loads can take significant time. Without a progress indicator, users may think the app is frozen or broken. Show loading state while content loads. {v2}',
     correctionMessage:
         'Add onProgress/onProgressChanged callback to show loading state. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _webViewTypes = <String>{
@@ -1415,13 +1339,10 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_webViewTypes.contains(typeName)) return;
 
@@ -1509,7 +1430,7 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidLoadingFlashRule extends SaropaLintRule {
-  const AvoidLoadingFlashRule() : super(code: _code);
+  AvoidLoadingFlashRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1521,23 +1442,21 @@ class AvoidLoadingFlashRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_loading_flash',
-    problemMessage:
-        '[avoid_loading_flash] Loading indicator shown without delay. Fast '
+    'avoid_loading_flash',
+    '[avoid_loading_flash] Loading indicator shown without delay. Fast '
         'responses will cause jarring visual flash. {v2}',
     correctionMessage:
         'Add a small delay (~200ms) before showing loading indicator, '
         'or use skeleton/shimmer placeholders.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for FutureBuilder or StreamBuilder
       final Expression? target = node.target;
       if (target != null) return; // Method on object, not constructor
@@ -1546,9 +1465,7 @@ class AvoidLoadingFlashRule extends SaropaLintRule {
       if (node.methodName.name != 'builder') return;
     });
 
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for FutureBuilder or StreamBuilder
@@ -1607,7 +1524,7 @@ class AvoidLoadingFlashRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferAvatarLoadingPlaceholderRule extends SaropaLintRule {
-  const PreferAvatarLoadingPlaceholderRule() : super(code: _code);
+  PreferAvatarLoadingPlaceholderRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1616,23 +1533,19 @@ class PreferAvatarLoadingPlaceholderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_avatar_loading_placeholder',
-    problemMessage:
-        '[prefer_avatar_loading_placeholder] CircleAvatar uses a network-loaded backgroundImage without providing onBackgroundImageError or a child widget as fallback. When the network image fails to load due to connectivity issues, invalid URLs, server errors, or slow connections, the avatar displays an empty or broken state with no visual feedback to the user. This creates a confusing UI where the user sees a blank circle instead of meaningful placeholder content like initials or a default icon. {v2}',
+    'prefer_avatar_loading_placeholder',
+    '[prefer_avatar_loading_placeholder] CircleAvatar uses a network-loaded backgroundImage without providing onBackgroundImageError or a child widget as fallback. When the network image fails to load due to connectivity issues, invalid URLs, server errors, or slow connections, the avatar displays an empty or broken state with no visual feedback to the user. This creates a confusing UI where the user sees a blank circle instead of meaningful placeholder content like initials or a default icon. {v2}',
     correctionMessage:
         'Add an onBackgroundImageError callback and/or a child widget (e.g., Text with user initials or an Icon) to serve as a fallback when the network image fails to load.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'CircleAvatar') return;
 
@@ -1658,43 +1571,8 @@ class PreferAvatarLoadingPlaceholderRule extends SaropaLintRule {
       }
 
       if (hasNetworkImage && !hasErrorHandler && !hasChild) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddAvatarFallbackFix()];
-}
-
-class _AddAvatarFallbackFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.constructorName.type.name.lexeme != 'CircleAvatar') return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add onBackgroundImageError and child fallback',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert before the closing parenthesis
-        final int insertOffset = node.argumentList.rightParenthesis.offset;
-        builder.addSimpleInsertion(
-          insertOffset,
-          "onBackgroundImageError: (_, __) {}, child: const Icon(Icons.person), ",
-        );
-      });
     });
   }
 }
@@ -1723,7 +1601,7 @@ class _AddAvatarFallbackFix extends DartFix {
 /// Icon(Icons.add, size: IconTheme.of(context).size)
 /// ```
 class PreferAdaptiveIconsRule extends SaropaLintRule {
-  const PreferAdaptiveIconsRule() : super(code: _code);
+  PreferAdaptiveIconsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1732,23 +1610,19 @@ class PreferAdaptiveIconsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_adaptive_icons',
-    problemMessage:
-        '[prefer_adaptive_icons] Icon has a hardcoded size value. The default 24px icon size is optimized for phones but is too small on tablets and too large on watches or compact layouts. Hardcoded sizes ignore device form factor, accessibility settings (large text mode), and theme overrides. Use IconTheme to provide contextual sizing, or derive the size from MediaQuery or the surrounding layout constraints. {v1}',
+    'prefer_adaptive_icons',
+    '[prefer_adaptive_icons] Icon has a hardcoded size value. The default 24px icon size is optimized for phones but is too small on tablets and too large on watches or compact layouts. Hardcoded sizes ignore device form factor, accessibility settings (large text mode), and theme overrides. Use IconTheme to provide contextual sizing, or derive the size from MediaQuery or the surrounding layout constraints. {v1}',
     correctionMessage:
         'Remove the hardcoded size and let IconTheme provide the size, or use IconTheme.of(context).size to scale relative to the theme.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Icon') return;
 
@@ -1757,7 +1631,7 @@ class PreferAdaptiveIconsRule extends SaropaLintRule {
           // Flag only literal number sizes (not variables or expressions)
           if (arg.expression is IntegerLiteral ||
               arg.expression is DoubleLiteral) {
-            reporter.atNode(arg, code);
+            reporter.atNode(arg);
             return;
           }
         }

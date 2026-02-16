@@ -9,9 +9,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -50,7 +47,7 @@ import '../../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidGetItInBuildRule extends SaropaLintRule {
-  const AvoidGetItInBuildRule() : super(code: _code);
+  AvoidGetItInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -59,21 +56,19 @@ class AvoidGetItInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_getit_in_build',
-    problemMessage:
-        '[avoid_getit_in_build] GetIt service locator in build() hides dependencies. Service locator calls in build() hide dependencies and make testing difficult. Inject dependencies via constructor instead. {v2}',
+    'avoid_getit_in_build',
+    '[avoid_getit_in_build] GetIt service locator in build() hides dependencies. Service locator calls in build() hide dependencies and make testing difficult. Inject dependencies via constructor instead. {v2}',
     correctionMessage:
         'Inject dependencies via constructor or access in initState(). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       final String? returnType = node.returnType?.toSource();
@@ -101,7 +96,7 @@ class _GetItBuildVisitor extends RecursiveAstVisitor<void> {
   void visitPrefixedIdentifier(PrefixedIdentifier node) {
     if (node.prefix.name == 'GetIt' &&
         (node.identifier.name == 'I' || node.identifier.name == 'instance')) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitPrefixedIdentifier(node);
   }
@@ -110,7 +105,7 @@ class _GetItBuildVisitor extends RecursiveAstVisitor<void> {
   void visitMethodInvocation(MethodInvocation node) {
     final String? targetName = node.target?.toSource();
     if (targetName == 'GetIt.I' || targetName == 'GetIt.instance') {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
   }
@@ -139,7 +134,7 @@ class _GetItBuildVisitor extends RecursiveAstVisitor<void> {
 /// getIt.registerSingleton<UserService>(UserService(getIt<AuthService>()));
 /// ```
 class RequireGetItRegistrationOrderRule extends SaropaLintRule {
-  const RequireGetItRegistrationOrderRule() : super(code: _code);
+  RequireGetItRegistrationOrderRule() : super(code: _code);
 
   /// Wrong registration order crashes at startup.
   @override
@@ -149,37 +144,41 @@ class RequireGetItRegistrationOrderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_getit_registration_order',
-    problemMessage:
-        '[require_getit_registration_order] GetIt registration uses a dependency not yet registered at this point in the setup sequence. This causes runtime errors when the service locator attempts to resolve an unregistered type, resulting in app crashes during startup or lazy initialization that are difficult to reproduce and debug in production. {v3}',
+    'require_getit_registration_order',
+    '[require_getit_registration_order] GetIt registration uses a dependency not yet registered at this point in the setup sequence. This causes runtime errors when the service locator attempts to resolve an unregistered type, resulting in app crashes during startup or lazy initialization that are difficult to reproduce and debug in production. {v3}',
     correctionMessage:
         'Register dependencies before services that depend on them, or use registerLazySingleton.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track registered types in the current function scope
-    context.registry.addFunctionBody((FunctionBody body) {
+    context.addFunctionBody((FunctionBody body) {
       if (body is! BlockFunctionBody) return;
 
       final Set<String> registeredTypes = <String>{};
       final List<(MethodInvocation, Set<String>)> registrations = [];
 
       // First pass: collect all registrations and their dependencies
-      body.accept(_GetItRegistrationVisitor(
-        onRegistration: (MethodInvocation node, String? registeredType,
-            Set<String> dependencies) {
-          registrations.add((node, dependencies));
-          if (registeredType != null) {
-            registeredTypes.add(registeredType);
-          }
-        },
-      ));
+      body.accept(
+        _GetItRegistrationVisitor(
+          onRegistration:
+              (
+                MethodInvocation node,
+                String? registeredType,
+                Set<String> dependencies,
+              ) {
+                registrations.add((node, dependencies));
+                if (registeredType != null) {
+                  registeredTypes.add(registeredType);
+                }
+              },
+        ),
+      );
 
       // Second pass: check for unregistered dependencies at registration time
       final Set<String> seenTypes = <String>{};
@@ -191,7 +190,7 @@ class RequireGetItRegistrationOrderRule extends SaropaLintRule {
         for (final dep in deps) {
           if (!seenTypes.contains(dep) && registeredTypes.contains(dep)) {
             // This dependency exists but wasn't registered yet
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             break;
           }
         }
@@ -328,7 +327,7 @@ class _DependencyFinder extends RecursiveAstVisitor<void> {
 ///
 /// **Quick fix available:** Adds a reminder comment.
 class RequireGetItResetInTestsRule extends SaropaLintRule {
-  const RequireGetItResetInTestsRule() : super(code: _code);
+  RequireGetItResetInTestsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -341,27 +340,25 @@ class RequireGetItResetInTestsRule extends SaropaLintRule {
 
   // cspell:ignore getit
   static const LintCode _code = LintCode(
-    name: 'require_getit_reset_in_tests',
-    problemMessage:
-        '[require_getit_reset_in_tests] GetIt singletons are not automatically reset between tests. If you do not call GetIt.I.reset(), state from one test can leak into others, causing unpredictable, flaky, or misleading results. This can hide real bugs and make tests unreliable. {v3}',
+    'require_getit_reset_in_tests',
+    '[require_getit_reset_in_tests] GetIt singletons are not automatically reset between tests. If you do not call GetIt.I.reset(), state from one test can leak into others, causing unpredictable, flaky, or misleading results. This can hide real bugs and make tests unreliable. {v3}',
     correctionMessage:
         'To ensure each test runs in isolation, add GetIt.I.reset() in setUp() or setUpAll() of your test suite.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only run in test files
-    final String path = resolver.source.fullName.replaceAll('\\', '/');
+    final String path = context.filePath.replaceAll('\\', '/');
     if (!path.contains('_test.dart') && !path.contains('/test/')) {
       return;
     }
 
-    context.registry.addCompilationUnit((CompilationUnit unit) {
+    context.addCompilationUnit((CompilationUnit unit) {
       final String source = unit.toSource();
 
       // Check if GetIt is used
@@ -370,7 +367,8 @@ class RequireGetItResetInTestsRule extends SaropaLintRule {
       }
 
       // Check if reset is called (typically in setUp/setUpAll)
-      final bool hasReset = source.contains('.reset()') ||
+      final bool hasReset =
+          source.contains('.reset()') ||
           source.contains('.resetLazySingleton') ||
           source.contains('GetIt.I.reset') ||
           source.contains('getIt.reset');
@@ -382,9 +380,6 @@ class RequireGetItResetInTestsRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddGetItResetReminderFix()];
 }
 
 class _GetItUsageVisitor extends RecursiveAstVisitor<void> {
@@ -400,36 +395,9 @@ class _GetItUsageVisitor extends RecursiveAstVisitor<void> {
 
     if (node.prefix.name == 'GetIt' &&
         (node.identifier.name == 'I' || node.identifier.name == 'instance')) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
       _reported = true;
     }
     super.visitPrefixedIdentifier(node);
-  }
-}
-
-class _AddGetItResetReminderFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add reminder to reset GetIt',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '/* HACK: Add GetIt.I.reset() in setUp() */ ',
-        );
-      });
-    });
   }
 }

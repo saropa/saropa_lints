@@ -1,10 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../literal_context_utils.dart';
 import '../saropa_lint_rule.dart';
@@ -29,7 +25,7 @@ import '../saropa_lint_rule.dart';
 /// final m = 10_000;
 /// ```
 class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
-  const AvoidInconsistentDigitSeparatorsRule() : super(code: _code);
+  AvoidInconsistentDigitSeparatorsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -39,21 +35,19 @@ class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_inconsistent_digit_separators',
-    problemMessage:
-        '[avoid_inconsistent_digit_separators] Digit separators are not grouped consistently. Digit separators should group digits by 3 for readability. {v4}',
+    'avoid_inconsistent_digit_separators',
+    '[avoid_inconsistent_digit_separators] Digit separators are not grouped consistently. Digit separators should group digits by 3 for readability. {v4}',
     correctionMessage:
         'Use consistent groups of 3 digits. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIntegerLiteral((IntegerLiteral node) {
+    context.addIntegerLiteral((IntegerLiteral node) {
       final String lexeme = node.literal.lexeme;
       if (!lexeme.contains('_')) return;
 
@@ -74,13 +68,13 @@ class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
       // First group can be any size, rest should be 3
       for (int i = 1; i < groups.length; i++) {
         if (groups[i].length != 3) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
     });
 
-    context.registry.addDoubleLiteral((DoubleLiteral node) {
+    context.addDoubleLiteral((DoubleLiteral node) {
       final String lexeme = node.literal.lexeme;
       if (!lexeme.contains('_')) return;
 
@@ -96,7 +90,7 @@ class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
 
       for (int i = 1; i < groups.length; i++) {
         if (groups[i].length != 3) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -124,7 +118,7 @@ class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
 /// final amount = 1_000_000;
 /// ```
 class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
-  const AvoidUnnecessaryDigitSeparatorsRule() : super(code: _code);
+  AvoidUnnecessaryDigitSeparatorsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -134,21 +128,19 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_digit_separators',
-    problemMessage:
-        '[avoid_unnecessary_digit_separators] Unnecessary or poorly placed digit separator. Digit separators should improve readability, not hinder it. {v5}',
+    'avoid_unnecessary_digit_separators',
+    '[avoid_unnecessary_digit_separators] Unnecessary or poorly placed digit separator. Digit separators should improve readability, not hinder it. {v5}',
     correctionMessage:
         'Use digit separators consistently for large numbers only. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIntegerLiteral((IntegerLiteral node) {
+    context.addIntegerLiteral((IntegerLiteral node) {
       final String lexeme = node.literal.lexeme;
       if (!lexeme.contains('_')) return;
 
@@ -160,7 +152,7 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
         final String part = parts[i];
         // After first separator, groups should be consistent (typically 3)
         if (part.length < 2) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -168,7 +160,7 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
       // Check if number is too small to need separators
       final String withoutSeparators = lexeme.replaceAll('_', '');
       if (withoutSeparators.length < 4) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -183,7 +175,7 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
 /// Double literals should be formatted consistently, e.g., always include
 /// a digit before the decimal point (0.5 instead of .5).
 class DoubleLiteralFormatRule extends SaropaLintRule {
-  const DoubleLiteralFormatRule() : super(code: _code);
+  DoubleLiteralFormatRule() : super(code: _code);
 
   /// Stylistic preference only. No performance or correctness benefit.
   @override
@@ -193,29 +185,27 @@ class DoubleLiteralFormatRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'double_literal_format',
-    problemMessage:
-        '[double_literal_format] Formatting double literals in a specific way (e.g., 1.0 vs 1.) is a stylistic preference. All forms represent the same value with no performance difference. Enable via the stylistic tier. {v4}',
+    'double_literal_format',
+    '[double_literal_format] Formatting double literals in a specific way (e.g., 1.0 vs 1.) is a stylistic preference. All forms represent the same value with no performance difference. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Include leading zero before decimal point (e.g., 0.5). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addDoubleLiteral((DoubleLiteral node) {
+    context.addDoubleLiteral((DoubleLiteral node) {
       final String lexeme = node.literal.lexeme;
       // Check for missing leading zero
       if (lexeme.startsWith('.')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
       // Check for trailing decimal without digits
       if (lexeme.endsWith('.')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -228,7 +218,7 @@ class DoubleLiteralFormatRule extends SaropaLintRule {
 /// Magic numbers make code harder to understand and maintain. Use named
 /// constants to give meaning to numeric values.
 class NoMagicNumberRule extends SaropaLintRule {
-  const NoMagicNumberRule() : super(code: _code);
+  NoMagicNumberRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -238,14 +228,13 @@ class NoMagicNumberRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'no_magic_number',
-    problemMessage:
-        '[no_magic_number] Unexplained numeric literal makes the code harder to understand, maintain, and update consistently. '
+    'no_magic_number',
+    '[no_magic_number] Unexplained numeric literal makes the code harder to understand, maintain, and update consistently. '
         'When the same value appears in multiple locations, a typo in one creates a subtle bug. Readers cannot determine whether the number represents a timeout, a threshold, a count, or an index without surrounding context. {v7}',
     correctionMessage:
         'Extract the number to a named constant (e.g., static const maxRetries = 3) that communicates its purpose. '
         'Group related constants in a dedicated class or file so they can be updated in one place and are discoverable by other developers.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Numbers that are commonly used and don't need constants
@@ -254,19 +243,18 @@ class NoMagicNumberRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIntegerLiteral((IntegerLiteral node) {
+    context.addIntegerLiteral((IntegerLiteral node) {
       if (_shouldReportInt(node, node.value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addDoubleLiteral((DoubleLiteral node) {
+    context.addDoubleLiteral((DoubleLiteral node) {
       if (_shouldReportDouble(node, node.value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -304,7 +292,7 @@ class NoMagicNumberRule extends SaropaLintRule {
 /// print(kErrorMessage);
 /// ```
 class NoMagicStringRule extends SaropaLintRule {
-  const NoMagicStringRule() : super(code: _code);
+  NoMagicStringRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -314,14 +302,13 @@ class NoMagicStringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'no_magic_string',
-    problemMessage:
-        '[no_magic_string] Unexplained string literal makes the code harder to understand, maintain, and update consistently. '
+    'no_magic_string',
+    '[no_magic_string] Unexplained string literal makes the code harder to understand, maintain, and update consistently. '
         'Duplicate string values across the codebase lead to inconsistencies when one occurrence is updated but others are missed, causing hard-to-trace bugs in routing, API calls, or status checks. {v7}',
     correctionMessage:
         'Extract the string to a named constant (e.g., static const kStatusActive = \'active\') that communicates its purpose. '
         'Group related constants in a dedicated class or file so they can be updated in one place and are discoverable by other developers.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Strings that are commonly acceptable as literals
@@ -348,11 +335,10 @@ class NoMagicStringRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       // Skip allowed common strings
       if (_allowedStrings.contains(node.value)) return;
 
@@ -374,7 +360,7 @@ class NoMagicStringRule extends SaropaLintRule {
       // Skip regex patterns
       if (isStringUsedAsRegexPattern(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -401,7 +387,7 @@ class NoMagicStringRule extends SaropaLintRule {
 /// z *= 2;
 /// ```
 class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
-  const PreferAdditionSubtractionAssignmentsRule() : super(code: _code);
+  PreferAdditionSubtractionAssignmentsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -411,12 +397,11 @@ class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_addition_subtraction_assignments',
-    problemMessage:
-        '[prefer_addition_subtraction_assignments] Use compound assignment operator. This numeric literal usage can cause precision errors or make the intended value unclear. {v4}',
+    'prefer_addition_subtraction_assignments',
+    '[prefer_addition_subtraction_assignments] Use compound assignment operator. This numeric literal usage can cause precision errors or make the intended value unclear. {v4}',
     correctionMessage:
         'Replace with +=, -=, *=, /=, etc. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _compoundableOperators = <String>{
@@ -435,11 +420,10 @@ class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAssignmentExpression((AssignmentExpression node) {
+    context.addAssignmentExpression((AssignmentExpression node) {
       // Only check simple assignments (=)
       if (node.operator.lexeme != '=') return;
 
@@ -457,7 +441,7 @@ class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
       final String leftSource = rhs.leftOperand.toSource();
 
       if (lhsSource == leftSource) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -484,7 +468,7 @@ class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
 /// y |= flag;
 /// ```
 class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
-  const PreferCompoundAssignmentOperatorsRule() : super(code: _code);
+  PreferCompoundAssignmentOperatorsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -494,21 +478,19 @@ class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_compound_assignment_operators',
-    problemMessage:
-        '[prefer_compound_assignment_operators] Use compound assignment operator. Similar to PreferAdditionSubtractionAssignmentsRule but focuses on less common operators. {v4}',
+    'prefer_compound_assignment_operators',
+    '[prefer_compound_assignment_operators] Use compound assignment operator. Similar to PreferAdditionSubtractionAssignmentsRule but focuses on less common operators. {v4}',
     correctionMessage:
         'Replace with compound assignment (e.g., &=, |=, ^=). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addAssignmentExpression((AssignmentExpression node) {
+    context.addAssignmentExpression((AssignmentExpression node) {
       // Only check simple assignments
       if (node.operator.lexeme != '=') return;
 
@@ -524,7 +506,7 @@ class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
         // for +, -, *, /, %, so only check bitwise here
         final String op = rhs.operator.lexeme;
         if (op == '&' || op == '|' || op == '^' || op == '<<' || op == '>>') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -551,7 +533,7 @@ class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
 /// final bigNumber = 123_456_789;
 /// ```
 class PreferDigitSeparatorsRule extends SaropaLintRule {
-  const PreferDigitSeparatorsRule() : super(code: _code);
+  PreferDigitSeparatorsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -563,21 +545,19 @@ class PreferDigitSeparatorsRule extends SaropaLintRule {
   static const int _threshold = 10000; // Numbers >= 10000 should use separators
 
   static const LintCode _code = LintCode(
-    name: 'prefer_digit_separators',
-    problemMessage:
-        '[prefer_digit_separators] Large number should use digit separators. Digit separators improve readability of large numbers. This numeric literal usage can cause precision errors or make the intended value unclear. {v4}',
+    'prefer_digit_separators',
+    '[prefer_digit_separators] Large number should use digit separators. Digit separators improve readability of large numbers. This numeric literal usage can cause precision errors or make the intended value unclear. {v4}',
     correctionMessage:
         'Add underscores to group digits (e.g., 1_000_000). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIntegerLiteral((IntegerLiteral node) {
+    context.addIntegerLiteral((IntegerLiteral node) {
       final String lexeme = node.literal.lexeme;
 
       // Skip if already has separators
@@ -595,13 +575,10 @@ class PreferDigitSeparatorsRule extends SaropaLintRule {
 
       final int? value = node.value;
       if (value != null && value >= _threshold) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddDigitSeparatorsFix()];
 
   /// Formats a number with digit separators (groups of 3).
   static String formatWithSeparators(String lexeme) {
@@ -625,49 +602,6 @@ class PreferDigitSeparatorsRule extends SaropaLintRule {
   }
 }
 
-class _AddDigitSeparatorsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addIntegerLiteral((IntegerLiteral node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String lexeme = node.literal.lexeme;
-
-      // Skip if already has separators or is non-decimal
-      if (lexeme.contains('_')) return;
-      if (lexeme.startsWith('0x') ||
-          lexeme.startsWith('0X') ||
-          lexeme.startsWith('0b') ||
-          lexeme.startsWith('0B') ||
-          lexeme.startsWith('0o') ||
-          lexeme.startsWith('0O')) {
-        return;
-      }
-
-      final String formatted =
-          PreferDigitSeparatorsRule.formatWithSeparators(lexeme);
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add digit separators',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          formatted,
-        );
-      });
-    });
-  }
-}
-
 /// Warns when digit separators are used unnecessarily.
 ///
 /// Since: v0.1.2 | Updated: v4.13.0 | Rule version: v6
@@ -688,7 +622,7 @@ class _AddDigitSeparatorsFix extends DartFix {
 /// final m = 1_000_000; // Separator improves readability
 /// ```
 class AvoidDigitSeparatorsRule extends SaropaLintRule {
-  const AvoidDigitSeparatorsRule() : super(code: _code);
+  AvoidDigitSeparatorsRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
@@ -698,23 +632,21 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_digit_separators',
-    problemMessage:
-        '[avoid_digit_separators] Unnecessary digit separator in small number. Digit separators in small numbers don\'t improve readability. {v6}',
+    'avoid_digit_separators',
+    '[avoid_digit_separators] Unnecessary digit separator in small number. Digit separators in small numbers don\'t improve readability. {v6}',
     correctionMessage:
         'Remove digit separators from small numbers. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _minDigitsForSeparator = 5;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIntegerLiteral((IntegerLiteral node) {
+    context.addIntegerLiteral((IntegerLiteral node) {
       final String lexeme = node.literal.lexeme;
       if (!lexeme.contains('_')) return;
 
@@ -732,7 +664,7 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
       }
 
       if (digitsOnly.length < _minDigitsForSeparator) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -814,7 +746,7 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
 /// - `no_magic_string` - Similar pattern for string literals
 /// - `no_magic_string_in_tests` - Test-specific variant for strings
 class NoMagicNumberInTestsRule extends SaropaLintRule {
-  const NoMagicNumberInTestsRule() : super(code: _code);
+  NoMagicNumberInTestsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -826,14 +758,13 @@ class NoMagicNumberInTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'no_magic_number_in_tests',
-    problemMessage:
-        '[no_magic_number_in_tests] Unexplained numeric literal in test file obscures the purpose of expected values and assertions. '
+    'no_magic_number_in_tests',
+    '[no_magic_number_in_tests] Unexplained numeric literal in test file obscures the purpose of expected values and assertions. '
         'When a test fails, readers cannot tell whether the number is an arbitrary fixture value, a meaningful boundary, or a calculated expected result, making failures harder to diagnose and fix. {v3}',
     correctionMessage:
         'Extract test values to named constants (e.g., const expectedCount = 42) that describe their role in the test. '
         'This makes assertions self-documenting, failures easier to diagnose, and test data easier to update when requirements change.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // More relaxed allowed values for test files
@@ -870,25 +801,21 @@ class NoMagicNumberInTestsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addIntegerLiteral((IntegerLiteral node) {
+    context.addIntegerLiteral((IntegerLiteral node) {
       if (_shouldReportInt(node, node.value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addDoubleLiteral((DoubleLiteral node) {
+    context.addDoubleLiteral((DoubleLiteral node) {
       if (_shouldReportDouble(node, node.value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => [_NoMagicNumberInTestsFix()];
 
   bool _shouldReportInt(Literal node, int? value) {
     if (value == null) return false;
@@ -899,94 +826,6 @@ class NoMagicNumberInTestsRule extends SaropaLintRule {
   bool _shouldReportDouble(Literal node, double value) {
     if (_allowedDoubles.contains(value)) return false;
     return !isLiteralInConstContext(node);
-  }
-}
-
-class _NoMagicNumberInTestsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addIntegerLiteral((IntegerLiteral node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final value = node.literal.lexeme;
-      final constantName = _suggestConstantName(value);
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Extract to const $constantName',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find the test function or test group containing this literal
-        AstNode? current = node;
-        while (current != null && current is! FunctionExpression) {
-          current = current.parent;
-        }
-
-        if (current == null) return;
-
-        // Insert constant declaration before the test function
-        final insertPosition = current.offset;
-        builder.addSimpleInsertion(
-          insertPosition,
-          'const $constantName = $value;\n  ',
-        );
-
-        // Replace the literal with the constant name
-        builder.addSimpleReplacement(node.sourceRange, constantName);
-      });
-    });
-
-    context.registry.addDoubleLiteral((DoubleLiteral node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final value = node.literal.lexeme;
-      final constantName = _suggestConstantName(value);
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Extract to const $constantName',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find the test function or test group containing this literal
-        AstNode? current = node;
-        while (current != null && current is! FunctionExpression) {
-          current = current.parent;
-        }
-
-        if (current == null) return;
-
-        // Insert constant declaration before the test function
-        final insertPosition = current.offset;
-        builder.addSimpleInsertion(
-          insertPosition,
-          'const $constantName = $value;\n  ',
-        );
-
-        // Replace the literal with the constant name
-        builder.addSimpleReplacement(node.sourceRange, constantName);
-      });
-    });
-  }
-
-  String _suggestConstantName(String value) {
-    // Remove underscores and dots for the name
-    final cleaned = value.replaceAll('_', '').replaceAll('.', '');
-    // Convert to camelCase name
-    if (value.startsWith('-')) {
-      return 'negativeValue$cleaned';
-    } else if (value.contains('.')) {
-      return 'testValue${cleaned.replaceAll('-', '')}';
-    } else {
-      return 'testValue$cleaned';
-    }
   }
 }
 
@@ -1092,7 +931,7 @@ class _NoMagicNumberInTestsFix extends DartFix {
 /// - `no_magic_number` - Similar pattern for numeric literals
 /// - `no_magic_number_in_tests` - Test-specific variant for numbers
 class NoMagicStringInTestsRule extends SaropaLintRule {
-  const NoMagicStringInTestsRule() : super(code: _code);
+  NoMagicStringInTestsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1104,14 +943,13 @@ class NoMagicStringInTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'no_magic_string_in_tests',
-    problemMessage:
-        '[no_magic_string_in_tests] Unexplained string literal in test file obscures the purpose of expected values and assertions. '
+    'no_magic_string_in_tests',
+    '[no_magic_string_in_tests] Unexplained string literal in test file obscures the purpose of expected values and assertions. '
         'When a test fails, readers cannot tell whether the string is an arbitrary fixture, a meaningful expected output, or a format-specific value, making failures harder to diagnose. {v4}',
     correctionMessage:
         'Extract test strings to named constants (e.g., const expectedName = \'John Doe\') that describe their role in the test. '
         'This makes assertions self-documenting, failures easier to diagnose, and test data easier to update when requirements change.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// More relaxed allowed strings for test files
@@ -1154,11 +992,10 @@ class NoMagicStringInTestsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       // Skip allowed common strings
       if (_allowedStrings.contains(node.value)) return;
 
@@ -1183,73 +1020,7 @@ class NoMagicStringInTestsRule extends SaropaLintRule {
       // Skip regex patterns
       if (isStringUsedAsRegexPattern(node)) return;
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
-  }
-
-  @override
-  List<Fix> getFixes() => [_NoMagicStringInTestsFix()];
-}
-
-class _NoMagicStringInTestsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
-      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
-
-      final value = node.literal.lexeme;
-      final constantName = _suggestConstantName(node.value);
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Extract to const $constantName',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find the test function or test group containing this literal
-        AstNode? current = node;
-        while (current != null && current is! FunctionExpression) {
-          current = current.parent;
-        }
-
-        if (current == null) return;
-
-        // Insert constant declaration before the test function
-        final insertPosition = current.offset;
-        builder.addSimpleInsertion(
-          insertPosition,
-          'const $constantName = $value;\n  ',
-        );
-
-        // Replace the literal with the constant name
-        builder.addSimpleReplacement(node.sourceRange, constantName);
-      });
-    });
-  }
-
-  String _suggestConstantName(String value) {
-    // Generate a descriptive constant name from the string value
-    if (value.isEmpty) return 'emptyString';
-    if (value.length <= 3) return 'test${value.toUpperCase()}';
-
-    // Try to make a meaningful name from the value
-    final cleaned = value
-        .replaceAll(RegExp(r'[^a-zA-Z0-9]'), ' ')
-        .trim()
-        .split(' ')
-        .where((s) => s.isNotEmpty)
-        .take(3) // Max 3 words
-        .map((s) => s[0].toUpperCase() + s.substring(1).toLowerCase())
-        .join('');
-
-    if (cleaned.isEmpty) return 'testString';
-
-    return 'test$cleaned';
   }
 }

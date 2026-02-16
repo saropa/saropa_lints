@@ -9,9 +9,6 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -42,7 +39,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class RequireNotifyListenersRule extends SaropaLintRule {
-  const RequireNotifyListenersRule() : super(code: _code);
+  RequireNotifyListenersRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -52,21 +49,19 @@ class RequireNotifyListenersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_notify_listeners',
-    problemMessage:
-        '[require_notify_listeners] ChangeNotifier method modifies state properties but does not call notifyListeners(). Widgets listening to this notifier will not rebuild to reflect the updated state, displaying stale data to the user. This creates silent data synchronization bugs that are difficult to diagnose because the state appears correct in debug tools. {v5}',
+    'require_notify_listeners',
+    '[require_notify_listeners] ChangeNotifier method modifies state properties but does not call notifyListeners(). Widgets listening to this notifier will not rebuild to reflect the updated state, displaying stale data to the user. This creates silent data synchronization bugs that are difficult to diagnose because the state appears correct in debug tools. {v5}',
     correctionMessage:
         'Add notifyListeners() as the last statement in every method that modifies observable state properties to trigger dependent widget rebuilds.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends ChangeNotifier
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -84,7 +79,9 @@ class RequireNotifyListenersRule extends SaropaLintRule {
   }
 
   void _checkMethod(
-      MethodDeclaration method, SaropaDiagnosticReporter reporter) {
+    MethodDeclaration method,
+    SaropaDiagnosticReporter reporter,
+  ) {
     // Skip getters and constructors
     if (method.isGetter || method.isStatic) return;
 
@@ -99,7 +96,7 @@ class RequireNotifyListenersRule extends SaropaLintRule {
     );
 
     if (hasStateModification && !hasNotifyListeners) {
-      reporter.atNode(method, code);
+      reporter.atNode(method);
     }
   }
 }
@@ -163,7 +160,7 @@ class _StateModificationVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class RequireStreamControllerDisposeRule extends SaropaLintRule {
-  const RequireStreamControllerDisposeRule() : super(code: _code);
+  RequireStreamControllerDisposeRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -176,21 +173,19 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_stream_controller_dispose',
-    problemMessage:
-        '[require_stream_controller_dispose] Not closing a StreamController in the StatefulWidget dispose method will leak memory, keep listeners active, and cause app slowdowns, crashes, or persistent background activity. This leads to stream subscription exhaustion, battery drain, and unpredictable bugs, especially in production apps with frequent widget tree rebuilds. Unclosed controllers also prevent garbage collection and block app updates. {v7}',
+    'require_stream_controller_dispose',
+    '[require_stream_controller_dispose] Not closing a StreamController in the StatefulWidget dispose method will leak memory, keep listeners active, and cause app slowdowns, crashes, or persistent background activity. This leads to stream subscription exhaustion, battery drain, and unpredictable bugs, especially in production apps with frequent widget tree rebuilds. Unclosed controllers also prevent garbage collection and block app updates. {v7}',
     correctionMessage:
         'Always call controller.close() in the dispose method of your widget or class to properly release resources and prevent memory leaks. Audit all StreamController usage for proper cleanup and add tests for resource management. Document disposal logic for maintainability.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -214,7 +209,7 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
               // Wrapper: IsarStreamController, MyStreamController<T>, etc.
               final bool isDirectStreamController =
                   typeStr == 'StreamController' ||
-                      typeStr.startsWith('StreamController<');
+                  typeStr.startsWith('StreamController<');
               controllers.add(
                 _ControllerField(variable, !isDirectStreamController),
               );
@@ -256,42 +251,12 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTodoForStreamControllerDisposeFix()];
 }
 
 class _ControllerField {
   final VariableDeclaration variable;
   final bool isWrapper;
   const _ControllerField(this.variable, this.isWrapper);
-}
-
-class _AddTodoForStreamControllerDisposeFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for missing StreamController close',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: close this StreamController in dispose()\n',
-        );
-      });
-    });
-  }
 }
 
 /// Warns when ValueNotifier is used without dispose.
@@ -333,7 +298,7 @@ class _AddTodoForStreamControllerDisposeFix extends DartFix {
 /// }
 /// ```
 class RequireValueNotifierDisposeRule extends SaropaLintRule {
-  const RequireValueNotifierDisposeRule() : super(code: _code);
+  RequireValueNotifierDisposeRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -346,12 +311,11 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_value_notifier_dispose',
-    problemMessage:
-        '[require_value_notifier_dispose] If you do not dispose a ValueNotifier, it will leak memory, keep listeners attached, and trigger updates on a StatefulWidget that has already been removed from the widget tree. This causes memory leaks, unexpected UI updates, and hard-to-find bugs in your app. {v6}',
+    'require_value_notifier_dispose',
+    '[require_value_notifier_dispose] If you do not dispose a ValueNotifier, it will leak memory, keep listeners attached, and trigger updates on a StatefulWidget that has already been removed from the widget tree. This causes memory leaks, unexpected UI updates, and hard-to-find bugs in your app. {v6}',
     correctionMessage:
         'Call notifier.dispose() in the dispose method of your widget or class to properly release resources and prevent memory leaks.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   // Cached regex for performance
@@ -361,11 +325,10 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State (not StatefulWidget or StatelessWidget)
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -474,7 +437,7 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
       if (member is FieldDeclaration) {
         for (final VariableDeclaration variable in member.fields.variables) {
           if (variable.name.lexeme == fieldName) {
-            reporter.atNode(variable, code);
+            reporter.atNode(variable);
           }
         }
       }
@@ -627,7 +590,7 @@ class _SimpleDisposeChecker extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class RequireMountedCheckRule extends SaropaLintRule {
-  const RequireMountedCheckRule() : super(code: _code);
+  RequireMountedCheckRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -637,27 +600,25 @@ class RequireMountedCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_mounted_check',
-    problemMessage:
-        '[require_mounted_check] Calling setState after an await without checking if the StatefulWidget is still mounted in the widget tree throws a "setState called after dispose" error. This leads to runtime exceptions, app instability, and hard-to-debug crashes, especially in async code. {v4}',
+    'require_mounted_check',
+    '[require_mounted_check] Calling setState after an await without checking if the StatefulWidget is still mounted in the widget tree throws a "setState called after dispose" error. This leads to runtime exceptions, app instability, and hard-to-debug crashes, especially in async code. {v4}',
     correctionMessage:
         'Add "if (!mounted) return;" before calling setState after an await to ensure the widget is still in the widget tree and prevent runtime errors.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Check if async method
       if (!node.body.isAsynchronous) return;
 
       // Check if in a State class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -672,37 +633,6 @@ class RequireMountedCheckRule extends SaropaLintRule {
 
       // Look for await expressions followed by setState without mounted check
       node.body.visitChildren(_AsyncSetStateVisitor(reporter, code));
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddMountedCheckFix()];
-}
-
-class _AddMountedCheckFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'setState') return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add mounted check before setState',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          'if (!mounted) return;\n    ',
-        );
-      });
     });
   }
 }
@@ -745,7 +675,7 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
     if (node.methodName.name == 'setState' && _sawAwait && !_hasMountedCheck) {
       // Double-check with ancestor mounted check
       if (!_hasAncestorMountedCheck(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     }
     super.visitMethodInvocation(node);
@@ -829,7 +759,7 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
 ///
 /// **Quick fix available:** Adds a TODO comment to convert to StatelessWidget.
 class AvoidStatefulWithoutStateRule extends SaropaLintRule {
-  const AvoidStatefulWithoutStateRule() : super(code: _code);
+  AvoidStatefulWithoutStateRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -842,21 +772,19 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_stateful_without_state',
-    problemMessage:
-        '[avoid_stateful_without_state] Using a StatefulWidget without any state fields adds unnecessary complexity, increases lifecycle overhead, and can confuse maintainers. This leads to harder-to-read code, wasted memory allocations for the State object, and potential performance issues. {v6}',
+    'avoid_stateful_without_state',
+    '[avoid_stateful_without_state] Using a StatefulWidget without any state fields adds unnecessary complexity, increases lifecycle overhead, and can confuse maintainers. This leads to harder-to-read code, wasted memory allocations for the State object, and potential performance issues. {v6}',
     correctionMessage:
         'Convert the widget to a StatelessWidget if it does not manage any state. This simplifies your code and improves performance.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends State<T>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -901,13 +829,10 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
       }
 
       if (!hasState && !hasLifecycleMethods && !hasSetStateCalls) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ConvertToStatelessWidgetFix()];
 }
 
 /// Quick fix that adds a TODO comment suggesting conversion to StatelessWidget.
@@ -917,32 +842,6 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
 /// 1. The StatefulWidget class also needs to be converted/removed
 /// 2. The conversion may require moving final fields to the widget class
 /// 3. Automatic widget refactoring is complex and error-prone
-class _ConvertToStatelessWidgetFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO to convert to StatelessWidget',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// TODO: Convert to StatelessWidget - this State has no mutable state\n',
-        );
-      });
-    });
-  }
-}
 
 /// Detects `setState` calls within method bodies.
 ///
@@ -989,7 +888,7 @@ class _StatefulSetStateVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
-  const AvoidGlobalKeyInBuildRule() : super(code: _code);
+  AvoidGlobalKeyInBuildRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -999,56 +898,22 @@ class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_global_key_in_build',
-    problemMessage:
-        '[avoid_global_key_in_build] Creating a GlobalKey inside the build() method causes it to be recreated on every rebuild, which results in lost widget state, broken references, and unpredictable UI behavior. This can cause your app to lose user input or fail to maintain state across rebuilds. {v4}',
+    'avoid_global_key_in_build',
+    '[avoid_global_key_in_build] Creating a GlobalKey inside the build() method causes it to be recreated on every rebuild, which results in lost widget state, broken references, and unpredictable UI behavior. This can cause your app to lose user input or fail to maintain state across rebuilds. {v4}',
     correctionMessage:
         'Create the GlobalKey as a class field (not inside build) to preserve widget state and ensure consistent behavior.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       node.body.visitChildren(_GlobalKeyVisitor(reporter, code));
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTodoForGlobalKeyInBuildFix()];
-}
-
-class _AddTodoForGlobalKeyInBuildFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for GlobalKey in build',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// HACK: move this GlobalKey to a class field\n',
-        );
-      });
     });
   }
 }
@@ -1063,7 +928,7 @@ class _GlobalKeyVisitor extends RecursiveAstVisitor<void> {
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     final String? typeName = node.constructorName.type.element?.name;
     if (typeName != null && typeName.contains('GlobalKey')) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
     super.visitInstanceCreationExpression(node);
   }
@@ -1128,7 +993,7 @@ class _GlobalKeyVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidSetStateInLargeStateClassRule extends SaropaLintRule {
-  const AvoidSetStateInLargeStateClassRule() : super(code: _code);
+  AvoidSetStateInLargeStateClassRule() : super(code: _code);
 
   /// Performance issue in large state classes. May require refactoring.
   @override
@@ -1141,14 +1006,13 @@ class AvoidSetStateInLargeStateClassRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_setstate_in_large_state_class',
-    problemMessage:
-        '[avoid_setstate_in_large_state_class] setState() in a large State class causes expensive full rebuilds. '
+    'avoid_setstate_in_large_state_class',
+    '[avoid_setstate_in_large_state_class] setState() in a large State class causes expensive full rebuilds. '
         'Consider breaking into smaller widgets or using granular state. {v1}',
     correctionMessage:
         'Extract parts of this widget into smaller stateless/stateful widgets, '
         'or use ValueNotifier/ValueListenableBuilder for targeted rebuilds.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Threshold for number of lines in the State class body
@@ -1159,11 +1023,10 @@ class AvoidSetStateInLargeStateClassRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a State class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1187,7 +1050,7 @@ class AvoidSetStateInLargeStateClassRule extends SaropaLintRule {
 
       // Report each setState call in the large class
       for (final MethodInvocation setStateCall in visitor.setStateCalls) {
-        reporter.atNode(setStateCall, code);
+        reporter.atNode(setStateCall);
       }
     });
   }
@@ -1236,7 +1099,7 @@ class _SetStateCallVisitor extends RecursiveAstVisitor<void> {
 /// )
 /// ```
 class PreferImmutableSelectorValueRule extends SaropaLintRule {
-  const PreferImmutableSelectorValueRule() : super(code: _code);
+  PreferImmutableSelectorValueRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1245,29 +1108,21 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_immutable_selector_value',
-    problemMessage:
-        '[prefer_immutable_selector_value] Selector uses mutable type that may cause incorrect rebuilds. Selector values must be immutable to ensure proper comparisons. Mutable values are used in Provider Selector. {v2}',
+    'prefer_immutable_selector_value',
+    '[prefer_immutable_selector_value] Selector uses mutable type that may cause incorrect rebuilds. Selector values must be immutable to ensure proper comparisons. Mutable values are used in Provider Selector. {v2}',
     correctionMessage:
         'Return an immutable value or use a primitive type. Verify the state updates correctly across all affected screens and edge cases.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
-  static const Set<String> _mutableTypes = <String>{
-    'List',
-    'Map',
-    'Set',
-  };
+  static const Set<String> _mutableTypes = <String>{'List', 'Map', 'Set'};
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName != 'Selector') return;
 
@@ -1281,7 +1136,7 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
 
       for (final String mutableType in _mutableTypes) {
         if (typeSource.startsWith('$mutableType<')) {
-          reporter.atNode(selectedType, code);
+          reporter.atNode(selectedType);
           return;
         }
       }
@@ -1316,7 +1171,7 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidStaticStateRule extends SaropaLintRule {
-  const AvoidStaticStateRule() : super(code: _code);
+  AvoidStaticStateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1325,21 +1180,19 @@ class AvoidStaticStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_static_state',
-    problemMessage:
-        '[avoid_static_state] Static mutable state persists across hot-reloads and tests, causing stale data and inconsistent behavior. Tests fail unpredictably due to shared state leaking between runs, and production bugs become hard to reproduce across different app sessions and isolates. {v4}',
+    'avoid_static_state',
+    '[avoid_static_state] Static mutable state persists across hot-reloads and tests, causing stale data and inconsistent behavior. Tests fail unpredictably due to shared state leaking between runs, and production bugs become hard to reproduce across different app sessions and isolates. {v4}',
     correctionMessage:
         'Replace static mutable fields with scoped state management (Provider, Riverpod, or Bloc) to ensure proper isolation across tests and hot-reloads.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       if (!node.isStatic) return;
       if (node.fields.isFinal && node.fields.isConst) return;
 
@@ -1364,13 +1217,14 @@ class AvoidStaticStateRule extends SaropaLintRule {
 
       // Check for mutable types
       final type = node.fields.type?.toSource() ?? '';
-      final isMutableCollection = type.startsWith('List') ||
+      final isMutableCollection =
+          type.startsWith('List') ||
           type.startsWith('Map') ||
           type.startsWith('Set');
 
       // Non-final static or mutable collection
       if (!node.fields.isFinal || isMutableCollection) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1409,7 +1263,7 @@ class AvoidStaticStateRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferOptimisticUpdatesRule extends SaropaLintRule {
-  const PreferOptimisticUpdatesRule() : super(code: _code);
+  PreferOptimisticUpdatesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1424,9 +1278,8 @@ class PreferOptimisticUpdatesRule extends SaropaLintRule {
   Set<String>? get requiredPatterns => const <String>{'setState'};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_optimistic_updates',
-    problemMessage:
-        '[prefer_optimistic_updates] setState called after an await '
+    'prefer_optimistic_updates',
+    '[prefer_optimistic_updates] setState called after an await '
         'expression. The UI will not update until the async operation '
         'completes, making the app feel slow and unresponsive. Consider '
         'updating the state optimistically before the await and rolling '
@@ -1434,16 +1287,15 @@ class PreferOptimisticUpdatesRule extends SaropaLintRule {
     correctionMessage:
         'Move setState before the await and add a try-catch to rollback '
         'on failure.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Only check async methods
       if (!node.isAbstract && node.body is! EmptyFunctionBody) {
         final FunctionBody body = node.body;
@@ -1469,7 +1321,7 @@ class PreferOptimisticUpdatesRule extends SaropaLintRule {
 
       // Check if this statement is a setState call after an await
       if (seenAwait && _isSetStateCall(stmt)) {
-        reporter.atNode(stmt, code);
+        reporter.atNode(stmt);
       }
     }
   }

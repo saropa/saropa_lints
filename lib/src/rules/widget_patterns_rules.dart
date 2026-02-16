@@ -3,15 +3,11 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
 class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
-  const AvoidIncorrectImageOpacityRule() : super(code: _code);
+  AvoidIncorrectImageOpacityRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -24,22 +20,19 @@ class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_incorrect_image_opacity',
-    problemMessage:
-        '[avoid_incorrect_image_opacity] Wrapping an Image widget in an Opacity widget is inefficient because it forces the framework to allocate an offscreen buffer, render the image into it, and then composite the buffer with reduced alpha. This extra compositing pass increases GPU memory usage and slows frame rendering, especially on lower-end devices. The Image widget natively supports opacity through its color and colorBlendMode properties, which apply the alpha during the image decode stage without an extra compositing layer. {v6}',
+    'avoid_incorrect_image_opacity',
+    '[avoid_incorrect_image_opacity] Wrapping an Image widget in an Opacity widget is inefficient because it forces the framework to allocate an offscreen buffer, render the image into it, and then composite the buffer with reduced alpha. This extra compositing pass increases GPU memory usage and slows frame rendering, especially on lower-end devices. The Image widget natively supports opacity through its color and colorBlendMode properties, which apply the alpha during the image decode stage without an extra compositing layer. {v6}',
     correctionMessage:
         'Replace Opacity(child: Image(...)) with Image(..., color: color.withOpacity(x), colorBlendMode: BlendMode.modulate) to apply opacity efficiently. This avoids unnecessary compositing and improves rendering performance. See Flutter documentation for details on image opacity handling.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Opacity') return;
 
@@ -48,7 +41,7 @@ class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'child') {
           final Expression childExpr = arg.expression;
           if (_isImageWidget(childExpr)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -101,7 +94,7 @@ class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidMissingImageAltRule extends SaropaLintRule {
-  const AvoidMissingImageAltRule() : super(code: _code);
+  AvoidMissingImageAltRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -114,29 +107,26 @@ class AvoidMissingImageAltRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_missing_image_alt',
-    problemMessage:
-        '[avoid_missing_image_alt] This Image widget is missing a semanticLabel, which is essential for accessibility. Without a semanticLabel, screen readers cannot describe the image to visually impaired users, making your app less inclusive and potentially non-compliant with accessibility standards. {v4}',
+    'avoid_missing_image_alt',
+    '[avoid_missing_image_alt] This Image widget is missing a semanticLabel, which is essential for accessibility. Without a semanticLabel, screen readers cannot describe the image to visually impaired users, making your app less inclusive and potentially non-compliant with accessibility standards. {v4}',
     correctionMessage:
         'Add a descriptive semanticLabel to every Image widget to ensure it is accessible to screen readers. This improves accessibility for users with visual impairments and helps meet accessibility guidelines. Refer to Flutter’s accessibility documentation for best practices on semantic labels.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Image') return;
 
       _checkForSemanticLabel(node, reporter);
     });
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
       if (target.name != 'Image') return;
@@ -150,26 +140,30 @@ class AvoidMissingImageAltRule extends SaropaLintRule {
   }
 
   void _checkForSemanticLabel(
-      InstanceCreationExpression node, SaropaDiagnosticReporter reporter) {
+    InstanceCreationExpression node,
+    SaropaDiagnosticReporter reporter,
+  ) {
     final bool hasSemanticLabel = node.argumentList.arguments.any(
       (Expression arg) =>
           arg is NamedExpression && arg.name.label.name == 'semanticLabel',
     );
 
     if (!hasSemanticLabel) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
   }
 
   void _checkForSemanticLabelInMethod(
-      MethodInvocation node, SaropaDiagnosticReporter reporter) {
+    MethodInvocation node,
+    SaropaDiagnosticReporter reporter,
+  ) {
     final bool hasSemanticLabel = node.argumentList.arguments.any(
       (Expression arg) =>
           arg is NamedExpression && arg.name.label.name == 'semanticLabel',
     );
 
     if (!hasSemanticLabel) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
   }
 }
@@ -198,7 +192,7 @@ class AvoidMissingImageAltRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidReturningWidgetsRule extends SaropaLintRule {
-  const AvoidReturningWidgetsRule() : super(code: _code);
+  AvoidReturningWidgetsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -211,21 +205,19 @@ class AvoidReturningWidgetsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_returning_widgets',
-    problemMessage:
-        '[avoid_returning_widgets] Defining methods that return widgets (other than the build method) can make your widget tree harder to read, test, and maintain. This practice hides widget structure in private methods, reducing code clarity and making it more difficult to leverage Flutter’s hot reload and widget inspector tools. {v5}',
+    'avoid_returning_widgets',
+    '[avoid_returning_widgets] Defining methods that return widgets (other than the build method) can make your widget tree harder to read, test, and maintain. This practice hides widget structure in private methods, reducing code clarity and making it more difficult to leverage Flutter’s hot reload and widget inspector tools. {v5}',
     correctionMessage:
         'Refactor methods that return widgets into separate StatelessWidget or StatefulWidget classes. This improves code organization, enables better tooling support, and makes your UI easier to test and maintain. See Flutter documentation for best practices on widget composition.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Skip build method
       if (node.name.lexeme == 'build') return;
 
@@ -248,7 +240,7 @@ class AvoidReturningWidgetsRule extends SaropaLintRule {
 /// Using shrinkWrap: true in nested scrollables can cause performance issues
 /// as it forces the list to calculate the size of all children.
 class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
-  const AvoidUnnecessaryGestureDetectorRule() : super(code: _code);
+  AvoidUnnecessaryGestureDetectorRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -261,12 +253,11 @@ class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unnecessary_gesture_detector',
-    problemMessage:
-        '[avoid_unnecessary_gesture_detector] GestureDetector wraps a child widget but has no gesture callbacks (onTap, onDoubleTap, onLongPress, etc.) defined, making it a redundant wrapper that adds an unnecessary layer to the widget tree and confuses maintainers reading the code. {v6}',
+    'avoid_unnecessary_gesture_detector',
+    '[avoid_unnecessary_gesture_detector] GestureDetector wraps a child widget but has no gesture callbacks (onTap, onDoubleTap, onLongPress, etc.) defined, making it a redundant wrapper that adds an unnecessary layer to the widget tree and confuses maintainers reading the code. {v6}',
     correctionMessage:
         'Add at least one gesture callback (e.g. onTap, onLongPress) or remove the GestureDetector wrapper entirely to simplify the widget tree.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _gestureCallbacks = <String>{
@@ -325,12 +316,10 @@ class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.type.name.lexeme;
       if (constructorName != 'GestureDetector') return;
 
@@ -381,7 +370,7 @@ class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferDefineHeroTagRule extends SaropaLintRule {
-  const PreferDefineHeroTagRule() : super(code: _code);
+  PreferDefineHeroTagRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -394,22 +383,19 @@ class PreferDefineHeroTagRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_define_hero_tag',
-    problemMessage:
-        '[prefer_define_hero_tag] Hero widget without an explicit tag defaults to the widget itself, causing conflicts when multiple Hero widgets exist on the same screen. Duplicate tags trigger runtime assertion errors that crash the app during navigation transitions. {v4}',
+    'prefer_define_hero_tag',
+    '[prefer_define_hero_tag] Hero widget without an explicit tag defaults to the widget itself, causing conflicts when multiple Hero widgets exist on the same screen. Duplicate tags trigger runtime assertion errors that crash the app during navigation transitions. {v4}',
     correctionMessage:
         'Add a unique tag parameter to the Hero widget, such as a String constant or identifier that distinguishes it from other Hero widgets on the same route.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Hero') return;
 
@@ -420,7 +406,7 @@ class PreferDefineHeroTagRule extends SaropaLintRule {
       );
 
       if (!hasTag) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -433,24 +419,22 @@ class PreferDefineHeroTagRule extends SaropaLintRule {
 /// Long inline callbacks can make code harder to read. Consider extracting
 /// them to named methods for better readability and testability.
 class PreferExtractingCallbacksRule extends SaropaLintRule {
-  const PreferExtractingCallbacksRule() : super(code: _code);
+  PreferExtractingCallbacksRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_extracting_callbacks',
-    problemMessage:
-        '[prefer_extracting_callbacks] Inline callback exceeds a reasonable length, reducing readability and making the build method harder to maintain. Long inline closures obscure widget structure, complicate debugging, and prevent reuse of the callback logic across widgets. {v3}',
+    'prefer_extracting_callbacks',
+    '[prefer_extracting_callbacks] Inline callback exceeds a reasonable length, reducing readability and making the build method harder to maintain. Long inline closures obscure widget structure, complicate debugging, and prevent reuse of the callback logic across widgets. {v3}',
     correctionMessage:
         'Extract the callback body into a named method on the widget or state class. This improves readability, enables reuse, and simplifies testing.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionExpression((FunctionExpression node) {
+    context.addFunctionExpression((FunctionExpression node) {
       // Only check callbacks passed as arguments
       final AstNode? parent = node.parent;
       if (parent is! NamedExpression && parent is! ArgumentList) return;
@@ -460,7 +444,7 @@ class PreferExtractingCallbacksRule extends SaropaLintRule {
       if (body is BlockFunctionBody) {
         final int lineCount = body.block.statements.length;
         if (lineCount > 5) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -474,7 +458,7 @@ class PreferExtractingCallbacksRule extends SaropaLintRule {
 /// Each public widget should generally be in its own file for better
 /// organization and maintainability.
 class PreferSingleWidgetPerFileRule extends SaropaLintRule {
-  const PreferSingleWidgetPerFileRule() : super(code: _code);
+  PreferSingleWidgetPerFileRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -487,21 +471,19 @@ class PreferSingleWidgetPerFileRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_single_widget_per_file',
-    problemMessage:
-        '[prefer_single_widget_per_file] File contains multiple public widget classes, making it harder to locate widgets by filename, increasing merge conflicts in team environments, and complicating code navigation. Each public widget deserves its own file for discoverability and maintainability. {v4}',
+    'prefer_single_widget_per_file',
+    '[prefer_single_widget_per_file] File contains multiple public widget classes, making it harder to locate widgets by filename, increasing merge conflicts in team environments, and complicating code navigation. Each public widget deserves its own file for discoverability and maintainability. {v4}',
     correctionMessage:
         'Move each public widget class to its own file named after the widget (e.g. my_widget.dart). Keep private helper widgets in the same file as the public widget they support.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit node) {
+    context.addCompilationUnit((CompilationUnit node) {
       final List<ClassDeclaration> publicWidgets = <ClassDeclaration>[];
 
       for (final CompilationUnitMember member in node.declarations) {
@@ -550,7 +532,7 @@ class PreferSingleWidgetPerFileRule extends SaropaLintRule {
 /// class SliverCustomGrid extends SliverGridDelegate {}
 /// ```
 class PreferTextRichRule extends SaropaLintRule {
-  const PreferTextRichRule() : super(code: _code);
+  PreferTextRichRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -563,25 +545,22 @@ class PreferTextRichRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_text_rich',
-    problemMessage:
-        '[prefer_text_rich] RichText widget does not inherit DefaultTextStyle or respect textScaler from the widget tree, causing inconsistent text rendering across the app. Text.rich provides the same TextSpan capabilities while automatically inheriting the ambient text style and scaling settings. {v6}',
+    'prefer_text_rich',
+    '[prefer_text_rich] RichText widget does not inherit DefaultTextStyle or respect textScaler from the widget tree, causing inconsistent text rendering across the app. Text.rich provides the same TextSpan capabilities while automatically inheriting the ambient text style and scaling settings. {v6}',
     correctionMessage:
         'Replace RichText(text: TextSpan(...)) with Text.rich(TextSpan(...)) to inherit DefaultTextStyle and textScaler from the widget tree automatically.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName == 'RichText') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -607,24 +586,22 @@ class PreferTextRichRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferWidgetPrivateMembersRule extends SaropaLintRule {
-  const PreferWidgetPrivateMembersRule() : super(code: _codeField);
+  PreferWidgetPrivateMembersRule() : super(code: _codeField);
 
   static const LintCode _codeField = LintCode(
-    name: 'prefer_widget_private_members',
-    problemMessage:
-        '[prefer_widget_private_members] Non-final public field in a widget class breaks the immutability contract of Flutter widgets. Mutable widget fields can cause unpredictable rebuilds, stale state, and hard-to-trace rendering bugs because the framework assumes widgets are immutable after construction. {v6}',
+    'prefer_widget_private_members',
+    '[prefer_widget_private_members] Non-final public field in a widget class breaks the immutability contract of Flutter widgets. Mutable widget fields can cause unpredictable rebuilds, stale state, and hard-to-trace rendering bugs because the framework assumes widgets are immutable after construction. {v6}',
     correctionMessage:
         'Make the field final (preferred) or private with an underscore prefix. Widget fields should be set only via the constructor.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const LintCode _codeMethod = LintCode(
-    name: 'prefer_widget_private_members',
-    problemMessage:
-        '[prefer_widget_private_members] Public helper method in a widget class exposes internal implementation details to consumers. This increases the public API surface, invites unintended coupling, and makes refactoring harder because external code may depend on methods that are not part of the widget contract. {v6}',
+    'prefer_widget_private_members',
+    '[prefer_widget_private_members] Public helper method in a widget class exposes internal implementation details to consumers. This increases the public API surface, invites unintended coupling, and makes refactoring harder because external code may depend on methods that are not part of the widget contract. {v6}',
     correctionMessage:
         'Prefix the method name with an underscore to make it private (e.g. _buildHeader), keeping the widget API limited to its constructor parameters.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _widgetBaseClasses = <String>{
@@ -634,11 +611,10 @@ class PreferWidgetPrivateMembersRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if it's a Widget class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -743,7 +719,7 @@ class PreferWidgetPrivateMembersRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
-  const AvoidUncontrolledTextFieldRule() : super(code: _code);
+  AvoidUncontrolledTextFieldRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -756,22 +732,19 @@ class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_uncontrolled_text_field',
-    problemMessage:
-        '[avoid_uncontrolled_text_field] TextField without a TextEditingController loses programmatic access to the input value, making it impossible to pre-fill, clear, validate on demand, or read the text outside of onChanged. This leads to fragile state management and unexpected behavior during form submissions. {v6}',
+    'avoid_uncontrolled_text_field',
+    '[avoid_uncontrolled_text_field] TextField without a TextEditingController loses programmatic access to the input value, making it impossible to pre-fill, clear, validate on demand, or read the text outside of onChanged. This leads to fragile state management and unexpected behavior during form submissions. {v6}',
     correctionMessage:
         'Create a TextEditingController in initState (and dispose it in dispose), then pass it to the TextField via the controller parameter.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TextField' && typeName != 'TextFormField') return;
 
@@ -787,7 +760,7 @@ class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
       }
 
       if (!hasController) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -809,24 +782,22 @@ class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
 /// Image.asset(Assets.images.logo)  // Using generated assets class
 /// ```
 class AvoidHardcodedAssetPathsRule extends SaropaLintRule {
-  const AvoidHardcodedAssetPathsRule() : super(code: _code);
+  AvoidHardcodedAssetPathsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_asset_paths',
-    problemMessage:
-        '[avoid_hardcoded_asset_paths] Hardcoded asset path string is error-prone: typos produce silent runtime failures, path changes require find-and-replace across the codebase, and the compiler cannot verify the asset exists. Centralized asset references enable compile-time safety and single-source-of-truth for all asset paths. {v5}',
+    'avoid_hardcoded_asset_paths',
+    '[avoid_hardcoded_asset_paths] Hardcoded asset path string is error-prone: typos produce silent runtime failures, path changes require find-and-replace across the codebase, and the compiler cannot verify the asset exists. Centralized asset references enable compile-time safety and single-source-of-truth for all asset paths. {v5}',
     correctionMessage:
         'Define asset paths in a constants class or use a code generator like flutter_gen to produce type-safe asset references (e.g. Assets.images.logo).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Image.asset, AssetImage, etc.
       final String methodName = node.methodName.name;
       if (methodName != 'asset' && methodName != 'file') return;
@@ -843,14 +814,13 @@ class AvoidHardcodedAssetPathsRule extends SaropaLintRule {
         final String? path = firstArg.stringValue;
         if (path != null &&
             (path.contains('assets/') || path.contains('images/'))) {
-          reporter.atNode(firstArg, code);
+          reporter.atNode(firstArg);
         }
       }
     });
 
     // Also check for AssetImage constructor
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'AssetImage') return;
 
@@ -862,7 +832,7 @@ class AvoidHardcodedAssetPathsRule extends SaropaLintRule {
         final String? path = firstArg.stringValue;
         if (path != null &&
             (path.contains('assets/') || path.contains('images/'))) {
-          reporter.atNode(firstArg, code);
+          reporter.atNode(firstArg);
         }
       }
     });
@@ -891,7 +861,7 @@ class AvoidHardcodedAssetPathsRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Comments out the print statement.
 class AvoidPrintInProductionRule extends SaropaLintRule {
-  const AvoidPrintInProductionRule() : super(code: _code);
+  AvoidPrintInProductionRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -904,81 +874,30 @@ class AvoidPrintInProductionRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_print_in_production',
-    problemMessage:
-        '[avoid_print_in_production] print() call found in production widget code. Print statements bypass structured logging, cannot be filtered by severity, pollute the console in release builds, and may inadvertently leak sensitive data. They also add unnecessary I/O overhead in production. {v5}',
+    'avoid_print_in_production',
+    '[avoid_print_in_production] print() call found in production widget code. Print statements bypass structured logging, cannot be filtered by severity, pollute the console in release builds, and may inadvertently leak sensitive data. They also add unnecessary I/O overhead in production. {v5}',
     correctionMessage:
         'Replace with a logging framework (e.g. package:logging, or debugPrint for debug-only output) that supports log levels and can be silenced in release builds.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Skip test files
-    final String path = resolver.path;
+    final String path = context.filePath;
     if (path.contains('_test.dart') || path.contains('/test/')) return;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'print') return;
 
       // Check if it's the top-level print function
       if (node.target == null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_CommentOutPrintFix()];
-}
-
-class _CommentOutPrintFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'print') return;
-      if (node.target != null) return;
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Find the statement containing this invocation
-      final AstNode? statement = _findContainingStatement(node);
-      if (statement == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Comment out print statement',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Comment out the statement to preserve developer intent history
-        final String originalCode = statement.toSource();
-        builder.addSimpleReplacement(
-          SourceRange(statement.offset, statement.length),
-          '// $originalCode',
-        );
-      });
-    });
-  }
-
-  AstNode? _findContainingStatement(AstNode node) {
-    AstNode? current = node;
-    while (current != null) {
-      if (current is ExpressionStatement) {
-        return current;
-      }
-      current = current.parent;
-    }
-    return null;
   }
 }
 
@@ -1006,7 +925,7 @@ class _CommentOutPrintFix extends DartFix {
 /// }
 /// ```
 class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
-  const AvoidCatchingGenericExceptionRule() : super(code: _code);
+  AvoidCatchingGenericExceptionRule() : super(code: _code);
 
   /// Masks bugs and allows corrupted state to persist.
   @override
@@ -1019,26 +938,24 @@ class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_catching_generic_exception',
-    problemMessage:
-        '[avoid_catching_generic_exception] Catching Exception or Object swallows all errors including programming bugs, assertion failures, and unexpected states that should crash visibly. This masks root causes, making bugs harder to diagnose and allowing the app to continue in a corrupted state. {v4}',
+    'avoid_catching_generic_exception',
+    '[avoid_catching_generic_exception] Catching Exception or Object swallows all errors including programming bugs, assertion failures, and unexpected states that should crash visibly. This masks root causes, making bugs harder to diagnose and allowing the app to continue in a corrupted state. {v4}',
     correctionMessage:
         'Catch specific exception types (e.g. FormatException, HttpException, SocketException) so that unexpected errors propagate and are caught by error reporting.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((CatchClause node) {
+    context.addCatchClause((CatchClause node) {
       final TypeAnnotation? exceptionType = node.exceptionType;
 
       // Catch without type catches everything
       if (exceptionType == null) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -1048,7 +965,7 @@ class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
         if (typeName == 'Exception' ||
             typeName == 'Object' ||
             typeName == 'dynamic') {
-          reporter.atNode(exceptionType, code);
+          reporter.atNode(exceptionType);
         }
       }
     });
@@ -1081,7 +998,7 @@ class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidServiceLocatorOveruseRule extends SaropaLintRule {
-  const AvoidServiceLocatorOveruseRule() : super(code: _code);
+  AvoidServiceLocatorOveruseRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1094,28 +1011,26 @@ class AvoidServiceLocatorOveruseRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_service_locator_overuse',
-    problemMessage:
-        '[avoid_service_locator_overuse] Service locator (e.g. GetIt.instance) called directly in a widget hides dependencies, makes the widget untestable without the full service container, and couples the UI layer to a specific DI framework. Constructor injection makes dependencies explicit and enables easy mocking in tests. {v6}',
+    'avoid_service_locator_overuse',
+    '[avoid_service_locator_overuse] Service locator (e.g. GetIt.instance) called directly in a widget hides dependencies, makes the widget untestable without the full service container, and couples the UI layer to a specific DI framework. Constructor injection makes dependencies explicit and enables easy mocking in tests. {v6}',
     correctionMessage:
         'Pass the dependency through the widget constructor or use a DI-aware wrapper (e.g. Provider, Riverpod) so that tests can supply mock implementations without configuring a global container.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Only check build methods
       if (node.name.lexeme != 'build') return;
 
       // Find GetIt calls in build method
       node.body.accept(
         _ServiceLocatorFinder((MethodInvocation call) {
-          reporter.atNode(call, code);
+          reporter.atNode(call);
         }),
       );
     });
@@ -1161,7 +1076,7 @@ class _ServiceLocatorFinder extends RecursiveAstVisitor<void> {
 /// final timestamp = DateTime.now();  // Consider DateTime.now().toUtc()
 /// ```
 class PreferUtcDateTimesRule extends SaropaLintRule {
-  const PreferUtcDateTimesRule() : super(code: _code);
+  PreferUtcDateTimesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1174,21 +1089,19 @@ class PreferUtcDateTimesRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_utc_datetimes',
-    problemMessage:
-        '[prefer_utc_datetimes] Local DateTime values shift meaning when serialized and deserialized across time zones, causing off-by-hours bugs in timestamps, scheduling, and data synchronization. Storing and transmitting dates in UTC eliminates timezone ambiguity and ensures consistent behavior across devices and servers. {v6}',
+    'prefer_utc_datetimes',
+    '[prefer_utc_datetimes] Local DateTime values shift meaning when serialized and deserialized across time zones, causing off-by-hours bugs in timestamps, scheduling, and data synchronization. Storing and transmitting dates in UTC eliminates timezone ambiguity and ensures consistent behavior across devices and servers. {v6}',
     correctionMessage:
         'Use DateTime.now().toUtc() or DateTime.utc() for timestamps intended for storage, API transmission, or cross-device synchronization. Convert to local time only for display.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'now') return;
 
       final Expression? target = node.target;
@@ -1204,7 +1117,7 @@ class PreferUtcDateTimesRule extends SaropaLintRule {
             varName.contains('created') ||
             varName.contains('updated') ||
             varName.contains('saved')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1233,7 +1146,7 @@ class PreferUtcDateTimesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidRegexInLoopRule extends SaropaLintRule {
-  const AvoidRegexInLoopRule() : super(code: _code);
+  AvoidRegexInLoopRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1246,40 +1159,38 @@ class AvoidRegexInLoopRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_regex_in_loop',
-    problemMessage:
-        '[avoid_regex_in_loop] RegExp object constructed inside a loop body is re-compiled on every iteration, wasting CPU cycles on repeated pattern parsing. Regex compilation is expensive relative to matching, and this overhead multiplies with large data sets, causing noticeable jank in UI-driven code. {v6}',
+    'avoid_regex_in_loop',
+    '[avoid_regex_in_loop] RegExp object constructed inside a loop body is re-compiled on every iteration, wasting CPU cycles on repeated pattern parsing. Regex compilation is expensive relative to matching, and this overhead multiplies with large data sets, causing noticeable jank in UI-driven code. {v6}',
     correctionMessage:
         'Declare the RegExp as a static final field or a local variable above the loop so it is compiled once and reused on each iteration.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addForStatement((ForStatement node) {
+    context.addForStatement((ForStatement node) {
       node.body.accept(
         _RegExpCreationFinder((InstanceCreationExpression expr) {
-          reporter.atNode(expr, code);
+          reporter.atNode(expr);
         }),
       );
     });
 
-    context.registry.addWhileStatement((WhileStatement node) {
+    context.addWhileStatement((WhileStatement node) {
       node.body.accept(
         _RegExpCreationFinder((InstanceCreationExpression expr) {
-          reporter.atNode(expr, code);
+          reporter.atNode(expr);
         }),
       );
     });
 
-    context.registry.addDoStatement((DoStatement node) {
+    context.addDoStatement((DoStatement node) {
       node.body.accept(
         _RegExpCreationFinder((InstanceCreationExpression expr) {
-          reporter.atNode(expr, code);
+          reporter.atNode(expr);
         }),
       );
     });
@@ -1320,7 +1231,7 @@ class _RegExpCreationFinder extends RecursiveAstVisitor<void> {
 /// int get count => _count;
 /// ```
 class PreferGetterOverMethodRule extends SaropaLintRule {
-  const PreferGetterOverMethodRule() : super(code: _code);
+  PreferGetterOverMethodRule() : super(code: _code);
 
   /// Stylistic preference only. No performance or correctness benefit.
   @override
@@ -1333,21 +1244,19 @@ class PreferGetterOverMethodRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_getter_over_method',
-    problemMessage:
-        '[prefer_getter_over_method] Using a getter instead of a zero-parameter method is a Dart API style preference. Both produce identical compiled code with no performance difference. Enable via the stylistic tier. {v4}',
+    'prefer_getter_over_method',
+    '[prefer_getter_over_method] Using a getter instead of a zero-parameter method is a Dart API style preference. Both produce identical compiled code with no performance difference. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Convert to a getter (e.g. String get name => _name;). Reserve methods for operations that have side effects or accept parameters.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Skip getters, setters, operators
       if (node.isGetter || node.isSetter || node.isOperator) return;
 
@@ -1416,7 +1325,7 @@ class PreferGetterOverMethodRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidUnusedCallbackParametersRule extends SaropaLintRule {
-  const AvoidUnusedCallbackParametersRule() : super(code: _code);
+  AvoidUnusedCallbackParametersRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1429,21 +1338,19 @@ class AvoidUnusedCallbackParametersRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unused_callback_parameters',
-    problemMessage:
-        '[avoid_unused_callback_parameters] Callback parameter is declared but never referenced in the closure body, adding visual noise and misleading readers into thinking the value is needed. Unused parameters also trigger analyzer warnings and obscure the actual data flow of the callback. {v4}',
+    'avoid_unused_callback_parameters',
+    '[avoid_unused_callback_parameters] Callback parameter is declared but never referenced in the closure body, adding visual noise and misleading readers into thinking the value is needed. Unused parameters also trigger analyzer warnings and obscure the actual data flow of the callback. {v4}',
     correctionMessage:
         'Replace the unused parameter name with an underscore (_) or double underscore (__) to signal that the value is intentionally ignored.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFunctionExpression((FunctionExpression node) {
+    context.addFunctionExpression((FunctionExpression node) {
       final NodeList<FormalParameter>? parameters = node.parameters?.parameters;
       if (parameters == null || parameters.isEmpty) return;
 
@@ -1496,7 +1403,7 @@ class _IdentifierCollector extends RecursiveAstVisitor<void> {
 /// ]
 /// ```
 class PreferSemanticWidgetNamesRule extends SaropaLintRule {
-  const PreferSemanticWidgetNamesRule() : super(code: _code);
+  PreferSemanticWidgetNamesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1509,22 +1416,19 @@ class PreferSemanticWidgetNamesRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_semantic_widget_names',
-    problemMessage:
-        '[prefer_semantic_widget_names] Generic Container widget used where a more specific widget communicates intent. Container combines padding, decoration, alignment, and sizing in one opaque widget, making it unclear which feature is actually needed. Specific widgets like SizedBox, DecoratedBox, Padding, or Align are more readable and more efficient. {v2}',
+    'prefer_semantic_widget_names',
+    '[prefer_semantic_widget_names] Generic Container widget used where a more specific widget communicates intent. Container combines padding, decoration, alignment, and sizing in one opaque widget, making it unclear which feature is actually needed. Specific widgets like SizedBox, DecoratedBox, Padding, or Align are more readable and more efficient. {v2}',
     correctionMessage:
         'Replace Container with the specific widget that matches the intended use: SizedBox for sizing, Padding for padding, DecoratedBox for decoration, or Align for alignment.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'Container') {
@@ -1576,7 +1480,7 @@ class PreferSemanticWidgetNamesRule extends SaropaLintRule {
 /// MediaQuery.of(context).textScaler;
 /// ```
 class AvoidTextScaleFactorRule extends SaropaLintRule {
-  const AvoidTextScaleFactorRule() : super(code: _code);
+  AvoidTextScaleFactorRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1589,29 +1493,27 @@ class AvoidTextScaleFactorRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_text_scale_factor',
-    problemMessage:
-        '[avoid_text_scale_factor] textScaleFactor is deprecated since Flutter 3.16. It applies a linear multiplier that cannot express non-linear text scaling used by accessibility settings on modern platforms. The replacement textScaler API supports both linear and non-linear scaling, ensuring correct rendering for users with accessibility needs. {v4}',
+    'avoid_text_scale_factor',
+    '[avoid_text_scale_factor] textScaleFactor is deprecated since Flutter 3.16. It applies a linear multiplier that cannot express non-linear text scaling used by accessibility settings on modern platforms. The replacement textScaler API supports both linear and non-linear scaling, ensuring correct rendering for users with accessibility needs. {v4}',
     correctionMessage:
         'Replace textScaleFactor with textScaler: TextScaler.linear(factor), or use MediaQuery.textScalerOf(context) to read the ambient scaler.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check for textScaleFactorOf method calls
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'textScaleFactorOf') {
         reporter.atNode(node.methodName, code);
       }
     });
 
     // Check for .textScaleFactor property access
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       if (node.propertyName.name == 'textScaleFactor') {
         reporter.atNode(node.propertyName, code);
       }
@@ -1640,7 +1542,7 @@ class AvoidTextScaleFactorRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidImageWithoutCacheRule extends SaropaLintRule {
-  const AvoidImageWithoutCacheRule() : super(code: _code);
+  AvoidImageWithoutCacheRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1653,22 +1555,19 @@ class AvoidImageWithoutCacheRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_image_without_cache',
-    problemMessage:
-        '[avoid_image_without_cache] Image.network without cacheWidth or cacheHeight decodes the full-resolution image into memory, even when displayed at a smaller size. A 4000x3000 photo decoded at full resolution consumes ~48 MB of GPU memory, causing excessive memory usage and potential out-of-memory crashes on low-end devices. {v6}',
+    'avoid_image_without_cache',
+    '[avoid_image_without_cache] Image.network without cacheWidth or cacheHeight decodes the full-resolution image into memory, even when displayed at a smaller size. A 4000x3000 photo decoded at full resolution consumes ~48 MB of GPU memory, causing excessive memory usage and potential out-of-memory crashes on low-end devices. {v6}',
     correctionMessage:
         'Add cacheWidth and/or cacheHeight matching the display size (in logical pixels multiplied by devicePixelRatio) so Flutter decodes a smaller image into memory.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -1716,7 +1615,7 @@ class AvoidImageWithoutCacheRule extends SaropaLintRule {
 /// // or extract to const widget
 /// ```
 class PreferSplitWidgetConstRule extends SaropaLintRule {
-  const PreferSplitWidgetConstRule() : super(code: _code);
+  PreferSplitWidgetConstRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1729,22 +1628,19 @@ class PreferSplitWidgetConstRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_split_widget_const',
-    problemMessage:
-        '[prefer_split_widget_const] Large widget subtree with all-const children is rebuilt on every parent setState, even though its output never changes. Extracting it into a separate const widget class allows Flutter to skip rebuilding the entire subtree, reducing frame build times and improving scroll performance. {v6}',
+    'prefer_split_widget_const',
+    '[prefer_split_widget_const] Large widget subtree with all-const children is rebuilt on every parent setState, even though its output never changes. Extracting it into a separate const widget class allows Flutter to skip rebuilding the entire subtree, reducing frame build times and improving scroll performance. {v6}',
     correctionMessage:
         'Extract the static subtree into its own StatelessWidget class with a const constructor, then instantiate it with const in the parent build method.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check common container widgets
@@ -1795,7 +1691,7 @@ class _WidgetCounter extends RecursiveAstVisitor<void> {
 /// // or use go_router/auto_route
 /// ```
 class AvoidNavigatorPushWithoutRouteNameRule extends SaropaLintRule {
-  const AvoidNavigatorPushWithoutRouteNameRule() : super(code: _code);
+  AvoidNavigatorPushWithoutRouteNameRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1808,21 +1704,19 @@ class AvoidNavigatorPushWithoutRouteNameRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_navigator_push_without_route_name',
-    problemMessage:
-        '[avoid_navigator_push_without_route_name] Anonymous Navigator.push with inline MaterialPageRoute scatters route definitions throughout the codebase, making it impossible to see all routes in one place, complicating deep linking, and preventing analytics from tracking navigation paths by name. {v4}',
+    'avoid_navigator_push_without_route_name',
+    '[avoid_navigator_push_without_route_name] Anonymous Navigator.push with inline MaterialPageRoute scatters route definitions throughout the codebase, making it impossible to see all routes in one place, complicating deep linking, and preventing analytics from tracking navigation paths by name. {v4}',
     correctionMessage:
         'Use Navigator.pushNamed with routes defined in a central route table, or adopt a declarative routing package (e.g. go_router) for type-safe navigation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target is SimpleIdentifier && target.name == 'Navigator') {
         final String methodName = node.methodName.name;
@@ -1858,7 +1752,7 @@ class AvoidNavigatorPushWithoutRouteNameRule extends SaropaLintRule {
 /// ]
 /// ```
 class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
-  const AvoidDuplicateWidgetKeysRule() : super(code: _code);
+  AvoidDuplicateWidgetKeysRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1871,21 +1765,19 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_widget_keys',
-    problemMessage:
-        '[avoid_duplicate_widget_keys] Multiple widgets in a list share the same Key value. Flutter uses keys to match old widgets with new widgets during reconciliation. Duplicate keys cause the framework to reuse the wrong element, leading to stale state, broken animations, and incorrect widget ordering after list mutations. {v4}',
+    'avoid_duplicate_widget_keys',
+    '[avoid_duplicate_widget_keys] Multiple widgets in a list share the same Key value. Flutter uses keys to match old widgets with new widgets during reconciliation. Duplicate keys cause the framework to reuse the wrong element, leading to stale state, broken animations, and incorrect widget ordering after list mutations. {v4}',
     correctionMessage:
         'Assign a unique key to each widget in the list, using ValueKey with a stable identifier (e.g. item.id) rather than the list index.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addListLiteral((ListLiteral node) {
+    context.addListLiteral((ListLiteral node) {
       final Map<String, List<AstNode>> keyValues = <String, List<AstNode>>{};
 
       for (final CollectionElement element in node.elements) {
@@ -1906,7 +1798,7 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
       for (final List<AstNode> nodes in keyValues.values) {
         if (nodes.length > 1) {
           for (final AstNode keyNode in nodes) {
-            reporter.atNode(keyNode, code);
+            reporter.atNode(keyNode);
           }
         }
       }
@@ -1951,7 +1843,7 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferSafeAreaConsumerRule extends SaropaLintRule {
-  const PreferSafeAreaConsumerRule() : super(code: _code);
+  PreferSafeAreaConsumerRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -1964,22 +1856,19 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_safe_area_consumer',
-    problemMessage:
-        '[prefer_safe_area_consumer] SafeArea placed directly inside a Scaffold body is often redundant because Scaffold already insets its body below the AppBar and above the BottomNavigationBar. Doubling up on safe area handling wastes vertical space and can push content further from the edges than intended. {v4}',
+    'prefer_safe_area_consumer',
+    '[prefer_safe_area_consumer] SafeArea placed directly inside a Scaffold body is often redundant because Scaffold already insets its body below the AppBar and above the BottomNavigationBar. Doubling up on safe area handling wastes vertical space and can push content further from the edges than intended. {v4}',
     correctionMessage:
         'Remove SafeArea if the Scaffold has appBar or bottomNavigationBar that already consume safe area insets. Use SafeArea only when the Scaffold body extends behind system UI.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'Scaffold') {
@@ -2019,7 +1908,7 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
-  const AvoidUnrestrictedTextFieldLengthRule() : super(code: _code);
+  AvoidUnrestrictedTextFieldLengthRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2032,22 +1921,19 @@ class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_unrestricted_text_field_length',
-    problemMessage:
-        '[avoid_unrestricted_text_field_length] TextField without maxLength allows unbounded input, enabling users to paste megabytes of text that can freeze the UI, exhaust memory, and create oversized payloads for backend APIs. Setting maxLength protects against denial-of-service scenarios and enforces data integrity constraints. {v6}',
+    'avoid_unrestricted_text_field_length',
+    '[avoid_unrestricted_text_field_length] TextField without maxLength allows unbounded input, enabling users to paste megabytes of text that can freeze the UI, exhaust memory, and create oversized payloads for backend APIs. Setting maxLength protects against denial-of-service scenarios and enforces data integrity constraints. {v6}',
     correctionMessage:
         'Add the maxLength parameter with a reasonable limit (e.g. maxLength: 500) and optionally set maxLengthEnforcement to control truncation behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'TextField' || typeName == 'TextFormField') {
@@ -2084,7 +1970,7 @@ class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
 /// ScaffoldMessenger.maybeOf(context)?.showSnackBar(...);
 /// ```
 class PreferScaffoldMessengerMaybeOfRule extends SaropaLintRule {
-  const PreferScaffoldMessengerMaybeOfRule() : super(code: _code);
+  PreferScaffoldMessengerMaybeOfRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2097,21 +1983,19 @@ class PreferScaffoldMessengerMaybeOfRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_scaffold_messenger_maybeof',
-    problemMessage:
-        '[prefer_scaffold_messenger_maybeof] ScaffoldMessenger.of throws a FlutterError if no ScaffoldMessenger ancestor exists, crashing the app in contexts like dialogs, overlays, or tests without a Scaffold. Using maybeOf returns null instead, allowing graceful fallback when the messenger is unavailable. {v4}',
+    'prefer_scaffold_messenger_maybeof',
+    '[prefer_scaffold_messenger_maybeof] ScaffoldMessenger.of throws a FlutterError if no ScaffoldMessenger ancestor exists, crashing the app in contexts like dialogs, overlays, or tests without a Scaffold. Using maybeOf returns null instead, allowing graceful fallback when the messenger is unavailable. {v4}',
     correctionMessage:
         'Replace ScaffoldMessenger.of(context) with ScaffoldMessenger.maybeOf(context) and handle the null case, or verify the context has a Scaffold ancestor before calling .of.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target is SimpleIdentifier &&
           target.name == 'ScaffoldMessenger' &&
@@ -2143,7 +2027,7 @@ class PreferScaffoldMessengerMaybeOfRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidFormWithoutKeyRule extends SaropaLintRule {
-  const AvoidFormWithoutKeyRule() : super(code: _code);
+  AvoidFormWithoutKeyRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2156,22 +2040,19 @@ class AvoidFormWithoutKeyRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_form_without_key',
-    problemMessage:
-        '[avoid_form_without_key] Form widget without a GlobalKey<FormState> makes it impossible to call validate(), save(), or reset() on the form state programmatically. Without a key, you cannot trigger field validation on submit, retrieve form values, or reset the form to its initial state. {v4}',
+    'avoid_form_without_key',
+    '[avoid_form_without_key] Form widget without a GlobalKey<FormState> makes it impossible to call validate(), save(), or reset() on the form state programmatically. Without a key, you cannot trigger field validation on submit, retrieve form values, or reset the form to its initial state. {v4}',
     correctionMessage:
         'Create a GlobalKey<FormState> field (e.g. final _formKey = GlobalKey<FormState>()) and pass it to the Form widget via the key parameter.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'Form') {
@@ -2213,7 +2094,7 @@ class AvoidFormWithoutKeyRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidMediaQueryInBuildRule extends SaropaLintRule {
-  const AvoidMediaQueryInBuildRule() : super(code: _code);
+  AvoidMediaQueryInBuildRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2226,26 +2107,24 @@ class AvoidMediaQueryInBuildRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_mediaquery_in_build',
-    problemMessage:
-        '[avoid_mediaquery_in_build] MediaQuery.of(context) subscribes to all MediaQueryData changes (size, padding, orientation, brightness, text scaling), causing unnecessary rebuilds when only one property is needed. Specific accessors like sizeOf or paddingOf subscribe to only the relevant property, significantly reducing rebuild frequency. {v6}',
+    'avoid_mediaquery_in_build',
+    '[avoid_mediaquery_in_build] MediaQuery.of(context) subscribes to all MediaQueryData changes (size, padding, orientation, brightness, text scaling), causing unnecessary rebuilds when only one property is needed. Specific accessors like sizeOf or paddingOf subscribe to only the relevant property, significantly reducing rebuild frequency. {v6}',
     correctionMessage:
         'Replace MediaQuery.of(context).size with MediaQuery.sizeOf(context), .padding with MediaQuery.paddingOf(context), etc. These targeted methods were added in Flutter 3.10.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target is SimpleIdentifier &&
           target.name == 'MediaQuery' &&
           node.methodName.name == 'of') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2274,7 +2153,7 @@ class AvoidMediaQueryInBuildRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferCachedNetworkImageRule extends SaropaLintRule {
-  const PreferCachedNetworkImageRule() : super(code: _code);
+  PreferCachedNetworkImageRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2287,22 +2166,19 @@ class PreferCachedNetworkImageRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_cached_network_image',
-    problemMessage:
-        '[prefer_cached_network_image] Image.network re-downloads images every time the widget rebuilds or the user navigates back to the screen, wasting bandwidth and causing visible loading flicker. CachedNetworkImage persists images to disk, loads them instantly on subsequent visits, and supports placeholder and error widgets out of the box. {v4}',
+    'prefer_cached_network_image',
+    '[prefer_cached_network_image] Image.network re-downloads images every time the widget rebuilds or the user navigates back to the screen, wasting bandwidth and causing visible loading flicker. CachedNetworkImage persists images to disk, loads them instantly on subsequent visits, and supports placeholder and error widgets out of the box. {v4}',
     correctionMessage:
         'Replace Image.network(url) with CachedNetworkImage(imageUrl: url) from the cached_network_image package, and add placeholder/errorWidget parameters for loading feedback.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -2336,7 +2212,7 @@ class PreferCachedNetworkImageRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidStatefulWidgetInListRule extends SaropaLintRule {
-  const AvoidStatefulWidgetInListRule() : super(code: _code);
+  AvoidStatefulWidgetInListRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2349,23 +2225,21 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_stateful_widget_in_list',
-    problemMessage:
-        '[avoid_stateful_widget_in_list] StatefulWidget created inside a ListView.builder callback loses its State when scrolled off-screen and recreated, causing input fields to reset, animations to restart, and expanded/collapsed states to revert. The framework cannot preserve State for widgets without stable keys in a lazily-built list. {v6}',
+    'avoid_stateful_widget_in_list',
+    '[avoid_stateful_widget_in_list] StatefulWidget created inside a ListView.builder callback loses its State when scrolled off-screen and recreated, causing input fields to reset, animations to restart, and expanded/collapsed states to revert. The framework cannot preserve State for widgets without stable keys in a lazily-built list. {v6}',
     correctionMessage:
         'Add a ValueKey with a stable identifier (e.g. item.id) to the StatefulWidget, or lift mutable state out of the list item into a parent state manager.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // This would need type resolution to check if widget extends StatefulWidget
     // For now, we'll check for common patterns
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'builder') return;
 
       final Expression? target = node.target;
@@ -2430,25 +2304,22 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
 /// // Or better, use AnimatedOpacity for animations
 /// ```
 class AvoidEmptyTextWidgetsRule extends SaropaLintRule {
-  const AvoidEmptyTextWidgetsRule() : super(code: _code);
+  AvoidEmptyTextWidgetsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_empty_text_widgets',
-    problemMessage:
-        "[avoid_empty_text_widgets] Text widget with an empty string ('') still occupies space based on the inherited text style's line height, creating invisible layout artifacts. It also participates in accessibility announcements, confusing screen readers with blank text nodes that convey no information. {v2}",
+    'avoid_empty_text_widgets',
+    "[avoid_empty_text_widgets] Text widget with an empty string ('') still occupies space based on the inherited text style's line height, creating invisible layout artifacts. It also participates in accessibility announcements, confusing screen readers with blank text nodes that convey no information. {v2}",
     correctionMessage:
         'Replace Text(\'\') with SizedBox.shrink() for a zero-size placeholder, or remove the widget entirely if conditional display is intended.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Text') return;
 
@@ -2461,50 +2332,16 @@ class AvoidEmptyTextWidgetsRule extends SaropaLintRule {
 
       // Check for empty string literal
       if (firstArg is SimpleStringLiteral && firstArg.value.isEmpty) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       } else if (firstArg is StringInterpolation &&
           firstArg.elements.length == 1 &&
           firstArg.elements.first is InterpolationString) {
         final InterpolationString str =
             firstArg.elements.first as InterpolationString;
         if (str.value.isEmpty) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceEmptyTextWithSizedBoxFix()];
-}
-
-class _ReplaceEmptyTextWithSizedBoxFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'Text') return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with SizedBox.shrink()',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          'const SizedBox.shrink()',
-        );
-      });
     });
   }
 }
@@ -2528,7 +2365,7 @@ class _ReplaceEmptyTextWithSizedBoxFix extends DartFix {
 /// TextStyle(fontWeight: FontWeight.bold)    // w700
 /// ```
 class AvoidFontWeightAsNumberRule extends SaropaLintRule {
-  const AvoidFontWeightAsNumberRule() : super(code: _code);
+  AvoidFontWeightAsNumberRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2541,12 +2378,11 @@ class AvoidFontWeightAsNumberRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_font_weight_as_number',
-    problemMessage:
-        '[avoid_font_weight_as_number] Numeric FontWeight values like w400 or w700 are less readable and harder to maintain than their named equivalents. Named constants (normal, bold) convey semantic intent, reduce lookup effort during code review, and align with design system terminology used by designers. {v2}',
+    'avoid_font_weight_as_number',
+    '[avoid_font_weight_as_number] Numeric FontWeight values like w400 or w700 are less readable and harder to maintain than their named equivalents. Named constants (normal, bold) convey semantic intent, reduce lookup effort during code review, and align with design system terminology used by designers. {v2}',
     correctionMessage:
         'Replace numeric FontWeight values with named constants: w100=thin, w200=extraLight, w300=light, w400=normal, w500=medium, w600=semiBold, w700=bold, w800=extraBold, w900=black.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Mapping of numeric values to named constants
@@ -2557,57 +2393,16 @@ class AvoidFontWeightAsNumberRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (node.prefix.name != 'FontWeight') return;
 
       final String identifier = node.identifier.name;
       if (_weightMapping.containsKey(identifier)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceFontWeightNumberFix()];
-}
-
-class _ReplaceFontWeightNumberFix extends DartFix {
-  static const Map<String, String> _weightMapping = <String, String>{
-    'w400': 'normal',
-    'w700': 'bold',
-  };
-
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.prefix.name != 'FontWeight') return;
-
-      final String identifier = node.identifier.name;
-      final String? replacement = _weightMapping[identifier];
-      if (replacement == null) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with FontWeight.$replacement',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          'FontWeight.$replacement',
-        );
-      });
     });
   }
 }
@@ -2633,15 +2428,14 @@ class _ReplaceFontWeightNumberFix extends DartFix {
 /// SizedBox.square(dimension: 10)
 /// ```
 class AvoidMultipleMaterialAppsRule extends SaropaLintRule {
-  const AvoidMultipleMaterialAppsRule() : super(code: _code);
+  AvoidMultipleMaterialAppsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_multiple_material_apps',
-    problemMessage:
-        '[avoid_multiple_material_apps] Multiple MaterialApp (or CupertinoApp) widgets in the tree create separate Navigator stacks, separate Theme contexts, and independent Locale/MediaQuery scopes. This breaks navigation (pushNamed cannot reach routes in the other app), causes theme inconsistencies, and doubles memory usage for shared resources. {v2}',
+    'avoid_multiple_material_apps',
+    '[avoid_multiple_material_apps] Multiple MaterialApp (or CupertinoApp) widgets in the tree create separate Navigator stacks, separate Theme contexts, and independent Locale/MediaQuery scopes. This breaks navigation (pushNamed cannot reach routes in the other app), causes theme inconsistencies, and doubles memory usage for shared resources. {v2}',
     correctionMessage:
         'Keep a single MaterialApp at the root. For sub-navigators, use Navigator widgets or a nested Router instead of adding another MaterialApp.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _appWidgets = <String>{
@@ -2652,12 +2446,10 @@ class AvoidMultipleMaterialAppsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_appWidgets.contains(typeName)) return;
 
@@ -2708,7 +2500,7 @@ class AvoidMultipleMaterialAppsRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidRawKeyboardListenerRule extends SaropaLintRule {
-  const AvoidRawKeyboardListenerRule() : super(code: _code);
+  AvoidRawKeyboardListenerRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2721,60 +2513,23 @@ class AvoidRawKeyboardListenerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_raw_keyboard_listener',
-    problemMessage:
-        '[avoid_raw_keyboard_listener] RawKeyboardListener is deprecated since Flutter 3.18. It uses the legacy RawKeyEvent system that does not correctly handle key mapping across platforms, missing modifier keys and producing inconsistent key codes. The replacement KeyboardListener uses the modern KeyEvent system with proper platform key mapping. {v4}',
+    'avoid_raw_keyboard_listener',
+    '[avoid_raw_keyboard_listener] RawKeyboardListener is deprecated since Flutter 3.18. It uses the legacy RawKeyEvent system that does not correctly handle key mapping across platforms, missing modifier keys and producing inconsistent key codes. The replacement KeyboardListener uses the modern KeyEvent system with proper platform key mapping. {v4}',
     correctionMessage:
         'Replace RawKeyboardListener with KeyboardListener (or Focus with onKeyEvent) which uses the modern HardwareKeyboard / KeyEvent API for correct cross-platform input handling.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName == 'RawKeyboardListener') {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceRawKeyboardListenerFix()];
-}
-
-class _ReplaceRawKeyboardListenerFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'RawKeyboardListener') return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with KeyboardListener',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.constructorName.type.sourceRange,
-          'KeyboardListener',
-        );
-      });
     });
   }
 }
@@ -2799,7 +2554,7 @@ class _ReplaceRawKeyboardListenerFix extends DartFix {
 /// Image.asset('image.png')
 /// ```
 class AvoidImageRepeatRule extends SaropaLintRule {
-  const AvoidImageRepeatRule() : super(code: _code);
+  AvoidImageRepeatRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2812,24 +2567,22 @@ class AvoidImageRepeatRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_image_repeat',
-    problemMessage:
-        '[avoid_image_repeat] ImageRepeat tiles the image across the available space, which is rarely the intended behavior for photos or icons and usually signals a misconfigured decoration. Tiled images consume additional GPU memory for the repeated texture and can produce visual artifacts at tile boundaries on different screen densities. {v4}',
+    'avoid_image_repeat',
+    '[avoid_image_repeat] ImageRepeat tiles the image across the available space, which is rarely the intended behavior for photos or icons and usually signals a misconfigured decoration. Tiled images consume additional GPU memory for the repeated texture and can produce visual artifacts at tile boundaries on different screen densities. {v4}',
     correctionMessage:
         'Remove the repeat parameter (defaults to ImageRepeat.noRepeat), or if tiling is intentional, use a dedicated pattern asset designed for seamless repetition.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (node.prefix.name == 'ImageRepeat' &&
           node.identifier.name != 'noRepeat') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2855,31 +2608,28 @@ class AvoidImageRepeatRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidIconSizeOverrideRule extends SaropaLintRule {
-  const AvoidIconSizeOverrideRule() : super(code: _code);
+  AvoidIconSizeOverrideRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_icon_size_override',
-    problemMessage:
-        '[avoid_icon_size_override] Setting icon size directly on individual Icon widgets scatters sizing values throughout the codebase, causing inconsistencies when the design system changes. IconTheme provides a single point of control for icon sizing within a subtree, keeping all icons consistent and easier to update. {v2}',
+    'avoid_icon_size_override',
+    '[avoid_icon_size_override] Setting icon size directly on individual Icon widgets scatters sizing values throughout the codebase, causing inconsistencies when the design system changes. IconTheme provides a single point of control for icon sizing within a subtree, keeping all icons consistent and easier to update. {v2}',
     correctionMessage:
         'Remove the size parameter from the Icon widget and wrap the relevant subtree with IconTheme(data: IconThemeData(size: 24), child: ...) for centralized sizing.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Icon') return;
 
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'size') {
-          reporter.atNode(arg, code);
+          reporter.atNode(arg);
           return;
         }
       }
@@ -2910,7 +2660,7 @@ class AvoidIconSizeOverrideRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferInkwellOverGestureRule extends SaropaLintRule {
-  const PreferInkwellOverGestureRule() : super(code: _code);
+  PreferInkwellOverGestureRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -2923,12 +2673,11 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_inkwell_over_gesture',
-    problemMessage:
-        '[prefer_inkwell_over_gesture] GestureDetector with onTap provides no visual feedback when tapped, leaving users unsure whether their tap registered. InkWell produces the Material Design ripple effect that confirms interaction, improving perceived responsiveness and matching platform conventions users expect. {v4}',
+    'prefer_inkwell_over_gesture',
+    '[prefer_inkwell_over_gesture] GestureDetector with onTap provides no visual feedback when tapped, leaving users unsure whether their tap registered. InkWell produces the Material Design ripple effect that confirms interaction, improving perceived responsiveness and matching platform conventions users expect. {v4}',
     correctionMessage:
         'Replace GestureDetector(onTap: ...) with InkWell(onTap: ...) to get built-in ripple feedback. Ensure a Material ancestor exists in the tree for the ripple to render.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _simpleGestures = <String>{
@@ -2955,12 +2704,10 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GestureDetector') return;
 
@@ -2978,40 +2725,6 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
       if (hasSimple && !hasComplex) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceGestureWithInkWellFix()];
-}
-
-class _ReplaceGestureWithInkWellFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'GestureDetector') return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with InkWell',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.constructorName.type.sourceRange,
-          'InkWell',
-        );
-      });
     });
   }
 }
@@ -3033,7 +2746,7 @@ class _ReplaceGestureWithInkWellFix extends DartFix {
 /// Text('Long text', maxLines: 2, overflow: TextOverflow.ellipsis)
 /// ```
 class AvoidFittedBoxForTextRule extends SaropaLintRule {
-  const AvoidFittedBoxForTextRule() : super(code: _code);
+  AvoidFittedBoxForTextRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3046,22 +2759,19 @@ class AvoidFittedBoxForTextRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_fitted_box_for_text',
-    problemMessage:
-        '[avoid_fitted_box_for_text] FittedBox scales Text widgets uniformly, shrinking the entire text to fit the container. This ignores the user accessibility text scaling preference, can render text unreadably small on narrow screens, and defeats the purpose of responsive text layout. Use text-specific overflow handling instead. {v3}',
+    'avoid_fitted_box_for_text',
+    '[avoid_fitted_box_for_text] FittedBox scales Text widgets uniformly, shrinking the entire text to fit the container. This ignores the user accessibility text scaling preference, can render text unreadably small on narrow screens, and defeats the purpose of responsive text layout. Use text-specific overflow handling instead. {v3}',
     correctionMessage:
         'Remove FittedBox and use maxLines with TextOverflow.ellipsis to handle long text, or use AutoSizeText for controlled text scaling that respects minimum font sizes.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'FittedBox') return;
 
@@ -3104,7 +2814,7 @@ class AvoidFittedBoxForTextRule extends SaropaLintRule {
 /// ListView.builder(itemCount: 100, itemBuilder: (ctx, i) => ListTile())
 /// ```
 class AvoidOpacityAnimationRule extends SaropaLintRule {
-  const AvoidOpacityAnimationRule() : super(code: _code);
+  AvoidOpacityAnimationRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3117,22 +2827,19 @@ class AvoidOpacityAnimationRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_opacity_animation',
-    problemMessage:
-        '[avoid_opacity_animation] Animating the Opacity widget via setState triggers a full rebuild of the child subtree on every frame, which is expensive for complex children. FadeTransition applies opacity changes directly on the compositing layer without rebuilding, achieving the same visual effect with significantly less CPU and GPU overhead. {v3}',
+    'avoid_opacity_animation',
+    '[avoid_opacity_animation] Animating the Opacity widget via setState triggers a full rebuild of the child subtree on every frame, which is expensive for complex children. FadeTransition applies opacity changes directly on the compositing layer without rebuilding, achieving the same visual effect with significantly less CPU and GPU overhead. {v3}',
     correctionMessage:
         'Replace the Opacity widget with FadeTransition(opacity: animation, child: ...) driven by an AnimationController, so opacity changes happen at the compositing layer.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Opacity') return;
 
@@ -3158,37 +2865,6 @@ class AvoidOpacityAnimationRule extends SaropaLintRule {
     }
     return false;
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceOpacityWithFadeTransitionFix()];
-}
-
-class _ReplaceOpacityWithFadeTransitionFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with FadeTransition',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.constructorName.type.sourceRange,
-          'FadeTransition',
-        );
-      });
-    });
-  }
 }
 
 /// Warns when SizedBox.expand() is used.
@@ -3207,7 +2883,7 @@ class _ReplaceOpacityWithFadeTransitionFix extends DartFix {
 /// SizedBox(width: double.infinity, height: 200, child: MyWidget())
 /// ```
 class PreferSelectableTextRule extends SaropaLintRule {
-  const PreferSelectableTextRule() : super(code: _code);
+  PreferSelectableTextRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3220,24 +2896,21 @@ class PreferSelectableTextRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_selectable_text',
-    problemMessage:
-        '[prefer_selectable_text] Long-form text displayed with the Text widget cannot be selected or copied by users, frustrating those who need to copy error messages, addresses, phone numbers, or reference codes. SelectableText enables native text selection with copy support at no additional performance cost. {v3}',
+    'prefer_selectable_text',
+    '[prefer_selectable_text] Long-form text displayed with the Text widget cannot be selected or copied by users, frustrating those who need to copy error messages, addresses, phone numbers, or reference codes. SelectableText enables native text selection with copy support at no additional performance cost. {v3}',
     correctionMessage:
         'Replace Text with SelectableText for content users may want to copy (errors, IDs, addresses, etc.). Use SelectableText.rich for styled spans.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const int _minLength = 100;
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Text') return;
 
@@ -3251,37 +2924,6 @@ class PreferSelectableTextRule extends SaropaLintRule {
           firstArg.value.length >= _minLength) {
         reporter.atNode(node.constructorName, code);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceTextWithSelectableFix()];
-}
-
-class _ReplaceTextWithSelectableFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with SelectableText',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.constructorName.type.sourceRange,
-          'SelectableText',
-        );
-      });
     });
   }
 }
@@ -3302,7 +2944,7 @@ class _ReplaceTextWithSelectableFix extends DartFix {
 /// Column(spacing: 8, children: [Text('A'), Text('B')])
 /// ```
 class AvoidMaterial2FallbackRule extends SaropaLintRule {
-  const AvoidMaterial2FallbackRule() : super(code: _code);
+  AvoidMaterial2FallbackRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3315,22 +2957,19 @@ class AvoidMaterial2FallbackRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_material2_fallback',
-    problemMessage:
-        '[avoid_material2_fallback] Explicitly setting useMaterial3: false forces the app back to the deprecated Material 2 design system, which will receive no new component updates or accessibility improvements. Material 2 components may also be removed in future Flutter releases, creating a migration burden. {v3}',
+    'avoid_material2_fallback',
+    '[avoid_material2_fallback] Explicitly setting useMaterial3: false forces the app back to the deprecated Material 2 design system, which will receive no new component updates or accessibility improvements. Material 2 components may also be removed in future Flutter releases, creating a migration burden. {v3}',
     correctionMessage:
         'Remove useMaterial3: false (M3 is the default since Flutter 3.16) or set it to true. Migrate M2-specific theming to M3 ColorScheme and typography.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'ThemeData') return;
 
@@ -3339,58 +2978,11 @@ class AvoidMaterial2FallbackRule extends SaropaLintRule {
           if (arg.name.label.name == 'useMaterial3') {
             final Expression valueExpr = arg.expression;
             if (valueExpr is BooleanLiteral && !valueExpr.value) {
-              reporter.atNode(arg, code);
+              reporter.atNode(arg);
             }
           }
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RemoveMaterial2FallbackFix()];
-}
-
-class _RemoveMaterial2FallbackFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addNamedExpression((NamedExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.name.label.name != 'useMaterial3') return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Remove useMaterial3: false',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find and remove the argument including trailing comma if present
-        int startOffset = node.offset;
-        int endOffset = node.end;
-
-        // Check for trailing comma
-        final AstNode? parent = node.parent;
-        if (parent is ArgumentList) {
-          final int index = parent.arguments.indexOf(node);
-          if (index >= 0) {
-            // Check if there's a comma after this argument
-            final String source =
-                resolver.source.contents.data.substring(endOffset);
-            final Match? commaMatch = RegExp(r'^\s*,').firstMatch(source);
-            if (commaMatch != null) {
-              endOffset += commaMatch.end;
-            }
-          }
-        }
-
-        builder.addDeletion(SourceRange(startOffset, endOffset - startOffset));
-      });
     });
   }
 }
@@ -3427,7 +3019,7 @@ class _RemoveMaterial2FallbackFix extends DartFix {
 /// )
 /// ```
 class PreferOverlayPortalRule extends SaropaLintRule {
-  const PreferOverlayPortalRule() : super(code: _code);
+  PreferOverlayPortalRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3440,23 +3032,20 @@ class PreferOverlayPortalRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_overlay_portal',
-    problemMessage:
-        '[prefer_overlay_portal] Consider using OverlayPortal instead of OverlayEntry. {v4}',
+    'prefer_overlay_portal',
+    '[prefer_overlay_portal] Consider using OverlayPortal instead of OverlayEntry. {v4}',
     correctionMessage:
         'OverlayPortal provides a declarative API that integrates '
         'with InheritedWidgets (Flutter 3.10+).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName == 'OverlayEntry') {
         reporter.atNode(node.constructorName, code);
@@ -3492,15 +3081,14 @@ class PreferOverlayPortalRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferCarouselViewRule extends SaropaLintRule {
-  const PreferCarouselViewRule() : super(code: _code);
+  PreferCarouselViewRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'prefer_carousel_view',
-    problemMessage:
-        '[prefer_carousel_view] Third-party carousel package adds dependency maintenance overhead, increases app size, and may not follow Material 3 design guidelines. The built-in CarouselView widget (Flutter 3.24+) provides standard M3 carousel behavior with accessibility support, animation curves, and theme integration out of the box. {v3}',
+    'prefer_carousel_view',
+    '[prefer_carousel_view] Third-party carousel package adds dependency maintenance overhead, increases app size, and may not follow Material 3 design guidelines. The built-in CarouselView widget (Flutter 3.24+) provides standard M3 carousel behavior with accessibility support, animation curves, and theme integration out of the box. {v3}',
     correctionMessage:
         'Replace the third-party carousel with CarouselView(children: items) from the Flutter framework. It supports item extent, shrink extent, and standard scroll physics.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Known third-party carousel packages and their main widgets
@@ -3520,13 +3108,11 @@ class PreferCarouselViewRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check for carousel widget constructors
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (_carouselWidgets.contains(typeName)) {
         reporter.atNode(node.constructorName, code);
@@ -3534,13 +3120,13 @@ class PreferCarouselViewRule extends SaropaLintRule {
     });
 
     // Check for carousel package imports
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       final String? uri = node.uri.stringValue;
       if (uri == null) return;
 
       for (final String pkg in _carouselPackages) {
         if (uri.startsWith('package:$pkg/')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -3585,7 +3171,7 @@ class PreferCarouselViewRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferSearchAnchorRule extends SaropaLintRule {
-  const PreferSearchAnchorRule() : super(code: _code);
+  PreferSearchAnchorRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3598,34 +3184,32 @@ class PreferSearchAnchorRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_search_anchor',
-    problemMessage:
-        '[prefer_search_anchor] showSearch with SearchDelegate uses an imperative API that bypasses the widget tree, cannot access InheritedWidgets from the parent context, and follows Material 2 patterns. SearchAnchor (Flutter 3.10+) provides a declarative, widget-based search with full M3 styling and theme integration. {v4}',
+    'prefer_search_anchor',
+    '[prefer_search_anchor] showSearch with SearchDelegate uses an imperative API that bypasses the widget tree, cannot access InheritedWidgets from the parent context, and follows Material 2 patterns. SearchAnchor (Flutter 3.10+) provides a declarative, widget-based search with full M3 styling and theme integration. {v4}',
     correctionMessage:
         'Replace showSearch/SearchDelegate with SearchAnchor and SearchAnchor.bar, which integrate into the widget tree and support suggestionsBuilder for async search results.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check for showSearch() calls
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'showSearch') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Check for SearchDelegate subclasses
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause != null) {
         final String superName = extendsClause.superclass.name.lexeme;
         if (superName == 'SearchDelegate') {
-          reporter.atNode(extendsClause, code);
+          reporter.atNode(extendsClause);
         }
       }
     });
@@ -3662,7 +3246,7 @@ class PreferSearchAnchorRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferTapRegionForDismissRule extends SaropaLintRule {
-  const PreferTapRegionForDismissRule() : super(code: _code);
+  PreferTapRegionForDismissRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3675,22 +3259,19 @@ class PreferTapRegionForDismissRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_tap_region_for_dismiss',
-    problemMessage:
-        '[prefer_tap_region_for_dismiss] Manual tap-outside detection using GestureDetector or Focus requires tracking tap locations and comparing against widget bounds, which is error-prone and breaks with nested interactive elements. TapRegion (Flutter 3.10+) handles this pattern correctly out of the box, including group regions for linked elements. {v4}',
+    'prefer_tap_region_for_dismiss',
+    '[prefer_tap_region_for_dismiss] Manual tap-outside detection using GestureDetector or Focus requires tracking tap locations and comparing against widget bounds, which is error-prone and breaks with nested interactive elements. TapRegion (Flutter 3.10+) handles this pattern correctly out of the box, including group regions for linked elements. {v4}',
     correctionMessage:
         'Wrap the dismissible content with TapRegion(onTapOutside: (_) => dismiss()) for reliable tap-outside detection. Use TapRegion.groupId to link multiple regions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GestureDetector') return;
 
@@ -3774,7 +3355,7 @@ class PreferTapRegionForDismissRule extends SaropaLintRule {
 /// Text('Submit', maxLines: 1) // Has maxLines
 /// ```
 class RequireTextOverflowHandlingRule extends SaropaLintRule {
-  const RequireTextOverflowHandlingRule() : super(code: _code);
+  RequireTextOverflowHandlingRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3787,23 +3368,19 @@ class RequireTextOverflowHandlingRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_text_overflow_handling',
-    problemMessage:
-        '[require_text_overflow_handling] Text displaying dynamic content (user input, API data, translations) without overflow handling can break layouts when the text is longer than expected. Unbounded text pushes sibling widgets off-screen, triggers RenderFlex overflow errors in Row/Column contexts, and creates inconsistent UI across locales with varying text lengths. {v3}',
+    'require_text_overflow_handling',
+    '[require_text_overflow_handling] Text displaying dynamic content (user input, API data, translations) without overflow handling can break layouts when the text is longer than expected. Unbounded text pushes sibling widgets off-screen, triggers RenderFlex overflow errors in Row/Column contexts, and creates inconsistent UI across locales with varying text lengths. {v3}',
     correctionMessage:
         'Add overflow: TextOverflow.ellipsis and maxLines to limit visible lines, or wrap in Expanded/Flexible within Row/Column to constrain the available width.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.type.name.lexeme;
       if (constructorName != 'Text') return;
 
@@ -3853,42 +3430,6 @@ class RequireTextOverflowHandlingRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddTextOverflowFix()];
-}
-
-class _AddTextOverflowFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.constructorName.type.name.lexeme != 'Text') return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add overflow: TextOverflow.ellipsis, maxLines: 1',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Find position before closing parenthesis
-        final int insertOffset = node.argumentList.rightParenthesis.offset;
-        final String comma = node.argumentList.arguments.isEmpty ? '' : ', ';
-        builder.addSimpleInsertion(
-          insertOffset,
-          '${comma}overflow: TextOverflow.ellipsis, maxLines: 1',
-        );
-      });
-    });
-  }
 }
 
 /// Requires Image.network to have an errorBuilder for handling load failures.
@@ -3920,7 +3461,7 @@ class _AddTextOverflowFix extends DartFix {
 /// )
 /// ```
 class RequireImageErrorBuilderRule extends SaropaLintRule {
-  const RequireImageErrorBuilderRule() : super(code: _code);
+  RequireImageErrorBuilderRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -3933,23 +3474,19 @@ class RequireImageErrorBuilderRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_image_error_builder',
-    problemMessage:
-        '[require_image_error_builder] Network image without errorBuilder shows a broken image icon or blank space when the URL is invalid, the server is down, or the network is unavailable. This creates a poor user experience with no indication of what went wrong and no way to retry loading the image. {v3}',
+    'require_image_error_builder',
+    '[require_image_error_builder] Network image without errorBuilder shows a broken image icon or blank space when the URL is invalid, the server is down, or the network is unavailable. This creates a poor user experience with no indication of what went wrong and no way to retry loading the image. {v3}',
     correctionMessage:
         'Add errorBuilder: (context, error, stackTrace) => FallbackWidget() to display a placeholder icon, error message, or retry button when image loading fails.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -3967,7 +3504,7 @@ class RequireImageErrorBuilderRule extends SaropaLintRule {
       }
 
       if (!hasErrorBuilder) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4010,26 +3547,22 @@ class RequireImageErrorBuilderRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireImageDimensionsRule extends SaropaLintRule {
-  const RequireImageDimensionsRule() : super(code: _code);
+  RequireImageDimensionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'require_image_dimensions',
-    problemMessage:
-        '[require_image_dimensions] Network image without explicit dimensions causes layout shifts (CLS) when the image loads, as the widget expands from zero to the image size. This pushes surrounding content around, creates a jarring user experience, and negatively impacts web Core Web Vitals scores. {v2}',
+    'require_image_dimensions',
+    '[require_image_dimensions] Network image without explicit dimensions causes layout shifts (CLS) when the image loads, as the widget expands from zero to the image size. This pushes surrounding content around, creates a jarring user experience, and negatively impacts web Core Web Vitals scores. {v2}',
     correctionMessage:
         'Set width and height on the Image widget matching the expected aspect ratio, or wrap it in a SizedBox/AspectRatio with fixed dimensions to reserve space before the image loads.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -4137,7 +3670,7 @@ class RequireImageDimensionsRule extends SaropaLintRule {
 /// )
 /// ```
 class RequirePlaceholderForNetworkRule extends SaropaLintRule {
-  const RequirePlaceholderForNetworkRule() : super(code: _code);
+  RequirePlaceholderForNetworkRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4150,23 +3683,19 @@ class RequirePlaceholderForNetworkRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_placeholder_for_network',
-    problemMessage:
-        '[require_placeholder_for_network] Network image without a placeholder or loadingBuilder shows blank space while the image downloads, giving users no indication that content is loading. On slow connections this blank period can last several seconds, making the UI appear broken or unresponsive. {v4}',
+    'require_placeholder_for_network',
+    '[require_placeholder_for_network] Network image without a placeholder or loadingBuilder shows blank space while the image downloads, giving users no indication that content is loading. On slow connections this blank period can last several seconds, making the UI appear broken or unresponsive. {v4}',
     correctionMessage:
         'Add loadingBuilder to show a progress indicator during download, or use a placeholder image (e.g. a low-res thumbnail or shimmer effect) to indicate loading state.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -4196,7 +3725,7 @@ class RequirePlaceholderForNetworkRule extends SaropaLintRule {
       }
 
       if (!hasPlaceholder) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4230,7 +3759,7 @@ class RequirePlaceholderForNetworkRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferTextThemeRule extends SaropaLintRule {
-  const PreferTextThemeRule() : super(code: _code);
+  PreferTextThemeRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4243,23 +3772,19 @@ class PreferTextThemeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_text_theme',
-    problemMessage:
-        '[prefer_text_theme] Hardcoded TextStyle with inline fontSize, fontWeight, and color values scatters typography decisions throughout the codebase. When the design system changes, every hardcoded style must be found and updated manually. Theme.textTheme centralizes typography so that a single theme change propagates consistently to all text widgets. {v4}',
+    'prefer_text_theme',
+    '[prefer_text_theme] Hardcoded TextStyle with inline fontSize, fontWeight, and color values scatters typography decisions throughout the codebase. When the design system changes, every hardcoded style must be found and updated manually. Theme.textTheme centralizes typography so that a single theme change propagates consistently to all text widgets. {v4}',
     correctionMessage:
         'Replace the inline TextStyle with Theme.of(context).textTheme.bodyMedium (or the appropriate text style) and use copyWith for minor overrides.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TextStyle') return;
 
@@ -4275,7 +3800,7 @@ class PreferTextThemeRule extends SaropaLintRule {
               final String parentType =
                   argListParent.constructorName.type.name.lexeme;
               if (parentType == 'Text' || parentType == 'RichText') {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
                 return;
               }
             }
@@ -4314,7 +3839,7 @@ class PreferTextThemeRule extends SaropaLintRule {
 /// // Or use shrinkWrap + NeverScrollableScrollPhysics for inner list
 /// ```
 class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
-  const AvoidGestureWithoutBehaviorRule() : super(code: _code);
+  AvoidGestureWithoutBehaviorRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4327,23 +3852,19 @@ class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_gesture_without_behavior',
-    problemMessage:
-        '[avoid_gesture_without_behavior] GestureDetector without explicit HitTestBehavior defaults to deferToChild, which only detects taps on painted pixels of the child. Empty areas within the GestureDetector bounds are ignored, causing missed taps that confuse users. Specifying the behavior makes the tap target boundaries explicit and predictable. {v5}',
+    'avoid_gesture_without_behavior',
+    '[avoid_gesture_without_behavior] GestureDetector without explicit HitTestBehavior defaults to deferToChild, which only detects taps on painted pixels of the child. Empty areas within the GestureDetector bounds are ignored, causing missed taps that confuse users. Specifying the behavior makes the tap target boundaries explicit and predictable. {v5}',
     correctionMessage:
         'Add behavior: HitTestBehavior.opaque to detect taps on the full bounding box, or .translucent to detect taps while allowing pass-through to widgets behind.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GestureDetector') return;
 
@@ -4386,15 +3907,14 @@ class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidDoubleTapSubmitRule extends SaropaLintRule {
-  const AvoidDoubleTapSubmitRule() : super(code: _code);
+  AvoidDoubleTapSubmitRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_double_tap_submit',
-    problemMessage:
-        '[avoid_double_tap_submit] Submit button without double-tap protection can fire the onPressed callback multiple times before the first submission completes. This causes duplicate API requests, duplicate database entries, double charges in payment flows, and race conditions that corrupt application state. {v4}',
+    'avoid_double_tap_submit',
+    '[avoid_double_tap_submit] Submit button without double-tap protection can fire the onPressed callback multiple times before the first submission completes. This causes duplicate API requests, duplicate database entries, double charges in payment flows, and race conditions that corrupt application state. {v4}',
     correctionMessage:
         'Set onPressed to null (disabling the button) while the async operation is in progress, or use a debounce/throttle mechanism to ignore rapid successive taps.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _buttonWidgets = <String>{
@@ -4419,13 +3939,10 @@ class AvoidDoubleTapSubmitRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_buttonWidgets.contains(typeName)) return;
 
@@ -4492,7 +4009,7 @@ class AvoidDoubleTapSubmitRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferCursorForButtonsRule extends SaropaLintRule {
-  const PreferCursorForButtonsRule() : super(code: _code);
+  PreferCursorForButtonsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4505,12 +4022,11 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_cursor_for_buttons',
-    problemMessage:
-        '[prefer_cursor_for_buttons] Interactive widget on web/desktop without a pointer cursor leaves the default arrow cursor, giving users no visual indication that the element is clickable. This violates web platform conventions and reduces discoverability of interactive elements, especially for GestureDetector-based custom buttons. {v6}',
+    'prefer_cursor_for_buttons',
+    '[prefer_cursor_for_buttons] Interactive widget on web/desktop without a pointer cursor leaves the default arrow cursor, giving users no visual indication that the element is clickable. This violates web platform conventions and reduces discoverability of interactive elements, especially for GestureDetector-based custom buttons. {v6}',
     correctionMessage:
         'Add mouseCursor: SystemMouseCursors.click to GestureDetector or InkWell widgets that act as buttons. Built-in Material buttons handle this automatically.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _interactiveWidgets = <String>{
@@ -4521,13 +4037,10 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_interactiveWidgets.contains(typeName)) return;
 
@@ -4576,7 +4089,7 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireHoverStatesRule extends SaropaLintRule {
-  const RequireHoverStatesRule() : super(code: _code);
+  RequireHoverStatesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4589,23 +4102,19 @@ class RequireHoverStatesRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_hover_states',
-    problemMessage:
-        '[require_hover_states] Interactive widget on web/desktop without hover feedback feels unresponsive to mouse users. Hover states are a fundamental interaction pattern on these platforms, signaling clickability and providing visual confirmation that the cursor is over the target. Missing hover states make the app feel like a mobile port rather than a native desktop experience. {v6}',
+    'require_hover_states',
+    '[require_hover_states] Interactive widget on web/desktop without hover feedback feels unresponsive to mouse users. Hover states are a fundamental interaction pattern on these platforms, signaling clickability and providing visual confirmation that the cursor is over the target. Missing hover states make the app feel like a mobile port rather than a native desktop experience. {v6}',
     correctionMessage:
         'Add onHover callback to change visual state (e.g. elevation, background color, or border) when the mouse enters the widget. Material widgets like ElevatedButton handle this automatically.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       // Only check InkWell and MouseRegion
       if (typeName != 'InkWell' && typeName != 'GestureDetector') return;
@@ -4662,7 +4171,7 @@ class RequireHoverStatesRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireButtonLoadingStateRule extends SaropaLintRule {
-  const RequireButtonLoadingStateRule() : super(code: _code);
+  RequireButtonLoadingStateRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4675,12 +4184,11 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_button_loading_state',
-    problemMessage:
-        '[require_button_loading_state] Button triggering an async operation without a loading state indicator leaves users unsure whether their tap was registered. They may tap again (causing duplicate requests), navigate away (abandoning the operation), or assume the app is frozen. A loading state provides essential feedback for async interactions. {v5}',
+    'require_button_loading_state',
+    '[require_button_loading_state] Button triggering an async operation without a loading state indicator leaves users unsure whether their tap was registered. They may tap again (causing duplicate requests), navigate away (abandoning the operation), or assume the app is frozen. A loading state provides essential feedback for async interactions. {v5}',
     correctionMessage:
         'Show a CircularProgressIndicator and set onPressed to null while the async operation runs. Restore the button when the operation completes or fails.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _buttonWidgets = <String>{
@@ -4692,13 +4200,10 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_buttonWidgets.contains(typeName)) return;
 
@@ -4721,13 +4226,15 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
       final String onPressedSource = onPressedExpr.toSource();
 
       // Check if the callback is async
-      bool isAsync = onPressedSource.contains('async') ||
+      bool isAsync =
+          onPressedSource.contains('async') ||
           onPressedSource.contains('await');
 
       if (!isAsync) return;
 
       // Check if there's loading state handling
-      bool hasLoadingState = onPressedSource.contains('isLoading') ||
+      bool hasLoadingState =
+          onPressedSource.contains('isLoading') ||
           onPressedSource.contains('_loading') ||
           onPressedSource.contains('loading') ||
           onPressedSource.contains('isSubmitting') ||
@@ -4737,9 +4244,9 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
       String childSource = childExpr?.toSource() ?? '';
       bool hasLoadingIndicator =
           childSource.contains('CircularProgressIndicator') ||
-              childSource.contains('Loading') ||
-              childSource.contains('isLoading') ||
-              childSource.contains('?');
+          childSource.contains('Loading') ||
+          childSource.contains('isLoading') ||
+          childSource.contains('?');
 
       if (!hasLoadingState && !hasLoadingIndicator) {
         reporter.atNode(node.constructorName, code);
@@ -4771,7 +4278,7 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidHardcodedTextStylesRule extends SaropaLintRule {
-  const AvoidHardcodedTextStylesRule() : super(code: _code);
+  AvoidHardcodedTextStylesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4784,23 +4291,19 @@ class AvoidHardcodedTextStylesRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_hardcoded_text_styles',
-    problemMessage:
-        '[avoid_hardcoded_text_styles] Inline TextStyle with hardcoded fontSize, fontWeight, and color values creates scattered styling that drifts from the design system over time. Every hardcoded style must be updated individually when the design changes, and inconsistencies between screens become difficult to detect during code review. {v5}',
+    'avoid_hardcoded_text_styles',
+    '[avoid_hardcoded_text_styles] Inline TextStyle with hardcoded fontSize, fontWeight, and color values creates scattered styling that drifts from the design system over time. Every hardcoded style must be updated individually when the design changes, and inconsistencies between screens become difficult to detect during code review. {v5}',
     correctionMessage:
         'Use Theme.of(context).textTheme (e.g. bodyMedium, titleLarge) for standard styles and .copyWith() for minor overrides. Define custom styles in a centralized theme extension.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TextStyle') return;
 
@@ -4864,7 +4367,7 @@ class AvoidHardcodedTextStylesRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireRefreshIndicatorRule extends SaropaLintRule {
-  const RequireRefreshIndicatorRule() : super(code: _code);
+  RequireRefreshIndicatorRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4877,12 +4380,11 @@ class RequireRefreshIndicatorRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_refresh_indicator',
-    problemMessage:
-        '[require_refresh_indicator] List displaying remote data without pull-to-refresh forces users to navigate away and back to see updated content. This common UX pattern is expected on both platforms, and its absence makes the app feel unresponsive when data becomes stale. Users have no self-service way to recover from a failed initial load. {v5}',
+    'require_refresh_indicator',
+    '[require_refresh_indicator] List displaying remote data without pull-to-refresh forces users to navigate away and back to see updated content. This common UX pattern is expected on both platforms, and its absence makes the app feel unresponsive when data becomes stale. Users have no self-service way to recover from a failed initial load. {v5}',
     correctionMessage:
         'Wrap the scrollable list with RefreshIndicator(onRefresh: () async => fetchData(), child: listView) to enable pull-to-refresh for data refresh.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Words suggesting remote/fetchable data
@@ -4902,13 +4404,10 @@ class RequireRefreshIndicatorRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -4961,7 +4460,7 @@ class RequireRefreshIndicatorRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireDefaultTextStyleRule extends SaropaLintRule {
-  const RequireDefaultTextStyleRule() : super(code: _code);
+  RequireDefaultTextStyleRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -4974,21 +4473,19 @@ class RequireDefaultTextStyleRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_default_text_style',
-    problemMessage:
-        '[require_default_text_style] Multiple sibling Text widgets repeat the same TextStyle, creating redundant style objects and making future style changes error-prone since each instance must be updated independently. DefaultTextStyle applies a shared style to all descendant Text widgets automatically, keeping the code DRY and consistent. {v5}',
+    'require_default_text_style',
+    '[require_default_text_style] Multiple sibling Text widgets repeat the same TextStyle, creating redundant style objects and making future style changes error-prone since each instance must be updated independently. DefaultTextStyle applies a shared style to all descendant Text widgets automatically, keeping the code DRY and consistent. {v5}',
     correctionMessage:
         'Wrap the parent widget with DefaultTextStyle(style: sharedStyle, child: ...) and remove individual style parameters from child Text widgets that use the common style.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addListLiteral((ListLiteral node) {
+    context.addListLiteral((ListLiteral node) {
       // Count Text widgets with explicit styles in this list
       int textWithStyleCount = 0;
       String? firstStyleSource;
@@ -5014,7 +4511,7 @@ class RequireDefaultTextStyleRule extends SaropaLintRule {
 
       // If 3+ Text widgets have the same style, suggest DefaultTextStyle
       if (textWithStyleCount >= 3) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -5041,7 +4538,7 @@ class RequireDefaultTextStyleRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferAssetImageForLocalRule extends SaropaLintRule {
-  const PreferAssetImageForLocalRule() : super(code: _code);
+  PreferAssetImageForLocalRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5054,23 +4551,19 @@ class PreferAssetImageForLocalRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_asset_image_for_local',
-    problemMessage:
-        '[prefer_asset_image_for_local] FileImage reads from the device filesystem at runtime and is intended for user-generated content, not bundled assets. Using FileImage for assets bypasses Flutter asset resolution (density variants, locale fallbacks), is not supported on web, and fails if the file path does not exist on the target device. {v3}',
+    'prefer_asset_image_for_local',
+    '[prefer_asset_image_for_local] FileImage reads from the device filesystem at runtime and is intended for user-generated content, not bundled assets. Using FileImage for assets bypasses Flutter asset resolution (density variants, locale fallbacks), is not supported on web, and fails if the file path does not exist on the target device. {v3}',
     correctionMessage:
         'Replace FileImage with AssetImage or use Image.asset() to load bundled assets through the Flutter asset pipeline with proper resolution-aware variant selection.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'FileImage') return;
 
@@ -5112,7 +4605,7 @@ class PreferAssetImageForLocalRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferFitCoverForBackgroundRule extends SaropaLintRule {
-  const PreferFitCoverForBackgroundRule() : super(code: _code);
+  PreferFitCoverForBackgroundRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5125,23 +4618,19 @@ class PreferFitCoverForBackgroundRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_fit_cover_for_background',
-    problemMessage:
-        '[prefer_fit_cover_for_background] Background DecorationImage without BoxFit.cover may show letterboxing, stretching, or empty space around the image on different screen aspect ratios. BoxFit.cover ensures the image fills the entire container while maintaining its aspect ratio, which is the standard behavior for background images. {v3}',
+    'prefer_fit_cover_for_background',
+    '[prefer_fit_cover_for_background] Background DecorationImage without BoxFit.cover may show letterboxing, stretching, or empty space around the image on different screen aspect ratios. BoxFit.cover ensures the image fills the entire container while maintaining its aspect ratio, which is the standard behavior for background images. {v3}',
     correctionMessage:
         'Add fit: BoxFit.cover to DecorationImage so the image fills the container on all screen sizes without distortion. Crop alignment defaults to center.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'DecorationImage') return;
 
@@ -5189,7 +4678,7 @@ class PreferFitCoverForBackgroundRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireDisabledStateRule extends SaropaLintRule {
-  const RequireDisabledStateRule() : super(code: _code);
+  RequireDisabledStateRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5202,12 +4691,11 @@ class RequireDisabledStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_disabled_state',
-    problemMessage:
-        '[require_disabled_state] Button without custom disabled styling uses the framework default gray appearance, which may not match your app design system or provide sufficient contrast. Customizing the disabled state ensures visual consistency, communicates the disabled status clearly, and maintains your brand identity across all button states. {v5}',
+    'require_disabled_state',
+    '[require_disabled_state] Button without custom disabled styling uses the framework default gray appearance, which may not match your app design system or provide sufficient contrast. Customizing the disabled state ensures visual consistency, communicates the disabled status clearly, and maintains your brand identity across all button states. {v5}',
     correctionMessage:
         'Add a ButtonStyle with disabledBackgroundColor and disabledForegroundColor via styleFrom or the theme, ensuring disabled buttons match your design system.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _buttonWidgets = <String>{
@@ -5219,13 +4707,10 @@ class RequireDisabledStateRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_buttonWidgets.contains(typeName)) return;
 
@@ -5280,7 +4765,7 @@ class RequireDisabledStateRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireDragFeedbackRule extends SaropaLintRule {
-  const RequireDragFeedbackRule() : super(code: _code);
+  RequireDragFeedbackRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5293,23 +4778,19 @@ class RequireDragFeedbackRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_drag_feedback',
-    problemMessage:
-        '[require_drag_feedback] Draggable without a feedback widget shows no visual representation of the dragged item under the user finger/cursor. The original child disappears (replaced by childWhenDragging or nothing) while the drag area appears empty, making it impossible for the user to see what they are dragging or where to drop it. {v4}',
+    'require_drag_feedback',
+    '[require_drag_feedback] Draggable without a feedback widget shows no visual representation of the dragged item under the user finger/cursor. The original child disappears (replaced by childWhenDragging or nothing) while the drag area appears empty, making it impossible for the user to see what they are dragging or where to drop it. {v4}',
     correctionMessage:
         'Add a feedback parameter with a widget representing the dragged item (e.g. a semi-transparent copy of the child or a Material-elevated card).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Draggable' && typeName != 'LongPressDraggable') return;
 
@@ -5354,7 +4835,7 @@ class RequireDragFeedbackRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidGestureConflictRule extends SaropaLintRule {
-  const AvoidGestureConflictRule() : super(code: _code);
+  AvoidGestureConflictRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5367,23 +4848,19 @@ class AvoidGestureConflictRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_gesture_conflict',
-    problemMessage:
-        '[avoid_gesture_conflict] Nested GestureDetector widgets compete in the gesture arena, causing unpredictable behavior where the inner detector wins some gestures and the outer wins others depending on timing. This leads to missed taps, swallowed swipes, and inconsistent interaction behavior that is difficult to debug. {v6}',
+    'avoid_gesture_conflict',
+    '[avoid_gesture_conflict] Nested GestureDetector widgets compete in the gesture arena, causing unpredictable behavior where the inner detector wins some gestures and the outer wins others depending on timing. This leads to missed taps, swallowed swipes, and inconsistent interaction behavior that is difficult to debug. {v6}',
     correctionMessage:
         'Consolidate gesture handling into a single GestureDetector, or use RawGestureDetector with a custom gesture factory to coordinate nested gesture recognition explicitly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GestureDetector' && typeName != 'InkWell') return;
 
@@ -5426,26 +4903,22 @@ class AvoidGestureConflictRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidLargeImagesInMemoryRule extends SaropaLintRule {
-  const AvoidLargeImagesInMemoryRule() : super(code: _code);
+  AvoidLargeImagesInMemoryRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_large_images_in_memory',
-    problemMessage:
-        '[avoid_large_images_in_memory] Image loaded without size constraints decodes at full resolution into GPU memory regardless of display size. A single uncompressed 4K image can consume 30-50 MB of memory, and lists of such images quickly exhaust available memory, causing OOM crashes on mobile devices. {v5}',
+    'avoid_large_images_in_memory',
+    '[avoid_large_images_in_memory] Image loaded without size constraints decodes at full resolution into GPU memory regardless of display size. A single uncompressed 4K image can consume 30-50 MB of memory, and lists of such images quickly exhaust available memory, causing OOM crashes on mobile devices. {v5}',
     correctionMessage:
         'Add width/height to constrain display size and cacheWidth/cacheHeight to limit decode resolution. Set cacheWidth to displayWidth * devicePixelRatio.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -5501,7 +4974,7 @@ class AvoidLargeImagesInMemoryRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferActionsAndShortcutsRule extends SaropaLintRule {
-  const PreferActionsAndShortcutsRule() : super(code: _code);
+  PreferActionsAndShortcutsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5514,23 +4987,19 @@ class PreferActionsAndShortcutsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_actions_and_shortcuts',
-    problemMessage:
-        '[prefer_actions_and_shortcuts] RawKeyboardListener requires manual key code matching and does not integrate with the Flutter intent system, making keyboard shortcuts invisible to accessibility tools and impossible to discover via keyboard shortcut overlays. The Actions/Shortcuts system provides composable, discoverable, and testable keyboard handling. {v6}',
+    'prefer_actions_and_shortcuts',
+    '[prefer_actions_and_shortcuts] RawKeyboardListener requires manual key code matching and does not integrate with the Flutter intent system, making keyboard shortcuts invisible to accessibility tools and impossible to discover via keyboard shortcut overlays. The Actions/Shortcuts system provides composable, discoverable, and testable keyboard handling. {v6}',
     correctionMessage:
         'Replace with Shortcuts(shortcuts: {key: intent}, child: Actions(actions: {Intent: CallbackAction(...)}, child: ...)) for declarative keyboard handling.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName == 'RawKeyboardListener' || typeName == 'KeyboardListener') {
         reporter.atNode(node.constructorName, code);
@@ -5562,26 +5031,22 @@ class PreferActionsAndShortcutsRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireLongPressCallbackRule extends SaropaLintRule {
-  const RequireLongPressCallbackRule() : super(code: _code);
+  RequireLongPressCallbackRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'require_long_press_callback',
-    problemMessage:
-        '[require_long_press_callback] Interactive list item without onLongPress misses a standard mobile interaction pattern for secondary actions. Users expect long-press to reveal context menus, selection mode, or additional options. Omitting this leaves no discoverable path to bulk actions like delete, share, or move. {v3}',
+    'require_long_press_callback',
+    '[require_long_press_callback] Interactive list item without onLongPress misses a standard mobile interaction pattern for secondary actions. Users expect long-press to reveal context menus, selection mode, or additional options. Omitting this leaves no discoverable path to bulk actions like delete, share, or move. {v3}',
     correctionMessage:
         'Add onLongPress callback to show a context menu (showMenu), enter selection mode, or trigger a bottom sheet with secondary actions for the item.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GestureDetector' && typeName != 'InkWell') return;
 
@@ -5639,7 +5104,7 @@ class RequireLongPressCallbackRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidFindChildInBuildRule extends SaropaLintRule {
-  const AvoidFindChildInBuildRule() : super(code: _code);
+  AvoidFindChildInBuildRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5652,23 +5117,19 @@ class AvoidFindChildInBuildRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_find_child_in_build',
-    problemMessage:
-        '[avoid_find_child_in_build] Creating findChildIndexCallback as a new closure inside the build method allocates a new function object on every rebuild. Since SliverChildBuilderDelegate uses this callback to optimize child reordering, a new instance defeats the identity check and forces unnecessary child lookups on every frame. {v4}',
+    'avoid_find_child_in_build',
+    '[avoid_find_child_in_build] Creating findChildIndexCallback as a new closure inside the build method allocates a new function object on every rebuild. Since SliverChildBuilderDelegate uses this callback to optimize child reordering, a new instance defeats the identity check and forces unnecessary child lookups on every frame. {v4}',
     correctionMessage:
         'Extract findChildIndexCallback to a final field, a static method, or a top-level function so the same instance is reused across rebuilds.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'ListView' && typeName != 'GridView') return;
 
@@ -5682,7 +5143,7 @@ class AvoidFindChildInBuildRule extends SaropaLintRule {
             while (current != null) {
               if (current is MethodDeclaration &&
                   current.name.lexeme == 'build') {
-                reporter.atNode(arg, code);
+                reporter.atNode(arg);
                 return;
               }
               current = current.parent;
@@ -5719,7 +5180,7 @@ class AvoidFindChildInBuildRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireErrorWidgetRule extends SaropaLintRule {
-  const RequireErrorWidgetRule() : super(code: _code);
+  RequireErrorWidgetRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -5732,23 +5193,19 @@ class RequireErrorWidgetRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_error_widget',
-    problemMessage:
-        '[require_error_widget] FutureBuilder/StreamBuilder must handle error state to prevent silent failures, blank screens, or cryptic UI. Without error handling, users may see no feedback when data fails to load, leading to confusion, poor UX, and support burden. This can also mask backend or network issues during development. {v4}',
+    'require_error_widget',
+    '[require_error_widget] FutureBuilder/StreamBuilder must handle error state to prevent silent failures, blank screens, or cryptic UI. Without error handling, users may see no feedback when data fails to load, leading to confusion, poor UX, and support burden. This can also mask backend or network issues during development. {v4}',
     correctionMessage:
         'Add error handling: if (snapshot.hasError) show a user-friendly error message or fallback UI. Log errors for diagnostics and provide actionable feedback to users. Audit all async builders for error handling coverage.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'FutureBuilder' && typeName != 'StreamBuilder') return;
 
@@ -5795,26 +5252,22 @@ class RequireErrorWidgetRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireFormValidationRule extends SaropaLintRule {
-  const RequireFormValidationRule() : super(code: _code);
+  RequireFormValidationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'require_form_validation',
-    problemMessage:
-        '[require_form_validation] TextFormField inside a Form without a validator function bypasses the form validation pipeline entirely. Calling formKey.currentState.validate() will always return true for this field, allowing invalid or empty input to reach the backend, causing data integrity issues and poor user feedback. {v3}',
+    'require_form_validation',
+    '[require_form_validation] TextFormField inside a Form without a validator function bypasses the form validation pipeline entirely. Calling formKey.currentState.validate() will always return true for this field, allowing invalid or empty input to reach the backend, causing data integrity issues and poor user feedback. {v3}',
     correctionMessage:
         'Add a validator parameter (e.g. validator: (value) => value?.isEmpty ?? true ? \"Required field\" : null) to participate in Form.validate() calls.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TextFormField') return;
 
@@ -5884,7 +5337,7 @@ class RequireFormValidationRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireThemeColorFromSchemeRule extends SaropaLintRule {
-  const RequireThemeColorFromSchemeRule() : super(code: _code);
+  RequireThemeColorFromSchemeRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -5897,49 +5350,45 @@ class RequireThemeColorFromSchemeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_theme_color_from_scheme',
-    problemMessage:
-        '[require_theme_color_from_scheme] Hardcoded Color value (e.g. Colors.blue, Color(0xFF...)) does not adapt to light/dark theme, high-contrast mode, or dynamic color (Material You). This breaks theming consistency and accessibility, as the color may become unreadable against the themed background in alternate modes. {v4}',
+    'require_theme_color_from_scheme',
+    '[require_theme_color_from_scheme] Hardcoded Color value (e.g. Colors.blue, Color(0xFF...)) does not adapt to light/dark theme, high-contrast mode, or dynamic color (Material You). This breaks theming consistency and accessibility, as the color may become unreadable against the themed background in alternate modes. {v4}',
     correctionMessage:
         'Replace with Theme.of(context).colorScheme.primary, .secondary, .surface, .onSurface, etc. to use theme-aware colors that adapt to light/dark mode automatically.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check for Color(0x...) hardcoded colors
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Color') return;
 
       // Skip if in theme definition file
-      final String filePath = resolver.source.fullName.toLowerCase();
+      final String filePath = context.filePath.toLowerCase();
       if (filePath.contains('theme') || filePath.contains('color')) return;
 
       // Check for hex literal
       if (node.argumentList.arguments.isNotEmpty) {
         final Expression firstArg = node.argumentList.arguments.first;
         if (firstArg is IntegerLiteral) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
 
     // Check for Colors.* constants
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (node.prefix.name != 'Colors') return;
 
       // Skip Colors.transparent - commonly used and valid
       if (node.identifier.name == 'transparent') return;
 
       // Skip if in theme definition
-      final String filePath = resolver.source.fullName.toLowerCase();
+      final String filePath = context.filePath.toLowerCase();
       if (filePath.contains('theme') || filePath.contains('color')) return;
 
       // Common colors that should come from theme
@@ -5956,7 +5405,7 @@ class RequireThemeColorFromSchemeRule extends SaropaLintRule {
 
       final String colorName = node.identifier.name.toLowerCase();
       if (semanticColors.any((String c) => colorName.startsWith(c))) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -5988,7 +5437,7 @@ class RequireThemeColorFromSchemeRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferColorSchemeFromSeedRule extends SaropaLintRule {
-  const PreferColorSchemeFromSeedRule() : super(code: _code);
+  PreferColorSchemeFromSeedRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -6001,23 +5450,19 @@ class PreferColorSchemeFromSeedRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_color_scheme_from_seed',
-    problemMessage:
-        '[prefer_color_scheme_from_seed] Manually constructing a ColorScheme requires specifying 20+ color roles with correct contrast ratios. Missing or mismatched colors cause poor contrast, invisible text, or WCAG accessibility failures. ColorScheme.fromSeed algorithmically generates all roles from a single seed color with guaranteed accessibility compliance. {v4}',
+    'prefer_color_scheme_from_seed',
+    '[prefer_color_scheme_from_seed] Manually constructing a ColorScheme requires specifying 20+ color roles with correct contrast ratios. Missing or mismatched colors cause poor contrast, invisible text, or WCAG accessibility failures. ColorScheme.fromSeed algorithmically generates all roles from a single seed color with guaranteed accessibility compliance. {v4}',
     correctionMessage:
         'Replace the manual ColorScheme constructor with ColorScheme.fromSeed(seedColor: primaryColor) to generate a complete, accessible palette automatically.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       final String? namedConstructor = node.constructorName.name?.name;
 
@@ -6082,7 +5527,7 @@ class PreferColorSchemeFromSeedRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferRichTextForComplexRule extends SaropaLintRule {
-  const PreferRichTextForComplexRule() : super(code: _code);
+  PreferRichTextForComplexRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -6095,23 +5540,19 @@ class PreferRichTextForComplexRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_rich_text_for_complex',
-    problemMessage:
-        '[prefer_rich_text_for_complex] Multiple Text widgets in a Row create separate text layout blocks that cannot wrap as a single paragraph. If the combined text exceeds the available width, each Text clips or overflows independently instead of wrapping naturally. Text.rich with multiple TextSpan children lays out as a single text block with proper line wrapping. {v4}',
+    'prefer_rich_text_for_complex',
+    '[prefer_rich_text_for_complex] Multiple Text widgets in a Row create separate text layout blocks that cannot wrap as a single paragraph. If the combined text exceeds the available width, each Text clips or overflows independently instead of wrapping naturally. Text.rich with multiple TextSpan children lays out as a single text block with proper line wrapping. {v4}',
     correctionMessage:
         'Replace the Row of Text widgets with a single Text.rich(TextSpan(children: [TextSpan(...), TextSpan(...)])) for unified text layout and natural line wrapping.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName != 'Row' && typeName != 'Wrap') return;
 
@@ -6170,7 +5611,7 @@ class PreferRichTextForComplexRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferSystemThemeDefaultRule extends SaropaLintRule {
-  const PreferSystemThemeDefaultRule() : super(code: _code);
+  PreferSystemThemeDefaultRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -6183,21 +5624,19 @@ class PreferSystemThemeDefaultRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_system_theme_default',
-    problemMessage:
-        '[prefer_system_theme_default] Hardcoded ThemeMode ignores user\'s OS dark mode preference. Using ThemeMode.light or ThemeMode.dark ignores user\'s OS preference. Default to ThemeMode.system to respect user settings, with option to override. {v3}',
+    'prefer_system_theme_default',
+    '[prefer_system_theme_default] Hardcoded ThemeMode ignores user\'s OS dark mode preference. Using ThemeMode.light or ThemeMode.dark ignores user\'s OS preference. Default to ThemeMode.system to respect user settings, with option to override. {v3}',
     correctionMessage:
         'Use ThemeMode.system as default to respect user settings. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
       // Only check ThemeMode.light or ThemeMode.dark
       if (node.prefix.name != 'ThemeMode') return;
       if (node.identifier.name != 'light' && node.identifier.name != 'dark') {
@@ -6231,7 +5670,7 @@ class PreferSystemThemeDefaultRule extends SaropaLintRule {
       }
 
       if (foundThemeModeArg) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -6267,25 +5706,23 @@ class PreferSystemThemeDefaultRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidBrightnessCheckForThemeRule extends SaropaLintRule {
-  const AvoidBrightnessCheckForThemeRule() : super(code: _code);
+  AvoidBrightnessCheckForThemeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_brightness_check_for_theme',
-    problemMessage:
-        '[avoid_brightness_check_for_theme] Manually checking Theme.of(context).brightness to pick light/dark colors bypasses the colorScheme system, which already provides semantically correct colors for each theme mode. Brightness checks are fragile, miss high-contrast mode, and scatter color logic throughout the codebase instead of centralizing it in the theme. {v2}',
+    'avoid_brightness_check_for_theme',
+    '[avoid_brightness_check_for_theme] Manually checking Theme.of(context).brightness to pick light/dark colors bypasses the colorScheme system, which already provides semantically correct colors for each theme mode. Brightness checks are fragile, miss high-contrast mode, and scatter color logic throughout the codebase instead of centralizing it in the theme. {v2}',
     correctionMessage:
         'Replace brightness-conditional colors with colorScheme properties (e.g. colorScheme.onSurface, colorScheme.surface) that automatically adapt to light, dark, and high-contrast modes.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Detect Theme.of(context).brightness pattern
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       if (node.propertyName.name != 'brightness') return;
 
       final Expression? target = node.target;
@@ -6294,7 +5731,7 @@ class AvoidBrightnessCheckForThemeRule extends SaropaLintRule {
 
       final Expression? methodTarget = target.target;
       if (methodTarget is SimpleIdentifier && methodTarget.name == 'Theme') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -6334,26 +5771,22 @@ class AvoidBrightnessCheckForThemeRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireSafeAreaHandlingRule extends SaropaLintRule {
-  const RequireSafeAreaHandlingRule() : super(code: _code);
+  RequireSafeAreaHandlingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'require_safe_area_handling',
-    problemMessage:
-        '[require_safe_area_handling] Scaffold body without safe area handling allows content to render behind device notches, camera cutouts, rounded corners, and home indicators. On modern devices with non-rectangular displays, this causes text and interactive elements to be obscured or unreachable. {v2}',
+    'require_safe_area_handling',
+    '[require_safe_area_handling] Scaffold body without safe area handling allows content to render behind device notches, camera cutouts, rounded corners, and home indicators. On modern devices with non-rectangular displays, this causes text and interactive elements to be obscured or unreachable. {v2}',
     correctionMessage:
         'Wrap the Scaffold body with SafeArea, or use MediaQuery.paddingOf(context) to manually inset content away from system UI intrusions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Scaffold') return;
 
@@ -6443,7 +5876,7 @@ class RequireSafeAreaHandlingRule extends SaropaLintRule {
 /// showAdaptiveDialog(...);
 /// ```
 class PreferCupertinoForIosFeelRule extends SaropaLintRule {
-  const PreferCupertinoForIosFeelRule() : super(code: _code);
+  PreferCupertinoForIosFeelRule() : super(code: _code);
 
   /// Design preference for native iOS feel.
   /// App works but may feel less native to iOS users.
@@ -6457,12 +5890,11 @@ class PreferCupertinoForIosFeelRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_cupertino_for_ios_feel',
-    problemMessage:
-        '[prefer_cupertino_for_ios_feel] Material widget has Cupertino equivalent for native iOS feel. Material widgets look foreign on iOS. Use Cupertino equivalents or adaptive widgets for native iOS feel. {v2}',
+    'prefer_cupertino_for_ios_feel',
+    '[prefer_cupertino_for_ios_feel] Material widget has Cupertino equivalent for native iOS feel. Material widgets look foreign on iOS. Use Cupertino equivalents or adaptive widgets for native iOS feel. {v2}',
     correctionMessage:
         'Use the Cupertino equivalent (e.g. CupertinoAlertDialog, CupertinoButton) or an adaptive widget (.adaptive constructor) to provide native iOS look and feel.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Map<String, String> _materialToCupertino = <String, String>{
@@ -6479,13 +5911,10 @@ class PreferCupertinoForIosFeelRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (_materialToCupertino.containsKey(typeName)) {
@@ -6519,7 +5948,7 @@ class PreferCupertinoForIosFeelRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireWindowSizeConstraintsRule extends SaropaLintRule {
-  const RequireWindowSizeConstraintsRule() : super(code: _code);
+  RequireWindowSizeConstraintsRule() : super(code: _code);
 
   /// Window can resize to unusable dimensions without constraints.
   /// Users may accidentally make window too small to use.
@@ -6533,33 +5962,32 @@ class RequireWindowSizeConstraintsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_window_size_constraints',
-    problemMessage:
-        '[require_window_size_constraints] Desktop app without minimum window size allows users to resize the window below the minimum layout dimensions, causing text overflow, clipped buttons, and broken layouts. Setting a minimum size prevents the window from reaching dimensions where the UI cannot function properly. {v2}',
+    'require_window_size_constraints',
+    '[require_window_size_constraints] Desktop app without minimum window size allows users to resize the window below the minimum layout dimensions, causing text overflow, clipped buttons, and broken layouts. Setting a minimum size prevents the window from reaching dimensions where the UI cannot function properly. {v2}',
     correctionMessage:
         'Use the window_manager package to call setMinimumSize(Size(minWidth, minHeight)) during app initialization, based on your minimum supported layout dimensions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
 
     // Only check main.dart in desktop contexts
     if (!path.endsWith('main.dart')) return;
 
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       if (node.name.lexeme != 'main') return;
 
       final String mainSource = node.toSource();
 
       // Check if has runApp but no window size setup
       if (mainSource.contains('runApp')) {
-        final bool hasWindowSetup = mainSource.contains('setMinimumSize') ||
+        final bool hasWindowSetup =
+            mainSource.contains('setMinimumSize') ||
             mainSource.contains('setWindowMinSize') ||
             mainSource.contains('windowManager') ||
             mainSource.contains('window_size') ||
@@ -6616,7 +6044,7 @@ class RequireWindowSizeConstraintsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferKeyboardShortcutsRule extends SaropaLintRule {
-  const PreferKeyboardShortcutsRule() : super(code: _code);
+  PreferKeyboardShortcutsRule() : super(code: _code);
 
   /// Desktop users expect keyboard shortcuts for efficiency.
   /// App works but power users may find it less productive.
@@ -6630,26 +6058,24 @@ class PreferKeyboardShortcutsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_keyboard_shortcuts',
-    problemMessage:
-        '[prefer_keyboard_shortcuts] Desktop app should implement keyboard shortcuts for common actions. Desktop users expect Ctrl+S, Ctrl+Z, etc. Implement Shortcuts and Actions for standard keyboard interactions. {v2}',
+    'prefer_keyboard_shortcuts',
+    '[prefer_keyboard_shortcuts] Desktop app should implement keyboard shortcuts for common actions. Desktop users expect Ctrl+S, Ctrl+Z, etc. Implement Shortcuts and Actions for standard keyboard interactions. {v2}',
     correctionMessage:
         'Add Shortcuts and Actions widgets for standard keyboard shortcuts (Ctrl+S save, Ctrl+Z undo, Ctrl+C copy, etc.) to match desktop user expectations.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String path = resolver.source.fullName;
+    final String path = context.filePath;
 
     // Only check files that might be desktop entry points
     if (!path.endsWith('main.dart') && !path.contains('app.dart')) return;
 
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends StatelessWidget/StatefulWidget
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -6725,7 +6151,7 @@ class PreferKeyboardShortcutsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidNullableWidgetMethodsRule extends SaropaLintRule {
-  const AvoidNullableWidgetMethodsRule() : super(code: _code);
+  AvoidNullableWidgetMethodsRule() : super(code: _code);
 
   /// Style/consistency issue. Large counts acceptable in legacy code.
   @override
@@ -6738,21 +6164,19 @@ class AvoidNullableWidgetMethodsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nullable_widget_methods',
-    problemMessage:
-        '[avoid_nullable_widget_methods] A method returning Widget? forces every call site to handle the null case, which clutters the widget tree with null checks and ternary expressions. Nullable widget returns also break composability because parent widgets expecting a non-null child cannot directly use the result. Returning a placeholder widget such as SizedBox.shrink() for empty states keeps the return type non-nullable and makes the widget tree consistent and predictable. {v2}',
+    'avoid_nullable_widget_methods',
+    '[avoid_nullable_widget_methods] A method returning Widget? forces every call site to handle the null case, which clutters the widget tree with null checks and ternary expressions. Nullable widget returns also break composability because parent widgets expecting a non-null child cannot directly use the result. Returning a placeholder widget such as SizedBox.shrink() for empty states keeps the return type non-nullable and makes the widget tree consistent and predictable. {v2}',
     correctionMessage:
         'Return SizedBox.shrink() instead of null for empty states, or move the null check to the call site using conditional rendering (e.g. if (show) widget else SizedBox.shrink()).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       // Skip build method
       if (node.name.lexeme == 'build') return;
 
@@ -6772,7 +6196,7 @@ class AvoidNullableWidgetMethodsRule extends SaropaLintRule {
     });
 
     // Also check function declarations (top-level functions)
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       final TypeAnnotation? returnType = node.returnType;
       if (returnType is NamedType) {
         final String typeName = returnType.name.lexeme;
@@ -6811,7 +6235,7 @@ class AvoidNullableWidgetMethodsRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferActionButtonTooltipRule extends SaropaLintRule {
-  const PreferActionButtonTooltipRule() : super(code: _code);
+  PreferActionButtonTooltipRule() : super(code: _code);
 
   /// Accessibility improvement.
   @override
@@ -6824,12 +6248,11 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_action_button_tooltip',
-    problemMessage:
-        '[prefer_action_button_tooltip] IconButton without a tooltip is inaccessible to screen reader users who cannot see the icon and have no text description of the button action. Tooltips also appear on long-press (mobile) and hover (desktop), providing discoverability for all users, not just those using assistive technology. {v2}',
+    'prefer_action_button_tooltip',
+    '[prefer_action_button_tooltip] IconButton without a tooltip is inaccessible to screen reader users who cannot see the icon and have no text description of the button action. Tooltips also appear on long-press (mobile) and hover (desktop), providing discoverability for all users, not just those using assistive technology. {v2}',
     correctionMessage:
         'Add tooltip: \"Description of action\" to the IconButton so screen readers can announce the button purpose and hover/long-press shows a label.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Buttons that should have tooltips
@@ -6840,12 +6263,10 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_buttonTypes.contains(typeName)) return;
 
@@ -6860,7 +6281,7 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
       }
 
       if (!hasTooltip) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -6886,7 +6307,7 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
 /// void doSomething(VoidCallback callback) {}
 /// ```
 class PreferVoidCallbackRule extends SaropaLintRule {
-  const PreferVoidCallbackRule() : super(code: _code);
+  PreferVoidCallbackRule() : super(code: _code);
 
   /// Style improvement.
   @override
@@ -6900,21 +6321,19 @@ class PreferVoidCallbackRule extends SaropaLintRule {
 
   /// Alias: prefer_void_callback_type
   static const LintCode _code = LintCode(
-    name: 'prefer_void_callback',
-    problemMessage:
-        '[prefer_void_callback] Use VoidCallback instead of void Function(). Using VoidCallback typedef is cleaner and more conventional in Flutter. {v2}',
+    'prefer_void_callback',
+    '[prefer_void_callback] Use VoidCallback instead of void Function(). Using VoidCallback typedef is cleaner and more conventional in Flutter. {v2}',
     correctionMessage:
         'Replace void Function() with VoidCallback for consistency. Use ValueChanged<T> for void Function(T) and ValueGetter<T> for T Function().',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addGenericFunctionType((GenericFunctionType node) {
+    context.addGenericFunctionType((GenericFunctionType node) {
       // Check for void Function()
       final TypeAnnotation? returnType = node.returnType;
       if (returnType == null) return;
@@ -6930,37 +6349,7 @@ class PreferVoidCallbackRule extends SaropaLintRule {
       // Should have no type parameters
       if (node.typeParameters != null) return;
 
-      reporter.atNode(node, code);
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceWithVoidCallbackFix()];
-}
-
-class _ReplaceWithVoidCallbackFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addGenericFunctionType((GenericFunctionType node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with VoidCallback',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          'VoidCallback',
-        );
-      });
+      reporter.atNode(node);
     });
   }
 }
@@ -6996,7 +6385,7 @@ class _ReplaceWithVoidCallbackFix extends DartFix {
 /// }
 /// ```
 class RequireOrientationHandlingRule extends SaropaLintRule {
-  const RequireOrientationHandlingRule() : super(code: _code);
+  RequireOrientationHandlingRule() : super(code: _code);
 
   /// UX issue - broken layouts in certain orientations.
   @override
@@ -7009,21 +6398,19 @@ class RequireOrientationHandlingRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_orientation_handling',
-    problemMessage:
-        '[require_orientation_handling] MaterialApp without orientation handling. May break in landscape. This widget pattern increases complexity and makes the widget tree harder to maintain and debug. {v3}',
+    'require_orientation_handling',
+    '[require_orientation_handling] MaterialApp without orientation handling. May break in landscape. This widget pattern increases complexity and makes the widget tree harder to maintain and debug. {v3}',
     correctionMessage:
         'Call SystemChrome.setPreferredOrientations in main() to lock orientation, or use OrientationBuilder/LayoutBuilder to provide responsive layouts for both portrait and landscape.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((node) {
+    context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'MaterialApp' && typeName != 'CupertinoApp') {
@@ -7085,7 +6472,7 @@ class RequireOrientationHandlingRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidNavigationInBuildRule extends SaropaLintRule {
-  const AvoidNavigationInBuildRule() : super(code: _code);
+  AvoidNavigationInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7097,13 +6484,12 @@ class AvoidNavigationInBuildRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_navigation_in_build',
-    problemMessage:
-        '[avoid_navigation_in_build] Navigation in build() triggers during '
+    'avoid_navigation_in_build',
+    '[avoid_navigation_in_build] Navigation in build() triggers during '
         'rebuild, causing infinite navigation loops or flickering screens. {v2}',
     correctionMessage:
         'Use WidgetsBinding.instance.addPostFrameCallback or move to callback.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _navigationMethods = <String>{
@@ -7120,11 +6506,10 @@ class AvoidNavigationInBuildRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Navigator.method or context.navigatorMethod via extensions
       final methodName = node.methodName.name;
       if (!_navigationMethods.contains(methodName)) return;
@@ -7203,7 +6588,7 @@ class AvoidNavigationInBuildRule extends SaropaLintRule {
 /// **Note:** This rule uses heuristic detection since Form widgets may be
 /// defined in parent files.
 class RequireTextFormFieldInFormRule extends SaropaLintRule {
-  const RequireTextFormFieldInFormRule() : super(code: _code);
+  RequireTextFormFieldInFormRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -7215,22 +6600,19 @@ class RequireTextFormFieldInFormRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_text_form_field_in_form',
-    problemMessage:
-        '[require_text_form_field_in_form] TextFormField outside a Form ancestor cannot participate in form-level validation. Calling formKey.currentState.validate() will not reach this field, and its validator callback will never execute. The field behaves identically to a plain TextField but misleads readers into thinking validation is wired up. {v2}',
+    'require_text_form_field_in_form',
+    '[require_text_form_field_in_form] TextFormField outside a Form ancestor cannot participate in form-level validation. Calling formKey.currentState.validate() will not reach this field, and its validator callback will never execute. The field behaves identically to a plain TextField but misleads readers into thinking validation is wired up. {v2}',
     correctionMessage:
         'Wrap the TextFormField and its siblings in a Form widget with a GlobalKey<FormState>, or replace it with TextField if form-level validation is not needed.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TextFormField') return;
 
@@ -7300,7 +6682,7 @@ class RequireTextFormFieldInFormRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
-  const RequireWebViewNavigationDelegateRule() : super(code: _code);
+  RequireWebViewNavigationDelegateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -7312,13 +6694,12 @@ class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_webview_navigation_delegate',
-    problemMessage:
-        '[require_webview_navigation_delegate] Without navigation delegate, '
+    'require_webview_navigation_delegate',
+    '[require_webview_navigation_delegate] Without navigation delegate, '
         'WebView can navigate to malicious or phishing sites. {v3}',
     correctionMessage:
         'Add navigationDelegate to validate URLs before navigation.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _webViewTypes = <String>{
@@ -7329,12 +6710,10 @@ class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name.lexeme;
       if (!_webViewTypes.contains(typeName)) return;
 
@@ -7397,7 +6776,7 @@ class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireAnimatedBuilderChildRule extends SaropaLintRule {
-  const RequireAnimatedBuilderChildRule() : super(code: _code);
+  RequireAnimatedBuilderChildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -7409,22 +6788,19 @@ class RequireAnimatedBuilderChildRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_animated_builder_child',
-    problemMessage:
-        '[require_animated_builder_child] AnimatedBuilder without a child parameter rebuilds the entire subtree on every animation frame. Static widgets that do not depend on the animation value are needlessly reconstructed 60 times per second, wasting CPU cycles and causing jank in complex widget trees. {v2}',
+    'require_animated_builder_child',
+    '[require_animated_builder_child] AnimatedBuilder without a child parameter rebuilds the entire subtree on every animation frame. Static widgets that do not depend on the animation value are needlessly reconstructed 60 times per second, wasting CPU cycles and causing jank in complex widget trees. {v2}',
     correctionMessage:
         'Move static widgets to the child parameter of AnimatedBuilder. The child is built once and passed to the builder callback, avoiding reconstruction on each frame.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'AnimatedBuilder') return;
 
@@ -7472,7 +6848,7 @@ class RequireAnimatedBuilderChildRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireRethrowPreserveStackRule extends SaropaLintRule {
-  const RequireRethrowPreserveStackRule() : super(code: _code);
+  RequireRethrowPreserveStackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -7484,21 +6860,19 @@ class RequireRethrowPreserveStackRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_rethrow_preserve_stack',
-    problemMessage:
-        '[require_rethrow_preserve_stack] Using \"throw e\" in a catch block creates a new stack trace starting from the throw site, discarding the original stack trace that shows where the error actually occurred. This makes debugging significantly harder because the error origin is lost. The rethrow keyword preserves the original stack trace. {v2}',
+    'require_rethrow_preserve_stack',
+    '[require_rethrow_preserve_stack] Using \"throw e\" in a catch block creates a new stack trace starting from the throw site, discarding the original stack trace that shows where the error actually occurred. This makes debugging significantly harder because the error origin is lost. The rethrow keyword preserves the original stack trace. {v2}',
     correctionMessage:
         'Replace \"throw e\" with \"rethrow\" to preserve the original stack trace. If you need to wrap the error, throw a new exception with the original as the cause.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addThrowExpression((ThrowExpression node) {
+    context.addThrowExpression((ThrowExpression node) {
       final thrown = node.expression;
       if (thrown is! SimpleIdentifier) return;
 
@@ -7521,7 +6895,7 @@ class RequireRethrowPreserveStackRule extends SaropaLintRule {
       if (exceptionParam == null) return;
 
       if (thrown.name == exceptionParam) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -7545,7 +6919,7 @@ class RequireRethrowPreserveStackRule extends SaropaLintRule {
 /// final response = await http.get(Uri.parse('https://api.example.com/data'));
 /// ```
 class RequireHttpsOverHttpRule extends SaropaLintRule {
-  const RequireHttpsOverHttpRule() : super(code: _code);
+  RequireHttpsOverHttpRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7557,28 +6931,26 @@ class RequireHttpsOverHttpRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_https_over_http',
-    problemMessage:
-        '[require_https_over_http] HTTP transmits data in plain text. '
+    'require_https_over_http',
+    '[require_https_over_http] HTTP transmits data in plain text. '
         'Attackers can intercept credentials, tokens, and user data. {v1}',
     correctionMessage: 'Replace http:// with https://.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final value = node.value;
       if (value.startsWith('http://') &&
           !value.startsWith('http://localhost') &&
           !value.startsWith('http://127.0.0.1') &&
           !value.startsWith('http://10.') &&
           !value.startsWith('http://192.168.')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -7602,7 +6974,7 @@ class RequireHttpsOverHttpRule extends SaropaLintRule {
 /// final channel = WebSocketChannel.connect(Uri.parse('wss://api.example.com'));
 /// ```
 class RequireWssOverWsRule extends SaropaLintRule {
-  const RequireWssOverWsRule() : super(code: _code);
+  RequireWssOverWsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7614,28 +6986,26 @@ class RequireWssOverWsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_wss_over_ws',
-    problemMessage:
-        '[require_wss_over_ws] ws:// transmits data unencrypted. Attackers '
+    'require_wss_over_ws',
+    '[require_wss_over_ws] ws:// transmits data unencrypted. Attackers '
         'can intercept, read, and modify WebSocket messages in transit. {v1}',
     correctionMessage: 'Replace ws:// with wss://.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final value = node.value;
       if (value.startsWith('ws://') &&
           !value.startsWith('ws://localhost') &&
           !value.startsWith('ws://127.0.0.1') &&
           !value.startsWith('ws://10.') &&
           !value.startsWith('ws://192.168.')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -7677,7 +7047,7 @@ class RequireWssOverWsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
-  const AvoidLateWithoutGuaranteeRule() : super(code: _code);
+  AvoidLateWithoutGuaranteeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -7689,21 +7059,19 @@ class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_late_without_guarantee',
-    problemMessage:
-        '[avoid_late_without_guarantee] late field throws a LateInitializationError at runtime if accessed before assignment, and Dart provides no compile-time guarantee that initialization has occurred. This creates a hidden crash risk that is difficult to catch in testing and may only surface in specific user flows or edge cases. {v2}',
+    'avoid_late_without_guarantee',
+    '[avoid_late_without_guarantee] late field throws a LateInitializationError at runtime if accessed before assignment, and Dart provides no compile-time guarantee that initialization has occurred. This creates a hidden crash risk that is difficult to catch in testing and may only surface in specific user flows or edge cases. {v2}',
     correctionMessage:
         'Use a nullable type with null checks for fields that may not be initialized, or ensure initialization in the constructor or initState where the framework guarantees execution order.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       // Check for late keyword
       if (node.fields.lateKeyword == null) return;
 
@@ -7739,7 +7107,7 @@ class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
         if (initStateBody == null ||
             !initStateBody.contains('$varName =') &&
                 !initStateBody.contains('$varName=')) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
@@ -7768,7 +7136,7 @@ class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
 /// <string>App needs camera access</string>
 /// ```
 class RequireImagePickerPermissionIosRule extends SaropaLintRule {
-  const RequireImagePickerPermissionIosRule() : super(code: _code);
+  RequireImagePickerPermissionIosRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7780,30 +7148,28 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_image_picker_permission_ios',
-    problemMessage:
-        '[require_image_picker_permission_ios] Missing Info.plist entries cause '
+    'require_image_picker_permission_ios',
+    '[require_image_picker_permission_ios] Missing Info.plist entries cause '
         'app rejection by App Store or instant crash when accessing photos. {v3}',
     correctionMessage:
         'Add NSPhotoLibraryUsageDescription and NSCameraUsageDescription to Info.plist.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only report once per file using image_picker
     bool reported = false;
 
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       if (reported) return;
 
       final uri = node.uri.stringValue ?? '';
       if (uri.contains('image_picker')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         reported = true;
       }
     });
@@ -7823,7 +7189,7 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
 /// <uses-permission android:name="android.permission.CAMERA"/>
 /// ```
 class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
-  const RequireImagePickerPermissionAndroidRule() : super(code: _code);
+  RequireImagePickerPermissionAndroidRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7835,29 +7201,27 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_image_picker_permission_android',
-    problemMessage:
-        '[require_image_picker_permission_android] Missing CAMERA permission '
+    'require_image_picker_permission_android',
+    '[require_image_picker_permission_android] Missing CAMERA permission '
         'causes SecurityException crash when user tries to take a photo. {v3}',
     correctionMessage:
         'Add <uses-permission android:name="android.permission.CAMERA"/> to manifest.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'pickImage') return;
 
       // Check for ImageSource.camera
       for (final arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'source') {
           if (arg.expression.toSource() == 'ImageSource.camera') {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -7879,7 +7243,7 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
 /// <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 /// ```
 class RequirePermissionManifestAndroidRule extends SaropaLintRule {
-  const RequirePermissionManifestAndroidRule() : super(code: _code);
+  RequirePermissionManifestAndroidRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7891,29 +7255,27 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_permission_manifest_android',
-    problemMessage:
-        '[require_permission_manifest_android] Runtime permission request without '
+    'require_permission_manifest_android',
+    '[require_permission_manifest_android] Runtime permission request without '
         'manifest entry always fails. Feature silently stops working. {v3}',
     correctionMessage:
         'Add <uses-permission android:name="android.permission.XXX"/> to manifest.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool reported = false;
 
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       if (reported) return;
 
       final uri = node.uri.stringValue ?? '';
       if (uri.contains('permission_handler')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         reported = true;
       }
     });
@@ -7934,7 +7296,7 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
 /// <string>Camera access for photo capture</string>
 /// ```
 class RequirePermissionPlistIosRule extends SaropaLintRule {
-  const RequirePermissionPlistIosRule() : super(code: _code);
+  RequirePermissionPlistIosRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -7946,22 +7308,20 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_permission_plist_ios',
-    problemMessage:
-        '[require_permission_plist_ios] iOS requires usage descriptions in '
+    'require_permission_plist_ios',
+    '[require_permission_plist_ios] iOS requires usage descriptions in '
         'Info.plist. App crashes or gets rejected from App Store without them. {v3}',
     correctionMessage:
         'Add NSxxxUsageDescription key to Info.plist for each permission.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'request') return;
 
       final target = node.target;
@@ -7969,7 +7329,7 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
 
       final targetSource = target.toSource();
       if (targetSource.contains('Permission.')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -7993,7 +7353,7 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
 /// </queries>
 /// ```
 class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
-  const RequireUrlLauncherQueriesAndroidRule() : super(code: _code);
+  RequireUrlLauncherQueriesAndroidRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -8005,29 +7365,27 @@ class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_url_launcher_queries_android',
-    problemMessage:
-        '[require_url_launcher_queries_android] Without <queries> in manifest, '
+    'require_url_launcher_queries_android',
+    '[require_url_launcher_queries_android] Without <queries> in manifest, '
         'canLaunchUrl returns false on Android 11+ even for installed apps. {v3}',
     correctionMessage:
         'Add <queries> element with intent filters to AndroidManifest.xml.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool reported = false;
 
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       if (reported) return;
 
       final uri = node.uri.stringValue ?? '';
       if (uri.contains('url_launcher')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         reported = true;
       }
     });
@@ -8052,7 +7410,7 @@ class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
 /// </array>
 /// ```
 class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
-  const RequireUrlLauncherSchemesIosRule() : super(code: _code);
+  RequireUrlLauncherSchemesIosRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -8064,28 +7422,26 @@ class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_url_launcher_schemes_ios',
-    problemMessage:
-        '[require_url_launcher_schemes_ios] Without LSApplicationQueriesSchemes, '
+    'require_url_launcher_schemes_ios',
+    '[require_url_launcher_schemes_ios] Without LSApplicationQueriesSchemes, '
         'canLaunchUrl returns false on iOS even for available URL schemes. {v3}',
     correctionMessage:
         'Add URL schemes to LSApplicationQueriesSchemes array in Info.plist.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'canLaunchUrl' &&
           node.methodName.name != 'canLaunch') {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -8123,7 +7479,7 @@ class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidStaticRouteConfigRule extends SaropaLintRule {
-  const AvoidStaticRouteConfigRule() : super(code: _code);
+  AvoidStaticRouteConfigRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -8132,13 +7488,12 @@ class AvoidStaticRouteConfigRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_static_route_config',
-    problemMessage:
-        '[avoid_static_route_config] Static router configuration prevents '
+    'avoid_static_route_config',
+    '[avoid_static_route_config] Static router configuration prevents '
         'hot reload. Route changes require full restart. {v2}',
     correctionMessage:
         'Use a top-level final variable or a getter for the router instead.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _routerTypes = <String>{
@@ -8151,11 +7506,10 @@ class AvoidStaticRouteConfigRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       // Check if static
       if (!node.isStatic) return;
 
@@ -8168,7 +7522,7 @@ class AvoidStaticRouteConfigRule extends SaropaLintRule {
         final String typeStr = type.toSource();
         for (final String routerType in _routerTypes) {
           if (typeStr.contains(routerType)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -8180,7 +7534,7 @@ class AvoidStaticRouteConfigRule extends SaropaLintRule {
         if (initializer is InstanceCreationExpression) {
           final String typeName = initializer.constructorName.type.name2.lexeme;
           if (_routerTypes.contains(typeName)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -8229,7 +7583,7 @@ class AvoidStaticRouteConfigRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireLocaleForTextRule extends SaropaLintRule {
-  const RequireLocaleForTextRule() : super(code: _code);
+  RequireLocaleForTextRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -8238,22 +7592,19 @@ class RequireLocaleForTextRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_locale_for_text',
-    problemMessage:
-        '[require_locale_for_text] Text formatting methods (toUpperCase, toLowerCase, number formatting) without an explicit locale use the device default, producing different results across regions. For example, Turkish locale uppercases \"i\" to \"I\" (with a dot), breaking string comparisons and identifiers unexpectedly. {v2}',
+    'require_locale_for_text',
+    '[require_locale_for_text] Text formatting methods (toUpperCase, toLowerCase, number formatting) without an explicit locale use the device default, producing different results across regions. For example, Turkish locale uppercases \"i\" to \"I\" (with a dot), breaking string comparisons and identifiers unexpectedly. {v2}',
     correctionMessage:
         'Pass an explicit locale parameter to text formatting calls, or use toUpperCase() only on ASCII-known strings. Use intl package for locale-aware number and date formatting.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.type.name2.lexeme;
 
       // Check for NumberFormat, DateFormat
@@ -8267,12 +7618,12 @@ class RequireLocaleForTextRule extends SaropaLintRule {
       if (!argsSource.contains('locale:') &&
           !argsSource.contains("'en") &&
           !argsSource.contains('"en')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Also check for static constructors like DateFormat.yMd()
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
 
@@ -8284,7 +7635,7 @@ class RequireLocaleForTextRule extends SaropaLintRule {
           (!argsSource.contains('locale:') &&
               !argsSource.contains("'en") &&
               !argsSource.contains('"en'))) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -8325,7 +7676,7 @@ class RequireLocaleForTextRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireDialogBarrierConsiderationRule extends SaropaLintRule {
-  const RequireDialogBarrierConsiderationRule() : super(code: _code);
+  RequireDialogBarrierConsiderationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -8337,12 +7688,11 @@ class RequireDialogBarrierConsiderationRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_dialog_barrier_consideration',
-    problemMessage:
-        '[require_dialog_barrier_consideration] Destructive confirmation dialog (delete, remove, logout) defaults to barrierDismissible: true, allowing users to accidentally dismiss the dialog by tapping outside. This can silently skip the confirmation step, or worse, leave the user unsure whether the action was confirmed or canceled. {v2}',
+    'require_dialog_barrier_consideration',
+    '[require_dialog_barrier_consideration] Destructive confirmation dialog (delete, remove, logout) defaults to barrierDismissible: true, allowing users to accidentally dismiss the dialog by tapping outside. This can silently skip the confirmation step, or worse, leave the user unsure whether the action was confirmed or canceled. {v2}',
     correctionMessage:
         'Set barrierDismissible: false on destructive confirmation dialogs so users must explicitly tap a button to confirm or cancel the action.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static final RegExp _destructivePattern = RegExp(
@@ -8352,11 +7702,10 @@ class RequireDialogBarrierConsiderationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'showDialog') return;
 
       final String argsSource = node.argumentList.toSource();
@@ -8366,7 +7715,7 @@ class RequireDialogBarrierConsiderationRule extends SaropaLintRule {
 
       // Check if dialog content contains destructive keywords
       if (_destructivePattern.hasMatch(argsSource)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -8409,7 +7758,7 @@ class RequireDialogBarrierConsiderationRule extends SaropaLintRule {
 ///       order_model.dart
 /// ```
 class PreferFeatureFolderStructureRule extends SaropaLintRule {
-  const PreferFeatureFolderStructureRule() : super(code: _code);
+  PreferFeatureFolderStructureRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -8418,12 +7767,11 @@ class PreferFeatureFolderStructureRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_feature_folder_structure',
-    problemMessage:
-        '[prefer_feature_folder_structure] File in type-based folder. Prefer feature-based organization. Group files by feature (/auth, /profile) instead of type (/bloc, /ui) to improve scalability. {v3}',
+    'prefer_feature_folder_structure',
+    '[prefer_feature_folder_structure] File in type-based folder. Prefer feature-based organization. Group files by feature (/auth, /profile) instead of type (/bloc, /ui) to improve scalability. {v3}',
     correctionMessage:
         'Group related files by feature (e.g. features/auth/login_bloc.dart, features/auth/login_screen.dart) so all code for a feature is co-located and can be modified, tested, and deleted as a unit.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static final RegExp _typeBasedFolderPattern = RegExp(
@@ -8433,16 +7781,15 @@ class PreferFeatureFolderStructureRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check the file path
-    final String filePath = resolver.source.fullName;
+    final String filePath = context.filePath;
 
     if (_typeBasedFolderPattern.hasMatch(filePath)) {
       // Report on the compilation unit (file level)
-      context.registry.addCompilationUnit((CompilationUnit node) {
+      context.addCompilationUnit((CompilationUnit node) {
         // Only report once per file, on the first declaration
         if (node.declarations.isNotEmpty) {
           reporter.atNode(node.declarations.first, code);

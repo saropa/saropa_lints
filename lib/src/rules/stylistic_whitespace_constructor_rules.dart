@@ -1,9 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -54,7 +51,7 @@ import '../saropa_lint_rule.dart';
 ///
 /// Alias: prefer_no_blank_line_before_return
 class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
-  const PreferNoBlankLineBeforeReturnRule() : super(code: _code);
+  PreferNoBlankLineBeforeReturnRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -63,21 +60,19 @@ class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_no_blank_line_before_return',
-    problemMessage:
-        '[prefer_no_blank_line_before_return] A blank line before the return statement adds unnecessary vertical space that separates the return value from its context. Remove it to keep the function body compact. {v3}',
+    'prefer_no_blank_line_before_return',
+    '[prefer_no_blank_line_before_return] A blank line before the return statement adds unnecessary vertical space that separates the return value from its context. Remove it to keep the function body compact. {v3}',
     correctionMessage:
         'Remove the blank line directly above the return statement to keep the function body compact and readable.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((node) {
+    context.addBlock((node) {
       final statements = node.statements;
       if (statements.length < 2) return;
 
@@ -86,14 +81,14 @@ class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
 
       final secondLastStmt = statements[statements.length - 2];
 
-      final lastLine =
-          resolver.lineInfo.getLocation(lastStmt.offset).lineNumber;
-      final prevLine =
-          resolver.lineInfo.getLocation(secondLastStmt.end).lineNumber;
+      final lastLine = context.lineInfo.getLocation(lastStmt.offset).lineNumber;
+      final prevLine = context.lineInfo
+          .getLocation(secondLastStmt.end)
+          .lineNumber;
 
       // Flag if there's a blank line
       if (lastLine - prevLine >= 2) {
-        reporter.atNode(lastStmt, code);
+        reporter.atNode(lastStmt);
       }
     });
   }
@@ -138,7 +133,7 @@ class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
 ///
 /// Alias: prefer_blank_line_after_declarations
 class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
-  const PreferBlankLineAfterDeclarationsRule() : super(code: _code);
+  PreferBlankLineAfterDeclarationsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -147,21 +142,19 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_blank_line_after_declarations',
-    problemMessage:
-        '[prefer_blank_line_after_declarations] Variable declarations run directly into the logic that follows without a visual break. A blank line separates setup from behavior and improves scanability. {v3}',
+    'prefer_blank_line_after_declarations',
+    '[prefer_blank_line_after_declarations] Variable declarations run directly into the logic that follows without a visual break. A blank line separates setup from behavior and improves scanability. {v3}',
     correctionMessage:
         'Insert a blank line after variable declarations to visually separate the setup block from the logic that follows.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((node) {
+    context.addBlock((node) {
       final statements = node.statements;
       if (statements.length < 2) return;
 
@@ -172,13 +165,13 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
         // Check if current is a variable declaration and next is not
         if (current is VariableDeclarationStatement &&
             next is! VariableDeclarationStatement) {
-          final currentLine =
-              resolver.lineInfo.getLocation(current.end).lineNumber;
-          final nextLine =
-              resolver.lineInfo.getLocation(next.offset).lineNumber;
+          final currentLine = context.lineInfo
+              .getLocation(current.end)
+              .lineNumber;
+          final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
 
           if (nextLine - currentLine < 2) {
-            reporter.atNode(current, code);
+            reporter.atNode(current);
           }
         }
       }
@@ -220,7 +213,7 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
 ///
 /// Alias: prefer_compact_declarations
 class PreferCompactDeclarationsRule extends SaropaLintRule {
-  const PreferCompactDeclarationsRule() : super(code: _code);
+  PreferCompactDeclarationsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -229,21 +222,19 @@ class PreferCompactDeclarationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_compact_declarations',
-    problemMessage:
-        '[prefer_compact_declarations] Unnecessary blank line after variable declarations pushes related logic further from the variables it uses, increasing the vertical distance readers must scan. {v3}',
+    'prefer_compact_declarations',
+    '[prefer_compact_declarations] Unnecessary blank line after variable declarations pushes related logic further from the variables it uses, increasing the vertical distance readers must scan. {v3}',
     correctionMessage:
         'Remove the blank line after declarations to keep variable definitions close to the code that uses them.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((node) {
+    context.addBlock((node) {
       final statements = node.statements;
       if (statements.length < 2) return;
 
@@ -253,13 +244,13 @@ class PreferCompactDeclarationsRule extends SaropaLintRule {
 
         if (current is VariableDeclarationStatement &&
             next is! VariableDeclarationStatement) {
-          final currentLine =
-              resolver.lineInfo.getLocation(current.end).lineNumber;
-          final nextLine =
-              resolver.lineInfo.getLocation(next.offset).lineNumber;
+          final currentLine = context.lineInfo
+              .getLocation(current.end)
+              .lineNumber;
+          final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
 
           if (nextLine - currentLine >= 2) {
-            reporter.atNode(current, code);
+            reporter.atNode(current);
           }
         }
       }
@@ -301,7 +292,7 @@ class PreferCompactDeclarationsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
-  const PreferBlankLinesBetweenMembersRule() : super(code: _code);
+  PreferBlankLinesBetweenMembersRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -310,21 +301,19 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_blank_lines_between_members',
-    problemMessage:
-        '[prefer_blank_lines_between_members] Class members are not separated by blank lines. Dense class bodies force readers to visually parse where one member ends and the next begins, slowing navigation. {v2}',
+    'prefer_blank_lines_between_members',
+    '[prefer_blank_lines_between_members] Class members are not separated by blank lines. Dense class bodies force readers to visually parse where one member ends and the next begins, slowing navigation. {v2}',
     correctionMessage:
         'Insert a blank line between each class member so fields, methods, and constructors are visually distinct.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((node) {
+    context.addClassDeclaration((node) {
       final members = node.members;
       if (members.length < 2) return;
 
@@ -335,12 +324,13 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
         // Skip field declarations - they can be grouped
         if (current is FieldDeclaration && next is FieldDeclaration) continue;
 
-        final currentLine =
-            resolver.lineInfo.getLocation(current.end).lineNumber;
-        final nextLine = resolver.lineInfo.getLocation(next.offset).lineNumber;
+        final currentLine = context.lineInfo
+            .getLocation(current.end)
+            .lineNumber;
+        final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
 
         if (nextLine - currentLine < 2) {
-          reporter.atNode(next, code);
+          reporter.atNode(next);
         }
       }
     });
@@ -379,7 +369,7 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferCompactClassMembersRule extends SaropaLintRule {
-  const PreferCompactClassMembersRule() : super(code: _code);
+  PreferCompactClassMembersRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -388,21 +378,19 @@ class PreferCompactClassMembersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_compact_class_members',
-    problemMessage:
-        '[prefer_compact_class_members] Unnecessary blank lines between class members inflate the class body. Compact layout lets the full class definition fit on fewer lines for a quick overview. {v2}',
+    'prefer_compact_class_members',
+    '[prefer_compact_class_members] Unnecessary blank lines between class members inflate the class body. Compact layout lets the full class definition fit on fewer lines for a quick overview. {v2}',
     correctionMessage:
         'Remove blank lines between class members so the full class definition fits on fewer lines for a quick overview.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((node) {
+    context.addClassDeclaration((node) {
       final members = node.members;
       if (members.length < 2) return;
 
@@ -410,12 +398,13 @@ class PreferCompactClassMembersRule extends SaropaLintRule {
         final current = members[i];
         final next = members[i + 1];
 
-        final currentLine =
-            resolver.lineInfo.getLocation(current.end).lineNumber;
-        final nextLine = resolver.lineInfo.getLocation(next.offset).lineNumber;
+        final currentLine = context.lineInfo
+            .getLocation(current.end)
+            .lineNumber;
+        final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
 
         if (nextLine - currentLine >= 2) {
-          reporter.atNode(next, code);
+          reporter.atNode(next);
         }
       }
     });
@@ -453,7 +442,7 @@ class PreferCompactClassMembersRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
-  const PreferNoBlankLineInsideBlocksRule() : super(code: _code);
+  PreferNoBlankLineInsideBlocksRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -465,27 +454,26 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_no_blank_line_inside_blocks',
-    problemMessage:
-        '[prefer_no_blank_line_inside_blocks] Blank line at the start or end of a block body wastes vertical space and creates visual inconsistency with the surrounding indentation structure. {v2}',
+    'prefer_no_blank_line_inside_blocks',
+    '[prefer_no_blank_line_inside_blocks] Blank line at the start or end of a block body wastes vertical space and creates visual inconsistency with the surrounding indentation structure. {v2}',
     correctionMessage:
         'Remove the leading or trailing blank line inside the block body so the code stays compact and consistently indented.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addBlock((node) {
+    context.addBlock((node) {
       if (node.statements.isEmpty) return;
 
       // Check for blank line at start
-      final openBraceLine =
-          resolver.lineInfo.getLocation(node.leftBracket.offset).lineNumber;
-      final firstStmtLine = resolver.lineInfo
+      final openBraceLine = context.lineInfo
+          .getLocation(node.leftBracket.offset)
+          .lineNumber;
+      final firstStmtLine = context.lineInfo
           .getLocation(node.statements.first.offset)
           .lineNumber;
 
@@ -494,10 +482,12 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
       }
 
       // Check for blank line at end
-      final lastStmtLine =
-          resolver.lineInfo.getLocation(node.statements.last.end).lineNumber;
-      final closeBraceLine =
-          resolver.lineInfo.getLocation(node.rightBracket.offset).lineNumber;
+      final lastStmtLine = context.lineInfo
+          .getLocation(node.statements.last.end)
+          .lineNumber;
+      final closeBraceLine = context.lineInfo
+          .getLocation(node.rightBracket.offset)
+          .lineNumber;
 
       if (closeBraceLine - lastStmtLine > 1) {
         reporter.atNode(node.statements.last, code);
@@ -536,7 +526,7 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
 /// void method2() {}
 /// ```
 class PreferSingleBlankLineMaxRule extends SaropaLintRule {
-  const PreferSingleBlankLineMaxRule() : super(code: _code);
+  PreferSingleBlankLineMaxRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -545,21 +535,19 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_single_blank_line_max',
-    problemMessage:
-        '[prefer_single_blank_line_max] Multiple consecutive blank lines waste vertical space and create visual gaps that break reading flow. One blank line is sufficient to separate logical sections. {v2}',
+    'prefer_single_blank_line_max',
+    '[prefer_single_blank_line_max] Multiple consecutive blank lines waste vertical space and create visual gaps that break reading flow. One blank line is sufficient to separate logical sections. {v2}',
     correctionMessage:
         'Collapse multiple consecutive blank lines into a single blank line to conserve vertical space in the file.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCompilationUnit((node) {
+    context.addCompilationUnit((node) {
       final declarations = node.declarations;
       if (declarations.length < 2) return;
 
@@ -567,13 +555,14 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
         final current = declarations[i];
         final next = declarations[i + 1];
 
-        final currentLine =
-            resolver.lineInfo.getLocation(current.end).lineNumber;
-        final nextLine = resolver.lineInfo.getLocation(next.offset).lineNumber;
+        final currentLine = context.lineInfo
+            .getLocation(current.end)
+            .lineNumber;
+        final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
 
         // More than 2 lines difference means 2+ blank lines
         if (nextLine - currentLine > 2) {
-          reporter.atNode(next, code);
+          reporter.atNode(next);
         }
       }
     });
@@ -615,7 +604,7 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferSuperParametersRule extends SaropaLintRule {
-  const PreferSuperParametersRule() : super(code: _code);
+  PreferSuperParametersRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -624,21 +613,19 @@ class PreferSuperParametersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_super_parameters',
-    problemMessage:
-        '[prefer_super_parameters] Constructor parameter is forwarded directly to super() instead of using Dart 3 super-parameter syntax. This adds unnecessary boilerplate and repetition; use super.paramName to shorten the signature. {v3}',
+    'prefer_super_parameters',
+    '[prefer_super_parameters] Constructor parameter is forwarded directly to super() instead of using Dart 3 super-parameter syntax. This adds unnecessary boilerplate and repetition; use super.paramName to shorten the signature. {v3}',
     correctionMessage:
         'Use Dart 3 super-parameter syntax (super.name) to forward constructor arguments without repeating the field name.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((node) {
+    context.addConstructorDeclaration((node) {
       // Check for super initializer
       for (final initializer in node.initializers) {
         if (initializer is SuperConstructorInvocation) {
@@ -652,7 +639,7 @@ class PreferSuperParametersRule extends SaropaLintRule {
                   final paramName = param.name?.lexeme;
                   if (paramName == expr.name &&
                       arg.name.label.name == paramName) {
-                    reporter.atNode(arg, code);
+                    reporter.atNode(arg);
                   }
                 }
               }
@@ -697,7 +684,7 @@ class PreferSuperParametersRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferInitializingFormalsRule extends SaropaLintRule {
-  const PreferInitializingFormalsRule() : super(code: _code);
+  PreferInitializingFormalsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -707,21 +694,19 @@ class PreferInitializingFormalsRule extends SaropaLintRule {
 
   /// Alias: prefer_initializing_formal
   static const LintCode _code = LintCode(
-    name: 'prefer_initializing_formals',
-    problemMessage:
-        '[prefer_initializing_formals] Constructor assigns a parameter directly to a field via the initializer list. Use this.field syntax in the parameter list instead to reduce boilerplate and improve readability. {v3}',
+    'prefer_initializing_formals',
+    '[prefer_initializing_formals] Constructor assigns a parameter directly to a field via the initializer list. Use this.field syntax in the parameter list instead to reduce boilerplate and improve readability. {v3}',
     correctionMessage:
         'Use this.field syntax in the constructor parameter list to assign the value directly without an initializer body.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((node) {
+    context.addConstructorDeclaration((node) {
       for (final initializer in node.initializers) {
         if (initializer is ConstructorFieldInitializer) {
           final value = initializer.expression;
@@ -731,7 +716,7 @@ class PreferInitializingFormalsRule extends SaropaLintRule {
               final paramName = param.name?.lexeme;
               if (paramName == value.name &&
                   initializer.fieldName.name == paramName) {
-                reporter.atNode(initializer, code);
+                reporter.atNode(initializer);
               }
             }
           }
@@ -774,7 +759,7 @@ class PreferInitializingFormalsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferConstructorBodyAssignmentRule extends SaropaLintRule {
-  const PreferConstructorBodyAssignmentRule() : super(code: _code);
+  PreferConstructorBodyAssignmentRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -783,24 +768,22 @@ class PreferConstructorBodyAssignmentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_constructor_body_assignment',
-    problemMessage:
-        '[prefer_constructor_body_assignment] Constructor uses this.field shorthand which prevents adding validation or transformation logic. Use an explicit initializer list or body assignment instead to keep the constructor flexible. {v2}',
+    'prefer_constructor_body_assignment',
+    '[prefer_constructor_body_assignment] Constructor uses this.field shorthand which prevents adding validation or transformation logic. Use an explicit initializer list or body assignment instead to keep the constructor flexible. {v2}',
     correctionMessage:
         'Assign fields inside the constructor body instead of using this.field to allow validation or transformation logic.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((node) {
+    context.addConstructorDeclaration((node) {
       for (final param in node.parameters.parameters) {
         if (param is FieldFormalParameter) {
-          reporter.atNode(param, code);
+          reporter.atNode(param);
         }
       }
     });
@@ -847,7 +830,7 @@ class PreferConstructorBodyAssignmentRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferFactoryForValidationRule extends SaropaLintRule {
-  const PreferFactoryForValidationRule() : super(code: _code);
+  PreferFactoryForValidationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -856,21 +839,19 @@ class PreferFactoryForValidationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_factory_for_validation',
-    problemMessage:
-        '[prefer_factory_for_validation] Use a factory constructor for validation logic instead of constructor assertions. This is an opinionated rule - not included in any tier by default. {v2}',
+    'prefer_factory_for_validation',
+    '[prefer_factory_for_validation] Use a factory constructor for validation logic instead of constructor assertions. This is an opinionated rule - not included in any tier by default. {v2}',
     correctionMessage:
         'A factory constructor can return null, a cached instance, or a subtype when validation fails, unlike assert.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((node) {
+    context.addConstructorDeclaration((node) {
       // Skip factory constructors
       if (node.factoryKeyword != null) return;
 
@@ -887,12 +868,12 @@ class PreferFactoryForValidationRule extends SaropaLintRule {
           }
           if (inner is ExpressionStatement &&
               inner.expression is ThrowExpression) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         } else if (stmt is ExpressionStatement &&
             stmt.expression is ThrowExpression) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -937,7 +918,7 @@ class PreferFactoryForValidationRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferConstructorAssertionRule extends SaropaLintRule {
-  const PreferConstructorAssertionRule() : super(code: _code);
+  PreferConstructorAssertionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -946,21 +927,19 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_constructor_assertion',
-    problemMessage:
-        '[prefer_constructor_assertion] Use a constructor assertion instead of a factory for simple debug-only precondition checks. This is an opinionated rule - not included in any tier by default. {v2}',
+    'prefer_constructor_assertion',
+    '[prefer_constructor_assertion] Use a constructor assertion instead of a factory for simple debug-only precondition checks. This is an opinionated rule - not included in any tier by default. {v2}',
     correctionMessage:
         'Constructor assertions run only in debug mode and keep the class constructor simple without a factory indirection.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((node) {
+    context.addConstructorDeclaration((node) {
       if (node.factoryKeyword == null) return;
 
       final body = node.body;
@@ -981,7 +960,7 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
         }
         if (inner is ExpressionStatement &&
             inner.expression is ThrowExpression) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1014,7 +993,7 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
 /// void create({required String name, String? prefix, int? suffix});
 /// ```
 class PreferRequiredBeforeOptionalRule extends SaropaLintRule {
-  const PreferRequiredBeforeOptionalRule() : super(code: _code);
+  PreferRequiredBeforeOptionalRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1023,21 +1002,19 @@ class PreferRequiredBeforeOptionalRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_required_before_optional',
-    problemMessage:
-        '[prefer_required_before_optional] Required parameters appear after optional ones, forcing callers to scan past defaults to find mandatory arguments. Place required parameters first for a clearer API signature. {v2}',
+    'prefer_required_before_optional',
+    '[prefer_required_before_optional] Required parameters appear after optional ones, forcing callers to scan past defaults to find mandatory arguments. Place required parameters first for a clearer API signature. {v2}',
     correctionMessage:
         'Move required parameters before optional ones so callers see mandatory arguments first in the signature.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFormalParameterList((node) {
+    context.addFormalParameterList((node) {
       bool seenOptional = false;
 
       for (final param in node.parameters) {
@@ -1047,7 +1024,7 @@ class PreferRequiredBeforeOptionalRule extends SaropaLintRule {
         if (isOptional) {
           seenOptional = true;
         } else if (seenOptional && isRequired) {
-          reporter.atNode(param, code);
+          reporter.atNode(param);
         }
       }
     });
@@ -1080,7 +1057,7 @@ class PreferRequiredBeforeOptionalRule extends SaropaLintRule {
 /// void create({required String name, required int id, String? prefix});
 /// ```
 class PreferGroupedByPurposeRule extends SaropaLintRule {
-  const PreferGroupedByPurposeRule() : super(code: _code);
+  PreferGroupedByPurposeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1089,23 +1066,21 @@ class PreferGroupedByPurposeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_grouped_by_purpose',
-    problemMessage:
-        '[prefer_grouped_by_purpose] Parameters alternate frequently between required and optional, scattering related arguments. Group parameters by purpose instead so callers can understand each logical group at a glance. {v2}',
+    'prefer_grouped_by_purpose',
+    '[prefer_grouped_by_purpose] Parameters alternate frequently between required and optional, scattering related arguments. Group parameters by purpose instead so callers can understand each logical group at a glance. {v2}',
     correctionMessage:
         'Group constructor parameters by purpose (e.g., layout, style, callbacks) rather than required-vs-optional ordering.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // This is a heuristic rule - it's hard to detect "purpose" statically
     // So we flag when required and optional alternate frequently
-    context.registry.addFormalParameterList((node) {
+    context.addFormalParameterList((node) {
       if (node.parameters.length < 4) return;
 
       int transitions = 0;
@@ -1121,7 +1096,7 @@ class PreferGroupedByPurposeRule extends SaropaLintRule {
 
       // If there are many transitions, suggest grouping differently
       if (transitions >= 3) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1164,7 +1139,7 @@ class PreferGroupedByPurposeRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferRethrowOverThrowERule extends SaropaLintRule {
-  const PreferRethrowOverThrowERule() : super(code: _code);
+  PreferRethrowOverThrowERule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -1174,21 +1149,19 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
 
   /// Alias: prefer_rethrow_throw_e
   static const LintCode _code = LintCode(
-    name: 'prefer_rethrow_over_throw_e',
-    problemMessage:
-        '[prefer_rethrow_over_throw_e] Using throw e resets the stack trace to the current frame, losing the original call site information. Use rethrow to preserve the full stack trace for easier debugging. {v3}',
+    'prefer_rethrow_over_throw_e',
+    '[prefer_rethrow_over_throw_e] Using throw e resets the stack trace to the current frame, losing the original call site information. Use rethrow to preserve the full stack trace for easier debugging. {v3}',
     correctionMessage:
         'Replace throw e with rethrow to preserve the original stack trace instead of resetting it to the current frame.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addCatchClause((node) {
+    context.addCatchClause((node) {
       final exceptionParam = node.exceptionParameter?.name;
       if (exceptionParam == null) return;
 
@@ -1200,38 +1173,11 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
             final thrown = expr.expression;
             if (thrown is SimpleIdentifier &&
                 thrown.name == exceptionParam.lexeme) {
-              reporter.atNode(expr, code);
+              reporter.atNode(expr);
             }
           }
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferRethrowOverThrowEFix()];
-}
-
-class _PreferRethrowOverThrowEFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addThrowExpression((ThrowExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace with rethrow',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(node.sourceRange, 'rethrow');
-      });
     });
   }
 }

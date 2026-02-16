@@ -11,10 +11,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -42,7 +38,7 @@ import '../../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidWatchInCallbacksRule extends SaropaLintRule {
-  const AvoidWatchInCallbacksRule() : super(code: _code);
+  AvoidWatchInCallbacksRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -52,21 +48,19 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_watch_in_callbacks',
-    problemMessage:
-        '[avoid_watch_in_callbacks] Using watch in callbacks (like onPressed or onTap) creates new subscriptions on every call, leading to memory leaks, redundant widget rebuilds, and degraded app performance. This can cause your app to slow down or even crash over time. {v4}',
+    'avoid_watch_in_callbacks',
+    '[avoid_watch_in_callbacks] Using watch in callbacks (like onPressed or onTap) creates new subscriptions on every call, leading to memory leaks, redundant widget rebuilds, and degraded app performance. This can cause your app to slow down or even crash over time. {v4}',
     correctionMessage:
         'Use ref.read instead of ref.watch in event handlers and callbacks to avoid creating unnecessary subscriptions and prevent memory leaks.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'watch') return;
 
       // Check if inside a callback (FunctionExpression in ArgumentList)
@@ -75,7 +69,7 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
         if (current is FunctionExpression) {
           final AstNode? funcParent = current.parent;
           if (funcParent is ArgumentList || funcParent is NamedExpression) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -108,7 +102,7 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireUpdateShouldNotifyRule extends SaropaLintRule {
-  const RequireUpdateShouldNotifyRule() : super(code: _code);
+  RequireUpdateShouldNotifyRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -119,21 +113,19 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
 
   /// Alias: require_update_should_notify_context
   static const LintCode _code = LintCode(
-    name: 'require_update_should_notify',
-    problemMessage:
-        '[require_update_should_notify] If an InheritedWidget does not override updateShouldNotify, all dependents rebuild on every change, causing unnecessary rebuilds, degraded performance, and battery drain. This can make your app slow and unresponsive. {v5}',
+    'require_update_should_notify',
+    '[require_update_should_notify] If an InheritedWidget does not override updateShouldNotify, all dependents rebuild on every change, causing unnecessary rebuilds, degraded performance, and battery drain. This can make your app slow and unresponsive. {v5}',
     correctionMessage:
         'Override updateShouldNotify in your InheritedWidget to control when dependents rebuild and optimize app performance.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if extends InheritedWidget
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -156,7 +148,7 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
       }
 
       if (!hasUpdateShouldNotify) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -196,7 +188,7 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidProviderOfInBuildRule extends SaropaLintRule {
-  const AvoidProviderOfInBuildRule() : super(code: _code);
+  AvoidProviderOfInBuildRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -210,21 +202,19 @@ class AvoidProviderOfInBuildRule extends SaropaLintRule {
 
   /// Alias: avoid_provider_of_in_build_method
   static const LintCode _code = LintCode(
-    name: 'avoid_provider_of_in_build',
-    problemMessage:
-        '[avoid_provider_of_in_build] Using Provider.of in build() causes the widget to rebuild every time the provider changes, which can lead to performance issues and unnecessary UI updates. This can make your app less efficient and harder to maintain. {v3}',
+    'avoid_provider_of_in_build',
+    '[avoid_provider_of_in_build] Using Provider.of in build() causes the widget to rebuild every time the provider changes, which can lead to performance issues and unnecessary UI updates. This can make your app less efficient and harder to maintain. {v3}',
     correctionMessage:
         'Use context.watch() for reactive UI updates, or context.read() in callbacks (like onPressed) to avoid unnecessary rebuilds and improve performance.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       node.body.visitChildren(_ProviderOfVisitor(reporter, code));
@@ -264,7 +254,7 @@ class _ProviderOfVisitor extends RecursiveAstVisitor<void> {
     }
 
     if (!hasListenFalse) {
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     }
 
     super.visitMethodInvocation(node);
@@ -302,7 +292,7 @@ class _ProviderOfVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidProviderRecreateRule extends SaropaLintRule {
-  const AvoidProviderRecreateRule() : super(code: _code);
+  AvoidProviderRecreateRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -315,26 +305,24 @@ class AvoidProviderRecreateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_provider_recreate',
-    problemMessage:
-        '[avoid_provider_recreate] Creating a Provider inside a frequently rebuilding build() method causes the provider to be recreated, losing its state and causing unexpected behavior. This can result in lost user input, bugs, and degraded app performance. {v3}',
+    'avoid_provider_recreate',
+    '[avoid_provider_recreate] Creating a Provider inside a frequently rebuilding build() method causes the provider to be recreated, losing its state and causing unexpected behavior. This can result in lost user input, bugs, and degraded app performance. {v3}',
     correctionMessage:
         'Move Provider creation to a parent widget that does not rebuild often to preserve provider state and ensure consistent behavior.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
       // Check if this is a StatefulWidget's State class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -405,7 +393,7 @@ class _ProviderRecreateVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class AvoidProviderInWidgetRule extends SaropaLintRule {
-  const AvoidProviderInWidgetRule() : super(code: _code);
+  AvoidProviderInWidgetRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -418,12 +406,11 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_provider_in_widget',
-    problemMessage:
-        '[avoid_provider_in_widget] Declaring a provider inside a widget class breaks Riverpod\'s global state model, leading to multiple provider instances, lost state, and unpredictable bugs. This can make your app behave inconsistently and is hard to debug. {v2}',
+    'avoid_provider_in_widget',
+    '[avoid_provider_in_widget] Declaring a provider inside a widget class breaks Riverpod\'s global state model, leading to multiple provider instances, lost state, and unpredictable bugs. This can make your app behave inconsistently and is hard to debug. {v2}',
     correctionMessage:
         'Move provider declaration to the file level as a top-level final variable to ensure a single, consistent provider instance.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _providerTypes = <String>{
@@ -439,14 +426,13 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       // Check if inside a class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       // Check each field
@@ -469,7 +455,7 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
         }
 
         if (isProvider) {
-          reporter.atNode(variable, code);
+          reporter.atNode(variable);
         }
       }
     });
@@ -509,7 +495,7 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
-  const AvoidChangeNotifierInWidgetRule() : super(code: _code);
+  AvoidChangeNotifierInWidgetRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -522,23 +508,19 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_change_notifier_in_widget',
-    problemMessage:
-        '[avoid_change_notifier_in_widget] ChangeNotifier created inside build() is re-instantiated on every widget rebuild, losing all accumulated state and listener registrations. This causes flickering UI, lost user input, and wasted allocations that trigger unnecessary garbage collection. {v5}',
+    'avoid_change_notifier_in_widget',
+    '[avoid_change_notifier_in_widget] ChangeNotifier created inside build() is re-instantiated on every widget rebuild, losing all accumulated state and listener registrations. This causes flickering UI, lost user input, and wasted allocations that trigger unnecessary garbage collection. {v5}',
     correctionMessage:
         'Create the ChangeNotifier in a ChangeNotifierProvider or in StatefulWidget.initState() to preserve state across rebuilds and ensure proper disposal.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Resolve the actual type to check the class hierarchy
       if (!_isChangeNotifierType(node)) {
         return;
@@ -612,7 +594,7 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
 /// )
 /// ```
 class RequireProviderDisposeRule extends SaropaLintRule {
-  const RequireProviderDisposeRule() : super(code: _code);
+  RequireProviderDisposeRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -625,23 +607,19 @@ class RequireProviderDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_provider_dispose',
-    problemMessage:
-        '[require_provider_dispose] Provider creating a ChangeNotifier without a dispose callback leaks listener registrations and memory. Over time, leaked notifiers accumulate stale listeners that fire after the StatefulWidget is removed from the tree, causing setState-after-dispose errors and increasing memory pressure. {v4}',
+    'require_provider_dispose',
+    '[require_provider_dispose] Provider creating a ChangeNotifier without a dispose callback leaks listener registrations and memory. Over time, leaked notifiers accumulate stale listeners that fire after the StatefulWidget is removed from the tree, causing setState-after-dispose errors and increasing memory pressure. {v4}',
     correctionMessage:
         'Use ChangeNotifierProvider (auto-disposes) or add a dispose callback that calls notifier.dispose() to release all listener registrations.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Only check Provider (not ChangeNotifierProvider which auto-disposes)
@@ -712,7 +690,7 @@ class RequireProviderDisposeRule extends SaropaLintRule {
 /// ),
 /// ```
 class RequireMultiProviderRule extends SaropaLintRule {
-  const RequireMultiProviderRule() : super(code: _code);
+  RequireMultiProviderRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -724,12 +702,11 @@ class RequireMultiProviderRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'require_multi_provider',
-    problemMessage:
-        '[require_multi_provider] Nested Provider widgets. Use MultiProvider to improve readability. Nested Provider widgets create deep indentation. MultiProvider flattens the tree and is easier to read and maintain. {v2}',
+    'require_multi_provider',
+    '[require_multi_provider] Nested Provider widgets. Use MultiProvider to improve readability. Nested Provider widgets create deep indentation. MultiProvider flattens the tree and is easier to read and maintain. {v2}',
     correctionMessage:
         'Replace nested Providers with MultiProvider(providers: [..], child: ..). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _providerTypes = {
@@ -749,12 +726,10 @@ class RequireMultiProviderRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (!_providerTypes.contains(typeName)) return;
@@ -775,7 +750,7 @@ class RequireMultiProviderRule extends SaropaLintRule {
 
       // If nested 2+ levels deep, suggest MultiProvider
       if (nestingDepth >= 2) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -813,7 +788,7 @@ class RequireMultiProviderRule extends SaropaLintRule {
 /// ),
 /// ```
 class AvoidNestedProvidersRule extends SaropaLintRule {
-  const AvoidNestedProvidersRule() : super(code: _code);
+  AvoidNestedProvidersRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -825,12 +800,11 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_nested_providers',
-    problemMessage:
-        '[avoid_nested_providers] Provider created inside Consumer or builder callback. Deeply nested provider trees are hard to reason about and maintain. Flatten with MultiProvider and avoid provider-in-provider patterns where possible. {v4}',
+    'avoid_nested_providers',
+    '[avoid_nested_providers] Provider created inside Consumer or builder callback. Deeply nested provider trees are hard to reason about and maintain. Flatten with MultiProvider and avoid provider-in-provider patterns where possible. {v4}',
     correctionMessage:
         'Use ProxyProvider or move provider to MultiProvider at tree root. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _providerTypes = {
@@ -859,12 +833,10 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (!_providerTypes.contains(typeName)) return;
@@ -884,7 +856,7 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
               final String parentType =
                   builderParent.constructorName.type.name.lexeme;
               if (_consumerTypes.contains(parentType)) {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
                 return;
               }
             }
@@ -943,7 +915,7 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferMultiProviderRule extends SaropaLintRule {
-  const PreferMultiProviderRule() : super(code: _code);
+  PreferMultiProviderRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -956,12 +928,11 @@ class PreferMultiProviderRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_multi_provider',
-    problemMessage:
-        '[prefer_multi_provider] Nested Providers should use MultiProvider instead. Use MultiProvider when providing multiple objects to reduce nesting and improve readability. Nested Provider widgets are used. {v2}',
+    'prefer_multi_provider',
+    '[prefer_multi_provider] Nested Providers should use MultiProvider instead. Use MultiProvider when providing multiple objects to reduce nesting and improve readability. Nested Provider widgets are used. {v2}',
     correctionMessage:
         'Combine into MultiProvider(providers: [..], child: ..). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _providerTypes = <String>{
@@ -977,12 +948,10 @@ class PreferMultiProviderRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_providerTypes.contains(typeName)) return;
 
@@ -996,7 +965,7 @@ class PreferMultiProviderRule extends SaropaLintRule {
           if (childExpr is InstanceCreationExpression) {
             final String childType = childExpr.constructorName.type.name.lexeme;
             if (_providerTypes.contains(childType)) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -1035,7 +1004,7 @@ class PreferMultiProviderRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
-  const AvoidInstantiatingInValueProviderRule() : super(code: _code);
+  AvoidInstantiatingInValueProviderRule() : super(code: _code);
 
   /// Critical - lifecycle management issue.
   @override
@@ -1048,12 +1017,11 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_instantiating_in_value_provider',
-    problemMessage:
-        '[avoid_instantiating_in_value_provider] Creating a new instance inside Provider.value prevents proper lifecycle management, leading to memory leaks, resource retention, and unpredictable behavior. This is a critical issue for stateful objects like ChangeNotifiers and ValueListenables. {v2}',
+    'avoid_instantiating_in_value_provider',
+    '[avoid_instantiating_in_value_provider] Creating a new instance inside Provider.value prevents proper lifecycle management, leading to memory leaks, resource retention, and unpredictable behavior. This is a critical issue for stateful objects like ChangeNotifiers and ValueListenables. {v2}',
     correctionMessage:
         'Always use Provider(create: ...) to create new instances, or pass an existing instance variable to Provider.value. Never instantiate objects directly inside Provider.value.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _providerTypes = <String>{
@@ -1065,12 +1033,10 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
       if (!_providerTypes.contains(typeName)) return;
@@ -1083,7 +1049,7 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'value') {
           final Expression valueExpr = arg.expression;
           if (valueExpr is InstanceCreationExpression) {
-            reporter.atNode(valueExpr, code);
+            reporter.atNode(valueExpr);
             return;
           }
         }
@@ -1119,7 +1085,7 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
 /// Note: This rule flags all Providers without dispose. If your instance
 /// doesn't need disposal, add `dispose: (_, __) {}` to silence the warning.
 class DisposeProvidersRule extends SaropaLintRule {
-  const DisposeProvidersRule() : super(code: _code);
+  DisposeProvidersRule() : super(code: _code);
 
   /// High impact - memory leak prevention.
   @override
@@ -1132,22 +1098,19 @@ class DisposeProvidersRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'dispose_provider_instances',
-    problemMessage:
-        '[dispose_provider_instances] Provider creating a disposable instance without a dispose callback leaks stream subscriptions and controllers. These undisposed resources accumulate across navigation, increasing memory usage and leaving background listeners that fire after the parent StatefulWidget is removed from the tree. {v4}',
+    'dispose_provider_instances',
+    '[dispose_provider_instances] Provider creating a disposable instance without a dispose callback leaks stream subscriptions and controllers. These undisposed resources accumulate across navigation, increasing memory usage and leaving background listeners that fire after the parent StatefulWidget is removed from the tree. {v4}',
     correctionMessage:
         'Add dispose: (_, instance) => instance.dispose() to the Provider constructor to release stream subscriptions and controllers on removal.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
 
@@ -1171,7 +1134,7 @@ class DisposeProvidersRule extends SaropaLintRule {
 
       // Only report if has create but no dispose
       if (hasCreate && !hasDispose) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1197,7 +1160,7 @@ class DisposeProvidersRule extends SaropaLintRule {
 /// final value = context.myValue;
 /// ```
 class PreferProviderExtensionsRule extends SaropaLintRule {
-  const PreferProviderExtensionsRule() : super(code: _code);
+  PreferProviderExtensionsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1209,21 +1172,19 @@ class PreferProviderExtensionsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_provider_extensions',
-    problemMessage:
-        '[prefer_provider_extensions] Long provider access chain is hard to read. Long chains like context.read<A>().read<B>().value are hard to read. Use extension methods. {v2}',
+    'prefer_provider_extensions',
+    '[prefer_provider_extensions] Long provider access chain is hard to read. Long chains like context.read<A>().read<B>().value are hard to read. Use extension methods. {v2}',
     correctionMessage:
         'Use an extension method. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'read' &&
           methodName != 'watch' &&
@@ -1236,7 +1197,7 @@ class PreferProviderExtensionsRule extends SaropaLintRule {
       if (target is MethodInvocation) {
         final String targetMethod = target.methodName.name;
         if (targetMethod == 'read' || targetMethod == 'watch') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -1267,7 +1228,7 @@ class PreferProviderExtensionsRule extends SaropaLintRule {
 /// )
 /// ```
 class DisposeProvidedInstancesRule extends SaropaLintRule {
-  const DisposeProvidedInstancesRule() : super(code: _code);
+  DisposeProvidedInstancesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1279,12 +1240,11 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'dispose_provided_instances',
-    problemMessage:
-        '[dispose_provided_instances] Provider creates a disposable instance without a dispose callback, causing memory leaks. Undisposed stream subscriptions and controllers persist after the parent StatefulWidget is removed from the tree, continuing to hold resources and fire callbacks that trigger setState-after-dispose errors. {v4}',
+    'dispose_provided_instances',
+    '[dispose_provided_instances] Provider creates a disposable instance without a dispose callback, causing memory leaks. Undisposed stream subscriptions and controllers persist after the parent StatefulWidget is removed from the tree, continuing to hold resources and fire callbacks that trigger setState-after-dispose errors. {v4}',
     correctionMessage:
         'Add dispose: (_, instance) => instance.dispose() to the Provider constructor to release stream subscriptions and controllers on removal.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _disposableTypes = <String>{
@@ -1303,12 +1263,10 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
 
@@ -1336,9 +1294,9 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
           if (expr is InstanceCreationExpression) {
             final String? createdType =
                 expr.constructorName.type.element?.name ??
-                    expr.constructorName.type.name.lexeme;
+                expr.constructorName.type.name.lexeme;
             if (_disposableTypes.contains(createdType)) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
           }
         }
@@ -1370,7 +1328,7 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferNullableProviderTypesRule extends SaropaLintRule {
-  const PreferNullableProviderTypesRule() : super(code: _code);
+  PreferNullableProviderTypesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1383,22 +1341,19 @@ class PreferNullableProviderTypesRule extends SaropaLintRule {
 
   /// Alias: prefer_nullable_provider_types_pattern
   static const LintCode _code = LintCode(
-    name: 'prefer_nullable_provider_types',
-    problemMessage:
-        '[prefer_nullable_provider_types] Provider type is non-nullable but create may return null. When a Provider\'s create callback explicitly returns null, the type parameter must be nullable to prevent runtime errors. {v2}',
+    'prefer_nullable_provider_types',
+    '[prefer_nullable_provider_types] Provider type is non-nullable but create may return null. When a Provider\'s create callback explicitly returns null, the type parameter must be nullable to prevent runtime errors. {v2}',
     correctionMessage:
         'Use nullable type parameter: Provider<Type?>. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
 
@@ -1422,7 +1377,7 @@ class PreferNullableProviderTypesRule extends SaropaLintRule {
             final _NullReturnVisitor visitor = _NullReturnVisitor();
             createExpr.body.accept(visitor);
             if (visitor.hasNullReturn) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
           }
         }
@@ -1471,7 +1426,7 @@ class _NullReturnVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// ```
 class PreferConsumerOverProviderOfRule extends SaropaLintRule {
-  const PreferConsumerOverProviderOfRule() : super(code: _code);
+  PreferConsumerOverProviderOfRule() : super(code: _code);
 
   /// Provider.of causes unnecessary rebuilds compared to Consumer.
   @override
@@ -1484,21 +1439,19 @@ class PreferConsumerOverProviderOfRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_consumer_over_provider_of',
-    problemMessage:
-        '[prefer_consumer_over_provider_of] Provider.of in build. Use Consumer for granular rebuilds. Provider.of<T>(context) is used in build method. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v2}',
+    'prefer_consumer_over_provider_of',
+    '[prefer_consumer_over_provider_of] Provider.of in build. Use Consumer for granular rebuilds. Provider.of<T>(context) is used in build method. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v2}',
     correctionMessage:
         'Replace with Consumer<T> or context.select() to improve performance. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Provider.of
       final Expression? target = node.target;
       if (target is! SimpleIdentifier || target.name != 'Provider') return;
@@ -1508,7 +1461,7 @@ class PreferConsumerOverProviderOfRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is MethodDeclaration && current.name.lexeme == 'build') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         current = current.parent;
@@ -1537,7 +1490,7 @@ class PreferConsumerOverProviderOfRule extends SaropaLintRule {
 /// final model = context.read<MyModel>();
 /// ```
 class RequireProviderGenericTypeRule extends SaropaLintRule {
-  const RequireProviderGenericTypeRule() : super(code: _code);
+  RequireProviderGenericTypeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -1549,21 +1502,19 @@ class RequireProviderGenericTypeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'require_provider_generic_type',
-    problemMessage:
-        '[require_provider_generic_type] Missing generic type causes runtime '
+    'require_provider_generic_type',
+    '[require_provider_generic_type] Missing generic type causes runtime '
         'cast errors when Provider returns dynamic instead of expected type. {v1}',
     correctionMessage: 'Add <Type> to Provider.of<Type>(context).',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Provider.of
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
@@ -1606,7 +1557,7 @@ class RequireProviderGenericTypeRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidProviderInInitStateRule extends SaropaLintRule {
-  const AvoidProviderInInitStateRule() : super(code: _code);
+  AvoidProviderInInitStateRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1618,21 +1569,19 @@ class AvoidProviderInInitStateRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_provider_in_init_state',
-    problemMessage:
-        '[avoid_provider_in_init_state] Accessing Provider in initState() may fail because the widget context is not fully mounted in the element tree. This can throw a ProviderNotFoundException or return stale data, causing initialization logic to operate on incorrect values or crash on first render. {v4}',
+    'avoid_provider_in_init_state',
+    '[avoid_provider_in_init_state] Accessing Provider in initState() may fail because the widget context is not fully mounted in the element tree. This can throw a ProviderNotFoundException or return stale data, causing initialization logic to operate on incorrect values or crash on first render. {v4}',
     correctionMessage:
         'Move Provider access to didChangeDependencies() where the BuildContext is fully mounted and InheritedWidget lookups are safe.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for Provider.of, context.read, context.watch
@@ -1657,7 +1606,7 @@ class AvoidProviderInInitStateRule extends SaropaLintRule {
       while (current != null) {
         if (current is MethodDeclaration) {
           if (current.name.lexeme == 'initState') {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
           return;
         }
@@ -1696,7 +1645,7 @@ class AvoidProviderInInitStateRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferContextReadInCallbacksRule extends SaropaLintRule {
-  const PreferContextReadInCallbacksRule() : super(code: _code);
+  PreferContextReadInCallbacksRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1705,21 +1654,19 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_context_read_in_callbacks',
-    problemMessage:
-        '[prefer_context_read_in_callbacks] context.watch must not be used in callbacks. Using context.watch in button callbacks or event handlers will cause unnecessary rebuilds. Use context.read for one-time access in callbacks. {v2}',
+    'prefer_context_read_in_callbacks',
+    '[prefer_context_read_in_callbacks] context.watch must not be used in callbacks. Using context.watch in button callbacks or event handlers will cause unnecessary rebuilds. Use context.read for one-time access in callbacks. {v2}',
     correctionMessage:
         'Use context.read instead for one-time access. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'watch') return;
 
       final Expression? target = node.target;
@@ -1741,7 +1688,7 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
             if (_isFlutterCallbackName(paramName) ||
                 paramName == 'builder' ||
                 paramName == 'callback') {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -1793,7 +1740,7 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferProxyProviderRule extends SaropaLintRule {
-  const PreferProxyProviderRule() : super(code: _code);
+  PreferProxyProviderRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1805,12 +1752,11 @@ class PreferProxyProviderRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_proxy_provider',
-    problemMessage:
-        '[prefer_proxy_provider] Provider.create() accesses other providers. Use ProxyProvider instead. When a Provider needs to depend on another provider\'s value, using a plain Provider with context.read() or context.watch() is fragile and error-prone. ProxyProvider ensures proper dependency tracking and rebuild behavior. {v2}',
+    'prefer_proxy_provider',
+    '[prefer_proxy_provider] Provider.create() accesses other providers. Use ProxyProvider instead. When a Provider needs to depend on another provider\'s value, using a plain Provider with context.read() or context.watch() is fragile and error-prone. ProxyProvider ensures proper dependency tracking and rebuild behavior. {v2}',
     correctionMessage:
         'Use ProxyProvider, ProxyProvider2, etc. to properly declare provider dependencies.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Provider widget types that should use ProxyProvider for dependencies
@@ -1821,13 +1767,10 @@ class PreferProxyProviderRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Only check Provider and ChangeNotifierProvider
@@ -1923,7 +1866,7 @@ class _ProxyProviderAccessVisitor extends RecursiveAstVisitor<void> {
 /// )
 /// ```
 class RequireUpdateCallbackRule extends SaropaLintRule {
-  const RequireUpdateCallbackRule() : super(code: _code);
+  RequireUpdateCallbackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1932,12 +1875,11 @@ class RequireUpdateCallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_update_callback',
-    problemMessage:
-        '[require_update_callback] ProxyProvider.update ignores the previous value. This may cause resource leaks. ProxyProvider.update is called whenever a dependency changes. If the callback doesn\'t properly handle the previous parameter, it may cause memory leaks or miss important cleanup logic. {v2}',
+    'require_update_callback',
+    '[require_update_callback] ProxyProvider.update ignores the previous value. This may cause resource leaks. ProxyProvider.update is called whenever a dependency changes. If the callback doesn\'t properly handle the previous parameter, it may cause memory leaks or miss important cleanup logic. {v2}',
     correctionMessage:
         'Handle the previous parameter to dispose resources or reuse the existing instance.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// ProxyProvider variants that have an update callback
@@ -1960,13 +1902,10 @@ class RequireUpdateCallbackRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Only check ProxyProvider variants
@@ -2068,7 +2007,7 @@ class _UpdateCallbackParameterUsageVisitor extends RecursiveAstVisitor<void> {
 /// )
 /// ```
 class PreferSelectorOverConsumerRule extends SaropaLintRule {
-  const PreferSelectorOverConsumerRule() : super(code: _code);
+  PreferSelectorOverConsumerRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2080,22 +2019,19 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'prefer_selector_over_consumer',
-    problemMessage:
-        '[prefer_selector_over_consumer] Consumer accessing single property. Use Selector for granular rebuilds. Consumer rebuilds on any change to the provider. Selector only rebuilds when the selected value changes, providing more granular control. {v3}',
+    'prefer_selector_over_consumer',
+    '[prefer_selector_over_consumer] Consumer accessing single property. Use Selector for granular rebuilds. Consumer rebuilds on any change to the provider. Selector only rebuilds when the selected value changes, providing more granular control. {v3}',
     correctionMessage:
         'Use Selector widget or ref.watch(provider.select(..)) for efficiency. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Consumer') return;
 
@@ -2114,8 +2050,8 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
               r'ref\.watch\([^)]+\)\.(\w+)[^.\w]',
             );
 
-            final Iterable<RegExpMatch> matches =
-                singlePropertyPattern.allMatches(bodySource);
+            final Iterable<RegExpMatch> matches = singlePropertyPattern
+                .allMatches(bodySource);
 
             // If we only see one property being accessed from the watched
             // provider, suggest using Selector
@@ -2166,7 +2102,7 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
 /// )
 /// ```
 class AvoidProviderValueRebuildRule extends SaropaLintRule {
-  const AvoidProviderValueRebuildRule() : super(code: _code);
+  AvoidProviderValueRebuildRule() : super(code: _code);
 
   /// Significant issue. Address when count exceeds 10.
   @override
@@ -2179,22 +2115,19 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_provider_value_rebuild',
-    problemMessage:
-        '[avoid_provider_value_rebuild] Provider.value with inline object creation recreates the notifier on every widget build. This discards accumulated user data, resets form state, and can trigger infinite rebuild loops that freeze the UI as each rebuild creates a new instance that triggers another rebuild. {v6}',
+    'avoid_provider_value_rebuild',
+    '[avoid_provider_value_rebuild] Provider.value with inline object creation recreates the notifier on every widget build. This discards accumulated user data, resets form state, and can trigger infinite rebuild loops that freeze the UI as each rebuild creates a new instance that triggers another rebuild. {v6}',
     correctionMessage:
         'Store the notifier instance in a variable and reuse it with Provider.value, or use the Provider constructor to create and manage the instance lifecycle automatically.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Check for Provider.value, ChangeNotifierProvider.value, etc.
       final String constructorName = node.constructorName.toSource();
       if (!constructorName.contains('.value')) return;
@@ -2209,10 +2142,10 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
           final Expression valueExpr = arg.expression;
           // Check if value is an inline constructor call
           if (valueExpr is InstanceCreationExpression) {
-            reporter.atNode(valueExpr, code);
+            reporter.atNode(valueExpr);
           } else if (valueExpr is MethodInvocation) {
             // Also check for factory methods like MyNotifier.create()
-            reporter.atNode(valueExpr, code);
+            reporter.atNode(valueExpr);
           }
         }
       }
@@ -2250,7 +2183,7 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferChangeNotifierProxyRule extends SaropaLintRule {
-  const PreferChangeNotifierProxyRule() : super(code: _code);
+  PreferChangeNotifierProxyRule() : super(code: _code);
 
   /// Performance issue. Causes unnecessary rebuilds.
   @override
@@ -2260,21 +2193,19 @@ class PreferChangeNotifierProxyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_change_notifier_proxy',
-    problemMessage:
-        '[prefer_change_notifier_proxy] Provider.of without listen:false in callback. Use context.read() or add listen: false. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v2}',
+    'prefer_change_notifier_proxy',
+    '[prefer_change_notifier_proxy] Provider.of without listen:false in callback. Use context.read() or add listen: false. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v2}',
     correctionMessage:
         'Add listen: false parameter, or use context.read<T>() for one-time reads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Provider.of<T>(context)
       if (node.methodName.name != 'of') return;
 
@@ -2299,7 +2230,7 @@ class PreferChangeNotifierProxyRule extends SaropaLintRule {
 
       // Check if inside callback (onTap, onPressed, etc.)
       if (_isInsideCallback(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2388,7 +2319,7 @@ class PreferChangeNotifierProxyRule extends SaropaLintRule {
 /// );
 /// ```
 class PreferSelectorWidgetRule extends SaropaLintRule {
-  const PreferSelectorWidgetRule() : super(code: _code);
+  PreferSelectorWidgetRule() : super(code: _code);
 
   /// Performance improvement suggestion.
   @override
@@ -2402,23 +2333,19 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
 
   /// Alias: prefer_selector_widget_pattern
   static const LintCode _code = LintCode(
-    name: 'prefer_selector_widget',
-    problemMessage:
-        '[prefer_selector_widget] Consumer rebuilds entire subtree. Prefer Selector for targeted rebuilds. Using Consumer to rebuild an entire widget tree when only part needs updating is wasteful. Use Selector to rebuild only what changed. {v2}',
+    'prefer_selector_widget',
+    '[prefer_selector_widget] Consumer rebuilds entire subtree. Prefer Selector for targeted rebuilds. Using Consumer to rebuild an entire widget tree when only part needs updating is wasteful. Use Selector to rebuild only what changed. {v2}',
     correctionMessage:
         'Use Selector<Model, T> to rebuild only widgets that depend on specific values. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Consumer') return;
 
@@ -2432,7 +2359,7 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
             if (body is ExpressionFunctionBody) {
               // Check if returning complex widget
               if (_isComplexWidgetReturn(body.expression)) {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
               }
             } else if (body is BlockFunctionBody) {
               // Check return statements
@@ -2441,7 +2368,7 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
                   final returnExpr = stmt.expression;
                   if (returnExpr != null &&
                       _isComplexWidgetReturn(returnExpr)) {
-                    reporter.atNode(node, code);
+                    reporter.atNode(node);
                     break;
                   }
                 }
@@ -2497,7 +2424,7 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
 /// )
 /// ```
 class PreferChangeNotifierProxyProviderRule extends SaropaLintRule {
-  const PreferChangeNotifierProxyProviderRule() : super(code: _code);
+  PreferChangeNotifierProxyProviderRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2506,24 +2433,20 @@ class PreferChangeNotifierProxyProviderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_change_notifier_proxy_provider',
-    problemMessage:
-        '[prefer_change_notifier_proxy_provider] ChangeNotifierProvider.create '
+    'prefer_change_notifier_proxy_provider',
+    '[prefer_change_notifier_proxy_provider] ChangeNotifierProvider.create '
         'accesses another provider. Use ChangeNotifierProxyProvider instead. {v2}',
     correctionMessage:
         'Use ChangeNotifierProxyProvider for proper dependency tracking.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'ChangeNotifierProvider') return;
 
@@ -2537,7 +2460,7 @@ class PreferChangeNotifierProxyProviderRule extends SaropaLintRule {
             if (body.contains('context.read') ||
                 body.contains('context.watch') ||
                 body.contains('Provider.of')) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
           }
         }
@@ -2578,7 +2501,7 @@ class PreferChangeNotifierProxyProviderRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidProviderListenFalseInBuildRule extends SaropaLintRule {
-  const AvoidProviderListenFalseInBuildRule() : super(code: _code);
+  AvoidProviderListenFalseInBuildRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -2587,21 +2510,19 @@ class AvoidProviderListenFalseInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_provider_listen_false_in_build',
-    problemMessage:
-        '[avoid_provider_listen_false_in_build] Provider.of() is called with listen: false inside a build() method. This prevents the widget from rebuilding when the provided value changes, causing the UI to display stale data that does not reflect the current application state. Users see outdated information until something else triggers a rebuild, creating confusing and inconsistent UI behavior that is difficult to debug. {v2}',
+    'avoid_provider_listen_false_in_build',
+    '[avoid_provider_listen_false_in_build] Provider.of() is called with listen: false inside a build() method. This prevents the widget from rebuilding when the provided value changes, causing the UI to display stale data that does not reflect the current application state. Users see outdated information until something else triggers a rebuild, creating confusing and inconsistent UI behavior that is difficult to debug. {v2}',
     correctionMessage:
         'Remove the listen: false parameter so that Provider.of() uses the default listen: true, or use context.watch<T>() which always rebuilds on change.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Provider.of() call
       if (node.methodName.name != 'of') return;
 
@@ -2626,65 +2547,10 @@ class AvoidProviderListenFalseInBuildRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is MethodDeclaration && current.name.lexeme == 'build') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
         current = current.parent;
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RemoveListenFalseFix()];
-}
-
-class _RemoveListenFalseFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'of') return;
-
-      // Find the listen: false argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'listen' &&
-            arg.expression is BooleanLiteral &&
-            (arg.expression as BooleanLiteral).value == false) {
-          final changeBuilder = reporter.createChangeBuilder(
-            message: 'Remove listen: false to enable rebuilds',
-            priority: 1,
-          );
-
-          changeBuilder.addDartFileEdit((builder) {
-            // Remove the ", listen: false" or "listen: false, " part
-            int start = arg.offset;
-            int end = arg.end;
-
-            // Check for preceding comma and whitespace
-            final String fullSource = node.toSource();
-            final int argOffsetInNode = start - node.offset;
-            if (argOffsetInNode > 0) {
-              // Look for preceding ", "
-              final String before =
-                  fullSource.substring(0, argOffsetInNode).trimRight();
-              if (before.endsWith(',')) {
-                start = node.offset + before.length - 1;
-              }
-            }
-
-            builder.addDeletion(
-              SourceRange(start, end - start),
-            );
-          });
-          return;
-        }
       }
     });
   }

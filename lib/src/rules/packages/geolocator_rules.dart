@@ -7,8 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -57,7 +55,7 @@ import '../../saropa_lint_rule.dart';
 /// );
 /// ```
 class RequireGeolocatorBatteryAwarenessRule extends SaropaLintRule {
-  const RequireGeolocatorBatteryAwarenessRule() : super(code: _code);
+  RequireGeolocatorBatteryAwarenessRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -66,23 +64,21 @@ class RequireGeolocatorBatteryAwarenessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_geolocator_battery_awareness',
-    problemMessage:
-        '[require_geolocator_battery_awareness] High-accuracy continuous '
+    'require_geolocator_battery_awareness',
+    '[require_geolocator_battery_awareness] High-accuracy continuous '
         'location tracking without battery consideration drains battery quickly. {v2}',
     correctionMessage:
         'Use LocationAccuracy.balanced, set distanceFilter > 0, or use '
         'AndroidSettings/AppleSettings for battery-optimized tracking.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for continuous location tracking
@@ -96,34 +92,36 @@ class RequireGeolocatorBatteryAwarenessRule extends SaropaLintRule {
       final String nodeSource = node.toSource();
 
       // Check for problematic patterns
-      bool hasBestAccuracy = nodeSource.contains('LocationAccuracy.best') ||
+      bool hasBestAccuracy =
+          nodeSource.contains('LocationAccuracy.best') ||
           nodeSource.contains('LocationAccuracy.bestForNavigation');
-      bool hasZeroDistanceFilter = nodeSource.contains('distanceFilter: 0') ||
+      bool hasZeroDistanceFilter =
+          nodeSource.contains('distanceFilter: 0') ||
           nodeSource.contains('distanceFilter:0');
-      bool hasNoIntervalDuration = !nodeSource.contains('intervalDuration') &&
+      bool hasNoIntervalDuration =
+          !nodeSource.contains('intervalDuration') &&
           !nodeSource.contains('timeLimit');
 
       // Check for platform-specific optimized settings
-      bool hasPlatformSettings = nodeSource.contains('AndroidSettings') ||
+      bool hasPlatformSettings =
+          nodeSource.contains('AndroidSettings') ||
           nodeSource.contains('AppleSettings');
 
       // Flag if using best accuracy without platform optimization
       if (hasBestAccuracy && !hasPlatformSettings) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
       // Flag if zero distance filter (updates too frequently)
       if (hasZeroDistanceFilter && hasNoIntervalDuration) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
     });
 
     // Also check LocationSettings creation
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'LocationSettings') return;
@@ -131,13 +129,15 @@ class RequireGeolocatorBatteryAwarenessRule extends SaropaLintRule {
       final String nodeSource = node.toSource();
 
       // Check for problematic patterns
-      bool hasBestAccuracy = nodeSource.contains('LocationAccuracy.best') ||
+      bool hasBestAccuracy =
+          nodeSource.contains('LocationAccuracy.best') ||
           nodeSource.contains('LocationAccuracy.bestForNavigation');
-      bool hasZeroDistanceFilter = nodeSource.contains('distanceFilter: 0') ||
+      bool hasZeroDistanceFilter =
+          nodeSource.contains('distanceFilter: 0') ||
           nodeSource.contains('distanceFilter:0');
 
       if (hasBestAccuracy && hasZeroDistanceFilter) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -170,7 +170,7 @@ class RequireGeolocatorBatteryAwarenessRule extends SaropaLintRule {
 /// _geocodeCache[cacheKey] = placemarks;
 /// ```
 class PreferGeocodingCacheRule extends SaropaLintRule {
-  const PreferGeocodingCacheRule() : super(code: _code);
+  PreferGeocodingCacheRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -179,12 +179,11 @@ class PreferGeocodingCacheRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_geocoding_cache',
-    problemMessage:
-        '[prefer_geocoding_cache] Reverse geocoding call without evident caching. Reverse geocoding (coordinates to address) incurs API calls, network latency, and rate limits. The same coordinates almost always resolve to the same address, so caching results dramatically reduces API usage and improves response time. Store results in a local Map or persistent cache keyed by rounded coordinates. {v1}',
+    'prefer_geocoding_cache',
+    '[prefer_geocoding_cache] Reverse geocoding call without evident caching. Reverse geocoding (coordinates to address) incurs API calls, network latency, and rate limits. The same coordinates almost always resolve to the same address, so caching results dramatically reduces API usage and improves response time. Store results in a local Map or persistent cache keyed by rounded coordinates. {v1}',
     correctionMessage:
         'Cache geocoding results using a Map<String, List<Placemark>> keyed by rounded coordinates (e.g., 3 decimal places ≈ 110m precision).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Method names that indicate reverse geocoding.
@@ -199,11 +198,10 @@ class PreferGeocodingCacheRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (!_geocodingMethods.contains(node.methodName.name)) return;
 
       // Check if there's a cache lookup nearby in the enclosing function
@@ -224,7 +222,7 @@ class PreferGeocodingCacheRule extends SaropaLintRule {
         current = current.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -258,7 +256,7 @@ class PreferGeocodingCacheRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidContinuousLocationUpdatesRule extends SaropaLintRule {
-  const AvoidContinuousLocationUpdatesRule() : super(code: _code);
+  AvoidContinuousLocationUpdatesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -267,12 +265,11 @@ class AvoidContinuousLocationUpdatesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_continuous_location_updates',
-    problemMessage:
-        '[avoid_continuous_location_updates] Continuous location stream without distance filter. GPS polling drains battery rapidly — a typical app consumes 10-15% battery per hour with continuous updates. Most use cases (ride tracking, delivery, fitness) work well with a distance filter (50-100m) that only fires when the user moves significantly. Use getPositionStream with a distanceFilter or switch to geofencing for area-based triggers. {v1}',
+    'avoid_continuous_location_updates',
+    '[avoid_continuous_location_updates] Continuous location stream without distance filter. GPS polling drains battery rapidly — a typical app consumes 10-15% battery per hour with continuous updates. Most use cases (ride tracking, delivery, fitness) work well with a distance filter (50-100m) that only fires when the user moves significantly. Use getPositionStream with a distanceFilter or switch to geofencing for area-based triggers. {v1}',
     correctionMessage:
         'Add a LocationSettings with distanceFilter (e.g., 50-100 meters) to reduce battery drain, or use getCurrentPosition() for one-shot requests.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Methods that start continuous location streams.
@@ -285,11 +282,10 @@ class AvoidContinuousLocationUpdatesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (!_streamMethods.contains(node.methodName.name)) return;
 
       // Check if locationSettings or distanceFilter is specified
@@ -301,7 +297,7 @@ class AvoidContinuousLocationUpdatesRule extends SaropaLintRule {
         return; // Has filtering, OK
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }

@@ -7,10 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../mode_constants_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -49,7 +45,7 @@ import '../../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidIsarEnumFieldRule extends SaropaLintRule {
-  const AvoidIsarEnumFieldRule() : super(code: _code);
+  AvoidIsarEnumFieldRule() : super(code: _code);
 
   /// Data corruption risk: renaming/reordering enums breaks persisted rows.
   @override
@@ -59,12 +55,11 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_isar_enum_field',
-    problemMessage:
-        '[avoid_isar_enum_field] Storing enums directly in Isar collections is dangerous: renaming or reordering enum values will silently corrupt your data, breaking existing records and causing unpredictable bugs. {v3}',
+    'avoid_isar_enum_field',
+    '[avoid_isar_enum_field] Storing enums directly in Isar collections is dangerous: renaming or reordering enum values will silently corrupt your data, breaking existing records and causing unpredictable bugs. {v3}',
     correctionMessage:
         'Store the enum as a String field in the database and use an @ignore getter to parse it into an enum. See the rule documentation for a safe pattern.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Type name suffixes that typically indicate an enum
@@ -100,11 +95,10 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this class has @collection annotation
       if (!_hasCollectionAnnotation(node)) {
         return;
@@ -118,9 +112,6 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AvoidIsarEnumFieldFix()];
 
   /// Check if a class has the @collection annotation
   bool _hasCollectionAnnotation(ClassDeclaration node) {
@@ -146,7 +137,9 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
 
   /// Check a field declaration for enum type usage
   void _checkFieldDeclaration(
-      FieldDeclaration node, SaropaDiagnosticReporter reporter) {
+    FieldDeclaration node,
+    SaropaDiagnosticReporter reporter,
+  ) {
     // Skip if field has @ignore annotation
     if (_hasIgnoreAnnotation(node)) {
       return;
@@ -198,171 +191,6 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
   }
 }
 
-class _AvoidIsarEnumFieldFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    final String fileContent = resolver.source.contents.data;
-
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.fields.variables.length != 1) return;
-      if (_hasIgnoreAnnotation(node)) return;
-
-      final TypeAnnotation? type = node.fields.type;
-      if (type is! NamedType) return;
-
-      final VariableDeclaration variable = node.fields.variables.first;
-      final ClassDeclaration? clazz = node.parent is ClassDeclaration
-          ? node.parent as ClassDeclaration
-          : null;
-      if (clazz == null || !_hasCollectionAnnotation(clazz)) return;
-
-      final bool isNullable = type.question != null;
-      final String enumTypeSource = type.name.toString();
-      final String enumTypeBase = enumTypeSource.endsWith('?')
-          ? enumTypeSource.substring(0, enumTypeSource.length - 1)
-          : enumTypeSource;
-      final String enumGetterType = enumTypeSource;
-      final String cacheFieldType =
-          enumGetterType.endsWith('?') ? enumGetterType : '$enumGetterType?';
-      final String stringType = isNullable ? 'String?' : 'String';
-
-      final String variableName = variable.name.lexeme;
-      final String stringFieldName = '${variableName}Name';
-      final String cacheFieldName = '_$variableName';
-
-      if (_classHasMemberNamed(clazz, stringFieldName) ||
-          _classHasMemberNamed(clazz, cacheFieldName)) {
-        return;
-      }
-
-      final String indent = _computeIndent(fileContent, node.offset);
-      final String storageModifiers = _buildStorageModifiers(node);
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Replace enum field with string storage + helper',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final StringBuffer buffer = StringBuffer();
-
-        final Comment? docs = node.documentationComment;
-        if (docs != null) {
-          buffer.writeln('$indent${docs.toSource()}');
-        }
-
-        for (final Annotation annotation in node.metadata) {
-          buffer.writeln('$indent${annotation.toSource()}');
-        }
-
-        buffer.writeln('$indent$storageModifiers$stringType $stringFieldName;');
-        buffer.writeln();
-        buffer.writeln('$indent@ignore');
-        buffer.writeln('$indent$cacheFieldType $cacheFieldName;');
-        buffer.writeln();
-        buffer.writeln('$indent@ignore');
-        buffer.writeln('$indent$enumGetterType get $variableName {');
-        buffer.writeln('$indent  final value = $stringFieldName;');
-        if (isNullable) {
-          buffer.writeln('$indent  if (value == null) return $cacheFieldName;');
-          buffer.writeln('$indent  try {');
-          buffer.writeln(
-              '$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
-          buffer.writeln('$indent  } on ArgumentError {');
-          buffer.writeln('$indent    return null;');
-          buffer.writeln('$indent  }');
-        } else {
-          buffer.writeln('$indent  final cached = $cacheFieldName;');
-          buffer.writeln('$indent  if (cached != null) return cached;');
-          buffer.writeln('$indent  if (value == null) {');
-          buffer.writeln(
-              "$indent    throw StateError('$stringFieldName is null for $variableName');");
-          buffer.writeln('$indent  }');
-          buffer.writeln('$indent  try {');
-          buffer.writeln(
-              '$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
-          buffer.writeln('$indent  } on ArgumentError {');
-          buffer.writeln(
-              "$indent    throw StateError('Invalid $enumTypeBase value: \$value');");
-          buffer.writeln('$indent  }');
-        }
-        buffer.writeln('$indent}');
-
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          buffer.toString(),
-        );
-      });
-    });
-  }
-
-  bool _classHasMemberNamed(ClassDeclaration clazz, String name) {
-    for (final ClassMember member in clazz.members) {
-      if (member is FieldDeclaration) {
-        for (final VariableDeclaration variable in member.fields.variables) {
-          if (variable.name.lexeme == name) {
-            return true;
-          }
-        }
-      }
-      if (member is MethodDeclaration && member.name.lexeme == name) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  String _buildStorageModifiers(FieldDeclaration node) {
-    final StringBuffer modifiers = StringBuffer();
-    if (node.isStatic) modifiers.write('static ');
-
-    final VariableDeclarationList fields = node.fields;
-    if (fields.lateKeyword != null) modifiers.write('late ');
-    if (fields.isFinal || fields.keyword?.lexeme == 'final') {
-      modifiers.write('final ');
-    }
-
-    return modifiers.toString();
-  }
-
-  bool _hasCollectionAnnotation(ClassDeclaration node) {
-    for (final Annotation annotation in node.metadata) {
-      final String name = annotation.name.name.toLowerCase();
-      if (name == 'collection') {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  bool _hasIgnoreAnnotation(FieldDeclaration node) {
-    for (final Annotation annotation in node.metadata) {
-      final String name = annotation.name.name.toLowerCase();
-      if (name == 'ignore') {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  String _computeIndent(String content, int offset) {
-    final int lineStart = content.lastIndexOf('\n', offset - 1);
-    final int start = lineStart == -1 ? 0 : lineStart + 1;
-    final int firstNonWhitespace = content.indexOf(RegExp(r'[^\s]'), start);
-    if (firstNonWhitespace == -1 || firstNonWhitespace > offset) {
-      return content.substring(start, offset);
-    }
-    return content.substring(start, firstNonWhitespace);
-  }
-}
-
 // =============================================================================
 // Isar Collection Annotation Rule
 // =============================================================================
@@ -392,7 +220,7 @@ class _AvoidIsarEnumFieldFix extends DartFix {
 /// }
 /// ```
 class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
-  const RequireIsarCollectionAnnotationRule() : super(code: _code);
+  RequireIsarCollectionAnnotationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -401,21 +229,19 @@ class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_isar_collection_annotation',
-    problemMessage:
-        '[require_isar_collection_annotation] This class is missing the @collection annotation, so Isar will not generate an adapter for it. As a result, any attempt to persist or query this type will fail at runtime, and your build will break with missing adapter errors. {v1}',
+    'require_isar_collection_annotation',
+    '[require_isar_collection_annotation] This class is missing the @collection annotation, so Isar will not generate an adapter for it. As a result, any attempt to persist or query this type will fail at runtime, and your build will break with missing adapter errors. {v1}',
     correctionMessage:
         'Add the @collection annotation to this class to enable Isar code generation and ensure persistence works.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class has Id field (suggests Isar usage)
       bool hasIdField = false;
       for (final member in node.members) {
@@ -440,7 +266,7 @@ class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
       }
 
       if (!hasCollection) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -474,7 +300,7 @@ class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireIsarIdFieldRule extends SaropaLintRule {
-  const RequireIsarIdFieldRule() : super(code: _code);
+  RequireIsarIdFieldRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -483,21 +309,19 @@ class RequireIsarIdFieldRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_isar_id_field',
-    problemMessage:
-        '[require_isar_id_field] Every Isar collection must have an "Id? id" field as the primary key. Without it, Isar cannot uniquely identify records, and code generation will fail, causing your build to break and all database operations to be unusable. {v1}',
+    'require_isar_id_field',
+    '[require_isar_id_field] Every Isar collection must have an "Id? id" field as the primary key. Without it, Isar cannot uniquely identify records, and code generation will fail, causing your build to break and all database operations to be unusable. {v1}',
     correctionMessage:
         'Add "Id? id;" as the first field in your @collection class to enable Isar persistence and code generation.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check for @collection annotation
       bool hasCollection = false;
       for (final annotation in node.metadata) {
@@ -522,7 +346,7 @@ class RequireIsarIdFieldRule extends SaropaLintRule {
       }
 
       if (!hasIdField) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -564,7 +388,7 @@ class RequireIsarIdFieldRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
-  const RequireIsarCloseOnDisposeRule() : super(code: _code);
+  RequireIsarCloseOnDisposeRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -576,21 +400,19 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_isar_close_on_dispose',
-    problemMessage:
-        '[require_isar_close_on_dispose] If you do not close the Isar instance in dispose(), file handles and system resources will leak. This can cause database corruption, prevent reopening the database, and lead to crashes or data loss on app restart. {v1}',
+    'require_isar_close_on_dispose',
+    '[require_isar_close_on_dispose] If you do not close the Isar instance in dispose(), file handles and system resources will leak. This can cause database corruption, prevent reopening the database, and lead to crashes or data loss on app restart. {v1}',
     correctionMessage:
         'Always call isar.close() in your dispose() method to safely release resources and prevent leaks.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Look for Isar field declarations
       final List<String> isarFields = [];
       MethodDeclaration? disposeMethod;
@@ -614,7 +436,7 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
       // Check if dispose calls close on isar fields
       if (disposeMethod == null) {
         // No dispose method at all - report on the class
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -622,7 +444,7 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
       for (final field in isarFields) {
         if (!disposeBody.contains('$field.close()') &&
             !disposeBody.contains('$field?.close()')) {
-          reporter.atNode(disposeMethod, code);
+          reporter.atNode(disposeMethod);
         }
       }
     });
@@ -655,7 +477,7 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferIsarAsyncWritesRule extends SaropaLintRule {
-  const PreferIsarAsyncWritesRule() : super(code: _code);
+  PreferIsarAsyncWritesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -664,21 +486,19 @@ class PreferIsarAsyncWritesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_isar_async_writes',
-    problemMessage:
-        '[prefer_isar_async_writes] Using writeTxnSync in build methods will block the UI thread, causing your app to freeze, stutter, or become unresponsive. This leads to poor user experience and can trigger platform watchdogs to kill your app. {v1}',
+    'prefer_isar_async_writes',
+    '[prefer_isar_async_writes] Using writeTxnSync in build methods will block the UI thread, causing your app to freeze, stutter, or become unresponsive. This leads to poor user experience and can trigger platform watchdogs to kill your app. {v1}',
     correctionMessage:
         'Always use writeTxn (async) instead of writeTxnSync in build methods or UI code. Refactor any synchronous database writes to be asynchronous to keep your app responsive.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'writeTxnSync') return;
 
       // Check if we're inside a build method
@@ -722,7 +542,7 @@ class PreferIsarAsyncWritesRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidIsarTransactionNestingRule extends SaropaLintRule {
-  const AvoidIsarTransactionNestingRule() : super(code: _code);
+  AvoidIsarTransactionNestingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -731,21 +551,19 @@ class AvoidIsarTransactionNestingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_isar_transaction_nesting',
-    problemMessage:
-        '[avoid_isar_transaction_nesting] Calling writeTxn inside another writeTxn causes a deadlock: Isar cannot acquire a second write lock while the first is held. This will freeze your app and block all database writes until a restart. {v1}',
+    'avoid_isar_transaction_nesting',
+    '[avoid_isar_transaction_nesting] Calling writeTxn inside another writeTxn causes a deadlock: Isar cannot acquire a second write lock while the first is held. This will freeze your app and block all database writes until a restart. {v1}',
     correctionMessage:
         'Combine all write operations into a single writeTxn block to avoid deadlocks and ensure your app remains responsive.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
       if (methodName != 'writeTxn' && methodName != 'writeTxnSync') return;
 
@@ -806,7 +624,7 @@ class AvoidIsarTransactionNestingRule extends SaropaLintRule {
 /// await isar.users.putAll(users);  // Fast!
 /// ```
 class PreferIsarBatchOperationsRule extends SaropaLintRule {
-  const PreferIsarBatchOperationsRule() : super(code: _code);
+  PreferIsarBatchOperationsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -815,21 +633,19 @@ class PreferIsarBatchOperationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_isar_batch_operations',
-    problemMessage:
-        '[prefer_isar_batch_operations] Using put() in a loop for many records is extremely slow: each call triggers a separate database write. This can make your app hang or take minutes to save data. Batch operations like putAll() are up to 100x faster and prevent UI freezes. {v1}',
+    'prefer_isar_batch_operations',
+    '[prefer_isar_batch_operations] Using put() in a loop for many records is extremely slow: each call triggers a separate database write. This can make your app hang or take minutes to save data. Batch operations like putAll() are up to 100x faster and prevent UI freezes. {v1}',
     correctionMessage:
         'Collect items into a list and use putAll() for batch writes instead of calling put() repeatedly. Refactor loops to use batch operations for better performance and user experience.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
       if (methodName != 'put' && methodName != 'putSync') return;
 
@@ -869,7 +685,7 @@ class PreferIsarBatchOperationsRule extends SaropaLintRule {
 /// isar.products.filter().priceBetween(19.98, 20.00);
 /// ```
 class AvoidIsarFloatEqualityQueriesRule extends SaropaLintRule {
-  const AvoidIsarFloatEqualityQueriesRule() : super(code: _code);
+  AvoidIsarFloatEqualityQueriesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -878,21 +694,19 @@ class AvoidIsarFloatEqualityQueriesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_isar_float_equality_queries',
-    problemMessage:
-        '[avoid_isar_float_equality_queries] Querying floats for exact equality is unreliable: due to rounding errors, you may miss matching records or get inconsistent results. This can break features that depend on accurate data retrieval. {v1}',
+    'avoid_isar_float_equality_queries',
+    '[avoid_isar_float_equality_queries] Querying floats for exact equality is unreliable: due to rounding errors, you may miss matching records or get inconsistent results. This can break features that depend on accurate data retrieval. {v1}',
     correctionMessage:
         'Use .between(value - epsilon, value + epsilon) for float comparisons to ensure all relevant records are found and avoid subtle bugs.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
       // Check for methods like priceEqualTo, amountEqualTo etc.
       if (!methodName.endsWith('EqualTo')) return;
@@ -930,7 +744,7 @@ class AvoidIsarFloatEqualityQueriesRule extends SaropaLintRule {
 /// await Isar.open([UserSchema], inspector: kDebugMode);
 /// ```
 class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
-  const RequireIsarInspectorDebugOnlyRule() : super(code: _code);
+  RequireIsarInspectorDebugOnlyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -939,21 +753,19 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_isar_inspector_debug_only',
-    problemMessage:
-        '[require_isar_inspector_debug_only] Enabling Isar Inspector in production exposes internal database details and can create security risks or performance issues. Inspector should only be enabled in debug mode to protect user data and app integrity. {v1}',
+    'require_isar_inspector_debug_only',
+    '[require_isar_inspector_debug_only] Enabling Isar Inspector in production exposes internal database details and can create security risks or performance issues. Inspector should only be enabled in debug mode to protect user data and app integrity. {v1}',
     correctionMessage:
         'Set inspector: kDebugMode to ensure Inspector is only active during development. Never use inspector: true in production builds.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
       if (methodName != 'open' && methodName != 'openSync') return;
 
@@ -966,7 +778,7 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'inspector') {
           final value = arg.expression;
           if (value is BooleanLiteral && value.value == true) {
-            reporter.atNode(arg, code);
+            reporter.atNode(arg);
           }
         }
       }
@@ -999,7 +811,7 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidIsarClearInProductionRule extends SaropaLintRule {
-  const AvoidIsarClearInProductionRule() : super(code: _code);
+  AvoidIsarClearInProductionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -1008,21 +820,19 @@ class AvoidIsarClearInProductionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_isar_clear_in_production',
-    problemMessage:
-        '[avoid_isar_clear_in_production] Calling isar.clear() will permanently delete ALL user data in the database. If this code runs in production, users will lose their data irreversibly, leading to catastrophic data loss. {v3}',
+    'avoid_isar_clear_in_production',
+    '[avoid_isar_clear_in_production] Calling isar.clear() will permanently delete ALL user data in the database. If this code runs in production, users will lose their data irreversibly, leading to catastrophic data loss. {v3}',
     correctionMessage:
         'Wrap isar.clear() in an if (kDebugMode) guard to ensure it only runs in development and never in production.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'clear') return;
 
       // Verify the receiver is an Isar instance to avoid false positives
@@ -1071,7 +881,7 @@ class AvoidIsarClearInProductionRule extends SaropaLintRule {
 /// final count = user.posts.length;
 /// ```
 class RequireIsarLinksLoadRule extends SaropaLintRule {
-  const RequireIsarLinksLoadRule() : super(code: _code);
+  RequireIsarLinksLoadRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1080,12 +890,11 @@ class RequireIsarLinksLoadRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_isar_links_load',
-    problemMessage:
-        '[require_isar_links_load] Accessing IsarLinks without calling load() first will return incorrect or empty results. This leads to subtle data bugs, such as missing related records, and can break app features that depend on linked data. {v1}',
+    'require_isar_links_load',
+    '[require_isar_links_load] Accessing IsarLinks without calling load() first will return incorrect or empty results. This leads to subtle data bugs, such as missing related records, and can break app features that depend on linked data. {v1}',
     correctionMessage:
         'Call await links.load() or links.loadSync() before accessing IsarLinks properties to ensure data is loaded and accurate.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _accessMethods = {
@@ -1108,11 +917,10 @@ class RequireIsarLinksLoadRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addPropertyAccess((PropertyAccess node) {
+    context.addPropertyAccess((PropertyAccess node) {
       final propertyName = node.propertyName.name;
       if (!_accessMethods.contains(propertyName)) return;
 
@@ -1152,7 +960,7 @@ class RequireIsarLinksLoadRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferIsarQueryStreamRule extends SaropaLintRule {
-  const PreferIsarQueryStreamRule() : super(code: _code);
+  PreferIsarQueryStreamRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1161,22 +969,19 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_isar_query_stream',
-    problemMessage:
-        '[prefer_isar_query_stream] Using Timer.periodic or manual polling for reactive queries is inefficient and can drain battery, waste CPU, and miss real-time updates. Isar watch() streams are event-driven and update instantly when data changes. {v1}',
+    'prefer_isar_query_stream',
+    '[prefer_isar_query_stream] Using Timer.periodic or manual polling for reactive queries is inefficient and can drain battery, waste CPU, and miss real-time updates. Isar watch() streams are event-driven and update instantly when data changes. {v1}',
     correctionMessage:
         'Replace Timer.periodic polling with collection.where().watch().listen() to get instant, efficient updates and avoid unnecessary resource usage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Check for Timer.periodic
       final constructorName = node.constructorName.toString();
       if (!constructorName.contains('Timer.periodic')) return;
@@ -1218,7 +1023,7 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
 /// final users = await isar.users.where().findAll();
 /// ```
 class AvoidIsarWebLimitationsRule extends SaropaLintRule {
-  const AvoidIsarWebLimitationsRule() : super(code: _code);
+  AvoidIsarWebLimitationsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1227,12 +1032,11 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_isar_web_limitations',
-    problemMessage:
-        '[avoid_isar_web_limitations] Isar sync APIs (e.g., putSync, getSync) will throw runtime errors or silently fail on web platforms. This can break your app for web users and cause data loss or missing features. {v1}',
+    'avoid_isar_web_limitations',
+    '[avoid_isar_web_limitations] Isar sync APIs (e.g., putSync, getSync) will throw runtime errors or silently fail on web platforms. This can break your app for web users and cause data loss or missing features. {v1}',
     correctionMessage:
         'Replace all sync methods with async equivalents (e.g., put, get) to ensure your app works reliably on web and avoids runtime failures.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _syncMethods = {
@@ -1250,11 +1054,10 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
       if (_syncMethods.contains(methodName)) {
         reporter.atNode(node.methodName, code);
@@ -1289,7 +1092,7 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferIsarIndexForQueriesRule extends SaropaLintRule {
-  const PreferIsarIndexForQueriesRule() : super(code: _code);
+  PreferIsarIndexForQueriesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1298,24 +1101,22 @@ class PreferIsarIndexForQueriesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_isar_index_for_queries',
-    problemMessage:
-        '[prefer_isar_index_for_queries] Querying fields without an @Index annotation forces Isar to scan the entire collection, resulting in slow queries and poor performance as your data grows. Indexed fields enable fast lookups and scalable apps. {v1}',
+    'prefer_isar_index_for_queries',
+    '[prefer_isar_index_for_queries] Querying fields without an @Index annotation forces Isar to scan the entire collection, resulting in slow queries and poor performance as your data grows. Indexed fields enable fast lookups and scalable apps. {v1}',
     correctionMessage:
         'Add @Index() annotation to any field you query frequently to ensure fast, indexed lookups and avoid performance bottlenecks.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // This rule would need full type resolution to be accurate.
     // For now, we provide a simplified implementation that warns
     // on filter() chains without prior index usage evidence.
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
       // Check for filter methods that suggest unindexed queries
       if (methodName == 'filter') {
@@ -1361,7 +1162,7 @@ class PreferIsarIndexForQueriesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidIsarEmbeddedLargeObjectsRule extends SaropaLintRule {
-  const AvoidIsarEmbeddedLargeObjectsRule() : super(code: _code);
+  AvoidIsarEmbeddedLargeObjectsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1370,21 +1171,19 @@ class AvoidIsarEmbeddedLargeObjectsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_isar_embedded_large_objects',
-    problemMessage:
-        '[avoid_isar_embedded_large_objects] Using @embedded for large objects will duplicate the data in every record, causing excessive storage use and slow queries. For shared or large objects, this can make your database unmanageable. {v1}',
+    'avoid_isar_embedded_large_objects',
+    '[avoid_isar_embedded_large_objects] Using @embedded for large objects will duplicate the data in every record, causing excessive storage use and slow queries. For shared or large objects, this can make your database unmanageable. {v1}',
     correctionMessage:
         'Use IsarLink<T> instead of @embedded for large or shared objects to avoid duplication and keep your database efficient.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       // Check for @embedded annotation
       bool hasEmbedded = false;
       for (final annotation in node.metadata) {
@@ -1401,8 +1200,13 @@ class AvoidIsarEmbeddedLargeObjectsRule extends SaropaLintRule {
       if (type is NamedType) {
         final typeName = type.name.lexeme;
         // Skip simple types
-        if (!{'String', 'int', 'double', 'bool', 'DateTime'}
-            .contains(typeName)) {
+        if (!{
+          'String',
+          'int',
+          'double',
+          'bool',
+          'DateTime',
+        }.contains(typeName)) {
           reporter.atNode(node.fields, code);
         }
       }
@@ -1431,7 +1235,7 @@ class AvoidIsarEmbeddedLargeObjectsRule extends SaropaLintRule {
 /// final posts = IsarLinks<Post>.lazy();  // Loads on-demand
 /// ```
 class PreferIsarLazyLinksRule extends SaropaLintRule {
-  const PreferIsarLazyLinksRule() : super(code: _code);
+  PreferIsarLazyLinksRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1440,22 +1244,19 @@ class PreferIsarLazyLinksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_isar_lazy_links',
-    problemMessage:
-        '[prefer_isar_lazy_links] Using IsarLinks<T>() for large linked collections loads all linked records at once, which can slow down your app and waste memory. IsarLinks.lazy() loads records on demand for better performance. {v1}',
+    'prefer_isar_lazy_links',
+    '[prefer_isar_lazy_links] Using IsarLinks<T>() for large linked collections loads all linked records at once, which can slow down your app and waste memory. IsarLinks.lazy() loads records on demand for better performance. {v1}',
     correctionMessage:
         'Replace IsarLinks<T>() with IsarLinks<T>.lazy() for large or frequently accessed collections to keep your app fast and efficient.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final type = node.constructorName.type;
       final typeName = type.name2.lexeme;
       if (typeName != 'IsarLinks') return;
@@ -1482,7 +1283,7 @@ class PreferIsarLazyLinksRule extends SaropaLintRule {
 /// Note: Full detection requires comparing against previous schema versions,
 /// which is beyond static analysis. This rule provides basic guidance.
 class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
-  const AvoidIsarSchemaBreakingChangesRule() : super(code: _code);
+  AvoidIsarSchemaBreakingChangesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1491,25 +1292,23 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_isar_schema_breaking_changes',
-    problemMessage:
-        '[avoid_isar_schema_breaking_changes] Renaming, removing, or changing the type of a field in an Isar collection without using @Name will break migrations. This can cause data loss, failed upgrades, or app crashes for existing users. {v1}',
+    'avoid_isar_schema_breaking_changes',
+    '[avoid_isar_schema_breaking_changes] Renaming, removing, or changing the type of a field in an Isar collection without using @Name will break migrations. This can cause data loss, failed upgrades, or app crashes for existing users. {v1}',
     correctionMessage:
         'When renaming a field, always add @Name("originalFieldName") to preserve the database mapping and ensure safe migrations.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // This is a documentation/awareness rule. Full schema comparison
     // would require cross-file/cross-version analysis.
     // We warn on @collection classes without any @Name annotations
     // as a reminder to use them for renamed fields.
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       bool hasCollection = false;
       for (final annotation in node.metadata) {
         if (annotation.name.name.toLowerCase() == 'collection') {
@@ -1553,7 +1352,7 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
 // /// }
 // /// ```
 // class RequireIsarNonNullableMigrationRule extends SaropaLintRule {
-//   const RequireIsarNonNullableMigrationRule() : super(code: _code);
+//   RequireIsarNonNullableMigrationRule() : super(code: _code);
 
 //   @override
 //   LintImpact get impact => LintImpact.high;
@@ -1562,21 +1361,21 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
 //   RuleCost get cost => RuleCost.medium;
 
 //   static const LintCode _code = LintCode(
-//     name: 'require_isar_non_nullable_migration',
+//     'require_isar_non_nullable_migration',
 //     problemMessage:
 //         '[require_isar_non_nullable_migration] Making a field non-nullable without a default value will break migrations: existing database records that contain null values for this field will cause runtime deserialization errors, data loss, or schema upgrade failures when the app is updated.',
 //     correctionMessage:
 //         'Either keep the field nullable or provide a default value to ensure safe migrations, prevent data loss, and avoid runtime deserialization errors.',
-//     errorSeverity: DiagnosticSeverity.ERROR,
+//     severity: DiagnosticSeverity.ERROR,
 //   );
 
 //   @override
 //   void runWithReporter(
-//     CustomLintResolver resolver,
+//
 //     SaropaDiagnosticReporter reporter,
-//     CustomLintContext context,
+//     SaropaContext context,
 //   ) {
-//     context.registry.addClassDeclaration((ClassDeclaration node) {
+//     context.addClassDeclaration((ClassDeclaration node) {
 //       bool hasCollection = false;
 //       for (final annotation in node.metadata) {
 //         if (annotation.name.name.toLowerCase() == 'collection') {
@@ -1598,7 +1397,7 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
 //             for (final variable in member.fields.variables) {
 //               if (variable.initializer == null) {
 //                 // Non-nullable without default - potential migration issue
-//                 reporter.atNode(variable, code);
+//                 reporter.atNode(variable);
 //               }
 //             }
 //           }
@@ -1636,7 +1435,7 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireIsarNullableFieldRule extends SaropaLintRule {
-  const RequireIsarNullableFieldRule() : super(code: _code);
+  RequireIsarNullableFieldRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -1645,21 +1444,19 @@ class RequireIsarNullableFieldRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_isar_nullable_field',
-    problemMessage:
-        '[require_isar_nullable_field] Isar TypeAdapters bypass constructors during hydration. Non-nullable fields trigger fatal TypeErrors when encountering NULL values from legacy disk records created in previous app versions where the field did not exist. {v3}',
+    'require_isar_nullable_field',
+    '[require_isar_nullable_field] Isar TypeAdapters bypass constructors during hydration. Non-nullable fields trigger fatal TypeErrors when encountering NULL values from legacy disk records created in previous app versions where the field did not exist. {v3}',
     correctionMessage:
         'Convert the field to a nullable type (e.g., String?). This ensures the database safely loads legacy records. Handle the null state via a Domain Mapper or Repository to maintain strict application logic safely.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // 1. Check for @collection annotation
       bool hasCollection = false;
       for (final annotation in node.metadata) {
@@ -1694,37 +1491,10 @@ class RequireIsarNullableFieldRule extends SaropaLintRule {
           // We check if the type definition lacks the '?' question mark.
           // We do NOT check for initializers anymore, as they are ignored by Isar readers.
           if (type is NamedType && type.question == null) {
-            reporter.atNode(type, _code);
+            reporter.atNode(type);
           }
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => [_MakeNullableFix()];
-}
-
-class _MakeNullableFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError error,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addNamedType((node) {
-      if (!error.sourceRange.intersects(node.sourceRange)) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Make field nullable for migration safety',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(node.end, '?');
-      });
     });
   }
 }
@@ -1756,7 +1526,7 @@ class _MakeNullableFix extends DartFix {
 /// }
 /// ```
 class PreferIsarCompositeIndexRule extends SaropaLintRule {
-  const PreferIsarCompositeIndexRule() : super(code: _code);
+  PreferIsarCompositeIndexRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1765,21 +1535,19 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_isar_composite_index',
-    problemMessage:
-        '[prefer_isar_composite_index] Querying multiple fields together without a composite index will force Isar to scan every record, making queries slow and unscalable as your data grows. Composite indexes enable fast, efficient lookups for multi-field queries. {v1}',
+    'prefer_isar_composite_index',
+    '[prefer_isar_composite_index] Querying multiple fields together without a composite index will force Isar to scan every record, making queries slow and unscalable as your data grows. Composite indexes enable fast, efficient lookups for multi-field queries. {v1}',
     correctionMessage:
         'Add @Index(composite: [...]) for any field combinations you frequently query together to ensure fast, indexed lookups and scalable performance.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for chained filter conditions
       final methodName = node.methodName.name;
       if (!methodName.endsWith('EqualTo') &&
@@ -1825,7 +1593,7 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
-  const AvoidIsarStringContainsWithoutIndexRule() : super(code: _code);
+  AvoidIsarStringContainsWithoutIndexRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1834,21 +1602,19 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_isar_string_contains_without_index',
-    problemMessage:
-        '[avoid_isar_string_contains_without_index] Running contains or matches queries on string fields without a full-text index will force Isar to scan every record, making queries extremely slow and potentially freezing your app as data grows. {v1}',
+    'avoid_isar_string_contains_without_index',
+    '[avoid_isar_string_contains_without_index] Running contains or matches queries on string fields without a full-text index will force Isar to scan every record, making queries extremely slow and potentially freezing your app as data grows. {v1}',
     correctionMessage:
         'Add @Index(type: IndexType.value) to the field being searched to enable fast, indexed text queries and prevent performance bottlenecks.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
       // Check for contains-style methods
       if (methodName.endsWith('Contains') ||
@@ -1931,42 +1697,40 @@ class AvoidCachedIsarStreamRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   /// Prevents caching of Isar query streams (must be created inline).
-  const AvoidCachedIsarStreamRule() : super(code: _code);
+  AvoidCachedIsarStreamRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
-    name: 'avoid_cached_isar_stream',
-    problemMessage:
-        '[avoid_cached_isar_stream] Caching or storing Isar/single-subscription streams in variables or fields will cause runtime errors: these streams can only be listened to once and must be created inline each time. If you cache them, your app will throw a StateError or fail to update as expected. {v2}',
+    'avoid_cached_isar_stream',
+    '[avoid_cached_isar_stream] Caching or storing Isar/single-subscription streams in variables or fields will cause runtime errors: these streams can only be listened to once and must be created inline each time. If you cache them, your app will throw a StateError or fail to update as expected. {v2}',
     correctionMessage:
         'Always create Isar streams directly inside StreamBuilder, listeners, or widgets that consume them. Do NOT assign Isar streams to variables, fields, or properties. Refactor any code that stores an Isar stream so it is created inline at the point of use.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check top-level and local variable assignments
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
+    context.addVariableDeclaration((VariableDeclaration node) {
       final Expression? init = node.initializer;
       if (init == null) return;
       final String source = init.toSource().toLowerCase();
       // Heuristic: look for isar stream creation
       if (source.contains('isar') && source.contains('watch')) {
-        reporter.atNode(node, _code);
+        reporter.atNode(node);
       }
     });
 
     // Check class field assignments
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       for (final variable in node.fields.variables) {
         final Expression? init = variable.initializer;
         if (init == null) continue;
         final String source = init.toSource().toLowerCase();
         if (source.contains('isar') && source.contains('watch')) {
-          reporter.atNode(variable, _code);
+          reporter.atNode(variable);
         }
       }
     });

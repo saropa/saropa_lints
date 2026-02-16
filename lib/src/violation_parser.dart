@@ -10,9 +10,7 @@ Map<String, LintImpact> _buildRuleImpactMap() {
 
   // Get impact from each rule instance
   for (final rule in allSaropaRules) {
-    if (rule is SaropaLintRule) {
-      map[rule.code.name] = rule.impact;
-    }
+    map[rule.code.name] = rule.impact;
   }
 
   return map;
@@ -37,14 +35,16 @@ List<Violation> parseViolations(String output) {
     // Look up impact for this rule
     final impact = _ruleImpacts[rule] ?? LintImpact.medium;
 
-    violations.add(Violation(
-      file: file,
-      line: line,
-      column: column,
-      rule: rule,
-      message: message,
-      impact: impact,
-    ));
+    violations.add(
+      Violation(
+        file: file,
+        line: line,
+        column: column,
+        rule: rule,
+        message: message,
+        impact: impact,
+      ),
+    );
   }
 
   return violations;

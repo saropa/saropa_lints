@@ -7,8 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -42,7 +40,7 @@ import '../../saropa_lint_rule.dart';
 /// }
 /// ```
 class RequireAndroidPermissionRequestRule extends SaropaLintRule {
-  const RequireAndroidPermissionRequestRule() : super(code: _code);
+  RequireAndroidPermissionRequestRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -51,13 +49,12 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_android_permission_request',
-    problemMessage:
-        '[require_android_permission_request] Permission-gated API called without '
+    'require_android_permission_request',
+    '[require_android_permission_request] Permission-gated API called without '
         'runtime permission request. Android 6+ will deny access or crash. {v2}',
     correctionMessage:
         'Call Permission.X.request() before using permission-gated APIs.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// APIs that require runtime permissions
@@ -80,11 +77,10 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check if this is a permission-gated API
@@ -116,13 +112,11 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
         return; // Has permission handling
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
 
     // Also check for CameraController instantiation
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'CameraController') return;
 
@@ -145,7 +139,7 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
       if (!bodySource.contains('.request()') &&
           !bodySource.contains('Permission.') &&
           !bodySource.contains('.isGranted')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -180,7 +174,7 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
 /// Navigator.push(context, MaterialPageRoute(...));
 /// ```
 class AvoidAndroidTaskAffinityDefaultRule extends SaropaLintRule {
-  const AvoidAndroidTaskAffinityDefaultRule() : super(code: _code);
+  AvoidAndroidTaskAffinityDefaultRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -189,22 +183,20 @@ class AvoidAndroidTaskAffinityDefaultRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_android_task_affinity_default',
-    problemMessage:
-        '[avoid_android_task_affinity_default] Starting Android activity via '
+    'avoid_android_task_affinity_default',
+    '[avoid_android_task_affinity_default] Starting Android activity via '
         'platform channel. Verify taskAffinity is set in AndroidManifest.xml. {v2}',
     correctionMessage:
         'Set android:taskAffinity on activities or use Flutter navigation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for platform channel activity launching
@@ -216,7 +208,7 @@ class AvoidAndroidTaskAffinityDefaultRule extends SaropaLintRule {
         if (argSource.contains('activity') ||
             argSource.contains('startactivity') ||
             argSource.contains('intent')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -254,7 +246,7 @@ class AvoidAndroidTaskAffinityDefaultRule extends SaropaLintRule {
 /// // Then optionally show a minimal Flutter splash for initialization
 /// ```
 class RequireAndroid12SplashRule extends SaropaLintRule {
-  const RequireAndroid12SplashRule() : super(code: _code);
+  RequireAndroid12SplashRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -263,22 +255,20 @@ class RequireAndroid12SplashRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_android_12_splash',
-    problemMessage:
-        '[require_android_12_splash] Flutter splash screen widget detected. '
+    'require_android_12_splash',
+    '[require_android_12_splash] Flutter splash screen widget detected. '
         'Android 12+ shows system splash first, causing potential double-splash. {v2}',
     correctionMessage:
         'Configure Android 12 splash in styles.xml or use flutter_native_splash.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
       // Check for splash screen class names
@@ -293,7 +283,7 @@ class RequireAndroid12SplashRule extends SaropaLintRule {
           superclass.contains('State') ||
           superclass == 'StatelessWidget' ||
           superclass == 'StatefulWidget') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -330,7 +320,7 @@ class RequireAndroid12SplashRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferPendingIntentFlagsRule extends SaropaLintRule {
-  const PreferPendingIntentFlagsRule() : super(code: _code);
+  PreferPendingIntentFlagsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -339,22 +329,20 @@ class PreferPendingIntentFlagsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_pending_intent_flags',
-    problemMessage:
-        '[prefer_pending_intent_flags] PendingIntent without FLAG_IMMUTABLE or '
+    'prefer_pending_intent_flags',
+    '[prefer_pending_intent_flags] PendingIntent without FLAG_IMMUTABLE or '
         'FLAG_MUTABLE crashes on Android 12+. {v2}',
     correctionMessage:
         'Specify FLAG_IMMUTABLE (preferred) or FLAG_MUTABLE in PendingIntent flags.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for platform channel calls that might create PendingIntent
@@ -382,7 +370,7 @@ class PreferPendingIntentFlagsRule extends SaropaLintRule {
         return; // Flags are specified
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -414,7 +402,7 @@ class PreferPendingIntentFlagsRule extends SaropaLintRule {
 /// // Or configure network_security_config.xml for specific debug domains
 /// ```
 class AvoidAndroidCleartextTrafficRule extends SaropaLintRule {
-  const AvoidAndroidCleartextTrafficRule() : super(code: _code);
+  AvoidAndroidCleartextTrafficRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -423,22 +411,20 @@ class AvoidAndroidCleartextTrafficRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_android_cleartext_traffic',
-    problemMessage:
-        '[avoid_android_cleartext_traffic] HTTP URL detected. Android 9+ blocks '
+    'avoid_android_cleartext_traffic',
+    '[avoid_android_cleartext_traffic] HTTP URL detected. Android 9+ blocks '
         'cleartext traffic by default. This request will fail silently. {v2}',
     correctionMessage:
         'Use HTTPS or configure network_security_config.xml for debug builds.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Uri.parse with http://
       if (node.methodName.name == 'parse') {
         final Expression? target = node.target;
@@ -454,7 +440,7 @@ class AvoidAndroidCleartextTrafficRule extends SaropaLintRule {
               if (!urlArg.contains('localhost') &&
                   !urlArg.contains('127.0.0.1') &&
                   !urlArg.contains('10.0.2.2')) {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
               }
             }
           }
@@ -474,7 +460,7 @@ class AvoidAndroidCleartextTrafficRule extends SaropaLintRule {
             if (!firstArg.contains('localhost') &&
                 !firstArg.contains('127.0.0.1') &&
                 !firstArg.contains('10.0.2.2')) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
           }
         }
@@ -512,7 +498,7 @@ class AvoidAndroidCleartextTrafficRule extends SaropaLintRule {
 /// // Or configure backup_rules.xml to exclude sensitive data
 /// ```
 class RequireAndroidBackupRulesRule extends SaropaLintRule {
-  const RequireAndroidBackupRulesRule() : super(code: _code);
+  RequireAndroidBackupRulesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -521,13 +507,12 @@ class RequireAndroidBackupRulesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_android_backup_rules',
-    problemMessage:
-        '[require_android_backup_rules] Sensitive data in SharedPreferences '
+    'require_android_backup_rules',
+    '[require_android_backup_rules] Sensitive data in SharedPreferences '
         'may be included in Android auto-backup. {v3}',
     correctionMessage:
         'Use flutter_secure_storage or configure backup_rules.xml to exclude sensitive data.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   // Cached regex patterns for performance
@@ -569,11 +554,10 @@ class RequireAndroidBackupRulesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for SharedPreferences setString with sensitive keys
@@ -600,7 +584,7 @@ class RequireAndroidBackupRulesRule extends SaropaLintRule {
             keyArg.contains('"$pattern"') ||
             keyArg.endsWith("$pattern'") ||
             keyArg.endsWith('$pattern"')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -610,10 +594,8 @@ class RequireAndroidBackupRulesRule extends SaropaLintRule {
       for (final String pattern in _sensitiveKeyPatterns) {
         final List<String> patternWords = _splitIntoWords(pattern);
         // Check if all pattern words appear in the key words
-        if (patternWords.every(
-          (String word) => keyWords.contains(word),
-        )) {
-          reporter.atNode(node, code);
+        if (patternWords.every((String word) => keyWords.contains(word))) {
+          reporter.atNode(node);
           return;
         }
       }
@@ -652,7 +634,7 @@ class RequireAndroidBackupRulesRule extends SaropaLintRule {
 /// );
 /// ```
 class PreferForegroundServiceAndroidRule extends SaropaLintRule {
-  const PreferForegroundServiceAndroidRule() : super(code: _code);
+  PreferForegroundServiceAndroidRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -661,9 +643,8 @@ class PreferForegroundServiceAndroidRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_foreground_service_android',
-    problemMessage:
-        '[prefer_foreground_service_android] Long-running periodic timer '
+    'prefer_foreground_service_android',
+    '[prefer_foreground_service_android] Long-running periodic timer '
         'without foreground service. Android 8+ aggressively kills background '
         'tasks — Timer.periodic and Isolate.spawn are terminated within '
         'minutes when the app is backgrounded. Use a foreground service with '
@@ -672,16 +653,15 @@ class PreferForegroundServiceAndroidRule extends SaropaLintRule {
     correctionMessage:
         'Use FlutterForegroundTask.startService() or WorkManager for '
         'reliable background execution on Android.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Detect Timer.periodic calls
@@ -723,7 +703,7 @@ class PreferForegroundServiceAndroidRule extends SaropaLintRule {
         current = current.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }

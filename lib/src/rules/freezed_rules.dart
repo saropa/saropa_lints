@@ -7,9 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -44,7 +41,7 @@ import '../saropa_lint_rule.dart';
 /// }
 /// ```
 class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
-  const AvoidFreezedJsonSerializableConflictRule() : super(code: _code);
+  AvoidFreezedJsonSerializableConflictRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -53,21 +50,19 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_freezed_json_serializable_conflict',
-    problemMessage:
-        '[avoid_freezed_json_serializable_conflict] Combining Freezed and json_serializable annotations incorrectly can result in code generation conflicts, leading to broken serialization, runtime errors, or data loss. This can cause your app to fail when parsing or serializing JSON, especially in production environments. Always follow the recommended integration patterns to ensure reliable code generation. See https://pub.dev/packages/freezed#json_serializable. {v2}',
+    'avoid_freezed_json_serializable_conflict',
+    '[avoid_freezed_json_serializable_conflict] Combining Freezed and json_serializable annotations incorrectly can result in code generation conflicts, leading to broken serialization, runtime errors, or data loss. This can cause your app to fail when parsing or serializing JSON, especially in production environments. Always follow the recommended integration patterns to ensure reliable code generation. See https://pub.dev/packages/freezed#json_serializable. {v2}',
     correctionMessage:
         'Review and adjust your Freezed and json_serializable usage to avoid annotation conflicts, following the official documentation for correct integration. This ensures consistent and reliable serialization behavior. See https://pub.dev/packages/freezed#json_serializable for best practices.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       bool hasFreezed = false;
       Annotation? jsonSerializableAnnotation;
 
@@ -84,39 +79,7 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
       }
 
       if (hasFreezed && jsonSerializableAnnotation != null) {
-        reporter.atNode(jsonSerializableAnnotation, code);
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => [_RemoveJsonSerializableFix()];
-}
-
-class _RemoveJsonSerializableFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      for (final annotation in node.metadata) {
-        if (annotation.name.name.toLowerCase() != 'jsonserializable') continue;
-
-        final changeBuilder = reporter.createChangeBuilder(
-          message: 'Remove @JsonSerializable()',
-          priority: 80,
-        );
-
-        changeBuilder.addDartFileEdit((builder) {
-          builder.addDeletion(annotation.sourceRange);
-        });
-        return;
+        reporter.atNode(jsonSerializableAnnotation);
       }
     });
   }
@@ -149,7 +112,7 @@ class _RemoveJsonSerializableFix extends DartFix {
 /// }
 /// ```
 class RequireFreezedArrowSyntaxRule extends SaropaLintRule {
-  const RequireFreezedArrowSyntaxRule() : super(code: _code);
+  RequireFreezedArrowSyntaxRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -158,21 +121,19 @@ class RequireFreezedArrowSyntaxRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_freezed_arrow_syntax',
-    problemMessage:
-        '[require_freezed_arrow_syntax] The fromJson factory in a @freezed class must use arrow syntax (=>) to ensure correct code generation. Using block syntax ({}) breaks the generated code, causing runtime errors, missing serialization, and build_runner failures. This leads to broken deserialization and hard-to-debug bugs in your models. {v2}',
+    'require_freezed_arrow_syntax',
+    '[require_freezed_arrow_syntax] The fromJson factory in a @freezed class must use arrow syntax (=>) to ensure correct code generation. Using block syntax ({}) breaks the generated code, causing runtime errors, missing serialization, and build_runner failures. This leads to broken deserialization and hard-to-debug bugs in your models. {v2}',
     correctionMessage:
         'Change the fromJson factory to use arrow syntax. Example: factory User.fromJson(Map<String, dynamic> json) => _\$UserFromJson(json);',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check for @freezed annotation
       bool hasFreezed = false;
       for (final annotation in node.metadata) {
@@ -192,59 +153,9 @@ class RequireFreezedArrowSyntaxRule extends SaropaLintRule {
           // Check if it uses block body instead of arrow
           final body = member.body;
           if (body is BlockFunctionBody) {
-            reporter.atNode(member, code);
+            reporter.atNode(member);
           }
         }
-      }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => [_ConvertToArrowSyntaxFix()];
-}
-
-class _ConvertToArrowSyntaxFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      for (final member in node.members) {
-        if (member is! ConstructorDeclaration) continue;
-        if (member.factoryKeyword == null) continue;
-        if (member.name?.lexeme != 'fromJson') continue;
-        if (!member.sourceRange.intersects(analysisError.sourceRange)) continue;
-
-        final body = member.body;
-        if (body is! BlockFunctionBody) continue;
-
-        final block = body.block;
-        if (block.statements.length != 1) continue;
-
-        final statement = block.statements.first;
-        if (statement is! ReturnStatement) continue;
-
-        final expression = statement.expression;
-        if (expression == null) continue;
-
-        final changeBuilder = reporter.createChangeBuilder(
-          message: 'Convert to arrow syntax',
-          priority: 80,
-        );
-
-        changeBuilder.addDartFileEdit((builder) {
-          builder.addSimpleReplacement(
-            body.sourceRange,
-            '=> ${expression.toSource()};',
-          );
-        });
-        return;
       }
     });
   }
@@ -276,7 +187,7 @@ class _ConvertToArrowSyntaxFix extends DartFix {
 /// }
 /// ```
 class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
-  const RequireFreezedPrivateConstructorRule() : super(code: _code);
+  RequireFreezedPrivateConstructorRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -285,21 +196,19 @@ class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_freezed_private_constructor',
-    problemMessage:
-        '[require_freezed_private_constructor] Missing private constructor '
+    'require_freezed_private_constructor',
+    '[require_freezed_private_constructor] Missing private constructor '
         'breaks code generation, causing build_runner to fail. {v2}',
     correctionMessage: 'Add: const ClassName._();',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check for @freezed annotation
       bool hasFreezed = false;
       for (final annotation in node.metadata) {
@@ -335,40 +244,8 @@ class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
       }
 
       if (!hasPrivateConstructor && hasCustomMethods) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => [_AddPrivateConstructorFix()];
-}
-
-class _AddPrivateConstructorFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final className = node.name.lexeme;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add const $className._()',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.leftBracket.end,
-          '\n  const $className._();',
-        );
-      });
     });
   }
 }
@@ -407,7 +284,7 @@ class _AddPrivateConstructorFix extends DartFix {
 ///           explicit_to_json: true
 /// ```
 class RequireFreezedExplicitJsonRule extends SaropaLintRule {
-  const RequireFreezedExplicitJsonRule() : super(code: _code);
+  RequireFreezedExplicitJsonRule() : super(code: _code);
 
   /// Potential bug. Nested objects may not serialize correctly.
   @override
@@ -417,21 +294,19 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_freezed_explicit_json',
-    problemMessage:
-        '[require_freezed_explicit_json] Freezed class with nested objects may need explicit_to_json in build.yaml. Freezed requires explicit_to_json: true in build.yaml to correctly serialize nested objects into JSON. Without this setting, nested toJson() calls produce Instance-of strings instead of actual JSON data. {v3}',
+    'require_freezed_explicit_json',
+    '[require_freezed_explicit_json] Freezed class with nested objects may need explicit_to_json in build.yaml. Freezed requires explicit_to_json: true in build.yaml to correctly serialize nested objects into JSON. Without this setting, nested toJson() calls produce Instance-of strings instead of actual JSON data. {v3}',
     correctionMessage:
         'Add explicit_to_json: true to build.yaml under json_serializable options. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class has @freezed annotation
       if (!_hasFreezedAnnotation(node)) return;
 
@@ -439,7 +314,7 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
       if (!_hasNestedObjects(node)) return;
 
       // If we get here, the class has nested objects
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 
@@ -571,7 +446,7 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferFreezedDefaultValuesRule extends SaropaLintRule {
-  const PreferFreezedDefaultValuesRule() : super(code: _code);
+  PreferFreezedDefaultValuesRule() : super(code: _code);
 
   /// Style preference. Clearer intent for optional fields.
   @override
@@ -581,21 +456,19 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_freezed_default_values',
-    problemMessage:
-        '[prefer_freezed_default_values] Freezed nullable field could use @Default annotation instead. Using @Default annotation instead of nullable types provides clearer intent and better code when the field must have a default value rather than being truly optional. {v2}',
+    'prefer_freezed_default_values',
+    '[prefer_freezed_default_values] Freezed nullable field could use @Default annotation instead. Using @Default annotation instead of nullable types provides clearer intent and better code when the field must have a default value rather than being truly optional. {v2}',
     correctionMessage:
         'Use @Default(value) instead of nullable type if field has a sensible default. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if class has @freezed annotation
       if (!_hasFreezedAnnotation(node)) return;
 
@@ -604,7 +477,7 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
         if (member is ConstructorDeclaration && member.factoryKeyword != null) {
           for (final FormalParameter param in member.parameters.parameters) {
             if (_isNullableWithoutDefault(param)) {
-              reporter.atNode(param, code);
+              reporter.atNode(param);
             }
           }
         }
@@ -630,8 +503,9 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
     }
 
     // Check if parameter has @Default annotation
-    final NodeList<Annotation>? metadata =
-        actualParam is NormalFormalParameter ? actualParam.metadata : null;
+    final NodeList<Annotation>? metadata = actualParam is NormalFormalParameter
+        ? actualParam.metadata
+        : null;
     if (metadata != null) {
       for (final Annotation annotation in metadata) {
         if (annotation.name.name == 'Default') {
@@ -683,7 +557,7 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireFreezedJsonConverterRule extends SaropaLintRule {
-  const RequireFreezedJsonConverterRule() : super(code: _code);
+  RequireFreezedJsonConverterRule() : super(code: _code);
 
   /// JSON serialization failures at runtime.
   @override
@@ -693,12 +567,11 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_freezed_json_converter',
-    problemMessage:
-        '[require_freezed_json_converter] Freezed class with DateTime/Color field may need a JsonConverter for correct serialization. Missing converters can cause runtime errors, silent data loss, and broken API contracts. This is a common source of serialization bugs in complex models. {v2}',
+    'require_freezed_json_converter',
+    '[require_freezed_json_converter] Freezed class with DateTime/Color field may need a JsonConverter for correct serialization. Missing converters can cause runtime errors, silent data loss, and broken API contracts. This is a common source of serialization bugs in complex models. {v2}',
     correctionMessage:
         'Add @JsonSerializable(converters: [...]) for custom types. Audit all Freezed models for converter coverage and add tests for serialization/deserialization. Document converter logic for maintainability.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Types that typically need converters.
@@ -713,11 +586,10 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check for @freezed annotation
       bool hasFreezed = false;
       for (final Annotation annotation in node.metadata) {
@@ -781,7 +653,7 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
                   }
 
                   if (!hasConverter) {
-                    reporter.atNode(param, code);
+                    reporter.atNode(param);
                     return;
                   }
                 }
@@ -807,7 +679,7 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
 ///
 /// **Recommendation:** Add freezed_lint to dev_dependencies.
 class RequireFreezedLintPackageRule extends SaropaLintRule {
-  const RequireFreezedLintPackageRule() : super(code: _code);
+  RequireFreezedLintPackageRule() : super(code: _code);
 
   /// Missing specialized linting for Freezed patterns.
   @override
@@ -817,30 +689,28 @@ class RequireFreezedLintPackageRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_freezed_lint_package',
-    problemMessage:
-        '[require_freezed_lint_package] File uses Freezed. Add freezed_lint package for specialized linting. Heuristic warning: This rule cannot verify if freezed_lint is in your pubspec.yaml. It simply reminds developers using Freezed to Add freezed_lint to their dev_dependencies. Disable this rule if you have already installed freezed_lint. {v2}',
+    'require_freezed_lint_package',
+    '[require_freezed_lint_package] File uses Freezed. Add freezed_lint package for specialized linting. Heuristic warning: This rule cannot verify if freezed_lint is in your pubspec.yaml. It simply reminds developers using Freezed to Add freezed_lint to their dev_dependencies. Disable this rule if you have already installed freezed_lint. {v2}',
     correctionMessage:
         'Add freezed_lint to dev_dependencies. Disable this rule if already installed. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Flag the first freezed import as a reminder to add freezed_lint.
     // This is a heuristic - we cannot check if freezed_lint is actually
     // in pubspec.yaml. Users should disable this rule if they've installed it.
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       final String? uri = node.uri.stringValue;
       if (uri == null) return;
 
       // Only flag freezed_annotation imports (the main freezed package)
       if (uri == 'package:freezed_annotation/freezed_annotation.dart') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -873,7 +743,7 @@ class RequireFreezedLintPackageRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidFreezedForLogicClassesRule extends SaropaLintRule {
-  const AvoidFreezedForLogicClassesRule() : super(code: _code);
+  AvoidFreezedForLogicClassesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -882,13 +752,12 @@ class AvoidFreezedForLogicClassesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_freezed_for_logic_classes',
-    problemMessage:
-        '[avoid_freezed_for_logic_classes] Freezed annotation on logic class. '
+    'avoid_freezed_for_logic_classes',
+    '[avoid_freezed_for_logic_classes] Freezed annotation on logic class. '
         'Freezed is meant for data classes, not Blocs/Services. {v2}',
     correctionMessage:
         'Remove @freezed from logic classes. Use regular classes for Blocs/Services.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _logicClassSuffixes = <String>{
@@ -906,11 +775,10 @@ class AvoidFreezedForLogicClassesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if has @freezed annotation
       bool hasFreezed = false;
       for (final annotation in node.metadata) {
@@ -989,7 +857,7 @@ class AvoidFreezedForLogicClassesRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferFreezedForDataClassesRule extends SaropaLintRule {
-  const PreferFreezedForDataClassesRule() : super(code: _code);
+  PreferFreezedForDataClassesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -998,22 +866,20 @@ class PreferFreezedForDataClassesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_freezed_for_data_classes',
-    problemMessage:
-        '[prefer_freezed_for_data_classes] Data class with manual copyWith/equals. '
+    'prefer_freezed_for_data_classes',
+    '[prefer_freezed_for_data_classes] Data class with manual copyWith/equals. '
         'Consider using @freezed to eliminate boilerplate. {v2}',
     correctionMessage:
         'Add @freezed annotation and let code generation handle copyWith, ==, hashCode.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if already using freezed/equatable
       for (final annotation in node.metadata) {
         final name = annotation.name.name;

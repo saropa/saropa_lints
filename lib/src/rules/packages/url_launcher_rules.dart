@@ -7,8 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -42,7 +40,7 @@ import '../../saropa_lint_rule.dart';
 /// }
 /// ```
 class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
-  const RequireUrlLauncherCanLaunchCheckRule() : super(code: _code);
+  RequireUrlLauncherCanLaunchCheckRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -51,21 +49,19 @@ class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_url_launcher_can_launch_check',
-    problemMessage:
-        '[require_url_launcher_can_launch_check] launchUrl called without canLaunchUrl check. May fail silently on unsupported schemes, confusing users and breaking expected flows. Check canLaunchUrl before launchUrl to improve error messages. Without this check, launchUrl may fail silently or throw cryptic platform exceptions. {v2}',
+    'require_url_launcher_can_launch_check',
+    '[require_url_launcher_can_launch_check] launchUrl called without canLaunchUrl check. May fail silently on unsupported schemes, confusing users and breaking expected flows. Check canLaunchUrl before launchUrl to improve error messages. Without this check, launchUrl may fail silently or throw cryptic platform exceptions. {v2}',
     correctionMessage:
         'Check canLaunchUrl(uri) before calling launchUrl(uri). Example: if (await canLaunchUrl(uri)) { launchUrl(uri); } else { showError("Could not open link"); }',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for launchUrl or launch calls
@@ -93,7 +89,7 @@ class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
         return; // Has the check
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -141,7 +137,7 @@ class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
 /// });
 /// ```
 class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
-  const AvoidUrlLauncherSimulatorTestsRule() : super(code: _code);
+  AvoidUrlLauncherSimulatorTestsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -153,12 +149,11 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_url_launcher_simulator_tests',
-    problemMessage:
-        '[avoid_url_launcher_simulator_tests] URL launcher test with tel:/mailto:/sms:/facetime:/maps: scheme may fail on simulator. These schemes are not supported in emulators and will cause test failures. {v3}',
+    'avoid_url_launcher_simulator_tests',
+    '[avoid_url_launcher_simulator_tests] URL launcher test with tel:/mailto:/sms:/facetime:/maps: scheme may fail on simulator. These schemes are not supported in emulators and will cause test failures. {v3}',
     correctionMessage:
         'Mock url_launcher in tests or add skip condition for simulator. Example: skip: !Platform.isAndroid or use a mockUrlLauncher.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _problematicSchemes = <String>{
@@ -180,17 +175,16 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Only check test files
-    final String filePath = resolver.source.fullName.toLowerCase();
+    final String filePath = context.filePath.toLowerCase();
     if (!filePath.contains('_test.dart') && !filePath.contains('/test/')) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Only match individual test calls, not group() which is too coarse
       final String methodName = node.methodName.name;
       if (methodName != 'test' && methodName != 'testWidgets') {
@@ -218,8 +212,9 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
         if (!hasScheme) continue;
 
         // Must also contain launcher API usage
-        final bool hasLauncherUsage =
-            _launcherIndicators.any(bodySource.contains);
+        final bool hasLauncherUsage = _launcherIndicators.any(
+          bodySource.contains,
+        );
         if (!hasLauncherUsage) continue;
 
         // Check if there's mocking or skip
@@ -230,7 +225,7 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
           return;
         }
 
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
     });
@@ -269,7 +264,7 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferUrlLauncherFallbackRule extends SaropaLintRule {
-  const PreferUrlLauncherFallbackRule() : super(code: _code);
+  PreferUrlLauncherFallbackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -278,12 +273,11 @@ class PreferUrlLauncherFallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_url_launcher_fallback',
-    problemMessage:
-        '[prefer_url_launcher_fallback] launchUrl called without a fallback. If the scheme is unsupported, the user gets no feedback and cannot complete the action. This leads to user frustration and failed actions. {v2}',
+    'prefer_url_launcher_fallback',
+    '[prefer_url_launcher_fallback] launchUrl called without a fallback. If the scheme is unsupported, the user gets no feedback and cannot complete the action. This leads to user frustration and failed actions. {v2}',
     correctionMessage:
         'Provide a fallback action (copy to clipboard, show dialog) when launch fails. Example: if (!await launchUrl(uri)) { showDialog(context: context, builder: (_) => Text("Could not open link")); }',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Schemes that commonly need fallbacks
@@ -295,11 +289,10 @@ class PreferUrlLauncherFallbackRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for launchUrl calls
@@ -350,7 +343,7 @@ class PreferUrlLauncherFallbackRule extends SaropaLintRule {
         return; // Has fallback handling
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }

@@ -8,8 +8,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -39,7 +37,7 @@ import '../../saropa_lint_rule.dart';
 /// ));
 /// ```
 class RequireDioTimeoutRule extends SaropaLintRule {
-  const RequireDioTimeoutRule() : super(code: _code);
+  RequireDioTimeoutRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -48,22 +46,19 @@ class RequireDioTimeoutRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_dio_timeout',
-    problemMessage:
-        '[require_dio_timeout] Creating a Dio instance for network requests without setting connectTimeout and receiveTimeout in BaseOptions can cause HTTP requests to hang indefinitely if the server is slow or unresponsive. This can freeze the UI, degrade user experience, and make error recovery impossible, especially in mobile apps with unreliable networks. Always configure timeouts to ensure your app remains responsive and can handle network failures gracefully. See https://pub.dev/packages/dio#timeouts. {v3}',
+    'require_dio_timeout',
+    '[require_dio_timeout] Creating a Dio instance for network requests without setting connectTimeout and receiveTimeout in BaseOptions can cause HTTP requests to hang indefinitely if the server is slow or unresponsive. This can freeze the UI, degrade user experience, and make error recovery impossible, especially in mobile apps with unreliable networks. Always configure timeouts to ensure your app remains responsive and can handle network failures gracefully. See https://pub.dev/packages/dio#timeouts. {v3}',
     correctionMessage:
         'Set connectTimeout and receiveTimeout in Dio BaseOptions to ensure all HTTP requests fail fast and can be retried or handled appropriately. This prevents the UI from hanging and improves reliability. See https://pub.dev/packages/dio#timeouts.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Dio') return;
 
@@ -72,7 +67,7 @@ class RequireDioTimeoutRule extends SaropaLintRule {
 
       if (args.isEmpty) {
         // No options at all
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -87,7 +82,7 @@ class RequireDioTimeoutRule extends SaropaLintRule {
       }
 
       if (!hasConnectTimeout || !hasReceiveTimeout) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -113,7 +108,7 @@ class RequireDioTimeoutRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireDioErrorHandlingRule extends SaropaLintRule {
-  const RequireDioErrorHandlingRule() : super(code: _code);
+  RequireDioErrorHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -122,12 +117,11 @@ class RequireDioErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_dio_error_handling',
-    problemMessage:
-        '[require_dio_error_handling] Making a Dio HTTP request without wrapping it in a try-catch block means any DioException (such as network errors, timeouts, or invalid responses) will crash the app and leave users with no feedback. This is especially problematic in production apps where network conditions are unpredictable. Always handle Dio errors to provide a robust and user-friendly experience. See https://pub.dev/packages/dio#handling-errors. {v3}',
+    'require_dio_error_handling',
+    '[require_dio_error_handling] Making a Dio HTTP request without wrapping it in a try-catch block means any DioException (such as network errors, timeouts, or invalid responses) will crash the app and leave users with no feedback. This is especially problematic in production apps where network conditions are unpredictable. Always handle Dio errors to provide a robust and user-friendly experience. See https://pub.dev/packages/dio#handling-errors. {v3}',
     correctionMessage:
         'Wrap all Dio requests in try-catch blocks and handle DioException to show user-friendly error messages, retry logic, or fallback behavior. This prevents crashes and improves reliability. See https://pub.dev/packages/dio#handling-errors.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _dioMethods = <String>{
@@ -144,11 +138,10 @@ class RequireDioErrorHandlingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_dioMethods.contains(methodName)) return;
 
@@ -167,7 +160,7 @@ class RequireDioErrorHandlingRule extends SaropaLintRule {
         current = current.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -193,7 +186,7 @@ class RequireDioErrorHandlingRule extends SaropaLintRule {
 /// ));
 /// ```
 class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
-  const RequireDioInterceptorErrorHandlerRule() : super(code: _code);
+  RequireDioInterceptorErrorHandlerRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -202,22 +195,19 @@ class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_dio_interceptor_error_handler',
-    problemMessage:
-        '[require_dio_interceptor_error_handler] InterceptorsWrapper without onError handler. Errors may be unhandled. Interceptors without error handling let errors propagate unexpectedly. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v3}',
+    'require_dio_interceptor_error_handler',
+    '[require_dio_interceptor_error_handler] InterceptorsWrapper without onError handler. Errors may be unhandled. Interceptors without error handling let errors propagate unexpectedly. This pattern increases maintenance cost and the likelihood of introducing bugs during future changes. {v3}',
     correctionMessage:
         'Add onError callback to handle request errors in interceptor. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'InterceptorsWrapper') return;
 
@@ -232,7 +222,7 @@ class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
       }
 
       if (!hasOnError) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -257,7 +247,7 @@ class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
 /// // On dispose: cancelToken.cancel();
 /// ```
 class PreferDioCancelTokenRule extends SaropaLintRule {
-  const PreferDioCancelTokenRule() : super(code: _code);
+  PreferDioCancelTokenRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -266,23 +256,21 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_dio_cancel_token',
-    problemMessage:
-        '[prefer_dio_cancel_token] Long-running Dio request without CancelToken. Cannot be canceled. Requests must be cancellable to avoid wasting resources when the user navigates away. {v3}',
+    'prefer_dio_cancel_token',
+    '[prefer_dio_cancel_token] Long-running Dio request without CancelToken. Cannot be canceled. Requests must be cancellable to avoid wasting resources when the user navigates away. {v3}',
     correctionMessage:
         'Add cancelToken parameter for cancellable requests. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _longRunningMethods = <String>{'download', 'fetch'};
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_longRunningMethods.contains(methodName)) return;
 
@@ -304,7 +292,7 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
       }
 
       if (!hasCancelToken) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -333,7 +321,7 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireDioSslPinningRule extends SaropaLintRule {
-  const RequireDioSslPinningRule() : super(code: _code);
+  RequireDioSslPinningRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -342,12 +330,11 @@ class RequireDioSslPinningRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_dio_ssl_pinning',
-    problemMessage:
-        '[require_dio_ssl_pinning] Making authentication or sensitive API requests with Dio without SSL pinning exposes your app to man-in-the-middle (MITM) attacks, where attackers can intercept or modify network traffic. This is a critical security risk for login, registration, and token endpoints. Always configure SSL pinning for all sensitive endpoints to protect user credentials and data. See https://pub.dev/packages/dio#ssl-pinning. {v3}',
+    'require_dio_ssl_pinning',
+    '[require_dio_ssl_pinning] Making authentication or sensitive API requests with Dio without SSL pinning exposes your app to man-in-the-middle (MITM) attacks, where attackers can intercept or modify network traffic. This is a critical security risk for login, registration, and token endpoints. Always configure SSL pinning for all sensitive endpoints to protect user credentials and data. See https://pub.dev/packages/dio#ssl-pinning. {v3}',
     correctionMessage:
         'Set up SSL pinning in Dio by configuring httpClientAdapter with certificate validation for all authentication and sensitive endpoints. This prevents MITM attacks and protects user data. See https://pub.dev/packages/dio#ssl-pinning.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _authEndpoints = <String>{
@@ -366,11 +353,10 @@ class RequireDioSslPinningRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (methodName != 'post' && methodName != 'get') return;
 
@@ -389,7 +375,7 @@ class RequireDioSslPinningRule extends SaropaLintRule {
 
       for (final endpoint in _authEndpoints) {
         if (urlSource.contains(endpoint)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -417,7 +403,7 @@ class RequireDioSslPinningRule extends SaropaLintRule {
 /// // Use in try-finally or with proper disposal
 /// ```
 class AvoidDioFormDataLeakRule extends SaropaLintRule {
-  const AvoidDioFormDataLeakRule() : super(code: _code);
+  AvoidDioFormDataLeakRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -426,21 +412,19 @@ class AvoidDioFormDataLeakRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_dio_form_data_leak',
-    problemMessage:
-        '[avoid_dio_form_data_leak] FormData with file. Ensure proper cleanup of file resources. FormData with file streams must be cleaned up to avoid resource leaks. FormData with files is not properly cleaned up. {v3}',
+    'avoid_dio_form_data_leak',
+    '[avoid_dio_form_data_leak] FormData with file. Ensure proper cleanup of file resources. FormData with file streams must be cleaned up to avoid resource leaks. FormData with files is not properly cleaned up. {v3}',
     correctionMessage:
         'Prefer cleanup or using try-finally for file uploads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for MultipartFile.fromFile
@@ -463,7 +447,7 @@ class AvoidDioFormDataLeakRule extends SaropaLintRule {
         }
 
         if (!insideTryFinally) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -490,7 +474,7 @@ class AvoidDioFormDataLeakRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
-  const AvoidDioDebugPrintProductionRule() : super(code: _code);
+  AvoidDioDebugPrintProductionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -499,21 +483,19 @@ class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_dio_debug_print_production',
-    problemMessage:
-        '[avoid_dio_debug_print_production] Using Dio LogInterceptor in production exposes sensitive request and response data\u2014including authentication tokens, user information, and API payloads\u2014to device logs. This can lead to data leaks, privacy violations, and compliance issues, especially on shared or rooted devices. Always restrict debug logging to development builds only. {v3}',
+    'avoid_dio_debug_print_production',
+    '[avoid_dio_debug_print_production] Using Dio LogInterceptor in production exposes sensitive request and response data\u2014including authentication tokens, user information, and API payloads\u2014to device logs. This can lead to data leaks, privacy violations, and compliance issues, especially on shared or rooted devices. Always restrict debug logging to development builds only. {v3}',
     correctionMessage:
         'Wrap LogInterceptor usage in an if (kDebugMode) block to ensure it is only active in development. Never log sensitive data in production. Review your build configuration and audit for accidental log exposure.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'add') return;
 
       // Only apply to files that import Dio
@@ -589,7 +571,7 @@ class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
 /// }
 /// ```
 class RequireDioSingletonRule extends SaropaLintRule {
-  const RequireDioSingletonRule() : super(code: _code);
+  RequireDioSingletonRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -598,22 +580,19 @@ class RequireDioSingletonRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_dio_singleton',
-    problemMessage:
-        '[require_dio_singleton] Use a singleton Dio instance. Creating multiple Dio instances wastes resources and makes interceptor configuration inconsistent. {v2}',
+    'require_dio_singleton',
+    '[require_dio_singleton] Use a singleton Dio instance. Creating multiple Dio instances wastes resources and makes interceptor configuration inconsistent. {v2}',
     correctionMessage:
         'Create a shared Dio instance with consistent configuration. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'Dio') return;
 
@@ -665,7 +644,7 @@ class RequireDioSingletonRule extends SaropaLintRule {
 /// dio.get('/b');
 /// ```
 class PreferDioBaseOptionsRule extends SaropaLintRule {
-  const PreferDioBaseOptionsRule() : super(code: _code);
+  PreferDioBaseOptionsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -674,24 +653,22 @@ class PreferDioBaseOptionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_dio_base_options',
-    problemMessage:
-        '[prefer_dio_base_options] Repeated options in Dio requests. Use BaseOptions. Repeated headers/timeouts across requests must be in BaseOptions. {v2}',
+    'prefer_dio_base_options',
+    '[prefer_dio_base_options] Repeated options in Dio requests. Use BaseOptions. Repeated headers/timeouts across requests must be in BaseOptions. {v2}',
     correctionMessage:
         'Move common headers/timeouts to BaseOptions in Dio constructor. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track options usage in file
     final List<MethodInvocation> dioRequestsWithOptions = [];
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
       if (!['get', 'post', 'put', 'patch', 'delete'].contains(methodName)) {
         return;
@@ -740,7 +717,7 @@ class PreferDioBaseOptionsRule extends SaropaLintRule {
 /// dio.get('/posts');
 /// ```
 class AvoidDioWithoutBaseUrlRule extends SaropaLintRule {
-  const AvoidDioWithoutBaseUrlRule() : super(code: _code);
+  AvoidDioWithoutBaseUrlRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -749,21 +726,19 @@ class AvoidDioWithoutBaseUrlRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_dio_without_base_url',
-    problemMessage:
-        '[avoid_dio_without_base_url] Dio request with full URL. Prefer setting baseUrl. Using full URLs in each request is error-prone. Set baseUrl once. {v2}',
+    'avoid_dio_without_base_url',
+    '[avoid_dio_without_base_url] Dio request with full URL. Prefer setting baseUrl. Using full URLs in each request is error-prone. Set baseUrl once. {v2}',
     correctionMessage:
         'Set baseUrl in BaseOptions and use relative paths in requests. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
       if (!['get', 'post', 'put', 'patch', 'delete'].contains(methodName)) {
         return;
@@ -783,7 +758,7 @@ class AvoidDioWithoutBaseUrlRule extends SaropaLintRule {
       if (firstArg is SimpleStringLiteral) {
         final url = firstArg.value;
         if (url.startsWith('http://') || url.startsWith('https://')) {
-          reporter.atNode(firstArg, code);
+          reporter.atNode(firstArg);
         }
       }
     });
@@ -812,7 +787,7 @@ class AvoidDioWithoutBaseUrlRule extends SaropaLintRule {
 /// final response = await dio.get(url);
 /// ```
 class PreferDioOverHttpRule extends SaropaLintRule {
-  const PreferDioOverHttpRule() : super(code: _code);
+  PreferDioOverHttpRule() : super(code: _code);
 
   /// Minor improvement. Track for later review.
   @override
@@ -822,24 +797,22 @@ class PreferDioOverHttpRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_dio_over_http',
-    problemMessage:
-        '[prefer_dio_over_http] Using http package. Dio provides interceptors, cancellation, and structured error handling suited for production apps. {v2}',
+    'prefer_dio_over_http',
+    '[prefer_dio_over_http] Using http package. Dio provides interceptors, cancellation, and structured error handling suited for production apps. {v2}',
     correctionMessage:
         'Use Dio for interceptors, cancellation, and error handling. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       final String? uri = node.uri.stringValue;
       if (uri == 'package:http/http.dart') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -869,7 +842,7 @@ class PreferDioOverHttpRule extends SaropaLintRule {
 /// );
 /// ```
 class RequireDioResponseTypeRule extends SaropaLintRule {
-  const RequireDioResponseTypeRule() : super(code: _code);
+  RequireDioResponseTypeRule() : super(code: _code);
 
   /// Binary data corruption if wrong response type used.
   @override
@@ -879,21 +852,19 @@ class RequireDioResponseTypeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_dio_response_type',
-    problemMessage:
-        '[require_dio_response_type] Dio download without explicit responseType may corrupt binary data. Dio defaults responseType to JSON, which causes issues when downloading files or handling binary responses. {v2}',
+    'require_dio_response_type',
+    '[require_dio_response_type] Dio download without explicit responseType may corrupt binary data. Dio defaults responseType to JSON, which causes issues when downloading files or handling binary responses. {v2}',
     correctionMessage:
         'Add options: Options(responseType: ResponseType.bytes) for downloads. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       // Only check download-related methods
       if (methodName != 'download' && methodName != 'downloadUri') return;
@@ -921,7 +892,7 @@ class RequireDioResponseTypeRule extends SaropaLintRule {
       }
 
       if (!hasResponseType) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -952,7 +923,7 @@ class RequireDioResponseTypeRule extends SaropaLintRule {
 ///   ));
 /// ```
 class RequireDioRetryInterceptorRule extends SaropaLintRule {
-  const RequireDioRetryInterceptorRule() : super(code: _code);
+  RequireDioRetryInterceptorRule() : super(code: _code);
 
   /// User experience degradation from transient failures.
   @override
@@ -962,23 +933,19 @@ class RequireDioRetryInterceptorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_dio_retry_interceptor',
-    problemMessage:
-        '[require_dio_retry_interceptor] Dio instance without retry interceptor. Network failures are common on mobile. Without retry logic, transient failures cause unnecessary errors. {v2}',
+    'require_dio_retry_interceptor',
+    '[require_dio_retry_interceptor] Dio instance without retry interceptor. Network failures are common on mobile. Without retry logic, transient failures cause unnecessary errors. {v2}',
     correctionMessage:
         'Add RetryInterceptor for network resilience. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Dio') return;
 
@@ -995,7 +962,7 @@ class RequireDioRetryInterceptorRule extends SaropaLintRule {
 
       // Check if part of an assignment where interceptors are added later
       // This is a simple heuristic - just flag bare Dio() calls
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -1022,7 +989,7 @@ class RequireDioRetryInterceptorRule extends SaropaLintRule {
 /// dio.transformer = BackgroundTransformer();
 /// ```
 class PreferDioTransformerRule extends SaropaLintRule {
-  const PreferDioTransformerRule() : super(code: _code);
+  PreferDioTransformerRule() : super(code: _code);
 
   /// UI jank from main thread JSON parsing.
   @override
@@ -1032,23 +999,19 @@ class PreferDioTransformerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_dio_transformer',
-    problemMessage:
-        '[prefer_dio_transformer] Dio instance without custom transformer for large data. Parsing large JSON responses on the main thread causes jank. Use BackgroundTransformer or compute() for heavy parsing. {v2}',
+    'prefer_dio_transformer',
+    '[prefer_dio_transformer] Dio instance without custom transformer for large data. Parsing large JSON responses on the main thread causes jank. Use BackgroundTransformer or compute() for heavy parsing. {v2}',
     correctionMessage:
         'Set dio.transformer = BackgroundTransformer() for off-main-thread parsing. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Dio') return;
 
@@ -1064,7 +1027,7 @@ class PreferDioTransformerRule extends SaropaLintRule {
       }
 
       // Simple heuristic - flag Dio() without transformer configuration
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }

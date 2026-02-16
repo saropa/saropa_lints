@@ -7,9 +7,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 import '../type_annotation_utils.dart';
@@ -44,7 +41,7 @@ import '../type_annotation_utils.dart';
 /// }
 /// ```
 class AvoidServiceLocatorInWidgetsRule extends SaropaLintRule {
-  const AvoidServiceLocatorInWidgetsRule() : super(code: _code);
+  AvoidServiceLocatorInWidgetsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -57,12 +54,11 @@ class AvoidServiceLocatorInWidgetsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_service_locator_in_widgets',
-    problemMessage:
-        '[avoid_service_locator_in_widgets] Service locator in widget hides dependencies. Cannot mock in widget tests. This reduces testability, maintainability, and makes code harder to refactor. {v5}',
+    'avoid_service_locator_in_widgets',
+    '[avoid_service_locator_in_widgets] Service locator in widget hides dependencies. Cannot mock in widget tests. This reduces testability, maintainability, and makes code harder to refactor. {v5}',
     correctionMessage:
         'Add required constructor parameter: MyWidget({required this.service}). Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _serviceLocatorPatterns = <String>{
@@ -78,11 +74,10 @@ class AvoidServiceLocatorInWidgetsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is a widget class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -96,7 +91,7 @@ class AvoidServiceLocatorInWidgetsRule extends SaropaLintRule {
       final String classSource = node.toSource();
       for (final String pattern in _serviceLocatorPatterns) {
         if (classSource.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -135,7 +130,7 @@ class AvoidServiceLocatorInWidgetsRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidTooManyDependenciesRule extends SaropaLintRule {
-  const AvoidTooManyDependenciesRule() : super(code: _code);
+  AvoidTooManyDependenciesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -145,12 +140,11 @@ class AvoidTooManyDependenciesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_too_many_dependencies',
-    problemMessage:
-        '[avoid_too_many_dependencies] Constructor has >5 dependencies. Class likely violates Single Responsibility. Classes with many dependencies often violate single responsibility. Break the class into smaller, focused components. {v5}',
+    'avoid_too_many_dependencies',
+    '[avoid_too_many_dependencies] Constructor has >5 dependencies. Class likely violates Single Responsibility. Classes with many dependencies often violate single responsibility. Break the class into smaller, focused components. {v5}',
     correctionMessage:
         'Group related dependencies into a facade class, or split this class. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Maximum recommended number of constructor dependencies.
@@ -158,11 +152,10 @@ class AvoidTooManyDependenciesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
       // Skip factory constructors and named constructors
       if (node.factoryKeyword != null) return;
       if (node.name != null) return; // Named constructor
@@ -179,7 +172,7 @@ class AvoidTooManyDependenciesRule extends SaropaLintRule {
       }
 
       if (dependencyCount > _maxDependencies) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -245,7 +238,7 @@ class AvoidTooManyDependenciesRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidInternalDependencyCreationRule extends SaropaLintRule {
-  const AvoidInternalDependencyCreationRule() : super(code: _code);
+  AvoidInternalDependencyCreationRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -255,12 +248,11 @@ class AvoidInternalDependencyCreationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_internal_dependency_creation',
-    problemMessage:
-        '[avoid_internal_dependency_creation] Dependency created internally instead of being injected. Cannot substitute mock implementations for testing. This tight coupling reduces testability and makes the component harder to reuse. {v5}',
+    'avoid_internal_dependency_creation',
+    '[avoid_internal_dependency_creation] Dependency created internally instead of being injected. Cannot substitute mock implementations for testing. This tight coupling reduces testability and makes the component harder to reuse. {v5}',
     correctionMessage:
         'Add constructor parameter: MyClass(this._repo); then inject from outside. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _dependencySuffixes = <String>{
@@ -278,11 +270,10 @@ class AvoidInternalDependencyCreationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       // Check for field initializers that create dependencies
       for (final VariableDeclaration variable in node.fields.variables) {
         final Expression? initializer = variable.initializer;
@@ -294,7 +285,7 @@ class AvoidInternalDependencyCreationRule extends SaropaLintRule {
           if (typeName != null) {
             for (final String suffix in _dependencySuffixes) {
               if (typeName.endsWith(suffix)) {
-                reporter.atNode(initializer, code);
+                reporter.atNode(initializer);
                 break;
               }
             }
@@ -328,7 +319,7 @@ class AvoidInternalDependencyCreationRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferAbstractDependenciesRule extends SaropaLintRule {
-  const PreferAbstractDependenciesRule() : super(code: _code);
+  PreferAbstractDependenciesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -338,12 +329,11 @@ class PreferAbstractDependenciesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_abstract_dependencies',
-    problemMessage:
-        '[prefer_abstract_dependencies] Depends on concrete implementation. Tight coupling prevents substitution. Dependencies should depend on abstractions (interfaces/abstract classes), not concrete implementations, following the Dependency Inversion Principle. {v5}',
+    'prefer_abstract_dependencies',
+    '[prefer_abstract_dependencies] Depends on concrete implementation. Tight coupling prevents substitution. Dependencies should depend on abstractions (interfaces/abstract classes), not concrete implementations, following the Dependency Inversion Principle. {v5}',
     correctionMessage:
         'Use abstract type: replace PostgresUserRepo with UserRepository interface. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _concretePrefixes = <String>{
@@ -365,25 +355,24 @@ class PreferAbstractDependenciesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
       for (final FormalParameter param in node.parameters.parameters) {
         final String? typeName = _getParameterTypeName(param);
         if (typeName == null) continue;
 
         for (final String prefix in _concretePrefixes) {
           if (typeName.startsWith(prefix)) {
-            reporter.atNode(param, code);
+            reporter.atNode(param);
             break;
           }
         }
 
         // Also check for Impl suffix
         if (typeName.endsWith('Impl')) {
-          reporter.atNode(param, code);
+          reporter.atNode(param);
         }
       }
     });
@@ -422,7 +411,7 @@ class PreferAbstractDependenciesRule extends SaropaLintRule {
 /// getIt.registerFactoryParam((userId, _) => ShoppingCart(userId));
 /// ```
 class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
-  const AvoidSingletonForScopedDependenciesRule() : super(code: _code);
+  AvoidSingletonForScopedDependenciesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -432,12 +421,11 @@ class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_singleton_for_scoped_dependencies',
-    problemMessage:
-        '[avoid_singleton_for_scoped_dependencies] Scoped data as singleton. State will persist across sessions/screens. Some dependencies must be scoped to a specific lifecycle (e.g., per request, per screen) rather than being global singletons. {v6}',
+    'avoid_singleton_for_scoped_dependencies',
+    '[avoid_singleton_for_scoped_dependencies] Scoped data as singleton. State will persist across sessions/screens. Some dependencies must be scoped to a specific lifecycle (e.g., per request, per screen) rather than being global singletons. {v6}',
     correctionMessage:
         'Use registerFactory(() => MySession()) for fresh instance per scope. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _scopedTypePatterns = <String>{
@@ -455,11 +443,10 @@ class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName != 'registerSingleton') return;
@@ -471,52 +458,10 @@ class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
 
       for (final String pattern in _scopedTypePatterns) {
         if (argSource.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AvoidSingletonForScopedDependenciesFix()];
-}
-
-class _AvoidSingletonForScopedDependenciesFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'registerSingleton') return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Change to registerFactory',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.methodName.sourceRange,
-          'registerFactory',
-        );
-        // Also need to wrap the argument in a factory function
-        final args = node.argumentList.arguments;
-        if (args.isNotEmpty) {
-          final firstArg = args.first;
-          if (firstArg is! NamedExpression) {
-            builder.addSimpleReplacement(
-              firstArg.sourceRange,
-              '() => ${firstArg.toSource()}',
-            );
-          }
-        }
-      });
     });
   }
 }
@@ -552,7 +497,7 @@ class _AvoidSingletonForScopedDependenciesFix extends DartFix {
 /// }
 /// ```
 class AvoidCircularDiDependenciesRule extends SaropaLintRule {
-  const AvoidCircularDiDependenciesRule() : super(code: _code);
+  AvoidCircularDiDependenciesRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -562,21 +507,19 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_circular_di_dependencies',
-    problemMessage:
-        '[avoid_circular_di_dependencies] Potential circular dependency detected. Circular dependencies cause runtime errors or infinite loops during dependency resolution. Circular dependencies are detected in DI registration. {v5}',
+    'avoid_circular_di_dependencies',
+    '[avoid_circular_di_dependencies] Potential circular dependency detected. Circular dependencies cause runtime errors or infinite loops during dependency resolution. Circular dependencies are detected in DI registration. {v5}',
     correctionMessage:
         'Refactor to break the cycle using interfaces or events. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
 
       // Find constructor parameters
@@ -589,7 +532,7 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
             // Check if this type might depend back on us
             // Simple heuristic: if they share a suffix pattern
             if (_mightBeCircular(className, typeName)) {
-              reporter.atNode(param, code);
+              reporter.atNode(param);
             }
           }
         }
@@ -622,10 +565,14 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
     for (final String pattern in patterns) {
       if (className.endsWith(pattern) && dependencyType.endsWith(pattern)) {
         // Check if names suggest relationship
-        final String classBase =
-            className.substring(0, className.length - pattern.length);
-        final String depBase =
-            dependencyType.substring(0, dependencyType.length - pattern.length);
+        final String classBase = className.substring(
+          0,
+          className.length - pattern.length,
+        );
+        final String depBase = dependencyType.substring(
+          0,
+          dependencyType.length - pattern.length,
+        );
 
         if (classBase.contains(depBase) || depBase.contains(classBase)) {
           return true;
@@ -667,7 +614,7 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferNullObjectPatternRule extends SaropaLintRule {
-  const PreferNullObjectPatternRule() : super(code: _code);
+  PreferNullObjectPatternRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -677,12 +624,11 @@ class PreferNullObjectPatternRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_null_object_pattern',
-    problemMessage:
-        '[prefer_null_object_pattern] Optional dependency (Logger, Analytics, etc.) registered as nullable type. Callers must perform null checks before every use, scattering defensive code throughout the application and increasing the risk of NullPointerExceptions. {v5}',
+    'prefer_null_object_pattern',
+    '[prefer_null_object_pattern] Optional dependency (Logger, Analytics, etc.) registered as nullable type. Callers must perform null checks before every use, scattering defensive code throughout the application and increasing the risk of NullPointerExceptions. {v5}',
     correctionMessage:
         'Implement a no-op or stub version of the dependency interface and register it instead of null. This eliminates null checks at call sites while preserving the optional behavior through safe default implementation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _optionalDependencySuffixes = <String>{
@@ -697,11 +643,10 @@ class PreferNullObjectPatternRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addFieldDeclaration((FieldDeclaration node) {
+    context.addFieldDeclaration((FieldDeclaration node) {
       final TypeAnnotation? type = node.fields.type;
       if (type == null) return;
 
@@ -711,7 +656,7 @@ class PreferNullObjectPatternRule extends SaropaLintRule {
       final String baseType = type.name.lexeme;
       for (final String suffix in _optionalDependencySuffixes) {
         if (baseType.endsWith(suffix)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -736,7 +681,7 @@ class PreferNullObjectPatternRule extends SaropaLintRule {
 /// getIt.registerSingleton<IUserService>(UserServiceImpl());
 /// ```
 class RequireTypedDiRegistrationRule extends SaropaLintRule {
-  const RequireTypedDiRegistrationRule() : super(code: _code);
+  RequireTypedDiRegistrationRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
@@ -746,12 +691,11 @@ class RequireTypedDiRegistrationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_typed_di_registration',
-    problemMessage:
-        '[require_typed_di_registration] Dependency injection registration lacks explicit type parameter, relying on type inference. Type inference can fail or infer incorrect types when implementations differ from interfaces, causing runtime resolution errors that could be caught at compile time. {v6}',
+    'require_typed_di_registration',
+    '[require_typed_di_registration] Dependency injection registration lacks explicit type parameter, relying on type inference. Type inference can fail or infer incorrect types when implementations differ from interfaces, causing runtime resolution errors that could be caught at compile time. {v6}',
     correctionMessage:
         'Add explicit type parameter to the registration method (e.g., registerSingleton<UserRepository>(UserRepositoryImpl())) to document the registered type and catch mismatches early during development.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _registrationMethods = <String>{
@@ -763,11 +707,10 @@ class RequireTypedDiRegistrationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (!_registrationMethods.contains(methodName)) return;
@@ -775,60 +718,8 @@ class RequireTypedDiRegistrationRule extends SaropaLintRule {
       // Check for type arguments
       final TypeArgumentList? typeArgs = node.typeArguments;
       if (typeArgs == null || typeArgs.arguments.isEmpty) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_RequireTypedDiRegistrationFix()];
-}
-
-class _RequireTypedDiRegistrationFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      // Try to infer type from the argument
-      final args = node.argumentList.arguments;
-      if (args.isEmpty) return;
-
-      String? inferredType;
-      final firstArg = args.first;
-
-      if (firstArg is InstanceCreationExpression) {
-        inferredType = firstArg.constructorName.type.name.lexeme;
-      } else if (firstArg is FunctionExpression) {
-        // For factory functions, try to get return type
-        final body = firstArg.body;
-        if (body is ExpressionFunctionBody) {
-          final expr = body.expression;
-          if (expr is InstanceCreationExpression) {
-            inferredType = expr.constructorName.type.name.lexeme;
-          }
-        }
-      }
-
-      if (inferredType == null) return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Add type parameter <$inferredType>',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.methodName.end,
-          '<$inferredType>',
-        );
-      });
     });
   }
 }
@@ -857,7 +748,7 @@ class _RequireTypedDiRegistrationFix extends DartFix {
 /// getIt.registerFactory<UserService>(() => UserService());
 /// ```
 class AvoidFunctionsInRegisterSingletonRule extends SaropaLintRule {
-  const AvoidFunctionsInRegisterSingletonRule() : super(code: _code);
+  AvoidFunctionsInRegisterSingletonRule() : super(code: _code);
 
   /// Potential bug. Wrong method used.
   @override
@@ -867,22 +758,20 @@ class AvoidFunctionsInRegisterSingletonRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_functions_in_register_singleton',
-    problemMessage:
-        '[avoid_functions_in_register_singleton] registerSingleton expects an instance, not a factory function. {v3}',
+    'avoid_functions_in_register_singleton',
+    '[avoid_functions_in_register_singleton] registerSingleton expects an instance, not a factory function. {v3}',
     correctionMessage:
         'Use registerLazySingleton(() => ...) or registerFactory(() => ...) '
         'for lazy instantiation. Use registerSingleton(MyService()) for eager.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'registerSingleton') return;
 
       final ArgumentList args = node.argumentList;
@@ -901,39 +790,8 @@ class AvoidFunctionsInRegisterSingletonRule extends SaropaLintRule {
 
       // Check if it's a function expression
       if (firstArg is FunctionExpression) {
-        reporter.atNode(firstArg, code);
+        reporter.atNode(firstArg);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AvoidFunctionsInRegisterSingletonFix()];
-}
-
-class _AvoidFunctionsInRegisterSingletonFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'registerSingleton') return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Change to registerLazySingleton',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.methodName.sourceRange,
-          'registerLazySingleton',
-        );
-      });
     });
   }
 }
@@ -959,7 +817,7 @@ class _AvoidFunctionsInRegisterSingletonFix extends DartFix {
 /// final timeout = int.tryParse(env['TIMEOUT'] ?? '') ?? 30;
 /// ```
 class RequireDefaultConfigRule extends SaropaLintRule {
-  const RequireDefaultConfigRule() : super(code: _code);
+  RequireDefaultConfigRule() : super(code: _code);
 
   /// Missing config causes startup crashes in production.
   @override
@@ -969,12 +827,11 @@ class RequireDefaultConfigRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_default_config',
-    problemMessage:
-        '[require_default_config] Accessing configuration values without providing a default or fallback can cause runtime crashes if the value is missing or misconfigured. This leads to unpredictable app behavior, poor user experience, and failed startup. It may also result in app store rejection for reliability issues. {v4}',
+    'require_default_config',
+    '[require_default_config] Accessing configuration values without providing a default or fallback can cause runtime crashes if the value is missing or misconfigured. This leads to unpredictable app behavior, poor user experience, and failed startup. It may also result in app store rejection for reliability issues. {v4}',
     correctionMessage:
         'Always provide a fallback value or use nullable access with a null check when reading config values. Document default values and ensure your app can start and function even if a config value is missing.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Methods that get config values.
@@ -988,11 +845,10 @@ class RequireDefaultConfigRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_configMethods.contains(methodName)) return;
 
@@ -1021,7 +877,7 @@ class RequireDefaultConfigRule extends SaropaLintRule {
       });
 
       if (!hasDefault) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1071,7 +927,7 @@ class RequireDefaultConfigRule extends SaropaLintRule {
 /// - Setter methods for dependency types
 /// - `init()` or `configure()` methods that set dependencies
 class PreferConstructorInjectionRule extends SaropaLintRule {
-  const PreferConstructorInjectionRule() : super(code: _code);
+  PreferConstructorInjectionRule() : super(code: _code);
 
   /// Code quality issue. Makes testing harder.
   @override
@@ -1081,13 +937,12 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_constructor_injection',
-    problemMessage:
-        '[prefer_constructor_injection] Setter/method injection hides dependencies. Use constructor injection. Constructor injection makes dependencies explicit and ensures objects are fully initialized when created. Setter injection allows partially initialized objects and makes dependencies implicit. {v2}',
+    'prefer_constructor_injection',
+    '[prefer_constructor_injection] Setter/method injection hides dependencies. Use constructor injection. Constructor injection makes dependencies explicit and ensures objects are fully initialized when created. Setter injection allows partially initialized objects and makes dependencies implicit. {v2}',
     correctionMessage:
         'Make this a final field and add a constructor parameter:. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'MyClass(this._service);',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Suffixes that identify dependency types (services, repos, etc.).
@@ -1123,11 +978,10 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       // Skip abstract classes and mixins
       if (node.abstractKeyword != null) return;
 
@@ -1164,7 +1018,7 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
     final String typeStr = type.toSource();
     for (final String suffix in _dependencySuffixes) {
       if (typeStr.contains(suffix)) {
-        reporter.atNode(field, code);
+        reporter.atNode(field);
         return;
       }
     }
@@ -1193,7 +1047,7 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
     if (typeStr != null) {
       for (final String suffix in _dependencySuffixes) {
         if (typeStr.contains(suffix)) {
-          reporter.atNode(setter, code);
+          reporter.atNode(setter);
           return;
         }
       }
@@ -1230,7 +1084,7 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
       if (typeStr != null) {
         for (final String suffix in _dependencySuffixes) {
           if (typeStr.contains(suffix)) {
-            reporter.atNode(method, code);
+            reporter.atNode(method);
             return;
           }
         }
@@ -1267,7 +1121,7 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
 /// GetIt.I.registerFactory(() => RequestHandler());  // Stateless, OK as factory
 /// ```
 class RequireDiScopeAwarenessRule extends SaropaLintRule {
-  const RequireDiScopeAwarenessRule() : super(code: _code);
+  RequireDiScopeAwarenessRule() : super(code: _code);
 
   /// Memory leaks or stale data from wrong scope.
   @override
@@ -1277,12 +1131,11 @@ class RequireDiScopeAwarenessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_di_scope_awareness',
-    problemMessage:
-        '[require_di_scope_awareness] Review DI scope: singleton retains state, factory creates each time. Misusing DI scopes causes lifecycle bugs: - singleton: Created once, lives forever - lazySingleton: Created on first access, lives forever - factory: Created fresh each time. {v2}',
+    'require_di_scope_awareness',
+    '[require_di_scope_awareness] Review DI scope: singleton retains state, factory creates each time. Misusing DI scopes causes lifecycle bugs: - singleton: Created once, lives forever - lazySingleton: Created on first access, lives forever - factory: Created fresh each time. {v2}',
     correctionMessage:
         'Use lazySingleton for expensive objects, factory for stateless handlers. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Service types that might have scope issues.
@@ -1305,11 +1158,10 @@ class RequireDiScopeAwarenessRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for GetIt registration methods
@@ -1342,7 +1194,7 @@ class RequireDiScopeAwarenessRule extends SaropaLintRule {
         // Stateful services as singleton may cause stale data
         for (final String suffix in _statefulSuffixes) {
           if (argSource.contains(suffix)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -1350,7 +1202,7 @@ class RequireDiScopeAwarenessRule extends SaropaLintRule {
         // Expensive services as factory waste resources
         for (final String suffix in _expensiveSuffixes) {
           if (argSource.contains(suffix)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -1394,7 +1246,7 @@ class RequireDiScopeAwarenessRule extends SaropaLintRule {
 /// }
 /// ```
 class AvoidDiInWidgetsRule extends SaropaLintRule {
-  const AvoidDiInWidgetsRule() : super(code: _code);
+  AvoidDiInWidgetsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1406,23 +1258,21 @@ class AvoidDiInWidgetsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'avoid_di_in_widgets',
-    problemMessage:
-        '[avoid_di_in_widgets] GetIt.I access in widgets creates hidden dependencies that break testability and widget reuse. '
+    'avoid_di_in_widgets',
+    '[avoid_di_in_widgets] GetIt.I access in widgets creates hidden dependencies that break testability and widget reuse. '
         'Direct service locator calls tightly couple widgets to the DI container, making it impossible to substitute mock dependencies in tests and preventing widget extraction to other packages. {v3}',
     correctionMessage:
         'Pass dependencies via constructor injection or use context-based lookup (e.g., context.read<T>() with Provider, or InheritedWidget). '
         'This makes dependencies explicit, enables easy mocking in widget tests, and keeps widgets reusable across different dependency configurations.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check if inside a widget class
       if (!_isInsideWidgetClass(node)) return;
 
@@ -1435,19 +1285,19 @@ class AvoidDiInWidgetsRule extends SaropaLintRule {
 
       // Match GetIt.I<T>(), GetIt.instance<T>(), sl<T>(), locator<T>()
       if (_isServiceLocatorCall(targetSource, methodName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
     // Also check for GetIt.I.get<T>() patterns
-    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (!_isInsideWidgetClass(node)) return;
 
       final String source = node.toSource();
       if (source == 'GetIt.I' ||
           source == 'GetIt.instance' ||
           source == 'GetIt.asNewInstance') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1511,7 +1361,7 @@ class AvoidDiInWidgetsRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferAbstractionInjectionRule extends SaropaLintRule {
-  const PreferAbstractionInjectionRule() : super(code: _code);
+  PreferAbstractionInjectionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -1520,13 +1370,12 @@ class PreferAbstractionInjectionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_abstraction_injection',
-    problemMessage:
-        '[prefer_abstraction_injection] Injecting concrete implementation. '
+    'prefer_abstraction_injection',
+    '[prefer_abstraction_injection] Injecting concrete implementation. '
         'Prefer injecting abstract types for testability. {v2}',
     correctionMessage:
         'Create an abstract class or interface and inject that instead.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Concrete type patterns that suggest implementation injection.
@@ -1548,11 +1397,10 @@ class PreferAbstractionInjectionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
       final FormalParameterList? params = node.parameters;
       if (params == null) return;
 
@@ -1571,7 +1419,7 @@ class PreferAbstractionInjectionRule extends SaropaLintRule {
         }
 
         if (typeStr != null && _isLikelyConcrete(typeStr)) {
-          reporter.atNode(param, code);
+          reporter.atNode(param);
         }
       }
     });
@@ -1618,7 +1466,7 @@ class PreferAbstractionInjectionRule extends SaropaLintRule {
 /// }
 /// ```
 class PreferLazySingletonRegistrationRule extends SaropaLintRule {
-  const PreferLazySingletonRegistrationRule() : super(code: _code);
+  PreferLazySingletonRegistrationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1627,12 +1475,11 @@ class PreferLazySingletonRegistrationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_lazy_singleton_registration',
-    problemMessage:
-        '[prefer_lazy_singleton_registration] Expensive service (Database, Analytics, Cache) registered as eager singleton. The service initializes immediately at app startup, slowing down launch time and consuming resources even if the service is never used during the session. {v3}',
+    'prefer_lazy_singleton_registration',
+    '[prefer_lazy_singleton_registration] Expensive service (Database, Analytics, Cache) registered as eager singleton. The service initializes immediately at app startup, slowing down launch time and consuming resources even if the service is never used during the session. {v3}',
     correctionMessage:
         'Replace registerSingleton with registerLazySingleton(() => Service()) to defer initialization until first access. This improves app startup time and reduces memory usage when features are conditionally accessed.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static final RegExp _expensiveServicePattern = RegExp(
@@ -1642,11 +1489,10 @@ class PreferLazySingletonRegistrationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'registerSingleton') return;
 
       // Check arguments for potentially expensive services
@@ -1657,51 +1503,8 @@ class PreferLazySingletonRegistrationRule extends SaropaLintRule {
 
       // Check if registering a potentially expensive service
       if (_expensiveServicePattern.hasMatch(argSource)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
-    });
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_PreferLazySingletonRegistrationFix()];
-}
-
-class _PreferLazySingletonRegistrationFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      if (node.methodName.name != 'registerSingleton') return;
-
-      final changeBuilder = reporter.createChangeBuilder(
-        message: 'Change to registerLazySingleton',
-        priority: 80,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Change method name
-        builder.addSimpleReplacement(
-          node.methodName.sourceRange,
-          'registerLazySingleton',
-        );
-        // Wrap argument in factory function
-        final args = node.argumentList.arguments;
-        if (args.isNotEmpty) {
-          final firstArg = args.first;
-          if (firstArg is! NamedExpression && firstArg is! FunctionExpression) {
-            builder.addSimpleReplacement(
-              firstArg.sourceRange,
-              '() => ${firstArg.toSource()}',
-            );
-          }
-        }
-      });
     });
   }
 }

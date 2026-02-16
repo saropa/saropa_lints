@@ -25,10 +25,6 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/source/source_range.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../../info_plist_utils.dart';
 import '../../mode_constants_utils.dart';
@@ -90,7 +86,7 @@ import '../../saropa_lint_rule.dart';
 /// @see [MediaQuery.padding](https://api.flutter.dev/flutter/widgets/MediaQueryData/padding.html)
 class PreferIosSafeAreaRule extends SaropaLintRule {
   /// Creates a new instance of [PreferIosSafeAreaRule].
-  const PreferIosSafeAreaRule() : super(code: _code);
+  PreferIosSafeAreaRule() : super(code: _code);
 
   /// UI overlap affects user experience but is not critical.
   @override
@@ -100,13 +96,12 @@ class PreferIosSafeAreaRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_ios_safe_area',
-    problemMessage:
-        '[prefer_ios_safe_area] Scaffold body without SafeArea may have content hidden by iOS notch '
+    'prefer_ios_safe_area',
+    '[prefer_ios_safe_area] Scaffold body without SafeArea may have content hidden by iOS notch '
         'or Dynamic Island. {v2}',
     correctionMessage:
         'Wrap body content with SafeArea to avoid UI overlap on iOS devices.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Widgets that handle safe area internally and don't need explicit SafeArea.
@@ -123,12 +118,10 @@ class PreferIosSafeAreaRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Only check Scaffold widgets
       if (node.typeName != 'Scaffold') {
         return;
@@ -148,53 +141,12 @@ class PreferIosSafeAreaRule extends SaropaLintRule {
         }
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_WrapWithSafeAreaFix()];
 }
 
 /// Quick fix that wraps Scaffold body with SafeArea.
-class _WrapWithSafeAreaFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      if (node.typeName != 'Scaffold') {
-        return;
-      }
-
-      final Expression? bodyArg = node.getNamedParameterValue('body');
-      if (bodyArg == null) {
-        return;
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Wrap body with SafeArea',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Insert SafeArea( before the body content
-        builder.addSimpleInsertion(bodyArg.offset, 'SafeArea(child: ');
-        // Insert ) after the body content
-        builder.addSimpleInsertion(bodyArg.end, ')');
-      });
-    });
-  }
-}
 
 /// Warns when hardcoded iOS status bar height values are used.
 ///
@@ -239,7 +191,7 @@ class _WrapWithSafeAreaFix extends DartFix {
 /// @see [MediaQuery.padding](https://api.flutter.dev/flutter/widgets/MediaQueryData/padding.html)
 class AvoidIosHardcodedStatusBarRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosHardcodedStatusBarRule].
-  const AvoidIosHardcodedStatusBarRule() : super(code: _code);
+  AvoidIosHardcodedStatusBarRule() : super(code: _code);
 
   /// Hardcoded values cause UI bugs on specific devices.
   @override
@@ -249,13 +201,12 @@ class AvoidIosHardcodedStatusBarRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_hardcoded_status_bar',
-    problemMessage:
-        '[avoid_ios_hardcoded_status_bar] Hardcoded status bar height (20, 44, 47, or 59) may cause UI issues '
+    'avoid_ios_hardcoded_status_bar',
+    '[avoid_ios_hardcoded_status_bar] Hardcoded status bar height (20, 44, 47, or 59) may cause UI issues '
         'on different iOS devices. {v2}',
     correctionMessage:
         'Use MediaQuery.of(context).padding.top for dynamic status bar height.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Known iOS status bar heights in logical pixels.
@@ -269,12 +220,10 @@ class AvoidIosHardcodedStatusBarRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Check EdgeInsets.only(top: XX)
       if (node.typeName == 'EdgeInsets') {
         final String? constructorName = node.constructorName.name?.name;
@@ -326,61 +275,12 @@ class AvoidIosHardcodedStatusBarRule extends SaropaLintRule {
     }
 
     if (value != null && _statusBarHeights.contains(value)) {
-      reporter.atNode(arg, code);
+      reporter.atNode(arg);
     }
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_UseMediaQueryPaddingFix()];
 }
 
 /// Quick fix that replaces hardcoded value with MediaQuery.padding.top.
-class _UseMediaQueryPaddingFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addIntegerLiteral((IntegerLiteral node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use MediaQuery.of(context).padding.top',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          'MediaQuery.of(context).padding.top',
-        );
-      });
-    });
-
-    context.registry.addDoubleLiteral((DoubleLiteral node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Use MediaQuery.of(context).padding.top',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          node.sourceRange,
-          'MediaQuery.of(context).padding.top',
-        );
-      });
-    });
-  }
-}
 
 /// Suggests adding haptic feedback for important button interactions on iOS.
 ///
@@ -428,7 +328,7 @@ class _UseMediaQueryPaddingFix extends DartFix {
 /// @see [HapticFeedback class](https://api.flutter.dev/flutter/services/HapticFeedback-class.html)
 class PreferIosHapticFeedbackRule extends SaropaLintRule {
   /// Creates a new instance of [PreferIosHapticFeedbackRule].
-  const PreferIosHapticFeedbackRule() : super(code: _code);
+  PreferIosHapticFeedbackRule() : super(code: _code);
 
   /// Haptic feedback is a nice-to-have UX enhancement.
   @override
@@ -438,13 +338,12 @@ class PreferIosHapticFeedbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_ios_haptic_feedback',
-    problemMessage:
-        '[prefer_ios_haptic_feedback] Consider adding haptic feedback for important button interactions '
+    'prefer_ios_haptic_feedback',
+    '[prefer_ios_haptic_feedback] Consider adding haptic feedback for important button interactions '
         'on iOS. {v2}',
     correctionMessage:
         'Use HapticFeedback.mediumImpact() or similar for tactile response.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Button types that typically benefit from haptic feedback.
@@ -455,12 +354,10 @@ class PreferIosHapticFeedbackRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (!_importantButtonTypes.contains(node.typeName)) {
         return;
       }
@@ -476,647 +373,12 @@ class PreferIosHapticFeedbackRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_AddHapticFeedbackFix()];
 }
 
 /// Quick fix that adds HapticFeedback.mediumImpact() to button callback.
-class _AddHapticFeedbackFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      final Expression? onPressedArg = node.getNamedParameterValue('onPressed');
-      if (onPressedArg == null) {
-        return;
-      }
-
-      // Handle function expression callbacks: () { ... } or () => ...
-      if (onPressedArg is FunctionExpression) {
-        final FunctionBody body = onPressedArg.body;
-
-        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-          message: 'Add HapticFeedback.mediumImpact()',
-          priority: 1,
-        );
-
-        changeBuilder.addDartFileEdit((builder) {
-          if (body is BlockFunctionBody) {
-            // Insert at the start of the block: { HapticFeedback.mediumImpact(); ...
-            final int insertOffset = body.block.leftBracket.end;
-            builder.addSimpleInsertion(
-              insertOffset,
-              '\n    HapticFeedback.mediumImpact();',
-            );
-          } else if (body is ExpressionFunctionBody) {
-            // Convert => expr to { HapticFeedback.mediumImpact(); expr; }
-            final int arrowOffset = body.functionDefinition.offset;
-            final Expression expression = body.expression;
-            builder.addSimpleReplacement(
-              SourceRange(arrowOffset, body.end - arrowOffset),
-              '{\n    HapticFeedback.mediumImpact();\n    ${expression.toSource()};\n  }',
-            );
-          }
-        });
-      }
-    });
-  }
-}
-
-/// Warns when iOS-specific MethodChannel calls lack Platform.isIOS guard.
-///
-/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
-///
-/// Platform-specific MethodChannel calls should be wrapped in platform checks
-/// to prevent runtime errors when running on unsupported platforms.
-///
-/// ## Why This Matters
-///
-/// Without platform checks:
-/// - Code crashes on Android/Web/Desktop if iOS-specific channel is called
-/// - MissingPluginException thrown at runtime
-/// - Poor user experience on non-iOS platforms
-///
-/// ## Detection
-///
-/// This rule detects MethodChannel instantiations with names containing:
-/// - `ios`
-/// - `apple`
-/// - `darwin`
-/// - `cupertino`
-/// - `uikit`
-///
-/// ## Example
-///
-/// **BAD:**
-/// ```dart
-/// final channel = MethodChannel('com.example/ios_feature');
-/// final result = await channel.invokeMethod('doThing');
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// if (Platform.isIOS) {
-///   final channel = MethodChannel('com.example/ios_feature');
-///   final result = await channel.invokeMethod('doThing');
-/// }
-/// ```
-///
-/// @see [Platform class](https://api.flutter.dev/flutter/dart-io/Platform-class.html)
-/// @see [MethodChannel class](https://api.flutter.dev/flutter/services/MethodChannel-class.html)
-class RequireIosPlatformCheckRule extends SaropaLintRule {
-  /// Creates a new instance of [RequireIosPlatformCheckRule].
-  const RequireIosPlatformCheckRule() : super(code: _code);
-
-  /// Missing platform checks can cause crashes.
-  @override
-  LintImpact get impact => LintImpact.high;
-
-  @override
-  RuleCost get cost => RuleCost.low;
-
-  static const LintCode _code = LintCode(
-    name: 'require_ios_platform_check',
-    problemMessage:
-        '[require_ios_platform_check] iOS-specific MethodChannel without Platform.isIOS check may crash '
-        'on other platforms. {v2}',
-    correctionMessage: 'Wrap iOS-specific code with if (Platform.isIOS) check.',
-    errorSeverity: DiagnosticSeverity.WARNING,
-  );
-
-  /// Patterns in channel names that suggest iOS-specific functionality.
-  static const Set<String> _iosChannelPatterns = <String>{
-    'ios',
-    'apple',
-    'darwin',
-    'cupertino',
-    'uikit',
-  };
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (node.typeName != 'MethodChannel') {
-        return;
-      }
-
-      // Get the channel name argument (first positional argument)
-      final NodeList<Expression> args = node.argumentList.arguments;
-      if (args.isEmpty) {
-        return;
-      }
-
-      final Expression firstArg = args.first;
-      if (firstArg is! StringLiteral) {
-        return;
-      }
-
-      final String channelName = firstArg.stringValue?.toLowerCase() ?? '';
-
-      // Check if channel name suggests iOS-specific functionality
-      bool isIosSpecific = false;
-      for (final String pattern in _iosChannelPatterns) {
-        if (channelName.contains(pattern)) {
-          isIosSpecific = true;
-          break;
-        }
-      }
-
-      if (!isIosSpecific) {
-        return;
-      }
-
-      // Check if wrapped in Platform.isIOS check by walking up the tree
-      if (_isInsidePlatformCheck(node)) {
-        return;
-      }
-
-      reporter.atNode(node, code);
-    });
-  }
-
-  /// Checks if the node is inside a Platform.isIOS/isMacOS conditional.
-  bool _isInsidePlatformCheck(AstNode node) {
-    AstNode? current = node.parent;
-    while (current != null) {
-      if (current is IfStatement) {
-        final String condition = current.expression.toSource();
-        if (condition.contains('Platform.isIOS') ||
-            condition.contains('Platform.isMacOS') ||
-            condition.contains('defaultTargetPlatform') ||
-            condition.contains('kIsWeb')) {
-          return true;
-        }
-      }
-      // Also check ternary expressions
-      if (current is ConditionalExpression) {
-        final String condition = current.condition.toSource();
-        if (condition.contains('Platform.isIOS') ||
-            condition.contains('Platform.isMacOS')) {
-          return true;
-        }
-      }
-      current = current.parent;
-    }
-    return false;
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_WrapWithPlatformCheckFix()];
-}
-
-/// Quick fix that wraps MethodChannel with if (Platform.isIOS) check.
-class _WrapWithPlatformCheckFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      if (node.typeName != 'MethodChannel') {
-        return;
-      }
-
-      // Find the containing statement to wrap
-      AstNode? statementToWrap = node.parent;
-      while (statementToWrap != null && statementToWrap is! Statement) {
-        statementToWrap = statementToWrap.parent;
-      }
-
-      if (statementToWrap == null) {
-        return;
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Wrap with if (Platform.isIOS)',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final String statementSource = statementToWrap!.toSource();
-        final String indentedStatement =
-            statementSource.split('\n').map((line) => '  $line').join('\n');
-        builder.addSimpleReplacement(
-          statementToWrap.sourceRange,
-          'if (Platform.isIOS) {\n$indentedStatement\n}',
-        );
-      });
-    });
-  }
-}
-
-/// Warns when Future.delayed exceeds iOS background fetch time limits.
-///
-/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
-///
-/// iOS terminates background tasks after approximately 30 seconds. Using
-/// [Future.delayed] with durations exceeding this limit in background
-/// contexts will result in incomplete execution.
-///
-/// ## Why This Matters
-///
-/// iOS background execution limits:
-/// - Background fetch: ~30 seconds maximum
-/// - Background URLSession: System managed
-/// - Push notification handling: ~30 seconds
-///
-/// Tasks exceeding these limits are terminated by iOS, potentially leaving
-/// operations incomplete.
-///
-/// ## Example
-///
-/// **BAD:**
-/// ```dart
-/// void backgroundTask() async {
-///   await Future.delayed(Duration(minutes: 5)); // Will be killed by iOS
-///   await syncAllData();
-/// }
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// void backgroundTask() async {
-///   await syncIncrementalData(); // Complete within 30 seconds
-/// }
-/// ```
-///
-/// @see [iOS Background Execution](https://developer.apple.com/documentation/uikit/app_and_environment/scenes/preparing_your_ui_to_run_in_the_background)
-class AvoidIosBackgroundFetchAbuseRule extends SaropaLintRule {
-  /// Creates a new instance of [AvoidIosBackgroundFetchAbuseRule].
-  const AvoidIosBackgroundFetchAbuseRule() : super(code: _code);
-
-  /// Exceeding background limits causes incomplete operations.
-  @override
-  LintImpact get impact => LintImpact.high;
-
-  @override
-  RuleCost get cost => RuleCost.low;
-
-  static const LintCode _code = LintCode(
-    name: 'avoid_ios_background_fetch_abuse',
-    problemMessage:
-        '[avoid_ios_background_fetch_abuse] Future.delayed duration exceeds iOS 30-second background limit. {v2}',
-    correctionMessage:
-        'Design background tasks to complete within iOS time limits '
-        '(~30 seconds).',
-    errorSeverity: DiagnosticSeverity.WARNING,
-  );
-
-  /// iOS background task time limit in seconds.
-  static const int _iosBackgroundLimitSeconds = 30;
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      // Check for Future.delayed
-      final Expression? target = node.target;
-      if (target is! SimpleIdentifier || target.name != 'Future') {
-        return;
-      }
-
-      if (node.methodName.name != 'delayed') {
-        return;
-      }
-
-      final NodeList<Expression> args = node.argumentList.arguments;
-      if (args.isEmpty) {
-        return;
-      }
-
-      final Expression durationArg = args.first;
-      if (durationArg is! InstanceCreationExpression) {
-        return;
-      }
-
-      if (durationArg.typeName != 'Duration') {
-        return;
-      }
-
-      // Calculate total seconds from duration arguments
-      int totalSeconds = 0;
-
-      final Expression? minutesArg =
-          durationArg.getNamedParameterValue('minutes');
-      if (minutesArg is IntegerLiteral) {
-        totalSeconds += (minutesArg.value ?? 0) * 60;
-      }
-
-      final Expression? secondsArg =
-          durationArg.getNamedParameterValue('seconds');
-      if (secondsArg is IntegerLiteral) {
-        totalSeconds += secondsArg.value ?? 0;
-      }
-
-      final Expression? hoursArg = durationArg.getNamedParameterValue('hours');
-      if (hoursArg is IntegerLiteral) {
-        totalSeconds += (hoursArg.value ?? 0) * 3600;
-      }
-
-      if (totalSeconds > _iosBackgroundLimitSeconds) {
-        reporter.atNode(node, code);
-      }
-    });
-  }
-}
-
-// =============================================================================
-// Cross-Platform Apple Rules (iOS & macOS)
-// =============================================================================
-
-/// Warns when MethodChannel.invokeMethod is used without error handling.
-///
-/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
-///
-/// Platform channels can fail on iOS/macOS for various reasons:
-/// - Plugin not implemented on native side
-/// - Permission denied
-/// - Native exception thrown
-/// - Invalid arguments
-///
-/// Always wrap platform channel calls in try-catch blocks.
-///
-/// ## Why This Matters
-///
-/// Unhandled PlatformException:
-/// - Crashes the app
-/// - Provides poor user experience
-/// - May lose user data
-///
-/// ## Example
-///
-/// **BAD:**
-/// ```dart
-/// final result = await channel.invokeMethod('getData');
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// try {
-///   final result = await channel.invokeMethod('getData');
-///   return result;
-/// } on PlatformException catch (e) {
-///   debugPrint('Platform error: ${e.message}');
-///   return null;
-/// }
-/// ```
-///
-/// @see [PlatformException class](https://api.flutter.dev/flutter/services/PlatformException-class.html)
-class RequireMethodChannelErrorHandlingRule extends SaropaLintRule {
-  /// Creates a new instance of [RequireMethodChannelErrorHandlingRule].
-  const RequireMethodChannelErrorHandlingRule() : super(code: _code);
-
-  /// Unhandled platform errors cause crashes.
-  @override
-  LintImpact get impact => LintImpact.high;
-
-  @override
-  RuleCost get cost => RuleCost.low;
-
-  static const LintCode _code = LintCode(
-    name: 'require_method_channel_error_handling',
-    problemMessage:
-        '[require_method_channel_error_handling] MethodChannel.invokeMethod without error handling may crash on '
-        'iOS/macOS. {v2}',
-    correctionMessage: 'Wrap in try-catch and handle PlatformException.',
-    errorSeverity: DiagnosticSeverity.WARNING,
-  );
-
-  /// Method names on MethodChannel that require error handling.
-  static const Set<String> _invokeMethodNames = <String>{
-    'invokeMethod',
-    'invokeListMethod',
-    'invokeMapMethod',
-  };
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!_invokeMethodNames.contains(node.methodName.name)) {
-        return;
-      }
-
-      // Check if this looks like a MethodChannel call
-      final Expression? target = node.target;
-      if (target == null) {
-        return;
-      }
-
-      // Check if wrapped in try-catch
-      if (_isInsideTryCatch(node)) {
-        return;
-      }
-
-      reporter.atNode(node, code);
-    });
-  }
-
-  /// Checks if the node is inside a try-catch block with appropriate handling.
-  bool _isInsideTryCatch(AstNode node) {
-    AstNode? current = node.parent;
-    while (current != null) {
-      if (current is TryStatement) {
-        // Check if it catches any exception type
-        for (final CatchClause catchClause in current.catchClauses) {
-          final TypeAnnotation? exceptionType = catchClause.exceptionType;
-          // Accept: catch (e), catch (PlatformException e), catch (Exception e)
-          if (exceptionType == null) {
-            return true; // Bare catch catches everything
-          }
-          final String typeSource = exceptionType.toSource();
-          if (typeSource.contains('PlatformException') ||
-              typeSource.contains('Exception') ||
-              typeSource == 'Object') {
-            return true;
-          }
-        }
-      }
-      current = current.parent;
-    }
-    return false;
-  }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_WrapWithTryCatchFix()];
-}
-
-/// Quick fix that wraps the invokeMethod call with try-catch.
-class _WrapWithTryCatchFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      // Find the await expression or expression statement containing this
-      AstNode? statementNode = node.parent;
-      while (statementNode != null &&
-          statementNode is! ExpressionStatement &&
-          statementNode is! VariableDeclarationStatement) {
-        statementNode = statementNode.parent;
-      }
-
-      if (statementNode == null) {
-        return;
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Wrap with try-catch',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          statementNode!.offset,
-          'try {\n  ',
-        );
-        builder.addSimpleInsertion(
-          statementNode.end,
-          '\n} on PlatformException catch (e) {\n'
-          '  // TODO: Handle platform error\n'
-          '  debugPrint(\'Platform error: \${e.message}\');\n'
-          '}',
-        );
-      });
-    });
-  }
-}
-
-/// Reminds to validate iOS Universal Links server configuration.
-///
-/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
-///
-/// iOS Universal Links (and Android App Links) require proper server-side
-/// configuration:
-/// - **iOS**: apple-app-site-association file at /.well-known/
-/// - **Android**: assetlinks.json at /.well-known/
-///
-/// This rule flags parameterized routes in go_router as a reminder to
-/// verify server configuration.
-///
-/// ## Why This Matters
-///
-/// Without proper server configuration:
-/// - Deep links open in Safari instead of the app
-/// - Universal Links fail silently
-/// - Users have poor experience
-///
-/// ## Example
-///
-/// **Route that likely needs Universal Link configuration:**
-/// ```dart
-/// GoRoute(
-///   path: '/product/:id',  // Parameterized route
-///   builder: (context, state) => ProductPage(id: state.params['id']!),
-/// )
-/// ```
-///
-/// **Server configuration needed:**
-/// ```json
-/// // apple-app-site-association
-/// {
-///   "applinks": {
-///     "apps": [],
-///     "details": [{
-///       "appID": "TEAM_ID.com.example.app",
-///       "paths": ["/product/*"]
-///     }]
-///   }
-/// }
-/// ```
-///
-/// @see [Universal Links](https://developer.apple.com/documentation/xcode/supporting-universal-links-in-your-app)
-class RequireUniversalLinkValidationRule extends SaropaLintRule {
-  /// Creates a new instance of [RequireUniversalLinkValidationRule].
-  const RequireUniversalLinkValidationRule() : super(code: _code);
-
-  /// Server misconfiguration causes silent failures.
-  @override
-  LintImpact get impact => LintImpact.medium;
-
-  @override
-  RuleCost get cost => RuleCost.low;
-
-  static const LintCode _code = LintCode(
-    name: 'require_universal_link_validation',
-    problemMessage:
-        '[require_universal_link_validation] Deep link route may need iOS Universal Links server configuration. iOS Universal Links (and Android App Links) require proper server-side configuration: - iOS: apple-app-site-association file at /.well-known/ - Android: assetlinks.json at /.well-known/. {v2}',
-    correctionMessage:
-        'Ensure apple-app-site-association is configured and test on real. Verify the change works correctly with existing tests and add coverage for the new behavior.'
-        'iOS device.',
-    errorSeverity: DiagnosticSeverity.INFO,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (node.typeName != 'GoRoute') {
-        return;
-      }
-
-      final Expression? pathArg = node.getNamedParameterValue('path');
-      if (pathArg == null) {
-        return;
-      }
-
-      // Check if path contains parameters (likely a deep link)
-      final String pathSource = pathArg.toSource();
-      // go_router uses :param syntax, also check for regex-style {param}
-      if (!pathSource.contains(':') &&
-          !pathSource.contains(RegExp(r'\{[^}]+\}'))) {
-        return; // Not a parameterized route
-      }
-
-      reporter.atNode(node, code);
-    });
-  }
-}
 
 /// Suggests using Cupertino widgets in iOS-specific code blocks.
 ///
@@ -1161,7 +423,7 @@ class RequireUniversalLinkValidationRule extends SaropaLintRule {
 /// @see [Cupertino widgets](https://docs.flutter.dev/ui/widgets/cupertino)
 class PreferCupertinoForIosRule extends SaropaLintRule {
   /// Creates a new instance of [PreferCupertinoForIosRule].
-  const PreferCupertinoForIosRule() : super(code: _code);
+  PreferCupertinoForIosRule() : super(code: _code);
 
   /// Using non-native widgets is a UX preference.
   @override
@@ -1171,13 +433,12 @@ class PreferCupertinoForIosRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_cupertino_for_ios',
-    problemMessage:
-        '[prefer_cupertino_for_ios] Material widget in iOS-specific code block. Consider using '
+    'prefer_cupertino_for_ios',
+    '[prefer_cupertino_for_ios] Material widget in iOS-specific code block. Consider using '
         'Cupertino equivalent for native iOS feel. {v2}',
     correctionMessage:
         'Use CupertinoAlertDialog, CupertinoSwitch, etc. for native iOS feel.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Material widgets and their Cupertino equivalents.
@@ -1192,12 +453,10 @@ class PreferCupertinoForIosRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
       if (!_materialToCupertino.containsKey(typeName)) {
         return;
@@ -1205,7 +464,7 @@ class PreferCupertinoForIosRule extends SaropaLintRule {
 
       // Check if inside Platform.isIOS block
       if (_isInsideIosPlatformCheck(node)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1278,7 +537,7 @@ class PreferCupertinoForIosRule extends SaropaLintRule {
 /// @see [App Transport Security](https://developer.apple.com/documentation/security/preventing_insecure_network_connections)
 class RequireHttpsForIosRule extends SaropaLintRule {
   /// Creates a new instance of [RequireHttpsForIosRule].
-  const RequireHttpsForIosRule() : super(code: _code);
+  RequireHttpsForIosRule() : super(code: _code);
 
   /// HTTP requests fail without configuration.
   @override
@@ -1288,13 +547,12 @@ class RequireHttpsForIosRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_https_for_ios',
-    problemMessage:
-        '[require_https_for_ios] HTTP URL will be blocked by iOS App Transport Security unless '
+    'require_https_for_ios',
+    '[require_https_for_ios] HTTP URL will be blocked by iOS App Transport Security unless '
         'exception is configured. {v2}',
     correctionMessage:
         'Use HTTPS or add NSAppTransportSecurity exception in Info.plist.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Localhost addresses that don't need HTTPS.
@@ -1306,11 +564,10 @@ class RequireHttpsForIosRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       // Check for Uri.parse('http://...')
       if (node.methodName.name != 'parse') {
         return;
@@ -1333,7 +590,7 @@ class RequireHttpsForIosRule extends SaropaLintRule {
 
       final String url = urlArg.stringValue ?? '';
       if (_isInsecureUrl(url)) {
-        reporter.atNode(urlArg, code);
+        reporter.atNode(urlArg);
       }
     });
   }
@@ -1352,42 +609,9 @@ class RequireHttpsForIosRule extends SaropaLintRule {
 
     return true;
   }
-
-  @override
-  List<Fix> getFixes() => <Fix>[_ReplaceHttpWithHttpsFix()];
 }
 
 /// Quick fix that replaces http:// with https://.
-class _ReplaceHttpWithHttpsFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) {
-        return;
-      }
-
-      if (!node.value.startsWith('http://')) {
-        return;
-      }
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Change to HTTPS',
-        priority: 1,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        final String newUrl = node.value.replaceFirst('http://', 'https://');
-        builder.addSimpleReplacement(node.sourceRange, "'$newUrl'");
-      });
-    });
-  }
-}
 
 /// Warns when permission-requiring APIs are used without Info.plist entries.
 ///
@@ -1439,7 +663,7 @@ class _ReplaceHttpWithHttpsFix extends DartFix {
 /// @see [Info.plist Keys](https://developer.apple.com/documentation/bundleresources/information_property_list)
 class RequireIosPermissionDescriptionRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosPermissionDescriptionRule].
-  const RequireIosPermissionDescriptionRule() : super(code: _code);
+  RequireIosPermissionDescriptionRule() : super(code: _code);
 
   /// Missing permission descriptions cause App Store rejection.
   @override
@@ -1449,12 +673,11 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_permission_description',
-    problemMessage:
-        '[require_ios_permission_description] Missing Info.plist keys cause App '
+    'require_ios_permission_description',
+    '[require_ios_permission_description] Missing Info.plist keys cause App '
         'Store rejection or instant crash when the permission is requested. {v5}',
     correctionMessage: 'Add the missing key(s) to ios/Runner/Info.plist.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Methods on ImagePicker that access device resources.
@@ -1469,29 +692,26 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
   /// Creates a LintCode with specific missing keys in the message.
   static LintCode _codeWithMissingKeys(List<String> missingKeys) {
     return LintCode(
-      name: 'require_ios_permission_description',
-      problemMessage:
-          '[require_ios_permission_description] Permission-requiring API used. Missing Info.plist key(s): '
+      'require_ios_permission_description',
+      '[require_ios_permission_description] Permission-requiring API used. Missing Info.plist key(s): '
           '${missingKeys.join(", ")}',
       correctionMessage:
           'Add ${missingKeys.join(" and ")} to ios/Runner/Info.plist.',
-      errorSeverity: DiagnosticSeverity.WARNING,
+      severity: DiagnosticSeverity.WARNING,
     );
   }
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Get the Info.plist checker for this file's project.
-    final filePath = resolver.source.fullName;
+    final filePath = context.filePath;
     final plistChecker = InfoPlistChecker.forFile(filePath);
 
     // Check for permission-requiring types (non-ImagePicker).
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
       // Get required keys for this type.
@@ -1508,7 +728,7 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
     });
 
     // Smart ImagePicker detection: check the actual source parameter.
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Only check ImagePicker methods.
@@ -1635,7 +855,7 @@ enum _ImageSource { gallery, camera, unknown }
 /// @see [Privacy Manifest](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files)
 class RequireIosPrivacyManifestRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosPrivacyManifestRule].
-  const RequireIosPrivacyManifestRule() : super(code: _code);
+  RequireIosPrivacyManifestRule() : super(code: _code);
 
   /// Missing privacy manifest can cause App Store rejection (iOS 17+).
   @override
@@ -1645,12 +865,11 @@ class RequireIosPrivacyManifestRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_privacy_manifest',
-    problemMessage:
-        '[require_ios_privacy_manifest] API requires an iOS Privacy Manifest entry (iOS 17+). Missing PrivacyInfo.xcprivacy declarations for required-reason APIs will cause automatic App Store rejection during review, block new releases, and may trigger runtime permission failures on user devices. {v3}',
+    'require_ios_privacy_manifest',
+    '[require_ios_privacy_manifest] API requires an iOS Privacy Manifest entry (iOS 17+). Missing PrivacyInfo.xcprivacy declarations for required-reason APIs will cause automatic App Store rejection during review, block new releases, and may trigger runtime permission failures on user devices. {v3}',
     correctionMessage:
         'Add a PrivacyInfo.xcprivacy file with the required reason API declarations. This is mandatory for App Store approval and correct runtime behavior on iOS 17+.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// APIs that require privacy manifest declarations.
@@ -1672,24 +891,22 @@ class RequireIosPrivacyManifestRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
       if (_privacyManifestTypes.contains(typeName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (_privacyManifestMethods.contains(methodName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1748,7 +965,7 @@ class RequireIosPrivacyManifestRule extends SaropaLintRule {
 /// @see [sign_in_with_apple package](https://pub.dev/packages/sign_in_with_apple)
 class RequireAppleSignInRule extends SaropaLintRule {
   /// Creates a new instance of [RequireAppleSignInRule].
-  const RequireAppleSignInRule() : super(code: _code);
+  RequireAppleSignInRule() : super(code: _code);
 
   /// App Store rejection is critical.
   @override
@@ -1758,14 +975,13 @@ class RequireAppleSignInRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_apple_sign_in',
-    problemMessage:
-        '[require_apple_sign_in] Third-party login detected without Sign in with Apple. '
+    'require_apple_sign_in',
+    '[require_apple_sign_in] Third-party login detected without Sign in with Apple. '
         'iOS apps with social login must offer Sign in with Apple. {v2}',
     correctionMessage:
         'Add Sign in with Apple using the sign_in_with_apple package '
         'per App Store Guidelines 4.8.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Third-party sign-in method patterns that trigger this rule.
@@ -1797,9 +1013,8 @@ class RequireAppleSignInRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Track if file has third-party sign-in and Apple sign-in
     bool hasThirdPartySignIn = false;
@@ -1807,7 +1022,7 @@ class RequireAppleSignInRule extends SaropaLintRule {
     MethodInvocation? firstThirdPartyNode;
 
     // Check file source for Apple sign-in presence
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
     for (final String indicator in _appleSignInIndicators) {
       if (fileSource.contains(indicator)) {
         hasAppleSignIn = true;
@@ -1815,7 +1030,7 @@ class RequireAppleSignInRule extends SaropaLintRule {
       }
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for third-party sign-in methods
@@ -1897,7 +1112,7 @@ class RequireAppleSignInRule extends SaropaLintRule {
 /// @see [workmanager package](https://pub.dev/packages/workmanager)
 class RequireIosBackgroundModeRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosBackgroundModeRule].
-  const RequireIosBackgroundModeRule() : super(code: _code);
+  RequireIosBackgroundModeRule() : super(code: _code);
 
   /// Background violations can cause app termination.
   @override
@@ -1907,14 +1122,13 @@ class RequireIosBackgroundModeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_background_mode',
-    problemMessage:
-        '[require_ios_background_mode] Background task pattern detected. iOS requires specific capabilities '
+    'require_ios_background_mode',
+    '[require_ios_background_mode] Background task pattern detected. iOS requires specific capabilities '
         'for background execution. {v2}',
     correctionMessage:
         'Add background capabilities in Xcode (Background fetch, '
         'Background processing, etc.) and use workmanager package.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Background-related class/method patterns.
@@ -1929,24 +1143,22 @@ class RequireIosBackgroundModeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (_backgroundPatterns.contains(methodName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
       if (_backgroundPatterns.contains(typeName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -1995,7 +1207,7 @@ class RequireIosBackgroundModeRule extends SaropaLintRule {
 /// @see [UIWebView deprecation](https://developer.apple.com/documentation/uikit/uiwebview)
 class AvoidIos13DeprecationsRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIos13DeprecationsRule].
-  const AvoidIos13DeprecationsRule() : super(code: _code);
+  AvoidIos13DeprecationsRule() : super(code: _code);
 
   /// Deprecated APIs cause App Store warnings and eventual rejection.
   @override
@@ -2005,14 +1217,13 @@ class AvoidIos13DeprecationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_13_deprecations',
-    problemMessage:
-        '[avoid_ios_13_deprecations] Deprecated iOS API detected. This API is deprecated since iOS 13 '
+    'avoid_ios_13_deprecations',
+    '[avoid_ios_13_deprecations] Deprecated iOS API detected. This API is deprecated since iOS 13 '
         'and may cause App Store rejection. {v2}',
     correctionMessage:
         'Use the modern replacement API. See Apple documentation for '
         'migration guidance.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Deprecated iOS API names that appear in platform channel code.
@@ -2031,26 +1242,25 @@ class AvoidIos13DeprecationsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       for (final String api in _deprecatedApis) {
         if (value.contains(api)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
     });
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (_deprecatedApis.contains(methodName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2095,7 +1305,7 @@ class AvoidIos13DeprecationsRule extends SaropaLintRule {
 /// @see [path_provider package](https://pub.dev/packages/path_provider)
 class AvoidIosSimulatorOnlyCodeRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosSimulatorOnlyCodeRule].
-  const AvoidIosSimulatorOnlyCodeRule() : super(code: _code);
+  AvoidIosSimulatorOnlyCodeRule() : super(code: _code);
 
   /// Simulator-only code causes production failures.
   @override
@@ -2105,14 +1315,13 @@ class AvoidIosSimulatorOnlyCodeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_simulator_only_code',
-    problemMessage:
-        '[avoid_ios_simulator_only_code] iOS Simulator-only code pattern detected. This code may not work '
+    'avoid_ios_simulator_only_code',
+    '[avoid_ios_simulator_only_code] iOS Simulator-only code pattern detected. This code may not work '
         'on real iOS devices. {v2}',
     correctionMessage:
         'Use platform-agnostic paths (path_provider) and proper environment '
         'detection.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Patterns that indicate Simulator-only code.
@@ -2127,22 +1336,21 @@ class AvoidIosSimulatorOnlyCodeRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       // Skip if in test file
-      final String filePath = resolver.source.fullName;
+      final String filePath = context.filePath;
       if (filePath.contains('_test.dart') || filePath.contains('/test/')) {
         return;
       }
 
       for (final String pattern in _simulatorPatterns) {
         if (value.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -2194,7 +1402,7 @@ class AvoidIosSimulatorOnlyCodeRule extends SaropaLintRule {
 /// @see [Checking iOS Version](https://developer.apple.com/documentation/swift/checking-api-availability)
 class RequireIosMinimumVersionCheckRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosMinimumVersionCheckRule].
-  const RequireIosMinimumVersionCheckRule() : super(code: _code);
+  RequireIosMinimumVersionCheckRule() : super(code: _code);
 
   /// Missing version checks cause crashes on older iOS.
   @override
@@ -2204,13 +1412,12 @@ class RequireIosMinimumVersionCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_minimum_version_check',
-    problemMessage:
-        '[require_ios_minimum_version_check] iOS version-specific API detected. Ensure iOS version is checked '
+    'require_ios_minimum_version_check',
+    '[require_ios_minimum_version_check] iOS version-specific API detected. Ensure iOS version is checked '
         'before using this API. {v2}',
     correctionMessage:
         'Add iOS version check before calling version-specific APIs.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// APIs that require specific iOS versions.
@@ -2233,27 +1440,26 @@ class RequireIosMinimumVersionCheckRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       for (final String api in _versionSpecificApis) {
         if (value.contains(api)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
     });
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       for (final String api in _versionSpecificApis) {
         if (methodName.contains(api)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -2304,7 +1510,7 @@ class RequireIosMinimumVersionCheckRule extends SaropaLintRule {
 /// @see [iOS 13 Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-13-release-notes)
 class AvoidIosDeprecatedUikitRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosDeprecatedUikitRule].
-  const AvoidIosDeprecatedUikitRule() : super(code: _code);
+  AvoidIosDeprecatedUikitRule() : super(code: _code);
 
   /// Deprecated APIs cause warnings and potential rejection.
   @override
@@ -2314,13 +1520,12 @@ class AvoidIosDeprecatedUikitRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_deprecated_uikit',
-    problemMessage:
-        '[avoid_ios_deprecated_uikit] Deprecated UIKit API pattern detected in platform channel code. Platform channel code (Swift/Objective-C) that uses deprecated UIKit APIs will generate warnings during Xcode builds and may be rejected by App Store in future iOS versions. {v2}',
+    'avoid_ios_deprecated_uikit',
+    '[avoid_ios_deprecated_uikit] Deprecated UIKit API pattern detected in platform channel code. Platform channel code (Swift/Objective-C) that uses deprecated UIKit APIs will generate warnings during Xcode builds and may be rejected by App Store in future iOS versions. {v2}',
     correctionMessage:
         'Update platform channel code to use modern iOS APIs. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'See Xcode warnings for specific replacements.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Deprecated UIKit API patterns.
@@ -2338,16 +1543,15 @@ class AvoidIosDeprecatedUikitRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       for (final String pattern in _deprecatedPatterns) {
         if (value.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -2402,7 +1606,7 @@ class AvoidIosDeprecatedUikitRule extends SaropaLintRule {
 /// @see [app_tracking_transparency package](https://pub.dev/packages/app_tracking_transparency)
 class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosAppTrackingTransparencyRule].
-  const RequireIosAppTrackingTransparencyRule() : super(code: _code);
+  RequireIosAppTrackingTransparencyRule() : super(code: _code);
 
   /// ATT is required for App Store approval.
   @override
@@ -2412,14 +1616,13 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_app_tracking_transparency',
-    problemMessage:
-        '[require_ios_app_tracking_transparency] Advertising/tracking SDK detected. iOS 14.5+ requires App Tracking '
+    'require_ios_app_tracking_transparency',
+    '[require_ios_app_tracking_transparency] Advertising/tracking SDK detected. iOS 14.5+ requires App Tracking '
         'Transparency permission before tracking users. {v2}',
     correctionMessage:
         'Use AppTrackingTransparency.requestTrackingAuthorization() before '
         'initializing ad SDKs. Add NSUserTrackingUsageDescription to Info.plist.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Advertising/tracking SDK patterns.
@@ -2450,12 +1653,11 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check file source for ATT presence
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
     bool hasATT = false;
     for (final String pattern in _attPatterns) {
       if (fileSource.contains(pattern)) {
@@ -2464,30 +1666,30 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
       }
     }
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (hasATT) return;
 
       final String typeName = node.typeName;
       for (final String pattern in _trackingPatterns) {
         if (typeName.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
     });
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (hasATT) return;
 
       final String methodName = node.methodName.name;
       final Expression? target = node.target;
-      final String fullCall =
-          target != null ? '${target.toSource()}.$methodName' : methodName;
+      final String fullCall = target != null
+          ? '${target.toSource()}.$methodName'
+          : methodName;
 
       for (final String pattern in _trackingPatterns) {
         if (fullCall.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -2529,7 +1731,7 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
 /// @see [local_auth package](https://pub.dev/packages/local_auth)
 class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosFaceIdUsageDescriptionRule].
-  const RequireIosFaceIdUsageDescriptionRule() : super(code: _code);
+  RequireIosFaceIdUsageDescriptionRule() : super(code: _code);
 
   /// Missing Face ID description causes crashes and rejection.
   @override
@@ -2539,20 +1741,17 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_face_id_usage_description',
-    problemMessage:
-        '[require_ios_face_id_usage_description] Biometric authentication detected. iOS requires '
+    'require_ios_face_id_usage_description',
+    '[require_ios_face_id_usage_description] Biometric authentication detected. iOS requires '
         'NSFaceIDUsageDescription in Info.plist for Face ID. {v4}',
     correctionMessage:
         'Add NSFaceIDUsageDescription to ios/Runner/Info.plist explaining '
         'why your app uses Face ID.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Type names from the local_auth package.
-  static const Set<String> _localAuthTypeNames = {
-    'LocalAuthentication',
-  };
+  static const Set<String> _localAuthTypeNames = {'LocalAuthentication'};
 
   /// Method names that are unique to LocalAuthentication class.
   /// These methods only exist on LocalAuthentication, so type checking
@@ -2566,12 +1765,11 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Get the Info.plist checker for this file's project.
-    final filePath = resolver.source.fullName;
+    final filePath = context.filePath;
     final plistChecker = InfoPlistChecker.forFile(filePath);
 
     // Skip if NSFaceIDUsageDescription is already in Info.plist.
@@ -2579,7 +1777,7 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Only check methods that could be from local_auth
@@ -2594,18 +1792,17 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
       // Use static type resolution - this is the reliable way
       final String? typeName = target.staticType?.element?.name;
       if (typeName != null && _localAuthTypeNames.contains(typeName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Use element name for reliable type checking
       final String? typeName = node.constructorName.type.element?.name;
 
       if (typeName == 'LocalAuthentication' ||
           typeName == 'AuthenticationOptions') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -2644,7 +1841,7 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
 /// @see [PHPhotoLibrary](https://developer.apple.com/documentation/photokit/phphotolibrary)
 class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosPhotoLibraryAddUsageRule].
-  const RequireIosPhotoLibraryAddUsageRule() : super(code: _code);
+  RequireIosPhotoLibraryAddUsageRule() : super(code: _code);
 
   /// Missing permission causes crashes.
   @override
@@ -2654,13 +1851,12 @@ class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_photo_library_add_usage',
-    problemMessage:
-        '[require_ios_photo_library_add_usage] Photo saving detected. iOS requires NSPhotoLibraryAddUsageDescription '
+    'require_ios_photo_library_add_usage',
+    '[require_ios_photo_library_add_usage] Photo saving detected. iOS requires NSPhotoLibraryAddUsageDescription '
         'for saving photos (separate from read permission). {v2}',
     correctionMessage:
         'Add NSPhotoLibraryAddUsageDescription to ios/Runner/Info.plist.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Photo saving patterns.
@@ -2676,17 +1872,16 @@ class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       final Expression? target = node.target;
 
       // Check method name
       if (_photoSavePatterns.contains(methodName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         return;
       }
 
@@ -2695,7 +1890,7 @@ class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
         final String targetSource = target.toSource();
         for (final String pattern in _photoSavePatterns) {
           if (targetSource.contains(pattern)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -2740,7 +1935,7 @@ class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
 /// @see [flutter_appauth package](https://pub.dev/packages/flutter_appauth)
 class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosInAppBrowserForAuthRule].
-  const AvoidIosInAppBrowserForAuthRule() : super(code: _code);
+  AvoidIosInAppBrowserForAuthRule() : super(code: _code);
 
   /// OAuth via WebView is blocked by identity providers.
   @override
@@ -2750,13 +1945,13 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_in_app_browser_for_auth',
-    problemMessage:
-        '[avoid_ios_in_app_browser_for_auth] OAuth URL detected in WebView. Google and Apple block OAuth via '
+    'avoid_ios_in_app_browser_for_auth',
+    '[avoid_ios_in_app_browser_for_auth] OAuth URL detected in WebView. Google and Apple block OAuth via '
         'in-app WebView for security reasons. {v2}',
-    correctionMessage: 'Use flutter_appauth or url_launcher for OAuth. '
+    correctionMessage:
+        'Use flutter_appauth or url_launcher for OAuth. '
         'ASWebAuthenticationSession is required on iOS.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// OAuth URL patterns.
@@ -2780,12 +1975,10 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
       if (!_webViewWidgets.contains(typeName)) {
@@ -2797,7 +1990,7 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
         final String argSource = arg.toSource();
         for (final String pattern in _oauthPatterns) {
           if (argSource.contains(pattern)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -2805,16 +1998,16 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
     });
 
     // Also check string literals for OAuth URLs with WebView nearby
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       for (final String pattern in _oauthPatterns) {
         if (value.contains(pattern)) {
           // Check if file contains WebView
-          final String fileSource = resolver.source.contents.data;
+          final String fileSource = context.fileContent;
           for (final String webView in _webViewWidgets) {
             if (fileSource.contains(webView)) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -2871,7 +2064,7 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
 /// @see [in_app_review package](https://pub.dev/packages/in_app_review)
 class RequireIosAppReviewPromptTimingRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosAppReviewPromptTimingRule].
-  const RequireIosAppReviewPromptTimingRule() : super(code: _code);
+  RequireIosAppReviewPromptTimingRule() : super(code: _code);
 
   /// Poor review timing causes App Store rejection.
   @override
@@ -2881,13 +2074,13 @@ class RequireIosAppReviewPromptTimingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_app_review_prompt_timing',
-    problemMessage:
-        '[require_ios_app_review_prompt_timing] App review request detected in initialization context. '
+    'require_ios_app_review_prompt_timing',
+    '[require_ios_app_review_prompt_timing] App review request detected in initialization context. '
         'Do not request reviews on first launch or during startup. {v2}',
-    correctionMessage: 'Move review request after meaningful user engagement. '
+    correctionMessage:
+        'Move review request after meaningful user engagement. '
         'Apple rejects apps that prompt too early.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Review request patterns.
@@ -2909,11 +2102,10 @@ class RequireIosAppReviewPromptTimingRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (!_reviewPatterns.contains(methodName)) {
@@ -2927,7 +2119,7 @@ class RequireIosAppReviewPromptTimingRule extends SaropaLintRule {
           final String parentName = parent.name.lexeme;
           for (final String initContext in _initContexts) {
             if (parentName.toLowerCase().contains(initContext.toLowerCase())) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -2937,7 +2129,7 @@ class RequireIosAppReviewPromptTimingRule extends SaropaLintRule {
           final String parentName = parent.name.lexeme;
           for (final String initContext in _initContexts) {
             if (parentName.toLowerCase().contains(initContext.toLowerCase())) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -2993,7 +2185,7 @@ class RequireIosAppReviewPromptTimingRule extends SaropaLintRule {
 /// @see [flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage)
 class RequireIosKeychainAccessibilityRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosKeychainAccessibilityRule].
-  const RequireIosKeychainAccessibilityRule() : super(code: _code);
+  RequireIosKeychainAccessibilityRule() : super(code: _code);
 
   /// Keychain misconfiguration can expose sensitive data.
   @override
@@ -3003,23 +2195,21 @@ class RequireIosKeychainAccessibilityRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_keychain_accessibility',
-    problemMessage:
-        '[require_ios_keychain_accessibility] Keychain write detected. Consider specifying iOS accessibility level '
+    'require_ios_keychain_accessibility',
+    '[require_ios_keychain_accessibility] Keychain write detected. Consider specifying iOS accessibility level '
         'for security. {v2}',
     correctionMessage:
         'Use IOSOptions with KeychainAccessibility to control when data '
         'is accessible.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Check for secure storage write without IOSOptions
@@ -3041,7 +2231,7 @@ class RequireIosKeychainAccessibilityRule extends SaropaLintRule {
               }
             }
             if (!hasIOSOptions) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
           }
         }
@@ -3086,7 +2276,7 @@ class RequireIosKeychainAccessibilityRule extends SaropaLintRule {
 /// @see [package_info_plus](https://pub.dev/packages/package_info_plus)
 class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosHardcodedBundleIdRule].
-  const AvoidIosHardcodedBundleIdRule() : super(code: _code);
+  AvoidIosHardcodedBundleIdRule() : super(code: _code);
 
   /// Hardcoded bundle IDs cause deployment issues.
   @override
@@ -3096,13 +2286,12 @@ class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_hardcoded_bundle_id',
-    problemMessage:
-        '[avoid_ios_hardcoded_bundle_id] Hardcoded bundle ID detected. Bundle IDs should come from '
+    'avoid_ios_hardcoded_bundle_id',
+    '[avoid_ios_hardcoded_bundle_id] Hardcoded bundle ID detected. Bundle IDs should come from '
         'configuration, not hardcoded strings. {v2}',
     correctionMessage:
         'Use PackageInfo.fromPlatform().packageName or build-time configuration.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Pattern matching bundle IDs.
@@ -3113,15 +2302,14 @@ class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       // Skip if in test file
-      final String filePath = resolver.source.fullName;
+      final String filePath = context.filePath;
       if (filePath.contains('_test.dart') || filePath.contains('/test/')) {
         return;
       }
@@ -3136,7 +2324,7 @@ class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
             if (varName.contains('bundle') ||
                 varName.contains('package') ||
                 varName.contains('appid')) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -3145,7 +2333,7 @@ class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
             if (paramName.contains('bundle') ||
                 paramName.contains('package') ||
                 paramName.contains('appid')) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -3186,7 +2374,7 @@ class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
 /// @see [firebase_messaging](https://pub.dev/packages/firebase_messaging)
 class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosPushNotificationCapabilityRule].
-  const RequireIosPushNotificationCapabilityRule() : super(code: _code);
+  RequireIosPushNotificationCapabilityRule() : super(code: _code);
 
   /// Missing push configuration causes silent failures.
   @override
@@ -3196,14 +2384,13 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_push_notification_capability',
-    problemMessage:
-        '[require_ios_push_notification_capability] Push notification usage detected. Ensure Push Notifications '
+    'require_ios_push_notification_capability',
+    '[require_ios_push_notification_capability] Push notification usage detected. Ensure Push Notifications '
         'capability is enabled in Xcode and APNs is configured. {v3}',
     correctionMessage:
         'Enable Push Notifications in Xcode Signing & Capabilities. '
         'Configure APNs key/certificate in Apple Developer Console.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Push notification method name patterns.
@@ -3229,13 +2416,12 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (hasReported) return;
 
       final String methodName = node.methodName.name;
@@ -3244,7 +2430,7 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
       // Check method name (exact match)
       if (_pushMethodPatterns.contains(methodName) ||
           _pushClassPatterns.contains(methodName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         hasReported = true;
         return;
       }
@@ -3254,7 +2440,7 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
         final String targetSource = target.toSource();
         for (final String className in _pushClassPatterns) {
           if (targetSource.contains(className)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             hasReported = true;
             return;
           }
@@ -3302,7 +2488,7 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
 /// @see [App Transport Security](https://developer.apple.com/documentation/security/preventing_insecure_network_connections)
 class RequireIosAtsExceptionDocumentationRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosAtsExceptionDocumentationRule].
-  const RequireIosAtsExceptionDocumentationRule() : super(code: _code);
+  RequireIosAtsExceptionDocumentationRule() : super(code: _code);
 
   /// HTTP without ATS documentation causes confusion and potential issues.
   @override
@@ -3312,23 +2498,21 @@ class RequireIosAtsExceptionDocumentationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_ats_exception_documentation',
-    problemMessage:
-        '[require_ios_ats_exception_documentation] HTTP URL detected. If intentional, document the ATS exception '
+    'require_ios_ats_exception_documentation',
+    '[require_ios_ats_exception_documentation] HTTP URL detected. If intentional, document the ATS exception '
         'required in Info.plist with a comment. {v2}',
     correctionMessage:
         'Add a comment explaining why HTTP is needed and which ATS exception '
         'is configured in Info.plist.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       // Check for HTTP URLs (not HTTPS)
@@ -3342,7 +2526,7 @@ class RequireIosAtsExceptionDocumentationRule extends SaropaLintRule {
       }
 
       // Check if there's a comment nearby explaining ATS
-      final String fileSource = resolver.source.contents.data;
+      final String fileSource = context.fileContent;
       final int nodeOffset = node.offset;
       final int lineStart = fileSource.lastIndexOf('\n', nodeOffset) + 1;
       final String precedingLine = fileSource.substring(
@@ -3357,7 +2541,7 @@ class RequireIosAtsExceptionDocumentationRule extends SaropaLintRule {
         return;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
@@ -3399,7 +2583,7 @@ class RequireIosAtsExceptionDocumentationRule extends SaropaLintRule {
 /// @see [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)
 class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosLocalNotificationPermissionRule].
-  const RequireIosLocalNotificationPermissionRule() : super(code: _code);
+  RequireIosLocalNotificationPermissionRule() : super(code: _code);
 
   /// Notifications without permission fail silently.
   @override
@@ -3409,14 +2593,13 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_local_notification_permission',
-    problemMessage:
-        '[require_ios_local_notification_permission] Local notification scheduling detected. Ensure iOS notification '
+    'require_ios_local_notification_permission',
+    '[require_ios_local_notification_permission] Local notification scheduling detected. Ensure iOS notification '
         'permission is requested before scheduling. {v2}',
     correctionMessage:
         'Call requestPermissions() on IOSFlutterLocalNotificationsPlugin '
         'before scheduling notifications.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Notification scheduling methods.
@@ -3430,21 +2613,20 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check if file has permission request
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
     final bool hasPermissionRequest =
         fileSource.contains('requestPermissions') ||
-            fileSource.contains('IOSFlutterLocalNotificationsPlugin');
+        fileSource.contains('IOSFlutterLocalNotificationsPlugin');
 
     if (hasPermissionRequest) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (_scheduleMethods.contains(methodName)) {
@@ -3453,7 +2635,7 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
           final String targetSource = target.toSource();
           if (targetSource.contains('Notification') ||
               targetSource.contains('notification')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -3493,7 +2675,7 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
 /// @see [device_info_plus](https://pub.dev/packages/device_info_plus)
 class AvoidIosHardcodedDeviceModelRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosHardcodedDeviceModelRule].
-  const AvoidIosHardcodedDeviceModelRule() : super(code: _code);
+  AvoidIosHardcodedDeviceModelRule() : super(code: _code);
 
   /// Hardcoded device models break with new releases.
   @override
@@ -3503,13 +2685,12 @@ class AvoidIosHardcodedDeviceModelRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_hardcoded_device_model',
-    problemMessage:
-        '[avoid_ios_hardcoded_device_model] Hardcoded iOS device model detected. Device-specific code breaks '
+    'avoid_ios_hardcoded_device_model',
+    '[avoid_ios_hardcoded_device_model] Hardcoded iOS device model detected. Device-specific code breaks '
         'when new devices are released. {v3}',
     correctionMessage:
         'Use platform APIs to detect capabilities instead of device names.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Device model patterns to detect.
@@ -3523,21 +2704,20 @@ class AvoidIosHardcodedDeviceModelRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       // Skip test files
-      final String filePath = resolver.source.fullName;
+      final String filePath = context.filePath;
       if (filePath.contains('_test.dart') || filePath.contains('/test/')) {
         return;
       }
 
       if (_deviceModelPattern.hasMatch(value)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3571,7 +2751,7 @@ class AvoidIosHardcodedDeviceModelRule extends SaropaLintRule {
 /// @see [App Groups](https://developer.apple.com/documentation/bundleresources/entitlements/com_apple_security_application-groups)
 class RequireIosAppGroupCapabilityRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosAppGroupCapabilityRule].
-  const RequireIosAppGroupCapabilityRule() : super(code: _code);
+  RequireIosAppGroupCapabilityRule() : super(code: _code);
 
   /// Missing App Groups causes silent data sharing failures.
   @override
@@ -3581,14 +2761,13 @@ class RequireIosAppGroupCapabilityRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_app_group_capability',
-    problemMessage:
-        '[require_ios_app_group_capability] App extension data sharing detected. Ensure App Groups capability '
+    'require_ios_app_group_capability',
+    '[require_ios_app_group_capability] App extension data sharing detected. Ensure App Groups capability '
         'is enabled in Xcode for both main app and extensions. {v2}',
     correctionMessage:
         'Add App Groups capability in Xcode Signing & Capabilities. '
         'Use same group ID in both main app and extensions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Patterns indicating App Groups usage.
@@ -3605,31 +2784,30 @@ class RequireIosAppGroupCapabilityRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (hasReported) return;
 
       final String value = node.value;
 
       // Check for group. prefix in suite name
       if (value.startsWith('group.')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         hasReported = true;
       }
     });
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (hasReported) return;
 
       final String methodName = node.methodName.name;
 
       if (_appGroupPatterns.contains(methodName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         hasReported = true;
       }
     });
@@ -3676,7 +2854,7 @@ class RequireIosAppGroupCapabilityRule extends SaropaLintRule {
 /// @see [health package](https://pub.dev/packages/health)
 class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosHealthKitAuthorizationRule].
-  const RequireIosHealthKitAuthorizationRule() : super(code: _code);
+  RequireIosHealthKitAuthorizationRule() : super(code: _code);
 
   /// HealthKit access without authorization fails silently.
   @override
@@ -3686,15 +2864,14 @@ class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_healthkit_authorization',
-    problemMessage:
-        '[require_ios_healthkit_authorization] HealthKit data access detected. Ensure authorization is requested '
+    'require_ios_healthkit_authorization',
+    '[require_ios_healthkit_authorization] HealthKit data access detected. Ensure authorization is requested '
         'before reading or writing health data. {v2}',
     correctionMessage:
         'Call requestAuthorization() before accessing health data. '
         'Add NSHealthShareUsageDescription and NSHealthUpdateUsageDescription '
         'to Info.plist.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// HealthKit data access methods.
@@ -3711,13 +2888,13 @@ class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check if file has authorization call
-    final String fileSource = resolver.source.contents.data;
-    final bool hasAuthCheck = fileSource.contains('requestAuthorization') ||
+    final String fileSource = context.fileContent;
+    final bool hasAuthCheck =
+        fileSource.contains('requestAuthorization') ||
         fileSource.contains('hasAuthorization') ||
         fileSource.contains('isAuthorized');
 
@@ -3725,11 +2902,11 @@ class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (_healthDataMethods.contains(methodName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -3766,7 +2943,7 @@ class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
 /// @see [flutter_siri_shortcuts](https://pub.dev/packages/flutter_siri_shortcuts)
 class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosSiriIntentDefinitionRule].
-  const RequireIosSiriIntentDefinitionRule() : super(code: _code);
+  RequireIosSiriIntentDefinitionRule() : super(code: _code);
 
   /// Missing Siri intent definition causes silent failures.
   @override
@@ -3776,14 +2953,13 @@ class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_siri_intent_definition',
-    problemMessage:
-        '[require_ios_siri_intent_definition] Siri Shortcuts usage detected. Ensure Intent Definition file '
+    'require_ios_siri_intent_definition',
+    '[require_ios_siri_intent_definition] Siri Shortcuts usage detected. Ensure Intent Definition file '
         'exists in Xcode and SiriKit capability is enabled. {v2}',
     correctionMessage:
         'Add Intent Definition file in Xcode: File > New > File > Intent Definition. '
         'Enable SiriKit capability in Signing & Capabilities.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Siri-related patterns.
@@ -3800,28 +2976,26 @@ class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (hasReported) return;
 
       final String typeName = node.typeName;
 
       for (final String pattern in _siriPatterns) {
         if (typeName.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           hasReported = true;
           return;
         }
       }
     });
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (hasReported) return;
 
       final String methodName = node.methodName.name;
@@ -3830,7 +3004,7 @@ class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
       if (target != null) {
         final String fullCall = '${target.toSource()}.$methodName';
         if (fullCall.contains('Siri') && methodName == 'donate') {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           hasReported = true;
         }
       }
@@ -3866,7 +3040,7 @@ class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
 /// @see [home_widget package](https://pub.dev/packages/home_widget)
 class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosWidgetExtensionCapabilityRule].
-  const RequireIosWidgetExtensionCapabilityRule() : super(code: _code);
+  RequireIosWidgetExtensionCapabilityRule() : super(code: _code);
 
   /// Missing widget extension setup causes silent failures.
   @override
@@ -3879,14 +3053,13 @@ class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_widget_extension_capability',
-    problemMessage:
-        '[require_ios_widget_extension_capability] Home Screen widget usage detected. Ensure Widget Extension target '
+    'require_ios_widget_extension_capability',
+    '[require_ios_widget_extension_capability] Home Screen widget usage detected. Ensure Widget Extension target '
         'and App Groups are configured in Xcode. {v2}',
     correctionMessage:
         'Create Widget Extension target in Xcode. Enable App Groups in both '
         'main app and extension. Use shared UserDefaults for data.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Widget-related patterns.
@@ -3902,20 +3075,19 @@ class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (hasReported) return;
 
       final String methodName = node.methodName.name;
       final Expression? target = node.target;
 
       if (_widgetPatterns.contains(methodName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         hasReported = true;
         return;
       }
@@ -3924,7 +3096,7 @@ class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
         final String targetSource = target.toSource();
         for (final String pattern in _widgetPatterns) {
           if (targetSource.contains(pattern)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             hasReported = true;
             return;
           }
@@ -3976,7 +3148,7 @@ class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
 /// @see [Validating Receipts](https://developer.apple.com/documentation/storekit/in-app_purchase/original_api_for_in-app_purchase/validating_receipts_with_the_app_store)
 class RequireIosReceiptValidationRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosReceiptValidationRule].
-  const RequireIosReceiptValidationRule() : super(code: _code);
+  RequireIosReceiptValidationRule() : super(code: _code);
 
   /// Missing receipt validation enables fraud.
   @override
@@ -3986,14 +3158,13 @@ class RequireIosReceiptValidationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_receipt_validation',
-    problemMessage:
-        '[require_ios_receipt_validation] In-app purchase detected. Ensure receipt is validated with server, '
+    'require_ios_receipt_validation',
+    '[require_ios_receipt_validation] In-app purchase detected. Ensure receipt is validated with server, '
         'not just locally. {v2}',
     correctionMessage:
         'Send receipt data to your server for validation with Apple. '
         'Local-only validation can be bypassed.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// In-app purchase methods.
@@ -4007,13 +3178,13 @@ class RequireIosReceiptValidationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check if file has validation logic
-    final String fileSource = resolver.source.contents.data;
-    final bool hasValidation = fileSource.contains('validateReceipt') ||
+    final String fileSource = context.fileContent;
+    final bool hasValidation =
+        fileSource.contains('validateReceipt') ||
         fileSource.contains('verifyPurchase') ||
         fileSource.contains('/verify') ||
         fileSource.contains('receipt_validation');
@@ -4022,11 +3193,11 @@ class RequireIosReceiptValidationRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (_purchaseMethods.contains(methodName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4061,7 +3232,7 @@ class RequireIosReceiptValidationRule extends SaropaLintRule {
 /// ```
 class RequireIosDatabaseConflictResolutionRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosDatabaseConflictResolutionRule].
-  const RequireIosDatabaseConflictResolutionRule() : super(code: _code);
+  RequireIosDatabaseConflictResolutionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4070,13 +3241,12 @@ class RequireIosDatabaseConflictResolutionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_database_conflict_resolution',
-    problemMessage:
-        '[require_ios_database_conflict_resolution] Database sync detected. Ensure conflict resolution is implemented '
+    'require_ios_database_conflict_resolution',
+    '[require_ios_database_conflict_resolution] Database sync detected. Ensure conflict resolution is implemented '
         'for multi-device sync scenarios. {v2}',
     correctionMessage:
         'Implement conflict resolution handlers for sync errors.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _syncPatterns = {
@@ -4089,13 +3259,12 @@ class RequireIosDatabaseConflictResolutionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (hasReported) return;
 
       final Expression? target = node.target;
@@ -4103,7 +3272,7 @@ class RequireIosDatabaseConflictResolutionRule extends SaropaLintRule {
         final String targetSource = target.toSource();
         for (final String pattern in _syncPatterns) {
           if (targetSource.contains(pattern)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             hasReported = true;
             return;
           }
@@ -4152,7 +3321,7 @@ class RequireIosDatabaseConflictResolutionRule extends SaropaLintRule {
 /// ```
 class AvoidIosContinuousLocationTrackingRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosContinuousLocationTrackingRule].
-  const AvoidIosContinuousLocationTrackingRule() : super(code: _code);
+  AvoidIosContinuousLocationTrackingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4161,22 +3330,20 @@ class AvoidIosContinuousLocationTrackingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_continuous_location_tracking',
-    problemMessage:
-        '[avoid_ios_continuous_location_tracking] Continuous location tracking detected with high accuracy. '
+    'avoid_ios_continuous_location_tracking',
+    '[avoid_ios_continuous_location_tracking] Continuous location tracking detected with high accuracy. '
         'Consider using lower accuracy or distance filters to save battery. {v2}',
     correctionMessage:
         'Use LocationAccuracy.medium or lower, and set distanceFilter.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName == 'getPositionStream' ||
@@ -4187,7 +3354,7 @@ class AvoidIosContinuousLocationTrackingRule extends SaropaLintRule {
         if (argSource.contains('best') ||
             argSource.contains('bestForNavigation') ||
             argSource.contains('high')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -4210,7 +3377,7 @@ class AvoidIosContinuousLocationTrackingRule extends SaropaLintRule {
 /// ```
 class RequireIosBackgroundAudioCapabilityRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosBackgroundAudioCapabilityRule].
-  const RequireIosBackgroundAudioCapabilityRule() : super(code: _code);
+  RequireIosBackgroundAudioCapabilityRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4219,14 +3386,13 @@ class RequireIosBackgroundAudioCapabilityRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_background_audio_capability',
-    problemMessage:
-        '[require_ios_background_audio_capability] Audio playback detected. If audio should play in background, '
+    'require_ios_background_audio_capability',
+    '[require_ios_background_audio_capability] Audio playback detected. If audio should play in background, '
         'enable Background Modes > Audio capability in Xcode. {v2}',
     correctionMessage:
         'Add Background Modes capability and enable Audio, AirPlay, '
         'and Picture in Picture.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _audioPatterns = {
@@ -4242,19 +3408,17 @@ class RequireIosBackgroundAudioCapabilityRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (hasReported) return;
 
       final String typeName = node.typeName;
       if (_audioPatterns.contains(typeName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         hasReported = true;
       }
     });
@@ -4284,7 +3448,7 @@ class RequireIosBackgroundAudioCapabilityRule extends SaropaLintRule {
 /// ```
 class PreferIosStoreKit2Rule extends SaropaLintRule {
   /// Creates a new instance of [PreferIosStoreKit2Rule].
-  const PreferIosStoreKit2Rule() : super(code: _code);
+  PreferIosStoreKit2Rule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -4293,29 +3457,27 @@ class PreferIosStoreKit2Rule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_ios_storekit2',
-    problemMessage:
-        '[prefer_ios_storekit2] Consider using StoreKit 2 APIs for new in-app purchase implementations. '
+    'prefer_ios_storekit2',
+    '[prefer_ios_storekit2] Consider using StoreKit 2 APIs for new in-app purchase implementations. '
         'StoreKit 2 offers better async support and automatic receipt verification. {v3}',
     correctionMessage:
         'Evaluate migrating to StoreKit 2 for simpler IAP implementation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (hasReported) return;
 
       final Expression? target = node.target;
       if (target != null && target.toSource().contains('InAppPurchase')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
         hasReported = true;
       }
     });
@@ -4344,7 +3506,7 @@ class PreferIosStoreKit2Rule extends SaropaLintRule {
 /// ```
 class RequireIosAppClipSizeLimitRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosAppClipSizeLimitRule].
-  const RequireIosAppClipSizeLimitRule() : super(code: _code);
+  RequireIosAppClipSizeLimitRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4353,30 +3515,29 @@ class RequireIosAppClipSizeLimitRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_app_clip_size_limit',
-    problemMessage:
-        '[require_ios_app_clip_size_limit] App Clip detected. Ensure App Clip bundle stays under 10 MB. '
+    'require_ios_app_clip_size_limit',
+    '[require_ios_app_clip_size_limit] App Clip detected. Ensure App Clip bundle stays under 10 MB. '
         'Large dependencies can exceed this limit. {v2}',
-    correctionMessage: 'Minimize dependencies and assets in App Clip target. '
+    correctionMessage:
+        'Minimize dependencies and assets in App Clip target. '
         'Consider lazy loading heavy features.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     // Check if file path suggests App Clip
-    final String filePath = resolver.source.fullName;
+    final String filePath = context.filePath;
     if (!filePath.contains('app_clip') && !filePath.contains('AppClip')) {
       return;
     }
 
     bool hasReported = false;
 
-    context.registry.addImportDirective((ImportDirective node) {
+    context.addImportDirective((ImportDirective node) {
       if (hasReported) return;
 
       final String? uri = node.uri.stringValue;
@@ -4386,7 +3547,7 @@ class RequireIosAppClipSizeLimitRule extends SaropaLintRule {
             uri.contains('firebase') ||
             uri.contains('video_player') ||
             uri.contains('webview')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           hasReported = true;
         }
       }
@@ -4431,7 +3592,7 @@ class RequireIosAppClipSizeLimitRule extends SaropaLintRule {
 /// ```
 class RequireIosKeychainSyncAwarenessRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosKeychainSyncAwarenessRule].
-  const RequireIosKeychainSyncAwarenessRule() : super(code: _code);
+  RequireIosKeychainSyncAwarenessRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4440,13 +3601,12 @@ class RequireIosKeychainSyncAwarenessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_keychain_sync_awareness',
-    problemMessage:
-        '[require_ios_keychain_sync_awareness] Keychain write of sensitive key detected. Consider if this should '
+    'require_ios_keychain_sync_awareness',
+    '[require_ios_keychain_sync_awareness] Keychain write of sensitive key detected. Consider if this should '
         'sync across devices via iCloud Keychain. {v2}',
     correctionMessage:
         'For device-only secrets, use accessibility ending in ThisDeviceOnly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _sensitiveKeyPatterns = {
@@ -4461,11 +3621,10 @@ class RequireIosKeychainSyncAwarenessRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'write') return;
 
       final Expression? target = node.target;
@@ -4487,7 +3646,7 @@ class RequireIosKeychainSyncAwarenessRule extends SaropaLintRule {
               final String fullArgs = node.argumentList.toSource();
               if (!fullArgs.contains('ThisDeviceOnly') &&
                   !fullArgs.contains('this_device_only')) {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
               }
               return;
             }
@@ -4512,7 +3671,7 @@ class RequireIosKeychainSyncAwarenessRule extends SaropaLintRule {
 /// - Document types for files you can open
 class RequireIosShareSheetUtiDeclarationRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosShareSheetUtiDeclarationRule].
-  const RequireIosShareSheetUtiDeclarationRule() : super(code: _code);
+  RequireIosShareSheetUtiDeclarationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4521,23 +3680,21 @@ class RequireIosShareSheetUtiDeclarationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_share_sheet_uti_declaration',
-    problemMessage:
-        '[require_ios_share_sheet_uti_declaration] File sharing with custom type detected. Ensure UTI is declared '
+    'require_ios_share_sheet_uti_declaration',
+    '[require_ios_share_sheet_uti_declaration] File sharing with custom type detected. Ensure UTI is declared '
         'in Info.plist for custom file types. {v2}',
     correctionMessage:
         'Add UTExportedTypeDeclarations or UTImportedTypeDeclarations '
         'to Info.plist for custom file types.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName == 'share' || methodName == 'shareFiles') {
@@ -4546,7 +3703,7 @@ class RequireIosShareSheetUtiDeclarationRule extends SaropaLintRule {
         if (argSource.contains('.custom') ||
             argSource.contains('.myapp') ||
             argSource.contains('mimeType:')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -4569,7 +3726,7 @@ class RequireIosShareSheetUtiDeclarationRule extends SaropaLintRule {
 /// - Handle conflicts (last write wins)
 class RequireIosIcloudKvstoreLimitationsRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosIcloudKvstoreLimitationsRule].
-  const RequireIosIcloudKvstoreLimitationsRule() : super(code: _code);
+  RequireIosIcloudKvstoreLimitationsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -4578,27 +3735,25 @@ class RequireIosIcloudKvstoreLimitationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_icloud_kvstore_limitations',
-    problemMessage:
-        '[require_ios_icloud_kvstore_limitations] iCloud Key-Value Storage has 1 MB limit and 1024 keys max. '
+    'require_ios_icloud_kvstore_limitations',
+    '[require_ios_icloud_kvstore_limitations] iCloud Key-Value Storage has 1 MB limit and 1024 keys max. '
         'Use only for small preferences. {v2}',
     correctionMessage:
         'For larger data, use CloudKit or iCloud Documents instead.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       if (value.contains('NSUbiquitousKeyValueStore') ||
           value.contains('ubiquitous_key_value')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4618,7 +3773,7 @@ class RequireIosIcloudKvstoreLimitationsRule extends SaropaLintRule {
 /// - Custom controls need traits
 class RequireIosAccessibilityLabelsRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosAccessibilityLabelsRule].
-  const RequireIosAccessibilityLabelsRule() : super(code: _code);
+  RequireIosAccessibilityLabelsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4627,25 +3782,22 @@ class RequireIosAccessibilityLabelsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_accessibility_labels',
-    problemMessage:
-        '[require_ios_accessibility_labels] Interactive widget without Semantics wrapper. VoiceOver users '
+    'require_ios_accessibility_labels',
+    '[require_ios_accessibility_labels] Interactive widget without Semantics wrapper. VoiceOver users '
         'cannot identify this element. {v2}',
     correctionMessage:
         'Wrap with Semantics widget and provide label for VoiceOver.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
       // Check for icon buttons without semantics
@@ -4653,7 +3805,7 @@ class RequireIosAccessibilityLabelsRule extends SaropaLintRule {
         final String argSource = node.argumentList.toSource();
         if (!argSource.contains('tooltip') &&
             !fileSource.contains('Semantics')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
 
@@ -4663,7 +3815,7 @@ class RequireIosAccessibilityLabelsRule extends SaropaLintRule {
         if (argSource.contains('Image') &&
             !argSource.contains('semanticLabel') &&
             !fileSource.contains('Semantics')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -4683,7 +3835,7 @@ class RequireIosAccessibilityLabelsRule extends SaropaLintRule {
 /// - UISupportedInterfaceOrientations~ipad (iPad)
 class RequireIosOrientationHandlingRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosOrientationHandlingRule].
-  const RequireIosOrientationHandlingRule() : super(code: _code);
+  RequireIosOrientationHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -4692,27 +3844,25 @@ class RequireIosOrientationHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_orientation_handling',
-    problemMessage:
-        '[require_ios_orientation_handling] Orientation lock detected. Ensure Info.plist declares supported '
+    'require_ios_orientation_handling',
+    '[require_ios_orientation_handling] Orientation lock detected. Ensure Info.plist declares supported '
         'orientations and UI handles all locked orientations. {v2}',
     correctionMessage:
         'Set UISupportedInterfaceOrientations in Info.plist to match '
         'SystemChrome.setPreferredOrientations calls.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName == 'setPreferredOrientations') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4726,7 +3876,7 @@ class RequireIosOrientationHandlingRule extends SaropaLintRule {
 /// path variations can cause routing issues.
 class RequireIosUniversalLinksDomainMatchingRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosUniversalLinksDomainMatchingRule].
-  const RequireIosUniversalLinksDomainMatchingRule() : super(code: _code);
+  RequireIosUniversalLinksDomainMatchingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4735,30 +3885,27 @@ class RequireIosUniversalLinksDomainMatchingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_universal_links_domain_matching',
-    problemMessage:
-        '[require_ios_universal_links_domain_matching] Deep link pattern detected. Ensure apple-app-site-association '
+    'require_ios_universal_links_domain_matching',
+    '[require_ios_universal_links_domain_matching] Deep link pattern detected. Ensure apple-app-site-association '
         'paths match exactly for Universal Links to work. {v2}',
     correctionMessage:
         'Verify apple-app-site-association on server matches app paths exactly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
       if (typeName == 'GoRoute' || typeName == 'MaterialPageRoute') {
         final String argSource = node.argumentList.toSource();
         // Check for deep link paths with parameters
         if (argSource.contains('/:') || argSource.contains('/:id')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -4779,7 +3926,7 @@ class RequireIosUniversalLinksDomainMatchingRule extends SaropaLintRule {
 /// - Background NFC: iPhone XS and later
 class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosNfcCapabilityCheckRule].
-  const RequireIosNfcCapabilityCheckRule() : super(code: _code);
+  RequireIosNfcCapabilityCheckRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4788,13 +3935,12 @@ class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_nfc_capability_check',
-    problemMessage:
-        '[require_ios_nfc_capability_check] NFC usage detected. Not all iOS devices support NFC. '
+    'require_ios_nfc_capability_check',
+    '[require_ios_nfc_capability_check] NFC usage detected. Not all iOS devices support NFC. '
         'Check capability before use. {v2}',
     correctionMessage:
         'Use NFCNDEFReaderSession.readingAvailable before scanning.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _nfcPatterns = {
@@ -4807,11 +3953,10 @@ class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     if (fileSource.contains('isAvailable') ||
         fileSource.contains('readingAvailable') ||
@@ -4819,11 +3964,11 @@ class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (_nfcPatterns.contains(methodName)) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -4861,7 +4006,7 @@ class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
 /// - Push notifications for VoIP
 class RequireIosCallkitIntegrationRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosCallkitIntegrationRule].
-  const RequireIosCallkitIntegrationRule() : super(code: _code);
+  RequireIosCallkitIntegrationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -4870,38 +4015,37 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_callkit_integration',
-    problemMessage:
-        '[require_ios_callkit_integration] VoIP call handling detected. iOS requires CallKit integration for native call UI. Without CallKit, incoming calls will not appear on the lock screen, call audio routing will fail, and Apple will reject your app from the App Store during review. {v4}',
+    'require_ios_callkit_integration',
+    '[require_ios_callkit_integration] VoIP call handling detected. iOS requires CallKit integration for native call UI. Without CallKit, incoming calls will not appear on the lock screen, call audio routing will fail, and Apple will reject your app from the App Store during review. {v4}',
     correctionMessage:
         'Integrate CallKit using flutter_callkit_incoming or a similar package to ensure App Store compliance and a native call experience on iOS.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Word-boundary regexes for VoIP pattern matching.
   ///
   /// Uses `\b` anchors to prevent false positives from substring matches
   /// (e.g. "Zagora" should not match the "Agora" pattern).
-  static final List<RegExp> _voipRegexes = [
-    'voip',
-    'incoming_call',
-    'outgoing_call',
-    'call_state',
-    'WebRTC',
-    'Twilio',
-    'Agora',
-    'Vonage',
-  ]
-      .map((p) => RegExp('\\b${RegExp.escape(p)}\\b', caseSensitive: false))
-      .toList();
+  static final List<RegExp> _voipRegexes =
+      [
+            'voip',
+            'incoming_call',
+            'outgoing_call',
+            'call_state',
+            'WebRTC',
+            'Twilio',
+            'Agora',
+            'Vonage',
+          ]
+          .map((p) => RegExp('\\b${RegExp.escape(p)}\\b', caseSensitive: false))
+          .toList();
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Check if CallKit is already integrated
     if (fileSource.contains('CallKit') ||
@@ -4912,13 +4056,13 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
 
     bool hasReported = false;
 
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (hasReported) return;
 
       final String value = node.value;
       for (final RegExp regex in _voipRegexes) {
         if (regex.hasMatch(value)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           hasReported = true;
           return;
         }
@@ -4941,7 +4085,7 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
 /// - Limited UI templates
 class RequireIosCarplaySetupRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosCarplaySetupRule].
-  const RequireIosCarplaySetupRule() : super(code: _code);
+  RequireIosCarplaySetupRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -4950,13 +4094,13 @@ class RequireIosCarplaySetupRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_carplay_setup',
-    problemMessage:
-        '[require_ios_carplay_setup] CarPlay-related code detected. CarPlay requires Apple approval '
+    'require_ios_carplay_setup',
+    '[require_ios_carplay_setup] CarPlay-related code detected. CarPlay requires Apple approval '
         'and specific entitlements. {v2}',
-    correctionMessage: 'Apply for CarPlay entitlement at developer.apple.com. '
+    correctionMessage:
+        'Apply for CarPlay entitlement at developer.apple.com. '
         'Implement CPTemplateApplicationSceneDelegate.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _carplayPatterns = {
@@ -4969,20 +4113,18 @@ class RequireIosCarplaySetupRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (hasReported) return;
 
       final String typeName = node.typeName;
       for (final String pattern in _carplayPatterns) {
         if (typeName.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           hasReported = true;
           return;
         }
@@ -5001,7 +4143,7 @@ class RequireIosCarplaySetupRule extends SaropaLintRule {
 /// - Proper push notification setup for remote updates
 class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosLiveActivitiesSetupRule].
-  const RequireIosLiveActivitiesSetupRule() : super(code: _code);
+  RequireIosLiveActivitiesSetupRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -5010,13 +4152,13 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_live_activities_setup',
-    problemMessage:
-        '[require_ios_live_activities_setup] Live Activity usage detected. Ensure ActivityKit capability '
+    'require_ios_live_activities_setup',
+    '[require_ios_live_activities_setup] Live Activity usage detected. Ensure ActivityKit capability '
         'and Widget Extension are configured. {v2}',
-    correctionMessage: 'Add Widget Extension with ActivityConfiguration. '
+    correctionMessage:
+        'Add Widget Extension with ActivityConfiguration. '
         'Enable Push Notifications for remote updates.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _liveActivityPatterns = {
@@ -5029,33 +4171,31 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (hasReported) return;
 
       final String typeName = node.typeName;
       for (final String pattern in _liveActivityPatterns) {
         if (typeName.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           hasReported = true;
           return;
         }
       }
     });
 
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (hasReported) return;
 
       final String value = node.value;
       for (final String pattern in _liveActivityPatterns) {
         if (value.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           hasReported = true;
           return;
         }
@@ -5072,7 +4212,7 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
 /// Apps should use CADisplayLink for smooth animations on these devices.
 class RequireIosPromotionDisplaySupportRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosPromotionDisplaySupportRule].
-  const RequireIosPromotionDisplaySupportRule() : super(code: _code);
+  RequireIosPromotionDisplaySupportRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -5081,23 +4221,20 @@ class RequireIosPromotionDisplaySupportRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_promotion_display_support',
-    problemMessage:
-        '[require_ios_promotion_display_support] Manual frame timing detected. ProMotion displays run at 120Hz. '
+    'require_ios_promotion_display_support',
+    '[require_ios_promotion_display_support] Manual frame timing detected. ProMotion displays run at 120Hz. '
         'Use Flutter animations for automatic frame rate adaptation. {v2}',
     correctionMessage:
         'Use AnimationController instead of manual timing for smooth animations.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
       if (typeName == 'Duration') {
@@ -5105,7 +4242,7 @@ class RequireIosPromotionDisplaySupportRule extends SaropaLintRule {
         // Check for hardcoded 60fps timing (16-17ms)
         if (argSource.contains('milliseconds: 16') ||
             argSource.contains('milliseconds: 17')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -5120,7 +4257,7 @@ class RequireIosPromotionDisplaySupportRule extends SaropaLintRule {
 /// the case where user only grants access to selected photos.
 class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosPhotoLibraryLimitedAccessRule].
-  const RequireIosPhotoLibraryLimitedAccessRule() : super(code: _code);
+  RequireIosPhotoLibraryLimitedAccessRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -5129,23 +4266,21 @@ class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_photo_library_limited_access',
-    problemMessage:
-        '[require_ios_photo_library_limited_access] Photo library access detected. Handle iOS 14+ limited access mode '
+    'require_ios_photo_library_limited_access',
+    '[require_ios_photo_library_limited_access] Photo library access detected. Handle iOS 14+ limited access mode '
         'where user may only grant access to selected photos. {v2}',
     correctionMessage:
         'Check for PHAuthorizationStatus.limited and provide UI to '
         'modify selection.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if limited access is handled
     if (fileSource.contains('limited') ||
@@ -5154,13 +4289,13 @@ class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName == 'pickImage' ||
           methodName == 'pickMultiImage' ||
           methodName == 'pickVideo') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -5200,7 +4335,7 @@ class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
 /// ```
 class RequireIosPasteboardPrivacyHandlingRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosPasteboardPrivacyHandlingRule].
-  const RequireIosPasteboardPrivacyHandlingRule() : super(code: _code);
+  RequireIosPasteboardPrivacyHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -5209,29 +4344,27 @@ class RequireIosPasteboardPrivacyHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_pasteboard_privacy_handling',
-    problemMessage:
-        '[require_ios_pasteboard_privacy_handling] Clipboard access detected. On iOS 16+, users see a notification '
+    'require_ios_pasteboard_privacy_handling',
+    '[require_ios_pasteboard_privacy_handling] Clipboard access detected. On iOS 16+, users see a notification '
         'when apps read the clipboard. Only access after explicit user action. {v2}',
     correctionMessage:
         'Access clipboard only in response to user paste action.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       final Expression? target = node.target;
 
       if (target != null &&
           target.toSource() == 'Clipboard' &&
           methodName == 'getData') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -5251,7 +4384,7 @@ class RequireIosPasteboardPrivacyHandlingRule extends SaropaLintRule {
 /// - Background refresh must complete within 30 seconds
 class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosBackgroundRefreshDeclarationRule].
-  const RequireIosBackgroundRefreshDeclarationRule() : super(code: _code);
+  RequireIosBackgroundRefreshDeclarationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -5260,12 +4393,11 @@ class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_background_refresh_declaration',
-    problemMessage:
-        '[require_ios_background_refresh_declaration] Background task scheduling detected. Ensure UIBackgroundModes '
+    'require_ios_background_refresh_declaration',
+    '[require_ios_background_refresh_declaration] Background task scheduling detected. Ensure UIBackgroundModes '
         'includes "fetch" in Info.plist for background refresh. {v2}',
     correctionMessage: 'Add UIBackgroundModes with "fetch" to Info.plist.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _backgroundPatterns = {
@@ -5279,13 +4411,12 @@ class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (hasReported) return;
 
       final String methodName = node.methodName.name;
@@ -5294,7 +4425,7 @@ class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
       for (final String pattern in _backgroundPatterns) {
         if (methodName.contains(pattern) ||
             (target != null && target.toSource().contains(pattern))) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           hasReported = true;
           return;
         }
@@ -5318,7 +4449,7 @@ class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
 /// - sceneWillEnterForeground
 class RequireIosSceneDelegateAwarenessRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosSceneDelegateAwarenessRule].
-  const RequireIosSceneDelegateAwarenessRule() : super(code: _code);
+  RequireIosSceneDelegateAwarenessRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -5327,22 +4458,21 @@ class RequireIosSceneDelegateAwarenessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_scene_delegate_awareness',
-    problemMessage:
-        '[require_ios_scene_delegate_awareness] App lifecycle handling detected. On iOS 13+, consider using '
+    'require_ios_scene_delegate_awareness',
+    '[require_ios_scene_delegate_awareness] App lifecycle handling detected. On iOS 13+, consider using '
         'scene-based lifecycle for multi-window support. {v2}',
-    correctionMessage: 'Use WidgetsBindingObserver.didChangeAppLifecycleState '
+    correctionMessage:
+        'Use WidgetsBindingObserver.didChangeAppLifecycleState '
         'which handles both app and scene lifecycle.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Check for app lifecycle handling
     if (fileSource.contains('WidgetsBindingObserver') &&
@@ -5350,13 +4480,13 @@ class RequireIosSceneDelegateAwarenessRule extends SaropaLintRule {
       return; // Already using Flutter's unified lifecycle handler
     }
 
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
       if (value.contains('applicationDidBecomeActive') ||
           value.contains('applicationWillResignActive') ||
           value.contains('applicationDidEnterBackground')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -5391,7 +4521,7 @@ class RequireIosSceneDelegateAwarenessRule extends SaropaLintRule {
 /// ```
 class RequireIosMethodChannelCleanupRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosMethodChannelCleanupRule].
-  const RequireIosMethodChannelCleanupRule() : super(code: _code);
+  RequireIosMethodChannelCleanupRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -5400,22 +4530,20 @@ class RequireIosMethodChannelCleanupRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_method_channel_cleanup',
-    problemMessage:
-        '[require_ios_method_channel_cleanup] MethodChannel handler set without cleanup. Set handler to null '
+    'require_ios_method_channel_cleanup',
+    '[require_ios_method_channel_cleanup] MethodChannel handler set without cleanup. Set handler to null '
         'in dispose() to prevent memory leaks. {v2}',
     correctionMessage:
         'Add channel.setMethodCallHandler(null) in dispose() method.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Check if there's proper cleanup
     if (fileSource.contains('setMethodCallHandler(null)') ||
@@ -5423,11 +4551,11 @@ class RequireIosMethodChannelCleanupRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'setMethodCallHandler') {
         final String argSource = node.argumentList.toSource();
         if (!argSource.contains('null')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -5456,7 +4584,7 @@ class RequireIosMethodChannelCleanupRule extends SaropaLintRule {
 /// ```
 class AvoidIosForceUnwrapInCallbacksRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosForceUnwrapInCallbacksRule].
-  const AvoidIosForceUnwrapInCallbacksRule() : super(code: _code);
+  AvoidIosForceUnwrapInCallbacksRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -5465,21 +4593,19 @@ class AvoidIosForceUnwrapInCallbacksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_force_unwrap_in_callbacks',
-    problemMessage:
-        '[avoid_ios_force_unwrap_in_callbacks] Force unwrap on MethodChannel result detected. Native code may '
+    'avoid_ios_force_unwrap_in_callbacks',
+    '[avoid_ios_force_unwrap_in_callbacks] Force unwrap on MethodChannel result detected. Native code may '
         'return null unexpectedly, causing crashes. {v2}',
     correctionMessage: 'Use null-safe access (?.) and provide default values.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Only check files with MethodChannel
     if (!fileSource.contains('MethodChannel') &&
@@ -5487,12 +4613,12 @@ class AvoidIosForceUnwrapInCallbacksRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addPostfixExpression((PostfixExpression node) {
+    context.addPostfixExpression((PostfixExpression node) {
       if (node.operator.lexeme == '!') {
         // Check if this is related to invokeMethod result
         final String source = node.toSource();
         if (source.contains('result') || source.contains('Response')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -5514,7 +4640,7 @@ class AvoidIosForceUnwrapInCallbacksRule extends SaropaLintRule {
 /// - Let users complete a task before prompting
 class RequireIosReviewPromptFrequencyRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosReviewPromptFrequencyRule].
-  const RequireIosReviewPromptFrequencyRule() : super(code: _code);
+  RequireIosReviewPromptFrequencyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -5523,22 +4649,20 @@ class RequireIosReviewPromptFrequencyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_review_prompt_frequency',
-    problemMessage:
-        '[require_ios_review_prompt_frequency] In-app review detected. Apple limits StoreKit prompts to 3x per year. '
+    'require_ios_review_prompt_frequency',
+    '[require_ios_review_prompt_frequency] In-app review detected. Apple limits StoreKit prompts to 3x per year. '
         'Track and limit prompt frequency. {v2}',
     correctionMessage:
         'Implement review prompt tracking to respect Apple\'s limits.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if frequency tracking exists
     if (fileSource.contains('reviewCount') ||
@@ -5547,10 +4671,10 @@ class RequireIosReviewPromptFrequencyRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'requestReview' ||
           node.methodName.name == 'openStoreListing') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -5571,7 +4695,7 @@ class RequireIosReviewPromptFrequencyRule extends SaropaLintRule {
 /// - StandBy mode: iOS 17.0+
 class RequireIosDeploymentTargetConsistencyRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosDeploymentTargetConsistencyRule].
-  const RequireIosDeploymentTargetConsistencyRule() : super(code: _code);
+  RequireIosDeploymentTargetConsistencyRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -5580,13 +4704,13 @@ class RequireIosDeploymentTargetConsistencyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_deployment_target_consistency',
-    problemMessage:
-        '[require_ios_deployment_target_consistency] API requiring iOS 15+ detected. Ensure minimum deployment target '
+    'require_ios_deployment_target_consistency',
+    '[require_ios_deployment_target_consistency] API requiring iOS 15+ detected. Ensure minimum deployment target '
         'matches or add version guards. {v2}',
-    correctionMessage: 'Check iOS version before using newer APIs or increase '
+    correctionMessage:
+        'Check iOS version before using newer APIs or increase '
         'minimum deployment target.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   static const Map<String, String> _ios15PlusApis = {
@@ -5598,11 +4722,10 @@ class RequireIosDeploymentTargetConsistencyRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if version check exists
     if (fileSource.contains('@available') ||
@@ -5611,11 +4734,11 @@ class RequireIosDeploymentTargetConsistencyRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
       for (final String api in _ios15PlusApis.keys) {
         if (value.contains(api)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -5639,7 +4762,7 @@ class RequireIosDeploymentTargetConsistencyRule extends SaropaLintRule {
 /// | iPhone 15 Pro (Dynamic Island) | 59pt |
 class RequireIosDynamicIslandSafeZonesRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosDynamicIslandSafeZonesRule].
-  const RequireIosDynamicIslandSafeZonesRule() : super(code: _code);
+  RequireIosDynamicIslandSafeZonesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -5648,23 +4771,20 @@ class RequireIosDynamicIslandSafeZonesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_dynamic_island_safe_zones',
-    problemMessage:
-        '[require_ios_dynamic_island_safe_zones] Fixed top padding (44pt or 59pt) detected. Dynamic Island height '
+    'require_ios_dynamic_island_safe_zones',
+    '[require_ios_dynamic_island_safe_zones] Fixed top padding (44pt or 59pt) detected. Dynamic Island height '
         'varies by device. Use MediaQuery.padding.top instead. {v2}',
     correctionMessage:
         'Replace hardcoded value with MediaQuery.of(context).padding.top.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
       if (typeName == 'EdgeInsets' || typeName == 'Padding') {
@@ -5673,7 +4793,7 @@ class RequireIosDynamicIslandSafeZonesRule extends SaropaLintRule {
         if (argSource.contains('top: 44') ||
             argSource.contains('top: 47') ||
             argSource.contains('top: 59')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -5694,7 +4814,7 @@ class RequireIosDynamicIslandSafeZonesRule extends SaropaLintRule {
 /// - Better Swift concurrency support
 class PreferIosAppIntentsFrameworkRule extends SaropaLintRule {
   /// Creates a new instance of [PreferIosAppIntentsFrameworkRule].
-  const PreferIosAppIntentsFrameworkRule() : super(code: _code);
+  PreferIosAppIntentsFrameworkRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -5703,13 +4823,12 @@ class PreferIosAppIntentsFrameworkRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_ios_app_intents_framework',
-    problemMessage:
-        '[prefer_ios_app_intents_framework] Legacy SiriKit Intent detected. Consider migrating to App Intents '
+    'prefer_ios_app_intents_framework',
+    '[prefer_ios_app_intents_framework] Legacy SiriKit Intent detected. Consider migrating to App Intents '
         'framework (iOS 16+) for better Siri and Shortcuts integration. {v2}',
     correctionMessage:
         'Migrate from INIntent to AppIntent for modern Siri integration.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _legacySiriPatterns = {
@@ -5722,19 +4841,18 @@ class PreferIosAppIntentsFrameworkRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (hasReported) return;
 
       final String value = node.value;
       for (final String pattern in _legacySiriPatterns) {
         if (value.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           hasReported = true;
           return;
         }
@@ -5751,7 +4869,7 @@ class PreferIosAppIntentsFrameworkRule extends SaropaLintRule {
 /// need appropriate age ratings in App Store Connect.
 class RequireIosAgeRatingConsiderationRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosAgeRatingConsiderationRule].
-  const RequireIosAgeRatingConsiderationRule() : super(code: _code);
+  RequireIosAgeRatingConsiderationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -5760,14 +4878,13 @@ class RequireIosAgeRatingConsiderationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_age_rating_consideration',
-    problemMessage:
-        '[require_ios_age_rating_consideration] Feature requiring age rating consideration detected. '
+    'require_ios_age_rating_consideration',
+    '[require_ios_age_rating_consideration] Feature requiring age rating consideration detected. '
         'Verify App Store Connect age rating matches app content. {v2}',
     correctionMessage:
         'Review App Store Connect age rating for user-generated content, '
         'web access, or mature themes.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _ageRatingTriggers = {
@@ -5783,20 +4900,18 @@ class RequireIosAgeRatingConsiderationRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
     bool hasReported = false;
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (hasReported) return;
 
       final String typeName = node.typeName;
       for (final String trigger in _ageRatingTriggers) {
         if (typeName.contains(trigger)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           hasReported = true;
           return;
         }
@@ -5813,7 +4928,7 @@ class RequireIosAgeRatingConsiderationRule extends SaropaLintRule {
 /// pinning to prevent man-in-the-middle attacks.
 class RequireIosCertificatePinningRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosCertificatePinningRule].
-  const RequireIosCertificatePinningRule() : super(code: _code);
+  RequireIosCertificatePinningRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -5822,13 +4937,12 @@ class RequireIosCertificatePinningRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_certificate_pinning',
-    problemMessage:
-        '[require_ios_certificate_pinning] Sensitive API endpoint detected. Consider implementing SSL '
+    'require_ios_certificate_pinning',
+    '[require_ios_certificate_pinning] Sensitive API endpoint detected. Consider implementing SSL '
         'certificate pinning for additional security. {v2}',
     correctionMessage:
         'Use Dio with certificate pinning or platform-specific SSL pinning.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _sensitivePatterns = {
@@ -5844,11 +4958,10 @@ class RequireIosCertificatePinningRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if pinning is implemented
     if (fileSource.contains('certificatePinner') ||
@@ -5857,11 +4970,11 @@ class RequireIosCertificatePinningRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value.toLowerCase();
       for (final String pattern in _sensitivePatterns) {
         if (value.contains(pattern)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -5877,7 +4990,7 @@ class RequireIosCertificatePinningRule extends SaropaLintRule {
 /// or SharedPreferences which are not encrypted.
 class RequireIosKeychainForCredentialsRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosKeychainForCredentialsRule].
-  const RequireIosKeychainForCredentialsRule() : super(code: _code);
+  RequireIosKeychainForCredentialsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -5886,13 +4999,12 @@ class RequireIosKeychainForCredentialsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_keychain_for_credentials',
-    problemMessage:
-        '[require_ios_keychain_for_credentials] Credential storage in SharedPreferences detected. Use iOS Keychain '
+    'require_ios_keychain_for_credentials',
+    '[require_ios_keychain_for_credentials] Credential storage in SharedPreferences detected. Use iOS Keychain '
         '(flutter_secure_storage) for sensitive data. {v2}',
     correctionMessage:
         'Replace SharedPreferences with FlutterSecureStorage for credentials.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _credentialKeys = {
@@ -5911,11 +5023,10 @@ class RequireIosKeychainForCredentialsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       final Expression? target = node.target;
 
@@ -5926,7 +5037,7 @@ class RequireIosKeychainForCredentialsRule extends SaropaLintRule {
         final String argSource = node.argumentList.toSource().toLowerCase();
         for (final String key in _credentialKeys) {
           if (argSource.contains(key.toLowerCase())) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -5943,7 +5054,7 @@ class RequireIosKeychainForCredentialsRule extends SaropaLintRule {
 /// conditionally compiled out of release builds.
 class AvoidIosDebugCodeInReleaseRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosDebugCodeInReleaseRule].
-  const AvoidIosDebugCodeInReleaseRule() : super(code: _code);
+  AvoidIosDebugCodeInReleaseRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -5952,29 +5063,27 @@ class AvoidIosDebugCodeInReleaseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_debug_code_in_release',
-    problemMessage:
-        '[avoid_ios_debug_code_in_release] Debug code detected. Ensure this is conditionally compiled out '
+    'avoid_ios_debug_code_in_release',
+    '[avoid_ios_debug_code_in_release] Debug code detected. Ensure this is conditionally compiled out '
         'for release builds. {v2}',
     correctionMessage:
         'Wrap debug code in kDebugMode or assert() for automatic removal.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if mode constant guard exists
     if (usesFlutterModeConstants(fileSource)) {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName == 'print' || methodName == 'debugPrint') {
@@ -5983,7 +5092,7 @@ class AvoidIosDebugCodeInReleaseRule extends SaropaLintRule {
         if (argSource.contains('debug') ||
             argSource.contains('test') ||
             argSource.contains('todo')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -5998,7 +5107,7 @@ class AvoidIosDebugCodeInReleaseRule extends SaropaLintRule {
 /// provide alternative authentication methods.
 class RequireIosBiometricFallbackRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosBiometricFallbackRule].
-  const RequireIosBiometricFallbackRule() : super(code: _code);
+  RequireIosBiometricFallbackRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -6007,22 +5116,20 @@ class RequireIosBiometricFallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_biometric_fallback',
-    problemMessage:
-        '[require_ios_biometric_fallback] Biometric authentication detected. Ensure fallback authentication '
+    'require_ios_biometric_fallback',
+    '[require_ios_biometric_fallback] Biometric authentication detected. Ensure fallback authentication '
         '(passcode) is available for devices without biometrics. {v2}',
     correctionMessage:
         'Handle BiometricType.none and provide alternative login method.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if fallback is handled
     if (fileSource.contains('canCheckBiometrics') ||
@@ -6032,10 +5139,10 @@ class RequireIosBiometricFallbackRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'authenticate' ||
           node.methodName.name == 'authenticateWithBiometrics') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -6049,7 +5156,7 @@ class RequireIosBiometricFallbackRule extends SaropaLintRule {
 /// the user's interests or that spam users.
 class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosMisleadingPushNotificationsRule].
-  const AvoidIosMisleadingPushNotificationsRule() : super(code: _code);
+  AvoidIosMisleadingPushNotificationsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -6058,13 +5165,13 @@ class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_misleading_push_notifications',
-    problemMessage:
-        '[avoid_ios_misleading_push_notifications] Marketing notification pattern detected. Push notifications must '
+    'avoid_ios_misleading_push_notifications',
+    '[avoid_ios_misleading_push_notifications] Marketing notification pattern detected. Push notifications must '
         'be relevant to user interests to comply with Apple guidelines. {v2}',
-    correctionMessage: 'Ensure notifications are personalized and relevant. '
+    correctionMessage:
+        'Ensure notifications are personalized and relevant. '
         'Avoid generic marketing messages.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _marketingPatterns = {
@@ -6081,11 +5188,10 @@ class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name == 'show' ||
           node.methodName.name == 'send' ||
           node.methodName.name == 'schedule') {
@@ -6095,7 +5201,7 @@ class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
           final String argSource = node.argumentList.toSource().toLowerCase();
           for (final String pattern in _marketingPatterns) {
             if (argSource.contains(pattern)) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -6164,7 +5270,7 @@ class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
 /// @see [Background Execution](https://developer.apple.com/documentation/uikit/app_and_environment/scenes/preparing_your_ui_to_run_in_the_background)
 class AvoidLongRunningIsolatesRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidLongRunningIsolatesRule].
-  const AvoidLongRunningIsolatesRule() : super(code: _code);
+  AvoidLongRunningIsolatesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -6173,34 +5279,32 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_long_running_isolates',
-    problemMessage:
-        '[avoid_long_running_isolates] Long-running isolate detected. iOS kills background tasks after '
+    'avoid_long_running_isolates',
+    '[avoid_long_running_isolates] Long-running isolate detected. iOS kills background tasks after '
         '~30 seconds. Design tasks to complete quickly. {v3}',
     correctionMessage:
         'Use workmanager package for reliable background tasks, or break '
         'work into smaller chunks.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Detect Isolate.spawn - creates long-lived isolates
       if (methodName == 'spawn') {
         final Expression? target = node.target;
         if (target != null && target.toSource() == 'Isolate') {
-          final String fileSource = resolver.source.contents.data;
+          final String fileSource = context.fileContent;
           if (!fileSource.contains('workmanager') &&
               !fileSource.contains('Workmanager') &&
               !fileSource.contains('BGTaskScheduler')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -6212,15 +5316,17 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
           (methodName == 'run' &&
               node.target != null &&
               node.target!.toSource() == 'Isolate')) {
-        final String fileSource = resolver.source.contents.data;
+        final String fileSource = context.fileContent;
         if (!fileSource.contains('workmanager') &&
             !fileSource.contains('Workmanager')) {
           // Only warn if surrounding context doesn't show awareness
           // of short-lived foreground work
           final int nodeOffset = node.offset;
           final int startOffset = nodeOffset > 500 ? nodeOffset - 500 : 0;
-          final String preceding =
-              fileSource.substring(startOffset, nodeOffset);
+          final String preceding = fileSource.substring(
+            startOffset,
+            nodeOffset,
+          );
           final String precedingLower = preceding.toLowerCase();
 
           // Skip if comments indicate intentional short-lived foreground use
@@ -6242,7 +5348,7 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
             return;
           }
 
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -6283,7 +5389,7 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
 /// ```
 class RequireNotificationForLongTasksRule extends SaropaLintRule {
   /// Creates a new instance of [RequireNotificationForLongTasksRule].
-  const RequireNotificationForLongTasksRule() : super(code: _code);
+  RequireNotificationForLongTasksRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -6292,14 +5398,13 @@ class RequireNotificationForLongTasksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_notification_for_long_tasks',
-    problemMessage:
-        '[require_notification_for_long_tasks] Long-running operation detected without progress notification. '
+    'require_notification_for_long_tasks',
+    '[require_notification_for_long_tasks] Long-running operation detected without progress notification. '
         'Silent background work may be killed by OS. {v2}',
     correctionMessage:
         'Show a progress notification for operations that take more than '
         'a few seconds. This keeps users informed and prevents OS termination.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Patterns indicating potentially long operations.
@@ -6319,11 +5424,10 @@ class RequireNotificationForLongTasksRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if notifications are being used
     if (fileSource.contains('showNotification') ||
@@ -6332,12 +5436,12 @@ class RequireNotificationForLongTasksRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       for (final String pattern in _longOperationPatterns) {
         if (methodName.toLowerCase().contains(pattern.toLowerCase())) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -6397,7 +5501,7 @@ class RequireNotificationForLongTasksRule extends SaropaLintRule {
 /// @see [Apple HIG - Notifications](https://developer.apple.com/design/human-interface-guidelines/notifications)
 class PreferDelayedPermissionPromptRule extends SaropaLintRule {
   /// Creates a new instance of [PreferDelayedPermissionPromptRule].
-  const PreferDelayedPermissionPromptRule() : super(code: _code);
+  PreferDelayedPermissionPromptRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -6406,23 +5510,21 @@ class PreferDelayedPermissionPromptRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_delayed_permission_prompt',
-    problemMessage:
-        '[prefer_delayed_permission_prompt] Permission request detected in main() or initState(). '
+    'prefer_delayed_permission_prompt',
+    '[prefer_delayed_permission_prompt] Permission request detected in main() or initState(). '
         'Asking too early reduces acceptance rates. {v2}',
     correctionMessage:
         'Wait until user interaction shows they need the feature, '
         'then explain the value before requesting permission.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Detect permission requests
@@ -6437,14 +5539,14 @@ class PreferDelayedPermissionPromptRule extends SaropaLintRule {
             if (current is FunctionDeclaration) {
               final String funcName = current.name.lexeme;
               if (funcName == 'main') {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
                 return;
               }
             }
             if (current is MethodDeclaration) {
               final String funcName = current.name.lexeme;
               if (funcName == 'initState' || funcName == 'main') {
-                reporter.atNode(node, code);
+                reporter.atNode(node);
                 return;
               }
             }
@@ -6490,7 +5592,7 @@ class PreferDelayedPermissionPromptRule extends SaropaLintRule {
 /// ```
 class AvoidNotificationSpamRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidNotificationSpamRule].
-  const AvoidNotificationSpamRule() : super(code: _code);
+  AvoidNotificationSpamRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -6499,23 +5601,21 @@ class AvoidNotificationSpamRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_notification_spam',
-    problemMessage:
-        '[avoid_notification_spam] Notification inside loop detected. Sending too many notifications '
+    'avoid_notification_spam',
+    '[avoid_notification_spam] Notification inside loop detected. Sending too many notifications '
         'causes users to disable notifications or uninstall. {v2}',
     correctionMessage:
         'Batch notifications or use a summary notification when there are '
         'multiple items.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Detect notification calls
@@ -6530,13 +5630,13 @@ class AvoidNotificationSpamRule extends SaropaLintRule {
                 current is ForElement ||
                 current is WhileStatement ||
                 current is DoStatement) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
             // Check for forEach
             if (current is MethodInvocation &&
                 current.methodName.name == 'forEach') {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
             current = current.parent;
@@ -6586,7 +5686,7 @@ class AvoidNotificationSpamRule extends SaropaLintRule {
 /// @see [Validating Receipts](https://developer.apple.com/documentation/storekit/in-app_purchase/original_api_for_in-app_purchase/validating_receipts_with_the_app_store)
 class RequirePurchaseVerificationRule extends SaropaLintRule {
   /// Creates a new instance of [RequirePurchaseVerificationRule].
-  const RequirePurchaseVerificationRule() : super(code: _code);
+  RequirePurchaseVerificationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -6595,23 +5695,21 @@ class RequirePurchaseVerificationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_purchase_verification',
-    problemMessage:
-        '[require_purchase_verification] In-app purchase without server verification detected. '
+    'require_purchase_verification',
+    '[require_purchase_verification] In-app purchase without server verification detected. '
         'Client-side verification can be bypassed by attackers. {v2}',
     correctionMessage:
         'Verify purchase receipts server-side with Apple/Google. '
         'Consider using an IAP SDK for cross-platform verification.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if server verification is present
     if (fileSource.contains('serverVerificationData') ||
@@ -6621,7 +5719,7 @@ class RequirePurchaseVerificationRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addSimpleIdentifier((SimpleIdentifier node) {
+    context.addSimpleIdentifier((SimpleIdentifier node) {
       final String name = node.name;
 
       // Detect purchase status checks without verification
@@ -6631,7 +5729,7 @@ class RequirePurchaseVerificationRule extends SaropaLintRule {
           final String parentSource = parent.toSource();
           if (parentSource.contains('purchased') ||
               parentSource.contains('restored')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -6691,7 +5789,7 @@ class RequirePurchaseVerificationRule extends SaropaLintRule {
 /// @see [App Store Guidelines 3.1.1](https://developer.apple.com/app-store/review/guidelines/#in-app-purchase)
 class RequirePurchaseRestorationRule extends SaropaLintRule {
   /// Creates a new instance of [RequirePurchaseRestorationRule].
-  const RequirePurchaseRestorationRule() : super(code: _code);
+  RequirePurchaseRestorationRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -6700,22 +5798,21 @@ class RequirePurchaseRestorationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_purchase_restoration',
-    problemMessage:
-        '[require_purchase_restoration] In-app purchase detected without restore functionality. '
+    'require_purchase_restoration',
+    '[require_purchase_restoration] In-app purchase detected without restore functionality. '
         'App Store requires "Restore Purchases" for non-consumables. {v2}',
-    correctionMessage: 'Add a "Restore Purchases" button that calls '
+    correctionMessage:
+        'Add a "Restore Purchases" button that calls '
         'InAppPurchase.instance.restorePurchases().',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Check if file uses in-app purchases
     if (!fileSource.contains('InAppPurchase') &&
@@ -6731,9 +5828,9 @@ class RequirePurchaseRestorationRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addSimpleIdentifier((SimpleIdentifier node) {
+    context.addSimpleIdentifier((SimpleIdentifier node) {
       if (node.name == 'InAppPurchase' || node.name == 'StoreKit') {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -6780,7 +5877,7 @@ class RequirePurchaseRestorationRule extends SaropaLintRule {
 /// @see [BGTaskScheduler](https://developer.apple.com/documentation/backgroundtasks)
 class PreferBackgroundSyncRule extends SaropaLintRule {
   /// Creates a new instance of [PreferBackgroundSyncRule].
-  const PreferBackgroundSyncRule() : super(code: _code);
+  PreferBackgroundSyncRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -6789,14 +5886,13 @@ class PreferBackgroundSyncRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_background_sync',
-    problemMessage:
-        '[prefer_background_sync] Data sync in initState() only runs when app is open. '
+    'prefer_background_sync',
+    '[prefer_background_sync] Data sync in initState() only runs when app is open. '
         'Consider background sync for better user experience. {v2}',
     correctionMessage:
         'Use Workmanager for background sync. Data stays fresh even when '
         'the app is not actively used.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Patterns indicating sync operations.
@@ -6811,11 +5907,10 @@ class PreferBackgroundSyncRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if workmanager is used
     if (fileSource.contains('Workmanager') ||
@@ -6823,12 +5918,12 @@ class PreferBackgroundSyncRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodDeclaration((MethodDeclaration node) {
+    context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme == 'initState') {
         final String bodySource = node.body.toSource();
         for (final String pattern in _syncPatterns) {
           if (bodySource.contains(pattern)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -6878,7 +5973,7 @@ class PreferBackgroundSyncRule extends SaropaLintRule {
 /// ```
 class RequireSyncErrorRecoveryRule extends SaropaLintRule {
   /// Creates a new instance of [RequireSyncErrorRecoveryRule].
-  const RequireSyncErrorRecoveryRule() : super(code: _code);
+  RequireSyncErrorRecoveryRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -6887,13 +5982,13 @@ class RequireSyncErrorRecoveryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_sync_error_recovery',
-    problemMessage:
-        '[require_sync_error_recovery] Sync operation without error recovery detected. '
+    'require_sync_error_recovery',
+    '[require_sync_error_recovery] Sync operation without error recovery detected. '
         'Failed syncs should retry and notify user of unrecoverable errors. {v2}',
-    correctionMessage: 'Implement exponential backoff retry and notify user of '
+    correctionMessage:
+        'Implement exponential backoff retry and notify user of '
         'persistent failures.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Patterns indicating sync operations that should have retry.
@@ -6908,11 +6003,10 @@ class RequireSyncErrorRecoveryRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Only check specific sync patterns, not any method containing 'sync'
@@ -6937,7 +6031,8 @@ class RequireSyncErrorRecoveryRule extends SaropaLintRule {
         if (current is TryStatement) {
           inTryCatch = true;
           final String catchSource = current.toSource();
-          hasRetry = catchSource.contains('retry') ||
+          hasRetry =
+              catchSource.contains('retry') ||
               catchSource.contains('attempt') ||
               catchSource.contains('backoff') ||
               catchSource.contains('Retry');
@@ -6946,7 +6041,7 @@ class RequireSyncErrorRecoveryRule extends SaropaLintRule {
       }
 
       if (!inTryCatch || !hasRetry) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -7000,7 +6095,7 @@ class RequireSyncErrorRecoveryRule extends SaropaLintRule {
 /// @see [connectivity_plus](https://pub.dev/packages/connectivity_plus)
 class AvoidIosWifiOnlyAssumptionRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosWifiOnlyAssumptionRule].
-  const AvoidIosWifiOnlyAssumptionRule() : super(code: _code);
+  AvoidIosWifiOnlyAssumptionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -7009,23 +6104,21 @@ class AvoidIosWifiOnlyAssumptionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_wifi_only_assumption',
-    problemMessage:
-        '[avoid_ios_wifi_only_assumption] Large download without connectivity check. Users may have '
+    'avoid_ios_wifi_only_assumption',
+    '[avoid_ios_wifi_only_assumption] Large download without connectivity check. Users may have '
         'expensive cellular plans. {v2}',
     correctionMessage:
         'Check connectivity type and warn user before large downloads '
         'on cellular.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if connectivity is being checked
     if (fileSource.contains('Connectivity') ||
@@ -7034,12 +6127,12 @@ class AvoidIosWifiOnlyAssumptionRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name.toLowerCase();
 
       if (methodName.contains('download') &&
           (methodName.contains('large') || methodName.contains('file'))) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -7079,7 +6172,7 @@ class AvoidIosWifiOnlyAssumptionRule extends SaropaLintRule {
 /// @see [ProcessInfo](https://developer.apple.com/documentation/foundation/processinfo)
 class RequireIosLowPowerModeHandlingRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosLowPowerModeHandlingRule].
-  const RequireIosLowPowerModeHandlingRule() : super(code: _code);
+  RequireIosLowPowerModeHandlingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -7088,23 +6181,21 @@ class RequireIosLowPowerModeHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_low_power_mode_handling',
-    problemMessage:
-        '[require_ios_low_power_mode_handling] Heavy animation or background activity detected. Consider '
+    'require_ios_low_power_mode_handling',
+    '[require_ios_low_power_mode_handling] Heavy animation or background activity detected. Consider '
         'checking iOS Low Power Mode and adapting behavior. {v2}',
     correctionMessage:
         'Check ProcessInfo.isLowPowerModeEnabled and reduce animations '
         'or defer background work when enabled.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if low power mode is being checked
     if (fileSource.contains('LowPower') ||
@@ -7113,8 +6204,7 @@ class RequireIosLowPowerModeHandlingRule extends SaropaLintRule {
       return;
     }
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
       // Detect heavy animations
@@ -7126,7 +6216,7 @@ class RequireIosLowPowerModeHandlingRule extends SaropaLintRule {
           // Check for long durations (over 1 second)
           if (durationSource.contains('seconds') &&
               !durationSource.contains('milliseconds')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -7167,7 +6257,7 @@ class RequireIosLowPowerModeHandlingRule extends SaropaLintRule {
 /// @see [Dynamic Type](https://developer.apple.com/design/human-interface-guidelines/typography)
 class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosAccessibilityLargeTextRule].
-  const RequireIosAccessibilityLargeTextRule() : super(code: _code);
+  RequireIosAccessibilityLargeTextRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -7176,23 +6266,21 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_accessibility_large_text',
-    problemMessage:
-        '[require_ios_accessibility_large_text] Hardcoded font size may not respect iOS Dynamic Type. '
+    'require_ios_accessibility_large_text',
+    '[require_ios_accessibility_large_text] Hardcoded font size may not respect iOS Dynamic Type. '
         'Use theme text styles for accessibility. {v2}',
-    correctionMessage: 'Use Theme.of(context).textTheme styles or apply '
+    correctionMessage:
+        'Use Theme.of(context).textTheme styles or apply '
         'MediaQuery.textScaleFactorOf(context).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (node.typeName != 'TextStyle') {
         return;
       }
@@ -7218,7 +6306,7 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
           current = current.parent;
         }
 
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -7271,7 +6359,7 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
 /// @see [CupertinoContextMenu](https://api.flutter.dev/flutter/cupertino/CupertinoContextMenu-class.html)
 class PreferIosContextMenuRule extends SaropaLintRule {
   /// Creates a new instance of [PreferIosContextMenuRule].
-  const PreferIosContextMenuRule() : super(code: _code);
+  PreferIosContextMenuRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -7280,22 +6368,20 @@ class PreferIosContextMenuRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_ios_context_menu',
-    problemMessage:
-        '[prefer_ios_context_menu] ListTile with multiple actions could benefit from a context menu. '
+    'prefer_ios_context_menu',
+    '[prefer_ios_context_menu] ListTile with multiple actions could benefit from a context menu. '
         'iOS users expect long-press for secondary actions. {v2}',
     correctionMessage:
         'Wrap actionable items with CupertinoContextMenu for better iOS UX.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if already using context menus
     if (fileSource.contains('CupertinoContextMenu') ||
@@ -7310,8 +6396,7 @@ class PreferIosContextMenuRule extends SaropaLintRule {
       return;
     }
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (node.typeName == 'ListTile' || node.typeName == 'Card') {
         // Check if there are multiple interactive elements
         final String nodeSource = node.toSource();
@@ -7319,7 +6404,7 @@ class PreferIosContextMenuRule extends SaropaLintRule {
         final int actionCount = actionPattern.allMatches(nodeSource).length;
 
         if (actionCount >= 2) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -7356,7 +6441,7 @@ class PreferIosContextMenuRule extends SaropaLintRule {
 /// @see [NSUserActivity](https://developer.apple.com/documentation/foundation/nsuseractivity)
 class RequireIosQuickNoteAwarenessRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosQuickNoteAwarenessRule].
-  const RequireIosQuickNoteAwarenessRule() : super(code: _code);
+  RequireIosQuickNoteAwarenessRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -7365,23 +6450,21 @@ class RequireIosQuickNoteAwarenessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_quick_note_awareness',
-    problemMessage:
-        '[require_ios_quick_note_awareness] Document viewing detected. Consider implementing NSUserActivity '
+    'require_ios_quick_note_awareness',
+    '[require_ios_quick_note_awareness] Document viewing detected. Consider implementing NSUserActivity '
         'for iOS Quick Note compatibility. {v2}',
     correctionMessage:
         'Set NSUserActivity with document context so users can link '
         'Quick Notes to your app content.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if NSUserActivity is being used
     if (fileSource.contains('NSUserActivity') ||
@@ -7390,14 +6473,14 @@ class RequireIosQuickNoteAwarenessRule extends SaropaLintRule {
     }
 
     // Only check for document-like screens
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
       if (className.contains('document') ||
           className.contains('article') ||
           className.contains('viewer') ||
           className.contains('reader')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -7440,7 +6523,7 @@ class RequireIosQuickNoteAwarenessRule extends SaropaLintRule {
 /// @see [viewInsets](https://api.flutter.dev/flutter/widgets/MediaQueryData/viewInsets.html)
 class AvoidIosHardcodedKeyboardHeightRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosHardcodedKeyboardHeightRule].
-  const AvoidIosHardcodedKeyboardHeightRule() : super(code: _code);
+  AvoidIosHardcodedKeyboardHeightRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -7449,13 +6532,12 @@ class AvoidIosHardcodedKeyboardHeightRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_hardcoded_keyboard_height',
-    problemMessage:
-        '[avoid_ios_hardcoded_keyboard_height] Hardcoded bottom padding may be for keyboard. iOS keyboard height '
+    'avoid_ios_hardcoded_keyboard_height',
+    '[avoid_ios_hardcoded_keyboard_height] Hardcoded bottom padding may be for keyboard. iOS keyboard height '
         'varies by device and input type. {v2}',
     correctionMessage:
         'Use MediaQuery.of(context).viewInsets.bottom for keyboard height.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Common hardcoded keyboard heights.
@@ -7470,17 +6552,15 @@ class AvoidIosHardcodedKeyboardHeightRule extends SaropaLintRule {
     320,
     330,
     340,
-    350
+    350,
   };
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (node.typeName != 'EdgeInsets') {
         return;
       }
@@ -7490,7 +6570,7 @@ class AvoidIosHardcodedKeyboardHeightRule extends SaropaLintRule {
       if (bottom != null && bottom is IntegerLiteral) {
         final int value = bottom.value ?? 0;
         if (_keyboardHeights.contains(value)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -7538,7 +6618,7 @@ class AvoidIosHardcodedKeyboardHeightRule extends SaropaLintRule {
 /// @see [Multitasking](https://developer.apple.com/design/human-interface-guidelines/multitasking)
 class RequireIosMultitaskingSupportRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosMultitaskingSupportRule].
-  const RequireIosMultitaskingSupportRule() : super(code: _code);
+  RequireIosMultitaskingSupportRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -7547,23 +6627,21 @@ class RequireIosMultitaskingSupportRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_multitasking_support',
-    problemMessage:
-        '[require_ios_multitasking_support] Fixed layout detected. iPads support Split View and Slide Over. '
+    'require_ios_multitasking_support',
+    '[require_ios_multitasking_support] Fixed layout detected. iPads support Split View and Slide Over. '
         'Layouts should adapt to window size changes. {v2}',
     correctionMessage:
         'Use LayoutBuilder or MediaQuery breakpoints to create responsive '
         'layouts that work in multitasking modes.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if responsive patterns are used
     if (fileSource.contains('LayoutBuilder') ||
@@ -7573,8 +6651,7 @@ class RequireIosMultitaskingSupportRule extends SaropaLintRule {
       return;
     }
 
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Detect Row with fixed width children at top level
       if (node.typeName == 'Row') {
         // Check if parent suggests full-screen usage
@@ -7582,7 +6659,7 @@ class RequireIosMultitaskingSupportRule extends SaropaLintRule {
         while (current != null) {
           if (current is InstanceCreationExpression) {
             if (current.typeName == 'Scaffold') {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
               return;
             }
           }
@@ -7625,7 +6702,7 @@ class RequireIosMultitaskingSupportRule extends SaropaLintRule {
 /// @see [Core Spotlight](https://developer.apple.com/documentation/corespotlight)
 class PreferIosSpotlightIndexingRule extends SaropaLintRule {
   /// Creates a new instance of [PreferIosSpotlightIndexingRule].
-  const PreferIosSpotlightIndexingRule() : super(code: _code);
+  PreferIosSpotlightIndexingRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -7634,22 +6711,20 @@ class PreferIosSpotlightIndexingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_ios_spotlight_indexing',
-    problemMessage:
-        '[prefer_ios_spotlight_indexing] Searchable content detected. Consider indexing with Core Spotlight '
+    'prefer_ios_spotlight_indexing',
+    '[prefer_ios_spotlight_indexing] Searchable content detected. Consider indexing with Core Spotlight '
         'so users can find content from iOS home screen. {v2}',
     correctionMessage:
         'Use CSSearchableItem to index content for Spotlight search.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if Spotlight is being used
     if (fileSource.contains('Spotlight') ||
@@ -7663,13 +6738,13 @@ class PreferIosSpotlightIndexingRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
       if (className.contains('search') || className.contains('list')) {
         final String bodySource = node.toSource();
         if (bodySource.contains('ListView') || bodySource.contains('items')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -7710,7 +6785,7 @@ class PreferIosSpotlightIndexingRule extends SaropaLintRule {
 /// @see [Data Protection](https://developer.apple.com/documentation/uikit/protecting_the_user_s_privacy/encrypting_your_app_s_files)
 class RequireIosDataProtectionRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosDataProtectionRule].
-  const RequireIosDataProtectionRule() : super(code: _code);
+  RequireIosDataProtectionRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -7719,13 +6794,13 @@ class RequireIosDataProtectionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_data_protection',
-    problemMessage:
-        '[require_ios_data_protection] Sensitive file storage detected. Consider using iOS Data Protection '
+    'require_ios_data_protection',
+    '[require_ios_data_protection] Sensitive file storage detected. Consider using iOS Data Protection '
         'to encrypt files when device is locked. {v2}',
-    correctionMessage: 'Set appropriate FileProtectionType for sensitive data. '
+    correctionMessage:
+        'Set appropriate FileProtectionType for sensitive data. '
         'Use "complete" protection for highly sensitive files.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// Patterns indicating sensitive data.
@@ -7741,11 +6816,10 @@ class RequireIosDataProtectionRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if data protection is being used
     if (fileSource.contains('FileProtection') ||
@@ -7754,7 +6828,7 @@ class RequireIosDataProtectionRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Detect file write operations
@@ -7765,7 +6839,7 @@ class RequireIosDataProtectionRule extends SaropaLintRule {
         final String surroundingSource = node.toSource().toLowerCase();
         for (final String pattern in _sensitivePatterns) {
           if (surroundingSource.contains(pattern)) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
             return;
           }
         }
@@ -7813,7 +6887,7 @@ class RequireIosDataProtectionRule extends SaropaLintRule {
 /// @see [Energy Efficiency Guide](https://developer.apple.com/library/archive/documentation/Performance/Conceptual/EnergyGuide-iOS/)
 class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosBatteryDrainPatternsRule].
-  const AvoidIosBatteryDrainPatternsRule() : super(code: _code);
+  AvoidIosBatteryDrainPatternsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -7822,22 +6896,21 @@ class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_ios_battery_drain_patterns',
-    problemMessage:
-        '[avoid_ios_battery_drain_patterns] Pattern detected that may cause excessive battery drain. '
+    'avoid_ios_battery_drain_patterns',
+    '[avoid_ios_battery_drain_patterns] Pattern detected that may cause excessive battery drain. '
         'iOS shows high battery usage in Settings. {v2}',
-    correctionMessage: 'Use push notifications instead of polling. '
+    correctionMessage:
+        'Use push notifications instead of polling. '
         'Reduce location accuracy and frequency.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       // Detect frequent polling
@@ -7845,15 +6918,16 @@ class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
         final Expression? target = node.target;
         if (target != null && target.toSource() == 'Timer') {
           // Check duration
-          final List<Expression> args =
-              node.argumentList.arguments.whereType<Expression>().toList();
+          final List<Expression> args = node.argumentList.arguments
+              .whereType<Expression>()
+              .toList();
           if (args.isNotEmpty) {
             final String durationSource = args.first.toSource();
             // Very short intervals are battery-draining
             if (durationSource.contains('milliseconds') ||
                 (durationSource.contains('seconds') &&
                     durationSource.contains(RegExp(r'[1-5]\)')))) {
-              reporter.atNode(node, code);
+              reporter.atNode(node);
             }
           }
         }
@@ -7866,7 +6940,7 @@ class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
           // Check for distance filter
           if (!argSource.contains('distanceFilter') ||
               argSource.contains('distanceFilter: 0')) {
-            reporter.atNode(node, code);
+            reporter.atNode(node);
           }
         }
       }
@@ -7900,7 +6974,7 @@ class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
 /// @see [Xcode Capabilities](https://developer.apple.com/documentation/xcode/adding-capabilities-to-your-app)
 class RequireIosEntitlementsRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosEntitlementsRule].
-  const RequireIosEntitlementsRule() : super(code: _code);
+  RequireIosEntitlementsRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -7909,14 +6983,13 @@ class RequireIosEntitlementsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_entitlements',
-    problemMessage:
-        '[require_ios_entitlements] Feature detected that requires iOS entitlement/capability. '
+    'require_ios_entitlements',
+    '[require_ios_entitlements] Feature detected that requires iOS entitlement/capability. '
         'Enable in Xcode Signing & Capabilities. {v2}',
     correctionMessage:
         'Open Xcode, select Runner target, go to Signing & Capabilities, '
         'and add the required capability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   /// Features and their required capabilities.
@@ -7931,16 +7004,15 @@ class RequireIosEntitlementsRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry.addSimpleIdentifier((SimpleIdentifier node) {
+    context.addSimpleIdentifier((SimpleIdentifier node) {
       final String name = node.name;
 
       for (final String feature in _featureToCapability.keys) {
         if (name.contains(feature)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -7970,7 +7042,7 @@ class RequireIosEntitlementsRule extends SaropaLintRule {
 /// @see [Launch Screen](https://developer.apple.com/design/human-interface-guidelines/launching)
 class RequireIosLaunchStoryboardRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosLaunchStoryboardRule].
-  const RequireIosLaunchStoryboardRule() : super(code: _code);
+  RequireIosLaunchStoryboardRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -7979,37 +7051,35 @@ class RequireIosLaunchStoryboardRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_launch_storyboard',
-    problemMessage:
-        '[require_ios_launch_storyboard] iOS app detected. Ensure LaunchScreen.storyboard is properly '
+    'require_ios_launch_storyboard',
+    '[require_ios_launch_storyboard] iOS app detected. Ensure LaunchScreen.storyboard is properly '
         'configured. Apps without launch screen are rejected. {v2}',
     correctionMessage:
         'Verify ios/Runner/Base.lproj/LaunchScreen.storyboard exists '
         'and is configured in Xcode.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String filePath = resolver.source.fullName;
+    final String filePath = context.filePath;
 
     // Only check main.dart
     if (!filePath.endsWith('main.dart')) {
       return;
     }
 
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Check for iOS platform check
     if (!fileSource.contains('Platform.isIOS') && !fileSource.contains('ios')) {
       return;
     }
 
-    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
       if (node.name.lexeme == 'main') {
         // Check for launch screen comment
         final String surroundingSource = fileSource.substring(
@@ -8018,7 +7088,7 @@ class RequireIosLaunchStoryboardRule extends SaropaLintRule {
         );
         if (!surroundingSource.contains('LaunchScreen') &&
             !surroundingSource.contains('launch screen')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -8059,7 +7129,7 @@ class RequireIosLaunchStoryboardRule extends SaropaLintRule {
 /// ```
 class RequireIosVersionCheckRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosVersionCheckRule].
-  const RequireIosVersionCheckRule() : super(code: _code);
+  RequireIosVersionCheckRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.high;
@@ -8068,13 +7138,13 @@ class RequireIosVersionCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_version_check',
-    problemMessage:
-        '[require_ios_version_check] iOS version-specific feature detected without version check. '
+    'require_ios_version_check',
+    '[require_ios_version_check] iOS version-specific feature detected without version check. '
         'Crashes may occur on older iOS versions. {v2}',
-    correctionMessage: 'Check iOS version before using newer APIs. '
+    correctionMessage:
+        'Check iOS version before using newer APIs. '
         'Use device_info_plus to get iOS version.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.WARNING,
   );
 
   /// iOS 17+ APIs.
@@ -8088,11 +7158,10 @@ class RequireIosVersionCheckRule extends SaropaLintRule {
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if version check is present
     if (fileSource.contains('iosVersion') ||
@@ -8101,12 +7170,12 @@ class RequireIosVersionCheckRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addSimpleIdentifier((SimpleIdentifier node) {
+    context.addSimpleIdentifier((SimpleIdentifier node) {
       final String name = node.name;
 
       for (final String api in _ios17Apis) {
         if (name.contains(api)) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
           return;
         }
       }
@@ -8142,7 +7211,7 @@ class RequireIosVersionCheckRule extends SaropaLintRule {
 /// @see [Focus](https://developer.apple.com/design/human-interface-guidelines/focus)
 class RequireIosFocusModeAwarenessRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosFocusModeAwarenessRule].
-  const RequireIosFocusModeAwarenessRule() : super(code: _code);
+  RequireIosFocusModeAwarenessRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -8151,23 +7220,21 @@ class RequireIosFocusModeAwarenessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_focus_mode_awareness',
-    problemMessage:
-        '[require_ios_focus_mode_awareness] Notification without interruption level detected. iOS Focus mode '
+    'require_ios_focus_mode_awareness',
+    '[require_ios_focus_mode_awareness] Notification without interruption level detected. iOS Focus mode '
         'may silence notifications. Set appropriate interruption level. {v2}',
     correctionMessage:
         'Use interruptionLevel parameter to indicate notification importance. '
         'Time-sensitive notifications can break through Focus.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if interruption level is being used
     if (fileSource.contains('interruptionLevel') ||
@@ -8175,14 +7242,14 @@ class RequireIosFocusModeAwarenessRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addMethodInvocation((MethodInvocation node) {
+    context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
       if (methodName == 'show' || methodName == 'send') {
         final Expression? target = node.target;
         if (target != null &&
             target.toSource().toLowerCase().contains('notification')) {
-          reporter.atNode(node, code);
+          reporter.atNode(node);
         }
       }
     });
@@ -8218,7 +7285,7 @@ class RequireIosFocusModeAwarenessRule extends SaropaLintRule {
 /// @see [Handoff](https://developer.apple.com/handoff/)
 class PreferIosHandoffSupportRule extends SaropaLintRule {
   /// Creates a new instance of [PreferIosHandoffSupportRule].
-  const PreferIosHandoffSupportRule() : super(code: _code);
+  PreferIosHandoffSupportRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.low;
@@ -8227,23 +7294,21 @@ class PreferIosHandoffSupportRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_ios_handoff_support',
-    problemMessage:
-        '[prefer_ios_handoff_support] Document or content editing detected. Consider implementing '
+    'prefer_ios_handoff_support',
+    '[prefer_ios_handoff_support] Document or content editing detected. Consider implementing '
         'iOS Handoff for continuity across devices. {v2}',
     correctionMessage:
         'Use NSUserActivity to enable Handoff. Users can continue work '
         'on other Apple devices.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    final String fileSource = resolver.source.contents.data;
+    final String fileSource = context.fileContent;
 
     // Skip if NSUserActivity is being used
     if (fileSource.contains('NSUserActivity') ||
@@ -8252,13 +7317,13 @@ class PreferIosHandoffSupportRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addClassDeclaration((ClassDeclaration node) {
+    context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
       if (className.contains('editor') ||
           className.contains('compose') ||
           className.contains('draft')) {
-        reporter.atNode(node, code);
+        reporter.atNode(node);
       }
     });
   }
@@ -8301,7 +7366,7 @@ class PreferIosHandoffSupportRule extends SaropaLintRule {
 /// @see [VoiceOver Gestures](https://support.apple.com/guide/iphone/use-voiceover-gestures-iph3e2e2281/ios)
 class RequireIosVoiceoverGestureCompatibilityRule extends SaropaLintRule {
   /// Creates a new instance of [RequireIosVoiceoverGestureCompatibilityRule].
-  const RequireIosVoiceoverGestureCompatibilityRule() : super(code: _code);
+  RequireIosVoiceoverGestureCompatibilityRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -8310,24 +7375,21 @@ class RequireIosVoiceoverGestureCompatibilityRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'require_ios_voiceover_gesture_compatibility',
-    problemMessage:
-        '[require_ios_voiceover_gesture_compatibility] Custom gesture without accessibility action. VoiceOver users may '
+    'require_ios_voiceover_gesture_compatibility',
+    '[require_ios_voiceover_gesture_compatibility] Custom gesture without accessibility action. VoiceOver users may '
         'not be able to perform this action. {v2}',
     correctionMessage:
         'Wrap with Semantics and provide onDismiss, onScrollLeft, '
         'or other accessibility actions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
   void runWithReporter(
-    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
+    SaropaContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (node.typeName != 'GestureDetector') {
         return;
       }
@@ -8335,8 +7397,8 @@ class RequireIosVoiceoverGestureCompatibilityRule extends SaropaLintRule {
       // Check for drag gestures
       final bool hasDragGesture =
           node.getNamedParameterValue('onHorizontalDragEnd') != null ||
-              node.getNamedParameterValue('onVerticalDragEnd') != null ||
-              node.getNamedParameterValue('onPanEnd') != null;
+          node.getNamedParameterValue('onVerticalDragEnd') != null ||
+          node.getNamedParameterValue('onPanEnd') != null;
 
       if (!hasDragGesture) {
         return;
@@ -8353,7 +7415,7 @@ class RequireIosVoiceoverGestureCompatibilityRule extends SaropaLintRule {
         current = current.parent;
       }
 
-      reporter.atNode(node, code);
+      reporter.atNode(node);
     });
   }
 }
