@@ -1467,6 +1467,10 @@ const Set<String> recommendedOnlyRules = <String>{
   // v4.14.0 - GitHub issue rules (Recommended)
   'require_feature_flag_type_safety', // INFO - typed feature flag accessors
   'require_timezone_display', // INFO - timezone context in time display
+
+  // v4.15.0 - ROADMAP ⭐ Rules (Recommended)
+  'require_analytics_error_handling', // INFO - analytics calls need try-catch
+  'prefer_adaptive_icons', // INFO - use adaptive icon sizes
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -2435,6 +2439,25 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_getx_static_get', // WARNING - Get.find() hides dependencies
   'require_navigation_result_handling', // INFO - Navigator.push result ignored
   'require_semantic_colors', // INFO - name colors by purpose not appearance
+
+  // v4.15.0 - ROADMAP ⭐ Rules (Professional)
+  'prefer_semantics_container', // INFO - Semantics needs container: true for groups
+  'avoid_image_picker_quick_succession', // WARNING - pickImage without debounce guard
+  'prefer_input_formatters', // INFO - numeric fields need TextInputFormatter
+  'prefer_go_router_redirect', // INFO - GoRouter needs redirect for auth
+  'prefer_permission_request_in_context', // INFO - don't request perms in main()
+  'avoid_shared_prefs_large_data', // WARNING - don't store JSON in SharedPrefs
+  'prefer_geocoding_cache', // INFO - cache reverse geocoding results
+  'prefer_oauth_pkce', // INFO - OAuth needs PKCE for mobile
+  'avoid_continuous_location_updates', // WARNING - GPS stream needs distance filter
+  'prefer_grace_period_handling', // INFO - handle IAP billing grace period
+  'require_cached_image_device_pixel_ratio', // INFO - use DPR for cached images
+  'prefer_foreground_service_android', // INFO - use foreground service for bg work
+  'prefer_sliverfillremaining_for_empty', // INFO - empty state in CustomScrollView
+  'avoid_infinite_scroll_duplicate_requests', // WARNING - loading guard for scroll
+  'prefer_infinite_scroll_preload', // INFO - preload at 80% scroll
+  'prefer_use_callback', // INFO - memoize callbacks in HookWidget
+  'require_stepper_state_management', // INFO - preserve Stepper form state
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).
@@ -2568,6 +2591,9 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'require_text_form_field_in_form',
   'require_url_launcher_mode',
   'require_webview_progress_indicator',
+
+  // v4.15.0 - ROADMAP ⭐ Rules (Comprehensive)
+  'avoid_redundant_semantics', // INFO - Semantics wrapping Image with semanticLabel
 };
 
 /// Pedantic tier rules - pedantic, highly opinionated rules.

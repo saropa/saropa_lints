@@ -2195,3 +2195,195 @@ class PreferRegexValidationRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// INPUT FORMATTER RULES
+// =============================================================================
+
+/// Warns when text fields with numeric/phone keyboard lack inputFormatters.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Phone numbers, credit cards, and dates should auto-format as the user
+/// types using TextInputFormatter. Without formatters, users must manually
+/// type dashes, parentheses, or spaces, leading to inconsistent data and
+/// poor UX. The keyboardType alone restricts the keyboard but does not
+/// format or validate input.
+///
+/// **BAD:**
+/// ```dart
+/// TextField(
+///   keyboardType: TextInputType.phone,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// TextField(
+///   keyboardType: TextInputType.phone,
+///   inputFormatters: [
+///     FilteringTextInputFormatter.digitsOnly,
+///     PhoneInputFormatter(),
+///   ],
+/// )
+/// ```
+class PreferInputFormattersRule extends SaropaLintRule {
+  const PreferInputFormattersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_input_formatters',
+    problemMessage:
+        '[prefer_input_formatters] Text field has a structured keyboardType (phone, number, datetime) but no inputFormatters. The keyboard type only restricts which keys appear — it does not format, mask, or validate input. Users must manually type dashes, parentheses, and spaces for phone numbers, credit cards, and dates, leading to inconsistent data and entry errors. Add TextInputFormatter to auto-format as the user types. {v1}',
+    correctionMessage:
+        'Add inputFormatters with appropriate formatters (e.g., FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter, or a custom mask formatter).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Keyboard types that typically need input formatting.
+  static const Set<String> _structuredKeyboardTypes = <String>{
+    'TextInputType.phone',
+    'TextInputType.number',
+    'TextInputType.datetime',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_textFieldTypes.contains(typeName)) return;
+
+      bool hasStructuredKeyboard = false;
+      bool hasInputFormatters = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+        final String paramName = arg.name.label.name;
+
+        if (paramName == 'keyboardType') {
+          final String value = arg.expression.toSource();
+          if (_structuredKeyboardTypes.any(value.contains)) {
+            hasStructuredKeyboard = true;
+          }
+        }
+
+        if (paramName == 'inputFormatters') {
+          hasInputFormatters = true;
+        }
+      }
+
+      if (hasStructuredKeyboard && !hasInputFormatters) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_stepper_state_management
+// =============================================================================
+
+/// Warns when Stepper widget lacks proper form state management.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Flutter's Stepper widget does not preserve form state across steps by
+/// default. When a user navigates back to a previous step, text fields
+/// lose their values unless state is explicitly preserved using
+/// GlobalKey<FormState>, AutomaticKeepAliveClientMixin, or a state
+/// management solution. Always manage step form state to avoid data loss.
+///
+/// **BAD:**
+/// ```dart
+/// Stepper(
+///   steps: [
+///     Step(title: Text('Name'), content: TextField()),
+///     Step(title: Text('Address'), content: TextField()),
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Stepper(
+///   steps: [
+///     Step(
+///       title: Text('Name'),
+///       content: Form(key: _formKey1, child: TextField(controller: _name)),
+///     ),
+///   ],
+/// )
+/// ```
+class RequireStepperStateManagementRule extends SaropaLintRule {
+  const RequireStepperStateManagementRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_stepper_state_management',
+    problemMessage:
+        '[require_stepper_state_management] Stepper widget without form state '
+        'preservation. Flutter Stepper does not persist form data across '
+        'step navigation by default — when a user goes back to a previous '
+        'step, text fields lose their values. Use GlobalKey<FormState>, '
+        'TextEditingController, or AutomaticKeepAliveClientMixin to preserve '
+        'input across step transitions and prevent data loss. {v1}',
+    correctionMessage:
+        'Wrap step content in Form with a GlobalKey<FormState>, or use '
+        'TextEditingControllers to persist field values across steps.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Stepper') return;
+
+      // Check if the Stepper's steps contain form state management
+      final String nodeSource = node.toSource();
+
+      // Look for state management patterns
+      if (nodeSource.contains('FormState') ||
+          nodeSource.contains('formKey') ||
+          nodeSource.contains('_formKey') ||
+          nodeSource.contains('GlobalKey') ||
+          nodeSource.contains('controller:') ||
+          nodeSource.contains('TextEditingController') ||
+          nodeSource.contains('KeepAlive') ||
+          nodeSource.contains('AutomaticKeepAlive')) {
+        return; // Has state management, OK
+      }
+
+      // Check if steps contain any form inputs that need state
+      if (!nodeSource.contains('TextField') &&
+          !nodeSource.contains('TextFormField') &&
+          !nodeSource.contains('Form(')) {
+        return; // No form inputs, not relevant
+      }
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}

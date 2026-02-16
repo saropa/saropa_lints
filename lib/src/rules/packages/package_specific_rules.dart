@@ -2084,3 +2084,211 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// IMAGE PICKER RULES
+// =============================================================================
+
+/// Warns when pickImage or pickVideo is called without debounce protection.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Calling pickImage() or pickVideo() in rapid succession causes an
+/// ALREADY_ACTIVE PlatformException on both iOS and Android. The native
+/// image picker can only handle one request at a time. Without a loading
+/// guard or debounce, a double-tap on a "Choose Photo" button crashes
+/// the app.
+///
+/// **BAD:**
+/// ```dart
+/// onPressed: () async {
+///   final image = await picker.pickImage(source: ImageSource.gallery);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// onPressed: () async {
+///   if (_isPicking) return;
+///   _isPicking = true;
+///   try {
+///     final image = await picker.pickImage(source: ImageSource.gallery);
+///   } finally {
+///     _isPicking = false;
+///   }
+/// }
+/// ```
+class AvoidImagePickerQuickSuccessionRule extends SaropaLintRule {
+  const AvoidImagePickerQuickSuccessionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_image_picker_quick_succession',
+    problemMessage:
+        '[avoid_image_picker_quick_succession] Image picker method called without a loading guard. Calling pickImage() or pickVideo() while another picker is already active throws a PlatformException (ALREADY_ACTIVE) that crashes the app. Users who double-tap "Choose Photo" or press it during a slow gallery load will trigger this crash. Add a boolean loading flag that prevents concurrent picker invocations. {v1}',
+    correctionMessage:
+        'Add a boolean guard (e.g., _isPicking) that returns early if a pick operation is already in progress, and reset it in a finally block.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Method names on ImagePicker that open native UI.
+  static const Set<String> _pickerMethods = <String>{
+    'pickImage',
+    'pickVideo',
+    'pickMultiImage',
+    'pickMedia',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_pickerMethods.contains(node.methodName.name)) return;
+
+      // Check if target looks like an ImagePicker instance
+      final String? targetSource = node.target?.toSource();
+      if (targetSource == null) return;
+
+      final bool isImagePicker = targetSource.contains('picker') ||
+          targetSource.contains('Picker') ||
+          targetSource.contains('imagePicker') ||
+          targetSource.contains('ImagePicker');
+
+      if (!isImagePicker) return;
+
+      // Check if there's a guard (boolean check) in the enclosing function
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is IfStatement) {
+          final String condition = current.expression.toSource();
+          if (condition.contains('picking') ||
+              condition.contains('loading') ||
+              condition.contains('isLoading') ||
+              condition.contains('isPicking') ||
+              condition.contains('_picking') ||
+              condition.contains('_isPicking')) {
+            return; // Has a guard, OK
+          }
+        }
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+// =============================================================================
+// ANALYTICS RULES
+// =============================================================================
+
+/// Warns when analytics calls lack error handling.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Analytics SDK calls (logEvent, setUserProperty, setCurrentScreen) can
+/// throw when the SDK is not initialized, the network is unavailable, or
+/// event parameters exceed limits. Without try-catch, a failed analytics
+/// call crashes the entire app — analytics should never break the user
+/// experience.
+///
+/// **BAD:**
+/// ```dart
+/// await analytics.logEvent(name: 'purchase', parameters: data);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   await analytics.logEvent(name: 'purchase', parameters: data);
+/// } catch (e) {
+///   // Analytics failure should not crash the app
+/// }
+/// ```
+class RequireAnalyticsErrorHandlingRule extends SaropaLintRule {
+  const RequireAnalyticsErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_analytics_error_handling',
+    problemMessage:
+        '[require_analytics_error_handling] Analytics method call without error handling. Analytics SDKs (Firebase Analytics, Mixpanel, Amplitude) can throw when the SDK is not initialized, the network is unavailable, or event parameters are invalid. A failed analytics call should never crash the app or interrupt user workflows — wrap analytics calls in try-catch and silently log failures instead. {v1}',
+    correctionMessage:
+        'Wrap the analytics call in a try-catch block. Log the failure for debugging but do not rethrow — analytics errors should be silent.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Common analytics method names across SDKs.
+  static const Set<String> _analyticsMethods = <String>{
+    'logEvent',
+    'setCurrentScreen',
+    'setUserProperty',
+    'setUserId',
+    'logScreenView',
+    'logPurchase',
+    'logSignUp',
+    'logLogin',
+    'logShare',
+    'logSearch',
+    'track',
+    'identify',
+    'screen',
+    'flush',
+  };
+
+  /// Target name patterns that indicate analytics instances.
+  static const Set<String> _analyticsTargets = <String>{
+    'analytics',
+    'Analytics',
+    'mixpanel',
+    'Mixpanel',
+    'amplitude',
+    'Amplitude',
+    'segment',
+    'Segment',
+    'tracker',
+    'Tracker',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_analyticsMethods.contains(node.methodName.name)) return;
+
+      // Check if target looks like an analytics instance
+      final String? targetSource = node.target?.toSource();
+      if (targetSource == null) return;
+
+      final bool isAnalytics = _analyticsTargets.any(targetSource.contains);
+      if (!isAnalytics) return;
+
+      // Check if wrapped in try-catch
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is TryStatement) return; // Has try-catch, OK
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}

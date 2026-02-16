@@ -325,3 +325,134 @@ bool _isHookFunction(String methodName) {
   return charAfterUse == charAfterUse.toUpperCase() &&
       charAfterUse != charAfterUse.toLowerCase();
 }
+
+// =============================================================================
+// prefer_use_callback
+// =============================================================================
+
+/// Warns when inline closures are used instead of useCallback in HookWidgets.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// In a HookWidget, passing an inline anonymous function as a callback
+/// (e.g., onPressed: () { ... }) creates a new closure on every build.
+/// This defeats hook memoization and causes unnecessary child rebuilds.
+/// Use useCallback to memoize callbacks and maintain referential equality.
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends HookWidget {
+///   Widget build(BuildContext context) {
+///     return ElevatedButton(
+///       onPressed: () { doSomething(); },
+///       child: Text('Click'),
+///     );
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyWidget extends HookWidget {
+///   Widget build(BuildContext context) {
+///     final onPressed = useCallback(() { doSomething(); }, []);
+///     return ElevatedButton(
+///       onPressed: onPressed,
+///       child: Text('Click'),
+///     );
+///   }
+/// }
+/// ```
+class PreferUseCallbackRule extends SaropaLintRule {
+  const PreferUseCallbackRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_use_callback',
+    problemMessage:
+        '[prefer_use_callback] Inline closure passed as callback in a '
+        'HookWidget build method. Every rebuild creates a new closure '
+        'instance, which breaks referential equality and defeats hook '
+        'memoization. Child widgets receiving this callback will rebuild '
+        'unnecessarily. Use useCallback to memoize the function and '
+        'maintain stable references across rebuilds. {v1}',
+    correctionMessage: 'Extract the inline closure into a useCallback hook: '
+        'final handler = useCallback(() { ... }, [dependencies]);',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Callback parameter names commonly used in Flutter widgets.
+  static const Set<String> _callbackParams = <String>{
+    'onPressed',
+    'onTap',
+    'onChanged',
+    'onSubmitted',
+    'onSaved',
+    'onLongPress',
+    'onDoubleTap',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      // Check if enclosing class extends HookWidget
+      final AstNode? parent = node.parent;
+      if (parent is! ClassDeclaration) return;
+
+      final ExtendsClause? extendsClause = parent.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superclass = extendsClause.superclass.name2.lexeme;
+      if (superclass != 'HookWidget' && superclass != 'HookConsumerWidget') {
+        return;
+      }
+
+      // Check if useCallback is already used in the body
+      final String bodySource = node.body.toSource();
+      if (bodySource.contains('useCallback')) return;
+
+      // Look for inline closures in callback parameters
+      final _InlineCallbackVisitor visitor = _InlineCallbackVisitor();
+      node.body.accept(visitor);
+
+      if (visitor.inlineCallbackNode != null) {
+        reporter.atNode(visitor.inlineCallbackNode!, code);
+      }
+    });
+  }
+}
+
+class _InlineCallbackVisitor extends RecursiveAstVisitor<void> {
+  AstNode? inlineCallbackNode;
+
+  @override
+  void visitNamedExpression(NamedExpression node) {
+    if (inlineCallbackNode != null) return;
+
+    final String paramName = node.name.label.name;
+    if (!PreferUseCallbackRule._callbackParams.contains(paramName)) {
+      super.visitNamedExpression(node);
+      return;
+    }
+
+    // Check if the value is an inline closure
+    final Expression value = node.expression;
+    if (value is FunctionExpression) {
+      inlineCallbackNode = value;
+      return;
+    }
+
+    super.visitNamedExpression(node);
+  }
+}

@@ -1023,3 +1023,92 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// SHARED PREFERENCES LARGE DATA RULES
+// =============================================================================
+
+/// Warns when SharedPreferences is used to store large or serialized data.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// SharedPreferences is backed by an XML file (Android) or plist (iOS)
+/// that is read entirely into memory on first access. Storing large JSON
+/// blobs, base64 images, or serialized objects degrades startup time and
+/// wastes memory. Use a proper database (Hive, Isar, sqflite) for data
+/// larger than simple key-value pairs.
+///
+/// **BAD:**
+/// ```dart
+/// final prefs = await SharedPreferences.getInstance();
+/// await prefs.setString('user_data', jsonEncode(largeObject));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final box = await Hive.openBox('userData');
+/// await box.put('user_data', largeObject);
+/// ```
+class AvoidSharedPrefsLargeDataRule extends SaropaLintRule {
+  const AvoidSharedPrefsLargeDataRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_shared_prefs_large_data',
+    problemMessage:
+        '[avoid_shared_prefs_large_data] SharedPreferences setString called with serialized data (jsonEncode, json.encode, toJson, toString). SharedPreferences loads the entire XML/plist file into memory on first access. Storing JSON blobs or serialized objects wastes memory, degrades app startup time, and risks exceeding platform limits. Use a proper database (Hive, Isar, sqflite) for structured or large data. {v1}',
+    correctionMessage:
+        'Use a local database (Hive, Isar, or sqflite) for storing serialized objects. SharedPreferences is intended for simple key-value pairs like booleans, small strings, and numbers.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Patterns in the value argument that indicate serialized data.
+  static const Set<String> _serializationPatterns = <String>{
+    'jsonEncode',
+    'json.encode',
+    'toJson',
+    'toMap',
+    'serialize',
+    'base64Encode',
+    'base64.encode',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'setString' && methodName != 'setStringList') return;
+
+      // Check if target is SharedPreferences
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('pref') &&
+          !targetSource.contains('sharedpreferences')) {
+        return;
+      }
+
+      // Check if value argument contains serialization
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.length < 2) return;
+
+      final String valueSource = args[1].toSource();
+      for (final String pattern in _serializationPatterns) {
+        if (valueSource.contains(pattern)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+}

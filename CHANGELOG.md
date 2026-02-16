@@ -11,6 +11,34 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [4.14.5]
+
+### Added
+
+- **`prefer_semantics_container`** (Professional, INFO): Warns when Semantics wraps a multi-child layout (Column, Row, etc.) without `container: true`, causing screen readers to announce children individually instead of as a group
+- **`avoid_redundant_semantics`** (Comprehensive, INFO): Warns when Semantics wraps an Image that already has `semanticLabel`, causing duplicate screen reader announcements
+- **`avoid_image_picker_quick_succession`** (Professional, WARNING): Warns when `pickImage`/`pickVideo` is called without a loading guard, preventing ALREADY_ACTIVE PlatformException from double-taps
+- **`require_analytics_error_handling`** (Recommended, INFO): Warns when analytics SDK calls (logEvent, track, etc.) lack try-catch, since analytics failures should never crash the app
+- **`prefer_input_formatters`** (Professional, INFO): Warns when TextField/TextFormField has a structured keyboardType (phone, number, datetime) but no `inputFormatters` for auto-formatting
+- **`prefer_go_router_redirect`** (Professional, INFO): Warns when GoRouter is created without a `redirect` callback, risking flash of protected content during auth checks
+- **`prefer_permission_request_in_context`** (Professional, INFO): Warns when permissions are requested in `main()` or `initState()` instead of just-in-time when the user performs a relevant action
+- **`avoid_shared_prefs_large_data`** (Professional, WARNING): Warns when SharedPreferences `setString` is called with serialized data (jsonEncode, toJson), which should use a proper database instead
+- **`prefer_geocoding_cache`** (Professional, INFO): Warns when reverse geocoding calls lack caching, wasting API quota on repeated lookups for the same coordinates
+- **`prefer_oauth_pkce`** (Professional, INFO): Warns when OAuth authorization requests lack PKCE parameters, leaving mobile flows vulnerable to code interception attacks
+- **`avoid_continuous_location_updates`** (Professional, WARNING): Warns when continuous location streams (getPositionStream, watchPosition) lack a distanceFilter, causing rapid battery drain from constant GPS polling
+- **`prefer_adaptive_icons`** (Recommended, INFO): Warns when Icon widgets use hardcoded literal sizes instead of adaptive sizing via IconTheme or MediaQuery
+- **`prefer_grace_period_handling`** (Professional, INFO): Warns when IAP purchase verification only checks PurchaseStatus.purchased without handling pending/grace period states, locking out users during billing retry
+- **`require_cached_image_device_pixel_ratio`** (Professional, INFO): Warns when CachedNetworkImage uses fixed width/height without considering device pixel ratio, causing blurry images on high-DPI screens
+- **`prefer_foreground_service_android`** (Professional, INFO): Warns when Timer.periodic is used without a foreground service, since Android 8+ kills background tasks within minutes
+- **`prefer_sliverfillremaining_for_empty`** (Professional, INFO): Warns when SliverToBoxAdapter is used for empty state content in CustomScrollView instead of SliverFillRemaining
+- **`avoid_infinite_scroll_duplicate_requests`** (Professional, WARNING): Warns when scroll listeners trigger data loading without an isLoading guard, causing duplicate simultaneous requests
+- **`prefer_infinite_scroll_preload`** (Professional, INFO): Warns when infinite scroll triggers loading only at 100% scroll extent instead of preloading at 70-80%
+- **`prefer_use_callback`** (Professional, INFO): Warns when inline closures are passed as callbacks in HookWidget build methods instead of using useCallback for memoization
+- **`require_stepper_state_management`** (Professional, INFO): Warns when Stepper widget with form inputs lacks state management (GlobalKey, controllers), causing data loss on step navigation
+- **`prefer_semantics_container` quick fix**: "Add container: true" inserts the parameter into the Semantics constructor
+- **`prefer_sliverfillremaining_for_empty` quick fix**: "Replace with SliverFillRemaining" renames SliverToBoxAdapter to SliverFillRemaining
+
+---
 ## [4.14.4]
 
 ### Added
