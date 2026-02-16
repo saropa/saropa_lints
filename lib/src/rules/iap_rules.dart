@@ -375,3 +375,88 @@ class RequirePriceLocalizationRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// GRACE PERIOD HANDLING RULES
+// =============================================================================
+
+/// Warns when IAP purchase verification ignores grace period status.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Users with expired cards get a billing grace period from Apple/Google
+/// before their subscription is canceled. If your app only checks for
+/// `PurchaseStatus.purchased`, users in the grace period lose access
+/// even though they intend to pay. Handle pending and grace period
+/// statuses to avoid locking out paying customers.
+///
+/// **BAD:**
+/// ```dart
+/// if (purchaseDetails.status == PurchaseStatus.purchased) {
+///   grantAccess();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (purchaseDetails.status == PurchaseStatus.purchased ||
+///     purchaseDetails.status == PurchaseStatus.pending) {
+///   grantAccess();
+/// }
+/// ```
+class PreferGracePeriodHandlingRule extends SaropaLintRule {
+  const PreferGracePeriodHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_grace_period_handling',
+    problemMessage:
+        '[prefer_grace_period_handling] Purchase status check only handles PurchaseStatus.purchased without considering pending or grace period states. Apple and Google give users a billing grace period (typically 3-16 days) when their payment method fails. During this time, the subscription is still active but in a grace state. Locking out these users causes churn — they intend to pay but lose access, often uninstalling the app instead of fixing payment. {v1}',
+    correctionMessage:
+        'Also handle PurchaseStatus.pending (and restored) in your purchase verification logic to support billing grace periods.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      // Check for purchaseDetails.status == PurchaseStatus.purchased
+      final String source = node.toSource();
+      if (!source.contains('PurchaseStatus.purchased')) return;
+      if (!source.contains('status')) return;
+
+      // Check if the enclosing if/switch also checks for pending
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is IfStatement) {
+          final String condition = current.expression.toSource();
+          if (condition.contains('pending') ||
+              condition.contains('grace') ||
+              condition.contains('restored')) {
+            return; // Handles grace period, OK
+          }
+          break;
+        }
+        if (current is SwitchStatement || current is SwitchExpression) {
+          final String switchSource = current.toSource();
+          if (switchSource.contains('pending')) {
+            return; // Switch handles pending, OK
+          }
+          break;
+        }
+        current = current.parent;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}

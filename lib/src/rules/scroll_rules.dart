@@ -1504,3 +1504,362 @@ class _RequireAddAutomaticKeepAlivesOffFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// prefer_sliverfillremaining_for_empty
+// =============================================================================
+
+/// Warns when empty state widgets in CustomScrollView are not wrapped in
+/// SliverFillRemaining.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// When displaying empty state content (Center, "no items", "empty") inside
+/// a CustomScrollView, you must wrap it in SliverFillRemaining so it fills
+/// the remaining viewport space. Using SliverToBoxAdapter for empty states
+/// results in the message sitting at the top of the scroll area rather than
+/// being vertically centered.
+///
+/// **BAD:**
+/// ```dart
+/// CustomScrollView(
+///   slivers: [
+///     SliverToBoxAdapter(child: Center(child: Text('No items'))),
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// CustomScrollView(
+///   slivers: [
+///     SliverFillRemaining(child: Center(child: Text('No items'))),
+///   ],
+/// )
+/// ```
+class PreferSliverFillRemainingForEmptyRule extends SaropaLintRule {
+  const PreferSliverFillRemainingForEmptyRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_sliverfillremaining_for_empty',
+    problemMessage:
+        '[prefer_sliverfillremaining_for_empty] Empty state widget in '
+        'CustomScrollView uses SliverToBoxAdapter instead of '
+        'SliverFillRemaining. The empty state content will sit at the top '
+        'of the scroll area rather than being centered in the viewport. '
+        'SliverFillRemaining expands to fill remaining space, giving a '
+        'proper centered empty state experience. {v1}',
+    correctionMessage:
+        'Wrap empty state content in SliverFillRemaining instead of '
+        'SliverToBoxAdapter for proper vertical centering.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Keywords in child content that suggest an empty state.
+  static const Set<String> _emptyStateIndicators = <String>{
+    'empty',
+    'no items',
+    'no results',
+    'nothing',
+    'no data',
+    'not found',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'SliverToBoxAdapter') return;
+
+      // Check if child contains empty state indicators
+      final String childSource = node.toSource().toLowerCase();
+
+      bool hasEmptyIndicator = false;
+      for (final String indicator in _emptyStateIndicators) {
+        if (childSource.contains(indicator)) {
+          hasEmptyIndicator = true;
+          break;
+        }
+      }
+
+      // Also check for Center wrapping text (common empty state)
+      if (!hasEmptyIndicator) {
+        if (childSource.contains('center(') && childSource.contains('text(')) {
+          // Only flag if inside a CustomScrollView slivers list
+          AstNode? current = node.parent;
+          while (current != null) {
+            if (current is InstanceCreationExpression) {
+              final String parentType =
+                  current.constructorName.type.name.lexeme;
+              if (parentType == 'CustomScrollView') {
+                hasEmptyIndicator = true;
+                break;
+              }
+            }
+            current = current.parent;
+          }
+        }
+      }
+
+      if (!hasEmptyIndicator) return;
+
+      // Verify it's inside a CustomScrollView
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (parentType == 'CustomScrollView') {
+            reporter.atNode(node.constructorName, code);
+            return;
+          }
+        }
+        current = current.parent;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => [_ReplaceSliverToBoxAdapterFix()];
+}
+
+class _ReplaceSliverToBoxAdapterFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'SliverToBoxAdapter') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with SliverFillRemaining',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.constructorName.type.name.sourceRange,
+          'SliverFillRemaining',
+        );
+      });
+    });
+  }
+}
+
+// =============================================================================
+// avoid_infinite_scroll_duplicate_requests
+// =============================================================================
+
+/// Warns when scroll listeners load data without a loading guard.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Infinite scroll implementations that trigger data loading from a scroll
+/// listener without checking an `isLoading` flag will fire multiple
+/// simultaneous requests as the user scrolls. This wastes bandwidth,
+/// causes duplicate items, and may trigger API rate limits. Always check
+/// a loading flag before requesting the next page.
+///
+/// **BAD:**
+/// ```dart
+/// _scrollController.addListener(() {
+///   if (_scrollController.position.pixels >=
+///       _scrollController.position.maxScrollExtent) {
+///     loadNextPage();
+///   }
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// _scrollController.addListener(() {
+///   if (!_isLoading &&
+///       _scrollController.position.pixels >=
+///           _scrollController.position.maxScrollExtent) {
+///     loadNextPage();
+///   }
+/// });
+/// ```
+class AvoidInfiniteScrollDuplicateRequestsRule extends SaropaLintRule {
+  const AvoidInfiniteScrollDuplicateRequestsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_infinite_scroll_duplicate_requests',
+    problemMessage:
+        '[avoid_infinite_scroll_duplicate_requests] Scroll listener triggers '
+        'data loading without a loading guard. When the user scrolls to the '
+        'bottom, this fires multiple simultaneous requests because the '
+        'listener fires continuously while at max extent. This wastes '
+        'bandwidth, causes duplicate items in the list, and may trigger API '
+        'rate limits. Check an isLoading flag before loading. {v1}',
+    correctionMessage:
+        'Add an isLoading/isFetching guard check before calling the load '
+        'function in your scroll listener.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'addListener') return;
+
+      // Check if this is a scroll controller listener
+      final String targetSource = node.target?.toSource() ?? '';
+      if (!targetSource.contains('scroll') &&
+          !targetSource.contains('Scroll') &&
+          !targetSource.contains('controller') &&
+          !targetSource.contains('Controller')) {
+        return;
+      }
+
+      // Check callback body for maxScrollExtent without loading guard
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final String callbackSource = args.first.toSource();
+      if (!callbackSource.contains('maxScrollExtent')) return;
+
+      // Check for loading guard patterns
+      if (callbackSource.contains('isLoading') ||
+          callbackSource.contains('_isLoading') ||
+          callbackSource.contains('isFetching') ||
+          callbackSource.contains('_isFetching') ||
+          callbackSource.contains('loading') ||
+          callbackSource.contains('hasMore') ||
+          callbackSource.contains('_hasMore')) {
+        return; // Has loading guard, OK
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+// =============================================================================
+// prefer_infinite_scroll_preload
+// =============================================================================
+
+/// Warns when infinite scroll triggers loading only at 100% scroll extent.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Loading the next page only when the user reaches the very bottom of the
+/// list causes a visible pause while data loads. Preload the next page at
+/// 70-80% scroll progress so content is ready before the user reaches the
+/// end. This creates a seamless infinite scroll experience.
+///
+/// **BAD:**
+/// ```dart
+/// if (position.pixels == position.maxScrollExtent) {
+///   loadNextPage();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (position.pixels >= position.maxScrollExtent * 0.8) {
+///   loadNextPage();
+/// }
+/// ```
+class PreferInfiniteScrollPreloadRule extends SaropaLintRule {
+  const PreferInfiniteScrollPreloadRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_infinite_scroll_preload',
+    problemMessage:
+        '[prefer_infinite_scroll_preload] Infinite scroll loads next page '
+        'only at 100%% scroll extent. Users see a loading spinner and must '
+        'wait for content. Preload the next page at 70-80%% scroll progress '
+        'so data arrives before the user reaches the end. This creates a '
+        'seamless experience without visible pauses. Use '
+        'position.pixels >= position.maxScrollExtent * 0.8 as threshold. {v1}',
+    correctionMessage: 'Trigger loading at 70-80%% scroll extent (e.g., '
+        'position.pixels >= position.maxScrollExtent * 0.8) instead of '
+        'waiting for the exact bottom.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      final String source = node.toSource();
+
+      // Detect exact equality check with maxScrollExtent
+      if (!source.contains('maxScrollExtent')) return;
+
+      // Check for == comparison (exact bottom check)
+      if (node.operator.lexeme != '==' && node.operator.lexeme != '>=') {
+        return;
+      }
+
+      // Only flag == (exact match), not >= (which may use threshold)
+      if (node.operator.lexeme == '>=') {
+        // If using >=, check that it's not multiplied by a threshold
+        if (source.contains('*') || source.contains('- ')) {
+          return; // Has threshold, OK
+        }
+        // >= maxScrollExtent without threshold is same as ==
+      }
+
+      if (node.operator.lexeme == '==') {
+        // pixels == maxScrollExtent — always a problem
+      }
+
+      // Verify it's in a scroll listener context
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is FunctionBody) {
+          final String bodySource = current.toSource();
+          if (bodySource.contains('addListener') ||
+              bodySource.contains('onNotification') ||
+              bodySource.contains('ScrollNotification')) {
+            reporter.atNode(node, code);
+            return;
+          }
+          break;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}

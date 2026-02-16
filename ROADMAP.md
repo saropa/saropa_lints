@@ -72,7 +72,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `prefer_oauth_pkce` | Professional | INFO | Mobile OAuth without PKCE is vulnerable to authorization code interception. Use PKCE (Proof Key for Code Exchange) for secure OAuth flows. |
 | ℹ️⭐ `require_session_timeout` | Professional | INFO | Sessions without timeout remain valid forever if tokens are stolen. Implement idle timeout and absolute session limits. |
 | ℹ️ `prefer_deep_link_auth` | Professional | INFO | Deep links with auth tokens (password reset, magic links) must validate tokens server-side and expire quickly. |
 | ⚠️ `avoid_remember_me_insecure` | Recommended | WARNING | "Remember me" storing unencrypted credentials is a security risk. Use refresh tokens with proper rotation and revocation. |
@@ -107,8 +106,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `avoid_redundant_semantics` | Comprehensive | INFO | An Image with semanticLabel inside a Semantics wrapper announces twice. Remove duplicate semantic information. |
-| ℹ️⭐ `prefer_semantics_container` | Professional | INFO | Groups of related widgets should use Semantics `container: true` to indicate they form a logical unit for navigation. |
 | ℹ️ `prefer_semantics_sort` | Professional | INFO | Complex layouts may need `sortKey` to control screen reader navigation order. Default order may not match visual layout. |
 | ℹ️ `avoid_semantics_in_animation` | Comprehensive | INFO | Semantics should not change during animations. Screen readers get confused by rapidly changing semantic trees. |
 | ℹ️ `prefer_announce_for_changes` | Comprehensive | INFO | Important state changes should use `SemanticsService.announce()` to inform screen reader users of non-visual feedback. |
@@ -136,7 +133,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `prefer_go_router_redirect` | Professional | INFO | Auth checks in redirect() run before build, preventing flash of protected content. Checking in build shows then redirects. |
 
 #### Deep Linking
 
@@ -149,7 +145,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️⭐ `prefer_form_bloc_for_complex` | Professional | INFO | Forms with >5 fields, conditional logic, or multi-step flows benefit from form state management (FormBloc, Reactive Forms). |
-| ℹ️⭐ `prefer_input_formatters` | Professional | INFO | Phone numbers, credit cards, dates should auto-format as user types using TextInputFormatter for better UX. |
 
 ### 1.10 Database & Storage Rules
 
@@ -193,7 +188,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `prefer_foreground_service_android` | Professional | INFO | Android kills background services aggressively. Use foreground service with notification for ongoing work. |
 
 ### 1.15 Push Notification Rules
 
@@ -205,15 +199,12 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `prefer_grace_period_handling` | Professional | INFO | Users with expired cards get billing grace period. Handle "grace period" status to avoid locking out paying customers. |
 | ⚠️ `avoid_entitlement_without_server` | Professional | WARNING | Client-side entitlement checks can be bypassed. Verify subscription status server-side for valuable content. |
 
 ### 1.17 Maps & Location Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️⭐ `avoid_continuous_location_updates` | Professional | WARNING | GPS polling drains battery fast. Use significant location changes or geofencing when you don't need real-time updates. |
-| ℹ️⭐ `prefer_geocoding_cache` | Professional | INFO | Reverse geocoding (coords to address) costs API calls. Cache results; coordinates rarely change for same address. |
 
 ### 1.19 Theming & Dark Mode Rules
 
@@ -225,14 +216,12 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️⭐ `prefer_master_detail_for_large` | Professional | INFO | On tablets, list-detail flows should show both panes (master-detail) rather than stacked navigation. |
-| ℹ️⭐ `prefer_adaptive_icons` | Recommended | INFO | Icons at 24px default are too small on tablets, too large on watches. Use IconTheme or scale based on screen size. |
 | ℹ️ `require_foldable_awareness` | Comprehensive | INFO | Foldable devices have hinges and multiple displays. Use DisplayFeature API to avoid placing content on fold. |
 
 ### 1.28 Analytics & Tracking Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `require_analytics_error_handling` | Recommended | INFO | Analytics failures shouldn't crash the app. Detect analytics calls without try-catch wrapper. |
 
 ### 1.34 JSON & Serialization Rules
 
@@ -271,7 +260,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `prefer_sliverfillremaining_for_empty` | Professional | INFO | Empty state in CustomScrollView needs SliverFillRemaining. Detect empty state widget as regular sliver. |
 
 ### 1.44 Internationalization (L10n) Rules
 
@@ -283,7 +271,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `require_stepper_state_management` | Professional | INFO | Stepper state should handle back navigation. Detect Stepper without preserving form state across steps. |
 
 ### 1.51 Avatar & Profile Image Rules
 
@@ -296,10 +283,8 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `prefer_infinite_scroll_preload` | Professional | INFO | Load next page before reaching end. Detect ScrollController listener triggering at 100% scroll. |
 | ℹ️🐙 [`prefer_infinite_scroll_preload`](https://github.com/saropa/saropa_lints/issues/28) | Professional | INFO | Load next page before reaching end. Detect ScrollController listener triggering at 100% scroll. |
 | ℹ️ `require_infinite_scroll_error_recovery` | Recommended | INFO | Failed page loads need retry. Detect infinite scroll without error state and retry button. |
-| ⚠️⭐ `avoid_infinite_scroll_duplicate_requests` | Professional | WARNING | Prevent multiple simultaneous page requests. Detect scroll listener without loading guard. |
 
 ### 1.55 Architecture Rules
 
@@ -384,7 +369,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1721 i
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ⚠️⭐ `avoid_misused_hooks` | Essential | WARNING | Detect common hook misuse patterns. |
-| ℹ️⭐ `prefer_use_callback` | Professional | INFO | Use useCallback for memoizing callback functions. |
 
 #### Intl/Localization Rules
 
@@ -686,7 +670,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️⭐ `avoid_shared_prefs_large_data` | Professional | WARNING | SharedPreferences isn't for large data. Detect storing >1KB values. |
 | ⚠️ `avoid_shared_prefs_sync_race` | Professional | WARNING | Multiple writers can race. Detect concurrent SharedPreferences writes. |
 
 ### 5.9 sqflite Database Rules
@@ -700,7 +683,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `require_cached_image_device_pixel_ratio` | Professional | INFO | Consider devicePixelRatio for sizing. Detect fixed sizes without DPR. |
 | ⚠️ `avoid_cached_image_web` | Recommended | WARNING | CachedNetworkImage lacks web caching. Detect web usage; suggest alternatives. |
 | ⚠️⭐ `avoid_cached_image_unbounded_list` | Essential | WARNING | Image lists need bounded cache. Detect ListView with many CachedNetworkImages. |
 
@@ -708,13 +690,11 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️⭐ `avoid_image_picker_quick_succession` | Professional | WARNING | Multiple rapid picks cause ALREADY_ACTIVE error. Detect pickImage without debounce. |
 
 ### 5.12 permission_handler Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `prefer_permission_request_in_context` | Professional | INFO | Request permissions when needed, not at startup. Detect all permissions in main(). |
 | ℹ️ `require_permission_lifecycle_observer` | Professional | INFO | Re-check permissions on app resume. Detect missing WidgetsBindingObserver. |
 | ℹ️ `prefer_permission_minimal_request` | Recommended | INFO | Request only needed permissions. Detect requesting unused permissions. |
 | ⚠️ `avoid_permission_request_loop` | Professional | WARNING | Don't repeatedly request denied permission. Detect request in loop or retry. |
@@ -805,7 +785,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `prefer_input_formatters` | Professional | INFO | Use inputFormatters for controlled input. Detect manual onChange filtering. |
 | ⚠️ `avoid_form_validation_on_change` | Professional | WARNING | Validating every keystroke is expensive. Detect onChanged triggering validation. |
 | ℹ️ `prefer_form_bloc_for_complex` | Professional | INFO | Complex forms benefit from FormBloc. Detect forms with >5 fields and conditionals. |
 | ℹ️ `require_error_message_clarity` | Recommended | INFO | Error messages should explain fix. Detect generic "Invalid" messages. |

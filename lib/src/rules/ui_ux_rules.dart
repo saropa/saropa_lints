@@ -1698,3 +1698,70 @@ class _AddAvatarFallbackFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// ADAPTIVE ICON RULES
+// =============================================================================
+
+/// Warns when Icon widget uses a hardcoded size.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// The default Icon size (24px) is too small on tablets and too large
+/// on watches. Hardcoding a specific size ignores device form factor.
+/// Use IconTheme to set sizes contextually or scale based on screen size.
+///
+/// **BAD:**
+/// ```dart
+/// Icon(Icons.add, size: 24)
+/// Icon(Icons.add, size: 48)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Icon(Icons.add) // Uses IconTheme size
+/// Icon(Icons.add, size: IconTheme.of(context).size)
+/// ```
+class PreferAdaptiveIconsRule extends SaropaLintRule {
+  const PreferAdaptiveIconsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_adaptive_icons',
+    problemMessage:
+        '[prefer_adaptive_icons] Icon has a hardcoded size value. The default 24px icon size is optimized for phones but is too small on tablets and too large on watches or compact layouts. Hardcoded sizes ignore device form factor, accessibility settings (large text mode), and theme overrides. Use IconTheme to provide contextual sizing, or derive the size from MediaQuery or the surrounding layout constraints. {v1}',
+    correctionMessage:
+        'Remove the hardcoded size and let IconTheme provide the size, or use IconTheme.of(context).size to scale relative to the theme.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Icon') return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'size') {
+          // Flag only literal number sizes (not variables or expressions)
+          if (arg.expression is IntegerLiteral ||
+              arg.expression is DoubleLiteral) {
+            reporter.atNode(arg, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}

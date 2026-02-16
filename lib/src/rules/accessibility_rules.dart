@@ -3860,3 +3860,218 @@ class PreferFocusTraversalOrderRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// SEMANTICS CONTAINER RULES
+// =============================================================================
+
+/// Warns when Semantics wraps grouped widgets without `container: true`.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Groups of related widgets inside a Semantics wrapper should set
+/// `container: true` to indicate they form a single logical unit for
+/// assistive technology navigation. Without it, screen readers may
+/// announce each child separately rather than as a group.
+///
+/// **BAD:**
+/// ```dart
+/// Semantics(
+///   label: 'User info',
+///   child: Column(
+///     children: [Text('Name'), Text('Email')],
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Semantics(
+///   label: 'User info',
+///   container: true,
+///   child: Column(
+///     children: [Text('Name'), Text('Email')],
+///   ),
+/// )
+/// ```
+class PreferSemanticsContainerRule extends SaropaLintRule {
+  const PreferSemanticsContainerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_semantics_container',
+    problemMessage:
+        '[prefer_semantics_container] Semantics widget wraps a multi-child layout (Column, Row, Wrap, ListView) without container: true. Screen readers navigate each child individually rather than treating the group as a single logical unit, confusing users who expect related content to be announced together. Set container: true to group related semantic information. {v1}',
+    correctionMessage:
+        'Add container: true to the Semantics widget to group its children as a single navigable unit for screen readers.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Multi-child layout widgets that benefit from container grouping.
+  static const Set<String> _groupWidgets = <String>{
+    'Column',
+    'Row',
+    'Wrap',
+    'ListView',
+    'GridView',
+    'Flex',
+    'Stack',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Semantics') return;
+
+      // Check if container: true is already set
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'container') {
+          final String value = arg.expression.toSource();
+          if (value == 'true') return; // Already has container: true
+        }
+      }
+
+      // Check if child is a multi-child layout widget
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'child') {
+          final Expression child = arg.expression;
+          if (child is InstanceCreationExpression) {
+            final String childType = child.constructorName.type.name.lexeme;
+            if (_groupWidgets.contains(childType)) {
+              reporter.atNode(node.constructorName, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => [_AddContainerTrueFix()];
+}
+
+class _AddContainerTrueFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add container: true',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final args = node.argumentList;
+        final insertOffset = args.leftParenthesis.offset + 1;
+        final suffix = args.arguments.isNotEmpty ? ', ' : '';
+        builder.addSimpleInsertion(insertOffset, 'container: true$suffix');
+      });
+    });
+  }
+}
+
+/// Warns when Semantics wraps an Image that already has semanticLabel.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// An Image widget with a `semanticLabel` already provides accessible
+/// information. Wrapping it in an additional Semantics widget causes
+/// screen readers to announce the information twice, confusing users.
+///
+/// **BAD:**
+/// ```dart
+/// Semantics(
+///   label: 'Company logo',
+///   child: Image.asset('logo.png', semanticLabel: 'Company logo'),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Image.asset('logo.png', semanticLabel: 'Company logo')
+/// ```
+class AvoidRedundantSemanticsRule extends SaropaLintRule {
+  const AvoidRedundantSemanticsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_redundant_semantics',
+    problemMessage:
+        '[avoid_redundant_semantics] Semantics widget wraps an Image that already has a semanticLabel. The screen reader announces the image description twice — once from the Semantics label and once from the Image semanticLabel — creating a confusing and repetitive experience for users relying on assistive technology. Remove the outer Semantics wrapper or the Image semanticLabel. {v1}',
+    correctionMessage:
+        'Remove the outer Semantics wrapper (preferred) or remove the semanticLabel from the Image to avoid duplicate announcements.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Image widget types that support semanticLabel.
+  static const Set<String> _imageTypes = <String>{
+    'Image',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Semantics') return;
+
+      // Check if Semantics has a label
+      bool hasLabel = false;
+      Expression? childExpr;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          if (arg.name.label.name == 'label') hasLabel = true;
+          if (arg.name.label.name == 'child') childExpr = arg.expression;
+        }
+      }
+
+      if (!hasLabel || childExpr == null) return;
+
+      // Check if child is an Image with semanticLabel
+      if (childExpr is! InstanceCreationExpression) return;
+      final String childType = childExpr.constructorName.type.name.lexeme;
+      if (!_imageTypes.contains(childType)) return;
+
+      // Check for semanticLabel in the Image
+      for (final Expression arg in childExpr.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'semanticLabel') {
+          reporter.atNode(node.constructorName, code);
+          return;
+        }
+      }
+    });
+  }
+}

@@ -6528,3 +6528,121 @@ class AvoidEncryptionKeyInMemoryRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// OAUTH PKCE RULES
+// =============================================================================
+
+/// Warns when OAuth authorization flows lack PKCE (Proof Key for Code
+/// Exchange) parameters.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Mobile OAuth without PKCE is vulnerable to authorization code
+/// interception attacks. A malicious app can intercept the redirect URI
+/// and steal the authorization code. PKCE adds a code verifier/challenge
+/// pair that prevents this attack. All mobile OAuth flows should use PKCE.
+///
+/// **BAD:**
+/// ```dart
+/// final result = await appAuth.authorizeAndExchangeCode(
+///   AuthorizationTokenRequest('clientId', 'redirectUrl',
+///     serviceConfiguration: config),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final result = await appAuth.authorizeAndExchangeCode(
+///   AuthorizationTokenRequest('clientId', 'redirectUrl',
+///     serviceConfiguration: config,
+///     codeVerifier: generateCodeVerifier()),
+/// );
+/// ```
+class PreferOauthPkceRule extends SaropaLintRule {
+  const PreferOauthPkceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_oauth_pkce',
+    problemMessage:
+        '[prefer_oauth_pkce] OAuth authorization request without PKCE (Proof Key for Code Exchange). Mobile OAuth flows without PKCE are vulnerable to authorization code interception — a malicious app registers for the same redirect URI and steals the code before your app receives it. PKCE binds the authorization request to the token exchange with a code verifier/challenge pair, preventing interception. All mobile OAuth flows must use PKCE per RFC 7636. {v1}',
+    correctionMessage:
+        'Add codeVerifier (or codeChallenge) parameter to the authorization request. Use a cryptographically random code verifier generated with PKCE utilities.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Constructor/class names related to OAuth authorization.
+  static const Set<String> _oauthConstructors = <String>{
+    'AuthorizationTokenRequest',
+    'AuthorizationRequest',
+    'EndSessionRequest',
+  };
+
+  /// Method names related to OAuth authorization.
+  static const Set<String> _oauthMethods = <String>{
+    'authorizeAndExchangeCode',
+    'authorize',
+    'exchangeCode',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check OAuth constructor calls for PKCE parameters
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_oauthConstructors.contains(typeName)) return;
+
+      // Check for PKCE-related parameters
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name;
+          if (paramName == 'codeVerifier' ||
+              paramName == 'codeChallenge' ||
+              paramName == 'pkce') {
+            return; // Has PKCE, OK
+          }
+        }
+      }
+
+      reporter.atNode(node.constructorName, code);
+    });
+
+    // Check OAuth method calls
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_oauthMethods.contains(node.methodName.name)) return;
+
+      // Check if target looks like an OAuth/AppAuth instance
+      final String? targetSource = node.target?.toSource();
+      if (targetSource == null) return;
+
+      final bool isOAuth = targetSource.contains('appAuth') ||
+          targetSource.contains('AppAuth') ||
+          targetSource.contains('oauth') ||
+          targetSource.contains('OAuth');
+
+      if (!isOAuth) return;
+
+      // Check if arguments contain PKCE parameters
+      final String argsSource = node.argumentList.toSource();
+      if (argsSource.contains('codeVerifier') ||
+          argsSource.contains('codeChallenge') ||
+          argsSource.contains('pkce')) {
+        return; // Has PKCE, OK
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
