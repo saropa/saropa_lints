@@ -13,7 +13,7 @@ bool isEquatable(ClassDeclaration node) {
   // Check extends Equatable
   final ExtendsClause? extendsClause = node.extendsClause;
   if (extendsClause != null) {
-    final String superclassName = extendsClause.superclass.name2.lexeme;
+    final String superclassName = extendsClause.superclass.name.lexeme;
     if (superclassName == 'Equatable') return true;
   }
 
@@ -21,7 +21,7 @@ bool isEquatable(ClassDeclaration node) {
   final WithClause? withClause = node.withClause;
   if (withClause != null) {
     for (final NamedType mixin in withClause.mixinTypes) {
-      if (mixin.name2.lexeme == 'EquatableMixin') return true;
+      if (mixin.name.lexeme == 'EquatableMixin') return true;
     }
   }
 
@@ -120,7 +120,7 @@ class ExtendEquatableRule extends SaropaLintRule {
     final ExtendsClause? extendsClause = node.extendsClause;
     if (extendsClause == null) return false;
 
-    final String superclassName = extendsClause.superclass.name2.lexeme;
+    final String superclassName = extendsClause.superclass.name.lexeme;
     return superclassName == 'Equatable';
   }
 
@@ -129,7 +129,7 @@ class ExtendEquatableRule extends SaropaLintRule {
     if (withClause == null) return false;
 
     for (final NamedType mixin in withClause.mixinTypes) {
-      if (mixin.name2.lexeme == 'EquatableMixin') {
+      if (mixin.name.lexeme == 'EquatableMixin') {
         return true;
       }
     }
@@ -334,7 +334,7 @@ class PreferEquatableMixinRule extends SaropaLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superclassName = extendsClause.superclass.name2.lexeme;
+      final String superclassName = extendsClause.superclass.name.lexeme;
 
       // Only suggest for classes that directly extend Equatable
       if (superclassName != 'Equatable') return;

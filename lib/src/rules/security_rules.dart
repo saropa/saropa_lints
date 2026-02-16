@@ -2774,7 +2774,7 @@ class PreferDataMaskingRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for Text widgets
       if (typeName != 'Text' && typeName != 'SelectableText') return;
@@ -2969,7 +2969,7 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'TextField' &&
           typeName != 'TextFormField' &&
@@ -3078,7 +3078,7 @@ class AvoidPathTraversalRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for File/Directory creation
       if (typeName != 'File' && typeName != 'Directory') return;
@@ -3219,7 +3219,7 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for WebView widgets
       if (typeName != 'WebView' &&
@@ -4053,7 +4053,7 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (!_webViewTypes.contains(typeName)) return;
 
       // Check for JavaScript-related parameters
@@ -4152,7 +4152,7 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for InAppWebViewSettings or similar
       if (typeName != 'InAppWebViewSettings' &&
@@ -4290,7 +4290,7 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (!_webViewTypes.contains(typeName)) return;
 
       // Check for error handling callbacks
@@ -5263,7 +5263,7 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
 
     // Check for Uri.parse with user input passed to HTTP methods
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Uri') return;
 
       // Check if any argument contains user input patterns

@@ -92,7 +92,7 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     final String typeName =
         node.constructorName.type.element?.name ??
-        node.constructorName.type.name2.lexeme;
+        node.constructorName.type.name.lexeme;
 
     if (gradientTypes.contains(typeName)) {
       // Skip const gradients - they're properly reused

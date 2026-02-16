@@ -932,7 +932,7 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
     // Also check for inline Client() usage that isn't assigned to local variable
     // (The MethodDeclaration check above handles local variable + close pattern)
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'Client' && typeName != 'Dio') return;
 
@@ -2478,7 +2478,7 @@ class AvoidCachedImageInBuildRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final typeName = node.constructorName.type.name2.lexeme;
+      final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'CachedNetworkImage') return;
 
       // Check if inside build method

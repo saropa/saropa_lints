@@ -1258,7 +1258,7 @@ class PreferIsarLazyLinksRule extends SaropaLintRule {
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final type = node.constructorName.type;
-      final typeName = type.name2.lexeme;
+      final typeName = type.name.lexeme;
       if (typeName != 'IsarLinks') return;
 
       // Check if it's the lazy constructor

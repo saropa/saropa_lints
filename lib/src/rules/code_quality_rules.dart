@@ -3779,7 +3779,7 @@ class AvoidUnusedInstancesRule extends SaropaLintRule {
       final Expression expr = node.expression;
       if (expr is! InstanceCreationExpression) return;
 
-      final String typeName = expr.constructorName.type.name2.lexeme;
+      final String typeName = expr.constructorName.type.name.lexeme;
       if (_fireAndForgetTypes.contains(typeName)) return;
 
       reporter.atNode(node);
@@ -4480,7 +4480,7 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
-            final DartType? type = variable.declaredElement?.type;
+            final DartType? type = variable.declaredFragment?.element.type;
             if (type != null &&
                 type.nullabilitySuffix == NullabilitySuffix.question) {
               if (variable.initializer == null) {
@@ -4767,7 +4767,7 @@ class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
-            final DartType? type = variable.declaredElement?.type;
+            final DartType? type = variable.declaredFragment?.element.type;
             if (type != null &&
                 type.nullabilitySuffix == NullabilitySuffix.question) {
               // Skip if has initializer that's null
