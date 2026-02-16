@@ -104,22 +104,29 @@
 // Source: lib\src\rules\packages\url_launcher_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-// BAD: Should trigger avoid_url_launcher_simulator_tests
+// BAD: url_launcher imported + scheme string + launcher API call
 // expect_lint: avoid_url_launcher_simulator_tests
 void _bad774() async {
   testWidgets('can make phone call', (tester) async {
-    await tester.tap(find.byKey(Key('call_button')));
-    // This will fail on simulator!
+    await launchUrl(Uri.parse('tel:+1234567890'));
   });
 }
 
-// GOOD: Should NOT trigger avoid_url_launcher_simulator_tests
+// GOOD: Has mocking/skip condition
 void _good774() async {
   testWidgets('can make phone call', (tester) async {
-    // Mock the url_launcher for testing
     when(mockUrlLauncher.canLaunch(any)).thenAnswer((_) async => true);
     await tester.tap(find.byKey(Key('call_button')));
     verify(mockUrlLauncher.launch('tel:+1234567890'));
   }, skip: Platform.environment.containsKey('FLUTTER_TEST'));
+}
+
+// GOOD: Scheme string present but no launcher API in body (pure string logic)
+void _good774b() async {
+  test('rejects mailto URLs', () {
+    final result = parseHttpUrl('mailto:test@example.com');
+    expect(result, isNull);
+  });
 }

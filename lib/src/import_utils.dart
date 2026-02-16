@@ -110,4 +110,7 @@ class PackageImports {
   static const Set<String> cachedNetworkImage = {
     'package:cached_network_image/',
   };
+
+  /// URL Launcher package imports.
+  static const Set<String> urlLauncher = {'package:url_launcher/'};
 }
