@@ -203,6 +203,7 @@ from scripts.modules._rule_metrics import (
 from scripts.modules._timing import StepTimer
 from scripts.modules._version_changelog import (
     _VERSION_RE,
+    add_version_section,
     display_changelog,
     get_latest_changelog_version,
     get_package_name,
@@ -572,12 +573,30 @@ def main() -> int:
                         f"Updated pubspec.yaml to {version}"
                     )
                 else:
-                    exit_with_error(
-                        f"Version mismatch: pubspec={version} "
-                        f"is ahead of CHANGELOG="
-                        f"{changelog_version}. "
-                        f"Update CHANGELOG.md first.",
-                        ExitCode.CHANGELOG_FAILED,
+                    print_warning(
+                        f"pubspec version ({version}) is ahead "
+                        f"of CHANGELOG ({changelog_version})."
+                    )
+                    response = (
+                        input(
+                            f"  Add a [{version}] section to "
+                            f"CHANGELOG.md? [Y/n] "
+                        )
+                        .strip()
+                        .lower()
+                    )
+                    if response.startswith("n"):
+                        exit_with_error(
+                            "Publish canceled — update "
+                            "CHANGELOG.md manually.",
+                            ExitCode.CHANGELOG_FAILED,
+                        )
+                    add_version_section(
+                        changelog_path, version, "Version bump",
+                    )
+                    print_success(
+                        f"Added [{version}] section to "
+                        f"CHANGELOG.md"
                     )
 
             # Fail fast if already published
