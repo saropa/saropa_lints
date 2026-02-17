@@ -11,6 +11,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [5.0.0-beta.3]
+
+### Fixed
+- Add `analyzer` as explicit dependency — `dart pub publish` rejected transitive-only imports, causing silent publish failure
+- Remove `|| [ $? -eq 65 ]` from publish workflow — was silently swallowing publish failures
+
+---
 ## [5.0.0-beta.2]
 
 ### Fixed

@@ -17,13 +17,23 @@ dartdoc_options.yaml
 # Log files
 *.log
 
-# Example package files (path dependency breaks pana analysis)
-# Keep example/example.md and example/custom_lint.yaml for documentation
+# Example package files (path dependencies break pana analysis)
+# Keep example/example.md for pub.dev documentation tab
 example/pubspec.yaml
 example/pubspec.lock
 example/lib/
 example/analysis_options.yaml
 example/.dart_tool/
+example/nul
+example/reports/
+
+# Example fixture packages (path dependencies, custom_lint dev dep)
+example_async/
+example_core/
+example_packages/
+example_platforms/
+example_style/
+example_widgets/
 
 # Development files
 .dart_tool/
@@ -38,11 +48,21 @@ build/
 # OS files
 .DS_Store
 Thumbs.db
+nul
 
 # Project management files
 CLAUDE.md
 articles/
 cspell.json
+
+# Generated reports (large audit files)
+reports/
+
+# Bug tracking / internal issue docs
+bugs/
+
+# Backup files
+*.bak
 
 # Scripts not needed for package usage
 scripts/
