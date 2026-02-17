@@ -11,6 +11,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+
+### Fixed
+- Untrack `.github/copilot-instructions.md` — was gitignored but tracked, causing `dart pub publish --dry-run` to exit 65 (warning)
+- Publish workflow dry-run step now tolerates warnings (exit 65) but still fails on errors (exit 66)
+- Publish script now waits for GitHub Actions workflow to complete and reports real success/failure — previously printed "PUBLISHED" immediately without checking CI status
+
+---
 ## [5.0.0-beta.3]
 
 ### Fixed
