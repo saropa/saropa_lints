@@ -52,8 +52,19 @@ nul
 
 # Project management files
 CLAUDE.md
+CHANGELOG_ARCHIVE.md
 articles/
 cspell.json
+
+# Package dev config (not for consumers)
+analysis_options_custom.yaml
+
+# v4 custom_lint artifacts (obsolete for v5 native plugin)
+example/custom_lint.yaml
+example/analysis_options_template.yaml
+
+# Non-source file in lib/
+lib/src/rules/visitor_import_patch.txt
 
 # Generated reports (large audit files)
 reports/
