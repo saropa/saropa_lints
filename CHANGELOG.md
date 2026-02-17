@@ -11,6 +11,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+- Internal testing
+
+---
 ## [5.0.0-beta.1] — Native Plugin Migration
 
 Migrated from `custom_lint_builder` to the native `analysis_server_plugin` system. This is a **breaking change** for consumers (v4 → v5).
@@ -53,6 +57,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ### Fixed
 - Publish script regex patterns updated for v5 positional `LintCode` constructor — tier integrity, audit checks, OWASP coverage, prefix validation, and correction message stats now match both v5 positional and v4 named parameter formats
+- Publish script version utilities now support pre-release versions (`5.0.0-beta.1` → `5.0.0-beta.2`) — version parsing, comparison, pubspec read/write, changelog extraction, and input validation all handle `-suffix.N` format
 
 ### Removed
 - `custom_lint_builder` dependency and `lib/custom_lint_client.dart`
