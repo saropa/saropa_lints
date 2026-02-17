@@ -117,9 +117,11 @@ def get_registered_rule_names(
     saropa_content = saropa_lints_path.read_text(encoding="utf-8")
 
     # Step 1: Extract factory class names (ClassName.new entries)
+    # v5 uses SaropaLintRule, v4 used LintRule. The type and variable
+    # name may be on separate lines.
     factory_match = re.search(
-        r"final List<LintRule Function\(\)> _allRuleFactories"
-        r".*?=.*?\[(.+?)\];",
+        r"final List<\w+LintRule Function\(\)>\s*"
+        r"_allRuleFactories\s*=\s*<\w+LintRule Function\(\)>\[(.+?)\];",
         saropa_content,
         re.DOTALL,
     )
@@ -138,19 +140,37 @@ def get_registered_rule_names(
 
     # Step 3: Resolve each class name to its _code rule name
     #
-    # Matches: static const [LintCode] _code = LintCode(name: 'rule_name',
-    # Also handles: name: _name (variable reference)
+    # v5 uses positional constructor: LintCode('rule_name', 'message', ...)
+    # v4 used named params:          LintCode(name: 'rule_name', ...)
+    # Both formats are matched for backward compatibility.
+    #
+    # Also handles: LintCode(_name, ...) where _name is a const String.
     #
     # NOTE: Uses _code\w* (not _code) to match variant field names:
     #   _codeField, _codeMethod  (PreferWidgetPrivateMembersRule)
     #   _codeDoubleNegation, _codeDeMorgan  (PreferSimplerBooleanExpressionsRule)
     # Without \w*, rules using these names appear as "phantom" because
     # the regex can't resolve their class to a rule name.
+
+    # v5 positional: LintCode('rule_name', ...
+    code_positional = re.compile(
+        r"static const (?:LintCode )?_code\w*\s*=\s*LintCode\(\s*"
+        r"'([a-z_0-9]+)',",
+        re.DOTALL,
+    )
+    # v5 positional variable: LintCode(_name, ...
+    code_positional_var = re.compile(
+        r"static const (?:LintCode )?_code\w*\s*=\s*LintCode\(\s*"
+        r"(_\w+),",
+        re.DOTALL,
+    )
+    # v4 named: LintCode(name: 'rule_name', ...
     code_literal = re.compile(
         r"static const (?:LintCode )?_code\w*\s*=\s*LintCode\(\s*"
         r"name:\s*'([a-z_0-9]+)',",
         re.DOTALL,
     )
+    # v4 named variable: LintCode(name: _name, ...
     code_variable = re.compile(
         r"static const (?:LintCode )?_code\w*\s*=\s*LintCode\(\s*"
         r"name:\s*(_\w+),",
@@ -174,17 +194,32 @@ def get_registered_rule_names(
                 next_class if next_class != -1 else len(content)
             )]
 
-            # Try literal name: 'rule_name'
+            # Try v5 positional: LintCode('rule_name', ...
+            match = code_positional.search(class_body)
+            if match:
+                registered.add(match.group(1))
+                break
+
+            # Try v4 named: LintCode(name: 'rule_name', ...
             match = code_literal.search(class_body)
             if match:
                 registered.add(match.group(1))
                 break
 
-            # Try variable reference: name: _name
+            # Try v5 positional variable: LintCode(_name, ...
+            var_match = code_positional_var.search(class_body)
+            if var_match:
+                var_name = var_match.group(1)
+                for nm in name_const.finditer(class_body):
+                    if nm.group(1) == var_name:
+                        registered.add(nm.group(2))
+                        break
+                break
+
+            # Try v4 named variable: LintCode(name: _name, ...
             var_match = code_variable.search(class_body)
             if var_match:
                 var_name = var_match.group(1)
-                # Resolve the variable to its string value
                 for nm in name_const.finditer(class_body):
                     if nm.group(1) == var_name:
                         registered.add(nm.group(2))
@@ -300,7 +335,11 @@ def get_opinionated_prefer_rules(rules_dir: Path) -> set[str]:
         Set of rule names matching both criteria.
     """
     opinionated_prefer: set[str] = set()
-    name_pattern = re.compile(r"name:\s*'([a-z_]+)'")
+    # v5 positional: LintCode('rule_name', ...
+    # v4 named:      LintCode(name: 'rule_name', ...
+    name_pattern = re.compile(
+        r"LintCode\(\s*(?:name:\s*)?'([a-z_0-9]+)',"
+    )
     impact_pattern = re.compile(
         r"LintImpact get impact => LintImpact\.opinionated;"
     )

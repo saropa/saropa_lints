@@ -51,6 +51,9 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - Dependencies: `analysis_server_plugin: ^0.3.3` replaces `custom_lint_builder`
 - README updated for v5: `dart analyze` replaces `dart run custom_lint`, tier preset includes, v4 migration FAQ
 
+### Fixed
+- Publish script regex patterns updated for v5 positional `LintCode` constructor — tier integrity, audit checks, OWASP coverage, prefix validation, and correction message stats now match both v5 positional and v4 named parameter formats
+
 ### Removed
 - `custom_lint_builder` dependency and `lib/custom_lint_client.dart`
 - Redundant PoC files (`saropa_analysis_rule.dart`, `poc_rules.dart`, `saropa_reporter.dart`)

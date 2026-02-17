@@ -176,10 +176,17 @@ def find_duplicate_rules(rules_dir: Path) -> dict:
     class_pattern = re.compile(
         r"class\s+([A-Za-z0-9_]+)\s+extends\s+SaropaLintRule"
     )
-    rule_name_pattern = re.compile(r"name:\s*'([a-z0-9_]+)'")
+    # v5 positional: LintCode('rule_name', ...
+    # v4 named:      LintCode(name: 'rule_name', ...
+    rule_name_pattern = re.compile(
+        r"LintCode\(\s*(?:name:\s*)?'([a-z0-9_]+)',"
+    )
     alias_pattern = re.compile(r"///\s*Alias:\s*([a-zA-Z0-9_,\s]+)")
+    # v5 positional: LintCode('name', 'problemMessage', ...
+    # v4 named:      LintCode(name: 'name', problemMessage: 'msg', ...
     lint_code_pattern = re.compile(
-        r"name:\s*'([a-z0-9_]+)'.*?problemMessage:\s*(?:'([^']*)'|\"([^\"]*)\")",
+        r"LintCode\(\s*(?:name:\s*)?'([a-z0-9_]+)',\s*"
+        r"(?:problemMessage:\s*)?(?:'([^']*)'|\"([^\"]*)\")",
         re.DOTALL,
     )
 
@@ -254,7 +261,11 @@ def find_duplicate_rules(rules_dir: Path) -> dict:
 
 def get_file_stats(rules_dir: Path) -> list[FileStats]:
     """Get per-file statistics for all rule files."""
-    name_pattern = re.compile(r"name:\s*'([a-z0-9_]+)'")
+    # v5 positional: LintCode('rule_name', ...
+    # v4 named:      LintCode(name: 'rule_name', ...
+    name_pattern = re.compile(
+        r"LintCode\(\s*(?:name:\s*)?'([a-z0-9_]+)',"
+    )
     fix_pattern = re.compile(r"class \w+ extends DartFix")
     stats: list[FileStats] = []
 
@@ -278,9 +289,9 @@ def get_implemented_rules(
     """Extract rule names, aliases, and quick fix count from rule files.
 
     Scans ``*_rules.dart`` files for ``LintCode`` definitions and extracts
-    the ``name:`` value.  Handles both literal names (``name: 'rule'``) and
-    variable references (``name: _name``) by resolving the variable through
-    ``static const String`` declarations in the same file.
+    the rule name.  Handles both v5 positional (``LintCode('rule', ...``)
+    and v4 named (``LintCode(name: 'rule', ...``) formats, including
+    variable references resolved through ``static const String`` declarations.
 
     Returns:
         Tuple of (rule_names, aliases, quick_fix_count).
@@ -289,14 +300,18 @@ def get_implemented_rules(
     aliases: set[str] = set()
     fix_count = 0
 
+    # v5 positional: LintCode('rule_name', ...
+    # v4 named:      LintCode(name: 'rule_name', ...
     lintcode_pattern = re.compile(
         r"static const (?:LintCode )?_code\w*\s*=\s*LintCode\(\s*"
-        r"name:\s*'([a-z0-9_]+)',",
+        r"(?:name:\s*)?'([a-z0-9_]+)',",
         re.DOTALL,
     )
+    # v5 positional variable: LintCode(_name, ...
+    # v4 named variable:      LintCode(name: _name, ...
     lintcode_var_pattern = re.compile(
         r"static const (?:LintCode )?_code\w*\s*=\s*LintCode\(\s*"
-        r"name:\s*(_\w+),",
+        r"(?:name:\s*)?(_\w+),",
         re.DOTALL,
     )
     name_const_pattern = re.compile(
@@ -361,10 +376,17 @@ def get_rules_with_corrections(
     with_correction: set[str] = set()
     without_correction: set[str] = set()
 
+    # v5: LintCode('name', 'msg', correctionMessage: ...
+    # v4: LintCode(name: 'name', ... correctionMessage: ...
     lint_code_with_correction = re.compile(
-        r"name:\s*'([a-z0-9_]+)'.*?correctionMessage:", re.DOTALL
+        r"LintCode\(\s*(?:name:\s*)?'([a-z0-9_]+)'.*?correctionMessage:",
+        re.DOTALL,
     )
-    name_pattern = re.compile(r"name:\s*'([a-z0-9_]+)'")
+    # v5 positional: LintCode('rule_name', ...
+    # v4 named:      LintCode(name: 'rule_name', ...
+    name_pattern = re.compile(
+        r"LintCode\(\s*(?:name:\s*)?'([a-z0-9_]+)',"
+    )
 
     for dart_file in rules_dir.glob("**/*.dart"):
         if dart_file.name == "all_rules.dart":
@@ -384,8 +406,8 @@ def get_rules_missing_prefix(rules_dir: Path) -> list[str]:
     """Find rules whose problemMessage does not start with [rule_name].
 
     Every problemMessage must begin with ``[rule_name] `` where
-    ``rule_name`` matches the ``name:`` value in the same LintCode
-    definition.  This is a publish-blocking requirement.
+    ``rule_name`` matches the first argument in the LintCode
+    constructor.  This is a publish-blocking requirement.
 
     This is a lightweight check that runs even when DX audit is
     skipped.  For comprehensive message quality analysis including
@@ -396,10 +418,12 @@ def get_rules_missing_prefix(rules_dir: Path) -> list[str]:
     """
     missing: list[str] = []
 
+    # v5 positional: LintCode('name', 'problemMessage', ...
+    # v4 named:      LintCode(name: 'name', problemMessage: 'msg', ...
     lint_code_pattern = re.compile(
         r"LintCode\(\s*"
-        r"name:\s*'([a-z0-9_]+)',\s*"
-        r"problemMessage:\s*"
+        r"(?:name:\s*)?'([a-z0-9_]+)',\s*"
+        r"(?:problemMessage:\s*)?"
         r"(?:'([^']*)'|\"([^\"]*)\")",
         re.DOTALL,
     )
@@ -422,7 +446,11 @@ def get_owasp_coverage(rules_dir: Path) -> OwaspCoverage:
     """Extract OWASP coverage from rule files."""
     coverage = OwaspCoverage()
 
-    name_pattern = re.compile(r"name:\s*'([a-z0-9_]+)'")
+    # v5 positional: LintCode('rule_name', ...
+    # v4 named:      LintCode(name: 'rule_name', ...
+    name_pattern = re.compile(
+        r"LintCode\(\s*(?:name:\s*)?'([a-z0-9_]+)',"
+    )
     owasp_block_pattern = re.compile(
         r"OwaspMapping get owasp => const OwaspMapping\(\s*"
         r"mobile:\s*<OwaspMobile>\{([^}]*)\},?\s*"
