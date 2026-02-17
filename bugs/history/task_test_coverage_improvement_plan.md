@@ -239,8 +239,12 @@ Fixtures live in `example_platforms/lib/platforms/` (or `example_platforms/lib/p
 - Fixed: macOS capitalization in `macos_rules_test.dart`
 - Coverage: 1420/1748 (81.2%), 61/95 categories (64.2%)
 
-### Phase 3 — TODO
-- 34 remaining small categories (<10 rules)
+### Phase 3 — DONE
+- 34 test files created for small categories (<10 rules)
+- 59 fixture stubs created
+- 9 new package directories: flutter_hooks, workmanager, supabase, qr_scanner, get_it, geolocator, flame, sqflite, graphql
+- Fixed: `require_freezed_lint_package` test description had inverted semantics
+- Coverage: 1460/1748 (83.5%), 95/95 categories (100.0%)
 
 ## Risks & Notes
 

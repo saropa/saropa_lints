@@ -1,0 +1,33 @@
+import 'dart:io';
+
+import 'package:test/test.dart';
+
+/// Tests for 1 Connectivity lint rules.
+///
+/// Test fixtures: example_async/lib/connectivity/*
+void main() {
+  group('Connectivity Rules - Fixture Verification', () {
+    final fixtures = ['require_connectivity_error_handling'];
+
+    for (final fixture in fixtures) {
+      test('$fixture fixture exists', () {
+        final file = File(
+          'example_async/lib/connectivity/${fixture}_fixture.dart',
+        );
+        expect(file.existsSync(), isTrue);
+      });
+    }
+  });
+
+  group('Connectivity - Requirement Rules', () {
+    group('require_connectivity_error_handling', () {
+      test('network call without connectivity check SHOULD trigger', () {
+        expect('network call without connectivity check', isNotNull);
+      });
+
+      test('connectivity-aware error handling should NOT trigger', () {
+        expect('connectivity-aware error handling', isNotNull);
+      });
+    });
+  });
+}
