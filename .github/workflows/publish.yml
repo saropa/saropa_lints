@@ -27,7 +27,7 @@ jobs:
         run: dart test
 
       - name: Dry run
-        run: dart pub publish --dry-run || [ $? -eq 65 ]
+        run: dart pub publish --dry-run
 
       - name: Publish to pub.dev
-        run: dart pub publish --force || [ $? -eq 65 ]
+        run: dart pub publish --force
