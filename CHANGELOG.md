@@ -14,8 +14,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ## [Unreleased]
 
 ### Added
-- Test coverage for 50 rule categories (Phase 1 + Phase 2): 16 high-impact and 34 medium categories now have dedicated `test/*_rules_test.dart` files with fixture verification and semantic test stubs
-- 255 missing fixture stubs across all example directories
+- Test coverage for all 95 rule categories (Phase 1-3): every category now has a dedicated `test/*_rules_test.dart` file with fixture verification and semantic test stubs
+- 314 missing fixture stubs across all example directories
+- 9 new package fixture directories: flutter_hooks, workmanager, supabase, qr_scanner, get_it, geolocator, flame, sqflite, graphql
 
 ---
 ## [5.0.0-beta.4]
