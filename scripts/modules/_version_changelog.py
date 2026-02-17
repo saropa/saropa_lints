@@ -229,6 +229,41 @@ def rename_unreleased_to_version(
     return True
 
 
+def add_version_section(
+    changelog_path: Path, version: str, message: str = "Version bump",
+) -> bool:
+    """Insert a new version section above the first existing version.
+
+    Creates a ``## [version]`` heading with a single changelog entry,
+    matching the project's ``---``-separated section format.
+
+    Returns:
+        True if the section was added, False if it already exists.
+    """
+    content = changelog_path.read_text(encoding="utf-8")
+
+    # Don't duplicate an existing section
+    if re.search(rf"## \[{re.escape(version)}\]", content):
+        return False
+
+    new_section = (
+        f"---\n## [{version}]\n\n### Changed\n- {message}\n\n"
+    )
+
+    # Insert before the first ---\n## [version] block
+    match = re.search(
+        rf"---\n## \[?{_VERSION_RE}", content,
+    )
+    if match:
+        pos = match.start()
+        content = content[:pos] + new_section + content[pos:]
+    else:
+        content = content.rstrip() + "\n\n" + new_section
+
+    changelog_path.write_text(content, encoding="utf-8")
+    return True
+
+
 def add_unreleased_section(changelog_path: Path) -> bool:
     """Add empty [Unreleased] section above the first versioned section.
 
