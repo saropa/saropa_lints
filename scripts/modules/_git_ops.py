@@ -218,88 +218,65 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
     return True
 
 
-def publish_to_pubdev_step(
-    project_dir: Path, version: str,
-) -> bool:
-    """Step 14: Wait for GitHub Actions publish workflow.
+def _find_workflow_run(
+    project_dir: Path, tag_name: str,
+) -> str | None:
+    """Poll GitHub Actions until the publish workflow run appears.
 
-    Polls the workflow triggered by the version tag push. Returns
-    True only if the workflow completes successfully, ensuring the
-    success banner reflects the actual publish status.
+    GitHub may take several seconds to queue the workflow after a
+    tag push. Retries every 5 seconds for up to 60 seconds.
+
+    Returns the run's database ID as a string, or None.
     """
-    print_header("STEP 14: PUBLISHING TO PUB.DEV VIA GITHUB ACTIONS")
-
-    tag_name = f"v{version}"
-    use_shell = get_shell_mode()
-    remote_url = get_remote_url(project_dir)
-    repo_path = extract_repo_path(remote_url)
-
-    print_info(
-        "Tag push triggered GitHub Actions publish workflow."
-    )
-    print_colored(
-        f"  Waiting for workflow to complete...",
-        Color.CYAN,
-    )
-    print_colored(
-        f"  Monitor: https://github.com/{repo_path}/actions",
-        Color.DIM,
-    )
-    print()
-
-    # Find the workflow run triggered by this tag
-    result = subprocess.run(
-        [
-            "gh", "run", "list",
-            "--workflow=publish.yml",
-            f"--branch={tag_name}",
-            "--limit=1",
-            "--json=databaseId,status,conclusion",
-        ],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell,
-    )
-    if result.returncode != 0:
-        print_warning(
-            "Could not find workflow run. Check GitHub Actions "
-            "manually."
-        )
-        return False
-
     import json
-    try:
-        runs = json.loads(result.stdout)
-    except json.JSONDecodeError:
-        print_warning("Could not parse workflow run data.")
-        return False
+    import time
 
-    if not runs:
-        print_warning(
-            f"No publish workflow found for tag {tag_name}. "
-            f"Check GitHub Actions manually."
+    use_shell = get_shell_mode()
+    max_wait = 60
+    interval = 5
+
+    for elapsed in range(0, max_wait + 1, interval):
+        if elapsed > 0:
+            print_info(
+                f"  Waiting for workflow to appear "
+                f"({elapsed}s / {max_wait}s)..."
+            )
+            time.sleep(interval)
+
+        result = subprocess.run(
+            [
+                "gh", "run", "list",
+                "--workflow=publish.yml",
+                f"--branch={tag_name}",
+                "--limit=1",
+                "--json=databaseId,status,conclusion",
+            ],
+            cwd=project_dir,
+            capture_output=True,
+            text=True,
+            shell=use_shell,
         )
-        return False
+        if result.returncode != 0:
+            continue
 
-    run_id = str(runs[0]["databaseId"])
+        try:
+            runs = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            continue
 
-    # Wait for the workflow to complete (up to 5 minutes)
-    print_info(f"Watching workflow run {run_id}...")
-    watch_result = subprocess.run(
-        ["gh", "run", "watch", run_id, "--exit-status"],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell,
-        timeout=300,
-    )
+        if runs:
+            return str(runs[0]["databaseId"])
 
-    if watch_result.returncode == 0:
-        print_success("GitHub Actions publish workflow succeeded!")
-        return True
+    return None
 
-    # Workflow failed — show the failure details
+
+def _report_workflow_failure(
+    project_dir: Path, run_id: str, repo_path: str,
+) -> None:
+    """Print details about a failed GitHub Actions workflow run."""
+    import json
+
+    use_shell = get_shell_mode()
     print_error("GitHub Actions publish workflow FAILED!")
     print_colored(
         f"  View logs: gh run view {run_id} --log",
@@ -311,12 +288,8 @@ def publish_to_pubdev_step(
         Color.DIM,
     )
 
-    # Try to show the failing step
     log_result = subprocess.run(
-        [
-            "gh", "run", "view", run_id,
-            "--json=jobs",
-        ],
+        ["gh", "run", "view", run_id, "--json=jobs"],
         cwd=project_dir,
         capture_output=True,
         text=True,
@@ -334,6 +307,60 @@ def publish_to_pubdev_step(
         except (json.JSONDecodeError, KeyError):
             pass
 
+
+def publish_to_pubdev_step(
+    project_dir: Path, version: str,
+) -> bool:
+    """Step 14: Wait for GitHub Actions publish workflow.
+
+    Polls until the workflow run appears, then watches it to
+    completion. Returns True only when the workflow succeeds.
+    """
+    print_header("STEP 14: PUBLISHING TO PUB.DEV VIA GITHUB ACTIONS")
+
+    tag_name = f"v{version}"
+    use_shell = get_shell_mode()
+    remote_url = get_remote_url(project_dir)
+    repo_path = extract_repo_path(remote_url)
+
+    print_info(
+        "Tag push triggered GitHub Actions publish workflow."
+    )
+    print_colored(
+        f"  Waiting for workflow to appear...",
+        Color.CYAN,
+    )
+    print_colored(
+        f"  Monitor: https://github.com/{repo_path}/actions",
+        Color.DIM,
+    )
+    print()
+
+    run_id = _find_workflow_run(project_dir, tag_name)
+    if not run_id:
+        print_warning(
+            f"No publish workflow found for tag {tag_name} "
+            f"after 60s. Check GitHub Actions manually."
+        )
+        return False
+
+    print_info(f"Watching workflow run {run_id}...")
+    watch_result = subprocess.run(
+        ["gh", "run", "watch", run_id, "--exit-status"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+        timeout=300,
+    )
+
+    if watch_result.returncode == 0:
+        print_success(
+            "GitHub Actions publish workflow succeeded!"
+        )
+        return True
+
+    _report_workflow_failure(project_dir, run_id, repo_path)
     return False
 
 
