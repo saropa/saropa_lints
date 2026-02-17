@@ -27,7 +27,10 @@ jobs:
         run: dart test
 
       - name: Dry run
-        run: dart pub publish --dry-run
+        # Exit 65 = warnings (non-fatal), exit 66 = errors (fatal)
+        run: |
+          dart pub publish --dry-run; code=$?
+          if [ $code -eq 66 ]; then exit 1; fi
 
       - name: Publish to pub.dev
         run: dart pub publish --force

@@ -651,7 +651,7 @@ def main() -> int:
                 )
 
         with timer.step("Publish"):
-            if not publish_to_pubdev_step(project_dir):
+            if not publish_to_pubdev_step(project_dir, version):
                 exit_with_error(
                     "Publish failed", ExitCode.PUBLISH_FAILED,
                 )

@@ -218,26 +218,123 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
     return True
 
 
-def publish_to_pubdev_step(project_dir: Path) -> bool:
-    """Step 14: Notify that publishing happens via GitHub Actions."""
+def publish_to_pubdev_step(
+    project_dir: Path, version: str,
+) -> bool:
+    """Step 14: Wait for GitHub Actions publish workflow.
+
+    Polls the workflow triggered by the version tag push. Returns
+    True only if the workflow completes successfully, ensuring the
+    success banner reflects the actual publish status.
+    """
     print_header("STEP 14: PUBLISHING TO PUB.DEV VIA GITHUB ACTIONS")
 
-    print_success(
-        "Tag push triggered GitHub Actions publish workflow!"
-    )
-    print_colored(
-        "  Publishing is now running automatically on GitHub Actions.",
-        Color.CYAN,
-    )
-
+    tag_name = f"v{version}"
+    use_shell = get_shell_mode()
     remote_url = get_remote_url(project_dir)
     repo_path = extract_repo_path(remote_url)
+
+    print_info(
+        "Tag push triggered GitHub Actions publish workflow."
+    )
     print_colored(
-        f"  Monitor: https://github.com/{repo_path}/actions",
+        f"  Waiting for workflow to complete...",
         Color.CYAN,
     )
+    print_colored(
+        f"  Monitor: https://github.com/{repo_path}/actions",
+        Color.DIM,
+    )
     print()
-    return True
+
+    # Find the workflow run triggered by this tag
+    result = subprocess.run(
+        [
+            "gh", "run", "list",
+            "--workflow=publish.yml",
+            f"--branch={tag_name}",
+            "--limit=1",
+            "--json=databaseId,status,conclusion",
+        ],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    if result.returncode != 0:
+        print_warning(
+            "Could not find workflow run. Check GitHub Actions "
+            "manually."
+        )
+        return False
+
+    import json
+    try:
+        runs = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        print_warning("Could not parse workflow run data.")
+        return False
+
+    if not runs:
+        print_warning(
+            f"No publish workflow found for tag {tag_name}. "
+            f"Check GitHub Actions manually."
+        )
+        return False
+
+    run_id = str(runs[0]["databaseId"])
+
+    # Wait for the workflow to complete (up to 5 minutes)
+    print_info(f"Watching workflow run {run_id}...")
+    watch_result = subprocess.run(
+        ["gh", "run", "watch", run_id, "--exit-status"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+        timeout=300,
+    )
+
+    if watch_result.returncode == 0:
+        print_success("GitHub Actions publish workflow succeeded!")
+        return True
+
+    # Workflow failed — show the failure details
+    print_error("GitHub Actions publish workflow FAILED!")
+    print_colored(
+        f"  View logs: gh run view {run_id} --log",
+        Color.DIM,
+    )
+    print_colored(
+        f"  URL: https://github.com/{repo_path}"
+        f"/actions/runs/{run_id}",
+        Color.DIM,
+    )
+
+    # Try to show the failing step
+    log_result = subprocess.run(
+        [
+            "gh", "run", "view", run_id,
+            "--json=jobs",
+        ],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    if log_result.returncode == 0:
+        try:
+            data = json.loads(log_result.stdout)
+            for job in data.get("jobs", []):
+                for step in job.get("steps", []):
+                    if step.get("conclusion") == "failure":
+                        print_error(
+                            f"  Failed step: {step['name']}"
+                        )
+        except (json.JSONDecodeError, KeyError):
+            pass
+
+    return False
 
 
 def create_github_release(
