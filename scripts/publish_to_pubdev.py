@@ -202,11 +202,12 @@ from scripts.modules._rule_metrics import (
 )
 from scripts.modules._timing import StepTimer
 from scripts.modules._version_changelog import (
+    _VERSION_RE,
     display_changelog,
     get_latest_changelog_version,
     get_package_name,
     get_version_from_pubspec,
-    increment_patch_version,
+    increment_version,
     parse_version,
     rename_unreleased_to_version,
     set_version_in_pubspec,
@@ -515,16 +516,17 @@ def main() -> int:
         # --- Step 8: Version prompt (interactive, not timed) ---
         print_header("VERSION")
         if tag_exists_on_remote(project_dir, f"v{pubspec_version}"):
-            default_version = increment_patch_version(pubspec_version)
+            default_version = increment_version(pubspec_version)
         else:
             default_version = pubspec_version
 
         while True:
             version = _prompt_version(default_version)
-            if re.match(r"^\d+\.\d+\.\d+$", version):
+            if re.match(rf"^{_VERSION_RE}$", version):
                 break
             print_warning(
-                f"Invalid version format '{version}'. Use X.Y.Z"
+                f"Invalid version format '{version}'. "
+                f"Use X.Y.Z or X.Y.Z-pre.N"
             )
 
         with timer.step("Version sync"):
