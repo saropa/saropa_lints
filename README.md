@@ -29,23 +29,36 @@ Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter be
 
 ## Quick Start
 
-**Three steps. Two commands. One config file.**
-
-### Step 1 — Install & initialize
+### Option A — Zero-config (tier preset)
 
 ```bash
-# Add dependencies
-dart pub add --dev custom_lint saropa_lints
+dart pub add --dev saropa_lints
+```
 
-# Generate rule configuration (pick your tier - try essential or recommended to begin with)
-dart run saropa_lints:init --tier essential
+Add one line to your `analysis_options.yaml`:
+
+```yaml
+include: package:saropa_lints/tiers/recommended.yaml
+```
+
+That's it. Run `dart analyze` and issues appear in your IDE and terminal.
+
+Available presets: `essential.yaml` · `recommended.yaml` · `professional.yaml` · `comprehensive.yaml` · `pedantic.yaml`
+
+### Option B — Full control (init tool)
+
+```bash
+dart pub add --dev saropa_lints
+
+# Generate explicit rule configuration (pick your tier)
+dart run saropa_lints:init --tier recommended
 ```
 
 This updates (or creates) two files:
-- **`analysis_options.yaml`** — the `custom_lint:` section is regenerated with every rule set to `true`/`false` for your tier. All other sections (`analyzer:`, `linter:`, etc.) are preserved. Your manual rule overrides are kept.
+- **`analysis_options.yaml`** — the `plugins: saropa_lints: diagnostics:` section is regenerated with every rule set to `true`/`false` for your tier. All other sections (`analyzer:`, `linter:`, etc.) are preserved. Your manual rule overrides are kept.
 - **`analysis_options_custom.yaml`** — your project settings. Created on first run; never overwritten. Missing sections are added automatically on subsequent runs.
 
-### Step 2 — Review your settings
+### Review your settings
 
 Open `analysis_options_custom.yaml` and adjust for your project:
 
@@ -74,20 +87,13 @@ output: both         # "both" = Problems tab + report file
 
 After changing settings, re-run init to apply: `dart run saropa_lints:init`
 
-### Step 3 — Run analysis
+### Run analysis
 
 ```bash
-dart run custom_lint
+dart analyze
 ```
 
-#### Where do my issues go?
-
-| Destination | What it contains | Controlled by |
-|-------------|-----------------|---------------|
-| **Problems tab** | First 500 issues (configurable) | `max_issues` — set to `0` for unlimited |
-| **Report file** | **ALL issues, always, uncapped** | `output` — set to `file` to skip Problems tab entirely |
-
-The report file is written to `reports/<timestamp>_saropa_lint_report.log` in your project root. It contains every violation for your tier regardless of the `max_issues` cap.
+Issues appear in your IDE's Problems panel and in the terminal. No extra commands needed — Saropa Lints runs as a native Dart analyzer plugin.
 
 > **Available tiers:** `essential` · `recommended` · `professional` · `comprehensive` · `pedantic` — see [The 5 Tiers](#the-5-tiers) for details
 >
@@ -99,7 +105,7 @@ The report file is written to `reports/<timestamp>_saropa_lint_report.log` in yo
 
 ### Linting vs static analysis
 
-`flutter analyze` checks syntax and style. Static analysis checks _behavior_.
+`dart analyze` checks syntax and style. Static analysis checks _behavior_.
 
 Your linter catches unused variables and formatting issues. It doesn't catch undisposed controllers, hardcoded credentials, or `setState` after `dispose` — because these require understanding what the code _does_, not just how it's written.
 
@@ -192,7 +198,7 @@ Why switch? Saropa Lints covers everything in standard tools plus strict behavio
 | :--- | :---: | :---: | :--- |
 | **Syntax Checks** | ✅ | ✅ | ✅ |
 | **Strict/Opinionated Style** | ❌ | ✅ | ✅ |
-| **Zero-Config Setup** | ✅ | ✅ | 🚧 **(Coming Soon)** |
+| **Zero-Config Setup** | ✅ | ✅ | ✅ **(Tier Presets)** |
 | **Controller Leak Detection** | ❌ | ❌ | ✅ **(Deep Analysis)** |
 | **Runtime Crash Prevention** | ❌ | ❌ | ✅ **(Behavioral)** |
 | **Security (OWASP Mapped)** | ❌ | ❌ | ✅ **(ISO/OWASP)** |
@@ -259,7 +265,7 @@ The tool is also built to **fix**. Saropa Lints diagnostics are engineered to be
 - [Migrating from solid_lints](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_solid_lints.md)
 - [Using with flutter_lints](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_flutter_lints.md) (complementary setup)
 
-> **Why a CLI tool?** The `custom_lint` plugin doesn't reliably pass configuration like `tier: recommended` to plugins. The CLI generates explicit `true`/`false` for every rule, which works 100% of the time.
+> **Why two options?** The tier presets (Option A) are great for getting started fast. The init tool (Option B) gives you explicit `true`/`false` for every rule, making it easy to customize individual rules and see exactly what's enabled.
 
 ## The 5 Tiers
 
@@ -295,7 +301,14 @@ See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_li
 
 ### Using a tier
 
-Generate configuration for your chosen tier:
+**Option A — Tier preset (zero-config):**
+
+```yaml
+# In analysis_options.yaml — just pick your tier:
+include: package:saropa_lints/tiers/recommended.yaml
+```
+
+**Option B — Init tool (full control):**
 
 ```bash
 # Most teams start here
@@ -317,30 +330,21 @@ Add `--stylistic` to include opinionated formatting rules.
 After generating configuration, customize rules by editing `analysis_options.yaml`:
 
 ```yaml
-custom_lint:
-  rules:
-    # The init tool generates explicit true/false for every rule
-    - avoid_hardcoded_strings_in_ui: true  # change to false to disable
-    - require_public_api_documentation: false  # change to true to enable
+plugins:
+  saropa_lints:
+    diagnostics:
+      # The init tool generates explicit true/false for every rule
+      avoid_hardcoded_strings_in_ui: true  # change to false to disable
+      require_public_api_documentation: false  # change to true to enable
 
-    # Stylistic rules (enable the ones your team prefers)
-    - prefer_single_quotes: true
-    - prefer_trailing_comma_always: true
+      # Stylistic rules (enable the ones your team prefers)
+      prefer_single_quotes: true
+      prefer_trailing_comma_always: true
 ```
 
-**IMPORTANT:** Rules must use YAML list format (with `-` prefix):
+Rules use standard YAML map format (no `-` prefix needed).
 
-```yaml
-# ✅ Correct (list format)
-rules:
-  - avoid_hardcoded_strings_in_ui: false
-
-# ❌ Wrong (map format - rules will be silently ignored)
-rules:
-  avoid_hardcoded_strings_in_ui: false  # NO DASH = NOT PARSED!
-```
-
-To change tiers, re-run the init tool:
+To change tiers, either switch the `include:` preset or re-run the init tool:
 
 ```bash
 dart run saropa_lints:init --tier professional
@@ -451,32 +455,37 @@ lib/my_file.dart:42 - [prefer_arguments_ordering] Named arguments should be in a
                        ^^^^^^^^^^^^^^^^^^^^^^^^^ This is the config key
 ```
 
-To disable this rule: `- prefer_arguments_ordering: false`
+To disable this rule: `prefer_arguments_ordering: false`
 
 **Aliases**: Some rules support shorter aliases for convenience. For example, `prefer_arguments_ordering` also accepts `arguments_ordering`:
 
 ```yaml
-rules:
-  # Both of these work:
-  - prefer_arguments_ordering: false  # canonical name
-  - arguments_ordering: false          # alias
+plugins:
+  saropa_lints:
+    diagnostics:
+      # Both of these work:
+      prefer_arguments_ordering: false  # canonical name
+      arguments_ordering: false          # alias
 ```
 
 Aliases are provided for rules where the prefix (`enforce_`, `require_`) might be commonly omitted.
 
-### enable_all_lint_rules
+### Enabling all rules
 
-The `enable_all_lint_rules: true` setting enables ALL rules, including opinionated stylistic rules:
+Use the `pedantic` tier preset or the init tool to enable all rules:
 
 ```yaml
-custom_lint:
-  enable_all_lint_rules: true
+# Option A: Tier preset
+include: package:saropa_lints/tiers/pedantic.yaml
+
+# Option B: Init tool
+# dart run saropa_lints:init --tier pedantic --stylistic
 ```
 
 **This is intentional.** It forces teams to explicitly review and disable rules they disagree with, ensuring:
 
 - No rule is accidentally overlooked
-- Your `custom_lint.yaml` becomes a complete record of team style decisions
+- Your config becomes a complete record of team style decisions
 - Mutually exclusive rules (e.g., `prefer_single_quotes` vs `prefer_double_quotes`) require explicit choice
 
 If you enable all rules, you will need to disable one rule from each conflicting pair.
@@ -486,14 +495,14 @@ If you enable all rules, you will need to disable one rule from each conflicting
 Each rule has a fixed severity (ERROR, WARNING, or INFO) defined in the rule itself. Severity cannot be overridden per-project. If a rule's severity doesn't match your needs:
 
 - Use `// ignore: rule_name` to suppress individual occurrences
-- Disable the rule entirely with `- rule_name: false`
+- Disable the rule entirely with `rule_name: false`
 - [Open an issue](https://github.com/saropa/saropa_lints/issues) if you think the default severity should change
 
 ### Baseline for Brownfield Projects
 
 #### The Problem
 
-You want to adopt saropa_lints on an existing project. You run `dart run custom_lint` and see:
+You want to adopt saropa_lints on an existing project. You run `dart analyze` and see:
 
 ```
 lib/old_widget.dart:42 - avoid_print
@@ -627,7 +636,7 @@ Examples: `prefer_relative_imports`, `prefer_single_quotes`, `prefer_arrow_funct
 
 ## Performance
 
-Running all 1700+ rules uses significant memory. The tier system helps:
+Saropa Lints runs as a native Dart analyzer plugin — no separate process needed. The tier system helps manage analysis scope:
 
 - Rules set to `false` are not loaded
 - Start with `essential` or `recommended`
@@ -643,19 +652,11 @@ dart run saropa_lints:init --tier pedantic
 
 ### Performance Tip: Use Lower Tiers During Development
 
-**custom_lint is notoriously slow** with large rule sets. For faster iteration during development:
+For faster iteration during development:
 
-1. **Use `essential` tier locally** (~400 rules) - catches critical bugs, runs 3-5x faster
-2. **Use `professional` or higher in CI** - thorough checking where speed matters less
-3. **Upgrade tiers gradually** - fix warnings before enabling more rules
-
-```bash
-# Fast local development (~400 rules)
-dart run saropa_lints:init --tier essential
-
-# Thorough CI checking (~1400 rules)
-dart run saropa_lints:init --tier professional
-```
+1. **Use `essential` tier locally** — catches critical bugs with fewer rules
+2. **Use `professional` or higher in CI** — thorough checking where speed matters less
+3. **Upgrade tiers gradually** — fix warnings before enabling more rules
 
 The tier you choose has a direct impact on analysis speed:
 
@@ -686,10 +687,6 @@ When a rule doesn't apply to specific code:
 // ignore: avoid_hardcoded_strings_in_ui
 const debugText = 'DEBUG MODE';
 
-// Hyphenated format also works:
-// ignore: avoid-hardcoded-strings-in-ui
-const debugText = 'DEBUG MODE';
-
 // For entire files:
 // ignore_for_file: avoid_print_in_production
 ```
@@ -715,16 +712,18 @@ Test files are skipped by default because most production-focused rules generate
 
 ## Limitations
 
-- Scope: custom_lint (and therefore saropa_lints) only runs rules inside the package where you invoke it. `dependency_overrides` pointing to local packages are not linted automatically—add saropa_lints to the overridden package and run `dart run custom_lint` in that package (or wire a workspace task) if you want coverage there.
-- File types: Only Dart source files (`.dart`) are analyzed. Non-Dart assets (JSON, XML, YAML, scripts, etc.) are out of scope for custom_lint.
+- **Scope**: Saropa Lints runs as a native analyzer plugin on the package where it's configured. For multi-package workspaces, add `saropa_lints` to each package's `analysis_options.yaml`.
+- **File types**: Only Dart source files (`.dart`) are analyzed. Non-Dart assets (JSON, XML, YAML, scripts, etc.) are out of scope.
 
 ## Running the Linter
 
-**Command line (recommended - always works):**
+**Command line:**
 
 ```bash
-dart run custom_lint
+dart analyze
 ```
+
+Saropa Lints runs as a native Dart analyzer plugin. Issues appear automatically in your IDE's Problems panel and in `dart analyze` output.
 
 ### Impact Report
 
@@ -764,82 +763,15 @@ Total: 53 issues
 
 Exit code equals the number of critical issues (capped at 125), making it CI-friendly.
 
-**IDE Integration (unreliable):**
+### IDE Integration
 
-custom_lint uses the Dart analyzer plugin system, which has known reliability issues. IDE integration may or may not work depending on your setup. If you don't see warnings in your IDE:
+Saropa Lints v5 uses the native Dart analyzer plugin system. Issues appear directly in your IDE's Problems panel — no extra setup required.
 
-1. Run `flutter pub get`
-2. Restart VS Code completely (not just the analysis server)
+**If you don't see warnings:**
+
+1. Run `dart pub get` (or `flutter pub get`)
+2. Restart your IDE (VS Code: `Ctrl+Shift+P` → "Developer: Reload Window")
 3. Check **View → Output → Dart Analysis Server** for errors
-4. If still not working, use the CLI - it's reliable
-
-**For reliable workflows, use:**
-
-- Pre-commit hooks
-- CI/CD checks
-- VS Code tasks (see below)
-
-### VS Code Task Setup (Recommended)
-
-Create `.vscode/tasks.json` in your project root:
-
-```json
-{
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "custom_lint",
-      "type": "shell",
-      "command": "dart run custom_lint",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      },
-      "problemMatcher": {
-        "owner": "custom_lint",
-        "fileLocation": ["relative", "${workspaceFolder}"],
-        "pattern": {
-          "regexp": "^\\s*(.+):(\\d+):(\\d+)\\s+•\\s+(.+)\\s+•\\s+(\\w+)\\s+•\\s+(ERROR|WARNING|INFO)$",
-          "file": 1,
-          "line": 2,
-          "column": 3,
-          "message": 4,
-          "code": 5,
-          "severity": 6
-        }
-      }
-    }
-  ]
-}
-```
-
-**Usage:**
-
-- Press **Ctrl+Shift+B** (or **Cmd+Shift+B** on Mac) to run custom_lint
-- Warnings appear in the **Problems** panel (Ctrl+Shift+M)
-- Click any warning to jump to that line in your code
-
-This is more reliable than IDE integration because it runs the actual CLI tool rather than depending on the analyzer plugin system.
-
-### VS Code Status Bar Button (Optional)
-
-Want a clickable button instead of remembering the keyboard shortcut? Install the included extension:
-
-```bash
-python scripts/modules/_install_vscode_extension.py
-```
-
-Then restart VS Code.
-
-**What you get:**
-
-- A **"Lints"** button in the status bar (bottom of VS Code)
-- A search icon in the editor title bar when viewing Dart files
-- Both trigger `dart run custom_lint` and open the Problems panel
 
 ## Troubleshooting
 
@@ -850,28 +782,25 @@ Then restart VS Code.
 1. **Install**: Add to your `pubspec.yaml` dev_dependencies:
    ```yaml
    dev_dependencies:
-     custom_lint: ^0.8.0
-     saropa_lints: ^4.2.3
+     saropa_lints: ^5.0.0
    ```
 
 2. **Configure**: Add to your `analysis_options.yaml`:
    ```yaml
-   analyzer:
-     plugins:
-       - custom_lint
-
-   custom_lint:
-     enable_all_lint_rules: true  # Start with all rules
+   include: package:saropa_lints/tiers/recommended.yaml
    ```
 
-3. **Reload VS Code**:
+3. **Get dependencies**:
+   ```bash
+   dart pub get
+   ```
+
+4. **Reload VS Code**:
    - Press `Ctrl+Shift+P`
    - Type "reload"
    - Click "Developer: Reload Window"
 
-4. **Wait**: Give it 1-2 minutes to analyze your code
-
-5. **Check**: Look at the PROBLEMS panel (View → Problems)
+5. **Check**: Look at the PROBLEMS panel (View → Problems), or run `dart analyze`
 
 **Still not working?** See the sections below.
 
@@ -882,38 +811,36 @@ Then restart VS Code.
 1. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
 2. Type "reload"
 3. Click "Developer: Reload Window"
-4. Wait 1 minute for analysis to complete
+4. Wait for analysis to complete
 
 **If that doesn't work:**
 
-1. Clear the cache: Delete the `.dart_tool/custom_lint` folder in your project
+1. Clear the cache: Delete the `.dart_tool` folder and run `dart pub get`
 2. Reload VS Code again (steps above)
 3. Check **View → Output → Dart Analysis Server** for errors
 4. Verify configuration is correct (see "Configuration not working" below)
 
 **Alternative (command line):**
 
-Run `dart run custom_lint` in your terminal to see all issues immediately.
+Run `dart analyze` in your terminal to see all issues immediately.
 
 ### Configuration not working (not enough rules loading)
 
-**Problem:** You only get ~200 rules instead of the full set for your chosen tier.
-
-**Cause:** The `custom_lint` plugin does not support plugin-level configuration keys. YAML-based tier selection (e.g., `saropa_lints: tier: recommended`) does not work.
+**Problem:** You only get a few rules instead of the full set for your chosen tier.
 
 **Solution:** Use the CLI tool to generate explicit configuration:
 
 ```bash
-# Generate config for comprehensive tier (1618 rules)
+# Generate config for comprehensive tier
 dart run saropa_lints:init --tier comprehensive
 
 # Or for all rules (pedantic tier)
 dart run saropa_lints:init --tier pedantic
 ```
 
-This generates `analysis_options.yaml` with explicit `- rule_name: true` for every enabled rule, which works 100% of the time.
+This generates `analysis_options.yaml` with explicit `rule_name: true` for every enabled rule.
 
-**Verify it worked:** Run `dart run custom_lint` and check the rule count in the output.
+**Verify it worked:** Run `dart analyze` and check the output.
 
 ### Too many warnings! What do I do?
 
@@ -922,7 +849,7 @@ This generates `analysis_options.yaml` with explicit `- rule_name: true` for eve
 **Option 1: Start smaller** (recommended for existing projects)
 
 ```bash
-# Start with essential tier (~400 critical rules)
+# Start with essential tier (~300 critical rules)
 dart run saropa_lints:init --tier essential
 ```
 
@@ -936,13 +863,15 @@ dart run saropa_lints:baseline
 
 **Option 3: Disable noisy rules**
 
-Edit your generated `analysis_options.yaml` and change specific rules from `true` to `false`:
+Edit your `analysis_options.yaml` and set specific rules to `false`:
 
 ```yaml
-rules:
-    - prefer_double_quotes: false  # disabled
-    - prefer_trailing_comma_always: false
-    - no_magic_number: false
+plugins:
+  saropa_lints:
+    diagnostics:
+      prefer_double_quotes: false  # disabled
+      prefer_trailing_comma_always: false
+      no_magic_number: false
 ```
 
 **Option 4: Use quick fixes**
@@ -951,6 +880,7 @@ Many rules have automatic fixes:
 - Hover over the warning
 - Click "Quick Fix" or press `Ctrl+.`
 - Select "Fix all in file" to fix all instances at once
+- Or run `dart fix --apply` from the command line
 
 **Don't stress about fixing everything immediately.** Pick one category (like accessibility or memory leaks) and fix those first.
 
@@ -960,7 +890,6 @@ If you see errors like:
 
 ```
 ../../runtime/vm/zone.cc: 96: error: Out of memory.
-Crash occurred when compiling package:analyzer/... in optimizing JIT mode
 ```
 
 **Solution 1: Clear the pub cache** (most effective)
@@ -968,14 +897,13 @@ Crash occurred when compiling package:analyzer/... in optimizing JIT mode
 ```bash
 dart pub cache clean
 dart pub get
-dart run custom_lint
 ```
 
 **Solution 2: Increase Dart heap size** (PowerShell)
 
 ```powershell
 $env:DART_VM_OPTIONS="--old_gen_heap_size=4096"
-dart run custom_lint
+dart analyze
 ```
 
 **Solution 3: Delete local build artifacts**
@@ -1000,18 +928,21 @@ rmdir /s /q .dart_tool && flutter pub get
 rm -rf .dart_tool && flutter pub get
 ```
 
-Then run `dart run custom_lint` again.
+Then run `dart analyze` again.
 
 ## Frequently Asked Questions
 
 **Q: Does this replace `flutter_lints`?**
-A: You can run them side-by-side, but Saropa Lints covers everything in `flutter_lints` plus 1600+ additional behavioral and security checks. Most teams replace `flutter_lints` entirely.
+A: You can run them side-by-side, but Saropa Lints covers everything in `flutter_lints` plus 1600+ additional behavioral and security checks. Most teams replace `flutter_lints` entirely. With v5, you no longer need `custom_lint` either — just `saropa_lints` in your dev_dependencies.
 
 **Q: Will this slow down my CI/CD pipeline?**
-A: Saropa Lints is optimized for performance. While it runs deeper checks than standard linters, the **Tier System** allows you to balance speed and strictness. The `essential` tier is designed to be lightning-fast for CI environments.
+A: Saropa Lints v5 runs as a native analyzer plugin, integrated directly into `dart analyze`. The **Tier System** allows you to balance speed and strictness. The `essential` tier is designed to be fast for CI environments.
 
 **Q: Can I use this with existing legacy projects?**
 A: Yes! Use the **Baseline** feature (`dart run saropa_lints:baseline`) to suppress existing issues instantly. This lets you enforce quality on *new* code without having to fix 500+ legacy errors first.
+
+**Q: I'm upgrading from v4 — what changed?**
+A: v5 uses the native Dart analyzer plugin system instead of `custom_lint`. Remove `custom_lint` from your dependencies, replace `custom_lint: rules:` with `plugins: saropa_lints: diagnostics:` in your config (or just use a tier preset), and run `dart analyze` instead of `dart run custom_lint`. The init tool handles the config migration automatically.
 
 ## Contributing
 
@@ -1035,9 +966,10 @@ See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUT
 **Adding a new rule:**
 
 1. Create rule in appropriate `lib/src/rules/*.dart` file
-2. Add to the appropriate tier(s) in `lib/tiers/*.yaml`
-3. Add tests in `test/rules/*_test.dart`
-4. Update CHANGELOG.md
+2. Register in `lib/src/rules/all_rules.dart`
+3. Add to the appropriate tier in `lib/src/tiers.dart`
+4. Add tests in `test/`
+5. Update CHANGELOG.md
 
 **Reporting issues:**
 
@@ -1139,7 +1071,7 @@ Built with care by the Flutter community. Questions? Ideas? We'd love to hear fr
 
 **saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 1700+ lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
 
-**Keywords:** Flutter linter, Dart static analysis, custom_lint rules, Flutter code quality, memory leak detection, security scanning, accessibility testing, WCAG compliance, European Accessibility Act, Flutter best practices, Dart analyzer plugin, code review automation, CI/CD linting, Flutter enterprise tools
+**Keywords:** Flutter linter, Dart static analysis, Flutter code quality, memory leak detection, security scanning, accessibility testing, WCAG compliance, European Accessibility Act, Flutter best practices, Dart analyzer plugin, code review automation, CI/CD linting, Flutter enterprise tools
 
 **Hashtags:** #Flutter #Dart #StaticAnalysis #CodeQuality #FlutterDev #DartLang #Linting #DevTools #OpenSource #Accessibility #Security #BestPractices
 
@@ -1147,11 +1079,11 @@ Built with care by the Flutter community. Questions? Ideas? We'd love to hear fr
 
 ## Sources
 
-- **custom_lint** — Plugin framework for custom Dart analysis rules
-  https://pub.dev/packages/custom_lint
-
 - **Dart Analyzer** — Dart's static analysis engine
   https://dart.dev/tools/analysis
+
+- **analysis_server_plugin** — Native Dart analyzer plugin framework
+  https://pub.dev/packages/analysis_server_plugin
 
 - **Flutter Accessibility** — Flutter accessibility documentation
   https://docs.flutter.dev/ui/accessibility-and-internationalization/accessibility
