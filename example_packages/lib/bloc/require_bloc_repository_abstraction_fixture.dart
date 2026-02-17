@@ -1,0 +1,6 @@
+// ignore_for_file: unused_local_variable, unused_element
+
+/// Fixture for `require_bloc_repository_abstraction` lint rule.
+
+// TODO: Add bad/good examples for require_bloc_repository_abstraction
+void main() {}
