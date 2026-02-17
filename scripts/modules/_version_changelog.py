@@ -4,7 +4,7 @@ Version and changelog utilities.
 Reads version/name from pubspec.yaml, validates and displays
 changelog entries for the publish workflow.
 
-Version:   1.0
+Version:   1.1
 Author:    Saropa
 Copyright: (c) 2025-2026 Saropa
 """
@@ -20,26 +20,50 @@ from scripts.modules._utils import (
     print_warning,
 )
 
+# Semantic version with optional pre-release suffix.
+# Matches: 5.0.0, 5.0.0-beta.1, 5.0.0-rc.2, etc.
+_VERSION_RE = r"\d+\.\d+\.\d+(?:-[\w]+(?:\.[\w]+)*)?"
+
 
 def get_version_from_pubspec(pubspec_path: Path) -> str:
     """Read version string from pubspec.yaml."""
     content = pubspec_path.read_text(encoding="utf-8")
-    match = re.search(r"^version:\s*(\d+\.\d+\.\d+)", content, re.MULTILINE)
+    match = re.search(
+        rf"^version:\s*({_VERSION_RE})",
+        content,
+        re.MULTILINE,
+    )
     if not match:
         raise ValueError("Could not find version in pubspec.yaml")
     return match.group(1)
 
 
-def parse_version(version: str) -> tuple[int, ...]:
-    """Parse a version string into a comparable tuple."""
-    return tuple(int(x) for x in version.split("."))
+def parse_version(version: str) -> tuple:
+    """Parse a version string into a comparable sort key.
+
+    Pre-release versions sort before stable for the same base:
+        5.0.0-beta.1 < 5.0.0-beta.2 < 5.0.0
+
+    Returns:
+        Tuple suitable for comparison with < and >.
+    """
+    match = re.match(r"^(\d+\.\d+\.\d+)(?:-(.+))?$", version)
+    if not match:
+        raise ValueError(f"Invalid version: {version}")
+    base = tuple(int(x) for x in match.group(1).split("."))
+    pre = match.group(2)
+    # No pre-release = stable = sorts after any pre-release of same base.
+    # (0, suffix) for pre-release, (1,) for stable.
+    if pre is None:
+        return (*base, 1, "")
+    return (*base, 0, pre)
 
 
 def set_version_in_pubspec(pubspec_path: Path, new_version: str) -> None:
     """Write a new version string into pubspec.yaml."""
     content = pubspec_path.read_text(encoding="utf-8")
     updated = re.sub(
-        r"^(version:\s*)\d+\.\d+\.\d+",
+        rf"^(version:\s*){_VERSION_RE}",
         rf"\g<1>{new_version}",
         content,
         count=1,
@@ -67,7 +91,7 @@ def get_latest_changelog_version(changelog_path: Path) -> str | None:
     if not changelog_path.exists():
         return None
     content = changelog_path.read_text(encoding="utf-8")
-    match = re.search(r"##\s*\[?(\d+\.\d+\.\d+)\]?", content)
+    match = re.search(rf"##\s*\[?({_VERSION_RE})\]?", content)
     return match.group(1) if match else None
 
 
@@ -91,7 +115,7 @@ def validate_changelog_version(
 
     pattern = (
         rf"(?s)##\s*\[?{re.escape(version)}\]?[^\n]*\n"
-        rf"(.*?)(?=##\s*\[?\d+\.\d+\.\d+|$)"
+        rf"(.*?)(?=##\s*\[?{_VERSION_RE}|$)"
     )
     match = re.search(pattern, content)
     return match.group(1).strip() if match else ""
@@ -113,7 +137,7 @@ def display_changelog(project_dir: Path) -> str | None:
 
     content = changelog_path.read_text(encoding="utf-8")
     match = re.search(
-        r"^(## \[?\d+\.\d+\.\d+\]?.*?)(?=^## |\Z)",
+        rf"^(## \[?{_VERSION_RE}\]?.*?)(?=^## |\Z)",
         content,
         re.MULTILINE | re.DOTALL,
     )
@@ -159,8 +183,14 @@ def display_changelog(project_dir: Path) -> str | None:
     return latest_entry
 
 
-def increment_patch_version(version: str) -> str:
-    """Increment the patch version: 4.9.15 -> 4.9.16."""
+def increment_version(version: str) -> str:
+    """Increment version: 5.0.0 -> 5.0.1, 5.0.0-beta.1 -> 5.0.0-beta.2."""
+    # Pre-release: increment the trailing number after the last dot
+    pre_match = re.match(r"^(\d+\.\d+\.\d+-\w+\.)(\d+)$", version)
+    if pre_match:
+        prefix, num = pre_match.group(1), int(pre_match.group(2))
+        return f"{prefix}{num + 1}"
+    # Stable: increment patch
     parts = version.split(".")
     parts[-1] = str(int(parts[-1]) + 1)
     return ".".join(parts)
@@ -212,7 +242,7 @@ def add_unreleased_section(changelog_path: Path) -> bool:
 
     # Insert before the first ---\n## [version] block
     content = re.sub(
-        r"(---\n)(## \[?\d+)",
+        rf"(---\n)(## \[?{_VERSION_RE})",
         r"\1## [Unreleased]\n\n---\n\2",
         content,
         count=1,
