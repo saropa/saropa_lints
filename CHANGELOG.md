@@ -11,6 +11,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+
+### Added
+- Test coverage for 50 rule categories (Phase 1 + Phase 2): 16 high-impact and 34 medium categories now have dedicated `test/*_rules_test.dart` files with fixture verification and semantic test stubs
+- 255 missing fixture stubs across all example directories
+
+---
 ## [5.0.0-beta.4]
 
 ### Fixed
