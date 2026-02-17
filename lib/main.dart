@@ -32,6 +32,7 @@ class SaropaLintsPlugin extends Plugin {
   @override
   String get name => 'saropa_lints';
 
+  /// Loads plugin configuration before rules are registered.
   @override
   FutureOr<void> start() {
     loadNativePluginConfig();
