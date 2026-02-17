@@ -49,6 +49,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - `context.addXxx()` replaces `context.registry.addXxx()`
 - `reporter.atNode(node)` replaces `reporter.atNode(node, code)` (code is implicit)
 - Dependencies: `analysis_server_plugin: ^0.3.3` replaces `custom_lint_builder`
+- README updated for v5: `dart analyze` replaces `dart run custom_lint`, tier preset includes, v4 migration FAQ
 
 ### Removed
 - `custom_lint_builder` dependency and `lib/custom_lint_client.dart`
