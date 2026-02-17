@@ -225,6 +225,23 @@ Fixtures live in `example_platforms/lib/platforms/` (or `example_platforms/lib/p
 | Unit test categories | 11/95 (11.6%) | 27/95 (28.4%) | 95/95 (100%) |
 | Fixture coverage | 1165/1748 (66.6%) | ~1400/1748 (~80%) | ~1700/1748 (97%+) |
 
+## Progress
+
+### Phase 1 — DONE
+- 16 test files created for high-impact categories (>25 rules)
+- 64 fixture stubs created
+- Coverage: 1229/1748 (70.3%), 27/95 categories (28.4%)
+
+### Phase 2 — DONE
+- 34 test files created for medium categories (10–24 rules)
+- 191 fixture stubs created
+- Fixed: `error_handling_rules_test.dart` was regenerated with correct rules (had disposal rules by mistake)
+- Fixed: macOS capitalization in `macos_rules_test.dart`
+- Coverage: 1420/1748 (81.2%), 61/95 categories (64.2%)
+
+### Phase 3 — TODO
+- 34 remaining small categories (<10 rules)
+
 ## Risks & Notes
 
 - **Fixture files in example dirs must compile** — they are analyzed by `dart analyze` but example dirs are excluded in root `analysis_options.yaml`, so they can contain lint violations intentionally
