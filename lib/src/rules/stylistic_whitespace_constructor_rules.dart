@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/stylistic_widget/prefer_clip_r_superellipse_fix.dart';
 
 // ============================================================================
 // STYLISTIC WHITESPACE & CONSTRUCTOR/PARAMETER RULES
@@ -1146,6 +1147,12 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferClipRSuperellipseFix(context: context),
+      ];
 
   /// Alias: prefer_rethrow_throw_e
   static const LintCode _code = LintCode(

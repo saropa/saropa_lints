@@ -11,6 +11,8 @@ import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../type_annotation_utils.dart';
+import '../../fixes/packages/hive/prefer_hive_lazy_box_fix.dart';
+import '../../fixes/packages/hive/add_hive_sub_dir_fix.dart';
 
 // =============================================================================
 // Shared Utilities
@@ -1419,6 +1421,12 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferHiveLazyBoxFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'prefer_hive_lazy_box',
     '[prefer_hive_lazy_box] Consider using LazyBox for potentially large '
@@ -1841,6 +1849,12 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            AddHiveSubDirFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'require_hive_web_subdirectory',

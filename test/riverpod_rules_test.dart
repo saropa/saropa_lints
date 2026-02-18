@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 /// These rules cover ref.read/watch usage, provider lifecycle, notifier
 /// patterns, async value handling, auto-dispose, and architectural patterns.
 ///
-/// Test fixtures: example_packages/lib/packages/*riverpod*
+/// Test fixtures: example_packages/lib/riverpod/*
 void main() {
   group('Riverpod Rules - Fixture Verification', () {
     final fixtures = [
@@ -28,7 +28,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_packages/lib/packages/${fixture}_fixture.dart',
+          'example_packages/lib/riverpod/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

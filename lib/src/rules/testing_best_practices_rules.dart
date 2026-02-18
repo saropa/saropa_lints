@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/testing_best_practices/wrap_with_material_app_fix.dart';
 
 /// Warns when test has no assertions.
 ///
@@ -1603,6 +1604,12 @@ class PreferTestWrapperRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            WrapWithMaterialAppFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};

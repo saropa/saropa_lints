@@ -10,6 +10,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 
 import '../saropa_lint_rule.dart';
 import '../type_annotation_utils.dart';
+import '../fixes/dependency_injection/avoid_singleton_for_scoped_dependencies_fix.dart';
+import '../fixes/dependency_injection/avoid_functions_in_register_singleton_fix.dart';
+import '../fixes/dependency_injection/prefer_lazy_singleton_registration_fix.dart';
 
 /// Warns when service locator is accessed directly in widgets.
 ///
@@ -420,6 +423,12 @@ class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            AvoidSingletonForScopedDependenciesFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'avoid_singleton_for_scoped_dependencies',
     '[avoid_singleton_for_scoped_dependencies] Scoped data as singleton. State will persist across sessions/screens. Some dependencies must be scoped to a specific lifecycle (e.g., per request, per screen) rather than being global singletons. {v6}',
@@ -756,6 +765,12 @@ class AvoidFunctionsInRegisterSingletonRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            AvoidFunctionsInRegisterSingletonFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_functions_in_register_singleton',
@@ -1473,6 +1488,12 @@ class PreferLazySingletonRegistrationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferLazySingletonRegistrationFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_lazy_singleton_registration',

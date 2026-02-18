@@ -4,6 +4,10 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/control_flow/comment_out_unnecessary_continue_fix.dart';
+import '../fixes/control_flow/invert_operator_fix.dart';
+import '../fixes/control_flow/simplify_boolean_literal_fix.dart';
+import '../fixes/control_flow/use_positive_form_fix.dart';
 
 /// Warns when an assignment is used inside a condition.
 ///
@@ -235,6 +239,12 @@ class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            SimplifyBooleanLiteralFix(context: context),
+      ];
 }
 
 /// Warns when assert has a constant condition (always true or always false).
@@ -631,6 +641,12 @@ class AvoidInvertedBooleanChecksRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            InvertOperatorFix(context: context),
+      ];
 }
 
 /// Warns when a negated condition can be simplified.
@@ -703,6 +719,12 @@ class AvoidNegatedConditionsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UsePositiveFormFix(context: context),
+      ];
 }
 
 /// Warns when assignment is used inside another expression.
@@ -1259,6 +1281,12 @@ class AvoidUnnecessaryConditionalsRule extends SaropaLintRule {
 /// **Quick fix available:** Comments out the unnecessary continue.
 class AvoidUnnecessaryContinueRule extends SaropaLintRule {
   AvoidUnnecessaryContinueRule() : super(code: _code);
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            CommentOutUnnecessaryContinueFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_continue',

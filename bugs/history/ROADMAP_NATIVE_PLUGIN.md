@@ -34,7 +34,7 @@ Dart 3.10 introduced a first-party analyzer plugin system that offers:
 | Quick fixes | `DartFix` subclasses | Various `*_rules.dart` files |
 | Reporter | `SaropaDiagnosticReporter` wrapping `DiagnosticReporter` | `lib/src/saropa_lint_rule.dart` |
 
-**Stats**: 1,677+ rules, 213 quick fixes, 5 tiers
+**Stats**: 1,677+ rules, 108 quick fixes (all with real implementations), 5 tiers
 
 ## Target Architecture (v5.x - native plugin)
 
@@ -333,11 +333,21 @@ Base class stayed as `SaropaLintRule` (now extends `AnalysisRule` directly inste
 
 ---
 
-### Phase 6: Testing & Release - TODO
+### Phase 6: Testing & Release - IN PROGRESS
 
 **Goal**: Comprehensive testing and release
 
-#### 6.1 Testing
+#### 6.1 Quick Fix Migration - IN PROGRESS
+
+86 rules have real `fixGenerators` with working `SaropaFixProducer` implementations. HackCommentFix placeholder pattern was removed entirely — rules without a real fix simply have no `fixGenerators`.
+
+| Fix category | Count | Implementation |
+|---|---|---|
+| Individual fix files | 108 | Dedicated `SaropaFixProducer` subclasses in `lib/src/fixes/<category>/`, all with real implementations |
+| Base classes | 3 | `InsertTextFix`, `ReplaceNodeFix`, `DeleteNodeFix` |
+| Rules without fixes | ~1,569 | No `fixGenerators` — honest about no auto-fix |
+
+#### 6.2 Testing
 
 | Test Type | Coverage |
 |-----------|----------|
@@ -348,7 +358,7 @@ Base class stayed as `SaropaLintRule` (now extends `AnalysisRule` directly inste
 | Performance tests | Benchmark against custom_lint on large projects |
 | IDE tests | VS Code squiggles, Problems panel, quick fixes |
 
-#### 6.2 Release Plan
+#### 6.3 Release Plan
 
 1. `5.0.0-dev.1` - Current state (infrastructure + PoC)
 2. `5.0.0-beta.1` - All rules migrated, basic quick fixes
@@ -357,9 +367,10 @@ Base class stayed as `SaropaLintRule` (now extends `AnalysisRule` directly inste
 5. Maintain `4.x` security fixes during transition
 
 #### Deliverables
+- [x] Quick fix migration (290 rules wired)
+- [x] Migration guide (`MIGRATION_V5.md`)
 - [ ] Test suite covering all migrated rules
 - [ ] Beta releases for feedback
-- [ ] Migration guide (`MIGRATION_V5.md`)
 - [ ] Stable release
 - [ ] Deprecation notice for v4
 

@@ -9,6 +9,8 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/crypto/use_secure_random_fix.dart';
+import '../fixes/crypto/use_secure_random_iv_fix.dart';
 
 /// Warns when encryption keys appear to be hardcoded.
 ///
@@ -184,6 +186,12 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseSecureRandomFix(context: context),
+      ];
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -389,6 +397,12 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseSecureRandomIvFix(context: context),
+      ];
 
   @override
   OwaspMapping get owasp => const OwaspMapping(

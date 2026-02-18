@@ -5,6 +5,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../fixes/complexity/replace_bitwise_with_logical_fix.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when bitwise operators are used with boolean operands.
@@ -68,6 +69,12 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceBitwiseWithLogicalFix(context: context),
+      ];
 }
 
 /// Warns when cascade is used after if-null operator without parentheses.

@@ -9,6 +9,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/internationalization/require_directional_widgets_fix.dart';
 
 /// Warns when hardcoded user-facing strings are detected.
 ///
@@ -213,6 +214,12 @@ class RequireDirectionalWidgetsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            RequireDirectionalWidgetsFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};

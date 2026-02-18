@@ -11,6 +11,9 @@ import 'package:analyzer/source/line_info.dart';
 import '../ignore_utils.dart';
 import '../saropa_lint_rule.dart';
 import '../type_annotation_utils.dart';
+import '../fixes/code_quality/prefer_returning_conditional_expressions_fix.dart';
+import '../fixes/code_quality/move_trailing_comment_fix.dart';
+import '../fixes/code_quality/simplify_boolean_comparison_fix.dart';
 
 /// Warns against any usage of adjacent strings.
 ///
@@ -8070,6 +8073,12 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            SimplifyBooleanComparisonFix(context: context),
+      ];
 }
 
 /// Quick fix: Simplifies boolean literal comparisons.
@@ -8113,6 +8122,12 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferReturningConditionalExpressionsFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_returning_conditional_expressions',
@@ -8192,6 +8207,12 @@ class AvoidIgnoreTrailingCommentRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            MoveTrailingCommentFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_ignore_trailing_comment',
