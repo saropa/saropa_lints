@@ -907,7 +907,7 @@ Future<void> main(List<String> args) async {
         '${_Colors.green}Removed custom_lint: section${_Colors.reset}',
       );
 
-      _warnPubspecCustomLint();
+      _cleanPubspecCustomLint(dryRun: cliArgs.dryRun);
       _logTerminal('');
     }
 
@@ -933,9 +933,16 @@ Future<void> main(List<String> args) async {
         );
       }
     } else {
-      _logTerminal(
-        '${_Colors.yellow}⚠ --reset: discarding customizations${_Colors.reset}',
-      );
+      if (v4MigratedRules.isNotEmpty) {
+        _logTerminal(
+          '${_Colors.yellow}⚠ --reset: discarding ${v4MigratedRules.length} '
+          'v4 rule settings (run without --reset to preserve)${_Colors.reset}',
+        );
+      } else {
+        _logTerminal(
+          '${_Colors.yellow}⚠ --reset: discarding customizations${_Colors.reset}',
+        );
+      }
     }
   }
 
@@ -1079,43 +1086,53 @@ Future<void> main(List<String> args) async {
     }
   }
 
-  // Convert v4 ignore comments if requested
-  if (v4Detected && cliArgs.fixIgnores && !cliArgs.dryRun) {
-    _logTerminal('');
-    _logTerminal(
-      '${_Colors.bold}Converting v4 ignore comments...${_Colors.reset}',
-    );
-    final Map<String, int> ignoreResults = _convertIgnoreComments(
-      allRules,
-      false,
-    );
-    if (ignoreResults.isEmpty) {
-      _logTerminal(
-        '${_Colors.dim}  No v4 ignore comments found${_Colors.reset}',
-      );
+  // Convert v4 ignore comments (interactive prompt or --fix-ignores flag)
+  if (v4Detected && !cliArgs.dryRun) {
+    final bool shouldConvert;
+    if (cliArgs.fixIgnores) {
+      shouldConvert = true;
+    } else if (!stdin.hasTerminal) {
+      // Non-interactive: skip unless explicitly requested
+      shouldConvert = false;
     } else {
-      final int total = ignoreResults.values.fold(0, (s, c) => s + c);
-      _logTerminal(
-        '${_Colors.green}Converted $total ignore comments in '
-        '${ignoreResults.length} files${_Colors.reset}',
+      _logTerminal('');
+      stdout.write(
+        '${_Colors.cyan}Convert v4 ignore comments to v5 format? [y/N]: '
+        '${_Colors.reset}',
       );
-      for (final MapEntry<String, int> entry in ignoreResults.entries) {
-        _logTerminal(
-          '${_Colors.dim}  ${entry.key}: ${entry.value}${_Colors.reset}',
-        );
-      }
+      final String resp = stdin.readLineSync()?.toLowerCase().trim() ?? '';
+      shouldConvert = resp == 'y' || resp == 'yes';
     }
-  } else if (v4Detected && !cliArgs.fixIgnores) {
-    _logTerminal('');
-    _logTerminal(
-      '${_Colors.yellow}Tip:${_Colors.reset} Run with '
-      '${_Colors.bold}--fix-ignores${_Colors.reset} to convert '
-      'v4 ignore comments',
-    );
-    _logTerminal(
-      '${_Colors.dim}  // ignore: rule  ->  '
-      '// ignore: saropa_lints/rule${_Colors.reset}',
-    );
+
+    if (shouldConvert) {
+      _logTerminal(
+        '${_Colors.bold}Converting v4 ignore comments...${_Colors.reset}',
+      );
+      final Map<String, int> ignoreResults = _convertIgnoreComments(
+        allRules,
+        false,
+      );
+      if (ignoreResults.isEmpty) {
+        _logTerminal(
+          '${_Colors.dim}  No v4 ignore comments found${_Colors.reset}',
+        );
+      } else {
+        final int total = ignoreResults.values.fold(0, (s, c) => s + c);
+        _logTerminal(
+          '${_Colors.green}Converted $total ignore comments in '
+          '${ignoreResults.length} files${_Colors.reset}',
+        );
+        for (final MapEntry<String, int> entry in ignoreResults.entries) {
+          _logTerminal(
+            '${_Colors.dim}  ${entry.key}: ${entry.value}${_Colors.reset}',
+          );
+        }
+      }
+    } else {
+      _logTerminal(
+        '${_Colors.dim}  Skipped ignore comment conversion${_Colors.reset}',
+      );
+    }
   }
 
   _logTerminal('');
@@ -1279,24 +1296,104 @@ String _removeCustomLintSection(String content) {
 }
 
 /// Removes `- custom_lint` from the `analyzer: plugins:` section.
+/// Also removes the `plugins:` sub-key if it becomes empty.
 String _removeAnalyzerCustomLintPlugin(String content) {
-  return content.replaceAll(_analyzerCustomLintLine, '');
+  String result = content.replaceAll(_analyzerCustomLintLine, '');
+
+  // Remove empty `plugins:` key (no indented children remaining)
+  result = result.replaceAll(
+    RegExp(r'^\s+plugins:\s*\n(?=\s{0,2}\S|\s*$)', multiLine: true),
+    '',
+  );
+
+  return result;
 }
 
-/// Warns the user to remove custom_lint from pubspec.yaml.
-void _warnPubspecCustomLint() {
+/// Removes custom_lint from pubspec.yaml dev_dependencies after user
+/// confirmation. Skips silently if not found in dev_dependencies.
+void _cleanPubspecCustomLint({required bool dryRun}) {
   final File pubspecFile = File('pubspec.yaml');
   if (!pubspecFile.existsSync()) return;
 
   final String content = pubspecFile.readAsStringSync();
-  if (!RegExp(r'^\s+custom_lint:', multiLine: true).hasMatch(content)) return;
+
+  // Only match custom_lint inside the dev_dependencies section
+  final String? cleaned = _removeDevDep(content, 'custom_lint');
+  if (cleaned == null) return;
 
   _logTerminal('');
-  _logTerminal(
-    '${_Colors.yellow}ACTION REQUIRED:${_Colors.reset} '
-    'Remove custom_lint from pubspec.yaml dev_dependencies',
+
+  // Skip prompts in non-interactive mode (CI, piped input)
+  if (!stdin.hasTerminal) {
+    _logTerminal(
+      '${_Colors.dim}  Non-interactive: skipping pubspec.yaml '
+      'cleanup (remove custom_lint manually)${_Colors.reset}',
+    );
+    return;
+  }
+
+  stdout.write(
+    '${_Colors.cyan}Remove custom_lint from pubspec.yaml '
+    'dev_dependencies? [y/N]: ${_Colors.reset}',
   );
-  _logTerminal('${_Colors.dim}  Then run: dart pub get${_Colors.reset}');
+  final String response = stdin.readLineSync()?.toLowerCase().trim() ?? '';
+
+  if (response != 'y' && response != 'yes') {
+    _logTerminal(
+      '${_Colors.dim}  Skipped pubspec.yaml cleanup${_Colors.reset}',
+    );
+    return;
+  }
+
+  if (dryRun) {
+    _logTerminal(
+      '${_Colors.dim}  (dry-run) Would remove custom_lint from '
+      'pubspec.yaml${_Colors.reset}',
+    );
+    return;
+  }
+
+  pubspecFile.writeAsStringSync(cleaned);
+  _logTerminal(
+    '${_Colors.green}Removed custom_lint from pubspec.yaml${_Colors.reset}',
+  );
+  _logTerminal(
+    '${_Colors.dim}  Run dart pub get to update dependencies${_Colors.reset}',
+  );
+}
+
+/// Removes a dependency line from the dev_dependencies section only.
+/// Returns the modified content, or null if the dependency was not found.
+String? _removeDevDep(String content, String packageName) {
+  final RegExp devDepsHeader = RegExp(
+    r'^dev_dependencies:\s*$',
+    multiLine: true,
+  );
+  final Match? devMatch = devDepsHeader.firstMatch(content);
+  if (devMatch == null) return null;
+
+  // Find the section boundaries
+  final String afterDevDeps = content.substring(devMatch.end);
+  final Match? nextSection = _topLevelKeyPattern.firstMatch(afterDevDeps);
+  final String devSection = nextSection != null
+      ? afterDevDeps.substring(0, nextSection.start)
+      : afterDevDeps;
+
+  // Match the dependency line within dev_dependencies
+  final RegExp depLine = RegExp(
+    '^\\ +${RegExp.escape(packageName)}:[^\\n]*\\n?',
+    multiLine: true,
+  );
+  if (!depLine.hasMatch(devSection)) return null;
+
+  // Remove only within the dev_dependencies section
+  final String cleanedSection = devSection.replaceAll(depLine, '');
+  final String before = content.substring(0, devMatch.end);
+  final String after = nextSection != null
+      ? afterDevDeps.substring(nextSection.start)
+      : '';
+
+  return '$before$cleanedSection$after';
 }
 
 /// Converts v4 ignore comments to v5 format in .dart files.
@@ -1323,29 +1420,39 @@ Map<String, int> _convertIgnoreComments(Set<String> allRules, bool dryRun) {
   return results;
 }
 
-/// Regex matching ignore comments with a bare rule name (not yet prefixed).
-final RegExp _ignoreCommentPattern = RegExp(
-  r'(//\s*ignore(?:_for_file)?\s*:\s*)'
-  r'(?!saropa_lints/)' // skip already converted
-  r'([\w_]+)',
+/// Matches a full ignore directive: `// ignore: rule_a, rule_b, rule_c`
+/// or `// ignore_for_file: rule_a, rule_b`.
+final RegExp _ignoreDirectivePattern = RegExp(
+  r'(//\s*ignore(?:_for_file)?\s*:\s*)([\w_/,\s]+)',
 );
 
 /// Converts ignore comments in a single file. Returns count of conversions.
+///
+/// Handles multi-rule ignore comments like `// ignore: a, b, c`.
 int _convertIgnoreCommentsInFile(File file, Set<String> allRules, bool dryRun) {
   final String content = file.readAsStringSync();
   int count = 0;
 
-  final String newContent = content.replaceAllMapped(_ignoreCommentPattern, (
+  final String newContent = content.replaceAllMapped(_ignoreDirectivePattern, (
     Match match,
   ) {
     final String prefix = match.group(1)!;
-    final String ruleName = match.group(2)!;
+    final String ruleList = match.group(2)!;
 
-    if (allRules.contains(ruleName)) {
-      count++;
-      return '${prefix}saropa_lints/$ruleName';
-    }
-    return match.group(0)!;
+    final String converted = ruleList.splitMapJoin(
+      RegExp(r'[\w_/]+'),
+      onMatch: (Match m) {
+        final String name = m.group(0)!;
+        if (name.startsWith('saropa_lints/')) return name;
+        if (allRules.contains(name)) {
+          count++;
+          return 'saropa_lints/$name';
+        }
+        return name;
+      },
+    );
+
+    return '$prefix$converted';
   });
 
   if (count > 0 && !dryRun) {
@@ -2494,7 +2601,7 @@ Options:
   -t, --tier <tier>     Tier level (1-5 or name, default: comprehensive)
   -o, --output <file>   Output file (default: analysis_options.yaml)
   --stylistic           Include stylistic rules (opinionated, off by default)
-  --fix-ignores         Convert v4 ignore comments to v5 format (saropa_lints/ prefix)
+  --fix-ignores         Auto-convert v4 ignore comments without prompting
   --reset               Discard user customizations and reset to tier defaults
   --dry-run             Preview output without writing
   -h, --help            Show this help message
