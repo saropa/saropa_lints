@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/error_handling/change_exception_to_object_fix.dart';
 
 /// Warns when catch block swallows exception without logging.
 ///
@@ -1215,6 +1216,12 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ChangeExceptionToObjectFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_catch_exception_alone',

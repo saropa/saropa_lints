@@ -12,6 +12,9 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 import '../import_utils.dart';
 import '../saropa_lint_rule.dart';
+import '../fixes/navigation/add_mounted_check_fix.dart';
+import '../fixes/navigation/replace_with_maybe_pop_fix.dart';
+import '../fixes/navigation/add_await_to_navigator_push_fix.dart';
 
 // =============================================================================
 // Flutter Navigation Rules
@@ -138,6 +141,12 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            AddMountedCheckFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_context_after_navigation',
@@ -1991,6 +2000,12 @@ class PreferMaybePopRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceWithMaybePopFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'prefer_maybe_pop',
     '[prefer_maybe_pop] Navigator.pop() called without verifying that a route exists on the navigation stack to pop. When the stack is empty or contains only the root route, this call throws a FlutterError at runtime, crashing the app. On Android, this also bypasses the system back button contract, preventing the app from exiting gracefully. {v3}',
@@ -3212,6 +3227,12 @@ class RequireNavigationResultHandlingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            AddAwaitToNavigatorPushFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'require_navigation_result_handling',

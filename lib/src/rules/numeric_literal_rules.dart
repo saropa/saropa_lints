@@ -4,6 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 
 import '../literal_context_utils.dart';
 import '../saropa_lint_rule.dart';
+import '../fixes/numeric_literal/add_digit_separators_fix.dart';
 
 /// Warns when digit separators are not grouped consistently.
 ///
@@ -541,6 +542,12 @@ class PreferDigitSeparatorsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            AddDigitSeparatorsFix(context: context),
+      ];
 
   static const int _threshold = 10000; // Numbers >= 10000 should use separators
 

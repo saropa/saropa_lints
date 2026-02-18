@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../mode_constants_utils.dart';
 import '../../saropa_lint_rule.dart';
+import '../../fixes/packages/package_specific/add_try_catch_todo_fix.dart';
 
 /// Warns when enum types are used directly as fields in Isar `@collection` classes.
 ///
@@ -1442,6 +1443,12 @@ class RequireIsarNullableFieldRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            AddTryCatchTodoFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'require_isar_nullable_field',

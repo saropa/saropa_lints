@@ -29,6 +29,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import '../../info_plist_utils.dart';
 import '../../mode_constants_utils.dart';
 import '../../saropa_lint_rule.dart';
+import '../../fixes/platforms/ios/replace_http_with_https_fix.dart';
 
 // =============================================================================
 // iOS-Specific Rules
@@ -545,6 +546,12 @@ class RequireHttpsForIosRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceHttpWithHttpsFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'require_https_for_ios',

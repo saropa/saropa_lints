@@ -4,6 +4,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/equality/use_date_time_difference_fix.dart';
+import '../fixes/equality/use_direct_equality_fix.dart';
+import '../fixes/equality/use_not_equals_fix.dart';
 
 /// Warns when comparing an expression to itself (x == x).
 ///
@@ -117,6 +120,12 @@ class AvoidNegationsInEqualityChecksRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseNotEqualsFix(context: context),
+      ];
 }
 
 /// Warns when a variable is assigned to itself.
@@ -283,6 +292,12 @@ class AvoidUnnecessaryCompareToRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseDirectEqualityFix(context: context),
+      ];
 }
 
 /// Warns when the same argument value is passed multiple times.
@@ -389,6 +404,12 @@ class AvoidDatetimeComparisonWithoutPrecisionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseDateTimeDifferenceFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_datetime_comparison_without_precision',

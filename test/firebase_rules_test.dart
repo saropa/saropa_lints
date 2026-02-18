@@ -8,33 +8,33 @@ import 'package:test/test.dart';
 /// database patterns, Analytics naming conventions, Cloud Messaging,
 /// Maps integration, Crashlytics, App Check, Auth, and error handling.
 ///
-/// Test fixtures: example_packages/lib/packages/*firebase*
+/// Test fixtures: example_packages/lib/firebase/*
 void main() {
   group('Firebase Rules - Fixture Verification', () {
     test('incorrect_firebase_event_name fixture exists', () {
       final file = File(
-        'example_packages/lib/packages/incorrect_firebase_event_name_fixture.dart',
+        'example_packages/lib/firebase/incorrect_firebase_event_name_fixture.dart',
       );
       expect(file.existsSync(), isTrue);
     });
 
     test('incorrect_firebase_parameter_name fixture exists', () {
       final file = File(
-        'example_packages/lib/packages/incorrect_firebase_parameter_name_fixture.dart',
+        'example_packages/lib/firebase/incorrect_firebase_parameter_name_fixture.dart',
       );
       expect(file.existsSync(), isTrue);
     });
 
     test('prefer_firebase_auth_persistence fixture exists', () {
       final file = File(
-        'example_packages/lib/packages/prefer_firebase_auth_persistence_fixture.dart',
+        'example_packages/lib/firebase/prefer_firebase_auth_persistence_fixture.dart',
       );
       expect(file.existsSync(), isTrue);
     });
 
     test('prefer_firebase_remote_config_defaults fixture exists', () {
       final file = File(
-        'example_packages/lib/packages/'
+        'example_packages/lib/firebase/'
         'prefer_firebase_remote_config_defaults_fixture.dart',
       );
       expect(file.existsSync(), isTrue);
@@ -42,21 +42,21 @@ void main() {
 
     test('require_firebase_app_check fixture exists', () {
       final file = File(
-        'example_packages/lib/packages/require_firebase_app_check_fixture.dart',
+        'example_packages/lib/firebase/require_firebase_app_check_fixture.dart',
       );
       expect(file.existsSync(), isTrue);
     });
 
     test('require_firebase_init_before_use fixture exists', () {
       final file = File(
-        'example_packages/lib/packages/require_firebase_init_before_use_fixture.dart',
+        'example_packages/lib/firebase/require_firebase_init_before_use_fixture.dart',
       );
       expect(file.existsSync(), isTrue);
     });
 
     test('require_firebase_composite_index fixture exists', () {
       final file = File(
-        'example_packages/lib/packages/require_firebase_composite_index_fixture.dart',
+        'example_packages/lib/firebase/require_firebase_composite_index_fixture.dart',
       );
       expect(file.existsSync(), isTrue);
     });

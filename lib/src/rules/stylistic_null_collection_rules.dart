@@ -5,6 +5,9 @@ import 'package:analyzer/dart/ast/token.dart';
 
 import '../saropa_lint_rule.dart';
 import '../type_annotation_utils.dart';
+import '../fixes/stylistic_null_collection/prefer_if_null_over_ternary_fix.dart';
+import '../fixes/stylistic_null_collection/prefer_ternary_over_if_null_fix.dart';
+import '../fixes/stylistic_null_collection/prefer_where_type_fix.dart';
 
 // ============================================================================
 // STYLISTIC NULL HANDLING & COLLECTION RULES
@@ -196,6 +199,12 @@ class PreferIfNullOverTernaryRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferIfNullOverTernaryFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'prefer_if_null_over_ternary',
     '[prefer_if_null_over_ternary] Null-checking ternary detected where the ?? operator expresses the same intent more concisely. Replace with ?? to reduce verbosity and follow idiomatic Dart conventions. {v4}',
@@ -288,6 +297,12 @@ class PreferTernaryOverIfNullRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferTernaryOverIfNullFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_ternary_over_if_null',
@@ -804,6 +819,12 @@ class PreferWhereTypeOverWhereIsRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferWhereTypeFix(context: context),
+      ];
 }
 
 /// Warns when iterating map with .keys and lookup vs .entries.

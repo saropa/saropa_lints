@@ -5,6 +5,9 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/class_constructor/prefer_const_string_list_fix.dart';
+import '../fixes/class_constructor/prefer_declaring_const_constructor_fix.dart';
+import '../fixes/class_constructor/prefer_final_class_fix.dart';
 
 /// Warns when a class declares a call() method.
 ///
@@ -520,6 +523,12 @@ class PreferConstStringListRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferConstStringListFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'prefer_const_string_list',
     '[prefer_const_string_list] This <String>[...] list contains only string literals '
@@ -637,6 +646,12 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferDeclaringConstConstructorFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_declaring_const_constructor',
@@ -959,6 +974,12 @@ class PreferFinalClassRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferFinalClassFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_final_class',

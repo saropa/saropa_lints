@@ -11,6 +11,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/navigation/add_mounted_check_fix.dart';
 
 /// Warns when ChangeNotifier subclass doesn't call notifyListeners.
 ///
@@ -598,6 +599,12 @@ class RequireMountedCheckRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            AddMountedCheckFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'require_mounted_check',

@@ -9,6 +9,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/freezed/remove_json_serializable_fix.dart';
 
 // =============================================================================
 // FREEZED RULES
@@ -48,6 +49,12 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            RemoveJsonSerializableFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_freezed_json_serializable_conflict',

@@ -12,6 +12,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/accessibility/increase_animation_duration_fix.dart';
 
 /// Warns when IconButton is used without a tooltip for accessibility.
 ///
@@ -2566,6 +2567,12 @@ class AvoidFlashingContentRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            IncreaseAnimationDurationFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_flashing_content',

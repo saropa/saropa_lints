@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 /// These rules cover launch pre-checks, fallback handling, and simulator
 /// test safety for the url_launcher package.
 ///
-/// Test fixtures: example_packages/lib/packages/*url_launcher*
+/// Test fixtures: example_packages/lib/url_launcher/*
 void main() {
   group('URL Launcher Rules - Fixture Verification', () {
     final fixtures = [
@@ -19,7 +19,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_packages/lib/packages/${fixture}_fixture.dart',
+          'example_packages/lib/url_launcher/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });

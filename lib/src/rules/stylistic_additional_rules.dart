@@ -4,6 +4,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/stylistic_additional/prefer_double_quotes_fix.dart';
+import '../fixes/stylistic_additional/prefer_object_over_dynamic_fix.dart';
+import '../fixes/stylistic_error_testing/replace_assert_with_expect_fix.dart';
 
 // ============================================================================
 // ADDITIONAL STYLISTIC RULES - String, Import, Class Structure, Types
@@ -170,6 +173,12 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferDoubleQuotesFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_double_quotes',
@@ -861,6 +870,12 @@ class PreferObjectOverDynamicRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferObjectOverDynamicFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'prefer_object_over_dynamic',
     '[prefer_object_over_dynamic] Type is declared as dynamic, which disables static type checking and allows any member access without compile-time verification. Use Object? instead to retain type safety while still accepting any runtime type. {v4}',
@@ -915,6 +930,12 @@ class PreferDynamicOverObjectRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceAssertWithExpectFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_dynamic_over_object',

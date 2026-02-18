@@ -3,6 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/platform/add_k_is_web_guard_fix.dart';
+import '../fixes/platform/replace_platform_check_fix.dart';
 
 // =============================================================================
 // Platform-Specific Rules (v4.1.6)
@@ -130,6 +132,12 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            AddKIsWebGuardFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'prefer_platform_io_conditional',
     '[prefer_platform_io_conditional] Platform class from dart:io throws UnsupportedError at runtime on Flutter web because dart:io is unavailable in browser environments. Accessing Platform.isAndroid, Platform.isIOS, or any Platform property without first checking kIsWeb crashes the web app immediately with an unrecoverable runtime error. {v2}',
@@ -212,6 +220,12 @@ class PreferFoundationPlatformCheckRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplacePlatformCheckFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
