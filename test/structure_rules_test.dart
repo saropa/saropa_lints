@@ -316,7 +316,6 @@ void main() {
         expect('avoid_unnecessary_nullable_return_type passes', isNotNull);
       });
     });
-
   });
 
   group('Structure - Preference Rules', () {
@@ -451,7 +450,6 @@ void main() {
         expect('prefer_trailing_underscore_for_unused passes', isNotNull);
       });
     });
-
   });
 
   group('Structure - General Rules', () {
@@ -466,6 +464,5 @@ void main() {
         expect('limit_max_imports passes', isNotNull);
       });
     });
-
   });
 }

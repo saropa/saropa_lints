@@ -147,7 +147,6 @@ void main() {
         expect('avoid_cached_isar_stream passes', isNotNull);
       });
     });
-
   });
 
   group('Isar - Requirement Rules', () {
@@ -222,7 +221,6 @@ void main() {
         expect('require_isar_nullable_field passes', isNotNull);
       });
     });
-
   });
 
   group('Isar - Preference Rules', () {
@@ -297,6 +295,5 @@ void main() {
         expect('prefer_isar_composite_index passes', isNotNull);
       });
     });
-
   });
 }

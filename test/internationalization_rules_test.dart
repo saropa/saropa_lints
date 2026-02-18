@@ -38,7 +38,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_style/lib/internationalization/${fixture}_fixture.dart');
+        final file = File(
+          'example_style/lib/internationalization/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -152,7 +154,6 @@ void main() {
         expect('avoid_hardcoded_locale_strings passes', isNotNull);
       });
     });
-
   });
 
   group('Internationalization - Requirement Rules', () {
@@ -275,7 +276,6 @@ void main() {
         expect('require_rtl_layout_support passes', isNotNull);
       });
     });
-
   });
 
   group('Internationalization - Preference Rules', () {
@@ -350,7 +350,6 @@ void main() {
         expect('prefer_intl_message_description passes', isNotNull);
       });
     });
-
   });
 
   group('Internationalization - General Rules', () {
@@ -365,6 +364,5 @@ void main() {
         expect('provide_correct_intl_args passes', isNotNull);
       });
     });
-
   });
 }

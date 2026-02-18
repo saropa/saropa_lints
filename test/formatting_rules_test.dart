@@ -22,7 +22,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/formatting/${fixture}_fixture.dart');
+        final file = File(
+          'example_core/lib/formatting/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -100,7 +102,6 @@ void main() {
         expect('prefer_member_ordering passes', isNotNull);
       });
     });
-
   });
 
   group('Formatting - General Rules', () {
@@ -151,6 +152,5 @@ void main() {
         expect('enum_constants_ordering passes', isNotNull);
       });
     });
-
   });
 }

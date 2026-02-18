@@ -342,9 +342,9 @@ class AvoidRedundantAsyncRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AvoidRedundantAsyncFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AvoidRedundantAsyncFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_redundant_async',
@@ -1028,9 +1028,9 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ChangeToFutureVoidFunctionFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ChangeToFutureVoidFunctionFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_async_callback',
@@ -1199,9 +1199,9 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceAsyncCallbackWithFutureVoidFunctionFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceAsyncCallbackWithFutureVoidFunctionFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_future_void_function_over_async_callback',
@@ -1819,9 +1819,9 @@ class PreferUtcForStorageRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddToUtcFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddToUtcFix(context: context),
+  ];
 
   // No applicableFileTypes override: DateTime storage patterns appear in models,
   // services, repositories, widgets, and utilities. Early-exit guards on method

@@ -217,9 +217,9 @@ class RequireDirectionalWidgetsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RequireDirectionalWidgetsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RequireDirectionalWidgetsFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};

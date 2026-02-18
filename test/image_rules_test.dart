@@ -75,7 +75,6 @@ void main() {
         expect('avoid_cached_image_unbounded_list passes', isNotNull);
       });
     });
-
   });
 
   group('Image - Requirement Rules', () {
@@ -222,7 +221,6 @@ void main() {
         expect('require_cached_image_device_pixel_ratio passes', isNotNull);
       });
     });
-
   });
 
   group('Image - Preference Rules', () {
@@ -297,6 +295,5 @@ void main() {
         expect('prefer_cached_image_cache_manager passes', isNotNull);
       });
     });
-
   });
 }

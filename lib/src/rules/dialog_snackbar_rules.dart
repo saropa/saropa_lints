@@ -354,9 +354,9 @@ class PreferAdaptiveDialogRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseAdaptiveDialogFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseAdaptiveDialogFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_adaptive_dialog',

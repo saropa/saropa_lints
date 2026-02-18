@@ -29,9 +29,7 @@ class RemoveUnnecessaryReturnFix extends SaropaFixProducer {
     if (target == null) return;
 
     await builder.addDartFileEdit(file, (builder) {
-      builder.addDeletion(
-        SourceRange(target.offset, target.length),
-      );
+      builder.addDeletion(SourceRange(target.offset, target.length));
     });
   }
 }

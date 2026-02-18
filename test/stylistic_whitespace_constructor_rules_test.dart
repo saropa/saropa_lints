@@ -27,7 +27,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_style/lib/stylistic_whitespace_constructor/${fixture}_fixture.dart');
+        final file = File(
+          'example_style/lib/stylistic_whitespace_constructor/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -213,6 +215,5 @@ void main() {
         expect('prefer_rethrow_over_throw_e passes', isNotNull);
       });
     });
-
   });
 }

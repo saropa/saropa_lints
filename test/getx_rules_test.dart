@@ -112,7 +112,6 @@ void main() {
         expect('require_getx_binding passes', isNotNull);
       });
     });
-
   });
 
   group('Getx - Avoidance Rules', () {
@@ -259,7 +258,6 @@ void main() {
         expect('avoid_getx_build_context_bypass passes', isNotNull);
       });
     });
-
   });
 
   group('Getx - General Rules', () {
@@ -298,7 +296,6 @@ void main() {
         expect('dispose_getx_fields passes', isNotNull);
       });
     });
-
   });
 
   group('Getx - Preference Rules', () {
@@ -313,6 +310,5 @@ void main() {
         expect('prefer_getx_builder passes', isNotNull);
       });
     });
-
   });
 }

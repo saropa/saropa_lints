@@ -56,9 +56,9 @@ class PreferAutovalidateOnInteractionRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ChangeToOnUserInteractionFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ChangeToOnUserInteractionFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_autovalidate_on_interaction',

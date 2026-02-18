@@ -134,9 +134,9 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddKIsWebGuardFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddKIsWebGuardFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_platform_io_conditional',
@@ -223,9 +223,9 @@ class PreferFoundationPlatformCheckRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplacePlatformCheckFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplacePlatformCheckFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};

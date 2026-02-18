@@ -31,10 +31,7 @@ class ReplaceExpectWithExpectLaterFix extends SaropaFixProducer {
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(
-        SourceRange(
-          invocation.methodName.offset,
-          invocation.methodName.length,
-        ),
+        SourceRange(invocation.methodName.offset, invocation.methodName.length),
         'expectLater',
       );
     });

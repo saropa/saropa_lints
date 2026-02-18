@@ -1609,9 +1609,9 @@ class PreferSecureRandomRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseSecureRandomFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseSecureRandomFix(context: context),
+  ];
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -4763,9 +4763,9 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceWithHttpsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithHttpsFix(context: context),
+  ];
 
   @override
   OwaspMapping get owasp => const OwaspMapping(

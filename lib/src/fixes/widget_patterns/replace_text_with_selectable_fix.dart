@@ -24,7 +24,9 @@ class ReplaceTextWithSelectableFix extends SaropaFixProducer {
 
     // Replace "Text(" with "SelectableText(" in the constructor name
     final source = node.toSource();
-    if (!source.startsWith('Text(') && !source.startsWith('const Text(')) return;
+    if (!source.startsWith('Text(') && !source.startsWith('const Text(')) {
+      return;
+    }
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(

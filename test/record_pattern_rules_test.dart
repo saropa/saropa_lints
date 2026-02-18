@@ -31,7 +31,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/record_pattern/${fixture}_fixture.dart');
+        final file = File(
+          'example_core/lib/record_pattern/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -193,7 +195,6 @@ void main() {
         expect('avoid_single_field_destructuring passes', isNotNull);
       });
     });
-
   });
 
   group('Record Pattern - General Rules', () {
@@ -208,7 +209,6 @@ void main() {
         expect('move_records_to_typedefs passes', isNotNull);
       });
     });
-
   });
 
   group('Record Pattern - Preference Rules', () {
@@ -271,6 +271,5 @@ void main() {
         expect('prefer_pattern_destructuring passes', isNotNull);
       });
     });
-
   });
 }

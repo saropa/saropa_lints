@@ -602,9 +602,9 @@ class RequireMountedCheckRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddMountedCheckFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddMountedCheckFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'require_mounted_check',

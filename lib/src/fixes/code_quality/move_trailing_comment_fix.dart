@@ -27,8 +27,8 @@ class MoveTrailingCommentFix extends SaropaFixProducer {
     final directive = node is ImportDirective
         ? node as Directive
         : node is ExportDirective
-            ? node as Directive
-            : node.thisOrAncestorOfType<ImportDirective>() as Directive? ??
+        ? node as Directive
+        : node.thisOrAncestorOfType<ImportDirective>() as Directive? ??
               node.thisOrAncestorOfType<ExportDirective>() as Directive?;
     if (directive == null) return;
 

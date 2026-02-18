@@ -195,9 +195,9 @@ class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseShorthandPatternFieldFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseShorthandPatternFieldFix(context: context),
+  ];
 }
 
 /// Warns when extension is defined on a Record type.

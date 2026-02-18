@@ -203,7 +203,6 @@ void main() {
         expect('require_dispose_implementation passes', isNotNull);
       });
     });
-
   });
 
   group('Disposal - Avoidance Rules', () {
@@ -218,7 +217,6 @@ void main() {
         expect('avoid_websocket_memory_leak passes', isNotNull);
       });
     });
-
   });
 
   group('Disposal - Preference Rules', () {
@@ -233,7 +231,6 @@ void main() {
         expect('prefer_dispose_before_new_instance passes', isNotNull);
       });
     });
-
   });
 
   group('Disposal - General Rules', () {
@@ -248,6 +245,5 @@ void main() {
         expect('dispose_class_fields passes', isNotNull);
       });
     });
-
   });
 }

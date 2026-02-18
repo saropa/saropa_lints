@@ -6,7 +6,7 @@ This guide documents the performance optimizations in saropa_lints v5.0.0 and ho
 
 ## Architecture: Native Analyzer Plugin
 
-saropa_lints v5 runs as a **native Dart analyzer plugin**, integrated directly into `dart analyze`. This replaces the previous custom_lint-based architecture and brings significant performance benefits:
+Saropa Lints (v5+) runs as a **native Dart analyzer plugin**, integrated directly into `dart analyze`. This replaces the previous custom_lint-based architecture and brings significant performance benefits:
 
 1. **Native integration** - Rules run inside the analyzer process, eliminating IPC overhead
 2. **Incremental analysis** - The analyzer only re-analyzes changed files
@@ -64,7 +64,33 @@ analyzer:
 
 **Why this matters:** Generated code can be 10x larger than your source code. Excluding it can cut analysis time in half.
 
-### 3. Clear Analyzer Cache When Stuck
+### 3. Cap the Problems Tab (Default: 500)
+
+By default, saropa_lints caps the IDE Problems tab at **500 non-ERROR issues**. After the cap is reached:
+
+- **ERROR-severity issues** are always reported (never capped)
+- **WARNING and INFO issues** stop appearing in the Problems tab
+- **All violations** are still recorded in the report log
+- Rules continue running — nothing is skipped
+
+This prevents the IDE from becoming unresponsive on large codebases with many warnings.
+
+**Configure the cap:**
+
+```yaml
+# In analysis_options_custom.yaml
+max_issues: 500  # default; set 0 for unlimited
+```
+
+Or via environment variable:
+
+```bash
+SAROPA_LINTS_MAX=1000 dart analyze
+```
+
+**Tip:** Use `0` (unlimited) in CI where you want a complete count. Use the default `500` locally to keep the IDE responsive.
+
+### 4. Clear Analyzer Cache When Stuck
 
 If analysis seems stuck or slow:
 
@@ -412,6 +438,7 @@ Potential improvements not yet implemented:
 | Exclude generated code      | `analysis_options.yaml`     | 2x faster                       |
 | Compile-time constant tiers | Built-in (v5.0.0)           | Zero runtime cost for tier sets  |
 | Lazy rule instantiation     | Built-in (v5.0.0)           | ~500MB vs ~4GB memory            |
+| Problems tab cap (500)      | Built-in (v5.0.0)           | Keeps IDE responsive             |
 | Profiling                   | `SAROPA_LINTS_PROFILE=true` | Identify slow rules              |
 | Rule deferral               | `SAROPA_LINTS_DEFER=true`   | Fast first pass, slow rules last |
 

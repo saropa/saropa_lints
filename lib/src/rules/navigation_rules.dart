@@ -144,9 +144,9 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddMountedCheckFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddMountedCheckFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_context_after_navigation',
@@ -2002,9 +2002,9 @@ class PreferMaybePopRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceWithMaybePopFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithMaybePopFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_maybe_pop',
@@ -3230,9 +3230,9 @@ class RequireNavigationResultHandlingRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddAwaitToNavigatorPushFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddAwaitToNavigatorPushFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'require_navigation_result_handling',

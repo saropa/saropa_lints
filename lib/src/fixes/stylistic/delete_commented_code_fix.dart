@@ -23,9 +23,7 @@ class DeleteCommentedCodeFix extends SaropaFixProducer {
     if (node == null) return;
 
     await builder.addDartFileEdit(file, (builder) {
-      builder.addDeletion(
-        SourceRange(node.offset, node.length),
-      );
+      builder.addDeletion(SourceRange(node.offset, node.length));
     });
   }
 }

@@ -1220,9 +1220,9 @@ class PreferUuidV4Rule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceV1WithV4Fix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceV1WithV4Fix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_uuid_v4',

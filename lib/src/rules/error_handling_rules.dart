@@ -1219,9 +1219,9 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ChangeExceptionToObjectFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ChangeExceptionToObjectFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_catch_exception_alone',

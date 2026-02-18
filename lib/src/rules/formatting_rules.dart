@@ -289,9 +289,9 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddBlankLineBeforeReturnFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeReturnFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_return',
