@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
+import '../fixes/dialog_snackbar/use_adaptive_dialog_fix.dart';
 
 /// Warns when SnackBar is created without explicit duration.
 ///
@@ -350,6 +351,12 @@ class PreferAdaptiveDialogRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseAdaptiveDialogFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_adaptive_dialog',

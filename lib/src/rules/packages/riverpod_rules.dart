@@ -8,6 +8,8 @@ import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
+import '../../fixes/packages/riverpod/comment_out_notifier_assignment_fix.dart';
+import '../../fixes/packages/riverpod/replace_read_with_watch_fix.dart';
 
 /// Warns when `ref.read()` is used inside a `build()` method.
 ///
@@ -456,6 +458,12 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            CommentOutNotifierAssignmentFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -2166,6 +2174,12 @@ class PreferRefWatchOverReadRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceReadWithWatchFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_ref_watch_over_read',

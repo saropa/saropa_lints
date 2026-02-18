@@ -13,6 +13,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../fixes/packages/provider/remove_listen_false_fix.dart';
 
 // =============================================================================
 // PROVIDER RULES
@@ -2508,6 +2509,12 @@ class AvoidProviderListenFalseInBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            RemoveListenFalseFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_provider_listen_false_in_build',

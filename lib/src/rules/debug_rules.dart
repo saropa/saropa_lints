@@ -6,6 +6,9 @@ import 'package:analyzer/dart/ast/token.dart';
 import '../fixes/comment_out_debug_print_fix.dart';
 import '../mode_constants_utils.dart';
 import '../saropa_lint_rule.dart';
+import '../fixes/debug/replace_with_debug_print_fix.dart';
+import '../fixes/debug/comment_out_sensitive_log_fix.dart';
+import '../fixes/debug/wrap_in_debug_mode_fix.dart';
 
 /// Test-only rule that always reports a lint at the start of the file.
 ///
@@ -472,6 +475,12 @@ class PreferDebugPrintRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceWithDebugPrintFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'prefer_debugPrint',
     '[prefer_debugPrint] print() should use debugPrint() for throttled console output. {v1}',
@@ -599,6 +608,12 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
     }
     return false;
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            WrapInDebugModeFix(context: context),
+      ];
 }
 
 /// Warns when log calls use string concatenation instead of structured logging.
@@ -737,6 +752,12 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            CommentOutSensitiveLogFix(context: context),
+      ];
 
   /// OWASP mapping: M6 (Privacy Controls), A09 (Logging Failures)
   @override

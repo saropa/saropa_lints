@@ -6,6 +6,14 @@ import 'package:analyzer/dart/ast/token.dart';
 
 import '../comment_utils.dart';
 import '../saropa_lint_rule.dart';
+import '../fixes/stylistic/convert_to_single_quotes_fix.dart';
+import '../fixes/stylistic/capitalize_comment_fix.dart';
+import '../fixes/stylistic/replace_curly_apostrophe_fix.dart';
+import '../fixes/stylistic/replace_straight_with_curly_fix.dart';
+import '../fixes/stylistic/sort_arguments_fix.dart';
+import '../fixes/stylistic/convert_to_screaming_case_fix.dart';
+import '../fixes/stylistic/delete_commented_code_fix.dart';
+import '../fixes/stylistic/increase_font_size_fix.dart';
 
 // ============================================================================
 // STYLISTIC / OPINIONATED RULES
@@ -1140,6 +1148,12 @@ class PreferSingleQuotesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ConvertToSingleQuotesFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'prefer_single_quotes',
     '[prefer_single_quotes] Double quotes detected where single quotes would suffice. Prefer single quotes for consistency with Dart style conventions and to reduce visual noise in string literals. {v6}',
@@ -1415,6 +1429,12 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            CapitalizeCommentFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_sentence_case_comments',
@@ -1809,6 +1829,12 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ConvertToScreamingCaseFix(context: context),
+      ];
 }
 
 /// Warns when boolean variables/parameters don't use descriptive prefixes.
@@ -2412,6 +2438,12 @@ class AvoidSmallTextRule extends SaropaLintRule {
       }
     }
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            IncreaseFontSizeFix(context: context),
+      ];
 }
 
 /// Warns when regular comments (`//`) are used instead of doc comments (`///`)
@@ -2656,6 +2688,12 @@ class PreferStraightApostropheRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceCurlyApostropheFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_straight_apostrophe',
@@ -2967,6 +3005,12 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceStraightWithCurlyFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'prefer_curly_apostrophe',
     "[prefer_curly_apostrophe] Use Right Single Quotation Mark (') instead of straight apostrophe (') in strings. This is an opinionated rule - not included in any tier by default. {v4}",
@@ -3072,6 +3116,12 @@ class ArgumentsOrderingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            SortArgumentsFix(context: context),
+      ];
 
   @override
   List<String> get configAliases => const <String>[
@@ -3183,6 +3233,12 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            DeleteCommentedCodeFix(context: context),
+      ];
 
   @override
   List<String> get configAliases => const <String>['avoid_commented_out_code'];

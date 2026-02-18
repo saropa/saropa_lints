@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 
+import '../fixes/record_pattern/use_shorthand_pattern_field_fix.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when pattern contains bottom types (void, Never, Null).
@@ -191,6 +192,12 @@ class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseShorthandPatternFieldFix(context: context),
+      ];
 }
 
 /// Warns when extension is defined on a Record type.

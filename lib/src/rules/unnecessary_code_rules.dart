@@ -4,6 +4,12 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import '../saropa_lint_rule.dart';
+import '../fixes/unnecessary_code/comment_out_empty_spread_fix.dart';
+import '../fixes/unnecessary_code/comment_out_unnecessary_constructor_fix.dart';
+import '../fixes/unnecessary_code/remove_extends_object_fix.dart';
+import '../fixes/unnecessary_code/use_is_empty_or_is_not_empty_fix.dart';
+import '../fixes/unnecessary_code/remove_unnecessary_call_fix.dart';
+import '../fixes/unnecessary_code/remove_unnecessary_super_fix.dart';
 
 /// Warns when an empty spread is used.
 ///
@@ -29,6 +35,12 @@ class AvoidEmptySpreadRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            CommentOutEmptySpreadFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_empty_spread',
@@ -170,6 +182,12 @@ class AvoidUnnecessaryCallRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            RemoveUnnecessaryCallFix(context: context),
+      ];
 }
 
 /// Warns when a class has an empty constructor (no parameters, no body, no initializers).
@@ -202,6 +220,12 @@ class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            CommentOutUnnecessaryConstructorFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_constructor',
@@ -396,6 +420,12 @@ class AvoidUnnecessaryExtendsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            RemoveExtendsObjectFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'avoid_unnecessary_extends',
     '[avoid_unnecessary_extends] All Dart classes implicitly extend Object, so explicitly writing extends Object is unnecessary and adds clutter to your class declaration. This can confuse readers and is never required. {v4}',
@@ -546,6 +576,12 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseIsEmptyOrIsNotEmptyFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_length_check',
@@ -715,6 +751,12 @@ class AvoidUnnecessarySuperRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            RemoveUnnecessarySuperFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_super',

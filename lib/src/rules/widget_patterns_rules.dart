@@ -5,6 +5,15 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/widget_patterns/comment_out_print_fix.dart';
+import '../fixes/widget_patterns/replace_empty_text_with_sized_box_fix.dart';
+import '../fixes/widget_patterns/replace_font_weight_number_fix.dart';
+import '../fixes/widget_patterns/replace_raw_keyboard_listener_fix.dart';
+import '../fixes/widget_patterns/replace_gesture_with_ink_well_fix.dart';
+import '../fixes/widget_patterns/replace_opacity_with_fade_transition_fix.dart';
+import '../fixes/widget_patterns/replace_text_with_selectable_fix.dart';
+import '../fixes/widget_patterns/remove_material2_fallback_fix.dart';
+import '../fixes/widget_patterns/replace_with_void_callback_fix.dart';
 
 class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
   AvoidIncorrectImageOpacityRule() : super(code: _code);
@@ -899,6 +908,12 @@ class AvoidPrintInProductionRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            CommentOutPrintFix(context: context),
+      ];
 }
 
 /// Future rule: avoid-catching-generic-exception
@@ -2306,6 +2321,12 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
 class AvoidEmptyTextWidgetsRule extends SaropaLintRule {
   AvoidEmptyTextWidgetsRule() : super(code: _code);
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceEmptyTextWithSizedBoxFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'avoid_empty_text_widgets',
     "[avoid_empty_text_widgets] Text widget with an empty string ('') still occupies space based on the inherited text style's line height, creating invisible layout artifacts. It also participates in accessibility announcements, confusing screen readers with blank text nodes that convey no information. {v2}",
@@ -2405,6 +2426,12 @@ class AvoidFontWeightAsNumberRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceFontWeightNumberFix(context: context),
+      ];
 }
 
 /// Warns when Container is used only for whitespace/spacing.
@@ -2508,6 +2535,12 @@ class AvoidRawKeyboardListenerRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceRawKeyboardListenerFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2670,6 +2703,12 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceGestureWithInkWellFix(context: context),
+      ];
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -2824,6 +2863,12 @@ class AvoidOpacityAnimationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceOpacityWithFadeTransitionFix(context: context),
+      ];
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -2893,6 +2938,12 @@ class PreferSelectableTextRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceTextWithSelectableFix(context: context),
+      ];
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -2952,6 +3003,12 @@ class AvoidMaterial2FallbackRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            RemoveMaterial2FallbackFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -6315,6 +6372,12 @@ class PreferVoidCallbackRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceWithVoidCallbackFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};

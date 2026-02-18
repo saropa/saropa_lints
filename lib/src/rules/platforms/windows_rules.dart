@@ -24,6 +24,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../fixes/platforms/windows/case_insensitive_path_fix.dart';
 
 // =============================================================================
 // Shared constants
@@ -272,6 +273,12 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            CaseInsensitivePathFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_case_sensitive_path_comparison',

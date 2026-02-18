@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/forms/change_to_on_user_interaction_fix.dart';
 
 // =============================================================================
 // Shared Constants
@@ -52,6 +53,12 @@ class PreferAutovalidateOnInteractionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ChangeToOnUserInteractionFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_autovalidate_on_interaction',

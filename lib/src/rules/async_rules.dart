@@ -6,6 +6,10 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/async/avoid_redundant_async_fix.dart';
+import '../fixes/async/change_to_future_void_function_fix.dart';
+import '../fixes/async/replace_async_callback_with_future_void_function_fix.dart';
+import '../fixes/async/add_to_utc_fix.dart';
 
 /// Warns when calling .ignore() on a Future.
 ///
@@ -335,6 +339,12 @@ class AvoidRedundantAsyncRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            AvoidRedundantAsyncFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_redundant_async',
@@ -1016,6 +1026,12 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ChangeToFutureVoidFunctionFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'prefer_async_callback',
     '[prefer_async_callback] VoidCallback discards Futures silently. Errors will be swallowed and '
@@ -1180,6 +1196,12 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceAsyncCallbackWithFutureVoidFunctionFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_future_void_function_over_async_callback',
@@ -1794,6 +1816,12 @@ class PreferUtcForStorageRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            AddToUtcFix(context: context),
+      ];
 
   // No applicableFileTypes override: DateTime storage patterns appear in models,
   // services, repositories, widgets, and utilities. Early-exit guards on method

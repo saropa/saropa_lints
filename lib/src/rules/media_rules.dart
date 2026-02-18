@@ -9,6 +9,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/media/disable_autoplay_fix.dart';
 
 /// Warns when autoPlay: true is set on audio/video players.
 ///
@@ -39,6 +40,12 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            DisableAutoplayFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_autoplay_audio',
