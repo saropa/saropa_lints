@@ -25,7 +25,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/class_constructor/${fixture}_fixture.dart');
+        final file = File(
+          'example_core/lib/class_constructor/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -103,7 +105,6 @@ void main() {
         expect('avoid_unmarked_public_class passes', isNotNull);
       });
     });
-
   });
 
   group('Class Constructor - Preference Rules', () {
@@ -178,7 +179,6 @@ void main() {
         expect('prefer_base_class passes', isNotNull);
       });
     });
-
   });
 
   group('Class Constructor - General Rules', () {
@@ -193,6 +193,5 @@ void main() {
         expect('proper_super_calls passes', isNotNull);
       });
     });
-
   });
 }

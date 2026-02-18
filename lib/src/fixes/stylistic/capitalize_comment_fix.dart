@@ -29,8 +29,10 @@ class CapitalizeCommentFix extends SaropaFixProducer {
     if (match == null) return;
 
     final prefix = source.substring(0, match.start + match.group(1)!.length);
-    final spacing = source.substring(match.start + match.group(1)!.length,
-        match.start + match.group(0)!.length - 1);
+    final spacing = source.substring(
+      match.start + match.group(1)!.length,
+      match.start + match.group(0)!.length - 1,
+    );
     final firstChar = match.group(2)!;
     final rest = source.substring(match.start + match.group(0)!.length);
     final capitalized = '$prefix$spacing${firstChar.toUpperCase()}$rest';

@@ -130,7 +130,6 @@ void main() {
         expect('avoid_infinite_scroll_duplicate_requests passes', isNotNull);
       });
     });
-
   });
 
   group('Scroll - Requirement Rules', () {
@@ -181,7 +180,6 @@ void main() {
         expect('require_add_automatic_keep_alives_off passes', isNotNull);
       });
     });
-
   });
 
   group('Scroll - Preference Rules', () {
@@ -232,6 +230,5 @@ void main() {
         expect('prefer_infinite_scroll_preload passes', isNotNull);
       });
     });
-
   });
 }

@@ -1150,9 +1150,9 @@ class PreferSingleQuotesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ConvertToSingleQuotesFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ConvertToSingleQuotesFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_single_quotes',
@@ -1432,9 +1432,9 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CapitalizeCommentFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CapitalizeCommentFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_sentence_case_comments',
@@ -1832,9 +1832,9 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ConvertToScreamingCaseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ConvertToScreamingCaseFix(context: context),
+  ];
 }
 
 /// Warns when boolean variables/parameters don't use descriptive prefixes.
@@ -2441,9 +2441,9 @@ class AvoidSmallTextRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            IncreaseFontSizeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        IncreaseFontSizeFix(context: context),
+  ];
 }
 
 /// Warns when regular comments (`//`) are used instead of doc comments (`///`)
@@ -2691,9 +2691,9 @@ class PreferStraightApostropheRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceCurlyApostropheFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceCurlyApostropheFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_straight_apostrophe',
@@ -3007,9 +3007,9 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceStraightWithCurlyFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceStraightWithCurlyFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_curly_apostrophe',
@@ -3119,9 +3119,9 @@ class ArgumentsOrderingRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            SortArgumentsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        SortArgumentsFix(context: context),
+  ];
 
   @override
   List<String> get configAliases => const <String>[
@@ -3236,9 +3236,9 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            DeleteCommentedCodeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        DeleteCommentedCodeFix(context: context),
+  ];
 
   @override
   List<String> get configAliases => const <String>['avoid_commented_out_code'];

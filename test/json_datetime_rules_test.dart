@@ -25,7 +25,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/json_datetime/${fixture}_fixture.dart');
+        final file = File(
+          'example_async/lib/json_datetime/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -79,7 +81,6 @@ void main() {
         expect('require_timezone_display passes', isNotNull);
       });
     });
-
   });
 
   group('Json Datetime - Avoidance Rules', () {
@@ -130,7 +131,6 @@ void main() {
         expect('avoid_optional_field_crash passes', isNotNull);
       });
     });
-
   });
 
   group('Json Datetime - Preference Rules', () {
@@ -193,6 +193,5 @@ void main() {
         expect('prefer_json_serializable passes', isNotNull);
       });
     });
-
   });
 }

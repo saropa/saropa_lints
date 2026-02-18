@@ -51,7 +51,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_widgets/lib/accessibility/${fixture}_fixture.dart');
+        final file = File(
+          'example_widgets/lib/accessibility/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -249,7 +251,6 @@ void main() {
         expect('avoid_color_only_meaning passes', isNotNull);
       });
     });
-
   });
 
   group('Accessibility - Requirement Rules', () {
@@ -444,7 +445,6 @@ void main() {
         expect('require_drag_alternatives passes', isNotNull);
       });
     });
-
   });
 
   group('Accessibility - Preference Rules', () {
@@ -531,6 +531,5 @@ void main() {
         expect('prefer_semantics_container passes', isNotNull);
       });
     });
-
   });
 }

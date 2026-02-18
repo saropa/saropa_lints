@@ -2052,9 +2052,9 @@ class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceContainerWithSizedBoxFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceContainerWithSizedBoxFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4775,9 +4775,9 @@ class PreferSizedBoxSquareRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferSizedBoxSquareFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferSizedBoxSquareFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4866,9 +4866,9 @@ class PreferCenterOverAlignRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferCenterOverAlignFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferCenterOverAlignFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4945,9 +4945,9 @@ class PreferAlignOverContainerRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferAlignOverContainerFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferAlignOverContainerFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -5036,9 +5036,9 @@ class PreferPaddingOverContainerRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferPaddingOverContainerFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferPaddingOverContainerFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -5125,9 +5125,9 @@ class PreferConstrainedBoxOverContainerRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferConstrainedBoxOverContainerFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferConstrainedBoxOverContainerFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};

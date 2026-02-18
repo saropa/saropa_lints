@@ -525,9 +525,9 @@ class PreferConstStringListRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferConstStringListFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferConstStringListFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_const_string_list',
@@ -649,9 +649,9 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferDeclaringConstConstructorFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferDeclaringConstConstructorFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_declaring_const_constructor',
@@ -977,9 +977,9 @@ class PreferFinalClassRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferFinalClassFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferFinalClassFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_final_class',

@@ -39,7 +39,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_style/lib/stylistic/${fixture}_fixture.dart');
+        final file = File(
+          'example_style/lib/stylistic/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -357,7 +359,6 @@ void main() {
         expect('prefer_no_commented_out_code passes', isNotNull);
       });
     });
-
   });
 
   group('Stylistic - Avoidance Rules', () {
@@ -372,6 +373,5 @@ void main() {
         expect('avoid_small_text passes', isNotNull);
       });
     });
-
   });
 }

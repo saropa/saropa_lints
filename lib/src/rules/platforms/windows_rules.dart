@@ -276,9 +276,9 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CaseInsensitivePathFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CaseInsensitivePathFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_case_sensitive_path_comparison',

@@ -25,7 +25,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/unnecessary_code/${fixture}_fixture.dart');
+        final file = File(
+          'example_core/lib/unnecessary_code/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -163,7 +165,6 @@ void main() {
         expect('avoid_unnecessary_super passes', isNotNull);
       });
     });
-
   });
 
   group('Unnecessary Code - General Rules', () {
@@ -190,6 +191,5 @@ void main() {
         expect('no_empty_string passes', isNotNull);
       });
     });
-
   });
 }

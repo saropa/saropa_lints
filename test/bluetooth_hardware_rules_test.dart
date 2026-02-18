@@ -22,7 +22,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/bluetooth_hardware/${fixture}_fixture.dart');
+        final file = File(
+          'example_async/lib/bluetooth_hardware/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -40,7 +42,6 @@ void main() {
         expect('avoid_bluetooth_scan_without_timeout passes', isNotNull);
       });
     });
-
   });
 
   group('Bluetooth Hardware - Requirement Rules', () {
@@ -139,7 +140,6 @@ void main() {
         expect('require_geolocator_error_handling passes', isNotNull);
       });
     });
-
   });
 
   group('Bluetooth Hardware - Preference Rules', () {
@@ -154,6 +154,5 @@ void main() {
         expect('prefer_ble_mtu_negotiation passes', isNotNull);
       });
     });
-
   });
 }

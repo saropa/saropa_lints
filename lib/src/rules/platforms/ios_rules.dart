@@ -549,9 +549,9 @@ class RequireHttpsForIosRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceHttpWithHttpsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceHttpWithHttpsFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'require_https_for_ios',

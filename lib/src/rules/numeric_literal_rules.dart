@@ -545,9 +545,9 @@ class PreferDigitSeparatorsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddDigitSeparatorsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddDigitSeparatorsFix(context: context),
+  ];
 
   static const int _threshold = 10000; // Numbers >= 10000 should use separators
 

@@ -27,7 +27,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/dependency_injection/${fixture}_fixture.dart');
+        final file = File(
+          'example_core/lib/dependency_injection/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -117,7 +119,6 @@ void main() {
         expect('avoid_di_in_widgets passes', isNotNull);
       });
     });
-
   });
 
   group('Dependency Injection - Preference Rules', () {
@@ -180,7 +181,6 @@ void main() {
         expect('prefer_lazy_singleton_registration passes', isNotNull);
       });
     });
-
   });
 
   group('Dependency Injection - Requirement Rules', () {
@@ -219,6 +219,5 @@ void main() {
         expect('require_di_scope_awareness passes', isNotNull);
       });
     });
-
   });
 }

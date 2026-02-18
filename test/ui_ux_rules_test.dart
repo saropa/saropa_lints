@@ -169,7 +169,6 @@ void main() {
         expect('require_webview_progress_indicator passes', isNotNull);
       });
     });
-
   });
 
   group('Ui Ux - Preference Rules', () {
@@ -244,7 +243,6 @@ void main() {
         expect('prefer_adaptive_icons passes', isNotNull);
       });
     });
-
   });
 
   group('Ui Ux - Avoidance Rules', () {
@@ -271,6 +269,5 @@ void main() {
         expect('avoid_loading_flash passes', isNotNull);
       });
     });
-
   });
 }

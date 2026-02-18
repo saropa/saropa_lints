@@ -1607,9 +1607,9 @@ class PreferTestWrapperRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            WrapWithMaterialAppFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        WrapWithMaterialAppFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};

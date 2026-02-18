@@ -125,9 +125,9 @@ class AvoidDateTimeParseUnvalidatedRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseTryParseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseTryParseFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_datetime_parse_unvalidated',
@@ -235,9 +235,9 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseTryParseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseTryParseFix(context: context),
+  ];
 
   bool _isInsideTryCatch(AstNode node) {
     AstNode? current = node.parent;
@@ -645,9 +645,9 @@ class RequireDateFormatSpecificationRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseDateTimeTryParseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseDateTimeTryParseFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'require_date_format_specification',
@@ -777,9 +777,9 @@ class AvoidOptionalFieldCrashRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddNullAwareAccessFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddNullAwareAccessFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_optional_field_crash',

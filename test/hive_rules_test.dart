@@ -182,7 +182,6 @@ void main() {
         expect('require_hive_web_subdirectory passes', isNotNull);
       });
     });
-
   });
 
   group('Hive - Preference Rules', () {
@@ -233,7 +232,6 @@ void main() {
         expect('prefer_hive_lazy_box passes', isNotNull);
       });
     });
-
   });
 
   group('Hive - Avoidance Rules', () {
@@ -284,6 +282,5 @@ void main() {
         expect('avoid_hive_synchronous_in_ui passes', isNotNull);
       });
     });
-
   });
 }

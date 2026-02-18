@@ -48,9 +48,7 @@ class RemoveListenFalseFix extends SaropaFixProducer {
             );
           } else {
             // Only argument - just delete it
-            builder.addDeletion(
-              SourceRange(arg.offset, arg.length),
-            );
+            builder.addDeletion(SourceRange(arg.offset, arg.length));
           }
         });
         return;

@@ -39,9 +39,7 @@ class RemoveJsonSerializableFix extends SaropaFixProducer {
           final deleteLen = newlineIdx >= 0
               ? annotation.length + newlineIdx + 1
               : annotation.length;
-          builder.addDeletion(
-            SourceRange(annotation.offset, deleteLen),
-          );
+          builder.addDeletion(SourceRange(annotation.offset, deleteLen));
         });
         return;
       }

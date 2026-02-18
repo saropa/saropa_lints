@@ -8076,9 +8076,9 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            SimplifyBooleanComparisonFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        SimplifyBooleanComparisonFix(context: context),
+  ];
 }
 
 /// Quick fix: Simplifies boolean literal comparisons.
@@ -8125,9 +8125,9 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferReturningConditionalExpressionsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferReturningConditionalExpressionsFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_returning_conditional_expressions',
@@ -8210,9 +8210,9 @@ class AvoidIgnoreTrailingCommentRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            MoveTrailingCommentFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        MoveTrailingCommentFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_ignore_trailing_comment',

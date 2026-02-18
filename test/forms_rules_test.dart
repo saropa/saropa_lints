@@ -103,7 +103,6 @@ void main() {
         expect('prefer_input_formatters passes', isNotNull);
       });
     });
-
   });
 
   group('Forms - Requirement Rules', () {
@@ -286,7 +285,6 @@ void main() {
         expect('require_stepper_state_management passes', isNotNull);
       });
     });
-
   });
 
   group('Forms - Avoidance Rules', () {
@@ -349,6 +347,5 @@ void main() {
         expect('avoid_keyboard_overlap passes', isNotNull);
       });
     });
-
   });
 }

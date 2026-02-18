@@ -208,9 +208,9 @@ class AvoidMapKeysContainsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseContainsKeyFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseContainsKeyFix(context: context),
+  ];
 }
 
 /// Warns when unnecessary collection wrappers are used.
@@ -889,9 +889,9 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseWhereOrNullFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseWhereOrNullFix(context: context),
+  ];
 }
 
 /// Suggests using *OrNull methods instead of *Where with orElse callback.
@@ -982,9 +982,9 @@ class PreferWhereOrNullRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceWithWhereOrNullFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithWhereOrNullFix(context: context),
+  ];
 }
 
 /// Warns when map literal keys are not in alphabetical order.
@@ -1084,9 +1084,9 @@ class PreferContainsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseContainsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseContainsFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_list_contains',
@@ -1146,9 +1146,9 @@ class PreferFirstRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseFirstFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseFirstFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_list_first',
@@ -1304,9 +1304,9 @@ class PreferLastRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseLastFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseLastFix(context: context),
+  ];
 }
 
 /// Warns when forEach with add is used instead of addAll.

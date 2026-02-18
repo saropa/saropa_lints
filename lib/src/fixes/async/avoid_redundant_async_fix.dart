@@ -34,9 +34,7 @@ class AvoidRedundantAsyncFix extends SaropaFixProducer {
 
     await builder.addDartFileEdit(file, (builder) {
       // Delete 'async' plus trailing space
-      builder.addDeletion(
-        SourceRange(keyword.offset, keyword.length + 1),
-      );
+      builder.addDeletion(SourceRange(keyword.offset, keyword.length + 1));
     });
   }
 }

@@ -9,11 +9,7 @@ import '../../native/saropa_fix.dart';
 class UseFirstFix extends SaropaFixProducer {
   UseFirstFix({required super.context});
 
-  static const _fixKind = FixKind(
-    'saropa.fix.useFirstFix',
-    50,
-    'Use .first',
-  );
+  static const _fixKind = FixKind('saropa.fix.useFirstFix', 50, 'Use .first');
 
   @override
   FixKind get fixKind => _fixKind;

@@ -477,9 +477,9 @@ class PreferDebugPrintRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceWithDebugPrintFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithDebugPrintFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_debugPrint',
@@ -611,9 +611,9 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            WrapInDebugModeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        WrapInDebugModeFix(context: context),
+  ];
 }
 
 /// Warns when log calls use string concatenation instead of structured logging.
@@ -755,9 +755,9 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CommentOutSensitiveLogFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CommentOutSensitiveLogFix(context: context),
+  ];
 
   /// OWASP mapping: M6 (Privacy Controls), A09 (Logging Failures)
   @override

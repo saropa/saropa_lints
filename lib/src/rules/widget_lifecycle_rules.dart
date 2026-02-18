@@ -1941,9 +1941,9 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            WrapSetStateInMountedCheckFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        WrapSetStateInMountedCheckFix(context: context),
+  ];
 }
 
 // Note: _SetStateWithMountedCheckFinder and _AwaitFinder removed.

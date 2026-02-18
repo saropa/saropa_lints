@@ -29,7 +29,10 @@ class ReplaceSliverToBoxAdapterFix extends SaropaFixProducer {
     if (target == null) return;
 
     final source = target.toSource();
-    final replacement = source.replaceFirst('SliverToBoxAdapter', 'SliverFillRemaining');
+    final replacement = source.replaceFirst(
+      'SliverToBoxAdapter',
+      'SliverFillRemaining',
+    );
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(

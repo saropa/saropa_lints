@@ -31,8 +31,7 @@ class CaseInsensitivePathFix extends SaropaFixProducer {
     final left = target.leftOperand.toSource();
     final right = target.rightOperand.toSource();
     final op = target.operator.lexeme;
-    final replacement =
-        '$left.toLowerCase() $op $right.toLowerCase()';
+    final replacement = '$left.toLowerCase() $op $right.toLowerCase()';
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(

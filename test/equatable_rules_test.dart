@@ -25,7 +25,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_packages/lib/equatable/${fixture}_fixture.dart');
+        final file = File(
+          'example_packages/lib/equatable/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -91,7 +93,6 @@ void main() {
         expect('require_equatable_props_override passes', isNotNull);
       });
     });
-
   });
 
   group('Equatable - General Rules', () {
@@ -106,7 +107,6 @@ void main() {
         expect('list_all_equatable_fields passes', isNotNull);
       });
     });
-
   });
 
   group('Equatable - Preference Rules', () {
@@ -169,7 +169,6 @@ void main() {
         expect('prefer_unmodifiable_collections passes', isNotNull);
       });
     });
-
   });
 
   group('Equatable - Avoidance Rules', () {
@@ -196,6 +195,5 @@ void main() {
         expect('avoid_equatable_datetime passes', isNotNull);
       });
     });
-
   });
 }

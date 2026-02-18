@@ -47,9 +47,13 @@ class UseIsEmptyOrIsNotEmptyFix extends SaropaFixProducer {
     final String property;
     if (op == TokenType.EQ_EQ && right is IntegerLiteral && right.value == 0) {
       property = 'isEmpty';
-    } else if (op == TokenType.BANG_EQ && right is IntegerLiteral && right.value == 0) {
+    } else if (op == TokenType.BANG_EQ &&
+        right is IntegerLiteral &&
+        right.value == 0) {
       property = 'isNotEmpty';
-    } else if (op == TokenType.GT && right is IntegerLiteral && right.value == 0) {
+    } else if (op == TokenType.GT &&
+        right is IntegerLiteral &&
+        right.value == 0) {
       property = 'isNotEmpty';
     } else {
       return;

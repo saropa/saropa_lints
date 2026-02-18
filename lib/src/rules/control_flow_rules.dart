@@ -242,9 +242,9 @@ class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            SimplifyBooleanLiteralFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        SimplifyBooleanLiteralFix(context: context),
+  ];
 }
 
 /// Warns when assert has a constant condition (always true or always false).
@@ -644,9 +644,9 @@ class AvoidInvertedBooleanChecksRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            InvertOperatorFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        InvertOperatorFix(context: context),
+  ];
 }
 
 /// Warns when a negated condition can be simplified.
@@ -722,9 +722,9 @@ class AvoidNegatedConditionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UsePositiveFormFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UsePositiveFormFix(context: context),
+  ];
 }
 
 /// Warns when assignment is used inside another expression.
@@ -1284,9 +1284,9 @@ class AvoidUnnecessaryContinueRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CommentOutUnnecessaryContinueFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CommentOutUnnecessaryContinueFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_continue',

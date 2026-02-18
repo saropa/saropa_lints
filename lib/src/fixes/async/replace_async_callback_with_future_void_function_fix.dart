@@ -5,7 +5,7 @@ import 'package:analyzer/source/source_range.dart';
 
 import '../../native/saropa_fix.dart';
 
-/// Quick fix: Change to Future<void> Function()
+/// Quick fix: Change to `Future<void>` Function()
 class ReplaceAsyncCallbackWithFutureVoidFunctionFix extends SaropaFixProducer {
   ReplaceAsyncCallbackWithFutureVoidFunctionFix({required super.context});
 

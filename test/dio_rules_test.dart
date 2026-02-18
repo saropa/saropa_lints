@@ -116,7 +116,6 @@ void main() {
         expect('require_dio_retry_interceptor passes', isNotNull);
       });
     });
-
   });
 
   group('Dio - Preference Rules', () {
@@ -167,7 +166,6 @@ void main() {
         expect('prefer_dio_transformer passes', isNotNull);
       });
     });
-
   });
 
   group('Dio - Avoidance Rules', () {
@@ -206,6 +204,5 @@ void main() {
         expect('avoid_dio_without_base_url passes', isNotNull);
       });
     });
-
   });
 }

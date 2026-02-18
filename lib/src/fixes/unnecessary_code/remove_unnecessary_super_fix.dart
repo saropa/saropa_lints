@@ -39,7 +39,10 @@ class RemoveUnnecessarySuperFix extends SaropaFixProducer {
           if (separator != null) {
             await builder.addDartFileEdit(file, (builder) {
               builder.addDeletion(
-                SourceRange(separator.offset, initializer.end - separator.offset),
+                SourceRange(
+                  separator.offset,
+                  initializer.end - separator.offset,
+                ),
               );
             });
           }

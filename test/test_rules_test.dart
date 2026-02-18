@@ -156,7 +156,6 @@ void main() {
         expect('avoid_misused_test_matchers passes', isNotNull);
       });
     });
-
   });
 
   group('Test Rules - Preference Rules', () {
@@ -267,7 +266,6 @@ void main() {
         expect('prefer_test_variant passes', isNotNull);
       });
     });
-
   });
 
   group('Test Rules - Requirement Rules', () {
@@ -402,7 +400,6 @@ void main() {
         expect('require_integration_test_timeout passes', isNotNull);
       });
     });
-
   });
 
   group('Test Rules - General Rules', () {
@@ -417,6 +414,5 @@ void main() {
         expect('missing_test_assertion passes', isNotNull);
       });
     });
-
   });
 }

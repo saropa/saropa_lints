@@ -29,7 +29,10 @@ class UseAdaptiveDialogFix extends SaropaFixProducer {
     if (target == null) return;
 
     final source = target.toSource();
-    final replacement = source.replaceFirst('AlertDialog(', 'AlertDialog.adaptive(');
+    final replacement = source.replaceFirst(
+      'AlertDialog(',
+      'AlertDialog.adaptive(',
+    );
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(

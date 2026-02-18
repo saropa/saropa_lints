@@ -47,7 +47,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_style/lib/testing_best_practices/${fixture}_fixture.dart');
+        final file = File(
+          'example_style/lib/testing_best_practices/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -209,7 +211,6 @@ void main() {
         expect('require_test_documentation passes', isNotNull);
       });
     });
-
   });
 
   group('Testing Best Practices - Avoidance Rules', () {
@@ -344,7 +345,6 @@ void main() {
         expect('avoid_hardcoded_delays passes', isNotNull);
       });
     });
-
   });
 
   group('Testing Best Practices - Preference Rules', () {
@@ -479,6 +479,5 @@ void main() {
         expect('prefer_fake_platform passes', isNotNull);
       });
     });
-
   });
 }
