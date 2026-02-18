@@ -124,13 +124,27 @@ def _count_fixtures_for_category(
     example_dirs: list[Path], category: str,
 ) -> int:
     """Count fixture files for a category across all sub-packages."""
+    # Primary: exact directory match (e.g., lib/ios/, lib/scroll/)
     for suffix in [category, f"{category}s"]:
         for lib_dir in example_dirs:
             fixture_dir = lib_dir / suffix
             if fixture_dir.exists():
-                count = len(list(fixture_dir.glob("*_fixture.dart")))
-                if count > 0:
-                    return count
+                return len(list(fixture_dir.glob("*_fixture.dart")))
+
+    # Fallback: search subdirs for prefix-matched fixtures
+    for lib_dir in example_dirs:
+        if not lib_dir.exists():
+            continue
+        count = 0
+        try:
+            subdirs = [s for s in lib_dir.iterdir() if s.is_dir()]
+        except OSError:
+            continue
+        for sub in subdirs:
+            count += len(list(sub.glob(f"{category}_*_fixture.dart")))
+        if count > 0:
+            return count
+
     return 0
 
 

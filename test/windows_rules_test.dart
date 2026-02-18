@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 /// Tests for 5 Windows lint rules.
 ///
-/// Test fixtures: example_platforms/lib/platforms/*
+/// Test fixtures: example_platforms/lib/windows/
 void main() {
   group('Windows Rules - Fixture Verification', () {
     final fixtures = [
@@ -18,7 +18,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_platforms/lib/platforms/${fixture}_fixture.dart',
+          'example_platforms/lib/windows/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });
