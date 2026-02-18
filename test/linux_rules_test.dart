@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 /// Tests for 5 Linux lint rules.
 ///
-/// Test fixtures: example_platforms/lib/platforms/*
+/// Test fixtures: example_platforms/lib/linux/
 void main() {
   group('Linux Rules - Fixture Verification', () {
     final fixtures = [
@@ -18,7 +18,7 @@ void main() {
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
-          'example_platforms/lib/platforms/${fixture}_fixture.dart',
+          'example_platforms/lib/linux/${fixture}_fixture.dart',
         );
         expect(file.existsSync(), isTrue);
       });
