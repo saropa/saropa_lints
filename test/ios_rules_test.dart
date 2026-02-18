@@ -8,10 +8,10 @@ import 'package:test/test.dart';
 /// privacy and permissions, security, performance, accessibility,
 /// and Apple platform integration.
 ///
-/// Test fixtures: example_platforms/lib/platforms/*ios*
+/// Test fixtures: example_platforms/lib/ios/
 void main() {
   group('iOS Rules - Fixture Verification', () {
-    // All 89 rules in ios_rules.dart have fixtures in example_platforms/lib/platforms/.
+    // All 89 rules in ios_rules.dart have fixtures in example_platforms/lib/ios/.
     // Some rules are not ios-prefixed (e.g. require_apple_sign_in).
     final fixtures = [
       'avoid_ios_13_deprecations',
@@ -107,9 +107,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File(
-          'example_platforms/lib/platforms/${fixture}_fixture.dart',
-        );
+        final file = File('example_platforms/lib/ios/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }
