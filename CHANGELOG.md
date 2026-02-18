@@ -22,6 +22,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - 506 missing fixture stubs across all example directories (Phase 1-4)
 - 12 new package fixture directories: flutter_hooks, workmanager, supabase, qr_scanner, get_it, geolocator, flame, sqflite, graphql, firebase, riverpod, url_launcher
 
+### Changed
+- PERFORMANCE.md rewritten for v5 native plugin architecture — replaced all custom_lint references with `dart analyze`, updated rule counts, documented lazy rule instantiation and compile-time constant tier sets, added rule deferral info
+
 ### Fixed
 - Test fixture paths for bloc, firebase, riverpod, provider, and url_launcher now point to individual category directories instead of shared `packages/` directory
 
