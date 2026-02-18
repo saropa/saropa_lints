@@ -34,7 +34,7 @@ Dart 3.10 introduced a first-party analyzer plugin system that offers:
 | Quick fixes | `DartFix` subclasses | Various `*_rules.dart` files |
 | Reporter | `SaropaDiagnosticReporter` wrapping `DiagnosticReporter` | `lib/src/saropa_lint_rule.dart` |
 
-**Stats**: 1,677+ rules, 108 quick fixes (all with real implementations), 5 tiers
+**Stats**: 1,677+ rules, 108 quick fixes (all with real AST-based implementations), 5 tiers
 
 ## Target Architecture (v5.x - native plugin)
 
@@ -184,7 +184,7 @@ cspell:disable
 | `native/saropa_context.dart` | Wraps `RuleVisitorRegistry` with 83 `addXxx()` methods + per-file filtering | ~660 |
 | `native/saropa_fix.dart` | `SaropaFixProducer` base class, `SaropaFixGenerator` typedef | ~67 |
 | `native/compat_visitor.dart` | `SimpleAstVisitor` bridge with 83 node type callbacks | ~270 |
-| `fixes/*.dart` | Quick fix implementations (2 PoC so far) | ~40 each |
+| `fixes/<category>/*.dart` | 108 quick fix implementations (all with real AST-based logic) | ~40 each |
 
 ## Migration Phases
 
@@ -337,9 +337,9 @@ Base class stayed as `SaropaLintRule` (now extends `AnalysisRule` directly inste
 
 **Goal**: Comprehensive testing and release
 
-#### 6.1 Quick Fix Migration - IN PROGRESS
+#### 6.1 Quick Fix Migration - DONE
 
-86 rules have real `fixGenerators` with working `SaropaFixProducer` implementations. HackCommentFix placeholder pattern was removed entirely — rules without a real fix simply have no `fixGenerators`.
+108 rules have real `fixGenerators` with working `SaropaFixProducer` implementations. All fix files contain real AST-based logic (zero TODO placeholders). HackCommentFix placeholder pattern was removed entirely — rules without a real fix simply have no `fixGenerators`.
 
 | Fix category | Count | Implementation |
 |---|---|---|
@@ -360,14 +360,14 @@ Base class stayed as `SaropaLintRule` (now extends `AnalysisRule` directly inste
 
 #### 6.3 Release Plan
 
-1. `5.0.0-dev.1` - Current state (infrastructure + PoC)
-2. `5.0.0-beta.1` - All rules migrated, basic quick fixes
-3. `5.0.0-beta.2` - All quick fixes, reporter features
+1. ~~`5.0.0-dev.1` - Infrastructure + PoC~~ DONE
+2. ~~`5.0.0-beta.1` - All rules migrated, basic quick fixes~~ DONE
+3. ~~`5.0.0-beta.2` - All quick fixes, reporter features~~ DONE (108 real fixes + reporter features)
 4. `5.0.0` - Stable release after beta feedback
 5. Maintain `4.x` security fixes during transition
 
 #### Deliverables
-- [x] Quick fix migration (290 rules wired)
+- [x] Quick fix migration (108 rules with real fix implementations)
 - [x] Migration guide (`MIGRATION_V5.md`)
 - [ ] Test suite covering all migrated rules
 - [ ] Beta releases for feedback
@@ -410,8 +410,8 @@ Base class stayed as `SaropaLintRule` (now extends `AnalysisRule` directly inste
 | `lib/src/native/compat_visitor.dart` | 1 | `SimpleAstVisitor` bridge (83 node type callbacks) |
 | `lib/src/native/saropa_fix.dart` | 2 | `SaropaFixProducer` base class + `SaropaFixGenerator` typedef |
 | `lib/src/native/config_loader.dart` | 3 | Config loading (severities, baseline, output settings) |
-| `lib/src/fixes/comment_out_debug_print_fix.dart` | 2 | PoC fix: comment out debugPrint |
-| `lib/src/fixes/remove_empty_set_state_fix.dart` | 2 | PoC fix: remove empty setState |
+| `lib/src/fixes/<category>/*.dart` (108 files) | 6 | Real `SaropaFixProducer` implementations with AST-based logic |
+| `lib/src/fixes/common/*.dart` (3 files) | 6 | Reusable fix base classes (`InsertTextFix`, `ReplaceNodeFix`, `DeleteNodeFix`) |
 | `scripts/migrate_to_native.py` | 4 | Automated rule migration script |
 
 ### Modified Files
@@ -458,4 +458,4 @@ Base class stayed as `SaropaLintRule` (now extends `AnalysisRule` directly inste
 
 ---
 
-_Last updated: 2026-02-16_
+_Last updated: 2026-02-17_
