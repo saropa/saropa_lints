@@ -6,6 +6,12 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/widget_layout/replace_container_with_sized_box_fix.dart';
+import '../fixes/widget_layout/prefer_sized_box_square_fix.dart';
+import '../fixes/widget_layout/prefer_center_over_align_fix.dart';
+import '../fixes/widget_layout/prefer_align_over_container_fix.dart';
+import '../fixes/widget_layout/prefer_padding_over_container_fix.dart';
+import '../fixes/widget_layout/prefer_constrained_box_over_container_fix.dart';
 
 class AvoidExpandedAsSpacerRule extends SaropaLintRule {
   AvoidExpandedAsSpacerRule() : super(code: _code);
@@ -2043,6 +2049,12 @@ class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceContainerWithSizedBoxFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4762,6 +4774,12 @@ class PreferSizedBoxSquareRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferSizedBoxSquareFix(context: context),
+      ];
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -4847,6 +4865,12 @@ class PreferCenterOverAlignRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferCenterOverAlignFix(context: context),
+      ];
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -4918,6 +4942,12 @@ class PreferAlignOverContainerRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferAlignOverContainerFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -5005,6 +5035,12 @@ class PreferPaddingOverContainerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferPaddingOverContainerFix(context: context),
+      ];
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -5086,6 +5122,12 @@ class PreferConstrainedBoxOverContainerRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferConstrainedBoxOverContainerFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};

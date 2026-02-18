@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
+import '../fixes/ui_ux/prefer_logger_over_print_fix.dart';
 
 /// Warns when MediaQuery width is compared to magic numbers.
 ///
@@ -594,6 +595,12 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            PreferLoggerOverPrintFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_logger_over_print',

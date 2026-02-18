@@ -5,7 +5,13 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../fixes/collection/replace_with_where_or_null_fix.dart';
+import '../fixes/collection/use_contains_key_fix.dart';
+import '../fixes/collection/use_last_fix.dart';
+import '../fixes/collection/use_where_or_null_fix.dart';
 import '../saropa_lint_rule.dart';
+import '../fixes/collection/use_contains_fix.dart';
+import '../fixes/collection/use_first_fix.dart';
 
 /// Warns when comparing collections using == operator.
 ///
@@ -199,6 +205,12 @@ class AvoidMapKeysContainsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseContainsKeyFix(context: context),
+      ];
 }
 
 /// Warns when unnecessary collection wrappers are used.
@@ -874,6 +886,12 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseWhereOrNullFix(context: context),
+      ];
 }
 
 /// Suggests using *OrNull methods instead of *Where with orElse callback.
@@ -961,6 +979,12 @@ class PreferWhereOrNullRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceWithWhereOrNullFix(context: context),
+      ];
 }
 
 /// Warns when map literal keys are not in alphabetical order.
@@ -1058,6 +1082,12 @@ class PreferContainsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseContainsFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'prefer_list_contains',
     '[prefer_list_contains] Using indexOf() with a comparison to -1 or 0 to check element presence is verbose and error-prone. The contains() method expresses intent directly, improving readability and reducing off-by-one mistakes. {v2}',
@@ -1113,6 +1143,12 @@ class PreferFirstRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseFirstFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_list_first',
@@ -1265,6 +1301,12 @@ class PreferLastRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseLastFix(context: context),
+      ];
 }
 
 /// Warns when forEach with add is used instead of addAll.

@@ -9,6 +9,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../fixes/packages/package_specific/replace_v1_with_v4_fix.dart';
 
 // =============================================================================
 // AUTHENTICATION RULES
@@ -1216,6 +1217,12 @@ class PreferUuidV4Rule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceV1WithV4Fix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_uuid_v4',

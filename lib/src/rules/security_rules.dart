@@ -10,6 +10,8 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/crypto/use_secure_random_fix.dart';
+import '../fixes/security/replace_with_https_fix.dart';
 
 // cspell:ignore pincode plaintext sessionid expir isbefore accountnumber cardnumber
 // cspell:ignore sharedpreferences returnurl launchurl creds phonenumber socialsecurity
@@ -1604,6 +1606,12 @@ class PreferSecureRandomRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseSecureRandomFix(context: context),
+      ];
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -4752,6 +4760,12 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceWithHttpsFix(context: context),
+      ];
 
   @override
   OwaspMapping get owasp => const OwaspMapping(

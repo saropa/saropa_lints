@@ -5,6 +5,8 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/return/remove_unnecessary_return_fix.dart';
+import '../fixes/return/inline_immediate_return_fix.dart';
 
 /// Warns when returning a cascade expression.
 ///
@@ -148,6 +150,12 @@ class AvoidUnnecessaryReturnRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            RemoveUnnecessaryReturnFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'avoid_unnecessary_return',
     '[avoid_unnecessary_return] Unnecessary return statement at end of void function. This return pattern causes unexpected control flow and makes function behavior harder to predict. {v5}',
@@ -224,6 +232,12 @@ class PreferImmediateReturnRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            InlineImmediateReturnFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_immediate_return',

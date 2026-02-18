@@ -9,6 +9,9 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/json_datetime/use_try_parse_fix.dart';
+import '../fixes/json_datetime/use_date_time_try_parse_fix.dart';
+import '../fixes/json_datetime/add_null_aware_access_fix.dart';
 
 /// Warns when jsonDecode is used without try-catch.
 ///
@@ -120,6 +123,12 @@ class AvoidDateTimeParseUnvalidatedRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseTryParseFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'avoid_datetime_parse_unvalidated',
     '[avoid_datetime_parse_unvalidated] DateTime.parse throws on invalid input. Unvalidated parsing can crash the app, cause silent failures, and break data flows. This is a common source of bugs in date handling and can lead to missed events or corrupted records. {v3}',
@@ -223,6 +232,12 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseTryParseFix(context: context),
+      ];
 
   bool _isInsideTryCatch(AstNode node) {
     AstNode? current = node.parent;
@@ -628,6 +643,12 @@ class RequireDateFormatSpecificationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            UseDateTimeTryParseFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'require_date_format_specification',
     '[require_date_format_specification] DateTime.parse may fail on server dates due to format mismatches. Unspecified formats can cause runtime errors, silent failures, and broken data flows. This is a common source of bugs in internationalized and backend-driven apps. {v2}',
@@ -753,6 +774,12 @@ class AvoidOptionalFieldCrashRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            AddNullAwareAccessFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_optional_field_crash',

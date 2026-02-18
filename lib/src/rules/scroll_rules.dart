@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/scroll/replace_sliver_to_box_adapter_fix.dart';
 
 /// Warns when shrinkWrap: true is used inside a ScrollView.
 ///
@@ -1359,6 +1360,12 @@ class PreferSliverFillRemainingForEmptyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceSliverToBoxAdapterFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_sliverfillremaining_for_empty',

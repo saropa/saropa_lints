@@ -6,6 +6,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../async_context_utils.dart';
 import '../fixes/remove_empty_set_state_fix.dart';
+import '../fixes/widget_lifecycle/wrap_set_state_in_mounted_check_fix.dart';
 import '../saropa_lint_rule.dart';
 
 /// Shared regex for detecting private method calls (e.g., `_dispose()`).
@@ -1937,6 +1938,12 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
       }),
     );
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            WrapSetStateInMountedCheckFix(context: context),
+      ];
 }
 
 // Note: _SetStateWithMountedCheckFinder and _AwaitFinder removed.
