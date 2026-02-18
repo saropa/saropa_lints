@@ -38,9 +38,9 @@ class AvoidEmptySpreadRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CommentOutEmptySpreadFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CommentOutEmptySpreadFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_empty_spread',
@@ -185,9 +185,9 @@ class AvoidUnnecessaryCallRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryCallFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryCallFix(context: context),
+  ];
 }
 
 /// Warns when a class has an empty constructor (no parameters, no body, no initializers).
@@ -223,9 +223,9 @@ class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CommentOutUnnecessaryConstructorFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CommentOutUnnecessaryConstructorFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_constructor',
@@ -422,9 +422,9 @@ class AvoidUnnecessaryExtendsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveExtendsObjectFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveExtendsObjectFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_extends',
@@ -579,9 +579,9 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseIsEmptyOrIsNotEmptyFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseIsEmptyOrIsNotEmptyFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_length_check',
@@ -754,9 +754,9 @@ class AvoidUnnecessarySuperRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessarySuperFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessarySuperFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_super',

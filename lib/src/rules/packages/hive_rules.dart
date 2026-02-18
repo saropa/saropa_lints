@@ -1423,9 +1423,9 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferHiveLazyBoxFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferHiveLazyBoxFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_hive_lazy_box',
@@ -1852,9 +1852,9 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddHiveSubDirFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddHiveSubDirFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'require_hive_web_subdirectory',

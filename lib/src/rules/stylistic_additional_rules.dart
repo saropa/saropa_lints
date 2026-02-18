@@ -176,9 +176,9 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferDoubleQuotesFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferDoubleQuotesFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_double_quotes',
@@ -872,9 +872,9 @@ class PreferObjectOverDynamicRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferObjectOverDynamicFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferObjectOverDynamicFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_object_over_dynamic',
@@ -933,9 +933,9 @@ class PreferDynamicOverObjectRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceAssertWithExpectFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceAssertWithExpectFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_dynamic_over_object',

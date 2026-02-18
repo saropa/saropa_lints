@@ -48,13 +48,22 @@ void main() {
     group('avoid_collection_methods_with_unrelated_types', () {
       test('avoid_collection_methods_with_unrelated_types SHOULD trigger', () {
         // Pattern that should be avoided: avoid collection methods with unrelated types
-        expect('avoid_collection_methods_with_unrelated_types detected', isNotNull);
+        expect(
+          'avoid_collection_methods_with_unrelated_types detected',
+          isNotNull,
+        );
       });
 
-      test('avoid_collection_methods_with_unrelated_types should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_collection_methods_with_unrelated_types passes', isNotNull);
-      });
+      test(
+        'avoid_collection_methods_with_unrelated_types should NOT trigger',
+        () {
+          // Avoidance pattern not present
+          expect(
+            'avoid_collection_methods_with_unrelated_types passes',
+            isNotNull,
+          );
+        },
+      );
     });
 
     group('avoid_dynamic_type', () {
@@ -96,13 +105,22 @@ void main() {
     group('avoid_nullable_parameters_with_default_values', () {
       test('avoid_nullable_parameters_with_default_values SHOULD trigger', () {
         // Pattern that should be avoided: avoid nullable parameters with default values
-        expect('avoid_nullable_parameters_with_default_values detected', isNotNull);
+        expect(
+          'avoid_nullable_parameters_with_default_values detected',
+          isNotNull,
+        );
       });
 
-      test('avoid_nullable_parameters_with_default_values should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_nullable_parameters_with_default_values passes', isNotNull);
-      });
+      test(
+        'avoid_nullable_parameters_with_default_values should NOT trigger',
+        () {
+          // Avoidance pattern not present
+          expect(
+            'avoid_nullable_parameters_with_default_values passes',
+            isNotNull,
+          );
+        },
+      );
     });
 
     group('avoid_nullable_tostring', () {
@@ -164,7 +182,6 @@ void main() {
         expect('avoid_unrelated_type_assertions passes', isNotNull);
       });
     });
-
   });
 
   group('Type - Preference Rules', () {
@@ -203,6 +220,5 @@ void main() {
         expect('prefer_type_over_var passes', isNotNull);
       });
     });
-
   });
 }

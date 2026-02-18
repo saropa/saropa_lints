@@ -36,7 +36,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/naming_style/${fixture}_fixture.dart');
+        final file = File(
+          'example_core/lib/naming_style/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -270,7 +272,6 @@ void main() {
         expect('prefer_correct_package_name passes', isNotNull);
       });
     });
-
   });
 
   group('Naming Style - Avoidance Rules', () {
@@ -285,7 +286,6 @@ void main() {
         expect('avoid_non_ascii_symbols passes', isNotNull);
       });
     });
-
   });
 
   group('Naming Style - General Rules', () {
@@ -328,7 +328,10 @@ void main() {
     group('match_positional_field_names_on_assignment', () {
       test('match_positional_field_names_on_assignment SHOULD trigger', () {
         // Detected violation: match positional field names on assignment
-        expect('match_positional_field_names_on_assignment detected', isNotNull);
+        expect(
+          'match_positional_field_names_on_assignment detected',
+          isNotNull,
+        );
       });
 
       test('match_positional_field_names_on_assignment should NOT trigger', () {
@@ -336,6 +339,5 @@ void main() {
         expect('match_positional_field_names_on_assignment passes', isNotNull);
       });
     });
-
   });
 }

@@ -30,7 +30,10 @@ class RequireDirectionalWidgetsFix extends SaropaFixProducer {
 
     final source = target.toSource();
     var replacement = source;
-    replacement = replacement.replaceAll('EdgeInsets.', 'EdgeInsetsDirectional.');
+    replacement = replacement.replaceAll(
+      'EdgeInsets.',
+      'EdgeInsetsDirectional.',
+    );
     replacement = replacement.replaceAll('left:', 'start:');
     replacement = replacement.replaceAll('right:', 'end:');
 

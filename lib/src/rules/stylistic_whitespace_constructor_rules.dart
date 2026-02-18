@@ -1150,9 +1150,9 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferClipRSuperellipseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferClipRSuperellipseFix(context: context),
+  ];
 
   /// Alias: prefer_rethrow_throw_e
   static const LintCode _code = LintCode(

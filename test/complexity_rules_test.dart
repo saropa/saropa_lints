@@ -24,7 +24,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/complexity/${fixture}_fixture.dart');
+        final file = File(
+          'example_core/lib/complexity/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -138,7 +140,6 @@ void main() {
         expect('avoid_multi_assignment passes', isNotNull);
       });
     });
-
   });
 
   group('Complexity - General Rules', () {
@@ -153,7 +154,6 @@ void main() {
         expect('binary_expression_operand_order passes', isNotNull);
       });
     });
-
   });
 
   group('Complexity - Preference Rules', () {
@@ -180,6 +180,5 @@ void main() {
         expect('prefer_parentheses_with_if_null passes', isNotNull);
       });
     });
-
   });
 }

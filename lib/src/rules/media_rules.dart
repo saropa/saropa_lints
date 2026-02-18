@@ -43,9 +43,9 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            DisableAutoplayFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        DisableAutoplayFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_autoplay_audio',

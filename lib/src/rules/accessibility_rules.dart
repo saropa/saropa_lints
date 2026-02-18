@@ -2570,9 +2570,9 @@ class AvoidFlashingContentRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            IncreaseAnimationDurationFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        IncreaseAnimationDurationFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_flashing_content',

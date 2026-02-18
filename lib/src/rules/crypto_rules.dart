@@ -189,9 +189,9 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseSecureRandomFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseSecureRandomFix(context: context),
+  ];
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -400,9 +400,9 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseSecureRandomIvFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseSecureRandomIvFix(context: context),
+  ];
 
   @override
   OwaspMapping get owasp => const OwaspMapping(

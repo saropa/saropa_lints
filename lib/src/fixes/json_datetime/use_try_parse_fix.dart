@@ -32,10 +32,7 @@ class UseTryParseFix extends SaropaFixProducer {
     // Replace "parse" with "tryParse" in the method name
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(
-        SourceRange(
-          invocation.methodName.offset,
-          invocation.methodName.length,
-        ),
+        SourceRange(invocation.methodName.offset, invocation.methodName.length),
         'tryParse',
       );
     });

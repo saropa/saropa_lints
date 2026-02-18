@@ -46,7 +46,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_widgets/lib/widget_lifecycle/${fixture}_fixture.dart');
+        final file = File(
+          'example_widgets/lib/widget_lifecycle/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -268,7 +270,6 @@ void main() {
         expect('avoid_global_keys_in_state passes', isNotNull);
       });
     });
-
   });
 
   group('Widget Lifecycle - Requirement Rules', () {
@@ -379,7 +380,6 @@ void main() {
         expect('require_widgets_binding_callback passes', isNotNull);
       });
     });
-
   });
 
   group('Widget Lifecycle - General Rules', () {
@@ -454,7 +454,6 @@ void main() {
         expect('pass_existing_stream_to_stream_builder passes', isNotNull);
       });
     });
-
   });
 
   group('Widget Lifecycle - Preference Rules', () {
@@ -469,6 +468,5 @@ void main() {
         expect('prefer_widget_state_mixin passes', isNotNull);
       });
     });
-
   });
 }

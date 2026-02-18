@@ -23,7 +23,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/memory_management/${fixture}_fixture.dart');
+        final file = File(
+          'example_async/lib/memory_management/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -101,7 +103,6 @@ void main() {
         expect('avoid_retaining_disposed_widgets passes', isNotNull);
       });
     });
-
   });
 
   group('Memory Management - Requirement Rules', () {
@@ -152,7 +153,6 @@ void main() {
         expect('require_cache_key_uniqueness passes', isNotNull);
       });
     });
-
   });
 
   group('Memory Management - Preference Rules', () {
@@ -167,6 +167,5 @@ void main() {
         expect('prefer_weak_references_for_cache passes', isNotNull);
       });
     });
-
   });
 }

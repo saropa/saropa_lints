@@ -27,7 +27,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_platforms/lib/platforms/${fixture}_fixture.dart');
+        final file = File(
+          'example_platforms/lib/platforms/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -57,7 +59,6 @@ void main() {
         expect('prefer_macos_keyboard_shortcuts passes', isNotNull);
       });
     });
-
   });
 
   group('Macos - Requirement Rules', () {
@@ -168,7 +169,6 @@ void main() {
         expect('require_macos_entitlements passes', isNotNull);
       });
     });
-
   });
 
   group('Macos - Avoidance Rules', () {
@@ -219,6 +219,5 @@ void main() {
         expect('avoid_macos_hardened_runtime_violations passes', isNotNull);
       });
     });
-
   });
 }

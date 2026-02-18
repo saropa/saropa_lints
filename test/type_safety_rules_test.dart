@@ -28,7 +28,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/type_safety/${fixture}_fixture.dart');
+        final file = File(
+          'example_core/lib/type_safety/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -106,7 +108,6 @@ void main() {
         expect('avoid_dynamic_json_chains passes', isNotNull);
       });
     });
-
   });
 
   group('Type Safety - Preference Rules', () {
@@ -145,7 +146,6 @@ void main() {
         expect('prefer_explicit_type_arguments passes', isNotNull);
       });
     });
-
   });
 
   group('Type Safety - Requirement Rules', () {
@@ -232,6 +232,5 @@ void main() {
         expect('require_validator_return_null passes', isNotNull);
       });
     });
-
   });
 }

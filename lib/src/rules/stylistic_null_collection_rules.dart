@@ -201,9 +201,9 @@ class PreferIfNullOverTernaryRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferIfNullOverTernaryFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferIfNullOverTernaryFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_if_null_over_ternary',
@@ -300,9 +300,9 @@ class PreferTernaryOverIfNullRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferTernaryOverIfNullFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferTernaryOverIfNullFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_ternary_over_if_null',
@@ -822,9 +822,9 @@ class PreferWhereTypeOverWhereIsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferWhereTypeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferWhereTypeFix(context: context),
+  ];
 }
 
 /// Warns when iterating map with .keys and lookup vs .entries.

@@ -31,7 +31,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_packages/lib/package_specific/${fixture}_fixture.dart');
+        final file = File(
+          'example_packages/lib/package_specific/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -181,7 +183,6 @@ void main() {
         expect('require_analytics_error_handling passes', isNotNull);
       });
     });
-
   });
 
   group('Package Specific - Avoidance Rules', () {
@@ -232,7 +233,6 @@ void main() {
         expect('avoid_image_picker_quick_succession passes', isNotNull);
       });
     });
-
   });
 
   group('Package Specific - Preference Rules', () {
@@ -271,6 +271,5 @@ void main() {
         expect('prefer_geolocator_distance_filter passes', isNotNull);
       });
     });
-
   });
 }

@@ -23,7 +23,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_packages/lib/shared_preferences/${fixture}_fixture.dart');
+        final file = File(
+          'example_packages/lib/shared_preferences/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -89,7 +91,6 @@ void main() {
         expect('avoid_shared_prefs_large_data passes', isNotNull);
       });
     });
-
   });
 
   group('Shared Preferences - Requirement Rules', () {
@@ -128,7 +129,6 @@ void main() {
         expect('require_shared_prefs_key_constants passes', isNotNull);
       });
     });
-
   });
 
   group('Shared Preferences - Preference Rules', () {
@@ -167,6 +167,5 @@ void main() {
         expect('prefer_encrypted_prefs passes', isNotNull);
       });
     });
-
   });
 }
