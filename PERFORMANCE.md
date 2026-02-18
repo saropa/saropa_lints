@@ -1,19 +1,19 @@
 # Performance Optimization Guide
 
-This guide documents the performance optimizations in saropa_lints v3.0.0 and how to configure the linter for optimal speed.
+This guide documents the performance optimizations in saropa_lints v5.0.0 and how to configure the linter for optimal speed.
 
 ---
 
-## Why custom_lint is Slow
+## Architecture: Native Analyzer Plugin
 
-custom_lint runs as a Dart analyzer plugin. With 1400+ rules, the analysis can be slow because:
+saropa_lints v5 runs as a **native Dart analyzer plugin**, integrated directly into `dart analyze`. This replaces the previous custom_lint-based architecture and brings significant performance benefits:
 
-1. **Every rule runs on every file** - No incremental analysis support
-2. **Set operations on each file** - Tier rule sets were rebuilt per-file
-3. **Rule filtering overhead** - 1400+ rules filtered for each file
-4. **Generated code analysis** - Analyzing files you can't fix anyway
+1. **Native integration** - Rules run inside the analyzer process, eliminating IPC overhead
+2. **Incremental analysis** - The analyzer only re-analyzes changed files
+3. **Lazy rule instantiation** - Only rules in the selected tier are created (not all 1700+)
+4. **Compile-time constant tier sets** - No runtime set-building overhead
 
-v3.0.0 addresses all of these bottlenecks.
+With 1700+ rules, analysis can still be slow on large projects. The optimizations below help manage this.
 
 ---
 
@@ -24,10 +24,10 @@ v3.0.0 addresses all of these bottlenecks.
 The single biggest performance improvement is using fewer rules. **Always generate your config with the CLI tool for reliable tier selection:**
 
 ```bash
-# Fast local development (~400 rules)
+# Fast local development (~290 rules)
 dart run saropa_lints:init --tier essential
 
-# Thorough CI checking (~1400 rules)
+# Thorough CI checking (~1600 rules)
 dart run saropa_lints:init --tier professional
 ```
 
@@ -35,11 +35,11 @@ dart run saropa_lints:init --tier professional
 
 | Tier            | Rule Count | Relative Speed         |
 | --------------- | ---------- | ---------------------- |
-| `essential`     | ~400       | **Fastest** (baseline) |
-| `recommended`   | ~900       | ~2x slower             |
-| `professional`  | ~1400      | ~3x slower             |
-| `comprehensive` | ~1450      | ~3.5x slower           |
-| `pedantic`      | ~1600      | **Slowest**            |
+| `essential`     | ~290       | **Fastest** (baseline) |
+| `recommended`   | ~840       | ~2x slower             |
+| `professional`  | ~1600      | ~3x slower             |
+| `comprehensive` | ~1710      | ~3.5x slower           |
+| `pedantic`      | ~1720      | **Slowest**            |
 
 ### 2. Exclude Generated Code
 
@@ -77,47 +77,62 @@ dart pub cache clean
 
 # Restart analysis
 dart pub get
-dart run custom_lint
+dart analyze
 ```
 
 ---
 
-## Built-in Optimizations (v3.0.0)
+## Built-in Optimizations (v5.0.0)
 
 These optimizations are automatic - no configuration needed.
 
-### Tier Set Caching
+### Compile-Time Constant Tier Sets
 
-**Problem:** `getRulesForTier()` was rebuilding Set unions on every file.
+**Problem:** Tier rule sets could be expensive to rebuild at runtime.
 
-**Solution:** Tier sets are now computed once on first access and cached:
+**Solution:** All tier sets are `const Set<String>` literals, computed at compile time:
 
 ```dart
-// Before (slow): Rebuilt on every call
-case 'professional':
-  return <String>{...essentialRules, ...recommendedOnlyRules, ...professionalOnlyRules};
-
-// After (fast): Computed once, cached forever
-case 'professional':
-  return _TierCache.professional;
+// Compile-time constant - zero runtime cost
+const Set<String> essentialRules = <String>{
+  'avoid_null_assertion',
+  'avoid_debug_print',
+  // ... ~290 rules
+};
 ```
 
-**Impact:** ~5-10x faster tier lookups after first access.
+Higher tiers use `.union()` on these const sets. Since the base sets are immutable constants, this is efficient.
 
-### Rule Filtering Cache
+**Impact:** Zero runtime cost for tier set construction.
 
-**Problem:** The 1400+ rule list was filtered for every single file.
+### Lazy Rule Instantiation
 
-**Solution:** Filtered rule list is computed once per analysis session:
+**Problem:** Instantiating all 1700+ rules consumes ~4GB of memory.
+
+**Solution:** Rules are stored as factory functions and only instantiated when needed:
 
 ```dart
-// Return cached rules if tier hasn't changed
-if (_cachedFilteredRules != null && _cachedTier == tier) {
-  return _cachedFilteredRules!;
+// Factories stored, not instances
+final List<SaropaLintRule Function()> _allRuleFactories = [
+  AvoidNullAssertionRule.new,
+  AvoidDebugPrintRule.new,
+  // ...
+];
+
+// Only instantiate rules in the selected tier
+List<SaropaLintRule> getRulesFromRegistry(Set<String> ruleNames) {
+  final rules = <SaropaLintRule>[];
+  for (final name in ruleNames) {
+    final factory = _ruleFactories[name];
+    if (factory != null) {
+      rules.add(factory());
+    }
+  }
+  return rules;
 }
 ```
 
-**Impact:** Eliminates O(n) filtering on each of thousands of files.
+**Impact:** Essential tier uses ~500MB instead of ~4GB. Only the rules you need are instantiated.
 
 ---
 
@@ -127,7 +142,7 @@ Enable timing instrumentation to identify slow rules:
 
 ```bash
 # Enable profiling
-SAROPA_LINTS_PROFILE=true dart run custom_lint
+SAROPA_LINTS_PROFILE=true dart analyze
 ```
 
 ### What You'll See
@@ -151,7 +166,9 @@ print(RuleTimingTracker.summary);
 
 // Get detailed timing records
 for (final timing in RuleTimingTracker.sortedTimings) {
-  print('${timing.ruleName}: ${timing.totalTime.inMilliseconds}ms');
+  print('${timing.ruleName}: ${timing.totalTime.inMilliseconds}ms total, '
+      '${timing.callCount} calls, '
+      '${timing.averageTime.inMilliseconds}ms avg');
 }
 
 // Reset timing data
@@ -168,6 +185,11 @@ Top 20 slowest rules (by total time):
   avoid_circular_dependencies: 987ms total, 156 calls, 6.3ms avg
   avoid_deeply_nested_widgets: 876ms total, 156 calls, 5.6ms avg
   ...
+
+=== RULES ELIGIBLE FOR DEFERRAL (>50ms) ===
+Use SAROPA_LINTS_DEFER=true to defer these rules.
+
+  avoid_god_class (3 slow executions)
 ```
 
 ### What to Do With Timing Data
@@ -176,6 +198,7 @@ Top 20 slowest rules (by total time):
 2. **Rules with high average time** - May need algorithmic optimization
 3. **Rules with many calls** - Expected, not a problem
 4. **Rules >10ms average** - Candidates for optimization or tier promotion
+5. **Rules eligible for deferral** - Use `SAROPA_LINTS_DEFER=true` to run them in a second pass
 
 ---
 
@@ -195,7 +218,7 @@ jobs:
         run: dart pub get
 
       - name: Run lints (professional tier)
-        run: dart run custom_lint
+        run: dart analyze --fatal-infos
         env:
           # Optional: Enable profiling in CI to track performance
           SAROPA_LINTS_PROFILE: true
@@ -206,10 +229,10 @@ jobs:
 Use different tiers for local development vs CI:
 
 ```bash
-# Local: Fast feedback loop (~340 rules)
+# Local: Fast feedback loop (~290 rules)
 dart run saropa_lints:init --tier essential
 
-# CI: Thorough checking (~1620 rules)
+# CI: Thorough checking (~1710 rules)
 dart run saropa_lints:init --tier comprehensive -o analysis_options.ci.yaml
 ```
 
@@ -224,16 +247,16 @@ If you see OOM errors:
 ```bash
 # Increase Dart heap size (PowerShell)
 $env:DART_VM_OPTIONS="--old_gen_heap_size=4096"
-dart run custom_lint
+dart analyze
 
 # Increase Dart heap size (bash)
 export DART_VM_OPTIONS="--old_gen_heap_size=4096"
-dart run custom_lint
+dart analyze
 ```
 
 ### Reduce Memory Usage
 
-1. **Use lower tiers** - Fewer rules = less memory
+1. **Use lower tiers** - Fewer rules = less memory (~500MB for essential vs ~4GB for all)
 2. **Exclude generated code** - Fewer files to analyze
 3. **Clear caches** - `rm -rf .dart_tool && dart pub get`
 
@@ -279,8 +302,7 @@ dart run saropa_lints:baseline
 
 ### Full Configuration
 
-Generate tier config and baseline via CLI (YAML-based tier/baseline config
-is not supported by custom_lint):
+Generate tier config and baseline via CLI:
 
 ```bash
 # Generate rule config for your tier
@@ -320,11 +342,11 @@ See [README.md](README.md#baseline-for-brownfield-projects) for full documentati
 
 ```bash
 # Time the full analysis
-time dart run custom_lint
+time dart analyze
 
 # Compare tiers (generate config first with: dart run saropa_lints:init --tier <name>)
-time dart run custom_lint  # after init --tier essential
-time dart run custom_lint  # after init --tier professional
+time dart analyze  # after init --tier essential
+time dart analyze  # after init --tier professional
 ```
 
 ### Expected Performance
@@ -364,11 +386,11 @@ Times vary based on:
 
 ### IDE Integration Slow
 
-The Dart analyzer plugin system has known reliability issues. For consistent performance:
+saropa_lints runs as a native analyzer plugin, so IDE performance depends on the Dart analysis server. For best results:
 
-1. Use CLI (`dart run custom_lint`) instead of IDE integration
-2. Set up VS Code tasks for on-demand linting
-3. Use pre-commit hooks for automated checking
+1. Use a lower tier during active development (`essential` or `recommended`)
+2. Exclude generated code directories
+3. Restart the analysis server if it becomes unresponsive (VS Code: "Dart: Restart Analysis Server")
 
 ---
 
@@ -378,21 +400,19 @@ Potential improvements not yet implemented:
 
 1. **Lazy rule loading** - Load rule categories on-demand
 2. **Parallel rule execution** - Run independent rules in isolates
-3. **Incremental analysis** - Only re-analyze changed files
-4. **Rule dependency ordering** - Run fast rules first, skip slow rules if fast rules fail
-
-These would require significant refactoring or upstream changes to custom_lint.
+3. **Rule dependency ordering** - Run fast rules first, skip slow rules if fast rules fail
 
 ---
 
 ## Summary
 
-| Optimization           | Where                       | Impact                    |
-| ---------------------- | --------------------------- | ------------------------- |
-| Use lower tiers        | `analysis_options.yaml`     | 3-5x faster               |
-| Exclude generated code | `analysis_options.yaml`     | 2x faster                 |
-| Tier set caching       | Built-in (v3.0.0)           | 5-10x faster tier lookups |
-| Rule filtering cache   | Built-in (v3.0.0)           | O(1) vs O(n) per file     |
-| Profiling              | `SAROPA_LINTS_PROFILE=true` | Identify slow rules       |
+| Optimization                | Where                       | Impact                           |
+| --------------------------- | --------------------------- | -------------------------------- |
+| Use lower tiers             | `analysis_options.yaml`     | 3-5x faster                     |
+| Exclude generated code      | `analysis_options.yaml`     | 2x faster                       |
+| Compile-time constant tiers | Built-in (v5.0.0)           | Zero runtime cost for tier sets  |
+| Lazy rule instantiation     | Built-in (v5.0.0)           | ~500MB vs ~4GB memory            |
+| Profiling                   | `SAROPA_LINTS_PROFILE=true` | Identify slow rules              |
+| Rule deferral               | `SAROPA_LINTS_DEFER=true`   | Fast first pass, slow rules last |
 
 **Best practice:** Start with `essential` tier locally, use `professional` in CI, and profile periodically to identify optimization opportunities.
