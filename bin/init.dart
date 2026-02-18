@@ -439,6 +439,25 @@ final RegExp _ruleEntryPattern = RegExp(
   multiLine: true,
 );
 
+/// Matches the `custom_lint:` section header (v4 format) in YAML.
+final RegExp _customLintSectionPattern = RegExp(
+  r'^custom_lint:\s*$',
+  multiLine: true,
+);
+
+/// Matches v4 rule entries: `rule_name: true` or `- rule_name: false`.
+/// Handles both dash-prefix (list) and plain (map) v4 formats.
+final RegExp _v4RuleEntryPattern = RegExp(
+  r'^\s+-?\s*([\w_]+):\s*(true|false)',
+  multiLine: true,
+);
+
+/// Matches `- custom_lint` line in the `analyzer: plugins:` section.
+final RegExp _analyzerCustomLintLine = RegExp(
+  r'^\s+-\s*custom_lint\s*$',
+  multiLine: true,
+);
+
 /// All available tiers in order of strictness.
 const List<String> tierOrder = <String>[
   'essential',
@@ -858,14 +877,54 @@ Future<void> main(List<String> args) async {
   Map<String, bool> userCustomizations = <String, bool>{};
   String existingContent = '';
 
+  // Track whether v4 migration occurred (used for ignore comment tip)
+  bool v4Detected = false;
+  Map<String, bool> v4MigratedRules = <String, bool>{};
+
   if (outputFile.existsSync()) {
     existingContent = outputFile.readAsStringSync();
+
+    // Auto-detect and migrate v4 custom_lint: format
+    if (_detectV4Config(existingContent)) {
+      v4Detected = true;
+      _logTerminal('');
+      _logTerminal(
+        '${_Colors.yellow}--- V4 MIGRATION DETECTED ---${_Colors.reset}',
+      );
+      _logTerminal(
+        '${_Colors.yellow}Found custom_lint: section (v4 format)${_Colors.reset}',
+      );
+
+      v4MigratedRules = _extractV4Rules(existingContent, allRules);
+      _logTerminal(
+        '${_Colors.dim}  Extracted ${v4MigratedRules.length} rule '
+        'settings from v4 config${_Colors.reset}',
+      );
+
+      existingContent = _removeCustomLintSection(existingContent);
+      existingContent = _removeAnalyzerCustomLintPlugin(existingContent);
+      _logTerminal(
+        '${_Colors.green}Removed custom_lint: section${_Colors.reset}',
+      );
+
+      _warnPubspecCustomLint();
+      _logTerminal('');
+    }
 
     if (!cliArgs.reset) {
       userCustomizations = _extractUserCustomizations(
         existingContent,
         allRules,
       );
+
+      // Merge v4 rules as customizations (v5 customizations take precedence)
+      if (v4MigratedRules.isNotEmpty) {
+        userCustomizations = {...v4MigratedRules, ...userCustomizations};
+        _logTerminal(
+          '${_Colors.green}${v4MigratedRules.length} v4 rules imported '
+          'as user customizations${_Colors.reset}',
+        );
+      }
 
       // Warn if suspiciously many customizations (likely corrupted)
       if (userCustomizations.length > 50) {
@@ -1020,6 +1079,45 @@ Future<void> main(List<String> args) async {
     }
   }
 
+  // Convert v4 ignore comments if requested
+  if (v4Detected && cliArgs.fixIgnores && !cliArgs.dryRun) {
+    _logTerminal('');
+    _logTerminal(
+      '${_Colors.bold}Converting v4 ignore comments...${_Colors.reset}',
+    );
+    final Map<String, int> ignoreResults = _convertIgnoreComments(
+      allRules,
+      false,
+    );
+    if (ignoreResults.isEmpty) {
+      _logTerminal(
+        '${_Colors.dim}  No v4 ignore comments found${_Colors.reset}',
+      );
+    } else {
+      final int total = ignoreResults.values.fold(0, (s, c) => s + c);
+      _logTerminal(
+        '${_Colors.green}Converted $total ignore comments in '
+        '${ignoreResults.length} files${_Colors.reset}',
+      );
+      for (final MapEntry<String, int> entry in ignoreResults.entries) {
+        _logTerminal(
+          '${_Colors.dim}  ${entry.key}: ${entry.value}${_Colors.reset}',
+        );
+      }
+    }
+  } else if (v4Detected && !cliArgs.fixIgnores) {
+    _logTerminal('');
+    _logTerminal(
+      '${_Colors.yellow}Tip:${_Colors.reset} Run with '
+      '${_Colors.bold}--fix-ignores${_Colors.reset} to convert '
+      'v4 ignore comments',
+    );
+    _logTerminal(
+      '${_Colors.dim}  // ignore: rule  ->  '
+      '// ignore: saropa_lints/rule${_Colors.reset}',
+    );
+  }
+
   _logTerminal('');
 
   // Write detailed log file (unless dry-run)
@@ -1119,6 +1217,142 @@ Map<String, bool> _extractUserCustomizations(
   }
 
   return customizations;
+}
+
+// ---------------------------------------------------------------------------
+// V4 (custom_lint) auto-migration
+// ---------------------------------------------------------------------------
+
+/// Detects whether the YAML content contains a v4 `custom_lint:` section.
+bool _detectV4Config(String yamlContent) {
+  return _customLintSectionPattern.hasMatch(yamlContent);
+}
+
+/// Extracts rule settings from a v4 `custom_lint:` section.
+///
+/// Handles both v4 formats:
+/// - Plain: `rule_name: true`
+/// - List:  `- rule_name: true`
+///
+/// Only returns rules that exist in [allRules].
+Map<String, bool> _extractV4Rules(String yamlContent, Set<String> allRules) {
+  final Map<String, bool> rules = <String, bool>{};
+
+  final Match? sectionMatch = _customLintSectionPattern.firstMatch(yamlContent);
+  if (sectionMatch == null) return rules;
+
+  // Get content from custom_lint: until next top-level key or EOF
+  final String afterSection = yamlContent.substring(sectionMatch.end);
+  final Match? nextTopLevel = _topLevelKeyPattern.firstMatch(afterSection);
+  final String sectionContent = nextTopLevel != null
+      ? afterSection.substring(0, nextTopLevel.start)
+      : afterSection;
+
+  for (final Match match in _v4RuleEntryPattern.allMatches(sectionContent)) {
+    final String ruleName = match.group(1)!;
+    final bool enabled = match.group(2) == 'true';
+
+    if (allRules.contains(ruleName)) {
+      rules[ruleName] = enabled;
+    }
+  }
+
+  return rules;
+}
+
+/// Removes the `custom_lint:` section from YAML content.
+///
+/// Removes everything from `custom_lint:` to the next top-level key
+/// (or end of file).
+String _removeCustomLintSection(String content) {
+  final Match? sectionMatch = _customLintSectionPattern.firstMatch(content);
+  if (sectionMatch == null) return content;
+
+  final String before = content.substring(0, sectionMatch.start);
+  final String afterStart = content.substring(sectionMatch.end);
+  final Match? nextTopLevel = _topLevelKeyPattern.firstMatch(afterStart);
+  final String after = nextTopLevel != null
+      ? afterStart.substring(nextTopLevel.start)
+      : '';
+
+  return '${before.trimRight()}\n\n$after'.trimRight() + '\n';
+}
+
+/// Removes `- custom_lint` from the `analyzer: plugins:` section.
+String _removeAnalyzerCustomLintPlugin(String content) {
+  return content.replaceAll(_analyzerCustomLintLine, '');
+}
+
+/// Warns the user to remove custom_lint from pubspec.yaml.
+void _warnPubspecCustomLint() {
+  final File pubspecFile = File('pubspec.yaml');
+  if (!pubspecFile.existsSync()) return;
+
+  final String content = pubspecFile.readAsStringSync();
+  if (!RegExp(r'^\s+custom_lint:', multiLine: true).hasMatch(content)) return;
+
+  _logTerminal('');
+  _logTerminal(
+    '${_Colors.yellow}ACTION REQUIRED:${_Colors.reset} '
+    'Remove custom_lint from pubspec.yaml dev_dependencies',
+  );
+  _logTerminal('${_Colors.dim}  Then run: dart pub get${_Colors.reset}');
+}
+
+/// Converts v4 ignore comments to v5 format in .dart files.
+///
+/// Changes `// ignore: rule_name` to `// ignore: saropa_lints/rule_name`.
+/// Only converts rules that exist in [allRules].
+/// Returns a map of file path to number of conversions made.
+Map<String, int> _convertIgnoreComments(Set<String> allRules, bool dryRun) {
+  final Map<String, int> results = <String, int>{};
+
+  for (final String dirName in const ['lib', 'test', 'bin']) {
+    final Directory dir = Directory(dirName);
+    if (!dir.existsSync()) continue;
+
+    for (final FileSystemEntity entity in dir.listSync(recursive: true)) {
+      if (entity is! File || !entity.path.endsWith('.dart')) continue;
+      final int count = _convertIgnoreCommentsInFile(entity, allRules, dryRun);
+      if (count > 0) {
+        results[entity.path] = count;
+      }
+    }
+  }
+
+  return results;
+}
+
+/// Regex matching ignore comments with a bare rule name (not yet prefixed).
+final RegExp _ignoreCommentPattern = RegExp(
+  r'(//\s*ignore(?:_for_file)?\s*:\s*)'
+  r'(?!saropa_lints/)' // skip already converted
+  r'([\w_]+)',
+);
+
+/// Converts ignore comments in a single file. Returns count of conversions.
+int _convertIgnoreCommentsInFile(File file, Set<String> allRules, bool dryRun) {
+  final String content = file.readAsStringSync();
+  int count = 0;
+
+  final String newContent = content.replaceAllMapped(_ignoreCommentPattern, (
+    Match match,
+  ) {
+    final String prefix = match.group(1)!;
+    final String ruleName = match.group(2)!;
+
+    if (allRules.contains(ruleName)) {
+      count++;
+      return '${prefix}saropa_lints/$ruleName';
+    }
+    return match.group(0)!;
+  });
+
+  if (count > 0 && !dryRun) {
+    file.writeAsStringSync(newContent);
+  }
+
+  return count;
 }
 
 /// Extract rule overrides from analysis_options_custom.yaml.
@@ -2163,6 +2397,7 @@ class CliArgs {
     required this.dryRun,
     required this.reset,
     required this.includeStylistic,
+    required this.fixIgnores,
     required this.outputPath,
     required this.tier,
   });
@@ -2171,6 +2406,7 @@ class CliArgs {
   final bool dryRun;
   final bool reset;
   final bool includeStylistic;
+  final bool fixIgnores;
   final String outputPath;
   final String? tier;
 }
@@ -2181,6 +2417,7 @@ CliArgs _parseArguments(List<String> args) {
   final bool dryRun = args.contains('--dry-run');
   final bool reset = args.contains('--reset');
   final bool includeStylistic = args.contains('--stylistic');
+  final bool fixIgnores = args.contains('--fix-ignores');
 
   String outputPath = 'analysis_options.yaml';
   int outputIndex = args.indexOf('--output');
@@ -2205,6 +2442,7 @@ CliArgs _parseArguments(List<String> args) {
     dryRun: dryRun,
     reset: reset,
     includeStylistic: includeStylistic,
+    fixIgnores: fixIgnores,
     outputPath: outputPath,
     tier: requestedTier,
   );
@@ -2256,6 +2494,7 @@ Options:
   -t, --tier <tier>     Tier level (1-5 or name, default: comprehensive)
   -o, --output <file>   Output file (default: analysis_options.yaml)
   --stylistic           Include stylistic rules (opinionated, off by default)
+  --fix-ignores         Convert v4 ignore comments to v5 format (saropa_lints/ prefix)
   --reset               Discard user customizations and reset to tier defaults
   --dry-run             Preview output without writing
   -h, --help            Show this help message
