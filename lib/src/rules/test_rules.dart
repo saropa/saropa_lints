@@ -477,9 +477,9 @@ class PreferExpectLaterRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceExpectWithExpectLaterFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceExpectWithExpectLaterFix(context: context),
+  ];
 }
 
 /// Warns when test files don't follow proper structure.

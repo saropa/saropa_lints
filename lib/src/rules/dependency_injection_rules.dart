@@ -425,9 +425,9 @@ class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AvoidSingletonForScopedDependenciesFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AvoidSingletonForScopedDependenciesFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_singleton_for_scoped_dependencies',
@@ -768,9 +768,9 @@ class AvoidFunctionsInRegisterSingletonRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AvoidFunctionsInRegisterSingletonFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AvoidFunctionsInRegisterSingletonFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_functions_in_register_singleton',
@@ -1491,9 +1491,9 @@ class PreferLazySingletonRegistrationRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferLazySingletonRegistrationFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferLazySingletonRegistrationFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_lazy_singleton_registration',

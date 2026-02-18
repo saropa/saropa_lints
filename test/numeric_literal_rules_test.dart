@@ -23,7 +23,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/numeric_literal/${fixture}_fixture.dart');
+        final file = File(
+          'example_core/lib/numeric_literal/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -65,7 +67,6 @@ void main() {
         expect('avoid_digit_separators passes', isNotNull);
       });
     });
-
   });
 
   group('Numeric Literal - General Rules', () {
@@ -128,7 +129,6 @@ void main() {
         expect('no_magic_string_in_tests passes', isNotNull);
       });
     });
-
   });
 
   group('Numeric Literal - Preference Rules', () {
@@ -167,6 +167,5 @@ void main() {
         expect('prefer_digit_separators passes', isNotNull);
       });
     });
-
   });
 }

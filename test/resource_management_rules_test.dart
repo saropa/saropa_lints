@@ -26,7 +26,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/resource_management/${fixture}_fixture.dart');
+        final file = File(
+          'example_async/lib/resource_management/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -140,7 +142,6 @@ void main() {
         expect('require_image_compression passes', isNotNull);
       });
     });
-
   });
 
   group('Resource Management - Preference Rules', () {
@@ -191,7 +192,6 @@ void main() {
         expect('prefer_image_picker_multi_selection passes', isNotNull);
       });
     });
-
   });
 
   group('Resource Management - Avoidance Rules', () {
@@ -206,6 +206,5 @@ void main() {
         expect('avoid_image_picker_without_source passes', isNotNull);
       });
     });
-
   });
 }

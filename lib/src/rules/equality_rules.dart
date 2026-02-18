@@ -123,9 +123,9 @@ class AvoidNegationsInEqualityChecksRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseNotEqualsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseNotEqualsFix(context: context),
+  ];
 }
 
 /// Warns when a variable is assigned to itself.
@@ -295,9 +295,9 @@ class AvoidUnnecessaryCompareToRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseDirectEqualityFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseDirectEqualityFix(context: context),
+  ];
 }
 
 /// Warns when the same argument value is passed multiple times.
@@ -407,9 +407,9 @@ class AvoidDatetimeComparisonWithoutPrecisionRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseDateTimeDifferenceFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseDateTimeDifferenceFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_datetime_comparison_without_precision',

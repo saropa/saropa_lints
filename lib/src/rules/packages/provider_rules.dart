@@ -2512,9 +2512,9 @@ class AvoidProviderListenFalseInBuildRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveListenFalseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveListenFalseFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_provider_listen_false_in_build',

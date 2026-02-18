@@ -598,9 +598,9 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferLoggerOverPrintFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferLoggerOverPrintFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_logger_over_print',

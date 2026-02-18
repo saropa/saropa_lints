@@ -152,9 +152,9 @@ class AvoidUnnecessaryReturnRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryReturnFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryReturnFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_return',
@@ -235,9 +235,9 @@ class PreferImmediateReturnRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            InlineImmediateReturnFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        InlineImmediateReturnFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_immediate_return',

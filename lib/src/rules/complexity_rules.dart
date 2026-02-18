@@ -72,9 +72,9 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceBitwiseWithLogicalFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceBitwiseWithLogicalFix(context: context),
+  ];
 }
 
 /// Warns when cascade is used after if-null operator without parentheses.

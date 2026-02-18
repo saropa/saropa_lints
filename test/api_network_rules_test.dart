@@ -47,7 +47,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/api_network/${fixture}_fixture.dart');
+        final file = File(
+          'example_async/lib/api_network/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -365,7 +367,6 @@ void main() {
         expect('require_analytics_event_naming passes', isNotNull);
       });
     });
-
   });
 
   group('Api Network - Avoidance Rules', () {
@@ -428,7 +429,6 @@ void main() {
         expect('avoid_cached_image_in_build passes', isNotNull);
       });
     });
-
   });
 
   group('Api Network - Preference Rules', () {
@@ -479,6 +479,5 @@ void main() {
         expect('prefer_timeout_on_requests passes', isNotNull);
       });
     });
-
   });
 }

@@ -58,7 +58,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/performance/${fixture}_fixture.dart');
+        final file = File(
+          'example_async/lib/performance/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -184,7 +186,6 @@ void main() {
         expect('require_isolate_for_heavy passes', isNotNull);
       });
     });
-
   });
 
   group('Performance - Avoidance Rules', () {
@@ -475,7 +476,6 @@ void main() {
         expect('avoid_full_sync_on_every_launch passes', isNotNull);
       });
     });
-
   });
 
   group('Performance - Preference Rules', () {
@@ -622,6 +622,5 @@ void main() {
         expect('prefer_element_rebuild passes', isNotNull);
       });
     });
-
   });
 }

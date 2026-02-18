@@ -52,9 +52,9 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveJsonSerializableFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveJsonSerializableFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_freezed_json_serializable_conflict',

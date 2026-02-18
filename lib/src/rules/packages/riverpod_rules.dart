@@ -461,9 +461,9 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CommentOutNotifierAssignmentFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CommentOutNotifierAssignmentFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -2177,9 +2177,9 @@ class PreferRefWatchOverReadRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceReadWithWatchFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceReadWithWatchFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_ref_watch_over_read',

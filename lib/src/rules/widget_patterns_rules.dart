@@ -911,9 +911,9 @@ class AvoidPrintInProductionRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CommentOutPrintFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CommentOutPrintFix(context: context),
+  ];
 }
 
 /// Future rule: avoid-catching-generic-exception
@@ -2323,9 +2323,9 @@ class AvoidEmptyTextWidgetsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceEmptyTextWithSizedBoxFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceEmptyTextWithSizedBoxFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_empty_text_widgets',
@@ -2429,9 +2429,9 @@ class AvoidFontWeightAsNumberRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceFontWeightNumberFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceFontWeightNumberFix(context: context),
+  ];
 }
 
 /// Warns when Container is used only for whitespace/spacing.
@@ -2538,9 +2538,9 @@ class AvoidRawKeyboardListenerRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceRawKeyboardListenerFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceRawKeyboardListenerFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2704,9 +2704,9 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceGestureWithInkWellFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceGestureWithInkWellFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2864,9 +2864,9 @@ class AvoidOpacityAnimationRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceOpacityWithFadeTransitionFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceOpacityWithFadeTransitionFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2939,9 +2939,9 @@ class PreferSelectableTextRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceTextWithSelectableFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceTextWithSelectableFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3006,9 +3006,9 @@ class AvoidMaterial2FallbackRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveMaterial2FallbackFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveMaterial2FallbackFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -6375,9 +6375,9 @@ class PreferVoidCallbackRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceWithVoidCallbackFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithVoidCallbackFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};

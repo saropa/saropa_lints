@@ -35,7 +35,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_core/lib/collection/${fixture}_fixture.dart');
+        final file = File(
+          'example_core/lib/collection/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -173,7 +175,6 @@ void main() {
         expect('avoid_unreachable_for_loop passes', isNotNull);
       });
     });
-
   });
 
   group('Collection - Preference Rules', () {
@@ -296,7 +297,6 @@ void main() {
         expect('prefer_iterable_operations passes', isNotNull);
       });
     });
-
   });
 
   group('Collection - General Rules', () {
@@ -311,7 +311,6 @@ void main() {
         expect('map_keys_ordering passes', isNotNull);
       });
     });
-
   });
 
   group('Collection - Requirement Rules', () {
@@ -326,6 +325,5 @@ void main() {
         expect('require_key_for_collection passes', isNotNull);
       });
     });
-
   });
 }

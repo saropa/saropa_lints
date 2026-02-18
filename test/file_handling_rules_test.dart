@@ -27,7 +27,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/file_handling/${fixture}_fixture.dart');
+        final file = File(
+          'example_async/lib/file_handling/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -129,7 +131,6 @@ void main() {
         expect('require_file_path_sanitization passes', isNotNull);
       });
     });
-
   });
 
   group('File Handling - Preference Rules', () {
@@ -180,7 +181,6 @@ void main() {
         expect('prefer_streaming_for_large_files passes', isNotNull);
       });
     });
-
   });
 
   group('File Handling - Avoidance Rules', () {
@@ -219,6 +219,5 @@ void main() {
         expect('avoid_loading_full_pdf_in_memory passes', isNotNull);
       });
     });
-
   });
 }

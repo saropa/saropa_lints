@@ -30,8 +30,7 @@ class UseDateTimeDifferenceFix extends SaropaFixProducer {
 
     final left = target.leftOperand.toSource();
     final right = target.rightOperand.toSource();
-    final replacement =
-        '$left.difference($right).inMilliseconds.abs() < 1';
+    final replacement = '$left.difference($right).inMilliseconds.abs() < 1';
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(

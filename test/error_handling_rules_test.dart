@@ -35,7 +35,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_async/lib/error_handling/${fixture}_fixture.dart');
+        final file = File(
+          'example_async/lib/error_handling/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -199,10 +201,13 @@ void main() {
     });
 
     group('require_permission_permanent_denial_handling', () {
-      test('permission request without permanent denial check SHOULD trigger', () {
-        // Users can permanently deny permissions
-        expect('missing permanent denial handling detected', isNotNull);
-      });
+      test(
+        'permission request without permanent denial check SHOULD trigger',
+        () {
+          // Users can permanently deny permissions
+          expect('missing permanent denial handling detected', isNotNull);
+        },
+      );
 
       test('handling permanent denial should NOT trigger', () {
         expect('permanent denial handled passes', isNotNull);

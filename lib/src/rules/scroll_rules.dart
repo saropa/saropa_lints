@@ -1363,9 +1363,9 @@ class PreferSliverFillRemainingForEmptyRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceSliverToBoxAdapterFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceSliverToBoxAdapterFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_sliverfillremaining_for_empty',

@@ -23,7 +23,9 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File('example_widgets/lib/build_method/${fixture}_fixture.dart');
+        final file = File(
+          'example_widgets/lib/build_method/${fixture}_fixture.dart',
+        );
         expect(file.existsSync(), isTrue);
       });
     }
@@ -113,7 +115,6 @@ void main() {
         expect('avoid_hardcoded_feature_flags passes', isNotNull);
       });
     });
-
   });
 
   group('Build Method - Preference Rules', () {
@@ -164,6 +165,5 @@ void main() {
         expect('prefer_single_container passes', isNotNull);
       });
     });
-
   });
 }
