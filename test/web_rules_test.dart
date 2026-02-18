@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 /// Tests for 6 Web lint rules.
 ///
-/// Test fixtures: example_platforms/lib/platforms/*
+/// Test fixtures: example_platforms/lib/web/
 void main() {
   group('Web Rules - Fixture Verification', () {
     final fixtures = [
@@ -18,9 +18,7 @@ void main() {
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final file = File(
-          'example_platforms/lib/platforms/${fixture}_fixture.dart',
-        );
+        final file = File('example_platforms/lib/web/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }
