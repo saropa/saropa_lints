@@ -14,6 +14,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ## [Unreleased]
 
 ### Added
+- Auto-migration from v4 (custom_lint) to v5 (native plugin) — `dart run saropa_lints:init` auto-detects and converts v4 config, with `--fix-ignores` for ignore comment conversion
 - Quick fix support for 108 rules via native `SaropaFixProducer` system — enables IDE lightbulb fixes and `dart fix --apply`
 - 3 reusable fix base classes: `InsertTextFix`, `ReplaceNodeFix`, `DeleteNodeFix` in `lib/src/fixes/common/`
 - 108 individual fix implementation files in `lib/src/fixes/<category>/`, all with real implementations (zero TODO placeholders)

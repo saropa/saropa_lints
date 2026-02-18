@@ -2,6 +2,34 @@
 
 saropa_lints v5 migrates from `custom_lint` to the native Dart analyzer plugin system introduced in Dart 3.10.
 
+## Automatic Migration (Recommended)
+
+Run the init command — it auto-detects v4 `custom_lint:` config and converts it:
+
+```bash
+dart run saropa_lints:init --tier recommended
+```
+
+This will:
+- Extract your v4 rule settings and preserve them as user customizations
+- Remove the `custom_lint:` section from `analysis_options.yaml`
+- Remove `- custom_lint` from `analyzer: plugins:`
+- Warn you to remove `custom_lint` from `pubspec.yaml`
+
+To also convert ignore comments in your `.dart` files:
+
+```bash
+dart run saropa_lints:init --tier recommended --fix-ignores
+```
+
+After running, remove `custom_lint` from `pubspec.yaml` and run `dart pub get`.
+
+---
+
+## Manual Migration (Reference)
+
+The steps below are handled automatically by `dart run saropa_lints:init`. They are kept here for reference only.
+
 ## Why Migrate?
 
 - **Quick fixes work in IDE** - the old system never delivered fix requests to custom_lint plugins
