@@ -11,6 +11,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+
+### Fixed
+- OWASP M2 coverage now correctly reported as 10/10 — `avoid_dynamic_code_loading` and `avoid_unverified_native_library` were invisible to the audit scanner due to a formatting inconsistency in their `OwaspMapping` getter (multiline `=>` arrow); same fix applied to `avoid_hardcoded_signing_config` (M7) and `avoid_sudo_shell_commands` (M1)
+- Completed test fixtures for `avoid_unverified_native_library` and `avoid_sudo_shell_commands` (previously empty stubs)
+
+---
 ## [5.0.0-beta.5]
 
 ### Added
