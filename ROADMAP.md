@@ -33,21 +33,11 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `prefer_pool_pattern` | Comprehensive | INFO | Frequently created/destroyed objects cause GC churn. Object pools reuse instances (e.g., for particles, bullet hell games, or recyclable list items). |
-| ℹ️🐙 [`prefer_pool_pattern`](https://github.com/saropa/saropa_lints/issues/13) | Comprehensive | INFO | Frequently created/destroyed objects cause GC churn. Object pools reuse instances (e.g., for particles, bullet hell games, or recyclable list items). |
-| ℹ️ `require_expando_cleanup` | Comprehensive | INFO | Expando attaches data to objects without modifying them. Entries persist until the key object is GC'd. Remove entries explicitly when done. |
-| ℹ️🐙 [`require_expando_cleanup`](https://github.com/saropa/saropa_lints/issues/14) | Comprehensive | INFO | Expando attaches data to objects without modifying them. Entries persist until the key object is GC'd. Remove entries explicitly when done. |
 
 #### Network Performance
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `require_compression` | Comprehensive | INFO | Large JSON/text responses should use gzip compression. Reduces bandwidth 60-80% for typical API responses. |
-| ℹ️🐙 [`require_compression`](https://github.com/saropa/saropa_lints/issues/15) | Comprehensive | INFO | Large JSON/text responses should use gzip compression. Reduces bandwidth 60-80% for typical API responses. |
-| ℹ️ `prefer_batch_requests` | Professional | INFO | Multiple small requests have more overhead than one batched request. Combine related queries when the API supports it. |
-| ℹ️🐙 [`prefer_batch_requests`](https://github.com/saropa/saropa_lints/issues/16) | Professional | INFO | Multiple small requests have more overhead than one batched request. Combine related queries when the API supports it. |
-| ℹ️ `prefer_binary_format` | Comprehensive | INFO | Protocol Buffers or MessagePack are smaller and faster to parse than JSON. Consider for high-frequency or large-payload APIs. |
-| ℹ️🐙 [`prefer_binary_format`](https://github.com/saropa/saropa_lints/issues/18) | Comprehensive | INFO | Protocol Buffers or MessagePack are smaller and faster to parse than JSON. Consider for high-frequency or large-payload APIs. |
 
 ### 1.4 Testing Rules
 
@@ -73,7 +63,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_deep_link_auth` | Professional | INFO | Deep links with auth tokens (password reset, magic links) must validate tokens server-side and expire quickly. |
-| ⚠️ `avoid_remember_me_insecure` | Recommended | WARNING | "Remember me" storing unencrypted credentials is a security risk. Use refresh tokens with proper rotation and revocation. |
 | ℹ️ `require_multi_factor` | Comprehensive | INFO | Sensitive operations (payments, account changes) should offer or require multi-factor authentication for additional security. |
 
 #### Data Protection
@@ -96,7 +85,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_whitelist_validation` | Professional | INFO | Validate input against known-good values (allowlist) rather than blocking known-bad values (blocklist). Blocklists miss novel attacks. |
-| ⚠️ `prefer_csrf_protection` | Professional | WARNING | State-changing requests need CSRF tokens. Without protection, malicious sites can trigger actions on behalf of logged-in users. |
 | ℹ️ `prefer_intent_filter_export` | Professional | INFO | Android intent filters should be exported only when necessary. Unexported components can't be invoked by malicious apps. |
 
 ### 1.6 Accessibility Rules
@@ -142,7 +130,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `prefer_form_bloc_for_complex` | Professional | INFO | Forms with >5 fields, conditional logic, or multi-step flows benefit from form state management (FormBloc, Reactive Forms). |
 
 ### 1.10 Database & Storage Rules
 
@@ -156,9 +143,7 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `require_yield_after_db_write` | Recommended | WARNING | Database or I/O write without a following `yieldToUI()` call. Write operations acquire exclusive locks that block the UI thread. |
 | ℹ️ `suggest_yield_after_db_read` | Recommended | INFO | Bulk database or I/O read without a following `yieldToUI()` call. Deserializing large payloads can cause frame drops. `findFirst` is excluded. |
-| ⚠️ `avoid_return_await_db` | Recommended | WARNING | Returning directly from a database/IO write skips `yieldToUI()`. Save to variable, yield, then return. Read operations are excluded. |
 
 ### 1.11 Platform-Specific Rules
 
@@ -168,7 +153,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_large_assets_on_web` | Recommended | WARNING | Web has no app install; assets download on demand. Lazy-load images and use appropriate formats (WebP) for faster loads. |
 
 > **Linux**: Implemented in v4.9.20 — 5 rules covering XDG paths, X11/Wayland, font fallbacks, and privilege escalation.
 >
@@ -178,7 +162,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `require_conflict_resolution_strategy` | Professional | WARNING | Offline edits that conflict with server need resolution: last-write-wins, merge, or user prompt. Define strategy upfront. |
 
 ### 1.14 Background Processing Rules
 
@@ -189,13 +172,11 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `prefer_local_notification_for_immediate` | Recommended | INFO | flutter_local_notifications is better for app-generated notifications. FCM is for server-triggered messages. |
 
 ### 1.16 Payment & In-App Purchase Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_entitlement_without_server` | Professional | WARNING | Client-side entitlement checks can be bypassed. Verify subscription status server-side for valuable content. |
 
 ### 1.17 Maps & Location Rules
 
@@ -211,7 +192,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `prefer_master_detail_for_large` | Professional | INFO | On tablets, list-detail flows should show both panes (master-detail) rather than stacked navigation. |
 | ℹ️ `require_foldable_awareness` | Comprehensive | INFO | Foldable devices have hinges and multiple displays. Use DisplayFeature API to avoid placing content on fold. |
 
 ### 1.28 Analytics & Tracking Rules
@@ -242,8 +222,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `require_pagination_for_large_lists` | Essential | WARNING | Loading all items at once causes OOM and slow UI. Detect ListView/GridView with large itemCount without pagination. |
-| ⚠️ `avoid_pagination_refetch_all` | Professional | WARNING | Refetching all pages on refresh wastes bandwidth. Detect refresh logic that resets all paginated data. |
 | ℹ️ `require_pagination_error_recovery` | Recommended | INFO | Failed page loads need retry option. Detect pagination without error state handling. |
 
 ### 1.39 Search & Filter Rules
@@ -277,14 +255,12 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️🐙 [`prefer_infinite_scroll_preload`](https://github.com/saropa/saropa_lints/issues/28) | Professional | INFO | Load next page before reaching end. Detect ScrollController listener triggering at 100% scroll. |
 | ℹ️ `require_infinite_scroll_error_recovery` | Recommended | INFO | Failed page loads need retry. Detect infinite scroll without error state and retry button. |
 
 ### 1.55 Architecture Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_banned_api` | Professional | WARNING | Configurable rule to restrict usage of specific APIs based on source package, class name, identifier, or named parameter, with include/exclude file patterns. Useful for enforcing layer boundaries (e.g., UI cannot call database directly). Inspired by solid_lints' `avoid_using_api`. |
 
 ### 1.56 Type Safety & Casting Rules
 
@@ -296,17 +272,14 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️⭐ `handle_throwing_invocations` | Professional | INFO | Invocations that can throw should be handled appropriately. |
 | ℹ️ `prefer_correct_throws` | Professional | INFO | Document thrown exceptions with `@Throws` annotation. |
 
 ### 1.58 Class & Inheritance Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_accessing_other_classes_private_members` | Professional | WARNING | Detect access to private members of other classes through workarounds. |
 | ℹ️ `avoid_referencing_subclasses` | Professional | INFO | Base classes should not reference their subclasses directly. |
 | ℹ️ `avoid_renaming_representation_getters` | Professional | INFO | Extension type representation getters should not be renamed. |
-| ⚠️ `avoid_suspicious_super_overrides` | Professional | WARNING | Detect suspicious super.method() calls in overrides. |
 | ℹ️ `prefer_class_destructuring` | Professional | INFO | Use record destructuring for class field access when beneficial. |
 
 ### 1.59 JSON & Serialization Rules
@@ -326,14 +299,8 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️⭐ `avoid_deprecated_usage` | Recommended | WARNING | Warn when using deprecated APIs, classes, or methods. |
-| ⚠️ `avoid_high_cyclomatic_complexity` | Professional | WARNING | Warn when functions exceed a configurable cyclomatic complexity threshold. |
 | ℹ️ `avoid_importing_entrypoint_exports` | Professional | INFO | Avoid importing from files that re-export entry points. |
-| ⚠️ `avoid_suspicious_global_reference` | Professional | WARNING | Detect suspicious references to global state in methods. |
-| ⚠️ `avoid_unused_local_variable` | Recommended | WARNING | Local variables that are declared but never used. |
-| ⚠️⭐ `no_empty_block` | Recommended | WARNING | Empty blocks indicate missing implementation or dead code. |
 | ℹ️ `tag_name` | Professional | INFO | Validate custom element tag names follow conventions. |
-| ⚠️ `banned_usage` | Professional | WARNING | Configurable rule to ban specific APIs, classes, or patterns. |
 
 ### 1.63 Documentation Rules
 
@@ -347,7 +314,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 | ℹ️ `require_return_documentation` | Professional | INFO | Non-void methods must document return value |
 | ℹ️ `require_exception_documentation` | Professional | INFO | Methods that throw must document exceptions |
 | ℹ️ `require_example_in_documentation` | Professional | INFO | Complex public classes should include usage examples |
-| ⚠️ `verify_documented_parameters_exist` | Professional | WARNING | Doc `[paramName]` references must match actual parameters |
 
 ### 1.62 Bloc/Cubit Rules
 
@@ -365,14 +331,11 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_missing_tr` | Essential | WARNING | Detect strings that should be translated but aren't. |
-| ⚠️ `avoid_missing_tr_on_strings` | Essential | WARNING | User-visible strings should use translation methods. |
 
 #### Testing Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_missing_controller` | Essential | WARNING | Widgets with controllers should have controllers provided. |
 | ℹ️ `format_test_name` | Stylistic | INFO | Test names should follow a consistent format. |
 | ℹ️ `prefer_custom_finder_over_find` | Professional | INFO | Use custom finders for better test readability and maintenance. |
 
@@ -387,8 +350,6 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `add_resolution_workspace` | Professional | INFO | Add resolution workspace for monorepo dependency management. |
-| ⚠️ `avoid_any_version` | Essential | WARNING | Avoid `any` version constraint - specify version ranges. |
-| ⚠️ `avoid_dependency_overrides` | Recommended | WARNING | dependency_overrides should only be used temporarily. |
 | ℹ️ `dependencies_ordering` | Stylistic | INFO | Dependencies should be sorted alphabetically. |
 | ℹ️ `newline_before_pubspec_entry` | Stylistic | INFO | Add blank lines between major pubspec sections. |
 | ℹ️ `prefer_caret_version_syntax` | Stylistic | INFO | Use `^1.0.0` caret syntax for version constraints. |
@@ -397,15 +358,12 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 | ℹ️ `prefer_correct_topics` | Professional | INFO | Topics should be valid pub.dev topics. |
 | ℹ️ `prefer_pinned_version_syntax` | Professional | INFO | Pin exact versions for production stability. |
 | ℹ️ `prefer_publish_to_none` | Recommended | INFO | Private packages should have `publish_to: none`. |
-| ⚠️ `prefer_semver_version` | Essential | WARNING | Version should follow semantic versioning (major.minor.patch). |
 | ℹ️ `pubspec_ordering` | Stylistic | INFO | Pubspec fields should follow recommended ordering. |
 
 #### Widget/Flutter Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_collection_mutating_methods` | Professional | WARNING | Avoid methods that mutate collections in place. |
-| ⚠️ `avoid_missing_controller` | Essential | WARNING | Widgets requiring controllers should have them provided. |
 | ℹ️ `avoid_unnecessary_null_aware_elements` | Recommended | INFO | Null-aware elements in collections that can't be null. |
 | ℹ️ `use_closest_build_context` | Professional | INFO | Use the closest available BuildContext for better performance. |
 
@@ -444,7 +402,6 @@ These rules are **not included in any tier** by default. They represent team pre
 | ℹ️ `avoid_cascades` | Stylistic | INFO | Discourage use of cascade (..) for clarity and maintainability. |
 | ℹ️ `avoid_classes_with_only_static_members` | Recommended | INFO | Avoid classes with only static members; use top-level functions or variables. |
 | ℹ️ `avoid_double_and_int_checks` | Professional | INFO | Avoid type checks for double/int; use num or generic constraints. |
-| ⚠️ `avoid_dynamic_calls` | Recommended | WARNING | Avoid dynamic calls; prefer static typing for safety. |
 | ℹ️ `avoid_equals_and_hash_code_on_mutable_classes` | Professional | INFO | Avoid overriding equals/hashCode on mutable classes. |
 | ℹ️ `avoid_escaping_inner_quotes` | Stylistic | INFO | Prefer consistent quote usage to avoid escaping. |
 | ℹ️ `avoid_field_initializers_in_const_classes` | Professional | INFO | Avoid field initializers in const classes; use constructor initializers. |
@@ -460,12 +417,9 @@ These rules are **not included in any tier** by default. They represent team pre
 | ℹ️ `avoid_returning_null_for_void` | Recommended | INFO | Avoid returning null for void; just return. |
 | ℹ️ `avoid_returning_this` | Stylistic | INFO | Avoid returning this from methods; prefer fluent interfaces. |
 | ℹ️ `avoid_setters_without_getters` | Professional | INFO | Avoid setters without corresponding getters. |
-| ⚠️ `avoid_shadowing_type_parameters` | Recommended | WARNING | Avoid shadowing type parameters in generics. |
 | ℹ️ `avoid_single_cascade_in_expression_statements` | Stylistic | INFO | Avoid single cascade in expression statements; use direct call. |
 | ℹ️ `avoid_types_on_closure_parameters` | Stylistic | INFO | Avoid explicit types on closure parameters when unnecessary. |
 | ℹ️ `avoid_unnecessary_containers` | Recommended | INFO | Avoid unnecessary Container widgets in Flutter. |
-| ⚠️ `avoid_unused_constructor_parameters` | Recommended | WARNING | Avoid unused constructor parameters; remove or use them. |
-| ⚠️ `avoid_void_async` | Recommended | WARNING | Avoid async functions that return void. |
 | ℹ️ `prefer_asserts_in_initializer_lists` | Professional | INFO | Prefer asserts in initializer lists for constructors. |
 | ℹ️ `prefer_const_constructors_in_immutables` | Professional | INFO | Prefer const constructors in immutable classes. |
 | ℹ️ `prefer_const_declarations` | Recommended | INFO | Prefer const declarations where possible. |
@@ -530,7 +484,6 @@ These rules are **not included in any tier** by default. They represent team pre
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `prefer_no_commented_code` | Recommended | WARNING | Disallow commented-out code blocks |
 | ℹ️ `prefer_inline_comments_sparingly` | Comprehensive | INFO | Limit inline comments; prefer self-documenting code |
 
 #### String Preferences
@@ -600,7 +553,6 @@ Rules to help adopt modern Dart and Flutter language features.
 | ℹ️ `prefer_extension_type_for_wrapper` | Professional | INFO | Use extension types (Dart 3.3) for zero-cost type wrappers. |
 | ℹ️ `prefer_record_over_tuple_class` | Professional | INFO | Use records (Dart 3.0) instead of tuple classes. |
 | ℹ️ `prefer_sealed_for_state` | Professional | INFO | Use sealed classes (Dart 3.0) for exhaustive state hierarchies. |
-| ⚠️ `require_exhaustive_sealed_switch` | Essential | WARNING | Switch on sealed types must handle all cases. |
 
 ### 4.2 Flutter Widget Feature Rules
 
@@ -637,48 +589,30 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 ### 5.5 Bloc/Cubit Advanced Rules
 
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| ⚠️ `avoid_behavior_subject_last_value` | Professional | WARNING | BehaviorSubject retains value after close. Use PublishSubject when appropriate. |
-
 ### 5.6 GetX Anti-Pattern Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_getx_builder_over_obx` | Recommended | INFO | GetBuilder is more explicit than Obx for state. Detect mixed patterns. |
-| ⚠️ `avoid_getx_rx_nested_obs` | Professional | WARNING | Nested .obs creates complex reactive trees. Detect Rx<List<Rx<Type>>>. |
 
 ### 5.7 Hive Database Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_hive_type_modification` | Professional | WARNING | Modifying Hive type fields breaks existing data. Detect field type changes. |
 | ℹ️ `prefer_hive_compact` | Professional | INFO | Large boxes should be compacted periodically. Detect long-running box without compact. |
 | ℹ️ `prefer_hive_web_aware` | Recommended | INFO | Hive web has different behavior. Detect Hive usage without web considerations. |
 
 ### 5.8 SharedPreferences Security Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| ⚠️ `avoid_shared_prefs_sync_race` | Professional | WARNING | Multiple writers can race. Detect concurrent SharedPreferences writes. |
 
 ### 5.9 sqflite Database Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `require_sqflite_index_for_queries` | Professional | INFO | Frequently queried columns need indexes. Detect slow queries without index. |
-| ⚠️ `prefer_sqflite_encryption` | Professional | WARNING | Sensitive databases need encryption. Use sqlcipher_flutter_libs. |
 
 ### 5.10 cached_network_image Rules
 
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| ⚠️ `avoid_cached_image_web` | Recommended | WARNING | CachedNetworkImage lacks web caching. Detect web usage; suggest alternatives. |
-
 ### 5.11 image_picker Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
 
 ### 5.12 permission_handler Rules
 
@@ -686,7 +620,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 |-----------|------|----------|-------------|
 | ℹ️ `require_permission_lifecycle_observer` | Professional | INFO | Re-check permissions on app resume. Detect missing WidgetsBindingObserver. |
 | ℹ️ `prefer_permission_minimal_request` | Recommended | INFO | Request only needed permissions. Detect requesting unused permissions. |
-| ⚠️ `avoid_permission_request_loop` | Professional | WARNING | Don't repeatedly request denied permission. Detect request in loop or retry. |
 
 ### 5.13 geolocator Rules
 
@@ -698,24 +631,17 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `prefer_notification_custom_sound | Professional | INFO | Important notifications may need custom sound. Document sound configuration. |
+| ℹ️ `prefer_notification_custom_sound` | Professional | INFO | Important notifications may need custom sound. Document sound configuration. |
 
 ### 5.15 connectivity_plus Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_connectivity_equals_internet` | Essential | WARNING | Connectivity type doesn't mean internet access. Detect using status to skip network call. |
-| ⚠️ `require_connectivity_timeout` | Essential | WARNING | Always set timeout on network requests. Connectivity status can be misleading. |
 | ℹ️ `prefer_internet_connection_checker` | Professional | INFO | Use internet_connection_checker for actual internet verification. |
 | ℹ️ `require_connectivity_resume_check` | Professional | INFO | Re-check connectivity when app resumes. Android 8+ stops background updates. |
-| ⚠️ `avoid_connectivity_ui_decisions` | Professional | WARNING | Don't block UI based on connectivity alone. Detect conditional UI from connectivity. |
 | ℹ️ `prefer_connectivity_debounce` | Professional | INFO | Debounce rapid connectivity changes. Detect status handler without debounce. |
 
 ### 5.16 url_launcher Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| ⚠️ `avoid_url_launcher_sandbox_issues` | Professional | WARNING | Launched apps run in Flutter sandbox. Document back navigation issues. |
 
 ### 5.17 freezed/json_serializable Rules
 
@@ -723,30 +649,16 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 |-----------|------|----------|-------------|
 | ℹ️ `avoid_freezed_invalid_annotation_target` | Recommended | INFO | Disable invalid_annotation_target warning in analysis_options. |
 | ℹ️ `prefer_freezed_union_types` | Professional | INFO | Use Freezed unions for sealed state. Detect manual sealed class hierarchies. |
-| ⚠️ `avoid_freezed_any_map_issue` | Professional | WARNING | any_map in build.yaml not respected in .freezed.dart. Document workaround. |
 
 ### 5.18 equatable Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| ⚠️ `avoid_equatable_nested_equality | Professional | WARNING | Nested Equatables should also be immutable. Detect mutable nested objects. |
 
 ### 5.19 http Package Security Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `require_ssl_pinning_sensitive` | Professional | WARNING | Sensitive APIs need certificate pinning. Detect auth endpoints without pinning. |
-| ⚠️ `avoid_stack_trace_in_production` | Essential | WARNING | Don't show stack traces to users. Detect printStackTrace in error handlers. |
-| ⚠️ `require_input_validation` | Essential | WARNING | Validate user input before sending. Detect raw input in API calls. |
 | ℹ️ `require_content_type_validation` | Professional | INFO | Verify response Content-Type. Detect JSON parsing without content-type check. |
-| ⚠️ `require_error_handling_graceful` | Essential | WARNING | Show friendly errors, not technical ones. Detect raw exception messages in UI. |
 
 ### 5.20 Animation Performance Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| ⚠️ `avoid_clip_during_animation` | Professional | WARNING | Pre-clip content before animating. Detect ClipRect in animated widget. |
-| ⚠️ `avoid_multiple_animation_controllers` | Professional | WARNING | Multiple controllers on same widget conflict. Detect multiple controllers without coordination. |
 
 ### 5.21 Stream/StreamBuilder Rules
 
@@ -766,15 +678,12 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_expensive_did_change_dependencies` | Professional | WARNING | didChangeDependencies runs often. Detect heavy work in didChangeDependencies. |
 | ℹ️ `prefer_deactivate_for_cleanup` | Professional | INFO | Use deactivate for removable cleanup. Detect dispose-only cleanup that could be in deactivate. |
 
 ### 5.24 Form/TextFormField Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_form_validation_on_change` | Professional | WARNING | Validating every keystroke is expensive. Detect onChanged triggering validation. |
-| ℹ️ `prefer_form_bloc_for_complex` | Professional | INFO | Complex forms benefit from FormBloc. Detect forms with >5 fields and conditionals. |
 | ℹ️ `require_error_message_clarity` | Recommended | INFO | Error messages should explain fix. Detect generic "Invalid" messages. |
 
 ### 5.25 ListView/GridView Performance Rules
@@ -790,20 +699,16 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `require_will_pop_scope | Professional | INFO | Handle back button appropriately. Detect navigation without back handling. |
+| ℹ️ `require_will_pop_scope` | Professional | INFO | Handle back button appropriately. Detect navigation without back handling. |
 | ℹ️ `prefer_named_routes_for_deep_links` | Professional | INFO | Named routes enable deep linking. Detect anonymous route construction. |
 
 ### 5.27 auto_route Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️⭐ `require_auto_route_guard_resume` | Essential | WARNING | Call resolver.next(true) after guard condition met. Detect guard without resume. |
-| ⚠️ `avoid_auto_route_context_navigation` | Professional | WARNING | Use router instead of context for nested navigation. Detect context.push in nested route. |
 | ℹ️ `require_auto_route_page_suffix` | Stylistic | INFO | Page classes should have Page suffix. Detect @RoutePage without suffix. |
 | ℹ️ `prefer_auto_route_path_params_simple` | Recommended | INFO | Path params should be simple types. Detect complex objects in path. |
-| ⚠️ `require_auto_route_full_hierarchy` | Essential | WARNING | Navigate with full parent hierarchy. Detect child route without parent. |
 | ℹ️ `prefer_auto_route_typed_args` | Professional | INFO | Use strongly typed route arguments. Detect dynamic args passing. |
-| ⚠️ `avoid_auto_route_keep_history_misuse` | Professional | WARNING | Understand keepHistory: false behavior. Detect unintended stack modification. |
 | ℹ️ `require_auto_route_deep_link_config` | Professional | INFO | Configure deep links properly. Detect routes without path configuration. |
 
 ### 5.28 Internationalization (intl) Rules
@@ -817,24 +722,17 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_firestore_admin_role_overuse` | Professional | WARNING | Limit admin roles. Detect excessive admin claims assignment. |
-| ⚠️ `require_firebase_reauthentication` | Essential | WARNING | Sensitive operations need recent auth. Detect sensitive ops without reauthenticateWithCredential. |
 | ℹ️ `require_firebase_email_enumeration_protection` | Professional | INFO | fetchSignInMethodsForEmail was removed. Detect usage in code. |
-| ⚠️ `require_firebase_token_refresh` | Essential | WARNING | Handle token refresh on idTokenChanges. Detect missing refresh handler. |
-| ⚠️ `avoid_firebase_user_data_in_auth` | Professional | WARNING | Auth claims limited to 1000 bytes. Detect large data in custom claims. |
 | ℹ️ `require_firebase_offline_persistence` | Recommended | INFO | Configure Firestore offline persistence. Detect Firestore without persistence settings. |
 | ✅ `require_firebase_composite_index` | Essential | ERROR | RTDB compound queries need `.indexOn`. Detect `orderByChild` + filter without index. |
 | ℹ️ `prefer_firebase_transaction_for_counters` | Professional | INFO | Use transactions for counters. Detect read-then-write pattern. |
-| ⚠️ `require_firebase_app_check_production` | Professional | WARNING | Enable App Check for production. Detect production without App Check. |
 
 ### 5.30 WebView Security Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_webview_local_storage_access` | Professional | WARNING | Limit WebView local storage access. Detect unrestricted storage settings. |
 | ℹ️ `require_webview_user_agent` | Professional | INFO | Set custom user agent for analytics. Detect default user agent. |
 | ℹ️ `prefer_webview_sandbox` | Professional | INFO | Use sandbox attribute for iframes. Detect iframe without sandbox. |
-| ⚠️ `avoid_webview_cors_issues` | Professional | WARNING | WebView has CORS limitations. Document CORS handling. |
 
 ### 5.31 Testing Best Practices Rules
 
@@ -847,11 +745,8 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_large_object_in_state` | Professional | WARNING | Large objects in widget state cause memory issues. Detect >1MB objects in state. |
 | ℹ️ `require_image_memory_cache_limit` | Professional | INFO | Set PaintingBinding.imageCache limits. Detect default unlimited cache. |
 | ℹ️ `prefer_weak_references` | Comprehensive | INFO | Use Expando for optional associations. Detect strong refs where weak would work. |
-| ⚠️ `avoid_closure_capture_leaks` | Professional | WARNING | Closures can capture and retain objects. Detect closures capturing large objects. |
-| ⚠️ `avoid_unbounded_collections` | Essential | WARNING | Collections without size limits cause OOM. Detect growing collections without limits. |
 | ℹ️ `prefer_streams_over_polling` | Professional | INFO | Streams are more memory-efficient than polling. Detect Timer-based polling. |
 
 ### 5.34 Error Handling Best Practices Rules
@@ -866,7 +761,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_platform_specific_imports` | Recommended | WARNING | Use conditional imports for platform code. Detect dart:io in web code. |
 | ℹ️ `prefer_platform_widget_adaptive` | Recommended | INFO | Use platform-adaptive widgets. Detect Material widgets in iOS-only context. |
 
 ### 5.36 API Response Handling Rules
@@ -880,7 +774,7 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `prefer_context_read_not_watch | Professional | INFO | Use context.read in one-time operations. Detect context.watch in single-use callback. |
+| ℹ️ `prefer_context_read_not_watch` | Professional | INFO | Use context.read in one-time operations. Detect context.watch in single-use callback. |
 | ℹ️ `prefer_closest_context` | Professional | INFO | Use closest BuildContext for better performance. Detect distant context usage. |
 | ℹ️ `require_context_in_build_descendants` | Professional | INFO | Use Builder for updated context. Detect context issue after widget creation. |
 
@@ -899,7 +793,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_lru_cache` | Professional | INFO | Use LRU for memory-bounded cache. Detect Map used as cache without eviction. |
 | ℹ️ `prefer_stale_while_revalidate` | Professional | INFO | Show stale data while refreshing. Detect blocking refresh pattern. |
-| ⚠️ `avoid_cache_stampede` | Professional | WARNING | Prevent thundering herd on cache miss. Detect cache without locking. |
 | ℹ️ `prefer_disk_cache_for_persistence` | Professional | INFO | Use disk cache for persistence across sessions. Detect memory-only cache for persistent data. |
 
 ### 5.40 Debugging & Logging Rules
@@ -916,7 +809,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_flavor_configuration` | Professional | INFO | Use Flutter flavors for environments. Detect manual environment switching. |
-| ⚠️ `avoid_string_env_parsing` | Recommended | WARNING | Parse environment strings properly. Detect raw String.fromEnvironment usage. |
 | ℹ️ `prefer_compile_time_config` | Professional | INFO | Use const for compile-time config. Detect runtime config lookup for static values. |
 | ℹ️ `require_config_validation` | Professional | INFO | Validate configuration on startup. Detect config usage without validation. |
 
@@ -931,7 +823,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `require_text_scale_factor_awareness` | Essential | WARNING | UI should handle text scaling. Detect fixed-size text containers. |
 | ℹ️ `require_focus_order` | Professional | INFO | Ensure logical focus order. Detect FocusTraversalGroup misconfiguration. |
 | ℹ️ `require_reduced_motion_support` | Recommended | INFO | Check MediaQuery.disableAnimations. Detect animations without reduced motion check. |
 | ℹ️ `prefer_readable_line_length` | Professional | INFO | Lines shouldn't exceed ~80 characters. Detect wide text without constraints. |
@@ -950,18 +841,12 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 ### 5.46 Hot Reload Compatibility Rules
 
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| ⚠️ `require_init_state_idempotent` | Essential | WARNING | initState may run multiple times. Detect non-idempotent initialization. |
-
 > **Note:** Package Version Rules (11 rules) have been moved to [ROADMAP_DEFERRED.md](ROADMAP_DEFERRED.md#deferred-pubspec-rules-11-rules) — they require `[PUBSPEC]` YAML analysis which is not supported by custom_lint.
 
 ### 5.47 Widget Composition Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⚠️ `avoid_deep_nesting` | Professional | WARNING | Widgets shouldn't nest too deeply. Detect nesting >10 levels. |
-| ⚠️ `avoid_repeated_widget_creation` | Professional | WARNING | Cache widget references when possible. Detect identical widgets created in loop. |
 | ℹ️ `prefer_builder_pattern` | Professional | INFO | Use Builder for context-dependent children. Detect context issues. |
 | ℹ️ `prefer_sliver_for_mixed_scroll` | Professional | INFO | Use slivers for mixed scrollable content. Detect nested scrollables. |
 | ℹ️ `prefer_flex_for_complex_layout` | Professional | INFO | Use Flex over Row/Column for dynamic axis. Detect conditional Row/Column. |
@@ -972,14 +857,12 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_biometric_protection` | Professional | INFO | Use biometric protection for sensitive data. Detect authenticationRequired option. |
-| ⚠️ `avoid_secure_storage_in_background` | Professional | WARNING | Secure storage may fail in background. Detect background access without handling. |
 
 ### 5.50 Late Initialization Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_late_lazy_initialization` | Professional | INFO | Use late for expensive lazy initialization. Detect eager init of rarely-used fields. |
-| ⚠️ `require_late_access_check` | Professional | WARNING | Check isInitialized before late access when uncertain. Detect late access without context guarantee. |
 
 ### 5.51 Isar Database Rules
 
@@ -990,8 +873,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_hive_compact_periodically` | Professional | INFO | Hive files grow without compaction. Call box.compact() after bulk deletes to reclaim space. |
-| ⚠️ `avoid_hive_large_single_entry` | Professional | WARNING | Entries >1MB degrade performance. Split large data across multiple keys or use chunking. |
-| ⚠️ `avoid_hive_datetime_local` | Professional | WARNING | DateTime stored as-is loses timezone. Convert to UTC before storing, local after reading. |
 
 ---
 
