@@ -448,11 +448,6 @@ These rules are **not included in any tier** by default. They represent team pre
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_inline_comments_sparingly` | Comprehensive | INFO | Limit inline comments; prefer self-documenting code |
 
-#### String Preferences
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
 #### Function & Method Style
 
 | Rule Name | Tier | Severity | Description |

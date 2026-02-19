@@ -151,7 +151,7 @@ Suggest renaming the constant to `lowerCamelCase`. The fix should:
 Example conversion: `MAX_RETRY_COUNT` → `maxRetryCount`.
 
 ```dart
-String _toLower CamelCase(String screaming) {
+String _toLowerCamelCase(String screaming) {
   final parts = screaming.toLowerCase().split('_');
   return parts.first + parts.skip(1).map((p) => p[0].toUpperCase() + p.substring(1)).join();
 }
