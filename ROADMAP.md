@@ -306,9 +306,7 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 i
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `require_public_api_documentation` | Professional | INFO | Public classes and methods must have doc comments |
 | ℹ️ `avoid_misleading_documentation` | Professional | INFO | Doc comments must match method name and behavior |
-| ℹ️ `require_deprecation_message` | Recommended | INFO | `@Deprecated` must include migration guidance |
 | ℹ️ `require_complex_logic_comments` | Professional | INFO | Complex methods must have explanatory comments |
 | ℹ️ `require_parameter_documentation` | Professional | INFO | Parameters must be documented with `[paramName]` |
 | ℹ️ `require_return_documentation` | Professional | INFO | Non-void methods must document return value |
@@ -398,39 +396,11 @@ These rules are **not included in any tier** by default. They represent team pre
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `avoid_bool_in_widget_constructors` | Professional | INFO | Avoid using bools in widget constructors; prefer enums for clarity. |
 | ℹ️ `avoid_cascades` | Stylistic | INFO | Discourage use of cascade (..) for clarity and maintainability. |
-| ℹ️ `avoid_classes_with_only_static_members` | Recommended | INFO | Avoid classes with only static members; use top-level functions or variables. |
-| ℹ️ `avoid_double_and_int_checks` | Professional | INFO | Avoid type checks for double/int; use num or generic constraints. |
-| ℹ️ `avoid_equals_and_hash_code_on_mutable_classes` | Professional | INFO | Avoid overriding equals/hashCode on mutable classes. |
-| ℹ️ `avoid_escaping_inner_quotes` | Stylistic | INFO | Prefer consistent quote usage to avoid escaping. |
-| ℹ️ `avoid_field_initializers_in_const_classes` | Professional | INFO | Avoid field initializers in const classes; use constructor initializers. |
-| ℹ️ `avoid_function_literals_in_foreach_calls` | Stylistic | INFO | Prefer method references over function literals in forEach. |
-| ℹ️ `avoid_implementing_value_types` | Professional | INFO | Avoid implementing value types; use composition instead. |
-| ℹ️ `avoid_js_rounded_ints` | Comprehensive | INFO | Avoid relying on JS number rounding for ints. |
-| ℹ️ `avoid_null_checks_in_equality_operators` | Professional | INFO | Avoid null checks in == operator; use identical or null-aware logic. |
-| ℹ️ `avoid_positional_boolean_parameters` | Professional | INFO | Avoid positional boolean parameters; use named or enums. |
-| ℹ️ `avoid_private_typedef_functions` | Comprehensive | INFO | Avoid private typedef functions; prefer public for clarity. |
-| ℹ️ `avoid_redundant_argument_values` | Recommended | INFO | Avoid redundant argument values; use defaults. |
-| ℹ️ `avoid_redundant_await` | Recommended | INFO | Avoid redundant await; return the future directly. |
-| ℹ️ `avoid_returning_null_for_future` | Recommended | INFO | Avoid returning null for Future; return Future.value(). |
-| ℹ️ `avoid_returning_null_for_void` | Recommended | INFO | Avoid returning null for void; just return. |
 | ℹ️ `avoid_returning_this` | Stylistic | INFO | Avoid returning this from methods; prefer fluent interfaces. |
-| ℹ️ `avoid_setters_without_getters` | Professional | INFO | Avoid setters without corresponding getters. |
-| ℹ️ `avoid_single_cascade_in_expression_statements` | Stylistic | INFO | Avoid single cascade in expression statements; use direct call. |
 | ℹ️ `avoid_types_on_closure_parameters` | Stylistic | INFO | Avoid explicit types on closure parameters when unnecessary. |
-| ℹ️ `avoid_unnecessary_containers` | Recommended | INFO | Avoid unnecessary Container widgets in Flutter. |
-| ℹ️ `prefer_asserts_in_initializer_lists` | Professional | INFO | Prefer asserts in initializer lists for constructors. |
-| ℹ️ `prefer_const_constructors_in_immutables` | Professional | INFO | Prefer const constructors in immutable classes. |
-| ℹ️ `prefer_const_declarations` | Recommended | INFO | Prefer const declarations where possible. |
-| ℹ️ `prefer_const_literals_to_create_immutables` | Recommended | INFO | Prefer const literals to create immutable collections. |
 | ℹ️ `prefer_constructors_over_static_methods` | Stylistic | INFO | Prefer constructors over static factory methods. |
-| ℹ️ `prefer_expression_function_bodies` | Recommended | INFO | Prefer expression function bodies for simple functions. |
-| ℹ️ `prefer_final_fields` | Professional | INFO | Prefer final fields for immutability. |
-| ℹ️ `prefer_final_locals` | Recommended | INFO | Prefer final for local variables. |
 | ℹ️ `prefer_foreach` | Stylistic | INFO | Prefer forEach over for-in for readability. |
-| ℹ️ `prefer_if_elements_to_conditional_expressions` | Recommended | INFO | Prefer if elements in collections to conditional expressions. |
-| ℹ️ `prefer_inlined_adds` | Recommended | INFO | Prefer inlined adds in collection literals. |
 | ℹ️ `fold` | Stylistic | INFO | Use fold for collection reduction where appropriate. |
 | ℹ️ `prefer_asmap_over_indexed_iteration` | Professional | INFO | Prefer asMap().entries for indexed iteration over manual index. |
 | ℹ️ `prefer_cascade_assignments` | Stylistic | INFO | Prefer using cascade (..) for assignments to the same object. |
@@ -440,7 +410,6 @@ These rules are **not included in any tier** by default. They represent team pre
 | ℹ️ `prefer_fold_over_reduce` | Stylistic | INFO | Prefer fold over reduce for collections when initial value is needed. |
 | ℹ️ `prefer_foreach_over_map_entries` | Stylistic | INFO | Prefer forEach for map iteration over map.entries. |
 | ℹ️ `prefer_if_else_over_guards` | Stylistic | INFO | Prefer if-else over guard clauses for certain logic. |
-| ℹ️ `prefer_null_aware_method_calls` | Recommended | INFO | Prefer null-aware method calls (?.) for nullable objects. |
 | ℹ️ `prefer_separate_assignments` | Stylistic | INFO | Prefer separate assignments over chained or compound assignments. |
 | ℹ️ `prefer_then_catcherror` | Stylistic | INFO | Prefer then().catchError() over try/catch for async error handling. |
 
@@ -459,10 +428,6 @@ These rules are **not included in any tier** by default. They represent team pre
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `prefer_lowercase_constants` | Recommended | INFO | Constants in `lowerCamelCase` (Dart style guide) |
-| ℹ️ `prefer_verb_method_names` | Professional | INFO | Methods start with verbs (`get`, `set`, `fetch`, `compute`) |
-| ℹ️ `prefer_noun_class_names` | Professional | INFO | Class names are nouns or noun phrases |
-| ℹ️ `prefer_adjective_bool_getters` | Professional | INFO | Boolean getters as adjectives (`isEmpty` vs `getIsEmpty`) |
 | ℹ️ `prefer_i_prefix_interfaces` | Comprehensive | INFO | Interface classes use `I` prefix (`IRepository`) |
 | ℹ️ `prefer_no_i_prefix_interfaces` | Comprehensive | INFO | Interface classes without `I` prefix |
 | ℹ️ `prefer_impl_suffix` | Comprehensive | INFO | Implementation classes use `Impl` suffix |
@@ -474,9 +439,6 @@ These rules are **not included in any tier** by default. They represent team pre
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `prefer_constructors_first` | Professional | INFO | Constructors before other members |
-| ℹ️ `prefer_getters_before_setters` | Professional | INFO | Getters immediately before their setters |
-| ℹ️ `prefer_static_before_instance` | Professional | INFO | Static members before instance members |
 | ℹ️ `prefer_factory_before_named` | Comprehensive | INFO | Factory constructors before named constructors |
 | ℹ️ `prefer_overrides_last` | Comprehensive | INFO | `@override` methods at bottom of class |
 
@@ -490,9 +452,6 @@ These rules are **not included in any tier** by default. They represent team pre
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `prefer_raw_strings` | Professional | INFO | Raw strings `r'...'` when escapes are heavy |
-| ℹ️ `prefer_adjacent_strings` | Recommended | INFO | Adjacent strings over `+` concatenation |
-| ℹ️ `prefer_interpolation_to_compose` | Recommended | INFO | String interpolation `${}` over concatenation |
 
 #### Function & Method Style
 
@@ -503,7 +462,6 @@ These rules are **not included in any tier** by default. They represent team pre
 | ℹ️ `prefer_expression_body_getters` | Recommended | INFO | Arrow `=>` for simple getters |
 | ℹ️ `prefer_block_body_setters` | Comprehensive | INFO | Block body `{}` for setters |
 | ℹ️ `prefer_positional_bool_params` | Comprehensive | INFO | Boolean parameters as positional |
-| ℹ️ `prefer_named_bool_params` | Professional | INFO | Boolean parameters as named |
 | ℹ️ `prefer_optional_positional_params` | Comprehensive | INFO | `[optional]` over `{named}` |
 | ℹ️ `prefer_optional_named_params` | Recommended | INFO | `{named}` over `[positional]` |
 
@@ -512,10 +470,7 @@ These rules are **not included in any tier** by default. They represent team pre
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `prefer_final_fields_always` | Professional | INFO | All instance fields should be `final` |
-| ℹ️ `prefer_mixin_over_abstract` | Professional | INFO | Mixins over abstract classes when appropriate |
-| ℹ️ `prefer_extension_over_utility_class` | Professional | INFO | Extension methods over static utility classes |
 | ℹ️ `prefer_inline_function_types` | Comprehensive | INFO | Inline function types over `typedef` |
-| ℹ️ `prefer_sealed_classes` | Professional | INFO | Sealed classes for closed type hierarchies |
 
 ---
 
@@ -548,11 +503,7 @@ Rules to help adopt modern Dart and Flutter language features.
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ℹ️ `use_specific_deprecation` | Professional | INFO | Use Dart 3.10 specific deprecation annotations for finer-grained control. |
-| ℹ️ `avoid_redundant_null_check` | Recommended | INFO | Dart 3.9 improved type promotion makes some null checks redundant. |
 | ℹ️ `prefer_js_interop_over_dart_js` | Professional | INFO | Use stable `dart:js_interop` (Dart 3.5) instead of deprecated `dart:js`. |
-| ℹ️ `prefer_extension_type_for_wrapper` | Professional | INFO | Use extension types (Dart 3.3) for zero-cost type wrappers. |
-| ℹ️ `prefer_record_over_tuple_class` | Professional | INFO | Use records (Dart 3.0) instead of tuple classes. |
-| ℹ️ `prefer_sealed_for_state` | Professional | INFO | Use sealed classes (Dart 3.0) for exhaustive state hierarchies. |
 
 ### 4.2 Flutter Widget Feature Rules
 
@@ -785,7 +736,6 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 | ℹ️ `prefer_composition_over_inheritance` | Professional | INFO | Use composition for flexibility. Detect deep inheritance hierarchies. |
 | ℹ️ `require_barrel_files` | Professional | INFO | Use barrel files for exports. Detect multiple individual imports. |
 | ℹ️ `require_interface_for_dependency` | Professional | INFO | Use interfaces for testability. Detect concrete class dependencies. |
-| ℹ️ `prefer_extension_methods` | Professional | INFO | Use extensions for type-specific utilities. Detect static methods that could be extensions. |
 
 ### 5.39 Caching Strategy Rules
 
