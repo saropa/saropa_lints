@@ -15,6 +15,12 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 - Auto-migration from v4 (custom_lint) to v5 (native plugin) — `dart run saropa_lints:init` auto-detects and converts v4 config, with `--fix-ignores` for ignore comment conversion
+- Plugin reads `diagnostics:` section from `analysis_options.yaml` to determine which rules are enabled/disabled — previously the generated config was not consumed by the plugin
+- Registration-time rule filtering — disabled rules are never registered with the analyzer, improving startup performance
+
+### Fixed
+- Plugin now respects rule enable/disable config from `dart run saropa_lints:init` — previously all rules were registered unconditionally regardless of tier selection
+- V4 migration no longer imports all rule settings as overrides — only settings that differ from the selected v5 tier defaults are preserved, preventing mass rule disablement
 - Init script scans and auto-fixes broken ignore comments — detects trailing explanations (`// ignore: rule // reason` or `// ignore: rule - reason`) that silently break suppression, and moves the text to the line above
 - Quick fix support for 108 rules via native `SaropaFixProducer` system — enables IDE lightbulb fixes and `dart fix --apply`
 - 3 reusable fix base classes: `InsertTextFix`, `ReplaceNodeFix`, `DeleteNodeFix` in `lib/src/fixes/common/`
