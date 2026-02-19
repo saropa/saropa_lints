@@ -40,10 +40,12 @@ class SaropaLintsPlugin extends Plugin {
 
   @override
   void register(PluginRegistry registry) {
+    final disabled = SaropaLintRule.disabledRules;
     for (final rule in allSaropaRules) {
+      if (disabled != null && disabled.contains(rule.code.name)) continue;
+
       registry.registerLintRule(rule);
 
-      // Register any quick fixes declared by this rule.
       for (final generator in rule.fixGenerators) {
         registry.registerFixForRule(rule.code, generator);
       }
