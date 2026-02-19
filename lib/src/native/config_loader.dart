@@ -7,8 +7,9 @@
 /// - [BaselineManager] configuration
 /// - [ProgressTracker] output settings (max_issues, output mode)
 ///
-/// Reads `analysis_options_custom.yaml` from the project root using the same
-/// path resolution as the v4 plugin (`Directory.current`).
+/// Reads `analysis_options.yaml` (for rule enable/disable via `diagnostics:`)
+/// and `analysis_options_custom.yaml` (for severities, baseline, output)
+/// from the project root using `Directory.current`.
 library;
 
 import 'dart:io' show Directory, File, Platform;
@@ -23,17 +24,18 @@ import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 ///
 /// Safe to call multiple times — static fields are simply overwritten.
 void loadNativePluginConfig() {
-  final content = _readConfigFile();
+  final content = _readProjectFile('analysis_options_custom.yaml');
   _loadSeverityOverrides(content);
+  _loadDiagnosticsConfig();
   _loadBaselineConfig(content);
   _loadOutputConfig(content);
 }
 
-/// Read the custom yaml config file. Returns null if not found.
-String? _readConfigFile() {
+/// Read a yaml file from the project root. Returns null if not found.
+String? _readProjectFile(String filename) {
   try {
     final sep = Platform.pathSeparator;
-    final path = '${Directory.current.path}${sep}analysis_options_custom.yaml';
+    final path = '${Directory.current.path}$sep$filename';
     final file = File(path);
     if (!file.existsSync()) return null;
     return file.readAsStringSync();
@@ -94,6 +96,51 @@ void _loadSeverityOverrides(String? content) {
 
   SaropaLintRule.severityOverrides = overrides.isEmpty ? null : overrides;
   SaropaLintRule.disabledRules = disabled.isEmpty ? null : disabled;
+}
+
+/// Parse `diagnostics:` section from `analysis_options.yaml`.
+///
+/// The init command generates rule enable/disable config here:
+/// ```yaml
+/// plugins:
+///   saropa_lints:
+///     diagnostics:
+///       rule_name: true   # enabled
+///       rule_name: false  # disabled
+/// ```
+///
+/// Rules marked `false` are added to [SaropaLintRule.disabledRules].
+/// This merges with any rules already disabled by `severities:` in the
+/// custom config file.
+void _loadDiagnosticsConfig() {
+  final content = _readProjectFile('analysis_options.yaml');
+  if (content == null) return;
+
+  final sectionMatch = RegExp(
+    r'^\s+diagnostics:\s*$',
+    multiLine: true,
+  ).firstMatch(content);
+  if (sectionMatch == null) return;
+
+  final disabled = SaropaLintRule.disabledRules ?? <String>{};
+  final lines = content.substring(sectionMatch.end).split('\n');
+
+  for (final line in lines) {
+    if (line.trim().isEmpty || line.trimLeft().startsWith('#')) continue;
+    // diagnostics entries are indented 6+ spaces; stop at less indentation
+    if (!line.startsWith('      ')) break;
+
+    final match = RegExp(r'^\s+([\w_]+):\s*(true|false)').firstMatch(line);
+    if (match == null) continue;
+
+    if (match.group(2) == 'false') {
+      disabled.add(match.group(1)!);
+    }
+  }
+
+  if (disabled.isNotEmpty) {
+    SaropaLintRule.disabledRules = disabled;
+  }
 }
 
 /// Parse `baseline:` section and initialize [BaselineManager].
