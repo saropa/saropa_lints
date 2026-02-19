@@ -30,6 +30,7 @@ void main() {
       'avoid_storing_sensitive_unencrypted',
       'avoid_token_in_url',
       'avoid_unnecessary_to_list',
+      'avoid_unverified_native_library',
       'avoid_webview_insecure_content',
       'avoid_webview_javascript_enabled',
       'prefer_data_masking',
