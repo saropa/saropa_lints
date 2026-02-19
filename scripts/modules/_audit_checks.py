@@ -451,14 +451,16 @@ def get_owasp_coverage(rules_dir: Path) -> OwaspCoverage:
     name_pattern = re.compile(
         r"LintCode\(\s*(?:name:\s*)?'([a-z0-9_]+)',"
     )
+    # \s* between => and const handles both single-line and dart-formatted
+    # multiline arrow style (dart format splits after => for short bodies)
     owasp_block_pattern = re.compile(
-        r"OwaspMapping get owasp => const OwaspMapping\(\s*"
+        r"OwaspMapping get owasp =>\s*const OwaspMapping\(\s*"
         r"mobile:\s*<OwaspMobile>\{([^}]*)\},?\s*"
         r"(?:web:\s*<OwaspWeb>\{([^}]*)\},?)?\s*\);",
         re.DOTALL,
     )
     owasp_block_alt = re.compile(
-        r"OwaspMapping get owasp => const OwaspMapping\(\s*"
+        r"OwaspMapping get owasp =>\s*const OwaspMapping\(\s*"
         r"web:\s*<OwaspWeb>\{([^}]*)\},?\s*"
         r"(?:mobile:\s*<OwaspMobile>\{([^}]*)\},?)?\s*\);",
         re.DOTALL,
