@@ -24,7 +24,7 @@
 
 ### Description
 
-Towards https://github.com/flutter/flutter/issues/168934.
+Toward https://github.com/flutter/flutter/issues/168934.
 
 /cc @reidbaker as release engineer
 
