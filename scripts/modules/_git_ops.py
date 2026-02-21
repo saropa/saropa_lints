@@ -224,7 +224,7 @@ def _find_workflow_run(
     """Poll GitHub Actions until the publish workflow run appears.
 
     GitHub may take several seconds to queue the workflow after a
-    tag push. Retries every 5 seconds for up to 60 seconds.
+    tag push. Retries every 30 seconds for up to 10 minutes.
 
     Returns the run's database ID as a string, or None.
     """
@@ -232,14 +232,16 @@ def _find_workflow_run(
     import time
 
     use_shell = get_shell_mode()
-    max_wait = 60
-    interval = 5
+    max_wait = 600
+    interval = 30
 
     for elapsed in range(0, max_wait + 1, interval):
         if elapsed > 0:
+            mins, secs = divmod(elapsed, 60)
+            max_mins = max_wait // 60
             print_info(
                 f"  Waiting for workflow to appear "
-                f"({elapsed}s / {max_wait}s)..."
+                f"({mins}m {secs:02d}s / {max_mins}m)..."
             )
             time.sleep(interval)
 
@@ -340,7 +342,7 @@ def publish_to_pubdev_step(
     if not run_id:
         print_warning(
             f"No publish workflow found for tag {tag_name} "
-            f"after 60s. Check GitHub Actions manually."
+            f"after 10m. Check GitHub Actions manually."
         )
         return False
 
