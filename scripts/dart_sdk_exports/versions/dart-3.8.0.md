@@ -1,0 +1,315 @@
+# Dart SDK 3.8.0
+
+## 3.8.0
+
+**Released on:** 2025-05-20
+
+### Language
+
+Dart 3.8 adds [null-aware elements][] to the language. To use them, set
+your package's [SDK constraint][language version] lower bound to 3.8
+or greater (`sdk: '^3.8.0'`).
+
+[null-aware elements]: https://dart.dev/language/collections#null-aware-element
+
+#### Null-aware elements
+
+Null-aware elements make it easier to omit a value from a collection literal if
+it's `null`. The syntax works in list literals, set literals, and map literals.
+Within map literals, both null-aware keys and values are supported.
+Here is an example a list literal written in both styles,
+without using null-aware elements and using them:
+
+```dart
+String? lunch = isTuesday ? 'tacos!' : null;
+
+var withoutNullAwareElements = [
+  if (lunch != null) lunch,
+  if (lunch.length != null) lunch.length!,
+  if (lunch.length case var length?) length,
+];
+
+var withNullAwareElements = [
+  ?lunch,
+  ?lunch.length,
+  ?lunch.length,
+];
+```
+
+To learn more about null-aware collection elements,
+check out the [documentation][null-aware-element-docs]
+and the [feature specification][null-aware-element-spec].
+
+[null-aware-element-docs]: https://dart.dev/language/collections#null-aware-element
+[null-aware-element-spec]: https://github.com/dart-lang/language/blob/main/accepted/future-releases/0323-null-aware-elements/feature-specification.md
+
+### Libraries
+
+#### `dart:core`
+
+- Added `Iterable.withIterator` constructor.
+
+#### `dart:io`
+
+- Added `HttpClientBearerCredentials`.
+- Updated `Stdout.supportsAnsiEscapes` and `Stdin.supportsAnsiEscapes` to
+  return `true` for `TERM` containing `tmux` values.
+
+#### `dart:html`
+
+- **Breaking change**: Native classes in `dart:html`, like `HtmlElement`, can no
+  longer be extended. Long ago, to support custom elements, element classes
+  exposed a `.created` constructor that adhered to the v0.5 spec of web
+  components. On this release, those constructors have been removed and with
+  that change, the classes can no longer be extended. In a future change, they
+  may be marked as interface classes as well. This is a follow up from an
+  earlier breaking change in 3.0.0 that removed the `registerElement` APIs. See
+  [#53264](https://github.com/dart-lang/sdk/issues/53264) for details.
+
+#### `dart:ffi`
+
+- Added `Array.elements` which exposes an `Iterable` over the `Array`'s content.
+
+### Tools
+
+#### Analyzer
+
+- The analyzer now supports "doc imports," a new comment-based syntax which
+  enables external elements to be referenced in documentation comments without
+  actually importing them. See [the
+  documentation](https://dart.dev/tools/doc-comments/references#doc-imports)
+  for details.
+- Code completion is improved to offer more valid suggestions. In particular,
+  the suggestions are improved when completing text in a comment reference on a
+  documentation comment for an extension, a typedef, or a directive (an import,
+  an export, or a library). Additionally, instance members can now be suggested
+  in a documentation comment reference.
+- Offer additional assist to wrap a Flutter widget with a `FutureBuilder` widget.
+- Add a quick assist to wrap with `ValueListenableBuilder`.
+- Add a quick fix to convert an (illegal) extension field declaration into a
+  getter declaration.
+- Add a quick fix to help code comply with a few lint rules that encourage
+  omitting types: `omit_local_variable_types`,
+  `omit_obvious_local_variable_types`, and `omit_obvious_property_types`.
+- Add a quick fix to create an extension method to resolve an "undefined method
+  invocation" error.
+- Renaming a closure parameter is now possible.
+- Renaming a field now adjusts implicit `this` references in order to avoid
+  name collisions.
+- Renaming a field formal parameter now properly renames known super-parameters
+  in subclasses in other libraries.
+- Renaming a method parameter now properly renames across the type hierarchy.
+- The "encapsulate field" quick assist now works on final fields.
+- The "inline method" refactoring now properly handles inner closures.
+- The quick fix that adds names to a `show` clause or removes names from a
+  `hide` clause can now add or remove multiple names simultaneously, in order to
+  resolve as many "undefined" errors as possible.
+- The "remove const" quick fix now operates on more types of code.
+- The "add missing required argument" quick fix can now add multiple missing
+  required arguments.
+- Add a new warning that reports an import or export directive with multiple
+  `show` or `hide` clauses, which are never necessary.
+- Add a quick fix for this warning.
+- Add LSP document links for lint rules in analysis options files.
+- Add LSP document links for dependency packages in pubspec files.
+- Fix various issues around patterns, like highlighting, navigation, and
+  autocompletion.
+- Add the [`use_null_aware_elements`][] lint rule.
+- Add the experimental [`unnecessary_ignore`][] lint rule.
+- (Thanks [@FMorschel](https://github.com/FMorschel) for many of the above
+  enhancements!)
+
+[`use_null_aware_elements`]: http://dart.dev/lints/use_null_aware_elements
+[`unnecessary_ignore`]: http://dart.dev/lints/unnecessary_ignore
+
+#### Dart Development Compiler (dartdevc)
+
+In order to align with dart2js semantics, DDC will now throw a runtime error
+when a redirecting factory is torn off and one of its optional non-nullable
+parameters is provided no value. The implicit null passed to the factory will
+not match the non-nullable type and this will now throw.
+
+In the future this will likely be a compile-time error and will be entirely
+disallowed.
+
+#### Dart to Javascript Compiler (dart2js)
+
+Removed the `--experiment-new-rti` and `--use-old-rti` flags.
+
+#### Dart native compiler
+
+Added [cross-compilation][] support for the
+Linux x64 and Linux ARM64 target platforms.
+
+[cross-compilation]: https://dart.dev/tools/dart-compile#cross-compilation-exe
+
+#### Dart format
+
+In 3.7.0, we released a largely rewritten formatter supporting a new
+["tall" style][tall style]. Since then, we've gotten a lot of feedback and bug
+reports and made a number of fixes in response to that.
+
+[tall style]: https://github.com/dart-lang/dart_style/issues/1253
+
+##### Features
+
+Some users strongly prefer the old behavior where a trailing comma will be
+preserved by the formatter and force the surrounding construct to split. That
+behavior is supported again (but off by default) and can enabled by adding this
+to a surrounding `analysis_options.yaml` file:
+
+```yaml
+formatter:
+  trailing_commas: preserve
+```
+
+This is similar to how trailing commas work in the old short style formatter
+applied to code before language version 3.7.
+
+##### Bug fixes
+
+* Don't add a trailing comma in lists that don't allow it, even when there is
+  a trailing comment (issue [dart-lang/dart_style#1639][]).
+
+[dart-lang/dart_style#1639]: https://github.com/dart-lang/dart_style/issues/1639
+
+##### Style changes
+
+The following style changes are language versioned and only
+affect code whose [language version][] is 3.8 or later.
+Dart code at 3.7 or earlier is formatted the same as it was before.
+
+* Allow more code on the same line as a named argument or `=>`.
+
+  ```dart
+  // Before:
+  function(
+    name:
+        (param) => another(
+          argument1,
+          argument2,
+        ),
+  );
+
+  // After:
+  function(
+    name: (param) => another(
+      argument1,
+      argument3,
+    ),
+  );
+  ```
+
+* Allow the target or property chain part of a split method chain on the RHS of
+  `=`, `:`, and `=>`.
+
+  ```dart
+  // Before:
+  variable =
+      target.property
+          .method()
+          .another();
+
+  // After:
+  variable = target.property
+      .method()
+      .another();
+  ```
+
+* Allow the condition part of a split conditional expression on the RHS of `=`,
+  `:`, and `=>`.
+
+  ```dart
+  // Before:
+  variable =
+      condition
+      ? longThenBranch
+      : longElseBranch;
+
+  // After:
+  variable = condition
+      ? longThenBranch
+      : longElseBranch;
+  ```
+
+* Don't indent conditional branches redundantly after `=`, `:`, and `=>`.
+
+  ```dart
+  // Before:
+  function(
+    argument:
+        condition
+            ? thenBranch
+            : elseBranch,
+  )
+
+  // After:
+  function(
+    argument:
+        condition
+        ? thenBranch
+        : elseBranch,
+  )
+  ```
+
+* Indent conditional branches past the operators.
+
+  ```dart
+  // Before:
+  condition
+      ? thenBranch +
+          anotherOperand
+      : elseBranch(
+        argument,
+      );
+
+  // After:
+  condition
+      ? thenBranch +
+            anotherOperand
+      : elseBranch(
+          argument,
+        );
+  ```
+
+* Block format record types in typedefs:
+
+  ```dart
+  // Before:
+  typedef ExampleRecordTypedef =
+      (
+        String firstParameter,
+        int secondParameter,
+        String thirdParameter,
+        String fourthParameter,
+      );
+
+  // After:
+  typedef ExampleRecordTypedef = (
+    String firstParameter,
+    int secondParameter,
+    String thirdParameter,
+    String fourthParameter,
+  );
+  ```
+
+* Eagerly split argument lists whose contents are complex enough to be easier
+  to read spread across multiple lines even if they would otherwise fit on a
+  single line.
+
+  The heuristic is that the argument list must contain at least three named
+  arguments, some of which are nested and some of which are not.
+
+  ```dart
+  // Before:
+  TabBar(tabs: [Tab(text: 'A'), Tab(text: 'B')], labelColor: Colors.white70);
+
+  // After:
+  TabBar(
+    tabs: [
+      Tab(text: 'A'),
+      Tab(text: 'B'),
+    ],
+    labelColor: Colors.white70,
+  );
+  ```
