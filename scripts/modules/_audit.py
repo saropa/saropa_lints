@@ -278,8 +278,11 @@ def export_full_audit_report(
 ) -> Path:
     """Export a full audit report to timestamped markdown file."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    date_folder = timestamp[:8]
+    dated_dir = output_dir / date_folder
+    dated_dir.mkdir(parents=True, exist_ok=True)
     name_part = f"_{project_name}" if project_name else ""
-    output_path = output_dir / f"{timestamp}{name_part}_full_audit.md"
+    output_path = dated_dir / f"{timestamp}{name_part}_full_audit.md"
     lines: list[str] = []
     lines.append("# Saropa Lints Full Audit Report\n")
     lines.append(
