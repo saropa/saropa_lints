@@ -27,6 +27,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - `dart analyze` output is now captured and streamed (was `inheritStdio` with no capture)
 - Log file write deferred until after analysis completes so the report includes everything
 - All tier YAML files now include `version: "^5.0.0-beta.8"` for direct-include users
+- All report-generating scripts now write to `reports/YYYYMMDD/` date subfolders with timestamped filenames (todo audit, full audit, lint candidates, rule versions)
 
 ### Archive
 

@@ -30,6 +30,7 @@ import json
 import re
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
 
 # Ensure scripts/ is on path for module imports
@@ -647,9 +648,12 @@ def main() -> int:
 
     # Generate version data report (before file modifications)
     print(f"\n{_CYN}Generating reports...{_R}")
-    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    json_path = REPORTS_DIR / "rule_versions.json"
-    summary_path = REPORTS_DIR / "rule_versions_summary.txt"
+    file_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    date_folder = file_timestamp[:8]
+    dated_dir = REPORTS_DIR / date_folder
+    dated_dir.mkdir(parents=True, exist_ok=True)
+    json_path = dated_dir / f"{file_timestamp}_rule_versions.json"
+    summary_path = dated_dir / f"{file_timestamp}_rule_versions_summary.txt"
     generate_json_report(versions, json_path)
 
     # Phase 5: Update Dart files
