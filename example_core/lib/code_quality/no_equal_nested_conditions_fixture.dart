@@ -121,7 +121,8 @@ void _bad193() {
 // GOOD: Should NOT trigger no_equal_nested_conditions
 void _good193() {
   if (x > 0) {
-    if (x > 10) { // Different threshold from outer check
+    if (x > 10) {
+      // Different threshold from outer check
     }
   }
 }

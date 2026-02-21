@@ -108,7 +108,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_constant_switches
 // expect_lint: avoid_constant_switches
 void _bad277() {
-  switch (1) { // Switching on a literal constant
+  switch (1) {
+    // Switching on a literal constant
     case 1:
       print('one');
   }
@@ -116,7 +117,8 @@ void _bad277() {
 
 // GOOD: Should NOT trigger avoid_constant_switches
 void _good277(int value) {
-  switch (value) { // Switching on a variable
+  switch (value) {
+    // Switching on a variable
     case 1:
       print('one');
   }

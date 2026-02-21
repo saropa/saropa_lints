@@ -110,7 +110,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 void _bad488() {
   try {
     throw Exception();
-  } catch (caught) { // Non-standard name — should be 'e' or 'error'
+  } catch (caught) {
+    // Non-standard name — should be 'e' or 'error'
     print(caught);
   }
 }
@@ -119,7 +120,8 @@ void _bad488() {
 void _good488() {
   try {
     throw Exception();
-  } catch (e) { // Standard catch parameter name
+  } catch (e) {
+    // Standard catch parameter name
     print(e);
   }
 }

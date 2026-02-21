@@ -16,7 +16,9 @@ void _bad() {
 void _good() {
   try {
     doSomething();
-  } on Object catch (e, st) { print(e); } // catches all with type
+  } on Object catch (e, st) {
+    print(e);
+  } // catches all with type
 }
 
 void main() {}

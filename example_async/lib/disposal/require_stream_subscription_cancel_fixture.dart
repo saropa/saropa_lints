@@ -8,7 +8,7 @@
 // Requires class extending State<T> with controller fields.
 //
 // BAD:
-// // late StreamSubscription _sub; // not cancelled in dispose()
+// // late StreamSubscription _sub; // not canceled in dispose()
 //
 // GOOD:
 // // @override void dispose() { _sub.cancel(); super.dispose(); }

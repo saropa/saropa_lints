@@ -107,7 +107,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_public_exception_classes
 // expect_lint: prefer_public_exception_classes
-class _NetworkException extends Exception {} // Private — cannot be caught by name outside library
+class _NetworkException
+    extends Exception {} // Private — cannot be caught by name outside library
 
 // GOOD: Should NOT trigger prefer_public_exception_classes
 class NetworkException extends Exception {} // Public — can be caught anywhere

@@ -3,6 +3,7 @@
 /// Fixture for `prefer_abstraction_injection` lint rule.
 
 class _HttpClientImpl {} // concrete type
+
 abstract class ApiClient {} // abstract interface
 
 // BAD: Should trigger prefer_abstraction_injection
