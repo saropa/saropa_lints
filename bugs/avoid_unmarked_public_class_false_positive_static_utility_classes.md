@@ -1,10 +1,10 @@
-# `avoid_unmarked_public_class` false positive: static utility classes with private constructors
+# `avoid_unmarked_public_class` false positive: static utility classes
 
 ## Status: OPEN
 
 ## Summary
 
-The `avoid_unmarked_public_class` rule (v3) fires on static utility classes that have **private constructors** (`ClassName._()`), meaning they already cannot be instantiated, extended, or implemented by consumers. The rule demands adding a Dart 3.0 class modifier (`base`, `final`, `interface`, or `sealed`), but the private constructor already prevents subclassing, making the modifier redundant. For a published Dart utility package where every flagged class follows the static-methods-with-private-constructor pattern, the rule generates noise without identifying any actual API stability risk.
+The `avoid_unmarked_public_class` rule (v3) fires on static utility classes in `saropa_dart_utils`, including classes with **private constructors** (`ClassName._()`) that already prevent instantiation and extension, and classes with **only static members** that have no extensible instance API. The rule demands adding a Dart 3.0 class modifier (`base`, `final`, `interface`, or `sealed`), but for static-only utility classes — especially those with private constructors — the modifier is redundant. For a published Dart utility package where all flagged classes are static namespaces, the rule generates noise without identifying any actual API stability risk.
 
 ## Diagnostic Output
 
@@ -55,7 +55,6 @@ Additional examples following the same pattern: `JsonUtils` (`lib/json/json_util
 | `lib/datetime/time_emoji_utils.dart` | 4 | `TimeEmojiUtils` | No (static methods + constants) |
 | `lib/gesture/swipe_properties.dart` | 79 | `Swipe` | No (data class with `const` constructor) |
 | `lib/gesture/swipe_properties.dart` | 196 | `GestureUtils` | No (static methods) |
-| `lib/hex/hex_utils.dart` | — | (extensions, not classes) | N/A |
 | `lib/html/html_utils.dart` | 67 | `HtmlUtils` | Yes (`const HtmlUtils._()`) |
 | `lib/int/int_utils.dart` | 20 | `IntUtils` | No (static methods) |
 | `lib/json/json_utils.dart` | 20 | `JsonIterablesUtils` | No (static methods with generic) |

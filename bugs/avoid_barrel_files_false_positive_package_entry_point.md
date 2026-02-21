@@ -24,7 +24,7 @@ line:     0
 
 ## Affected Source
 
-File: `lib/saropa_dart_utils.dart` — the main library entry point (87 lines, 35 exports)
+File: `lib/saropa_dart_utils.dart` — the main library entry point (87 lines, 47 exports)
 
 ```dart
 /// Saropa Dart Utils - Boilerplate reduction tools and human-readable
@@ -62,7 +62,7 @@ Key characteristics of this file:
 |----------|-------|-------------|
 | File name | `lib/saropa_dart_utils.dart` | Matches package name from `pubspec.yaml` |
 | Package name | `saropa_dart_utils` | Published on pub.dev |
-| Contents | 35 `export` statements | Defines the public API surface |
+| Contents | 47 `export` statements | Defines the public API surface |
 | `library` directive | Present (`library;`) | Official library declaration |
 | Required by | Dart package conventions | Removing it breaks all consumers |
 
@@ -97,7 +97,7 @@ The rule has no mechanism to identify the package name (available from `pubspec.
 
 Every published Dart package on pub.dev will trigger this rule. This includes:
 
-- All packages published by Google (`provider`, `riverpod`, `bloc`, etc.)
+- All major packages (`provider`, `http`, `path`, `collection`, etc.)
 - All community packages
 - Any project structured as a Dart package with a public API
 
