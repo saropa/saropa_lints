@@ -13,13 +13,19 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Added
+- Quick fix for `require_subscription_status_check` — inserts TODO reminder to verify subscription status in build methods
+- `getLineIndent()` utility on `SaropaFixProducer` base class for consistent indentation in fix output
+
 ### Changed
 - Filled TODO placeholders in 745 fixture files across all example directories — core and async fixtures now have real bad/good triggering code; widget, package, and platform fixtures have NOTE placeholders documenting rule requirements
 - Expanded ROADMAP task backlog with 138 detailed implementation specs
+- Deduplicated `_getIndent` from 5 fix files into shared `SaropaFixProducer.getLineIndent()`
 
 ### Fixed
 - OWASP M2 coverage now correctly reported as 10/10 — audit scanner regex updated to match both single-line and dart-formatted multiline `OwaspMapping` getters; `avoid_dynamic_code_loading` and `avoid_unverified_native_library` (M2), `avoid_hardcoded_signing_config` (M7), and `avoid_sudo_shell_commands` (M1) were previously invisible to the scanner
 - Completed test fixtures for `avoid_unverified_native_library` and `avoid_sudo_shell_commands` (previously empty stubs)
+- Removed 4 dead references to unimplemented rule classes from registration and tier files (`require_ios_platform_check`, `avoid_ios_background_fetch_abuse`, `require_method_channel_error_handling`, `require_universal_link_validation`) — tracked as `bugs/todo_001` through `todo_004`
 
 ---
 ## [5.0.0-beta.5]

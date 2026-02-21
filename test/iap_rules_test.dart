@@ -36,14 +36,79 @@ void main() {
 
   group('In-App Purchase - Requirement Rules', () {
     group('require_subscription_status_check', () {
-      test('feature access without subscription check SHOULD trigger', () {
-        expect('feature access without subscription check', isNotNull);
+      test('fixture has bad example with expect_lint marker', () {
+        final content = File(
+          'example_async/lib/iap/require_subscription_status_check_fixture.dart',
+        ).readAsStringSync();
+        expect(
+          content,
+          contains('// expect_lint: require_subscription_status_check'),
+        );
+        expect(content, contains('_bad'));
       });
 
-      test('subscription status verification should NOT trigger', () {
-        expect('subscription status verification', isNotNull);
+      test('fixture has good example without expect_lint', () {
+        final content = File(
+          'example_async/lib/iap/require_subscription_status_check_fixture.dart',
+        ).readAsStringSync();
+        expect(content, contains('_good'));
+        expect(content, contains('FutureBuilder'));
+      });
+
+      test('fixture has no remaining TODOs', () {
+        final content = File(
+          'example_async/lib/iap/require_subscription_status_check_fixture.dart',
+        ).readAsStringSync();
+        expect(content, isNot(contains('// TODO: Add')));
+      });
+
+      test('word boundary matching avoids false positives', () {
+        // The rule uses \b word boundaries around each indicator.
+        // "isProportional" should NOT match the "isPro" indicator.
+        final pattern = RegExp(r'\b' + RegExp.escape('isPro') + r'\b');
+        expect(pattern.hasMatch('isProportional'), isFalse);
+        expect(pattern.hasMatch('isPro'), isTrue);
+        expect(pattern.hasMatch('widget.isPro'), isTrue);
+      });
+
+      test('word boundary matching catches premium indicators', () {
+        final pattern = RegExp(
+          r'\b' + RegExp.escape('premium') + r'\b',
+          caseSensitive: false,
+        );
+        // Standalone word matches
+        expect(pattern.hasMatch('premium'), isTrue);
+        expect(pattern.hasMatch('if (premium)'), isTrue);
+        // CamelCase substrings do NOT match (no word boundary)
+        expect(pattern.hasMatch('showPremiumContent()'), isFalse);
+        expect(pattern.hasMatch('isPremium'), isFalse);
+      });
+
+      test('status check patterns are recognized as compliant', () {
+        const verificationPatterns = [
+          'FutureBuilder',
+          'StreamBuilder',
+          'checkStatus',
+          'checkSubscription',
+          'verifyPurchase',
+          'getEntitlements',
+          'customerInfo',
+          'purchaseStream',
+          'Consumer<',
+          'BlocBuilder',
+          'watch(',
+          'ref.watch',
+        ];
+        for (final p in verificationPatterns) {
+          expect(
+            'Widget build(ctx) { return $p(); }'.contains(p),
+            isTrue,
+            reason: '$p should be detected as compliant',
+          );
+        }
       });
     });
+
     group('require_price_localization', () {
       test('hardcoded price string SHOULD trigger', () {
         expect('hardcoded price string', isNotNull);

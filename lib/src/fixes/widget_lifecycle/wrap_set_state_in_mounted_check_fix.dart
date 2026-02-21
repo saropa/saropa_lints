@@ -33,7 +33,7 @@ class WrapSetStateInMountedCheckFix extends SaropaFixProducer {
     if (statement == null) return;
 
     final source = statement.toSource();
-    final indent = _getIndent(statement);
+    final indent = getLineIndent(statement);
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(
@@ -41,22 +41,5 @@ class WrapSetStateInMountedCheckFix extends SaropaFixProducer {
         'if (mounted) {\n$indent  $source\n$indent}',
       );
     });
-  }
-
-  String _getIndent(AstNode node) {
-    final lineInfo = unitResult.lineInfo;
-    final line = lineInfo.getLocation(node.offset).lineNumber - 1;
-    final lineStart = lineInfo.getOffsetOfLine(line);
-    final content = unitResult.content;
-    final indent = StringBuffer();
-    for (var i = lineStart; i < content.length; i++) {
-      final ch = content[i];
-      if (ch == ' ' || ch == '\t') {
-        indent.write(ch);
-      } else {
-        break;
-      }
-    }
-    return indent.toString();
   }
 }
