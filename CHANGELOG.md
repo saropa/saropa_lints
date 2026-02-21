@@ -23,6 +23,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - Deduplicated `_getIndent` from 5 fix files into shared `SaropaFixProducer.getLineIndent()`
 
 ### Fixed
+- Audit script `get_rules_with_corrections()` now handles variable-referenced rule names (e.g. `LintCode(_name, ...)`) — previously undercounted correction messages by 1 (`no_empty_block`)
 - OWASP M2 coverage now correctly reported as 10/10 — audit scanner regex updated to match both single-line and dart-formatted multiline `OwaspMapping` getters; `avoid_dynamic_code_loading` and `avoid_unverified_native_library` (M2), `avoid_hardcoded_signing_config` (M7), and `avoid_sudo_shell_commands` (M1) were previously invisible to the scanner
 - Completed test fixtures for `avoid_unverified_native_library` and `avoid_sudo_shell_commands` (previously empty stubs)
 - Removed 4 dead references to unimplemented rule classes from registration and tier files (`require_ios_platform_check`, `avoid_ios_background_fetch_abuse`, `require_method_channel_error_handling`, `require_universal_link_validation`) — tracked as `bugs/todo_001` through `todo_004`

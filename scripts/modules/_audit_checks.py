@@ -387,6 +387,17 @@ def get_rules_with_corrections(
     name_pattern = re.compile(
         r"LintCode\(\s*(?:name:\s*)?'([a-z0-9_]+)',"
     )
+    # Variable reference: LintCode(_varName, ... or LintCode(name: _varName, ...
+    var_with_correction = re.compile(
+        r"LintCode\(\s*(?:name:\s*)?(_\w+),.*?correctionMessage:",
+        re.DOTALL,
+    )
+    var_name_pattern = re.compile(
+        r"LintCode\(\s*(?:name:\s*)?(_\w+),"
+    )
+    name_const_pattern = re.compile(
+        r"static const String (_\w+)\s*=\s*'([a-z0-9_]+)';",
+    )
 
     for dart_file in rules_dir.glob("**/*.dart"):
         if dart_file.name == "all_rules.dart":
@@ -396,6 +407,21 @@ def get_rules_with_corrections(
         names_with_correction = set()
         for match in lint_code_with_correction.finditer(content):
             names_with_correction.add(match.group(1))
+
+        # Resolve variable-referenced rule names
+        name_consts = {
+            m.group(1): m.group(2)
+            for m in name_const_pattern.finditer(content)
+        }
+        for var_match in var_name_pattern.finditer(content):
+            var_name = var_match.group(1)
+            if var_name in name_consts:
+                all_names.add(name_consts[var_name])
+        for var_match in var_with_correction.finditer(content):
+            var_name = var_match.group(1)
+            if var_name in name_consts:
+                names_with_correction.add(name_consts[var_name])
+
         with_correction.update(names_with_correction)
         without_correction.update(all_names - names_with_correction)
 
