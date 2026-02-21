@@ -13,6 +13,12 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Changed
+- CLI defaults to `init` command when run without arguments (`dart run saropa_lints` now equivalent to `dart run saropa_lints init`)
+- Publish script: `dart format` now targets specific top-level paths, excluding `example*/` directories upfront instead of tolerating exit-code 65 after the fact
+- Publish script: roadmap summary now includes color-coded bug report breakdown (unsolved/categorized/resolved) from sibling `saropa_dart_utils/bugs/` directory
+- Deferred `avoid_misused_hooks` rule removed from ROADMAP_DEFERRED (hook rules vary by context — not viable as static lint)
+
 ---
 ## [5.0.0-beta.10]
 
