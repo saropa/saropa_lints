@@ -11,13 +11,16 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
+import re
 import subprocess
 from pathlib import Path
 
 from scripts.modules._utils import (
     Color,
+    OutputLevel,
     clear_flutter_lock,
     command_exists,
+    get_output_level,
     get_shell_mode,
     is_windows,
     print_colored,
@@ -280,6 +283,26 @@ def run_tests(project_dir: Path) -> bool:
     return True
 
 
+def _format_failures_are_fixtures(stderr: str) -> bool:
+    """Check if all dart format parse failures are in example fixtures.
+
+    Returns True when every 'Could not format' block references a path
+    under an example_* directory, meaning the failures are expected
+    (fixture files that use future language features).
+    """
+    # Each unparseable file is reported as:
+    #   "Could not format because the source could not be parsed:\n\n
+    #    line N, column M of <path>: ..."
+    paths = re.findall(
+        r"line \d+, column \d+ of ([^:]+):", stderr,
+    )
+    if not paths:
+        return False
+    return all(
+        p.replace("\\", "/").startswith("example") for p in paths
+    )
+
+
 def run_format(project_dir: Path) -> bool:
     """Step 6: Run dart format."""
     print_header("STEP 6: FORMATTING CODE")
@@ -294,16 +317,45 @@ def run_format(project_dir: Path) -> bool:
             shell=use_shell,
         )
 
-    result = run_command(["dart", "format", "."], project_dir, "Formatting")
+    print_info("Formatting...")
+    if get_output_level().value >= OutputLevel.VERBOSE.value:
+        print_colored("      $ dart format .", Color.WHITE)
+
+    result = subprocess.run(
+        ["dart", "format", "."],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+
     if result.returncode != 0:
-        if is_windows():
-            subprocess.run(
-                ["git", "config", "core.autocrlf", "true"],
-                cwd=project_dir,
-                capture_output=True,
-                shell=use_shell,
+        # Exit code 65 = some files couldn't be parsed.
+        # Tolerate this when ALL parse failures are in example fixture
+        # files (they intentionally use future language features).
+        if result.returncode == 65 and _format_failures_are_fixtures(
+            result.stderr or "",
+        ):
+            print_warning(
+                "Some fixture files could not be parsed by the "
+                "formatter (future language features) — skipped"
             )
-        return False
+        else:
+            if result.stdout:
+                print_colored(result.stdout.rstrip(), Color.WHITE)
+            if result.stderr:
+                print_colored(result.stderr.rstrip(), Color.RED)
+            print_error(
+                f"Formatting failed (exit code {result.returncode})"
+            )
+            if is_windows():
+                subprocess.run(
+                    ["git", "config", "core.autocrlf", "true"],
+                    cwd=project_dir,
+                    capture_output=True,
+                    shell=use_shell,
+                )
+            return False
 
     subprocess.run(
         ["git", "add", "-A"],

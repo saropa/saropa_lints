@@ -37,7 +37,7 @@ static const LintCode _code = LintCode(
    `build()` method. The widget works when used directly in a Row, but crashes
    the moment it gets wrapped with Padding, LimitedBox, GestureDetector, or
    any other non-Flex container. This breaks the required Flex→Expanded parent
-   chain without the developer realising it.
+   chain without the developer realizing it.
 
 3. **Correction message is too vague.** "Use Expanded only inside Row, Column,
    or Flex" doesn't tell the developer *how* to fix the indirect case. The fix
