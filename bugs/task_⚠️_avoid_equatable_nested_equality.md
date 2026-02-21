@@ -131,7 +131,7 @@ class SearchState extends Equatable {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `List.unmodifiable(...)` field | **Suppress** — unmodifiable at runtime | Type is still `List` though — hard to detect statically |
 | `const []` literal in props | **Suppress** — const is immutable | |

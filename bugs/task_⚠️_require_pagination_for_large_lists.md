@@ -93,7 +93,7 @@ ListView.builder(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `itemCount: 5` (literal, small) | **Suppress** | Only flag variable references |
 | `itemCount: items.length` where items are user's own photos (could be thousands) | **Trigger** | Variable count from external source |

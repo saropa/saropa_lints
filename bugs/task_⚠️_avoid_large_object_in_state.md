@@ -88,7 +88,7 @@ class PdfProvider extends ChangeNotifier {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `Uint8List` for a small icon (< 1KB) | **Trigger** — can't know size statically | This is a false positive |
 | `Uint8List` with size limit enforced elsewhere | **Trigger** — can't know | |

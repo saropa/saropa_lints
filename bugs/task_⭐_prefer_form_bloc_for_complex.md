@@ -95,13 +95,13 @@ Form(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Project already uses `reactive_forms` | **Suppress** entirely | Use `ProjectContext.usesPackage` |
 | Wrapped `TextFormField` subclass | **Count it** | Check static type, not just class name string |
 | `TextFormField` inside `Visibility(visible: false)` | **Count it** — it still exists in the tree | The hidden field still represents complexity |
 | `ListView.builder` with dynamic fields | **Do NOT count** — count is unknown at static analysis time | Only count literal `children: [...]` arrays |
-| `Stepper` widget containing `Form` with 3 fields per step, 3 steps | Total visible at once ≤ 5, but total app fields > 5 — **grey area** | Phase 2: count total across all steps |
+| `Stepper` widget containing `Form` with 3 fields per step, 3 steps | Total visible at once ≤ 5, but total app fields > 5 — **gray area** | Phase 2: count total across all steps |
 | Form inside a `Dialog` / `BottomSheet` | Should still trigger — field count is the same | No special exemption |
 | Test files | Should suppress — test files often create large forms as fixtures | Use `ProjectContext.isTestFile(path)` |
 | `FormField<T>` that is NOT `TextFormField` | Should count it — it's still a form field | Check assignability to `FormField` not just `TextFormField` |

@@ -108,7 +108,7 @@ for (final item in items) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Loop fetching from different APIs | **Suppress** — different APIs can't be batched | Check if receiver is the same object |
 | Loop with 1 iteration guaranteed | **Suppress** — not a pattern issue | Hard to detect statically |

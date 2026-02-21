@@ -100,7 +100,7 @@ if (customerInfo.entitlements.active.containsKey('premium')) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | RevenueCat `customerInfo.entitlements` check | **Suppress** — RevenueCat is server-verified | `Purchases.getCustomerInfo()` = server call |
 | Using `PurchaseStatus.purchased` for analytics/logging (not feature gate) | **Suppress** — not gating access | Check what happens inside the `if` |

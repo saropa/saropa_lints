@@ -11,7 +11,7 @@
 
 > ⚠️ **Verification Required**: Newer versions of Hive's `DateTimeAdapter` may already store `DateTime` as UTC milliseconds since epoch, which would make this rule partially or fully redundant. **Verify the adapter implementation before implementing this rule.** See Note 3.
 
-Hive stores `DateTime` objects using its built-in `DateTimeAdapter`. In older or non-UTC-normalising versions of the adapter, local `DateTime` objects are serialised as-is — including their timezone offset. This creates a subtle bug:
+Hive stores `DateTime` objects using its built-in `DateTimeAdapter`. In older or non-UTC-normalizing versions of the adapter, local `DateTime` objects are serialized as-is — including their timezone offset. This creates a subtle bug:
 
 **Local `DateTime` objects on different devices or after timezone changes are deserialized incorrectly.**
 
@@ -97,7 +97,7 @@ final createdAt = (box.get('created_at') as DateTime).toLocal();
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `DateTime.utc(year, month, day)` | **Suppress** — already UTC | Check for `utc` constructor |
 | `DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true)` | **Suppress** — explicitly UTC | |

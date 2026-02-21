@@ -100,7 +100,7 @@ final response = await client.get(Uri.parse(url))
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Global Dio interceptor that adds timeout | **Complex** — may need cross-file analysis | |
 | `http.get` in test file | **Suppress** | Tests should use mocks anyway |

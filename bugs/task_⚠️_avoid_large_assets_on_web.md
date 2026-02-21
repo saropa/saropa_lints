@@ -95,7 +95,7 @@ Image.asset('assets/icon_24px.png')  // small
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | App doesn't target web | **Suppress** | Check build targets / `kIsWeb` usage |
 | `Image.asset` with `kIsWeb` guard in parent widget | **Suppress** | Walk parents for `kIsWeb` check |

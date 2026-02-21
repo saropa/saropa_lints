@@ -105,7 +105,7 @@ Future<void> onDeleteAccountTapped() async {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Reauthentication in a separate method called before | **Suppress** — if `_reauthenticate()` is called before sensitive op | Cross-method analysis needed for accuracy |
 | `try/catch` handling the `requires-recent-login` error | **Suppress** — developer is handling it | |

@@ -94,7 +94,7 @@ box.put('user_count', users.length); // ← tiny
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `List<int>` or `List<String>` (primitive lists) | **Suppress** — small per element | |
 | `List<bool>` | **Suppress** | |
