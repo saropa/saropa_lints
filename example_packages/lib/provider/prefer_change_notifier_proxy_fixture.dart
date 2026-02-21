@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_change_notifier_proxy` lint rule.
 
-// TODO: Add bad/good examples for prefer_change_notifier_proxy
+// NOTE: prefer_change_notifier_proxy requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

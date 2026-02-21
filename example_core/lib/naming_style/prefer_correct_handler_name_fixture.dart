@@ -108,12 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_correct_handler_name
 // expect_lint: prefer_correct_handler_name
 class _BadClass489 {
-  // TODO: Add method declaration that triggers prefer_correct_handler_name
-  void badMethod() {}
+  void buttonPressed() {} // Ends with 'Pressed' but no 'on'/'handle' prefix
 }
 
 // GOOD: Should NOT trigger prefer_correct_handler_name
 class _GoodClass489 {
-  // TODO: Add compliant method for prefer_correct_handler_name
-  void goodMethod() {}
+  void onButtonPressed() {} // Correctly prefixed with 'on'
 }

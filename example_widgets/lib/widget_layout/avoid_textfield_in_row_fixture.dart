@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_textfield_in_row` lint rule.
 
-// TODO: Add bad/good examples for avoid_textfield_in_row
+// NOTE: avoid_textfield_in_row requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

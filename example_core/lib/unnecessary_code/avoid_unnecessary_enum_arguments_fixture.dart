@@ -106,12 +106,16 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unnecessary_enum_arguments
-// expect_lint: avoid_unnecessary_enum_arguments
-void _bad1273() {
-  // TODO: Add code that triggers avoid_unnecessary_enum_arguments
+enum _BadEnum1273 {
+  // expect_lint: avoid_unnecessary_enum_arguments
+  active(false), // false is a common default — redundant
+  inactive;
+  const _BadEnum1273([bool enabled = true]);
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_enum_arguments
-void _good1273() {
-  // TODO: Add compliant code for avoid_unnecessary_enum_arguments
+enum _GoodEnum1273 {
+  active(true), // Non-default value — meaningful
+  inactive;
+  const _GoodEnum1273([bool enabled = false]);
 }

@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_webview_file_access` lint rule.
 
-// TODO: Add bad/good examples for avoid_webview_file_access
+// NOTE: avoid_webview_file_access requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

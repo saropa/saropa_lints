@@ -105,13 +105,13 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_fail_test_case
-// expect_lint: prefer_fail_test_case
-void _bad306() {
-  // TODO: Add code that triggers prefer_fail_test_case
-}
-
-// GOOD: Should NOT trigger prefer_fail_test_case
-void _good306() {
-  // TODO: Add compliant code for prefer_fail_test_case
-}
+// NOTE: prefer_fail_test_case fires on test assertions using
+// expect(true, false) or similar instead of fail().
+// Typically fires in test files.
+//
+// BAD (in test):
+// test('should fail', () { expect(true, false); });
+//
+// GOOD (in test):
+// test('should fail', () { fail('Expected error'); });
+void _note306() {}

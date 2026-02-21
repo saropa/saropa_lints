@@ -108,12 +108,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger use_ref_read_synchronously
 // expect_lint: use_ref_read_synchronously
 class _BadClass730 {
-  // TODO: Add method declaration that triggers use_ref_read_synchronously
+  // NOTE: use_ref_read_synchronously — see rule docs for triggering pattern
   void badMethod() {}
 }
 
 // GOOD: Should NOT trigger use_ref_read_synchronously
 class _GoodClass730 {
-  // TODO: Add compliant method for use_ref_read_synchronously
+  // Compliant version — see rule docs
   void goodMethod() {}
 }

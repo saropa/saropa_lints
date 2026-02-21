@@ -107,9 +107,13 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger match_getter_setter_field_names
 // expect_lint: match_getter_setter_field_names
-// TODO: Add class that triggers match_getter_setter_field_names
-class _BadClass481 {}
+class _BadClass481 {
+  int _count = 0;
+  int get total => _count; // Getter name 'total' doesn't match field name 'count'
+}
 
 // GOOD: Should NOT trigger match_getter_setter_field_names
-// TODO: Add compliant class for match_getter_setter_field_names
-class _GoodClass481 {}
+class _GoodClass481 {
+  int _count = 0;
+  int get count => _count; // Getter name matches backing field
+}

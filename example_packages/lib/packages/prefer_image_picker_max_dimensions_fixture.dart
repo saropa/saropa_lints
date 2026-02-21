@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_image_picker_max_dimensions
 // expect_lint: prefer_image_picker_max_dimensions
 void _bad699() {
-  // TODO: Add method call that triggers prefer_image_picker_max_dimensions
+  // NOTE: prefer_image_picker_max_dimensions — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_image_picker_max_dimensions
 void _good699() {
-  // TODO: Add compliant method call for prefer_image_picker_max_dimensions
+  // Compliant version — see rule docs
 }

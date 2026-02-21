@@ -111,7 +111,7 @@ class _Bad1309 extends StatelessWidget {
   const _Bad1309({super.key});
   @override
   Widget build(BuildContext context) {
-    // TODO: Add widget creation that triggers prefer_ignore_pointer
+    // NOTE: prefer_ignore_pointer — see rule docs for triggering pattern
     return Container();
   }
 }
@@ -121,7 +121,7 @@ class _Good1309 extends StatelessWidget {
   const _Good1309({super.key});
   @override
   Widget build(BuildContext context) {
-    // TODO: Add compliant widget pattern for prefer_ignore_pointer
+    // Compliant version — see rule docs
     return Container();
   }
 }

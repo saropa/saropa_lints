@@ -117,5 +117,7 @@ void _bad182() {
 
 // GOOD: Should NOT trigger avoid_accessing_collections_by_constant_index
 void _good182() {
-  // TODO: Add compliant code for avoid_accessing_collections_by_constant_index
+  for (var i = 0; i < items.length; i++) {
+    print(items[i]); // Use the loop variable as the index
+  }
 }

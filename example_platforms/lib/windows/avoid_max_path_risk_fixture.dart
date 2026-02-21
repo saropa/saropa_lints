@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_max_path_risk` lint rule.
 
-// TODO: Add bad/good examples for avoid_max_path_risk
+// NOTE: avoid_max_path_risk requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

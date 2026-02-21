@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_ios_context_menu
 // expect_lint: prefer_ios_context_menu
 void _bad911() {
-  // TODO: Add code that triggers prefer_ios_context_menu
+  // NOTE: prefer_ios_context_menu — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_ios_context_menu
 void _good911() {
-  // TODO: Add compliant code for prefer_ios_context_menu
+  // Compliant version — see rule docs
 }

@@ -107,11 +107,13 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_correct_callback_field_name
 // expect_lint: prefer_correct_callback_field_name
-void _bad487() {
-  // TODO: Add code that triggers prefer_correct_callback_field_name
+class _Bad487 {
+  VoidCallback tap; // Missing 'on' prefix
+  _Bad487(this.tap);
 }
 
 // GOOD: Should NOT trigger prefer_correct_callback_field_name
-void _good487() {
-  // TODO: Add compliant code for prefer_correct_callback_field_name
+class _Good487 {
+  VoidCallback onTap; // Correctly prefixed with 'on'
+  _Good487(this.onTap);
 }

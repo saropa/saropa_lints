@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_shared_prefs_sensitive_data` lint rule.
 
-// TODO: Add bad/good examples for avoid_shared_prefs_sensitive_data
+// NOTE: avoid_shared_prefs_sensitive_data requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

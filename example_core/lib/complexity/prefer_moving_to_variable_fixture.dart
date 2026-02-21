@@ -107,11 +107,14 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_moving_to_variable
 // expect_lint: prefer_moving_to_variable
-void _bad267() {
-  // TODO: Add code that triggers prefer_moving_to_variable
+void _bad267(List<int> items) {
+  print(items.length);
+  print(items.length); // Same expression used twice — extract to variable
 }
 
 // GOOD: Should NOT trigger prefer_moving_to_variable
-void _good267() {
-  // TODO: Add compliant code for prefer_moving_to_variable
+void _good267(List<int> items) {
+  final len = items.length; // Extracted to named variable
+  print(len);
+  print(len);
 }

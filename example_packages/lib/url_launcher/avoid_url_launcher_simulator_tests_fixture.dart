@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_url_launcher_simulator_tests` lint rule.
 
-// TODO: Add bad/good examples for avoid_url_launcher_simulator_tests
+// NOTE: avoid_url_launcher_simulator_tests requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

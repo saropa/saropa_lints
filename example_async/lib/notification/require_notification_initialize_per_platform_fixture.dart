@@ -106,22 +106,17 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_notification_initialize_per_platform
-// expect_lint: require_notification_initialize_per_platform
-class _Bad534 extends StatelessWidget {
-  const _Bad534({super.key});
+// NOTE: require_notification_initialize_per_platform fires on
+// notification plugin initialization missing android:/iOS: params.
+// Needs specific notification plugin constructor patterns.
+//
+// BAD: FlutterLocalNotificationsPlugin().initialize(settings);
+//   // missing android: or iOS: initialization settings
+//
+// GOOD: FlutterLocalNotificationsPlugin().initialize(
+//   InitializationSettings(android: androidSettings, iOS: iosSettings));
+class _Note534 extends StatelessWidget {
+  const _Note534({super.key});
   @override
-  Widget build(BuildContext context) {
-    // TODO: Add widget creation that triggers require_notification_initialize_per_platform
-    return Container();
-  }
-}
-
-// GOOD: Should NOT trigger require_notification_initialize_per_platform
-class _Good534 extends StatelessWidget {
-  const _Good534({super.key});
-  @override
-  Widget build(BuildContext context) {
-    // TODO: Add compliant widget pattern for require_notification_initialize_per_platform
-    return Container();
-  }
+  Widget build(BuildContext context) => Container();
 }

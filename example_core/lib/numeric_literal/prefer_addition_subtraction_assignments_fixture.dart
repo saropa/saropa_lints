@@ -107,11 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_addition_subtraction_assignments
 // expect_lint: prefer_addition_subtraction_assignments
-void _bad544() {
-  // TODO: Add code that triggers prefer_addition_subtraction_assignments
+void _bad544(int x) {
+  x = x + 1; // Verbose — use += instead
 }
 
 // GOOD: Should NOT trigger prefer_addition_subtraction_assignments
-void _good544() {
-  // TODO: Add compliant code for prefer_addition_subtraction_assignments
+void _good544(int x) {
+  x += 1; // Compound assignment operator
 }

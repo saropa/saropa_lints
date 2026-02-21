@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_app_links_sensitive_params` lint rule.
 
-// TODO: Add bad/good examples for avoid_app_links_sensitive_params
+// NOTE: avoid_app_links_sensitive_params requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

@@ -118,6 +118,8 @@ void _topLevel114() {
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_nullable_parameters
+void _good181_bar(String x) {} // Non-nullable since callers never pass null
 void _good181() {
-  // TODO: Add compliant code for avoid_unnecessary_nullable_parameters
+  _good181_bar('a');
+  _good181_bar('b');
 }

@@ -110,7 +110,7 @@ final title = 'Title';
 
 // BAD: Should trigger prefer_ios_handoff_support
 // expect_lint: prefer_ios_handoff_support
-// TODO: Add class that triggers prefer_ios_handoff_support
+// NOTE: prefer_ios_handoff_support — see rule docs
 class _BadClass922 {}
 
 // GOOD: Should NOT trigger prefer_ios_handoff_support

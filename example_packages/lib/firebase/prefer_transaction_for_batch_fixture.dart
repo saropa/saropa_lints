@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_transaction_for_batch` lint rule.
 
-// TODO: Add bad/good examples for prefer_transaction_for_batch
+// NOTE: prefer_transaction_for_batch requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

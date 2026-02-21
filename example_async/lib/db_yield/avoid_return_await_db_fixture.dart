@@ -105,15 +105,14 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_return_await_db
-// expect_lint: avoid_return_await_db
-class _BadClass305 {
-  // TODO: Add method declaration that triggers avoid_return_await_db
-  void badMethod() {}
-}
-
-// GOOD: Should NOT trigger avoid_return_await_db
-class _GoodClass305 {
-  // TODO: Add compliant method for avoid_return_await_db
-  void goodMethod() {}
+// NOTE: avoid_return_await_db fires on return await of DB write
+// without intervening yieldToUI().
+//
+// BAD:
+// Future<void> save() async { return await db.writeTxn(...); }
+//
+// GOOD:
+// Future<void> save() async { await db.writeTxn(...); await yieldToUI(); }
+class _NoteClass305 {
+  void noteMethod() {}
 }

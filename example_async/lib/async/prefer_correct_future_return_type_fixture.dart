@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_correct_future_return_type
 // expect_lint: prefer_correct_future_return_type
-void _bad96() {
-  // TODO: Add code that triggers prefer_correct_future_return_type
-}
+void _bad96() async {} // async but returns void, not Future<void>
 
 // GOOD: Should NOT trigger prefer_correct_future_return_type
-void _good96() {
-  // TODO: Add compliant code for prefer_correct_future_return_type
-}
+Future<void> _good96() async {} // correct Future return type

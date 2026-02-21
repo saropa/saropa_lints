@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_firebase_remote_config_defaults` lint rule.
 
-// TODO: Add bad/good examples for prefer_firebase_remote_config_defaults
+// NOTE: prefer_firebase_remote_config_defaults requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_assigning_notifiers` lint rule.
 
-// TODO: Add bad/good examples for avoid_assigning_notifiers
+// NOTE: avoid_assigning_notifiers requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

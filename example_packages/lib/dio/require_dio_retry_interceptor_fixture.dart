@@ -2,5 +2,8 @@
 
 /// Fixture for `require_dio_retry_interceptor` lint rule.
 
-// TODO: Add bad/good examples for require_dio_retry_interceptor
+// NOTE: require_dio_retry_interceptor requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

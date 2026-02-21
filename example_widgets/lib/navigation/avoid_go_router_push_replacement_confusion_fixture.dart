@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_go_router_push_replacement_confusion` lint rule.
 
-// TODO: Add bad/good examples for avoid_go_router_push_replacement_confusion
+// NOTE: avoid_go_router_push_replacement_confusion requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

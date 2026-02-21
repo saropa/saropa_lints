@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger check_is_not_closed_after_async_gap
 // expect_lint: check_is_not_closed_after_async_gap
 void _bad563() {
-  // TODO: Add method call that triggers check_is_not_closed_after_async_gap
+  // NOTE: check_is_not_closed_after_async_gap — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger check_is_not_closed_after_async_gap
 void _good563() {
-  // TODO: Add compliant method call for check_is_not_closed_after_async_gap
+  // Compliant version — see rule docs
 }

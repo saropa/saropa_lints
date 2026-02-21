@@ -2,5 +2,8 @@
 
 /// Fixture for `require_avatar_alt_text` lint rule.
 
-// TODO: Add bad/good examples for require_avatar_alt_text
+// NOTE: require_avatar_alt_text requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

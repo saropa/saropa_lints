@@ -120,5 +120,9 @@ void _bad206() {
 
 // GOOD: Should NOT trigger no_equal_switch_expression_cases
 void _good206() {
-  // TODO: Add compliant code for no_equal_switch_expression_cases
+  final result = switch (x) {
+    1 => 'one',
+    2 => 'two', // Different value from case 1
+    _ => 'other',
+  };
 }

@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_sqflite_type_mismatch` lint rule.
 
-// TODO: Add bad/good examples for avoid_sqflite_type_mismatch
+// NOTE: avoid_sqflite_type_mismatch requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

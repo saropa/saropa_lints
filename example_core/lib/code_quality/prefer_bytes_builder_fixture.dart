@@ -115,5 +115,8 @@ void _bad207() {
 
 // GOOD: Should NOT trigger prefer_bytes_builder
 void _good207() {
-  // TODO: Add compliant method call for prefer_bytes_builder
+  final builder = BytesBuilder();
+  builder.add([1, 2, 3]);
+  builder.add([4, 5, 6]); // BytesBuilder avoids repeated memory copies
+  final result = builder.toBytes();
 }

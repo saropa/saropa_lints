@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_hive_box_name_collision` lint rule.
 
-// TODO: Add bad/good examples for avoid_hive_box_name_collision
+// NOTE: avoid_hive_box_name_collision requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

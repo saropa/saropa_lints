@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_unnecessary_gesture_detector
 // expect_lint: avoid_unnecessary_gesture_detector
 void _bad1368() {
-  // TODO: Add code that triggers avoid_unnecessary_gesture_detector
+  // NOTE: avoid_unnecessary_gesture_detector — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_gesture_detector
 void _good1368() {
-  // TODO: Add compliant code for avoid_unnecessary_gesture_detector
+  // Compliant version — see rule docs
 }

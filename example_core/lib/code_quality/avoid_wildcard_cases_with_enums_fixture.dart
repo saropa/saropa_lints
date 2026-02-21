@@ -118,5 +118,10 @@ void _bad191() {
 
 // GOOD: Should NOT trigger avoid_wildcard_cases_with_enums
 void _good191() {
-  // TODO: Add compliant code for avoid_wildcard_cases_with_enums
+  switch (status) {
+    case Status.active:
+      print('active');
+    case Status.inactive:
+      print('inactive'); // All enum values handled explicitly, no default
+  }
 }

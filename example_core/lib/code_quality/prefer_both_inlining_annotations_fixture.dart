@@ -108,12 +108,13 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_both_inlining_annotations
 // expect_lint: prefer_both_inlining_annotations
 class _BadClass165 {
-  // TODO: Add method declaration that triggers prefer_both_inlining_annotations
-  void badMethod() {}
+  @pragma('vm:prefer-inline') // Missing dart2js:tryInline counterpart
+  int compute(int x) => x * 2;
 }
 
 // GOOD: Should NOT trigger prefer_both_inlining_annotations
 class _GoodClass165 {
-  // TODO: Add compliant method for prefer_both_inlining_annotations
-  void goodMethod() {}
+  @pragma('vm:prefer-inline')
+  @pragma('dart2js:tryInline') // Both VM and dart2js annotations present
+  int compute(int x) => x * 2;
 }

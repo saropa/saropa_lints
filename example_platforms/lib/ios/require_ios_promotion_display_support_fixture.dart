@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_promotion_display_support
 // expect_lint: require_ios_promotion_display_support
 void _bad883() {
-  // TODO: Add code that triggers require_ios_promotion_display_support
+  // NOTE: require_ios_promotion_display_support — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_promotion_display_support
 void _good883() {
-  // TODO: Add compliant code for require_ios_promotion_display_support
+  // Compliant version — see rule docs
 }

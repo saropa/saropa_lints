@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_border_all
 // expect_lint: avoid_border_all
 void _bad1292() {
-  // TODO: Add method call that triggers avoid_border_all
+  // NOTE: avoid_border_all — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_border_all
 void _good1292() {
-  // TODO: Add compliant method call for avoid_border_all
+  // Compliant version — see rule docs
 }

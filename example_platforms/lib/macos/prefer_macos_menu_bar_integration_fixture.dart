@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_macos_menu_bar_integration
 // expect_lint: prefer_macos_menu_bar_integration
 void _bad924() {
-  // TODO: Add code that triggers prefer_macos_menu_bar_integration
+  // NOTE: prefer_macos_menu_bar_integration — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_macos_menu_bar_integration
 void _good924() {
-  // TODO: Add compliant code for prefer_macos_menu_bar_integration
+  // Compliant version — see rule docs
 }

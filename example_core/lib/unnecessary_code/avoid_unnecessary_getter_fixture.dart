@@ -106,10 +106,15 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unnecessary_getter
-// expect_lint: avoid_unnecessary_getter
-// TODO: Add class that triggers avoid_unnecessary_getter
-class _BadClass1276 {}
+class _BadClass1276 {
+  final int _value;
+  _BadClass1276(this._value);
+  // expect_lint: avoid_unnecessary_getter
+  int get value => _value; // Unnecessary getter
+}
 
 // GOOD: Should NOT trigger avoid_unnecessary_getter
-// TODO: Add compliant class for avoid_unnecessary_getter
-class _GoodClass1276 {}
+class _GoodClass1276 {
+  final int value;
+  _GoodClass1276(this.value);
+}

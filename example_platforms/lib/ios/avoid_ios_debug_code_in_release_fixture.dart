@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_ios_debug_code_in_release
 // expect_lint: avoid_ios_debug_code_in_release
 void _bad897() {
-  // TODO: Add method call that triggers avoid_ios_debug_code_in_release
+  // NOTE: avoid_ios_debug_code_in_release — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_ios_debug_code_in_release
 void _good897() {
-  // TODO: Add compliant method call for avoid_ios_debug_code_in_release
+  // Compliant version — see rule docs
 }

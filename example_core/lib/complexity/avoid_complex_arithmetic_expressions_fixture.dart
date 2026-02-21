@@ -107,11 +107,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_complex_arithmetic_expressions
 // expect_lint: avoid_complex_arithmetic_expressions
-void _bad259() {
-  // TODO: Add code that triggers avoid_complex_arithmetic_expressions
+void _bad259(int a, int b, int c, int d, int e, int f) {
+  final result = a + b - c * d / e % f; // 5 operators — too complex
 }
 
 // GOOD: Should NOT trigger avoid_complex_arithmetic_expressions
-void _good259() {
-  // TODO: Add compliant code for avoid_complex_arithmetic_expressions
+void _good259(int a, int b, int c, int d, int e, int f) {
+  final partial = a + b - c; // Break into named sub-expressions
+  final result = partial * d;
 }

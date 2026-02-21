@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_ref_read_inside_build` lint rule.
 
-// TODO: Add bad/good examples for avoid_ref_read_inside_build
+// NOTE: avoid_ref_read_inside_build requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

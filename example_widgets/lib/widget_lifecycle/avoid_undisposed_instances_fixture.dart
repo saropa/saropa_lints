@@ -119,5 +119,20 @@ class _MyWidgetState extends State<MyWidget> {
 }
 
 // GOOD: Should NOT trigger avoid_undisposed_instances
-// TODO: Add compliant class for avoid_undisposed_instances
-class _GoodClass1354 {}
+class _GoodClass1354_MyWidget extends StatefulWidget {
+  @override
+  _GoodClass1354_State createState() => _GoodClass1354_State();
+}
+
+class _GoodClass1354_State extends State<_GoodClass1354_MyWidget> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Properly disposed
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}

@@ -107,11 +107,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unnecessary_if
 // expect_lint: avoid_unnecessary_if
-void _bad291() {
-  // TODO: Add code that triggers avoid_unnecessary_if
+bool _bad291(bool condition) {
+  if (condition) return true;
+  return false; // Simplify to: return condition
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_if
-void _good291() {
-  // TODO: Add compliant code for avoid_unnecessary_if
-}
+bool _good291(bool condition) => condition; // Direct return

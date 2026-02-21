@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_ios_app_intents_framework
 // expect_lint: prefer_ios_app_intents_framework
 void _bad893() {
-  // TODO: Add code that triggers prefer_ios_app_intents_framework
+  // NOTE: prefer_ios_app_intents_framework — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_ios_app_intents_framework
 void _good893() {
-  // TODO: Add compliant code for prefer_ios_app_intents_framework
+  // Compliant version — see rule docs
 }

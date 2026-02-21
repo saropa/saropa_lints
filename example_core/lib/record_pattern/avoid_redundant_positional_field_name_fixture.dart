@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_redundant_positional_field_name
 // expect_lint: avoid_redundant_positional_field_name
-void _bad957() {
-  // TODO: Add code that triggers avoid_redundant_positional_field_name
-}
+void _bad957(($1 int, $2 String) pair) {} // $1/$2 are default names
 
 // GOOD: Should NOT trigger avoid_redundant_positional_field_name
-void _good957() {
-  // TODO: Add compliant code for avoid_redundant_positional_field_name
-}
+void _good957((int, String) pair) {} // No redundant positional names

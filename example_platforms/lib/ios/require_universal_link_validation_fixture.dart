@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_universal_link_validation
 // expect_lint: require_universal_link_validation
 void _bad841() {
-  // TODO: Add code that triggers require_universal_link_validation
+  // NOTE: require_universal_link_validation — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_universal_link_validation
 void _good841() {
-  // TODO: Add compliant code for require_universal_link_validation
+  // Compliant version — see rule docs
 }

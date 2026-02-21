@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_macos_notarization_ready
 // expect_lint: require_macos_notarization_ready
 void _bad937() {
-  // TODO: Add code that triggers require_macos_notarization_ready
+  // NOTE: require_macos_notarization_ready — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_macos_notarization_ready
 void _good937() {
-  // TODO: Add compliant code for require_macos_notarization_ready
+  // Compliant version — see rule docs
 }

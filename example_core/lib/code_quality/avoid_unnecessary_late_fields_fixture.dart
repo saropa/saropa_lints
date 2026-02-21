@@ -117,5 +117,7 @@ class _bad202_Foo {
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_late_fields
-// TODO: Add compliant class for avoid_unnecessary_late_fields
-class _GoodClass202 {}
+class _GoodClass202 {
+  final String name; // final without late - initialized via constructor
+  _GoodClass202(this.name);
+}

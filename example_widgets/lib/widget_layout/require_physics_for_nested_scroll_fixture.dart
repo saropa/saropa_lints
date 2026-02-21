@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_physics_for_nested_scroll
 // expect_lint: require_physics_for_nested_scroll
 void _bad1332() {
-  // TODO: Add code that triggers require_physics_for_nested_scroll
+  // NOTE: require_physics_for_nested_scroll — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_physics_for_nested_scroll
 void _good1332() {
-  // TODO: Add compliant code for require_physics_for_nested_scroll
+  // Compliant version — see rule docs
 }

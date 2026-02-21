@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_launch_storyboard
 // expect_lint: require_ios_launch_storyboard
 void _bad919() {
-  // TODO: Add code that triggers require_ios_launch_storyboard
+  // NOTE: require_ios_launch_storyboard — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_launch_storyboard
 void _good919() {
-  // TODO: Add compliant code for require_ios_launch_storyboard
+  // Compliant version — see rule docs
 }

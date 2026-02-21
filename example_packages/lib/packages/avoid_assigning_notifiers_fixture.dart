@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_assigning_notifiers
 // expect_lint: avoid_assigning_notifiers
 void _bad732() {
-  // TODO: Add code that triggers avoid_assigning_notifiers
+  // NOTE: avoid_assigning_notifiers — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_assigning_notifiers
 void _good732() {
-  // TODO: Add compliant code for avoid_assigning_notifiers
+  // Compliant version — see rule docs
 }

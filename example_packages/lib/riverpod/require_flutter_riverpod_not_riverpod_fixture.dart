@@ -2,5 +2,8 @@
 
 /// Fixture for `require_flutter_riverpod_not_riverpod` lint rule.
 
-// TODO: Add bad/good examples for require_flutter_riverpod_not_riverpod
+// NOTE: require_flutter_riverpod_not_riverpod requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

@@ -105,13 +105,16 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
+Future<String> _fetch86() async => 'data';
+
 // BAD: Should trigger avoid_future_tostring
-// expect_lint: avoid_future_tostring
 void _bad86() {
-  // TODO: Add method call that triggers avoid_future_tostring
+  // expect_lint: avoid_future_tostring
+  _fetch86().toString(); // toString on Future gives useless output
 }
 
 // GOOD: Should NOT trigger avoid_future_tostring
-void _good86() {
-  // TODO: Add compliant method call for avoid_future_tostring
+void _good86() async {
+  final value = await _fetch86();
+  value.toString(); // toString on resolved value
 }

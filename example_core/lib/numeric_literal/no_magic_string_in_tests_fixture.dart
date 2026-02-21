@@ -105,13 +105,10 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger no_magic_string_in_tests
-// expect_lint: no_magic_string_in_tests
-void _bad549() {
-  // TODO: Add code that triggers no_magic_string_in_tests
-}
+// NOTE: no_magic_string_in_tests only fires in test files (FileType.test).
+// This lib/ fixture cannot demonstrate it. Add examples in test/ instead.
 
-// GOOD: Should NOT trigger no_magic_string_in_tests
-void _good549() {
-  // TODO: Add compliant code for no_magic_string_in_tests
-}
+// BAD (in test files): expect(name, equals('John'));
+// GOOD (in test files): const kTestName = 'John';
+//                       expect(name, equals(kTestName));
+void _placeholder549() {}

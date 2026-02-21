@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_nullable_parameters_with_default_values
 // expect_lint: avoid_nullable_parameters_with_default_values
-void _bad1226() {
-  // TODO: Add code that triggers avoid_nullable_parameters_with_default_values
-}
+void _bad1226({String? name = 'default'}) {} // Nullable with non-null default
 
 // GOOD: Should NOT trigger avoid_nullable_parameters_with_default_values
-void _good1226() {
-  // TODO: Add compliant code for avoid_nullable_parameters_with_default_values
-}
+void _good1226({String name = 'default'}) {} // Non-nullable with default

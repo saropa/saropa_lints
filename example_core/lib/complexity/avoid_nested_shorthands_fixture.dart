@@ -107,11 +107,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_nested_shorthands
 // expect_lint: avoid_nested_shorthands
-void _bad264() {
-  // TODO: Add code that triggers avoid_nested_shorthands
+void _bad264(bool a, bool b) {
+  final result = a ? (b ? 'both' : 'only a') : 'neither'; // Nested ternary
 }
 
 // GOOD: Should NOT trigger avoid_nested_shorthands
-void _good264() {
-  // TODO: Add compliant code for avoid_nested_shorthands
+void _good264(bool a, bool b) {
+  final inner = b ? 'both' : 'only a'; // Extract inner ternary to variable
+  final result = a ? inner : 'neither';
 }

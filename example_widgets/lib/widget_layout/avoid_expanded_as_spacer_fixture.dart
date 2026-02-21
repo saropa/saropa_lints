@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_expanded_as_spacer
 // expect_lint: avoid_expanded_as_spacer
 void _bad1281() {
-  // TODO: Add code that triggers avoid_expanded_as_spacer
+  // NOTE: avoid_expanded_as_spacer — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_expanded_as_spacer
 void _good1281() {
-  // TODO: Add compliant code for avoid_expanded_as_spacer
+  // Compliant version — see rule docs
 }

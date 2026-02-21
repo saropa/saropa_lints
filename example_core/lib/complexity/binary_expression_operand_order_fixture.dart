@@ -107,11 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger binary_expression_operand_order
 // expect_lint: binary_expression_operand_order
-void _bad266() {
-  // TODO: Add code that triggers binary_expression_operand_order
+void _bad266(int x) {
+  if (1 == x) {} // Literal on left side — put variable on left
 }
 
 // GOOD: Should NOT trigger binary_expression_operand_order
-void _good266() {
-  // TODO: Add compliant code for binary_expression_operand_order
+void _good266(int x) {
+  if (x == 1) {} // Variable on left, constant on right
 }

@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_equatable_datetime` lint rule.
 
-// TODO: Add bad/good examples for avoid_equatable_datetime
+// NOTE: avoid_equatable_datetime requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

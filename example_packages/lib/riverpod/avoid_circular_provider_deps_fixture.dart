@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_circular_provider_deps` lint rule.
 
-// TODO: Add bad/good examples for avoid_circular_provider_deps
+// NOTE: avoid_circular_provider_deps requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

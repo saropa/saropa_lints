@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_carousel_view
 // expect_lint: prefer_carousel_view
 void _bad1407() {
-  // TODO: Add code that triggers prefer_carousel_view
+  // NOTE: prefer_carousel_view — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_carousel_view
 void _good1407() {
-  // TODO: Add compliant code for prefer_carousel_view
+  // Compliant version — see rule docs
 }

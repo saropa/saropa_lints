@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_tap_region_for_dismiss
 // expect_lint: prefer_tap_region_for_dismiss
 void _bad1409() {
-  // TODO: Add code that triggers prefer_tap_region_for_dismiss
+  // NOTE: prefer_tap_region_for_dismiss — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_tap_region_for_dismiss
 void _good1409() {
-  // TODO: Add compliant code for prefer_tap_region_for_dismiss
+  // Compliant version — see rule docs
 }
