@@ -273,10 +273,11 @@ def display_todo_audit(project_dir: Path) -> None:
             Color.YELLOW if count > 20 else Color.CYAN,
         )
 
-    # Write full log to reports directory
-    reports_dir = project_dir / "reports"
-    reports_dir.mkdir(parents=True, exist_ok=True)
+    # Write full log to reports date subfolder
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    date_folder = timestamp[:8]
+    reports_dir = project_dir / "reports" / date_folder
+    reports_dir.mkdir(parents=True, exist_ok=True)
     log_path = reports_dir / f"{timestamp}_todo_audit.log"
     log_lines = [
         f"TODO Audit - {total} items",
