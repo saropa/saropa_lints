@@ -4,7 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../../native/saropa_fix.dart';
 
-/// Quick fix for [require_subscription_status_check]: inserts a TODO reminder.
+/// Quick fix for `require_subscription_status_check`: inserts a TODO reminder.
 ///
 /// When a `build()` method references premium/subscription keywords without
 /// a status verification pattern (FutureBuilder, StreamBuilder, checkStatus,

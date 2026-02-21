@@ -272,7 +272,7 @@ The `_getParameterName` helper already handles `FieldFormalParameter`. The new r
 When overriding a method, docs may reference parameters by the parent's naming. The rule should use the actual override's parameter names, not the parent's.
 
 ### 4. Generic type parameters
-`[T]`, `[E]`, `[K]`, `[V]` etc. are type parameter references, not function parameters. The rule should recognise single-uppercase-letter bracketed names as type parameters and skip them.
+`[T]`, `[E]`, `[K]`, `[V]` etc. are type parameter references, not function parameters. The rule should recognize single-uppercase-letter bracketed names as type parameters and skip them.
 
 ### 5. Enum values and constants
 `[BackupOptionEnum.contact]` or `[ThemeCommonIcon.BackupRestore]` — dotted references are field/enum accesses, not parameter references. Skip anything containing a dot.
