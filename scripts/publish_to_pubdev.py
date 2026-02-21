@@ -356,6 +356,14 @@ def _print_success_banner(
         Color.CYAN,
     )
     print()
+    print_colored("  Add to your pubspec.yaml:", Color.DIM)
+    print()
+    print_colored("      dev_dependencies:", Color.WHITE)
+    print_colored(
+        f"        {package_name}: ^{version}",
+        Color.WHITE,
+    )
+    print()
 
 
 # =============================================================================
