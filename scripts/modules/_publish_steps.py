@@ -357,6 +357,13 @@ def run_format(project_dir: Path) -> bool:
                 )
             return False
 
+    # Show format summary (e.g. "Formatted 2384 files (31 changed)")
+    if result.stdout:
+        for line in result.stdout.strip().splitlines():
+            if line.startswith("Formatted "):
+                print_info(f"  {line}")
+                break
+
     subprocess.run(
         ["git", "add", "-A"],
         cwd=project_dir,

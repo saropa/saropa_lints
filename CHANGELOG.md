@@ -11,6 +11,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [5.0.0-beta.7]
+
+### Fixed
+- `.pubignore` pattern `test/` was excluding `lib/src/fixes/test/` from published package — anchored to `/test/` so only the root test directory is excluded; this caused `dart run saropa_lints:init` to fail with a missing import error for `replace_expect_with_expect_later_fix.dart`
+- Publish script `dart format` step failed on fixture files using future language features (extension types, digit separators, non-ASCII identifiers) — now tolerates exit code 65 when all unparseable files are in example fixture directories
+
+---
 ## [5.0.0-beta.6]
 
 ### Added
