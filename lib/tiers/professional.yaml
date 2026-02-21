@@ -10,6 +10,7 @@ include: package:saropa_lints/tiers/recommended.yaml
 
 plugins:
   saropa_lints:
+    version: "^5.0.0-beta.8"
     diagnostics:
       # =========================================================================
       # ARCHITECTURE - Maintainable codebase

@@ -2,7 +2,7 @@
 
 import 'dart:collection' show LinkedHashSet;
 import 'dart:developer' as developer;
-import 'dart:io' show Directory, File, Platform, stderr, stdout;
+import 'dart:io' show Directory, File, Platform, stderr;
 import 'dart:math' show max;
 
 import 'package:analyzer/analysis_rule/analysis_rule.dart';
@@ -604,9 +604,9 @@ class ProgressTracker {
         ..write('$dim│$reset ')
         ..write('$dim$displayName$reset');
 
-      // Write in-place (no newline) - use stdout for better terminal compat
-      stdout.write(status.toString());
-      stdout.flush();
+      // Write in-place (no newline) - use stderr to avoid corrupting
+      // the JSON-RPC protocol when running inside the analysis server
+      stderr.write(status.toString());
     } else {
       // No file count known - simpler output with labels
       final status = StringBuffer()
@@ -622,8 +622,7 @@ class ProgressTracker {
         ..write('$dim│$reset ')
         ..write('$dim$displayName$reset');
 
-      stdout.write(status.toString());
-      stdout.flush();
+      stderr.write(status.toString());
     }
   }
 
@@ -1228,9 +1227,9 @@ class ReportWriter {
       // Write summary report
       await _writeSummaryReport(io);
 
-      print('[saropa_lints] Reports written to: $_reportsDir');
+      stderr.writeln('[saropa_lints] Reports written to: $_reportsDir');
     } catch (e) {
-      print('[saropa_lints] Failed to write reports: $e');
+      stderr.writeln('[saropa_lints] Failed to write reports: $e');
     }
   }
 
@@ -1276,7 +1275,7 @@ class ReportWriter {
     }
 
     // Would write to file here with dart:io
-    print(buffer.toString());
+    stderr.writeln(buffer.toString());
   }
 
   // ignore: avoid_dynamic
@@ -1294,7 +1293,9 @@ class ReportWriter {
       buffer.writeln(entry);
     }
 
-    print('[saropa_lints] Slow rules: ${_slowRuleLog.length} occurrences');
+    stderr.writeln(
+      '[saropa_lints] Slow rules: ${_slowRuleLog.length} occurrences',
+    );
   }
 
   // ignore: avoid_dynamic
@@ -1311,7 +1312,7 @@ class ReportWriter {
       buffer.writeln(entry);
     }
 
-    print('[saropa_lints] Skipped files: ${_skippedFiles.length}');
+    stderr.writeln('[saropa_lints] Skipped files: ${_skippedFiles.length}');
   }
 
   // ignore: avoid_dynamic
@@ -1333,7 +1334,7 @@ class ReportWriter {
       }
     }
 
-    print(buffer.toString());
+    stderr.writeln(buffer.toString());
   }
 
   // ignore: avoid_dynamic
@@ -1355,7 +1356,7 @@ class ReportWriter {
     buffer.writeln('');
     buffer.writeln(ImpactTracker.summary);
 
-    print(buffer.toString());
+    stderr.writeln(buffer.toString());
   }
 
   /// Reset all tracked data.
