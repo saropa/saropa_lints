@@ -380,6 +380,7 @@ def main() -> int:
     project_dir = get_project_dir()
     pubspec_path = project_dir / "pubspec.yaml"
     changelog_path = project_dir / "CHANGELOG.md"
+    bugs_dir = project_dir.parent / "saropa_dart_utils" / "bugs"
 
     if not pubspec_path.exists():
         exit_with_error(
@@ -440,7 +441,7 @@ def main() -> int:
     display_test_coverage(project_dir)
     display_unit_test_coverage(project_dir)
     display_todo_audit(project_dir)
-    display_roadmap_summary(project_dir)
+    display_roadmap_summary(project_dir, bugs_dir=bugs_dir)
 
     # --- Timed workflow ---
     audit_only = "--audit-only" in sys.argv

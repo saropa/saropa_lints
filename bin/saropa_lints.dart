@@ -4,10 +4,11 @@
 /// Unified CLI for saropa_lints tools.
 ///
 /// Usage:
-///   dart run saropa_lints `<command>` [options]
+///   dart run saropa_lints [command] [options]
 ///
 /// Commands:
 ///   init            Generate analysis_options.yaml with explicit rule config
+///                   (default if no command given)
 ///   baseline        Generate and manage baseline files for existing violations
 ///   impact-report   Run lint analysis and display results by impact level
 ///
@@ -23,13 +24,13 @@ import 'impact_report.dart' as impact_cmd;
 import 'init.dart' as init_cmd;
 
 Future<void> main(List<String> args) async {
-  if (args.isEmpty || args.first == '--help' || args.first == '-h') {
+  if (args.isNotEmpty && (args.first == '--help' || args.first == '-h')) {
     _printUsage();
     return;
   }
 
-  final command = args.first;
-  final commandArgs = args.sublist(1);
+  final command = args.isEmpty ? 'init' : args.first;
+  final commandArgs = args.isEmpty ? args : args.sublist(1);
 
   switch (command) {
     case 'init':
@@ -48,10 +49,11 @@ Future<void> main(List<String> args) async {
 void _printUsage() {
   print('saropa_lints - CLI tools for saropa_lints');
   print('');
-  print('Usage: dart run saropa_lints <command> [options]');
+  print('Usage: dart run saropa_lints [command] [options]');
   print('');
   print('Commands:');
   print('  init            Generate analysis_options.yaml with rule config');
+  print('                  (default if no command given)');
   print('  baseline        Generate/manage baseline for existing violations');
   print('  impact-report   Run analysis and show results by impact level');
   print('');
@@ -59,7 +61,8 @@ void _printUsage() {
   print('  -h, --help      Show this help message');
   print('');
   print(
-    'Run "dart run saropa_lints <command> --help" for command-specific help.',
+    'Run "dart run saropa_lints <command> --help" for command-specific help.\n'
+    'Run without arguments to use "init" with default settings.',
   );
   print('');
   print('Examples:');

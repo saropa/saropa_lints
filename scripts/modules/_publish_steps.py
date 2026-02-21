@@ -11,7 +11,6 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
-import re
 import subprocess
 from pathlib import Path
 
@@ -283,24 +282,25 @@ def run_tests(project_dir: Path) -> bool:
     return True
 
 
-def _format_failures_are_fixtures(stderr: str) -> bool:
-    """Check if all dart format parse failures are in example fixtures.
+def _collect_format_paths(project_dir: Path) -> list[str]:
+    """Collect top-level paths to format, excluding example fixtures.
 
-    Returns True when every 'Could not format' block references a path
-    under an example_* directory, meaning the failures are expected
-    (fixture files that use future language features).
+    Example directories contain intentional lint violations and future
+    language features that ``dart format`` cannot parse.  Excluding
+    them avoids exit-code 65 warnings entirely.
     """
-    # Each unparseable file is reported as:
-    #   "Could not format because the source could not be parsed:\n\n
-    #    line N, column M of <path>: ..."
-    paths = re.findall(
-        r"line \d+, column \d+ of ([^:]+):", stderr,
-    )
-    if not paths:
-        return False
-    return all(
-        p.replace("\\", "/").startswith("example") for p in paths
-    )
+    skip_prefixes = (".", "example")
+    skip_names = {"build"}
+    paths: list[str] = []
+    for entry in sorted(project_dir.iterdir()):
+        name = entry.name
+        if any(name.startswith(p) for p in skip_prefixes):
+            continue
+        if name in skip_names:
+            continue
+        if entry.is_dir() or name.endswith(".dart"):
+            paths.append(name)
+    return paths or ["."]
 
 
 def run_format(project_dir: Path) -> bool:
@@ -317,12 +317,15 @@ def run_format(project_dir: Path) -> bool:
             shell=use_shell,
         )
 
+    format_paths = _collect_format_paths(project_dir)
+    cmd = ["dart", "format"] + format_paths
+
     print_info("Formatting...")
     if get_output_level().value >= OutputLevel.VERBOSE.value:
-        print_colored("      $ dart format .", Color.WHITE)
+        print_colored(f"      $ {' '.join(cmd)}", Color.WHITE)
 
     result = subprocess.run(
-        ["dart", "format", "."],
+        cmd,
         cwd=project_dir,
         capture_output=True,
         text=True,
@@ -330,32 +333,21 @@ def run_format(project_dir: Path) -> bool:
     )
 
     if result.returncode != 0:
-        # Exit code 65 = some files couldn't be parsed.
-        # Tolerate this when ALL parse failures are in example fixture
-        # files (they intentionally use future language features).
-        if result.returncode == 65 and _format_failures_are_fixtures(
-            result.stderr or "",
-        ):
-            print_warning(
-                "Some fixture files could not be parsed by the "
-                "formatter (future language features) — skipped"
+        if result.stdout:
+            print_colored(result.stdout.rstrip(), Color.WHITE)
+        if result.stderr:
+            print_colored(result.stderr.rstrip(), Color.RED)
+        print_error(
+            f"Formatting failed (exit code {result.returncode})"
+        )
+        if is_windows():
+            subprocess.run(
+                ["git", "config", "core.autocrlf", "true"],
+                cwd=project_dir,
+                capture_output=True,
+                shell=use_shell,
             )
-        else:
-            if result.stdout:
-                print_colored(result.stdout.rstrip(), Color.WHITE)
-            if result.stderr:
-                print_colored(result.stderr.rstrip(), Color.RED)
-            print_error(
-                f"Formatting failed (exit code {result.returncode})"
-            )
-            if is_windows():
-                subprocess.run(
-                    ["git", "config", "core.autocrlf", "true"],
-                    cwd=project_dir,
-                    capture_output=True,
-                    shell=use_shell,
-                )
-            return False
+        return False
 
     # Show format summary (e.g. "Formatted 2384 files (31 changed)")
     if result.stdout:

@@ -224,7 +224,6 @@ This section consolidates all rules that are deferred or marked as too complex f
 | `avoid_never_passed_parameters` | CROSS-FILE | Requires analyzing all call sites |
 | `avoid_getit_unregistered_access` | CROSS-FILE | Registration may be in separate file |
 | `require_temp_file_cleanup` | CROSS-FILE | Delete may be in separate function |
-| `avoid_misused_hooks` | CONTEXT | Hook rules vary by context |
 | `require_crash_reporting` | CROSS-FILE | Crash reporting setup is centralized |
 | `prefer_layer_separation` | CROSS-FILE | Architecture analysis is cross-file |
 | `require_missing_test_files` | CROSS-FILE | Test file existence check |
