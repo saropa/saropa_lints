@@ -120,5 +120,8 @@ void _bad197() {
 
 // GOOD: Should NOT trigger avoid_duplicate_patterns
 void _good197() {
-  // TODO: Add compliant code for avoid_duplicate_patterns
+  switch (value) {
+    case (int x, int y) when x > 0:
+    case (int x, int y) when y > 0: // Different guard conditions
+  }
 }

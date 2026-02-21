@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_long_records
 // expect_lint: avoid_long_records
-void _bad952() {
-  // TODO: Add code that triggers avoid_long_records
-}
+void _bad952((int, int, int, int, int, int) t) {} // 6 fields > 5 max
 
 // GOOD: Should NOT trigger avoid_long_records
-void _good952() {
-  // TODO: Add compliant code for avoid_long_records
-}
+void _good952((int, int, int) t) {} // 3 fields — concise record

@@ -122,6 +122,16 @@ void _bad284() {
 }
 
 // GOOD: Should NOT trigger avoid_nested_switches
+void _good284_handleB(int b) {
+  switch (b) {
+    case 2:
+      break;
+  }
+}
+
 void _good284() {
-  // TODO: Add compliant code for avoid_nested_switches
+  switch (a) {
+    case 1:
+      _good284_handleB(b); // Extract inner switch to a separate function
+  }
 }

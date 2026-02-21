@@ -2,5 +2,8 @@
 
 /// Fixture for `proper_getx_super_calls` lint rule.
 
-// TODO: Add bad/good examples for proper_getx_super_calls
+// NOTE: proper_getx_super_calls requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

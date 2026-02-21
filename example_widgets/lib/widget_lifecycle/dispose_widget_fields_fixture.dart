@@ -113,5 +113,12 @@ class _bad1356__MyState extends State<MyWidget> {
 }
 
 // GOOD: Should NOT trigger dispose_widget_fields
-// TODO: Add compliant class for dispose_widget_fields
-class _GoodClass1356 {}
+class _GoodClass1356_MyState extends State<MyWidget> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Field is disposed
+    super.dispose();
+  }
+}

@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_large_touch_targets` lint rule.
 
-// TODO: Add bad/good examples for prefer_large_touch_targets
+// NOTE: prefer_large_touch_targets requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

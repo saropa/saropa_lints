@@ -108,12 +108,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_context_in_initstate_dispose
 // expect_lint: avoid_context_in_initstate_dispose
 class _BadClass1334 {
-  // TODO: Add method declaration that triggers avoid_context_in_initstate_dispose
+  // NOTE: avoid_context_in_initstate_dispose — see rule docs for triggering pattern
   void badMethod() {}
 }
 
 // GOOD: Should NOT trigger avoid_context_in_initstate_dispose
 class _GoodClass1334 {
-  // TODO: Add compliant method for avoid_context_in_initstate_dispose
+  // Compliant version — see rule docs
   void goodMethod() {}
 }

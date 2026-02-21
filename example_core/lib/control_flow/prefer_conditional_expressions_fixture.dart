@@ -107,11 +107,13 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_conditional_expressions
 // expect_lint: prefer_conditional_expressions
-void _bad294() {
-  // TODO: Add code that triggers prefer_conditional_expressions
+int _bad294(bool flag) {
+  if (flag) {
+    return 1;
+  } else {
+    return 2; // Both branches return — simplify to conditional
+  }
 }
 
 // GOOD: Should NOT trigger prefer_conditional_expressions
-void _good294() {
-  // TODO: Add compliant code for prefer_conditional_expressions
-}
+int _good294(bool flag) => flag ? 1 : 2; // Conditional expression

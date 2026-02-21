@@ -2,5 +2,8 @@
 
 /// Fixture for `require_getx_worker_dispose` lint rule.
 
-// TODO: Add bad/good examples for require_getx_worker_dispose
+// NOTE: require_getx_worker_dispose requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

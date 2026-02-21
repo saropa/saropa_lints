@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_cubit_for_simple_state` lint rule.
 
-// TODO: Add bad/good examples for prefer_cubit_for_simple_state
+// NOTE: prefer_cubit_for_simple_state requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

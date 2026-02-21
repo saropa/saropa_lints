@@ -107,9 +107,14 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_blank_line_before_constructor
 // expect_lint: prefer_blank_line_before_constructor
-// TODO: Add class that triggers prefer_blank_line_before_constructor
-class _BadClass384 {}
+class _BadClass384 {
+  final int value;
+  _BadClass384(this.value); // No blank line before constructor
+}
 
 // GOOD: Should NOT trigger prefer_blank_line_before_constructor
-// TODO: Add compliant class for prefer_blank_line_before_constructor
-class _GoodClass384 {}
+class _GoodClass384 {
+  final int value;
+
+  _GoodClass384(this.value); // Blank line before constructor
+}

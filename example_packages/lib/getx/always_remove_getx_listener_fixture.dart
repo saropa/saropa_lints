@@ -2,5 +2,8 @@
 
 /// Fixture for `always_remove_getx_listener` lint rule.
 
-// TODO: Add bad/good examples for always_remove_getx_listener
+// NOTE: always_remove_getx_listener requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

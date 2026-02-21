@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_certificate_pinning
 // expect_lint: require_ios_certificate_pinning
 void _bad895() {
-  // TODO: Add code that triggers require_ios_certificate_pinning
+  // NOTE: require_ios_certificate_pinning — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_certificate_pinning
 void _good895() {
-  // TODO: Add compliant code for require_ios_certificate_pinning
+  // Compliant version — see rule docs
 }

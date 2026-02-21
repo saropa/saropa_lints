@@ -2,5 +2,8 @@
 
 /// Fixture for `require_qr_content_validation` lint rule.
 
-// TODO: Add bad/good examples for require_qr_content_validation
+// NOTE: require_qr_content_validation requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

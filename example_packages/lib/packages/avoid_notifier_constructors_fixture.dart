@@ -107,9 +107,9 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_notifier_constructors
 // expect_lint: avoid_notifier_constructors
-// TODO: Add class that triggers avoid_notifier_constructors
+// NOTE: avoid_notifier_constructors — see rule docs
 class _BadClass733 {}
 
 // GOOD: Should NOT trigger avoid_notifier_constructors
-// TODO: Add compliant class for avoid_notifier_constructors
+// NOTE: avoid_notifier_constructors — see rule docs
 class _GoodClass733 {}

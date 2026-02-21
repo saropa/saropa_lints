@@ -2,5 +2,8 @@
 
 /// Fixture for `require_bloc_close` lint rule.
 
-// TODO: Add bad/good examples for require_bloc_close
+// NOTE: require_bloc_close requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

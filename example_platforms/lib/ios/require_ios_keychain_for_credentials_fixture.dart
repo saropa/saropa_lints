@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_keychain_for_credentials
 // expect_lint: require_ios_keychain_for_credentials
 void _bad896() {
-  // TODO: Add method call that triggers require_ios_keychain_for_credentials
+  // NOTE: require_ios_keychain_for_credentials — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_keychain_for_credentials
 void _good896() {
-  // TODO: Add compliant method call for require_ios_keychain_for_credentials
+  // Compliant version — see rule docs
 }

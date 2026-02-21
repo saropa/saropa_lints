@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_hive_field_index_reuse` lint rule.
 
-// TODO: Add bad/good examples for avoid_hive_field_index_reuse
+// NOTE: avoid_hive_field_index_reuse requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

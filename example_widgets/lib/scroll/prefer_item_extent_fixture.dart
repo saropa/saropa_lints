@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_item_extent` lint rule.
 
-// TODO: Add bad/good examples for prefer_item_extent
+// NOTE: prefer_item_extent requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

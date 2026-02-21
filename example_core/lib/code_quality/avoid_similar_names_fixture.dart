@@ -114,5 +114,6 @@ void _bad180() {
 
 // GOOD: Should NOT trigger avoid_similar_names
 void _good180() {
-  // TODO: Add compliant code for avoid_similar_names
+  final userId = 1;
+  final productId = 2; // Clearly distinct names
 }

@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_provider_in_widget` lint rule.
 
-// TODO: Add bad/good examples for avoid_provider_in_widget
+// NOTE: avoid_provider_in_widget requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

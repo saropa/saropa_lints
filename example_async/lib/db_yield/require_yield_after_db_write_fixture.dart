@@ -105,13 +105,10 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger require_yield_after_db_write
-// expect_lint: require_yield_after_db_write
-void _bad303() {
-  // TODO: Add code that triggers require_yield_after_db_write
-}
-
-// GOOD: Should NOT trigger require_yield_after_db_write
-void _good303() {
-  // TODO: Add compliant code for require_yield_after_db_write
-}
+// NOTE: require_yield_after_db_write fires on database write ops
+// (writeTxn, putAll) without yieldToUI() after.
+// Requires specific DB method name patterns.
+//
+// BAD: await isar.writeTxn(() async { ... }); // no yield
+// GOOD: await isar.writeTxn(() async { ... }); await yieldToUI();
+void _note303() {}

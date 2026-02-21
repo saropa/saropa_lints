@@ -119,5 +119,13 @@ class Child extends Parent {
 }
 
 // GOOD: Should NOT trigger prefer_overriding_parent_equality
-// TODO: Add compliant class for prefer_overriding_parent_equality
-class _GoodClass226 {}
+class _GoodClass226_Parent {
+  @override
+  bool operator ==(Object other) => other is _GoodClass226_Parent;
+}
+
+class _GoodClass226_Child extends _GoodClass226_Parent {
+  @override
+  bool operator ==(Object other) =>
+      other is _GoodClass226_Child && super == other; // Chains to parent equality
+}

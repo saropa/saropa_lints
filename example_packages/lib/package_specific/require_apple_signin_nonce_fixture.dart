@@ -2,5 +2,8 @@
 
 /// Fixture for `require_apple_signin_nonce` lint rule.
 
-// TODO: Add bad/good examples for require_apple_signin_nonce
+// NOTE: require_apple_signin_nonce requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

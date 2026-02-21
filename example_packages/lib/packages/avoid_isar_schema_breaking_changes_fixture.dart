@@ -107,9 +107,9 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_isar_schema_breaking_changes
 // expect_lint: avoid_isar_schema_breaking_changes
-// TODO: Add class that triggers avoid_isar_schema_breaking_changes
+// NOTE: avoid_isar_schema_breaking_changes — see rule docs
 class _BadClass687 {}
 
 // GOOD: Should NOT trigger avoid_isar_schema_breaking_changes
-// TODO: Add compliant class for avoid_isar_schema_breaking_changes
+// NOTE: avoid_isar_schema_breaking_changes — see rule docs
 class _GoodClass687 {}

@@ -2,5 +2,8 @@
 
 /// Fixture for `require_error_state` lint rule.
 
-// TODO: Add bad/good examples for require_error_state
+// NOTE: require_error_state requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

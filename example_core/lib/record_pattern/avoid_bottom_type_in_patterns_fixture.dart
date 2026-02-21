@@ -106,12 +106,22 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_bottom_type_in_patterns
-// expect_lint: avoid_bottom_type_in_patterns
-void _bad946() {
-  // TODO: Add code that triggers avoid_bottom_type_in_patterns
+void _bad946(dynamic val) {
+  switch (val) {
+    // expect_lint: avoid_bottom_type_in_patterns
+    case Null x: // Null type in pattern — use null literal pattern
+      break;
+    default:
+      break;
+  }
 }
 
 // GOOD: Should NOT trigger avoid_bottom_type_in_patterns
-void _good946() {
-  // TODO: Add compliant code for avoid_bottom_type_in_patterns
+void _good946(dynamic val) {
+  switch (val) {
+    case null: // Use null pattern instead
+      break;
+    default:
+      break;
+  }
 }

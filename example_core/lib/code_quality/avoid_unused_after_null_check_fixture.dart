@@ -117,5 +117,7 @@ void _bad190() {
 
 // GOOD: Should NOT trigger avoid_unused_after_null_check
 void _good190() {
-  // TODO: Add compliant code for avoid_unused_after_null_check
+  if (x != null) {
+    print(x); // x is used after the null check
+  }
 }

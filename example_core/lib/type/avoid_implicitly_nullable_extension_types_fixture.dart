@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_implicitly_nullable_extension_types
 // expect_lint: avoid_implicitly_nullable_extension_types
-void _bad1224() {
-  // TODO: Add code that triggers avoid_implicitly_nullable_extension_types
-}
+extension type _BadET1224(int value) {} // No implements Object — nullable
 
 // GOOD: Should NOT trigger avoid_implicitly_nullable_extension_types
-void _good1224() {
-  // TODO: Add compliant code for avoid_implicitly_nullable_extension_types
-}
+extension type _GoodET1224(int value) implements Object {} // Safe

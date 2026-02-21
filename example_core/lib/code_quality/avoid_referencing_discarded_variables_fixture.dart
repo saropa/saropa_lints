@@ -108,10 +108,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_referencing_discarded_variables
 // expect_lint: avoid_referencing_discarded_variables
 void _bad157() {
-  // TODO: Add code that triggers avoid_referencing_discarded_variables
+  final _result = 42; // Underscore signals discard intent
+  print(_result); // But then it is referenced — contradicts naming
 }
 
 // GOOD: Should NOT trigger avoid_referencing_discarded_variables
 void _good157() {
-  // TODO: Add compliant code for avoid_referencing_discarded_variables
+  final result = 42; // No underscore — clearly intended to be used
+  print(result);
 }

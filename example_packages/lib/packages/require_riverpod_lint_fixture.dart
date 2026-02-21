@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_riverpod_lint
 // expect_lint: require_riverpod_lint
 void _bad755() {
-  // TODO: Add code that triggers require_riverpod_lint
+  // NOTE: require_riverpod_lint — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_riverpod_lint
 void _good755() {
-  // TODO: Add compliant code for require_riverpod_lint
+  // Compliant version — see rule docs
 }

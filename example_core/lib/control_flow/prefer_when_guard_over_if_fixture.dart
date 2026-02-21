@@ -107,11 +107,19 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_when_guard_over_if
 // expect_lint: prefer_when_guard_over_if
-void _bad298() {
-  // TODO: Add code that triggers prefer_when_guard_over_if
+void _bad298(dynamic value) {
+  switch (value) {
+    case int r:
+      if (r > 0) { // Should use when guard instead
+        print('positive');
+      }
+  }
 }
 
 // GOOD: Should NOT trigger prefer_when_guard_over_if
-void _good298() {
-  // TODO: Add compliant code for prefer_when_guard_over_if
+void _good298(dynamic value) {
+  switch (value) {
+    case int r when r > 0: // when guard instead of if
+      print('positive');
+  }
 }

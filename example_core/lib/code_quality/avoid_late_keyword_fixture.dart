@@ -107,13 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_late_keyword
 // expect_lint: avoid_late_keyword
-void _bad151() {
-  // TODO: Add variable declaration that triggers avoid_late_keyword
-  var x = 0;
+class _Bad151 {
+  late int value; // Runtime crash risk — use nullable or initialize at declaration
 }
 
 // GOOD: Should NOT trigger avoid_late_keyword
-void _good151() {
-  // TODO: Add compliant variable for avoid_late_keyword
-  final x = 0;
+class _Good151 {
+  int? value; // Nullable — initialization error visible at compile time
 }

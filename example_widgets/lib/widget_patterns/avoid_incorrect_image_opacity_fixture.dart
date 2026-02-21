@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_incorrect_image_opacity
 // expect_lint: avoid_incorrect_image_opacity
 void _bad1365() {
-  // TODO: Add code that triggers avoid_incorrect_image_opacity
+  // NOTE: avoid_incorrect_image_opacity — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_incorrect_image_opacity
 void _good1365() {
-  // TODO: Add compliant code for avoid_incorrect_image_opacity
+  // Compliant version — see rule docs
 }

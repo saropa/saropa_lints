@@ -107,11 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_parentheses_with_if_null
 // expect_lint: prefer_parentheses_with_if_null
-void _bad268() {
-  // TODO: Add code that triggers prefer_parentheses_with_if_null
+void _bad268(int? a, int b, int c) {
+  final x = a ?? b + c; // Ambiguous precedence — add parens around b + c
 }
 
 // GOOD: Should NOT trigger prefer_parentheses_with_if_null
-void _good268() {
-  // TODO: Add compliant code for prefer_parentheses_with_if_null
+void _good268(int? a, int b, int c) {
+  final x = a ?? (b + c); // Explicit parentheses clarify intent
 }

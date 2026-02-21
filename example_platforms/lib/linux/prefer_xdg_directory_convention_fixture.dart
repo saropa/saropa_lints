@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_xdg_directory_convention` lint rule.
 
-// TODO: Add bad/good examples for prefer_xdg_directory_convention
+// NOTE: prefer_xdg_directory_convention requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

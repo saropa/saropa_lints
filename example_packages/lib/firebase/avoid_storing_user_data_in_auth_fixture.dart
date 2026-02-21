@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_storing_user_data_in_auth` lint rule.
 
-// TODO: Add bad/good examples for avoid_storing_user_data_in_auth
+// NOTE: avoid_storing_user_data_in_auth requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

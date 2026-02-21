@@ -2,5 +2,8 @@
 
 /// Fixture for `dispose_provided_instances` lint rule.
 
-// TODO: Add bad/good examples for dispose_provided_instances
+// NOTE: dispose_provided_instances requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

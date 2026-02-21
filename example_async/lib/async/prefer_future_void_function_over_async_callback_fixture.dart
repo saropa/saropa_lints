@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_future_void_function_over_async_callback
 // expect_lint: prefer_future_void_function_over_async_callback
-void _bad100() {
-  // TODO: Add code that triggers prefer_future_void_function_over_async_callback
-}
+void _bad100(AsyncCallback cb) {} // uses AsyncCallback type
 
 // GOOD: Should NOT trigger prefer_future_void_function_over_async_callback
-void _good100() {
-  // TODO: Add compliant code for prefer_future_void_function_over_async_callback
-}
+void _good100(Future<void> Function() cb) {} // explicit Future type

@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_constant_assert_conditions
 // expect_lint: avoid_constant_assert_conditions
 void _bad276() {
-  // TODO: Add code that triggers avoid_constant_assert_conditions
+  assert(true); // Constant condition — always passes, provides no value
 }
 
 // GOOD: Should NOT trigger avoid_constant_assert_conditions
-void _good276() {
-  // TODO: Add compliant code for avoid_constant_assert_conditions
+void _good276(List<int> items) {
+  assert(items.isNotEmpty); // Runtime check on actual value
 }

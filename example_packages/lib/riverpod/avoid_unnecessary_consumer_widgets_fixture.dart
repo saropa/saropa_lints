@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_unnecessary_consumer_widgets` lint rule.
 
-// TODO: Add bad/good examples for avoid_unnecessary_consumer_widgets
+// NOTE: avoid_unnecessary_consumer_widgets requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

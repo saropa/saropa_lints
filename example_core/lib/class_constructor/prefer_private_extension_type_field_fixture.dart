@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_private_extension_type_field
 // expect_lint: prefer_private_extension_type_field
-void _bad142() {
-  // TODO: Add code that triggers prefer_private_extension_type_field
-}
+extension type _BadET142(int publicField) {} // Public field — bad
 
 // GOOD: Should NOT trigger prefer_private_extension_type_field
-void _good142() {
-  // TODO: Add compliant code for prefer_private_extension_type_field
-}
+extension type _GoodET142(int _privateField) {} // Private field — good

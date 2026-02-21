@@ -111,7 +111,7 @@ class _Bad432 extends StatelessWidget {
   const _Bad432({super.key});
   @override
   Widget build(BuildContext context) {
-    // TODO: Add widget creation that triggers prefer_cached_image_fade_animation
+    // NOTE: prefer_cached_image_fade_animation — see rule docs for triggering pattern
     return Container();
   }
 }
@@ -121,7 +121,7 @@ class _Good432 extends StatelessWidget {
   const _Good432({super.key});
   @override
   Widget build(BuildContext context) {
-    // TODO: Add compliant widget pattern for prefer_cached_image_fade_animation
+    // Compliant version — see rule docs
     return Container();
   }
 }

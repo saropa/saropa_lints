@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_scrollable_in_intrinsic` lint rule.
 
-// TODO: Add bad/good examples for avoid_scrollable_in_intrinsic
+// NOTE: avoid_scrollable_in_intrinsic requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

@@ -107,11 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unnecessary_length_check
 // expect_lint: avoid_unnecessary_length_check
-void _bad1277() {
-  // TODO: Add code that triggers avoid_unnecessary_length_check
+void _bad1277(List<int> items) {
+  if (items.length > 0) {} // Use isNotEmpty instead
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_length_check
-void _good1277() {
-  // TODO: Add compliant code for avoid_unnecessary_length_check
+void _good1277(List<int> items) {
+  if (items.isNotEmpty) {} // Idiomatic
 }

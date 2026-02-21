@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_incorrect_uri
 // expect_lint: avoid_incorrect_uri
 void _bad150() {
-  // TODO: Add method call that triggers avoid_incorrect_uri
+  final uri = Uri.parse('https://example .com/path with spaces'); // Invalid URI
 }
 
 // GOOD: Should NOT trigger avoid_incorrect_uri
 void _good150() {
-  // TODO: Add compliant method call for avoid_incorrect_uri
+  final uri = Uri.parse('https://example.com/path'); // Valid URI
 }

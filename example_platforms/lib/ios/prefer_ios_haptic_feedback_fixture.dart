@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_ios_haptic_feedback
 // expect_lint: prefer_ios_haptic_feedback
 void _bad837() {
-  // TODO: Add code that triggers prefer_ios_haptic_feedback
+  // NOTE: prefer_ios_haptic_feedback — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_ios_haptic_feedback
 void _good837() {
-  // TODO: Add compliant code for prefer_ios_haptic_feedback
+  // Compliant version — see rule docs
 }

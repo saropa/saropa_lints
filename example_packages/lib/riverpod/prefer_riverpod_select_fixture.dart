@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_riverpod_select` lint rule.
 
-// TODO: Add bad/good examples for prefer_riverpod_select
+// NOTE: prefer_riverpod_select requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

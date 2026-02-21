@@ -107,11 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_nullable_interpolation
 // expect_lint: avoid_nullable_interpolation
-void _bad1225() {
-  // TODO: Add code that triggers avoid_nullable_interpolation
+void _bad1225(String? name) {
+  final s = 'Hello $name'; // nullable in interpolation
 }
 
 // GOOD: Should NOT trigger avoid_nullable_interpolation
-void _good1225() {
-  // TODO: Add compliant code for avoid_nullable_interpolation
+void _good1225(String? name) {
+  final s = 'Hello ${name ?? "Guest"}'; // null-coalesced
 }

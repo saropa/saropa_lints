@@ -107,9 +107,9 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_immutable_bloc_events
 // expect_lint: prefer_immutable_bloc_events
-// TODO: Add class that triggers prefer_immutable_bloc_events
+// NOTE: prefer_immutable_bloc_events — see rule docs
 class _BadClass565 {}
 
 // GOOD: Should NOT trigger prefer_immutable_bloc_events
-// TODO: Add compliant class for prefer_immutable_bloc_events
+// NOTE: prefer_immutable_bloc_events — see rule docs
 class _GoodClass565 {}

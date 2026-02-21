@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_getx_dialog_snackbar_in_controller` lint rule.
 
-// TODO: Add bad/good examples for avoid_getx_dialog_snackbar_in_controller
+// NOTE: avoid_getx_dialog_snackbar_in_controller requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

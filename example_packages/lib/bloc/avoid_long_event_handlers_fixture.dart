@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_long_event_handlers` lint rule.
 
-// TODO: Add bad/good examples for avoid_long_event_handlers
+// NOTE: avoid_long_event_handlers requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

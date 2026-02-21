@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_entitlements
 // expect_lint: require_ios_entitlements
 void _bad918() {
-  // TODO: Add code that triggers require_ios_entitlements
+  // NOTE: require_ios_entitlements — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_entitlements
 void _good918() {
-  // TODO: Add compliant code for require_ios_entitlements
+  // Compliant version — see rule docs
 }

@@ -118,6 +118,6 @@ void _bad204_foo(int x) {
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_patterns
-void _good204() {
-  // TODO: Add compliant code for avoid_unnecessary_patterns
+void _good204_foo(int x) {
+  print(x); // Use x directly without an unnecessary case pattern
 }

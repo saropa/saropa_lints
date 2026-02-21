@@ -106,12 +106,22 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_keywords_in_wildcard_pattern
-// expect_lint: avoid_keywords_in_wildcard_pattern
-void _bad951() {
-  // TODO: Add code that triggers avoid_keywords_in_wildcard_pattern
+void _bad951(dynamic val) {
+  switch (val) {
+    // expect_lint: avoid_keywords_in_wildcard_pattern
+    case int dynamic: // 'dynamic' keyword as pattern name
+      break;
+    default:
+      break;
+  }
 }
 
 // GOOD: Should NOT trigger avoid_keywords_in_wildcard_pattern
-void _good951() {
-  // TODO: Add compliant code for avoid_keywords_in_wildcard_pattern
+void _good951(dynamic val) {
+  switch (val) {
+    case int _: // Proper wildcard — no keyword
+      break;
+    default:
+      break;
+  }
 }

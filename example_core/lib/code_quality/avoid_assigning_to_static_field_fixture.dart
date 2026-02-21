@@ -115,5 +115,9 @@ class _bad172_Foo {
 }
 
 // GOOD: Should NOT trigger avoid_assigning_to_static_field
-// TODO: Add compliant class for avoid_assigning_to_static_field
-class _GoodClass172 {}
+class _GoodClass172 {
+  static int _count = 0;
+  static void increment() {
+    _count++; // Static method modifying static field
+  }
+}

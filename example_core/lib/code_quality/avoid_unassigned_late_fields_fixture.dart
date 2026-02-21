@@ -114,5 +114,9 @@ class _bad201_Foo {
 }
 
 // GOOD: Should NOT trigger avoid_unassigned_late_fields
-// TODO: Add compliant class for avoid_unassigned_late_fields
-class _GoodClass201 {}
+class _GoodClass201 {
+  late String name;
+  void init(String n) {
+    name = n; // late field is eventually assigned
+  }
+}

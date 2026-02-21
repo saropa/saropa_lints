@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_flashing_content` lint rule.
 
-// TODO: Add bad/good examples for avoid_flashing_content
+// NOTE: avoid_flashing_content requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

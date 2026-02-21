@@ -107,9 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_correct_type_name
 // expect_lint: prefer_correct_type_name
-// TODO: Add class that triggers prefer_correct_type_name
-class _BadClass1232 {}
+class userData {} // Starts lowercase — not UpperCamelCase
 
 // GOOD: Should NOT trigger prefer_correct_type_name
-// TODO: Add compliant class for prefer_correct_type_name
-class _GoodClass1232 {}
+class UserData {} // Correct UpperCamelCase name

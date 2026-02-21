@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_immutable_annotation` lint rule.
 
-// TODO: Add bad/good examples for prefer_immutable_annotation
+// NOTE: prefer_immutable_annotation requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

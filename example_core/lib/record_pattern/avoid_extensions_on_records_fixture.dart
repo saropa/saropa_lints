@@ -107,11 +107,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_extensions_on_records
 // expect_lint: avoid_extensions_on_records
-void _bad949() {
-  // TODO: Add code that triggers avoid_extensions_on_records
-}
+extension on (int, String) {} // Extending a record type
 
 // GOOD: Should NOT trigger avoid_extensions_on_records
-void _good949() {
-  // TODO: Add compliant code for avoid_extensions_on_records
-}
+class _GoodClass949 {}
+extension on _GoodClass949 {} // Extending a class is fine

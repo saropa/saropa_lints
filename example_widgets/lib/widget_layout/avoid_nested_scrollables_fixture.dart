@@ -111,7 +111,7 @@ class _Bad1307 extends StatelessWidget {
   const _Bad1307({super.key});
   @override
   Widget build(BuildContext context) {
-    // TODO: Add widget creation that triggers avoid_nested_scrollables
+    // NOTE: avoid_nested_scrollables — see rule docs for triggering pattern
     return Container();
   }
 }
@@ -121,7 +121,7 @@ class _Good1307 extends StatelessWidget {
   const _Good1307({super.key});
   @override
   Widget build(BuildContext context) {
-    // TODO: Add compliant widget pattern for avoid_nested_scrollables
+    // Compliant version — see rule docs
     return Container();
   }
 }

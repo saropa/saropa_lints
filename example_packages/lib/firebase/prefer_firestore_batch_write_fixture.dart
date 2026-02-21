@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_firestore_batch_write` lint rule.
 
-// TODO: Add bad/good examples for prefer_firestore_batch_write
+// NOTE: prefer_firestore_batch_write requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

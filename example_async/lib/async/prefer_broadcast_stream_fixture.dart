@@ -2,5 +2,18 @@
 
 /// Fixture for `prefer_broadcast_stream` lint rule.
 
-// TODO: Add bad/good examples for prefer_broadcast_stream
+// BAD: Should trigger prefer_broadcast_stream
+void _bad() {
+  final stream = Stream<int>.empty();
+  // expect_lint: prefer_broadcast_stream
+  stream.listen((_) {}); // first listen
+  stream.listen((_) {}); // second listen — error at runtime
+}
+
+// GOOD: Should NOT trigger prefer_broadcast_stream
+void _good() {
+  final stream = Stream<int>.empty();
+  stream.listen((_) {}); // single listener — OK
+}
+
 void main() {}
