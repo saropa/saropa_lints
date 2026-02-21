@@ -24,15 +24,6 @@ Standard contacts apps store data; Saropa helps you use it. It is an "Intelligen
 * **Trust:** 50,000+ Downloads | ★ 4.8/5 Rating
 * **Link:** [saropa.com](https://saropa.com/)
 
-### Home Essentials
-**Your family's lifestyle backup plan.**
-
-A secure crisis management vault designed to protect your household's critical information 24/7.
-
-* **Asset Inventory:** Prove ownership for insurance claims with detailed logs of physical assets.
-* **Secure Vault:** Encrypted storage for important photos, family papers, and medical records.
-* **Legacy Planning:** Tools for business succession and household recovery planning.
-
 ---
 
 ## 🛠️ Developer Ecosystem
