@@ -8,6 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../fixes/packages/package_specific/add_subscription_check_todo_fix.dart';
 import '../mode_constants_utils.dart';
 import '../saropa_lint_rule.dart';
 
@@ -259,10 +260,15 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
         return; // Has proper subscription checking
       }
 
-      // TODO: Add quick fix support when custom_lint supports it for this rule type.
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddSubscriptionCheckTodoFix(context: context),
+  ];
 }
 
 // =============================================================================
