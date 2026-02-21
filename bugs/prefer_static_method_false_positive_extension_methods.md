@@ -29,7 +29,7 @@ lines:    55:16–55:23 (getter anyTrue)
 
 ## Affected Source
 
-126 violations across every extension file in the library (32 files). Representative examples:
+126 violations across every extension file in the library (30 files). Representative examples:
 
 ### Extension getters on `Iterable<bool>`
 
@@ -275,7 +275,7 @@ class _bad_Formatter {
 
 - **saropa_lints version:** 5.0.0-beta.9 (rule version v4)
 - **Dart SDK:** >=3.9.0 <4.0.0
-- **Trigger project:** `D:\src\saropa_dart_utils` (Dart utility library — 32 extension files)
+- **Trigger project:** `D:\src\saropa_dart_utils` (Dart utility library — 30 extension files)
 - **Total violations:** 126 across 30 extension files
 - **False positive rate on extensions:** 100% (every violation is on an extension method/getter)
 - **Affected AST node types:** `MethodDeclaration` and `PropertyAccessorDeclaration` inside `ExtensionDeclaration`
