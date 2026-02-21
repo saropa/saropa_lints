@@ -82,6 +82,8 @@ import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart'
     show RuleTier, SaropaLintRule, allSaropaRules;
+import 'package:saropa_lints/src/report/analysis_reporter.dart'
+    show AnalysisReporter;
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
 /// Get saropa_lints rootUri from .dart_tool/package_config.json.
@@ -167,7 +169,7 @@ void _writeLogFile() {
   if (_logTimestamp == null) return;
 
   try {
-    final dateFolder = _logTimestamp!.substring(0, 8);
+    final dateFolder = AnalysisReporter.dateFolder(_logTimestamp!);
     final reportsDir = Directory('reports/$dateFolder');
     if (!reportsDir.existsSync()) {
       reportsDir.createSync(recursive: true);
@@ -1275,7 +1277,7 @@ Future<void> main(List<String> args) async {
 
       // Remind user where the init log is
       if (_logTimestamp != null) {
-        final dateFolder = _logTimestamp!.substring(0, 8);
+        final dateFolder = AnalysisReporter.dateFolder(_logTimestamp!);
         final logPath =
             'reports/$dateFolder/${_logTimestamp}_saropa_lints_init.log';
         _logTerminal(
@@ -2776,8 +2778,16 @@ CliArgs _parseArguments(List<String> args) {
   if (outputIndex == -1) {
     outputIndex = args.indexOf('-o');
   }
-  if (outputIndex != -1 && outputIndex + 1 < args.length) {
-    outputPath = args[outputIndex + 1];
+  if (outputIndex != -1) {
+    if (outputIndex + 1 < args.length &&
+        !args[outputIndex + 1].startsWith('-')) {
+      outputPath = args[outputIndex + 1];
+    } else {
+      print(
+        'Warning: --output requires a file path. '
+        'Using default: $outputPath',
+      );
+    }
   }
 
   String? requestedTier;

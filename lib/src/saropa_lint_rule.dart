@@ -781,14 +781,13 @@ class ProgressTracker {
           '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_'
           '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
 
-      final dateFolder = timestamp.substring(0, 8);
-      final reportsDir = Directory('reports/$dateFolder');
+      final df = AnalysisReporter.dateFolder(timestamp);
+      final reportsDir = Directory('reports/$df');
       if (!reportsDir.existsSync()) {
         reportsDir.createSync(recursive: true);
       }
 
-      final logPath =
-          'reports/$dateFolder/${timestamp}_saropa_lints_analysis.log';
+      final logPath = 'reports/$df/${timestamp}_saropa_lints_analysis.log';
       final logBuf = StringBuffer();
 
       logBuf.writeln('Saropa Lints Analysis Report');
