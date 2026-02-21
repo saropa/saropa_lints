@@ -22,7 +22,7 @@ library;
 ///
 /// | Option | Description | Default |
 /// |--------|-------------|---------|
-/// | `-t, --tier <tier>` | Tier level (1-5 or name) | comprehensive |
+/// | `-t, --tier <tier>` | Tier level (1-5 or name) | prompt (or comprehensive) |
 /// | `-o, --output <file>` | Output file path | analysis_options.yaml |
 /// | `--stylistic` | Include opinionated formatting rules | false |
 /// | `--reset` | Discard user customizations | false |
@@ -55,7 +55,7 @@ library;
 /// ## Examples
 ///
 /// ```bash
-/// # Generate config for comprehensive tier (default)
+/// # Interactive tier selection (prompts if no --tier given)
 /// dart run saropa_lints:init
 ///
 /// # Start with essential tier for legacy projects
@@ -167,12 +167,14 @@ void _writeLogFile() {
   if (_logTimestamp == null) return;
 
   try {
-    final reportsDir = Directory('reports');
+    final dateFolder = _logTimestamp!.substring(0, 8);
+    final reportsDir = Directory('reports/$dateFolder');
     if (!reportsDir.existsSync()) {
       reportsDir.createSync(recursive: true);
     }
 
-    final logPath = 'reports/${_logTimestamp}_saropa_lints_init.log';
+    final logPath =
+        'reports/$dateFolder/${_logTimestamp}_saropa_lints_init.log';
     final logContent = _stripAnsi(_logBuffer.toString());
     File(logPath).writeAsStringSync(logContent);
 
@@ -184,6 +186,57 @@ void _writeLogFile() {
       '${_Colors.yellow}Warning: Could not write log file: $e${_Colors.reset}',
     );
   }
+}
+
+/// Append a detailed rule-by-rule listing to the log buffer.
+///
+/// Written to the log file only, not printed to the terminal.
+/// Each rule gets one line: `+ SEVERITY  tier  rule_name  [note]`.
+void _appendDetailedReport({
+  required Set<String> enabledRules,
+  required Set<String> disabledRules,
+  required Map<String, bool> userCustomizations,
+  required Set<String> platformFilteredRules,
+  required Set<String> packageFilteredRules,
+}) {
+  final allRules = [...enabledRules, ...disabledRules]..sort();
+
+  _logBuffer.writeln('');
+  _logBuffer.writeln('${'=' * 80}');
+  _logBuffer.writeln('DETAILED RULE REPORT (${allRules.length} rules)');
+  _logBuffer.writeln('${'=' * 80}');
+  _logBuffer.writeln('');
+
+  for (final rule in allRules) {
+    final enabled = enabledRules.contains(rule);
+    final marker = enabled ? '+' : '-';
+    final severity = _getRuleSeverity(rule).padRight(7);
+    final tierName = _tierToString(_getRuleTierFromMetadata(rule)).padRight(13);
+    final note = _detailNote(
+      rule,
+      userCustomizations,
+      platformFilteredRules,
+      packageFilteredRules,
+    );
+    _logBuffer.writeln('$marker $severity $tierName $rule$note');
+  }
+
+  _logBuffer.writeln('');
+  _logBuffer.writeln('Legend: + enabled, - disabled');
+  _logBuffer.writeln('${'=' * 80}');
+}
+
+/// Returns a bracketed note explaining why a rule has a non-default state.
+String _detailNote(
+  String rule,
+  Map<String, bool> customs,
+  Set<String> platform,
+  Set<String> package,
+) {
+  if (customs.containsKey(rule)) return '  [custom override]';
+  if (platform.contains(rule)) return '  [platform filtered]';
+  if (package.contains(rule)) return '  [package filtered]';
+  return '';
 }
 
 // ---------------------------------------------------------------------------
@@ -264,6 +317,7 @@ bool _detectColorSupport() {
   // Dart's built-in check (reliable after VTP is enabled on Windows)
   if (stdout.supportsAnsiEscapes) return true;
 
+  // cspell:ignore ANSICON
   // Windows: detect terminals known to support ANSI
   if (Platform.isWindows) {
     final env = Platform.environment;
@@ -753,9 +807,10 @@ Future<void> main(List<String> args) async {
   _logTerminal('${_Colors.dim}Source: $source${_Colors.reset}');
   _logTerminal('');
 
-  // Resolve tier (handle numeric input)
-  final String? tier = _resolveTier(cliArgs.tier);
-  if (tier == null) {
+  // Resolve tier (handle numeric input, or prompt if not specified)
+  String? tier = _resolveTier(cliArgs.tier);
+  if (tier == null && cliArgs.tier != null) {
+    // User explicitly provided an invalid tier name/number
     _logTerminal(_error('✗ Error: Invalid tier "${cliArgs.tier}"'));
     _logTerminal('');
     _logTerminal('Valid tiers:');
@@ -765,17 +820,24 @@ Future<void> main(List<String> args) async {
     exitCode = 1;
     return;
   }
+  if (tier == null) {
+    // No tier specified — prompt interactively or fall back to default
+    tier = _promptForTier();
+  }
+  final String resolvedTier = tier;
 
   _logTerminal(
-    '${_Colors.bold}Tier:${_Colors.reset} ${_tierColor(tier)} (level ${tierIds[tier]})',
+    '${_Colors.bold}Tier:${_Colors.reset} ${_tierColor(resolvedTier)} (level ${tierIds[resolvedTier]})',
   );
-  _logTerminal('${_Colors.dim}${tierDescriptions[tier]}${_Colors.reset}');
+  _logTerminal(
+    '${_Colors.dim}${tierDescriptions[resolvedTier]}${_Colors.reset}',
+  );
   _logTerminal('');
 
   // tiers.dart is the source of truth for all rules
   // A unit test validates that all plugin rules are in tiers.dart
   final Set<String> allRules = tiers.getAllDefinedRules();
-  final Set<String> enabledRules = tiers.getRulesForTier(tier);
+  final Set<String> enabledRules = tiers.getRulesForTier(resolvedTier);
   final Set<String> disabledRules = allRules.difference(enabledRules);
 
   // Handle stylistic rules (opt-in)
@@ -1028,9 +1090,18 @@ Future<void> main(List<String> args) async {
   }
   _logTerminal('');
 
+  // Append rule-by-rule detail to the log file (not printed to terminal)
+  _appendDetailedReport(
+    enabledRules: finalEnabled,
+    disabledRules: finalDisabled,
+    userCustomizations: userCustomizations,
+    platformFilteredRules: platformDisabledRules,
+    packageFilteredRules: packageDisabledRules,
+  );
+
   // Generate the new plugins section with proper formatting
   final String pluginsYaml = _generatePluginsYaml(
-    tier: tier,
+    tier: resolvedTier,
     enabledRules: finalEnabled,
     disabledRules: finalDisabled,
     userCustomizations: userCustomizations,
@@ -1204,7 +1275,9 @@ Future<void> main(List<String> args) async {
 
       // Remind user where the init log is
       if (_logTimestamp != null) {
-        final logPath = 'reports/${_logTimestamp}_saropa_lints_init.log';
+        final dateFolder = _logTimestamp!.substring(0, 8);
+        final logPath =
+            'reports/$dateFolder/${_logTimestamp}_saropa_lints_init.log';
         _logTerminal(
           '${_Colors.bold}Log:${_Colors.reset} ${_Colors.cyan}$logPath${_Colors.reset}',
         );
@@ -2712,8 +2785,16 @@ CliArgs _parseArguments(List<String> args) {
   if (tierIndex == -1) {
     tierIndex = args.indexOf('-t');
   }
-  if (tierIndex != -1 && tierIndex + 1 < args.length) {
-    requestedTier = args[tierIndex + 1];
+  if (tierIndex != -1) {
+    if (tierIndex + 1 < args.length && !args[tierIndex + 1].startsWith('-')) {
+      requestedTier = args[tierIndex + 1];
+    } else {
+      // --tier without a value: warn and fall through to prompt/default
+      print(
+        'Warning: --tier requires a value (1-5 or tier name). '
+        'Will prompt for selection.',
+      );
+    }
   }
 
   return CliArgs(
@@ -2733,9 +2814,7 @@ void _logTerminal(String message) {
 }
 
 String? _resolveTier(String? input) {
-  if (input == null) {
-    return 'comprehensive';
-  }
+  if (input == null) return null;
 
   final int? numericTier = int.tryParse(input);
   if (numericTier != null) {
@@ -2755,6 +2834,54 @@ String? _resolveTier(String? input) {
   return null;
 }
 
+/// Prompts the user to select a tier interactively.
+///
+/// In non-interactive mode (piped input, CI), defaults to 'comprehensive'.
+String _promptForTier() {
+  const String defaultTier = 'comprehensive';
+
+  if (!stdin.hasTerminal) {
+    _logTerminal(
+      '${_Colors.dim}Non-interactive: using default tier '
+      '($defaultTier)${_Colors.reset}',
+    );
+    return defaultTier;
+  }
+
+  _logTerminal('${_Colors.bold}Select a tier:${_Colors.reset}');
+  _logTerminal('');
+
+  for (final String name in tierOrder) {
+    final int id = tierIds[name]!;
+    final int count = tiers.getRulesForTier(name).length;
+    final String desc = tierDescriptions[name] ?? '';
+    final String label = _tierColor(name.padRight(13));
+    final String countStr = '${_Colors.dim}(~$count rules)${_Colors.reset}';
+    final String isDefault = name == defaultTier
+        ? ' ${_Colors.cyan}(default)${_Colors.reset}'
+        : '';
+    _logTerminal('  $id. $label $countStr  $desc$isDefault');
+  }
+
+  _logTerminal('');
+  stdout.write(
+    '${_Colors.cyan}Enter tier (1-5) '
+    '[default: ${tierIds[defaultTier]}]: ${_Colors.reset}',
+  );
+
+  final String input = stdin.readLineSync()?.trim() ?? '';
+  if (input.isEmpty) return defaultTier;
+
+  final String? resolved = _resolveTier(input);
+  if (resolved != null) return resolved;
+
+  _logTerminal(
+    '${_Colors.yellow}Invalid selection "$input", '
+    'using $defaultTier${_Colors.reset}',
+  );
+  return defaultTier;
+}
+
 void _printUsage() {
   print('''
 
@@ -2770,7 +2897,7 @@ IMPORTANT: This tool preserves:
 Usage: dart run saropa_lints:init [options]
 
 Options:
-  -t, --tier <tier>     Tier level (1-5 or name, default: comprehensive)
+  -t, --tier <tier>     Tier level (1-5 or name, prompts if omitted)
   -o, --output <file>   Output file (default: analysis_options.yaml)
   --stylistic           Include stylistic rules (opinionated, off by default)
   --fix-ignores         Auto-convert v4 ignore comments without prompting
@@ -2782,7 +2909,7 @@ Tiers:
 ${tierOrder.map((String t) => '  ${tierIds[t]}. $t\n     ${tierDescriptions[t]}').join('\n')}
 
 Examples:
-  dart run saropa_lints:init                          # Default: comprehensive
+  dart run saropa_lints:init                          # Prompts for tier
   dart run saropa_lints:init --tier comprehensive
   dart run saropa_lints:init --tier 4
   dart run saropa_lints:init --tier essential --reset
