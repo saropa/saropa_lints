@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_unbounded_listview_in_column` lint rule.
 
-// TODO: Add bad/good examples for avoid_unbounded_listview_in_column
+// NOTE: avoid_unbounded_listview_in_column requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

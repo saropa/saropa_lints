@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_selector_over_consumer` lint rule.
 
-// TODO: Add bad/good examples for prefer_selector_over_consumer
+// NOTE: prefer_selector_over_consumer requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

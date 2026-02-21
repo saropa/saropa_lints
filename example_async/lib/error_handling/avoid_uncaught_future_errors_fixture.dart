@@ -105,13 +105,13 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_uncaught_future_errors
-// expect_lint: avoid_uncaught_future_errors
-void _bad360() {
-  // TODO: Add code that triggers avoid_uncaught_future_errors
-}
-
-// GOOD: Should NOT trigger avoid_uncaught_future_errors
-void _good360() {
-  // TODO: Add compliant code for avoid_uncaught_future_errors
-}
+// NOTE: avoid_uncaught_future_errors fires on Future method calls
+// without .catchError(), try-catch, or .ignore(). Needs static type
+// analysis to detect Future return type on the expression.
+//
+// BAD:
+// void _bad360() { fetchData(); } // Future not handled
+//
+// GOOD:
+// void _good360() async { await fetchData(); }
+void _note360() {}

@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_macos_deprecated_security_apis
 // expect_lint: avoid_macos_deprecated_security_apis
 void _bad928() {
-  // TODO: Add code that triggers avoid_macos_deprecated_security_apis
+  // NOTE: avoid_macos_deprecated_security_apis — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_macos_deprecated_security_apis
 void _good928() {
-  // TODO: Add compliant code for avoid_macos_deprecated_security_apis
+  // Compliant version — see rule docs
 }

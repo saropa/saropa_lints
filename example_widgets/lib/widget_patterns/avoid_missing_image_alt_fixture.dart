@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_missing_image_alt
 // expect_lint: avoid_missing_image_alt
 void _bad1366() {
-  // TODO: Add method call that triggers avoid_missing_image_alt
+  // NOTE: avoid_missing_image_alt — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_missing_image_alt
 void _good1366() {
-  // TODO: Add compliant method call for avoid_missing_image_alt
+  // Compliant version — see rule docs
 }

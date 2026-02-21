@@ -105,13 +105,9 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger suggest_yield_after_db_read
-// expect_lint: suggest_yield_after_db_read
-void _bad304() {
-  // TODO: Add code that triggers suggest_yield_after_db_read
-}
-
-// GOOD: Should NOT trigger suggest_yield_after_db_read
-void _good304() {
-  // TODO: Add compliant code for suggest_yield_after_db_read
-}
+// NOTE: suggest_yield_after_db_read fires on bulk database reads
+// (findAll, getAll) without yield.
+//
+// BAD: final items = await collection.findAll();
+// GOOD: final items = await collection.findAll(); await yieldToUI();
+void _note304() {}

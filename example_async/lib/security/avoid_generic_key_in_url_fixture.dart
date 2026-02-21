@@ -106,12 +106,12 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_generic_key_in_url
-// expect_lint: avoid_generic_key_in_url
 void _bad1000() {
-  // TODO: Add code that triggers avoid_generic_key_in_url
+  // expect_lint: avoid_generic_key_in_url
+  final url = 'https://api.example.com?key=ABC123'; // key in URL
 }
 
 // GOOD: Should NOT trigger avoid_generic_key_in_url
 void _good1000() {
-  // TODO: Add compliant code for avoid_generic_key_in_url
+  final url = 'https://api.example.com/v1/data'; // no key in URL
 }

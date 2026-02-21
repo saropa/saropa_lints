@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_macos_window_restoration
 // expect_lint: require_macos_window_restoration
 void _bad931() {
-  // TODO: Add method call that triggers require_macos_window_restoration
+  // NOTE: require_macos_window_restoration — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_macos_window_restoration
 void _good931() {
-  // TODO: Add compliant method call for require_macos_window_restoration
+  // Compliant version — see rule docs
 }

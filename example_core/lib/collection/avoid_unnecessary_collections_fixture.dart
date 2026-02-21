@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_unnecessary_collections
 // expect_lint: avoid_unnecessary_collections
 void _bad242() {
-  // TODO: Add method call that triggers avoid_unnecessary_collections
+  final items = List.of([1, 2, 3]); // Wrapping a literal is redundant
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_collections
 void _good242() {
-  // TODO: Add compliant method call for avoid_unnecessary_collections
+  final items = [1, 2, 3]; // Use the literal directly
 }

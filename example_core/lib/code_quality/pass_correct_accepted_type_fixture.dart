@@ -112,6 +112,4 @@ dynamic value;
 void _bad212_process(@Accept(String) int value) {} // Type mismatch
 
 // GOOD: Should NOT trigger pass_correct_accepted_type
-void _good212() {
-  // TODO: Add compliant code for pass_correct_accepted_type
-}
+void _good212(@Accept(String) String value) {} // Parameter type matches annotation

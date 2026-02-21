@@ -106,12 +106,12 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_specifying_future_value_type
-// expect_lint: prefer_specifying_future_value_type
 void _bad98() {
-  // TODO: Add code that triggers prefer_specifying_future_value_type
+  // expect_lint: prefer_specifying_future_value_type
+  final f = Future.value(42); // no type argument — Future<dynamic>
 }
 
 // GOOD: Should NOT trigger prefer_specifying_future_value_type
 void _good98() {
-  // TODO: Add compliant code for prefer_specifying_future_value_type
+  final f = Future<int>.value(42); // explicit type
 }

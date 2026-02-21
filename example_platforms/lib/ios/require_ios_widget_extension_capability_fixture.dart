@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_widget_extension_capability
 // expect_lint: require_ios_widget_extension_capability
 void _bad866() {
-  // TODO: Add method call that triggers require_ios_widget_extension_capability
+  // NOTE: require_ios_widget_extension_capability — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_widget_extension_capability
 void _good866() {
-  // TODO: Add compliant method call for require_ios_widget_extension_capability
+  // Compliant version — see rule docs
 }

@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger map_keys_ordering
 // expect_lint: map_keys_ordering
 void _bad243() {
-  // TODO: Add code that triggers map_keys_ordering
+  final m = {'zebra': 1, 'apple': 2}; // Keys not in alphabetical order
 }
 
 // GOOD: Should NOT trigger map_keys_ordering
 void _good243() {
-  // TODO: Add compliant code for map_keys_ordering
+  final m = {'apple': 2, 'zebra': 1}; // Keys in alphabetical order
 }

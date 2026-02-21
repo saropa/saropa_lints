@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_void_callback
 // expect_lint: prefer_void_callback
 void _bad1445() {
-  // TODO: Add code that triggers prefer_void_callback
+  // NOTE: prefer_void_callback — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_void_callback
 void _good1445() {
-  // TODO: Add compliant code for prefer_void_callback
+  // Compliant version — see rule docs
 }

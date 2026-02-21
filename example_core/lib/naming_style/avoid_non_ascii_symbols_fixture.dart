@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_non_ascii_symbols
 // expect_lint: avoid_non_ascii_symbols
 void _bad479() {
-  // TODO: Add code that triggers avoid_non_ascii_symbols
+  final naïve = true; // Non-ASCII character in identifier
 }
 
 // GOOD: Should NOT trigger avoid_non_ascii_symbols
 void _good479() {
-  // TODO: Add compliant code for avoid_non_ascii_symbols
+  final naive = true; // ASCII-only identifier
 }

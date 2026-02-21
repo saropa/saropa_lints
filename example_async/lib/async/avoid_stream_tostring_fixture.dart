@@ -113,5 +113,5 @@ void _bad91() {
 
 // GOOD: Should NOT trigger avoid_stream_tostring
 void _good91() {
-  // TODO: Add compliant method call for avoid_stream_tostring
+  myStream.listen((event) => print(event)); // Listen to stream events directly
 }

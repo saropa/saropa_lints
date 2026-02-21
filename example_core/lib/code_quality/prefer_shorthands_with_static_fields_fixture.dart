@@ -113,5 +113,5 @@ void _bad211() {
 
 // GOOD: Should NOT trigger prefer_shorthands_with_static_fields
 void _good211() {
-  // TODO: Add compliant method call for prefer_shorthands_with_static_fields
+  final color = Colors.red; // Use shorthand directly
 }

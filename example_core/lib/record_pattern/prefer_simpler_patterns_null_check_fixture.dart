@@ -106,12 +106,22 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_simpler_patterns_null_check
-// expect_lint: prefer_simpler_patterns_null_check
-void _bad961() {
-  // TODO: Add code that triggers prefer_simpler_patterns_null_check
+void _bad961(int? val) {
+  switch (val) {
+    // expect_lint: prefer_simpler_patterns_null_check
+    case var x?: // var x? is verbose — prefer final
+      print(x);
+    default:
+      break;
+  }
 }
 
 // GOOD: Should NOT trigger prefer_simpler_patterns_null_check
-void _good961() {
-  // TODO: Add compliant code for prefer_simpler_patterns_null_check
+void _good961(int? val) {
+  switch (val) {
+    case final x?: // final is more explicit than var
+      print(x);
+    default:
+      break;
+  }
 }

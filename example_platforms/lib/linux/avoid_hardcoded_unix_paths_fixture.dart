@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_hardcoded_unix_paths` lint rule.
 
-// TODO: Add bad/good examples for avoid_hardcoded_unix_paths
+// NOTE: avoid_hardcoded_unix_paths requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

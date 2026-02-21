@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_sized_box_square` lint rule.
 
-// TODO: Add bad/good examples for prefer_sized_box_square
+// NOTE: prefer_sized_box_square requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

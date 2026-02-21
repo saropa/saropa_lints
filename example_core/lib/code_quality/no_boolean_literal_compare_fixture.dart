@@ -2,5 +2,13 @@
 
 /// Fixture for `no_boolean_literal_compare` lint rule.
 
-// TODO: Add bad/good examples for no_boolean_literal_compare
-void main() {}
+// BAD: Should trigger no_boolean_literal_compare
+// expect_lint: no_boolean_literal_compare
+void _bad(bool isValid) {
+  if (isValid == true) {} // Redundant comparison to literal
+}
+
+// GOOD: Should NOT trigger no_boolean_literal_compare
+void _good(bool isValid) {
+  if (isValid) {} // Use boolean value directly
+}

@@ -107,9 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger match_class_name_pattern
 // expect_lint: match_class_name_pattern
-// TODO: Add class that triggers match_class_name_pattern
-class _BadClass480 {}
+class UserSt extends State<dynamic> {} // Extends State but name missing 'State' suffix
 
 // GOOD: Should NOT trigger match_class_name_pattern
-// TODO: Add compliant class for match_class_name_pattern
-class _GoodClass480 {}
+class UserState extends State<dynamic> {} // Ends with 'State'

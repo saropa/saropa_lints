@@ -107,11 +107,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_returning_conditionals
 // expect_lint: prefer_returning_conditionals
-void _bad296() {
-  // TODO: Add code that triggers prefer_returning_conditionals
+bool _bad296_isValid(int x) {
+  if (x > 0) {
+    return true;
+  }
+  return false; // Simplify to: return x > 0
 }
 
 // GOOD: Should NOT trigger prefer_returning_conditionals
-void _good296() {
-  // TODO: Add compliant code for prefer_returning_conditionals
-}
+bool _good296_isValid(int x) => x > 0; // Direct boolean expression

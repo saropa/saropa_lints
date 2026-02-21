@@ -115,5 +115,12 @@ class _bad1355__MyState extends State<MyWidget> {
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_overrides_in_state
-// TODO: Add compliant class for avoid_unnecessary_overrides_in_state
-class _GoodClass1355 {}
+class _GoodClass1355_MyState extends State<MyWidget> {
+  late final _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {}); // Does actual work beyond calling super
+  }
+}

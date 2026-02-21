@@ -107,9 +107,9 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_extend_equatable
 // expect_lint: require_extend_equatable
-// TODO: Add class that triggers require_extend_equatable
+// NOTE: require_extend_equatable — see rule docs
 class _BadClass602 {}
 
 // GOOD: Should NOT trigger require_extend_equatable
-// TODO: Add compliant class for require_extend_equatable
+// NOTE: require_extend_equatable — see rule docs
 class _GoodClass602 {}

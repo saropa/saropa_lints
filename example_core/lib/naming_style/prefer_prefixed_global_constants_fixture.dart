@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_prefixed_global_constants
 // expect_lint: prefer_prefixed_global_constants
-void _bad494() {
-  // TODO: Add code that triggers prefer_prefixed_global_constants
-}
+const maxItems = 10; // Global constant missing 'k' prefix
 
 // GOOD: Should NOT trigger prefer_prefixed_global_constants
-void _good494() {
-  // TODO: Add compliant code for prefer_prefixed_global_constants
-}
+const kMaxItems = 10; // Global constant with conventional 'k' prefix

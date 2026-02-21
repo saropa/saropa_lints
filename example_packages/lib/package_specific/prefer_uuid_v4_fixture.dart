@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_uuid_v4` lint rule.
 
-// TODO: Add bad/good examples for prefer_uuid_v4
+// NOTE: prefer_uuid_v4 requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

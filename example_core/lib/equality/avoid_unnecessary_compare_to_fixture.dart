@@ -107,11 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unnecessary_compare_to
 // expect_lint: avoid_unnecessary_compare_to
-void _bad349() {
-  // TODO: Add code that triggers avoid_unnecessary_compare_to
+void _bad349(String a, String b) {
+  if (a.compareTo(b) == 0) {} // Use == directly for equality
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_compare_to
-void _good349() {
-  // TODO: Add compliant code for avoid_unnecessary_compare_to
+void _good349(String a, String b) {
+  if (a == b) {} // Direct equality check
 }

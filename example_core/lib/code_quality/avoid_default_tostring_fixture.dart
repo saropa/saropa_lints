@@ -118,5 +118,9 @@ class _bad183_User {
 }
 
 // GOOD: Should NOT trigger avoid_default_tostring
-// TODO: Add compliant class for avoid_default_tostring
-class _GoodClass183 {}
+class _GoodClass183 {
+  final String name;
+  _GoodClass183(this.name);
+  @override
+  String toString() => 'User(name: $name)'; // Explicit toString override
+}

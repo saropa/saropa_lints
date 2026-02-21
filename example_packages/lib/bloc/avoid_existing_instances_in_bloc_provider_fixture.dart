@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_existing_instances_in_bloc_provider` lint rule.
 
-// TODO: Add bad/good examples for avoid_existing_instances_in_bloc_provider
+// NOTE: avoid_existing_instances_in_bloc_provider requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

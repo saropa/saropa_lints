@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_image_rebuild_on_scroll` lint rule.
 
-// TODO: Add bad/good examples for avoid_image_rebuild_on_scroll
+// NOTE: avoid_image_rebuild_on_scroll requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_explicit_function_type
 // expect_lint: prefer_explicit_function_type
-void _bad1233() {
-  // TODO: Add code that triggers prefer_explicit_function_type
-}
+void _bad1233(Function callback) {} // Bare Function type — imprecise
 
 // GOOD: Should NOT trigger prefer_explicit_function_type
-void _good1233() {
-  // TODO: Add compliant code for prefer_explicit_function_type
-}
+void _good1233(void Function() callback) {} // Explicit function signature

@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_orientation_handling
 // expect_lint: require_ios_orientation_handling
 void _bad877() {
-  // TODO: Add method call that triggers require_ios_orientation_handling
+  // NOTE: require_ios_orientation_handling — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_orientation_handling
 void _good877() {
-  // TODO: Add compliant method call for require_ios_orientation_handling
+  // Compliant version — see rule docs
 }

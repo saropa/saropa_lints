@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_universal_links_domain_matching
 // expect_lint: require_ios_universal_links_domain_matching
 void _bad878() {
-  // TODO: Add code that triggers require_ios_universal_links_domain_matching
+  // NOTE: require_ios_universal_links_domain_matching — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_universal_links_domain_matching
 void _good878() {
-  // TODO: Add compliant code for require_ios_universal_links_domain_matching
+  // Compliant version — see rule docs
 }

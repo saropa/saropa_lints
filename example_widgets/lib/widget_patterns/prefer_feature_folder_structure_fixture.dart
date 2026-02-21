@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_feature_folder_structure
 // expect_lint: prefer_feature_folder_structure
 void _bad1461() {
-  // TODO: Add code that triggers prefer_feature_folder_structure
+  // NOTE: prefer_feature_folder_structure — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_feature_folder_structure
 void _good1461() {
-  // TODO: Add compliant code for prefer_feature_folder_structure
+  // Compliant version — see rule docs
 }

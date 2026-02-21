@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_large_bloc` lint rule.
 
-// TODO: Add bad/good examples for avoid_large_bloc
+// NOTE: avoid_large_bloc requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

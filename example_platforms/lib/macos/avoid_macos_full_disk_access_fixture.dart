@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_macos_full_disk_access
 // expect_lint: avoid_macos_full_disk_access
 void _bad932() {
-  // TODO: Add code that triggers avoid_macos_full_disk_access
+  // NOTE: avoid_macos_full_disk_access — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_macos_full_disk_access
 void _good932() {
-  // TODO: Add compliant code for avoid_macos_full_disk_access
+  // Compliant version — see rule docs
 }

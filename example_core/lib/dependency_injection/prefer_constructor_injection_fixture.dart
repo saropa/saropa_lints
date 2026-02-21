@@ -2,5 +2,18 @@
 
 /// Fixture for `prefer_constructor_injection` lint rule.
 
-// TODO: Add bad/good examples for prefer_constructor_injection
+class MyService {}
+
+// BAD: Should trigger prefer_constructor_injection
+class _BadDI3 {
+  // expect_lint: prefer_constructor_injection
+  late MyService _service; // late field — use constructor injection
+}
+
+// GOOD: Should NOT trigger prefer_constructor_injection
+class _GoodDI3 {
+  final MyService _service;
+  _GoodDI3(this._service); // injected via constructor
+}
+
 void main() {}

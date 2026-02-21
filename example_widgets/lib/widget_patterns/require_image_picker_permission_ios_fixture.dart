@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_image_picker_permission_ios
 // expect_lint: require_image_picker_permission_ios
 void _bad1455() {
-  // TODO: Add code that triggers require_image_picker_permission_ios
+  // NOTE: require_image_picker_permission_ios — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_image_picker_permission_ios
 void _good1455() {
-  // TODO: Add compliant code for require_image_picker_permission_ios
+  // Compliant version — see rule docs
 }

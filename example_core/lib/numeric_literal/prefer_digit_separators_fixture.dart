@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_digit_separators
 // expect_lint: prefer_digit_separators
 void _bad546() {
-  // TODO: Add code that triggers prefer_digit_separators
+  final x = 10000; // Large number should use separators
 }
 
 // GOOD: Should NOT trigger prefer_digit_separators
 void _good546() {
-  // TODO: Add compliant code for prefer_digit_separators
+  final x = 10_000; // Separator improves readability
 }

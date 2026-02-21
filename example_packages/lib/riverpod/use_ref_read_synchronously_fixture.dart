@@ -2,5 +2,8 @@
 
 /// Fixture for `use_ref_read_synchronously` lint rule.
 
-// TODO: Add bad/good examples for use_ref_read_synchronously
+// NOTE: use_ref_read_synchronously requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

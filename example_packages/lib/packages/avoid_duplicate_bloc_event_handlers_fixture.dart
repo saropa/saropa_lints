@@ -107,9 +107,9 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_duplicate_bloc_event_handlers
 // expect_lint: avoid_duplicate_bloc_event_handlers
-// TODO: Add class that triggers avoid_duplicate_bloc_event_handlers
+// NOTE: avoid_duplicate_bloc_event_handlers — see rule docs
 class _BadClass564 {}
 
 // GOOD: Should NOT trigger avoid_duplicate_bloc_event_handlers
-// TODO: Add compliant class for avoid_duplicate_bloc_event_handlers
+// NOTE: avoid_duplicate_bloc_event_handlers — see rule docs
 class _GoodClass564 {}

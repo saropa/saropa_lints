@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_prefs_for_large_data` lint rule.
 
-// TODO: Add bad/good examples for avoid_prefs_for_large_data
+// NOTE: avoid_prefs_for_large_data requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

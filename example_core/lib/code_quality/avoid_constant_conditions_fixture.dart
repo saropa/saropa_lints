@@ -118,5 +118,6 @@ void _bad174() {
 
 // GOOD: Should NOT trigger avoid_constant_conditions
 void _good174() {
-  // TODO: Add compliant code for avoid_constant_conditions
+  if (a > b) {} // Dynamic comparison using variables
+  final result = a + b; // Dynamic expression
 }

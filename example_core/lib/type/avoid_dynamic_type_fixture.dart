@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_dynamic_type
 // expect_lint: avoid_dynamic_type
-void _bad1223() {
-  // TODO: Add code that triggers avoid_dynamic_type
-}
+void _bad1223(dynamic value) {} // dynamic type — avoid
 
 // GOOD: Should NOT trigger avoid_dynamic_type
-void _good1223() {
-  // TODO: Add compliant code for avoid_dynamic_type
-}
+void _good1223(Object? value) {} // Use Object? instead of dynamic

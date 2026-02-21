@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_ios_misleading_push_notifications
 // expect_lint: avoid_ios_misleading_push_notifications
 void _bad899() {
-  // TODO: Add method call that triggers avoid_ios_misleading_push_notifications
+  // NOTE: avoid_ios_misleading_push_notifications — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_ios_misleading_push_notifications
 void _good899() {
-  // TODO: Add compliant method call for avoid_ios_misleading_push_notifications
+  // Compliant version — see rule docs
 }

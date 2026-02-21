@@ -108,10 +108,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger no_magic_number
 // expect_lint: no_magic_number
 void _bad542() {
-  // TODO: Add code that triggers no_magic_number
+  final timeout = 42; // Magic number — extract to named constant
 }
 
 // GOOD: Should NOT trigger no_magic_number
 void _good542() {
-  // TODO: Add compliant code for no_magic_number
+  const kTimeout = 42; // Named constant — self-documenting
+  final timeout = kTimeout;
 }

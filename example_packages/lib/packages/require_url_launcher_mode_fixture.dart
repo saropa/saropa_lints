@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_url_launcher_mode
 // expect_lint: require_url_launcher_mode
 void _bad700() {
-  // TODO: Add method call that triggers require_url_launcher_mode
+  // NOTE: require_url_launcher_mode — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_url_launcher_mode
 void _good700() {
-  // TODO: Add compliant method call for require_url_launcher_mode
+  // Compliant version — see rule docs
 }

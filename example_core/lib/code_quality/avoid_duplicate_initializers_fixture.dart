@@ -119,6 +119,10 @@ class _bad185_Foo {
 }
 
 // GOOD: Should NOT trigger avoid_duplicate_initializers
-void _good185() {
-  // TODO: Add compliant code for avoid_duplicate_initializers
+class _good185_Bar {
+  final int a;
+  final int b;
+  _good185_Bar()
+      : a = 1,
+        b = 2; // Different initializers for each field
 }

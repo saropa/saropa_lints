@@ -107,11 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_negations_in_equality_checks
 // expect_lint: avoid_negations_in_equality_checks
-void _bad346() {
-  // TODO: Add code that triggers avoid_negations_in_equality_checks
+void _bad346(int a, int b) {
+  if (!(a == b)) {} // Double negation — use != directly
 }
 
 // GOOD: Should NOT trigger avoid_negations_in_equality_checks
-void _good346() {
-  // TODO: Add compliant code for avoid_negations_in_equality_checks
+void _good346(int a, int b) {
+  if (a != b) {} // Direct inequality check
 }

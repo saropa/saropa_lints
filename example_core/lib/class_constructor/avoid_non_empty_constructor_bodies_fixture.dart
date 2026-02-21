@@ -106,12 +106,16 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_non_empty_constructor_bodies
-// expect_lint: avoid_non_empty_constructor_bodies
-void _bad139() {
-  // TODO: Add code that triggers avoid_non_empty_constructor_bodies
+class _BadClass139 {
+  int value = 0;
+  // expect_lint: avoid_non_empty_constructor_bodies
+  _BadClass139(int v) {
+    value = v; // Logic in constructor body
+  }
 }
 
 // GOOD: Should NOT trigger avoid_non_empty_constructor_bodies
-void _good139() {
-  // TODO: Add compliant code for avoid_non_empty_constructor_bodies
+class _GoodClass139 {
+  final int value;
+  _GoodClass139(int v) : value = v; // Initializer list — no body
 }

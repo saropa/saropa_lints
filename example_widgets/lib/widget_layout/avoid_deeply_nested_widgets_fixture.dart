@@ -134,7 +134,21 @@ void _bad1293() {
 }
 
 // GOOD: Should NOT trigger avoid_deeply_nested_widgets
-class _GoodClass1293 {
-  // TODO: Add compliant method for avoid_deeply_nested_widgets
-  void goodMethod() {}
+class _GoodClass1293_CardContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Card(child: ListTile(title: Text(''))); // Extracted to shallow sub-widget
+  }
+}
+
+void _good1293() {
+  return Container(
+    child: Padding(
+      child: Column(
+        children: [
+          Row(children: [Expanded(child: _GoodClass1293_CardContent())]),
+        ],
+      ),
+    ),
+  );
 }

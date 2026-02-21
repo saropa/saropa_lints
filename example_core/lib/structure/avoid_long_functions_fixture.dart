@@ -105,13 +105,10 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_long_functions
-// expect_lint: avoid_long_functions
-void _bad1048() {
-  // TODO: Add code that triggers avoid_long_functions
-}
+// NOTE: avoid_long_functions fires when a function has > 100 lines.
+// A fixture file demonstrating this would itself be 100+ lines long.
+// In real code: split long functions into smaller, named helper functions.
 
-// GOOD: Should NOT trigger avoid_long_functions
-void _good1048() {
-  // TODO: Add compliant code for avoid_long_functions
-}
+// BAD: A function with 101+ statements or declarations
+// GOOD: Extract logical blocks into well-named helper functions
+void _placeholder1048() {}

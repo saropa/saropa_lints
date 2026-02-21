@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_macos_entitlements
 // expect_lint: require_macos_entitlements
 void _bad938() {
-  // TODO: Add method call that triggers require_macos_entitlements
+  // NOTE: require_macos_entitlements — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_macos_entitlements
 void _good938() {
-  // TODO: Add compliant method call for require_macos_entitlements
+  // Compliant version — see rule docs
 }

@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_explicit_parameter_names
 // expect_lint: prefer_explicit_parameter_names
-void _bad492() {
-  // TODO: Add code that triggers prefer_explicit_parameter_names
-}
+void _bad492(String s, int n) {} // Single-char param names are not explicit
 
 // GOOD: Should NOT trigger prefer_explicit_parameter_names
-void _good492() {
-  // TODO: Add compliant code for prefer_explicit_parameter_names
-}
+void _good492(String name, int count) {} // Descriptive parameter names

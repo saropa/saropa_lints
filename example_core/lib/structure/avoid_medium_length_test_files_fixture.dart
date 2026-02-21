@@ -105,13 +105,7 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_medium_length_test_files
-// expect_lint: avoid_medium_length_test_files
-void _bad1045() {
-  // TODO: Add code that triggers avoid_medium_length_test_files
-}
-
-// GOOD: Should NOT trigger avoid_medium_length_test_files
-void _good1045() {
-  // TODO: Add compliant code for avoid_medium_length_test_files
-}
+// NOTE: avoid_medium_length_test_files fires on test files exceeding 600 lines.
+// This lib/ fixture cannot demonstrate it (test files only, and too short).
+// In real test code: keep test files under 600 lines for maintainability.
+void _placeholder1045() {}

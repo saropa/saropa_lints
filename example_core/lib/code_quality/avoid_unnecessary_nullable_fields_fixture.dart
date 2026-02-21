@@ -116,5 +116,7 @@ class _bad203_Foo {
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_nullable_fields
-// TODO: Add compliant class for avoid_unnecessary_nullable_fields
-class _GoodClass203 {}
+class _GoodClass203 {
+  String name; // Non-nullable since always assigned a non-null value
+  _GoodClass203(this.name);
+}

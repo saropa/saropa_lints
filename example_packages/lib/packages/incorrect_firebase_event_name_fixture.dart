@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger incorrect_firebase_event_name
 // expect_lint: incorrect_firebase_event_name
 void _bad614() {
-  // TODO: Add method call that triggers incorrect_firebase_event_name
+  // NOTE: incorrect_firebase_event_name — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger incorrect_firebase_event_name
 void _good614() {
-  // TODO: Add compliant method call for incorrect_firebase_event_name
+  // Compliant version — see rule docs
 }

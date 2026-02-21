@@ -2,5 +2,18 @@
 
 /// Fixture for `prefer_abstraction_injection` lint rule.
 
-// TODO: Add bad/good examples for prefer_abstraction_injection
+class _HttpClientImpl {} // concrete type
+abstract class ApiClient {} // abstract interface
+
+// BAD: Should trigger prefer_abstraction_injection
+class _BadDI {
+  // expect_lint: prefer_abstraction_injection
+  _BadDI(_HttpClientImpl client); // Impl suffix — concrete type injected
+}
+
+// GOOD: Should NOT trigger prefer_abstraction_injection
+class _GoodDI {
+  _GoodDI(ApiClient client); // Abstract interface — testable
+}
+
 void main() {}

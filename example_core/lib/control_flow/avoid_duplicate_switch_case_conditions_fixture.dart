@@ -122,5 +122,12 @@ void _bad279() {
 
 // GOOD: Should NOT trigger avoid_duplicate_switch_case_conditions
 void _good279() {
-  // TODO: Add compliant code for avoid_duplicate_switch_case_conditions
+  switch (value) {
+    case 1:
+      doSomething();
+      break;
+    case 2: // Distinct case value
+      doSomethingElse();
+      break;
+  }
 }

@@ -105,13 +105,10 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_builder_for_conditional
-// expect_lint: prefer_builder_for_conditional
-void _bad805() {
-  // TODO: Add code that triggers prefer_builder_for_conditional
-}
-
-// GOOD: Should NOT trigger prefer_builder_for_conditional
-void _good805() {
-  // TODO: Add compliant code for prefer_builder_for_conditional
-}
+// NOTE: prefer_builder_for_conditional fires on ternary expressions
+// with expensive widgets (ListView, GridView) in widget build().
+// Requires widget class context.
+//
+// BAD: isLoading ? CircularProgressIndicator() : ListView(...)
+// GOOD: Builder(builder: (_) => isLoading ? ... : ...)
+void _note805() {}

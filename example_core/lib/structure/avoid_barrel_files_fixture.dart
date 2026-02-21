@@ -105,13 +105,10 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_barrel_files
-// expect_lint: avoid_barrel_files
-void _bad1034() {
-  // TODO: Add code that triggers avoid_barrel_files
-}
+// NOTE: avoid_barrel_files fires when a file has only exports and no declarations.
+// A barrel file like: export 'a.dart'; export 'b.dart';
+// This fixture cannot demonstrate it (it has declarations by design).
 
-// GOOD: Should NOT trigger avoid_barrel_files
-void _good1034() {
-  // TODO: Add compliant code for avoid_barrel_files
-}
+// BAD: A file containing only: export 'models.dart'; export 'utils.dart';
+// GOOD: Add a meaningful declaration, or keep exports in a named barrel file
+void _placeholder1034() {}

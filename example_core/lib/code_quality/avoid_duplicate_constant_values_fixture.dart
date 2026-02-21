@@ -116,5 +116,6 @@ void _bad184() {
 
 // GOOD: Should NOT trigger avoid_duplicate_constant_values
 void _good184() {
-  // TODO: Add compliant code for avoid_duplicate_constant_values
+  const errorMessage = 'Error occurred';
+  const successMessage = 'Operation succeeded'; // Different values
 }

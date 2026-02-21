@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_url_launcher_fallback` lint rule.
 
-// TODO: Add bad/good examples for prefer_url_launcher_fallback
+// NOTE: prefer_url_launcher_fallback requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

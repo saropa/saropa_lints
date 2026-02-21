@@ -107,9 +107,14 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_blank_line_before_method
 // expect_lint: prefer_blank_line_before_method
-// TODO: Add class that triggers prefer_blank_line_before_method
-class _BadClass385 {}
+class _BadClass385 {
+  void foo() {}
+  void bar() {} // No blank line before this method
+}
 
 // GOOD: Should NOT trigger prefer_blank_line_before_method
-// TODO: Add compliant class for prefer_blank_line_before_method
-class _GoodClass385 {}
+class _GoodClass385 {
+  void foo() {}
+
+  void bar() {} // Blank line before method
+}

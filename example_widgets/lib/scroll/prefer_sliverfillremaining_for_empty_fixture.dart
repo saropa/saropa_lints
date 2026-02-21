@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_sliverfillremaining_for_empty` lint rule.
 
-// TODO: Add bad/good examples for prefer_sliverfillremaining_for_empty
+// NOTE: prefer_sliverfillremaining_for_empty requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

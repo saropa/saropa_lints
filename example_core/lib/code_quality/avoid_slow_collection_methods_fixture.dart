@@ -116,5 +116,5 @@ void _bad199() {
 
 // GOOD: Should NOT trigger avoid_slow_collection_methods
 void _good199() {
-  // TODO: Add compliant code for avoid_slow_collection_methods
+  List<int> getItems() => [1, 2]; // Return a list directly instead of a sync* generator
 }

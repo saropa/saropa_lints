@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_enum_values_by_index
 // expect_lint: avoid_enum_values_by_index
 void _bad149() {
-  // TODO: Add code that triggers avoid_enum_values_by_index
+  final s = Status.values[0]; // Index-based — fragile when enum reorders
 }
 
 // GOOD: Should NOT trigger avoid_enum_values_by_index
 void _good149() {
-  // TODO: Add compliant code for avoid_enum_values_by_index
+  final s = Status.active; // Named access — safe to reorder enum
 }

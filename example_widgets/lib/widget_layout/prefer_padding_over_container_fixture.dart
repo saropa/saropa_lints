@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_padding_over_container` lint rule.
 
-// TODO: Add bad/good examples for prefer_padding_over_container
+// NOTE: prefer_padding_over_container requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

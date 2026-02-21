@@ -107,11 +107,9 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unknown_pragma
 // expect_lint: avoid_unknown_pragma
-void _bad160() {
-  // TODO: Add code that triggers avoid_unknown_pragma
-}
+@pragma('vm:unknown-hint') // Unrecognized — silently ignored by compiler
+void _bad160() {}
 
 // GOOD: Should NOT trigger avoid_unknown_pragma
-void _good160() {
-  // TODO: Add compliant code for avoid_unknown_pragma
-}
+@pragma('vm:prefer-inline') // Known pragma — valid optimization hint
+void _good160() {}

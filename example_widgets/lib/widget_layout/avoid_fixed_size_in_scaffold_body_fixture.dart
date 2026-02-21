@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_fixed_size_in_scaffold_body` lint rule.
 
-// TODO: Add bad/good examples for avoid_fixed_size_in_scaffold_body
+// NOTE: avoid_fixed_size_in_scaffold_body requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

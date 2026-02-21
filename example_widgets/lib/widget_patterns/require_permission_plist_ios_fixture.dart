@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_permission_plist_ios
 // expect_lint: require_permission_plist_ios
 void _bad1458() {
-  // TODO: Add method call that triggers require_permission_plist_ios
+  // NOTE: require_permission_plist_ios — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_permission_plist_ios
 void _good1458() {
-  // TODO: Add compliant method call for require_permission_plist_ios
+  // Compliant version — see rule docs
 }

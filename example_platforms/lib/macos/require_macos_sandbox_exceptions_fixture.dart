@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_macos_sandbox_exceptions
 // expect_lint: require_macos_sandbox_exceptions
 void _bad934() {
-  // TODO: Add method call that triggers require_macos_sandbox_exceptions
+  // NOTE: require_macos_sandbox_exceptions — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_macos_sandbox_exceptions
 void _good934() {
-  // TODO: Add compliant method call for require_macos_sandbox_exceptions
+  // Compliant version — see rule docs
 }

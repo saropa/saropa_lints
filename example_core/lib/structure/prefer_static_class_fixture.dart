@@ -107,9 +107,13 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_static_class
 // expect_lint: prefer_static_class
-// TODO: Add class that triggers prefer_static_class
-class _BadClass1057 {}
+class _BadUtils1057 {
+  static const int kMax = 100;
+  static void doThing() {} // Only static members — use abstract final class
+}
 
 // GOOD: Should NOT trigger prefer_static_class
-// TODO: Add compliant class for prefer_static_class
-class _GoodClass1057 {}
+abstract final class _GoodUtils1057 {
+  static const int kMax = 100;
+  static void doThing() {} // abstract final prevents instantiation
+}

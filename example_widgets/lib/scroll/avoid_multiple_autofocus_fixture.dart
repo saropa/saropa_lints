@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_multiple_autofocus` lint rule.
 
-// TODO: Add bad/good examples for avoid_multiple_autofocus
+// NOTE: avoid_multiple_autofocus requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

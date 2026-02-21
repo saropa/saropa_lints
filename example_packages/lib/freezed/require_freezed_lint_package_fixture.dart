@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_freezed_lint_package
 // expect_lint: require_freezed_lint_package
 void _bad416() {
-  // TODO: Add code that triggers require_freezed_lint_package
+  // NOTE: require_freezed_lint_package — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_freezed_lint_package
 void _good416() {
-  // TODO: Add compliant code for require_freezed_lint_package
+  // Compliant version — see rule docs
 }

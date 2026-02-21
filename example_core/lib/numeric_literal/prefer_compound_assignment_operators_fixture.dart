@@ -107,11 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_compound_assignment_operators
 // expect_lint: prefer_compound_assignment_operators
-void _bad545() {
-  // TODO: Add code that triggers prefer_compound_assignment_operators
+void _bad545(int flags) {
+  flags = flags & 0xFF; // Use &= instead
 }
 
 // GOOD: Should NOT trigger prefer_compound_assignment_operators
-void _good545() {
-  // TODO: Add compliant code for prefer_compound_assignment_operators
+void _good545(int flags) {
+  flags &= 0xFF; // Compound bitwise assignment
 }

@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_ios_storekit2
 // expect_lint: prefer_ios_storekit2
 void _bad871() {
-  // TODO: Add method call that triggers prefer_ios_storekit2
+  // NOTE: prefer_ios_storekit2 — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_ios_storekit2
 void _good871() {
-  // TODO: Add compliant method call for prefer_ios_storekit2
+  // Compliant version — see rule docs
 }

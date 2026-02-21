@@ -108,12 +108,16 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_correct_setter_parameter_name
 // expect_lint: prefer_correct_setter_parameter_name
 class _BadClass491 {
-  // TODO: Add method declaration that triggers prefer_correct_setter_parameter_name
-  void badMethod() {}
+  String _name = '';
+  set name(String n) { // Parameter name 'n' should be 'value'
+    _name = n;
+  }
 }
 
 // GOOD: Should NOT trigger prefer_correct_setter_parameter_name
 class _GoodClass491 {
-  // TODO: Add compliant method for prefer_correct_setter_parameter_name
-  void goodMethod() {}
+  String _name = '';
+  set name(String value) { // Conventional parameter name 'value'
+    _name = value;
+  }
 }

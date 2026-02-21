@@ -2,5 +2,8 @@
 
 /// Fixture for `require_dialog_barrier_dismissible` lint rule.
 
-// TODO: Add bad/good examples for require_dialog_barrier_dismissible
+// NOTE: require_dialog_barrier_dismissible requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

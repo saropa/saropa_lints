@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_context_read_in_callbacks` lint rule.
 
-// TODO: Add bad/good examples for prefer_context_read_in_callbacks
+// NOTE: prefer_context_read_in_callbacks requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

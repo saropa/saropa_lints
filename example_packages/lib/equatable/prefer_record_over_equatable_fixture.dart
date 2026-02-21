@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_record_over_equatable` lint rule.
 
-// TODO: Add bad/good examples for prefer_record_over_equatable
+// NOTE: prefer_record_over_equatable requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

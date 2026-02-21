@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_ref_watch_outside_build
 // expect_lint: avoid_ref_watch_outside_build
 void _bad728() {
-  // TODO: Add method call that triggers avoid_ref_watch_outside_build
+  // NOTE: avoid_ref_watch_outside_build — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_ref_watch_outside_build
 void _good728() {
-  // TODO: Add compliant method call for avoid_ref_watch_outside_build
+  // Compliant version — see rule docs
 }

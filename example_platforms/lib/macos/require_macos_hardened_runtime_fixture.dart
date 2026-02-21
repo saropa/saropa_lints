@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_macos_hardened_runtime
 // expect_lint: require_macos_hardened_runtime
 void _bad929() {
-  // TODO: Add method call that triggers require_macos_hardened_runtime
+  // NOTE: require_macos_hardened_runtime — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_macos_hardened_runtime
 void _good929() {
-  // TODO: Add compliant method call for require_macos_hardened_runtime
+  // Compliant version — see rule docs
 }

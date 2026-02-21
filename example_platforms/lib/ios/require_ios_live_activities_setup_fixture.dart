@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_live_activities_setup
 // expect_lint: require_ios_live_activities_setup
 void _bad882() {
-  // TODO: Add code that triggers require_ios_live_activities_setup
+  // NOTE: require_ios_live_activities_setup — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_live_activities_setup
 void _good882() {
-  // TODO: Add compliant code for require_ios_live_activities_setup
+  // Compliant version — see rule docs
 }

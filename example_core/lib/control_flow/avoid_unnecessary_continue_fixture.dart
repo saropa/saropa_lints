@@ -107,11 +107,16 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unnecessary_continue
 // expect_lint: avoid_unnecessary_continue
-void _bad290() {
-  // TODO: Add code that triggers avoid_unnecessary_continue
+void _bad290(List<int> items) {
+  for (final item in items) {
+    print(item);
+    continue; // Redundant — already at end of loop body
+  }
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_continue
-void _good290() {
-  // TODO: Add compliant code for avoid_unnecessary_continue
+void _good290(List<int> items) {
+  for (final item in items) {
+    print(item); // No unnecessary continue
+  }
 }

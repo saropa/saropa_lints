@@ -2,5 +2,8 @@
 
 /// Fixture for `require_hive_initialization` lint rule.
 
-// TODO: Add bad/good examples for require_hive_initialization
+// NOTE: require_hive_initialization requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

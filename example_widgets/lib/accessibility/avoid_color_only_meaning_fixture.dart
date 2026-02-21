@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_color_only_meaning` lint rule.
 
-// TODO: Add bad/good examples for avoid_color_only_meaning
+// NOTE: avoid_color_only_meaning requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

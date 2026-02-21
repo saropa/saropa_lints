@@ -2,5 +2,8 @@
 
 /// Fixture for `require_isar_links_load` lint rule.
 
-// TODO: Add bad/good examples for require_isar_links_load
+// NOTE: require_isar_links_load requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

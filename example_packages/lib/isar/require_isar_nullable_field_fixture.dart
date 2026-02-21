@@ -2,5 +2,8 @@
 
 /// Fixture for `require_isar_nullable_field` lint rule.
 
-// TODO: Add bad/good examples for require_isar_nullable_field
+// NOTE: require_isar_nullable_field requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

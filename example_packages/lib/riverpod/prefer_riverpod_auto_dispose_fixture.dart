@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_riverpod_auto_dispose` lint rule.
 
-// TODO: Add bad/good examples for prefer_riverpod_auto_dispose
+// NOTE: prefer_riverpod_auto_dispose requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

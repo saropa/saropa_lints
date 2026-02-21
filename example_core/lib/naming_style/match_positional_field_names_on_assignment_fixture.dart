@@ -108,10 +108,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger match_positional_field_names_on_assignment
 // expect_lint: match_positional_field_names_on_assignment
 void _bad483() {
-  // TODO: Add code that triggers match_positional_field_names_on_assignment
+  final record = (x: 1, y: 2);
+  var (x: a, y: b) = record; // Field names 'x','y' don't match vars 'a','b'
 }
 
 // GOOD: Should NOT trigger match_positional_field_names_on_assignment
 void _good483() {
-  // TODO: Add compliant code for match_positional_field_names_on_assignment
+  final record = (x: 1, y: 2);
+  var (:x, :y) = record; // Shorthand — field names match variable names
 }

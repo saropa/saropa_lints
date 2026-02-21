@@ -2,5 +2,8 @@
 
 /// Fixture for `require_workmanager_result_return` lint rule.
 
-// TODO: Add bad/good examples for require_workmanager_result_return
+// NOTE: require_workmanager_result_return requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

@@ -2,5 +2,8 @@
 
 /// Fixture for `require_isar_close_on_dispose` lint rule.
 
-// TODO: Add bad/good examples for require_isar_close_on_dispose
+// NOTE: require_isar_close_on_dispose requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

@@ -115,5 +115,5 @@ void _bad210() {
 
 // GOOD: Should NOT trigger prefer_shorthands_with_enums
 void _good210() {
-  // TODO: Add compliant method call for prefer_shorthands_with_enums
+  final status = Status.active; // Use shorthand directly
 }

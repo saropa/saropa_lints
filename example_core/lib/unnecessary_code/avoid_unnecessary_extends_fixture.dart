@@ -107,9 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unnecessary_extends
 // expect_lint: avoid_unnecessary_extends
-// TODO: Add class that triggers avoid_unnecessary_extends
-class _BadClass1275 {}
+class _BadClass1275 extends Object {} // All classes extend Object implicitly
 
 // GOOD: Should NOT trigger avoid_unnecessary_extends
-// TODO: Add compliant class for avoid_unnecessary_extends
-class _GoodClass1275 {}
+class _GoodClass1275 {} // No explicit extends Object needed

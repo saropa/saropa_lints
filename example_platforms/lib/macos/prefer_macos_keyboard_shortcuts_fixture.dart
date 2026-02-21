@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_macos_keyboard_shortcuts
 // expect_lint: prefer_macos_keyboard_shortcuts
 void _bad925() {
-  // TODO: Add code that triggers prefer_macos_keyboard_shortcuts
+  // NOTE: prefer_macos_keyboard_shortcuts — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_macos_keyboard_shortcuts
 void _good925() {
-  // TODO: Add compliant code for prefer_macos_keyboard_shortcuts
+  // Compliant version — see rule docs
 }

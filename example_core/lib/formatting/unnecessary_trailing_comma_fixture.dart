@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger unnecessary_trailing_comma
 // expect_lint: unnecessary_trailing_comma
 void _bad387() {
-  // TODO: Add code that triggers unnecessary_trailing_comma
+  final list = ['single item',]; // Single-element list with unnecessary trailing comma
 }
 
 // GOOD: Should NOT trigger unnecessary_trailing_comma
 void _good387() {
-  // TODO: Add compliant code for unnecessary_trailing_comma
+  final list = ['single item']; // No trailing comma for single element
 }

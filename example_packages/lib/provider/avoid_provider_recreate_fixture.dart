@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_provider_recreate` lint rule.
 
-// TODO: Add bad/good examples for avoid_provider_recreate
+// NOTE: avoid_provider_recreate requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

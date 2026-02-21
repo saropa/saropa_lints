@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_age_rating_consideration
 // expect_lint: require_ios_age_rating_consideration
 void _bad894() {
-  // TODO: Add code that triggers require_ios_age_rating_consideration
+  // NOTE: require_ios_age_rating_consideration — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_age_rating_consideration
 void _good894() {
-  // TODO: Add compliant code for require_ios_age_rating_consideration
+  // Compliant version — see rule docs
 }

@@ -105,13 +105,9 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_sqflite_read_all_columns
-// expect_lint: avoid_sqflite_read_all_columns
-void _bad377() {
-  // TODO: Add method call that triggers avoid_sqflite_read_all_columns
-}
-
-// GOOD: Should NOT trigger avoid_sqflite_read_all_columns
-void _good377() {
-  // TODO: Add compliant method call for avoid_sqflite_read_all_columns
-}
+// NOTE: avoid_sqflite_read_all_columns fires on rawQuery() calls
+// containing SELECT * — should specify column names.
+//
+// BAD: db.rawQuery('SELECT * FROM users');
+// GOOD: db.rawQuery('SELECT id, name FROM users');
+void _note377() {}

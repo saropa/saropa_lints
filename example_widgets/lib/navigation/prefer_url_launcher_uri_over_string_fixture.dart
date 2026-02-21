@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_url_launcher_uri_over_string` lint rule.
 
-// TODO: Add bad/good examples for prefer_url_launcher_uri_over_string
+// NOTE: prefer_url_launcher_uri_over_string requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

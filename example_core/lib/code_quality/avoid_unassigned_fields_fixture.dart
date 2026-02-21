@@ -117,5 +117,7 @@ class _bad200_Foo {
 }
 
 // GOOD: Should NOT trigger avoid_unassigned_fields
-// TODO: Add compliant class for avoid_unassigned_fields
-class _GoodClass200 {}
+class _GoodClass200 {
+  String? name;
+  _GoodClass200(this.name); // Field assigned via constructor
+}

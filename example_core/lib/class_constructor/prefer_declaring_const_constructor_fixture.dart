@@ -106,10 +106,14 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_declaring_const_constructor
-// expect_lint: prefer_declaring_const_constructor
-// TODO: Add class that triggers prefer_declaring_const_constructor
-class _BadClass141 {}
+class _BadClass141 {
+  final int x;
+  // expect_lint: prefer_declaring_const_constructor
+  _BadClass141(this.x); // Missing const — class could be const
+}
 
 // GOOD: Should NOT trigger prefer_declaring_const_constructor
-// TODO: Add compliant class for prefer_declaring_const_constructor
-class _GoodClass141 {}
+class _GoodClass141 {
+  final int x;
+  const _GoodClass141(this.x); // Correctly declared const
+}

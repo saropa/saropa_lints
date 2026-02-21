@@ -107,11 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unnecessary_call
 // expect_lint: avoid_unnecessary_call
-void _bad1271() {
-  // TODO: Add method call that triggers avoid_unnecessary_call
+void _bad1271(void Function() fn) {
+  fn.call(); // .call() is redundant
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_call
-void _good1271() {
-  // TODO: Add compliant method call for avoid_unnecessary_call
+void _good1271(void Function() fn) {
+  fn(); // Direct invocation
 }

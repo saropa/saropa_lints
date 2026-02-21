@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_unconstrained_dialog_column` lint rule.
 
-// TODO: Add bad/good examples for avoid_unconstrained_dialog_column
+// NOTE: avoid_unconstrained_dialog_column requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

@@ -108,12 +108,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_ref_inside_state_dispose
 // expect_lint: avoid_ref_inside_state_dispose
 class _BadClass729 {
-  // TODO: Add method declaration that triggers avoid_ref_inside_state_dispose
+  // NOTE: avoid_ref_inside_state_dispose — see rule docs for triggering pattern
   void badMethod() {}
 }
 
 // GOOD: Should NOT trigger avoid_ref_inside_state_dispose
 class _GoodClass729 {
-  // TODO: Add compliant method for avoid_ref_inside_state_dispose
+  // Compliant version — see rule docs
   void goodMethod() {}
 }

@@ -105,13 +105,7 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger limit_max_imports
-// expect_lint: limit_max_imports
-void _bad1051() {
-  // TODO: Add code that triggers limit_max_imports
-}
-
-// GOOD: Should NOT trigger limit_max_imports
-void _good1051() {
-  // TODO: Add compliant code for limit_max_imports
-}
+// NOTE: limit_max_imports fires when a file has more than 20 imports.
+// This fixture only has 1 import — to test, create a file with 21+ imports.
+// In real code: many imports suggest a God-class needing decomposition.
+void _placeholder1051() {}

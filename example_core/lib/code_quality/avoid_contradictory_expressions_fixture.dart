@@ -116,5 +116,8 @@ void _bad175() {
 
 // GOOD: Should NOT trigger avoid_contradictory_expressions
 void _good175() {
-  // TODO: Add compliant code for avoid_contradictory_expressions
+  if (x > 3 && x < 10) {} // Non-contradictory range check
+  if (x != null) {
+    print(x.toString()); // Safe use of x after null guard
+  }
 }

@@ -105,13 +105,10 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_named_imports
-// expect_lint: prefer_named_imports
-void _bad1055() {
-  // TODO: Add code that triggers prefer_named_imports
-}
+// NOTE: prefer_named_imports fires on package: imports without show/hide/prefix.
+// This fixture's own import would trigger it — not demonstrable in stub body.
 
-// GOOD: Should NOT trigger prefer_named_imports
-void _good1055() {
-  // TODO: Add compliant code for prefer_named_imports
-}
+// BAD: import 'package:some_lib/lib.dart';
+// GOOD: import 'package:some_lib/lib.dart' show MyClass;
+//   OR: import 'package:some_lib/lib.dart' as lib;
+void _placeholder1055() {}

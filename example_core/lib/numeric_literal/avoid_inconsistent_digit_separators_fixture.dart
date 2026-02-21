@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_inconsistent_digit_separators
 // expect_lint: avoid_inconsistent_digit_separators
 void _bad539() {
-  // TODO: Add code that triggers avoid_inconsistent_digit_separators
+  final x = 1_00_0; // Inconsistent groups (2, 1) — should be 3s
 }
 
 // GOOD: Should NOT trigger avoid_inconsistent_digit_separators
 void _good539() {
-  // TODO: Add compliant code for avoid_inconsistent_digit_separators
+  final x = 1_000_000; // Consistent groups of 3
 }

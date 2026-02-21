@@ -116,5 +116,7 @@ void _bad188_foo() {
 
 // GOOD: Should NOT trigger avoid_unused_assignment
 void _good188() {
-  // TODO: Add compliant code for avoid_unused_assignment
+  var x = 1;
+  x = 2;
+  print(x); // x is read after the reassignment
 }

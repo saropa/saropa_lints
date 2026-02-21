@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_isar_transaction_nesting` lint rule.
 
-// TODO: Add bad/good examples for avoid_isar_transaction_nesting
+// NOTE: avoid_isar_transaction_nesting requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

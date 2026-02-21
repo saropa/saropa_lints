@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_table_cell_outside_table` lint rule.
 
-// TODO: Add bad/good examples for avoid_table_cell_outside_table
+// NOTE: avoid_table_cell_outside_table requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

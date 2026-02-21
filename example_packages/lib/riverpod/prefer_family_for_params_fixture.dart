@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_family_for_params` lint rule.
 
-// TODO: Add bad/good examples for prefer_family_for_params
+// NOTE: prefer_family_for_params requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

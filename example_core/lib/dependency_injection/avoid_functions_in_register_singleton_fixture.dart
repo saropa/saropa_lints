@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_functions_in_register_singleton
 // expect_lint: avoid_functions_in_register_singleton
 void _bad319() {
-  // TODO: Add method call that triggers avoid_functions_in_register_singleton
+  GetIt.I.registerSingleton(() => MyService()); // lambda — use instance
 }
 
 // GOOD: Should NOT trigger avoid_functions_in_register_singleton
 void _good319() {
-  // TODO: Add compliant method call for avoid_functions_in_register_singleton
+  GetIt.I.registerSingleton(MyService()); // direct instance — correct
 }

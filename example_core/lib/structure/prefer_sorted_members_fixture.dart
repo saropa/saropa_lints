@@ -107,9 +107,13 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_sorted_members
 // expect_lint: prefer_sorted_members
-// TODO: Add class that triggers prefer_sorted_members
-class _BadClass1052 {}
+class _BadClass1052 {
+  void doWork() {} // Method before constructor — wrong order
+  _BadClass1052();
+}
 
 // GOOD: Should NOT trigger prefer_sorted_members
-// TODO: Add compliant class for prefer_sorted_members
-class _GoodClass1052 {}
+class _GoodClass1052 {
+  _GoodClass1052(); // Constructor before methods — correct order
+  void doWork() {}
+}

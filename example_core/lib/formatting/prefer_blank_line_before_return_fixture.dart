@@ -2,5 +2,16 @@
 
 /// Fixture for `prefer_blank_line_before_return` lint rule.
 
-// TODO: Add bad/good examples for prefer_blank_line_before_return
-void main() {}
+// BAD: Should trigger prefer_blank_line_before_return
+// expect_lint: prefer_blank_line_before_return
+int _bad() {
+  final x = 1;
+  return x; // No blank line before return
+}
+
+// GOOD: Should NOT trigger prefer_blank_line_before_return
+int _good() {
+  final x = 1;
+
+  return x; // Blank line before return
+}

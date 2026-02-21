@@ -107,11 +107,13 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_complex_conditions
 // expect_lint: avoid_complex_conditions
-void _bad260() {
-  // TODO: Add code that triggers avoid_complex_conditions
+void _bad260(bool a, bool b, bool c, bool d, bool e) {
+  if (a && b || c && d && e) {} // 4 logical operators — too complex
 }
 
 // GOOD: Should NOT trigger avoid_complex_conditions
-void _good260() {
-  // TODO: Add compliant code for avoid_complex_conditions
+void _good260(bool a, bool b, bool c, bool d, bool e) {
+  final primary = a && b;
+  final secondary = c && d && e; // Extract parts to named variables
+  if (primary || secondary) {}
 }

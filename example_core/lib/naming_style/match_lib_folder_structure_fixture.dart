@@ -105,13 +105,11 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger match_lib_folder_structure
-// expect_lint: match_lib_folder_structure
-void _bad482() {
-  // TODO: Add code that triggers match_lib_folder_structure
-}
+// NOTE: match_lib_folder_structure only fires on test files in /test/ paths.
+// Rule ensures test/src/utils/helper_test.dart mirrors lib/src/utils/helper.dart.
 
-// GOOD: Should NOT trigger match_lib_folder_structure
-void _good482() {
-  // TODO: Add compliant code for match_lib_folder_structure
-}
+// BAD example (in a test file):
+// lib/src/utils/helper.dart exists but test is at test/helper_test.dart
+
+// GOOD example (in a test file):
+// lib/src/utils/helper.dart → test/src/utils/helper_test.dart

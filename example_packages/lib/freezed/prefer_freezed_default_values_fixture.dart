@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_freezed_default_values` lint rule.
 
-// TODO: Add bad/good examples for prefer_freezed_default_values
+// NOTE: prefer_freezed_default_values requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

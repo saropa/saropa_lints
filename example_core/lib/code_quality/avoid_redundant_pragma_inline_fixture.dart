@@ -108,12 +108,13 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_redundant_pragma_inline
 // expect_lint: avoid_redundant_pragma_inline
 class _BadClass158 {
-  // TODO: Add method declaration that triggers avoid_redundant_pragma_inline
-  void badMethod() {}
+  int _value = 0;
+  @pragma('vm:prefer-inline')
+  int get value => _value; // Trivial getter — compiler inlines it automatically
 }
 
 // GOOD: Should NOT trigger avoid_redundant_pragma_inline
 class _GoodClass158 {
-  // TODO: Add compliant method for avoid_redundant_pragma_inline
-  void goodMethod() {}
+  int _value = 0;
+  int get value => _value; // No redundant pragma needed
 }

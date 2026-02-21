@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_bloc_listener_for_side_effects` lint rule.
 
-// TODO: Add bad/good examples for prefer_bloc_listener_for_side_effects
+// NOTE: prefer_bloc_listener_for_side_effects requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

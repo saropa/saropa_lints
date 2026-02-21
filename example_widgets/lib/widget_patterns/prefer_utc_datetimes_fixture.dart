@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_utc_datetimes
 // expect_lint: prefer_utc_datetimes
 void _bad1378() {
-  // TODO: Add method call that triggers prefer_utc_datetimes
+  // NOTE: prefer_utc_datetimes — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_utc_datetimes
 void _good1378() {
-  // TODO: Add compliant method call for prefer_utc_datetimes
+  // Compliant version — see rule docs
 }

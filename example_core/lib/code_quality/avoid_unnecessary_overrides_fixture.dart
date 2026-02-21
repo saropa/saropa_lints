@@ -113,6 +113,8 @@ void _bad186_dispose() {
 
 // GOOD: Should NOT trigger avoid_unnecessary_overrides
 class _GoodClass186 {
-  // TODO: Add compliant method for avoid_unnecessary_overrides
-  void goodMethod() {}
+  void dispose() {
+    _controller.close(); // Adds meaningful logic beyond just calling super
+    super.dispose();
+  }
 }

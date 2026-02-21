@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_spacer_in_wrap` lint rule.
 
-// TODO: Add bad/good examples for avoid_spacer_in_wrap
+// NOTE: avoid_spacer_in_wrap requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

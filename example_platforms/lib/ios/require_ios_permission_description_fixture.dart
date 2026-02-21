@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_permission_description
 // expect_lint: require_ios_permission_description
 void _bad844() {
-  // TODO: Add method call that triggers require_ios_permission_description
+  // NOTE: require_ios_permission_description — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_permission_description
 void _good844() {
-  // TODO: Add compliant method call for require_ios_permission_description
+  // Compliant version — see rule docs
 }

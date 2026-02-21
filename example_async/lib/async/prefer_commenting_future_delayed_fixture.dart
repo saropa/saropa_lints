@@ -106,12 +106,13 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_commenting_future_delayed
-// expect_lint: prefer_commenting_future_delayed
-void _bad95() {
-  // TODO: Add method call that triggers prefer_commenting_future_delayed
+Future<void> _bad95() async {
+  // expect_lint: prefer_commenting_future_delayed
+  await Future.delayed(Duration(seconds: 1)); // no explanation
 }
 
 // GOOD: Should NOT trigger prefer_commenting_future_delayed
-void _good95() {
-  // TODO: Add compliant method call for prefer_commenting_future_delayed
+Future<void> _good95() async {
+  // Wait for animation to complete
+  await Future.delayed(Duration(seconds: 1));
 }

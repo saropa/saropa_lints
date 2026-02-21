@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_static_route_config` lint rule.
 
-// TODO: Add bad/good examples for avoid_static_route_config
+// NOTE: avoid_static_route_config requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

@@ -105,13 +105,29 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
+class _Pt960 {
+  final int x;
+  final int y;
+  const _Pt960(this.x, this.y);
+}
+
 // BAD: Should trigger prefer_sorted_pattern_fields
-// expect_lint: prefer_sorted_pattern_fields
-void _bad960() {
-  // TODO: Add code that triggers prefer_sorted_pattern_fields
+void _bad960(Object? obj) {
+  switch (obj) {
+    // expect_lint: prefer_sorted_pattern_fields
+    case _Pt960(y: _, x: _): // y before x — not alphabetical
+      break;
+    default:
+      break;
+  }
 }
 
 // GOOD: Should NOT trigger prefer_sorted_pattern_fields
-void _good960() {
-  // TODO: Add compliant code for prefer_sorted_pattern_fields
+void _good960(Object? obj) {
+  switch (obj) {
+    case _Pt960(x: _, y: _): // x then y — alphabetical order
+      break;
+    default:
+      break;
+  }
 }

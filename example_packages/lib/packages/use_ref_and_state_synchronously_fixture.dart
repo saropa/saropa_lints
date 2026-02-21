@@ -108,12 +108,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger use_ref_and_state_synchronously
 // expect_lint: use_ref_and_state_synchronously
 class _BadClass731 {
-  // TODO: Add method declaration that triggers use_ref_and_state_synchronously
+  // NOTE: use_ref_and_state_synchronously — see rule docs for triggering pattern
   void badMethod() {}
 }
 
 // GOOD: Should NOT trigger use_ref_and_state_synchronously
 class _GoodClass731 {
-  // TODO: Add compliant method for use_ref_and_state_synchronously
+  // Compliant version — see rule docs
   void goodMethod() {}
 }

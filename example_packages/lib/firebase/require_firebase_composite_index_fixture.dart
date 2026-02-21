@@ -2,5 +2,8 @@
 
 /// Fixture for `require_firebase_composite_index` lint rule.
 
-// TODO: Add bad/good examples for require_firebase_composite_index
+// NOTE: require_firebase_composite_index requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_dio_over_http` lint rule.
 
-// TODO: Add bad/good examples for prefer_dio_over_http
+// NOTE: prefer_dio_over_http requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

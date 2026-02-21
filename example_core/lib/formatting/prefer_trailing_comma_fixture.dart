@@ -108,10 +108,16 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_trailing_comma
 // expect_lint: prefer_trailing_comma
 void _bad386() {
-  // TODO: Add code that triggers prefer_trailing_comma
+  final list = [
+    'first item in list',
+    'second item in list' // No trailing comma on last element
+  ];
 }
 
 // GOOD: Should NOT trigger prefer_trailing_comma
 void _good386() {
-  // TODO: Add compliant code for prefer_trailing_comma
+  final list = [
+    'first item in list',
+    'second item in list', // Trailing comma present
+  ];
 }

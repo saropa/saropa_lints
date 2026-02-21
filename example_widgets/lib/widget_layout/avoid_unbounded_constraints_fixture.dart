@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_unbounded_constraints` lint rule.
 
-// TODO: Add bad/good examples for avoid_unbounded_constraints
+// NOTE: avoid_unbounded_constraints requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

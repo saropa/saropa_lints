@@ -111,7 +111,7 @@ final title = 'Title';
 // BAD: Should trigger require_ios_focus_mode_awareness
 // expect_lint: require_ios_focus_mode_awareness
 void _bad921() {
-  // TODO: Add method call that triggers require_ios_focus_mode_awareness
+  // NOTE: require_ios_focus_mode_awareness — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_focus_mode_awareness

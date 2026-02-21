@@ -111,7 +111,7 @@ dynamic user;
 
 // BAD: Should trigger require_ios_quick_note_awareness
 // expect_lint: require_ios_quick_note_awareness
-// TODO: Add class that triggers require_ios_quick_note_awareness
+// NOTE: require_ios_quick_note_awareness — see rule docs
 class _BadClass912 {}
 
 // GOOD: Should NOT trigger require_ios_quick_note_awareness

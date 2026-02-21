@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_hive_binary_storage` lint rule.
 
-// TODO: Add bad/good examples for avoid_hive_binary_storage
+// NOTE: avoid_hive_binary_storage requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

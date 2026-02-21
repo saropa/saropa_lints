@@ -107,11 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger no_equal_arguments
 // expect_lint: no_equal_arguments
-void _bad350() {
-  // TODO: Add code that triggers no_equal_arguments
+void _bad350(int value, int other) {
+  compare(value, value); // Same argument passed twice
 }
 
 // GOOD: Should NOT trigger no_equal_arguments
-void _good350() {
-  // TODO: Add compliant code for no_equal_arguments
+void _good350(int value, int other) {
+  compare(value, other); // Different arguments
 }
