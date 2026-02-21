@@ -1,0 +1,1342 @@
+[
+  {
+    "source": "Flutter SDK",
+    "version": "3.41.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* [Material] Change default mouse cursor of buttons to basic arrow instead of click (except on web) by @camsim99 in [171796](https://github.com/flutter/flutter/pull/171796)",
+    "pr_url": "https://github.com/flutter/flutter/pull/171796",
+    "pr_num": "171796",
+    "context": "* Fix drawer Semantics for mismatched platforms by @huycozy in [177095](https://github.com/flutter/flutter/pull/177095)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.41.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* Fix Drawer.child docstring to say ListView instead of SliverList by @nathannewyen in [180326](https://github.com/flutter/flutter/pull/180326)",
+    "pr_url": "https://github.com/flutter/flutter/pull/180326",
+    "pr_num": "180326",
+    "context": "* Raw tooltip with smaller API surface that exposes tooltip widget by @victorsanni in [177678](https://github.com/flutter/flutter/pull/177678)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.38.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* Remove deprecated `AssetManifest.json` file by @matanlurey in [172594](https://github.com/flutter/flutter/pull/172594)",
+    "pr_url": "https://github.com/flutter/flutter/pull/172594",
+    "pr_num": "172594",
+    "context": "* fix(scrollbar): Update padding type to EdgeInsetsGeometry by @SalehTZ in [172056](https://github.com/flutter/flutter/pull/172056)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.38.0",
+    "category": "New Feature / API",
+    "score": 5,
+    "text": "* Introduce a getter for `Project` to get `gradle-wrapper.properties` directly by @AbdeMohlbi in [175485](https://github.com/flutter/flutter/pull/175485)",
+    "pr_url": "https://github.com/flutter/flutter/pull/175485",
+    "pr_num": "175485",
+    "context": "* [ Widget Preview ] Fix filter by file on Windows by @bkonyi in [175783](https://github.com/flutter/flutter/pull/175783)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.38.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Update gradle_utils.dart to use `constant` instead of `final` by @AbdeMohlbi in [175443](https://github.com/flutter/flutter/pull/175443)",
+    "pr_url": "https://github.com/flutter/flutter/pull/175443",
+    "pr_num": "175443",
+    "context": "* Update gradle_errors.dart to use constants defined in gradle_utils.dart by @AbdeMohlbi in [174760](https://github.com/flutter/flutter/pull/174760)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.38.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* `last_engine_commit.ps1`: Use `$flutterRoot` instead of `$gitTopLevel` by @matanlurey in [172786](https://github.com/flutter/flutter/pull/172786)",
+    "pr_url": "https://github.com/flutter/flutter/pull/172786",
+    "pr_num": "172786",
+    "context": "* fix: get content hash for master on local engine branches by @jtmcdole in [172792](https://github.com/flutter/flutter/pull/172792)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.35.0",
+    "category": "Deprecation",
+    "score": 6,
+    "text": "* Deprecate DropdownButtonFormField \"value\" parameter in favor of \"initialValue\" by @bleroux in [170805](https://github.com/flutter/flutter/pull/170805)",
+    "pr_url": "https://github.com/flutter/flutter/pull/170805",
+    "pr_num": "170805",
+    "context": "* When maintainHintSize is false, hint is centered and aligned, it is different from the original one by @zeqinjie in [168654](https://github.com/flutter/flutter/pull/168654)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.35.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* Clean up references to deprecated onPop method in docs by @justinmc in [169700](https://github.com/flutter/flutter/pull/169700)",
+    "pr_url": "https://github.com/flutter/flutter/pull/169700",
+    "pr_num": "169700",
+    "context": "* IOSSystemContextMenuItem.toString to Diagnosticable by @justinmc in [169705](https://github.com/flutter/flutter/pull/169705)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.35.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Android gradle use lowercase instead of toLowerCase in preparation for removal in v9 by @reidbaker in [171397](https://github.com/flutter/flutter/pull/171397)",
+    "pr_url": "https://github.com/flutter/flutter/pull/171397",
+    "pr_num": "171397",
+    "context": "* remove `x86` unused codepaths by @AbdeMohlbi in [170191](https://github.com/flutter/flutter/pull/170191)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.35.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Add/use `addMachineOutputFlag`/`outputsMachineFormat` instead of strings by @matanlurey in [171459](https://github.com/flutter/flutter/pull/171459)",
+    "pr_url": "https://github.com/flutter/flutter/pull/171459",
+    "pr_num": "171459",
+    "context": "* Remove now duplicate un-forward ports for Android by @matanlurey in [171473](https://github.com/flutter/flutter/pull/171473)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.35.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* Switch to Linux orchestrators for Windows releasers. by @matanlurey in [168941](https://github.com/flutter/flutter/pull/168941)",
+    "pr_url": "https://github.com/flutter/flutter/pull/168941",
+    "pr_num": "168941",
+    "context": "* Revert \"fix: update experiment to use different setup (#169728)\" and \"feat: experimental workflow for Linux tool-tests-general (#169706)\" by @jason-simmons in [169770](https://github.com/flutter/flutter/pull/169770)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.32.0",
+    "category": "Deprecation",
+    "score": 11,
+    "text": "* Deprecate `ThemeData.indicatorColor` in favor of `TabBarThemeData.indicatorColor` by @TahaTesser in [160024](https://github.com/flutter/flutter/pull/160024)",
+    "pr_url": "https://github.com/flutter/flutter/pull/160024",
+    "pr_num": "160024",
+    "context": "* Fix incorrect [enabled] documentation by @sethmfuller in [161650](https://github.com/flutter/flutter/pull/161650)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.32.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* [CP-beta][skwasm] Use `queueMicrotask` instead of `postMessage` when single-threaded by @flutteractionsbot in [167154](https://github.com/flutter/flutter/pull/167154)",
+    "pr_url": "https://github.com/flutter/flutter/pull/167154",
+    "pr_num": "167154",
+    "context": ""
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.32.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Make developing `flutter_tools` nicer: Use `fail` instead of `throw StateError`. by @matanlurey in [163094](https://github.com/flutter/flutter/pull/163094)",
+    "pr_url": "https://github.com/flutter/flutter/pull/163094",
+    "pr_num": "163094",
+    "context": "* explicitly set packageConfigPath for strategy providers by @jyameo in [163080](https://github.com/flutter/flutter/pull/163080)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.32.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "* [fuchsia] Remove explicit LogSink and InspectSink routing and use dictionaries instead by @gbbosak in [162780](https://github.com/flutter/flutter/pull/162780)",
+    "pr_url": "https://github.com/flutter/flutter/pull/162780",
+    "pr_num": "162780",
+    "context": "* Public nodes needing paint or layout by @emerssso in [166148](https://github.com/flutter/flutter/pull/166148)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.32.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* Prefer using non nullable opacityAnimation property by @AhmedLSayed9 in [164795](https://github.com/flutter/flutter/pull/164795)",
+    "pr_url": "https://github.com/flutter/flutter/pull/164795",
+    "pr_num": "164795",
+    "context": "* feat: Added forceErrorText in DropdownButtonFormField #165188 by @Memet18 in [165189](https://github.com/flutter/flutter/pull/165189)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.29.0",
+    "category": "Deprecation",
+    "score": 7,
+    "text": "* Deprecate unused `ButtonStyleButton.iconAlignment` property by @TahaTesser in 160023",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "* Add script to check format of changed dart files by @goderbauer in 160007"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.29.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* Add `SurfaceProducer.onSurfaceCleanup`, deprecate `onSurfaceDestroyed`. by @matanlurey in 160937",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "* Fix docImport issues by @goderbauer in 160918"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.29.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "* [native assets] Create `NativeAssetsManifest.json` instead of kernel embedding by @dcharkes in 159322",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "* [tool] Removes deprecated --web-renderer parameter. by @ditman in 159314"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.27.0",
+    "category": "Replacement / Migration",
+    "score": 9,
+    "text": "* Update fake_codec.dart to use Future.value instead of SynchronousFuture by @biggs0125 in [152182](https://github.com/flutter/flutter/pull/152182)",
+    "pr_url": "https://github.com/flutter/flutter/pull/152182",
+    "pr_num": "152182",
+    "context": "* Add a more typical / concrete example to IntrinsicHeight / IntrinsicWidth by @LongCatIsLooong in [152246](https://github.com/flutter/flutter/pull/152246)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.27.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* [Flutter GPU] Use vm.Vector4 for clear color instead of ui.Color. by @bdero in [55416](https://github.com/flutter/engine/pull/55416)",
+    "pr_url": "https://github.com/flutter/engine/pull/55416",
+    "pr_num": "55416",
+    "context": "* [scenario_app] delete get bitmap activity. by @jonahwilliams in [55436](https://github.com/flutter/engine/pull/55436)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.24.0",
+    "category": "Deprecation",
+    "score": 7,
+    "text": "* Deprecate `ButtonBar`, `ButtonBarThemeData`, and `ThemeData.buttonBarTheme` by @TahaTesser in [145523](https://github.com/flutter/flutter/pull/145523)",
+    "pr_url": "https://github.com/flutter/flutter/pull/145523",
+    "pr_num": "145523",
+    "context": "* Fix `MenuItemButton` overflow by @TahaTesser in [143932](https://github.com/flutter/flutter/pull/143932)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.24.0",
+    "category": "Replacement / Migration",
+    "score": 10,
+    "text": "* Use `fml::ScopedCleanupClosure` instead of `DeathRattle`. by @matanlurey in [51834](https://github.com/flutter/engine/pull/51834)",
+    "pr_url": "https://github.com/flutter/engine/pull/51834",
+    "pr_num": "51834",
+    "context": "* Return an empty optional in HardwareBuffer::GetSystemUniqueID if the underlying NDK API is unavailable by @jason-simmons in [51839](https://github.com/flutter/engine/pull/51839)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.24.0",
+    "category": "Replacement / Migration",
+    "score": 8,
+    "text": "* Switch to `Iterable.cast` instance method by @parlough in [150185](https://github.com/flutter/flutter/pull/150185)",
+    "pr_url": "https://github.com/flutter/flutter/pull/150185",
+    "pr_num": "150185",
+    "context": "* Add tests for navigator.0.dart by @ValentinVignal in [150034](https://github.com/flutter/flutter/pull/150034)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.24.0",
+    "category": "Replacement / Migration",
+    "score": 8,
+    "text": "* Copy any previous `IconThemeData` instead of overwriting it in CupertinoButton by @ricardoboss in [149777](https://github.com/flutter/flutter/pull/149777)",
+    "pr_url": "https://github.com/flutter/flutter/pull/149777",
+    "pr_num": "149777",
+    "context": "* Manual engine roll to ddd4814 by @gmackall in [150952](https://github.com/flutter/flutter/pull/150952)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.24.0",
+    "category": "Replacement / Migration",
+    "score": 8,
+    "text": "* Switch to relevant `Remote` constructors by @nate-thegrate in [146773](https://github.com/flutter/flutter/pull/146773)",
+    "pr_url": "https://github.com/flutter/flutter/pull/146773",
+    "pr_num": "146773",
+    "context": "* Create web tests suite & update utils by @sealesj in [146592](https://github.com/flutter/flutter/pull/146592)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.24.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Use super.key instead of manually passing the Key parameter to the parent class by @EchoEllet in [147621](https://github.com/flutter/flutter/pull/147621)",
+    "pr_url": "https://github.com/flutter/flutter/pull/147621",
+    "pr_num": "147621",
+    "context": "* test material text field example by @NobodyForNothing in [147864](https://github.com/flutter/flutter/pull/147864)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.24.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Use --(no-)strip-wams instead of --(no-)-name-section in `dart compile wasm` by @mkustermann in [150180](https://github.com/flutter/flutter/pull/150180)",
+    "pr_url": "https://github.com/flutter/flutter/pull/150180",
+    "pr_num": "150180",
+    "context": "* Reland \"Identify and re-throw our dependency checking errors in flutter.groovy\" by @gmackall in [150128](https://github.com/flutter/flutter/pull/150128)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.24.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "* Issue an`ERROR` instead of an `INFO` for a non-working API. by @matanlurey in [52892](https://github.com/flutter/engine/pull/52892)",
+    "pr_url": "https://github.com/flutter/engine/pull/52892",
+    "pr_num": "52892",
+    "context": "* Fix another instance of platform view breakage on Android 14 by @johnmccutchan in [52980](https://github.com/flutter/engine/pull/52980)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.24.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* Switch to FilterQuality.medium for images by @goderbauer in [148799](https://github.com/flutter/flutter/pull/148799)",
+    "pr_url": "https://github.com/flutter/flutter/pull/148799",
+    "pr_num": "148799",
+    "context": "* Fix InputDecorator default hint text style on M3 by @bleroux in [148944](https://github.com/flutter/flutter/pull/148944)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.24.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* Switch to more reliable flutter.dev link destinations in the tool by @parlough in [150587](https://github.com/flutter/flutter/pull/150587)",
+    "pr_url": "https://github.com/flutter/flutter/pull/150587",
+    "pr_num": "150587",
+    "context": "* [tool] when writing to openssl as a part of macOS/iOS code-signing, flush the stdin stream before closing it by @andrewkolos in [150120](https://github.com/flutter/flutter/pull/150120)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.24.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* Switch to triage-* labels for platform package triage by @stuartmorgan in [149614](https://github.com/flutter/flutter/pull/149614)",
+    "pr_url": "https://github.com/flutter/flutter/pull/149614",
+    "pr_num": "149614",
+    "context": "* Bump github/codeql-action from 3.25.7 to 3.25.8 by @dependabot in [149691](https://github.com/flutter/flutter/pull/149691)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.22.0",
+    "category": "Deprecation",
+    "score": 7,
+    "text": "* Remove deprecated `TextTheme` members by @Renzo-Olivares in [139255](https://github.com/flutter/flutter/pull/139255)",
+    "pr_url": "https://github.com/flutter/flutter/pull/139255",
+    "pr_num": "139255",
+    "context": "* Update `TabBar` and `TabBar.secondary` to use indicator height/color M3 tokens by @TahaTesser in [145753](https://github.com/flutter/flutter/pull/145753)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.22.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* Remove deprecated `KeepAliveHandle.release` by @LongCatIsLooong in [143961](https://github.com/flutter/flutter/pull/143961)",
+    "pr_url": "https://github.com/flutter/flutter/pull/143961",
+    "pr_num": "143961",
+    "context": "* Remove deprecated `InteractiveViewer.alignPanAxis` by @LongCatIsLooong in [142500](https://github.com/flutter/flutter/pull/142500)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.22.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* Remove deprecated `InteractiveViewer.alignPanAxis` by @LongCatIsLooong in [142500](https://github.com/flutter/flutter/pull/142500)",
+    "pr_url": "https://github.com/flutter/flutter/pull/142500",
+    "pr_num": "142500",
+    "context": "* disable debug banner in m3 page test apps. by @jonahwilliams in [143857](https://github.com/flutter/flutter/pull/143857)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.22.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* Remove deprecated `CupertinoContextMenu.previewBuilder` by @LongCatIsLooong in [143990](https://github.com/flutter/flutter/pull/143990)",
+    "pr_url": "https://github.com/flutter/flutter/pull/143990",
+    "pr_num": "143990",
+    "context": "* Clean up lint ignores by @eliasyishak in [144229](https://github.com/flutter/flutter/pull/144229)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.22.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "* Fix chips use square delete button `InkWell` shape instead of circular by @TahaTesser in [144319](https://github.com/flutter/flutter/pull/144319)",
+    "pr_url": "https://github.com/flutter/flutter/pull/144319",
+    "pr_num": "144319",
+    "context": "* Fix `CalendarDatePicker` day selection shape and overlay by @TahaTesser in [144317](https://github.com/flutter/flutter/pull/144317)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.19.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* Remove deprecated `PlatformMenuBar.body` by @gspencergoog in [138509](https://github.com/flutter/flutter/pull/138509)",
+    "pr_url": "https://github.com/flutter/flutter/pull/138509",
+    "pr_num": "138509",
+    "context": "* Refactor to use Apple system fonts by @MitchellGoodwin in [137275](https://github.com/flutter/flutter/pull/137275)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.19.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* Deprecate `RawKeyEvent`, `RawKeyboard`, et al. by @gspencergoog in [136677](https://github.com/flutter/flutter/pull/136677)",
+    "pr_url": "https://github.com/flutter/flutter/pull/136677",
+    "pr_num": "136677",
+    "context": "* Fix dayPeriodColor handling of non-MaterialStateColors by @gspencergoog in [139845](https://github.com/flutter/flutter/pull/139845)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.19.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Changes to use valuenotifier instead of a force rebuild for WidgetInspector by @CoderDake in [131634](https://github.com/flutter/flutter/pull/131634)",
+    "pr_url": "https://github.com/flutter/flutter/pull/131634",
+    "pr_num": "131634",
+    "context": "* [Impeller] GPU frame timings summarization. by @jonahwilliams in [136408](https://github.com/flutter/flutter/pull/136408)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.19.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Use --timeline_recorder=systrace instead of --systrace_timeline by @derekxu16 in [46884](https://github.com/flutter/engine/pull/46884)",
+    "pr_url": "https://github.com/flutter/engine/pull/46884",
+    "pr_num": "46884",
+    "context": "* [Impeller] Only allow Impeller in flutter_tester if vulkan is enabled. by @dnfield in [46895](https://github.com/flutter/engine/pull/46895)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.19.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "* `OverlayPortal.overlayChild` contributes semantics to `OverlayPortal` instead of `Overlay` by @LongCatIsLooong in [134921](https://github.com/flutter/flutter/pull/134921)",
+    "pr_url": "https://github.com/flutter/flutter/pull/134921",
+    "pr_num": "134921",
+    "context": "* Update `ColorScheme.fromSwatch` docs for Material 3 by @TahaTesser in [136816](https://github.com/flutter/flutter/pull/136816)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.19.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* fix typo of 'not' instead of 'now' for `useInheritedMediaQuery` by @timmaffett in [139940](https://github.com/flutter/flutter/pull/139940)",
+    "pr_url": "https://github.com/flutter/flutter/pull/139940",
+    "pr_num": "139940",
+    "context": "* [Docs] Added missing `CupertinoApp.showSemanticsDebugger` by @piedcipher in [139913](https://github.com/flutter/flutter/pull/139913)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.19.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* Switch to Chrome for Testing instead of vanilla Chromium. by @eyebrowsoffire in [136214](https://github.com/flutter/flutter/pull/136214)",
+    "pr_url": "https://github.com/flutter/flutter/pull/136214",
+    "pr_num": "136214",
+    "context": "* [Windows Arm64] Add the 'platform_channel_sample_test_windows' Devicelab test by @loic-sharma in [136401](https://github.com/flutter/flutter/pull/136401)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.19.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* [Windows] Move to `FlutterCompositor` for rendering by @loic-sharma in [48849](https://github.com/flutter/engine/pull/48849)",
+    "pr_url": "https://github.com/flutter/engine/pull/48849",
+    "pr_num": "48849",
+    "context": "* [Flutter GPU] Runtime shader import. by @bdero in [48875](https://github.com/flutter/engine/pull/48875)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.19.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* Switch to Chrome For Testing instead of Chromium by @eyebrowsoffire in [46683](https://github.com/flutter/engine/pull/46683)",
+    "pr_url": "https://github.com/flutter/engine/pull/46683",
+    "pr_num": "46683",
+    "context": "* [web] Stop using `flutterViewEmbedder` for platform views by @mdebbar in [46046](https://github.com/flutter/engine/pull/46046)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.19.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* Switch to Android 14 for physical device firebase tests by @gmackall in [47016](https://github.com/flutter/engine/pull/47016)",
+    "pr_url": "https://github.com/flutter/engine/pull/47016",
+    "pr_num": "47016",
+    "context": "* Move window state update to window realize callback by @gspencergoog in [47713](https://github.com/flutter/engine/pull/47713)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.16.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* Deprecate `useMaterial3` parameter in `ThemeData.copyWith()` by @QuncCccccc in [131455](https://github.com/flutter/flutter/pull/131455)",
+    "pr_url": "https://github.com/flutter/flutter/pull/131455",
+    "pr_num": "131455",
+    "context": "* Update `BottomSheet.enableDrag` & `BottomSheet.showDragHandle` docs for animation controller by @TahaTesser in [131484](https://github.com/flutter/flutter/pull/131484)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.16.0",
+    "category": "New Feature / API",
+    "score": 5,
+    "text": "* [New feature] Allowing the `ListView` slivers to have different extents while still having scrolling performance by @xu-baolin in [131393](https://github.com/flutter/flutter/pull/131393)",
+    "pr_url": "https://github.com/flutter/flutter/pull/131393",
+    "pr_num": "131393",
+    "context": "* Revert \"Adds a parent scope TraversalEdgeBehavior and fixes modal rou… by @chunhtai in [134550](https://github.com/flutter/flutter/pull/134550)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.16.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Use utf8.encode() instead of longer const Utf8Encoder.convert() by @mkustermann in [130567](https://github.com/flutter/flutter/pull/130567)",
+    "pr_url": "https://github.com/flutter/flutter/pull/130567",
+    "pr_num": "130567",
+    "context": "* Fix material date picker behavior when changing year by @Lexycon in [130486](https://github.com/flutter/flutter/pull/130486)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.16.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Use `start` instead of `extent` for Windows IME cursor position by @yaakovschectman in [45667](https://github.com/flutter/engine/pull/45667)",
+    "pr_url": "https://github.com/flutter/engine/pull/45667",
+    "pr_num": "45667",
+    "context": "* Handle external window's `WM_CLOSE` in lifecycle manager by @yaakovschectman in [45840](https://github.com/flutter/engine/pull/45840)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.13.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Advise developers to use OverflowBar instead of ButtonBar by @leighajarett in [128437](https://github.com/flutter/flutter/pull/128437)",
+    "pr_url": "https://github.com/flutter/flutter/pull/128437",
+    "pr_num": "128437",
+    "context": "* Sliver Main Axis Group by @thkim1011 in [126596](https://github.com/flutter/flutter/pull/126596)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.13.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Give channel descriptions in `flutter channel`, use branch instead of upstream for channel name by @Hixie in [126936](https://github.com/flutter/flutter/pull/126936)",
+    "pr_url": "https://github.com/flutter/flutter/pull/126936",
+    "pr_num": "126936",
+    "context": "* Revert \"Replace rsync when unzipping artifacts on a Mac (#126703)\" by @vashworth in [127430](https://github.com/flutter/flutter/pull/127430)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.13.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "* [flutter_tools] modify Skeleton template to use ListenableBuilder instead of AnimatedBuilder by @fabiancrx in [128810](https://github.com/flutter/flutter/pull/128810)",
+    "pr_url": "https://github.com/flutter/flutter/pull/128810",
+    "pr_num": "128810",
+    "context": "* [CP] Fix ConcurrentModificationError in DDS by @christopherfujino in [130740](https://github.com/flutter/flutter/pull/130740)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.10.0",
+    "category": "Deprecation",
+    "score": 7,
+    "text": "* Remove deprecated `AppBar.color` & `AppBar.backwardsCompatibility` by @LongCatIsLooong in [120618](https://github.com/flutter/flutter/pull/120618)",
+    "pr_url": "https://github.com/flutter/flutter/pull/120618",
+    "pr_num": "120618",
+    "context": "* Revert \"Fix error when resetting configurations in tear down phase\" by @loic-sharma in [120739](https://github.com/flutter/flutter/pull/120739)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.10.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* Deprecates `TestWindow` by @pdblasi-google in [122824](https://github.com/flutter/flutter/pull/122824)",
+    "pr_url": "https://github.com/flutter/flutter/pull/122824",
+    "pr_num": "122824",
+    "context": "* Bump lower Dart SDK constraints to 3.0 & add class modifiers by @goderbauer in [122546](https://github.com/flutter/flutter/pull/122546)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.10.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* @alwaysThrows is deprecated. Return `Never` instead. by @eyebrowsoffire in [39269](https://github.com/flutter/engine/pull/39269)",
+    "pr_url": "https://github.com/flutter/engine/pull/39269",
+    "pr_num": "39269",
+    "context": "* [macOS] Move A11yBridge to FVC by @dkwingsmt in [38855](https://github.com/flutter/engine/pull/38855)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.10.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Use String.codeUnitAt instead of String.codeUnits[] in ParagraphBoundary by @Renzo-Olivares in [120234](https://github.com/flutter/flutter/pull/120234)",
+    "pr_url": "https://github.com/flutter/flutter/pull/120234",
+    "pr_num": "120234",
+    "context": "* Fix lerping for `NavigationRailThemeData` icon themes by @guidezpl in [120066](https://github.com/flutter/flutter/pull/120066)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.10.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Use variable instead of multiple accesses through a map by @ueman in [122178](https://github.com/flutter/flutter/pull/122178)",
+    "pr_url": "https://github.com/flutter/flutter/pull/122178",
+    "pr_num": "122178",
+    "context": "* Improve Dart plugin registration handling by @stuartmorgan in [122046](https://github.com/flutter/flutter/pull/122046)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.10.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Use skia_enable_ganesh instead of legacy GN arg by @kjlubick in [40382](https://github.com/flutter/engine/pull/40382)",
+    "pr_url": "https://github.com/flutter/engine/pull/40382",
+    "pr_num": "40382",
+    "context": "* disabled the impeller unit tests again by @gaaclarke in [40389](https://github.com/flutter/engine/pull/40389)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.10.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "* Initialize `ThemeData.visualDensity` using `ThemeData.platform` instead of `defaultTargetPlatform` by @gspencergoog in [124357](https://github.com/flutter/flutter/pull/124357)",
+    "pr_url": "https://github.com/flutter/flutter/pull/124357",
+    "pr_num": "124357",
+    "context": "* Revert \"Refactor reorderable list semantics\" by @XilaiZhang in [124368](https://github.com/flutter/flutter/pull/124368)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.10.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "* [Windows] Use 'ninja' instead of 'ninja.exe' by @loic-sharma in [39326](https://github.com/flutter/engine/pull/39326)",
+    "pr_url": "https://github.com/flutter/engine/pull/39326",
+    "pr_num": "39326",
+    "context": "* [web] Hide autofill overlay by @htoor3 in [39294](https://github.com/flutter/engine/pull/39294)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.10.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* Switch from Noto Emoji to Noto Color Emoji and update font data by @hterkelsen in [40666](https://github.com/flutter/engine/pull/40666)",
+    "pr_url": "https://github.com/flutter/engine/pull/40666",
+    "pr_num": "40666",
+    "context": "* [macOS]Support SemanticsService.announce by @hangyujin in [40585](https://github.com/flutter/engine/pull/40585)"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.7.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* Deprecate `AnimatedListItemBuilder` and `AnimatedListRemovedItemBuilder` by @gspencergoog in https://github.com/flutter/flutter/pull/113131",
+    "pr_url": "https://github.com/flutter/flutter/pull/113131",
+    "pr_num": "",
+    "context": "* `AutomatedTestWidgetsFlutterBinding.pump` provides wrong pump time stamp, probably because of forgetting the precision by @fzyzcjy in https://github.com/flutter/flutter/pull/112609"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.7.0",
+    "category": "Breaking Change",
+    "score": 6,
+    "text": "* Change type in `ImplicitlyAnimatedWidget` to remove type cast to improve performance and style by @fzyzcjy in https://github.com/flutter/flutter/pull/111849",
+    "pr_url": "https://github.com/flutter/flutter/pull/111849",
+    "pr_num": "",
+    "context": "* make ModalBottomSheetRoute public by @The-Redhat in https://github.com/flutter/flutter/pull/108112"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.7.0",
+    "category": "Performance Improvement",
+    "score": 6,
+    "text": "* Change type in `ImplicitlyAnimatedWidget` to remove type cast to improve performance and style by @fzyzcjy in https://github.com/flutter/flutter/pull/111849",
+    "pr_url": "https://github.com/flutter/flutter/pull/111849",
+    "pr_num": "",
+    "context": "* make ModalBottomSheetRoute public by @The-Redhat in https://github.com/flutter/flutter/pull/108112"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.7.0",
+    "category": "Replacement / Migration",
+    "score": 9,
+    "text": "* Use ScrollbarTheme instead Theme for Scrollbar by @Oleh-Sv in https://github.com/flutter/flutter/pull/113237",
+    "pr_url": "https://github.com/flutter/flutter/pull/113237",
+    "pr_num": "",
+    "context": "* Add `AnimatedIcons` previews and examples by @TahaTesser in https://github.com/flutter/flutter/pull/113700"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.7.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Fix references to symbols to use brackets instead of backticks by @gspencergoog in https://github.com/flutter/flutter/pull/111331",
+    "pr_url": "https://github.com/flutter/flutter/pull/111331",
+    "pr_num": "",
+    "context": "* Add doc note about when to dispose TextPainter by @dnfield in https://github.com/flutter/flutter/pull/111403"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.7.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* [framework] use Visibility instead of Opacity by @jonahwilliams in https://github.com/flutter/flutter/pull/112191",
+    "pr_url": "https://github.com/flutter/flutter/pull/112191",
+    "pr_num": "",
+    "context": "* Add regression test for TextPainter.getWordBoundary by @LongCatIsLooong in https://github.com/flutter/flutter/pull/112229"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.7.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "* Use `double.isNaN` instead of `... == double.nan` (which is always false) by @mkustermann in https://github.com/flutter/flutter/pull/115424",
+    "pr_url": "https://github.com/flutter/flutter/pull/115424",
+    "pr_num": "",
+    "context": "* InkResponse highlights can be updated by @bleroux in https://github.com/flutter/flutter/pull/115635"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.7.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "* Error in docs: `CustomPaint` instead of `CustomPainter` by @0xba1 in https://github.com/flutter/flutter/pull/107836",
+    "pr_url": "https://github.com/flutter/flutter/pull/107836",
+    "pr_num": "",
+    "context": "* Dropdown height large scale text fix by @foongsq in https://github.com/flutter/flutter/pull/107201"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.7.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* Change default value of `effectiveInactivePressedOverlayColor` in Switch to refer to `effectiveInactiveThumbColor` by @QuncCccccc in https://github.com/flutter/flutter/pull/108477",
+    "pr_url": "https://github.com/flutter/flutter/pull/108477",
+    "pr_num": "",
+    "context": "* Guard against usage after async callbacks in RenderAndroidView, unregister listener by @dnfield in https://github.com/flutter/flutter/pull/108496"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.3.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* Ignore uses of soon-to-be deprecated `NullThrownError`. by @lrhn in https://github.com/flutter/flutter/pull/105693",
+    "pr_url": "https://github.com/flutter/flutter/pull/105693",
+    "pr_num": "",
+    "context": "* Fix `StretchingOverscrollIndicator` clipping and add `clipBehavior` parameter by @TahaTesser in https://github.com/flutter/flutter/pull/105303"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.3.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "* [tool] Migrate off deprecated coverage parameters by @cbracken in https://github.com/flutter/flutter/pull/104997",
+    "pr_url": "https://github.com/flutter/flutter/pull/104997",
+    "pr_num": "",
+    "context": "* Retry builds when SSL exceptions are thrown by @blasten in https://github.com/flutter/flutter/pull/105078"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.3.0",
+    "category": "New Feature / API",
+    "score": 5,
+    "text": "* Mention that `NavigationBar` is a new widget by @guidezpl in https://github.com/flutter/flutter/pull/104264",
+    "pr_url": "https://github.com/flutter/flutter/pull/104264",
+    "pr_num": "",
+    "context": "* [Keyboard, Windows] Fix that IME events are still dispatched to FocusNode.onKey by @dkwingsmt in https://github.com/flutter/flutter/pull/104244"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.3.0",
+    "category": "Replacement / Migration",
+    "score": 8,
+    "text": "* `InputDecorator`: Switch hint to Opacity instead of AnimatedOpacity by @markusaksli-nc in https://github.com/flutter/flutter/pull/107156",
+    "pr_url": "https://github.com/flutter/flutter/pull/107156",
+    "pr_num": "",
+    "context": "* Fix `ListTile` theme shape in a drawer by @TahaTesser in https://github.com/flutter/flutter/pull/106343"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.3.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "* Update key examples to use `Focus` widgets instead of `RawKeyboardListener` by @gspencergoog in https://github.com/flutter/flutter/pull/101537",
+    "pr_url": "https://github.com/flutter/flutter/pull/101537",
+    "pr_num": "",
+    "context": "* Enable unnecessary_import by @goderbauer in https://github.com/flutter/flutter/pull/101600"
+  },
+  {
+    "source": "Flutter SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 7,
+    "text": "* Remove deprecated RenderObjectElement methods by @Piinks in https://github.com/flutter/flutter/pull/98616",
+    "pr_url": "https://github.com/flutter/flutter/pull/98616",
+    "pr_num": "",
+    "context": "* CupertinoTabBar: Add clickable cursor on web by @TahaTesser in https://github.com/flutter/flutter/pull/96996"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.11.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "but `false` on Windows. Use `FileSystemEntity.typeSync()` instead to get",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "portable behavior."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.8.0",
+    "category": "Breaking Change",
+    "score": 6,
+    "text": "- **Breaking change**: Native classes in `dart:html`, like `HtmlElement`, can no",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "longer be extended. Long ago, to support custom elements, element classes"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.5.0",
+    "category": "Breaking Change",
+    "score": 6,
+    "text": "- **Breaking Change** [#55786][]: `SecurityContext` is now `final`. This means",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "that `SecurityContext` can no longer be subclassed. `SecurityContext`"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.4.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Deprecates `FileSystemDeleteEvent.isDirectory`, which always returns",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "`false`."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.4.0",
+    "category": "New Feature / API",
+    "score": 5,
+    "text": "- Added option for `ParallelWaitError` to get some meta-information that",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "it can expose in its `toString`, and the `Iterable<Future>.wait` and"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.4.0",
+    "category": "New Feature / API",
+    "score": 5,
+    "text": "- **Breaking change** [#53863][]: `Stdout` has a new field `lineTerminator`,",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "which allows developers to control the line ending used by `stdout` and"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.4.0",
+    "category": "New Parameter / Option",
+    "score": 5,
+    "text": "- Added option for `ParallelWaitError` to get some meta-information that",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "it can expose in its `toString`, and the `Iterable<Future>.wait` and"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.4.0",
+    "category": "New Parameter / Option",
+    "score": 5,
+    "text": "- **Breaking change** [#53863][]: `Stdout` has a new field `lineTerminator`,",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "which allows developers to control the line ending used by `stdout` and"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.3.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "core `Pointer` types are now deprecated.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "Migrate to the new `-` and `+` operators instead."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.3.0",
+    "category": "New Feature / API",
+    "score": 5,
+    "text": "`JSAnyOperatorExtension` for the new extensions. This shouldn't make a",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "difference unless the extension names were explicitly used."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.2.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Deprecated the `Service.getIsolateID` method.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "- Added `getIsolateId` method to `Service`."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.2.0",
+    "category": "Breaking Change",
+    "score": 8,
+    "text": "`JSNumber.toDart` is removed in favor of `toDartDouble` and `toDartInt` to",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "make the type explicit. `Object.toJS` is also removed in favor of"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.2.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "Both APIs now return a `bool` instead of a `JSBoolean`. `typeofEquals` also",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "now takes in a `String` instead of a `JSString`."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.2.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "now takes in a `String` instead of a `JSString`.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "- **Breaking Change on `dart:js_interop` `JSAny` and `JSObject`**:"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.2.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "This API now takes in an `int` instead of `JSNumber`.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": ""
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.1.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Added a deprecation warning when `Platform` is instantiated.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "- Added `Platform.lineTerminator` which exposes the character or characters"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.1.0",
+    "category": "New Feature / API",
+    "score": 5,
+    "text": "- Added class `SameSite`.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "- **Breaking change** [#52027][]: `FileSystemEvent` is"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.1.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "calls these members, and use that instead.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "- **Breaking change to `@staticInterop` and `external` extension members**:"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 9,
+    "text": "Use [`Deprecated.message`][] instead.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "- Removed the deprecated [`CastError`][] error."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Removed the deprecated `List` constructor, as it wasn't null safe.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "Use list literals (e.g. `[]` for an empty list or `<int>[]` for an empty"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Removed the deprecated [`proxy`][] and [`Provisional`][] annotations.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "The original `proxy` annotation has no effect in Dart 2,"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Removed the deprecated [`Deprecated.expires`][] getter.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "Use [`Deprecated.message`][] instead."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Removed the deprecated [`CastError`][] error.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "Use [`TypeError`][] instead."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Removed the deprecated [`FallThroughError`][] error. The kind of",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "fall-through previously throwing this error was made a compile-time"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Removed the deprecated [`AbstractClassInstantiationError`][] error. It was made",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "a compile-time error to call the constructor of an abstract class in Dart 2.0."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Removed the deprecated [`CyclicInitializationError`]. Cyclic dependencies are",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "no longer detected at runtime in null safe code. Such code will fail in other"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Removed the deprecated [`NoSuchMethodError`][] default constructor.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "Use the [`NoSuchMethodError.withInvocation`][] named constructor instead."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Removed the deprecated [`BidirectionalIterator`][] class.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "Existing bidirectional iterators can still work, they just don't have"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Removed the deprecated [`DeferredLibrary`][] class.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "Use the [`deferred as`][] import syntax instead."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Deprecated the `HasNextIterator` class ([#50883][]).",
+    "pr_url": "",
+    "pr_num": "",
+    "context": ""
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Removed the deprecated [`MAX_USER_TAGS`][] constant.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "Use [`maxUserTags`][] instead."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Removed the deprecated [`Metrics`][], [`Metric`][], [`Counter`][],",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "and [`Gauge`][] classes as they have been broken since Dart 2.0."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Deprecation",
+    "score": 5,
+    "text": "- Deprecate `NetworkInterface.listSupported`. Has always returned true since",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "Dart 2.3."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Replacement / Migration",
+    "score": 10,
+    "text": "Use [`Deprecated.message`][] instead.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "- Removed the deprecated [`CastError`][] error."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Replacement / Migration",
+    "score": 10,
+    "text": "Use [`TypeError`][] instead.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "- Removed the deprecated [`FallThroughError`][] error. The kind of"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "Use [`maxUserTags`][] instead.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "- Callbacks passed to `registerExtension` will be run in the zone from which"
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "now takes `Object` instead of `String`.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": ""
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "- On Windows the `PUB_CACHE` has moved to `%LOCALAPPDATA%`, since Dart 2.8 the",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "`PUB_CACHE` has been created in `%LOCALAPPDATA%` when one wasn't present."
+  },
+  {
+    "source": "Dart SDK",
+    "version": "3.0.0",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "- Observatory is no longer served by default and users should instead use Dart",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "DevTools. Users requiring specific functionality in Observatory should set"
+  },
+  {
+    "source": "Dart-Code",
+    "version": "128",
+    "category": "Deprecation",
+    "score": 6,
+    "text": "> There is no immediate problem but is related to a deprecation. Since `flutter pub run` was deprecated in favor of `dart run`, the built in task command in the extension should be updated to use `dart run`.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": ">"
+  },
+  {
+    "source": "Dart-Code",
+    "version": "128",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "> **#5728**: Use `flutterRoot` instead of looking for the `flutter` package when reading the sdk path from `.package_config.json` `is enhancement`",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "> **Is your feature request related to a problem? Please describe.**"
+  },
+  {
+    "source": "Dart-Code",
+    "version": "126",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "> **#5830**: Switch to LSP client v10.0.0-next.18 and enable delayOpenNotifications `is performance`",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "> Fixes https://github.com/Dart-Code/Dart-Code/issues/5176"
+  },
+  {
+    "source": "Dart-Code",
+    "version": "124",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "> **#5801**: Use \"package:foo\" instead of foldernames in command execution `is enhancement` `in commands`",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "> Fixes https://github.com/Dart-Code/Dart-Code/issues/5789"
+  },
+  {
+    "source": "Dart-Code",
+    "version": "124",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* [#5775](https://github.com/Dart-Code/Dart-Code/issues/5775): The Flutter Widget Preview now works for _all_ projects within a Pub Workspace instead of only the first.",
+    "pr_url": "https://github.com/Dart-Code/Dart-Code/issues/5775",
+    "pr_num": "",
+    "context": ""
+  },
+  {
+    "source": "Dart-Code",
+    "version": "122",
+    "category": "Replacement / Migration",
+    "score": 7,
+    "text": "> **#5730**: Wish to inform the user to prefer USB over WiFi when developing against an iOS 26 device `is enhancement` `in flutter` `in debugging` `relies on sdk changes`",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "> Related to https://github.com/flutter/flutter/issues/176206"
+  },
+  {
+    "source": "Dart-Code",
+    "version": "122",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "* [#5744](https://github.com/Dart-Code/Dart-Code/issues/5744): The Flutter Widget Preview sidebar icon now appears after extension activation instead of only after the widget preview server initialises.",
+    "pr_url": "https://github.com/Dart-Code/Dart-Code/issues/5744",
+    "pr_num": "",
+    "context": ""
+  },
+  {
+    "source": "Dart-Code",
+    "version": "104",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "[#5334](https://github.com/Dart-Code/Dart-Code/issues/5334)/[#5377](https://github.com/Dart-Code/Dart-Code/issues/5377)/[#5117](https://github.com/Dart-Code/Dart-Code/issues/5117): [@davidmartos96](https://github.com/davidmartos96) contributed new settings `dart.getFlutterSdkCommand` and `dart.getDartSdkCommand` that allow executing a command to locate the Dart/Flutter SDKs to use for a workspace. This improves compatibility with some SDK version managers (such as `mise` and `asdf`) because they can be queried for the current SDK instead of reading from `PATH` (or `package.json`).",
+    "pr_url": "https://github.com/Dart-Code/Dart-Code/issues/5334",
+    "pr_num": "",
+    "context": ""
+  },
+  {
+    "source": "Dart-Code",
+    "version": "100",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "> **#5311**: Switch customDevTools to assume `dt` instead of `devtools_tool` `is enhancement` `in devtools`",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "> See https://github.com/flutter/devtools/pull/8410"
+  },
+  {
+    "source": "Dart-Code",
+    "version": "v3-96",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "> **#5231**: Switch to parsing the new Flutter version file `bin/cache/flutter.version.json` instead of the legacy one `version` and remove workaround `is enhancement`",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "> See:"
+  },
+  {
+    "source": "Dart-Code",
+    "version": "v3-96",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "> **#5225**: Switch to the DTD sidebar when using a new enough SDK `is enhancement` `in flutter sidebar`",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "> - DevTools work done in https://github.com/flutter/devtools/commit/faeb2a3e0d49a01301ed85dd9bba989a88b4b762"
+  },
+  {
+    "source": "Dart-Code",
+    "version": "v3-84",
+    "category": "Replacement / Migration",
+    "score": 6,
+    "text": "* [#4877](https://github.com/Dart-Code/Dart-Code/issues/4877): The hover for `Enum.values` no longer incorrectly reports the type as `Enum` instead of `List<Enum>`.",
+    "pr_url": "https://github.com/Dart-Code/Dart-Code/issues/4877",
+    "pr_num": "",
+    "context": ""
+  },
+  {
+    "source": "Dart-Code",
+    "version": "v3-82",
+    "category": "New Parameter / Option",
+    "score": 6,
+    "text": "* [#4966](https://github.com/Dart-Code/Dart-Code/issues/4966): The `dart.previewSdkDaps` setting has been replaced by a new `dart.useLegacyDebugAdapters`. The new setting has the opposite meaning (`true` means to use the legacy adapters, whereas for the old setting that was `false`).",
+    "pr_url": "https://github.com/Dart-Code/Dart-Code/issues/4966",
+    "pr_num": "",
+    "context": ""
+  },
+  {
+    "source": "Dart-Code",
+    "version": "v3-72",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "> Flutter users should run `flutter pub get` instead of `dart pub get`.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": ""
+  },
+  {
+    "source": "Dart-Code",
+    "version": "v3-62",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "> **#4377**: Switch to VS Code's telemetry classes `is enhancement`",
+    "pr_url": "",
+    "pr_num": "",
+    "context": "> https://code.visualstudio.com/updates/v1_75#_telemetry"
+  },
+  {
+    "source": "Dart-Code",
+    "version": "v3-60",
+    "category": "New Parameter / Option",
+    "score": 5,
+    "text": "* [#737](https://github.com/Dart-Code/Dart-Code/issues/737): A new setting `\"dart.addSdkToTerminalPath\"` enables automatically adding your current SDK to the `PATH` environment variable for built-in terminals. This works with quick SDK switching and ensures running `dart` or `flutter` from the terminal matches the version being used for analysis and debugging. To avoid losing terminal state, VS Code may require you to click an icon in existing terminal windows to restart them for this change to apply (this is not required for new terminals). This setting is opt-in today, but may become the default in a future release.",
+    "pr_url": "https://github.com/Dart-Code/Dart-Code/issues/737",
+    "pr_num": "",
+    "context": ""
+  },
+  {
+    "source": "Dart-Code",
+    "version": "v3-54",
+    "category": "Replacement / Migration",
+    "score": 5,
+    "text": "> Flutter recently added an option to `flutter create` to create an empty project that doesn't have any comments, the code is just a hello world instead of the counter app, and there's no test directory.  The flag is `--empty`.",
+    "pr_url": "",
+    "pr_num": "",
+    "context": ""
+  }
+]
