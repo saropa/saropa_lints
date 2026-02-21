@@ -88,7 +88,7 @@ await const FlutterSecureStorage().write(key: 'password', value: password);
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Key is `password_strength` (not a credential) | **False positive** — strength is not a password | Key matching must be careful: exact word match, not just substring |
 | Key is `passwordHash` | **Trigger** — even hashed passwords shouldn't be in SharedPreferences | Store in secure storage |

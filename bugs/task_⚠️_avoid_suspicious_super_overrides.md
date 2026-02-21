@@ -108,7 +108,7 @@ class _MyWidgetState extends State<MyWidget> {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `dispose()` in a mixin that intentionally skips super | **False positive** — mixins have complex super call chains | Check if mixin; may need to suppress |
 | Method that calls super via a helper | **False negative** — can't trace into helper | Known limitation |

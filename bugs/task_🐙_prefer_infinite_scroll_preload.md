@@ -104,7 +104,7 @@ if (_scrollController.offset >= _scrollController.position.maxScrollExtent - 200
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Project uses `infinite_scroll_pagination` package | **Suppress** — package handles preloading | `ProjectContext.usesPackage('infinite_scroll_pagination')` |
 | `scrollController.jumpTo(maxScrollExtent)` (programmatic) | **Suppress** — not a listener trigger | Check context — assignment vs comparison |

@@ -59,7 +59,7 @@ dependency_overrides:
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Monorepo with local path overrides | **Suppress or note** — path overrides are common in monorepos | `path:` overrides are more acceptable |
 | Flutter test override (common) | **Suppress if configured as allowed** | `flutter_test` is commonly overridden |

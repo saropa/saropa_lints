@@ -104,7 +104,7 @@ final List<LogEntry> _log = List.filled(100, LogEntry.empty, growable: false);
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | List that is always cleared after use | **Suppress** — `_list.clear()` in dispose or after use | |
 | `StreamController` fed list (stream handles backpressure) | **Suppress** | |

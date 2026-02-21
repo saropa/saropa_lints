@@ -114,7 +114,7 @@ Widget _buildContent() {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Builders (LayoutBuilder, Builder, etc.) that count as nesting | **Count** — builders add nesting | |
 | Sliver widgets in CustomScrollView | **Count** — each sliver is a level | |

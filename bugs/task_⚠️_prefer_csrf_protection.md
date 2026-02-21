@@ -89,7 +89,7 @@ await http.post(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Mobile-only app (no web target) | **Suppress** — native apps are CSRF-resistant | Check build targets |
 | GET request (not state-changing) | **Suppress** — GET is idempotent | Only flag POST/PUT/DELETE/PATCH |

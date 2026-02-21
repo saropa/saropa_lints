@@ -93,7 +93,7 @@ unawaited(prefs.setString('analytics_event', event));
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `setX` in non-async function that returns Future | **Trigger** — caller may not await | |
 | `unawaited(prefs.setX(...))` | **Suppress** — explicit fire-and-forget | Developer acknowledged the race |

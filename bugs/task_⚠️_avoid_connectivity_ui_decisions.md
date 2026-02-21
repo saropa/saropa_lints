@@ -109,7 +109,7 @@ ElevatedButton(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Small offline indicator widget | **Suppress** — not a full-screen block | |
 | `OfflineBanner` in a Stack | **Suppress** — additive, not replacing | |

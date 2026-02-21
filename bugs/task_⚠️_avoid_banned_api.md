@@ -91,7 +91,7 @@ class ProductRepository {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | No configuration provided | **Suppress all** — rule is a no-op without config | Check config exists first |
 | File matches both `allowedFiles` and `bannedFiles` | **Allow takes precedence** — document this behavior | |

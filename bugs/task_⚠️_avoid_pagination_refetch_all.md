@@ -98,7 +98,7 @@ RefreshIndicator(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | List with 1 page (not actually paginated) | **Suppress** — single page fetch is not "all pages" | Check if `_loadedPages > 1` is detectable |
 | `RefreshIndicator` on a non-paginated list | **Suppress** | Need to detect pagination context |

@@ -92,7 +92,7 @@ try {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `unawaited(launchUrl(...))` | **Suppress** — explicit fire-and-forget | |
 | `launchUrl` in test | **Suppress** | |

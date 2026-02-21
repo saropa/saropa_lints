@@ -78,7 +78,7 @@ Widget(this.title, String subtitle) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `@required` deprecated param kept for API compat | **Trigger** — still unused | Note as known limitation |
 | Abstract class constructor with unused param | **Trigger** — even abstract, if declared and not used | Subclass cannot use abstract constructor params |

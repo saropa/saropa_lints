@@ -89,7 +89,7 @@ final profile = UserProfile.fromJson(profileDoc.data()!);
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | 3-4 claim keys (reasonable) | **Suppress** — threshold-based | Use threshold of 5+ keys |
 | Claims in test/mock data | **Suppress** | |

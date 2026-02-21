@@ -98,7 +98,7 @@ Form(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `TextFormField` with `validator` | **Suppress** if form `.validate()` called before API call | Cross-file analysis needed |
 | Dropdown/Select input (not freeform) | **Suppress** — user can't type arbitrary text | |

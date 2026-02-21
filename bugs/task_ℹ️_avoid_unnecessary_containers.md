@@ -33,7 +33,7 @@ context.registry.addInstanceCreationExpression((node) {
 1. Resolve the static type of the created instance.
 2. Check whether the type is `Container` from `package:flutter/widgets.dart`.
 3. Collect all named arguments in the argument list.
-4. Filter out `key` (which is inherited from `Widget` and does not contribute to layout or painting behaviour).
+4. Filter out `key` (which is inherited from `Widget` and does not contribute to layout or painting behavior).
 5. If the remaining named arguments are exactly `{child}` — or empty (no child at all, but that is covered by a different rule) — report the node.
 6. Do **not** report if any of the following arguments are present: `color`, `decoration`, `foregroundDecoration`, `width`, `height`, `constraints`, `margin`, `padding`, `alignment`, `transform`, `transformAlignment`, `clipBehavior`.
 

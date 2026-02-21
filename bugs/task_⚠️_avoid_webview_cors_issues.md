@@ -102,7 +102,7 @@ final controller = WebViewController()
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | WebView only loading HTTPS URLs (no file:// involved) | **Suppress** — CORS less likely to be an issue | |
 | `loadHtmlString` with inline content (no external fetch) | **Suppress** — no cross-origin requests | |

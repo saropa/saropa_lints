@@ -77,7 +77,7 @@ void _sortList() {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Mutation outside `setState` | **Suppress** in Phase 1 — only flag inside setState | Broader detection in Phase 2 |
 | `Map` mutation on private state map | **Trigger** — same concern | |

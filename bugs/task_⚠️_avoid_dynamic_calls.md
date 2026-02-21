@@ -76,7 +76,7 @@ final response = MyResponse.fromJson(jsonDecode(body));  // ✓
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `dynamic.toString()` | **Suppress** — `toString()` is available on all types | Whitelist `toString`, `hashCode`, `runtimeType` |
 | `dynamic.runtimeType` | **Suppress** | |

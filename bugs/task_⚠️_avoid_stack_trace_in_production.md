@@ -98,7 +98,7 @@ try {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `print(e)` in debug mode (`kDebugMode`) | **Suppress** — debug only | `if (kDebugMode) print(e)` |
 | `debugPrint(e.toString())` | **Trigger** — still goes to logcat | |
