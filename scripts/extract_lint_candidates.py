@@ -25,10 +25,12 @@ PROJECT_DIR = os.path.dirname(BASE_DIR)
 REPORTS_DIR = os.path.join(PROJECT_DIR, "reports")
 DART_FIX_PAIRS_FILE = os.path.join(BASE_DIR, "dart_fix_pairs.txt")
 
+CACHE_DIR = os.path.join(REPORTS_DIR, "_cache")
+
 SOURCES = {
-    "Flutter SDK": os.path.join(REPORTS_DIR, "flutter_sdk_exports", "versions"),
-    "Dart SDK": os.path.join(REPORTS_DIR, "dart_sdk_exports", "versions"),
-    "Dart-Code": os.path.join(REPORTS_DIR, "dart_code_exports", "versions"),
+    "Flutter SDK": os.path.join(CACHE_DIR, "flutter_sdk_exports", "versions"),
+    "Dart SDK": os.path.join(CACHE_DIR, "dart_sdk_exports", "versions"),
+    "Dart-Code": os.path.join(CACHE_DIR, "dart_code_exports", "versions"),
 }
 
 # --- Candidate Categories ---
