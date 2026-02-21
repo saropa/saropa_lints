@@ -503,7 +503,6 @@ const Set<String> essentialRules = <String>{
   'require_catch_logging', // WARNING - security event logging (OWASP A09)
   'require_intl_args_match', // ERROR - runtime crash
   'require_cache_key_determinism', // ERROR - memory bloat
-  // TODO(migration): require_method_channel_error_handling - class not found
   'require_https_for_ios', // WARNING - ATS blocking
   'require_ios_permission_description', // WARNING - App Store rejection
   'require_ios_privacy_manifest', // WARNING - iOS 17+ requirement
@@ -1052,9 +1051,6 @@ const Set<String> recommendedOnlyRules = <String>{
   // moved to Essential (they cause crashes)
   'prefer_ios_safe_area', // INFO - iOS notch/Dynamic Island handling
   'avoid_ios_hardcoded_status_bar', // WARNING - device-specific issues
-  // TODO(migration): require_ios_platform_check - class not found
-  // TODO(migration): avoid_ios_background_fetch_abuse - class not found
-  // TODO(migration): require_universal_link_validation - class not found
   'require_macos_window_size_constraints', // INFO - UX
 
   'avoid_ios_13_deprecations', // WARNING - App Store warnings
@@ -2608,8 +2604,6 @@ const Set<String> iosPlatformRules = <String>{
   // Recommended
   'prefer_ios_safe_area',
   'avoid_ios_hardcoded_status_bar',
-  // TODO(migration): require_ios_platform_check - class not found
-  // TODO(migration): avoid_ios_background_fetch_abuse - class not found
   'avoid_ios_13_deprecations',
   'avoid_ios_simulator_only_code',
   'require_ios_minimum_version_check',
