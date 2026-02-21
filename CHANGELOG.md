@@ -13,8 +13,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [5.0.0-beta.7]
 
+### Added
+- Init log file now includes a detailed rule-by-rule report listing every rule with its status, severity, tier, and any override/filter notes
+
 ### Changed
 - Report files now write into `reports/YYYYMMDD/` date subfolders instead of flat in `reports/` — reduces clutter when many reports accumulate
+- `--tier` / `--output` flags without a value now warn instead of silently using defaults
+- `dart run saropa_lints:init` without `--tier` now prompts for interactive tier selection (was silently defaulting to comprehensive)
 
 ### Fixed
 - `.pubignore` pattern `test/` was excluding `lib/src/fixes/test/` from published package — anchored to `/test/` so only the root test directory is excluded; this caused `dart run saropa_lints:init` to fail with a missing import error for `replace_expect_with_expect_later_fix.dart`
