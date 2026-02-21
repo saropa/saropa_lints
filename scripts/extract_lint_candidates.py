@@ -23,7 +23,6 @@ from typing import Dict, List, Set, Tuple
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 REPORTS_DIR = os.path.join(PROJECT_DIR, "reports")
-OUTPUT_FILE = os.path.join(REPORTS_DIR, "lint_candidates_report.md")
 DART_FIX_PAIRS_FILE = os.path.join(BASE_DIR, "dart_fix_pairs.txt")
 
 SOURCES = {
@@ -518,7 +517,15 @@ def write_report(
     pre_dedup_count: int,
 ):
     """Write the filtered, scored candidates report."""
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    now = datetime.now()
+    timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+    file_timestamp = now.strftime('%Y%m%d_%H%M%S')
+    date_folder = file_timestamp[:8]
+    output_dir = os.path.join(REPORTS_DIR, date_folder)
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(
+        output_dir, f"{file_timestamp}_lint_candidates_report.md",
+    )
 
     actionable = 0
     covered = 0
@@ -537,7 +544,7 @@ def write_report(
 
     total = actionable + covered
 
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         f.write("# Lint Rule Candidates Report\n\n")
         f.write(f"Generated on: {timestamp}\n")
         f.write(f"Total candidates: {total} ")
@@ -673,7 +680,7 @@ def write_report(
                         f.write(f"- ~~{line}~~\n")
                     f.write("\n---\n\n")
 
-    print(f"Report written to: {OUTPUT_FILE}")
+    print(f"Report written to: {output_file}")
     print(f"Total: {total} ({actionable} actionable, "
           f"{covered} dart-fix-covered)")
     print(f"Noise filtered: {noise_count} lines")
