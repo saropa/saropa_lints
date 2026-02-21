@@ -190,6 +190,91 @@ void _writeLogFile() {
   }
 }
 
+/// Migrate old report files from `reports/` root into date subfolders.
+///
+/// Files matching `YYYYMMDD_HHMMSS_*.log` in the `reports/` root are
+/// moved to `reports/YYYYMMDD/` based on the first 8 characters of the
+/// filename. This is a one-time cleanup for logs created before the
+/// date-folder migration. Runs silently if nothing to migrate.
+void _migrateOldReports() {
+  try {
+    final reportsDir = Directory('reports');
+    if (!reportsDir.existsSync()) return;
+
+    final pattern = RegExp(r'^\d{8}_\d{6}_.*\.log$');
+    final toMigrate = reportsDir.listSync().whereType<File>().where((f) {
+      final name = f.path.split('/').last.split('\\').last;
+      return pattern.hasMatch(name);
+    }).toList();
+
+    if (toMigrate.isEmpty) return;
+
+    for (final file in toMigrate) {
+      final name = file.path.split('/').last.split('\\').last;
+      final df = AnalysisReporter.dateFolder(name);
+      final targetDir = Directory('reports/$df');
+      if (!targetDir.existsSync()) {
+        targetDir.createSync(recursive: true);
+      }
+      file.renameSync('${targetDir.path}${Platform.pathSeparator}$name');
+    }
+
+    // Use print() not _logTerminal() — migration is operational cleanup,
+    // not configuration data for the init log.
+    final n = toMigrate.length;
+    print(
+      '${_Colors.dim}Migrated $n old report${n == 1 ? '' : 's'}'
+      ' to date subfolders${_Colors.reset}',
+    );
+  } catch (e) {
+    print(
+      '${_Colors.yellow}Warning: Could not migrate old reports: '
+      '$e${_Colors.reset}',
+    );
+  }
+}
+
+/// Find the newest plugin lint report in the given date subfolder.
+///
+/// The plugin's [AnalysisReporter] writes its report asynchronously via a
+/// debounce timer, so the file may not exist immediately after `dart analyze`
+/// exits. Retries up to [maxAttempts] times with a short delay.
+///
+/// Returns the relative path (e.g. `reports/20260221/..._report.log`)
+/// or null if no report was found.
+Future<String?> _findNewestPluginReport(
+  String dateFolderName, {
+  int maxAttempts = 10,
+}) async {
+  for (var attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      final dir = Directory('reports/$dateFolderName');
+      if (!dir.existsSync()) {
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+        continue;
+      }
+
+      final reports =
+          dir
+              .listSync()
+              .whereType<File>()
+              .where((f) => f.path.endsWith('_saropa_lint_report.log'))
+              .toList()
+            // Filenames start with YYYYMMDD_HHMMSS so lexicographic = newest first
+            ..sort((a, b) => b.path.compareTo(a.path));
+
+      if (reports.isNotEmpty) {
+        final name = reports.first.path.split('/').last.split('\\').last;
+        return 'reports/$dateFolderName/$name';
+      }
+    } catch (_) {
+      // Non-critical — fall through to retry or return null
+    }
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+  }
+  return null;
+}
+
 /// Append a detailed rule-by-rule listing to the log buffer.
 ///
 /// Written to the log file only, not printed to the terminal.
@@ -1039,6 +1124,9 @@ Future<void> main(List<String> args) async {
       '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_'
       '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
 
+  // Move old reports from reports/ root into date subfolders
+  _migrateOldReports();
+
   // Get version and source info early for logging
   final version = _getPackageVersion();
   final source = _getPackageSource();
@@ -1514,67 +1602,8 @@ Future<void> main(List<String> args) async {
   _logTerminal('');
 
   if (!cliArgs.dryRun) {
-    // Ask user if they want to run analysis BEFORE writing the log,
-    // so analysis results are captured in the report file.
-    stdout.write('${_Colors.cyan}Run analysis now? [y/N]: ${_Colors.reset}');
-    final response = stdin.readLineSync()?.toLowerCase().trim() ?? '';
-
-    if (response == 'y' || response == 'yes') {
-      _logTerminal('');
-      _logTerminal('${_Colors.bold}Running: dart analyze${_Colors.reset}');
-      _logTerminal('${'─' * 60}');
-
-      // Capture output so we can log it, while also streaming to terminal.
-      // Await both stream futures AND exitCode to avoid a race where the
-      // process exits before all output has been delivered to the listeners.
-      final process = await Process.start('dart', [
-        'analyze',
-      ], runInShell: true);
-
-      final stdoutLines = <String>[];
-      final stderrLines = <String>[];
-
-      final stdoutDone = process.stdout
-          .transform(const SystemEncoding().decoder)
-          .forEach((data) {
-            stdout.write(data);
-            stdoutLines.add(data);
-          });
-      final stderrDone = process.stderr
-          .transform(const SystemEncoding().decoder)
-          .forEach((data) {
-            stderr.write(data);
-            stderrLines.add(data);
-          });
-
-      final analyzeExitCode = await process.exitCode;
-      await stdoutDone;
-      await stderrDone;
-      _logTerminal('${'─' * 60}');
-
-      // Log the analysis result
-      _logBuffer.writeln('');
-      _logBuffer.writeln('${'=' * 80}');
-      _logBuffer.writeln('DART ANALYZE OUTPUT (exit code: $analyzeExitCode)');
-      _logBuffer.writeln('${'=' * 80}');
-      for (final line in stdoutLines) {
-        _logBuffer.write(line);
-      }
-      for (final line in stderrLines) {
-        _logBuffer.write(line);
-      }
-
-      if (analyzeExitCode == 0) {
-        _logTerminal(_success('✓ dart analyze passed'));
-      } else {
-        _logTerminal(
-          _error('✗ dart analyze failed (exit code $analyzeExitCode)'),
-        );
-        _warnings.add('dart analyze exited with code $analyzeExitCode');
-      }
-    }
-
-    // Append summary and write the log file LAST so everything is captured
+    // Write the init log (setup only) BEFORE analysis. The plugin writes
+    // its own detailed report (*_saropa_lint_report.log) during analysis.
     _appendLogSummary((
       version: version,
       tier: resolvedTier,
@@ -1583,6 +1612,61 @@ Future<void> main(List<String> args) async {
       outputPath: cliArgs.outputPath,
     ));
     _writeLogFile();
+    _logTerminal('');
+
+    // Ask user if they want to run analysis
+    stdout.write('${_Colors.cyan}Run analysis now? [y/N]: ${_Colors.reset}');
+    final response = stdin.readLineSync()?.toLowerCase().trim() ?? '';
+
+    if (response == 'y' || response == 'yes') {
+      _logTerminal('');
+      _logTerminal('${_Colors.bold}Running: dart analyze${_Colors.reset}');
+      _logTerminal('${'─' * 60}');
+
+      // Stream output to terminal. The plugin's AnalysisReporter writes
+      // the structured results to a separate *_saropa_lint_report.log.
+      final process = await Process.start('dart', [
+        'analyze',
+      ], runInShell: true);
+
+      final stdoutDone = process.stdout
+          .transform(const SystemEncoding().decoder)
+          .forEach(stdout.write);
+      final stderrDone = process.stderr
+          .transform(const SystemEncoding().decoder)
+          .forEach(stderr.write);
+
+      // Wait for exit code AND stream drain together so the separator
+      // line doesn't appear before trailing analyzer output.
+      final exitCodeFuture = process.exitCode;
+      await Future.wait([exitCodeFuture, stdoutDone, stderrDone]);
+      final analyzeExitCode = await exitCodeFuture;
+      _logTerminal('${'─' * 60}');
+
+      if (analyzeExitCode == 0) {
+        _logTerminal(_success('✓ dart analyze passed'));
+      } else if (analyzeExitCode <= 2) {
+        // Exit codes 1-2 mean "issues found" — the analysis completed.
+        _logTerminal(_success('✓ dart analyze completed'));
+      } else {
+        // Exit code 3+ means the analyzer itself failed (internal error,
+        // could not analyze, etc.)
+        _logTerminal(
+          _error('✗ dart analyze failed (exit code $analyzeExitCode)'),
+        );
+      }
+
+      // Show the plugin's lint report path if one was generated.
+      // Retries briefly since the plugin may still be flushing to disk.
+      final dateFolder = AnalysisReporter.dateFolder(_logTimestamp!);
+      final pluginReport = await _findNewestPluginReport(dateFolder);
+      if (pluginReport != null) {
+        _logTerminal(
+          '${_Colors.bold}Report:${_Colors.reset} '
+          '${_Colors.cyan}$pluginReport${_Colors.reset}',
+        );
+      }
+    }
   }
 }
 
