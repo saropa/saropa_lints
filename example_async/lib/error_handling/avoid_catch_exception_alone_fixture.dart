@@ -18,7 +18,9 @@ void _good() {
     doSomething();
   } on Exception catch (e) {
     print(e);
-  } on Object catch (e, st) { print(e); } // fallback for Error types
+  } on Object catch (e, st) {
+    print(e);
+  } // fallback for Error types
 }
 
 void main() {}

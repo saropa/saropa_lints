@@ -110,6 +110,7 @@ enum _BadEnum1273 {
   // expect_lint: avoid_unnecessary_enum_arguments
   active(false), // false is a common default — redundant
   inactive;
+
   const _BadEnum1273([bool enabled = true]);
 }
 
@@ -117,5 +118,6 @@ enum _BadEnum1273 {
 enum _GoodEnum1273 {
   active(true), // Non-default value — meaningful
   inactive;
+
   const _GoodEnum1273([bool enabled = false]);
 }

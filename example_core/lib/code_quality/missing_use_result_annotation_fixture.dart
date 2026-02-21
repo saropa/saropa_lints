@@ -108,7 +108,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger missing_use_result_annotation
 // expect_lint: missing_use_result_annotation
 class _BadClass163 {
-  String processData(String input) { // Returns value — callers may ignore it
+  String processData(String input) {
+    // Returns value — callers may ignore it
     return input.trim();
   }
 }
@@ -116,7 +117,8 @@ class _BadClass163 {
 // GOOD: Should NOT trigger missing_use_result_annotation
 class _GoodClass163 {
   @useResult
-  String processData(String input) { // @useResult signals return value matters
+  String processData(String input) {
+    // @useResult signals return value matters
     return input.trim();
   }
 }

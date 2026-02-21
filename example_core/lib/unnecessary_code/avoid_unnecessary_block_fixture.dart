@@ -108,7 +108,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_unnecessary_block
 void _bad1270() {
   // expect_lint: avoid_unnecessary_block
-  { // Nested block adds no value
+  {
+    // Nested block adds no value
     final x = 1;
   }
 }
