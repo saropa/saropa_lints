@@ -174,7 +174,8 @@ class AnalysisReporter {
   static String? get reportPath {
     if (_projectRoot == null || _sessionId == null) return null;
     final sep = Platform.pathSeparator;
-    return '$_projectRoot${sep}reports$sep'
+    final dateFolder = _sessionId!.substring(0, 8);
+    return '$_projectRoot${sep}reports$sep$dateFolder$sep'
         '${ReportConsolidator.reportFilename(_sessionId!)}';
   }
 
@@ -188,7 +189,8 @@ class AnalysisReporter {
 
     try {
       final sep = Platform.pathSeparator;
-      final reportsDir = Directory('$_projectRoot${sep}reports');
+      final dateFolder = _sessionId!.substring(0, 8);
+      final reportsDir = Directory('$_projectRoot${sep}reports$sep$dateFolder');
       if (!reportsDir.existsSync()) {
         reportsDir.createSync(recursive: true);
       }
@@ -744,7 +746,7 @@ class AnalysisReporter {
   }
 
   /// Move old report files to `.trash/`, keeping only the
-  /// [_maxReportFiles] most recent in the reports directory.
+  /// [_maxReportFiles] most recent across all date subdirectories.
   /// Trashed files can still be viewed but are excluded from the
   /// active reports listing.
   static void _cleanOldReports() {
@@ -755,13 +757,20 @@ class AnalysisReporter {
       final reportsDir = Directory('$_projectRoot${sep}reports');
       if (!reportsDir.existsSync()) return;
 
-      final reportFiles =
-          reportsDir
-              .listSync()
-              .whereType<File>()
-              .where((f) => f.path.endsWith('_saropa_lint_report.log'))
-              .toList()
-            ..sort((a, b) => b.path.compareTo(a.path));
+      // Collect report files from all date subdirectories
+      // (skip hidden dirs like .trash, .batches, .saropa_lints)
+      final reportFiles = <File>[];
+      for (final entity in reportsDir.listSync()) {
+        final dirName = entity.path.split(sep).last;
+        if (entity is Directory && !dirName.startsWith('.')) {
+          reportFiles.addAll(
+            entity.listSync().whereType<File>().where(
+              (f) => f.path.endsWith('_saropa_lint_report.log'),
+            ),
+          );
+        }
+      }
+      reportFiles.sort((a, b) => b.path.compareTo(a.path));
 
       if (reportFiles.length <= _maxReportFiles) return;
 

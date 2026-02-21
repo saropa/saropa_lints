@@ -13,6 +13,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [5.0.0-beta.7]
 
+### Changed
+- Report files now write into `reports/YYYYMMDD/` date subfolders instead of flat in `reports/` — reduces clutter when many reports accumulate
+
 ### Fixed
 - `.pubignore` pattern `test/` was excluding `lib/src/fixes/test/` from published package — anchored to `/test/` so only the root test directory is excluded; this caused `dart run saropa_lints:init` to fail with a missing import error for `replace_expect_with_expect_later_fix.dart`
 - Publish script `dart format` step failed on fixture files using future language features (extension types, digit separators, non-ASCII identifiers) — now tolerates exit code 65 when all unparseable files are in example fixture directories
