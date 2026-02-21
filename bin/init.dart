@@ -241,6 +241,261 @@ String _detailNote(
   return '';
 }
 
+/// Summary data for the log file.
+typedef _RunSummary = ({
+  String version,
+  String tier,
+  int enabled,
+  int disabled,
+  String outputPath,
+});
+
+/// Append a final summary block to the log buffer.
+///
+/// Called just before [_writeLogFile] so the summary is the last section
+/// in the report, after any analysis output.
+void _appendLogSummary(_RunSummary s) {
+  _logBuffer.writeln('');
+  _logBuffer.writeln('${'=' * 80}');
+  _logBuffer.writeln('SUMMARY');
+  _logBuffer.writeln('${'=' * 80}');
+  _logBuffer.writeln('Version:  ${s.version}');
+  _logBuffer.writeln('Tier:     ${s.tier}');
+  _logBuffer.writeln('Enabled:  ${s.enabled} rules');
+  _logBuffer.writeln('Disabled: ${s.disabled} rules');
+  _logBuffer.writeln('Output:   ${s.outputPath}');
+
+  if (_warnings.isNotEmpty) {
+    _logBuffer.writeln('');
+    _logBuffer.writeln('Warnings (${_warnings.length}):');
+    for (final w in _warnings) {
+      _logBuffer.writeln('  - $w');
+    }
+  } else {
+    _logBuffer.writeln('Warnings: none');
+  }
+  _logBuffer.writeln('${'=' * 80}');
+}
+
+// ---------------------------------------------------------------------------
+// Pre-flight validation
+// ---------------------------------------------------------------------------
+
+/// Collected warnings during the run (printed in log summary).
+final List<String> _warnings = <String>[];
+
+/// Log a validation check result to both terminal and log buffer.
+void _logCheck(String label, {required bool pass, String? detail}) {
+  final tag = pass
+      ? '${_Colors.green}[PASS]${_Colors.reset}'
+      : '${_Colors.yellow}[WARN]${_Colors.reset}';
+  final msg = detail != null ? '$tag $label — $detail' : '$tag $label';
+  _logTerminal(msg);
+  if (!pass) {
+    _warnings.add(detail != null ? '$label — $detail' : label);
+  }
+}
+
+/// Run pre-flight checks before generating the configuration.
+///
+/// All checks are non-fatal (warnings only). Results are logged to both
+/// terminal and the log buffer so they appear in the report file.
+void _runPreflightChecks({required String version}) {
+  _logTerminal('${_Colors.bold}Pre-flight checks${_Colors.reset}');
+
+  _checkPubspecDependency();
+  _checkDartSdkVersion();
+  _auditExistingConfig(version);
+
+  _logTerminal('');
+}
+
+/// Check that pubspec.yaml lists saropa_lints as a dependency.
+void _checkPubspecDependency() {
+  final pubspec = File('pubspec.yaml');
+  if (!pubspec.existsSync()) {
+    _logCheck(
+      'pubspec.yaml',
+      pass: false,
+      detail: 'file not found — are you in the project root?',
+    );
+    return;
+  }
+
+  final content = pubspec.readAsStringSync();
+  final hasDep = RegExp(
+    r'^\s+saropa_lints:',
+    multiLine: true,
+  ).hasMatch(content);
+
+  if (hasDep) {
+    _logCheck('pubspec.yaml contains saropa_lints dependency', pass: true);
+  } else {
+    _logCheck(
+      'pubspec.yaml',
+      pass: false,
+      detail:
+          'saropa_lints not found in dependencies — '
+          'add it to dev_dependencies',
+    );
+  }
+}
+
+/// Check that the Dart SDK version supports the plugin system (>= 3.6).
+void _checkDartSdkVersion() {
+  final versionStr = Platform.version; // e.g. "3.10.0 (stable) ..."
+  final match = RegExp(r'^(\d+)\.(\d+)').firstMatch(versionStr);
+  if (match == null) {
+    _logCheck(
+      'Dart SDK version',
+      pass: false,
+      detail: 'could not parse: $versionStr',
+    );
+    return;
+  }
+
+  final major = int.parse(match.group(1)!);
+  final minor = int.parse(match.group(2)!);
+
+  if (major > 3 || (major == 3 && minor >= 6)) {
+    _logCheck('Dart SDK $major.$minor (plugin support OK)', pass: true);
+  } else {
+    _logCheck(
+      'Dart SDK version',
+      pass: false,
+      detail: '$major.$minor detected — native plugins require Dart >= 3.6',
+    );
+  }
+}
+
+/// Audit an existing analysis_options.yaml for common issues.
+void _auditExistingConfig(String currentVersion) {
+  final configFile = File('analysis_options.yaml');
+  if (!configFile.existsSync()) {
+    _logCheck('No existing analysis_options.yaml (fresh setup)', pass: true);
+    return;
+  }
+
+  final content = configFile.readAsStringSync();
+
+  // Check for old custom_lint section (v4 leftover)
+  if (RegExp(r'custom_lint:', multiLine: true).hasMatch(content)) {
+    _logCheck(
+      'Existing config',
+      pass: false,
+      detail:
+          'contains custom_lint: section — '
+          'saropa_lints v5 uses native plugins, not custom_lint',
+    );
+  }
+
+  // Check for plugins section missing version key
+  if (RegExp(r'^\s+saropa_lints:', multiLine: true).hasMatch(content) &&
+      !RegExp(r'^\s+version:', multiLine: true).hasMatch(content)) {
+    _logCheck(
+      'Existing config',
+      pass: false,
+      detail:
+          'plugins section missing version: key — '
+          'the analyzer will silently ignore the plugin',
+    );
+  }
+
+  // Check for stale version constraint
+  final versionMatch = RegExp(
+    r'version:\s*"?\^?([^"\s]+)"?',
+    multiLine: true,
+  ).firstMatch(content);
+  if (versionMatch != null && currentVersion != 'unknown') {
+    final existing = versionMatch.group(1)!;
+    if (existing != currentVersion && !existing.startsWith(currentVersion)) {
+      _logCheck(
+        'Existing config',
+        pass: false,
+        detail: 'version $existing may be stale (current: $currentVersion)',
+      );
+    }
+  }
+
+  // If none of the config-specific checks above fired, report OK
+  if (!_warnings.any((w) => w.startsWith('Existing config'))) {
+    _logCheck('Existing analysis_options.yaml looks OK', pass: true);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Post-write validation
+// ---------------------------------------------------------------------------
+
+/// Validate the written configuration file has the critical sections.
+///
+/// Returns true if all checks pass.
+bool _validateWrittenConfig(String filePath, int expectedRuleCount) {
+  _logTerminal('');
+  _logTerminal('${_Colors.bold}Post-write validation${_Colors.reset}');
+
+  final file = File(filePath);
+  if (!file.existsSync()) {
+    _logCheck(filePath, pass: false, detail: 'file does not exist');
+    return false;
+  }
+
+  final content = file.readAsStringSync();
+  var allPassed = true;
+
+  // Check plugins: section exists
+  if (RegExp(r'^plugins:', multiLine: true).hasMatch(content)) {
+    _logCheck('plugins: section present', pass: true);
+  } else {
+    _logCheck('plugins:', pass: false, detail: 'section missing');
+    allPassed = false;
+  }
+
+  // Check version: key under saropa_lints
+  if (RegExp(r'^\s+version:', multiLine: true).hasMatch(content)) {
+    _logCheck('version: key present', pass: true);
+  } else {
+    _logCheck(
+      'version:',
+      pass: false,
+      detail: 'key missing — analyzer will silently ignore plugin',
+    );
+    allPassed = false;
+  }
+
+  // Check diagnostics: section
+  if (RegExp(r'^\s+diagnostics:', multiLine: true).hasMatch(content)) {
+    _logCheck('diagnostics: section present', pass: true);
+  } else {
+    _logCheck('diagnostics:', pass: false, detail: 'section missing');
+    allPassed = false;
+  }
+
+  // Check rule count (5% tolerance)
+  final ruleLines = RegExp(
+    r'^\s{6}\w+:\s*(true|false)',
+    multiLine: true,
+  ).allMatches(content).length;
+  final tolerance = (expectedRuleCount * 0.05).ceil();
+  final diff = (ruleLines - expectedRuleCount).abs();
+  if (diff <= tolerance) {
+    _logCheck(
+      'Rule count: $ruleLines (expected ~$expectedRuleCount)',
+      pass: true,
+    );
+  } else {
+    _logCheck(
+      'Rule count',
+      pass: false,
+      detail: '$ruleLines rules found, expected ~$expectedRuleCount',
+    );
+    allPassed = false;
+  }
+
+  _logTerminal('');
+  return allPassed;
+}
+
 // ---------------------------------------------------------------------------
 // Cross-platform ANSI color support
 // ---------------------------------------------------------------------------
@@ -836,6 +1091,9 @@ Future<void> main(List<String> args) async {
   );
   _logTerminal('');
 
+  // Run pre-flight validation checks (non-fatal warnings)
+  _runPreflightChecks(version: version);
+
   // tiers.dart is the source of truth for all rules
   // A unit test validates that all plugin rules are in tiers.dart
   final Set<String> allRules = tiers.getAllDefinedRules();
@@ -1104,6 +1362,7 @@ Future<void> main(List<String> args) async {
   // Generate the new plugins section with proper formatting
   final String pluginsYaml = _generatePluginsYaml(
     tier: resolvedTier,
+    packageVersion: version,
     enabledRules: finalEnabled,
     disabledRules: finalDisabled,
     userCustomizations: userCustomizations,
@@ -1169,6 +1428,9 @@ Future<void> main(List<String> args) async {
       return;
     }
   }
+
+  // Validate the written file has the critical sections
+  _validateWrittenConfig(cliArgs.outputPath, allRules.length);
 
   // Convert v4 ignore comments (interactive prompt or --fix-ignores flag)
   if (v4Detected && !cliArgs.dryRun) {
@@ -1251,40 +1513,76 @@ Future<void> main(List<String> args) async {
 
   _logTerminal('');
 
-  // Write detailed log file (unless dry-run)
   if (!cliArgs.dryRun) {
-    _writeLogFile();
-
-    // Ask user if they want to run analysis
+    // Ask user if they want to run analysis BEFORE writing the log,
+    // so analysis results are captured in the report file.
     stdout.write('${_Colors.cyan}Run analysis now? [y/N]: ${_Colors.reset}');
     final response = stdin.readLineSync()?.toLowerCase().trim() ?? '';
 
     if (response == 'y' || response == 'yes') {
       _logTerminal('');
-      _logTerminal('🚀 ${_Colors.bold}Running: dart analyze${_Colors.reset}');
+      _logTerminal('${_Colors.bold}Running: dart analyze${_Colors.reset}');
       _logTerminal('${'─' * 60}');
 
-      // Run with inheritStdio for real-time output streaming
-      // Must await to prevent parent exit from killing child process
-      final process = await Process.start(
-        'dart',
-        ['analyze'],
-        mode: ProcessStartMode.inheritStdio,
-        runInShell: true,
-      );
-      await process.exitCode;
+      // Capture output so we can log it, while also streaming to terminal.
+      // Await both stream futures AND exitCode to avoid a race where the
+      // process exits before all output has been delivered to the listeners.
+      final process = await Process.start('dart', [
+        'analyze',
+      ], runInShell: true);
+
+      final stdoutLines = <String>[];
+      final stderrLines = <String>[];
+
+      final stdoutDone = process.stdout
+          .transform(const SystemEncoding().decoder)
+          .forEach((data) {
+            stdout.write(data);
+            stdoutLines.add(data);
+          });
+      final stderrDone = process.stderr
+          .transform(const SystemEncoding().decoder)
+          .forEach((data) {
+            stderr.write(data);
+            stderrLines.add(data);
+          });
+
+      final analyzeExitCode = await process.exitCode;
+      await stdoutDone;
+      await stderrDone;
       _logTerminal('${'─' * 60}');
 
-      // Remind user where the init log is
-      if (_logTimestamp != null) {
-        final dateFolder = AnalysisReporter.dateFolder(_logTimestamp!);
-        final logPath =
-            'reports/$dateFolder/${_logTimestamp}_saropa_lints_init.log';
+      // Log the analysis result
+      _logBuffer.writeln('');
+      _logBuffer.writeln('${'=' * 80}');
+      _logBuffer.writeln('DART ANALYZE OUTPUT (exit code: $analyzeExitCode)');
+      _logBuffer.writeln('${'=' * 80}');
+      for (final line in stdoutLines) {
+        _logBuffer.write(line);
+      }
+      for (final line in stderrLines) {
+        _logBuffer.write(line);
+      }
+
+      if (analyzeExitCode == 0) {
+        _logTerminal(_success('✓ dart analyze passed'));
+      } else {
         _logTerminal(
-          '${_Colors.bold}Log:${_Colors.reset} ${_Colors.cyan}$logPath${_Colors.reset}',
+          _error('✗ dart analyze failed (exit code $analyzeExitCode)'),
         );
+        _warnings.add('dart analyze exited with code $analyzeExitCode');
       }
     }
+
+    // Append summary and write the log file LAST so everything is captured
+    _appendLogSummary((
+      version: version,
+      tier: resolvedTier,
+      enabled: finalEnabled.length,
+      disabled: finalDisabled.length,
+      outputPath: cliArgs.outputPath,
+    ));
+    _writeLogFile();
   }
 }
 
@@ -2418,6 +2716,7 @@ Map<String, bool> _extractPackagesFromFile(File file) {
 /// Organizes rules by tier with problem message comments.
 String _generatePluginsYaml({
   required String tier,
+  required String packageVersion,
   required Set<String> enabledRules,
   required Set<String> disabledRules,
   required Map<String, bool> userCustomizations,
@@ -2431,6 +2730,13 @@ String _generatePluginsYaml({
 
   buffer.writeln('plugins:');
   buffer.writeln('  saropa_lints:');
+  // version: is REQUIRED — without it the Dart analyzer silently ignores
+  // the plugin and dart analyze reports zero issues.
+  if (packageVersion != 'unknown') {
+    buffer.writeln('    version: "$packageVersion"');
+  } else {
+    buffer.writeln('    # version: unknown — run dart pub get to resolve');
+  }
   buffer.writeln(
     '    # ═══════════════════════════════════════════════════════════════════',
   );

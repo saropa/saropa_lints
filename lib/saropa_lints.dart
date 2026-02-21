@@ -2586,8 +2586,9 @@ _CustomYamlSettings _parseCustomYamlSettings() {
       disabledPackages: disabledPackages,
     );
   } catch (e) {
-    // ignore: avoid_print
-    print('[saropa_lints] Failed to parse analysis_options_custom.yaml: $e');
+    stderr.writeln(
+      '[saropa_lints] Failed to parse analysis_options_custom.yaml: $e',
+    );
     return empty;
   }
 }
@@ -2652,9 +2653,8 @@ void _checkConflictingRules(List<SaropaLintRule> enabledRules) {
     final String rule2 = pair[1];
 
     if (enabledNames.contains(rule1) && enabledNames.contains(rule2)) {
-      // Use stderr to output warning without breaking analysis
-      // ignore: avoid_print
-      print(
+      // Use stderr to avoid corrupting JSON-RPC protocol in analysis server
+      stderr.writeln(
         '[saropa_lints] WARNING: Conflicting rules enabled: '
         '$rule1 and $rule2. '
         'These rules have opposite effects - disable one.',
@@ -2742,8 +2742,9 @@ void _loadAnalysisConfig() {
       }
     }
   } catch (e) {
-    // ignore: avoid_print
-    print('[saropa_lints] Failed to read analysis_options_custom.yaml: $e');
+    stderr.writeln(
+      '[saropa_lints] Failed to read analysis_options_custom.yaml: $e',
+    );
   }
 }
 
