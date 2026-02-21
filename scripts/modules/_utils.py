@@ -141,7 +141,7 @@ def show_saropa_logo() -> None:
 \033[38;5;209m                    -odMMMNyo/-..````.++:+o+/-\033[0m
 \033[38;5;215m                 `/dMMMMMM/`          ``````````\033[0m
 \033[38;5;220m                `dMMMMMMMMNdhhhdddmmmNmmddhs+-\033[0m
-\033[38;5;226m                /MMMMMMMMMMMMMMMMMMMMMMMMMMMMMNh\\033[0m
+\033[38;5;226m                /MMMMMMMMMMMMMMMMMMMMMMMMMMMMMNh\\\033[0m
 \033[38;5;190m              . :sdmNNNNMMMMMNNNMMMMMMMMMMMMMMMMm+\033[0m
 \033[38;5;154m              o     `..~~~::~+==+~:/+sdNMMMMMMMMMMMo\033[0m
 \033[38;5;118m              m                        .+NMMMMMMMMMN\033[0m
