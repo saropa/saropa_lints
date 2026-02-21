@@ -14,6 +14,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ## [Unreleased]
 
 ### Fixed
+- Init: `_stylisticRuleCategories` synced with `tiers.stylisticRules` — removed obsolete `prefer_async_only_when_awaiting`, added ~40 rules to proper categories instead of "Other stylistic rules" catch-all
+- Init: obsolete stylistic rules in consumer `analysis_options_custom.yaml` are now cleaned up during rebuild, with warnings for user-enabled rules being dropped
+- Init: stylistic rules redundantly placed in RULE OVERRIDES section are detected — interactive prompt offers to move them to the STYLISTIC RULES section
+- Init: `_buildStylisticSection()` now filters against `tiers.stylisticRules` to prevent future category/tier desyncs
 - `dart analyze` exit codes 1-2 (issues found) no longer reported as "failed" — only exit code 3+ (analyzer error) is treated as failure
 - Progress bar stuck at ~83% — recalibration threshold no longer inflates expected file count when discovery overcounts
 - Progress bar now shows 100% completion before the summary box
