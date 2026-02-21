@@ -121,7 +121,7 @@ Future<UserData> getUser(String id) async {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Single-threaded dart (no concurrency) | **Suppress** — Dart is single-threaded (but async interleaving is real) | |
 | Cache with size limit but no dedup | **Trigger** — stampede still possible | |

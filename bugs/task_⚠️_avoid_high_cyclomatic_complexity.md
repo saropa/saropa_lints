@@ -139,7 +139,7 @@ String processOrder(Order order) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Generated code (`.g.dart`) | **Suppress** — generated code can be complex | |
 | `switch` on sealed class (exhaustive) | **Count each case** — but exhaustive switches are acceptable | May need to not count sealed switch cases |

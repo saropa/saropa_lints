@@ -95,7 +95,7 @@ final dio = Dio(BaseOptions(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `dart:io` `HttpClient` (low-level) | **Check separately** — may not auto-add Accept-Encoding | Different API surface |
 | `http.Client` subclass that adds headers in `send()` | **False positive** — can't detect middleware statically | Very common pattern |

@@ -86,7 +86,7 @@ Future<String?> getToken() async {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `try { await _storage.read() } catch...` | **Suppress** — has error handling | |
 | Secure storage access in test | **Suppress** | |

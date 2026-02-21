@@ -70,7 +70,7 @@ dependencies:
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `flutter:` with `sdk: flutter` | **Suppress** — SDK dependency, not a pub package | |
 | `dart:` with `sdk: dart` | **Suppress** | |

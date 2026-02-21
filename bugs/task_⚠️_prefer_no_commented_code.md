@@ -82,7 +82,7 @@ void dispose() {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Doc comment examples (`/// ```dart ...`) | **Suppress** — doc comment code examples are valid | Check if inside `///` triple-slash doc comment |
 | `// TODO: var x = ...` | **Suppress** — TODO followed by code description is prose | Strip TODO/FIXME/NOTE prefixes |

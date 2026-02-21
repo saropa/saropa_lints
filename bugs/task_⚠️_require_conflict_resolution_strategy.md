@@ -89,7 +89,7 @@ Future<void> syncWithConflictUI(Item local, Item remote) async {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | App is not offline-first (always requires connectivity) | **Suppress** | Hard to detect static connectivity requirement |
 | App uses Amplify DataStore (handles conflicts automatically) | **Suppress** | `ProjectContext.usesPackage('amplify_datastore')` |

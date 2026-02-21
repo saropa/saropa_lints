@@ -84,7 +84,7 @@ void main() async {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Debug mode with `DebugProvider` | **Suppress** — debug App Check is fine | |
 | Test files | **Suppress** | |

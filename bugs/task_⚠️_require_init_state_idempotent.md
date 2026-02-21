@@ -38,7 +38,7 @@ void initState() {
 ## Trigger Conditions
 
 1. `initState()` that calls `addListener`, `subscribe`, `register` without a corresponding check for already-registered state
-2. `initState()` that creates a `Timer` without cancelling any existing timer first
+2. `initState()` that creates a `Timer` without canceling any existing timer first
 3. `initState()` that calls static methods that accumulate state (e.g., adding to a static list)
 
 **Phase 1 (Conservative)**: Flag `addListener` calls in `initState()` when the enclosing `dispose()` doesn't have a corresponding `removeListener`.
@@ -109,10 +109,10 @@ class _EventWidgetState extends State<EventWidget> {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `addListener` with matching `removeListener` in `dispose` | **Suppress** — properly managed | |
-| `StreamSubscription` stored and cancelled in `dispose` | **Suppress** | |
+| `StreamSubscription` stored and canceled in `dispose` | **Suppress** | |
 | `_initialized` guard in `initState` | **Suppress** — developer is aware | |
 | Simple `initState` with only variable initialization | **Suppress** | |
 | `ChangeNotifier.addListener` vs stream listener | **Same treatment** | |
@@ -128,7 +128,7 @@ class _EventWidgetState extends State<EventWidget> {
 ### Non-Violations
 1. `initState` that only initializes local fields → no lint
 2. `addListener` in `initState` matched by `removeListener` in `dispose` → no lint
-3. Stream subscription stored and cancelled in `dispose` → no lint
+3. Stream subscription stored and canceled in `dispose` → no lint
 
 ## Quick Fix
 
@@ -156,4 +156,4 @@ void dispose() {
 3. **Cross-method analysis**: Checking that `dispose()` has a matching `removeListener` requires finding the `dispose()` method in the same class — cross-method within a single class. This is feasible.
 4. **The `_initialized` flag pattern**: This is the idiomatic guard for one-time initialization in `initState`. Detecting it as a suppression is important to avoid false positives.
 5. **`WidgetsBinding.instance.addObserver`**: A common pattern that needs matching `removeObserver` in `dispose`. Include in detection.
-6. **Timer non-idempotency**: Creating a `Timer` in `initState` is only a problem if the old one isn't cancelled. Store the timer in a field and cancel in `dispose`.
+6. **Timer non-idempotency**: Creating a `Timer` in `initState` is only a problem if the old one isn't canceled. Store the timer in a field and cancel in `dispose`.

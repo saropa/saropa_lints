@@ -99,7 +99,7 @@ try {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `if (kDebugMode) Text(e.toString())` | **Suppress** — debug only | |
 | Custom exception with user-facing `message` | **Complex** — `e.message` may be user-friendly | Can't know if `message` is user-friendly |

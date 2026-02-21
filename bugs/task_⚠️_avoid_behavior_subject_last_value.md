@@ -75,7 +75,7 @@ if (!_subject.isClosed) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Project doesn't use `rxdart` | **Suppress** | `ProjectContext.usesPackage('rxdart')` |
 | `BehaviorSubject` accessed before close | **Suppress** — valid use | Only flag after-close access |

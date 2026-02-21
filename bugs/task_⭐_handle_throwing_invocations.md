@@ -117,12 +117,12 @@ void main() {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Method annotated `@Throws` called inside a `try/catch` | **Suppress** | Walk parents for `TryStatement` |
 | Method annotated `@Throws` called inside a method that is itself annotated `@Throws` | **Suppress** — the caller propagates the throw | Check enclosing function for `@Throws` annotation |
 | Override of a method annotated `@Throws` | **Suppress on the override call** | Only check call sites, not declarations |
-| Test files | **Suppress** | `ProjectContext.isTestFile` — tests are EXPECTED to test throwing behaviour |
+| Test files | **Suppress** | `ProjectContext.isTestFile` — tests are EXPECTED to test throwing behavior |
 | `@Throws` in a generated file (`.g.dart`, `.freezed.dart`) | **Suppress** | Check `isGenerated` on the file path |
 | Method annotated `@Throws([])`  (empty list) | **Suppress** — explicitly declares no throws | Check list length |
 | Method that catches internally and rethrows | **Should trigger** — from the caller's perspective it can throw | Caller doesn't know what happens internally |

@@ -104,7 +104,7 @@ Focus(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `onChanged` with debounce (e.g., `Timer` delay) | **Suppress** — rate-limited | |
 | `onChange` vs `onChanged` | **Same treatment** | |

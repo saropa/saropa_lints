@@ -100,7 +100,7 @@ Future<String> _getFreshToken() async {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `getIdToken(true)` (forceRefresh) | **Suppress** — always fresh | |
 | `getIdToken()` used immediately without storage | **Suppress** — no caching issue | |

@@ -133,7 +133,7 @@ void dispose() {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `catch (e) { rethrow; }` | **Suppress** — not empty | `rethrow` is a statement |
 | Empty `test('description', () {})` | **Trigger** — test body should have assertions | Unless it's a placeholder |

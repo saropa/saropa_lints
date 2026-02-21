@@ -85,7 +85,7 @@ context.router.push(ProductDetailRoute(id: 123)); // then push within tab
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Top-level route pushed with `push()` | **Suppress** — push is correct for top-level | Phase 1 can't distinguish |
 | `navigateTo()` helper method | **Suppress** — auto_route's own navigate API | |

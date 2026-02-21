@@ -117,7 +117,7 @@ class _ProductCardState extends State<ProductCard>
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | 2 controllers | **Suppress** — threshold is 3 | |
 | 3 controllers with explicit coordination comments | **Trigger** — still a code smell | |

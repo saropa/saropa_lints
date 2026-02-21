@@ -29,17 +29,17 @@ This also creates confusion with methods: a boolean getter named with a verb loo
 The Dart style guide states that boolean properties should "prefer adjectives over verbs." This rule enforces that guidance for getters explicitly declared to return `bool`.
 
 ## Description (from ROADMAP)
-Flag boolean getter declarations (`bool get name`) whose names start with a verb rather than a recognised predicate prefix (`is`, `has`, `can`, `should`, `was`, `will`, `needs`, `allows`, `contains`, `includes`, `supports`, `requires`, `provides`, `matches`), and suggest renaming to a predicate form.
+Flag boolean getter declarations (`bool get name`) whose names start with a verb rather than a recognized predicate prefix (`is`, `has`, `can`, `should`, `was`, `will`, `needs`, `allows`, `contains`, `includes`, `supports`, `requires`, `provides`, `matches`), and suggest renaming to a predicate form.
 
 ## Trigger Conditions
 The rule triggers when:
 1. A `MethodDeclaration` is a getter (`isGetter == true`).
 2. The getter's declared return type is `bool` (checked via the type annotation or the inferred type element).
-3. The getter name does NOT start with any recognised predicate prefix from the allowlist.
+3. The getter name does NOT start with any recognized predicate prefix from the allowlist.
 4. The getter name starts with a common verb that is not a predicate word.
 
 It does NOT trigger for:
-- Getters that start with recognised prefixes: `is`, `has`, `can`, `should`, `was`, `will`, `needs`, `allows`, `contains`, `includes`, `supports`, `requires`, `provides`, `matches`, `exists`.
+- Getters that start with recognized prefixes: `is`, `has`, `can`, `should`, `was`, `will`, `needs`, `allows`, `contains`, `includes`, `supports`, `requires`, `provides`, `matches`, `exists`.
 - Override getters (inherited name from supertype).
 - Getters in generated code.
 - Getters in test files.

@@ -93,7 +93,7 @@ Future<void> requestCamera() async {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `for` loop requesting permissions for different types | **Trigger** — loop over `Permission.values` is still a loop | Each permission should be handled individually |
 | `request()` called once in `initState` | **Suppress** — single request | |

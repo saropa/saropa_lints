@@ -100,7 +100,7 @@ TextField(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `errorText` set to `null` (no error) | **Suppress** — null is not a user-visible string | Only check non-null string literals |
 | `labelText: ''` empty string | **Suppress** | |

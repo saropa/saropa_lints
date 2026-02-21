@@ -90,7 +90,7 @@ await _localNotifications.show(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | FCM `sendMessage` to a different device (not self) | **Suppress** — this IS a server-ish use case (device-to-device) | Hard to detect statically; may need to suppress entirely |
 | Background isolate with FCM | **Suppress** — background message handling is legitimate FCM use | Check if inside `@pragma('vm:entry-point')` handler |

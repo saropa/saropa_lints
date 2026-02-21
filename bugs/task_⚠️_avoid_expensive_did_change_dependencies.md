@@ -117,7 +117,7 @@ void didChangeDependencies() {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `_initialized` guard around heavy work | **Suppress** — protected from re-runs | |
 | Light work (reading from context, assignment) | **Suppress** | |

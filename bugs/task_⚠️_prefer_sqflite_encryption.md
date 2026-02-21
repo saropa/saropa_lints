@@ -86,7 +86,7 @@ final db = await openDatabase('app_settings.db');
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Test files | **Suppress** | Test DBs don't need encryption |
 | In-memory database `openDatabase(':memory:')` | **Suppress** — no persistence | |

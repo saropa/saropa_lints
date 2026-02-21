@@ -112,7 +112,7 @@ class AsyncAuthGuard extends AutoRouteGuard {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `resolver.next(true)` inside a nested `Future` callback | **Trigger** — the outer method may return before the future resolves | Async guards need `await` |
 | Guard that calls a helper method which calls `resolver.next` | **False negative** — can't trace into helper without inter-method analysis | Phase 1 limitation; document as known limitation |

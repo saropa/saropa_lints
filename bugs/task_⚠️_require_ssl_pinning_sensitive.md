@@ -87,7 +87,7 @@ dio.interceptors.add(CertificatePinningInterceptor(allowedFingerprints: [...]));
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Local development server (`localhost`, `127.0.0.1`) | **Suppress** | Dev servers don't have pinnable certs |
 | HTTP (not HTTPS) URLs | **Suppress** — pinning is irrelevant on HTTP | Actually, HTTP should be a separate error |

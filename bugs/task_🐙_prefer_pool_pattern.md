@@ -110,7 +110,7 @@ void _onTick(Duration elapsed) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `Offset(x, y)` created in animation frame | **Suppress** — built-in value types are stack-allocated or very cheap | Whitelist known cheap types: `Offset`, `Size`, `Rect`, `Color` |
 | `Future` / `Stream` creation in timer | **Suppress** — async machinery, not domain objects | Complex to detect |

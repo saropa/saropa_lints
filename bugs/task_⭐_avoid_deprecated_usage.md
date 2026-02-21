@@ -32,7 +32,7 @@ Trigger when:
 ### Overlap with Built-in Rule
 **IMPORTANT**: The Dart SDK's `deprecated_member_use` already does exactly this. Before implementing, determine what differentiated value this rule adds. Options:
 1. Higher severity (WARNING instead of INFO/hint) — this is the primary value
-2. Configurable ignore-own-package behaviour
+2. Configurable ignore-own-package behavior
 3. Cross-package deprecation escalation
 
 ### AST Visitor Pattern
@@ -100,7 +100,7 @@ void oldMethod() {}
 // (if ignore_own_package: true is configured)
 oldMethod();  // in same package
 
-// Test file testing deprecated behaviour
+// Test file testing deprecated behavior
 test('deprecated method still works', () {
   // ignore: deprecated_member_use
   oldMethod();
@@ -109,7 +109,7 @@ test('deprecated method still works', () {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Using own package's deprecated API | **Suppress** by default (`ignore_own_package: true`) | This is normal during a migration |
 | `// ignore: avoid_deprecated_usage` inline | **Suppress** | Standard ignore comment handling |

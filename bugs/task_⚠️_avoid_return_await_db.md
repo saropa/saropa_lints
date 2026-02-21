@@ -105,7 +105,7 @@ Future<void> batchMigrate(List<Item> items) async {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `return await db.query(...)` | **Suppress** — read operations excluded | Check method name against reads list |
 | `return await db.rawQuery(...)` | **Suppress** — read | |

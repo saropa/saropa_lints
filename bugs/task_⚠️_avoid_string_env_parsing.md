@@ -100,7 +100,7 @@ static const enableDebug = bool.fromEnvironment('ENABLE_DEBUG');
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `defaultValue: 'fallback'` provided | **Suppress** — has fallback | |
 | Result checked with `isEmpty` before use | **Suppress** — validated | |

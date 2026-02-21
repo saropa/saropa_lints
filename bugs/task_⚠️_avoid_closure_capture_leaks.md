@@ -30,7 +30,7 @@ class _MyWidgetState extends State<MyWidget> {
 
 Other patterns:
 - Large objects captured by a `Timer` callback
-- State captured by a `StreamSubscription` that isn't cancelled
+- State captured by a `StreamSubscription` that isn't canceled
 - Widgets captured by animation callbacks
 
 ## Description (from ROADMAP)
@@ -110,10 +110,10 @@ void dispose() {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `Future.delayed` with `mounted` check | **Suppress** | |
-| `setState` in `Stream.listen` callback | **Similar rule** — stream should be cancelled in dispose | |
+| `setState` in `Stream.listen` callback | **Similar rule** — stream should be canceled in dispose | |
 | `setState` in `AnimationController.addListener` | **Similar** | |
 | Test files | **Suppress** | |
 | Generated code | **Suppress** | |

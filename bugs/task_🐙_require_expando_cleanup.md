@@ -110,7 +110,7 @@ void processItems(List<Object> items) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Local `Expando` variable (not a field) | **Suppress** — GC will collect it | Only flag fields |
 | `Expando` field that is `null`-cleared in `dispose()` | **Suppress** | Check for `null` assignment |

@@ -89,7 +89,7 @@ final controller = WebViewController()
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Own domain URL | **Suppress** — trusted content | |
 | `file://` local HTML | **Suppress** — no remote scripts | |

@@ -100,7 +100,7 @@ AdaptiveLayout(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `onTap` navigates but enclosing widget has `LayoutBuilder` | **Suppress** — developer is aware of breakpoints | Walk the enclosing `build()` for any `LayoutBuilder` |
 | Navigation inside a `Dialog` (not a list item) | **Suppress** — dialogs don't apply master-detail | Check parent context |

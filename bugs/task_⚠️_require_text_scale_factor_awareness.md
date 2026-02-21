@@ -110,7 +110,7 @@ MediaQuery(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Icon buttons with fixed size | **Suppress** — icons don't scale with text | Check for icon vs text child |
 | Fixed height for non-text content | **Suppress** — if no Text child | |
