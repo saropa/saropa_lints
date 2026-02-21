@@ -170,12 +170,18 @@ class AnalysisReporter {
     _writeReport();
   }
 
+  /// Extract the date folder name (`YYYYMMDD`) from a session timestamp.
+  ///
+  /// Timestamps follow the format `YYYYMMDD_HHMMSS`. The first 8 characters
+  /// are the date portion used to group report files by day.
+  static String dateFolder(String timestamp) => timestamp.substring(0, 8);
+
   /// Full path to the report file, or null if not initialized.
   static String? get reportPath {
     if (_projectRoot == null || _sessionId == null) return null;
     final sep = Platform.pathSeparator;
-    final dateFolder = _sessionId!.substring(0, 8);
-    return '$_projectRoot${sep}reports$sep$dateFolder$sep'
+    final df = dateFolder(_sessionId!);
+    return '$_projectRoot${sep}reports$sep$df$sep'
         '${ReportConsolidator.reportFilename(_sessionId!)}';
   }
 
@@ -189,8 +195,8 @@ class AnalysisReporter {
 
     try {
       final sep = Platform.pathSeparator;
-      final dateFolder = _sessionId!.substring(0, 8);
-      final reportsDir = Directory('$_projectRoot${sep}reports$sep$dateFolder');
+      final df = dateFolder(_sessionId!);
+      final reportsDir = Directory('$_projectRoot${sep}reports$sep$df');
       if (!reportsDir.existsSync()) {
         reportsDir.createSync(recursive: true);
       }
