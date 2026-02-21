@@ -11,6 +11,21 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+
+### Fixed
+- `dart analyze` exit codes 1-2 (issues found) no longer reported as "failed" — only exit code 3+ (analyzer error) is treated as failure
+- Progress bar stuck at ~83% — recalibration threshold no longer inflates expected file count when discovery overcounts
+- Progress bar now shows 100% completion before the summary box
+
+### Changed
+- Init log (`*_saropa_lints_init.log`) now contains only setup/configuration data; raw `dart analyze` output is no longer mixed in — the plugin's report (`*_saropa_lint_report.log`) covers analysis results
+- Init log written before analysis prompt so the path is available upfront
+- Plugin report path displayed after analysis completes (with retry for async flush)
+- Old report files in `reports/` root are automatically migrated to `reports/YYYYMMDD/` date subfolders during init
+- Stream drain and exit code now awaited together via `Future.wait` to prevent interleaved output
+
+---
 ## [5.0.0-beta.9]
 
 ### Fixed

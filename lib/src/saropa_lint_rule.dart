@@ -507,8 +507,11 @@ class ProgressTracker {
       _checkAbortSentinel();
     }
 
-    // Recalibrate ETA after seeing some files
-    if (_etaCalibrated && _seenFiles.length > _totalExpectedFiles * 0.9) {
+    // Recalibrate ETA only when we've actually exceeded the expected count
+    // (discovery undercounted). Triggering at 90% caused the progress bar to
+    // go backwards when discovery overcounted (common when analysis_options
+    // excludes files that discoverFiles counted).
+    if (_etaCalibrated && _seenFiles.length > _totalExpectedFiles) {
       _totalExpectedFiles = (_seenFiles.length * 1.2).round();
     }
   }
@@ -643,6 +646,27 @@ class ProgressTracker {
     final yellow = _ProgressColors.yellow;
     final cyan = _ProgressColors.cyan;
     final clearLine = _ProgressColors.clearLine;
+
+    // Emit a final 100% progress bar to replace the stale in-progress line.
+    if (_discoveredFromFiles && fileCount > 0) {
+      final issuesDisplay = _limitReached
+          ? '$_maxIssues shown, $_violationsFound total'
+          : '$_violationsFound';
+      const barWidth = 20;
+      final bar = '${_ProgressColors.brightGreen}${'█' * barWidth}$reset';
+      final issuesColor = _violationsFound == 0
+          ? green
+          : _errorCount > 0
+          ? red
+          : yellow;
+      // End with newline so the 100% bar persists above the summary box
+      stderr.writeln(
+        '$clearLine$bar ${bold}100%$reset '
+        '$dim│$reset ${dim}Files:$reset $cyan$fileCount$reset/$dim$fileCount$reset '
+        '$dim│$reset ${dim}Issues:$reset $issuesColor$issuesDisplay$reset '
+        '$dim│$reset ${green}Done$reset',
+      );
+    }
 
     final buf = StringBuffer();
 
