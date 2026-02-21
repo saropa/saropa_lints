@@ -8,6 +8,7 @@
 
 plugins:
   saropa_lints:
+    version: "^5.0.0-beta.8"
     diagnostics:
       # =========================================================================
       # MEMORY LEAKS - Will crash your app
