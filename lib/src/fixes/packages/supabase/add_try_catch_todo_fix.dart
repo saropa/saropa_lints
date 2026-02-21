@@ -29,7 +29,7 @@ class AddTryCatchTodoFix extends SaropaFixProducer {
         : node.thisOrAncestorOfType<ExpressionStatement>();
     if (stmt == null) return;
 
-    final indent = _getIndent(stmt);
+    final indent = getLineIndent(stmt);
     final source = stmt.toSource();
 
     await builder.addDartFileEdit(file, (builder) {
@@ -39,13 +39,5 @@ class AddTryCatchTodoFix extends SaropaFixProducer {
         "$indent  // TODO: handle error\n$indent}",
       );
     });
-  }
-
-  String _getIndent(AstNode node) {
-    final lineInfo = unitResult.lineInfo;
-    final line = lineInfo.getLocation(node.offset).lineNumber - 1;
-    final lineStart = lineInfo.getOffsetOfLine(line);
-    final prefix = unitResult.content.substring(lineStart, node.offset);
-    return prefix;
   }
 }

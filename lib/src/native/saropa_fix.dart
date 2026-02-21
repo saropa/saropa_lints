@@ -38,6 +38,7 @@ library;
 
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 import 'package:analysis_server_plugin/src/correction/fix_generators.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 
 export 'package:analysis_server_plugin/edit/dart/correction_producer.dart'
     show CorrectionApplicability, CorrectionProducerContext;
@@ -57,6 +58,27 @@ abstract class SaropaFixProducer extends ResolvedCorrectionProducer {
   @override
   CorrectionApplicability get applicability =>
       CorrectionApplicability.singleLocation;
+
+  /// Returns the leading whitespace of the line containing [node].
+  ///
+  /// Useful for inserting or wrapping code at the same indentation level.
+  /// Only returns spaces and tabs — stops at the first non-whitespace char.
+  String getLineIndent(AstNode node) {
+    final lineInfo = unitResult.lineInfo;
+    final line = lineInfo.getLocation(node.offset).lineNumber - 1;
+    final lineStart = lineInfo.getOffsetOfLine(line);
+    final content = unitResult.content;
+    final indent = StringBuffer();
+    for (var i = lineStart; i < content.length; i++) {
+      final ch = content[i];
+      if (ch == ' ' || ch == '\t') {
+        indent.write(ch);
+      } else {
+        break;
+      }
+    }
+    return indent.toString();
+  }
 }
 
 /// Factory function that creates a fix producer.
