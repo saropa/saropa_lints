@@ -111,4 +111,5 @@ extension on (int, String) {} // Extending a record type
 
 // GOOD: Should NOT trigger avoid_extensions_on_records
 class _GoodClass949 {}
+
 extension on _GoodClass949 {} // Extending a class is fine
