@@ -32,7 +32,8 @@ RULES_DIR = PROJECT_ROOT / "lib" / "src" / "rules"
 CHANGELOG_PATH = PROJECT_ROOT / "CHANGELOG.md"
 CHANGELOG_ARCHIVE_PATH = PROJECT_ROOT / "CHANGELOG_ARCHIVE.md"
 REPORTS_DIR = PROJECT_ROOT / "reports"
-CACHE_PATH = REPORTS_DIR / "rule_version_cache.json"
+CACHE_DIR = REPORTS_DIR / "_cache"
+CACHE_PATH = CACHE_DIR / "rule_version_cache.json"
 
 
 # ---------------------------------------------------------------------------
