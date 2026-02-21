@@ -79,7 +79,8 @@ bugs/
 scripts/
 
 # Test fixtures (users don't need these)
-test/
+# Anchored to root so lib/src/fixes/test/ is still published
+/test/
 
 # VSCode extension (distributed separately)
 vscode-saropa-lints/
