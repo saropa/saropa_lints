@@ -5,7 +5,7 @@
 `prefer_const_widgets_in_lists` fires a false positive on `List<Color>` (and
 potentially any `List<T>` where `T` is not a `Widget`) when the list contains
 `InstanceCreationExpression` elements with const-compatible arguments. It also
-fails to recognise implicitly const lists — those declared in `static const`
+fails to recognize implicitly const lists — those declared in `static const`
 fields — where the list is already const by definition.
 
 ## Severity

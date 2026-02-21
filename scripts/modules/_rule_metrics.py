@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import os
 import re
+from datetime import datetime
 from pathlib import Path
 
 from collections import defaultdict
@@ -273,9 +274,10 @@ def display_todo_audit(project_dir: Path) -> None:
         )
 
     # Write full log to reports directory
-    reports_dir = project_dir / "example" / "reports"
+    reports_dir = project_dir / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
-    log_path = reports_dir / "todo_audit.log"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_path = reports_dir / f"{timestamp}_todo_audit.log"
     log_lines = [
         f"TODO Audit - {total} items",
         f"{'=' * 60}",
