@@ -11,6 +11,24 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+
+### Fixed
+- Plugin silently ignored by `dart analyze` — generated `analysis_options.yaml` was missing the required `version:` key under `plugins: saropa_lints:`; the Dart SDK's plugin loader returns `null` when no version/path constraint is present, causing zero lint issues to be reported
+- Analysis server crash loop (FormatException) — `ProgressTracker` was writing ANSI progress bars to `stdout`, which corrupts the JSON-RPC protocol used by the analysis server; all output now routes through `stderr`
+
+### Added
+- Pre-flight validation checks in `init`: verifies pubspec dependency, Dart SDK >= 3.6, and audits existing config for stale `custom_lint:` sections or missing `version:` keys
+- Post-write validation: confirms the generated file has `plugins:`, `version:`, `diagnostics:` sections and expected rule count
+- Analysis results now captured in the init log file (previously only shown on terminal)
+- Log summary section with version, tier, rule counts, and collected warnings
+
+### Changed
+- `dart analyze` output is now captured and streamed (was `inheritStdio` with no capture)
+- Log file write deferred until after analysis completes so the report includes everything
+- All tier YAML files now include `version: "^5.0.0-beta.8"` for direct-include users
+
+---
 ## [5.0.0-beta.8]
 
 ### Changed
