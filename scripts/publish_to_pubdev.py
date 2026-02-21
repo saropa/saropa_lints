@@ -22,6 +22,7 @@ Workflow:
     Step 13: Create git tag
     Step 14: Publish via GitHub Actions
     Step 15: Create GitHub release
+    Post:    Bump version for next cycle (pubspec + [Unreleased])
 
 Options:
     --audit-only      Run audit + integrity checks only, skip publish
@@ -171,6 +172,7 @@ from scripts.modules._git_ops import (
     get_current_branch,
     get_remote_url,
     git_commit_and_push,
+    post_publish_commit,
     publish_to_pubdev_step,
     tag_exists_on_remote,
 )
@@ -203,6 +205,7 @@ from scripts.modules._rule_metrics import (
 from scripts.modules._timing import StepTimer
 from scripts.modules._version_changelog import (
     _VERSION_RE,
+    add_unreleased_section,
     add_version_section,
     display_changelog,
     get_latest_changelog_version,
@@ -297,14 +300,18 @@ def _offer_custom_lint(project_dir: Path) -> None:
     if not example_dirs:
         return
 
-    response = (
-        input(
-            "  Run custom_lint on example fixtures "
-            f"({len(example_dirs)} packages, background)? [y/N] "
+    try:
+        response = (
+            input(
+                "  Run custom_lint on example fixtures "
+                f"({len(example_dirs)} packages, background)? [y/N] "
+            )
+            .strip()
+            .lower()
         )
-        .strip()
-        .lower()
-    )
+    except (KeyboardInterrupt, EOFError):
+        print()
+        return
     if response.startswith("y"):
         use_shell = get_shell_mode()
         for example_dir in example_dirs:
@@ -693,16 +700,36 @@ def main() -> int:
                     ExitCode.GITHUB_RELEASE_FAILED,
                 )
 
-        # --- Post-publish (before timing summary) ---
+        succeeded = True
+
+        # --- Post-publish version bump ---
+        try:
+            with timer.step("Version bump"):
+                next_version = increment_version(version)
+                set_version_in_pubspec(pubspec_path, next_version)
+                add_unreleased_section(changelog_path)
+                if post_publish_commit(
+                    project_dir, next_version, branch,
+                ):
+                    print_success(
+                        f"Bumped to {next_version} with "
+                        f"[Unreleased] section"
+                    )
+                else:
+                    print_warning(
+                        f"Version bump to {next_version} "
+                        f"not committed \u2014 commit manually"
+                    )
+        except Exception as exc:
+            print_warning(f"Post-publish version bump failed: {exc}")
+
+        # --- Post-publish (non-critical) ---
         try:
             webbrowser.open(
                 f"https://pub.dev/packages/{package_name}",
             )
         except Exception:
             pass
-
-        _offer_custom_lint(project_dir)
-        succeeded = True
 
     except SystemExit as exc:
         exit_code = exc.code if isinstance(exc.code, int) else 1
@@ -714,6 +741,7 @@ def main() -> int:
     if succeeded:
         repo_path = extract_repo_path(remote_url)
         _print_success_banner(package_name, version, repo_path)
+        _offer_custom_lint(project_dir)
 
     return exit_code
 

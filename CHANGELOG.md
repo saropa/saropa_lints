@@ -17,6 +17,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - `dart analyze` exit codes 1-2 (issues found) no longer reported as "failed" — only exit code 3+ (analyzer error) is treated as failure
 - Progress bar stuck at ~83% — recalibration threshold no longer inflates expected file count when discovery overcounts
 - Progress bar now shows 100% completion before the summary box
+- Publish script: restored post-publish version bump (pubspec + `[Unreleased]` section) — accidentally removed in v4.9.17 refactor
+- Publish script: optional `_offer_custom_lint` prompt no longer blocks success status or timing summary on interrupt
 
 ### Changed
 - Init log (`*_saropa_lints_init.log`) now contains only setup/configuration data; raw `dart analyze` output is no longer mixed in — the plugin's report (`*_saropa_lint_report.log`) covers analysis results
