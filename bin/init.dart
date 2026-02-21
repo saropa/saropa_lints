@@ -894,6 +894,10 @@ const Map<String, List<String>> _stylisticRuleCategories =
         'prefer_sorted_parameters',
         'prefer_sorted_pattern_fields',
         'prefer_sorted_record_fields',
+        'binary_expression_operand_order',
+        'enforce_parameters_ordering',
+        'enum_constants_ordering',
+        'map_keys_ordering',
       ],
       'Naming conventions': <String>[
         'prefer_boolean_prefixes',
@@ -905,6 +909,16 @@ const Map<String, List<String>> _stylisticRuleCategories =
         'prefer_camel_case_method_names',
         'prefer_exception_suffix',
         'prefer_error_suffix',
+        'prefer_boolean_prefixes_for_params',
+        'prefer_boolean_prefixes_for_locals',
+        'prefer_trailing_underscore_for_unused',
+        'prefer_sliver_prefix',
+        'prefer_correct_callback_field_name',
+        'prefer_correct_handler_name',
+        'prefer_correct_setter_parameter_name',
+        'prefer_bloc_event_suffix',
+        'prefer_bloc_state_suffix',
+        'prefer_use_prefix',
       ],
       'Error handling style': <String>['prefer_catch_over_on'],
       'Code style preferences': <String>[
@@ -912,6 +926,19 @@ const Map<String, List<String>> _stylisticRuleCategories =
         'prefer_single_exit_point',
         'prefer_wildcard_for_unused_param',
         'prefer_rethrow_over_throw_e',
+        'prefer_list_first',
+        'prefer_list_last',
+        'no_boolean_literal_compare',
+        'prefer_returning_conditional_expressions',
+        'prefer_duration_constants',
+        'prefer_immediate_return',
+        'prefer_for_in',
+        'prefer_conditional_expressions',
+        'prefer_returning_condition',
+        'prefer_returning_conditionals',
+        'prefer_returning_shorthands',
+        'prefer_pushing_conditional_expressions',
+        'prefer_getter_over_method',
       ],
       'Function & Parameter style': <String>[
         'prefer_arrow_functions',
@@ -925,13 +952,26 @@ const Map<String, List<String>> _stylisticRuleCategories =
         'prefer_widget_methods_over_classes',
         'prefer_borderradius_circular',
         'avoid_small_text',
+        'prefer_sized_box_square',
+        'prefer_center_over_align',
+        'prefer_spacing_over_sizedbox',
       ],
       'Class & Record style': <String>[
         'prefer_class_over_record_return',
         'prefer_private_underscore_prefix',
         'prefer_explicit_this',
       ],
-      'Formatting': <String>['prefer_trailing_comma_always'],
+      'Formatting': <String>[
+        'prefer_trailing_comma_always',
+        'prefer_blank_line_before_case',
+        'prefer_blank_line_before_constructor',
+        'prefer_blank_line_before_method',
+        'prefer_blank_line_before_return',
+        'prefer_trailing_comma',
+        'unnecessary_trailing_comma',
+        'double_literal_format',
+        'format_comment_style',
+      ],
       'Comments & Documentation': <String>[
         'prefer_todo_format',
         'prefer_fixme_format',
@@ -969,7 +1009,6 @@ const Map<String, List<String>> _stylisticRuleCategories =
       ],
       'Opinionated prefer_* rules': <String>[
         'prefer_addall_over_spread',
-        'prefer_async_only_when_awaiting',
         'prefer_await_over_then',
         'prefer_blank_line_after_declarations',
         'prefer_blank_lines_between_members',
@@ -1046,8 +1085,11 @@ const Map<String, List<String>> _stylisticRuleCategories =
         'prefer_test_name_should_when',
         'prefer_text_rich_over_richtext',
         'prefer_then_over_await',
-        'prefer_var_over_explicit_type',
         'prefer_wheretype_over_where_is',
+      ],
+      'Variable type style (conflicting - choose one)': <String>[
+        'prefer_type_over_var',
+        'prefer_var_over_explicit_type',
       ],
       'Control flow & collection style': <String>[
         'prefer_early_return',
@@ -2504,8 +2546,12 @@ String _buildStylisticSection({
     final category = entry.key;
     final rules = entry.value;
 
-    // Filter out skipped rules
-    final activeRules = rules.where((r) => !skipRules.contains(r)).toList();
+    // Filter out rules not in tiers.stylisticRules (prevents stale entries)
+    // and skip rules already in RULE OVERRIDES section
+    final activeRules = rules
+        .where((r) => tiers.stylisticRules.contains(r))
+        .where((r) => !skipRules.contains(r))
+        .toList();
     if (activeRules.isEmpty) continue;
 
     buffer.writeln('# --- $category ---');
@@ -2557,52 +2603,44 @@ final RegExp _ruleOverridesSectionHeader = RegExp(
 /// config file. Adds missing rules, preserves existing true/false values.
 /// Skips rules that appear in the RULE OVERRIDES section.
 void _ensureStylisticRulesSection(File file) {
-  final content = file.readAsStringSync();
+  var content = file.readAsStringSync();
 
-  // Find rules in the RULE OVERRIDES section (to skip them)
-  final rulesInOverrides = _extractRulesInOverridesSection(content);
-  final skipRules = rulesInOverrides.intersection(tiers.stylisticRules);
+  // Find stylistic rules in the RULE OVERRIDES section (to skip them)
+  final overrideValues = _extractOverrideSectionValues(content);
+  var skipRules = overrideValues.keys.toSet().intersection(
+    tiers.stylisticRules,
+  );
 
   // Check if STYLISTIC RULES section exists
   final sectionMatch = _stylisticSectionHeader.firstMatch(content);
 
   if (sectionMatch == null) {
-    // No section yet - insert after platforms section, before RULE OVERRIDES
-    final newSection = _buildStylisticSection(skipRules: skipRules);
-    final insertContent = '\n$newSection';
-
-    // Find insertion point: before RULE OVERRIDES header
-    final overridesHeaderMatch = RegExp(
-      r'# ─+\n# RULE OVERRIDES',
-      multiLine: true,
-    ).firstMatch(content);
-
-    String newContent;
-    if (overridesHeaderMatch != null) {
-      newContent =
-          content.substring(0, overridesHeaderMatch.start) +
-          insertContent +
-          content.substring(overridesHeaderMatch.start);
-    } else {
-      // No RULE OVERRIDES section, append before end
-      newContent = content + insertContent;
-    }
-
-    file.writeAsStringSync(newContent);
-    _logTerminal(
-      '${_Colors.green}✓ Added stylistic rules section to ${file.path}${_Colors.reset}',
-    );
+    _insertNewStylisticSection(file, content, skipRules);
     return;
   }
 
   // Section exists - parse existing values and rebuild
   final existingValues = _extractStylisticSectionValues(content);
+
+  // Clean up obsolete rules no longer in tiers.stylisticRules
+  _logRemovedStylisticRules(content);
+
+  // Offer to move stylistic rules from RULE OVERRIDES to STYLISTIC section
+  final moveResult = _promptMoveOverridesToStylistic(
+    content,
+    skipRules,
+    overrideValues,
+    existingValues,
+  );
+  content = moveResult.content;
+  skipRules = moveResult.skipRules;
+
+  // Rebuild the section with current rules and preserved values
   final newSection = _buildStylisticSection(
     existingValues: existingValues,
     skipRules: skipRules,
   );
 
-  // Find section boundaries
   final sectionStart = _findStylisticSectionStart(content);
   final sectionEnd = _findStylisticSectionEnd(content, sectionStart);
 
@@ -2612,6 +2650,122 @@ void _ensureStylisticRulesSection(File file) {
       content.substring(sectionEnd);
 
   file.writeAsStringSync(newContent);
+}
+
+/// Insert a new STYLISTIC RULES section when none exists yet.
+void _insertNewStylisticSection(
+  File file,
+  String content,
+  Set<String> skipRules,
+) {
+  final newSection = _buildStylisticSection(skipRules: skipRules);
+  final insertContent = '\n$newSection';
+
+  // Find insertion point: before RULE OVERRIDES header
+  final overridesHeaderMatch = RegExp(
+    r'# ─+\n# RULE OVERRIDES',
+    multiLine: true,
+  ).firstMatch(content);
+
+  String newContent;
+  if (overridesHeaderMatch != null) {
+    newContent =
+        content.substring(0, overridesHeaderMatch.start) +
+        insertContent +
+        content.substring(overridesHeaderMatch.start);
+  } else {
+    newContent = content + insertContent;
+  }
+
+  file.writeAsStringSync(newContent);
+  _logTerminal(
+    '${_Colors.green}✓ Added stylistic rules section to ${file.path}${_Colors.reset}',
+  );
+}
+
+/// Log warnings about obsolete stylistic rules being cleaned up during
+/// section rebuild. Enabled rules get a yellow warning; disabled ones
+/// get a dim info message.
+void _logRemovedStylisticRules(String content) {
+  final removedRules = _extractRemovedStylisticRules(content);
+  if (removedRules.isEmpty) return;
+
+  final enabledRemoved =
+      removedRules.entries.where((e) => e.value).map((e) => e.key).toList()
+        ..sort();
+  final disabledRemoved =
+      removedRules.entries.where((e) => !e.value).map((e) => e.key).toList()
+        ..sort();
+
+  if (enabledRemoved.isNotEmpty) {
+    _logTerminal(
+      '${_Colors.yellow}⚠ Removing ${enabledRemoved.length} obsolete '
+      'stylistic rule(s) that were enabled:${_Colors.reset}',
+    );
+    for (final rule in enabledRemoved) {
+      _logTerminal('${_Colors.dim}  - $rule${_Colors.reset}');
+    }
+  }
+  if (disabledRemoved.isNotEmpty) {
+    _logTerminal(
+      '${_Colors.dim}  Cleaned up ${disabledRemoved.length} obsolete '
+      'disabled stylistic rule(s)${_Colors.reset}',
+    );
+  }
+}
+
+/// Prompt the user to move stylistic rules from RULE OVERRIDES into the
+/// STYLISTIC RULES section. Returns updated content and skipRules.
+({String content, Set<String> skipRules}) _promptMoveOverridesToStylistic(
+  String content,
+  Set<String> skipRules,
+  Map<String, bool> overrideValues,
+  Map<String, bool> existingValues,
+) {
+  if (skipRules.isEmpty) {
+    return (content: content, skipRules: skipRules);
+  }
+
+  _logTerminal('');
+  _logTerminal(
+    '${_Colors.yellow}Found ${skipRules.length} stylistic rule(s) '
+    'in RULE OVERRIDES section:${_Colors.reset}',
+  );
+  for (final rule in skipRules.toList()..sort()) {
+    _logTerminal('${_Colors.dim}  - $rule${_Colors.reset}');
+  }
+
+  bool shouldMove = false;
+  if (stdin.hasTerminal) {
+    stdout.write(
+      '${_Colors.cyan}Move to STYLISTIC RULES section? [y/N]: '
+      '${_Colors.reset}',
+    );
+    final response = stdin.readLineSync()?.toLowerCase().trim() ?? '';
+    shouldMove = response == 'y' || response == 'yes';
+  } else {
+    _logTerminal(
+      '${_Colors.dim}  Non-interactive: keeping in RULE OVERRIDES'
+      '${_Colors.reset}',
+    );
+  }
+
+  if (!shouldMove) {
+    return (content: content, skipRules: skipRules);
+  }
+
+  final movedCount = skipRules.length;
+  final movedValues = Map<String, bool>.fromEntries(
+    overrideValues.entries.where((e) => skipRules.contains(e.key)),
+  );
+  final updatedContent = _removeRulesFromOverridesSection(content, skipRules);
+  existingValues.addAll(movedValues);
+  _logTerminal(
+    '${_Colors.green}✓ Moved $movedCount rule(s) to '
+    'STYLISTIC RULES section${_Colors.reset}',
+  );
+
+  return (content: updatedContent, skipRules: <String>{});
 }
 
 /// Find the start of the STYLISTIC RULES section (including the divider).
@@ -2672,12 +2826,36 @@ Map<String, bool> _extractStylisticSectionValues(String content) {
   return values;
 }
 
-/// Extract rule names from the RULE OVERRIDES section.
-Set<String> _extractRulesInOverridesSection(String content) {
-  final rules = <String>{};
+/// Extract rules from the STYLISTIC RULES section that no longer exist in
+/// [tiers.stylisticRules]. Returns a map of removed rule name to its
+/// enabled/disabled value so we can warn if user-enabled rules are dropped.
+Map<String, bool> _extractRemovedStylisticRules(String content) {
+  final removed = <String, bool>{};
+
+  final sectionStart = _findStylisticSectionStart(content);
+  final sectionEnd = _findStylisticSectionEnd(content, sectionStart);
+  final sectionContent = content.substring(sectionStart, sectionEnd);
+
+  final rulePattern = RegExp(r'^([\w_]+):\s*(true|false)', multiLine: true);
+
+  for (final match in rulePattern.allMatches(sectionContent)) {
+    final ruleName = match.group(1)!;
+    final enabled = match.group(2) == 'true';
+    if (!tiers.stylisticRules.contains(ruleName)) {
+      removed[ruleName] = enabled;
+    }
+  }
+
+  return removed;
+}
+
+/// Extract all rule name → enabled/disabled values from the RULE OVERRIDES
+/// section. Returns empty map if the section doesn't exist.
+Map<String, bool> _extractOverrideSectionValues(String content) {
+  final values = <String, bool>{};
 
   final sectionMatch = _ruleOverridesSectionHeader.firstMatch(content);
-  if (sectionMatch == null) return rules;
+  if (sectionMatch == null) return values;
 
   // Content after the RULE OVERRIDES header until end of file
   // (it's the last section)
@@ -2686,10 +2864,34 @@ Set<String> _extractRulesInOverridesSection(String content) {
   final rulePattern = RegExp(r'^([\w_]+):\s*(true|false)', multiLine: true);
 
   for (final match in rulePattern.allMatches(afterSection)) {
-    rules.add(match.group(1)!);
+    values[match.group(1)!] = match.group(2) == 'true';
   }
 
-  return rules;
+  return values;
+}
+
+/// Remove specific rules from the RULE OVERRIDES section.
+/// Returns the modified content string.
+String _removeRulesFromOverridesSection(
+  String content,
+  Set<String> rulesToRemove,
+) {
+  final sectionMatch = _ruleOverridesSectionHeader.firstMatch(content);
+  if (sectionMatch == null) return content;
+
+  // Only modify content after the RULE OVERRIDES header
+  final before = content.substring(0, sectionMatch.end);
+  var after = content.substring(sectionMatch.end);
+
+  for (final rule in rulesToRemove) {
+    // Remove the line: "rule_name: true/false" with optional comment/newline
+    after = after.replaceAll(
+      RegExp('^$rule:\\s*(true|false).*\\n?', multiLine: true),
+      '',
+    );
+  }
+
+  return before + after;
 }
 
 /// Extract platform settings from analysis_options_custom.yaml.
