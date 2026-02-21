@@ -287,7 +287,7 @@ def _prompt_version(default: str, timeout: int = 30) -> str:
 
 
 def _offer_custom_lint(project_dir: Path) -> None:
-    """Offer to launch custom_lint on example fixtures in background."""
+    """Launch custom_lint on example fixtures in background."""
     example_dirs = [
         project_dir / d
         for d in [
@@ -300,33 +300,24 @@ def _offer_custom_lint(project_dir: Path) -> None:
     if not example_dirs:
         return
 
-    try:
-        response = (
-            input(
-                "  Run custom_lint on example fixtures "
-                f"({len(example_dirs)} packages, background)? [y/N] "
-            )
-            .strip()
-            .lower()
+    print_info(
+        f"  Running custom_lint on {len(example_dirs)} "
+        f"example fixtures (background)..."
+    )
+    use_shell = get_shell_mode()
+    for example_dir in example_dirs:
+        print_info(f"  Launching custom_lint in {example_dir.name}/")
+        subprocess.run(
+            ["dart", "pub", "get"],
+            cwd=example_dir,
+            shell=use_shell,
+            capture_output=True,
         )
-    except (KeyboardInterrupt, EOFError):
-        print()
-        return
-    if response.startswith("y"):
-        use_shell = get_shell_mode()
-        for example_dir in example_dirs:
-            print_info(f"  Launching custom_lint in {example_dir.name}/")
-            subprocess.run(
-                ["dart", "pub", "get"],
-                cwd=example_dir,
-                shell=use_shell,
-                capture_output=True,
-            )
-            subprocess.Popen(
-                ["dart", "run", "custom_lint"],
-                cwd=example_dir,
-                shell=use_shell,
-            )
+        subprocess.Popen(
+            ["dart", "run", "custom_lint"],
+            cwd=example_dir,
+            shell=use_shell,
+        )
         print_success(
             f"custom_lint launched in {len(example_dirs)} packages"
         )
