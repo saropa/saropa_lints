@@ -127,5 +127,6 @@ class _GoodClass226_Parent {
 class _GoodClass226_Child extends _GoodClass226_Parent {
   @override
   bool operator ==(Object other) =>
-      other is _GoodClass226_Child && super == other; // Chains to parent equality
+      other is _GoodClass226_Child &&
+      super == other; // Chains to parent equality
 }

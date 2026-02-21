@@ -109,7 +109,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: prefer_correct_setter_parameter_name
 class _BadClass491 {
   String _name = '';
-  set name(String n) { // Parameter name 'n' should be 'value'
+  set name(String n) {
+    // Parameter name 'n' should be 'value'
     _name = n;
   }
 }
@@ -117,7 +118,8 @@ class _BadClass491 {
 // GOOD: Should NOT trigger prefer_correct_setter_parameter_name
 class _GoodClass491 {
   String _name = '';
-  set name(String value) { // Conventional parameter name 'value'
+  set name(String value) {
+    // Conventional parameter name 'value'
     _name = value;
   }
 }

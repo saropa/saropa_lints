@@ -110,7 +110,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 void _bad298(dynamic value) {
   switch (value) {
     case int r:
-      if (r > 0) { // Should use when guard instead
+      if (r > 0) {
+        // Should use when guard instead
         print('positive');
       }
   }
