@@ -11,6 +11,12 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [5.0.0-beta.8]
+
+### Changed
+- Version bump
+
+---
 ## [5.0.0-beta.7]
 
 ### Added
