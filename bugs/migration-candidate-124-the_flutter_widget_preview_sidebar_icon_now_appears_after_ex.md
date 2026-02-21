@@ -9,7 +9,7 @@
 
 ## Release Note Entry
 
-> [#5744](https://github.com/Dart-Code/Dart-Code/issues/5744): The Flutter Widget Preview sidebar icon now appears after extension activation instead of only after the widget preview server initialises.
+> [#5744](https://github.com/Dart-Code/Dart-Code/issues/5744): The Flutter Widget Preview sidebar icon now appears after extension activation instead of only after the widget preview server initializes.
 
 **PR:** https://github.com/Dart-Code/Dart-Code/issues/5744
 
