@@ -91,7 +91,7 @@ const Map<String, String> _htmlEntities = <String, String>{
 };
 ```
 
-Note: These are ALREADY using Unicode escape sequences (`\u00A9` etc.), yet the rule still triggers. The rule appears to flag the **resolved** character value, not just literal non-ASCII in source text. This is a secondary issue.
+Note: These are ALREADY using Unicode escape sequences (`\u00A9` etc.) which are pure ASCII in source text, yet the rule still triggers. This suggests the rule checks the Dart AST's resolved `stringValue` property (which converts escapes to actual Unicode code points) rather than the raw source text. This is a secondary bug: the rule should inspect source characters, not resolved string values, to avoid flagging properly escaped Unicode.
 
 ### Typographic constants (15+ violations)
 
@@ -148,7 +148,7 @@ The rule flags ALL non-ASCII characters in string literals without considering:
 
 2. **Whether the character is visible and identifiable** -- the rule's own message acknowledges "different types of spaces" as the primary concern, but it flags ALL non-ASCII including clearly visible emoji, mathematical symbols, and accented letters.
 
-3. **Whether Unicode escape sequences are already used** -- some flagged constants already use `\uXXXX` form (e.g., `'\u00A9'` for copyright), yet the rule still fires because the resolved value is non-ASCII.
+3. **Whether Unicode escape sequences are already used** -- some flagged constants already use `\uXXXX` form (e.g., `'\u00A9'` for copyright), yet the rule still fires. This indicates the rule inspects the AST's resolved `stringValue` rather than the raw source text, flagging escape sequences that are pure ASCII in source code.
 
 4. **The project type** -- a utility library that processes Unicode text fundamentally requires non-ASCII characters in its source code.
 

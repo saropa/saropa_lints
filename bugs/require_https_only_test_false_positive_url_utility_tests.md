@@ -16,8 +16,8 @@ severity: 2 (info)
 message:  [require_https_only_test] HTTP URL detected in test file. Consider
           using HTTPS even in test data. {v3}
           Replace http:// with https:// or disable this rule for test files.
-lines:    46, 285, 302, 314, 315, 328, 329, 355, 371, 378, 528
-          (11 violations)
+lines:    46, 285, 302, 315, 320, 355, 371, 378, 528
+          (9 violations)
 ```
 
 ## Affected Source
@@ -48,7 +48,7 @@ test('8. HTTP URL', () {
 
 This test verifies that `tryParse` correctly handles HTTP URLs. Replacing with HTTPS would eliminate HTTP protocol coverage entirely.
 
-### Violations 3-5: URL validation and domain extraction (lines 302, 314-315, 320, 328-329, 355)
+### Violations 3-5: URL validation and domain extraction (lines 302, 315, 320, 355)
 
 ```dart
 // isValidUrl must accept HTTP URLs
@@ -219,8 +219,8 @@ final String webhookUrl = 'http://hooks.example.com/notify';
 - **Dart SDK:** >=3.9.0 <4.0.0
 - **Trigger project:** `D:\src\saropa_dart_utils` (published Dart utility package)
 - **Trigger file:** `test/url/url_extensions_test.dart`
-- **Trigger lines:** 46, 285, 302, 314, 315, 328, 329, 355, 371, 378, 528
-- **Violation count:** 11 violations in a single test file
+- **Trigger lines:** 46, 285, 302, 315, 320, 355, 371, 378, 528
+- **Violation count:** 9 violations in a single test file
 - **HTTP URLs used in:** `Uri.parse()`, `UrlUtils.tryParse()`, `UrlUtils.isValidUrl()`, `UrlUtils.isValidHttpUrl()`, `UrlUtils.extractDomain()` test inputs
 - **Network I/O:** None — all tests are pure string/URI manipulation
 

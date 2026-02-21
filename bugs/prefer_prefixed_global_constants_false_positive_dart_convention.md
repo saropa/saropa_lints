@@ -83,7 +83,7 @@ However, the **official Dart style guide** (Effective Dart) explicitly contradic
 > In new code, use lowerCamelCase for constant variables, including enum values.
 > — https://dart.dev/effective-dart/style#do-use-lowercamelcase-for-constant-names
 
-The Dart team has been actively moving away from the `k` prefix convention. The `prefer_const_declarations_for_variables` core lint and the `constant_identifier_names` core lint both enforce `lowerCamelCase` without any prefix requirement.
+The Dart team has been actively moving away from the `k` prefix convention. The `constant_identifier_names` core lint enforces `lowerCamelCase` without any prefix requirement. While `kMinMonth` would technically pass that lint (it is valid `lowerCamelCase`), the `k` prefix is not part of the Dart convention and is not used by any official Dart or Flutter package published after the convention change.
 
 The rule has no mechanism to recognize that `lowerCamelCase` names like `minMonth`, `maxYear`, and `dayStartHour` are already descriptive and follow Dart conventions.
 
@@ -95,7 +95,7 @@ The rule has no mechanism to recognize that `lowerCamelCase` names like `minMont
 
 3. **Breaking change for published packages** — Renaming `minMonth` to `kMinMonth` in a published package (`saropa_dart_utils` v1.0.6 on pub.dev) is a breaking API change that would require a major version bump and force all consumers to update their code.
 
-4. **Conflicts with core Dart lints** — The built-in `constant_identifier_names` lint enforces `lowerCamelCase` for constants. Adding a `k` prefix would create a conflict where one rule demands `kMinMonth` and another demands `minMonth`.
+4. **Conflicts with Dart ecosystem norms** — While `kMinMonth` technically passes the `constant_identifier_names` lint (it is valid `lowerCamelCase`), the `k` prefix convention is not used by any official Dart package, the Dart SDK, or the Effective Dart guide. Adopting it creates inconsistency with the broader Dart ecosystem.
 
 5. **Flutter SDK is migrating away from `k` prefix** — The Flutter team has acknowledged that `k` prefix constants are a legacy pattern. New Flutter APIs use `lowerCamelCase` without prefix (e.g., `defaultTargetPlatform` not `kDefaultTargetPlatform`).
 
@@ -208,7 +208,7 @@ const double r = 3.14;
 - **Trigger file:** `lib/datetime/date_constants.dart`
 - **Trigger constants:** `minMonth`, `maxMonth`, `maxYear`, `maxHour` (lines 5, 8, 11, 14)
 - **Naming convention used:** Official Effective Dart `lowerCamelCase`
-- **Conflicting core lint:** `constant_identifier_names` (enforces `lowerCamelCase`)
+- **Related core lint:** `constant_identifier_names` (enforces `lowerCamelCase` — `k` prefix is allowed but not required)
 
 ## Severity
 
