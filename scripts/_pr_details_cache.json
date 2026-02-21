@@ -1,0 +1,888 @@
+{
+  "https://github.com/flutter/flutter/pull/171796": {
+    "body": "Changes default mouse cursor of Material buttons to basic arrow instead of click as per updated Android guidance.\r\n\r\nFor each Material button, I did the following:\r\n\r\n1. Changed the default mouse cursor to the basic arrow.\r\n2. Added a way to configure the mouse cursor of the button if a method did not exist before.\r\n3. Added a test to ensure that the default mouse cursor is now the basic arrow (or modified an existing one if applicable).\r\n4. Added a test to ensure that the customization of button mouse cursors still works (if currently untested).\r\n\r\nThe list of Material buttons I modified (supposed to be all of them):\r\n\r\n- RawMaterialButton\r\n- DropdownButton\r\n- FloatingActionButton\r\n- ToggleButtons\r\n- ElevatedButton\r\n- IconButton\r\n- FilledButton\r\n- OutlinedButton\r\n- PopupMenuItem\r\n- InkWell\r\n- TextButton\r\n- MaterialButton\r\n- DropdownMenuItem\r\n- DropdownButtonFormField\r\n- BackButton\r\n- CloseButton\r\n- DrawerButton\r\n- EndDrawerButton\r\n- PopupMenuButton\r\n- MenuItemButton\r\n- CheckboxMenuButton\r\n- RadioMenuButton\r\n- MenuBar\r\n- SubmenuButton\r\n- SegmentedButton\r\n- FilterChip\r\n- ChoiceChip\r\n- ActionChip\r\n- InputChip\r\n\r\nFixes https://github.com/flutter/flutter/issues/170296.\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [ ] I followed the [breaking change policy] and added [Data Driven Fixes] where supported.\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].",
+    "labels": [
+      "a: text input",
+      "framework",
+      "f: material design",
+      "d: api docs",
+      "d: examples"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "[Material] Change default mouse cursor of buttons to basic arrow instead of click (except on web)",
+    "user": "camsim99"
+  },
+  "https://github.com/flutter/flutter/pull/180326": {
+    "body": "## Description\n\nThe docstring says \"Typically a [SliverList]\" but the class example uses `ListView`. \n\n`SliverList` is used inside `CustomScrollView`, not as a direct child of `Drawer`.\n\n## Related Issue\n\nFixes #100268",
+    "labels": [
+      "framework",
+      "f: material design"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Fix Drawer.child docstring to say ListView instead of SliverList",
+    "user": "nathannewyen"
+  },
+  "https://github.com/flutter/flutter/pull/172594": {
+    "body": "Closes https://github.com/flutter/flutter/issues/143577.",
+    "labels": [
+      "a: tests",
+      "tool",
+      "framework",
+      "team-android",
+      "team-ios"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Remove deprecated `AssetManifest.json` file",
+    "user": "matanlurey"
+  },
+  "https://github.com/flutter/flutter/pull/175485": {
+    "body": "follow up to [this comment](https://github.com/flutter/flutter/pull/174760#discussion_r2353508903)\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I followed the [breaking change policy] and added [Data Driven Fixes] where supported.\r\n- [ ] I listed at least one issue that this PR fixes in the description above.\r\n- [ ] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [ ] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n**Note**: The Flutter team is currently trialing the use of [Gemini Code Assist for GitHub](https://developers.google.com/gemini-code-assist/docs/review-github-code). Comments from the `gemini-code-assist` bot should not be taken as authoritative feedback from the Flutter team. If you find its comments useful you can update your code accordingly, but if you are unsure or disagree with the feedback, please feel free to wait for a Flutter team member's review for guidance on which automated comments should be addressed.\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md\r\n[test-exempt]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/blob/main/docs/contributing/Style-guide-for-Flutter-repo.md\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/blob/main/docs/contributing/S",
+    "labels": [
+      "tool",
+      "team-android"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Introduce a getter for `Project` to get `gradle-wrapper.properties` directly  ",
+    "user": "AbdeMohlbi"
+  },
+  "https://github.com/flutter/flutter/pull/175443": {
+    "body": "\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I followed the [breaking change policy] and added [Data Driven Fixes] where supported.\r\n- [ ] All existing and new tests are passing.\r\n- [ ] I listed at least one issue that this PR fixes in the description above.\r\n- [ ] I updated/added relevant documentation (doc comments with `///`).\r\n- [ ] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n**Note**: The Flutter team is currently trialing the use of [Gemini Code Assist for GitHub](https://developers.google.com/gemini-code-assist/docs/review-github-code). Comments from the `gemini-code-assist` bot should not be taken as authoritative feedback from the Flutter team. If you find its comments useful you can update your code accordingly, but if you are unsure or disagree with the feedback, please feel free to wait for a Flutter team member's review for guidance on which automated comments should be addressed.\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md\r\n[test-exempt]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/blob/main/docs/contributing/Style-guide-for-Flutter-repo.md\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/blob/main/docs/contributing/Style-guide-for-Flutter-repo.md#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.deve",
+    "labels": [
+      "tool",
+      "team-android"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Update gradle_utils.dart to use `constant` instead of `final`",
+    "user": "AbdeMohlbi"
+  },
+  "https://github.com/flutter/flutter/pull/172786": {
+    "body": "Closes https://github.com/flutter/flutter/issues/172190.",
+    "labels": [],
+    "merged": true,
+    "state": "closed",
+    "title": "`last_engine_commit.ps1`: Use `$flutterRoot` instead of `$gitTopLevel`",
+    "user": "matanlurey"
+  },
+  "https://github.com/flutter/flutter/pull/170805": {
+    "body": "## Description\r\n\r\nThis PR renames the DropdownButtonFormField constuctor parameter 'value' to 'initialValue'.\r\nSee https://github.com/flutter/flutter/pull/170050#issuecomment-2965486000 and https://github.com/flutter/flutter/pull/170050#issuecomment-2971920009 for some context.\r\n\r\n## Related Issue\r\n\r\nFixes [DropdownButtonFormField retains selected value even after setting value to null](https://github.com/flutter/flutter/issues/169983#top)\r\n\r\n## Tests\r\n\r\nAdds 2 tests (one to validate the deprecated parameter can still be used, one for the dart fix).\r\nUpdates many (renaming the confusing parameter).",
+    "labels": [
+      "framework",
+      "f: material design",
+      "d: api docs",
+      "d: examples",
+      "c: tech-debt"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Deprecate DropdownButtonFormField \"value\" parameter in favor of \"initialValue\"",
+    "user": "bleroux"
+  },
+  "https://github.com/flutter/flutter/pull/169700": {
+    "body": "onPop is deprecated but was mentioned in the docs. I've put its replacement onPopWithResult in its place. Also, there was one unterminated square bracket that I've fixed.",
+    "labels": [
+      "framework",
+      "f: routes"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Clean up references to deprecated onPop method in docs",
+    "user": "justinmc"
+  },
+  "https://github.com/flutter/flutter/pull/171397": {
+    "body": "partial resolution for #170791 (lowercase but not filemode) \r\n\r\nThis is the first time I have used the experimental api annotation. Most users should have lowercase available without the annotation only the oldest kotlin/agp versions should need the annotation. \r\n\r\nto test with different gradle versions I ran `sed -i '' 's/gradle-.*-bin\\.zip/gradle-VERSION-bin.zip/g' gradle/wrapper/gradle-wrapper.properties; JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/ ./gradlew test` \r\nfrom packages/flutter_tools/gradle\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] I followed the [breaking change policy] and added [Data Driven Fixes] where supported.\r\n- [x] All existing and new tests are passing.\r\n",
+    "labels": [
+      "platform-android",
+      "tool"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Android gradle use lowercase instead of toLowerCase in preparation for removal in v9",
+    "user": "reidbaker"
+  },
+  "https://github.com/flutter/flutter/pull/171459": {
+    "body": "Prepares to make changes such as https://github.com/flutter/flutter/issues/10621 easier.",
+    "labels": [
+      "tool"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Add/use `addMachineOutputFlag`/`outputsMachineFormat` instead of strings",
+    "user": "matanlurey"
+  },
+  "https://github.com/flutter/flutter/pull/168941": {
+    "body": "Towards https://github.com/flutter/flutter/issues/168934.\r\n\r\n/cc @reidbaker as release engineer\r\n\r\n/cc @zanderso (we talked about this offline)",
+    "labels": [
+      "engine"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Switch to Linux orchestrators for Windows releasers.",
+    "user": "matanlurey"
+  },
+  "https://github.com/flutter/flutter/pull/160024": {
+    "body": "Related to [☂️ Material Theme System Updates](https://github.com/flutter/flutter/issues/91772)\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] I followed the [breaking change policy] and added [Data Driven Fixes] where supported.\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md\r\n[test-exempt]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/blob/main/docs/contributing/Style-guide-for-Flutter-repo.md\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/blob/main/docs/contributing/Style-guide-for-Flutter-repo.md#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/blob/main/docs/contributing/Chat.md\r\n[Data Driven Fixes]: https://github.com/flutter/flutter/blob/main/docs/contributing/Data-driven-Fixes.md\r\n",
+    "labels": [
+      "framework",
+      "f: material design",
+      "c: tech-debt"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Deprecate `ThemeData.indicatorColor` in favor of `TabBarThemeData.indicatorColor`",
+    "user": "TahaTesser"
+  },
+  "https://github.com/flutter/flutter/pull/167154": {
+    "body": "This pull request is created by [automatic cherry pick workflow](https://github.com/flutter/flutter/blob/main/docs/releases/Flutter-Cherrypick-Process.md#automatically-creates-a-cherry-pick-request)\r\n\r\n### Issue Link:\r\nhttps://github.com/flutter/flutter/issues/166905\r\n\r\n### Changelog Description:\r\n* [flutter/166905](https://github.com/flutter/flutter/issues/166905) Fixes a performance regression in skwasm when running in single-threaded mode.\r\n\r\n### Impact Description:\r\nThis fixes a significant regression in the skwasm renderer when running single-thraaded (i.e. in a non-`crossOriginIsolated` browsing context)\r\n\r\n### Workaround:\r\nIs there a workaround for this issue?\r\n\r\nThe only workaround is to run skwasm in a multi-threaded context or to disable skwasm.\r\n\r\n### Risk:\r\nWhat is the risk level of this cherry-pick?\r\n\r\n  - [ x ] Low\r\n  - [ ] Medium\r\n  - [ ] High\r\n\r\nThis essentially returns the single-threaded renderer to the previous message passing strategy.\r\n\r\n### Test Coverage:\r\nAre you confident that your fix is well-tested by automated tests?\r\n\r\n  - [ x ] Yes\r\n  - [ ] No\r\n\r\n### Validation Steps:\r\nWhat are the steps to validate that this fix works?\r\n\r\nBuilt the Wonderous app and take a Chrome profile.",
+    "labels": [
+      "engine",
+      "platform-web",
+      "cp: review",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "[CP-beta][skwasm] Use `queueMicrotask` instead of `postMessage` when single-threaded",
+    "user": "flutteractionsbot"
+  },
+  "https://github.com/flutter/flutter/pull/163094": {
+    "body": "Closes https://github.com/flutter/flutter/issues/163091.",
+    "labels": [
+      "tool"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Make developing `flutter_tools` nicer: Use `fail` instead of `throw StateError`.",
+    "user": "matanlurey"
+  },
+  "https://github.com/flutter/flutter/pull/162780": {
+    "body": "This is a Fuchsia change to prepare for future changes to the SDK. LogSink and InspectSink will soon be routed through dictionaries, rather than explicitly. For RealmBuilders, we need to route both the dictionary and the protocol (to preserve compatibility). For CML files, we need to use the shards in the SDK instead of using explicit routes. Once the SDK shard is updated, then all SDK consumers should receive new routes. However, not everyone will necessarily be updated at the same time, which is the reason for keeping compatibility routes in RealmBuilder (to prepare for the soft transition).\r\n\r\nb/394681733\r\n\r\n## Pre-launch Checklist\r\n\r\n- [X] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [X] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [X] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [(Google employee)] I signed the [CLA].\r\n- [X] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [X (exempt, SDK mechanical change only)] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [X] I followed the [breaking change policy] and added [Data Driven Fixes] where supported.\r\n- [X (unable to test on Fuchsia, I believe it has to be merged to be tested)] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md\r\n[test-exempt]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/blob/main/docs/contributing/Style-guide-for-Flutter-repo.m",
+    "labels": [
+      "a: text input",
+      "engine",
+      "platform-fuchsia"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "[fuchsia] Remove explicit LogSink and InspectSink routing and use dictionaries instead",
+    "user": "gbbosak"
+  },
+  "https://github.com/flutter/flutter/pull/164795": {
+    "body": "`opacityAnimation` of `DropdownMenuItemButton` is always set with a non-nullable value. Therefore, I think it's a good idea to use `late CurvedAnimation` instead of `CurvedAnimation?` and avoid the unnecessary null assertion operator (!)\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] I followed the [breaking change policy] and added [Data Driven Fixes] where supported.\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md\r\n[test-exempt]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/blob/main/docs/contributing/Style-guide-for-Flutter-repo.md\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/blob/main/docs/contributing/Style-guide-for-Flutter-repo.md#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/blob/main/docs/contributing/Chat.md\r\n[D",
+    "labels": [
+      "framework",
+      "f: material design"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Prefer using non nullable opacityAnimation property",
+    "user": "AhmedLSayed9"
+  },
+  "https://github.com/flutter/flutter/pull/152182": {
+    "body": "Upcoming changes to DDC change the async semantics of code produced by the compiler. The changes will bring the semantics more in line with those of dart2js and fix several bugs in the old semantics. However in landing those changes I experienced a test failure in [obscured_animated_image_test](https://github.com/flutter/flutter/blob/master/packages/flutter/test/widgets/obscured_animated_image_test.dart).\r\n\r\nSome debugging uncovered that this is due to the use of `SynchronousFuture` in this `FakeCodec`. The old DDC async semantics forced an async gap when that future was [awaited](https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/painting/image_stream.dart#L1064). The new async semantics do not create an async gap here. This changes the render ordering of the widget tree created in the test leading to the test failure.\r\n\r\n`Future.value` should be a reasonable substitute here and should achieve what the test was trying to achieve while also preserving the correct render ordering given the new DDC semantics.",
+    "labels": [
+      "framework",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Update fake_codec.dart to use Future.value instead of SynchronousFuture",
+    "user": "biggs0125"
+  },
+  "https://github.com/flutter/engine/pull/55416": {
+    "body": "Resolves https://github.com/flutter/flutter/issues/155627.\r\n\r\nAllow setting the clear directly as floats without conversion work. vector_math already has convenient `Colors.[color]` factories and such. Also, `ui.Color` has a color space now, which does not apply here.\r\n\r\nAdds a simple golden to verify that clear colors work:\r\n![flutter_gpu_test_clear_color](https://github.com/user-attachments/assets/ba7a4e74-aaf2-48d8-ac13-115a86daeb19)\r\n",
+    "labels": [
+      "will affect goldens",
+      "autosubmit",
+      "flutter-gpu"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "[Flutter GPU] Use vm.Vector4 for clear color instead of ui.Color.",
+    "user": "bdero"
+  },
+  "https://github.com/flutter/flutter/pull/145523": {
+    "body": "fixes [Deprecate `ButtonBar`](https://github.com/flutter/flutter/issues/127955)\r\n\r\n### Code sample\r\n\r\n<details>\r\n<summary>expand to view the code sample</summary> \r\n\r\n```dart\r\nimport 'package:flutter/material.dart';\r\n\r\nvoid main() => runApp(const MyApp());\r\n\r\nclass MyApp extends StatelessWidget {\r\n  const MyApp({super.key});\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    return MaterialApp(\r\n      theme: ThemeData(\r\n        buttonBarTheme: const ButtonBarThemeData(\r\n          alignment: MainAxisAlignment.spaceEvenly,\r\n        ),\r\n      ),\r\n      home: Scaffold(\r\n        body: ButtonBar(\r\n          alignment: MainAxisAlignment.spaceEvenly,\r\n          children: <Widget>[\r\n            TextButton(\r\n              onPressed: () {},\r\n              child: const Text('Button 1'),\r\n            ),\r\n            TextButton(\r\n              onPressed: () {},\r\n              child: const Text('Button 2'),\r\n            ),\r\n            TextButton(\r\n              onPressed: () {},\r\n              child: const Text('Button 3'),\r\n            ),\r\n          ],\r\n        ),\r\n      ),\r\n    );\r\n  }\r\n}\r\n```\r\n\r\n</details>\r\n\r\n## Data driven fix\r\n\r\n### Before executing `dart fix --apply`\r\n```dart\r\n  return MaterialApp(\r\n      theme: ThemeData(\r\n        buttonBarTheme: const ButtonBarThemeData(\r\n          alignment: MainAxisAlignment.spaceEvenly,\r\n        ),\r\n      ),\r\n      home: Scaffold(\r\n        body: ButtonBar(\r\n          alignment: MainAxisAlignment.spaceEvenly,\r\n          children: <Widget>[\r\n            TextButton(\r\n              onPressed: () {},\r\n              child: const Text('Button 1'),\r\n            ),\r\n            TextButton(\r\n              onPressed: () {},\r\n              child: const Text('Button 2'),\r\n            ),\r\n            TextButton(\r\n              onPressed: () {},\r\n              child: const Text('Button 3'),\r\n            ),\r\n          ],\r\n        ),\r\n      ),\r\n    );\r\n```\r\n\r\n### After executing `dart fix --apply`\r\n```dart\r\n    return MaterialApp(\r\n      theme",
+    "labels": [
+      "framework",
+      "f: material design",
+      "c: tech-debt",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Deprecate `ButtonBar`, `ButtonBarThemeData`, and `ThemeData.buttonBarTheme`",
+    "user": "TahaTesser"
+  },
+  "https://github.com/flutter/engine/pull/51834": {
+    "body": "Closes https://github.com/flutter/flutter/issues/146105.\r\n\r\nOriginally when we authored these suites, `ScopedCleanupClosure` disallowed move-semantics, but that was fixed in https://github.com/flutter/engine/pull/45772, so there is no reason to have a copy of these in different tests.\r\n\r\n/cc @jonahwilliams ",
+    "labels": [
+      "e: impeller",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Use `fml::ScopedCleanupClosure` instead of `DeathRattle`.",
+    "user": "matanlurey"
+  },
+  "https://github.com/flutter/flutter/pull/150185": {
+    "body": "Switch away from the `Iterable.castFrom` static method to the `Iterable.cast` instance method which is more readable and more consistent with other iterable usages.\r\n",
+    "labels": [
+      "a: tests",
+      "framework",
+      "f: scrolling",
+      "will affect goldens",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Switch to `Iterable.cast` instance method",
+    "user": "parlough"
+  },
+  "https://github.com/flutter/flutter/pull/149777": {
+    "body": "This changes how the `IconThemeData` is passed to the child of `CupertinoButton`.\r\n\r\nPreviously, it would derive the foreground color from the current theme and create a new `IconThemeData` object.\r\nThis causes any `IconThemeData` to be overwritten.\r\n\r\nThis change uses `IconTheme.of` to get the currently applied icon theme and only overwrites the properties provided by the `CupertinoButton` instead of the whole object.\r\n\r\nFixes #149172.\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] I followed the [breaking change policy] and added [Data Driven Fixes] where supported.\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/",
+    "labels": [
+      "framework",
+      "f: cupertino",
+      "will affect goldens",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Copy any previous `IconThemeData` instead of overwriting it in CupertinoButton",
+    "user": "ricardoboss"
+  },
+  "https://github.com/flutter/flutter/pull/146773": {
+    "body": "[A previous PR](https://github.com/flutter/flutter/pull/144279) implemented `const` constructors in the `Remote` class, so I wanted to follow up and use those constructors in the appropriate places.",
+    "labels": [
+      "autosubmit",
+      "refactor"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Switch to relevant `Remote` constructors",
+    "user": "nate-thegrate"
+  },
+  "https://github.com/flutter/flutter/pull/147621": {
+    "body": "*Use `super.key` instead of manually passing the `Key` parameter using super(key: key) in the constructors.*\r\n\r\nSince if you create a widget the new default will use `super.key` instead of `Key? key : super(key: key)` this small change is to maintain the consistency, it has no semantic change\r\n\r\nalso there are some other places that might need to be updated:\r\n\r\n![image](https://github.com/flutter/flutter/assets/73608287/898f62f5-10f9-4d76-a46c-6def328177cb)\r\n\r\nthis file for example generate l10n project and it has all the dart code as String, it might have tests that validate the output somewhere that I might miss, also there are some other places like the `_Segment` class where it require `ValueKey` instead if `Key` so I didn't update them (even though it's possible)\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [ ] I listed at least one issue that this PR fixes in the description above.\r\n- [ ] I updated/added relevant documentation (doc comments with `///`).\r\n- [ ] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [ ] I followed the [breaking change policy] and added [Data Driven Fixes] where supported.\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.",
+    "labels": [
+      "framework",
+      "d: api docs",
+      "d: examples",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Use super.key instead of manually passing the Key parameter to the parent class",
+    "user": "EchoEllet"
+  },
+  "https://github.com/flutter/flutter/pull/150180": {
+    "body": null,
+    "labels": [
+      "tool",
+      "will affect goldens"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Use --(no-)strip-wams instead of --(no-)-name-section in `dart compile wasm`",
+    "user": "mkustermann"
+  },
+  "https://github.com/flutter/engine/pull/52892": {
+    "body": "Work towards https://github.com/flutter/flutter/issues/139702.\r\n\r\nI think we should also `@Deprecate`/cleanup the API surface in `FlutterView`, but that needs a bit more a discussion.\r\n\r\n/cc @johnmccutchan ",
+    "labels": [
+      "platform-android"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Issue an`ERROR` instead of an `INFO` for a non-working API.",
+    "user": "matanlurey"
+  },
+  "https://github.com/flutter/flutter/pull/148799": {
+    "body": "https://github.com/flutter/flutter/issues/148253",
+    "labels": [
+      "framework",
+      "f: material design",
+      "f: scrolling",
+      "will affect goldens",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Switch to FilterQuality.medium for images",
+    "user": "goderbauer"
+  },
+  "https://github.com/flutter/flutter/pull/150587": {
+    "body": "Contributes to https://github.com/flutter/website/issues/10363.",
+    "labels": [
+      "platform-ios",
+      "tool",
+      "a: desktop",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Switch to more reliable flutter.dev link destinations in the tool",
+    "user": "parlough"
+  },
+  "https://github.com/flutter/flutter/pull/149614": {
+    "body": "Currently the ecosystem team triages all PRs in the packages repository, but the platform teams also triage all PRs with their platform label. Due to the way PRs in packages work, however, it's relatively common for a PR to not be relevant to all the teams' triages at all times. Common examples:\r\n- One platform team may LGTM a multi-platform PR for their platform's portion, while another platform goes through review for several more weeks.\r\n- A cross-platform PR may not have high-level design approval from the ecosystem owner, at which point platform implementation review is premature.\r\n\r\nTo avoid PRs showing up repeatedly in a platform team's triage when it's not relevant, this adjusts the triage structure:\r\n- Queries for PRs in platform teams query `triage-<platform name>` rather than `platform-<platform name>`\r\n- Ecosystem triage will add the `triage-<platform name>` label during triage when a PR is ready for that platform team's consideration.\r\n- Platform teams can remove the label when it's not relevant to them (e..g, after it's been LGTM'd for that platform).\r\n\r\nThis also adds a desktop PR query, since there wasn't one, covering the separate platforms. They are separated to allow for more triage flexibility in the future.\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [ ] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] I followed the [breaking change policy] and added [Data Driven Fixes] where supported.\r\n- [x] All existing and new tests are passing.\r\n\r\n<!-- Links -->\r\n[Contr",
+    "labels": [
+      "autosubmit",
+      "d: docs/"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Switch to triage-* labels for platform package triage",
+    "user": "stuartmorgan-g"
+  },
+  "https://github.com/flutter/flutter/pull/139255": {
+    "body": "Part of: https://github.com/flutter/flutter/issues/143956\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] All existing and new tests are passing.",
+    "labels": [
+      "a: text input",
+      "framework",
+      "f: material design",
+      "d: api docs",
+      "d: examples",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Remove deprecated `TextTheme` members",
+    "user": "Renzo-Olivares"
+  },
+  "https://github.com/flutter/flutter/pull/143961": {
+    "body": "https://github.com/flutter/flutter/issues/143956\r\n\r\nI still did not include a dartfix since a dartfix that replaces `release` with `dispose` would change the semantics and may cause a runtime crash instead of a build error.\r\n\r\n@Piinks  does setting `bulkApply` to false force the user to apply the fix to every occurrence one by one in their IDE? If so then it seems that would be the way to go for this deprecation?\r\n\r\n## Pre-launch Checklist\r\n\r\n- [ ] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [ ] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [ ] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [ ] I signed the [CLA].\r\n- [ ] I listed at least one issue that this PR fixes in the description above.\r\n- [ ] I updated/added relevant documentation (doc comments with `///`).\r\n- [ ] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [ ] I followed the [breaking change policy] and added [Data Driven Fixes] where supported.\r\n- [ ] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n[Data",
+    "labels": [
+      "framework",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Remove deprecated `KeepAliveHandle.release`",
+    "user": "LongCatIsLooong"
+  },
+  "https://github.com/flutter/flutter/pull/142500": {
+    "body": "\r\n\r\n## Pre-launch Checklist\r\n\r\n- [ ] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [ ] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [ ] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [ ] I signed the [CLA].\r\n- [ ] I listed at least one issue that this PR fixes in the description above.\r\n- [ ] I updated/added relevant documentation (doc comments with `///`).\r\n- [ ] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [ ] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n",
+    "labels": [
+      "framework",
+      "c: tech-debt",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Remove deprecated `InteractiveViewer.alignPanAxis`",
+    "user": "LongCatIsLooong"
+  },
+  "https://github.com/flutter/flutter/pull/143990": {
+    "body": "It was deprecated in https://github.com/flutter/flutter/pull/110616.\r\n\r\nDeprecated in https://github.com/flutter/flutter/pull/110616\r\n\r\n## Pre-launch Checklist\r\n\r\n- [ ] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [ ] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [ ] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [ ] I signed the [CLA].\r\n- [ ] I listed at least one issue that this PR fixes in the description above.\r\n- [ ] I updated/added relevant documentation (doc comments with `///`).\r\n- [ ] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [ ] I followed the [breaking change policy] and added [Data Driven Fixes] where supported.\r\n- [ ] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n[Data Driven Fixes]: https://github.com/flutter/flutter/wiki/Data-driven-Fixes\r\n",
+    "labels": [
+      "a: text input",
+      "framework",
+      "f: cupertino",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Remove deprecated `CupertinoContextMenu.previewBuilder`",
+    "user": "LongCatIsLooong"
+  },
+  "https://github.com/flutter/flutter/pull/144319": {
+    "body": "fixes [Chips delete button hover style is square, not circular](https://github.com/flutter/flutter/issues/141335)\r\n\r\n### Code sample\r\n\r\n<details>\r\n<summary>expand to view the code sample</summary> \r\n\r\n```dart\r\nimport 'package:flutter/material.dart';\r\n\r\nvoid main() {\r\n  runApp(MyApp());\r\n}\r\n\r\nclass MyApp extends StatelessWidget {\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    return MaterialApp(\r\n      home: Scaffold(\r\n        body: Center(\r\n          child: RawChip(\r\n            label: const Text('Test'),\r\n            onPressed: null,\r\n            deleteIcon: const Icon(Icons.clear, size: 18),\r\n            onDeleted: () {},\r\n          ),\r\n        ),\r\n      ),\r\n    );\r\n  }\r\n}\r\n```\r\n\r\n</details>\r\n\r\n### Preview\r\n\r\n| Before | After |\r\n| --------------- | --------------- |\r\n| <img src=\"https://github.com/flutter/flutter/assets/48603081/c5d62c57-97b3-4f94-b83d-df13559ee3a8\" /> | <img src=\"https://github.com/flutter/flutter/assets/48603081/b76edaab-73e0-4aa9-8ca2-127eedd77814\"  /> |\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [ ] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [ ] I followed the [breaking change policy] and added [Data Driven Fixes] where supported.\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-ex",
+    "labels": [
+      "framework",
+      "f: material design",
+      "will affect goldens",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Fix chips use square delete button `InkWell` shape instead of circular",
+    "user": "TahaTesser"
+  },
+  "https://github.com/flutter/flutter/pull/138509": {
+    "body": "Part of https://github.com/flutter/flutter/issues/139243\r\n\r\n## Description\r\n\r\nThis removes the `PlatformMenuBar.body` attribute and constructor parameter, since its deprecation period has elapsed.\r\n\r\n## Tests\r\n - No tests were using the deprecated attribute, so no tests were removed.\r\n\r\n#FlutterDeprecations",
+    "labels": [
+      "framework",
+      "f: material design",
+      "f: cupertino",
+      "c: tech-debt",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Remove deprecated `PlatformMenuBar.body`",
+    "user": "gspencergoog"
+  },
+  "https://github.com/flutter/flutter/pull/136677": {
+    "body": "## Description\r\n\r\nThis starts the deprecation of the `RawKeyEvent`/`RawKeyboard` event system that has been replaced by the `KeyEvent`/`HardwareKeyboard` event system.\r\n\r\nMigration guide is available here: https://docs.flutter.dev/release/breaking-changes/key-event-migration\r\n\r\n## Related Issues\r\n - https://github.com/flutter/flutter/issues/136419\r\n\r\n## Related PRs\r\n - https://github.com/flutter/website/pull/9889",
+    "labels": [
+      "a: tests",
+      "a: text input",
+      "framework",
+      "f: material design",
+      "f: scrolling",
+      "f: cupertino",
+      "d: api docs",
+      "d: examples",
+      "f: focus",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Deprecate `RawKeyEvent`, `RawKeyboard`, et al.",
+    "user": "gspencergoog"
+  },
+  "https://github.com/flutter/flutter/pull/131634": {
+    "body": "![](https://media.giphy.com/media/qriH9W51oLsL6/giphy.gif)\r\nFixes https://github.com/flutter/devtools/issues/6014\r\n\r\nChange the forceRebuild behaviour of the WidgetInspector to use ValueListenableBuilders instead. This should help resolve heavy rebuilds when the widgetInspectorOverride value changes.",
+    "labels": [
+      "framework",
+      "c: tech-debt"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Changes to use valuenotifier instead of a force rebuild for WidgetInspector",
+    "user": "CoderDake"
+  },
+  "https://github.com/flutter/engine/pull/46884": {
+    "body": "`--systrace_timeline` is redundant and makes the `getFlagList` VM Service RPC not return `timeline_recorder=systrace` (https://github.com/flutter/devtools/issues/6524#issuecomment-1760090526), so we would like to deprecate and remove it.",
+    "labels": [
+      "platform-fuchsia"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Use --timeline_recorder=systrace instead of --systrace_timeline",
+    "user": "derekxu16"
+  },
+  "https://github.com/flutter/flutter/pull/134921": {
+    "body": "Fixes https://github.com/flutter/flutter/issues/134456\r\n\r\n## Pre-launch Checklist\r\n\r\n- [ ] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [ ] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [ ] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [ ] I signed the [CLA].\r\n- [ ] I listed at least one issue that this PR fixes in the description above.\r\n- [ ] I updated/added relevant documentation (doc comments with `///`).\r\n- [ ] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [ ] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n",
+    "labels": [
+      "framework",
+      "f: material design",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "`OverlayPortal.overlayChild` contributes semantics to `OverlayPortal` instead of `Overlay`",
+    "user": "LongCatIsLooong"
+  },
+  "https://github.com/flutter/flutter/pull/139940": {
+    "body": "The doc comment for `useInheritedMediaQuery` has a typo of 'not' instead of 'now' and it is confusing at the `@Deprecated()` message clearly states it is *now* ignored.\r\n(and indeed checking the code you can verify that it *is* indeed ignored)\r\n\r\nexisting code before PR:\r\n```dart\r\n/// {@template flutter.widgets.widgetsApp.useInheritedMediaQuery}\r\n/// Deprecated. This setting is not ignored.\r\n///                             ^^^\r\n/// The widget never introduces its own [MediaQuery]; the [View] widget takes\r\n/// care of that.\r\n/// {@endtemplate}\r\n@Deprecated(\r\n  'This setting is now ignored. '\r\n  'WidgetsApp never introduces its own MediaQuery; the View widget takes care of that. '\r\n  'This feature was deprecated after v3.7.0-29.0.pre.'\r\n)\r\nfinal bool useInheritedMediaQuery;\r\n```\r\n\r\n\r\n## Pre-launch Checklist\r\n\r\n- [X ] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [X] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [X] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [X] I signed the [CLA].\r\n- [X] I listed at least one issue that this PR fixes in the description above.\r\n- [X] I updated/added relevant documentation (doc comments with `///`).\r\n- [X] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [X] All existing and new tests are passing.\r\n",
+    "labels": [
+      "framework",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "fix typo of 'not' instead of 'now' for `useInheritedMediaQuery` ",
+    "user": "timmaffett"
+  },
+  "https://github.com/flutter/flutter/pull/136214": {
+    "body": "This switches over to using Chrome for Testing instead of Chromium. This should ensure that we are consistently using an official and consistent build of Chrome on all platforms, rather than whatever we can get from the continuous builds archive, which can potentially put platforms out of sync with each other.",
+    "labels": [
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Switch to Chrome for Testing instead of vanilla Chromium.",
+    "user": "eyebrowsoffire"
+  },
+  "https://github.com/flutter/engine/pull/48849": {
+    "body": "This migrates the Windows embedder to `FlutterCompositor` so that the engine renders off-screen to a framebuffer instead of directly onto the window's surface. This will allow us to support platform views and multiple views on Windows.\r\n\r\n<details>\r\n<summary>Tests...</summary>\r\n\r\n* Verify OpenGL compositor's raster time isn't regressed and memory increase is reasonable\r\n* Software compositor's raster time and memory isn't regressed\r\n\r\nTest device configurations\r\n* [x] Windows 11 (hardware acceleration enabled/disabled)\r\n* [x] Windows Arm64 (hardware acceleration enabled/disabled)\r\n* [x] Windows 7 (hardware acceleration enabled/disabled, DWM enabled/disabled)\r\n\r\n</details>\r\n\r\nAddresses https://github.com/flutter/flutter/issues/128904\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide] and the [C++, Objective-C, Java style guides].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I added new tests to check the change I am making or feature I am adding, or the PR is [test-exempt]. See [testing the engine] for instructions on writing and running engine tests.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I signed the [CLA].\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[C++, Objective-C, Java style guides]: https://github.com/flutter/engine/blob/main/CONTRIBUTING.md#style",
+    "labels": [
+      "affects: desktop",
+      "platform-linux",
+      "platform-windows",
+      "e: impeller",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "[Windows] Move to `FlutterCompositor` for rendering",
+    "user": "loic-sharma"
+  },
+  "https://github.com/flutter/engine/pull/46683": {
+    "body": "This switches over to using Chrome for Testing instead of Chromium. This requires some changes from the recipes repo (https://flutter-review.googlesource.com/c/recipes/+/51482) in order to coordinate the change in filestructure on the mac versions.",
+    "labels": [
+      "platform-web",
+      "will affect goldens",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Switch to Chrome For Testing instead of Chromium",
+    "user": "eyebrowsoffire"
+  },
+  "https://github.com/flutter/engine/pull/47016": {
+    "body": "Switch to the latest android version for tests.\r\n\r\nDevice is high capacity, and [currently in use in flutter/flutter](https://github.com/flutter/flutter/blob/dbb79e63ebdfdc0f11c9d1ab4125a80384a59d56/.ci.yaml#L451). See [here](https://firebase.google.com/docs/test-lab/android/available-testing-devices) to get the list of devices.\r\n\r\nRelated to https://github.com/flutter/flutter/pull/136736\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide] and the [C++, Objective-C, Java style guides].\r\n- [ ] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I added new tests to check the change I am making or feature I am adding, or the PR is [test-exempt]. See [testing the engine] for instructions on writing and running engine tests.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I signed the [CLA].\r\n- [ ] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[C++, Objective-C, Java style guides]: https://github.com/flutter/engine/blob/main/CONTRIBUTING.md#style\r\n[testing the engine]: https://github.com/flutter/flutter/wiki/Testing-the-engine\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n",
+    "labels": [
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Switch to Android 14 for physical device firebase tests",
+    "user": "gmackall"
+  },
+  "https://github.com/flutter/flutter/pull/131455": {
+    "body": "This PR is to deprecate `useMaterial3` parameter in `ThemeData.copyWith()`.\r\n\r\nSetting `useMaterial3` to false in `ThemeData.copyWith()` doesn't force Flutter to use Material 2, instead, we should set it in `ThemeData()` directly. The documentation of `useMaterial3` has covered this limitation: https://api.flutter.dev/flutter/material/ThemeData/useMaterial3.html, but it still likely to be misused in the `.copyWith()` method.\r\n\r\nA related issue happens in b/292560771\r\n\r\nRelated to #131041\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n",
+    "labels": [
+      "framework",
+      "f: material design",
+      "c: tech-debt"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Deprecate `useMaterial3` parameter in `ThemeData.copyWith()`",
+    "user": "QuncCccccc"
+  },
+  "https://github.com/flutter/flutter/pull/131393": {
+    "body": "Fixes https://github.com/flutter/flutter/issues/113431\r\n\r\nCurrently we only support specifying all slivers to have the same extent.\r\nThis patch introduces an `itemExtentBuilder` property for `ListView`, allowing the slivers to have different extents while still having scrolling performance, especially when the scroll position changes drastically(such as scrolling by the scrollbar or controller.jumpTo()).\r\n\r\n@Piinks Hi, Any thoughts about this?  :)",
+    "labels": [
+      "c: new feature",
+      "framework",
+      "f: material design",
+      "f: scrolling",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "[New feature] Allowing the `ListView` slivers to have different extents while still having scrolling performance",
+    "user": "xu-baolin"
+  },
+  "https://github.com/flutter/flutter/pull/130567": {
+    "body": "The change in [0] has propagated now everywhere, so we can use `utf8.encode()` instead of the longer `const Utf8Encoder.convert()`.\r\n\r\nAlso it cleans up code like\r\n\r\n```\r\n  TypedData bytes;\r\n  bytes.buffer.asByteData();\r\n```\r\n\r\nas that is not guaranteed to be correct, the correct version would be\r\n\r\n```\r\n  TypedData bytes;\r\n  bytes.buffer.asByteData(bytes.offsetInBytes, bytes.lengthInBytes);\r\n```\r\n\r\na shorter hand for that is:\r\n\r\n```\r\n  TypedData bytes;\r\n  ByteData.sublistView(bytes);\r\n```\r\n\r\n[0] https://github.com/dart-lang/sdk/issues/52801",
+    "labels": [
+      "framework"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Use utf8.encode() instead of longer const Utf8Encoder.convert()",
+    "user": "mkustermann"
+  },
+  "https://github.com/flutter/engine/pull/45667": {
+    "body": "When composing with the IME in a text edit, we should add the `start` of the composition range to the in-composition `cursor_pos` rather than its `extent`. When using `extent`, the cursor position would always be outside of the composition range, resulting in the linked bug. Add a test to check cursor position.\r\n\r\nhttps://github.com/flutter/flutter/issues/123749\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide] and the [C++, Objective-C, Java style guides].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I added new tests to check the change I am making or feature I am adding, or the PR is [test-exempt]. See [testing the engine] for instructions on writing and running engine tests.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [ ] I signed the [CLA].\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[C++, Objective-C, Java style guides]: https://github.com/flutter/engine/blob/main/CONTRIBUTING.md#style\r\n[testing the engine]: https://github.com/flutter/flutter/wiki/Testing-the-engine\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n",
+    "labels": [
+      "affects: text input",
+      "affects: desktop",
+      "platform-windows"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Use `start` instead of `extent` for Windows IME cursor position",
+    "user": "yaakovschectman"
+  },
+  "https://github.com/flutter/flutter/pull/128437": {
+    "body": "Fixes https://github.com/flutter/flutter/issues/128430\r\n\r\n## Pre-launch Checklist\r\n\r\n- [X] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [X] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [X] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [X] I signed the [CLA].\r\n- [X] I listed at least one issue that this PR fixes in the description above.\r\n- [X] I updated/added relevant documentation (doc comments with `///`).\r\n- [X] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [X] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n",
+    "labels": [
+      "framework",
+      "f: material design",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Advise developers to use OverflowBar instead of ButtonBar",
+    "user": "leighajarett"
+  },
+  "https://github.com/flutter/flutter/pull/126936": {
+    "body": "## How we determine the channel name\r\n\r\nHistorically, we used the current branch's upstream to figure out the current channel name. I have no idea why. I traced it back to https://github.com/flutter/flutter/pull/446/files where @abarth implement this and I reviewed that PR and left no comment on it at the time.\r\n\r\nI think this is confusing. You can be on a branch and it tells you that your channel is different. That seems weird.\r\n\r\nThis PR changes the logic to uses the current branch as the channel name.\r\n\r\n## How we display channels\r\n\r\nThe main reason this PR exists is to add channel descriptions to the `flutter channel` list:\r\n\r\n```\r\nianh@burmese:~/dev/flutter/packages/flutter_tools$ flutter channel\r\nFlutter channels:\r\n  master (tip of tree, for contributors)\r\n  main (tip of tree, follows master channel)\r\n  beta (updated monthly, recommended for experienced users)\r\n  stable (updated quarterly, for new users and for production app releases)\r\n* foo_bar\r\n\r\nCurrently not on an official channel.\r\nianh@burmese:~/dev/flutter/packages/flutter_tools$\r\n```\r\n\r\n## Other changes\r\n\r\nI made a few other changes while I was at it:\r\n\r\n* If you're not on an official channel, we used to imply `--show-all`, but now we don't, we just show the official channels plus yours. This avoids flooding the screen in the case the user is on a weird channel and just wants to know what channel they're on.\r\n* I made the tool more consistent about how it handles unofficial branches. Now it's always `[user branch]`.\r\n* I slightly adjusted how unknown versions are rendered so it's clearer the version is unknown rather than just having the word \"Unknown\" floating in the output without context.\r\n* Simplified some of the code.\r\n* Made some of the tests more strict (checking all output rather than just some aspects of it).\r\n* Changed the MockFlutterVersion to implement the FlutterVersion API more strictly.\r\n* I made sure we escape the output to `.metadata` to avoid potential injection bugs (previously we j",
+    "labels": [
+      "tool",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Give channel descriptions in `flutter channel`, use branch instead of upstream for channel name",
+    "user": "Hixie"
+  },
+  "https://github.com/flutter/flutter/pull/128810": {
+    "body": "Replaces AnimatedBuilder for ListenableBuilder in the skeleton template\r\n\r\nFixes https://github.com/flutter/flutter/issues/128801\r\n\r\nNo tests needed\r\n",
+    "labels": [
+      "tool",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "[flutter_tools] modify Skeleton template to use ListenableBuilder instead of AnimatedBuilder",
+    "user": "fabiancrx"
+  },
+  "https://github.com/flutter/flutter/pull/120618": {
+    "body": "Deprecated in #86198\r\n\r\n## Pre-launch Checklist\r\n\r\n- [ ] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [ ] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [ ] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [ ] I signed the [CLA].\r\n- [ ] I listed at least one issue that this PR fixes in the description above.\r\n- [ ] I updated/added relevant documentation (doc comments with `///`).\r\n- [ ] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [ ] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n",
+    "labels": [
+      "framework",
+      "f: material design",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Remove deprecated `AppBar.color` & `AppBar.backwardsCompatibility`",
+    "user": "LongCatIsLooong"
+  },
+  "https://github.com/flutter/flutter/pull/122824": {
+    "body": "Deprecates `TestWindow`\r\n\r\n* Adds `Deprecated` annotations to `TestWindow` and its constructors.\r\n* Adds `Deprecated` annotations to all properties and methods on `TestWindow` except `noSuchMethod`.\r\n* Adds `Deprecated` annotation to `TestWidgetsFlutterBinding.window`.\r\n* Adds `flutter_test` specific deprecation documentation to `TestWidgetsFlutterBinding.window`.\r\n\r\nResolves #121915.\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] All existing and new tests are passing.",
+    "labels": [
+      "a: tests",
+      "framework",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Deprecates `TestWindow`",
+    "user": "pdblasi-google"
+  },
+  "https://github.com/flutter/engine/pull/39269": {
+    "body": null,
+    "labels": [
+      "platform-web",
+      "needs tests",
+      "warning: land on red to fix tree breakage",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "@alwaysThrows is deprecated. Return `Never` instead.",
+    "user": "eyebrowsoffire"
+  },
+  "https://github.com/flutter/flutter/pull/120234": {
+    "body": "This change changes `ParagraphBoundary` uses of `String.codeUnits[index]` to `String.codeUnitAt(index)` to avoid creating a new list when using the `.codeUnits` getter.\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] All existing and new tests are passing.",
+    "labels": [
+      "a: text input",
+      "framework",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Use String.codeUnitAt instead of String.codeUnits[] in ParagraphBoundary",
+    "user": "Renzo-Olivares"
+  },
+  "https://github.com/flutter/flutter/pull/122178": {
+    "body": "Instead of accessing the same variable through the map multiple times, use the variable which is also statically checked.\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [ ] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [ ] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n",
+    "labels": [
+      "tool",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Use variable instead of multiple accesses through a map",
+    "user": "ueman"
+  },
+  "https://github.com/flutter/engine/pull/40382": {
+    "body": "Follow-up to Skia's change http://review.skia.org/649523\r\n\r\n## Pre-launch Checklist\r\n\r\n- [ x ] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [ x ] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [ x ] I read and followed the [Flutter Style Guide] and the [C++, Objective-C, Java style guides].\r\n- [ ] I listed at least one issue that this PR fixes in the description above.\r\n- [ x ] I added new tests to check the change I am making or feature I am adding, or Hixie said the PR is test-exempt. See [testing the engine] for instructions on writing and running engine tests.\r\n- [ ] I updated/added relevant documentation (doc comments with `///`).\r\n- [ x ] I signed the [CLA].\r\n- [ x ] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[C++, Objective-C, Java style guides]: https://github.com/flutter/engine/blob/main/CONTRIBUTING.md#style\r\n[testing the engine]: https://github.com/flutter/flutter/wiki/Testing-the-engine\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n",
+    "labels": [],
+    "merged": true,
+    "state": "closed",
+    "title": "Use skia_enable_ganesh instead of legacy GN arg",
+    "user": "kjlubick"
+  },
+  "https://github.com/flutter/flutter/pull/124357": {
+    "body": "## Description\r\n\r\nThis changes the initialization of `ThemeData.visualDensity` to use the `ThemeData`'s `platform` instead of always using `defaultTargetPlatform`.  Before this change, setting the platform on the `ThemeData` had an effect on all the platform-dependent properties _except_ for `visualDensity`.\r\n\r\n## Related Issues\r\n - https://github.com/flutter/flutter/issues/123773\r\n\r\n## Tests\r\n - Added tests for the new static `defaultDensityForPlatform` and verified that the theme data uses the passed-in platform.",
+    "labels": [
+      "framework",
+      "f: material design",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Initialize `ThemeData.visualDensity` using `ThemeData.platform` instead of `defaultTargetPlatform`",
+    "user": "gspencergoog"
+  },
+  "https://github.com/flutter/engine/pull/39326": {
+    "body": "The engine's Visual Studio integration is currently broken. See: https://groups.google.com/a/chromium.org/g/chromium-dev/c/027jM6DLkIk\r\n\r\n> For Developers who build on Windows, instead of calling “ninja.exe”, please call “ninja” to resolve the [depot_tools/ninja.bat](https://crsrc.org/d/ninja.bat) wrapper.\r\n\r\nNote that the Visual Studio integration won't be fixed until [depot_tools#4215121](https://chromium-review.googlesource.com/c/chromium/tools/depot_tools/+/4215121) lands.\r\n\r\nPart of: https://github.com/flutter/flutter/issues/119760\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide] and the [C++, Objective-C, Java style guides].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [ ] I added new tests to check the change I am making or feature I am adding, or Hixie said the PR is test-exempt. See [testing the engine] for instructions on writing and running engine tests.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I signed the [CLA].\r\n- [ ] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[C++, Objective-C, Java style guides]: https://github.com/flutter/engine/blob/main/CONTRIBUTING.md#style\r\n[testing the engine]: https://github.com/flutter/flutter/wiki/Testing-the-engine\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-",
+    "labels": [],
+    "merged": true,
+    "state": "closed",
+    "title": "[Windows] Use 'ninja' instead of 'ninja.exe'",
+    "user": "loic-sharma"
+  },
+  "https://github.com/flutter/engine/pull/40666": {
+    "body": "Use Noto Color Emoji instead of Noto Emoji for the default Emoji fallback font. These emoji look much nicer than the black and white variants.\r\n\r\nFixes https://github.com/flutter/flutter/issues/119536\r\n\r\nBefore:\r\n![Screenshot 2023-03-27 at 9 52 52 AM](https://user-images.githubusercontent.com/1961493/228015897-b5f0656e-d585-48f8-8f64-3fe78137349a.png)\r\n\r\nAfter:\r\n![Screenshot 2023-03-27 at 10 11 25 AM](https://user-images.githubusercontent.com/1961493/228015945-f483c350-f915-46e1-8bc0-600f31738aca.png)\r\n\r\n\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide] and the [C++, Objective-C, Java style guides].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I added new tests to check the change I am making or feature I am adding, or Hixie said the PR is test-exempt. See [testing the engine] for instructions on writing and running engine tests.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I signed the [CLA].\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[C++, Objective-C, Java style guides]: https://github.com/flutter/engine/blob/main/CONTRIBUTING.md#style\r\n[testing the engine]: https://github.com/flutter/flutter/wiki/Testing-the-engine\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: htt",
+    "labels": [
+      "platform-web"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Switch from Noto Emoji to Noto Color Emoji and update font data",
+    "user": "harryterkelsen"
+  },
+  "https://github.com/flutter/flutter/pull/113131": {
+    "body": "## Description\r\n\r\nDeprecate `AnimatedListItemBuilder` and `AnimatedListRemovedItemBuilder` in favor of `AnimatedItemBuilder` and `AnimatedRemovedItemBuilder`, since they have the same signature, and just need a new, more appropriate, name.\r\n\r\n## Tests\r\n - No tests needed: just a refactor without a semantic difference.",
+    "labels": [
+      "c: contributor-productivity",
+      "framework",
+      "f: scrolling",
+      "d: api docs",
+      "d: examples",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Deprecate `AnimatedListItemBuilder` and `AnimatedListRemovedItemBuilder` ",
+    "user": "gspencergoog"
+  },
+  "https://github.com/flutter/flutter/pull/111849": {
+    "body": "Hi, hope to have a quick view whether this PR is acceptable or not? If yes I will add an issue and maybe ask for test-exempt.\r\n\r\n---\r\n\r\n*Replace this paragraph with a description of what this PR is changing or adding, and why. Consider including before/after screenshots.*\r\n\r\n*List which issues are fixed by this PR. You must list at least one issue.*\r\n\r\n*If you had to change anything in the [flutter/tests] repo, include a link to the migration guide as per the [breaking change policy].*\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [ ] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [ ] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n",
+    "labels": [
+      "framework",
+      "a: animation",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Change type in `ImplicitlyAnimatedWidget` to remove type cast to improve performance and style",
+    "user": "fzyzcjy"
+  },
+  "https://github.com/flutter/flutter/pull/113237": {
+    "body": "When we are using Theme directly scrollbar ignores ScrollbarTheme widgets in tree. We should use ScrollbarTheme.of(context) for get correct theme. Implementation of  ScrollbarTheme.of(context) already use Theme.of(context) if we don't have any ScrollbarTheme widgets in tree.\r\n\r\nIssue\r\nFixes https://github.com/flutter/flutter/issues/113235\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] All existing and new tests are passing.\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n",
+    "labels": [
+      "framework",
+      "f: material design",
+      "f: scrolling",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Use ScrollbarTheme instead Theme for Scrollbar",
+    "user": "Oleh-Sv"
+  },
+  "https://github.com/flutter/flutter/pull/111331": {
+    "body": "## Description\r\n\r\nThis fixes a bunch of places where we refer to the symbol being documented using ``` `symbol` ``` notation, when it would be really helpful in an IDE to have them be linked symbols, since we don't mind if a symbol links to itself, but using backticks makes those references invisible to the analyzer, so that refactorings, dart fixes, etc. don't see them.\r\n\r\n## Related Issues\r\n - https://github.com/dart-lang/dartdoc/issues/3149\r\n\r\n## Tests\r\n - Just doc changes, no code.",
+    "labels": [
+      "a: text input",
+      "framework",
+      "a: animation",
+      "f: material design",
+      "f: scrolling",
+      "f: cupertino",
+      "f: routes",
+      "f: focus",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Fix references to symbols to use brackets instead of backticks",
+    "user": "gspencergoog"
+  },
+  "https://github.com/flutter/flutter/pull/112191": {
+    "body": "When fully opaque, the Opacity widget still inserts an opacity layer in the tree. While this isn't super expensive by itself, it does force parent render objects to perform compositing and may make UIs marginally slower.\r\n\r\nUse the visibility widget instead",
+    "labels": [
+      "a: text input",
+      "framework",
+      "f: material design",
+      "f: cupertino",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "[framework] use Visibility instead of Opacity",
+    "user": "jonahwilliams"
+  },
+  "https://github.com/flutter/flutter/pull/115424": {
+    "body": "This is needed after analyzer introduced a new warning in https://github.com/dart-lang/sdk/commit/254da6749515d03abb7b7e37f342b161e9c6fdac",
+    "labels": [
+      "a: tests",
+      "framework",
+      "a: accessibility"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Use `double.isNaN` instead of `... == double.nan` (which is always false)",
+    "user": "mkustermann"
+  },
+  "https://github.com/flutter/flutter/pull/107836": {
+    "body": "Hi, while going through the code documentation of `CustomPainter`, I found an error in which `CustomPaint` was used instead of `CustomPainter` https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/rendering/custom_paint.dart#L29\r\n\r\nError: line 29, lib/src/rendering/custom_paint.dart\r\n\r\n```\r\n/// To implement a custom painter, either subclass or implement this interface\r\n/// to define your custom paint delegate. [CustomPaint] subclasses must\r\n/// implement the [paint] and [shouldRepaint] methods, and may optionally also...\r\n```\r\nShould be:\r\n```\r\n/// To implement a custom painter, either subclass or implement this interface\r\n/// to define your custom paint delegate. [CustomPainter] subclasses must\r\n/// implement the [paint] and [shouldRepaint] methods, and may optionally also...\r\n```\r\n\r\nThis error is also available on the website docs https://api.flutter.dev/flutter/rendering/CustomPainter-class.html.\r\n\r\nThis solves https://github.com/flutter/flutter/issues/107837\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [ ] I updated/added relevant documentation (doc comments with `///`).\r\n- [ ] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] All existing and new tests are passing.\r\n\r\n\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every wi",
+    "labels": [
+      "framework",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Error in docs: `CustomPaint` instead of `CustomPainter`",
+    "user": "0xba1"
+  },
+  "https://github.com/flutter/flutter/pull/108477": {
+    "body": "The default value of `effectiveInactivePressedOverlayColor` was determined by `effectiveActiveThumbColor` which supposed to be `effectiveInactiveThumbColor`.\r\n\r\nThis PR fixes the typo.\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [ ] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] All existing and new tests are passing.",
+    "labels": [
+      "framework",
+      "f: material design"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Change default value of `effectiveInactivePressedOverlayColor` in Switch to refer to `effectiveInactiveThumbColor`",
+    "user": "QuncCccccc"
+  },
+  "https://github.com/flutter/flutter/pull/105693": {
+    "body": "The `NullThrownError` is not used in null safe Dart,\r\nand is planned to go away when pre-null-safety code stops being supported.\r\nThe error class will soon be deprecated.\r\n\r\nThe deprecation recommends using `TypeError` instead, because that is what should be thrown in null-safe code if you do `throw (null as dynamic)`, because `null` cannot be down-cast from `dynamic` to `Object`.\r\n",
+    "labels": [
+      "c: contributor-productivity",
+      "framework",
+      "c: tech-debt",
+      "autosubmit"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Ignore uses of soon-to-be deprecated `NullThrownError`.",
+    "user": "lrhn"
+  },
+  "https://github.com/flutter/flutter/pull/104997": {
+    "body": "In https://github.com/flutter/flutter/pull/103771, we rolled\r\ndependencies in Flutter, which triggered an update of package:coverage\r\nto v1.3.1. The new version includes\r\nhttps://github.com/dart-lang/coverage/pull/370 in which two deprecations\r\nlanded:\r\n\r\n* The `Resolver` default constructor was deprecated and replaced with\r\n  the `Resolver.create` static factory method, which unfortunately\r\n  happens to be async.\r\n* The `packagesPath` parameter to `HitMap.parseJson`, which takes the\r\n  path to the `.packages` file of the package for which coverage is to\r\n  be collected, was deprecated. This parameter was replaced with\r\n  `packagePath` in https://github.com/dart-lang/coverage/pull/370 which\r\n  was part of the overall deprecation of the .packages file in Dart\r\n  itself https://github.com/dart-lang/sdk/issues/48272. The overall goal\r\n  being that end-user code shouldn't need to know about implementation\r\n  details such as whether dependency information is stored in a\r\n  .packages file or a package_info.json file, but rather use the\r\n  package_config package to obtain the package metadata and perform\r\n  other functions such as resolving its dependencies to filesystem\r\n  paths. packagesPath was replaced by packagePath, which takes the path\r\n  to the package directory itself. Internally, package:coverage then\r\n  uses package_config to do the rest of the package/script URI\r\n  resolution to filesystem paths.\r\n\r\nThis migrates off the deprecated `packagesPath` parameter to the\r\nreplacement `packagePath` paramter.\r\n\r\nNo test since this simply migrates off a deprecated parameter and onto its\r\nreplacement; the goal is to maintain identical behaviour.\r\n\r\nIssue: https://github.com/flutter/flutter/issues/103830\r\n\r\n\r\n## Pre-launch Checklist\r\n\r\n- [X] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [X] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [X] I read and followed the [Flutter Style Guide], including [",
+    "labels": [
+      "tool"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "[tool] Migrate off deprecated coverage parameters",
+    "user": "cbracken"
+  },
+  "https://github.com/flutter/flutter/pull/104264": {
+    "body": "https://github.com/flutter/flutter/issues/88888\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n",
+    "labels": [
+      "framework",
+      "f: material design"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Mention that `NavigationBar` is a new widget",
+    "user": "guidezpl"
+  },
+  "https://github.com/flutter/flutter/pull/107156": {
+    "body": "The `AnimatedOpacity` transition doesn't match native components on at least Android and web. [M3](https://m3.material.io/components/text-fields/specs) doesn't include [Placeholder text](https://material.io/archive/guidelines/components/text-fields.html#text-fields-layout) anymore and I can't find anything saying that it was animated. The original complaint also stated that the transition from hint to input text can be disorienting.\r\n\r\nThis PR switches the hint to `Opacity`, making the opacity transition instant.\r\n\r\nFixes https://github.com/flutter/flutter/issues/20283\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] All existing and new tests are passing.\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-every-widget-to-implement\r\n[CLA]: https://cla.developers.google.com/\r\n[flutter/tests]: https://github.com/flutter/tests\r\n[breaking change policy]: https://github.com/flutter/flutter/wiki/Tree-hygiene#handling-breaking-changes\r\n[Discord]: https://github.com/flutter/flutter/wiki/Chat\r\n",
+    "labels": [
+      "a: text input",
+      "framework",
+      "f: material design"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "`InputDecorator`: Switch hint to Opacity instead of AnimatedOpacity",
+    "user": "markusaksli-nc"
+  },
+  "https://github.com/flutter/flutter/pull/101537": {
+    "body": "## Description\r\n\r\nThis updates the examples for `PhysicalKeyboardKey` and `LogicalKeyboardKey` to use `Focus` widgets that handle the keys instead of using `RawKeyboardListener`, since that usually leads people down the wrong path. Updated the See Also and added tests as well.\r\n\r\n## Related Issues\r\n - https://github.com/flutter/flutter/issues/74287\r\n\r\n## Tests\r\n - Added tests for the examples.",
+    "labels": [
+      "c: contributor-productivity",
+      "framework",
+      "d: api docs",
+      "d: examples"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Update key examples to use `Focus` widgets instead of `RawKeyboardListener`",
+    "user": "gspencergoog"
+  },
+  "https://github.com/flutter/flutter/pull/98616": {
+    "body": "This removes the following methods from `RenderObjectElement` \r\n- `insertChildRenderObject`\r\n- `moveChildRenderObject`\r\n- `removeChildRenderObject`\r\n\r\nThese deprecated methods have reached end of life after the release of Flutter 2.10\r\n\r\n- The respective replacements are\r\n  - `insertRenderObjectChild`\r\n  - `moveRenderObjectChild`\r\n  - `removeRenderObjectChild`\r\n- ✅  This migration is supported by the dart fix tool. \r\n- 🕐  This API was deprecated in https://github.com/flutter/flutter/pull/64254, first tagged v1.21\r\n\r\nPart of https://github.com/flutter/flutter/issues/98537\r\nFor the full list of deprecations being removed in this batch, see [flutter.dev/go/deprecations-removed-after-2-10](https://docs.google.com/spreadsheets/d/12krawYCu6X_g_5wLGpmiAIi-VcTRV6xG7RGbRovuatQ/edit?usp=sharing)\r\n\r\n## Pre-launch Checklist\r\n\r\n- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.\r\n- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.\r\n- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].\r\n- [x] I signed the [CLA].\r\n- [x] I listed at least one issue that this PR fixes in the description above.\r\n- [x] I updated/added relevant documentation (doc comments with `///`).\r\n- [x] I added new tests to check the change I am making, or this PR is [test-exempt].\r\n- [x] All existing and new tests are passing.\r\n\r\nIf you need help, consider asking for advice on the #hackers-new channel on [Discord].\r\n\r\n<!-- Links -->\r\n[Contributor Guide]: https://github.com/flutter/flutter/wiki/Tree-hygiene#overview\r\n[Tree Hygiene]: https://github.com/flutter/flutter/wiki/Tree-hygiene\r\n[test-exempt]: https://github.com/flutter/flutter/wiki/Tree-hygiene#tests\r\n[Flutter Style Guide]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo\r\n[Features we expect every widget to implement]: https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#features-we-expect-eve",
+    "labels": [
+      "c: contributor-productivity",
+      "framework",
+      "c: API break",
+      "a: quality",
+      "c: tech-debt"
+    ],
+    "merged": true,
+    "state": "closed",
+    "title": "Remove deprecated RenderObjectElement methods",
+    "user": "Piinks"
+  }
+}
