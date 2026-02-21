@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_correct_stream_return_type
 // expect_lint: prefer_correct_stream_return_type
-void _bad97() {
-  // TODO: Add code that triggers prefer_correct_stream_return_type
-}
+void _bad97() async* { yield 1; } // async* but void, not Stream
 
 // GOOD: Should NOT trigger prefer_correct_stream_return_type
-void _good97() {
-  // TODO: Add compliant code for prefer_correct_stream_return_type
-}
+Stream<int> _good97() async* { yield 1; } // correct Stream type

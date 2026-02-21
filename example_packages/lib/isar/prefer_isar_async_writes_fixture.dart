@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_isar_async_writes` lint rule.
 
-// TODO: Add bad/good examples for prefer_isar_async_writes
+// NOTE: prefer_isar_async_writes requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

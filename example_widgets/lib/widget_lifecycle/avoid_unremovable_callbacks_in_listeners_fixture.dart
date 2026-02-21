@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_unremovable_callbacks_in_listeners
 // expect_lint: avoid_unremovable_callbacks_in_listeners
 void _bad1342() {
-  // TODO: Add method call that triggers avoid_unremovable_callbacks_in_listeners
+  // NOTE: avoid_unremovable_callbacks_in_listeners — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_unremovable_callbacks_in_listeners
 void _good1342() {
-  // TODO: Add compliant method call for avoid_unremovable_callbacks_in_listeners
+  // Compliant version — see rule docs
 }

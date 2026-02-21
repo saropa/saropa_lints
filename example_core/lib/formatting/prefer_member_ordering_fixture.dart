@@ -107,9 +107,13 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_member_ordering
 // expect_lint: prefer_member_ordering
-// TODO: Add class that triggers prefer_member_ordering
-class _BadClass389 {}
+class _BadClass389 {
+  void method() {}
+  final int field = 0; // Field declared after method
+}
 
 // GOOD: Should NOT trigger prefer_member_ordering
-// TODO: Add compliant class for prefer_member_ordering
-class _GoodClass389 {}
+class _GoodClass389 {
+  final int field = 0; // Fields before methods
+  void method() {}
+}

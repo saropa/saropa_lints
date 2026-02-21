@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_positioned_outside_stack` lint rule.
 
-// TODO: Add bad/good examples for avoid_positioned_outside_stack
+// NOTE: avoid_positioned_outside_stack requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

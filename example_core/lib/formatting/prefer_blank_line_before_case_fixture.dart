@@ -106,12 +106,23 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_blank_line_before_case
-// expect_lint: prefer_blank_line_before_case
-void _bad383() {
-  // TODO: Add code that triggers prefer_blank_line_before_case
+void _bad383(int x) {
+  switch (x) {
+    case 1:
+      print('one');
+    // expect_lint: prefer_blank_line_before_case
+    case 2: // No blank line before this case
+      print('two');
+  }
 }
 
 // GOOD: Should NOT trigger prefer_blank_line_before_case
-void _good383() {
-  // TODO: Add compliant code for prefer_blank_line_before_case
+void _good383(int x) {
+  switch (x) {
+    case 1:
+      print('one');
+
+    case 2: // Blank line before each case
+      print('two');
+  }
 }

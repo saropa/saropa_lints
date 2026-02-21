@@ -106,12 +106,13 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unassigned_stream_subscriptions
-// expect_lint: avoid_unassigned_stream_subscriptions
 void _bad92() {
-  // TODO: Add method call that triggers avoid_unassigned_stream_subscriptions
+  // expect_lint: avoid_unassigned_stream_subscriptions
+  Stream<int>.empty().listen((_) {}); // not assigned — can't cancel
 }
 
 // GOOD: Should NOT trigger avoid_unassigned_stream_subscriptions
 void _good92() {
-  // TODO: Add compliant method call for avoid_unassigned_stream_subscriptions
+  final sub = Stream<int>.empty().listen((_) {}); // assigned
+  sub.cancel();
 }

@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger double_literal_format
 // expect_lint: double_literal_format
 void _bad541() {
-  // TODO: Add code that triggers double_literal_format
+  final x = .5; // Missing leading zero
 }
 
 // GOOD: Should NOT trigger double_literal_format
 void _good541() {
-  // TODO: Add compliant code for double_literal_format
+  final x = 0.5; // Proper leading zero
 }

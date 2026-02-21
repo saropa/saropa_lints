@@ -107,11 +107,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_nested_conditional_expressions
 // expect_lint: avoid_nested_conditional_expressions
-void _bad283() {
-  // TODO: Add code that triggers avoid_nested_conditional_expressions
+void _bad283(bool a, bool b) {
+  final result = a ? (b ? 'both' : 'only a') : 'neither'; // Nested ternary
 }
 
 // GOOD: Should NOT trigger avoid_nested_conditional_expressions
-void _good283() {
-  // TODO: Add compliant code for avoid_nested_conditional_expressions
+void _good283(bool a, bool b) {
+  final inner = b ? 'both' : 'only a'; // Extract inner ternary to variable
+  final result = a ? inner : 'neither';
 }

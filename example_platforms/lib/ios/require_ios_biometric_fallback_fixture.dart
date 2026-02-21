@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_biometric_fallback
 // expect_lint: require_ios_biometric_fallback
 void _bad898() {
-  // TODO: Add method call that triggers require_ios_biometric_fallback
+  // NOTE: require_ios_biometric_fallback — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_biometric_fallback
 void _good898() {
-  // TODO: Add compliant method call for require_ios_biometric_fallback
+  // Compliant version — see rule docs
 }

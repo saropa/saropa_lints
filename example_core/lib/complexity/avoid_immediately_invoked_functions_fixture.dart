@@ -108,10 +108,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_immediately_invoked_functions
 // expect_lint: avoid_immediately_invoked_functions
 void _bad263() {
-  // TODO: Add code that triggers avoid_immediately_invoked_functions
+  final x = (() => 42)(); // IIFE — immediately invoked function expression
 }
 
 // GOOD: Should NOT trigger avoid_immediately_invoked_functions
+int _getValue() => 42;
+
 void _good263() {
-  // TODO: Add compliant code for avoid_immediately_invoked_functions
+  final x = _getValue(); // Named function — clearly reusable and testable
 }

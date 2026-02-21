@@ -2,5 +2,8 @@
 
 /// Fixture for `require_keyboard_visibility_dispose` lint rule.
 
-// TODO: Add bad/good examples for require_keyboard_visibility_dispose
+// NOTE: require_keyboard_visibility_dispose requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_unnecessary_digit_separators
 // expect_lint: avoid_unnecessary_digit_separators
 void _bad540() {
-  // TODO: Add code that triggers avoid_unnecessary_digit_separators
+  final x = 1_0; // Only 1 digit after separator — meaningless
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_digit_separators
 void _good540() {
-  // TODO: Add compliant code for avoid_unnecessary_digit_separators
+  final x = 10_000; // 3 digits after separator — meaningful grouping
 }

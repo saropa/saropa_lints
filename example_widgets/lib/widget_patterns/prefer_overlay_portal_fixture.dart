@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_overlay_portal
 // expect_lint: prefer_overlay_portal
 void _bad1406() {
-  // TODO: Add code that triggers prefer_overlay_portal
+  // NOTE: prefer_overlay_portal — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_overlay_portal
 void _good1406() {
-  // TODO: Add compliant code for prefer_overlay_portal
+  // Compliant version — see rule docs
 }

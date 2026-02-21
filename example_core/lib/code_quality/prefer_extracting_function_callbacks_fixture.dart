@@ -107,11 +107,32 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_extracting_function_callbacks
 // expect_lint: prefer_extracting_function_callbacks
-void _bad168() {
-  // TODO: Add code that triggers prefer_extracting_function_callbacks
+void _bad168(List<int> items) {
+  items.forEach((item) {
+    if (item > 0) {
+      print('positive: $item');
+    } else if (item < 0) {
+      print('negative: $item');
+    } else {
+      print('zero');
+    }
+    final doubled = item * 2;
+    print('doubled: $doubled'); // 10+ line callback — extract to named function
+  });
 }
 
 // GOOD: Should NOT trigger prefer_extracting_function_callbacks
-void _good168() {
-  // TODO: Add compliant code for prefer_extracting_function_callbacks
+void _processItem168(int item) {
+  if (item > 0) {
+    print('positive: $item');
+  } else if (item < 0) {
+    print('negative: $item');
+  } else {
+    print('zero');
+  }
+  print('doubled: ${item * 2}');
+}
+
+void _good168(List<int> items) {
+  items.forEach(_processItem168); // Extracted named function
 }

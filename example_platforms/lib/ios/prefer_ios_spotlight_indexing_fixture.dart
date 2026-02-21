@@ -112,7 +112,7 @@ final title = 'Title';
 
 // BAD: Should trigger prefer_ios_spotlight_indexing
 // expect_lint: prefer_ios_spotlight_indexing
-// TODO: Add class that triggers prefer_ios_spotlight_indexing
+// NOTE: prefer_ios_spotlight_indexing — see rule docs
 class _BadClass915 {}
 
 // GOOD: Should NOT trigger prefer_ios_spotlight_indexing

@@ -116,5 +116,5 @@ void _topLevel112() {
 
 // GOOD: Should NOT trigger pass_optional_argument
 void _good213() {
-  // TODO: Add compliant code for pass_optional_argument
+  _bad213_process('test', verbose: true); // Optional argument is provided
 }

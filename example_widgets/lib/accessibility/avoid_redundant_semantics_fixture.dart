@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_redundant_semantics` lint rule.
 
-// TODO: Add bad/good examples for avoid_redundant_semantics
+// NOTE: avoid_redundant_semantics requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

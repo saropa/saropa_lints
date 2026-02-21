@@ -107,9 +107,15 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_non_final_exception_class_fields
 // expect_lint: avoid_non_final_exception_class_fields
-// TODO: Add class that triggers avoid_non_final_exception_class_fields
-class _BadClass364 {}
+class _BadClass364 extends Exception {
+  int code = 0; // Non-final field can be mutated after throw
+  String message;
+  _BadClass364(this.message);
+}
 
 // GOOD: Should NOT trigger avoid_non_final_exception_class_fields
-// TODO: Add compliant class for avoid_non_final_exception_class_fields
-class _GoodClass364 {}
+class _GoodClass364 extends Exception {
+  final int code; // Final — immutable after construction
+  final String message;
+  _GoodClass364(this.code, this.message);
+}

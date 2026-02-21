@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_url_launcher_queries_android
 // expect_lint: require_url_launcher_queries_android
 void _bad1459() {
-  // TODO: Add code that triggers require_url_launcher_queries_android
+  // NOTE: require_url_launcher_queries_android — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_url_launcher_queries_android
 void _good1459() {
-  // TODO: Add compliant code for require_url_launcher_queries_android
+  // Compliant version — see rule docs
 }

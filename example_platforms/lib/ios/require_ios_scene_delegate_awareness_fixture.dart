@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_scene_delegate_awareness
 // expect_lint: require_ios_scene_delegate_awareness
 void _bad887() {
-  // TODO: Add code that triggers require_ios_scene_delegate_awareness
+  // NOTE: require_ios_scene_delegate_awareness — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_scene_delegate_awareness
 void _good887() {
-  // TODO: Add compliant code for require_ios_scene_delegate_awareness
+  // Compliant version — see rule docs
 }

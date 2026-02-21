@@ -106,12 +106,22 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_wildcard_pattern
-// expect_lint: prefer_wildcard_pattern
-void _bad962() {
-  // TODO: Add code that triggers prefer_wildcard_pattern
+void _bad962(dynamic val) {
+  switch (val) {
+    // expect_lint: prefer_wildcard_pattern
+    case int unused: // 'unused' signals discard — use _ instead
+      break;
+    default:
+      break;
+  }
 }
 
 // GOOD: Should NOT trigger prefer_wildcard_pattern
-void _good962() {
-  // TODO: Add compliant code for prefer_wildcard_pattern
+void _good962(dynamic val) {
+  switch (val) {
+    case int _: // Proper wildcard pattern
+      break;
+    default:
+      break;
+  }
 }

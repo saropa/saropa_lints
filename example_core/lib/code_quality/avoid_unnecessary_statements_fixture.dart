@@ -116,5 +116,6 @@ void _bad187_foo() {
 
 // GOOD: Should NOT trigger avoid_unnecessary_statements
 void _good187() {
-  // TODO: Add compliant code for avoid_unnecessary_statements
+  final result = 1 + 2; // Result is assigned and used
+  print(result);
 }

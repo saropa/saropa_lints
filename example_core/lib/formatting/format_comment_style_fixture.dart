@@ -107,11 +107,9 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger format_comment_style
 // expect_lint: format_comment_style
-void _bad388() {
-  // TODO: Add code that triggers format_comment_style
-}
+// this comment starts lowercase and should be capitalized
+void _bad388() {}
 
 // GOOD: Should NOT trigger format_comment_style
-void _good388() {
-  // TODO: Add compliant code for format_comment_style
-}
+// This comment starts with a capital letter
+void _good388() {}

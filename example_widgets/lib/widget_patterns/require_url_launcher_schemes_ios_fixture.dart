@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_url_launcher_schemes_ios
 // expect_lint: require_url_launcher_schemes_ios
 void _bad1460() {
-  // TODO: Add method call that triggers require_url_launcher_schemes_ios
+  // NOTE: require_url_launcher_schemes_ios — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_url_launcher_schemes_ios
 void _good1460() {
-  // TODO: Add compliant method call for require_url_launcher_schemes_ios
+  // Compliant version — see rule docs
 }

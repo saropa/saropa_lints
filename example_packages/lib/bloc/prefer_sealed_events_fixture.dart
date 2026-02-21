@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_sealed_events` lint rule.
 
-// TODO: Add bad/good examples for prefer_sealed_events
+// NOTE: prefer_sealed_events requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

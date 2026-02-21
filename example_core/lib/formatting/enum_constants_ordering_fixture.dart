@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger enum_constants_ordering
 // expect_lint: enum_constants_ordering
-void _bad391() {
-  // TODO: Add code that triggers enum_constants_ordering
-}
+enum _Bad391Status { pending, active, cancelled, approved } // Not alphabetical
 
 // GOOD: Should NOT trigger enum_constants_ordering
-void _good391() {
-  // TODO: Add compliant code for enum_constants_ordering
-}
+enum _Good391Status { active, approved, cancelled, pending } // Alphabetical order

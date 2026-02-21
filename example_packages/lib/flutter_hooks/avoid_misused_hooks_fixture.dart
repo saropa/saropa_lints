@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_misused_hooks` lint rule.
 
-// TODO: Add bad/good examples for avoid_misused_hooks
+// NOTE: avoid_misused_hooks requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

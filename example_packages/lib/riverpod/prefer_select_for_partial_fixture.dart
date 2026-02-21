@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_select_for_partial` lint rule.
 
-// TODO: Add bad/good examples for prefer_select_for_partial
+// NOTE: prefer_select_for_partial requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

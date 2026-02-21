@@ -107,11 +107,14 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_correct_switch_length
 // expect_lint: prefer_correct_switch_length
-void _bad295() {
-  // TODO: Add code that triggers prefer_correct_switch_length
+void _bad295(int x) {
+  switch (x) { // Only one case — use if instead
+    case 1:
+      print('one');
+  }
 }
 
 // GOOD: Should NOT trigger prefer_correct_switch_length
-void _good295() {
-  // TODO: Add compliant code for prefer_correct_switch_length
+void _good295(int x) {
+  if (x == 1) print('one'); // Simpler than switch for single case
 }

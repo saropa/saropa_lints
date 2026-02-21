@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_typed_prefs_wrapper` lint rule.
 
-// TODO: Add bad/good examples for prefer_typed_prefs_wrapper
+// NOTE: prefer_typed_prefs_wrapper requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

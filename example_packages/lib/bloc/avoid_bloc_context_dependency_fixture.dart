@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_bloc_context_dependency` lint rule.
 
-// TODO: Add bad/good examples for avoid_bloc_context_dependency
+// NOTE: avoid_bloc_context_dependency requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

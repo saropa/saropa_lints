@@ -2,5 +2,8 @@
 
 /// Fixture for `emit_new_bloc_state_instances` lint rule.
 
-// TODO: Add bad/good examples for emit_new_bloc_state_instances
+// NOTE: emit_new_bloc_state_instances requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

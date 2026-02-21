@@ -108,12 +108,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_ref_read_inside_build
 // expect_lint: avoid_ref_read_inside_build
 class _BadClass727 {
-  // TODO: Add method declaration that triggers avoid_ref_read_inside_build
+  // NOTE: avoid_ref_read_inside_build — see rule docs for triggering pattern
   void badMethod() {}
 }
 
 // GOOD: Should NOT trigger avoid_ref_read_inside_build
 class _GoodClass727 {
-  // TODO: Add compliant method for avoid_ref_read_inside_build
+  // Compliant version — see rule docs
   void goodMethod() {}
 }

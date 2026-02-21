@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_isar_float_equality_queries` lint rule.
 
-// TODO: Add bad/good examples for avoid_isar_float_equality_queries
+// NOTE: avoid_isar_float_equality_queries requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

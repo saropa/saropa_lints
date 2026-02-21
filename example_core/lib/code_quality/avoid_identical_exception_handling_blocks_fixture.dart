@@ -117,5 +117,9 @@ void _bad176() {
 
 // GOOD: Should NOT trigger avoid_identical_exception_handling_blocks
 void _good176() {
-  // TODO: Add compliant code for avoid_identical_exception_handling_blocks
+  try {} on FormatException catch (e) {
+    print('Format error: $e');
+  } on IOException catch (e) {
+    print('IO error: $e'); // Different handling per exception type
+  }
 }

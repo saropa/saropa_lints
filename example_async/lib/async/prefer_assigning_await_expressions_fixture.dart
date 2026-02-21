@@ -105,13 +105,16 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
+Future<String> _fetch94() async => 'data';
+
 // BAD: Should trigger prefer_assigning_await_expressions
-// expect_lint: prefer_assigning_await_expressions
-void _bad94() {
-  // TODO: Add code that triggers prefer_assigning_await_expressions
+Future<void> _bad94() async {
+  // expect_lint: prefer_assigning_await_expressions
+  print(await _fetch94()); // await inline as argument
 }
 
 // GOOD: Should NOT trigger prefer_assigning_await_expressions
-void _good94() {
-  // TODO: Add compliant code for prefer_assigning_await_expressions
+Future<void> _good94() async {
+  final data = await _fetch94(); // assign first
+  print(data);
 }

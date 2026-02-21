@@ -112,6 +112,6 @@ extension StringExt on String {
 }
 
 // GOOD: Should NOT trigger avoid_shadowed_extension_methods
-void _good221() {
-  // TODO: Add compliant code for avoid_shadowed_extension_methods
+extension StringExtGood on String {
+  String get reversed => split('').reversed.join(); // New method, not shadowing existing
 }

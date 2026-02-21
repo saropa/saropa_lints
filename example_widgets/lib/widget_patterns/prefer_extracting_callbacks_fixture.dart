@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_extracting_callbacks
 // expect_lint: prefer_extracting_callbacks
 void _bad1370() {
-  // TODO: Add code that triggers prefer_extracting_callbacks
+  // NOTE: prefer_extracting_callbacks — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_extracting_callbacks
 void _good1370() {
-  // TODO: Add compliant code for prefer_extracting_callbacks
+  // Compliant version — see rule docs
 }

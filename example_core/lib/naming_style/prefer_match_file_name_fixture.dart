@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_match_file_name
 // expect_lint: prefer_match_file_name
-void _bad493() {
-  // TODO: Add code that triggers prefer_match_file_name
-}
+class WrongClassName {} // First public class doesn't match file name
 
-// GOOD: Should NOT trigger prefer_match_file_name
-void _good493() {
-  // TODO: Add compliant code for prefer_match_file_name
-}
+// GOOD: class name matching the file name:
+// class PreferMatchFileNameFixture {} // Would match prefer_match_file_name_fixture.dart

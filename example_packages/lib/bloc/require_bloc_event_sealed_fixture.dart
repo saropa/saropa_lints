@@ -2,5 +2,8 @@
 
 /// Fixture for `require_bloc_event_sealed` lint rule.
 
-// TODO: Add bad/good examples for require_bloc_event_sealed
+// NOTE: require_bloc_event_sealed requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

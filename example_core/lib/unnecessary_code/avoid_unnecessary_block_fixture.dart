@@ -106,12 +106,14 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unnecessary_block
-// expect_lint: avoid_unnecessary_block
 void _bad1270() {
-  // TODO: Add code that triggers avoid_unnecessary_block
+  // expect_lint: avoid_unnecessary_block
+  { // Nested block adds no value
+    final x = 1;
+  }
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_block
 void _good1270() {
-  // TODO: Add compliant code for avoid_unnecessary_block
+  final x = 1; // Statement directly in block
 }

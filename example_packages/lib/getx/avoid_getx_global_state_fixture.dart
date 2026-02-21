@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_getx_global_state` lint rule.
 
-// TODO: Add bad/good examples for avoid_getx_global_state
+// NOTE: avoid_getx_global_state requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

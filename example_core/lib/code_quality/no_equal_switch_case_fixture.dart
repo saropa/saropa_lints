@@ -121,5 +121,10 @@ void _bad194() {
 
 // GOOD: Should NOT trigger no_equal_switch_case
 void _good194() {
-  // TODO: Add compliant code for no_equal_switch_case
+  switch (x) {
+    case 1:
+      return 'one';
+    case 2:
+      return 'two'; // Different body from case 1
+  }
 }

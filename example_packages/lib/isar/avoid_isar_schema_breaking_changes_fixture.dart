@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_isar_schema_breaking_changes` lint rule.
 
-// TODO: Add bad/good examples for avoid_isar_schema_breaking_changes
+// NOTE: avoid_isar_schema_breaking_changes requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

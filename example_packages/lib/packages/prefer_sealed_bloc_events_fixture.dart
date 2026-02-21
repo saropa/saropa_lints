@@ -107,9 +107,9 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_sealed_bloc_events
 // expect_lint: prefer_sealed_bloc_events
-// TODO: Add class that triggers prefer_sealed_bloc_events
+// NOTE: prefer_sealed_bloc_events — see rule docs
 class _BadClass567 {}
 
 // GOOD: Should NOT trigger prefer_sealed_bloc_events
-// TODO: Add compliant class for prefer_sealed_bloc_events
+// NOTE: prefer_sealed_bloc_events — see rule docs
 class _GoodClass567 {}

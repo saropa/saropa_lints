@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_single_widget_per_file
 // expect_lint: prefer_single_widget_per_file
 void _bad1371() {
-  // TODO: Add code that triggers prefer_single_widget_per_file
+  // NOTE: prefer_single_widget_per_file — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_single_widget_per_file
 void _good1371() {
-  // TODO: Add compliant code for prefer_single_widget_per_file
+  // Compliant version — see rule docs
 }

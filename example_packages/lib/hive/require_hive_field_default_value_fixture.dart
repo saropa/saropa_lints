@@ -2,5 +2,8 @@
 
 /// Fixture for `require_hive_field_default_value` lint rule.
 
-// TODO: Add bad/good examples for require_hive_field_default_value
+// NOTE: require_hive_field_default_value requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_sorted_record_fields
 // expect_lint: prefer_sorted_record_fields
-void _bad963() {
-  // TODO: Add code that triggers prefer_sorted_record_fields
-}
+void _bad963(({int z, int a}) pair) {} // z before a — not alphabetical
 
 // GOOD: Should NOT trigger prefer_sorted_record_fields
-void _good963() {
-  // TODO: Add compliant code for prefer_sorted_record_fields
-}
+void _good963(({int a, int z}) pair) {} // a before z — alphabetical

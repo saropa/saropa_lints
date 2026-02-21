@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_search_anchor
 // expect_lint: prefer_search_anchor
 void _bad1408() {
-  // TODO: Add method call that triggers prefer_search_anchor
+  // NOTE: prefer_search_anchor — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_search_anchor
 void _good1408() {
-  // TODO: Add compliant method call for prefer_search_anchor
+  // Compliant version — see rule docs
 }

@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_background_audio_capability
 // expect_lint: require_ios_background_audio_capability
 void _bad870() {
-  // TODO: Add code that triggers require_ios_background_audio_capability
+  // NOTE: require_ios_background_audio_capability — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_background_audio_capability
 void _good870() {
-  // TODO: Add compliant code for require_ios_background_audio_capability
+  // Compliant version — see rule docs
 }

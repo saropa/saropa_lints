@@ -105,13 +105,10 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger no_magic_number_in_tests
-// expect_lint: no_magic_number_in_tests
-void _bad548() {
-  // TODO: Add code that triggers no_magic_number_in_tests
-}
+// NOTE: no_magic_number_in_tests only fires in test files (FileType.test).
+// This lib/ fixture cannot demonstrate it. Add examples in test/ instead.
 
-// GOOD: Should NOT trigger no_magic_number_in_tests
-void _good548() {
-  // TODO: Add compliant code for no_magic_number_in_tests
-}
+// BAD (in test files): expect(result, equals(42));
+// GOOD (in test files): const kExpectedCount = 42;
+//                       expect(result, equals(kExpectedCount));
+void _placeholder548() {}

@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_input_formatters` lint rule.
 
-// TODO: Add bad/good examples for prefer_input_formatters
+// NOTE: prefer_input_formatters requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

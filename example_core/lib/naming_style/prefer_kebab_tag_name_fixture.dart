@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_kebab_tag_name
 // expect_lint: prefer_kebab_tag_name
 void _bad495() {
-  // TODO: Add method call that triggers prefer_kebab_tag_name
+  element.tag('myElement'); // camelCase — should be kebab-case
 }
 
 // GOOD: Should NOT trigger prefer_kebab_tag_name
 void _good495() {
-  // TODO: Add compliant method call for prefer_kebab_tag_name
+  element.tag('my-element'); // kebab-case tag name
 }

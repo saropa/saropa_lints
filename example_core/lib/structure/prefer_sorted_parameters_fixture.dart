@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_sorted_parameters
 // expect_lint: prefer_sorted_parameters
-void _bad1053() {
-  // TODO: Add code that triggers prefer_sorted_parameters
-}
+void _bad1053({int z = 0, int a = 0}) {} // z before a — not alphabetical
 
 // GOOD: Should NOT trigger prefer_sorted_parameters
-void _good1053() {
-  // TODO: Add compliant code for prefer_sorted_parameters
-}
+void _good1053({int a = 0, int z = 0}) {} // a before z — alphabetical

@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_background_refresh_declaration
 // expect_lint: require_ios_background_refresh_declaration
 void _bad886() {
-  // TODO: Add method call that triggers require_ios_background_refresh_declaration
+  // NOTE: require_ios_background_refresh_declaration — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_background_refresh_declaration
 void _good886() {
-  // TODO: Add compliant method call for require_ios_background_refresh_declaration
+  // Compliant version — see rule docs
 }

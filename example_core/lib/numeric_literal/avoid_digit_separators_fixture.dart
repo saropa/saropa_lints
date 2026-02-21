@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_digit_separators
 // expect_lint: avoid_digit_separators
 void _bad547() {
-  // TODO: Add code that triggers avoid_digit_separators
+  final x = 1_000; // 4 digits with separator — unnecessary for small number
 }
 
 // GOOD: Should NOT trigger avoid_digit_separators
 void _good547() {
-  // TODO: Add compliant code for avoid_digit_separators
+  final x = 1000; // 4 digits without separator — or use 10_000 for >=5 digits
 }

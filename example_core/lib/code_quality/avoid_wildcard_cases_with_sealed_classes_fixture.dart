@@ -117,6 +117,15 @@ void _topLevel110() {
 }
 
 // GOOD: Should NOT trigger avoid_wildcard_cases_with_sealed_classes
-void _good205() {
-  // TODO: Add compliant code for avoid_wildcard_cases_with_sealed_classes
+sealed class _good205_Animal {}
+class _good205_Dog extends _good205_Animal {}
+class _good205_Cat extends _good205_Animal {}
+
+void _good205(_good205_Animal animal) {
+  switch (animal) {
+    case _good205_Dog():
+      print('dog');
+    case _good205_Cat():
+      print('cat'); // All subclasses explicitly handled
+  }
 }

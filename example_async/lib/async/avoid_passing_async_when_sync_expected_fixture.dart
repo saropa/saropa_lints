@@ -105,13 +105,12 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_passing_async_when_sync_expected
-// expect_lint: avoid_passing_async_when_sync_expected
-void _bad89() {
-  // TODO: Add code that triggers avoid_passing_async_when_sync_expected
-}
-
-// GOOD: Should NOT trigger avoid_passing_async_when_sync_expected
-void _good89() {
-  // TODO: Add compliant code for avoid_passing_async_when_sync_expected
-}
+// NOTE: avoid_passing_async_when_sync_expected only fires in test files
+// (applicableFileTypes => {FileType.test}).
+//
+// BAD (in test):
+// test('example', () async { await someOp(); }); // async not needed
+//
+// GOOD (in test):
+// test('example', () { expect(1, 1); }); // sync callback
+void _note89() {}

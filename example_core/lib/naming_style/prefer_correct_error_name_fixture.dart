@@ -108,10 +108,18 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_correct_error_name
 // expect_lint: prefer_correct_error_name
 void _bad488() {
-  // TODO: Add code that triggers prefer_correct_error_name
+  try {
+    throw Exception();
+  } catch (caught) { // Non-standard name — should be 'e' or 'error'
+    print(caught);
+  }
 }
 
 // GOOD: Should NOT trigger prefer_correct_error_name
 void _good488() {
-  // TODO: Add compliant code for prefer_correct_error_name
+  try {
+    throw Exception();
+  } catch (e) { // Standard catch parameter name
+    print(e);
+  }
 }

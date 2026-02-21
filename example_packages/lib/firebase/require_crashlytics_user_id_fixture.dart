@@ -2,5 +2,8 @@
 
 /// Fixture for `require_crashlytics_user_id` lint rule.
 
-// TODO: Add bad/good examples for require_crashlytics_user_id
+// NOTE: require_crashlytics_user_id requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

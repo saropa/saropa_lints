@@ -118,5 +118,9 @@ void _bad177() {
 }
 
 // GOOD: Should NOT trigger avoid_late_final_reassignment
-// TODO: Add compliant class for avoid_late_final_reassignment
-class _GoodClass177 {}
+class _GoodClass177 {
+  late final int value;
+  void init() {
+    value = 1; // Assigned only once
+  }
+}

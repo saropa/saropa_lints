@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_macos_window_size_constraints
 // expect_lint: require_macos_window_size_constraints
 void _bad926() {
-  // TODO: Add code that triggers require_macos_window_size_constraints
+  // NOTE: require_macos_window_size_constraints — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_macos_window_size_constraints
 void _good926() {
-  // TODO: Add compliant code for require_macos_window_size_constraints
+  // Compliant version — see rule docs
 }

@@ -105,13 +105,7 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_long_length_test_files
-// expect_lint: avoid_long_length_test_files
-void _bad1046() {
-  // TODO: Add code that triggers avoid_long_length_test_files
-}
-
-// GOOD: Should NOT trigger avoid_long_length_test_files
-void _good1046() {
-  // TODO: Add compliant code for avoid_long_length_test_files
-}
+// NOTE: avoid_long_length_test_files fires on test files exceeding 1000 lines.
+// This lib/ fixture cannot demonstrate it (test files only, and too short).
+// In real test code: split large test files into smaller test suites.
+void _placeholder1046() {}

@@ -106,12 +106,22 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unnecessary_enum_prefix
-// expect_lint: avoid_unnecessary_enum_prefix
-void _bad1274() {
-  // TODO: Add code that triggers avoid_unnecessary_enum_prefix
+enum _BadDir1274 {
+  north,
+  south;
+
+  bool isOpposite(_BadDir1274 other) {
+    // expect_lint: avoid_unnecessary_enum_prefix
+    return other == _BadDir1274.north; // Prefix is redundant inside enum
+  }
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_enum_prefix
-void _good1274() {
-  // TODO: Add compliant code for avoid_unnecessary_enum_prefix
+enum _GoodDir1274 {
+  north,
+  south;
+
+  bool isOpposite(_GoodDir1274 other) {
+    return other == north; // No prefix needed inside enum
+  }
 }

@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger enforce_parameters_ordering
 // expect_lint: enforce_parameters_ordering
-void _bad390() {
-  // TODO: Add code that triggers enforce_parameters_ordering
-}
+void _bad390({String? opt, required String req}) {} // Optional before required named
 
 // GOOD: Should NOT trigger enforce_parameters_ordering
-void _good390() {
-  // TODO: Add compliant code for enforce_parameters_ordering
-}
+void _good390({required String req, String? opt}) {} // Required before optional

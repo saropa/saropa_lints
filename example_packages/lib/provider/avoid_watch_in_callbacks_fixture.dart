@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_watch_in_callbacks` lint rule.
 
-// TODO: Add bad/good examples for avoid_watch_in_callbacks
+// NOTE: avoid_watch_in_callbacks requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

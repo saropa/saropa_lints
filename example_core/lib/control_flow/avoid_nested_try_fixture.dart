@@ -117,5 +117,10 @@ void _bad286() {
 
 // GOOD: Should NOT trigger avoid_nested_try
 void _good286() {
-  // TODO: Add compliant code for avoid_nested_try
+  try {
+    doSomething();
+    doSomethingElse(); // Both operations in a single try block
+  } catch (e) {
+    print(e);
+  }
 }

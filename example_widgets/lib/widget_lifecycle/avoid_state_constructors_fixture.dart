@@ -107,9 +107,9 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_state_constructors
 // expect_lint: avoid_state_constructors
-// TODO: Add class that triggers avoid_state_constructors
+// NOTE: avoid_state_constructors — see rule docs
 class _BadClass1338 {}
 
 // GOOD: Should NOT trigger avoid_state_constructors
-// TODO: Add compliant class for avoid_state_constructors
+// NOTE: avoid_state_constructors — see rule docs
 class _GoodClass1338 {}

@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_hive_synchronous_in_ui` lint rule.
 
-// TODO: Add bad/good examples for avoid_hive_synchronous_in_ui
+// NOTE: avoid_hive_synchronous_in_ui requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

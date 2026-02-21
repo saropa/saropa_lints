@@ -107,11 +107,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger move_records_to_typedefs
 // expect_lint: move_records_to_typedefs
-void _bad959() {
-  // TODO: Add code that triggers move_records_to_typedefs
-}
+void _bad959((int, int, int, int) quad) {} // 4 fields inline — use typedef
 
 // GOOD: Should NOT trigger move_records_to_typedefs
-void _good959() {
-  // TODO: Add compliant code for move_records_to_typedefs
-}
+typedef _Quad959 = (int, int, int, int);
+void _good959(_Quad959 quad) {} // Named typedef — readable

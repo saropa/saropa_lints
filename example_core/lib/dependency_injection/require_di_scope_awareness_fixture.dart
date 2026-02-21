@@ -108,7 +108,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_di_scope_awareness
 // expect_lint: require_di_scope_awareness
 void _bad321() {
-  // TODO: Add method call that triggers require_di_scope_awareness
+  GetIt.I.registerSingleton(UserSession()); // Session is stateful
 }
 
 // GOOD: Should NOT trigger require_di_scope_awareness

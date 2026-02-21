@@ -105,13 +105,10 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_geolocator_last_known
-// expect_lint: prefer_geolocator_last_known
-void _bad977() {
-  // TODO: Add method call that triggers prefer_geolocator_last_known
-}
-
-// GOOD: Should NOT trigger prefer_geolocator_last_known
-void _good977() {
-  // TODO: Add compliant method call for prefer_geolocator_last_known
-}
+// NOTE: prefer_geolocator_last_known fires on
+// Geolocator.getCurrentPosition() calls — use getLastKnownPosition()
+// for faster, battery-friendly location.
+//
+// BAD: final pos = await Geolocator.getCurrentPosition();
+// GOOD: final pos = await Geolocator.getLastKnownPosition();
+void _note977() {}

@@ -1,6 +1,16 @@
 // ignore_for_file: unused_local_variable, unused_element
+// ignore_for_file: undefined_function, undefined_identifier
+// ignore_for_file: undefined_class, undefined_method
 
 /// Fixture for `require_text_editing_controller_dispose` lint rule.
 
-// TODO: Add bad/good examples for require_text_editing_controller_dispose
+// NOTE: require_text_editing_controller_dispose fires in widget/State classes.
+// Requires class extending State<T> with controller fields.
+//
+// BAD:
+// // late TextEditingController _ctrl; // not disposed in dispose()
+//
+// GOOD:
+// // @override void dispose() { _ctrl.dispose(); super.dispose(); }
+
 void main() {}

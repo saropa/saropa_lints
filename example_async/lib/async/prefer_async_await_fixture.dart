@@ -105,13 +105,16 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
+Future<String> _fetch93() async => 'data';
+
 // BAD: Should trigger prefer_async_await
-// expect_lint: prefer_async_await
-void _bad93() {
-  // TODO: Add method call that triggers prefer_async_await
+Future<void> _bad93() async {
+  // expect_lint: prefer_async_await
+  _fetch93().then((data) => print(data)); // .then() in async function
 }
 
 // GOOD: Should NOT trigger prefer_async_await
-void _good93() {
-  // TODO: Add compliant method call for prefer_async_await
+Future<void> _good93() async {
+  final data = await _fetch93(); // use await instead
+  print(data);
 }

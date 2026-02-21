@@ -107,11 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_null_aware_spread
 // expect_lint: prefer_null_aware_spread
-void _bad169() {
-  // TODO: Add code that triggers prefer_null_aware_spread
+void _bad169(List<int>? extras) {
+  final all = [1, 2, ...extras]; // Throws TypeError if extras is null
 }
 
 // GOOD: Should NOT trigger prefer_null_aware_spread
-void _good169() {
-  // TODO: Add compliant code for prefer_null_aware_spread
+void _good169(List<int>? extras) {
+  final all = [1, 2, ...?extras]; // ...? safely handles null as empty
 }

@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_overlapping_animations` lint rule.
 
-// TODO: Add bad/good examples for avoid_overlapping_animations
+// NOTE: avoid_overlapping_animations requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

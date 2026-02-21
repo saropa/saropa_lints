@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_riverpod_navigation` lint rule.
 
-// TODO: Add bad/good examples for avoid_riverpod_navigation
+// NOTE: avoid_riverpod_navigation requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

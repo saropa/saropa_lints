@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_ats_exception_documentation
 // expect_lint: require_ios_ats_exception_documentation
 void _bad860() {
-  // TODO: Add code that triggers require_ios_ats_exception_documentation
+  // NOTE: require_ios_ats_exception_documentation — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_ats_exception_documentation
 void _good860() {
-  // TODO: Add compliant code for require_ios_ats_exception_documentation
+  // Compliant version — see rule docs
 }

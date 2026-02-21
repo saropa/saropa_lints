@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_continuous_location_updates` lint rule.
 
-// TODO: Add bad/good examples for avoid_continuous_location_updates
+// NOTE: avoid_continuous_location_updates requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

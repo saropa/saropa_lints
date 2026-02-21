@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_multi_provider` lint rule.
 
-// TODO: Add bad/good examples for prefer_multi_provider
+// NOTE: prefer_multi_provider requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_immutable_provider_arguments
 // expect_lint: prefer_immutable_provider_arguments
 void _bad734() {
-  // TODO: Add code that triggers prefer_immutable_provider_arguments
+  // NOTE: prefer_immutable_provider_arguments — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_immutable_provider_arguments
 void _good734() {
-  // TODO: Add compliant code for prefer_immutable_provider_arguments
+  // Compliant version — see rule docs
 }

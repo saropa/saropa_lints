@@ -2,5 +2,8 @@
 
 /// Fixture for `require_shared_prefs_prefix` lint rule.
 
-// TODO: Add bad/good examples for require_shared_prefs_prefix
+// NOTE: require_shared_prefs_prefix requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

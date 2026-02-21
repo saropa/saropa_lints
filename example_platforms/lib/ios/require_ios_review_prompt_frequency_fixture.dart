@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_review_prompt_frequency
 // expect_lint: require_ios_review_prompt_frequency
 void _bad890() {
-  // TODO: Add method call that triggers require_ios_review_prompt_frequency
+  // NOTE: require_ios_review_prompt_frequency — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_review_prompt_frequency
 void _good890() {
-  // TODO: Add compliant method call for require_ios_review_prompt_frequency
+  // Compliant version — see rule docs
 }

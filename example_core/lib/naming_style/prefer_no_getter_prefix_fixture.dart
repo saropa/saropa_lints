@@ -108,12 +108,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_no_getter_prefix
 // expect_lint: prefer_no_getter_prefix
 class _BadClass478 {
-  // TODO: Add method declaration that triggers prefer_no_getter_prefix
-  void badMethod() {}
+  String _name = '';
+  String get getName => _name; // Getter has redundant 'get' prefix
 }
 
 // GOOD: Should NOT trigger prefer_no_getter_prefix
 class _GoodClass478 {
-  // TODO: Add compliant method for prefer_no_getter_prefix
-  void goodMethod() {}
+  String _name = '';
+  String get name => _name; // No redundant 'get' prefix
 }

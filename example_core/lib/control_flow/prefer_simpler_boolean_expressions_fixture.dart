@@ -107,11 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_simpler_boolean_expressions
 // expect_lint: prefer_simpler_boolean_expressions
-void _bad299() {
-  // TODO: Add code that triggers prefer_simpler_boolean_expressions
+void _bad299(bool a, bool b) {
+  if (!(a && b)) {} // De Morgan: simplify to !a || !b
 }
 
 // GOOD: Should NOT trigger prefer_simpler_boolean_expressions
-void _good299() {
-  // TODO: Add compliant code for prefer_simpler_boolean_expressions
+void _good299(bool a, bool b) {
+  if (!a || !b) {} // Already simplified
 }

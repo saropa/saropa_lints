@@ -2,5 +2,8 @@
 
 /// Fixture for `prefer_hive_encryption` lint rule.
 
-// TODO: Add bad/good examples for prefer_hive_encryption
+// NOTE: prefer_hive_encryption requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

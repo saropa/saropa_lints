@@ -116,5 +116,6 @@ void _bad173() {
 
 // GOOD: Should NOT trigger avoid_complex_loop_conditions
 void _good173() {
-  // TODO: Add compliant code for avoid_complex_loop_conditions
+  final shouldContinue = a && b; // Extract complex condition to a named variable
+  while (shouldContinue) {}
 }

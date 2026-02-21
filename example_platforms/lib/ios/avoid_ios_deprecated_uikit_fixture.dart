@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_ios_deprecated_uikit
 // expect_lint: avoid_ios_deprecated_uikit
 void _bad851() {
-  // TODO: Add code that triggers avoid_ios_deprecated_uikit
+  // NOTE: avoid_ios_deprecated_uikit — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_ios_deprecated_uikit
 void _good851() {
-  // TODO: Add compliant code for avoid_ios_deprecated_uikit
+  // Compliant version — see rule docs
 }

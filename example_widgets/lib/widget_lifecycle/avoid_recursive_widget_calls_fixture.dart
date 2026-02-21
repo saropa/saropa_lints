@@ -117,5 +117,9 @@ class _bad1353_MyWidget extends StatelessWidget {
 }
 
 // GOOD: Should NOT trigger avoid_recursive_widget_calls
-// TODO: Add compliant class for avoid_recursive_widget_calls
-class _GoodClass1353 {}
+class _GoodClass1353_MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Text('content'); // Returns a different widget, no recursion
+  }
+}

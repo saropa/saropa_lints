@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_excessive_rebuilds_animation` lint rule.
 
-// TODO: Add bad/good examples for avoid_excessive_rebuilds_animation
+// NOTE: avoid_excessive_rebuilds_animation requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

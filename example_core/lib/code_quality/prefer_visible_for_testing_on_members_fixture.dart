@@ -108,12 +108,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_visible_for_testing_on_members
 // expect_lint: prefer_visible_for_testing_on_members
 class _BadClass170 {
-  // TODO: Add method declaration that triggers prefer_visible_for_testing_on_members
-  void badMethod() {}
+  void testInternals() {} // Test-only member without @visibleForTesting
 }
 
 // GOOD: Should NOT trigger prefer_visible_for_testing_on_members
 class _GoodClass170 {
-  // TODO: Add compliant method for prefer_visible_for_testing_on_members
-  void goodMethod() {}
+  @visibleForTesting
+  void testInternals() {} // Annotated — analyzer warns on production usage
 }

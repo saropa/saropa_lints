@@ -107,11 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_bottom_type_in_records
 // expect_lint: avoid_bottom_type_in_records
-void _bad947() {
-  // TODO: Add code that triggers avoid_bottom_type_in_records
-}
+void _bad947((int, void) pair) {} // void is a bottom type in record
 
 // GOOD: Should NOT trigger avoid_bottom_type_in_records
-void _good947() {
-  // TODO: Add compliant code for avoid_bottom_type_in_records
-}
+void _good947((int, String) pair) {} // Use concrete types

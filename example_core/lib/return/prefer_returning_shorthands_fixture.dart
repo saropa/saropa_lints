@@ -108,12 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_returning_shorthands
 // expect_lint: prefer_returning_shorthands
 class _BadClass982 {
-  // TODO: Add method declaration that triggers prefer_returning_shorthands
-  void badMethod() {}
+  String getValue() { return 'hello'; } // Block body with single return
 }
 
 // GOOD: Should NOT trigger prefer_returning_shorthands
 class _GoodClass982 {
-  // TODO: Add compliant method for prefer_returning_shorthands
-  void goodMethod() {}
+  String getValue() => 'hello'; // Arrow shorthand
 }

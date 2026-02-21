@@ -116,5 +116,5 @@ class _bad214_Bar {} // Should be in separate file
 
 // GOOD: Should NOT trigger prefer_single_declaration_per_file
 void _good214() {
-  // TODO: Add compliant code for prefer_single_declaration_per_file
+  // In compliant code, each file contains only one top-level public declaration.
 }

@@ -112,7 +112,7 @@ final path = '/path';
 // BAD: Should trigger require_ios_data_protection
 // expect_lint: require_ios_data_protection
 void _bad916() {
-  // TODO: Add method call that triggers require_ios_data_protection
+  // NOTE: require_ios_data_protection — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_data_protection

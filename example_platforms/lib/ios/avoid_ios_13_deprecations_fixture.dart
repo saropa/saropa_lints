@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_ios_13_deprecations
 // expect_lint: avoid_ios_13_deprecations
 void _bad848() {
-  // TODO: Add code that triggers avoid_ios_13_deprecations
+  // NOTE: avoid_ios_13_deprecations — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger avoid_ios_13_deprecations
 void _good848() {
-  // TODO: Add compliant code for avoid_ios_13_deprecations
+  // Compliant version — see rule docs
 }

@@ -107,11 +107,12 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_excessive_expressions
 // expect_lint: avoid_excessive_expressions
-void _bad262() {
-  // TODO: Add code that triggers avoid_excessive_expressions
+void _bad262(int a, int b, int c, int d, int e, int f, int g) {
+  final result = a + b + c + d + e + f + g; // 6 operators — excessive
 }
 
 // GOOD: Should NOT trigger avoid_excessive_expressions
-void _good262() {
-  // TODO: Add compliant code for avoid_excessive_expressions
+void _good262(int a, int b, int c, int d, int e, int f, int g) {
+  final left = a + b + c; // Break into smaller expressions
+  final result = left + d + e;
 }

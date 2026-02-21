@@ -105,13 +105,15 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
+Future<void> _fetch85() async {}
+
 // BAD: Should trigger avoid_future_ignore
-// expect_lint: avoid_future_ignore
 void _bad85() {
-  // TODO: Add method call that triggers avoid_future_ignore
+  // expect_lint: avoid_future_ignore
+  _fetch85().ignore(); // ignore() discards all errors
 }
 
 // GOOD: Should NOT trigger avoid_future_ignore
-void _good85() {
-  // TODO: Add compliant method call for avoid_future_ignore
+void _good85() async {
+  await _fetch85(); // properly await the Future
 }

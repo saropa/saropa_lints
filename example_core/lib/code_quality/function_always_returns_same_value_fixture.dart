@@ -115,6 +115,7 @@ int _bad192_getValue(bool condition) {
 }
 
 // GOOD: Should NOT trigger function_always_returns_same_value
-void _good192() {
-  // TODO: Add compliant code for function_always_returns_same_value
+int _good192_getValue(bool condition) {
+  if (condition) return 1;
+  return 42; // Returns different values based on condition
 }

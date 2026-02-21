@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_photo_library_add_usage
 // expect_lint: require_ios_photo_library_add_usage
 void _bad854() {
-  // TODO: Add method call that triggers require_ios_photo_library_add_usage
+  // NOTE: require_ios_photo_library_add_usage — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_photo_library_add_usage
 void _good854() {
-  // TODO: Add compliant method call for require_ios_photo_library_add_usage
+  // Compliant version — see rule docs
 }

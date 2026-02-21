@@ -2,5 +2,8 @@
 
 /// Fixture for `require_calendar_timezone_handling` lint rule.
 
-// TODO: Add bad/good examples for require_calendar_timezone_handling
+// NOTE: require_calendar_timezone_handling requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

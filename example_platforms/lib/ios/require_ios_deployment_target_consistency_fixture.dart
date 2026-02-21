@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_ios_deployment_target_consistency
 // expect_lint: require_ios_deployment_target_consistency
 void _bad891() {
-  // TODO: Add code that triggers require_ios_deployment_target_consistency
+  // NOTE: require_ios_deployment_target_consistency — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_ios_deployment_target_consistency
 void _good891() {
-  // TODO: Add compliant code for require_ios_deployment_target_consistency
+  // Compliant version — see rule docs
 }

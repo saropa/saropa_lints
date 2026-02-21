@@ -2,5 +2,8 @@
 
 /// Fixture for `avoid_freezed_for_logic_classes` lint rule.
 
-// TODO: Add bad/good examples for avoid_freezed_for_logic_classes
+// NOTE: avoid_freezed_for_logic_classes requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

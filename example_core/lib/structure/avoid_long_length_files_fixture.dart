@@ -105,13 +105,7 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_long_length_files
-// expect_lint: avoid_long_length_files
-void _bad1042() {
-  // TODO: Add code that triggers avoid_long_length_files
-}
-
-// GOOD: Should NOT trigger avoid_long_length_files
-void _good1042() {
-  // TODO: Add compliant code for avoid_long_length_files
-}
+// NOTE: avoid_long_length_files fires when a file exceeds 500 lines.
+// This fixture cannot demonstrate it (files are too short by design).
+// In real code: split large files into smaller focused modules.
+void _placeholder1042() {}

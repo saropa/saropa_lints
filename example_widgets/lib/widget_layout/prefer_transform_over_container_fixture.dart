@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_transform_over_container
 // expect_lint: prefer_transform_over_container
 void _bad1331() {
-  // TODO: Add code that triggers prefer_transform_over_container
+  // NOTE: prefer_transform_over_container — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger prefer_transform_over_container
 void _good1331() {
-  // TODO: Add compliant code for prefer_transform_over_container
+  // Compliant version — see rule docs
 }

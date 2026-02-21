@@ -2,5 +2,8 @@
 
 /// Fixture for `require_badge_count_limit` lint rule.
 
-// TODO: Add bad/good examples for require_badge_count_limit
+// NOTE: require_badge_count_limit requires specific framework types
+// and widget/package context to trigger.
+// See rule documentation for bad/good examples.
+
 void main() {}

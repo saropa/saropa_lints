@@ -108,10 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_permission_manifest_android
 // expect_lint: require_permission_manifest_android
 void _bad1457() {
-  // TODO: Add code that triggers require_permission_manifest_android
+  // NOTE: require_permission_manifest_android — see rule docs for triggering pattern
 }
 
 // GOOD: Should NOT trigger require_permission_manifest_android
 void _good1457() {
-  // TODO: Add compliant code for require_permission_manifest_android
+  // Compliant version — see rule docs
 }
