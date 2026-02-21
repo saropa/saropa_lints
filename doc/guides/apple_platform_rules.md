@@ -103,36 +103,6 @@ Available feedback types:
 - `HapticFeedback.selectionClick()` - Selection changes
 - `HapticFeedback.vibrate()` - Error/warning
 
-#### require_ios_platform_check
-
-Warns when iOS-specific MethodChannel calls lack Platform.isIOS guard.
-
-```dart
-// BAD - crashes on non-iOS platforms
-await MethodChannel('com.example/native').invokeMethod('iosOnly');
-
-// GOOD - guarded for iOS
-if (Platform.isIOS) {
-  await MethodChannel('com.example/native').invokeMethod('iosOnly');
-}
-```
-
-**Tier**: Recommended | **Severity**: WARNING
-
-#### avoid_ios_background_fetch_abuse
-
-Warns when Future.delayed exceeds iOS 30-second background limit. iOS terminates apps that exceed background execution time.
-
-```dart
-// BAD - iOS will kill the app
-await Future.delayed(Duration(minutes: 5));
-
-// GOOD - within iOS limits
-await Future.delayed(Duration(seconds: 25));
-```
-
-**Tier**: Recommended | **Severity**: WARNING
-
 ### macOS Platform Rules
 
 #### prefer_macos_menu_bar_integration
@@ -197,26 +167,6 @@ void main() async {
 **Tier**: Recommended | **Severity**: INFO
 
 ### Cross-Platform Apple Rules
-
-#### require_method_channel_error_handling
-
-Warns when MethodChannel.invokeMethod lacks try-catch for PlatformException. Native calls can fail and must be handled.
-
-```dart
-// BAD - crashes if native code fails
-final result = await channel.invokeMethod('getData');
-
-// GOOD - handles platform errors
-try {
-  final result = await channel.invokeMethod('getData');
-} on PlatformException catch (e) {
-  debugPrint('Platform error: ${e.message}');
-}
-```
-
-**Tier**: Essential | **Severity**: WARNING
-
-**Quick Fix**: Wrap with try-catch
 
 #### require_https_for_ios
 
@@ -300,29 +250,6 @@ await channel.invokeMethod('getUserDefaults', {'key': 'value'});
 
 See Apple's [Privacy Manifest documentation](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files) for the complete list of required reason APIs.
 
-#### require_universal_link_validation
-
-Reminds to validate iOS Universal Links server configuration when deep link routes are detected.
-
-```dart
-// Triggers reminder to verify apple-app-site-association
-GoRouter(
-  routes: [
-    GoRoute(
-      path: '/product/:id',  // Deep link route
-      builder: (context, state) => ProductScreen(),
-    ),
-  ],
-)
-```
-
-**Tier**: Recommended | **Severity**: INFO
-
-Universal Links require:
-1. `apple-app-site-association` file on your server
-2. Associated Domains entitlement in Xcode
-3. Proper SSL certificate (no self-signed)
-
 #### prefer_cupertino_for_ios
 
 Suggests using Cupertino widgets over Material widgets in Platform.isIOS blocks.
@@ -345,20 +272,18 @@ if (Platform.isIOS) {
 
 | Rule | Tier | Rationale |
 |------|------|-----------|
-| `require_method_channel_error_handling` | Essential | Unhandled exceptions crash the app |
 | `require_https_for_ios` | Essential | HTTP is blocked by default, causes silent failures |
 | `require_ios_permission_description` | Essential | App Store rejection without proper Info.plist |
 | `require_ios_privacy_manifest` | Essential | App Store rejection on iOS 17+ |
 | `prefer_ios_safe_area` | Recommended | UI quality issue, not blocking |
 | `avoid_ios_hardcoded_status_bar` | Recommended | Breaks on new devices |
-| `require_ios_platform_check` | Recommended | Cross-platform safety |
-| `avoid_ios_background_fetch_abuse` | Recommended | iOS terminates violating apps |
-| `require_universal_link_validation` | Recommended | Deep links silently fail without server config |
 | `require_macos_window_size_constraints` | Recommended | Desktop UX expectation |
 | `prefer_ios_haptic_feedback` | Comprehensive | Enhancement, not required |
 | `prefer_macos_menu_bar_integration` | Comprehensive | Enhancement, not required |
 | `prefer_macos_keyboard_shortcuts` | Comprehensive | Enhancement, not required |
 | `prefer_cupertino_for_ios` | Comprehensive | Style preference |
+
+**Planned (not yet implemented):** `require_ios_platform_check`, `avoid_ios_background_fetch_abuse`, `require_method_channel_error_handling`, `require_universal_link_validation` — tracked in `bugs/todo_001` through `todo_004`.
 
 ## v2.4.0 Additional Rules
 
