@@ -24,6 +24,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - Plugin report path displayed after analysis completes (with retry for async flush)
 - Old report files in `reports/` root are automatically migrated to `reports/YYYYMMDD/` date subfolders during init
 - Stream drain and exit code now awaited together via `Future.wait` to prevent interleaved output
+- Persistent cache files (`rule_version_cache.json`, export directories) moved from `reports/` root to `reports/_cache/` subfolder
 
 ---
 ## [5.0.0-beta.9]
