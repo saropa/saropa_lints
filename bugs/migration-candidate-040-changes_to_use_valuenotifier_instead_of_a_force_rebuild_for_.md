@@ -27,7 +27,7 @@
 ![](https://media.giphy.com/media/qriH9W51oLsL6/giphy.gif)
 Fixes https://github.com/flutter/devtools/issues/6014
 
-Change the forceRebuild behaviour of the WidgetInspector to use ValueListenableBuilders instead. This should help resolve heavy rebuilds when the widgetInspectorOverride value changes.
+Change the forceRebuild behavior of the WidgetInspector to use ValueListenableBuilders instead. This should help resolve heavy rebuilds when the widgetInspectorOverride value changes.
 
 ---
 

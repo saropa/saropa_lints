@@ -24,7 +24,7 @@
 
 ### Description
 
-Work towards https://github.com/flutter/flutter/issues/139702.
+Work toward https://github.com/flutter/flutter/issues/139702.
 
 I think we should also `@Deprecate`/cleanup the API surface in `FlutterView`, but that needs a bit more a discussion.
 
