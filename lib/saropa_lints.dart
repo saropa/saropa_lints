@@ -1814,8 +1814,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferIosSafeAreaRule.new,
   AvoidIosHardcodedStatusBarRule.new,
   PreferIosHapticFeedbackRule.new,
-  // TODO(migration): RequireIosPlatformCheckRule - class not found
-  // TODO(migration): AvoidIosBackgroundFetchAbuseRule - class not found
   RequireAppleSignInRule.new,
   RequireIosBackgroundModeRule.new,
   AvoidIos13DeprecationsRule.new,
@@ -1863,7 +1861,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireIosNfcCapabilityCheckRule.new,
   RequireIosMethodChannelCleanupRule.new,
   AvoidIosForceUnwrapInCallbacksRule.new,
-  // TODO(migration): RequireMethodChannelErrorHandlingRule - class not found
   PreferIosAppIntentsFrameworkRule.new,
 
   // Device & Hardware Rules
@@ -1885,7 +1882,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireIosLocalNotificationPermissionRule.new,
 
   // Deep Linking Rules
-  // TODO(migration): RequireUniversalLinkValidationRule - class not found
   RequireIosUniversalLinksDomainMatchingRule.new,
 
   // macOS Platform Rules
