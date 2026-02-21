@@ -22,9 +22,10 @@ from typing import Dict, Optional
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 REPORTS_DIR = os.path.join(PROJECT_DIR, "reports")
-ITEMS_FILE = os.path.join(REPORTS_DIR, "_high_confidence_items.json")
+CACHE_DIR = os.path.join(REPORTS_DIR, "_cache")
+ITEMS_FILE = os.path.join(CACHE_DIR, "_high_confidence_items.json")
 OUTPUT_DIR = os.path.join(PROJECT_DIR, "bugs")
-PR_CACHE_FILE = os.path.join(REPORTS_DIR, "_pr_details_cache.json")
+PR_CACHE_FILE = os.path.join(CACHE_DIR, "_pr_details_cache.json")
 
 PREFIX = "migration-candidate"
 
