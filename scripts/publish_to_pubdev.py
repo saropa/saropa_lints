@@ -380,7 +380,7 @@ def main() -> int:
     project_dir = get_project_dir()
     pubspec_path = project_dir / "pubspec.yaml"
     changelog_path = project_dir / "CHANGELOG.md"
-    bugs_dir = project_dir.parent / "saropa_dart_utils" / "bugs"
+    bugs_dir = project_dir / "bugs"
 
     if not pubspec_path.exists():
         exit_with_error(

@@ -516,92 +516,91 @@ def _severity_color(emoji: str, count: int) -> Color:
     return Color.CYAN
 
 
-@dataclass
-class BugSummary:
-    """Summary of bug reports by directory location."""
+class _BugCategory(NamedTuple):
+    """A bug report category with display metadata."""
 
-    unsolved: int = 0      # root-level .md files
-    categorized: int = 0   # subfolder .md files (not history)
-    resolved: int = 0      # history/ .md files
-
-    @property
-    def total(self) -> int:
-        """Total bug reports across all categories."""
-        return self.unsolved + self.categorized + self.resolved
+    label: str
+    count: int
+    color: Color
 
 
-def _count_bug_reports(bugs_dir: Path) -> BugSummary:
-    """Count .md bug report files by directory category.
+def _collect_bug_categories(bugs_dir: Path) -> list[_BugCategory]:
+    """Collect bug report counts by directory.
 
-    - Root-level .md files (excluding INDEX.md) -> unsolved
-    - history/ subfolder .md files -> resolved
-    - Other subfolder .md files -> categorized
+    - history/ -> GREEN (resolved)
+    - Other subfolders -> YELLOW (in-progress/categorized)
+    - Root-level .md files (excl. INDEX.md) -> RED (unsolved)
     """
     if not bugs_dir.exists() or not bugs_dir.is_dir():
-        return BugSummary()
+        return []
 
-    summary = BugSummary()
+    categories: list[_BugCategory] = []
 
-    for item in bugs_dir.iterdir():
-        if item.is_file() and item.suffix.lower() == ".md":
-            if item.name.upper() != "INDEX.MD":
-                summary.unsolved += 1
-        elif item.is_dir():
-            md_count = sum(
-                1 for f in item.rglob("*.md") if f.is_file()
+    for item in sorted(bugs_dir.iterdir()):
+        if not item.is_dir():
+            continue
+        md_count = sum(
+            1 for f in item.rglob("*.md") if f.is_file()
+        )
+        if md_count == 0:
+            continue
+        if item.name.lower() == "history":
+            categories.insert(
+                0, _BugCategory("History", md_count, Color.GREEN),
             )
-            if item.name.lower() == "history":
-                summary.resolved += md_count
-            else:
-                summary.categorized += md_count
+        else:
+            label = item.name.replace("_", " ").title()
+            categories.append(
+                _BugCategory(label, md_count, Color.YELLOW),
+            )
 
-    return summary
+    # Root-level unsolved bugs last (most prominent)
+    unsolved = sum(
+        1 for f in bugs_dir.iterdir()
+        if f.is_file()
+        and f.suffix.lower() == ".md"
+        and f.name.upper() != "INDEX.MD"
+    )
+    if unsolved > 0:
+        categories.append(
+            _BugCategory("Unsolved", unsolved, Color.RED),
+        )
+
+    return categories
 
 
 def _display_bug_section(bugs_dir: Path) -> None:
     """Display bug report summary with color-coded bar charts."""
-    bugs = _count_bug_reports(bugs_dir)
-    if bugs.total == 0:
+    categories = _collect_bug_categories(bugs_dir)
+    if not categories:
         return
+
+    total = sum(c.count for c in categories)
+    max_count = max(c.count for c in categories)
+    pad = max((len(c.label) for c in categories), default=12)
 
     print()
     print_colored(
-        f"  \u25b6 Bug Reports ({bugs.total} total)",
+        f"  \u25b6 Bug Reports ({total} total)",
         Color.WHITE,
     )
     print()
 
-    max_count = max(
-        bugs.unsolved, bugs.categorized, bugs.resolved, 1,
-    )
-
-    # Resolved (history/) - GREEN
-    bar = _make_bar(bugs.resolved, max_count)
-    pct = (bugs.resolved / bugs.total * 100) if bugs.total else 0
-    print_colored(
-        f"    {'Resolved':<12s} {bar}  {bugs.resolved:>4d} "
-        f"({pct:5.1f}%)",
-        Color.GREEN,
-    )
-
-    # Categorized (subfolders excl. history) - YELLOW
-    if bugs.categorized > 0:
-        bar = _make_bar(bugs.categorized, max_count)
-        pct = bugs.categorized / bugs.total * 100
+    for cat in categories:
+        bar = _make_bar(cat.count, max_count)
+        pct = cat.count / total * 100 if total else 0
         print_colored(
-            f"    {'Categorized':<12s} {bar}  "
-            f"{bugs.categorized:>4d} ({pct:5.1f}%)",
-            Color.YELLOW,
+            f"    {cat.label:<{pad}s} {bar}  "
+            f"{cat.count:>4d} ({pct:5.1f}%)",
+            cat.color,
         )
 
-    # Unsolved (root-level) - RED
-    bar = _make_bar(bugs.unsolved, max_count)
-    pct = (bugs.unsolved / bugs.total * 100) if bugs.total else 0
-    unsolved_color = Color.RED if bugs.unsolved > 0 else Color.GREEN
+    print()
     print_colored(
-        f"    {'Unsolved':<12s} {bar}  {bugs.unsolved:>4d} "
-        f"({pct:5.1f}%)",
-        unsolved_color,
+        f"    {'Total:':<{pad}s}                       "
+        f"{total:>4d}",
+        Color.RED if any(c.color == Color.RED for c in categories)
+        else Color.WHITE,
     )
 
 
