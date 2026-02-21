@@ -125,7 +125,7 @@ Form(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `TextField` inside `Form` with `FormKey` | **Suppress** — FormState manages the field | `TextFormField` without controller in Form is OK |
 | `TextField` for search (no need to read value) | **False positive** — `onChanged` callback provides value | Many legit use cases don't need a controller |

@@ -87,7 +87,7 @@ void _onLogout() {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `replaceAll` in auth-related function (login/logout) | **Suppress** | Heuristic: function name |
 | `replaceAll` in onboarding completion | **Suppress** | Heuristic: function name contains "onboarding" |

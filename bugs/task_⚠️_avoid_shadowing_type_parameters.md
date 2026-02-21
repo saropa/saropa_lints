@@ -67,7 +67,7 @@ class Box<T> {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Extension type parameters shadowing class type params | **Trigger** | |
 | Same letter but different case (`T` vs `t`) | **Suppress** — Dart is case-sensitive, no actual shadow | |

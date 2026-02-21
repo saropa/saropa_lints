@@ -89,7 +89,7 @@ class NativeFileService { ... }
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Mobile-only project (no web/ dir) | **Suppress** — dart:io is fine | |
 | File in `lib/src/native/` | **Suppress** — clearly native-only | |

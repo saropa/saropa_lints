@@ -17,7 +17,7 @@ items.add('beta');
 items.add('gamma');
 ```
 
-This pattern is unnecessarily verbose. Dart's collection literals support inline element specification, making the equivalent code both shorter and immutably initialised:
+This pattern is unnecessarily verbose. Dart's collection literals support inline element specification, making the equivalent code both shorter and immutably initialized:
 
 ```dart
 final items = <String>['alpha', 'beta', 'gamma'];
@@ -25,18 +25,18 @@ final items = <String>['alpha', 'beta', 'gamma'];
 
 The inline form has several advantages:
 1. It is shorter and easier to read.
-2. The final variable is initialised completely at the declaration site — the reader does not need to scan forward to understand what `items` contains.
+2. The final variable is initialized completely at the declaration site — the reader does not need to scan forward to understand what `items` contains.
 3. It communicates intent more clearly: the list is a fixed set of known values, not a dynamically built collection.
 4. For `addAll` with a spread-compatible iterable, the spread operator `...` achieves the same effect: `final items = [...otherList, 'extra']`.
 
 This rule targets the specific, high-confidence case where the collection is declared empty and immediately populated before any other use, which is always safe to inline.
 
 ## Description (from ROADMAP)
-Flag sequential statement groups where a local variable is initialised with an empty list or set literal (`[]`, `<T>[]`, `{}`, `<T>{}`) and is immediately followed by one or more `.add()` or `.addAll()` calls before any other use of the variable, suggesting replacement with an inline collection literal.
+Flag sequential statement groups where a local variable is initialized with an empty list or set literal (`[]`, `<T>[]`, `{}`, `<T>{}`) and is immediately followed by one or more `.add()` or `.addAll()` calls before any other use of the variable, suggesting replacement with an inline collection literal.
 
 ## Trigger Conditions
 The rule triggers when ALL of the following are true:
-1. A local variable declaration initialises the variable with an empty list or set literal (`[]` or `{}`).
+1. A local variable declaration initializes the variable with an empty list or set literal (`[]` or `{}`).
 2. The variable is declared as `final` or `var` (not `const` — adding to a `const` is a compile error and cannot occur).
 3. The immediately following statements in the same block are method invocations of `.add(element)` or `.addAll(iterable)` on the same variable.
 4. No other use of the variable appears between the declaration and the add calls.
@@ -269,6 +269,6 @@ This is a multi-edit fix — use `addDartFileEdit` with multiple `addDeletion` a
 
 ## Notes & Issues
 - This rule is block-level analysis, which is more expensive than single-node analysis. Ensure the block-walking is efficient and exits early as soon as the consecutive add pattern breaks.
-- The rule should NOT be applied to top-level variables or class fields — those are initialised once and adding to them implies module-level state management, which is different from the local-scope pattern this rule targets.
+- The rule should NOT be applied to top-level variables or class fields — those are initialized once and adding to them implies module-level state management, which is different from the local-scope pattern this rule targets.
 - Consider a `maxAdds` configuration threshold: if a list has more than N adds (e.g., 10), the inline form may actually be less readable than the verbose multi-line form, and the rule should not fire.
 - This rule pairs well with `prefer_collection_literals` from `package:lints`, which discourages `List()` constructor calls. Ensure the two rules complement each other.

@@ -28,7 +28,7 @@ It does NOT trigger for:
 - Constructors and factory constructors.
 - Overriding methods (the name is inherited from the supertype).
 - Methods on test classes (`_test.dart` files).
-- Methods whose name starts with a recognised verb prefix: `get`, `set`, `fetch`, `load`, `save`, `compute`, `calculate`, `build`, `create`, `make`, `handle`, `on`, `process`, `parse`, `format`, `convert`, `validate`, `check`, `find`, `search`, `update`, `delete`, `remove`, `add`, `insert`, `append`, `clear`, `reset`, `init`, `start`, `stop`, `run`, `execute`, `dispatch`, `emit`, `send`, `receive`, `read`, `write`, `open`, `close`, `show`, `hide`, `toggle`, `apply`, `render`, `notify`, `publish`, `subscribe`.
+- Methods whose name starts with a recognized verb prefix: `get`, `set`, `fetch`, `load`, `save`, `compute`, `calculate`, `build`, `create`, `make`, `handle`, `on`, `process`, `parse`, `format`, `convert`, `validate`, `check`, `find`, `search`, `update`, `delete`, `remove`, `add`, `insert`, `append`, `clear`, `reset`, `init`, `start`, `stop`, `run`, `execute`, `dispatch`, `emit`, `send`, `receive`, `read`, `write`, `open`, `close`, `show`, `hide`, `toggle`, `apply`, `render`, `notify`, `publish`, `subscribe`.
 
 ## Implementation Approach
 
@@ -195,4 +195,4 @@ correctionMessage: 'Prefix the method name with a verb such as "get", "fetch", "
 - Consider a configuration option allowing teams to extend the `_suspectNames` set via `analysis_options.yaml` under the saropa_lints options block.
 - This rule overlaps philosophically with `prefer_adjective_bool_getters` (file 4), which targets the specific case of boolean getters. Ensure the two rules do not fire on the same node — this rule should be limited to non-getter methods only.
 - False positive rate is expected to be moderate. Set severity to INFO so the rule is advisory rather than disruptive.
-- The strategy of checking field name collisions (Strategy 2) is the highest-confidence detection path and should be prioritised in the implementation.
+- The strategy of checking field name collisions (Strategy 2) is the highest-confidence detection path and should be prioritized in the implementation.

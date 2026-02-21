@@ -84,7 +84,7 @@ void initState() {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Event handlers (button callbacks) | **Trigger** — but this is a very common pattern | High false positive risk |
 | `@override` on `void` interface method | **Trigger** — but the interface forces the signature | Consider suppressing overrides |

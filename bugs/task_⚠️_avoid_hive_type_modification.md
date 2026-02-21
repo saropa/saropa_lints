@@ -120,7 +120,7 @@ class UserData {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | New class with sequential indices | **Suppress** — no existing data | Only fire on already-published types |
 | Index gaps in new code | **Suppress** — gaps are correct practice | |

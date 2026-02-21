@@ -96,7 +96,7 @@ final items = ItemList.fromBuffer(response.bodyBytes);
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Single-fire WebSocket message handler (not periodic) | **Suppress** — not high-frequency by default | Need to detect if the stream is high-frequency |
 | JSON decode with `compute()` | **Suppress** — already offloading to isolate | Good pattern; check for `compute` wrapper |

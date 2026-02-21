@@ -101,7 +101,7 @@ AnimatedContainer(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `ClipRect(clipBehavior: Clip.none)` | **Suppress** — effectively a no-op | |
 | Clip in a list that contains an animated widget | **Trigger** only if clip is direct child | |

@@ -88,7 +88,7 @@ void logUserAction(String action) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | No configuration | **No-op** — rule is disabled without config | |
 | Banned identifier used as string literal `'print'` | **Suppress** — not actual usage | |

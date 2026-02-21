@@ -103,7 +103,7 @@ final area = switch (shape) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Abstract (not sealed) class with default | **Suppress** — non-sealed classes can have unknown subtypes | Only fire on `sealed` classes |
 | `default:` in switch on non-sealed type | **Suppress** | |

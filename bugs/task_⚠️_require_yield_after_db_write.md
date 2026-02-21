@@ -95,7 +95,7 @@ Future<void> migrationTask() async {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Write at end of function (no subsequent UI update) | **Still trigger** — the NEXT operation (unknown) may be UI | Conservative approach |
 | Write inside `compute()` | **Suppress** — separate isolate, no UI thread | |

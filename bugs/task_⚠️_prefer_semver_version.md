@@ -50,7 +50,7 @@ version: 1.0.0-beta.1
 
 ## Edge Cases
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | No `version` field (package has no version) | **Suppress** — apps don't need version | Or trigger with different message |
 | `version: null` | **Trigger** — null is invalid | |

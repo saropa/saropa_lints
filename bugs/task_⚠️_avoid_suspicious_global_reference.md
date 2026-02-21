@@ -101,7 +101,7 @@ class RetryService {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `kDebugMode`, `kReleaseMode`, `kProfileMode` | **Suppress** — Flutter compile-time constants | Whitelist |
 | `Platform.isAndroid` | **Suppress** — read-only getter | Static read-only access |

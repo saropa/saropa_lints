@@ -205,4 +205,4 @@ correctionMessage: 'Rename the class to a noun form. For a gerund name like "Par
 - The rule intentionally targets only the most obvious cases (concrete gerund classes and concrete `-able` classes). A broader heuristic covering all verb-named classes would require NLP.
 - This rule pairs well with `prefer_verb_method_names` (file 2) — together they enforce a consistent noun/verb split between classes and methods.
 - Consider whether `extension` declarations should also be checked. Extension names like `StringParsing` are non-standard; `StringParser` or `StringExtensions` would be better.
-- Track false positive reports from early adopters and expand the allowlist accordingly. Use GitHub issues labelled `false-positive` to collect cases.
+- Track false positive reports from early adopters and expand the allowlist accordingly. Use GitHub issues labeled `false-positive` to collect cases.

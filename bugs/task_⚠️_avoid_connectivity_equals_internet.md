@@ -96,7 +96,7 @@ _updateConnectivityIcon(status); // ← OK: UI only, not a network gate
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `ConnectivityResult.none` used to show offline UI (not gate network call) | **Suppress** | UI feedback use is valid |
 | `InternetConnectionChecker` used alongside connectivity | **Suppress** — real check present | |

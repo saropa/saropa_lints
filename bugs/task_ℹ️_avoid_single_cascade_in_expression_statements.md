@@ -12,7 +12,7 @@ The cascade operator (`..`) in Dart allows chaining multiple method calls or pro
 
 When a cascade is used for only a single operation (`list..add(item)`), it provides no advantage over a direct method call (`list.add(item)`). The single-cascade form:
 
-1. **Is harder to read**: Readers must know what `..` does and recognise that only one operation follows.
+1. **Is harder to read**: Readers must know what `..` does and recognize that only one operation follows.
 2. **Adds visual weight**: The `..` prefix looks like a potential multi-operation chain, creating a false expectation that more cascades follow.
 3. **Is semantically different**: A cascade expression returns the receiver, not the result of the operation. `list..add(item)` returns `list`, not `void`. This difference is irrelevant in a statement context but could mislead readers about what the expression evaluates to.
 4. **Blocks IntelliJ/VS Code quick-actions**: Some IDE refactoring tools treat cascades specially; a single-cascade that should be a method call can break "Extract Method" and other refactors.

@@ -124,7 +124,7 @@ class AuthService {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `late final` (immutable after set) | **Different rule** — about double-assignment | |
 | `late` field initialized in `initState` | **Suppress** — Flutter lifecycle guarantees initState runs first | |

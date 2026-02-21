@@ -102,7 +102,7 @@ onTap: () {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | GoRouter project (not auto_route) | **Suppress** — `context.go()` is correct in go_router | |
 | `context.push(MaterialPageRoute(...))` | **Trigger** — raw Navigator in auto_route project | |

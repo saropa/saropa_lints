@@ -89,7 +89,7 @@ for (final entry in map.entries) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Variable used only in a nested function that is never called | **Trigger** — transitive non-use | Complex to detect |
 | Variable reassigned but original value unused | **Trigger** — initial assignment wasted | |

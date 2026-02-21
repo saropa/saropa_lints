@@ -113,7 +113,7 @@ Column(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `const` constructor call in loop | **Suppress** — already a const (shared instance) | |
 | Loop with index as item count (not widget parameter) | **Suppress** — loop structure, not arg | |

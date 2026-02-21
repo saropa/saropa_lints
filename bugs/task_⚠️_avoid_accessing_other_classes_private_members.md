@@ -97,7 +97,7 @@ int get secretForTesting => _secret;
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | `@visibleForTesting` annotated members | **Suppress** — intentionally exposed for tests | Check annotation |
 | `@visibleForOverriding` | **Suppress** | Check annotation |

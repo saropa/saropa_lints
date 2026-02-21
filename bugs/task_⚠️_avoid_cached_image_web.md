@@ -82,7 +82,7 @@ Widget buildImage(String url) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behaviour | Notes |
+| Scenario | Expected Behavior | Notes |
 |---|---|---|
 | Mobile-only app (no web/ dir) | **Suppress** | No web target |
 | `CachedNetworkImage` outside `kIsWeb` block | **Suppress** in Phase 1 | May run on mobile too |
