@@ -61,22 +61,23 @@ from rich.panel import Panel
 
 # --- Configuration & Setup ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-LOG_FILE = "session_status.log"
+PROJECT_DIR = os.path.dirname(BASE_DIR)
+REPORTS_DIR = os.path.join(PROJECT_DIR, "reports")
 EXTRACT_FILE = "all_features_report.md"
 
 # Dart-Code (VS Code extension)
 DARTCODE_BASE_URL = "https://dartcode.org"
 DARTCODE_REPO = "Dart-Code/Dart-Code"
-DARTCODE_OUTPUT_DIR = os.path.join(BASE_DIR, "dart_code_exports")
+DARTCODE_OUTPUT_DIR = os.path.join(REPORTS_DIR, "dart_code_exports")
 
 # Flutter SDK
 FLUTTER_BASE_URL = "https://docs.flutter.dev"
 FLUTTER_REPO = "flutter/flutter"
-FLUTTER_OUTPUT_DIR = os.path.join(BASE_DIR, "flutter_sdk_exports")
+FLUTTER_OUTPUT_DIR = os.path.join(REPORTS_DIR, "flutter_sdk_exports")
 
 # Dart SDK
 DART_SDK_CHANGELOG_URL = "https://raw.githubusercontent.com/dart-lang/sdk/main/CHANGELOG.md"
-DART_SDK_OUTPUT_DIR = os.path.join(BASE_DIR, "dart_sdk_exports")
+DART_SDK_OUTPUT_DIR = os.path.join(REPORTS_DIR, "dart_sdk_exports")
 
 console = Console()
 

@@ -20,9 +20,11 @@ import time
 from typing import Dict, Optional
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ITEMS_FILE = os.path.join(BASE_DIR, "_high_confidence_items.json")
-OUTPUT_DIR = os.path.join(os.path.dirname(BASE_DIR), "bugs")
-PR_CACHE_FILE = os.path.join(BASE_DIR, "_pr_details_cache.json")
+PROJECT_DIR = os.path.dirname(BASE_DIR)
+REPORTS_DIR = os.path.join(PROJECT_DIR, "reports")
+ITEMS_FILE = os.path.join(REPORTS_DIR, "_high_confidence_items.json")
+OUTPUT_DIR = os.path.join(PROJECT_DIR, "bugs")
+PR_CACHE_FILE = os.path.join(REPORTS_DIR, "_pr_details_cache.json")
 
 PREFIX = "migration-candidate"
 

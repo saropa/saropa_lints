@@ -18,6 +18,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - `getLineIndent()` utility on `SaropaFixProducer` base class for consistent indentation in fix output
 
 ### Changed
+- Moved generated export folders (`dart_code_exports/`, `dart_sdk_exports/`, `flutter_sdk_exports/`) and report caches from `scripts/` to `reports/` — scripts now write output to the gitignored `reports/` directory, keeping `scripts/` clean
 - Filled TODO placeholders in 745 fixture files across all example directories — core and async fixtures now have real bad/good triggering code; widget, package, and platform fixtures have NOTE placeholders documenting rule requirements
 - Expanded ROADMAP task backlog with 138 detailed implementation specs
 - Deduplicated `_getIndent` from 5 fix files into shared `SaropaFixProducer.getLineIndent()`

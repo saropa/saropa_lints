@@ -21,13 +21,15 @@ from typing import Dict, List, Set, Tuple
 
 # --- Configuration ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_FILE = os.path.join(BASE_DIR, "lint_candidates_report.md")
+PROJECT_DIR = os.path.dirname(BASE_DIR)
+REPORTS_DIR = os.path.join(PROJECT_DIR, "reports")
+OUTPUT_FILE = os.path.join(REPORTS_DIR, "lint_candidates_report.md")
 DART_FIX_PAIRS_FILE = os.path.join(BASE_DIR, "dart_fix_pairs.txt")
 
 SOURCES = {
-    "Flutter SDK": os.path.join(BASE_DIR, "flutter_sdk_exports", "versions"),
-    "Dart SDK": os.path.join(BASE_DIR, "dart_sdk_exports", "versions"),
-    "Dart-Code": os.path.join(BASE_DIR, "dart_code_exports", "versions"),
+    "Flutter SDK": os.path.join(REPORTS_DIR, "flutter_sdk_exports", "versions"),
+    "Dart SDK": os.path.join(REPORTS_DIR, "dart_sdk_exports", "versions"),
+    "Dart-Code": os.path.join(REPORTS_DIR, "dart_code_exports", "versions"),
 }
 
 # --- Candidate Categories ---
