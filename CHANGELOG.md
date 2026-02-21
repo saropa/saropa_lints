@@ -11,7 +11,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [Unreleased]
+## [5.0.0-beta.6]
 
 ### Added
 - Quick fix for `require_subscription_status_check` — inserts TODO reminder to verify subscription status in build methods

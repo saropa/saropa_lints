@@ -137,7 +137,8 @@ void _bad1293() {
 class _GoodClass1293_CardContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Card(child: ListTile(title: Text(''))); // Extracted to shallow sub-widget
+    return Card(
+        child: ListTile(title: Text(''))); // Extracted to shallow sub-widget
   }
 }
 
