@@ -516,7 +516,98 @@ def _severity_color(emoji: str, count: int) -> Color:
     return Color.CYAN
 
 
-def display_roadmap_summary(project_dir: Path) -> None:
+@dataclass
+class BugSummary:
+    """Summary of bug reports by directory location."""
+
+    unsolved: int = 0      # root-level .md files
+    categorized: int = 0   # subfolder .md files (not history)
+    resolved: int = 0      # history/ .md files
+
+    @property
+    def total(self) -> int:
+        """Total bug reports across all categories."""
+        return self.unsolved + self.categorized + self.resolved
+
+
+def _count_bug_reports(bugs_dir: Path) -> BugSummary:
+    """Count .md bug report files by directory category.
+
+    - Root-level .md files (excluding INDEX.md) -> unsolved
+    - history/ subfolder .md files -> resolved
+    - Other subfolder .md files -> categorized
+    """
+    if not bugs_dir.exists() or not bugs_dir.is_dir():
+        return BugSummary()
+
+    summary = BugSummary()
+
+    for item in bugs_dir.iterdir():
+        if item.is_file() and item.suffix.lower() == ".md":
+            if item.name.upper() != "INDEX.MD":
+                summary.unsolved += 1
+        elif item.is_dir():
+            md_count = sum(
+                1 for f in item.rglob("*.md") if f.is_file()
+            )
+            if item.name.lower() == "history":
+                summary.resolved += md_count
+            else:
+                summary.categorized += md_count
+
+    return summary
+
+
+def _display_bug_section(bugs_dir: Path) -> None:
+    """Display bug report summary with color-coded bar charts."""
+    bugs = _count_bug_reports(bugs_dir)
+    if bugs.total == 0:
+        return
+
+    print()
+    print_colored(
+        f"  \u25b6 Bug Reports ({bugs.total} total)",
+        Color.WHITE,
+    )
+    print()
+
+    max_count = max(
+        bugs.unsolved, bugs.categorized, bugs.resolved, 1,
+    )
+
+    # Resolved (history/) - GREEN
+    bar = _make_bar(bugs.resolved, max_count)
+    pct = (bugs.resolved / bugs.total * 100) if bugs.total else 0
+    print_colored(
+        f"    {'Resolved':<12s} {bar}  {bugs.resolved:>4d} "
+        f"({pct:5.1f}%)",
+        Color.GREEN,
+    )
+
+    # Categorized (subfolders excl. history) - YELLOW
+    if bugs.categorized > 0:
+        bar = _make_bar(bugs.categorized, max_count)
+        pct = bugs.categorized / bugs.total * 100
+        print_colored(
+            f"    {'Categorized':<12s} {bar}  "
+            f"{bugs.categorized:>4d} ({pct:5.1f}%)",
+            Color.YELLOW,
+        )
+
+    # Unsolved (root-level) - RED
+    bar = _make_bar(bugs.unsolved, max_count)
+    pct = (bugs.unsolved / bugs.total * 100) if bugs.total else 0
+    unsolved_color = Color.RED if bugs.unsolved > 0 else Color.GREEN
+    print_colored(
+        f"    {'Unsolved':<12s} {bar}  {bugs.unsolved:>4d} "
+        f"({pct:5.1f}%)",
+        unsolved_color,
+    )
+
+
+def display_roadmap_summary(
+    project_dir: Path, *, bugs_dir: Path | None = None,
+) -> None:
     """Display a summary of rules remaining to implement."""
     summary = get_roadmap_summary(project_dir)
 
@@ -559,6 +650,11 @@ def display_roadmap_summary(project_dir: Path) -> None:
         f"    Total remaining: {summary.grand_total} rules",
         Color.WHITE,
     )
+
+    # Bug reports (optional, from sibling project)
+    if bugs_dir is not None:
+        _display_bug_section(bugs_dir)
+
     print()
 
 
