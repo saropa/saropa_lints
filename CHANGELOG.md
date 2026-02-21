@@ -11,7 +11,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [Unreleased]
+## [5.0.0-beta.11]
 
 ### Changed
 - CLI defaults to `init` command when run without arguments (`dart run saropa_lints` now equivalent to `dart run saropa_lints init`)
