@@ -105,13 +105,40 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_unique_test_names
+// BAD: Same test name in the SAME group — true duplicate
 // expect_lint: prefer_unique_test_names
 void _bad1167() {
-  // TODO: Add code that triggers prefer_unique_test_names
+  group('encrypt', () {
+    test('returns null for null input', () {});
+    test('returns null for null input', () {}); // LINT: duplicate
+  });
 }
 
-// GOOD: Should NOT trigger prefer_unique_test_names
+// BAD: Same test name at top level — true duplicate
+// expect_lint: prefer_unique_test_names
+void _bad1167b() {
+  test('handles null', () {});
+  test('handles null', () {}); // LINT: duplicate
+}
+
+// GOOD: Same test name in DIFFERENT groups — not a duplicate
 void _good1167() {
-  // TODO: Add compliant code for prefer_unique_test_names
+  group('encrypt', () {
+    test('returns null for null input', () {});
+  });
+  group('decrypt', () {
+    test('returns null for null input', () {}); // OK: different group
+  });
+}
+
+// GOOD: Same test name in nested groups — not a duplicate
+void _good1167b() {
+  group('MonthUtils', () {
+    group('monthLongNames', () {
+      test('13. Invalid month 0', () {});
+    });
+    group('monthShortNames', () {
+      test('13. Invalid month 0', () {}); // OK: different group
+    });
+  });
 }

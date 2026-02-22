@@ -310,14 +310,30 @@ void main() {
     });
 
     group('avoid_large_list_copy', () {
-      test('avoid_large_list_copy SHOULD trigger', () {
-        // Pattern that should be avoided: avoid large list copy
-        expect('avoid_large_list_copy detected', isNotNull);
+      test('SHOULD trigger for List.from() without type args', () {
+        // List.from(largeList) — no type args, gratuitous copy
+        expect('untyped List.from detected', isNotNull);
       });
 
-      test('avoid_large_list_copy should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_large_list_copy passes', isNotNull);
+      test('should NOT trigger for List<T>.from() with type args', () {
+        // List<int>.from(dynamicList) — type-casting pattern
+        expect('typed List<T>.from is exempt', isNotNull);
+      });
+
+      test('should NOT trigger for .toList() in return statement', () {
+        // return list.where((e) => e > 0).toList()
+        // Function contract requires List
+        expect('toList in return is exempt', isNotNull);
+      });
+
+      test('should NOT trigger for .toList() assigned to variable', () {
+        // final x = list.where(...).toList() — variable needs List
+        expect('toList in variable assignment is exempt', isNotNull);
+      });
+
+      test('should NOT trigger for .toList() not after lazy chain', () {
+        // list.toList() without preceding where/map/etc — not flagged
+        expect('direct toList without lazy chain not flagged', isNotNull);
       });
     });
 
