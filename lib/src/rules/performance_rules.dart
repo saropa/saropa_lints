@@ -377,31 +377,55 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
 
       // Check if method name suggests heavy work
       for (final String pattern in _heavyOperations) {
-        if (methodName.contains(pattern.toLowerCase())) {
-          // Check if already inside compute or isolate
-          AstNode? current = node.parent;
-          bool insideIsolate = false;
+        if (!methodName.contains(pattern.toLowerCase())) continue;
 
-          while (current != null) {
-            if (current is MethodInvocation) {
-              final String parentMethod = current.methodName.name;
-              if (parentMethod == 'compute' ||
-                  parentMethod == 'run' ||
-                  parentMethod == 'spawn') {
-                insideIsolate = true;
-                break;
-              }
+        // Only flag inside widget lifecycle methods where blocking
+        // the UI thread is a real concern. Library utility methods
+        // have no UI thread — the consumer controls execution context.
+        if (!_isInsideWidgetLifecycle(node)) return;
+
+        // Check if already inside compute or isolate
+        AstNode? current = node.parent;
+        bool insideIsolate = false;
+
+        while (current != null) {
+          if (current is MethodInvocation) {
+            final String parentMethod = current.methodName.name;
+            if (parentMethod == 'compute' ||
+                parentMethod == 'run' ||
+                parentMethod == 'spawn') {
+              insideIsolate = true;
+              break;
             }
-            current = current.parent;
           }
-
-          if (!insideIsolate) {
-            reporter.atNode(node);
-          }
-          return;
+          current = current.parent;
         }
+
+        if (!insideIsolate) {
+          reporter.atNode(node);
+        }
+        return;
       }
     });
+  }
+
+  static const Set<String> _widgetLifecycleMethods = <String>{
+    'build',
+    'initState',
+    'didUpdateWidget',
+    'didChangeDependencies',
+    'reassemble',
+  };
+
+  static bool _isInsideWidgetLifecycle(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodDeclaration) {
+        return _widgetLifecycleMethods.contains(current.name.lexeme);
+      }
+      current = current.parent;
+    }
+    return false;
   }
 }
 
