@@ -1627,6 +1627,22 @@ class PreferSecureRandomRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static const Set<String> _securityIndicators = <String>{
+    'token',
+    'password',
+    'secret',
+    'key',
+    'nonce',
+    'salt',
+    'hash',
+    'otp',
+    'auth',
+    'session',
+    'credential',
+    'cipher',
+    'encrypt',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1636,11 +1652,49 @@ class PreferSecureRandomRule extends SaropaLintRule {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'Random') return;
 
-      // Check if it's Random() not Random.secure()
+      // Skip Random.secure()
       final String? namedConstructor = node.constructorName.name?.name;
       if (namedConstructor == 'secure') return;
 
-      reporter.atNode(node);
+      // Skip seeded constructors — intentionally predictable (e.g. testing)
+      if (node.argumentList.arguments.isNotEmpty) return;
+
+      // Skip when passed as argument to .shuffle()
+      final AstNode? parent = node.parent;
+      if (parent is ArgumentList) {
+        final AstNode? grandparent = parent.parent;
+        if (grandparent is MethodInvocation &&
+            grandparent.methodName.name == 'shuffle') {
+          return;
+        }
+      }
+
+      // Only flag in security-related contexts
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is VariableDeclaration) {
+          final String name = current.name.lexeme.toLowerCase();
+          if (_securityIndicators.any((String s) => name.contains(s))) {
+            reporter.atNode(node);
+            return;
+          }
+        }
+        if (current is MethodDeclaration) {
+          final String name = current.name.lexeme.toLowerCase();
+          if (_securityIndicators.any((String s) => name.contains(s))) {
+            reporter.atNode(node);
+            return;
+          }
+        }
+        if (current is FunctionDeclaration) {
+          final String name = current.name.lexeme.toLowerCase();
+          if (_securityIndicators.any((String s) => name.contains(s))) {
+            reporter.atNode(node);
+            return;
+          }
+        }
+        current = current.parent;
+      }
     });
   }
 }
