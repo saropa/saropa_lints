@@ -13,6 +13,15 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Changed
+- Init: "what's new" summary now shows all items (no `+N more` or section truncation) — only individual lines are truncated at 78 chars
+- Init: tier default changed from `comprehensive` to `essential` for fresh setups; re-runs default to the previously selected tier
+- Init: stale config version warning now tells the user how to fix it (`re-run "dart run saropa_lints" to update`)
+- Init: stylistic walkthrough shows per-rule progress counter (`4/120 — 3%`) and `[quick fix]` indicator for rules with IDE auto-fixes
+- Init: stylistic walkthrough rule descriptions rendered in default terminal color instead of dim gray for readability
+- Merged duplicate rule `prefer_sorted_members` into `prefer_member_ordering`; `prefer_sorted_members` continues to work as a config alias
+- Clarified correction messages for `prefer_boolean_prefixes`, `prefer_descriptive_bool_names`, and `prefer_descriptive_bool_names_strict` to distinguish scope (fields-only vs all booleans)
+
 ---
 ## [5.0.0-beta.12]
 
@@ -22,7 +31,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - Init: auto-detect project type from pubspec.yaml — Flutter widget rules are skipped for pure Dart projects, package-specific rules filtered by dependencies
 - `SaropaLintRule`: `exampleBad`/`exampleGood` properties for concise terminal-friendly code snippets (40 rules covered)
 - `tiers.dart`: `flutterStylisticRules` set for widget-specific stylistic rules filtered by platform
-- Init: "what's new" summary shown during `dart run saropa_lints:init`, with per-category caps and a link to the full changelog
+- Init: "what's new" summary shown during `dart run saropa_lints:init`, with line truncation and a link to the full changelog
 - New rule: `prefer_sorted_imports` (Comprehensive) — detects unsorted imports within each group (dart, package, relative) with quick fix to sort A-Z
 - New rule: `prefer_import_group_comments` (Stylistic) — detects missing `///` section headers between import groups with quick fix to add them
 - New rule: `avoid_asset_manifest_json` (Essential) — detects usage of removed `AssetManifest.json` path (Flutter 3.38.0); runtime crash since the file no longer exists in built bundles
