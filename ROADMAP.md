@@ -417,8 +417,8 @@ These rules are **not included in any tier** by default. They represent team pre
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ℹ️ `prefer_sorted_imports` | Professional | INFO | Alphabetically sort imports within groups |
-| ℹ️ `prefer_import_groups` | Professional | INFO | Group imports: dart, package, relative (with blank lines) |
+| ✅ `prefer_sorted_imports` | Comprehensive | INFO | Alphabetically sort imports within groups (with quick fix) |
+| ✅ `prefer_import_group_comments` | Stylistic | INFO | Add `///` section headers between import groups (with quick fix) |
 | ℹ️ `prefer_deferred_imports` | Comprehensive | INFO | Use deferred imports for large libraries |
 | ℹ️ `prefer_show_hide` | Comprehensive | INFO | Explicit `show`/`hide` on imports |
 | ℹ️ `prefer_part_over_import` | Pedantic | INFO | Use `part`/`part of` for tightly coupled files |

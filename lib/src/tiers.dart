@@ -118,6 +118,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_grouped_imports',
   'prefer_named_imports',
   'prefer_relative_imports',
+  'prefer_import_group_comments',
 
   // === Quote style (conflicting pair - opt-in only) ===
   'prefer_double_quotes',
@@ -2375,6 +2376,8 @@ const Set<String> professionalOnlyRules = <String>{
 /// Comprehensive tier rules - stricter patterns, optimization hints, edge cases.
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
+  // Import sorting
+  'prefer_sorted_imports', // alphabetical import sorting within groups
   // Performance micro-optimizations (moved from Professional)
   'prefer_item_extent', // scroll performance hint
   'prefer_prototype_item', // consistent sizing optimization
