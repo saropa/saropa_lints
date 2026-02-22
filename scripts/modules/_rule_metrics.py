@@ -176,29 +176,37 @@ def display_test_coverage(project_dir: Path) -> None:
     print_colored("  ▶ Test Coverage", Color.WHITE)
     print()
 
-    # Overall bar
-    bar = _make_bar(total_fixtures, total_rules)
-    print_colored(
-        f"    Overall      {bar}  {total_fixtures:>4d}/{total_rules:<4d} "
-        f"({coverage_pct:5.1f}%) {status}",
-        status_color,
-    )
-
-    # Top 5 worst offenders
+    # Top 5 worst offenders (compute early for column alignment)
     ranked = sorted(
         category_details,
         key=lambda c: c[1] - c[2],
         reverse=True,
     )[:5]
 
-    if ranked and ranked[0][1] - ranked[0][2] > 0:
+    # Top 5 lowest coverage (skip categories at 100%)
+    worst = [
+        (cat, r, f) for cat, r, f in ranked if r - f > 0
+    ]
+
+    # Unified column width for Overall + worst rows
+    pad = max(
+        len("Overall"),
+        max((len(c) for c, _, _ in worst), default=0),
+    )
+
+    # Overall bar
+    bar = _make_bar(total_fixtures, total_rules)
+    print_colored(
+        f"    {'Overall':<{pad}s} {bar}  "
+        f"{total_fixtures:>4d}/{total_rules:<4d} "
+        f"({coverage_pct:5.1f}%) {status}",
+        status_color,
+    )
+
+    if worst:
         print()
         print_colored("    Lowest coverage:", Color.WHITE)
-        max_rules = max(c[1] for c in ranked)
-        for category, rules, fixtures in ranked:
-            untested = rules - fixtures
-            if untested <= 0:
-                break
+        for category, rules, fixtures in worst:
             pct = (fixtures / rules * 100) if rules > 0 else 0
             bar = _make_bar(fixtures, rules)
             if pct < 10:
@@ -208,8 +216,8 @@ def display_test_coverage(project_dir: Path) -> None:
             else:
                 row_color = Color.CYAN
             print_colored(
-                f"    {category:<14s} {bar}  {fixtures:>3d}/{rules:<3d} "
-                f"({pct:5.1f}%)",
+                f"    {category:<{pad}s} {bar}  "
+                f"{fixtures:>4d}/{rules:<4d} ({pct:5.1f}%)",
                 row_color,
             )
     print()
@@ -570,38 +578,83 @@ def _collect_bug_categories(bugs_dir: Path) -> list[_BugCategory]:
 
 
 def _display_bug_section(bugs_dir: Path) -> None:
-    """Display bug report summary with color-coded bar charts."""
+    """Display bug report summary grouped by status.
+
+    Groups: resolved (green), active/in-progress (yellow),
+    unsolved (red).  Bars scale within the active group only.
+    """
     categories = _collect_bug_categories(bugs_dir)
     if not categories:
         return
 
+    resolved = [c for c in categories if c.color == Color.GREEN]
+    active = [c for c in categories if c.color == Color.YELLOW]
+    unsolved = [c for c in categories if c.color == Color.RED]
+
     total = sum(c.count for c in categories)
-    max_count = max(c.count for c in categories)
-    pad = max((len(c.label) for c in categories), default=12)
+    resolved_count = sum(c.count for c in resolved)
+    active_count = sum(c.count for c in active)
+    unsolved_count = sum(c.count for c in unsolved)
+
+    pad = max(len(c.label) for c in categories)
 
     print()
     print_colored(
         f"  \u25b6 Bug Reports ({total} total)",
         Color.WHITE,
     )
-    print()
 
-    for cat in categories:
-        bar = _make_bar(cat.count, max_count)
-        pct = cat.count / total * 100 if total else 0
-        print_colored(
-            f"    {cat.label:<{pad}s} {bar}  "
-            f"{cat.count:>4d} ({pct:5.1f}%)",
-            cat.color,
-        )
+    # Resolved (done)
+    if resolved:
+        print()
+        print_colored("    Done:", Color.DIM)
+        for cat in resolved:
+            bar = _make_bar(1, 1)  # full bar — 100% resolved
+            print_colored(
+                f"    {cat.label:<{pad}s} {bar}  "
+                f"{cat.count:>4d} resolved",
+                Color.GREEN,
+            )
 
+    # Active (in progress)
+    if active:
+        active_max = max(c.count for c in active)
+        print()
+        print_colored("    In progress:", Color.DIM)
+        for cat in active:
+            bar = _make_bar(cat.count, active_max)
+            print_colored(
+                f"    {cat.label:<{pad}s} {bar}  {cat.count:>4d}",
+                Color.YELLOW,
+            )
+
+    # Unsolved (critical)
+    if unsolved:
+        empty_bar = " " * _BAR_WIDTH
+        print()
+        print_colored("    Unsolved:", Color.DIM)
+        for cat in unsolved:
+            print_colored(
+                f"    {cat.label:<{pad}s} {empty_bar}  "
+                f"{cat.count:>4d}",
+                Color.RED,
+            )
+
+    # Summary line
     print()
-    print_colored(
-        f"    {'Total:':<{pad}s}                       "
-        f"{total:>4d}",
-        Color.RED if any(c.color == Color.RED for c in categories)
-        else Color.WHITE,
+    parts: list[str] = []
+    if resolved_count:
+        parts.append(f"{resolved_count} resolved")
+    if active_count:
+        parts.append(f"{active_count} in progress")
+    if unsolved_count:
+        parts.append(f"{unsolved_count} unsolved")
+    summary_color = (
+        Color.RED if unsolved_count
+        else Color.YELLOW if active_count
+        else Color.GREEN
     )
+    print_colored(f"    {', '.join(parts)}", summary_color)
 
 
 def display_roadmap_summary(
