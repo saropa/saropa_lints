@@ -11,7 +11,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [Unreleased]
+## [5.0.0-beta.12]
 
 ### Added
 - Init: interactive stylistic rule walkthrough — shows code examples and lets users enable/disable each rule individually with y/n/skip/abort support and resume via `[reviewed]` markers
@@ -48,6 +48,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - `avoid_stream_subscription_in_field`: skip `.listen()` calls whose return value is passed as an argument (e.g. `subs.add(stream.listen(...))`)
 - `avoid_string_concatenation_l10n`: skip numeric-only interpolated strings (e.g. `'$a / $b'`) that contain no translatable word content
 - `avoid_unmarked_public_class`: skip classes where all constructors are private (extension already prevented)
+
+### Package Publishing Changes
+- Publish audit: added 3 new blocking checks — `flutterStylisticRules` subset validation, `packageRuleSets` tier consistency, `exampleBad`/`exampleGood` pairing
+- Publish audit: doc comment auto-fix (angle brackets, references) now runs during audit step instead of only during analysis step
 
 ---
 ## [5.0.0-beta.11]

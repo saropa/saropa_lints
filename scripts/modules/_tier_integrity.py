@@ -55,6 +55,12 @@ class TierIntegrityResult:
             Each entry is (rule_name, list_of_tier_names).
         misplaced_opinionated: Opinionated prefer_* rules not in
             stylisticRules. Each entry is (rule_name, current_tier).
+        flutter_stylistic_not_in_stylistic: Rules in flutterStylisticRules
+            but not in stylisticRules.
+        package_rules_not_in_tiers: Rules in packageRuleSets but not in
+            any tier set. Each entry is (rule_name, package_name).
+        unpaired_examples: Rules that have exampleBad but not exampleGood
+            or vice versa. Each entry is (rule_name, which_missing).
     """
 
     passed: bool
@@ -62,6 +68,11 @@ class TierIntegrityResult:
     phantom_rules: list[str] = field(default_factory=list)
     multi_tier_rules: list[tuple[str, list[str]]] = field(default_factory=list)
     misplaced_opinionated: list[tuple[str, str]] = field(default_factory=list)
+    flutter_stylistic_not_in_stylistic: list[str] = field(default_factory=list)
+    package_rules_not_in_tiers: list[tuple[str, str]] = field(
+        default_factory=list,
+    )
+    unpaired_examples: list[tuple[str, str]] = field(default_factory=list)
 
     @property
     def issues_count(self) -> int:
@@ -71,6 +82,9 @@ class TierIntegrityResult:
             + len(self.phantom_rules)
             + len(self.multi_tier_rules)
             + len(self.misplaced_opinionated)
+            + len(self.flutter_stylistic_not_in_stylistic)
+            + len(self.package_rules_not_in_tiers)
+            + len(self.unpaired_examples)
         )
 
 
@@ -378,6 +392,114 @@ def get_opinionated_prefer_rules(rules_dir: Path) -> set[str]:
     return opinionated_prefer
 
 
+def _parse_named_set(content: str, set_name: str) -> set[str]:
+    """Extract rule names from a named ``const Set<String>`` in tiers.dart."""
+    pattern = (
+        rf"const Set<String> {set_name} = <String>\{{([^}}]*)\}};"
+    )
+    match = re.search(pattern, content, re.DOTALL)
+    if not match:
+        return set()
+    set_content = "\n".join(
+        line
+        for line in match.group(1).splitlines()
+        if not line.strip().startswith("//")
+    )
+    return set(re.findall(r"'([a-z0-9_]+)'", set_content))
+
+
+def get_flutter_stylistic_rules(tiers_path: Path) -> set[str]:
+    """Extract flutterStylisticRules from tiers.dart."""
+    content = tiers_path.read_text(encoding="utf-8")
+    return _parse_named_set(content, "flutterStylisticRules")
+
+
+def get_package_rule_sets(tiers_path: Path) -> dict[str, set[str]]:
+    """Extract all packageRuleSets from tiers.dart.
+
+    Parses the ``packageRuleSets`` getter and resolves each
+    ``<name>PackageRules`` reference to its const set.
+    """
+    content = tiers_path.read_text(encoding="utf-8")
+
+    # Find all <name>PackageRules sets (e.g., blocPackageRules)
+    pkg_set_pattern = re.compile(
+        r"const Set<String> (\w+PackageRules) = <String>\{([^}]*)\};",
+        re.DOTALL,
+    )
+    pkg_sets: dict[str, set[str]] = {}
+    for match in pkg_set_pattern.finditer(content):
+        set_name = match.group(1)
+        set_content = "\n".join(
+            line
+            for line in match.group(2).splitlines()
+            if not line.strip().startswith("//")
+        )
+        rules = set(re.findall(r"'([a-z0-9_]+)'", set_content))
+
+        # Resolve spread references like ..._databaseSharedRules
+        for spread in re.findall(r"\.\.\._?(\w+)", set_content):
+            ref_name = f"_{spread}" if not spread.startswith("_") else spread
+            ref_rules = _parse_named_set(content, ref_name)
+            if not ref_rules:
+                ref_rules = _parse_named_set(content, spread)
+            rules.update(ref_rules)
+
+        pkg_sets[set_name] = rules
+
+    return pkg_sets
+
+
+def get_unpaired_examples(rules_dir: Path) -> list[tuple[str, str]]:
+    """Find rules where exampleBad/exampleGood are not paired.
+
+    Scans rule classes for ``get exampleBad`` and ``get exampleGood``
+    overrides. If a class has one but not the other, it's reported.
+
+    Returns:
+        List of (rule_name, missing_property) tuples.
+    """
+    unpaired: list[tuple[str, str]] = []
+
+    class_pattern = re.compile(
+        r"class\s+\w+\s+extends\s+\w+LintRule"
+    )
+    name_pattern = re.compile(
+        r"LintCode\(\s*(?:name:\s*)?'([a-z_0-9]+)',"
+    )
+    bad_pattern = re.compile(r"String\s+get\s+exampleBad\s*=>")
+    good_pattern = re.compile(r"String\s+get\s+exampleGood\s*=>")
+
+    for dart_file in rules_dir.glob("**/*.dart"):
+        if dart_file.name == "all_rules.dart":
+            continue
+        content = dart_file.read_text(encoding="utf-8")
+        class_starts = [m.start() for m in class_pattern.finditer(content)]
+
+        for idx, start in enumerate(class_starts):
+            end = (
+                class_starts[idx + 1]
+                if idx + 1 < len(class_starts)
+                else len(content)
+            )
+            class_body = content[start:end]
+
+            name_match = name_pattern.search(class_body)
+            if not name_match:
+                continue
+            rule_name = name_match.group(1)
+
+            has_bad = bool(bad_pattern.search(class_body))
+            has_good = bool(good_pattern.search(class_body))
+
+            if has_bad and not has_good:
+                unpaired.append((rule_name, "exampleGood"))
+            elif has_good and not has_bad:
+                unpaired.append((rule_name, "exampleBad"))
+
+    return sorted(unpaired)
+
+
 # =============================================================================
 # INTEGRITY CHECK
 # =============================================================================
@@ -390,7 +512,7 @@ def check_tier_integrity(
 ) -> TierIntegrityResult:
     """Run all tier integrity checks.
 
-    This is the main entry point. It performs four checks:
+    This is the main entry point. It performs seven checks:
 
     Check 1 - Orphan rules:
         Every registered plugin rule must appear in exactly one tier
@@ -411,6 +533,20 @@ def check_tier_integrity(
         All prefer_* rules with LintImpact.opinionated must be in
         stylisticRules, not in a numbered tier. This ensures they
         are always opt-in and set to ``true`` in generated configs.
+
+    Check 5 - flutterStylisticRules subset:
+        Every rule in flutterStylisticRules must also be in
+        stylisticRules. flutterStylisticRules is a filter, not a
+        separate tier.
+
+    Check 6 - Package rule set consistency:
+        Every rule in a packageRuleSets entry must exist in the
+        tier system (the union of all tier sets).
+
+    Check 7 - Example pairing:
+        If a rule overrides exampleBad, it must also override
+        exampleGood (and vice versa). Unpaired examples break
+        the interactive walkthrough display.
 
     Args:
         rules_dir: Path to lib/src/rules/ directory.
@@ -475,10 +611,36 @@ def check_tier_integrity(
             misplaced.append((rule, current_tier))
 
     # ------------------------------------------------------------------
+    # Check 5: flutterStylisticRules ⊆ stylisticRules
+    # ------------------------------------------------------------------
+    flutter_stylistic = get_flutter_stylistic_rules(tiers_path)
+    flutter_not_in_stylistic = sorted(flutter_stylistic - stylistic_set)
+
+    # ------------------------------------------------------------------
+    # Check 6: Package rules must be in tier system
+    # ------------------------------------------------------------------
+    pkg_sets = get_package_rule_sets(tiers_path)
+    pkg_not_in_tiers: list[tuple[str, str]] = []
+    for pkg_name, pkg_rules in sorted(pkg_sets.items()):
+        for rule in sorted(pkg_rules - all_tiered):
+            pkg_not_in_tiers.append((rule, pkg_name))
+
+    # ------------------------------------------------------------------
+    # Check 7: exampleBad/exampleGood must be paired
+    # ------------------------------------------------------------------
+    unpaired = get_unpaired_examples(rules_dir)
+
+    # ------------------------------------------------------------------
     # Result
     # ------------------------------------------------------------------
     passed = (
-        not orphans and not phantoms and not multi_tier and not misplaced
+        not orphans
+        and not phantoms
+        and not multi_tier
+        and not misplaced
+        and not flutter_not_in_stylistic
+        and not pkg_not_in_tiers
+        and not unpaired
     )
 
     return TierIntegrityResult(
@@ -487,6 +649,9 @@ def check_tier_integrity(
         phantom_rules=phantoms,
         multi_tier_rules=multi_tier,
         misplaced_opinionated=misplaced,
+        flutter_stylistic_not_in_stylistic=flutter_not_in_stylistic,
+        package_rules_not_in_tiers=pkg_not_in_tiers,
+        unpaired_examples=unpaired,
     )
 
 
@@ -498,7 +663,7 @@ def check_tier_integrity(
 def print_tier_integrity_report(result: TierIntegrityResult) -> None:
     """Print a formatted tier integrity report to the terminal.
 
-    Shows pass/fail status for each of the four checks with
+    Shows pass/fail status for each of the seven checks with
     details of any failures.
 
     Args:
@@ -571,6 +736,60 @@ def print_tier_integrity_report(result: TierIntegrityResult) -> None:
     else:
         print_success(
             "All opinionated prefer_* rules are in stylisticRules"
+        )
+
+    # Check 5: flutterStylisticRules subset
+    if result.flutter_stylistic_not_in_stylistic:
+        print_error(
+            f"{len(result.flutter_stylistic_not_in_stylistic)} rule(s) in "
+            f"flutterStylisticRules but not in stylisticRules:"
+        )
+        for rule in result.flutter_stylistic_not_in_stylistic[:10]:
+            print(f"      {Color.RED.value}{rule}{Color.RESET.value}")
+        print()
+    else:
+        print_success(
+            "flutterStylisticRules is a valid subset of stylisticRules"
+        )
+
+    # Check 6: Package rules in tier system
+    if result.package_rules_not_in_tiers:
+        print_error(
+            f"{len(result.package_rules_not_in_tiers)} package rule(s) "
+            f"not in any tier set:"
+        )
+        for rule, pkg in result.package_rules_not_in_tiers[:10]:
+            print(
+                f"      {Color.RED.value}{rule}{Color.RESET.value}"
+                f" (in {pkg})"
+            )
+        if len(result.package_rules_not_in_tiers) > 10:
+            print(
+                f"      {Color.DIM.value}"
+                f"... and {len(result.package_rules_not_in_tiers) - 10} more"
+                f"{Color.RESET.value}"
+            )
+        print()
+    else:
+        print_success(
+            "All package rules exist in the tier system"
+        )
+
+    # Check 7: Example pairing
+    if result.unpaired_examples:
+        print_error(
+            f"{len(result.unpaired_examples)} rule(s) with unpaired "
+            f"exampleBad/exampleGood:"
+        )
+        for rule, missing in result.unpaired_examples[:10]:
+            print(
+                f"      {Color.RED.value}{rule}{Color.RESET.value}"
+                f" (missing {missing})"
+            )
+        print()
+    else:
+        print_success(
+            "All rule examples are properly paired"
         )
 
     # Summary
