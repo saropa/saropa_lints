@@ -966,6 +966,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferAbsoluteImportsRule.new,
   PreferGroupedImportsRule.new,
   PreferFlatImportsRule.new,
+  PreferSortedImportsRule.new,
+  PreferImportGroupCommentsRule.new,
   PreferFieldsBeforeMethodsRule.new,
   PreferMethodsBeforeFieldsRule.new,
   PreferStaticMembersFirstRule.new,
