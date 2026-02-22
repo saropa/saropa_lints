@@ -1890,6 +1890,12 @@ class PreferTypeOverVarRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  String get exampleBad => "var name = 'John';";
+
+  @override
+  String get exampleGood => "String name = 'John';";
+
   static const LintCode _code = LintCode(
     'prefer_type_over_var',
     '[prefer_type_over_var] Preferring explicit type annotations over var is a style choice. Both produce identical compiled code. Conflicts with prefer_var_over_explicit_type. Enable via the stylistic tier. {v4}',

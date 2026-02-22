@@ -283,4 +283,166 @@ void main() {
       expect(result, contains('require_firebase_init_before_use'));
     });
   });
+
+  group('flutterStylisticRules Validation', () {
+    test('flutterStylisticRules is a subset of stylisticRules', () {
+      final notInStylistic = flutterStylisticRules.difference(stylisticRules);
+
+      expect(
+        notInStylistic,
+        isEmpty,
+        reason:
+            'flutterStylisticRules contains rules not in stylisticRules:\n'
+            '${notInStylistic.toList()..sort()}\n\n'
+            'flutterStylisticRules must be a subset of stylisticRules.',
+      );
+    });
+
+    test('all widget-only stylistic rules are in flutterStylisticRules', () {
+      final widgetOnlyRules = <String>{};
+      for (final rule in allSaropaRules) {
+        final name = rule.code.name;
+        if (!stylisticRules.contains(name)) continue;
+        final fileTypes = rule.applicableFileTypes;
+        if (fileTypes != null && fileTypes.length == 1) {
+          // Rule only applies to widget files
+          final typeName = fileTypes.first.toString();
+          if (typeName.contains('widget')) {
+            widgetOnlyRules.add(name);
+          }
+        }
+      }
+
+      final missing = widgetOnlyRules.difference(flutterStylisticRules);
+      expect(
+        missing,
+        isEmpty,
+        reason:
+            'Widget-only stylistic rules missing from '
+            'flutterStylisticRules:\n'
+            '${missing.toList()..sort()}\n\n'
+            'Add these to flutterStylisticRules in lib/src/tiers.dart.',
+      );
+    });
+  });
+
+  group('exampleBad / exampleGood Validation', () {
+    test('exampleBad and exampleGood are always paired', () {
+      final badOnly = <String>[];
+      final goodOnly = <String>[];
+
+      for (final rule in allSaropaRules) {
+        final hasBad = rule.exampleBad != null;
+        final hasGood = rule.exampleGood != null;
+        if (hasBad && !hasGood) badOnly.add(rule.code.name);
+        if (hasGood && !hasBad) goodOnly.add(rule.code.name);
+      }
+
+      expect(
+        badOnly,
+        isEmpty,
+        reason:
+            'Rules with exampleBad but no exampleGood:\n'
+            '${badOnly.join('\n')}\n\n'
+            'Always provide both examples.',
+      );
+      expect(
+        goodOnly,
+        isEmpty,
+        reason:
+            'Rules with exampleGood but no exampleBad:\n'
+            '${goodOnly.join('\n')}\n\n'
+            'Always provide both examples.',
+      );
+    });
+
+    test('examples are non-empty strings', () {
+      final empty = <String>[];
+
+      for (final rule in allSaropaRules) {
+        final name = rule.code.name;
+        if (rule.exampleBad != null && rule.exampleBad!.trim().isEmpty) {
+          empty.add('$name.exampleBad');
+        }
+        if (rule.exampleGood != null && rule.exampleGood!.trim().isEmpty) {
+          empty.add('$name.exampleGood');
+        }
+      }
+
+      expect(
+        empty,
+        isEmpty,
+        reason: 'Examples must not be blank:\n${empty.join('\n')}',
+      );
+    });
+
+    test('exampleBad differs from exampleGood', () {
+      final identical = <String>[];
+
+      for (final rule in allSaropaRules) {
+        if (rule.exampleBad == null || rule.exampleGood == null) continue;
+        if (rule.exampleBad == rule.exampleGood) {
+          identical.add(rule.code.name);
+        }
+      }
+
+      expect(
+        identical,
+        isEmpty,
+        reason:
+            'Rules where exampleBad == exampleGood (no diff shown):\n'
+            '${identical.join('\n')}',
+      );
+    });
+
+    test('conflicting pair examples are swapped', () {
+      // For conflicting pairs, rule A's exampleBad should equal B's
+      // exampleGood and vice versa. Verify a few known pairs.
+      final ruleMap = <String, SaropaLintRule>{};
+      for (final rule in allSaropaRules) {
+        ruleMap[rule.code.name] = rule;
+      }
+
+      void checkPair(String ruleA, String ruleB) {
+        final a = ruleMap[ruleA];
+        final b = ruleMap[ruleB];
+        if (a == null || b == null) return;
+        if (a.exampleBad == null || b.exampleGood == null) return;
+
+        expect(
+          a.exampleBad,
+          b.exampleGood,
+          reason: "$ruleA.exampleBad should == $ruleB.exampleGood",
+        );
+        expect(
+          a.exampleGood,
+          b.exampleBad,
+          reason: "$ruleA.exampleGood should == $ruleB.exampleBad",
+        );
+      }
+
+      checkPair('prefer_single_quotes', 'prefer_double_quotes');
+      checkPair('prefer_relative_imports', 'prefer_absolute_imports');
+      checkPair('prefer_var_over_explicit_type', 'prefer_type_over_var');
+      checkPair(
+        'prefer_sizedbox_over_container',
+        'prefer_container_over_sizedbox',
+      );
+      checkPair(
+        'prefer_text_rich_over_richtext',
+        'prefer_richtext_over_text_rich',
+      );
+      checkPair('prefer_edgeinsets_symmetric', 'prefer_edgeinsets_only');
+      checkPair(
+        'prefer_expanded_over_flexible',
+        'prefer_flexible_over_expanded',
+      );
+      checkPair('prefer_material_theme_colors', 'prefer_explicit_colors');
+      checkPair(
+        'prefer_null_aware_assignment',
+        'prefer_explicit_null_assignment',
+      );
+      checkPair('prefer_if_null_over_ternary', 'prefer_ternary_over_if_null');
+    });
+  });
 }

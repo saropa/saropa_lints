@@ -64,6 +64,12 @@ class PreferRelativeImportsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => "import 'package:my_app/src/utils.dart';";
+
+  @override
+  String get exampleGood => "import '../utils.dart';";
+
   static const LintCode _code = LintCode(
     'prefer_relative_imports',
     '[prefer_relative_imports] An absolute package import was used for a file within the same package. Relative imports simplify refactoring and clearly signal local dependencies. Replace the absolute import with a relative path. {v6}',
@@ -244,6 +250,12 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'int add(int a, int b) { return a + b; }';
+
+  @override
+  String get exampleGood => 'int add(int a, int b) => a + b;';
 
   static const LintCode _code = LintCode(
     'prefer_arrow_functions',
@@ -477,6 +489,14 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'Widget build(BuildContext context) => Foo(a: 1, b: 2)';
+
+  @override
+  String get exampleGood =>
+      'Widget build(BuildContext context,) => Foo(a: 1, b: 2,)';
 
   static const LintCode _code = LintCode(
     'prefer_trailing_comma_always',
@@ -1147,6 +1167,12 @@ class PreferSingleQuotesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'String name = "John";';
+
+  @override
+  String get exampleGood => "String name = 'John';";
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -2690,6 +2716,12 @@ class PreferStraightApostropheRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad => "It\u2019s a test  // curly apostrophe";
+
+  @override
+  String get exampleGood => "It's a test  // straight apostrophe";
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         ReplaceCurlyApostropheFix(context: context),
@@ -2777,6 +2809,12 @@ class PreferDocCurlyApostropheRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => "/// It's a doc comment  // straight apostrophe";
+
+  @override
+  String get exampleGood => "/// It\u2019s a doc comment  // curly apostrophe";
 
   static const LintCode _code = LintCode(
     'prefer_doc_curly_apostrophe',
@@ -2894,6 +2932,12 @@ class PreferDocStraightApostropheRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => "/// It\u2019s a doc comment  // curly apostrophe";
+
+  @override
+  String get exampleGood => "/// It's a doc comment  // straight apostrophe";
 
   static const LintCode _code = LintCode(
     'prefer_doc_straight_apostrophe',

@@ -60,6 +60,12 @@ class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'final sum = a + b;\n\n  return sum;';
+
+  @override
+  String get exampleGood => 'final sum = a + b;\n  return sum;';
+
   static const LintCode _code = LintCode(
     'prefer_no_blank_line_before_return',
     '[prefer_no_blank_line_before_return] A blank line before the return statement adds unnecessary vertical space that separates the return value from its context. Remove it to keep the function body compact. {v3}',
@@ -613,6 +619,12 @@ class PreferSuperParametersRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'Foo(int x) : super(x: x)';
+
+  @override
+  String get exampleGood => 'Foo(super.x)';
+
   static const LintCode _code = LintCode(
     'prefer_super_parameters',
     '[prefer_super_parameters] Constructor parameter is forwarded directly to super() instead of using Dart 3 super-parameter syntax. This adds unnecessary boilerplate and repetition; use super.paramName to shorten the signature. {v3}',
@@ -692,6 +704,12 @@ class PreferInitializingFormalsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'User(String name) : this.name = name;';
+
+  @override
+  String get exampleGood => 'User(this.name);';
 
   /// Alias: prefer_initializing_formal
   static const LintCode _code = LintCode(

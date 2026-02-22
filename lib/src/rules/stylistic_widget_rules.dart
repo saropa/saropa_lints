@@ -52,6 +52,12 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  String get exampleBad => 'Container(width: 16, height: 16)';
+
+  @override
+  String get exampleGood => 'SizedBox(width: 16, height: 16)';
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -129,6 +135,12 @@ class PreferContainerOverSizedBoxRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  String get exampleBad => 'SizedBox(width: 16, height: 16)';
+
+  @override
+  String get exampleGood => 'Container(width: 16, height: 16)';
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -198,6 +210,12 @@ class PreferTextRichOverRichTextRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  String get exampleBad => "RichText(text: TextSpan(text: 'Hi'))";
+
+  @override
+  String get exampleGood => "Text.rich(TextSpan(text: 'Hi'))";
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -256,6 +274,12 @@ class PreferRichTextOverTextRichRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => "Text.rich(TextSpan(text: 'Hi'))";
+
+  @override
+  String get exampleGood => "RichText(text: TextSpan(text: 'Hi'))";
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -322,6 +346,12 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  @override
+  String get exampleBad => 'EdgeInsets.only(left: 16, right: 16)';
+
+  @override
+  String get exampleGood => 'EdgeInsets.symmetric(horizontal: 16)';
 
   //  cspell:ignore edgeinsets
   static const LintCode _code = LintCode(
@@ -414,6 +444,12 @@ class PreferEdgeInsetsOnlyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'EdgeInsets.symmetric(horizontal: 16)';
+
+  @override
+  String get exampleGood => 'EdgeInsets.only(left: 16, right: 16)';
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -557,6 +593,12 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  String get exampleBad => 'Flexible(fit: FlexFit.tight, child: w)';
+
+  @override
+  String get exampleGood => 'Expanded(child: w)';
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -629,6 +671,12 @@ class PreferFlexibleOverExpandedRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  String get exampleBad => 'Expanded(child: w)';
+
+  @override
+  String get exampleGood => 'Flexible(fit: FlexFit.tight, child: w)';
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -690,6 +738,13 @@ class PreferMaterialThemeColorsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'Container(color: Colors.blue)';
+
+  @override
+  String get exampleGood =>
+      'Container(color: Theme.of(context).colorScheme.primary)';
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -775,6 +830,13 @@ class PreferExplicitColorsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad =>
+      'Container(color: Theme.of(context).colorScheme.primary)';
+
+  @override
+  String get exampleGood => 'Container(color: Colors.blue)';
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};

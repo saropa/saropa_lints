@@ -6043,6 +6043,12 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   @override
+  String get exampleBad => "final list = <String>['a', 'b'];";
+
+  @override
+  String get exampleGood => "final list = ['a', 'b'];";
+
+  @override
   List<String> get configAliases => const <String>[
     'avoid_inferrable_type_arguments',
   ];
