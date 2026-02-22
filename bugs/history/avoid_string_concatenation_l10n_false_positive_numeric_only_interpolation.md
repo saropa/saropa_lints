@@ -1,6 +1,10 @@
 # `avoid_string_concatenation_l10n` false positive: numeric-only interpolation
 
-## Status: OPEN
+## Status: RESOLVED
+
+## Resolution
+
+Added word-content check on literal text portions. Only flag when interpolated strings contain letters (translatable words), not pure numeric separators.
 
 ## Summary
 

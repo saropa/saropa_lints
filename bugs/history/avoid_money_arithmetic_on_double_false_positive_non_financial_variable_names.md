@@ -1,5 +1,11 @@
 # Bug: `avoid_money_arithmetic_on_double` false positive on non-financial variables containing money-related substrings
 
+## Status: RESOLVED
+
+## Resolution
+
+Replaced substring matching with camelCase word-boundary splitting. Requires either two money words or a money word as the trailing segment.
+
 ## Rule
 
 `avoid_money_arithmetic_on_double` in `lib/src/rules/performance_rules.dart` (line 3547)
