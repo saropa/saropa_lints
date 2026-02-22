@@ -14,6 +14,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ## [Unreleased]
 
 ### Changed
+- Publish audit: consolidated quality checks into a single pass/warn/fail list instead of separate subsections per check
+- Publish audit: US English spelling check displayed as a simple bullet instead of a standalone subsection
+- Publish audit: bug reports grouped by status (done, in progress, unsolved) with scaled bars per group
+- Publish audit: test coverage columns dynamically aligned to longest category name
 - Init: "what's new" summary now shows all items (no `+N more` or section truncation) — only individual lines are truncated at 78 chars
 - Init: tier default changed from `comprehensive` to `essential` for fresh setups; re-runs default to the previously selected tier
 - Init: stale config version warning now tells the user how to fix it (`re-run "dart run saropa_lints" to update`)

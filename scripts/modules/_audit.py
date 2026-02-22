@@ -36,10 +36,8 @@ from scripts.modules._audit_checks import (
     get_rules_with_corrections,
     get_severity_stats,
     get_tier_stats,
-    print_duplicate_report,
     print_file_health,
     print_owasp_coverage,
-    print_orphan_analysis,
     print_quality_metrics,
     print_severity_stats,
     print_tier_stats,
@@ -52,6 +50,7 @@ from scripts.modules._audit_dx import (
 from scripts.modules._utils import (
     Color,
     get_project_dir,
+    print_colored,
     print_error,
     print_header,
     print_info,
@@ -345,6 +344,56 @@ def export_full_audit_report(
 
 
 # =============================================================================
+# CONSOLIDATED QUALITY CHECKS
+# =============================================================================
+
+# Check status constants
+_PASS = "pass"
+_WARN = "warn"
+_FAIL = "fail"
+
+# Type alias: (status, message, detail_lines)
+_Check = tuple[str, str, list[str]]
+
+
+def _print_quality_checks(checks: list[_Check]) -> None:
+    """Print consolidated quality check results as a flat list.
+
+    Passes print first, then warnings, then failures.  Each
+    warning/failure shows its detail lines indented below.
+    """
+    passed = [c for c in checks if c[0] == _PASS]
+    warnings = [c for c in checks if c[0] == _WARN]
+    failed = [c for c in checks if c[0] == _FAIL]
+
+    for _, msg, _ in passed:
+        print_success(msg)
+
+    for _, msg, details in warnings:
+        print_warning(msg)
+        for line in details:
+            print(f"      {Color.DIM.value}{line}{Color.RESET.value}")
+
+    for _, msg, details in failed:
+        print_error(msg)
+        for line in details:
+            print(f"      {Color.RED.value}{line}{Color.RESET.value}")
+
+    n_pass, n_warn, n_fail = len(passed), len(warnings), len(failed)
+    print()
+    if n_fail == 0 and n_warn == 0:
+        print_success(f"All {len(checks)} quality checks passed")
+    else:
+        parts = [f"{n_pass} passed"]
+        if n_warn:
+            parts.append(f"{n_warn} warning(s)")
+        if n_fail:
+            parts.append(f"{n_fail} failed")
+        color = Color.RED if n_fail else Color.YELLOW
+        print_colored(f"    {', '.join(parts)}", color)
+
+
+# =============================================================================
 # MAIN AUDIT ORCHESTRATOR
 # =============================================================================
 
@@ -399,6 +448,7 @@ def run_full_audit(
     duplicates = find_duplicate_rules(rules_dir)
     severity_stats = get_severity_stats(rules_dir)
     owasp_coverage = get_owasp_coverage(rules_dir)
+    rules_missing_prefix = get_rules_missing_prefix(rules_dir)
 
     tier_stats: TierStats | None = None
     orphan_rules: set[str] = set()
@@ -461,120 +511,153 @@ def run_full_audit(
     # ===== QUALITY CHECKS (second) =====
     print_section("QUALITY CHECKS")
 
-    # Duplicate detection (print_duplicate_report uses subheader internally)
-    print_duplicate_report(duplicates)
+    checks: list[_Check] = []
 
-    # Problem message prefix check (BLOCKING — runs even when DX is skipped)
-    rules_missing_prefix = get_rules_missing_prefix(rules_dir)
-    print_subheader("Problem Message Prefix Check")
+    # 1. Duplicate detection
+    dup_classes = duplicates.get("class_names", {})
+    dup_rule_names = duplicates.get("rule_names", {})
+    dup_aliases_found = duplicates.get("aliases", {})
+    if dup_classes or dup_rule_names or dup_aliases_found:
+        details: list[str] = []
+        for kind, dups in [
+            ("class", dup_classes),
+            ("rule", dup_rule_names),
+            ("alias", dup_aliases_found),
+        ]:
+            for name in sorted(dups)[:5]:
+                details.append(f"{name} (duplicate {kind} name)")
+        checks.append((
+            _FAIL,
+            "Duplicate rules, class names, or aliases found",
+            details,
+        ))
+    else:
+        checks.append((
+            _PASS,
+            "No duplicate class names, rule names, or aliases",
+            [],
+        ))
+
+    # 2. Problem message prefix (BLOCKING)
     if rules_missing_prefix:
-        print_error(
+        shown = sorted(rules_missing_prefix)[:10]
+        detail_line = ", ".join(shown)
+        if len(rules_missing_prefix) > 10:
+            detail_line += f" +{len(rules_missing_prefix) - 10} more"
+        checks.append((
+            _FAIL,
             f"{len(rules_missing_prefix)} rule(s) missing "
-            f"[rule_name] prefix in problemMessage (BLOCKING):"
-        )
-        for rule in sorted(rules_missing_prefix)[:20]:
-            print(f"      {Color.RED.value}{rule}{Color.RESET.value}")
-        if len(rules_missing_prefix) > 20:
-            print(
-                f"      {Color.DIM.value}"
-                f"... and {len(rules_missing_prefix) - 20} more"
-                f"{Color.RESET.value}"
-            )
+            f"[rule_name] prefix in problemMessage",
+            [detail_line],
+        ))
     else:
-        print_success(
-            "All rules have [rule_name] prefix in problemMessage."
-        )
+        checks.append((
+            _PASS,
+            "All rules have [rule_name] prefix in problemMessage",
+            [],
+        ))
 
-    # Underscore naming audit
-    print_subheader("Underscore Naming Audit")
-    if not rules_with_1 and not rules_with_0:
-        print_success("All rules have at least 2 underscores.")
+    # 3. Underscore naming (informational — never blocks publish)
+    if rules_with_0:
+        checks.append((
+            _WARN,
+            f"{len(rules_with_0)} rule(s) with ZERO underscores",
+            sorted(rules_with_0)[:5],
+        ))
+    elif rules_with_1:
+        checks.append((
+            _WARN,
+            f"{len(rules_with_1)} rule(s) with only 1 underscore",
+            sorted(rules_with_1)[:5],
+        ))
     else:
-        if rules_with_0:
-            print_error(
-                f"{len(rules_with_0)} rule(s) have ZERO underscores:"
-            )
-            for rule in rules_with_0:
-                print(f"      {Color.RED.value}{rule}{Color.RESET.value}")
-        if rules_with_1:
-            print_warning(
-                f"{len(rules_with_1)} rule(s) have only 1 underscore:"
-            )
-            for rule in rules_with_1:
-                print(f"      {Color.YELLOW.value}{rule}{Color.RESET.value}")
+        checks.append((_PASS, "All rules have at least 2 underscores", []))
 
-    # Tier assignment check
+    # 4. Tier assignment
     if tier_stats:
-        print_subheader("Tier Assignment")
-        print_orphan_analysis(orphan_rules, tier_stats)
-
-        print_subheader("Rules in tiers.dart NOT implemented")
-        if not_implemented:
-            alias_covered = [r for r in not_implemented if r in aliases]
-            truly_missing = [r for r in not_implemented if r not in aliases]
-            print_warning(
-                f"{len(not_implemented)} rules in tiers.dart not implemented:"
-            )
-            if alias_covered:
-                print_info(
-                    f"Aliases covering missing tiered rules "
-                    f"({len(alias_covered)}):"
-                )
-                for rule in alias_covered:
-                    print(
-                        f"      {Color.CYAN.value}{rule}{Color.RESET.value}"
-                        f" (alias)"
-                    )
-            if truly_missing:
-                print_error(
-                    f"Truly missing rules ({len(truly_missing)}):"
-                )
-                for rule in truly_missing:
-                    print(
-                        f"      {Color.RED.value}{rule}{Color.RESET.value}"
-                    )
-            if not truly_missing:
-                print_success(
-                    "All missing tiered rules are covered by aliases."
-                )
+        non_stylistic_orphans = [
+            r for r in sorted(orphan_rules)
+            if r not in tier_stats.stylistic_rules
+        ]
+        if non_stylistic_orphans:
+            checks.append((
+                _WARN,
+                f"{len(non_stylistic_orphans)} rule(s) not in any tier",
+                non_stylistic_orphans[:5],
+            ))
         else:
-            print_success("All rules in tiers.dart are implemented.")
+            checks.append((_PASS, "All rules assigned to tiers", []))
 
-    # ROADMAP sync
-    print_subheader("ROADMAP Sync")
+        # 5. Rules in tiers.dart not implemented
+        if not_implemented:
+            truly_missing = [
+                r for r in not_implemented if r not in aliases
+            ]
+            alias_covered = [
+                r for r in not_implemented if r in aliases
+            ]
+            if truly_missing:
+                checks.append((
+                    _FAIL,
+                    f"{len(truly_missing)} tiered rule(s) not implemented",
+                    truly_missing[:10],
+                ))
+            elif alias_covered:
+                checks.append((
+                    _PASS,
+                    f"All tiered rules implemented "
+                    f"({len(alias_covered)} via aliases)",
+                    [],
+                ))
+        else:
+            checks.append((_PASS, "All tiered rules implemented", []))
+
+    # 6. ROADMAP sync
     if roadmap_duplicates:
-        print_warning(
-            f"{len(roadmap_duplicates)} rule(s) implemented but still in ROADMAP:"
+        shown_rules = sorted(roadmap_duplicates)[:5]
+        suffix = (
+            f" +{len(roadmap_duplicates) - 5} more"
+            if len(roadmap_duplicates) > 5 else ""
         )
-        for rule in sorted(roadmap_duplicates)[:10]:
-            source = "alias" if rule in aliases else "rule"
-            color = Color.CYAN if source == "alias" else Color.GREEN
-            print(
-                f"      {color.value}{rule}{Color.RESET.value} "
-                f"{Color.DIM.value}({source}){Color.RESET.value}"
-            )
-        if len(roadmap_duplicates) > 10:
-            print(
-                f"      {Color.DIM.value}"
-                f"... and {len(roadmap_duplicates) - 10} more"
-                f"{Color.RESET.value}"
-            )
+        checks.append((
+            _WARN,
+            f"{len(roadmap_duplicates)} implemented rule(s) "
+            f"still in ROADMAP",
+            [", ".join(shown_rules) + suffix],
+        ))
     else:
-        print_success("ROADMAP is clean - no duplicates")
+        checks.append((_PASS, "ROADMAP is clean — no duplicates", []))
 
     if near_matches:
-        print_warning(f"{len(near_matches)} near-match(es) may need aliases:")
-        for roadmap_rule, impl_rule in near_matches[:5]:
-            print(
-                f"      {Color.YELLOW.value}{roadmap_rule}{Color.RESET.value}"
-                f" → {Color.GREEN.value}{impl_rule}{Color.RESET.value}"
-            )
+        match_details = [
+            f"{r} → {i}" for r, i in near_matches[:5]
+        ]
         if len(near_matches) > 5:
-            print(
-                f"      {Color.DIM.value}"
-                f"... and {len(near_matches) - 5} more"
-                f"{Color.RESET.value}"
-            )
+            match_details.append(f"+{len(near_matches) - 5} more")
+        checks.append((
+            _WARN,
+            f"{len(near_matches)} ROADMAP near-match(es) "
+            f"may need aliases",
+            match_details,
+        ))
+
+    # 7. DX message quality
+    if not skip_dx:
+        dx_failing = sum(1 for m in dx_messages if m.dx_issues)
+        if dx_failing:
+            checks.append((
+                _WARN,
+                f"{dx_failing} DX message(s) have quality issues",
+                [],
+            ))
+        else:
+            checks.append((
+                _PASS,
+                "All DX messages meet quality thresholds",
+                [],
+            ))
+
+    _print_quality_checks(checks)
 
     # DX message audit
     if not skip_dx:

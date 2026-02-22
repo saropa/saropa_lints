@@ -131,27 +131,20 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
         return False
 
     # --- BLOCKING: US English spelling check ---
-    from scripts.modules._us_spelling import check_us_spelling
+    from scripts.modules._us_spelling import (
+        print_spelling_report,
+        scan_directory,
+    )
 
-    spelling_hits = check_us_spelling(project_dir)
+    spelling_hits = scan_directory(project_dir)
     if spelling_hits:
-        return False
-
-    # --- INFORMATIONAL: DX message improvement analysis ---
-    from scripts.improve_dx_messages import run_dx_analysis
-
-    dx = run_dx_analysis()
-    if dx.total > 0:
-        print_info(
-            f"DX messages: {dx.total} improvable "
-            f"({dx.fixed} auto-fixable, "
-            f"{dx.partial} need review)"
+        print_spelling_report(
+            spelling_hits, project_dir, show_header=False,
         )
-        if dx.report_path:
-            print_info(f"DX report: {dx.report_path.name}")
-    else:
-        print_success("All DX messages meet quality thresholds.")
+        return False
+    print_success("No British English spellings found")
 
+    print()
     print_success("All pre-publish audit checks passed.")
     return True
 
