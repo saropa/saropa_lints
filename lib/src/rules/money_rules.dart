@@ -201,10 +201,29 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  static final RegExp _moneyFieldPattern = RegExp(
-    r'\b(price|amount|cost|total|balance|fee|charge|payment|salary|wage|rate)\b',
+  /// Strong monetary signals — field names that almost always mean money.
+  static final RegExp _strongMoneyPattern = RegExp(
+    r'\b(price|amount|cost|fee|charge|payment|salary|wage)\b',
     caseSensitive: false,
   );
+
+  /// Weak monetary signals — ambiguous names that need corroboration.
+  static final RegExp _weakMoneyPattern = RegExp(
+    r'\b(total|balance|rate)\b',
+    caseSensitive: false,
+  );
+
+  /// Class name patterns that indicate non-monetary aggregation.
+  static const Set<String> _nonMonetaryClassPatterns = <String>{
+    'stats',
+    'count',
+    'metric',
+    'summary',
+    'tally',
+    'score',
+    'result',
+    'pagination',
+  };
 
   @override
   void runWithReporter(
@@ -219,37 +238,55 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
         return;
       }
 
-      // Check for money-related fields
-      bool hasMoneyField = false;
+      // Skip class names that suggest non-monetary aggregation
+      for (final String pattern in _nonMonetaryClassPatterns) {
+        if (className.contains(pattern)) return;
+      }
+
+      int strongHits = 0;
+      int weakHits = 0;
       bool hasCurrencyField = false;
+      bool hasDoubleOrDecimal = false;
 
       for (final ClassMember member in node.members) {
-        if (member is FieldDeclaration) {
-          for (final VariableDeclaration variable in member.fields.variables) {
-            final String fieldName = variable.name.lexeme.toLowerCase();
+        if (member is! FieldDeclaration) continue;
 
-            if (_moneyFieldPattern.hasMatch(fieldName)) {
-              // Check if it's a numeric type
-              final TypeAnnotation? type = member.fields.type;
-              if (type != null) {
-                final String typeStr = type.toSource().toLowerCase();
-                if (typeStr.contains('double') ||
-                    typeStr.contains('int') ||
-                    typeStr.contains('num') ||
-                    typeStr.contains('decimal')) {
-                  hasMoneyField = true;
-                }
-              }
-            }
+        for (final VariableDeclaration variable in member.fields.variables) {
+          final String fieldName = variable.name.lexeme.toLowerCase();
 
-            if (fieldName.contains('currency') || fieldName.contains('code')) {
-              hasCurrencyField = true;
-            }
+          final TypeAnnotation? type = member.fields.type;
+          final String typeStr = type != null
+              ? type.toSource().toLowerCase()
+              : '';
+          final bool isNumeric =
+              typeStr.contains('double') ||
+              typeStr.contains('int') ||
+              typeStr.contains('num') ||
+              typeStr.contains('decimal');
+
+          if (typeStr.contains('double') || typeStr.contains('decimal')) {
+            hasDoubleOrDecimal = true;
+          }
+
+          if (_strongMoneyPattern.hasMatch(fieldName) && isNumeric) {
+            strongHits++;
+          } else if (_weakMoneyPattern.hasMatch(fieldName) && isNumeric) {
+            weakHits++;
+          }
+
+          if (fieldName.contains('currency') || fieldName.contains('code')) {
+            hasCurrencyField = true;
           }
         }
       }
 
-      if (hasMoneyField && !hasCurrencyField) {
+      if (hasCurrencyField) return;
+
+      // Flag if: any strong monetary field, OR 2+ weak fields with double type
+      final bool hasMoneyField =
+          strongHits > 0 || (weakHits >= 2 && hasDoubleOrDecimal);
+
+      if (hasMoneyField) {
         reporter.atNode(node);
       }
     });
