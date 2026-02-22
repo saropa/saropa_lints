@@ -3431,6 +3431,39 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
     'invoice',
   };
 
+  /// Splits a camelCase or snake_case identifier into lowercase words.
+  static List<String> _splitIdentifier(String name) {
+    return name
+        .replaceAllMapped(RegExp(r'[A-Z]'), (Match m) => ' ${m.group(0)}')
+        .toLowerCase()
+        .split(RegExp(r'[_ ]+'))
+        .where((String w) => w.isNotEmpty)
+        .toList();
+  }
+
+  /// Returns true if the identifier looks like a financial variable.
+  ///
+  /// Requires either two money-related words, or a single money word
+  /// as the trailing segment (the semantic "type" in camelCase).
+  /// This avoids false positives on names like `totalWidth`, `frameRate`.
+  static bool _looksFinancial(String identifier) {
+    final List<String> words = _splitIdentifier(identifier);
+    if (words.isEmpty) return false;
+
+    final Iterable<String> hits = words.where(
+      (String w) => _moneyPatterns.contains(w),
+    );
+    final int moneyHits = hits.length;
+
+    // Two or more money words: totalPrice, discountAmount, taxRate
+    if (moneyHits >= 2) return true;
+
+    // Single money word at the end: price, itemCost, monthlyFee
+    if (moneyHits == 1 && _moneyPatterns.contains(words.last)) return true;
+
+    return false;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3445,15 +3478,13 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
       bool isMoney = false;
 
       if (node.leftOperand is SimpleIdentifier) {
-        final String name = (node.leftOperand as SimpleIdentifier).name
-            .toLowerCase();
-        isMoney = _moneyPatterns.any((pattern) => name.contains(pattern));
+        final String name = (node.leftOperand as SimpleIdentifier).name;
+        isMoney = _looksFinancial(name);
       }
 
       if (!isMoney && node.rightOperand is SimpleIdentifier) {
-        final String name = (node.rightOperand as SimpleIdentifier).name
-            .toLowerCase();
-        isMoney = _moneyPatterns.any((pattern) => name.contains(pattern));
+        final String name = (node.rightOperand as SimpleIdentifier).name;
+        isMoney = _looksFinancial(name);
       }
 
       if (!isMoney) return;
