@@ -13,6 +13,11 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Fixed
+- `prefer_match_file_name`: false positive on Windows — backslash paths caused file name extraction to fail, reporting every correctly-named class
+- `prefer_match_file_name`: false positive when file has multiple public classes — second class was reported even when first class matched
+- `avoid_unnecessary_nullable_return_type`: false positive on expression-bodied functions — ternaries with null branches, map lookups, and other nullable expressions were not recognized
+
 ### Changed
 - Publish audit: consolidated quality checks into a single pass/warn/fail list instead of separate subsections per check
 - Publish audit: US English spelling check displayed as a simple bullet instead of a standalone subsection
