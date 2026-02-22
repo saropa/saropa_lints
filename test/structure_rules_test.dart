@@ -314,6 +314,21 @@ void main() {
         // Avoidance pattern not present
         expect('avoid_unnecessary_nullable_return_type passes', isNotNull);
       });
+
+      test('expression body false positives covered in fixture', () {
+        // Fixture covers: ternary with null, map lookup, nullable
+        // passthrough, and nullable method return — all must NOT
+        // trigger the rule (they are correctly nullable).
+        final fixture = File(
+          'example_core/lib/structure/'
+          'avoid_unnecessary_nullable_return_type_fixture.dart',
+        );
+        final content = fixture.readAsStringSync();
+        expect(content, contains('_good_ternaryWithNull'));
+        expect(content, contains('_good_mapLookup'));
+        expect(content, contains('_good_nullablePassthrough'));
+        expect(content, contains('_good_tryParseWrapper'));
+      });
     });
   });
 

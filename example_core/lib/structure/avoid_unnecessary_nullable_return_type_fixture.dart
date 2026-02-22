@@ -120,3 +120,19 @@ void _bad1067() {
 String _good1067_getValue() {
   return 'always a value';
 }
+
+// GOOD: Ternary with null branch — nullable return type is required
+String? _good_ternaryWithNull(int? v) => v == null ? null : v.toString();
+
+// GOOD: Map lookup — operator[] returns nullable
+String? _good_mapLookup(int key) => const <int, String>{1: 'a', 2: 'b'}[key];
+
+// GOOD: Ternary with null branch AND nullable map lookup
+String? _good_ternaryWithMapLookup(int? key) =>
+    key == null ? null : const <int, String>{1: 'a'}[key];
+
+// GOOD: Nullable variable in expression body
+String? _good_nullablePassthrough(String? input) => input;
+
+// GOOD: Method returning nullable
+String? _good_tryParseWrapper(String s) => int.tryParse(s)?.toString();
