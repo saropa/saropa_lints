@@ -4,6 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
+import '../project_context.dart' show ProjectContext;
 import '../saropa_lint_rule.dart';
 
 /// Warns when a file only contains export statements (barrel file).
@@ -58,15 +59,37 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
       // Check if file has any declarations
       if (unit.declarations.isNotEmpty) return;
 
-      // Count exports and imports
+      // Count exports and imports; check for library directive
       int exportCount = 0;
       int importCount = 0;
+      bool hasLibraryDirective = false;
 
       for (final Directive directive in unit.directives) {
         if (directive is ExportDirective) {
           exportCount++;
         } else if (directive is ImportDirective) {
           importCount++;
+        } else if (directive is LibraryDirective) {
+          hasLibraryDirective = true;
+        }
+      }
+
+      // Skip files with an explicit library directive — these are
+      // intentional library entry points, not accidental barrels.
+      if (hasLibraryDirective) return;
+
+      // Skip the mandatory package entry point (lib/<package_name>.dart).
+      // The Dart package layout convention requires this file to exist.
+      final String path = context.filePath;
+      if (path.isNotEmpty) {
+        final String? projectRoot = ProjectContext.findProjectRoot(path);
+        if (projectRoot != null) {
+          final String packageName = ProjectContext.getPackageName(projectRoot);
+          if (packageName.isNotEmpty) {
+            final String entryPoint = 'lib/$packageName.dart';
+            final String normalized = path.replaceAll('\\', '/');
+            if (normalized.endsWith(entryPoint)) return;
+          }
         }
       }
 
