@@ -1,6 +1,6 @@
 # `prefer_secure_random` false positive: non-security shuffling and random element selection
 
-## Status: OPEN
+## Status: RESOLVED
 
 ## Summary
 

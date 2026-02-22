@@ -1,6 +1,6 @@
 # `require_ios_callkit_integration` false positive: "Agora" as a whole word in non-VoIP context
 
-## Status: OPEN
+## Status: RESOLVED
 
 ## Summary
 

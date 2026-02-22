@@ -1,6 +1,6 @@
 # `require_https_only_test` false positive: HTTP URLs in URL utility test data
 
-## Status: OPEN
+## Status: RESOLVED
 
 ## Summary
 

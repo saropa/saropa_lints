@@ -1,6 +1,6 @@
 # `prefer_static_method` false positive: extension methods cannot be made static
 
-## Status: OPEN
+## Status: RESOLVED
 
 ## Summary
 
