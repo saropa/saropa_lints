@@ -203,10 +203,14 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
 
 /// Warns when dynamic type is used.
 ///
-/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v3
+/// Since: v4.1.3 | Updated: v5.0.0 | Rule version: v4
 ///
 /// Using dynamic bypasses the type system and can lead to runtime errors.
 /// Prefer using specific types or generics.
+///
+/// **Exemption**: `Map<String, dynamic>` is the canonical Dart JSON type
+/// returned by `jsonDecode()` and used throughout serialization packages.
+/// The `dynamic` value type in Map is exempt from this rule.
 class AvoidDynamicRule extends SaropaLintRule {
   AvoidDynamicRule() : super(code: _code);
 
@@ -220,7 +224,7 @@ class AvoidDynamicRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_dynamic_type',
     "[avoid_dynamic_type] 'dynamic' type disables static type checking, hiding errors until runtime. "
-        "Method calls on dynamic values are never verified by the compiler, so typos, missing methods, and wrong argument types only surface as NoSuchMethodError crashes in production. {v3}",
+        "Method calls on dynamic values are never verified by the compiler, so typos, missing methods, and wrong argument types only surface as NoSuchMethodError crashes in production. Map<String, dynamic> is exempt as the canonical Dart JSON type. {v4}",
     correctionMessage:
         "Replace 'dynamic' with a specific type, Object (for truly unknown values with explicit casts), or a generic type parameter. "
         'If the actual type varies, use a sealed class hierarchy or union type to keep the compiler involved in checking correctness.',
@@ -234,9 +238,24 @@ class AvoidDynamicRule extends SaropaLintRule {
   ) {
     context.addNamedType((NamedType node) {
       if (node.name.lexeme == 'dynamic') {
+        if (_isMapValueType(node)) return;
         reporter.atNode(node);
       }
     });
+  }
+
+  /// Returns true if [node] is the value type argument of a Map type.
+  ///
+  /// `Map<String, dynamic>` is the canonical Dart JSON type and should
+  /// not be flagged — it is unavoidable when working with jsonDecode().
+  static bool _isMapValueType(NamedType node) {
+    final AstNode? parent = node.parent;
+    if (parent is! TypeArgumentList) return false;
+    final AstNode? grandparent = parent.parent;
+    if (grandparent is! NamedType) return false;
+    if (grandparent.name.lexeme != 'Map') return false;
+    final NodeList<TypeAnnotation> args = parent.arguments;
+    return args.length == 2 && args[1] == node;
   }
 }
 

@@ -17,8 +17,17 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - `prefer_match_file_name`: false positive on Windows — backslash paths caused file name extraction to fail, reporting every correctly-named class
 - `prefer_match_file_name`: false positive when file has multiple public classes — second class was reported even when first class matched
 - `avoid_unnecessary_nullable_return_type`: false positive on expression-bodied functions — ternaries with null branches, map lookups, and other nullable expressions were not recognized
+- `prefer_unique_test_names`: false positives when same test name appears in different `group()` blocks — now builds fully-qualified names from group hierarchy, matching Flutter's test runner behavior
+- `avoid_dynamic_type`: false positives for `Map<String, dynamic>` — the canonical Dart JSON type is now exempt
+- `no_magic_number_in_tests`: expanded allowed integers to include 6–31 (day/month numbers), common round numbers (10000, 100000, 1000000), and exemptions for DateTime constructor arguments and expect() calls
+- `no_magic_string_in_tests`: false positives for test fixture data — strings passed as arguments to functions under test and strings in expect() calls are now exempt
+- `avoid_large_list_copy`: false positives for required copies — `List<T>.from()` with explicit type arguments (type-casting pattern) is now exempt; `.toList()` is exempt when returned, assigned, or otherwise structurally required
 
 ### Changed
+- Merged duplicate rule `prefer_sorted_members` into `prefer_member_ordering`; `prefer_sorted_members` continues to work as a config alias
+- Clarified correction messages for `prefer_boolean_prefixes`, `prefer_descriptive_bool_names`, and `prefer_descriptive_bool_names_strict` to distinguish scope (fields-only vs all booleans)
+
+### Publishing
 - Publish audit: consolidated quality checks into a single pass/warn/fail list instead of separate subsections per check
 - Publish audit: US English spelling check displayed as a simple bullet instead of a standalone subsection
 - Publish audit: bug reports grouped by status (done, in progress, unsolved) with scaled bars per group
@@ -28,9 +37,6 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - Init: stale config version warning now tells the user how to fix it (`re-run "dart run saropa_lints" to update`)
 - Init: stylistic walkthrough shows per-rule progress counter (`4/120 — 3%`) and `[quick fix]` indicator for rules with IDE auto-fixes
 - Init: stylistic walkthrough rule descriptions rendered in default terminal color instead of dim gray for readability
-- Merged duplicate rule `prefer_sorted_members` into `prefer_member_ordering`; `prefer_sorted_members` continues to work as a config alias
-- Clarified correction messages for `prefer_boolean_prefixes`, `prefer_descriptive_bool_names`, and `prefer_descriptive_bool_names_strict` to distinguish scope (fields-only vs all booleans)
-
 ---
 ## [5.0.0-beta.12]
 

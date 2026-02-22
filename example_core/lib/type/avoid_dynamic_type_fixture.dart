@@ -109,5 +109,15 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: avoid_dynamic_type
 void _bad1223(dynamic value) {} // dynamic type — avoid
 
+// BAD: dynamic as variable type
+// expect_lint: avoid_dynamic_type
+dynamic _bad1223b = 'hello'; // dynamic variable — avoid
+
 // GOOD: Should NOT trigger avoid_dynamic_type
 void _good1223(Object? value) {} // Use Object? instead of dynamic
+
+// GOOD: Map<String, dynamic> is the canonical Dart JSON type
+Map<String, dynamic>? _good1223b() => null;
+
+// GOOD: Nested Map<String, dynamic> in type arguments
+List<Map<String, dynamic>> _good1223c() => [];

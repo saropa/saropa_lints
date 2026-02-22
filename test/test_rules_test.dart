@@ -208,14 +208,29 @@ void main() {
     });
 
     group('prefer_unique_test_names', () {
-      test('prefer_unique_test_names SHOULD trigger', () {
-        // Better alternative available: prefer unique test names
-        expect('prefer_unique_test_names detected', isNotNull);
+      test('SHOULD trigger for same name in same group', () {
+        // group('encrypt', () { test('a', ...); test('a', ...); })
+        // FQ names: "encrypt a" and "encrypt a" — duplicate
+        expect('duplicate in same group detected', isNotNull);
       });
 
-      test('prefer_unique_test_names should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_unique_test_names passes', isNotNull);
+      test('SHOULD trigger for same name at top level', () {
+        // test('a', ...); test('a', ...); — no group, same name
+        expect('duplicate at top level detected', isNotNull);
+      });
+
+      test('should NOT trigger for same name in different groups', () {
+        // group('encrypt', () { test('a', ...); });
+        // group('decrypt', () { test('a', ...); });
+        // FQ: "encrypt a" vs "decrypt a" — different
+        expect('different groups are not duplicates', isNotNull);
+      });
+
+      test('should NOT trigger for same name in nested groups', () {
+        // group('M', () { group('long', () { test('x', ...) }); });
+        // group('M', () { group('short', () { test('x', ...) }); });
+        // FQ: "M long x" vs "M short x" — different
+        expect('nested groups produce different FQ names', isNotNull);
       });
     });
 

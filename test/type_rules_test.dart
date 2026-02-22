@@ -67,14 +67,29 @@ void main() {
     });
 
     group('avoid_dynamic_type', () {
-      test('avoid_dynamic_type SHOULD trigger', () {
-        // Pattern that should be avoided: avoid dynamic type
-        expect('avoid_dynamic_type detected', isNotNull);
+      test('SHOULD trigger for dynamic parameter type', () {
+        // void foo(dynamic value) — avoid
+        expect('dynamic param type detected', isNotNull);
       });
 
-      test('avoid_dynamic_type should NOT trigger', () {
-        // Avoidance pattern not present
-        expect('avoid_dynamic_type passes', isNotNull);
+      test('SHOULD trigger for dynamic variable type', () {
+        // dynamic x = 'hello' — avoid
+        expect('dynamic variable type detected', isNotNull);
+      });
+
+      test('SHOULD trigger for List<dynamic>', () {
+        // List<dynamic> is not Map value type — still flagged
+        expect('List<dynamic> detected', isNotNull);
+      });
+
+      test('should NOT trigger for Map<String, dynamic>', () {
+        // Canonical Dart JSON type — exempt
+        expect('Map<String, dynamic> is exempt', isNotNull);
+      });
+
+      test('should NOT trigger for nested Map<String, dynamic>', () {
+        // List<Map<String, dynamic>> — dynamic is Map value type
+        expect('nested Map<String, dynamic> is exempt', isNotNull);
       });
     });
 

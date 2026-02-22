@@ -571,22 +571,31 @@ class _TestStructureVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when test names are duplicated within a test file.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+/// Since: v0.1.4 | Updated: v5.0.0 | Rule version: v6
 ///
-/// Each test should have a unique name.
+/// Each test should have a unique fully-qualified name. The fully-qualified
+/// name is built by joining all enclosing `group()` names with the test name,
+/// matching Flutter's test runner behavior. Tests with the same local name
+/// in different groups are NOT duplicates.
 ///
 /// ### Example
 ///
 /// #### BAD:
 /// ```dart
-/// test('returns true', () { });
-/// test('returns true', () { }); // Duplicate!
+/// group('encrypt', () {
+///   test('returns null', () { });
+///   test('returns null', () { }); // Duplicate in same group!
+/// });
 /// ```
 ///
 /// #### GOOD:
 /// ```dart
-/// test('returns true for valid input', () { });
-/// test('returns true for empty input', () { });
+/// group('encrypt', () {
+///   test('returns null', () { }); // FQ: "encrypt returns null"
+/// });
+/// group('decrypt', () {
+///   test('returns null', () { }); // FQ: "decrypt returns null" — OK
+/// });
 /// ```
 class PreferUniqueTestNamesRule extends SaropaLintRule {
   PreferUniqueTestNamesRule() : super(code: _code);
@@ -603,7 +612,7 @@ class PreferUniqueTestNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_unique_test_names',
-    '[prefer_unique_test_names] Duplicate test name found. Each test must have a unique name. Test names are duplicated within a test file. This reduces test maintainability and makes it harder to identify which behavior failed when tests break. {v5}',
+    '[prefer_unique_test_names] Duplicate test name found. Tests with the same fully-qualified name (group hierarchy + test name) reduce maintainability and make it harder to identify which behavior failed when tests break. Tests in different group() blocks are NOT duplicates. {v6}',
     correctionMessage:
         'Use a unique name for each test. Update related tests to reflect the new structure and verify they still pass.',
     severity: DiagnosticSeverity.INFO,
@@ -621,33 +630,51 @@ class PreferUniqueTestNamesRule extends SaropaLintRule {
   }
 }
 
+/// Traverses a compilation unit tracking `group()` nesting to build
+/// fully-qualified test names. Reports duplicates only when the full
+/// group-prefixed name collides, matching Flutter's test runner behavior.
 class _UniqueTestNameVisitor extends RecursiveAstVisitor<void> {
   _UniqueTestNameVisitor(this.reporter, this.code);
 
   final SaropaDiagnosticReporter reporter;
   final LintCode code;
-  final Set<String> _testNames = <String>{};
+  final Set<String> _fullyQualifiedNames = <String>{};
+  final List<String> _groupStack = <String>[];
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
     final String methodName = node.methodName.name;
+
+    if (methodName == 'group') {
+      final String? groupName = _extractName(node);
+      if (groupName != null) _groupStack.add(groupName);
+      super.visitMethodInvocation(node);
+      if (groupName != null) _groupStack.removeLast();
+      return;
+    }
+
     if (methodName == 'test' || methodName == 'testWidgets') {
-      final ArgumentList args = node.argumentList;
-      if (args.arguments.isNotEmpty) {
-        final Expression firstArg = args.arguments.first;
-        if (firstArg is StringLiteral) {
-          final String? testName = firstArg.stringValue;
-          if (testName != null) {
-            if (_testNames.contains(testName)) {
-              reporter.atNode(firstArg);
-            } else {
-              _testNames.add(testName);
-            }
-          }
+      final String? testName = _extractName(node);
+      if (testName != null) {
+        final String fqName = [..._groupStack, testName].join(' ');
+        if (_fullyQualifiedNames.contains(fqName)) {
+          final Expression firstArg = node.argumentList.arguments.first;
+          reporter.atNode(firstArg);
+        } else {
+          _fullyQualifiedNames.add(fqName);
         }
       }
     }
+
     super.visitMethodInvocation(node);
+  }
+
+  static String? _extractName(MethodInvocation node) {
+    final ArgumentList args = node.argumentList;
+    if (args.arguments.isEmpty) return null;
+    final Expression firstArg = args.arguments.first;
+    if (firstArg is StringLiteral) return firstArg.stringValue;
+    return null;
   }
 }
 

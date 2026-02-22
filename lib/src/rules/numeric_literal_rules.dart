@@ -679,7 +679,7 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
 
 /// Warns when magic numbers are used in test files.
 ///
-/// Since: v4.3.0 | Updated: v4.13.0 | Rule version: v3
+/// Since: v4.3.0 | Updated: v5.0.0 | Rule version: v4
 ///
 /// **Context**: This is the test-specific variant of `no_magic_number`, which
 /// skips test files entirely (default `TestRelevance.never`). The production rule
@@ -689,19 +689,22 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
 /// **Rationale**: Test files legitimately use more literal values than
 /// production code for:
 /// - HTTP status codes (200, 404, 500) in API tests
-/// - Small integers (0-5) for indexing and counting test cases
-/// - Powers of 10 (10, 100, 1000) for threshold/boundary tests
+/// - Small integers (0-31) for indices, day/month numbers, boundaries
+/// - Powers of 10 (10, 100, 1000, 10000) for threshold/boundary tests
 /// - Common fractions (0.5, 1.0, 2.0) for mathematical assertions
+/// - DateTime constructor arguments (years, months, days)
+/// - Values inside expect() assertions
 ///
 /// However, meaningful domain values (like product prices, account balances,
 /// or business thresholds) should still use named constants to make tests
 /// self-documenting and maintainable.
 ///
 /// **Allowed values**:
-/// - Integers: -1, 0, 1, 2, 3, 4, 5, 10, 100, 200, 201, 204, 400, 401,
-///   403, 404, 500, 503, 1000
+/// - Integers: -1 through 31, HTTP status codes, round numbers up to 1M
 /// - Doubles: -1.0, 0.0, 0.5, 1.0, 2.0, 10.0, 100.0
 /// - All values in const contexts (const declarations, const constructors)
+/// - All values inside DateTime constructors
+/// - All values inside expect() calls
 ///
 /// **Tier**: Comprehensive (optional, style enforcement)
 /// **Severity**: INFO
@@ -767,34 +770,22 @@ class NoMagicNumberInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'no_magic_number_in_tests',
     '[no_magic_number_in_tests] Unexplained numeric literal in test file obscures the purpose of expected values and assertions. '
-        'When a test fails, readers cannot tell whether the number is an arbitrary fixture value, a meaningful boundary, or a calculated expected result, making failures harder to diagnose and fix. {v3}',
+        'When a test fails, readers cannot tell whether the number is an arbitrary fixture value, a meaningful boundary, or a calculated expected result, making failures harder to diagnose and fix. {v4}',
     correctionMessage:
         'Extract test values to named constants (e.g., const expectedCount = 42) that describe their role in the test. '
         'This makes assertions self-documenting, failures easier to diagnose, and test data easier to update when requirements change.',
     severity: DiagnosticSeverity.INFO,
   );
 
-  // More relaxed allowed values for test files
+  // Relaxed allowed values for test files.
+  // Includes -1 through 31 (day/month numbers, indices, common boundaries),
+  // HTTP status codes, and common round numbers.
   static const Set<int> _allowedInts = <int>{
-    -1,
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    10,
-    100,
-    200,
-    201,
-    204,
-    400,
-    401,
-    403,
-    404,
-    500,
-    503,
-    1000,
+    -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, //
+    11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+    100, 200, 201, 204, 400, 401, 403, 404, 500, 503,
+    1000, 10000, 100000, 1000000,
   };
   static const List<double> _allowedDoubles = <double>[
     -1.0,
@@ -827,18 +818,35 @@ class NoMagicNumberInTestsRule extends SaropaLintRule {
   bool _shouldReportInt(Literal node, int? value) {
     if (value == null) return false;
     if (_allowedInts.contains(value)) return false;
-    return !isLiteralInConstContext(node);
+    if (isLiteralInConstContext(node)) return false;
+    if (_isInDateTimeConstructor(node)) return false;
+    if (isInExpectCall(node)) return false;
+    return true;
   }
 
   bool _shouldReportDouble(Literal node, double value) {
     if (_allowedDoubles.contains(value)) return false;
-    return !isLiteralInConstContext(node);
+    if (isLiteralInConstContext(node)) return false;
+    if (_isInDateTimeConstructor(node)) return false;
+    if (isInExpectCall(node)) return false;
+    return true;
+  }
+
+  /// Returns true if [node] is an argument to a DateTime constructor.
+  static bool _isInDateTimeConstructor(AstNode node) {
+    final AstNode? parent = node.parent;
+    if (parent is! ArgumentList) return false;
+    final AstNode? grandparent = parent.parent;
+    if (grandparent is InstanceCreationExpression) {
+      return grandparent.constructorName.type.name.lexeme == 'DateTime';
+    }
+    return false;
   }
 }
 
 /// Warns when magic strings are used in test files.
 ///
-/// Since: v4.3.0 | Updated: v4.13.0 | Rule version: v4
+/// Since: v4.3.0 | Updated: v5.0.0 | Rule version: v5
 ///
 /// **Context**: This is the test-specific variant of `no_magic_string`, which
 /// skips test files entirely (default `TestRelevance.never`). The production rule
@@ -851,6 +859,8 @@ class NoMagicNumberInTestsRule extends SaropaLintRule {
 /// - Common test data (hex strings, single letters, placeholder values)
 /// - Simple assertions ('foo', 'bar', 'hello', 'world')
 /// - Regex patterns (automatically detected via RegExp() constructor)
+/// - Strings in expect() calls (assertion values, both actual and expected)
+/// - Strings passed as arguments to functions under test (fixture data)
 ///
 /// However, meaningful domain strings (like email addresses, URLs, API keys,
 /// or business identifiers) should still use named constants to make tests
@@ -952,7 +962,7 @@ class NoMagicStringInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'no_magic_string_in_tests',
     '[no_magic_string_in_tests] Unexplained string literal in test file obscures the purpose of expected values and assertions. '
-        'When a test fails, readers cannot tell whether the string is an arbitrary fixture, a meaningful expected output, or a format-specific value, making failures harder to diagnose. {v4}',
+        'When a test fails, readers cannot tell whether the string is an arbitrary fixture, a meaningful expected output, or a format-specific value, making failures harder to diagnose. {v5}',
     correctionMessage:
         'Extract test strings to named constants (e.g., const expectedName = \'John Doe\') that describe their role in the test. '
         'This makes assertions self-documenting, failures easier to diagnose, and test data easier to update when requirements change.',
@@ -997,6 +1007,18 @@ class NoMagicStringInTestsRule extends SaropaLintRule {
     'z',
   };
 
+  /// Test framework method names whose string args are NOT test fixture data.
+  static const Set<String> _testFrameworkMethods = <String>{
+    'test',
+    'group',
+    'testWidgets',
+    'testGoldens',
+    'setUp',
+    'tearDown',
+    'setUpAll',
+    'tearDownAll',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1027,7 +1049,25 @@ class NoMagicStringInTestsRule extends SaropaLintRule {
       // Skip regex patterns
       if (isStringUsedAsRegexPattern(node)) return;
 
+      // Skip strings in expect() calls (assertion values)
+      if (isInExpectCall(node)) return;
+
+      // Skip strings passed as arguments to non-test-framework functions
+      // (these are test fixture data — the input being tested)
+      if (_isTestFixtureArgument(node)) return;
+
       reporter.atNode(node);
     });
+  }
+
+  /// Returns true if [node] is a direct argument to a non-test-framework
+  /// function call (i.e., test fixture data being passed to code under test).
+  static bool _isTestFixtureArgument(AstNode node) {
+    final AstNode? parent = node.parent;
+    if (parent is! ArgumentList) return false;
+    final AstNode? grandparent = parent.parent;
+    if (grandparent is! MethodInvocation) return false;
+    final String methodName = grandparent.methodName.name;
+    return !_testFrameworkMethods.contains(methodName);
   }
 }

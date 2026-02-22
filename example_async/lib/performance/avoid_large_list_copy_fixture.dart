@@ -106,12 +106,12 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final largeList = List.generate(1000, (i) => i);
+final dynamicList = <dynamic>[1, 2, 3];
 
 // BAD: Should trigger avoid_large_list_copy
 // expect_lint: avoid_large_list_copy
 void _bad794() {
-  final copy = List.from(largeList);
-  final filtered = largeList.where((e) => e > 0).toList();
+  final copy = List.from(largeList); // No type args — gratuitous copy
 }
 
 // GOOD: Should NOT trigger avoid_large_list_copy
@@ -120,4 +120,20 @@ void _good794() {
   final filtered = largeList.where((e) => e > 0);
   // Or document the intentional copy
   final copy = List<int>.of(largeList); // Explicit copy
+}
+
+// GOOD: List<T>.from() with type args is a type-casting pattern
+void _good794b() {
+  final typed = List<int>.from(dynamicList); // Type cast, not gratuitous copy
+}
+
+// GOOD: .toList() in return statement — function contract requires List
+List<int> _good794c() {
+  return largeList.where((e) => e > 0).toList(); // Required by return type
+}
+
+// GOOD: .toList() assigned to variable — caller needs concrete List
+void _good794d() {
+  final list = largeList.where((e) => e > 0).toList(); // Variable assignment
+  list.shuffle();
 }
