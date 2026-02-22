@@ -116,19 +116,20 @@ def check_modules_exist() -> bool:
     """
     # Reconfigure stdout to UTF-8 early (Windows cp1252 can't print Unicode)
     try:
+        # Python 3.7+ supports reconfigure; older versions raise AttributeError
         sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
     except (AttributeError, OSError):
-        pass
+        pass  # Not available or not writable — fall back to system encoding
 
     scripts_dir = Path(__file__).resolve().parent
     missing: list[str] = []
 
     for module_rel in _REQUIRED_MODULES:
         module_path = scripts_dir / module_rel
-        if not module_path.exists():
+        if not module_path.exists():  # Module file not found on disk
             missing.append(module_rel)
 
-    if missing:
+    if missing:  # At least one required module is missing
         for m in missing:
             print(f"  [MISSING] Module MISSING: {m}")
         print()
@@ -225,13 +226,13 @@ from scripts.modules._version_changelog import (
 
 def _parse_output_level() -> OutputLevel:
     """Determine output level from CLI args."""
-    if "--silent" in sys.argv:
+    if "--silent" in sys.argv:  # Suppress all output except errors
         return OutputLevel.SILENT
-    if "--warnings-only" in sys.argv:
+    if "--warnings-only" in sys.argv:  # Show warnings and errors only
         return OutputLevel.WARNINGS_ONLY
-    if "--verbose" in sys.argv:
+    if "--verbose" in sys.argv:  # Explicitly requested verbose
         return OutputLevel.VERBOSE
-    return OutputLevel.VERBOSE  # default
+    return OutputLevel.VERBOSE  # Default: show everything
 
 # cspell:ignore kbhit getwch
 def _prompt_version(default: str, timeout: int = 30) -> str:
@@ -241,44 +242,45 @@ def _prompt_version(default: str, timeout: int = 30) -> str:
     On Unix it is shown in brackets; press Enter to accept.
     Returns the default after *timeout* seconds of inactivity.
     """
-    if sys.platform == "win32":
+    if sys.platform == "win32":  # Windows: editable pre-filled prompt
         import msvcrt
 
         sys.stdout.write(f"  Version to publish: {default}")
         sys.stdout.flush()
         buffer = list(default)
         start = time.time()
-        while time.time() - start < timeout:
-            if msvcrt.kbhit():
+        while time.time() - start < timeout:  # Poll for keystrokes
+            if msvcrt.kbhit():  # Key available
                 ch = msvcrt.getwch()
-                if ch in ("\r", "\n"):
+                if ch in ("\r", "\n"):  # Enter pressed — submit
                     print()
                     return "".join(buffer).strip() or default
-                if ch == "\x08":
+                if ch == "\x08":  # Backspace — delete last char
                     if buffer:
                         buffer.pop()
                         sys.stdout.write("\b \b")
                         sys.stdout.flush()
-                elif ch == "\x03":
+                elif ch == "\x03":  # Ctrl+C — abort
                     raise KeyboardInterrupt
-                elif ch.isprintable():
+                elif ch.isprintable():  # Normal character — append
                     buffer.append(ch)
                     sys.stdout.write(ch)
                     sys.stdout.flush()
             time.sleep(0.05)
         print()
-        return "".join(buffer).strip() or default
+        return "".join(buffer).strip() or default  # Timeout — use buffer
 
+    # Unix: simple readline with select-based timeout
     import select
 
     sys.stdout.write(f"  Version to publish [{default}]: ")
     sys.stdout.flush()
     ready, _, _ = select.select([sys.stdin], [], [], timeout)
-    if ready:
+    if ready:  # User typed something before timeout
         user_input = sys.stdin.readline().strip()
         return user_input if user_input else default
     print()
-    return default
+    return default  # Timeout — use default version
 
 
 # =============================================================================
@@ -288,6 +290,7 @@ def _prompt_version(default: str, timeout: int = 30) -> str:
 
 def _offer_custom_lint(project_dir: Path) -> None:
     """Launch custom_lint on example fixtures in background."""
+    # Collect example directories that have a pubspec (actual Dart packages)
     example_dirs = [
         project_dir / d
         for d in [
@@ -297,7 +300,7 @@ def _offer_custom_lint(project_dir: Path) -> None:
         ]
         if (project_dir / d / "pubspec.yaml").exists()
     ]
-    if not example_dirs:
+    if not example_dirs:  # No example fixtures found
         return
 
     print_info(
@@ -305,15 +308,15 @@ def _offer_custom_lint(project_dir: Path) -> None:
         f"example fixtures (background)..."
     )
     use_shell = get_shell_mode()
-    for example_dir in example_dirs:
+    for example_dir in example_dirs:  # Launch lint in each fixture package
         print_info(f"  Launching custom_lint in {example_dir.name}/")
-        subprocess.run(
+        subprocess.run(  # Ensure deps are up-to-date first
             ["dart", "pub", "get"],
             cwd=example_dir,
             shell=use_shell,
             capture_output=True,
         )
-        subprocess.Popen(
+        subprocess.Popen(  # Fire-and-forget background process
             ["dart", "run", "custom_lint"],
             cwd=example_dir,
             shell=use_shell,
@@ -321,7 +324,7 @@ def _offer_custom_lint(project_dir: Path) -> None:
         print_success(
             f"custom_lint launched in {len(example_dirs)} packages"
         )
-    else:
+    else:  # for/else: runs after loop completes (Python idiom)
         print_info(
             "Run manually: python scripts/run_custom_lint_all.py"
         )
@@ -382,23 +385,23 @@ def main() -> int:
     changelog_path = project_dir / "CHANGELOG.md"
     bugs_dir = project_dir / "bugs"
 
-    if not pubspec_path.exists():
+    if not pubspec_path.exists():  # Can't publish without a pubspec
         exit_with_error(
             f"pubspec.yaml not found at {pubspec_path}",
             ExitCode.PREREQUISITES_FAILED,
         )
 
-    if not changelog_path.exists():
+    if not changelog_path.exists():  # CHANGELOG is mandatory for releases
         exit_with_error(
             f"CHANGELOG.md not found at {changelog_path}",
             ExitCode.PREREQUISITES_FAILED,
         )
 
-    # --- Quick-exit: --fix-docs ---
+    # --- Quick-exit: --fix-docs (standalone mode, exits after fixing) ---
     if "--fix-docs" in sys.argv:
         print_header("FIX DOC COMMENT ISSUES")
         issues = check_pubdev_lint_issues(project_dir)
-        if not issues:
+        if not issues:  # Clean — nothing to fix
             print_success("No doc comment issues found.")
             return ExitCode.SUCCESS.value
         print_info(f"Found {len(issues)} issue(s):")
@@ -407,13 +410,13 @@ def main() -> int:
         fixed_brackets = fix_doc_angle_brackets(project_dir)
         fixed_refs = fix_doc_references(project_dir)
         total_fixed = fixed_brackets + fixed_refs
-        if total_fixed:
+        if total_fixed:  # Some issues were auto-fixable
             print_success(
                 f"Fixed {total_fixed} issue(s) "
                 f"({fixed_brackets} angle bracket(s), "
                 f"{fixed_refs} doc reference(s))."
             )
-        else:
+        else:  # Issues exist but none are auto-fixable
             print_warning("No auto-fixable issues found.")
         return ExitCode.SUCCESS.value
 
@@ -454,69 +457,69 @@ def main() -> int:
 
     try:
         # --- Step 1: Pre-publish audits (unless --skip-audit) ---
-        if not skip_audit:
+        if not skip_audit:  # Normal path: run full audit
             with timer.step("Pre-publish audit"):
                 print_header("STEP 1: PRE-PUBLISH AUDIT")
-                if not run_pre_publish_audits(project_dir):
+                if not run_pre_publish_audits(project_dir):  # Blocking issue
                     exit_with_error(
                         "Pre-publish audit failed. "
                         "Fix issues before publishing.",
                         ExitCode.AUDIT_FAILED,
                     )
 
-            if audit_only:
+            if audit_only:  # --audit-only: stop after audit, don't publish
                 print_success("Audit complete (--audit-only mode).")
                 succeeded = True
                 return ExitCode.SUCCESS.value
 
-            # Gate: ask to continue (interactive, not timed)
+            # Gate: user must confirm before starting the publish workflow
             print()
             response = (
                 input("  Audit passed. Continue to publish? [Y/n] ")
                 .strip()
                 .lower()
             )
-            if response.startswith("n"):
+            if response.startswith("n"):  # User declined to continue
                 print_warning("Publish canceled by user.")
                 return ExitCode.USER_CANCELED.value
-        elif audit_only:
+        elif audit_only:  # --skip-audit + --audit-only = nonsensical
             print_warning(
                 "--audit-only and --skip-audit are contradictory."
             )
             return ExitCode.USER_CANCELED.value
 
-        # --- Steps 2-7: Analysis workflow ---
-        with timer.step("Prerequisites"):
-            if not check_prerequisites():
+        # --- Steps 2-7: Pre-publish analysis workflow ---
+        with timer.step("Prerequisites"):  # Step 2: flutter, git, gh
+            if not check_prerequisites():  # Missing required tool
                 exit_with_error(
                     "Prerequisites failed",
                     ExitCode.PREREQUISITES_FAILED,
                 )
 
-        with timer.step("Working tree"):
+        with timer.step("Working tree"):  # Step 3: uncommitted changes
             ok, _ = check_working_tree(project_dir)
-            if not ok:
+            if not ok:  # User declined to include uncommitted changes
                 exit_with_error("Aborted.", ExitCode.USER_CANCELED)
 
-        with timer.step("Remote sync"):
-            if not check_remote_sync(project_dir, branch):
+        with timer.step("Remote sync"):  # Step 4: local/remote in sync
+            if not check_remote_sync(project_dir, branch):  # Sync failed
                 exit_with_error(
                     "Remote sync failed",
                     ExitCode.WORKING_TREE_FAILED,
                 )
 
-        with timer.step("Tests"):
-            if not run_tests(project_dir):
+        with timer.step("Tests"):  # Step 5: dart test
+            if not run_tests(project_dir):  # Test failure
                 exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
 
-        with timer.step("Format"):
-            if not run_format(project_dir):
+        with timer.step("Format"):  # Step 6: dart format
+            if not run_format(project_dir):  # Format error
                 exit_with_error(
                     "Formatting failed.", ExitCode.VALIDATION_FAILED,
                 )
 
-        with timer.step("Analysis"):
-            if not run_analysis(project_dir):
+        with timer.step("Analysis"):  # Step 7: dart analyze --fatal-infos
+            if not run_analysis(project_dir):  # Analysis error
                 exit_with_error(
                     "Analysis failed.", ExitCode.ANALYSIS_FAILED,
                 )
@@ -524,49 +527,52 @@ def main() -> int:
         # --- Step 8: Version prompt (interactive, not timed) ---
         print_header("VERSION")
         if tag_exists_on_remote(project_dir, f"v{pubspec_version}"):
+            # Current version already published — suggest next patch
             default_version = increment_version(pubspec_version)
         else:
+            # Current version not yet published — offer it as default
             default_version = pubspec_version
 
-        while True:
+        while True:  # Loop until valid version format entered
             version = _prompt_version(default_version)
-            if re.match(rf"^{_VERSION_RE}$", version):
+            if re.match(rf"^{_VERSION_RE}$", version):  # Valid semver
                 break
-            print_warning(
+            print_warning(  # Invalid format — prompt again
                 f"Invalid version format '{version}'. "
                 f"Use X.Y.Z or X.Y.Z-pre.N"
             )
 
-        with timer.step("Version sync"):
-            if version != pubspec_version:
+        with timer.step("Version sync"):  # Align pubspec, CHANGELOG, tag
+            if version != pubspec_version:  # User chose a different version
                 set_version_in_pubspec(pubspec_path, version)
                 print_success(f"Updated pubspec.yaml to {version}")
 
-            # Rename [Unreleased] to this version
+            # Rename [Unreleased] to this version in CHANGELOG
             try:
                 if rename_unreleased_to_version(changelog_path, version):
                     print_success(
                         f"Renamed [Unreleased] to [{version}] "
                         f"in CHANGELOG.md"
                     )
-            except ValueError as exc:
+            except ValueError as exc:  # Malformed CHANGELOG
                 exit_with_error(
                     str(exc), ExitCode.CHANGELOG_FAILED,
                 )
 
-            # Validate versions in sync
+            # Validate pubspec and CHANGELOG versions match
             changelog_version = get_latest_changelog_version(
                 changelog_path,
             )
-            if changelog_version is None:
+            if changelog_version is None:  # No version found in CHANGELOG
                 exit_with_error(
                     "Could not extract version from CHANGELOG.md",
                     ExitCode.CHANGELOG_FAILED,
                 )
-            if version != changelog_version:
+            if version != changelog_version:  # Version mismatch
                 if parse_version(version) < parse_version(
                     changelog_version,
                 ):
+                    # Pubspec behind CHANGELOG — auto-update pubspec
                     print_warning(
                         f"pubspec version ({version}) is behind "
                         f"CHANGELOG ({changelog_version}). "
@@ -580,6 +586,7 @@ def main() -> int:
                         f"Updated pubspec.yaml to {version}"
                     )
                 else:
+                    # Pubspec ahead of CHANGELOG — offer to add section
                     print_warning(
                         f"pubspec version ({version}) is ahead "
                         f"of CHANGELOG ({changelog_version})."
@@ -592,7 +599,7 @@ def main() -> int:
                         .strip()
                         .lower()
                     )
-                    if response.startswith("n"):
+                    if response.startswith("n"):  # User wants manual fix
                         exit_with_error(
                             "Publish canceled — update "
                             "CHANGELOG.md manually.",
@@ -606,7 +613,7 @@ def main() -> int:
                         f"CHANGELOG.md"
                     )
 
-            # Fail fast if already published
+            # Fail fast if version already published
             tag_name = f"v{version}"
             if tag_exists_on_remote(project_dir, tag_name):
                 exit_with_error(
@@ -622,38 +629,38 @@ def main() -> int:
         print()
 
         # --- Steps 9-11: Version-dependent validation ---
-        with timer.step("Badge sync"):
+        with timer.step("Badge sync"):  # Step 9: update README badges
             sync_readme_badges(project_dir, version, rule_count)
 
-        with timer.step("CHANGELOG validation"):
+        with timer.step("CHANGELOG validation"):  # Step 10: extract notes
             ok, release_notes = validate_changelog(
                 project_dir, version,
             )
-            if not ok:
+            if not ok:  # Version missing or empty in CHANGELOG
                 exit_with_error(
                     "CHANGELOG failed", ExitCode.CHANGELOG_FAILED,
                 )
 
-        with timer.step("Docs"):
-            if not generate_docs(project_dir):
+        with timer.step("Docs"):  # Step 11: dart doc
+            if not generate_docs(project_dir):  # Doc generation error
                 exit_with_error(
                     "Docs failed", ExitCode.VALIDATION_FAILED,
                 )
 
-        with timer.step("Pre-publish validation"):
-            if not pre_publish_validation(project_dir):
+        with timer.step("Pre-publish validation"):  # dart pub publish --dry-run
+            if not pre_publish_validation(project_dir):  # Would fail on pub.dev
                 exit_with_error(
                     "Validation failed", ExitCode.VALIDATION_FAILED,
                 )
 
-        # --- Final CI gate ---
+        # --- Final CI gate: re-check after version bump changed files ---
         with timer.step("Final CI gate"):
             print_header("FINAL CI GATE")
             print_info(
                 "Re-running CI checks after version changes to "
                 "prevent burning a tag on a broken build..."
             )
-            if not run_analysis(project_dir):
+            if not run_analysis(project_dir):  # Post-bump analysis failure
                 exit_with_error(
                     "Final CI gate failed \u2014 aborting before "
                     "tag creation. Fix analysis issues and re-run.",
@@ -662,7 +669,7 @@ def main() -> int:
             print_success("CI gate passed \u2014 safe to create tag")
 
         # --- Commit, tag, publish, release ---
-        with timer.step("Git commit & push"):
+        with timer.step("Git commit & push"):  # Stage and push all changes
             if not git_commit_and_push(
                 project_dir, version, branch,
             ):
@@ -670,23 +677,23 @@ def main() -> int:
                     "Git operations failed", ExitCode.GIT_FAILED,
                 )
 
-        with timer.step("Git tag"):
+        with timer.step("Git tag"):  # Create vX.Y.Z tag
             if not create_git_tag(project_dir, version):
                 exit_with_error(
                     "Git tag failed", ExitCode.GIT_FAILED,
                 )
 
-        with timer.step("Publish"):
+        with timer.step("Publish"):  # dart pub publish to pub.dev
             if not publish_to_pubdev_step(project_dir, version):
                 exit_with_error(
                     "Publish failed", ExitCode.PUBLISH_FAILED,
                 )
 
-        with timer.step("GitHub release"):
+        with timer.step("GitHub release"):  # Create GH release with notes
             gh_success, gh_error = create_github_release(
                 project_dir, version, release_notes,
             )
-            if not gh_success:
+            if not gh_success:  # GH CLI or auth failure
                 exit_with_error(
                     f"GitHub release failed: {gh_error}",
                     ExitCode.GITHUB_RELEASE_FAILED,
@@ -694,7 +701,7 @@ def main() -> int:
 
         succeeded = True
 
-        # --- Post-publish version bump ---
+        # --- Post-publish: bump version for next dev cycle ---
         try:
             with timer.step("Version bump"):
                 next_version = increment_version(version)
@@ -702,35 +709,35 @@ def main() -> int:
                 add_unreleased_section(changelog_path)
                 if post_publish_commit(
                     project_dir, next_version, branch,
-                ):
+                ):  # Commit succeeded
                     print_success(
                         f"Bumped to {next_version} with "
                         f"[Unreleased] section"
                     )
-                else:
+                else:  # Commit failed (non-fatal)
                     print_warning(
                         f"Version bump to {next_version} "
                         f"not committed \u2014 commit manually"
                     )
-        except Exception as exc:
+        except Exception as exc:  # Version bump is best-effort
             print_warning(f"Post-publish version bump failed: {exc}")
 
-        # --- Post-publish (non-critical) ---
+        # --- Post-publish: open pub.dev page (convenience) ---
         try:
             webbrowser.open(
                 f"https://pub.dev/packages/{package_name}",
             )
         except Exception:
-            pass
+            pass  # Browser open is non-critical
 
-    except SystemExit as exc:
+    except SystemExit as exc:  # Caught from exit_with_error() calls
         exit_code = exc.code if isinstance(exc.code, int) else 1
 
-    finally:
+    finally:  # Always show timing summary, even on failure
         timer.print_summary()
 
-    # Final status (always the last output)
-    if succeeded:
+    # Final status banner (always the last output)
+    if succeeded:  # Publish completed successfully
         repo_path = extract_repo_path(remote_url)
         _print_success_banner(package_name, version, repo_path)
         _offer_custom_lint(project_dir)
