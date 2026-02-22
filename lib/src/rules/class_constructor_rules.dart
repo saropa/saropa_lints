@@ -944,6 +944,19 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
       // benefit from base/interface/sealed. We'll skip them to reduce noise.
       if (isAbstract) return;
 
+      // Skip classes with only private constructors — they already prevent
+      // external instantiation and extension, making a modifier redundant.
+      final List<ConstructorDeclaration> constructors = node.members
+          .whereType<ConstructorDeclaration>()
+          .toList();
+      if (constructors.isNotEmpty &&
+          constructors.every(
+            (ConstructorDeclaration c) =>
+                c.name != null && c.name!.lexeme.startsWith('_'),
+          )) {
+        return;
+      }
+
       reporter.atToken(node.name, code);
     });
   }
