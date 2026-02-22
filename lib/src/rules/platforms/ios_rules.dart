@@ -4029,23 +4029,31 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  /// Word-boundary regexes for VoIP pattern matching.
-  ///
-  /// Uses `\b` anchors to prevent false positives from substring matches
-  /// (e.g. "Zagora" should not match the "Agora" pattern).
-  static final List<RegExp> _voipRegexes =
-      [
-            'voip',
-            'incoming_call',
-            'outgoing_call',
-            'call_state',
-            'WebRTC',
-            'Twilio',
-            'Agora',
-            'Vonage',
-          ]
+  /// Unambiguous VoIP technical terms for string scanning.
+  /// Brand names (Agora, Twilio, Vonage, WebRTC) removed because
+  /// they have non-VoIP meanings and cause false positives.
+  /// VoIP SDK usage is detected via import directives instead.
+  static final List<RegExp> _voipStringRegexes =
+      ['voip', 'incoming_call', 'outgoing_call', 'call_state']
           .map((p) => RegExp('\\b${RegExp.escape(p)}\\b', caseSensitive: false))
           .toList();
+
+  /// Known VoIP/telephony package URIs detected via import directives.
+  static const List<String> _voipPackages = <String>[
+    'agora_rtc_engine',
+    'agora_rtm',
+    'flutter_webrtc',
+    'twilio_voice',
+    'twilio_programmable_video',
+    'vonage_client_sdk',
+    'flutter_voip_push_notification',
+    'connectycube_flutter_call_kit',
+    'sip_ua',
+    'flutter_pjsip',
+    'janus_client',
+    'livekit_client',
+    'stream_video_flutter',
+  ];
 
   @override
   void runWithReporter(
@@ -4063,11 +4071,28 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
 
     bool hasReported = false;
 
+    // Check imports for known VoIP packages
+    context.addImportDirective((ImportDirective node) {
+      if (hasReported) return;
+
+      final String? uri = node.uri.stringValue;
+      if (uri == null) return;
+
+      for (final String package in _voipPackages) {
+        if (uri.contains(package)) {
+          reporter.atNode(node);
+          hasReported = true;
+          return;
+        }
+      }
+    });
+
+    // Check string literals for unambiguous VoIP technical terms
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (hasReported) return;
 
       final String value = node.value;
-      for (final RegExp regex in _voipRegexes) {
+      for (final RegExp regex in _voipStringRegexes) {
         if (regex.hasMatch(value)) {
           reporter.atNode(node);
           hasReported = true;
