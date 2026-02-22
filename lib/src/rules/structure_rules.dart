@@ -3,6 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/nullability_suffix.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../project_context.dart' show ProjectContext;
 import '../saropa_lint_rule.dart';
@@ -2258,12 +2260,12 @@ class AvoidUnnecessaryNullableReturnTypeRule extends SaropaLintRule {
   }
 
   bool _canReturnNull(FunctionBody body) {
+    if (body is ExpressionFunctionBody) {
+      return _expressionCanBeNull(body.expression);
+    }
+
     bool returnsNull = false;
     bool hasImplicitReturn = false;
-
-    if (body is ExpressionFunctionBody) {
-      return body.expression is NullLiteral;
-    }
 
     if (body is BlockFunctionBody) {
       body.block.visitChildren(
@@ -2275,6 +2277,25 @@ class AvoidUnnecessaryNullableReturnTypeRule extends SaropaLintRule {
     }
 
     return returnsNull || hasImplicitReturn;
+  }
+
+  bool _expressionCanBeNull(Expression expr) {
+    if (expr is NullLiteral) return true;
+
+    // Ternary with null in either branch
+    if (expr is ConditionalExpression) {
+      return _expressionCanBeNull(expr.thenExpression) ||
+          _expressionCanBeNull(expr.elseExpression);
+    }
+
+    // Check the static type of the expression
+    final DartType? staticType = expr.staticType;
+    if (staticType != null &&
+        staticType.nullabilitySuffix == NullabilitySuffix.question) {
+      return true;
+    }
+
+    return false;
   }
 }
 
