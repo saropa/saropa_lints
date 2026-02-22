@@ -1797,19 +1797,30 @@ class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
         // Skip if it's a long descriptive name
         if (name.length >= 15) continue;
 
-        // Skip common naming patterns
-        if (name.contains('Count') ||
-            name.contains('Size') ||
-            name.contains('Max') ||
-            name.contains('Min') ||
-            name.contains('Default') ||
-            name.contains('Timeout') ||
-            name.contains('Duration')) {
+        // Skip common descriptive naming patterns (case-insensitive,
+        // since Dart convention is lowerCamelCase for constants).
+        final String lower = name.toLowerCase();
+        if (lower.contains('count') ||
+            lower.contains('size') ||
+            lower.contains('max') ||
+            lower.contains('min') ||
+            lower.contains('default') ||
+            lower.contains('timeout') ||
+            lower.contains('duration') ||
+            lower.contains('width') ||
+            lower.contains('height') ||
+            lower.contains('padding') ||
+            lower.contains('margin') ||
+            lower.contains('offset') ||
+            lower.contains('index') ||
+            lower.contains('limit') ||
+            lower.contains('threshold')) {
           continue;
         }
 
-        // Warn for short generic names
-        if (name.length < 10) {
+        // Only flag very short or single-word names (< 5 chars)
+        // that are genuinely ambiguous without context.
+        if (name.length < 5) {
           reporter.atToken(variable.name, code);
         }
       }
