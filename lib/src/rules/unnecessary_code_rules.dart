@@ -955,9 +955,18 @@ class NoEmptyStringRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
-      if (node.value.isEmpty) {
-        reporter.atNode(node);
-      }
+      if (node.value.isNotEmpty) return;
+
+      // Only flag empty strings in equality comparisons where
+      // .isEmpty / .isNotEmpty is a viable alternative.
+      // Skip: return '', ?? '', default params, replaceAll args, etc.
+      final AstNode? parent = node.parent;
+      if (parent is! BinaryExpression) return;
+
+      final TokenType op = parent.operator.type;
+      if (op != TokenType.EQ_EQ && op != TokenType.BANG_EQ) return;
+
+      reporter.atNode(node);
     });
   }
 }
