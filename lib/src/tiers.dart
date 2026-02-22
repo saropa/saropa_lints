@@ -222,6 +222,32 @@ const Set<String> stylisticRules = <String>{
   'prefer_record_over_equatable',
 };
 
+/// Stylistic rules that only apply to Flutter projects (widget-related).
+///
+/// Used by the interactive walkthrough to skip these rules for pure Dart
+/// projects that have no Flutter dependency. These are a subset of
+/// [stylisticRules] — not a separate tier.
+const Set<String> flutterStylisticRules = <String>{
+  'avoid_shrink_wrap_in_scroll',
+  'avoid_small_text',
+  'prefer_borderradius_circular',
+  'prefer_center_over_align',
+  'prefer_container_over_sizedbox',
+  'prefer_edgeinsets_only',
+  'prefer_edgeinsets_symmetric',
+  'prefer_expanded_over_flexible',
+  'prefer_explicit_colors',
+  'prefer_flexible_over_expanded',
+  'prefer_material_theme_colors',
+  'prefer_one_widget_per_file',
+  'prefer_richtext_over_text_rich',
+  'prefer_sized_box_square',
+  'prefer_sizedbox_over_container',
+  'prefer_spacing_over_sizedbox',
+  'prefer_text_rich_over_richtext',
+  'prefer_widget_methods_over_classes',
+};
+
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
 /// A single violation causes real harm: app crashes, data exposed, resources never released.
 const Set<String> essentialRules = <String>{
@@ -629,6 +655,8 @@ const Set<String> essentialRules = <String>{
   'avoid_color_only_meaning', // WARNING - WCAG 1.4.1 color-only indicators
   'avoid_excessive_rebuilds_animation', // WARNING - too many widgets in builder
   'avoid_misused_hooks', // WARNING - hooks in callbacks/closures
+  // v5.1.0 - Migration rules (Essential)
+  'avoid_asset_manifest_json', // ERROR - removed in Flutter 3.38.0, runtime crash
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -637,6 +665,9 @@ const Set<String> recommendedOnlyRules = <String>{
   // Suppression comment validation
   'avoid_ignore_trailing_comment',
 
+  // v5.1.0 - Migration rules (Recommended)
+  'prefer_dropdown_initial_value', // WARNING - deprecated in Flutter 3.35.0
+  'prefer_on_pop_with_result', // WARNING - deprecated in Flutter 3.35.0
   // Moved from Essential (style/quality, not crash prevention)
   // 'prefer_list_first' moved to stylisticRules (opinionated)
   // 'prefer_list_last' moved to stylisticRules (opinionated)

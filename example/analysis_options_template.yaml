@@ -1447,3 +1447,8 @@ custom_lint:
 
     # --- Testing ---
     - avoid_misused_test_matchers: false             # WARNING - raw literals as test matchers (v4.16.0, quick fix)
+
+    # --- Migration (Flutter SDK deprecations) ---
+    - avoid_asset_manifest_json: false               # ERROR - removed in Flutter 3.38.0, runtime crash (v5.1.0)
+    - prefer_dropdown_initial_value: false            # WARNING - value→initialValue, Flutter 3.35.0 (v5.1.0, quick fix)
+    - prefer_on_pop_with_result: false                # WARNING - onPop→onPopWithResult, Flutter 3.35.0 (v5.1.0, quick fix)
