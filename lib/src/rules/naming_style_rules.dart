@@ -628,7 +628,7 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
     'prefer_boolean_prefixes',
     '[prefer_boolean_prefixes] Boolean variable must have a prefix (is/has/can/should/will/did). This rule only checks class fields and top-level variables, not local variables inside functions/methods. Local variables are implementation details and don\'t need strict naming conventions. {v7}',
     correctionMessage:
-        'Rename this boolean field to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: enabled becomes isEnabled.',
+        'Rename this boolean class field or top-level variable to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Does not check locals or parameters. Example: enabled becomes isEnabled.',
     severity: DiagnosticSeverity.INFO,
   );
 

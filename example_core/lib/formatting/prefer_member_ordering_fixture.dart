@@ -112,8 +112,21 @@ class _BadClass389 {
   final int field = 0; // Field declared after method
 }
 
+// BAD: Method before constructor (was prefer_sorted_members, now merged)
+// expect_lint: prefer_member_ordering
+class _BadClass389b {
+  void doWork() {}
+  _BadClass389b(); // Constructor after method — wrong order
+}
+
 // GOOD: Should NOT trigger prefer_member_ordering
 class _GoodClass389 {
   final int field = 0; // Fields before methods
   void method() {}
+}
+
+// GOOD: Constructor before methods
+class _GoodClass389b {
+  _GoodClass389b();
+  void doWork() {}
 }

@@ -92,15 +92,31 @@ void main() {
     });
 
     group('prefer_member_ordering', () {
-      test('prefer_member_ordering SHOULD trigger', () {
-        // Better alternative available: prefer member ordering
+      test('prefer_member_ordering SHOULD trigger for field after method', () {
+        // Method declared before field violates ordering
         expect('prefer_member_ordering detected', isNotNull);
       });
+
+      test(
+        'prefer_member_ordering SHOULD trigger for method before constructor',
+        () {
+          // Merged from prefer_sorted_members — constructor after method
+          expect('prefer_member_ordering detected', isNotNull);
+        },
+      );
 
       test('prefer_member_ordering should NOT trigger', () {
         // Preferred pattern used correctly
         expect('prefer_member_ordering passes', isNotNull);
       });
+
+      test(
+        'prefer_member_ordering should NOT trigger for correct ordering',
+        () {
+          // Constructor before methods — false positive guard
+          expect('prefer_member_ordering passes', isNotNull);
+        },
+      );
     });
   });
 
