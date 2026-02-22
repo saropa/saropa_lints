@@ -283,10 +283,20 @@ Pick the tier that matches your team's needs. Each tier builds on the previous o
 
 **[175+ stylistic rules](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** for formatting, ordering, and naming conventions.
 
-To include stylistic rules when generating configuration:
+The init tool includes an **interactive walkthrough** that shows code examples and lets you enable/disable each rule:
 
 ```bash
-dart run saropa_lints:init --tier comprehensive --stylistic
+# Interactive walkthrough (default — runs automatically)
+dart run saropa_lints:init
+
+# Bulk-enable all stylistic rules (CI / non-interactive)
+dart run saropa_lints:init --stylistic-all
+
+# Skip the walkthrough entirely
+dart run saropa_lints:init --no-stylistic
+
+# Re-review previously decided rules
+dart run saropa_lints:init --reset-stylistic
 ```
 
 Or enable specific stylistic rules in your generated config by changing `false` to `true`.
@@ -323,7 +333,7 @@ dart run saropa_lints:init --tier professional --dry-run
 
 Available tiers: `essential` (1), `recommended` (2), `professional` (3), `comprehensive` (4), `pedantic` (5)
 
-Add `--stylistic` to include opinionated formatting rules.
+The init tool includes an interactive stylistic rules walkthrough by default. Use `--stylistic-all` to bulk-enable, or `--no-stylistic` to skip.
 
 ### Customizing rules
 
@@ -479,7 +489,7 @@ Use the `pedantic` tier preset or the init tool to enable all rules:
 include: package:saropa_lints/tiers/pedantic.yaml
 
 # Option B: Init tool
-# dart run saropa_lints:init --tier pedantic --stylistic
+# dart run saropa_lints:init --tier pedantic --stylistic-all
 ```
 
 **This is intentional.** It forces teams to explicitly review and disable rules they disagree with, ensuring:
@@ -628,7 +638,7 @@ dart run saropa_lints:baseline --help        # See all options
 
 ## Stylistic Rules
 
-175+ rules for team preferences — not included in any correctness tier. Enable individually or via `--stylistic` flag based on your conventions.
+175+ rules for team preferences — not included in any correctness tier. Enable individually, via the interactive walkthrough during `init`, or use `--stylistic-all` to bulk-enable.
 
 Examples: `prefer_relative_imports`, `prefer_single_quotes`, `prefer_arrow_functions`, `prefer_trailing_comma_always`, `prefer_for_in`, `prefer_boolean_prefixes_for_params`
 

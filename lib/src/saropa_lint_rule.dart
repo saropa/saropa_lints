@@ -1852,6 +1852,38 @@ abstract class SaropaLintRule extends AnalysisRule {
   RuleCost get cost => RuleCost.medium;
 
   // ============================================================
+  // CLI Walkthrough Examples
+  // ============================================================
+
+  /// Short code example that VIOLATES this rule (shown in CLI walkthrough).
+  ///
+  /// Override to provide a concise terminal-friendly snippet (2-5 lines max).
+  /// Displayed during `dart run saropa_lints:init` interactive stylistic
+  /// walkthrough to help users understand what the rule catches.
+  ///
+  /// Return `null` to fall back to [LintCode.correctionMessage] in the
+  /// walkthrough display.
+  ///
+  /// Example:
+  /// ```dart
+  /// @override
+  /// String? get exampleBad => "import 'package:my_app/src/utils.dart';";
+  /// ```
+  String? get exampleBad => null;
+
+  /// Short code example of COMPLIANT code (shown in CLI walkthrough).
+  ///
+  /// Override to provide a concise terminal-friendly snippet (2-5 lines max).
+  /// Displayed alongside [exampleBad] during the interactive walkthrough.
+  ///
+  /// Example:
+  /// ```dart
+  /// @override
+  /// String? get exampleGood => "import '../utils.dart';";
+  /// ```
+  String? get exampleGood => null;
+
+  // ============================================================
   // OWASP Security Compliance Mapping
   // ============================================================
 

@@ -178,6 +178,12 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad => "String name = 'John';";
+
+  @override
+  String get exampleGood => 'String name = "John";';
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         PreferDoubleQuotesFix(context: context),
@@ -243,6 +249,12 @@ class PreferAbsoluteImportsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => "import '../utils.dart';";
+
+  @override
+  String get exampleGood => "import 'package:my_app/src/utils.dart';";
+
   static const LintCode _code = LintCode(
     'prefer_absolute_imports',
     '[prefer_absolute_imports] Relative import detected instead of the preferred absolute package import. Absolute imports provide a canonical path that avoids breakage when files are moved and improves cross-file searchability. {v5}',
@@ -302,6 +314,14 @@ class PreferGroupedImportsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      "import '../a.dart'; import 'dart:io'; import 'package:x/x.dart';";
+
+  @override
+  String get exampleGood =>
+      "import 'dart:io'; \\n import 'package:x/x.dart'; \\n import '../a.dart';";
 
   static const LintCode _code = LintCode(
     'prefer_grouped_imports',
@@ -377,6 +397,14 @@ class PreferFlatImportsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      "import 'dart:io'; \\n\\n import 'package:x/x.dart'; // blank line groups";
+
+  @override
+  String get exampleGood =>
+      "import 'dart:io'; \\n import 'package:x/x.dart'; // flat, sorted";
 
   static const LintCode _code = LintCode(
     'prefer_flat_imports',
@@ -759,6 +787,12 @@ class PreferStaticMembersFirstRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'final String name; static const max = 10;';
+
+  @override
+  String get exampleGood => 'static const max = 10; final String name;';
+
   static const LintCode _code = LintCode(
     'prefer_static_members_first',
     '[prefer_static_members_first] A static member appears after an instance member in the class body. Mixing declaration order makes it harder to locate class-level constants and factories; move all static members above instance members. {v4}',
@@ -815,6 +849,12 @@ class PreferInstanceMembersFirstRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'static const max = 10; final String name;';
+
+  @override
+  String get exampleGood => 'final String name; static const max = 10;';
 
   static const LintCode _code = LintCode(
     'prefer_instance_members_first',
@@ -873,6 +913,12 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'String _internalId; final String name;';
+
+  @override
+  String get exampleGood => 'final String name; String _internalId;';
+
   static const LintCode _code = LintCode(
     'prefer_public_members_first',
     '[prefer_public_members_first] A public member appears after a private member in the class body. Declaring public members first surfaces the external API at the top, making the class easier to consume. {v4}',
@@ -929,6 +975,12 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'final String name; String _internalId;';
+
+  @override
+  String get exampleGood => 'String _internalId; final String name;';
 
   static const LintCode _code = LintCode(
     'prefer_private_members_first',
@@ -991,6 +1043,12 @@ class PreferVarOverExplicitTypeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => "String name = 'John';";
+
+  @override
+  String get exampleGood => "var name = 'John';";
 
   static const LintCode _code = LintCode(
     'prefer_var_over_explicit_type',

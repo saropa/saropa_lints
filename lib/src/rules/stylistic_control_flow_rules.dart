@@ -284,6 +284,12 @@ class PreferGuardClausesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'void f(x) { if (x != null) { /* body */ } }';
+
+  @override
+  String get exampleGood => 'void f(x) { if (x == null) return; /* body */ }';
+
   static const LintCode _code = LintCode(
     'prefer_guard_clauses',
     '[prefer_guard_clauses] Wrapping the entire function body in an if block obscures preconditions and increases nesting. Guard clauses make preconditions explicit and help prevent bugs. {v3}',
@@ -501,6 +507,12 @@ class PreferCascadeOverChainedRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'list.add(1); list.add(2); list.add(3);';
+
+  @override
+  String get exampleGood => 'list..add(1)..add(2)..add(3);';
 
   static const LintCode _code = LintCode(
     'prefer_cascade_over_chained',
