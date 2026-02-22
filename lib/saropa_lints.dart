@@ -432,7 +432,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidPassingAsyncWhenSyncExpectedRule.new,
   BinaryExpressionOperandOrderRule.new,
   DoubleLiteralFormatRule.new,
-  MemberOrderingRule.new,
   NewlineBeforeReturnRule.new,
   NoMagicNumberRule.new,
   PreferAsyncAwaitRule.new,

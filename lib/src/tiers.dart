@@ -18,7 +18,6 @@ const Set<String> stylisticRules = <String>{
   // === Ordering & Sorting ===
   'prefer_member_ordering',
   'prefer_arguments_ordering',
-  'prefer_sorted_members',
   'prefer_sorted_parameters',
   'prefer_sorted_pattern_fields',
   'prefer_sorted_record_fields',

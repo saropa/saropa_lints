@@ -1918,7 +1918,7 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
     'prefer_descriptive_bool_names',
     '[prefer_descriptive_bool_names] Boolean should use a descriptive prefix (is, has, can, should, etc.) or action verb. This rule is suitable for the professional tier. {v5}',
     correctionMessage:
-        'Rename with a descriptive prefix: isEnabled, hasData, canEdit, shouldUpdate, or an action verb like processData.',
+        'Rename this boolean variable, parameter, or field with a descriptive prefix (isEnabled, hasData, canEdit, shouldUpdate) or action verb (processData, sortItems). Checks all booleans, not just fields.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -2095,7 +2095,7 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
     'prefer_descriptive_bool_names_strict',
     '[prefer_descriptive_bool_names_strict] Boolean should use a descriptive prefix (is, has, can, should, etc.). This rule is suitable for the pedantic tier. {v3}',
     correctionMessage:
-        'Rename with a descriptive boolean prefix: isEnabled, hasData, canEdit, shouldUpdate, doesExist, or willChange.',
+        'Rename this boolean variable, parameter, or field with a strict prefix only (isEnabled, hasData, canEdit, shouldUpdate). Action verbs like processData are not allowed. Checks all booleans.',
     severity: DiagnosticSeverity.INFO,
   );
 

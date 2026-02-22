@@ -1134,68 +1134,6 @@ class MaxImportsRule extends SaropaLintRule {
   }
 }
 
-/// Warns when class members are not in a consistent order.
-///
-/// Since: v4.10.2 | Updated: v4.13.0 | Rule version: v2
-///
-/// A consistent member ordering makes code easier to navigate. Typical order:
-/// 1. Static fields
-/// 2. Instance fields
-/// 3. Constructors
-/// 4. Static methods
-/// 5. Instance methods
-class MemberOrderingRule extends SaropaLintRule {
-  MemberOrderingRule() : super(code: _code);
-
-  /// Alias: prefer_sorted_member
-
-  static const LintCode _code = LintCode(
-    'prefer_sorted_members',
-    '[prefer_sorted_members] Class members are not in conventional order. '
-        'Inconsistent member ordering forces developers to scan the entire class to find '
-        'constructors, fields, or methods, which slows navigation and code review. {v2}',
-    correctionMessage:
-        'Reorder members: static fields, instance fields, constructors, '
-        'static methods, instance methods. Consistent ordering enables quick navigation.',
-    severity: DiagnosticSeverity.INFO,
-  );
-
-  @override
-  void runWithReporter(
-    SaropaDiagnosticReporter reporter,
-    SaropaContext context,
-  ) {
-    context.addClassDeclaration((ClassDeclaration node) {
-      int lastCategory = -1;
-      bool hasOrderingIssue = false;
-
-      for (final ClassMember member in node.members) {
-        final int category = _getMemberCategory(member);
-        if (category < lastCategory) {
-          hasOrderingIssue = true;
-          break;
-        }
-        lastCategory = category;
-      }
-
-      if (hasOrderingIssue) {
-        reporter.atToken(node.name, code);
-      }
-    });
-  }
-
-  int _getMemberCategory(ClassMember member) {
-    if (member is FieldDeclaration) {
-      return member.isStatic ? 0 : 1;
-    } else if (member is ConstructorDeclaration) {
-      return 2;
-    } else if (member is MethodDeclaration) {
-      return member.isStatic ? 3 : 4;
-    }
-    return 5;
-  }
-}
-
 /// Warns when function parameters are not in alphabetical order.
 ///
 /// Since: v0.1.2 | Updated: v4.13.0 | Rule version: v6
