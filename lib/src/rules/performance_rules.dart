@@ -2509,6 +2509,15 @@ class RequireDisposePatternRule extends SaropaLintRule {
         }
       }
 
+      // Skip classes with const constructors — they hold borrowed
+      // references passed in by the caller, not owned resources.
+      // Disposing borrowed references would be a bug.
+      final bool hasConstConstructor = node.members.any(
+        (ClassMember m) =>
+            m is ConstructorDeclaration && m.constKeyword != null,
+      );
+      if (hasConstConstructor) return;
+
       bool hasDisposable = false;
       bool hasDisposeMethod = false;
 
