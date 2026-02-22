@@ -589,7 +589,9 @@ void _auditExistingConfig(String currentVersion) {
       _logCheck(
         'Existing config',
         pass: false,
-        detail: 'version $existing may be stale (current: $currentVersion)',
+        detail:
+            'version $existing may be stale (current: $currentVersion) '
+            '— re-run "dart run saropa_lints" to update',
       );
     }
   }
@@ -822,6 +824,7 @@ class _RuleMetadata {
     required this.correctionMessage,
     required this.severity,
     required this.tier,
+    required this.hasFix,
     this.exampleBad,
     this.exampleGood,
   });
@@ -831,6 +834,9 @@ class _RuleMetadata {
   final String correctionMessage;
   final String severity; // 'ERROR', 'WARNING', 'INFO'
   final RuleTier tier;
+
+  /// Whether this rule provides a quick fix in the IDE.
+  final bool hasFix;
 
   /// Short BAD example for CLI walkthrough (null if not provided).
   final String? exampleBad;
@@ -862,6 +868,7 @@ Map<String, _RuleMetadata> _getRuleMetadata() {
         correctionMessage: correction,
         severity: severity,
         tier: tier,
+        hasFix: rule.fixGenerators.isNotEmpty,
         exampleBad: rule.exampleBad,
         exampleGood: rule.exampleGood,
       );
@@ -992,7 +999,6 @@ const Map<String, List<String>> _stylisticRuleCategories =
       'Ordering & Sorting': <String>[
         'prefer_member_ordering',
         'prefer_arguments_ordering',
-        'prefer_sorted_members',
         'prefer_sorted_parameters',
         'prefer_sorted_pattern_fields',
         'prefer_sorted_record_fields',
@@ -3811,6 +3817,8 @@ _WalkthroughResult _runStylisticWalkthrough({
           .length +
       (hasUncategorized ? 1 : 0);
   int categoryIndex = 0;
+  int ruleOffset = 0;
+  final int totalRules = rulesToReview.length;
 
   for (final entry in categoryEntries) {
     final category = entry.key;
@@ -3830,11 +3838,14 @@ _WalkthroughResult _runStylisticWalkthrough({
         existingValues: existingValues,
         categoryIndex: categoryIndex,
         totalCategories: totalCategories,
+        ruleOffset: ruleOffset,
+        totalRules: totalRules,
       );
       if (result == null) {
         aborted = true;
         break;
       }
+      ruleOffset += categoryRules.length;
       enabled += result.enabled;
       disabled += result.disabled;
       skipped += result.skipped;
@@ -3848,11 +3859,14 @@ _WalkthroughResult _runStylisticWalkthrough({
         existingValues: existingValues,
         categoryIndex: categoryIndex,
         totalCategories: totalCategories,
+        ruleOffset: ruleOffset,
+        totalRules: totalRules,
       );
       if (result == null) {
         aborted = true;
         break;
       }
+      ruleOffset += categoryRules.length;
       enabled += result.enabled;
       disabled += result.disabled;
       skipped += result.skipped;
@@ -3874,6 +3888,8 @@ _WalkthroughResult _runStylisticWalkthrough({
         existingValues: existingValues,
         categoryIndex: totalCategories,
         totalCategories: totalCategories,
+        ruleOffset: ruleOffset,
+        totalRules: totalRules,
       );
       if (result == null) {
         aborted = true;
@@ -3938,6 +3954,8 @@ _CategoryResult? _walkthroughCategory({
   required Map<String, bool> existingValues,
   required int categoryIndex,
   required int totalCategories,
+  required int ruleOffset,
+  required int totalRules,
 }) {
   _logTerminal(
     '${_Colors.bold}${_Colors.cyan}'
@@ -3963,8 +3981,15 @@ _CategoryResult? _walkthroughCategory({
       continue;
     }
 
-    // Display rule info
-    _logTerminal('  ${_Colors.bold}$rule${_Colors.reset}');
+    // Display rule info with progress
+    final ruleNum = ruleOffset + i + 1;
+    final pct = (ruleNum * 100 / totalRules).round();
+    final progress =
+        '${_Colors.dim}($ruleNum/$totalRules — $pct%)${_Colors.reset}';
+    final fixTag = (meta != null && meta.hasFix)
+        ? '  ${_Colors.green}[quick fix]${_Colors.reset}'
+        : '';
+    _logTerminal('  ${_Colors.bold}$rule${_Colors.reset}$fixTag  $progress');
     _logTerminal('');
 
     if (meta != null) {
@@ -3990,7 +4015,7 @@ _CategoryResult? _walkthroughCategory({
           ? _stripRulePrefix(meta.correctionMessage)
           : _stripRulePrefix(meta.problemMessage);
       if (desc.isNotEmpty) {
-        _logTerminal('  ${_Colors.dim}$desc${_Colors.reset}');
+        _logTerminal('  $desc');
         _logTerminal('');
       }
     }
@@ -4056,11 +4081,17 @@ _CategoryResult? _walkthroughConflicting({
   required Map<String, bool> existingValues,
   required int categoryIndex,
   required int totalCategories,
+  required int ruleOffset,
+  required int totalRules,
 }) {
+  final ruleNum = ruleOffset + 1;
+  final pct = (ruleNum * 100 / totalRules).round();
+  final progress =
+      '${_Colors.dim}($ruleNum/$totalRules — $pct%)${_Colors.reset}';
   _logTerminal(
     '${_Colors.bold}${_Colors.cyan}'
     '── $category ($categoryIndex of $totalCategories) '
-    '──${_Colors.reset}',
+    '──${_Colors.reset}  $progress',
   );
   _logTerminal('');
 
@@ -4070,12 +4101,12 @@ _CategoryResult? _walkthroughConflicting({
     final meta = metadata[rule];
     _logTerminal('  ${_Colors.bold}${i + 1}. $rule${_Colors.reset}');
     if (meta?.exampleGood != null) {
-      _logTerminal('     ${_Colors.dim}${meta!.exampleGood}${_Colors.reset}');
+      _logTerminal('     ${meta!.exampleGood}');
     } else if (meta != null) {
       final desc = _stripRulePrefix(meta.correctionMessage).isNotEmpty
           ? _stripRulePrefix(meta.correctionMessage)
           : _stripRulePrefix(meta.problemMessage);
-      _logTerminal('     ${_Colors.dim}$desc${_Colors.reset}');
+      _logTerminal('     $desc');
     }
     _logTerminal('');
   }
@@ -4186,9 +4217,11 @@ void _writeStylisticDecisions(File customFile, Map<String, bool> decisions) {
 
 /// Prompts the user to select a tier interactively.
 ///
-/// In non-interactive mode (piped input, CI), defaults to 'comprehensive'.
+/// Defaults to the tier found in the existing analysis_options.yaml,
+/// or 'essential' for fresh setups. In non-interactive mode (piped input,
+/// CI), uses the default without prompting.
 String _promptForTier() {
-  const String defaultTier = 'comprehensive';
+  final String defaultTier = _detectExistingTier() ?? 'essential';
 
   if (!stdin.hasTerminal) {
     _logTerminal(
@@ -4230,6 +4263,19 @@ String _promptForTier() {
     'using $defaultTier${_Colors.reset}',
   );
   return defaultTier;
+}
+
+/// Reads the existing analysis_options.yaml and returns the tier name
+/// from the `# Tier: <name>` comment, or null if not found.
+String? _detectExistingTier() {
+  final file = File('analysis_options.yaml');
+  if (!file.existsSync()) return null;
+
+  final match = RegExp(r'# Tier:\s*(\w+)').firstMatch(file.readAsStringSync());
+  if (match == null) return null;
+
+  final tier = match.group(1)!.toLowerCase();
+  return tierIds.containsKey(tier) ? tier : null;
 }
 
 void _printUsage() {
