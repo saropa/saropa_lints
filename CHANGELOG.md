@@ -13,6 +13,21 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Added
+- New rule: `prefer_sorted_imports` (Comprehensive) — detects unsorted imports within each group (dart, package, relative) with quick fix to sort A-Z
+- New rule: `prefer_import_group_comments` (Stylistic) — detects missing `///` section headers between import groups with quick fix to add them
+
+### Fixed
+- `avoid_barrel_files`: skip files with `library` directive and the mandatory package entry point (`lib/<package_name>.dart`)
+- `avoid_duplicate_number_elements`: only flag `Set` literals — duplicate numeric values in `List` literals are intentional (e.g. days-in-month)
+- `avoid_ignoring_return_values`: skip property setter assignments (`obj.prop = value`) which have no return value
+- `avoid_money_arithmetic_on_double`: use camelCase word-boundary matching instead of substring matching to avoid false positives on `totalWidth`, `frameRate`, etc.
+- `avoid_non_ascii_symbols`: narrow from all non-ASCII to invisible/confusable characters only (zero-width, invisible formatters, non-standard whitespace)
+- `avoid_static_state`: skip `static const` and `static final` with known-immutable types (`RegExp`, `DateTime`, etc.); retain detection of `static final` mutable collections
+- `avoid_stream_subscription_in_field`: skip `.listen()` calls whose return value is passed as an argument (e.g. `subs.add(stream.listen(...))`)
+- `avoid_string_concatenation_l10n`: skip numeric-only interpolated strings (e.g. `'$a / $b'`) that contain no translatable word content
+- `avoid_unmarked_public_class`: skip classes where all constructors are private (extension already prevented)
+
 ---
 ## [5.0.0-beta.11]
 

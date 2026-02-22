@@ -1,6 +1,10 @@
 # `avoid_static_state` false positive: cached RegExp constants and immutable static finals
 
-## Status: OPEN
+## Status: RESOLVED
+
+## Resolution
+
+Skip `static const` unconditionally and `static final` fields with known-immutable types. Retain detection of `static final` mutable collections.
 
 ## Summary
 

@@ -1,6 +1,10 @@
 # `avoid_ignoring_return_values` false positive: property setter assignment
 
-## Status: OPEN
+## Status: RESOLVED
+
+## Resolution
+
+Added explicit early return for `AssignmentExpression` before the existing type guard. Setter assignments have no meaningful return value.
 
 ## Summary
 
