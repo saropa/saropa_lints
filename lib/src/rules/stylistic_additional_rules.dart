@@ -3,9 +3,12 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 
+import '../import_utils.dart';
 import '../saropa_lint_rule.dart';
+import '../fixes/stylistic_additional/add_import_group_comments_fix.dart';
 import '../fixes/stylistic_additional/prefer_double_quotes_fix.dart';
 import '../fixes/stylistic_additional/prefer_object_over_dynamic_fix.dart';
+import '../fixes/stylistic_additional/sort_imports_fix.dart';
 import '../fixes/stylistic_error_testing/replace_assert_with_expect_fix.dart';
 
 // ============================================================================
@@ -409,6 +412,188 @@ class PreferFlatImportsRule extends SaropaLintRule {
         // If there's more than one line gap (blank line), report
         if (currStartLine - prevEndLine > 1) {
           reporter.atNode(currImport);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when imports within a group are not sorted alphabetically.
+///
+/// Since: v5.0.0 | Rule version: v1
+///
+/// Sorted imports within each group (dart:, package:, relative) make it
+/// easier to find specific imports and reduce merge conflicts.
+///
+/// ## Good Example
+/// ```dart
+/// import 'dart:async';
+/// import 'dart:io';
+///
+/// import 'package:flutter/material.dart';
+/// import 'package:provider/provider.dart';
+/// ```
+///
+/// ## Bad Example (flagged)
+/// ```dart
+/// import 'dart:io';
+/// import 'dart:async';
+///
+/// import 'package:provider/provider.dart';
+/// import 'package:flutter/material.dart';
+/// ```
+class PreferSortedImportsRule extends SaropaLintRule {
+  PreferSortedImportsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        SortImportsFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_sorted_imports',
+    '[prefer_sorted_imports] Imports within a group are not sorted '
+        'alphabetically (A-Z by URI). Unsorted imports make it harder to '
+        'locate specific dependencies and increase the likelihood of merge '
+        'conflicts when multiple developers add imports to the same file. '
+        '{v1}',
+    correctionMessage:
+        'Sort imports alphabetically within each group '
+        '(dart:, package:, relative) for easier scanning.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit node) {
+      final imports = node.directives.whereType<ImportDirective>().toList(
+        growable: false,
+      );
+      if (imports.length < 2) return;
+
+      String? lastUri;
+      int lastGroup = -1;
+
+      for (final imp in imports) {
+        final group = ImportGroup.classify(imp);
+        final uri = imp.uri.stringValue ?? '';
+
+        if (group == lastGroup && lastUri != null) {
+          if (uri.compareTo(lastUri) < 0) {
+            reporter.atNode(imp);
+          }
+        }
+
+        if (group != lastGroup) {
+          lastGroup = group;
+        }
+        lastUri = uri;
+      }
+    });
+  }
+}
+
+/// Warns when import groups lack doc-comment section headers.
+///
+/// Since: v5.0.0 | Rule version: v1
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// ## Good Example
+/// ```dart
+/// /// Dart imports
+/// import 'dart:async';
+/// import 'dart:io';
+///
+/// /// Package imports
+/// import 'package:flutter/material.dart';
+///
+/// /// Relative imports
+/// import '../utils/helpers.dart';
+/// ```
+///
+/// ## Bad Example (flagged - no section headers)
+/// ```dart
+/// import 'dart:async';
+///
+/// import 'package:flutter/material.dart';
+///
+/// import '../utils/helpers.dart';
+/// ```
+class PreferImportGroupCommentsRule extends SaropaLintRule {
+  PreferImportGroupCommentsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddImportGroupCommentsFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_import_group_comments',
+    '[prefer_import_group_comments] Import group is missing a doc-comment '
+        'section header. Adding section headers like "/// Dart imports" '
+        'before each group makes the import block self-documenting and '
+        'helps developers quickly identify which group a new import '
+        'belongs to. {v1}',
+    correctionMessage:
+        'Add section headers (/// Dart imports, /// Package imports, '
+        '/// Relative imports) before each import group.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit node) {
+      final imports = node.directives.whereType<ImportDirective>().toList(
+        growable: false,
+      );
+      if (imports.isEmpty) return;
+
+      final content = context.fileContent;
+      final lineInfo = context.lineInfo;
+
+      int? lastGroup;
+      for (final imp in imports) {
+        final group = ImportGroup.classify(imp);
+
+        if (group == lastGroup) continue;
+        lastGroup = group;
+
+        // First import of a new group — check for header above.
+        final importLine = lineInfo.getLocation(imp.offset).lineNumber - 1;
+        if (importLine == 0) {
+          reporter.atNode(imp);
+          continue;
+        }
+
+        final prevLineStart = lineInfo.getOffsetOfLine(importLine - 1);
+        final prevLineEnd = importLine < lineInfo.lineCount
+            ? lineInfo.getOffsetOfLine(importLine) - 1
+            : content.length;
+        final prevLine = content.substring(prevLineStart, prevLineEnd).trim();
+
+        if (prevLine != ImportGroup.headers[group]) {
+          reporter.atNode(imp);
         }
       }
     });

@@ -108,3 +108,44 @@ class PackageImports {
   /// URL Launcher package imports.
   static const Set<String> urlLauncher = {'package:url_launcher/'};
 }
+
+// =============================================================================
+// Import Group Classification
+// =============================================================================
+
+/// Group IDs for import classification.
+///
+/// Group 0 = dart: SDK imports, Group 1 = package: imports, Group 2 = relative.
+abstract final class ImportGroup {
+  static const int dart = 0;
+  static const int package = 1;
+  static const int relative = 2;
+
+  /// Doc-comment section headers for each import group.
+  static const Map<int, String> headers = <int, String>{
+    dart: '/// Dart imports',
+    package: '/// Package imports',
+    relative: '/// Relative imports',
+  };
+
+  /// Classify an [ImportDirective] into a group ID.
+  static int classify(ImportDirective directive) {
+    final uri = directive.uri.stringValue ?? '';
+    if (uri.startsWith('dart:')) return dart;
+    if (uri.startsWith('package:')) return package;
+    return relative;
+  }
+
+  /// Returns true if the file content between [start] and [end] contains
+  /// any comment lines (// or ///), excluding blank lines and whitespace.
+  static bool hasCommentsBetween(String content, int start, int end) {
+    if (start >= end || start < 0 || end > content.length) return false;
+    final segment = content.substring(start, end);
+    for (final line in segment.split('\n')) {
+      final trimmed = line.trim();
+      if (trimmed.startsWith('//')) return true;
+      if (trimmed.startsWith('/*')) return true;
+    }
+    return false;
+  }
+}
