@@ -83,6 +83,7 @@ library;
 /// - [PERFORMANCE.md](../PERFORMANCE.md) for performance considerations
 /// - [CONTRIBUTING.md](../CONTRIBUTING.md) for adding new rules
 
+import 'dart:convert' show utf8;
 import 'dart:ffi';
 import 'dart:io';
 
@@ -1806,11 +1807,14 @@ Future<void> main(List<String> args) async {
         'analyze',
       ], runInShell: true);
 
+      // Use UTF-8 decoder (not SystemEncoding) because Dart processes
+      // always write UTF-8, and SystemEncoding on Windows uses the
+      // console code page which corrupts Unicode progress bar characters.
       final stdoutDone = process.stdout
-          .transform(const SystemEncoding().decoder)
+          .transform(utf8.decoder)
           .forEach(stdout.write);
       final stderrDone = process.stderr
-          .transform(const SystemEncoding().decoder)
+          .transform(utf8.decoder)
           .forEach(stderr.write);
 
       // Wait for exit code AND stream drain together so the separator
