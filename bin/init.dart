@@ -24,7 +24,10 @@ library;
 /// |--------|-------------|---------|
 /// | `-t, --tier <tier>` | Tier level (1-5 or name) | prompt (or comprehensive) |
 /// | `-o, --output <file>` | Output file path | analysis_options.yaml |
-/// | `--stylistic` | Include opinionated formatting rules | false |
+/// | `--stylistic` | Interactive stylistic rules walkthrough | default |
+/// | `--stylistic-all` | Bulk-enable all stylistic rules (CI) | false |
+/// | `--no-stylistic` | Skip stylistic walkthrough entirely | false |
+/// | `--reset-stylistic` | Clear reviewed markers, re-walkthrough | false |
 /// | `--reset` | Discard user customizations | false |
 /// | `--dry-run` | Preview output without writing | false |
 /// | `-h, --help` | Show help message | - |
@@ -61,8 +64,11 @@ library;
 /// # Start with essential tier for legacy projects
 /// dart run saropa_lints:init --tier essential
 ///
-/// # Include stylistic rules
-/// dart run saropa_lints:init --tier professional --stylistic
+/// # Bulk-enable all stylistic rules (for CI)
+/// dart run saropa_lints:init --tier professional --stylistic-all
+///
+/// # Skip the interactive stylistic walkthrough
+/// dart run saropa_lints:init --no-stylistic
 ///
 /// # Preview without writing
 /// dart run saropa_lints:init --dry-run
@@ -85,6 +91,8 @@ import 'package:saropa_lints/saropa_lints.dart'
 import 'package:saropa_lints/src/report/analysis_reporter.dart'
     show AnalysisReporter;
 import 'package:saropa_lints/src/tiers.dart' as tiers;
+
+import 'whats_new.dart' show AnsiColors, formatWhatsNew;
 
 /// Get saropa_lints rootUri from .dart_tool/package_config.json.
 /// Returns null if not found. Used by both version and source detection.
@@ -112,6 +120,107 @@ String? _rootUriToPath(String rootUri) {
     return Directory('$dartToolDir/$rootUri').absolute.path;
   }
   return null;
+}
+
+/// Whether the host project is a Flutter project.
+///
+/// Checks pubspec.yaml for Flutter SDK dependency. Used by the stylistic
+/// walkthrough to skip widget-specific rules for pure Dart projects.
+bool _isFlutterProject() {
+  try {
+    final pubspecFile = File('pubspec.yaml');
+    if (!pubspecFile.existsSync()) return false;
+    final content = pubspecFile.readAsStringSync();
+    return content.contains('flutter:') ||
+        content.contains('flutter_test:') ||
+        content.contains('sdk: flutter');
+  } catch (_) {
+    return false;
+  }
+}
+
+/// Detect which packages the host project uses from its pubspec.yaml.
+///
+/// Reads the project's pubspec.yaml (not the saropa_lints package's),
+/// parses dependencies + dev_dependencies, and returns a map of
+/// saropa_lints package names to whether they were found.
+///
+/// Used to auto-filter stylistic rules irrelevant to the project.
+Map<String, bool> _detectProjectPackages() {
+  // Start with all disabled — only enable what we find
+  final detected = <String, bool>{
+    for (final pkg in tiers.allPackages) pkg: false,
+  };
+
+  try {
+    final pubspecFile = File('pubspec.yaml');
+    if (!pubspecFile.existsSync()) return detected;
+
+    final content = pubspecFile.readAsStringSync();
+
+    // Detect Flutter
+    final isFlutter =
+        content.contains('flutter:') ||
+        content.contains('flutter_test:') ||
+        content.contains('sdk: flutter');
+
+    // Parse indented dependency names (under dependencies: or
+    // dev_dependencies:)
+    final deps = <String>{};
+    final depMatches = RegExp(r'^\s+(\w+):').allMatches(content);
+    for (final match in depMatches) {
+      final dep = match.group(1);
+      if (dep != null) deps.add(dep);
+    }
+
+    // Map detected deps to saropa_lints package names.
+    // Some saropa_lints names differ from pub.dev package names:
+    //   saropa name       → pub.dev name(s)
+    //   bloc              → bloc, flutter_bloc
+    //   getx              → get
+    //   flutter_hooks     → flutter_hooks
+    //   firebase          → firebase_core, firebase_auth, etc.
+    //   qr_scanner        → mobile_scanner, qr_code_scanner
+    const Map<String, List<String>> aliases = {
+      'bloc': ['bloc', 'flutter_bloc'],
+      'getx': ['get', 'getx'],
+      'firebase': [
+        'firebase_core',
+        'firebase_auth',
+        'cloud_firestore',
+        'firebase_storage',
+        'firebase_messaging',
+        'firebase_analytics',
+      ],
+      'qr_scanner': ['mobile_scanner', 'qr_code_scanner'],
+    };
+
+    for (final pkg in tiers.allPackages) {
+      final pubNames = aliases[pkg] ?? [pkg];
+      if (pubNames.any((name) => deps.contains(name))) {
+        detected[pkg] = true;
+      }
+    }
+
+    // If not Flutter, disable Flutter-dependent packages too
+    if (!isFlutter) {
+      // These packages require Flutter
+      for (final pkg in ['flutter_hooks', 'flame']) {
+        detected[pkg] = false;
+      }
+    }
+
+    _logTerminal(
+      '${_Colors.dim}Auto-detected packages from pubspec.yaml: '
+      '${detected.entries.where((e) => e.value).map((e) => e.key).join(', ')}'
+      '${isFlutter ? ' (Flutter project)' : ' (pure Dart)'}${_Colors.reset}',
+    );
+  } catch (_) {
+    // Can't read pubspec — fall back to all enabled
+    return Map<String, bool>.of(tiers.defaultPackages);
+  }
+
+  return detected;
 }
 
 /// Get package version by reading pubspec.yaml from package location.
@@ -730,6 +839,8 @@ class _RuleMetadata {
     required this.correctionMessage,
     required this.severity,
     required this.tier,
+    this.exampleBad,
+    this.exampleGood,
   });
 
   final String name;
@@ -737,6 +848,12 @@ class _RuleMetadata {
   final String correctionMessage;
   final String severity; // 'ERROR', 'WARNING', 'INFO'
   final RuleTier tier;
+
+  /// Short BAD example for CLI walkthrough (null if not provided).
+  final String? exampleBad;
+
+  /// Short GOOD example for CLI walkthrough (null if not provided).
+  final String? exampleGood;
 }
 
 /// Builds and returns rule metadata from rule classes.
@@ -762,6 +879,8 @@ Map<String, _RuleMetadata> _getRuleMetadata() {
         correctionMessage: correction,
         severity: severity,
         tier: tier,
+        exampleBad: rule.exampleBad,
+        exampleGood: rule.exampleGood,
       );
     }
   }
@@ -1169,9 +1288,11 @@ Future<void> main(List<String> args) async {
   // Move old reports from reports/ root into date subfolders
   _migrateOldReports();
 
-  // Get version and source info early for logging
+  // Get version, source, and package directory early for logging + what's new
   final version = _getPackageVersion();
   final source = _getPackageSource();
+  final rootUri = _getSaropaLintsRootUri();
+  final packageDir = rootUri != null ? _rootUriToPath(rootUri) : null;
 
   // Add header to log buffer
   _logBuffer.writeln('=' * 80);
@@ -1192,6 +1313,7 @@ Future<void> main(List<String> args) async {
   _logTerminal('');
   _logTerminal('${_Colors.cyan}SAROPA LINTS${_Colors.reset} v$version');
   _logTerminal('${_Colors.dim}Source: $source${_Colors.reset}');
+  _showWhatsNew(version, packageDir);
   _logTerminal('');
 
   // Resolve tier (handle numeric input, or prompt if not specified)
@@ -1230,13 +1352,18 @@ Future<void> main(List<String> args) async {
   final Set<String> enabledRules = tiers.getRulesForTier(resolvedTier);
   final Set<String> disabledRules = allRules.difference(enabledRules);
 
-  // Handle stylistic rules (opt-in)
+  // Handle stylistic rules (opt-in).
+  // --stylistic-all: bulk-enable all (old --stylistic behavior for CI).
+  // --stylistic / default: interactive walkthrough (handled after config gen).
+  // --no-stylistic: skip entirely, stylistic rules stay as-is in custom yaml.
   Set<String> finalEnabled = enabledRules;
   Set<String> finalDisabled = disabledRules;
-  if (cliArgs.includeStylistic) {
+  if (cliArgs.stylisticAll) {
     finalEnabled = finalEnabled.union(tiers.stylisticRules);
     finalDisabled = finalDisabled.difference(tiers.stylisticRules);
   } else {
+    // Stylistic rules are managed in analysis_options_custom.yaml,
+    // not in the main diagnostics block. Keep them out of tier output.
     finalEnabled = finalEnabled.difference(tiers.stylisticRules);
     finalDisabled = finalDisabled.union(tiers.stylisticRules);
   }
@@ -1277,10 +1404,14 @@ Future<void> main(List<String> args) async {
       }
     }
   } else {
+    // Auto-detect packages from pubspec.yaml for first-time setup
+    packageSettings = _detectProjectPackages();
+
     // Create the custom overrides file with a helpful header
     _createCustomOverridesFile(overridesFile);
     _logTerminal(
-      '${_Colors.green}✓ Created:${_Colors.reset} analysis_options_custom.yaml',
+      '${_Colors.green}✓ Created:${_Colors.reset} '
+      'analysis_options_custom.yaml',
     );
   }
 
@@ -1637,6 +1768,21 @@ Future<void> main(List<String> args) async {
     for (final MapEntry<String, int> entry in trailingResults.entries) {
       _logTerminal(
         '${_Colors.dim}  ${entry.key}: ${entry.value}${_Colors.reset}',
+      );
+    }
+  }
+
+  // ── Interactive stylistic walkthrough ──
+  // Runs by default after config generation. Skip with --no-stylistic.
+  // --stylistic-all already handled above (bulk-enable).
+  if (!cliArgs.dryRun && !cliArgs.noStylistic && !cliArgs.stylisticAll) {
+    final File overridesForWalkthrough = File('analysis_options_custom.yaml');
+    if (overridesForWalkthrough.existsSync()) {
+      _runStylisticWalkthrough(
+        customFile: overridesForWalkthrough,
+        packageSettings: packageSettings,
+        platformSettings: platformSettings,
+        resetStylistic: cliArgs.resetStylistic,
       );
     }
   }
@@ -2512,10 +2658,12 @@ String _buildPackageSection() {
 ///
 /// Lists all stylistic rules organized by category with problem message
 /// comments. Preserves existing true/false values from [existingValues].
+/// Preserves [reviewed] markers from [reviewedRules].
 /// Skips rules in [skipRules] (found elsewhere in the file).
 /// New rules default to `false`.
 String _buildStylisticSection({
   Map<String, bool> existingValues = const <String, bool>{},
+  Set<String> reviewedRules = const <String>{},
   Set<String> skipRules = const <String>{},
 }) {
   final buffer = StringBuffer();
@@ -2526,6 +2674,12 @@ String _buildStylisticSection({
   buffer.writeln(
     '# ─────────────────────────────────────────────────────────────────────────────',
   );
+  // ┌─────────────────────────────────────────────────────────────────────────┐
+  // │ IMPORTANT: The [reviewed] markers below track interactive walkthrough  │
+  // │ progress. Do NOT remove them — they prevent re-prompting users for     │
+  // │ rules they've already decided on. Use --reset-stylistic to clear all   │
+  // │ markers and start the walkthrough from scratch.                        │
+  // └─────────────────────────────────────────────────────────────────────────┘
   buffer.writeln(
     '# Opinionated formatting, ordering, and naming convention rules.',
   );
@@ -2537,6 +2691,13 @@ String _buildStylisticSection({
   buffer.writeln('# NOTE: Some rules conflict (e.g., prefer_single_quotes vs');
   buffer.writeln(
     '# prefer_double_quotes). Only enable one from each conflicting group.',
+  );
+  buffer.writeln('#');
+  buffer.writeln(
+    '# [reviewed] markers track walkthrough progress. Do NOT remove them.',
+  );
+  buffer.writeln(
+    '# Use --reset-stylistic to clear markers and re-review all rules.',
   );
   buffer.writeln('');
 
@@ -2558,7 +2719,9 @@ String _buildStylisticSection({
     for (final rule in activeRules) {
       final enabled = existingValues[rule] ?? false;
       final msg = _getStylisticDescription(rule);
-      final comment = msg.isNotEmpty ? '  # $msg' : '';
+      final reviewed = reviewedRules.contains(rule);
+      final marker = reviewed ? ' [reviewed]' : '';
+      final comment = msg.isNotEmpty ? '  #$marker $msg' : '';
       buffer.writeln('$rule: $enabled$comment');
       categorizedRules.add(rule);
     }
@@ -2578,7 +2741,9 @@ String _buildStylisticSection({
     for (final rule in uncategorized) {
       final enabled = existingValues[rule] ?? false;
       final msg = _getStylisticDescription(rule);
-      final comment = msg.isNotEmpty ? '  # $msg' : '';
+      final reviewed = reviewedRules.contains(rule);
+      final marker = reviewed ? ' [reviewed]' : '';
+      final comment = msg.isNotEmpty ? '  #$marker $msg' : '';
       buffer.writeln('$rule: $enabled$comment');
     }
     buffer.writeln('');
@@ -2619,8 +2784,9 @@ void _ensureStylisticRulesSection(File file) {
     return;
   }
 
-  // Section exists - parse existing values and rebuild
+  // Section exists - parse existing values and reviewed markers
   final existingValues = _extractStylisticSectionValues(content);
+  final reviewedRules = _extractReviewedRules(content);
 
   // Clean up obsolete rules no longer in tiers.stylisticRules
   _logRemovedStylisticRules(content);
@@ -2635,9 +2801,10 @@ void _ensureStylisticRulesSection(File file) {
   content = moveResult.content;
   skipRules = moveResult.skipRules;
 
-  // Rebuild the section with current rules and preserved values
+  // Rebuild the section with current rules, preserved values and markers
   final newSection = _buildStylisticSection(
     existingValues: existingValues,
+    reviewedRules: reviewedRules,
     skipRules: skipRules,
   );
 
@@ -2824,6 +2991,42 @@ Map<String, bool> _extractStylisticSectionValues(String content) {
   }
 
   return values;
+}
+
+/// Extract rule names that have the [reviewed] marker in their comment.
+///
+/// Reviewed markers track which stylistic rules the user has already
+/// decided on during the interactive walkthrough. Rules without [reviewed]
+/// will be re-prompted on the next `init` run.
+///
+/// Marker format: `rule_name: true  # [reviewed] description`
+Set<String> _extractReviewedRules(String content) {
+  final reviewed = <String>{};
+
+  final sectionStart = _findStylisticSectionStart(content);
+  final sectionEnd = _findStylisticSectionEnd(content, sectionStart);
+  final sectionContent = content.substring(sectionStart, sectionEnd);
+
+  // Match lines like: rule_name: true/false  # [reviewed] ...
+  final reviewedPattern = RegExp(
+    r'^([\w_]+):\s*(?:true|false)\s*#.*\[reviewed\]',
+    multiLine: true,
+  );
+
+  for (final match in reviewedPattern.allMatches(sectionContent)) {
+    final ruleName = match.group(1)!;
+    if (tiers.stylisticRules.contains(ruleName)) {
+      reviewed.add(ruleName);
+    }
+  }
+
+  return reviewed;
+}
+
+/// Strip all [reviewed] markers from the STYLISTIC RULES section.
+/// Used by --reset-stylistic to force re-walkthrough of all rules.
+String _stripReviewedMarkers(String content) {
+  return content.replaceAll(RegExp(r' \[reviewed\]'), '');
 }
 
 /// Extract rules from the STYLISTIC RULES section that no longer exist in
@@ -3343,6 +3546,9 @@ class CliArgs {
     required this.dryRun,
     required this.reset,
     required this.includeStylistic,
+    required this.stylisticAll,
+    required this.noStylistic,
+    required this.resetStylistic,
     required this.fixIgnores,
     required this.outputPath,
     required this.tier,
@@ -3351,7 +3557,20 @@ class CliArgs {
   final bool showHelp;
   final bool dryRun;
   final bool reset;
+
+  /// --stylistic: triggers interactive walkthrough (was bulk-enable in v4).
   final bool includeStylistic;
+
+  /// --stylistic-all: bulk-enable all stylistic rules (old --stylistic
+  /// behavior, useful for CI/non-interactive).
+  final bool stylisticAll;
+
+  /// --no-stylistic: skip the stylistic walkthrough entirely.
+  final bool noStylistic;
+
+  /// --reset-stylistic: clear all [reviewed] markers and re-walkthrough.
+  final bool resetStylistic;
+
   final bool fixIgnores;
   final String outputPath;
   final String? tier;
@@ -3363,6 +3582,9 @@ CliArgs _parseArguments(List<String> args) {
   final bool dryRun = args.contains('--dry-run');
   final bool reset = args.contains('--reset');
   final bool includeStylistic = args.contains('--stylistic');
+  final bool stylisticAll = args.contains('--stylistic-all');
+  final bool noStylistic = args.contains('--no-stylistic');
+  final bool resetStylistic = args.contains('--reset-stylistic');
   final bool fixIgnores = args.contains('--fix-ignores');
 
   String outputPath = 'analysis_options.yaml';
@@ -3404,6 +3626,9 @@ CliArgs _parseArguments(List<String> args) {
     dryRun: dryRun,
     reset: reset,
     includeStylistic: includeStylistic,
+    stylisticAll: stylisticAll,
+    noStylistic: noStylistic,
+    resetStylistic: resetStylistic,
     fixIgnores: fixIgnores,
     outputPath: outputPath,
     tier: requestedTier,
@@ -3413,6 +3638,26 @@ CliArgs _parseArguments(List<String> args) {
 void _logTerminal(String message) {
   print(message);
   _logBuffer.writeln(message);
+}
+
+/// Display "what's new" from CHANGELOG.md (non-blocking, fail-safe).
+void _showWhatsNew(String version, String? packageDir) {
+  if (version == 'unknown' || packageDir == null) return;
+
+  final lines = formatWhatsNew(
+    packageDir: packageDir,
+    version: version,
+    colors: AnsiColors(
+      bold: _Colors.bold,
+      cyan: _Colors.cyan,
+      dim: _Colors.dim,
+      reset: _Colors.reset,
+    ),
+  );
+
+  for (final line in lines) {
+    _logTerminal(line);
+  }
 }
 
 String? _resolveTier(String? input) {
@@ -3434,6 +3679,500 @@ String? _resolveTier(String? input) {
   }
 
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// Interactive stylistic rules walkthrough
+// ---------------------------------------------------------------------------
+
+/// Result of running the stylistic walkthrough.
+class _WalkthroughResult {
+  const _WalkthroughResult({
+    required this.reviewed,
+    required this.enabled,
+    required this.disabled,
+    required this.skipped,
+    required this.aborted,
+  });
+
+  final int reviewed;
+  final int enabled;
+  final int disabled;
+  final int skipped;
+  final bool aborted;
+}
+
+/// Run the interactive stylistic rules walkthrough.
+///
+/// Walks through unreviewed stylistic rules category by category,
+/// showing code examples and prompting the user to enable or disable
+/// each rule. Saves decisions immediately to [customFile].
+///
+/// Returns early if non-interactive.
+_WalkthroughResult _runStylisticWalkthrough({
+  required File customFile,
+  required Map<String, bool> packageSettings,
+  required Map<String, bool> platformSettings,
+  required bool resetStylistic,
+}) {
+  if (!stdin.hasTerminal) {
+    _logTerminal(
+      '${_Colors.dim}Non-interactive: skipping stylistic '
+      'walkthrough${_Colors.reset}',
+    );
+    return const _WalkthroughResult(
+      reviewed: 0,
+      enabled: 0,
+      disabled: 0,
+      skipped: 0,
+      aborted: false,
+    );
+  }
+
+  final content = customFile.readAsStringSync();
+
+  // Get existing values and reviewed markers
+  final existingValues = _extractStylisticSectionValues(content);
+  var reviewedRules = resetStylistic
+      ? <String>{}
+      : _extractReviewedRules(content);
+
+  // If --reset-stylistic, strip markers from the file first
+  if (resetStylistic && content.contains('[reviewed]')) {
+    customFile.writeAsStringSync(_stripReviewedMarkers(content));
+    _logTerminal(
+      '${_Colors.yellow}Cleared all [reviewed] markers${_Colors.reset}',
+    );
+  }
+
+  // Filter out rules irrelevant to this project
+  final disabledByPackage = tiers.getRulesDisabledByPackages(packageSettings);
+  final disabledByPlatform = tiers.getRulesDisabledByPlatforms(
+    platformSettings,
+  );
+  var irrelevantRules = disabledByPackage.union(disabledByPlatform);
+
+  // Skip widget-specific stylistic rules for pure Dart projects
+  if (!_isFlutterProject()) {
+    irrelevantRules = irrelevantRules.union(tiers.flutterStylisticRules);
+  }
+
+  // Build the list of rules to walk through (unreviewed + relevant)
+  final rulesToReview = tiers.stylisticRules
+      .difference(reviewedRules)
+      .difference(irrelevantRules);
+
+  if (rulesToReview.isEmpty) {
+    _logTerminal(
+      '${_Colors.green}All stylistic rules already '
+      'reviewed.${_Colors.reset}',
+    );
+    _logTerminal(
+      '${_Colors.dim}Use --reset-stylistic to '
+      're-review.${_Colors.reset}',
+    );
+    return const _WalkthroughResult(
+      reviewed: 0,
+      enabled: 0,
+      disabled: 0,
+      skipped: 0,
+      aborted: false,
+    );
+  }
+
+  _logTerminal('');
+  _logTerminal(
+    '${_Colors.bold}${_Colors.cyan}'
+    '── Stylistic Rules Walkthrough ──${_Colors.reset}',
+  );
+  _logTerminal(
+    '${_Colors.dim}${rulesToReview.length} rules to review '
+    '(${irrelevantRules.intersection(tiers.stylisticRules).length} '
+    'skipped as irrelevant to project)${_Colors.reset}',
+  );
+  _logTerminal('');
+  _logTerminal(
+    '${_Colors.dim}  y = enable  n = disable  s = skip  '
+    'a = enable all in category  q = quit & save${_Colors.reset}',
+  );
+  _logTerminal('');
+
+  final metadata = _getRuleMetadata();
+  int enabled = 0;
+  int disabled = 0;
+  int skipped = 0;
+  bool aborted = false;
+
+  // Walk through categories in order
+  final categoryEntries = _stylisticRuleCategories.entries.toList();
+  final totalCategories = categoryEntries
+      .where((e) => e.value.any((r) => rulesToReview.contains(r)))
+      .length;
+  int categoryIndex = 0;
+
+  for (final entry in categoryEntries) {
+    final category = entry.key;
+    final categoryRules = entry.value
+        .where((r) => rulesToReview.contains(r))
+        .toList();
+    if (categoryRules.isEmpty) continue;
+
+    categoryIndex++;
+    final isConflicting = category.contains('conflicting');
+
+    if (isConflicting) {
+      final result = _walkthroughConflicting(
+        category: category,
+        rules: categoryRules,
+        metadata: metadata,
+        existingValues: existingValues,
+        categoryIndex: categoryIndex,
+        totalCategories: totalCategories,
+      );
+      if (result == null) {
+        aborted = true;
+        break;
+      }
+      enabled += result.enabled;
+      disabled += result.disabled;
+      skipped += result.skipped;
+      _writeStylisticDecisions(customFile, result.decisions, reviewedRules);
+      reviewedRules = reviewedRules.union(result.decisions.keys.toSet());
+    } else {
+      final result = _walkthroughCategory(
+        category: category,
+        rules: categoryRules,
+        metadata: metadata,
+        existingValues: existingValues,
+        categoryIndex: categoryIndex,
+        totalCategories: totalCategories,
+      );
+      if (result == null) {
+        aborted = true;
+        break;
+      }
+      enabled += result.enabled;
+      disabled += result.disabled;
+      skipped += result.skipped;
+      _writeStylisticDecisions(customFile, result.decisions, reviewedRules);
+      reviewedRules = reviewedRules.union(result.decisions.keys.toSet());
+    }
+  }
+
+  // Handle uncategorized rules
+  if (!aborted) {
+    final categorized = <String>{};
+    for (final rules in _stylisticRuleCategories.values) {
+      categorized.addAll(rules);
+    }
+    final uncategorizedToReview = rulesToReview.difference(categorized);
+    if (uncategorizedToReview.isNotEmpty) {
+      final result = _walkthroughCategory(
+        category: 'Other stylistic rules',
+        rules: uncategorizedToReview.toList()..sort(),
+        metadata: metadata,
+        existingValues: existingValues,
+        categoryIndex: totalCategories,
+        totalCategories: totalCategories,
+      );
+      if (result == null) {
+        aborted = true;
+      } else {
+        enabled += result.enabled;
+        disabled += result.disabled;
+        skipped += result.skipped;
+        _writeStylisticDecisions(customFile, result.decisions, reviewedRules);
+      }
+    }
+  }
+
+  final totalReviewed = enabled + disabled;
+  _logTerminal('');
+  _logTerminal(
+    '${_Colors.bold}Walkthrough '
+    '${aborted ? 'paused' : 'complete'}:${_Colors.reset} '
+    '$totalReviewed reviewed '
+    '(${_Colors.green}$enabled enabled${_Colors.reset}, '
+    '${_Colors.red}$disabled disabled${_Colors.reset}, '
+    '${_Colors.dim}$skipped skipped${_Colors.reset})',
+  );
+  if (aborted) {
+    _logTerminal(
+      '${_Colors.dim}Run init again to resume from where you '
+      'left off.${_Colors.reset}',
+    );
+  }
+
+  return _WalkthroughResult(
+    reviewed: totalReviewed,
+    enabled: enabled,
+    disabled: disabled,
+    skipped: skipped,
+    aborted: aborted,
+  );
+}
+
+/// Result from walking through a single category.
+class _CategoryResult {
+  const _CategoryResult({
+    required this.enabled,
+    required this.disabled,
+    required this.skipped,
+    required this.decisions,
+  });
+
+  final int enabled;
+  final int disabled;
+  final int skipped;
+
+  /// Rule name to enabled/disabled decision (skipped rules omitted).
+  final Map<String, bool> decisions;
+}
+
+/// Walk through a non-conflicting category rule by rule.
+/// Returns null if user chose to quit.
+_CategoryResult? _walkthroughCategory({
+  required String category,
+  required List<String> rules,
+  required Map<String, _RuleMetadata> metadata,
+  required Map<String, bool> existingValues,
+  required int categoryIndex,
+  required int totalCategories,
+}) {
+  _logTerminal(
+    '${_Colors.bold}${_Colors.cyan}'
+    '── $category ($categoryIndex of $totalCategories) '
+    '──${_Colors.reset}',
+  );
+  _logTerminal('');
+
+  int enabled = 0;
+  int disabled = 0;
+  int skipped = 0;
+  final decisions = <String, bool>{};
+  bool enableAllRemaining = false;
+
+  for (int i = 0; i < rules.length; i++) {
+    final rule = rules[i];
+    final meta = metadata[rule];
+
+    if (enableAllRemaining) {
+      decisions[rule] = true;
+      enabled++;
+      _logTerminal('  ${_Colors.green}+ $rule${_Colors.reset}');
+      continue;
+    }
+
+    // Display rule info
+    _logTerminal('  ${_Colors.bold}$rule${_Colors.reset}');
+    _logTerminal('');
+
+    if (meta != null) {
+      // Show code examples if available
+      if (meta.exampleBad != null) {
+        _logTerminal(
+          '  ${_Colors.red}BAD:${_Colors.reset}  '
+          '${meta.exampleBad}',
+        );
+      }
+      if (meta.exampleGood != null) {
+        _logTerminal(
+          '  ${_Colors.green}GOOD:${_Colors.reset} '
+          '${meta.exampleGood}',
+        );
+      }
+      if (meta.exampleBad != null || meta.exampleGood != null) {
+        _logTerminal('');
+      }
+
+      // Show description
+      final desc = meta.correctionMessage.isNotEmpty
+          ? _stripRulePrefix(meta.correctionMessage)
+          : _stripRulePrefix(meta.problemMessage);
+      if (desc.isNotEmpty) {
+        _logTerminal('  ${_Colors.dim}$desc${_Colors.reset}');
+        _logTerminal('');
+      }
+    }
+
+    // Prompt
+    final remaining = rules.length - i;
+    stdout.write(
+      '  ${_Colors.cyan}[y] enable  [n] disable  [s] skip  '
+      '[a] enable remaining $remaining  '
+      '[q] quit: ${_Colors.reset}',
+    );
+
+    final input = stdin.readLineSync()?.trim().toLowerCase() ?? '';
+    _logTerminal('');
+
+    switch (input) {
+      case 'y':
+      case 'yes':
+        decisions[rule] = true;
+        enabled++;
+      case 'n':
+      case 'no':
+        decisions[rule] = false;
+        disabled++;
+      case 's':
+      case 'skip':
+      case '':
+        skipped++;
+      case 'a':
+      case 'all':
+        decisions[rule] = true;
+        enabled++;
+        enableAllRemaining = true;
+      case 'q':
+      case 'quit':
+        return null;
+      default:
+        _logTerminal(
+          '  ${_Colors.yellow}Unknown "$input", '
+          'skipping${_Colors.reset}',
+        );
+        skipped++;
+    }
+  }
+
+  return _CategoryResult(
+    enabled: enabled,
+    disabled: disabled,
+    skipped: skipped,
+    decisions: decisions,
+  );
+}
+
+/// Walk through a conflicting category as a multiple-choice selection.
+/// Returns null if user chose to quit.
+_CategoryResult? _walkthroughConflicting({
+  required String category,
+  required List<String> rules,
+  required Map<String, _RuleMetadata> metadata,
+  required Map<String, bool> existingValues,
+  required int categoryIndex,
+  required int totalCategories,
+}) {
+  _logTerminal(
+    '${_Colors.bold}${_Colors.cyan}'
+    '── $category ($categoryIndex of $totalCategories) '
+    '──${_Colors.reset}',
+  );
+  _logTerminal('');
+
+  // Display all options with numbers
+  for (int i = 0; i < rules.length; i++) {
+    final rule = rules[i];
+    final meta = metadata[rule];
+    _logTerminal('  ${_Colors.bold}${i + 1}. $rule${_Colors.reset}');
+    if (meta?.exampleGood != null) {
+      _logTerminal('     ${_Colors.dim}${meta!.exampleGood}${_Colors.reset}');
+    } else if (meta != null) {
+      final desc = _stripRulePrefix(meta.correctionMessage).isNotEmpty
+          ? _stripRulePrefix(meta.correctionMessage)
+          : _stripRulePrefix(meta.problemMessage);
+      _logTerminal('     ${_Colors.dim}$desc${_Colors.reset}');
+    }
+    _logTerminal('');
+  }
+
+  // Prompt
+  final nums = List.generate(rules.length, (i) => '${i + 1}').join('/');
+  stdout.write(
+    '  ${_Colors.cyan}Choose [$nums] or [s] skip  '
+    '[q] quit: ${_Colors.reset}',
+  );
+
+  final input = stdin.readLineSync()?.trim().toLowerCase() ?? '';
+  _logTerminal('');
+
+  if (input == 'q' || input == 'quit') return null;
+
+  final decisions = <String, bool>{};
+  int enabled = 0;
+  int disabled = 0;
+  int skipped = 0;
+
+  if (input == 's' || input == 'skip' || input.isEmpty) {
+    skipped += rules.length;
+  } else {
+    final choice = int.tryParse(input);
+    if (choice != null && choice >= 1 && choice <= rules.length) {
+      // Enable the chosen rule, disable all others
+      for (int i = 0; i < rules.length; i++) {
+        if (i == choice - 1) {
+          decisions[rules[i]] = true;
+          enabled++;
+        } else {
+          decisions[rules[i]] = false;
+          disabled++;
+        }
+      }
+    } else {
+      _logTerminal(
+        '  ${_Colors.yellow}Unknown "$input", '
+        'skipping${_Colors.reset}',
+      );
+      skipped += rules.length;
+    }
+  }
+
+  return _CategoryResult(
+    enabled: enabled,
+    disabled: disabled,
+    skipped: skipped,
+    decisions: decisions,
+  );
+}
+
+/// Write walkthrough decisions to the custom yaml file.
+///
+/// Updates rule values and adds [reviewed] markers in the STYLISTIC
+/// RULES section. Only modifies rules present in [decisions].
+void _writeStylisticDecisions(
+  File customFile,
+  Map<String, bool> decisions,
+  Set<String> alreadyReviewed,
+) {
+  if (decisions.isEmpty) return;
+
+  var content = customFile.readAsStringSync();
+
+  for (final entry in decisions.entries) {
+    final rule = entry.key;
+    final enabled = entry.value;
+
+    // Match the rule line: rule_name: true/false  # ...
+    final rulePattern = RegExp(
+      '^(${RegExp.escape(rule)}):\\s*(true|false)(\\s*#.*)?\\s*\$',
+      multiLine: true,
+    );
+
+    final match = rulePattern.firstMatch(content);
+    if (match != null) {
+      // Preserve description after [reviewed] marker
+      final existingComment = match.group(3)?.trim() ?? '';
+
+      // Strip old marker if present, keep description
+      final descPart = existingComment
+          .replaceFirst(RegExp(r'^#\s*'), '')
+          .replaceFirst(RegExp(r'\[reviewed\]\s*'), '')
+          .trim();
+
+      final newComment = descPart.isNotEmpty
+          ? '  # [reviewed] $descPart'
+          : '  # [reviewed]';
+
+      content = content.replaceRange(
+        match.start,
+        match.end,
+        '$rule: $enabled$newComment',
+      );
+    }
+  }
+
+  customFile.writeAsStringSync(content);
 }
 
 /// Prompts the user to select a tier interactively.
@@ -3501,7 +4240,10 @@ Usage: dart run saropa_lints:init [options]
 Options:
   -t, --tier <tier>     Tier level (1-5 or name, prompts if omitted)
   -o, --output <file>   Output file (default: analysis_options.yaml)
-  --stylistic           Include stylistic rules (opinionated, off by default)
+  --stylistic           Interactive stylistic rules walkthrough (default)
+  --stylistic-all       Bulk-enable all stylistic rules (CI/non-interactive)
+  --no-stylistic        Skip stylistic rules walkthrough entirely
+  --reset-stylistic     Clear reviewed markers and re-walkthrough all rules
   --fix-ignores         Auto-convert v4 ignore comments without prompting
   --reset               Discard user customizations and reset to tier defaults
   --dry-run             Preview output without writing
@@ -3511,11 +4253,13 @@ Tiers:
 ${tierOrder.map((String t) => '  ${tierIds[t]}. $t\n     ${tierDescriptions[t]}').join('\n')}
 
 Examples:
-  dart run saropa_lints:init                          # Prompts for tier
+  dart run saropa_lints:init                          # Prompts for tier + walkthrough
   dart run saropa_lints:init --tier comprehensive
   dart run saropa_lints:init --tier 4
   dart run saropa_lints:init --tier essential --reset
-  dart run saropa_lints:init --tier pedantic --stylistic
+  dart run saropa_lints:init --stylistic-all            # Bulk-enable all stylistic
+  dart run saropa_lints:init --no-stylistic             # Skip stylistic walkthrough
+  dart run saropa_lints:init --reset-stylistic          # Re-review all stylistic rules
   dart run saropa_lints:init --dry-run
 
 After generating, run `dart analyze` to verify.
