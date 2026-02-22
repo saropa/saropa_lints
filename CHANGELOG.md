@@ -18,6 +18,18 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - New rule: `prefer_import_group_comments` (Stylistic) — detects missing `///` section headers between import groups with quick fix to add them
 
 ### Fixed
+- `no_empty_string`: only flag empty strings in equality comparisons (`== ''`, `!= ''`) where `.isEmpty`/`.isNotEmpty` is a viable alternative — skip return values, default params, null-coalescing, replacement args
+- `prefer_cached_getter`: skip methods inside extensions and extension types (cannot have instance fields) and static methods (cannot cache to instance fields)
+- `prefer_compute_for_heavy_work`: only flag encode/decode/compress calls inside widget lifecycle methods (`build`, `initState`, etc.) — library utility methods have no UI thread to protect
+- `prefer_keep_alive`: check for `TabBarView`/`PageView` identifiers instead of naive `contains('Tab')`/`contains('Page')` substring matching
+- `prefer_prefixed_global_constants`: case-insensitive descriptive pattern check for lowerCamelCase constants; expand pattern list (width, height, padding, etc.); narrow threshold to only flag names < 5 chars
+- `prefer_secure_random`: only flag `Random()` in security-related contexts (variable/method names containing token, password, encrypt, etc.); skip `.shuffle()` usage and literal-seeded constructors
+- `prefer_static_method`: skip methods inside extensions and extension types (cannot be made static in Dart)
+- `require_currency_code_with_amount`: split into strong (price, amount, cost, fee) and weak (total, balance, rate) monetary signals; weak signals require 2+ matches with double/Decimal type; skip non-monetary class names (stats, count, metric, score, etc.)
+- `require_dispose_pattern`: skip classes with `const` constructors (hold borrowed references, not owned resources)
+- `require_envied_obfuscation`: skip class-level `@Envied` warning when all `@EnviedField` annotations explicitly specify `obfuscate`
+- `require_https_only_test`: skip HTTP URLs inside test infrastructure calls (`test()`, `expect()`, `group()`, etc.) since URL utility tests must exercise HTTP
+- `require_ios_callkit_integration`: replace brand name string matching (Agora, Twilio, Vonage, WebRTC) with import-based detection for 13 VoIP packages; keep only unambiguous technical terms for string matching
 - `avoid_barrel_files`: skip files with `library` directive and the mandatory package entry point (`lib/<package_name>.dart`)
 - `avoid_duplicate_number_elements`: only flag `Set` literals — duplicate numeric values in `List` literals are intentional (e.g. days-in-month)
 - `avoid_ignoring_return_values`: skip property setter assignments (`obj.prop = value`) which have no return value

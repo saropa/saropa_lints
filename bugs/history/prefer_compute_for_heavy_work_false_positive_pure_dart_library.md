@@ -1,6 +1,6 @@
 # `prefer_compute_for_heavy_work` false positive: pure Dart library flagged for UI thread blocking
 
-## Status: OPEN
+## Status: RESOLVED
 
 ## Summary
 

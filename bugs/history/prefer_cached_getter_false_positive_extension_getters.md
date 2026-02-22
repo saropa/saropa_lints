@@ -1,6 +1,6 @@
 # `prefer_cached_getter` false positive: extension getters cannot cache values
 
-## Status: OPEN
+## Status: RESOLVED
 
 ## Summary
 
