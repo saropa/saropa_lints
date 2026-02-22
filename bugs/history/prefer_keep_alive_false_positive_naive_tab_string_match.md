@@ -1,6 +1,6 @@
 # `prefer_keep_alive` false positive: naive `contains('Tab')` matches unrelated string references
 
-## Status: OPEN
+## Status: RESOLVED
 
 ## Summary
 

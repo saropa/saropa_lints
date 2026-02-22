@@ -1,6 +1,6 @@
 # `require_dispose_pattern` false positive: `const` options class with borrowed `FocusNode?` reference
 
-## Status: OPEN
+## Status: RESOLVED
 
 ## Summary
 

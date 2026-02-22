@@ -1,6 +1,6 @@
 # `no_empty_string` false positive: standard Dart idiom for empty string literals
 
-## Status: OPEN
+## Status: RESOLVED
 
 ## Summary
 
