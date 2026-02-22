@@ -26,7 +26,6 @@ void main() {
       'avoid_long_parameter_list',
       'avoid_local_functions',
       'limit_max_imports',
-      'prefer_sorted_members',
       'prefer_sorted_parameters',
       'prefer_named_boolean_parameters',
       'prefer_named_imports',
@@ -340,18 +339,6 @@ void main() {
       test('prefer_small_length_test_files should NOT trigger', () {
         // Preferred pattern used correctly
         expect('prefer_small_length_test_files passes', isNotNull);
-      });
-    });
-
-    group('prefer_sorted_members', () {
-      test('prefer_sorted_members SHOULD trigger', () {
-        // Better alternative available: prefer sorted members
-        expect('prefer_sorted_members detected', isNotNull);
-      });
-
-      test('prefer_sorted_members should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_sorted_members passes', isNotNull);
       });
     });
 
