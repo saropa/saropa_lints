@@ -298,9 +298,19 @@ def scan_directory(project_dir: Path) -> list[SpellingHit]:
 def print_spelling_report(
     hits: list[SpellingHit],
     project_dir: Path | None = None,
+    *,
+    show_header: bool = True,
 ) -> None:
-    """Print a report of British spellings found."""
-    print_subheader("US English Spelling Check")
+    """Print a report of British spellings found.
+
+    Args:
+        hits: Spelling hits to report.
+        project_dir: Project root for relative paths.
+        show_header: Print the ``▶`` subheader (default True).
+            Pass False when embedding in a consolidated output.
+    """
+    if show_header:
+        print_subheader("US English Spelling Check")
 
     if not hits:
         print_success("No British English spellings found.")
