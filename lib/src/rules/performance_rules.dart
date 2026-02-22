@@ -382,7 +382,7 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
         // Only flag inside widget lifecycle methods where blocking
         // the UI thread is a real concern. Library utility methods
         // have no UI thread — the consumer controls execution context.
-        if (!_isInsideWidgetLifecycle(node)) return;
+        if (!_isInsideWidgetLifecycle(node)) continue;
 
         // Check if already inside compute or isolate
         AstNode? current = node.parent;
@@ -586,8 +586,12 @@ class PreferCachedGetterRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
-      // Extensions cannot have instance fields — caching is impossible.
-      if (node.parent is ExtensionDeclaration) return;
+      // Extensions and extension types cannot have instance fields —
+      // caching is impossible.
+      if (node.parent is ExtensionDeclaration ||
+          node.parent is ExtensionTypeDeclaration) {
+        return;
+      }
 
       // Static methods cannot cache to instance fields either.
       if (node.isStatic) return;

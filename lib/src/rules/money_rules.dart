@@ -274,7 +274,10 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
             weakHits++;
           }
 
-          if (fieldName.contains('currency') || fieldName.contains('code')) {
+          if (fieldName.contains('currency') ||
+              fieldName == 'currencycode' ||
+              fieldName == 'iso4217' ||
+              fieldName == 'iso4217code') {
             hasCurrencyField = true;
           }
         }
