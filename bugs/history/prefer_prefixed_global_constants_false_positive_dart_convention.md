@@ -1,6 +1,6 @@
 # `prefer_prefixed_global_constants` false positive: Dart lowerCamelCase convention for constants
 
-## Status: OPEN
+## Status: RESOLVED
 
 ## Summary
 
