@@ -1690,6 +1690,8 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
 class PreferMatchFileNameRule extends SaropaLintRule {
   PreferMatchFileNameRule() : super(code: _code);
 
+  static final RegExp _pathSeparator = RegExp(r'[/\\]');
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
@@ -1712,17 +1714,21 @@ class PreferMatchFileNameRule extends SaropaLintRule {
   ) {
     context.addCompilationUnit((CompilationUnit node) {
       final String filePath = context.filePath;
-      final String fileName = filePath.split('/').last.replaceAll('.dart', '');
+      final String fileName = filePath
+          .split(_pathSeparator)
+          .last
+          .replaceAll('.dart', '');
       final String expectedClassName = _snakeToPascal(fileName);
 
-      // Find the first public class
+      // Only check the first public class
       for (final CompilationUnitMember member in node.declarations) {
         if (member is ClassDeclaration) {
           final String className = member.name.lexeme;
-          if (!className.startsWith('_') && className != expectedClassName) {
+          if (className.startsWith('_')) continue;
+          if (className != expectedClassName) {
             reporter.atToken(member.name, code);
-            return;
           }
+          return; // Only check the first public class
         }
       }
     });

@@ -187,6 +187,27 @@ void main() {
         // Preferred pattern used correctly
         expect('prefer_match_file_name passes', isNotNull);
       });
+
+      test('path separator splits on forward slash', () {
+        final separator = RegExp(r'[/\\]');
+        const path = 'lib/src/my_class.dart';
+        final fileName = path.split(separator).last.replaceAll('.dart', '');
+        expect(fileName, 'my_class');
+      });
+
+      test('path separator splits on backslash (Windows)', () {
+        final separator = RegExp(r'[/\\]');
+        const path = r'd:\src\project\lib\my_class.dart';
+        final fileName = path.split(separator).last.replaceAll('.dart', '');
+        expect(fileName, 'my_class');
+      });
+
+      test('path separator handles mixed separators', () {
+        final separator = RegExp(r'[/\\]');
+        const path = r'd:\src/project\lib/my_class.dart';
+        final fileName = path.split(separator).last.replaceAll('.dart', '');
+        expect(fileName, 'my_class');
+      });
     });
 
     group('prefer_prefixed_global_constants', () {
