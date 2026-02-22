@@ -1465,10 +1465,11 @@ class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addListLiteral((ListLiteral node) {
-      _checkForDuplicateNumbers(node.elements, reporter, code);
-    });
-
+    // Only flag Set literals — duplicates in Sets are silently dropped
+    // (producing a smaller collection than expected), which is almost
+    // always a bug.  In Lists, duplicate numeric values at different
+    // indices are semantically distinct and commonly intentional
+    // (e.g. days-in-month arrays, quarter mappings).
     context.addSetOrMapLiteral((SetOrMapLiteral node) {
       if (node.isSet) {
         _checkForDuplicateNumbers(node.elements, reporter, code);
