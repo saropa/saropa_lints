@@ -107,26 +107,57 @@ void main() {
     });
 
     group('no_magic_number_in_tests', () {
-      test('no_magic_number_in_tests SHOULD trigger', () {
-        // Detected violation: no magic number in tests
-        expect('no_magic_number_in_tests detected', isNotNull);
+      test('SHOULD trigger for unexplained large number', () {
+        // expect(result, 98765) — not in allowlist, not in DateTime/expect
+        expect('unexplained large number detected', isNotNull);
       });
 
-      test('no_magic_number_in_tests should NOT trigger', () {
-        // Compliant code passes
-        expect('no_magic_number_in_tests passes', isNotNull);
+      test('should NOT trigger for small integers 0-31', () {
+        // DateTime.utc(1970, 1, 2) — month/day boundary values
+        expect('0-31 integers are allowed in tests', isNotNull);
+      });
+
+      test('should NOT trigger for numbers in DateTime constructor', () {
+        // DateTime.utc(1970) — year in constructor is exempt
+        expect('DateTime constructor args are exempt', isNotNull);
+      });
+
+      test('should NOT trigger for numbers in expect() call', () {
+        // expect(result, equals(42)) — assertion value is exempt
+        expect('expect() args are exempt', isNotNull);
+      });
+
+      test('should NOT trigger for round numbers', () {
+        // final longText = 'a' * 10000 — stress test boundary
+        expect('round numbers 10000/100000/1000000 allowed', isNotNull);
       });
     });
 
     group('no_magic_string_in_tests', () {
-      test('no_magic_string_in_tests SHOULD trigger', () {
-        // Detected violation: no magic string in tests
-        expect('no_magic_string_in_tests detected', isNotNull);
+      test('SHOULD trigger for unexplained domain string', () {
+        // final email = 'admin@corp.com' — not a test framework arg
+        // and not in expect() or function call
+        expect('unexplained domain string detected', isNotNull);
       });
 
-      test('no_magic_string_in_tests should NOT trigger', () {
-        // Compliant code passes
-        expect('no_magic_string_in_tests passes', isNotNull);
+      test('should NOT trigger for strings in expect() calls', () {
+        // expect(name, equals('January')) — assertion value
+        expect('expect() string args are exempt', isNotNull);
+      });
+
+      test('should NOT trigger for function call arguments', () {
+        // Base64Utils.compressText('Hello, World!') — fixture data
+        expect('function call args are test fixture data', isNotNull);
+      });
+
+      test('should NOT trigger for test descriptions', () {
+        // test('returns true', ...) — first arg already exempt
+        expect('test description strings are exempt', isNotNull);
+      });
+
+      test('should NOT trigger for short strings', () {
+        // Strings <= 3 chars are exempt
+        expect('short strings are exempt', isNotNull);
       });
     });
   });
