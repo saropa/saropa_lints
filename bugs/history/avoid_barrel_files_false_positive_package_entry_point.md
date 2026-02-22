@@ -1,6 +1,10 @@
 # `avoid_barrel_files` false positive: mandatory Dart package entry point file
 
-## Status: OPEN
+## Status: RESOLVED
+
+## Resolution
+
+Skip files with `library` directive and the mandatory package entry point (`lib/<package_name>.dart`).
 
 ## Summary
 

@@ -3431,12 +3431,15 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
     'invoice',
   };
 
+  static final RegExp _upperCaseRegex = RegExp(r'[A-Z]');
+  static final RegExp _wordSplitRegex = RegExp(r'[_ ]+');
+
   /// Splits a camelCase or snake_case identifier into lowercase words.
   static List<String> _splitIdentifier(String name) {
     return name
-        .replaceAllMapped(RegExp(r'[A-Z]'), (Match m) => ' ${m.group(0)}')
+        .replaceAllMapped(_upperCaseRegex, (Match m) => ' ${m.group(0)}')
         .toLowerCase()
-        .split(RegExp(r'[_ ]+'))
+        .split(_wordSplitRegex)
         .where((String w) => w.isNotEmpty)
         .toList();
   }

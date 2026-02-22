@@ -1,6 +1,10 @@
 # `avoid_unmarked_public_class` false positive: static utility classes
 
-## Status: OPEN
+## Status: RESOLVED
+
+## Resolution
+
+Skip classes where all declared constructors are private. Private constructors prevent external instantiation and extension.
 
 ## Summary
 

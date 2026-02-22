@@ -1240,12 +1240,19 @@ class AvoidStaticStateRule extends SaropaLintRule {
             return;
           }
         }
+
+        // Final mutable collections (List, Map, Set) can still have
+        // their contents modified — flag these.
+        if (type.startsWith('List') ||
+            type.startsWith('Map') ||
+            type.startsWith('Set')) {
+          reporter.atNode(node);
+        }
+        return;
       }
 
-      // Only flag non-final (truly mutable) static fields.
-      if (!node.fields.isFinal) {
-        reporter.atNode(node);
-      }
+      // Non-final static fields are truly mutable state.
+      reporter.atNode(node);
     });
   }
 }

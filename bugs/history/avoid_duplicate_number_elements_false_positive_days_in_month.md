@@ -1,6 +1,10 @@
 # `avoid_duplicate_number_elements` false positive: List literal with intentionally repeated values
 
-## Status: OPEN
+## Status: RESOLVED
+
+## Resolution
+
+Only flag `Set` literals where duplicates are silently dropped. Removed `List` literal handler since duplicate values at different indices are intentional.
 
 ## Summary
 

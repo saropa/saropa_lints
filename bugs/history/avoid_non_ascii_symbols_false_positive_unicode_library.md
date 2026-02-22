@@ -1,6 +1,10 @@
 # `avoid_non_ascii_symbols` false positive: Unicode processing library requires non-ASCII characters
 
-## Status: OPEN
+## Status: RESOLVED
+
+## Resolution
+
+Narrowed detection from all non-ASCII characters to a curated set of invisible/confusable code points (zero-width, invisible formatters, non-standard whitespace, directional overrides).
 
 ## Summary
 
