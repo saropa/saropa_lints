@@ -2466,6 +2466,11 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidMisusedHooksRule.new,
   RequireRtlLayoutSupportRule.new,
   AvoidMisusedTestMatchersRule.new,
+
+  // v5.1.0 - Migration rules (Flutter SDK deprecations)
+  AvoidAssetManifestJsonRule.new,
+  PreferDropdownInitialValueRule.new,
+  PreferOnPopWithResultRule.new,
 ];
 
 // =============================================================================

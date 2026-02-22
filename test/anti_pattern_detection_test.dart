@@ -274,4 +274,5 @@ const Map<String, int> _baselineCounts = {
   'stylistic_error_testing_rules.dart': 12,
   'iap_rules.dart': 19,
   'architecture_rules.dart': 2,
+  'migration_rules.dart': 1,
 };

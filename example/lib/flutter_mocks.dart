@@ -1000,6 +1000,8 @@ class MaterialPageRoute<T> {
   MaterialPageRoute({
     required Widget Function(BuildContext) builder,
     RouteSettings? settings,
+    void Function()? onPop,
+    void Function(T?)? onPopWithResult,
   });
 }
 
@@ -1350,6 +1352,16 @@ class DropdownButton<T> extends Widget {
   const DropdownButton({
     super.key,
     required T? value,
+    required dynamic onChanged,
+    required List<dynamic> items,
+  });
+}
+
+class DropdownButtonFormField<T> extends Widget {
+  const DropdownButtonFormField({
+    super.key,
+    T? value,
+    T? initialValue,
     required dynamic onChanged,
     required List<dynamic> items,
   });
@@ -3200,3 +3212,13 @@ class CancelToken {
   void cancel([String? reason]) {}
   bool get isCancelled => false;
 }
+
+// ============================================================================
+// Asset loading
+// ============================================================================
+
+class AssetBundle {
+  Future<String> loadString(String key) async => '';
+}
+
+final AssetBundle rootBundle = AssetBundle();
