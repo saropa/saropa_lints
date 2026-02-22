@@ -57,6 +57,12 @@ class PreferNullAwareAssignmentRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => "if (name == null) name = 'default';";
+
+  @override
+  String get exampleGood => "name ??= 'default';";
+
   static const LintCode _code = LintCode(
     'prefer_null_aware_assignment',
     '[prefer_null_aware_assignment] An if-null-then-assign pattern was detected that can be simplified. Replace the verbose null check and assignment block with the ??= operator for a concise, idiomatic single-expression assignment. {v3}',
@@ -142,6 +148,12 @@ class PreferExplicitNullAssignmentRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => "name ??= 'default';";
+
+  @override
+  String get exampleGood => "if (name == null) name = 'default';";
+
   static const LintCode _code = LintCode(
     'prefer_explicit_null_assignment',
     '[prefer_explicit_null_assignment] The ??= operator hides the null-check control flow, making it harder to debug and log. Use an explicit if-null-then-assign block for step-by-step clarity. {v3}',
@@ -198,6 +210,12 @@ class PreferIfNullOverTernaryRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => "x != null ? x : 'default'";
+
+  @override
+  String get exampleGood => "x ?? 'default'";
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -297,6 +315,12 @@ class PreferTernaryOverIfNullRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => "x ?? 'default'";
+
+  @override
+  String get exampleGood => "x != null ? x : 'default'";
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -533,6 +557,12 @@ class PreferSpreadOverAddAllRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'list.addAll([3, 4]);';
+
+  @override
+  String get exampleGood => 'final all = [...list, 3, 4];';
 
   // cspell:ignore addall
   static const LintCode _code = LintCode(
@@ -782,6 +812,12 @@ class PreferWhereTypeOverWhereIsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'list.where((e) => e is String)';
+
+  @override
+  String get exampleGood => 'list.whereType<String>()';
 
   // cspell:ignore wheretype
   static const LintCode _code = LintCode(

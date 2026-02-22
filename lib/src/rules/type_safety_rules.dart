@@ -605,6 +605,13 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => 'final list = []; final map = {};';
+
+  @override
+  String get exampleGood =>
+      'final list = <String>[]; final map = <String, int>{};';
+
   // Performance note: No requiredPatterns override because empty collection
   // literals (`[]`, `{}`) and generic constructors (`Future`, `Completer`) are
   // ubiquitous in Dart code. Pattern-based filtering would not provide

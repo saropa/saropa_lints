@@ -17,7 +17,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - Init: interactive stylistic rule walkthrough — shows code examples and lets users enable/disable each rule individually with y/n/skip/abort support and resume via `[reviewed]` markers
 - Init: `--stylistic-all` flag for bulk-enabling all stylistic rules (replaces old `--stylistic` behavior); `--no-stylistic` to skip walkthrough; `--reset-stylistic` to clear reviewed markers
 - Init: auto-detect project type from pubspec.yaml — Flutter widget rules are skipped for pure Dart projects, package-specific rules filtered by dependencies
-- `SaropaLintRule`: `exampleBad`/`exampleGood` properties for concise terminal-friendly code snippets (34 rules covered)
+- `SaropaLintRule`: `exampleBad`/`exampleGood` properties for concise terminal-friendly code snippets (40 rules covered)
 - `tiers.dart`: `flutterStylisticRules` set for widget-specific stylistic rules filtered by platform
 - Init: "what's new" summary shown during `dart run saropa_lints:init`, with per-category caps and a link to the full changelog
 - New rule: `prefer_sorted_imports` (Comprehensive) — detects unsorted imports within each group (dart, package, relative) with quick fix to sort A-Z
