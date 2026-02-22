@@ -2853,6 +2853,12 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
       // Check if inside an expression statement (bare listen call)
       current = node.parent;
       while (current != null) {
+        if (current is ArgumentList) {
+          // .listen() return value is passed as an argument to another
+          // method (e.g. subscriptions.add(stream.listen(...))).
+          // The caller is responsible for managing the subscription.
+          return;
+        }
         if (current is ExpressionStatement) {
           // This is a bare stream.listen() call without assignment
           reporter.atNode(node);
