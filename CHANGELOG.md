@@ -11,7 +11,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [Unreleased]
+## [5.0.0-beta.13]
 
 ### Fixed
 - `prefer_match_file_name`: false positive on Windows — backslash paths caused file name extraction to fail, reporting every correctly-named class
