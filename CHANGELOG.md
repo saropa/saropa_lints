@@ -14,8 +14,17 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ## [Unreleased]
 
 ### Added
+- Init: interactive stylistic rule walkthrough — shows code examples and lets users enable/disable each rule individually with y/n/skip/abort support and resume via `[reviewed]` markers
+- Init: `--stylistic-all` flag for bulk-enabling all stylistic rules (replaces old `--stylistic` behavior); `--no-stylistic` to skip walkthrough; `--reset-stylistic` to clear reviewed markers
+- Init: auto-detect project type from pubspec.yaml — Flutter widget rules are skipped for pure Dart projects, package-specific rules filtered by dependencies
+- `SaropaLintRule`: `exampleBad`/`exampleGood` properties for concise terminal-friendly code snippets (34 rules covered)
+- `tiers.dart`: `flutterStylisticRules` set for widget-specific stylistic rules filtered by platform
+- Init: "what's new" summary shown during `dart run saropa_lints:init`, with per-category caps and a link to the full changelog
 - New rule: `prefer_sorted_imports` (Comprehensive) — detects unsorted imports within each group (dart, package, relative) with quick fix to sort A-Z
 - New rule: `prefer_import_group_comments` (Stylistic) — detects missing `///` section headers between import groups with quick fix to add them
+- New rule: `avoid_asset_manifest_json` (Essential) — detects usage of removed `AssetManifest.json` path (Flutter 3.38.0); runtime crash since the file no longer exists in built bundles
+- New rule: `prefer_dropdown_initial_value` (Recommended) — detects deprecated `value` parameter on `DropdownButtonFormField`, suggests `initialValue` (Flutter 3.35.0) with quick fix
+- New rule: `prefer_on_pop_with_result` (Recommended) — detects deprecated `onPop` callback on routes, suggests `onPopWithResult` (Flutter 3.35.0) with quick fix
 
 ### Fixed
 - `no_empty_string`: only flag empty strings in equality comparisons (`== ''`, `!= ''`) where `.isEmpty`/`.isNotEmpty` is a viable alternative — skip return values, default params, null-coalescing, replacement args

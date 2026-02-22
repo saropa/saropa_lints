@@ -38,6 +38,7 @@ export 'json_datetime_rules.dart';
 export 'lifecycle_rules.dart';
 export 'media_rules.dart';
 export 'memory_management_rules.dart';
+export 'migration_rules.dart';
 export 'money_rules.dart';
 export 'naming_style_rules.dart';
 export 'navigation_rules.dart';
