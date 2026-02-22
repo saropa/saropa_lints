@@ -3111,13 +3111,16 @@ class PreferKeepAliveRule extends SaropaLintRule {
         }
       }
 
-      // Check if this State builds a scrollable that might need keep alive
+      // Check if this State builds a scrollable inside a tabbed/paged context
       final String classSource = node.toSource();
       if (classSource.contains('ListView') ||
           classSource.contains('GridView') ||
           classSource.contains('CustomScrollView')) {
-        // Check if inside a tab-like context (has TabBar reference)
-        if (classSource.contains('Tab') || classSource.contains('Page')) {
+        // Only flag when the class references actual tab/page view containers,
+        // not any identifier that happens to contain "Tab" or "Page"
+        // (e.g. HomeTab.icon, DataTable, PageStorageKey).
+        if (classSource.contains('TabBarView') ||
+            classSource.contains('PageView')) {
           reporter.atToken(node.name, code);
         }
       }
