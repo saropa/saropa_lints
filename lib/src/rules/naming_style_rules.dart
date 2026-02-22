@@ -91,6 +91,55 @@ class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  /// Code points that are invisible or visually confusable.
+  ///
+  /// These are the genuinely dangerous non-ASCII characters:
+  /// zero-width joiners/spaces, invisible formatters, non-standard
+  /// whitespace, and byte-order marks.  Visible characters like
+  /// emoji, accented letters, and math symbols are NOT included.
+  static const Set<int> _dangerousCodePoints = <int>{
+    // Zero-width characters
+    0x200B, // zero-width space
+    0x200C, // zero-width non-joiner
+    0x200D, // zero-width joiner
+    0xFEFF, // byte order mark / zero-width no-break space
+    // Invisible formatters
+    0x00AD, // soft hyphen
+    0x2060, // word joiner
+    0x2061, // function application
+    0x2062, // invisible times
+    0x2063, // invisible separator
+    0x2064, // invisible plus
+    // Non-standard whitespace
+    0x00A0, // non-breaking space
+    0x2000, // en quad
+    0x2001, // em quad
+    0x2002, // en space
+    0x2003, // em space
+    0x2004, // three-per-em space
+    0x2005, // four-per-em space
+    0x2006, // six-per-em space
+    0x2007, // figure space
+    0x2008, // punctuation space
+    0x2009, // thin space
+    0x200A, // hair space
+    0x202F, // narrow no-break space
+    0x205F, // medium mathematical space
+    0x3000, // ideographic space
+    // Directional formatting
+    0x200E, // left-to-right mark
+    0x200F, // right-to-left mark
+    0x202A, // left-to-right embedding
+    0x202B, // right-to-left embedding
+    0x202C, // pop directional formatting
+    0x202D, // left-to-right override
+    0x202E, // right-to-left override
+    0x2066, // left-to-right isolate
+    0x2067, // right-to-left isolate
+    0x2068, // first strong isolate
+    0x2069, // pop directional isolate
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -100,8 +149,10 @@ class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
       final String value = node.value;
       for (int i = 0; i < value.length; i++) {
         final int codeUnit = value.codeUnitAt(i);
-        // Check for non-ASCII (outside 0-127 range)
-        if (codeUnit > 127) {
+        // Only flag invisible or confusable characters, not all non-ASCII.
+        // Visible emoji, accented letters, math symbols, currency symbols,
+        // and typographic punctuation are intentional and readable.
+        if (_dangerousCodePoints.contains(codeUnit)) {
           reporter.atNode(node);
           return;
         }
