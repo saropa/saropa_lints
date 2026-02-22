@@ -562,6 +562,12 @@ class PreferCachedGetterRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
+      // Extensions cannot have instance fields — caching is impossible.
+      if (node.parent is ExtensionDeclaration) return;
+
+      // Static methods cannot cache to instance fields either.
+      if (node.isStatic) return;
+
       // Analyze the method body for repeated getter calls
       final Map<String, List<AstNode>> getterCalls = <String, List<AstNode>>{};
 
