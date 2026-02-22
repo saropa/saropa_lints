@@ -1685,6 +1685,10 @@ class PreferStaticMethodRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
+      // Extension methods cannot be made static — they always operate
+      // on `this` (the extended type's instance) implicitly.
+      if (node.parent is ExtensionDeclaration) return;
+
       // Skip already static methods
       if (node.isStatic) return;
 
