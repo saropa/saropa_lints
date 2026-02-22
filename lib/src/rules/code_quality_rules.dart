@@ -8461,6 +8461,10 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
     context.addExpressionStatement((ExpressionStatement node) {
       final Expression expression = node.expression;
 
+      // Property setter assignments (e.g. obj.prop = value) have no
+      // meaningful return value — skip them unconditionally.
+      if (expression is AssignmentExpression) return;
+
       // Only check method invocations and function invocations
       if (expression is! MethodInvocation &&
           expression is! FunctionExpressionInvocation) {
