@@ -80,7 +80,6 @@ Core stylistic preferences for imports, functions, formatting, naming, and comme
 | [`avoid_generic_greeting_text`](#avoid_generic_greeting_text) | Greeting messages should follow team style conventions | |
 | [`prefer_kebab_tag_name`](#prefer_kebab_tag_name) | Tag names should use kebab-case | |
 | [`prefer_rethrow_over_throw_e`](#prefer_rethrow_over_throw_e) | Prefer 'rethrow' over 'throw e' in catch blocks | |
-| [`prefer_sorted_members`](#prefer_sorted_members) | Class members should be sorted by team convention | |
 | [`prefer_sorted_parameters`](#prefer_sorted_parameters) | Function parameters should be sorted by team convention | |
 | [`require_purchase_verification`](#require_purchase_verification) | Purchase logic should follow team style conventions | |
 | [`purchase_completed`](#purchase_completed) | Purchase completion logic should follow team style conventions | |

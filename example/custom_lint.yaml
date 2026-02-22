@@ -677,7 +677,6 @@ custom_lint:
     # =========================================================================
 
     member_ordering: false # Class member ordering convention. [NOISY]
-    prefer_sorted_members: false # Consider reordering class members. [LOW]
     prefer_sorted_parameters: false # Named parameters should be alphabetical. [LOW]
     parameters_ordering: false # Parameter ordering convention. [LOW]
 

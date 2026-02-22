@@ -623,7 +623,8 @@ class FormatCommentFormattingRule extends SaropaLintRule {
 ///
 /// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v4
 ///
-/// Alias: sort_class_members, class_member_order, fields_before_methods
+/// Alias: sort_class_members, class_member_order, fields_before_methods,
+/// prefer_sorted_members
 ///
 /// Members should be ordered: fields, constructors, methods.
 ///
@@ -662,6 +663,7 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
   List<String> get configAliases => const <String>[
     'enforce_member_ordering',
     'member_ordering',
+    'prefer_sorted_members',
   ];
 
   static const LintCode _code = LintCode(
