@@ -1700,23 +1700,29 @@ class _TextSpanVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when List.from() or toList() copies large collections.
 ///
-/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+/// Since: v1.3.0 | Updated: v5.0.0 | Rule version: v4
 ///
 /// These methods copy all elements to a new list, which is expensive
 /// for large collections. Consider using lazy operations instead.
 ///
+/// **Exemptions**:
+/// - `List<T>.from()` with explicit type arguments (type-casting pattern)
+/// - `.toList()` when the result is returned, assigned, or in an assignment
+///   (structurally required — the caller needs a concrete List)
+///
 /// Example of **bad** code:
 /// ```dart
-/// final copy = List.from(largeList);
-/// final filtered = largeList.where((e) => e > 0).toList();
+/// final copy = List.from(largeList);  // No type args — gratuitous
 /// ```
 ///
 /// Example of **good** code:
 /// ```dart
-/// // Use Iterable operations lazily
+/// // Lazy operations
 /// final filtered = largeList.where((e) => e > 0);
-/// // Or document the intentional copy
-/// final copy = List<int>.of(largeList); // Explicit copy
+/// // Type-casting (exempt)
+/// final typed = List<int>.from(dynamicList);
+/// // Required by return type (exempt)
+/// List<int> getPositive() => list.where((e) => e > 0).toList();
 /// ```
 class AvoidLargeListCopyRule extends SaropaLintRule {
   AvoidLargeListCopyRule() : super(code: _code);
@@ -1730,7 +1736,7 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_large_list_copy',
-    '[avoid_large_list_copy] List.from() and toList() allocate a new list and copy every element, doubling memory consumption for the duration of the operation. For large collections, this triggers garbage collection pauses that freeze the UI and degrade scrolling performance. The unnecessary allocation pressure accumulates rapidly in loops or frequently called methods. {v3}',
+    '[avoid_large_list_copy] List.from() and toList() allocate a new list and copy every element, doubling memory consumption for the duration of the operation. For large collections, this triggers garbage collection pauses that freeze the UI and degrade scrolling performance. The unnecessary allocation pressure accumulates rapidly in loops or frequently called methods. List<T>.from() with type args and structurally-required .toList() are exempt. {v4}',
     correctionMessage:
         'Use lazy Iterable operations (like map, where, or take) instead of copying large lists, unless a full copy is required. If you must copy, document why to help maintainers understand the performance tradeoff.',
     severity: DiagnosticSeverity.INFO,
@@ -1741,35 +1747,61 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Check for List.from()
+    // Check for List.from() — exempt when type arguments present (type cast)
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'List') return;
 
       final SimpleIdentifier? constructorName = node.constructorName.name;
-      if (constructorName?.name == 'from') {
-        reporter.atNode(node.constructorName, code);
-      }
+      if (constructorName?.name != 'from') return;
+
+      // List<T>.from() with explicit type args is a type-casting pattern,
+      // not a gratuitous copy — there is no lazy alternative.
+      if (node.constructorName.type.typeArguments != null) return;
+
+      reporter.atNode(node.constructorName, code);
     });
 
     // Check for .toList() after filtering operations
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'toList') return;
 
-      // Check if called on a chain of operations
+      // Only flag when called on a lazy chain
       final Expression? target = node.target;
-      if (target is MethodInvocation) {
-        final String methodName = target.methodName.name;
-        // Warn if copying after filter/map operations
-        if (methodName == 'where' ||
-            methodName == 'map' ||
-            methodName == 'expand' ||
-            methodName == 'take' ||
-            methodName == 'skip') {
-          reporter.atNode(node.methodName, code);
-        }
+      if (target is! MethodInvocation) return;
+      final String methodName = target.methodName.name;
+      if (methodName != 'where' &&
+          methodName != 'map' &&
+          methodName != 'expand' &&
+          methodName != 'take' &&
+          methodName != 'skip') {
+        return;
       }
+
+      // Exempt when the .toList() result is structurally required
+      if (_isToListRequired(node)) return;
+
+      reporter.atNode(node.methodName, code);
     });
+  }
+
+  /// Returns true if the .toList() result is used in a context where a
+  /// concrete List is required (return statement, variable assignment,
+  /// or passed to a method that requires List).
+  static bool _isToListRequired(MethodInvocation node) {
+    final AstNode? parent = node.parent;
+
+    // .toList() result is returned — function contract requires List
+    if (parent is ReturnStatement) return true;
+    if (parent is ExpressionFunctionBody) return true;
+
+    // .toList() result is assigned to a variable
+    if (parent is VariableDeclaration) return true;
+
+    // .toList() is the expression in an assignment
+    if (parent is AssignmentExpression) return true;
+
+    return false;
   }
 }
 

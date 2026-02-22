@@ -148,3 +148,23 @@ bool isTestDescription(AstNode node) {
   }
   return false;
 }
+
+/// Checks if a node is inside an `expect()` call.
+///
+/// In test files, values inside `expect()` are either the actual value
+/// under test or the expected result — both are self-documenting in context
+/// and should generally be exempt from magic literal rules.
+///
+/// Walks up the parent chain and returns true if an `expect()` method
+/// invocation is found before reaching a function body boundary.
+bool isInExpectCall(AstNode node) {
+  AstNode? current = node.parent;
+  while (current != null) {
+    if (current is MethodInvocation && current.methodName.name == 'expect') {
+      return true;
+    }
+    if (current is FunctionBody) break;
+    current = current.parent;
+  }
+  return false;
+}
