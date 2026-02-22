@@ -2144,6 +2144,9 @@ class AvoidStringConcatenationL10nRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  /// Matches any ASCII letter — used to detect translatable word content.
+  static final RegExp _letterRegex = RegExp('[a-zA-Z]');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2176,7 +2179,7 @@ class AvoidStringConcatenationL10nRule extends SaropaLintRule {
           } else if (element is InterpolationString) {
             // Check if literal text contains letters (translatable words).
             // Pure separators like ' / ', ' x ', ' : ' are not translatable.
-            if (RegExp('[a-zA-Z]').hasMatch(element.value)) {
+            if (_letterRegex.hasMatch(element.value)) {
               hasWordContent = true;
             }
           }

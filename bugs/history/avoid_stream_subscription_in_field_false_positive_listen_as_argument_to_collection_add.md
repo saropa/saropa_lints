@@ -1,6 +1,10 @@
 # `avoid_stream_subscription_in_field` false positive: `.listen()` passed as argument to `List.add()`
 
-## Status: OPEN
+## Status: RESOLVED
+
+## Resolution
+
+Added `ArgumentList` check in the parent-walk loop. When `.listen()` is passed as an argument to another method, the caller manages the subscription.
 
 ## Summary
 
