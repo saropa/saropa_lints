@@ -1194,6 +1194,28 @@ class AvoidStaticStateRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  /// Types known to be immutable after construction.
+  static const Set<String> _knownImmutableTypes = <String>{
+    'RegExp',
+    'DateTime',
+    'String',
+    'int',
+    'double',
+    'num',
+    'bool',
+    'Duration',
+    'Uri',
+    'Type',
+  };
+
+  /// Returns true if the type annotation names a known-immutable type.
+  static bool _isKnownImmutableType(String typeSource) {
+    if (typeSource.isEmpty) return false;
+    return _knownImmutableTypes.any(
+      (String t) => typeSource == t || typeSource == '$t?',
+    );
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1201,36 +1223,27 @@ class AvoidStaticStateRule extends SaropaLintRule {
   ) {
     context.addFieldDeclaration((FieldDeclaration node) {
       if (!node.isStatic) return;
-      if (node.fields.isFinal && node.fields.isConst) return;
 
-      // Skip if final with immutable initializer
+      // Compile-time constants are never mutable state.
+      if (node.fields.isConst) return;
+
+      // Final fields with known-immutable types cannot be reassigned
+      // and hold objects that never change after construction.
       if (node.fields.isFinal) {
-        for (final variable in node.fields.variables) {
-          final init = variable.initializer;
-          if (init != null) {
-            final initSource = init.toSource();
-            // Allow final static with const initializers
-            if (initSource.startsWith('const ') ||
-                initSource == 'true' ||
-                initSource == 'false' ||
-                RegExp(r'^[\d.]+$').hasMatch(initSource) ||
-                initSource.startsWith("'") ||
-                initSource.startsWith('"')) {
-              return;
-            }
+        final String type = node.fields.type?.toSource() ?? '';
+        if (_isKnownImmutableType(type)) return;
+
+        // Also allow final fields with const initializers
+        for (final VariableDeclaration variable in node.fields.variables) {
+          final Expression? init = variable.initializer;
+          if (init != null && init.toSource().startsWith('const ')) {
+            return;
           }
         }
       }
 
-      // Check for mutable types
-      final type = node.fields.type?.toSource() ?? '';
-      final isMutableCollection =
-          type.startsWith('List') ||
-          type.startsWith('Map') ||
-          type.startsWith('Set');
-
-      // Non-final static or mutable collection
-      if (!node.fields.isFinal || isMutableCollection) {
+      // Only flag non-final (truly mutable) static fields.
+      if (!node.fields.isFinal) {
         reporter.atNode(node);
       }
     });
