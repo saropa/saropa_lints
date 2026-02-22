@@ -862,6 +862,16 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
       final String name = node.name.name;
       if (name != 'Envied' && name != 'EnviedField') return;
 
+      // For class-level @Envied, skip if all @EnviedField annotations
+      // in the class already specify obfuscate explicitly.
+      if (name == 'Envied') {
+        final AstNode? classNode = node.parent?.parent;
+        if (classNode is ClassDeclaration &&
+            _allFieldsHandleObfuscation(classNode)) {
+          return;
+        }
+      }
+
       // Check for obfuscate: true
       final ArgumentList? args = node.arguments;
       if (args == null) {
@@ -882,6 +892,35 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
+  }
+
+  /// Returns true if every @EnviedField in the class explicitly
+  /// specifies an `obfuscate` argument (true or false).
+  static bool _allFieldsHandleObfuscation(ClassDeclaration classDecl) {
+    bool hasAnyField = false;
+
+    for (final ClassMember member in classDecl.members) {
+      if (member is! FieldDeclaration) continue;
+
+      for (final Annotation annotation in member.metadata) {
+        if (annotation.name.name != 'EnviedField') continue;
+        hasAnyField = true;
+
+        final ArgumentList? args = annotation.arguments;
+        if (args == null) return false;
+
+        final bool specifiesObfuscate = args.arguments.any((Expression arg) {
+          if (arg is NamedExpression) {
+            return arg.name.label.name == 'obfuscate';
+          }
+          return false;
+        });
+
+        if (!specifiesObfuscate) return false;
+      }
+    }
+
+    return hasAnyField;
   }
 }
 
