@@ -865,7 +865,7 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
       // For class-level @Envied, skip if all @EnviedField annotations
       // in the class already specify obfuscate explicitly.
       if (name == 'Envied') {
-        final AstNode? classNode = node.parent?.parent;
+        final AstNode? classNode = node.parent;
         if (classNode is ClassDeclaration &&
             _allFieldsHandleObfuscation(classNode)) {
           return;

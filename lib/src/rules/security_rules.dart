@@ -1656,8 +1656,13 @@ class PreferSecureRandomRule extends SaropaLintRule {
       final String? namedConstructor = node.constructorName.name?.name;
       if (namedConstructor == 'secure') return;
 
-      // Skip seeded constructors — intentionally predictable (e.g. testing)
-      if (node.argumentList.arguments.isNotEmpty) return;
+      // Skip literal-seeded constructors — intentionally predictable
+      // (e.g. test fixtures). Dynamic seeds like DateTime.now() still
+      // fall through to the security context check.
+      if (node.argumentList.arguments.isNotEmpty &&
+          node.argumentList.arguments.first is IntegerLiteral) {
+        return;
+      }
 
       // Skip when passed as argument to .shuffle()
       final AstNode? parent = node.parent;
