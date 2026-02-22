@@ -122,23 +122,6 @@ String? _rootUriToPath(String rootUri) {
   return null;
 }
 
-/// Whether the host project is a Flutter project.
-///
-/// Checks pubspec.yaml for Flutter SDK dependency. Used by the stylistic
-/// walkthrough to skip widget-specific rules for pure Dart projects.
-bool _isFlutterProject() {
-  try {
-    final pubspecFile = File('pubspec.yaml');
-    if (!pubspecFile.existsSync()) return false;
-    final content = pubspecFile.readAsStringSync();
-    return content.contains('flutter:') ||
-        content.contains('flutter_test:') ||
-        content.contains('sdk: flutter');
-  } catch (_) {
-    return false;
-  }
-}
-
 /// Detect which packages the host project uses from its pubspec.yaml.
 ///
 /// Reads the project's pubspec.yaml (not the saropa_lints package's),
@@ -3023,10 +3006,19 @@ Set<String> _extractReviewedRules(String content) {
   return reviewed;
 }
 
-/// Strip all [reviewed] markers from the STYLISTIC RULES section.
+/// Strip all [reviewed] markers from the STYLISTIC RULES section only.
 /// Used by --reset-stylistic to force re-walkthrough of all rules.
+/// Scoped to the section to avoid stripping the text from user comments
+/// in other sections.
 String _stripReviewedMarkers(String content) {
-  return content.replaceAll(RegExp(r' \[reviewed\]'), '');
+  final sectionStart = _findStylisticSectionStart(content);
+  final sectionEnd = _findStylisticSectionEnd(content, sectionStart);
+
+  final before = content.substring(0, sectionStart);
+  final section = content.substring(sectionStart, sectionEnd);
+  final after = content.substring(sectionEnd);
+
+  return before + section.replaceAll(RegExp(r' \[reviewed\]'), '') + after;
 }
 
 /// Extract rules from the STYLISTIC RULES section that no longer exist in
@@ -3752,8 +3744,9 @@ _WalkthroughResult _runStylisticWalkthrough({
   );
   var irrelevantRules = disabledByPackage.union(disabledByPlatform);
 
-  // Skip widget-specific stylistic rules for pure Dart projects
-  if (!_isFlutterProject()) {
+  // Skip widget-specific stylistic rules for pure Dart projects.
+  // packageSettings already detected Flutter from pubspec.yaml in main().
+  if (packageSettings['flutter'] != true) {
     irrelevantRules = irrelevantRules.union(tiers.flutterStylisticRules);
   }
 
@@ -3805,9 +3798,18 @@ _WalkthroughResult _runStylisticWalkthrough({
 
   // Walk through categories in order
   final categoryEntries = _stylisticRuleCategories.entries.toList();
-  final totalCategories = categoryEntries
-      .where((e) => e.value.any((r) => rulesToReview.contains(r)))
-      .length;
+  final categorizedRuleNames = <String>{};
+  for (final rules in _stylisticRuleCategories.values) {
+    categorizedRuleNames.addAll(rules);
+  }
+  final hasUncategorized = rulesToReview
+      .difference(categorizedRuleNames)
+      .isNotEmpty;
+  final totalCategories =
+      categoryEntries
+          .where((e) => e.value.any((r) => rulesToReview.contains(r)))
+          .length +
+      (hasUncategorized ? 1 : 0);
   int categoryIndex = 0;
 
   for (final entry in categoryEntries) {
@@ -3836,7 +3838,7 @@ _WalkthroughResult _runStylisticWalkthrough({
       enabled += result.enabled;
       disabled += result.disabled;
       skipped += result.skipped;
-      _writeStylisticDecisions(customFile, result.decisions, reviewedRules);
+      _writeStylisticDecisions(customFile, result.decisions);
       reviewedRules = reviewedRules.union(result.decisions.keys.toSet());
     } else {
       final result = _walkthroughCategory(
@@ -3854,18 +3856,16 @@ _WalkthroughResult _runStylisticWalkthrough({
       enabled += result.enabled;
       disabled += result.disabled;
       skipped += result.skipped;
-      _writeStylisticDecisions(customFile, result.decisions, reviewedRules);
+      _writeStylisticDecisions(customFile, result.decisions);
       reviewedRules = reviewedRules.union(result.decisions.keys.toSet());
     }
   }
 
   // Handle uncategorized rules
   if (!aborted) {
-    final categorized = <String>{};
-    for (final rules in _stylisticRuleCategories.values) {
-      categorized.addAll(rules);
-    }
-    final uncategorizedToReview = rulesToReview.difference(categorized);
+    final uncategorizedToReview = rulesToReview.difference(
+      categorizedRuleNames,
+    );
     if (uncategorizedToReview.isNotEmpty) {
       final result = _walkthroughCategory(
         category: 'Other stylistic rules',
@@ -3881,7 +3881,7 @@ _WalkthroughResult _runStylisticWalkthrough({
         enabled += result.enabled;
         disabled += result.disabled;
         skipped += result.skipped;
-        _writeStylisticDecisions(customFile, result.decisions, reviewedRules);
+        _writeStylisticDecisions(customFile, result.decisions);
       }
     }
   }
@@ -3996,15 +3996,18 @@ _CategoryResult? _walkthroughCategory({
     }
 
     // Prompt
-    final remaining = rules.length - i;
+    final after = rules.length - i - 1;
+    final aLabel = after > 0 ? '[a] enable this + $after more  ' : '';
     stdout.write(
       '  ${_Colors.cyan}[y] enable  [n] disable  [s] skip  '
-      '[a] enable remaining $remaining  '
+      '$aLabel'
       '[q] quit: ${_Colors.reset}',
     );
 
-    final input = stdin.readLineSync()?.trim().toLowerCase() ?? '';
+    final rawInput = stdin.readLineSync();
     _logTerminal('');
+    if (rawInput == null) return null; // EOF → quit
+    final input = rawInput.trim().toLowerCase();
 
     switch (input) {
       case 'y':
@@ -4084,8 +4087,10 @@ _CategoryResult? _walkthroughConflicting({
     '[q] quit: ${_Colors.reset}',
   );
 
-  final input = stdin.readLineSync()?.trim().toLowerCase() ?? '';
+  final rawInput = stdin.readLineSync();
   _logTerminal('');
+  if (rawInput == null) return null; // EOF → quit
+  final input = rawInput.trim().toLowerCase();
 
   if (input == 'q' || input == 'quit') return null;
 
@@ -4130,14 +4135,15 @@ _CategoryResult? _walkthroughConflicting({
 ///
 /// Updates rule values and adds [reviewed] markers in the STYLISTIC
 /// RULES section. Only modifies rules present in [decisions].
-void _writeStylisticDecisions(
-  File customFile,
-  Map<String, bool> decisions,
-  Set<String> alreadyReviewed,
-) {
+void _writeStylisticDecisions(File customFile, Map<String, bool> decisions) {
   if (decisions.isEmpty) return;
 
   var content = customFile.readAsStringSync();
+
+  // Scope replacements to the STYLISTIC RULES section only, so a rule
+  // that also appears in RULE OVERRIDES is not accidentally modified.
+  final sectionStart = _findStylisticSectionStart(content);
+  final sectionEnd = _findStylisticSectionEnd(content, sectionStart);
 
   for (final entry in decisions.entries) {
     final rule = entry.key;
@@ -4149,7 +4155,9 @@ void _writeStylisticDecisions(
       multiLine: true,
     );
 
-    final match = rulePattern.firstMatch(content);
+    // Search only within the STYLISTIC RULES section
+    final sectionContent = content.substring(sectionStart, sectionEnd);
+    final match = rulePattern.firstMatch(sectionContent);
     if (match != null) {
       // Preserve description after [reviewed] marker
       final existingComment = match.group(3)?.trim() ?? '';
@@ -4164,9 +4172,10 @@ void _writeStylisticDecisions(
           ? '  # [reviewed] $descPart'
           : '  # [reviewed]';
 
+      // Offset match positions back to full-content coordinates
       content = content.replaceRange(
-        match.start,
-        match.end,
+        sectionStart + match.start,
+        sectionStart + match.end,
         '$rule: $enabled$newComment',
       );
     }
