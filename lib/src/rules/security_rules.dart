@@ -4973,15 +4973,41 @@ class RequireHttpsOnlyTestRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static const Set<String> _testInfrastructureMethods = <String>{
+    'test',
+    'testWidgets',
+    'expect',
+    'group',
+    'setUp',
+    'setUpAll',
+    'tearDown',
+    'tearDownAll',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    RequireHttpsOnlyRule.checkHttpUrls(
-      context,
-      (AstNode node) => reporter.atNode(node),
-    );
+    RequireHttpsOnlyRule.checkHttpUrls(context, (AstNode node) {
+      // Skip HTTP URLs inside test infrastructure calls — these are
+      // test fixture data, not production URLs. URL utility tests
+      // must exercise both HTTP and HTTPS to verify correct behavior.
+      if (_isInsideTestCall(node)) return;
+      reporter.atNode(node);
+    });
+  }
+
+  static bool _isInsideTestCall(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodInvocation) {
+        final String name = current.methodName.name;
+        if (_testInfrastructureMethods.contains(name)) return true;
+      }
+      current = current.parent;
+    }
+    return false;
   }
 }
 
