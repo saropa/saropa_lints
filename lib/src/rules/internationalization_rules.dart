@@ -2167,15 +2167,23 @@ class AvoidStringConcatenationL10nRule extends SaropaLintRule {
 
       // Check for string interpolation with variables
       if (firstArg is StringInterpolation) {
-        // Count interpolation elements
         int interpolationCount = 0;
-        for (final element in firstArg.elements) {
+        bool hasWordContent = false;
+
+        for (final InterpolationElement element in firstArg.elements) {
           if (element is InterpolationExpression) {
             interpolationCount++;
+          } else if (element is InterpolationString) {
+            // Check if literal text contains letters (translatable words).
+            // Pure separators like ' / ', ' x ', ' : ' are not translatable.
+            if (RegExp('[a-zA-Z]').hasMatch(element.value)) {
+              hasWordContent = true;
+            }
           }
         }
-        // If there are multiple interpolations, likely needs l10n
-        if (interpolationCount >= 2) {
+        // Only flag strings that have multiple interpolations AND
+        // natural language text that would need translation.
+        if (interpolationCount >= 2 && hasWordContent) {
           reporter.atNode(firstArg);
         }
       }
