@@ -44,10 +44,15 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
     """Run all audits before publish. Returns True if publish can proceed.
 
     BLOCKING checks (fail = no publish):
-      - Tier integrity: orphans, phantoms, multi-tier, misplaced opinionated
+      - Tier integrity: orphans, phantoms, multi-tier, misplaced opinionated,
+        flutterStylisticRules subset, package rule consistency,
+        example pairing
       - Duplicate rule names, class names, or aliases
       - Missing [rule_name] prefix in problemMessage
       - British English spellings (US English required)
+
+    AUTO-FIX (runs first, before blocking checks):
+      - Doc comment angle brackets and references
 
     INFORMATIONAL checks (warn but don't block):
       - DX message quality
@@ -63,6 +68,31 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
 
     rules_dir = project_dir / "lib" / "src" / "rules"
     tiers_path = project_dir / "lib" / "src" / "tiers.dart"
+
+    # --- AUTO-FIX: Doc comment issues (before blocking checks) ---
+    pubdev_issues = check_pubdev_lint_issues(project_dir)
+    if pubdev_issues:
+        print_info(
+            f"Found {len(pubdev_issues)} pub.dev doc issue(s), "
+            f"auto-fixing..."
+        )
+        fixed_brackets = fix_doc_angle_brackets(project_dir)
+        fixed_refs = fix_doc_references(project_dir)
+        total_fixed = fixed_brackets + fixed_refs
+        if total_fixed:
+            print_success(
+                f"Auto-fixed {total_fixed} doc issue(s) "
+                f"({fixed_brackets} angle bracket(s), "
+                f"{fixed_refs} reference(s))"
+            )
+        remaining = check_pubdev_lint_issues(project_dir)
+        if remaining:
+            print_warning(
+                f"{len(remaining)} unfixable doc issue(s) remain "
+                f"(will be caught by analysis step)"
+            )
+    else:
+        print_success("No pub.dev doc issues found")
 
     # --- BLOCKING: Tier integrity ---
     tier_result = check_tier_integrity(rules_dir, tiers_path)
