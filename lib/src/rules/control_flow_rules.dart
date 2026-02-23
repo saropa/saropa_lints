@@ -438,8 +438,34 @@ class AvoidContinueRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addContinueStatement((ContinueStatement node) {
+      // Skip early-skip guards: `if (condition) { continue; }` at top of loop
+      if (_isEarlySkipGuard(node)) return;
+
       reporter.atNode(node);
     });
+  }
+
+  /// Returns true when [node] is inside a simple guard `if` at the top of a
+  /// loop body: `for (...) { if (cond) { continue; } ... }`.
+  /// These act as the loop equivalent of early-return and keep the happy path
+  /// at a low nesting level.
+  static bool _isEarlySkipGuard(ContinueStatement node) {
+    // continue must be the only statement in a block
+    final AstNode? block = node.parent;
+    if (block is! Block || block.statements.length != 1) return false;
+
+    // That block must be the then-branch of an if with no else
+    final AstNode? ifStmt = block.parent;
+    if (ifStmt is! IfStatement || ifStmt.elseStatement != null) return false;
+
+    // The if must be a direct child of a loop body block
+    final AstNode? loopBody = ifStmt.parent;
+    if (loopBody is! Block) return false;
+
+    final AstNode? loop = loopBody.parent;
+    return loop is ForStatement ||
+        loop is WhileStatement ||
+        loop is DoStatement;
   }
 }
 

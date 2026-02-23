@@ -121,3 +121,21 @@ void _good440() {
   DateFormat('yyyy-MM-dd', Localizations.localeOf(context).toString());
   NumberFormat.currency(locale: locale).format(price);
 }
+
+// --- False-positive regression tests (bug fix) ---
+
+// GOOD: Locale strings in a Set (lookup data, not formatting args)
+const Set<String> _monthFirstLocales = <String>{
+  'en_US',
+  'en_CA',
+  'en_PH',
+};
+
+// GOOD: Locale strings in a List
+const List<String> _supportedLocales = <String>['en_US', 'es_MX', 'pt_BR'];
+
+// GOOD: Locale strings in a Map (data, not formatting)
+const Map<String, String> _localeNames = <String, String>{
+  'en_US': 'English (US)',
+  'fr_FR': 'French',
+};

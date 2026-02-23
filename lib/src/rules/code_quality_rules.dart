@@ -5619,11 +5619,41 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
       final int majorDeclarations = classCount + enumCount + mixinCount;
       if (majorDeclarations > 1 && secondClass != null) {
         // Skip if it looks like a private helper class
-        if (!secondClass.name.lexeme.startsWith('_')) {
-          reporter.atNode(secondClass);
+        if (secondClass.name.lexeme.startsWith('_')) return;
+
+        // Skip if all classes are abstract final with only static members
+        // (pure constant / utility namespaces co-located for discoverability)
+        if (enumCount == 0 &&
+            mixinCount == 0 &&
+            _allClassesAreStaticNamespaces(node)) {
+          return;
         }
+
+        reporter.atNode(secondClass);
       }
     });
+  }
+
+  /// Returns true when every [ClassDeclaration] in [unit] is `abstract final`
+  /// with only `static` members (pure constant / utility namespaces).
+  ///
+  /// See also: `_isUtilityNamespaceFile` in `structure_rules.dart` which
+  /// performs the same check (kept separate to avoid cross-file imports).
+  static bool _allClassesAreStaticNamespaces(CompilationUnit unit) {
+    final Iterable<ClassDeclaration> classes = unit.declarations
+        .whereType<ClassDeclaration>();
+    if (classes.isEmpty) return false;
+
+    for (final ClassDeclaration cls in classes) {
+      if (cls.abstractKeyword == null || cls.finalKeyword == null) {
+        return false;
+      }
+      for (final ClassMember member in cls.members) {
+        if (member is FieldDeclaration && !member.isStatic) return false;
+        if (member is MethodDeclaration && !member.isStatic) return false;
+      }
+    }
+    return true;
   }
 }
 
