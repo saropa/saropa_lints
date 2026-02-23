@@ -254,6 +254,9 @@ class ProgressTracker {
   // Output mode: when true, all violations go to report file only
   static bool _fileOnly = false;
 
+  // Guard to ensure reportSummary() is called at most once per session
+  static bool _summaryReported = false;
+
   // Total enabled rules (set from plugin entry point)
   static int _totalEnabledRules = 0;
 
@@ -446,11 +449,13 @@ class ProgressTracker {
     _startTime ??= DateTime.now();
     _lastProgressTime ??= _startTime;
 
-    // On first file, discover project files for progress %
+    // On first file, discover project files for progress % and
+    // initialize the analysis reporter for log generation.
     if (!_discoveredFromFiles && _seenFiles.isEmpty) {
       final projectRoot = ProjectContext.findProjectRoot(path);
       if (projectRoot != null) {
         discoverFiles(projectRoot);
+        AnalysisReporter.initialize(projectRoot);
       }
     }
 
@@ -485,6 +490,24 @@ class ProgressTracker {
       _reportProgress(fileCount, now);
       _lastProgressTime = now;
       _lastReportedCount = fileCount;
+    }
+
+    // Schedule a debounced report write after each new file. The debounce
+    // ensures the report is written once analysis goes idle (3s).
+    if (wasNew) {
+      AnalysisReporter.scheduleWrite();
+    }
+
+    // When all expected files have been processed, flush the report
+    // synchronously. `dart analyze` may exit before the debounce timer
+    // fires, so this ensures the report file exists on disk.
+    if (wasNew &&
+        !_summaryReported &&
+        _totalExpectedFiles > 0 &&
+        fileCount >= _totalExpectedFiles) {
+      _summaryReported = true;
+      AnalysisReporter.writeNow();
+      reportSummary();
     }
   }
 
@@ -990,6 +1013,7 @@ class ProgressTracker {
     _limitReached = false;
     _abortRequested = false;
     _hasReanalyzedFile = false;
+    _summaryReported = false;
     // Note: _maxIssues and _fileOnly are not reset - they're config, not state
   }
 }
