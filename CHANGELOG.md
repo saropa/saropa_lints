@@ -22,10 +22,32 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - `avoid_closure_capture_leaks`: warns when `setState` is called inside Timer/Future.delayed callbacks without a `mounted` check (Professional tier, quick fix)
 - `avoid_behavior_subject_last_value`: warns when `.value` is accessed on a BehaviorSubject inside an `isClosed` true-branch (Professional tier)
 - `avoid_cache_stampede`: warns when async methods use a Map cache without in-flight request deduplication (Professional tier)
+- `avoid_deep_nesting`: warns when code blocks are nested more than 5 levels deep (Professional tier)
+- `avoid_high_cyclomatic_complexity`: warns when functions exceed cyclomatic complexity of 10 (Professional tier)
+- `avoid_void_async`: warns when async functions return `void` instead of `Future<void>` (Recommended tier)
+- `avoid_redundant_await`: warns when `await` is used on a non-Future expression (Recommended tier)
+- `avoid_unused_constructor_parameters`: warns when constructor parameters are not stored or used (Recommended tier)
+- `avoid_returning_null_for_void`: warns when `return null` is used in void functions (Recommended tier)
+- `avoid_returning_null_for_future`: warns when `null` is returned from non-async Future functions (Recommended tier)
+- `avoid_shadowing_type_parameters`: warns when method type parameters shadow class type parameters (Recommended tier)
+- `avoid_redundant_null_check`: warns when non-nullable values are compared to null (Recommended tier)
+- `avoid_collection_mutating_methods`: warns when collections are mutated in-place inside setState (Professional tier)
+- `avoid_equatable_nested_equality`: warns when mutable collections are included in Equatable props (Professional tier)
+- `avoid_getx_rx_nested_obs`: warns when GetX Rx observables are nested (Professional tier)
+- `avoid_freezed_any_map_issue`: warns when @freezed class with fromJson lacks @JsonSerializable(anyMap: true) (Professional tier)
+- `avoid_hive_datetime_local`: warns when DateTime is stored in Hive without UTC conversion (Professional tier)
+- `avoid_hive_type_modification`: warns when @HiveField indices are duplicated (Professional tier)
+- `avoid_hive_large_single_entry`: warns when large objects are stored as single Hive entries (Professional tier)
+- `require_auto_route_guard_resume`: warns when AutoRouteGuard may not call resolver.next() on all paths (Essential tier)
+- `require_auto_route_full_hierarchy`: warns when push() is used instead of navigate() in auto_route (Essential tier)
+- `avoid_firebase_user_data_in_auth`: warns when too many custom claims are accessed from Firebase auth tokens (Professional tier)
+- `require_firebase_app_check_production`: warns when Firebase is initialized without App Check (Professional tier)
 
 ### Fixed
 - `avoid_god_class`: false positive on static-constant namespace classes — `static const` and `static final` fields are now excluded from the field count since they represent compile-time constants, not instance state
 - `prefer_static_class`: conflicting diagnostic with `prefer_abstract_final_static_class` on classes with private constructors — `prefer_static_class` now defers to `prefer_abstract_final_static_class` when a private constructor is present
+- `avoid_similar_names`: false positive on single-character variable pairs (`y`, `m`, `d`, `h`, `s`) — edit distance is always 1 for any two single-char names, which is not meaningful; confusable-char detection (1/l, 0/O) still catches genuinely dangerous cases
+- `avoid_unused_assignment`: false positive on definite assignment via if/else branches — assignments in mutually exclusive branches of the same if/else are now recognized as alternatives, not sequential overwrites
 
 ---
 ## [5.0.0-beta.14]
