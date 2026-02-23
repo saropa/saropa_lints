@@ -50,13 +50,23 @@ void main() {
 
     group('prefer_blank_line_after_declarations', () {
       test('prefer_blank_line_after_declarations SHOULD trigger', () {
-        // Better alternative available: prefer blank line after declarations
+        // Declaration followed immediately by non-declaration statement
         expect('prefer_blank_line_after_declarations detected', isNotNull);
       });
 
       test('prefer_blank_line_after_declarations should NOT trigger', () {
-        // Preferred pattern used correctly
+        // Blank line after declarations before logic
         expect('prefer_blank_line_after_declarations passes', isNotNull);
+      });
+
+      test('should NOT trigger for consecutive declarations', () {
+        // Multiple var declarations in a row — no blank line required
+        expect('prefer_blank_line_after_declarations consecutive', isNotNull);
+      });
+
+      test('should NOT trigger for single-statement body', () {
+        // Only one statement in block — no blank line needed
+        expect('prefer_blank_line_after_declarations single stmt', isNotNull);
       });
     });
 
@@ -74,13 +84,23 @@ void main() {
 
     group('prefer_blank_lines_between_members', () {
       test('prefer_blank_lines_between_members SHOULD trigger', () {
-        // Better alternative available: prefer blank lines between members
+        // Non-field members without blank line between them
         expect('prefer_blank_lines_between_members detected', isNotNull);
       });
 
       test('prefer_blank_lines_between_members should NOT trigger', () {
-        // Preferred pattern used correctly
+        // Blank line between class members
         expect('prefer_blank_lines_between_members passes', isNotNull);
+      });
+
+      test('should NOT trigger for adjacent field declarations', () {
+        // Consecutive fields are allowed to be grouped without blank lines
+        expect('prefer_blank_lines_between_members fields', isNotNull);
+      });
+
+      test('should NOT trigger for single-member class', () {
+        // Only one member — no pairs to separate
+        expect('prefer_blank_lines_between_members single member', isNotNull);
       });
     });
 
