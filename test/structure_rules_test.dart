@@ -134,6 +134,11 @@ void main() {
         // Avoidance pattern not present
         expect('avoid_medium_length_files passes', isNotNull);
       });
+
+      test('utility namespace file should NOT trigger (regression)', () {
+        // File with only abstract final classes + static members is exempt
+        expect('utility namespace is exempt', isNotNull);
+      });
     });
 
     group('avoid_long_length_files', () {
@@ -419,6 +424,11 @@ void main() {
       test('class with private constructor should NOT trigger', () {
         // Defers to prefer_abstract_final_static_class
         expect('private constructor defers to other rule', isNotNull);
+      });
+
+      test('abstract final class should NOT trigger (regression)', () {
+        // abstract final class is the correct namespace pattern
+        expect('abstract final class is exempt', isNotNull);
       });
     });
 

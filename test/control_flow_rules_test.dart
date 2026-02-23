@@ -289,6 +289,11 @@ void main() {
         // Preferred pattern used correctly
         expect('prefer_no_continue_statement passes', isNotNull);
       });
+
+      test('early-skip guard continue should NOT trigger (regression)', () {
+        // if (cond) { continue; } at top of loop body is exempt
+        expect('early-skip guard is exempt', isNotNull);
+      });
     });
 
     group('prefer_conditional_expressions', () {

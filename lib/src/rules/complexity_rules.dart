@@ -1014,7 +1014,7 @@ class AvoidHighCyclomaticComplexityRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.high;
 
-  static const int _threshold = 10;
+  static const int _threshold = 15;
 
   static const LintCode _code = LintCode(
     'avoid_high_cyclomatic_complexity',
@@ -1022,7 +1022,7 @@ class AvoidHighCyclomaticComplexityRule extends SaropaLintRule {
         'exceeding $_threshold have too many branching paths, making them '
         'difficult to understand, test exhaustively, and maintain over time. '
         'Each branch doubles the testing surface area. Simplify by extracting '
-        'helper methods or using polymorphism instead of conditionals. {v1}',
+        'helper methods or using polymorphism instead of conditionals. {v2}',
     correctionMessage:
         'Break the function into smaller methods with lower complexity. '
         'Aim for a complexity of $_threshold or less per function.',

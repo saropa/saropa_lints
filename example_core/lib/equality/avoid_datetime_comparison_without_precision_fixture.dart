@@ -117,3 +117,21 @@ void _good351() {
   if (startTime.difference(endTime).abs() < const Duration(seconds: 1)) {}
   if (startTime.isAtSameMomentAs(endTime)) {}
 }
+
+// --- False-positive regression tests (bug fix) ---
+
+abstract final class _DateConstants {
+  static final DateTime unixEpochDate = DateTime(1970, 1, 1);
+}
+
+// GOOD: Comparison against a static constant is intentional (epoch sentinel)
+void _goodConstRef() {
+  final DateTime dt = DateTime.now();
+  if (dt == _DateConstants.unixEpochDate) {} // Static field — exact check
+}
+
+// GOOD: Comparison against a const constructor
+void _goodConstCtor() {
+  final DateTime dt = DateTime.now();
+  if (dt == const DateTime(1970)) {} // const — exact check
+}

@@ -1485,7 +1485,7 @@ custom_lint:
 
     # --- Complexity ---
     - avoid_deep_nesting: false                        # WARNING - code nested >5 levels deep (v5.1.0)
-    - avoid_high_cyclomatic_complexity: false           # WARNING - complexity exceeding 10 (v5.1.0)
+    - avoid_high_cyclomatic_complexity: false           # WARNING - complexity exceeding 15 (v5.1.0)
 
     # --- Async ---
     - avoid_void_async: false                          # WARNING - async void instead of Future<void> (v5.1.0)

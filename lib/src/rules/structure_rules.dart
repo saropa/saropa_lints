@@ -465,6 +465,7 @@ void _checkFileLength({
   required LintCode code,
   required int maxLines,
   required bool forTestFiles,
+  bool exemptUtilityNamespaces = false,
 }) {
   final bool isTest = _isTestFile(context.filePath);
   if (forTestFiles != isTest) return;
@@ -474,9 +475,31 @@ void _checkFileLength({
     final int lineCount = unit.lineInfo.getLocation(endToken.end).lineNumber;
 
     if (lineCount > maxLines) {
+      if (exemptUtilityNamespaces && _isUtilityNamespaceFile(unit)) return;
       reporter.atToken(unit.beginToken, code);
     }
   });
+}
+
+/// Returns true when every top-level class in [unit] is an `abstract final`
+/// class containing only `static` members (a pure utility / constant
+/// namespace).  Files with no class declarations return false.
+///
+/// See also: [PreferSingleDeclarationPerFileRule._allClassesAreStaticNamespaces]
+/// which performs the same check (kept separate to avoid cross-file imports).
+bool _isUtilityNamespaceFile(CompilationUnit unit) {
+  final Iterable<ClassDeclaration> classes = unit.declarations
+      .whereType<ClassDeclaration>();
+  if (classes.isEmpty) return false;
+
+  for (final ClassDeclaration cls in classes) {
+    if (cls.abstractKeyword == null || cls.finalKeyword == null) return false;
+    for (final ClassMember member in cls.members) {
+      if (member is FieldDeclaration && !member.isStatic) return false;
+      if (member is MethodDeclaration && !member.isStatic) return false;
+    }
+  }
+  return true;
 }
 
 /// **OPINIONATED**: Suggests keeping files under 200 lines for maximum
@@ -576,6 +599,7 @@ class AvoidMediumFilesRule extends SaropaLintRule {
       code: code,
       maxLines: _maxLines,
       forTestFiles: false,
+      exemptUtilityNamespaces: true,
     );
   }
 }
@@ -1421,6 +1445,11 @@ class PreferStaticClassRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      // Skip abstract classes — abstract final class is the correct pattern
+      // for non-instantiable namespaces (handled by
+      // prefer_abstract_final_static_class instead)
+      if (node.abstractKeyword != null) return;
+
       // Skip if class extends something other than Object
       if (node.extendsClause != null) return;
 

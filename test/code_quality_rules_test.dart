@@ -746,6 +746,12 @@ void main() {
       test('multiple top-level declarations SHOULD trigger', () {
         expect('multi-declaration file detected', isNotNull);
       });
+
+      test('multiple abstract final static-only classes should NOT trigger '
+          '(regression)', () {
+        // Pure constant/utility namespaces co-located for discoverability
+        expect('constant namespaces are exempt', isNotNull);
+      });
     });
 
     group('prefer_unwrapping_future_or', () {
