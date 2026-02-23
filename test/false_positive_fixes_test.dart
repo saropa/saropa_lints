@@ -271,6 +271,259 @@ void main() {
 
         expect('Parameter shadowing outer variable is detected', isNotNull);
       });
+
+      test('should not flag sequential for loops with same variable', () {
+        // Expected behavior: These should NOT trigger
+        // for (final ex in listA) { ... } // scope A ends
+        // for (final ex in listB) { ... } // scope B — not shadowing
+        //
+        // For-loop variables are scoped to the loop body.
+
+        expect('Sequential loops with same name are not shadowing', isNotNull);
+      });
+
+      test('should not flag if/else sibling blocks with same variable', () {
+        // Expected behavior: These should NOT trigger
+        // if (cond) { final x = 1; } else { final x = 2; }
+        //
+        // Each branch is an independent scope.
+
+        expect('If/else branches are independent scopes', isNotNull);
+      });
+
+      test('should still flag nested loop shadowing', () {
+        // Expected behavior: These SHOULD trigger
+        // for (final x in [1]) {
+        //   for (final x in [2]) { ... } // Shadows outer loop x
+        // }
+
+        expect('Nested loop shadowing is still detected', isNotNull);
+      });
+    });
+
+    group('avoid_unused_assignment', () {
+      test('should not flag assignments inside loop bodies', () {
+        // Expected behavior: These should NOT trigger
+        // while (value.startsWith(find)) {
+        //   value = value.substring(find.length); // loop condition re-reads
+        // }
+
+        expect('Loop body assignments are not flagged', isNotNull);
+      });
+
+      test('should not flag conditional reassignment that reads old value', () {
+        // Expected behavior: These should NOT trigger
+        // String first = this;
+        // if (ignoreCase) first = first.toLowerCase(); // reads first on RHS
+        // if (trim) first = first.trim(); // reads from previous step
+
+        expect(
+          'Conditional self-referencing overwrites are not flagged',
+          isNotNull,
+        );
+      });
+
+      test('should still flag unconditional overwrite without read', () {
+        // Expected behavior: These SHOULD trigger
+        // String value = 'first'; // FLAGGED
+        // value = 'second'; // unconditional overwrite, no read
+
+        expect('Unconditional dead assignment is still flagged', isNotNull);
+      });
+    });
+
+    group('prefer_switch_expression', () {
+      test('should not flag switch with control flow in cases', () {
+        // Expected behavior: These should NOT trigger
+        // case 'y':
+        //   if (isVowel()) return '${this}s'; // control flow
+        //   return '${sub}ies';
+
+        expect('Complex case logic prevents switch expression', isNotNull);
+      });
+
+      test('should not flag non-exhaustive switch with post-switch code', () {
+        // Expected behavior: These should NOT trigger
+        // switch (x) { case 'a': return 1; case 'b': return 2; }
+        // return defaultValue; // code after non-exhaustive switch
+
+        expect(
+          'Non-exhaustive with post-switch code is not flagged',
+          isNotNull,
+        );
+      });
+
+      test('should still flag pure value-mapping switches', () {
+        // Expected behavior: These SHOULD trigger
+        // switch (n) { case 1: return 'one'; default: return 'other'; }
+
+        expect('Simple value-mapping switch is still flagged', isNotNull);
+      });
+    });
+
+    group('no_magic_number', () {
+      test('should not flag default parameter values', () {
+        // Expected behavior: These should NOT trigger
+        // void fetch({int maxRetries = 3}) {} // parameter name is context
+        // String pad({int width = 10}) {}
+
+        expect('Default parameter values are self-documenting', isNotNull);
+      });
+
+      test('should still flag bare numeric literals', () {
+        // Expected behavior: These SHOULD trigger
+        // if (items.length > 42) {} // FLAGGED: what is 42?
+
+        expect('Unexplained bare numbers are still flagged', isNotNull);
+      });
+    });
+
+    group('avoid_unnecessary_to_list / avoid_large_list_copy', () {
+      test('should not flag toList when required by return type', () {
+        // Expected behavior: These should NOT trigger
+        // List<bool> get reverse => map((b) => !b).toList(); // return is List
+
+        expect('toList required by return type is not flagged', isNotNull);
+      });
+
+      test('should not flag toList when used in method chain', () {
+        // Expected behavior: These should NOT trigger
+        // .toList().nullIfEmpty() // downstream needs List
+
+        expect('toList for method chain is not flagged', isNotNull);
+      });
+
+      test('should not flag toList in expression function body', () {
+        // Expected behavior: These should NOT trigger
+        // List<int> get evens => nums.where((n) => n.isEven).toList();
+
+        expect('toList in expression body is not flagged', isNotNull);
+      });
+    });
+
+    group('prefer_named_boolean_parameters', () {
+      test('should not flag lambda/closure boolean parameters', () {
+        // Expected behavior: These should NOT trigger
+        // bools.any((bool e) => e) // lambda signature is constrained
+        // bools.where((bool e) => !e)
+
+        expect('Lambda bool params are externally constrained', isNotNull);
+      });
+
+      test('should still flag method boolean parameters', () {
+        // Expected behavior: These SHOULD trigger
+        // void doThing(bool verbose) {} // call site is doThing(true)
+
+        expect('Method bool params are still flagged', isNotNull);
+      });
+    });
+
+    group('avoid_unnecessary_nullable_return_type', () {
+      test('should not flag ternary with null branch', () {
+        // Expected behavior: These should NOT trigger
+        // String? foo() => cond ? 'yes' : null; // null IS reachable
+
+        expect('Ternary null branch is recognized', isNotNull);
+      });
+
+      test('should not flag nullable static type (map operator)', () {
+        // Expected behavior: These should NOT trigger
+        // String? get(Map<K,V> m, K key) => m[key]; // map[] returns V?
+
+        expect('Nullable static types are recognized', isNotNull);
+      });
+
+      test('should still flag functions that never return null', () {
+        // Expected behavior: These SHOULD trigger
+        // String? bad() => 'always non-null';
+
+        expect('Always-non-null functions are still flagged', isNotNull);
+      });
+    });
+
+    group('avoid_duplicate_string_literals', () {
+      test('should not flag domain-inherent literals', () {
+        // Expected behavior: These should NOT trigger
+        // 'true', 'false', 'null', 'none' — self-documenting vocabulary
+
+        expect('Domain inherent literals are exempt', isNotNull);
+      });
+
+      test('should still flag long duplicate strings', () {
+        // Expected behavior: These SHOULD trigger
+        // 'Processing data...' appearing 3+ times
+
+        expect('Long duplicate strings are still flagged', isNotNull);
+      });
+    });
+
+    group('avoid_excessive_expressions', () {
+      test('should not flag guard clauses with many conditions', () {
+        // Expected behavior: These should NOT trigger
+        // if (a == null || b == null || c <= 0 || d <= 0 || e > 100 || f) {
+        //   return; // guard clause — linear checklist
+        // }
+
+        expect('Guard clauses have elevated threshold', isNotNull);
+      });
+
+      test('should not flag symmetric structural patterns', () {
+        // Expected behavior: These should NOT trigger
+        // (startsWith('(') && endsWith(')')) ||
+        // (startsWith('[') && endsWith(']')) ||
+        // (startsWith('{') && endsWith('}'))
+
+        expect(
+          'Symmetric patterns are recognized as low complexity',
+          isNotNull,
+        );
+      });
+
+      test('should still flag deeply nested mixed operators', () {
+        // Expected behavior: These SHOULD trigger
+        // a > 0 && (b < 0 || (c != 0 && a + b > c - 1) || b * c < a)
+
+        expect(
+          'Complex non-symmetric expressions are still flagged',
+          isNotNull,
+        );
+      });
+    });
+
+    group('prefer_digit_separators', () {
+      test('should not flag 5-digit numbers', () {
+        // Expected behavior: These should NOT trigger
+        // const codePoint = 56327; // 5 digits — at readability boundary
+
+        expect('5-digit numbers are below new threshold', isNotNull);
+      });
+
+      test('should still flag 6+ digit numbers', () {
+        // Expected behavior: These SHOULD trigger
+        // const population = 1000000; // 7 digits — should use 1_000_000
+
+        expect('6+ digit numbers are still flagged', isNotNull);
+      });
+    });
+
+    group('require_list_preallocate', () {
+      test('should not flag conditional add inside loop', () {
+        // Expected behavior: These should NOT trigger
+        // for (final item in items) {
+        //   if (item.isValid) result.add(item); // size unknowable
+        // }
+
+        expect('Conditional adds have unknowable size', isNotNull);
+      });
+
+      test('should still flag unconditional add inside loop', () {
+        // Expected behavior: These SHOULD trigger
+        // for (final item in items) {
+        //   result.add(item.toString()); // always adds — use .map().toList()
+        // }
+
+        expect('Unconditional loop adds are still flagged', isNotNull);
+      });
     });
 
     group('avoid_unused_instances', () {

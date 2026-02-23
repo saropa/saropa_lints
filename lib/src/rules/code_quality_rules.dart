@@ -3693,13 +3693,87 @@ class AvoidUnusedAssignmentRule extends SaropaLintRule {
       node.visitChildren(_AssignmentUsageVisitor(assignments, usedVariables));
 
       for (final MapEntry<String, List<AstNode>> entry in assignments.entries) {
-        if (entry.value.length > 1) {
-          for (int i = 0; i < entry.value.length - 1; i++) {
-            reporter.atNode(entry.value[i], code);
-          }
+        if (entry.value.length <= 1) continue;
+
+        for (int i = 0; i < entry.value.length - 1; i++) {
+          final AstNode current = entry.value[i];
+
+          // Don't flag assignments inside loop bodies — the loop
+          // condition re-reads the variable on the next iteration.
+          if (_isInsideLoop(current)) continue;
+
+          // Don't flag if the NEXT assignment is inside a conditional
+          // (may-overwrite): the old value is still live on the else path.
+          final AstNode next = entry.value[i + 1];
+          if (_isInsideConditionalOnly(next)) continue;
+
+          // Don't flag if the next assignment's RHS reads this variable
+          // (e.g. `x = x.toLowerCase()` reads then overwrites).
+          if (_nextAssignmentReadsVariable(next, entry.key)) continue;
+
+          reporter.atNode(current, code);
         }
       }
     });
+  }
+
+  /// Returns true if [node] is inside a loop body (while, do, for).
+  static bool _isInsideLoop(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is WhileStatement ||
+          current is DoStatement ||
+          current is ForStatement) {
+        return true;
+      }
+      // Stop at function boundaries
+      if (current is FunctionBody) break;
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Returns true if [node] is inside an if-block that has no else branch
+  /// (a may-overwrite, not a must-overwrite).
+  static bool _isInsideConditionalOnly(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement && current.elseStatement == null) {
+        return true;
+      }
+      if (current is FunctionBody) break;
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Returns true if the assignment node's RHS references [varName].
+  static bool _nextAssignmentReadsVariable(AstNode node, String varName) {
+    if (node is! AssignmentExpression) return false;
+    return _containsIdentifier(node.rightHandSide, varName);
+  }
+
+  static bool _containsIdentifier(AstNode node, String name) {
+    if (node is SimpleIdentifier && node.name == name) return true;
+    final finder = _QuickIdentifierFinder(name);
+    node.visitChildren(finder);
+    return finder.found;
+  }
+}
+
+class _QuickIdentifierFinder extends GeneralizingAstVisitor<void> {
+  _QuickIdentifierFinder(this.name);
+  final String name;
+  bool found = false;
+
+  @override
+  void visitNode(AstNode node) {
+    if (found) return;
+    if (node is SimpleIdentifier && node.name == name) {
+      found = true;
+      return;
+    }
+    super.visitNode(node);
   }
 }
 
@@ -5567,53 +5641,76 @@ class PreferSwitchExpressionRule extends SaropaLintRule {
       bool allSimpleAssignments = true;
       String? targetVariable;
       bool allReturns = true;
+      bool hasDefault = false;
 
       for (final SwitchMember member in node.members) {
-        if (member is SwitchCase) {
-          final List<Statement> statements = member.statements;
-          if (statements.isEmpty) {
-            allSimpleAssignments = false;
-            allReturns = false;
-            continue;
-          }
+        if (member is SwitchDefault) hasDefault = true;
 
-          // Check first non-break statement
-          for (final Statement stmt in statements) {
-            if (stmt is BreakStatement) continue;
+        final List<Statement> statements = member is SwitchCase
+            ? member.statements
+            : (member is SwitchDefault ? member.statements : const []);
 
-            if (stmt is ExpressionStatement) {
-              final Expression expr = stmt.expression;
-              if (expr is AssignmentExpression) {
-                final Expression left = expr.leftHandSide;
-                if (left is SimpleIdentifier) {
-                  if (targetVariable == null) {
-                    targetVariable = left.name;
-                  } else if (targetVariable != left.name) {
-                    allSimpleAssignments = false;
-                  }
-                } else {
-                  allSimpleAssignments = false;
-                }
-              } else {
+        // Empty statements = fall-through, skip without invalidating flags
+        if (statements.isEmpty) continue;
+
+        // Filter out break statements
+        final List<Statement> meaningful = statements
+            .where((s) => s is! BreakStatement)
+            .toList();
+        if (meaningful.isEmpty) continue;
+
+        // If any case has multiple meaningful statements, it's complex
+        if (meaningful.length > 1) {
+          allSimpleAssignments = false;
+          allReturns = false;
+          continue;
+        }
+
+        final Statement stmt = meaningful.first;
+
+        // If any case contains control flow, not a simple mapping
+        if (stmt is IfStatement ||
+            stmt is ForStatement ||
+            stmt is WhileStatement ||
+            stmt is TryStatement ||
+            stmt is DoStatement) {
+          allSimpleAssignments = false;
+          allReturns = false;
+          continue;
+        }
+
+        if (stmt is ExpressionStatement) {
+          final Expression expr = stmt.expression;
+          if (expr is AssignmentExpression) {
+            final Expression left = expr.leftHandSide;
+            if (left is SimpleIdentifier) {
+              if (targetVariable == null) {
+                targetVariable = left.name;
+              } else if (targetVariable != left.name) {
                 allSimpleAssignments = false;
               }
-              allReturns = false;
-            } else if (stmt is ReturnStatement) {
-              allSimpleAssignments = false;
             } else {
               allSimpleAssignments = false;
-              allReturns = false;
             }
+          } else {
+            allSimpleAssignments = false;
           }
-        } else if (member is SwitchDefault) {
-          // Default case - check same pattern
-          for (final Statement stmt in member.statements) {
-            if (stmt is! BreakStatement &&
-                stmt is! ReturnStatement &&
-                stmt is! ExpressionStatement) {
-              allSimpleAssignments = false;
-              allReturns = false;
-            }
+          allReturns = false;
+        } else if (stmt is ReturnStatement) {
+          allSimpleAssignments = false;
+        } else {
+          allSimpleAssignments = false;
+          allReturns = false;
+        }
+      }
+
+      // Non-exhaustive switch with code after it is not expression-convertible
+      if (!hasDefault && allReturns) {
+        final AstNode? parent = node.parent;
+        if (parent is Block) {
+          final int idx = parent.statements.indexOf(node);
+          if (idx >= 0 && idx < parent.statements.length - 1) {
+            allReturns = false;
           }
         }
       }
@@ -7121,6 +7218,8 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
   }
 
   bool _shouldSkipString(String value) {
+    if (_isDomainInherentLiteral(value)) return true;
+
     // Skip import-like strings
     if (value.startsWith('package:') || value.startsWith('dart:')) {
       return true;
@@ -7143,6 +7242,19 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
 
     return false;
   }
+
+  /// Self-documenting literals that gain nothing from extraction to a
+  /// named constant. These are domain vocabulary (bool parsing, sentinels)
+  /// where the literal IS the documentation.
+  ///
+  /// Only includes strings >= [_minLength] chars (shorter ones are already
+  /// filtered before reaching this check).
+  static bool _isDomainInherentLiteral(String value) =>
+      _domainLiterals.contains(value);
+
+  static const Set<String> _domainLiterals = <String>{
+    'true', 'false', 'null', 'none', // Language/sentinel literals as strings
+  };
 }
 
 /// Warns when the same string literal appears 2 or more times in a file.
@@ -7237,6 +7349,10 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
   }
 
   bool _shouldSkipString(String value) {
+    if (AvoidDuplicateStringLiteralsRule._isDomainInherentLiteral(value)) {
+      return true;
+    }
+
     // Skip import-like strings
     if (value.startsWith('package:') || value.startsWith('dart:')) {
       return true;
