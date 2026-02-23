@@ -15,8 +15,15 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 - Quick fixes for 5 blank-line formatting rules: `prefer_blank_line_before_case`, `prefer_blank_line_before_constructor`, `prefer_blank_line_before_method`, `prefer_blank_line_after_declarations`, `prefer_blank_lines_between_members`
+- Test fixtures for 4 auto_route rules (`avoid_auto_route_context_navigation`, `avoid_auto_route_keep_history_misuse`, `require_auto_route_guard_resume`, `require_auto_route_full_hierarchy`)
+- Test fixtures for `avoid_behavior_subject_last_value` (rxdart)
+- Test fixtures for 3 migration rules (`avoid_asset_manifest_json`, `prefer_dropdown_initial_value`, `prefer_on_pop_with_result`)
+- Unit test files for auto_route and rxdart rule categories
+- Implemented `prefer_mock_verify` and `require_mock_http_client` fixture examples (replaced stubs)
+- Uncommented `prefer_semantics_container` and `avoid_redundant_semantics` fixture code (added `container` parameter to Semantics mock)
 
 ### Fixed
+- Publish report: test coverage "Overall" percentage now caps per-category fixture counts at rule counts, preventing excess fixtures from masking gaps
 - `prefer_static_class`: no longer fires on `abstract final class` declarations (regression from beta.15 fix)
 - `avoid_hardcoded_locale`: skip locale-pattern strings inside collection literals (Set, List, Map lookup data)
 - `avoid_datetime_comparison_without_precision`: skip comparisons against compile-time constants (e.g., epoch sentinel checks)
