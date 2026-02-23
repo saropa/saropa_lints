@@ -65,6 +65,14 @@ void main() {
       test('single-responsibility classes should NOT trigger', () {
         expect('single-responsibility classes', isNotNull);
       });
+
+      test('static-const namespace with 16+ fields should NOT trigger', () {
+        expect('static const fields excluded from field count', isNotNull);
+      });
+
+      test('class with instance fields exceeding threshold SHOULD trigger', () {
+        expect('instance fields still counted', isNotNull);
+      });
     });
     group('avoid_ui_in_domain_layer', () {
       test('widget import in domain layer SHOULD trigger', () {

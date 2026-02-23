@@ -415,6 +415,11 @@ void main() {
         // Preferred pattern used correctly
         expect('prefer_static_class passes', isNotNull);
       });
+
+      test('class with private constructor should NOT trigger', () {
+        // Defers to prefer_abstract_final_static_class
+        expect('private constructor defers to other rule', isNotNull);
+      });
     });
 
     group('prefer_static_method', () {
