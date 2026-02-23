@@ -100,73 +100,49 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: prefer_mock_verify
-// Source: lib\src\rules\testing_best_practices_rules.dart
+// Test fixture for: avoid_auto_route_context_navigation
+// Source: lib\src\rules\packages\auto_route_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-dynamic api;
-dynamic data;
-dynamic service;
+dynamic context;
 
-class MockApi {
-  dynamic fetch() => null;
-}
-
-// BAD: when() setup with thenReturn but no verify()
-// expect_lint: prefer_mock_verify
+// BAD: String-based navigation in auto_route project
+// expect_lint: avoid_auto_route_context_navigation
 void _bad1() {
-  test('should fetch data', () {
-    final mockApi = MockApi();
-    when(mockApi.fetch()).thenReturn(data);
-    service.loadData();
-    // Missing verify!
-  });
+  context.push('/products/123');
 }
 
-// BAD: when() setup with thenAnswer but no verify()
-// expect_lint: prefer_mock_verify
+// BAD: String-based go navigation
+// expect_lint: avoid_auto_route_context_navigation
 void _bad2() {
-  test('should call api', () {
-    final mockApi = MockApi();
-    when(mockApi.fetch()).thenAnswer((_) async => data);
-    service.loadData();
-    // Missing verify!
-  });
+  context.go('/home');
 }
 
-// GOOD: when() with verify()
+// BAD: String-based pushNamed
+// expect_lint: avoid_auto_route_context_navigation
+void _bad3() {
+  context.pushNamed('/settings');
+}
+
+// BAD: String interpolation navigation
+// expect_lint: avoid_auto_route_context_navigation
+void _bad4() {
+  final id = 123;
+  context.push('/products/$id');
+}
+
+// GOOD: Typed route navigation via context.router
 void _good1() {
-  test('should call api', () {
-    final mockApi = MockApi();
-    when(mockApi.fetch()).thenAnswer((_) async => data);
-    service.loadData();
-    verify(mockApi.fetch()).called(1);
-  });
+  context.router.push(ProductDetailRoute(id: 123));
 }
 
-// GOOD: when() with verifyNever()
+// GOOD: navigateTo with typed route
 void _good2() {
-  test('should not call api', () {
-    final mockApi = MockApi();
-    when(mockApi.fetch()).thenReturn(data);
-    verifyNever(mockApi.fetch());
-  });
+  context.router.navigateTo(HomeRoute());
 }
 
-// GOOD: when() with verifyInOrder()
-void _good3() {
-  test('should call in order', () {
-    final mockApi = MockApi();
-    when(mockApi.fetch()).thenReturn(data);
-    service.loadData();
-    verifyInOrder([mockApi.fetch()]);
-  });
-}
-
-// GOOD: No when() at all
-void _good4() {
-  test('simple test', () {
-    expect(1 + 1, 2);
-  });
+// FALSE POSITIVE: push with non-string argument
+void _fp1() {
+  context.push(SomeRoute());
 }
