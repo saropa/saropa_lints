@@ -13,6 +13,19 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Fixed
+- `avoid_variable_shadowing`: false positive on sequential for/while/do loops reusing the same variable name — loop variables are scoped to their body and don't shadow each other
+- `avoid_unused_assignment`: false positive on conditional reassignment (`x = x.toLowerCase()` inside if-blocks) — now skips loop-body assignments, may-overwrite conditionals, and self-referencing RHS
+- `prefer_switch_expression`: false positive on switch cases containing control flow (`if`/`for`/`while`) or multiple statements — also detects non-exhaustive switches with post-switch code
+- `no_magic_number`: false positive on numeric literals used as default parameter values — the parameter name provides context, making the number self-documenting
+- `avoid_unnecessary_to_list` / `avoid_large_list_copy`: false positive when `.toList()` is required by return type, method chain, expression function body, or argument position
+- `prefer_named_boolean_parameters`: false positive on lambda/closure parameters — their signature is constrained by the expected function type
+- `avoid_unnecessary_nullable_return_type`: false positive on ternary expressions with null branches, map `[]` operator, and nullable method delegation — now checks static type nullability recursively
+- `avoid_duplicate_string_literals` / `avoid_duplicate_string_literals_pair`: false positive on domain-inherent literals (`'true'`, `'false'`, `'null'`, `'none'`) that are self-documenting
+- `avoid_excessive_expressions`: false positive on guard clauses (early-return if-statements) and symmetric structural patterns — guard clauses now allowed up to 10 operators, symmetric repeating patterns are exempt
+- `prefer_digit_separators`: false positive on 5-digit numbers — threshold raised from 10,000 to 100,000 (6+ digits) to match common style guide recommendations
+- `require_list_preallocate`: false positive when `List.add()` is inside a conditional branch within a loop — preallocation is impossible when the number of additions is data-dependent
+
 ---
 ## [5.0.0-beta.13]
 

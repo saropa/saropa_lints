@@ -1787,7 +1787,7 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
 
   /// Returns true if the .toList() result is used in a context where a
   /// concrete List is required (return statement, variable assignment,
-  /// or passed to a method that requires List).
+  /// method chain target, or passed as argument).
   static bool _isToListRequired(MethodInvocation node) {
     final AstNode? parent = node.parent;
 
@@ -1800,6 +1800,13 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
 
     // .toList() is the expression in an assignment
     if (parent is AssignmentExpression) return true;
+
+    // .toList() result is used in a method chain — downstream method
+    // may be defined on List but not Iterable
+    if (parent is MethodInvocation && parent.target == node) return true;
+
+    // .toList() result is passed as an argument
+    if (parent is ArgumentList) return true;
 
     return false;
   }
@@ -2638,7 +2645,13 @@ class RequireListPreallocateRule extends SaropaLintRule {
       if (node.methodName.name != 'add') return;
 
       // Check if inside a loop
-      if (!_isInsideLoop(node)) return;
+      final AstNode? loopNode = _findEnclosingLoop(node);
+      if (loopNode == null) return;
+
+      // Skip when add() is inside a conditional branch within the loop —
+      // the number of additions is data-dependent and preallocation
+      // is impossible without running the loop twice.
+      if (_isInsideConditionalWithinLoop(node, loopNode)) return;
 
       // Check if target looks like a list variable
       final Expression? target = node.target;
@@ -2667,21 +2680,34 @@ class RequireListPreallocateRule extends SaropaLintRule {
     });
   }
 
-  bool _isInsideLoop(AstNode node) {
+  /// Returns the enclosing loop node, or null if not inside a loop.
+  static AstNode? _findEnclosingLoop(AstNode node) {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is ForStatement ||
           current is ForElement ||
           current is WhileStatement ||
           current is DoStatement) {
-        return true;
+        return current;
       }
-      // Check for .forEach, .map, etc.
-      if (current is MethodInvocation) {
-        final String name = current.methodName.name;
-        if (name == 'forEach') {
-          return true;
-        }
+      if (current is MethodInvocation && current.methodName.name == 'forEach') {
+        return current;
+      }
+      current = current.parent;
+    }
+    return null;
+  }
+
+  /// Returns true if [node] is inside a conditional (if/switch/ternary)
+  /// that is itself inside [loopNode]. This means the add() count per
+  /// iteration is data-dependent and preallocation is impossible.
+  static bool _isInsideConditionalWithinLoop(AstNode node, AstNode loopNode) {
+    AstNode? current = node.parent;
+    while (current != null && current != loopNode) {
+      if (current is IfStatement ||
+          current is SwitchStatement ||
+          current is ConditionalExpression) {
+        return true;
       }
       current = current.parent;
     }
