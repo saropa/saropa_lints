@@ -8,6 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -2110,5 +2111,79 @@ class AvoidGetxBuildContextBypassRule extends SaropaLintRule {
 
       reporter.atNode(node);
     });
+  }
+}
+
+/// Warns when GetX reactive observables are nested (e.g. `Rx<List<RxInt>>`).
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Nesting Rx types causes double-notification when either the outer or inner
+/// observable changes, leading to redundant rebuilds and confusing behavior.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// final items = Rx<List<RxString>>([].obs); // nested reactivity
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// final items = RxList<String>([]);          // flat reactive list
+/// ```
+class AvoidGetxRxNestedObsRule extends SaropaLintRule {
+  AvoidGetxRxNestedObsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'get'};
+
+  static const LintCode _code = LintCode(
+    'avoid_getx_rx_nested_obs',
+    '[avoid_getx_rx_nested_obs] Nesting GetX reactive types like '
+        'Rx<List<RxString>> causes double-notification when either the outer '
+        'or inner observable changes, leading to redundant widget rebuilds, '
+        'confusing update behavior, and potential infinite loops. Use flat '
+        'reactive types like RxList<String> instead of wrapping collections '
+        'in multiple Rx layers. {v1}',
+    correctionMessage:
+        'Use RxList<T>, RxMap<K,V>, or RxSet<T> instead of nesting Rx types.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addVariableDeclaration((VariableDeclaration node) {
+      final DartType? type = node.declaredElement?.type;
+      if (type == null) return;
+
+      final String typeStr = type.getDisplayString();
+      if (!typeStr.startsWith('Rx')) return;
+
+      // Check if any type argument also starts with Rx
+      if (type is! InterfaceType) return;
+      if (_hasNestedRx(type)) {
+        reporter.atNode(node);
+      }
+    });
+  }
+
+  static bool _hasNestedRx(InterfaceType type) {
+    for (final DartType arg in type.typeArguments) {
+      final String argStr = arg.getDisplayString();
+      // Check for nested Rx types: Rx<...>, RxList, RxMap, RxSet, RxInt, etc.
+      if (argStr.startsWith('Rx')) return true;
+      if (arg is InterfaceType && _hasNestedRx(arg)) return true;
+    }
+    return false;
   }
 }

@@ -8,6 +8,20 @@ import '../saropa_lint_rule.dart';
 import '../fixes/return/remove_unnecessary_return_fix.dart';
 import '../fixes/return/inline_immediate_return_fix.dart';
 
+/// Resolves the declared return type from a [FunctionBody]'s parent.
+DartType? getReturnTypeFromBody(FunctionBody body) {
+  final AstNode? parent = body.parent;
+  if (parent is MethodDeclaration) return parent.returnType?.type;
+  if (parent is FunctionDeclaration) return parent.returnType?.type;
+  if (parent is FunctionExpression) {
+    final grandparent = parent.parent;
+    if (grandparent is FunctionDeclaration) {
+      return grandparent.returnType?.type;
+    }
+  }
+  return null;
+}
+
 /// Warns when returning a cascade expression.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
@@ -352,5 +366,144 @@ class PreferReturningShorthandsRule extends SaropaLintRule {
       // Single return statement - could use arrow
       reporter.atToken(nameToken);
     }
+  }
+}
+
+/// Warns when returning `null` from a function with `void` return type.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// In Dart, `void` functions don't need to return anything. Returning `null`
+/// explicitly is redundant and suggests the developer may have the wrong
+/// return type.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// void doWork() {
+///   print('done');
+///   return null;
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// void doWork() {
+///   print('done');
+///   return;
+/// }
+/// ```
+class AvoidReturningNullForVoidRule extends SaropaLintRule {
+  AvoidReturningNullForVoidRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_returning_null_for_void',
+    '[avoid_returning_null_for_void] Returning null from a void function is '
+        'redundant and misleading. Void functions should either use a bare '
+        'return statement or simply let execution fall through. An explicit '
+        'return null suggests the caller expects a value, which contradicts '
+        'the void return type and confuses readers. {v1}',
+    correctionMessage:
+        'Replace "return null;" with "return;" or remove the return '
+        'statement entirely.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addReturnStatement((ReturnStatement node) {
+      final Expression? expr = node.expression;
+      if (expr is! NullLiteral) return;
+
+      final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
+      if (body == null) return;
+
+      final DartType? returnType = getReturnTypeFromBody(body);
+      if (returnType == null) return;
+      if (returnType is! VoidType) return;
+
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Warns when returning `null` from a non-async `Future` function.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Returning `null` from a non-async function that returns `Future<T>` can
+/// cause a NullPointerException at runtime if T is non-nullable.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// Future<String> fetchName() {
+///   return null; // Runtime NPE when awaited
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// Future<String> fetchName() {
+///   return Future.value('default');
+/// }
+/// // or:
+/// Future<String> fetchName() async {
+///   return 'default';
+/// }
+/// ```
+class AvoidReturningNullForFutureRule extends SaropaLintRule {
+  AvoidReturningNullForFutureRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_returning_null_for_future',
+    '[avoid_returning_null_for_future] Returning null from a synchronous '
+        'function declared to return Future<T> where T is non-nullable causes '
+        'a runtime null error when the future is awaited. Use Future.value() '
+        'to wrap the default, or make the function async to let Dart handle '
+        'the future wrapping automatically. {v1}',
+    correctionMessage:
+        'Wrap the value with Future.value() or make the function async.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addReturnStatement((ReturnStatement node) {
+      final Expression? expr = node.expression;
+      if (expr is! NullLiteral) return;
+
+      final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
+      if (body == null) return;
+
+      // Only flag synchronous functions — async functions handle null fine
+      if (body.isAsynchronous) return;
+
+      final DartType? returnType = getReturnTypeFromBody(body);
+      if (returnType == null) return;
+      if (!returnType.isDartAsyncFuture) return;
+
+      reporter.atNode(node);
+    });
   }
 }

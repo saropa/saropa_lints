@@ -2473,3 +2473,170 @@ class RequireFirebaseCompositeIndexRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when too much user data is stored in Firebase Auth custom claims.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Firebase custom claims are limited to 1000 bytes total and are included
+/// in every authenticated request. Storing profile data here bloats tokens,
+/// slows requests, and risks hitting the size limit.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// final result = await user.getIdTokenResult();
+/// final name = result.claims?['name'];
+/// final email = result.claims?['email'];
+/// final avatar = result.claims?['avatarUrl'];
+/// final bio = result.claims?['bio'];
+/// final phone = result.claims?['phone'];
+/// final address = result.claims?['address']; // 6 claims — too many
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// final result = await user.getIdTokenResult();
+/// final role = result.claims?['role'];       // only security data
+/// final tier = result.claims?['tier'];
+/// // Profile data lives in Firestore
+/// ```
+class AvoidFirebaseUserDataInAuthRule extends SaropaLintRule {
+  AvoidFirebaseUserDataInAuthRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.high;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'firebase'};
+
+  static const int _maxClaims = 5;
+
+  static const LintCode _code = LintCode(
+    'avoid_firebase_user_data_in_auth',
+    '[avoid_firebase_user_data_in_auth] Accessing more than $_maxClaims '
+        'distinct custom claim keys from a Firebase ID token suggests '
+        'profile data is being stored in custom claims. Custom claims are '
+        'limited to 1000 bytes total and included in every authenticated '
+        'request, bloating token size and slowing network calls. Move '
+        'profile data to Firestore and keep only security-critical fields '
+        'like role and permissions in claims. {v1}',
+    correctionMessage:
+        'Move non-security data (name, avatar, bio, etc.) to Firestore '
+        'and keep only role/permission fields in custom claims.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'getIdTokenResult') return;
+
+      // Find enclosing function body
+      final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
+      if (body == null) return;
+
+      // Count distinct claims['key'] accesses in the same function
+      final String source = body.toSource();
+      final Iterable<RegExpMatch> matches = RegExp(
+        r"claims\?\?\[|claims\?\[|claims\[",
+      ).allMatches(source);
+      final Set<String> distinctKeys = {};
+      for (final RegExpMatch match in matches) {
+        // Extract the key from claims['key'] or claims?['key']
+        final int start = match.end;
+        final int end = source.indexOf(']', start);
+        if (end > start) {
+          distinctKeys.add(source.substring(start, end));
+        }
+      }
+
+      if (distinctKeys.length > _maxClaims) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+/// Warns when a Firebase project does not use Firebase App Check.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Without App Check, your Firebase backend has no protection against
+/// request forgery — any HTTP client can call your Cloud Functions and
+/// read your Firestore/RTDB data using the public API key.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// await Firebase.initializeApp();
+/// // No App Check activation — backend unprotected
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// await Firebase.initializeApp();
+/// await FirebaseAppCheck.instance.activate(
+///   androidProvider: AndroidProvider.playIntegrity,
+/// );
+/// ```
+class RequireFirebaseAppCheckProductionRule extends SaropaLintRule {
+  RequireFirebaseAppCheckProductionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'firebase'};
+
+  static const LintCode _code = LintCode(
+    'require_firebase_app_check_production',
+    '[require_firebase_app_check_production] Calling '
+        'Firebase.initializeApp() without activating Firebase App Check '
+        'leaves your backend unprotected against request forgery. Any HTTP '
+        'client can call your Cloud Functions and access Firestore or RTDB '
+        'using the public API key. Add '
+        'FirebaseAppCheck.instance.activate() after initialization. {v1}',
+    correctionMessage:
+        'Add FirebaseAppCheck.instance.activate() after '
+        'Firebase.initializeApp().',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'initializeApp') return;
+
+      // Target must be Firebase
+      final Expression? target = node.realTarget;
+      if (target == null) return;
+      if (target is! SimpleIdentifier || target.name != 'Firebase') return;
+
+      // Check if the same function body contains AppCheck activation
+      final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
+      if (body == null) return;
+
+      final String source = body.toSource();
+      if (source.contains('FirebaseAppCheck') || source.contains('AppCheck')) {
+        return;
+      }
+
+      reporter.atNode(node);
+    });
+  }
+}

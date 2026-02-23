@@ -1904,3 +1904,269 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when storing DateTime in Hive without converting to UTC first.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Hive serializes DateTime as-is. If a local DateTime is stored, reading it
+/// back on a device in a different timezone produces incorrect results.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// await box.put('ts', DateTime.now());  // local time stored
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// await box.put('ts', DateTime.now().toUtc());
+/// ```
+class AvoidHiveDatetimeLocalRule extends SaropaLintRule {
+  AvoidHiveDatetimeLocalRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'hive'};
+
+  static const LintCode _code = LintCode(
+    'avoid_hive_datetime_local',
+    '[avoid_hive_datetime_local] Storing a local DateTime value in Hive '
+        'without first converting to UTC causes timezone-dependent bugs. '
+        'When the value is read back on a device in a different timezone, '
+        'the timestamp will be interpreted incorrectly. Always call .toUtc() '
+        'before storing DateTime values in Hive to ensure consistent '
+        'behavior across timezones. {v1}',
+    correctionMessage: 'Call .toUtc() on the DateTime value before storing it.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'put') return;
+
+      // Check if target looks like a Hive box
+      final Expression? target = node.realTarget;
+      if (target == null) return;
+      final String targetStr = target.staticType?.getDisplayString() ?? '';
+      if (!targetStr.contains('Box')) return;
+
+      // Get the value argument (second positional arg)
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.length < 2) return;
+
+      final Expression value = args[1];
+      final String? valueType = value.staticType?.getDisplayString();
+      if (valueType == null || !valueType.startsWith('DateTime')) return;
+
+      // Allow if already calling .toUtc()
+      if (value is MethodInvocation && value.methodName.name == 'toUtc') {
+        return;
+      }
+
+      // Allow DateTime.utc(...) constructor
+      if (value is InstanceCreationExpression) {
+        final String ctorName = value.constructorName.toSource();
+        if (ctorName.contains('DateTime.utc')) return;
+      }
+
+      reporter.atNode(value);
+    });
+  }
+}
+
+/// Warns when @HiveType fields have duplicate @HiveField indices.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Reusing a @HiveField index causes silent data corruption — Hive reads
+/// the wrong field from disk. Once an index is assigned, it must never be
+/// reused, even if the original field is deleted.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// @HiveType(typeId: 1)
+/// class User extends HiveObject {
+///   @HiveField(0) String name;
+///   @HiveField(0) int age;   // ← duplicate index!
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// @HiveType(typeId: 1)
+/// class User extends HiveObject {
+///   @HiveField(0) String name;
+///   @HiveField(1) int age;
+/// }
+/// ```
+class AvoidHiveTypeModificationRule extends SaropaLintRule {
+  AvoidHiveTypeModificationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'hive'};
+
+  static const LintCode _code = LintCode(
+    'avoid_hive_type_modification',
+    '[avoid_hive_type_modification] Reusing a @HiveField index causes '
+        'silent data corruption because Hive maps indices to binary offsets. '
+        'When two fields share an index, reading from disk returns the wrong '
+        'data. Once a field index is assigned it must never be reused, even '
+        'if the original field is deleted. Mark retired indices with a '
+        'comment instead. {v1}',
+    correctionMessage:
+        'Assign a unique, incrementing @HiveField index to each field. '
+        'Never reuse indices from deleted fields.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      // Must have @HiveType annotation
+      bool hasHiveType = false;
+      for (final Annotation annotation in node.metadata) {
+        if (annotation.name.name == 'HiveType') {
+          hasHiveType = true;
+          break;
+        }
+      }
+      if (!hasHiveType) return;
+
+      // Collect all @HiveField indices
+      final Map<int, List<FieldDeclaration>> indexToFields = {};
+      for (final ClassMember member in node.members) {
+        if (member is! FieldDeclaration) continue;
+        for (final Annotation annotation in member.metadata) {
+          if (annotation.name.name != 'HiveField') continue;
+          final NodeList<Expression>? args = annotation.arguments?.arguments;
+          if (args == null || args.isEmpty) continue;
+
+          final Expression indexExpr = args.first;
+          if (indexExpr is IntegerLiteral && indexExpr.value != null) {
+            indexToFields.putIfAbsent(indexExpr.value!, () => []).add(member);
+          }
+        }
+      }
+
+      // Flag duplicates
+      for (final entry in indexToFields.entries) {
+        if (entry.value.length > 1) {
+          for (final FieldDeclaration field in entry.value) {
+            reporter.atNode(field);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when storing large objects as a single Hive entry.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Hive loads each box entry fully into memory. Storing a large list or
+/// binary blob as a single entry causes high memory usage and slow reads.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// await box.put('allUsers', userList); // Uint8List or List<User>
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// for (final user in userList) {
+///   await box.put('user_${user.id}', user); // individual entries
+/// }
+/// ```
+class AvoidHiveLargeSingleEntryRule extends SaropaLintRule {
+  AvoidHiveLargeSingleEntryRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'hive'};
+
+  static const LintCode _code = LintCode(
+    'avoid_hive_large_single_entry',
+    '[avoid_hive_large_single_entry] Storing a large collection or binary '
+        'blob as a single Hive entry forces Hive to load the entire object '
+        'into memory at once, causing high memory usage and slow reads. '
+        'Large Uint8List or List<Model> values should be split into '
+        'individual keyed entries so Hive can load them on demand. {v1}',
+    correctionMessage:
+        'Split large collections into individual entries, each stored under '
+        'its own key (e.g. "item_\$id").',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'put') return;
+
+      // Check if target looks like a Hive box
+      final Expression? target = node.realTarget;
+      if (target == null) return;
+      final String targetStr = target.staticType?.getDisplayString() ?? '';
+      if (!targetStr.contains('Box')) return;
+
+      // Get the value argument
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.length < 2) return;
+
+      final String? valueType = args[1].staticType?.getDisplayString();
+      if (valueType == null) return;
+
+      // Flag Uint8List and List<non-primitive> types
+      if (valueType == 'Uint8List') {
+        reporter.atNode(args[1]);
+        return;
+      }
+      if (valueType.startsWith('List<') && !_isPrimitiveList(valueType)) {
+        reporter.atNode(args[1]);
+      }
+    });
+  }
+
+  static bool _isPrimitiveList(String typeStr) {
+    const primitives = [
+      'List<int>',
+      'List<double>',
+      'List<String>',
+      'List<bool>',
+      'List<num>',
+    ];
+    return primitives.contains(typeStr);
+  }
+}
