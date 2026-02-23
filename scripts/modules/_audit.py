@@ -42,6 +42,10 @@ from scripts.modules._audit_checks import (
     print_severity_stats,
     print_tier_stats,
 )
+from scripts.modules._tier_integrity import (
+    check_tier_integrity,
+    get_tier_integrity_checks,
+)
 from scripts.modules._audit_dx import (
     RuleMessage,
     extract_rule_messages,
@@ -89,17 +93,20 @@ class AuditResult:
     without_corrections: set[str]
     roadmap_duplicates: set[str] = field(default_factory=set)
     rules_missing_prefix: list[str] = field(default_factory=list)
+    tier_integrity_passed: bool = True
 
     @property
     def has_blocking_issues(self) -> bool:
         """True if any blocking issues were found.
 
         Blocks publishing when:
+        - Tier integrity checks failed
         - Duplicate class names, rule names, or aliases exist
         - Rules missing ``[rule_name]`` prefix in problemMessage
         """
         return bool(
-            self.duplicate_report.get("class_names")
+            not self.tier_integrity_passed
+            or self.duplicate_report.get("class_names")
             or self.duplicate_report.get("rule_names")
             or self.duplicate_report.get("aliases")
             or self.rules_missing_prefix
@@ -403,6 +410,7 @@ def run_full_audit(
     show_dx_all: bool = False,
     skip_dx: bool = False,
     compact: bool = False,
+    extra_checks: list[_Check] | None = None,
 ) -> AuditResult:
     """Run all audit checks and return structured results.
 
@@ -453,10 +461,15 @@ def run_full_audit(
     tier_stats: TierStats | None = None
     orphan_rules: set[str] = set()
     not_implemented: list[str] = []
+    tier_checks: list[_Check] = []
+    tier_integrity_passed = True
     if tiers_path.exists():
         tier_stats = get_tier_stats(tiers_path)
         not_implemented = sorted(tier_stats.all_tier_rules - rules)
         orphan_rules = find_orphan_rules(rules, tier_stats)
+        tier_result = check_tier_integrity(rules_dir, tiers_path)
+        tier_checks = get_tier_integrity_checks(tier_result)
+        tier_integrity_passed = tier_result.passed
 
     # Underscore naming data
     rules_with_0 = [r for r in rules if r.count("_") == 0]
@@ -491,29 +504,12 @@ def run_full_audit(
     if not skip_dx:
         dx_messages = extract_rule_messages(rules_dir)
 
-    # ===== INFO SECTIONS (first) =====
+    # ===== AUDIT CHECKS (pass/fail — tier integrity + quality) =====
+    print_section("AUDIT CHECKS")
 
-    # ----- Distribution analysis -----
-    print_section("DISTRIBUTION ANALYSIS")
-    if tier_stats:
-        print_tier_stats(tier_stats)
-    print_severity_stats(severity_stats)
+    checks: list[_Check] = list(tier_checks)
 
-    # ----- Security & compliance -----
-    print_section("SECURITY & COMPLIANCE")
-    print_owasp_coverage(owasp_coverage)
-
-    # ----- Quality metrics -----
-    print_section("QUALITY METRICS")
-    print_quality_metrics(file_stats, rules, quick_fixes, with_corrections)
-    print_file_health(file_stats)
-
-    # ===== QUALITY CHECKS (second) =====
-    print_section("QUALITY CHECKS")
-
-    checks: list[_Check] = []
-
-    # 1. Duplicate detection
+    # Duplicate detection
     dup_classes = duplicates.get("class_names", {})
     dup_rule_names = duplicates.get("rule_names", {})
     dup_aliases_found = duplicates.get("aliases", {})
@@ -538,7 +534,7 @@ def run_full_audit(
             [],
         ))
 
-    # 2. Problem message prefix (BLOCKING)
+    # Problem message prefix (BLOCKING)
     if rules_missing_prefix:
         shown = sorted(rules_missing_prefix)[:10]
         detail_line = ", ".join(shown)
@@ -557,7 +553,7 @@ def run_full_audit(
             [],
         ))
 
-    # 3. Underscore naming (informational — never blocks publish)
+    # Underscore naming (informational — never blocks publish)
     if rules_with_0:
         checks.append((
             _WARN,
@@ -573,7 +569,7 @@ def run_full_audit(
     else:
         checks.append((_PASS, "All rules have at least 2 underscores", []))
 
-    # 4. Tier assignment
+    # Tier assignment (audit-level: orphans not in stylistic)
     if tier_stats:
         non_stylistic_orphans = [
             r for r in sorted(orphan_rules)
@@ -585,10 +581,8 @@ def run_full_audit(
                 f"{len(non_stylistic_orphans)} rule(s) not in any tier",
                 non_stylistic_orphans[:5],
             ))
-        else:
-            checks.append((_PASS, "All rules assigned to tiers", []))
 
-        # 5. Rules in tiers.dart not implemented
+        # Rules in tiers.dart not implemented
         if not_implemented:
             truly_missing = [
                 r for r in not_implemented if r not in aliases
@@ -609,10 +603,12 @@ def run_full_audit(
                     f"({len(alias_covered)} via aliases)",
                     [],
                 ))
-        else:
-            checks.append((_PASS, "All tiered rules implemented", []))
+            else:
+                checks.append((
+                    _PASS, "All tiered rules implemented", [],
+                ))
 
-    # 6. ROADMAP sync
+    # ROADMAP sync
     if roadmap_duplicates:
         shown_rules = sorted(roadmap_duplicates)[:5]
         suffix = (
@@ -641,7 +637,7 @@ def run_full_audit(
             match_details,
         ))
 
-    # 7. DX message quality
+    # DX message quality
     if not skip_dx:
         dx_failing = sum(1 for m in dx_messages if m.dx_issues)
         if dx_failing:
@@ -657,9 +653,28 @@ def run_full_audit(
                 [],
             ))
 
+    if extra_checks:
+        checks.extend(extra_checks)
+
     _print_quality_checks(checks)
 
-    # DX message audit
+    # ===== METRICS (distribution + coverage + quality) =====
+    print_section("METRICS")
+
+    print_subheader("Distribution")
+    if tier_stats:
+        print_tier_stats(tier_stats, show_header=False)
+    print_severity_stats(severity_stats, show_header=False)
+    print_owasp_coverage(owasp_coverage, show_header=False)
+
+    print_subheader("Quality")
+    print_quality_metrics(
+        file_stats, rules, quick_fixes, with_corrections,
+        show_header=False,
+    )
+    print_file_health(file_stats, show_headers=False)
+
+    # DX message detail
     if not skip_dx:
         print_dx_audit_report(
             dx_messages,
@@ -691,7 +706,7 @@ def run_full_audit(
             f"Report: {full_report.relative_to(project_dir)}"
         )
 
-    # ===== OVERVIEW (at end for terminal readability) =====
+    # ===== OVERVIEW =====
     print_subheader("Overview")
     print_stat("Implemented rules", len(rules), Color.GREEN)
     print_stat("Documented aliases", len(aliases), Color.CYAN)
@@ -715,4 +730,5 @@ def run_full_audit(
         without_corrections=without_corrections,
         roadmap_duplicates=roadmap_duplicates,
         rules_missing_prefix=rules_missing_prefix,
+        tier_integrity_passed=tier_integrity_passed,
     )

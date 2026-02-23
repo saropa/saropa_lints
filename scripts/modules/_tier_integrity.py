@@ -660,6 +660,114 @@ def check_tier_integrity(
 # =============================================================================
 
 
+def get_tier_integrity_checks(
+    result: TierIntegrityResult,
+) -> list[tuple[str, str, list[str]]]:
+    """Convert tier integrity results to check tuples for consolidated output.
+
+    Returns list of (status, message, detail_lines) tuples compatible with
+    ``_audit._print_quality_checks()``.
+    """
+    _P, _F = "pass", "fail"
+    checks: list[tuple[str, str, list[str]]] = []
+
+    # 1. Orphans
+    if result.orphan_rules:
+        shown = sorted(result.orphan_rules)[:10]
+        checks.append((
+            _F,
+            f"{len(result.orphan_rules)} rule(s) not in any tier set",
+            shown,
+        ))
+    else:
+        checks.append((_P, "All rules assigned to a tier", []))
+
+    # 2. Phantoms
+    if result.phantom_rules:
+        shown = sorted(result.phantom_rules)[:10]
+        checks.append((
+            _F,
+            f"{len(result.phantom_rules)} phantom rule(s) in tiers.dart",
+            shown,
+        ))
+    else:
+        checks.append((_P, "All tier rules exist as implemented rules", []))
+
+    # 3. Multi-tier
+    if result.multi_tier_rules:
+        details = [
+            f"{rule} → {', '.join(tiers)}"
+            for rule, tiers in result.multi_tier_rules[:10]
+        ]
+        checks.append((
+            _F,
+            f"{len(result.multi_tier_rules)} rule(s) in multiple tiers",
+            details,
+        ))
+    else:
+        checks.append((_P, "No rule appears in multiple tiers", []))
+
+    # 4. Opinionated placement
+    if result.misplaced_opinionated:
+        details = [
+            f"{rule} (in {tier})"
+            for rule, tier in result.misplaced_opinionated[:10]
+        ]
+        checks.append((
+            _F,
+            f"{len(result.misplaced_opinionated)} prefer_* rule(s) "
+            f"not in stylisticRules",
+            details,
+        ))
+    else:
+        checks.append((_P, "Opinionated prefer_* rules in stylisticRules", []))
+
+    # 5. flutterStylisticRules subset
+    if result.flutter_stylistic_not_in_stylistic:
+        shown = sorted(result.flutter_stylistic_not_in_stylistic)[:10]
+        checks.append((
+            _F,
+            f"{len(result.flutter_stylistic_not_in_stylistic)} "
+            f"flutterStylistic rule(s) not in stylisticRules",
+            shown,
+        ))
+    else:
+        checks.append((
+            _P, "flutterStylisticRules is subset of stylisticRules", [],
+        ))
+
+    # 6. Package rules
+    if result.package_rules_not_in_tiers:
+        details = [
+            f"{rule} ({pkg})"
+            for rule, pkg in result.package_rules_not_in_tiers[:10]
+        ]
+        checks.append((
+            _F,
+            f"{len(result.package_rules_not_in_tiers)} package rule(s) "
+            f"not in tier system",
+            details,
+        ))
+    else:
+        checks.append((_P, "All package rules in tier system", []))
+
+    # 7. Example pairing
+    if result.unpaired_examples:
+        details = [
+            f"{rule} (missing {missing})"
+            for rule, missing in result.unpaired_examples[:10]
+        ]
+        checks.append((
+            _F,
+            f"{len(result.unpaired_examples)} rule(s) with unpaired examples",
+            details,
+        ))
+    else:
+        checks.append((_P, "All rule examples properly paired", []))
+
+    return checks
+
+
 def print_tier_integrity_report(result: TierIntegrityResult) -> None:
     """Print a formatted tier integrity report to the terminal.
 
