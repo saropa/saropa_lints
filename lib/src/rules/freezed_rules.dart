@@ -935,3 +935,100 @@ class PreferFreezedForDataClassesRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when a `@freezed` class with `fromJson` lacks `@JsonSerializable(anyMap: true)`.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Firestore and some APIs return `Map<String, dynamic>` nested as
+/// `Map<dynamic, dynamic>`. Without `anyMap: true`, freezed's generated
+/// `fromJson` throws a cast error at runtime.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// @freezed
+/// class User with _$User {
+///   factory User({required String name}) = _User;
+///   factory User.fromJson(Map<String, dynamic> json) =>
+///       _$UserFromJson(json);  // ← crashes on nested maps
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// @freezed
+/// @JsonSerializable(anyMap: true)
+/// class User with _$User {
+///   factory User({required String name}) = _User;
+///   factory User.fromJson(Map<String, dynamic> json) =>
+///       _$UserFromJson(json);
+/// }
+/// ```
+class AvoidFreezedAnyMapIssueRule extends SaropaLintRule {
+  AvoidFreezedAnyMapIssueRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'freezed'};
+
+  static const LintCode _code = LintCode(
+    'avoid_freezed_any_map_issue',
+    '[avoid_freezed_any_map_issue] A @freezed class with a fromJson factory '
+        'that lacks @JsonSerializable(anyMap: true) will throw a cast error '
+        'when deserializing nested maps from Firestore or other APIs that '
+        'return Map<dynamic, dynamic>. Adding anyMap: true makes the '
+        'generated fromJson accept any map type safely. {v1}',
+    correctionMessage:
+        'Add @JsonSerializable(anyMap: true) above the class declaration.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      bool hasFreezed = false;
+      bool hasAnyMap = false;
+
+      for (final Annotation annotation in node.metadata) {
+        final String name = annotation.name.name;
+        if (name == 'freezed' || name == 'Freezed') {
+          hasFreezed = true;
+        }
+        if (name == 'JsonSerializable') {
+          final String source = annotation.toSource();
+          if (RegExp(r'anyMap\s*:\s*true').hasMatch(source)) {
+            hasAnyMap = true;
+          }
+        }
+      }
+
+      if (!hasFreezed) return;
+      if (hasAnyMap) return;
+
+      // Check for fromJson factory
+      bool hasFromJson = false;
+      for (final ClassMember member in node.members) {
+        if (member is ConstructorDeclaration &&
+            member.factoryKeyword != null &&
+            member.name?.lexeme == 'fromJson') {
+          hasFromJson = true;
+          break;
+        }
+      }
+
+      if (!hasFromJson) return;
+
+      reporter.atToken(node.name);
+    });
+  }
+}
