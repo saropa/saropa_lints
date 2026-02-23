@@ -2470,6 +2470,16 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidAssetManifestJsonRule.new,
   PreferDropdownInitialValueRule.new,
   PreferOnPopWithResultRule.new,
+
+  // v5.1.0 - New lint rules
+  AvoidCachedImageWebRule.new,
+  AvoidClipDuringAnimationRule.new,
+  AvoidAutoRouteContextNavigationRule.new,
+  AvoidAutoRouteKeepHistoryMisuseRule.new,
+  AvoidAccessingOtherClassesPrivateMembersRule.new,
+  AvoidClosureCaptureLeaksRule.new,
+  AvoidBehaviorSubjectLastValueRule.new,
+  AvoidCacheStampedeRule.new,
 ];
 
 // =============================================================================

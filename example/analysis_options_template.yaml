@@ -1452,3 +1452,29 @@ custom_lint:
     - avoid_asset_manifest_json: false               # ERROR - removed in Flutter 3.38.0, runtime crash (v5.1.0)
     - prefer_dropdown_initial_value: false            # WARNING - value→initialValue, Flutter 3.35.0 (v5.1.0, quick fix)
     - prefer_on_pop_with_result: false                # WARNING - onPop→onPopWithResult, Flutter 3.35.0 (v5.1.0, quick fix)
+
+    # =========================================================================
+    # V5.1.0 RULES - New lint rules
+    # =========================================================================
+
+    # --- Image ---
+    - avoid_cached_image_web: false                    # WARNING - CachedNetworkImage inside kIsWeb branch (v5.1.0)
+
+    # --- Animation ---
+    - avoid_clip_during_animation: false               # WARNING - Clip widget inside animated ancestor (v5.1.0)
+
+    # --- auto_route ---
+    - avoid_auto_route_context_navigation: false       # WARNING - string-based push/go in auto_route project (v5.1.0)
+    - avoid_auto_route_keep_history_misuse: false      # WARNING - replaceAll/popUntilRoot outside auth flow (v5.1.0)
+
+    # --- Class Encapsulation ---
+    - avoid_accessing_other_classes_private_members: false # WARNING - cross-class private access (v5.1.0)
+
+    # --- Memory Management ---
+    - avoid_closure_capture_leaks: false               # WARNING - setState in Timer without mounted check (v5.1.0, quick fix)
+
+    # --- RxDart ---
+    - avoid_behavior_subject_last_value: false         # WARNING - .value on closed BehaviorSubject (v5.1.0)
+
+    # --- Performance ---
+    - avoid_cache_stampede: false                      # WARNING - async cache without in-flight dedup (v5.1.0)

@@ -13,6 +13,16 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Added
+- `avoid_cached_image_web`: warns when CachedNetworkImage is used inside a `kIsWeb` branch where it provides no caching benefit (Recommended tier)
+- `avoid_clip_during_animation`: warns when Clip widgets are nested inside animated widgets, causing expensive per-frame rasterization (Professional tier)
+- `avoid_auto_route_context_navigation`: warns when string-based `context.push`/`context.go` is used in auto_route projects instead of typed routes (Professional tier)
+- `avoid_auto_route_keep_history_misuse`: warns when `replaceAll`/`popUntilRoot` is used outside authentication flows, destroying navigation history (Professional tier)
+- `avoid_accessing_other_classes_private_members`: warns when code accesses another class's private members through same-file library privacy (Professional tier)
+- `avoid_closure_capture_leaks`: warns when `setState` is called inside Timer/Future.delayed callbacks without a `mounted` check (Professional tier, quick fix)
+- `avoid_behavior_subject_last_value`: warns when `.value` is accessed on a BehaviorSubject inside an `isClosed` true-branch (Professional tier)
+- `avoid_cache_stampede`: warns when async methods use a Map cache without in-flight request deduplication (Professional tier)
+
 ### Fixed
 - `avoid_god_class`: false positive on static-constant namespace classes — `static const` and `static final` fields are now excluded from the field count since they represent compile-time constants, not instance state
 - `prefer_static_class`: conflicting diagnostic with `prefer_abstract_final_static_class` on classes with private constructors — `prefer_static_class` now defers to `prefer_abstract_final_static_class` when a private constructor is present
