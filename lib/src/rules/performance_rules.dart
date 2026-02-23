@@ -4424,3 +4424,159 @@ class AvoidFullSyncOnEveryLaunchRule extends SaropaLintRule {
     }
   }
 }
+
+// =============================================================================
+// avoid_cache_stampede
+// =============================================================================
+
+/// Warns when an async method uses a Map cache without in-flight dedup.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// A **cache stampede** (thundering herd) occurs when multiple concurrent
+/// callers all miss the cache simultaneously and each triggers a separate
+/// expensive fetch. In Dart's async event loop, this is real: two `await`
+/// calls can both see an empty cache before either completes.
+///
+/// **BAD:**
+/// ```dart
+/// final Map<String, Data> _cache = {};
+///
+/// Future<Data> getData(String id) async {
+///   if (_cache.containsKey(id)) return _cache[id]!;
+///   final data = await _api.fetch(id); // N concurrent fetches!
+///   _cache[id] = data;
+///   return data;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final Map<String, Data> _cache = {};
+/// final Map<String, Future<Data>> _inFlight = {};
+///
+/// Future<Data> getData(String id) async {
+///   return _cache[id] ??
+///       (_inFlight[id] ??= _api.fetch(id).then((data) {
+///         _cache[id] = data;
+///         _inFlight.remove(id);
+///         return data;
+///       }));
+/// }
+/// ```
+class AvoidCacheStampedeRule extends SaropaLintRule {
+  AvoidCacheStampedeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.high;
+
+  @override
+  bool get requiresAsync => true;
+
+  static const LintCode _code = LintCode(
+    'avoid_cache_stampede',
+    '[avoid_cache_stampede] Async method uses a Map cache without in-flight '
+        'request deduplication. When multiple concurrent callers miss the cache '
+        'simultaneously, each triggers a separate expensive fetch (cache '
+        'stampede / thundering herd). Dart\'s async event loop means multiple '
+        'awaits can interleave and all see the empty cache before any write '
+        'completes. This causes redundant API calls, wasted bandwidth, '
+        'potential server overload, and possible data corruption from race '
+        'conditions. {v1}',
+    correctionMessage:
+        'Add an in-flight deduplication Map<String, Future<T>> and use the '
+        '??= pattern: _inFlight[key] ??= fetch(key).then((data) { ... }). '
+        'Or wrap the cache access in a Lock from package:synchronized.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      // Must be an async method returning Future
+      if (!node.isAbstract && node.body is! BlockFunctionBody) return;
+      final FunctionBody body = node.body;
+      if (body is! BlockFunctionBody) return;
+
+      final String bodySource = body.toSource();
+
+      // Quick checks: must contain a cache-like pattern + await
+      if (!bodySource.contains('containsKey') &&
+          !bodySource.contains('[') &&
+          !bodySource.contains('putIfAbsent')) {
+        return;
+      }
+      if (!bodySource.contains('await')) return;
+
+      // Check for in-flight dedup or lock patterns (suppression)
+      if (_hasDeduplication(bodySource, node)) return;
+
+      // Look for the cache-miss-then-await pattern
+      if (_hasCacheMissThenAwait(body.block)) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+
+  /// Checks if the method or enclosing class has in-flight dedup or a lock.
+  static bool _hasDeduplication(String bodySource, MethodDeclaration node) {
+    // Check body for ??= pattern with Future
+    if (bodySource.contains('??=')) return true;
+
+    // Check body for Lock / synchronized
+    if (bodySource.contains('synchronized') || bodySource.contains('Lock(')) {
+      return true;
+    }
+
+    // Check enclosing class for Map<String, Future<...>> field
+    final AstNode? parent = node.parent;
+    if (parent is ClassDeclaration) {
+      for (final ClassMember member in parent.members) {
+        if (member is FieldDeclaration) {
+          final String? typeSource = member.fields.type?.toSource();
+          if (typeSource != null &&
+              typeSource.contains('Map') &&
+              typeSource.contains('Future')) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  /// Detects: if (map.containsKey(x)) ... await ... map[x] = ...
+  static bool _hasCacheMissThenAwait(Block block) {
+    bool sawContainsKey = false;
+    bool sawAwait = false;
+
+    for (final Statement stmt in block.statements) {
+      final String source = stmt.toSource();
+
+      if (source.contains('containsKey(') || source.contains('!= null')) {
+        sawContainsKey = true;
+      }
+      if (sawContainsKey && source.contains('await ')) {
+        sawAwait = true;
+      }
+      // Pattern: cache[key] = value (cache write after await)
+      if (sawAwait && _isCacheWrite(source)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Simple heuristic: assignment to a map index `xxx[yyy] = zzz`.
+  static bool _isCacheWrite(String source) {
+    // Look for pattern: identifier[...] = (not ==)
+    final RegExp pattern = RegExp(r'\w+\[.+\]\s*=(?!=)');
+    return pattern.hasMatch(source);
+  }
+}

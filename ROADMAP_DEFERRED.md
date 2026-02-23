@@ -198,6 +198,12 @@ This section consolidates all rules that are deferred or marked as too complex f
 |------|--------|-------------|
 | `avoid_cache_in_build` | CONTEXT | Cache lookups in build() may be expensive. Requires detecting build method context. |
 
+### Deferred: Configuration-Dependent Rules
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `avoid_banned_api` | TOO-COMPLEX | Configurable rule to restrict usage of specific APIs by package, class, or identifier with include/exclude file patterns. Requires per-project configuration parsing from analysis_options.yaml which is not yet supported by the rule infrastructure. |
+
 ### Deferred: Heuristic Detection Rules
 
 | Rule | Reason | Description |
