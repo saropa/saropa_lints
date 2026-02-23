@@ -13,6 +13,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Fixed
+- `avoid_god_class`: false positive on static-constant namespace classes — `static const` and `static final` fields are now excluded from the field count since they represent compile-time constants, not instance state
+- `prefer_static_class`: conflicting diagnostic with `prefer_abstract_final_static_class` on classes with private constructors — `prefer_static_class` now defers to `prefer_abstract_final_static_class` when a private constructor is present
+
 ---
 ## [5.0.0-beta.14]
 
