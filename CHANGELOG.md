@@ -13,6 +13,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Added
+- Quick fixes for 5 blank-line formatting rules: `prefer_blank_line_before_case`, `prefer_blank_line_before_constructor`, `prefer_blank_line_before_method`, `prefer_blank_line_after_declarations`, `prefer_blank_lines_between_members`
+
 ### Fixed
 - `prefer_static_class`: no longer fires on `abstract final class` declarations (regression from beta.15 fix)
 - `avoid_hardcoded_locale`: skip locale-pattern strings inside collection literals (Set, List, Map lookup data)

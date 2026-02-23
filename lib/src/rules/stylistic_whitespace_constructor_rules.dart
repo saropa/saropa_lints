@@ -3,6 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/formatting/add_blank_line_after_declarations_fix.dart';
+import '../fixes/formatting/add_blank_line_fix.dart';
 import '../fixes/stylistic_widget/prefer_clip_r_superellipse_fix.dart';
 
 // ============================================================================
@@ -147,6 +149,12 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineAfterDeclarationsFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_after_declarations',
@@ -306,6 +314,12 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_lines_between_members',
