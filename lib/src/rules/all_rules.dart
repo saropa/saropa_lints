@@ -100,5 +100,7 @@ export 'packages/riverpod_rules.dart';
 export 'packages/shared_preferences_rules.dart';
 export 'packages/sqflite_rules.dart';
 export 'packages/supabase_rules.dart';
+export 'packages/auto_route_rules.dart';
 export 'packages/url_launcher_rules.dart';
+export 'packages/rxdart_rules.dart';
 export 'packages/workmanager_rules.dart';

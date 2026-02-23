@@ -8,6 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../fixes/memory_management/add_mounted_check_fix.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when large objects are stored in widget state.
@@ -1192,5 +1193,168 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
     if (superclass == null) return false;
 
     return _widgetBaseClasses.contains(superclass.name.lexeme);
+  }
+}
+
+// =============================================================================
+// avoid_closure_capture_leaks
+// =============================================================================
+
+/// Warns when `setState` is called inside a Timer or Future.delayed callback
+/// without a `mounted` check.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Closures passed to `Timer`, `Timer.periodic`, or `Future.delayed` capture
+/// `this` (the State object). If the widget is disposed before the callback
+/// fires, calling `setState` throws a "setState() called after dispose()"
+/// error. Always check `mounted` before calling `setState` in async
+/// callbacks.
+///
+/// **BAD:**
+/// ```dart
+/// Timer.periodic(Duration(seconds: 1), (_) {
+///   setState(() { _counter++; }); // Crashes if widget disposed
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Timer.periodic(Duration(seconds: 1), (_) {
+///   if (!mounted) return;
+///   setState(() { _counter++; });
+/// });
+/// ```
+class AvoidClosureCaptureLeaksRule extends SaropaLintRule {
+  AvoidClosureCaptureLeaksRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get requiresWidgets => true;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddMountedCheckFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'avoid_closure_capture_leaks',
+    '[avoid_closure_capture_leaks] setState() is called inside a Timer or '
+        'Future.delayed callback without a mounted check. The closure '
+        'captures the State object, and if the widget is disposed before the '
+        'callback fires, calling setState throws a "setState() called after '
+        'dispose()" error at runtime. This is a common source of crashes in '
+        'production, especially on slow networks or with periodic timers. '
+        'Always check mounted before calling setState in async callbacks. '
+        '{v1}',
+    correctionMessage:
+        'Add `if (!mounted) return;` before the setState call to prevent '
+        'calling setState on a disposed State object.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Timer/delay constructors whose callbacks are async-delayed.
+  static const Set<String> _asyncCallbackSources = <String>{
+    'Timer',
+    'periodic',
+    'delayed',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'setState') return;
+
+      // Walk up to find the nearest enclosing FunctionExpression
+      final FunctionExpression? callback = _findEnclosingCallback(node);
+      if (callback == null) return;
+
+      // Check if that callback is an argument to Timer/Future.delayed
+      if (!_isAsyncCallbackArgument(callback)) return;
+
+      // Check if there's a mounted guard before this setState
+      if (_hasMountedGuard(callback, node)) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  /// Finds the nearest enclosing [FunctionExpression] (closure).
+  static FunctionExpression? _findEnclosingCallback(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionExpression) return current;
+      // Stop at method/function declarations (not inside a closure)
+      if (current is MethodDeclaration || current is FunctionDeclaration) {
+        return null;
+      }
+      current = current.parent;
+    }
+    return null;
+  }
+
+  /// Checks if [callback] is passed as an argument to Timer, Timer.periodic,
+  /// or Future.delayed.
+  static bool _isAsyncCallbackArgument(FunctionExpression callback) {
+    final AstNode? parent = callback.parent;
+    if (parent == null) return false;
+
+    // The closure may be a direct argument or inside an ArgumentList
+    AstNode? argContext = parent;
+    if (argContext is NamedExpression) {
+      argContext = argContext.parent;
+    }
+    if (argContext is! ArgumentList) return false;
+
+    final AstNode? invocation = argContext.parent;
+    if (invocation is InstanceCreationExpression) {
+      final String typeName = invocation.constructorName.type.name.lexeme;
+      final String? ctorName = invocation.constructorName.name?.name;
+      // Timer(...), Timer.periodic(...)
+      if (typeName == 'Timer') return true;
+      if (ctorName != null && _asyncCallbackSources.contains(ctorName)) {
+        return true;
+      }
+    }
+    if (invocation is MethodInvocation) {
+      final String methodName = invocation.methodName.name;
+      // Future.delayed(...)
+      if (_asyncCallbackSources.contains(methodName)) return true;
+    }
+    return false;
+  }
+
+  /// Checks if there is a `if (!mounted) return;` or `if (mounted)` guard
+  /// in the callback body before [setStateNode].
+  static bool _hasMountedGuard(
+    FunctionExpression callback,
+    MethodInvocation setStateNode,
+  ) {
+    final FunctionBody body = callback.body;
+    if (body is! BlockFunctionBody) return false;
+
+    final int setStateOffset = setStateNode.offset;
+
+    for (final Statement stmt in body.block.statements) {
+      // Only check statements before the setState call
+      if (stmt.offset >= setStateOffset) break;
+
+      final String source = stmt.toSource();
+      // Common patterns: `if (!mounted) return;`  `if (!context.mounted)`
+      if (source.contains('mounted')) return true;
+    }
+    return false;
   }
 }

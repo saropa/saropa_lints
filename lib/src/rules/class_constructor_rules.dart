@@ -1307,5 +1307,141 @@ class PreferBaseClassRule extends SaropaLintRule {
 }
 
 // =============================================================================
+// avoid_accessing_other_classes_private_members
+// =============================================================================
+
+/// Warns when code accesses another class's private members in the same file.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// In Dart, `_private` members are private to the **library** (file), not
+/// to the class. A class `Foo` in `foo.dart` can access `Bar._secret` if
+/// `Bar` is also defined in `foo.dart`. This violates encapsulation and
+/// creates maintenance debt — when classes are later split into separate
+/// files, these accesses break.
+///
+/// **BAD:**
+/// ```dart
+/// class Foo {
+///   final int _secret = 42;
+/// }
+///
+/// class Bar {
+///   void peek(Foo foo) {
+///     print(foo._secret); // Cross-class private access
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class Foo {
+///   final int _secret = 42;
+///   int get secret => _secret; // Expose via public API
+/// }
+///
+/// class Bar {
+///   void peek(Foo foo) {
+///     print(foo.secret); // Uses public API
+///   }
+/// }
+/// ```
+class AvoidAccessingOtherClassesPrivateMembersRule extends SaropaLintRule {
+  AvoidAccessingOtherClassesPrivateMembersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get requiresClassDeclaration => true;
+
+  static const LintCode _code = LintCode(
+    'avoid_accessing_other_classes_private_members',
+    '[avoid_accessing_other_classes_private_members] Accessing a private '
+        'member of another class in the same file. In Dart, underscore-prefixed '
+        'members are private to the library (file), not to the class. This '
+        'means classes in the same file can reach into each other\'s internal '
+        'state — but this violates encapsulation and creates maintenance debt. '
+        'When the code is later refactored (classes split into different '
+        'files), these accesses break. {v1}',
+    correctionMessage:
+        'Add a public method or property to expose the needed functionality '
+        'instead of accessing private members directly.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      // Only care about _private identifiers
+      final String memberName = node.identifier.name;
+      if (!memberName.startsWith('_')) return;
+
+      // Find the enclosing class
+      final ClassDeclaration? enclosingClass = _findEnclosingClass(node);
+      if (enclosingClass == null) return;
+
+      // Check if the prefix resolves to a different type
+      final String prefixName = node.prefix.name;
+
+      // Skip `this._field` and bare `_field` (same-class access)
+      if (prefixName == 'this' || prefixName == 'super') return;
+
+      // Check if prefix is a parameter, local variable, or field whose
+      // type name differs from the enclosing class name.
+      final String enclosingClassName = enclosingClass.name.lexeme;
+
+      // Use staticType to determine the prefix's type
+      final String? prefixType = node.prefix.staticType?.getDisplayString();
+      if (prefixType == null) return;
+
+      // Extract the base type name (strip generics and nullability)
+      final String baseType = _extractBaseTypeName(prefixType);
+
+      // Same class → fine
+      if (baseType == enclosingClassName) return;
+
+      // Skip if the member has a @visibleForTesting annotation
+      // (handled at declaration site, not here)
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  /// Finds the nearest enclosing [ClassDeclaration] for [node].
+  static ClassDeclaration? _findEnclosingClass(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ClassDeclaration) return current;
+      current = current.parent;
+    }
+    return null;
+  }
+
+  /// Extracts the base type name from a display string.
+  ///
+  /// `List<int>` → `List`, `String?` → `String`, `MyClass` → `MyClass`.
+  static String _extractBaseTypeName(String displayString) {
+    // Remove trailing `?` for nullable types
+    String name = displayString;
+    if (name.endsWith('?')) {
+      name = name.substring(0, name.length - 1);
+    }
+    // Remove generic parameters
+    final int genericStart = name.indexOf('<');
+    if (genericStart > 0) {
+      name = name.substring(0, genericStart);
+    }
+    return name.trim();
+  }
+}
+
+// =============================================================================
 // QUICK FIXES
 // =============================================================================

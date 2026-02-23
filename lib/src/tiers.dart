@@ -679,6 +679,9 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_single_container',
   'prefer_api_pagination',
 
+  // v5.1.0 - New rules (Recommended)
+  'avoid_cached_image_web',
+
   // Database (Isar)
   'require_isar_nullable_field',
 
@@ -2404,6 +2407,14 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_optimistic_updates', // INFO - setState before await, not after
   'avoid_full_sync_on_every_launch', // WARNING - use delta sync not getAll
   'require_session_timeout', // INFO - auth needs session expiry
+  // v5.1.0 - New lint rules (Professional)
+  'avoid_clip_during_animation', // WARNING - clip inside animation = janky
+  'avoid_auto_route_context_navigation', // WARNING - use typed routes
+  'avoid_auto_route_keep_history_misuse', // WARNING - replaceAll clears stack
+  'avoid_accessing_other_classes_private_members', // WARNING - encapsulation
+  'avoid_closure_capture_leaks', // WARNING - setState in Timer w/o mounted
+  'avoid_behavior_subject_last_value', // WARNING - .value on closed subject
+  'avoid_cache_stampede', // WARNING - cache miss without dedup
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).

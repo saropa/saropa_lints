@@ -250,7 +250,7 @@ const Map<String, int> _baselineCounts = {
   // Other rule files
   'test_rules.dart': 41,
   'testing_best_practices_rules.dart': 37,
-  'performance_rules.dart': 17,
+  'performance_rules.dart': 26,
   'error_handling_rules.dart': 15,
   'state_management_rules.dart': 4,
   'resource_management_rules.dart': 24,
@@ -261,7 +261,7 @@ const Map<String, int> _baselineCounts = {
   'lifecycle_rules.dart': 3,
   'notification_rules.dart': 5,
   'media_rules.dart': 1,
-  'memory_management_rules.dart': 4,
+  'memory_management_rules.dart': 5,
   'crypto_rules.dart': 2,
   'dependency_injection_rules.dart': 12,
   'bluetooth_hardware_rules.dart': 6,

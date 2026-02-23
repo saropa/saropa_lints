@@ -1773,3 +1773,125 @@ class _WidgetCountVisitor extends RecursiveAstVisitor<void> {
     super.visitInstanceCreationExpression(node);
   }
 }
+
+// =============================================================================
+// avoid_clip_during_animation
+// =============================================================================
+
+/// Warns when a Clip widget is used inside an animated widget.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// `ClipRect`, `ClipRRect`, `ClipOval`, and `ClipPath` trigger expensive
+/// rasterization on every animation frame. When nested inside an animated
+/// widget the GPU must re-clip content 60+ times per second, causing janky
+/// animations and dropped frames. Move the clip **outside** the animation
+/// scope, or use `BoxDecoration.borderRadius` instead.
+///
+/// **BAD:**
+/// ```dart
+/// AnimatedContainer(
+///   duration: Duration(milliseconds: 300),
+///   child: ClipRRect(
+///     borderRadius: BorderRadius.circular(16),
+///     child: Image.network(url),
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ClipRRect(
+///   borderRadius: BorderRadius.circular(16),
+///   child: AnimatedContainer(
+///     duration: Duration(milliseconds: 300),
+///     child: Image.network(url),
+///   ),
+/// )
+/// ```
+class AvoidClipDuringAnimationRule extends SaropaLintRule {
+  AvoidClipDuringAnimationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresWidgets => true;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  static const LintCode _code = LintCode(
+    'avoid_clip_during_animation',
+    '[avoid_clip_during_animation] A Clip widget is used inside an animated '
+        'widget, causing expensive rasterization on every animation frame. '
+        'ClipRRect, ClipOval, and ClipPath force the GPU to re-clip content '
+        '60+ times per second during animation, which leads to janky motion '
+        'and dropped frames. ClipPath is especially costly because it forces '
+        'software rasterization. Move the clip outside the animated scope or '
+        'use BoxDecoration.borderRadius for rounded corners. {v1}',
+    correctionMessage:
+        'Move the Clip widget outside the animated ancestor so clipping '
+        'happens once, not on every animation frame.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _clipWidgets = <String>{
+    'ClipRect',
+    'ClipRRect',
+    'ClipOval',
+    'ClipPath',
+  };
+
+  static const Set<String> _animatedWidgets = <String>{
+    'AnimatedContainer',
+    'AnimatedOpacity',
+    'AnimatedPositioned',
+    'AnimatedAlign',
+    'AnimatedPadding',
+    'AnimatedSize',
+    'AnimatedSwitcher',
+    'AnimatedCrossFade',
+    'AnimatedDefaultTextStyle',
+    'AnimatedPhysicalModel',
+    'FadeTransition',
+    'SlideTransition',
+    'ScaleTransition',
+    'RotationTransition',
+    'SizeTransition',
+    'DecoratedBoxTransition',
+    'PositionedTransition',
+    'RelativePositionedTransition',
+    'AnimatedBuilder',
+    'TweenAnimationBuilder',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_clipWidgets.contains(typeName)) return;
+
+      // Walk up parents (max 10 levels) looking for an animated ancestor
+      AstNode? current = node.parent;
+      int depth = 0;
+      while (current != null && depth < 10) {
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (_animatedWidgets.contains(parentType)) {
+            reporter.atNode(node.constructorName, code);
+            return;
+          }
+        }
+        current = current.parent;
+        depth++;
+      }
+    });
+  }
+}
