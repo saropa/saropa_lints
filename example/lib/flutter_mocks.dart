@@ -242,6 +242,7 @@ class Semantics extends Widget {
       {super.key,
       String? label,
       Widget? child,
+      bool? container,
       bool? excludeSemantics,
       bool? button,
       bool? header,

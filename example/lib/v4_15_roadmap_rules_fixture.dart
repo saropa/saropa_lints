@@ -3,6 +3,8 @@
 // ignore_for_file: avoid_print_in_release, prefer_no_commented_out_code
 // ignore_for_file: unused_import, depend_on_referenced_packages
 
+import 'flutter_mocks.dart';
+
 // =============================================================================
 // avoid_ignoring_return_values
 // =============================================================================
@@ -159,44 +161,44 @@ void fpCascade() {
 // =============================================================================
 
 // BAD: Semantics wraps Column without container: true
-// TODO: expect_lint: prefer_semantics_container (uncomment when code is uncommented)
-// Widget badSemantics() => Semantics(
-//   label: 'User info',
-//   child: Column(children: []),
-// );
+// expect_lint: prefer_semantics_container
+Widget badSemantics() => Semantics(
+      label: 'User info',
+      child: Column(children: []),
+    );
 
 // GOOD: Has container: true
-// Widget goodSemantics() => Semantics(
-//   container: true,
-//   label: 'User info',
-//   child: Column(children: []),
-// );
+Widget goodSemantics() => Semantics(
+      container: true,
+      label: 'User info',
+      child: Column(children: []),
+    );
 
 // FALSE POSITIVE: Semantics with non-group child (Text)
-// Widget fpSemantics() => Semantics(
-//   label: 'Title',
-//   child: Text('Hello'),
-// );
+Widget fpSemantics() => Semantics(
+      label: 'Title',
+      child: Text('Hello'),
+    );
 
 // =============================================================================
 // avoid_redundant_semantics
 // =============================================================================
 
 // BAD: Semantics wrapping Image with semanticLabel
-// TODO: expect_lint: avoid_redundant_semantics (uncomment when code is uncommented)
-// Widget badRedundant() => Semantics(
-//   label: 'Logo',
-//   child: Image.asset('logo.png', semanticLabel: 'Logo'),
-// );
+// expect_lint: avoid_redundant_semantics
+Widget badRedundant() => Semantics(
+      label: 'Logo',
+      child: Image.asset('logo.png', semanticLabel: 'Logo'),
+    );
 
 // GOOD: Image with semanticLabel only (no Semantics wrapper)
-// Widget goodRedundant() => Image.asset('logo.png', semanticLabel: 'Logo');
+Widget goodRedundant() => Image.asset('logo.png', semanticLabel: 'Logo');
 
 // FALSE POSITIVE: Semantics wrapping Image WITHOUT semanticLabel
-// Widget fpRedundant() => Semantics(
-//   label: 'Logo',
-//   child: Image.asset('logo.png'),
-// );
+Widget fpRedundant() => Semantics(
+      label: 'Logo',
+      child: Image.asset('logo.png'),
+    );
 
 // =============================================================================
 // avoid_image_picker_quick_succession

@@ -165,7 +165,8 @@ def display_test_coverage(project_dir: Path) -> None:
         category_details.append((cat.category, cat.rule_count, fixture_count))
 
     total_rules = sum(c[1] for c in category_details)
-    total_fixtures = sum(c[2] for c in category_details)
+    # Cap each category at its rule count so excess fixtures don't mask gaps
+    total_fixtures = sum(min(c[2], c[1]) for c in category_details)
     coverage_pct = (
         (total_fixtures / total_rules * 100) if total_rules > 0 else 0
     )

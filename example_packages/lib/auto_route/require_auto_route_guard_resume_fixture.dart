@@ -100,73 +100,52 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: prefer_mock_verify
-// Source: lib\src\rules\testing_best_practices_rules.dart
+// Test fixture for: require_auto_route_guard_resume
+// Source: lib\src\rules\packages\auto_route_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-dynamic api;
-dynamic data;
-dynamic service;
+bool isLoggedIn = false;
 
-class MockApi {
-  dynamic fetch() => null;
+// BAD: onNavigation with if but missing resolver.next on else path
+// expect_lint: require_auto_route_guard_resume
+class _BadAuthGuard implements AutoRouteGuard {
+  @override
+  void onNavigation(NavigationResolver resolver, StackRouter router) {
+    if (isLoggedIn) {
+      resolver.next(true);
+    }
+    // Missing resolver.next(false) in else path!
+  }
 }
 
-// BAD: when() setup with thenReturn but no verify()
-// expect_lint: prefer_mock_verify
-void _bad1() {
-  test('should fetch data', () {
-    final mockApi = MockApi();
-    when(mockApi.fetch()).thenReturn(data);
-    service.loadData();
-    // Missing verify!
-  });
+// GOOD: Both if and else branches call resolver.next
+class _GoodAuthGuard implements AutoRouteGuard {
+  @override
+  void onNavigation(NavigationResolver resolver, StackRouter router) {
+    if (isLoggedIn) {
+      resolver.next(true);
+    } else {
+      resolver.next(false);
+    }
+  }
 }
 
-// BAD: when() setup with thenAnswer but no verify()
-// expect_lint: prefer_mock_verify
-void _bad2() {
-  test('should call api', () {
-    final mockApi = MockApi();
-    when(mockApi.fetch()).thenAnswer((_) async => data);
-    service.loadData();
-    // Missing verify!
-  });
+// GOOD: No if-else, just unconditional resolver.next
+class _GoodSimpleGuard implements AutoRouteGuard {
+  @override
+  void onNavigation(NavigationResolver resolver, StackRouter router) {
+    resolver.next(true);
+  }
 }
 
-// GOOD: when() with verify()
-void _good1() {
-  test('should call api', () {
-    final mockApi = MockApi();
-    when(mockApi.fetch()).thenAnswer((_) async => data);
-    service.loadData();
-    verify(mockApi.fetch()).called(1);
-  });
+// Mock types for auto_route
+abstract class AutoRouteGuard {
+  void onNavigation(NavigationResolver resolver, StackRouter router);
 }
 
-// GOOD: when() with verifyNever()
-void _good2() {
-  test('should not call api', () {
-    final mockApi = MockApi();
-    when(mockApi.fetch()).thenReturn(data);
-    verifyNever(mockApi.fetch());
-  });
+class NavigationResolver {
+  void next([bool value = true]) {}
 }
 
-// GOOD: when() with verifyInOrder()
-void _good3() {
-  test('should call in order', () {
-    final mockApi = MockApi();
-    when(mockApi.fetch()).thenReturn(data);
-    service.loadData();
-    verifyInOrder([mockApi.fetch()]);
-  });
-}
-
-// GOOD: No when() at all
-void _good4() {
-  test('simple test', () {
-    expect(1 + 1, 2);
-  });
-}
+class StackRouter {}
