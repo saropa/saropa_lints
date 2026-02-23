@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../saropa_lint_rule.dart';
@@ -1277,5 +1278,87 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
     }
 
     return false;
+  }
+}
+
+/// Warns when comparing a non-nullable value with `null`.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// In sound null safety, comparing a non-nullable type to null is always
+/// either true or false at compile time, making the check redundant.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// void check(int value) {
+///   if (value == null) { } // int is non-nullable; always false
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// void check(int? value) {
+///   if (value == null) { } // int? is nullable; valid check
+/// }
+/// ```
+class AvoidRedundantNullCheckRule extends SaropaLintRule {
+  AvoidRedundantNullCheckRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_redundant_null_check',
+    '[avoid_redundant_null_check] Comparing a non-nullable value to null is '
+        'redundant because the result is always the same at compile time. '
+        'This often indicates a type signature that should be nullable, or '
+        'dead code that can be removed. With sound null safety, the compiler '
+        'already guarantees non-nullable variables cannot be null. {v1}',
+    correctionMessage:
+        'Remove the null check or change the variable type to nullable if '
+        'null is a valid state.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBinaryExpression((BinaryExpression node) {
+      final String op = node.operator.lexeme;
+      if (op != '==' && op != '!=') return;
+
+      final Expression left = node.leftOperand;
+      final Expression right = node.rightOperand;
+
+      // One side must be null literal
+      final Expression? nonNullSide;
+      if (right is NullLiteral) {
+        nonNullSide = left;
+      } else if (left is NullLiteral) {
+        nonNullSide = right;
+      } else {
+        return;
+      }
+
+      final DartType? type = nonNullSide.staticType;
+      if (type == null) return;
+
+      // Skip dynamic, Object, and type parameters
+      if (type is DynamicType) return;
+      if (type.isDartCoreObject) return;
+      if (type is TypeParameterType) return;
+
+      // Flag if the type is non-nullable
+      if (type.nullabilitySuffix == NullabilitySuffix.none) {
+        reporter.atNode(node);
+      }
+    });
   }
 }

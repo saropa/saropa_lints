@@ -2480,6 +2480,28 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidClosureCaptureLeaksRule.new,
   AvoidBehaviorSubjectLastValueRule.new,
   AvoidCacheStampedeRule.new,
+
+  // v5.1.0 - Batch 2
+  AvoidDeepNestingRule.new,
+  AvoidHighCyclomaticComplexityRule.new,
+  AvoidVoidAsyncRule.new,
+  AvoidRedundantAwaitRule.new,
+  AvoidUnusedConstructorParametersRule.new,
+  AvoidReturningNullForVoidRule.new,
+  AvoidReturningNullForFutureRule.new,
+  AvoidShadowingTypeParametersRule.new,
+  AvoidRedundantNullCheckRule.new,
+  AvoidCollectionMutatingMethodsRule.new,
+  AvoidEquatableNestedEqualityRule.new,
+  AvoidGetxRxNestedObsRule.new,
+  AvoidFreezedAnyMapIssueRule.new,
+  AvoidHiveDatetimeLocalRule.new,
+  AvoidHiveTypeModificationRule.new,
+  AvoidHiveLargeSingleEntryRule.new,
+  RequireAutoRouteGuardResumeRule.new,
+  RequireAutoRouteFullHierarchyRule.new,
+  AvoidFirebaseUserDataInAuthRule.new,
+  RequireFirebaseAppCheckProductionRule.new,
 ];
 
 // =============================================================================

@@ -1442,6 +1442,108 @@ class AvoidAccessingOtherClassesPrivateMembersRule extends SaropaLintRule {
   }
 }
 
+/// Warns when a constructor parameter is not stored in a field or used.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Constructor parameters that are neither assigned to a field (`this.x`),
+/// forwarded via `super.x`, used in the initializer list, nor referenced
+/// in the constructor body are dead code.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class Greeter {
+///   final String name;
+///   Greeter(this.name, int unused); // ← unused is never stored
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class Greeter {
+///   final String name;
+///   Greeter(this.name);
+/// }
+/// ```
+class AvoidUnusedConstructorParametersRule extends SaropaLintRule {
+  AvoidUnusedConstructorParametersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get requiresClassDeclaration => true;
+
+  static const LintCode _code = LintCode(
+    'avoid_unused_constructor_parameters',
+    '[avoid_unused_constructor_parameters] A constructor parameter that is '
+        'not assigned to any field, forwarded to a super constructor, or '
+        'referenced in the constructor body is dead code. It adds to the '
+        'public API surface without serving any purpose and confuses callers '
+        'who pass values that are silently discarded. {v1}',
+    correctionMessage:
+        'Remove the unused parameter or assign it to a field using '
+        '"this.paramName" syntax.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
+      // Skip redirecting constructors (factory Foo(int x) = _Foo)
+      if (node.redirectedConstructor != null) return;
+
+      final FormalParameterList? params = node.parameters;
+      if (params == null) return;
+
+      // Collect body source for reference checking
+      final String bodySource = node.body.toSource();
+
+      // Collect initializer list source
+      final String initSource = node.initializers
+          .map((ConstructorInitializer i) => i.toSource())
+          .join(' ');
+
+      for (final FormalParameter param in params.parameters) {
+        // this.field and super.field are always "used"
+        if (param is FieldFormalParameter) continue;
+        if (param is SuperFormalParameter) continue;
+
+        // Get the actual parameter (unwrap DefaultFormalParameter)
+        final FormalParameter actual = param is DefaultFormalParameter
+            ? param.parameter
+            : param;
+        if (actual is FieldFormalParameter) continue;
+        if (actual is SuperFormalParameter) continue;
+
+        final String? name = _paramName(actual);
+        if (name == null || name.startsWith('_')) continue;
+
+        // Check if referenced in initializer list or body
+        final RegExp ref = RegExp('\\b${RegExp.escape(name)}\\b');
+        if (ref.hasMatch(initSource)) continue;
+        if (bodySource != ';' && ref.hasMatch(bodySource)) continue;
+
+        reporter.atNode(param);
+      }
+    });
+  }
+
+  static String? _paramName(FormalParameter param) {
+    if (param is SimpleFormalParameter) return param.name?.lexeme;
+    if (param is FunctionTypedFormalParameter) return param.name.lexeme;
+    return null;
+  }
+}
+
 // =============================================================================
 // QUICK FIXES
 // =============================================================================

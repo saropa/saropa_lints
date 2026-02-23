@@ -873,3 +873,247 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when code blocks are nested more than 5 levels deep.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Deeply nested code is hard to read and maintain. Refactor by extracting
+/// helper methods, using early returns, or restructuring logic.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// void process() {
+///   if (a) {
+///     if (b) {
+///       for (var x in list) {
+///         if (c) {
+///           try {
+///             if (d) { // depth 6 — too deep
+///             }
+///           } catch (_) {}
+///         }
+///       }
+///     }
+///   }
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// void process() {
+///   if (!a || !b) return;
+///   for (var x in list) {
+///     _handleItem(x);
+///   }
+/// }
+/// ```
+class AvoidDeepNestingRule extends SaropaLintRule {
+  AvoidDeepNestingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const int _maxDepth = 5;
+
+  static const LintCode _code = LintCode(
+    'avoid_deep_nesting',
+    '[avoid_deep_nesting] Code nested more than $_maxDepth levels deep is '
+        'difficult to read, test, and maintain. Deep nesting increases '
+        'cyclomatic complexity and makes control flow hard to follow. '
+        'Refactor by extracting helper methods, using early returns, or '
+        'restructuring conditional logic into guard clauses. {v1}',
+    correctionMessage:
+        'Extract nested logic into separate methods or use early returns to '
+        'reduce nesting depth.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBlock((Block node) {
+      final int depth = _countBlockDepth(node);
+      // Only fire at the exact boundary to avoid duplicate warnings on
+      // every deeper block inside the same function.
+      if (depth == _maxDepth + 1) {
+        reporter.atNode(node);
+      }
+    });
+  }
+
+  /// Counts how many [Block] ancestors this [node] has within the same
+  /// function body (stops at function boundaries).
+  static int _countBlockDepth(Block node) {
+    int depth = 0;
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionBody) break;
+      if (current is Block) depth++;
+      current = current.parent;
+    }
+    return depth;
+  }
+}
+
+/// Warns when a function or method has high cyclomatic complexity.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Cyclomatic complexity measures the number of independent execution paths
+/// through a function. High complexity makes testing and maintenance harder.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// String classify(int x) {
+///   if (x > 100) {
+///     if (x > 200) {
+///       return x.isEven ? 'A' : 'B';
+///     } else if (x > 150) {
+///       return 'C';
+///     } else {
+///       for (var i = 0; i < x; i++) {
+///         if (i % 2 == 0) continue;
+///       }
+///       return 'D';
+///     }
+///   } else if (x > 50) {
+///     switch (x ~/ 10) {
+///       case 6: return 'E';
+///       case 7: return 'F';
+///       default: return 'G';
+///     }
+///   }
+///   return x > 0 ? 'H' : 'I';
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// String classify(int x) {
+///   if (x > 100) return _classifyHigh(x);
+///   if (x > 50) return _classifyMedium(x);
+///   return x > 0 ? 'H' : 'I';
+/// }
+/// ```
+class AvoidHighCyclomaticComplexityRule extends SaropaLintRule {
+  AvoidHighCyclomaticComplexityRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.high;
+
+  static const int _threshold = 10;
+
+  static const LintCode _code = LintCode(
+    'avoid_high_cyclomatic_complexity',
+    '[avoid_high_cyclomatic_complexity] Functions with cyclomatic complexity '
+        'exceeding $_threshold have too many branching paths, making them '
+        'difficult to understand, test exhaustively, and maintain over time. '
+        'Each branch doubles the testing surface area. Simplify by extracting '
+        'helper methods or using polymorphism instead of conditionals. {v1}',
+    correctionMessage:
+        'Break the function into smaller methods with lower complexity. '
+        'Aim for a complexity of $_threshold or less per function.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (node.body is EmptyFunctionBody) return;
+      final int complexity = _computeComplexity(node.body);
+      if (complexity > _threshold) {
+        reporter.atToken(node.name);
+      }
+    });
+
+    context.addFunctionDeclaration((FunctionDeclaration node) {
+      final int complexity = _computeComplexity(node.functionExpression.body);
+      if (complexity > _threshold) {
+        reporter.atToken(node.name);
+      }
+    });
+  }
+
+  static int _computeComplexity(FunctionBody body) {
+    final counter = _ComplexityCounter();
+    body.accept(counter);
+    return counter.complexity + 1; // +1 for the function itself
+  }
+}
+
+class _ComplexityCounter extends RecursiveAstVisitor<void> {
+  int complexity = 0;
+
+  @override
+  void visitIfStatement(IfStatement node) {
+    complexity++;
+    super.visitIfStatement(node);
+  }
+
+  @override
+  void visitForStatement(ForStatement node) {
+    complexity++;
+    super.visitForStatement(node);
+  }
+
+  @override
+  void visitWhileStatement(WhileStatement node) {
+    complexity++;
+    super.visitWhileStatement(node);
+  }
+
+  @override
+  void visitDoStatement(DoStatement node) {
+    complexity++;
+    super.visitDoStatement(node);
+  }
+
+  @override
+  void visitSwitchPatternCase(SwitchPatternCase node) {
+    complexity++;
+    super.visitSwitchPatternCase(node);
+  }
+
+  @override
+  void visitCatchClause(CatchClause node) {
+    complexity++;
+    super.visitCatchClause(node);
+  }
+
+  @override
+  void visitConditionalExpression(ConditionalExpression node) {
+    complexity++;
+    super.visitConditionalExpression(node);
+  }
+
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    final String op = node.operator.lexeme;
+    if (op == '&&' || op == '||' || op == '??') {
+      complexity++;
+    }
+    super.visitBinaryExpression(node);
+  }
+
+  // Don't descend into nested function bodies
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Skip — nested closures have their own complexity
+  }
+}

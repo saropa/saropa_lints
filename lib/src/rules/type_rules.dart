@@ -1936,3 +1936,85 @@ class PreferTypeOverVarRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when a method's type parameter shadows the enclosing class's
+/// type parameter.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Using the same type parameter name in a method as in the enclosing class
+/// creates a new, unrelated type that shadows the class-level one. This
+/// causes confusing type mismatches.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class Box<T> {
+///   T? convert<T>(T input) => input; // ← T shadows class T
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class Box<T> {
+///   R? convert<R>(R input) => input; // ← different name
+/// }
+/// ```
+class AvoidShadowingTypeParametersRule extends SaropaLintRule {
+  AvoidShadowingTypeParametersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresClassDeclaration => true;
+
+  static const LintCode _code = LintCode(
+    'avoid_shadowing_type_parameters',
+    '[avoid_shadowing_type_parameters] A method type parameter with the same '
+        'name as the enclosing class type parameter creates a new, unrelated '
+        'type that shadows the outer one. This causes confusing compile errors '
+        'where values of the "same" type T are incompatible. Rename the method '
+        'type parameter to avoid the collision. {v1}',
+    correctionMessage:
+        'Rename the method type parameter to a different letter (e.g., R, U, '
+        'S) that does not conflict with the class type parameters.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      final TypeParameterList? methodTypeParams = node.typeParameters;
+      if (methodTypeParams == null) return;
+
+      // Find enclosing class
+      final ClassDeclaration? enclosingClass = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (enclosingClass == null) return;
+
+      final TypeParameterList? classTypeParams = enclosingClass.typeParameters;
+      if (classTypeParams == null) return;
+
+      // Build set of class type parameter names
+      final Set<String> classNames = {
+        for (final TypeParameter tp in classTypeParams.typeParameters)
+          tp.name.lexeme,
+      };
+
+      // Check each method type parameter for shadowing
+      for (final TypeParameter methodTp in methodTypeParams.typeParameters) {
+        if (classNames.contains(methodTp.name.lexeme)) {
+          reporter.atToken(methodTp.name);
+        }
+      }
+    });
+  }
+}

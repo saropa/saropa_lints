@@ -203,7 +203,7 @@ const Map<String, int> _baselineCounts = {
   'animation_rules.dart': 10,
   'api_network_rules.dart': 143,
   'async_rules.dart': 59,
-  'disposal_rules.dart': 30,
+  'disposal_rules.dart': 29,
   'security_rules.dart': 72,
   'navigation_rules.dart': 52,
   'file_handling_rules.dart': 28,
@@ -219,7 +219,7 @@ const Map<String, int> _baselineCounts = {
   'platforms/windows_rules.dart': 13,
 
   // Package rule files
-  'packages/firebase_rules.dart': 35,
+  'packages/firebase_rules.dart': 37,
   'packages/riverpod_rules.dart': 28,
   'packages/bloc_rules.dart': 16,
   'packages/hive_rules.dart': 12,
@@ -250,7 +250,7 @@ const Map<String, int> _baselineCounts = {
   // Other rule files
   'test_rules.dart': 41,
   'testing_best_practices_rules.dart': 37,
-  'performance_rules.dart': 26,
+  'performance_rules.dart': 25,
   'error_handling_rules.dart': 15,
   'state_management_rules.dart': 4,
   'resource_management_rules.dart': 24,
