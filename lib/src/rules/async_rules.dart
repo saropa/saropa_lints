@@ -4469,3 +4469,170 @@ class _AwaitCollector extends RecursiveAstVisitor<void> {
     super.visitAwaitExpression(node);
   }
 }
+
+/// Warns when an async function returns `void` instead of `Future<void>`.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// An `async void` function silently swallows exceptions and prevents
+/// callers from awaiting its completion. Always return `Future<void>` so
+/// errors propagate and callers can coordinate execution.
+///
+/// Excludes common framework overrides (main, initState, dispose, build,
+/// setUp, tearDown) and @override methods on void interfaces.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// void fetchData() async {     // ← fires and forgets
+///   final data = await api.get();
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// Future<void> fetchData() async {
+///   final data = await api.get();
+/// }
+/// ```
+class AvoidVoidAsyncRule extends SaropaLintRule {
+  AvoidVoidAsyncRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_void_async',
+    '[avoid_void_async] Async functions returning void silently swallow '
+        'exceptions — callers cannot catch errors or await completion. '
+        'Changing the return type to Future<void> lets errors propagate and '
+        'enables callers to coordinate execution order. This is especially '
+        'dangerous in error-handling paths where silent failure masks bugs. '
+        '{v1}',
+    correctionMessage: 'Change the return type from void to Future<void>.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _exemptNames = {
+    'main',
+    'initState',
+    'dispose',
+    'didChangeDependencies',
+    'didUpdateWidget',
+    'deactivate',
+    'build',
+    'setUp',
+    'tearDown',
+    'setUpAll',
+    'tearDownAll',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
+      _check(node.name, node.returnType, node.functionExpression, reporter);
+    });
+
+    context.addMethodDeclaration((MethodDeclaration node) {
+      // Skip @override methods — they must match the interface signature
+      for (final Annotation annotation in node.metadata) {
+        if (annotation.name.name == 'override') return;
+      }
+      _check(node.name, node.returnType, null, reporter, body: node.body);
+    });
+  }
+
+  void _check(
+    Token nameToken,
+    TypeAnnotation? returnType,
+    FunctionExpression? funcExpr,
+    SaropaDiagnosticReporter reporter, {
+    FunctionBody? body,
+  }) {
+    // Must have explicit void return type
+    final DartType? type = returnType?.type;
+    if (type == null || type is! VoidType) return;
+
+    // Must be async
+    final FunctionBody actualBody = body ?? funcExpr!.body;
+    if (!actualBody.isAsynchronous) return;
+
+    // Exempt well-known lifecycle methods
+    if (_exemptNames.contains(nameToken.lexeme)) return;
+
+    reporter.atToken(nameToken);
+  }
+}
+
+/// Warns when `await` is used on a non-Future expression.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Awaiting a value that is not a Future, FutureOr, or Stream is a no-op
+/// that adds misleading indirection and a microtask scheduling delay.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// final value = await 42;        // int is not a Future
+/// final name = await getName();   // if getName() returns String
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// final value = 42;
+/// final name = getName();
+/// ```
+class AvoidRedundantAwaitRule extends SaropaLintRule {
+  AvoidRedundantAwaitRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_redundant_await',
+    '[avoid_redundant_await] Awaiting a non-Future expression is redundant '
+        'and misleading. It wraps the value in a resolved Future only to '
+        'immediately unwrap it, adding an unnecessary microtask delay and '
+        'confusing readers who expect asynchronous behavior. Remove the '
+        'await keyword to clarify that the expression is synchronous. {v1}',
+    correctionMessage: 'Remove the redundant await keyword.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addAwaitExpression((AwaitExpression node) {
+      final DartType? type = node.expression.staticType;
+      if (type == null) return;
+
+      // Skip dynamic and Object — could be a Future at runtime
+      if (type is DynamicType) return;
+      if (type.isDartCoreObject) return;
+
+      // Allow Future, FutureOr, and Stream
+      if (type.isDartAsyncFuture) return;
+      if (type.isDartAsyncFutureOr) return;
+      if (type.isDartAsyncStream) return;
+
+      // Skip type parameters — T could be a Future at runtime
+      if (type is TypeParameterType) return;
+
+      reporter.atNode(node);
+    });
+  }
+}

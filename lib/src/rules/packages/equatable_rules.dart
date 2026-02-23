@@ -1,6 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/element/type.dart';
+
 import '../../saropa_lint_rule.dart';
 import '../../type_annotation_utils.dart';
 
@@ -1277,6 +1279,105 @@ class RequireEquatablePropsOverrideRule extends SaropaLintRule {
 
       if (!hasProps) {
         reporter.atNode(node);
+      }
+    });
+  }
+}
+
+/// Warns when an Equatable class includes mutable collections in `props`.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Equatable performs shallow `==` on each prop. Mutable `List`, `Map`, or
+/// `Set` values may change after construction, making equality checks
+/// non-deterministic and hash codes unstable.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class UserState extends Equatable {
+///   final List<String> tags;
+///   @override
+///   List<Object?> get props => [tags]; // ← mutable list in props
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class UserState extends Equatable {
+///   final List<String> tags;
+///   @override
+///   List<Object?> get props => [List.unmodifiable(tags)];
+/// }
+/// ```
+class AvoidEquatableNestedEqualityRule extends SaropaLintRule {
+  AvoidEquatableNestedEqualityRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'Equatable'};
+
+  static const LintCode _code = LintCode(
+    'avoid_equatable_nested_equality',
+    '[avoid_equatable_nested_equality] Including a mutable collection (List, '
+        'Map, or Set) directly in Equatable props can cause non-deterministic '
+        'equality checks and unstable hash codes. Equatable performs shallow '
+        'comparison, so if the collection mutates after construction, two '
+        '"equal" instances may later compare as different. Wrap collections '
+        'with List.unmodifiable or use immutable types. {v1}',
+    correctionMessage:
+        'Wrap the collection with List.unmodifiable(), Map.unmodifiable(), '
+        'or use an immutable collection type in props.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.isGetter || node.name.lexeme != 'props') return;
+
+      // Must be inside an Equatable class
+      final ClassDeclaration? cls = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (cls == null) return;
+
+      if (!isEquatable(cls)) return;
+
+      // Analyze props return expression
+      final FunctionBody body = node.body;
+      ListLiteral? propsList;
+
+      if (body is ExpressionFunctionBody) {
+        final Expression expr = body.expression;
+        if (expr is ListLiteral) propsList = expr;
+      } else if (body is BlockFunctionBody) {
+        for (final Statement stmt in body.block.statements) {
+          if (stmt is ReturnStatement && stmt.expression is ListLiteral) {
+            propsList = stmt.expression as ListLiteral;
+            break;
+          }
+        }
+      }
+
+      if (propsList == null) return;
+
+      for (final CollectionElement element in propsList.elements) {
+        if (element is! Expression) continue;
+        final DartType? type = element.staticType;
+        if (type == null) continue;
+
+        if (type.isDartCoreList || type.isDartCoreMap || type.isDartCoreSet) {
+          reporter.atNode(element);
+        }
       }
     });
   }

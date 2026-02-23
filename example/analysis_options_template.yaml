@@ -1478,3 +1478,51 @@ custom_lint:
 
     # --- Performance ---
     - avoid_cache_stampede: false                      # WARNING - async cache without in-flight dedup (v5.1.0)
+
+    # =========================================================================
+    # V5.1.0 RULES - Batch 2
+    # =========================================================================
+
+    # --- Complexity ---
+    - avoid_deep_nesting: false                        # WARNING - code nested >5 levels deep (v5.1.0)
+    - avoid_high_cyclomatic_complexity: false           # WARNING - complexity exceeding 10 (v5.1.0)
+
+    # --- Async ---
+    - avoid_void_async: false                          # WARNING - async void instead of Future<void> (v5.1.0)
+    - avoid_redundant_await: false                     # INFO - await on non-Future expression (v5.1.0)
+
+    # --- Constructor ---
+    - avoid_unused_constructor_parameters: false       # WARNING - unused constructor params (v5.1.0)
+
+    # --- Return ---
+    - avoid_returning_null_for_void: false             # INFO - return null in void function (v5.1.0)
+    - avoid_returning_null_for_future: false            # INFO - return null from sync Future function (v5.1.0)
+
+    # --- Type Safety ---
+    - avoid_shadowing_type_parameters: false           # WARNING - method type param shadows class type param (v5.1.0)
+    - avoid_redundant_null_check: false                # INFO - null check on non-nullable value (v5.1.0)
+
+    # --- State Management ---
+    - avoid_collection_mutating_methods: false         # WARNING - mutating collection in setState (v5.1.0)
+
+    # --- Equatable ---
+    - avoid_equatable_nested_equality: false           # WARNING - mutable collection in props (v5.1.0)
+
+    # --- GetX ---
+    - avoid_getx_rx_nested_obs: false                  # WARNING - nested Rx observables (v5.1.0)
+
+    # --- Freezed ---
+    - avoid_freezed_any_map_issue: false               # WARNING - missing anyMap: true (v5.1.0)
+
+    # --- Hive ---
+    - avoid_hive_datetime_local: false                 # WARNING - local DateTime in Hive (v5.1.0)
+    - avoid_hive_type_modification: false              # WARNING - duplicate HiveField indices (v5.1.0)
+    - avoid_hive_large_single_entry: false             # WARNING - large single Hive entry (v5.1.0)
+
+    # --- auto_route ---
+    - require_auto_route_guard_resume: false           # WARNING - missing resolver.next() in guard (v5.1.0)
+    - require_auto_route_full_hierarchy: false         # WARNING - push() bypasses route hierarchy (v5.1.0)
+
+    # --- Firebase ---
+    - avoid_firebase_user_data_in_auth: false          # WARNING - too many custom claims (v5.1.0)
+    - require_firebase_app_check_production: false     # WARNING - missing App Check (v5.1.0)

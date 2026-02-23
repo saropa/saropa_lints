@@ -9,6 +9,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../saropa_lint_rule.dart';
 import '../fixes/navigation/add_mounted_check_fix.dart';
@@ -1369,6 +1370,133 @@ class PreferOptimisticUpdatesRule extends SaropaLintRule {
       if (expr is MethodInvocation) {
         return expr.methodName.name == 'setState';
       }
+    }
+    return false;
+  }
+}
+
+/// Warns when collections are mutated in-place inside `setState()`.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Mutating a collection in-place (`list.add(item)`) inside `setState()`
+/// keeps the same object reference. Some state management solutions may not
+/// detect the change. Prefer creating a new collection via spread.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// setState(() {
+///   _items.add(newItem);   // ← same reference
+/// });
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// setState(() {
+///   _items = [..._items, newItem]; // ← new list
+/// });
+/// ```
+class AvoidCollectionMutatingMethodsRule extends SaropaLintRule {
+  AvoidCollectionMutatingMethodsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get requiresWidgets => true;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  static const LintCode _code = LintCode(
+    'avoid_collection_mutating_methods',
+    '[avoid_collection_mutating_methods] Mutating a collection in-place '
+        'inside setState keeps the same object reference, which some state '
+        'management solutions may not detect. Additionally, mutating shared '
+        'collections breaks immutable-first architectures. Use the spread '
+        'operator to create a new collection instead of modifying the '
+        'existing one. {v1}',
+    correctionMessage:
+        'Replace in-place mutation with a new collection using the spread '
+        'operator, e.g. _items = [..._items, newItem].',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _listMutators = {
+    'add',
+    'addAll',
+    'insert',
+    'insertAll',
+    'remove',
+    'removeAt',
+    'removeWhere',
+    'clear',
+    'sort',
+    'shuffle',
+    'setRange',
+    'replaceRange',
+    'fillRange',
+  };
+
+  static const Set<String> _mapMutators = {
+    'remove',
+    'clear',
+    'addAll',
+    'addEntries',
+    'update',
+    'updateAll',
+    'putIfAbsent',
+  };
+
+  static const Set<String> _setMutators = {
+    'add',
+    'addAll',
+    'remove',
+    'removeAll',
+    'removeWhere',
+    'clear',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_isMutatingCollectionMethod(node)) return;
+      if (!_isInsideSetState(node)) return;
+      reporter.atNode(node.methodName);
+    });
+  }
+
+  static bool _isMutatingCollectionMethod(MethodInvocation node) {
+    final String name = node.methodName.name;
+    final DartType? targetType = node.realTarget?.staticType;
+    if (targetType == null) return false;
+
+    if (targetType.isDartCoreList) return _listMutators.contains(name);
+    if (targetType.isDartCoreMap) return _mapMutators.contains(name);
+    if (targetType.isDartCoreSet) return _setMutators.contains(name);
+    return false;
+  }
+
+  static bool _isInsideSetState(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodInvocation &&
+          current.methodName.name == 'setState') {
+        return true;
+      }
+      // Stop at function boundaries (don't escape nested functions)
+      if (current is FunctionDeclaration || current is MethodDeclaration) {
+        break;
+      }
+      current = current.parent;
     }
     return false;
   }

@@ -660,6 +660,9 @@ const Set<String> essentialRules = <String>{
   'avoid_misused_hooks', // WARNING - hooks in callbacks/closures
   // v5.1.0 - Migration rules (Essential)
   'avoid_asset_manifest_json', // ERROR - removed in Flutter 3.38.0, runtime crash
+  // v5.1.0 - Batch 2 (Essential)
+  'require_auto_route_guard_resume', // WARNING - missing resolver.next()
+  'require_auto_route_full_hierarchy', // WARNING - push() bypasses hierarchy
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -681,6 +684,13 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // v5.1.0 - New rules (Recommended)
   'avoid_cached_image_web',
+  'avoid_void_async',
+  'avoid_unused_constructor_parameters',
+  'avoid_redundant_await',
+  'avoid_redundant_null_check',
+  'avoid_returning_null_for_void',
+  'avoid_returning_null_for_future',
+  'avoid_shadowing_type_parameters',
 
   // Database (Isar)
   'require_isar_nullable_field',
@@ -2415,6 +2425,17 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_closure_capture_leaks', // WARNING - setState in Timer w/o mounted
   'avoid_behavior_subject_last_value', // WARNING - .value on closed subject
   'avoid_cache_stampede', // WARNING - cache miss without dedup
+  'avoid_deep_nesting', // WARNING - deeply nested code blocks
+  'avoid_high_cyclomatic_complexity', // WARNING - high complexity
+  'avoid_collection_mutating_methods', // WARNING - mutating in setState
+  'avoid_equatable_nested_equality', // WARNING - mutable collections in props
+  'avoid_getx_rx_nested_obs', // WARNING - nested Rx observables
+  'avoid_freezed_any_map_issue', // WARNING - missing anyMap: true
+  'avoid_hive_datetime_local', // WARNING - local DateTime in Hive
+  'avoid_hive_type_modification', // WARNING - duplicate HiveField indices
+  'avoid_hive_large_single_entry', // WARNING - large single Hive entry
+  'avoid_firebase_user_data_in_auth', // WARNING - too many custom claims
+  'require_firebase_app_check_production', // WARNING - missing App Check
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).
@@ -3097,6 +3118,7 @@ const Set<String> getxPackageRules = <String>{
   'avoid_getx_global_state',
   'avoid_getx_static_context',
   'avoid_tight_coupling_with_getx',
+  'avoid_getx_rx_nested_obs',
 };
 
 /// Rules specific to the flutter_hooks package.
@@ -3125,6 +3147,7 @@ const Set<String> equatablePackageRules = <String>{
   'avoid_equatable_datetime',
   'prefer_unmodifiable_collections',
   'require_equatable_props_override',
+  'avoid_equatable_nested_equality',
 };
 
 /// Rules specific to the Freezed code generation package.
@@ -3138,6 +3161,7 @@ const Set<String> freezedPackageRules = <String>{
   'require_freezed_lint_package',
   'avoid_freezed_for_logic_classes',
   'prefer_freezed_for_data_classes',
+  'avoid_freezed_any_map_issue',
 };
 
 // ---------------------------------------------------------------------------
@@ -3181,6 +3205,8 @@ const Set<String> firebasePackageRules = <String>{
   'avoid_map_markers_in_build',
   'require_map_idle_callback',
   'prefer_marker_clustering',
+  'avoid_firebase_user_data_in_auth',
+  'require_firebase_app_check_production',
 };
 
 /// Rules specific to the Isar database package.
@@ -3228,6 +3254,9 @@ const Set<String> hivePackageRules = <String>{
   'prefer_hive_lazy_box',
   'avoid_hive_binary_storage',
   'require_hive_migration_strategy',
+  'avoid_hive_datetime_local',
+  'avoid_hive_type_modification',
+  'avoid_hive_large_single_entry',
 };
 
 /// Rules specific to the shared_preferences package.
