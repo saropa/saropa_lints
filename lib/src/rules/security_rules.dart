@@ -1861,8 +1861,18 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
       // If it's returned directly, we can't easily check the return type
       if (parent is ReturnStatement) return;
 
+      // If it's the body of an expression function (=>), List may be required
+      if (parent is ExpressionFunctionBody) return;
+
       // If passed as argument, we can't easily check parameter type
       if (parent is ArgumentList) return;
+
+      // If the result is used in a method chain (.toList().someMethod()),
+      // the downstream method may require List, not Iterable
+      if (parent is MethodInvocation && parent.target == node) return;
+
+      // If assigned via =
+      if (parent is AssignmentExpression) return;
 
       // Otherwise, suggest removing toList
       reporter.atNode(node.methodName, code);

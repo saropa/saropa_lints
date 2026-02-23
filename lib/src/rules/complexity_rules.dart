@@ -397,6 +397,10 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  /// Guard clauses are early-return patterns with low cognitive complexity
+  /// despite high operator counts. Allow more operators in guard context.
+  static const int _guardClauseThreshold = 10;
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -407,10 +411,90 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
       if (node.parent is BinaryExpression) return;
 
       final int operatorCount = _countOperators(node);
-      if (operatorCount > _maxOperators) {
-        reporter.atNode(node);
+      if (operatorCount <= _maxOperators) return;
+
+      // Guard clauses (if + return/throw) have low cognitive complexity
+      if (_isGuardClause(node) && operatorCount <= _guardClauseThreshold) {
+        return;
       }
+
+      // Symmetric patterns like (a && b) || (c && d) || (e && f)
+      // have low cognitive complexity despite high operator count
+      if (_isSymmetricPattern(node)) return;
+
+      reporter.atNode(node);
     });
+  }
+
+  /// Returns true if the expression is the condition of a guard clause:
+  /// an `if` statement whose body is only a `return` or `throw`.
+  static bool _isGuardClause(Expression expr) {
+    final AstNode? parent = expr.parent;
+    if (parent is! IfStatement) return false;
+    if (parent.expression != expr) return false;
+
+    final Statement body = parent.thenStatement;
+    if (body is ReturnStatement) return true;
+    if (body is ExpressionStatement && body.expression is ThrowExpression) {
+      return true;
+    }
+    if (body is Block && body.statements.length == 1) {
+      final Statement only = body.statements.first;
+      if (only is ReturnStatement) return true;
+      if (only is ExpressionStatement && only.expression is ThrowExpression) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Detects symmetric patterns: `(a op b) || (c op d) || ...`
+  /// where each group uses the same operator structure. The cognitive
+  /// complexity of reading one group and seeing it repeated is low.
+  static bool _isSymmetricPattern(BinaryExpression node) {
+    // Collect all top-level operands joined by the same operator
+    final TokenType joinOp = node.operator.type;
+    final List<Expression> operands = <Expression>[];
+    _collectOperands(node, joinOp, operands);
+
+    // Need at least 3 groups to qualify as a repeating pattern
+    if (operands.length < 3) return false;
+
+    // Check if all operands have the same internal operator structure
+    final String? firstShape = _operatorShape(operands.first);
+    if (firstShape == null || firstShape.isEmpty) return false;
+
+    return operands.every((Expression op) => _operatorShape(op) == firstShape);
+  }
+
+  static void _collectOperands(
+    Expression node,
+    TokenType joinOp,
+    List<Expression> result,
+  ) {
+    if (node is ParenthesizedExpression) {
+      _collectOperands(node.expression, joinOp, result);
+      return;
+    }
+    if (node is BinaryExpression && node.operator.type == joinOp) {
+      _collectOperands(node.leftOperand, joinOp, result);
+      _collectOperands(node.rightOperand, joinOp, result);
+      return;
+    }
+    result.add(node);
+  }
+
+  /// Returns a string describing the operator structure of an expression,
+  /// ignoring actual operand values. E.g. `a && b` → "&&".
+  static String? _operatorShape(Expression node) {
+    if (node is ParenthesizedExpression) return _operatorShape(node.expression);
+    if (node is BinaryExpression) {
+      final String? left = _operatorShape(node.leftOperand);
+      final String? right = _operatorShape(node.rightOperand);
+      final String op = node.operator.lexeme;
+      return '${left ?? '_'} $op ${right ?? '_'}';
+    }
+    return null; // Leaf node
   }
 
   int _countOperators(Expression node) {

@@ -1255,6 +1255,11 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addFormalParameterList((FormalParameterList node) {
+      // Skip lambda/closure parameters — their signature is constrained
+      // by the expected function type, not by API design choices.
+      final AstNode? parent = node.parent;
+      if (parent is FunctionExpression) return;
+
       for (final FormalParameter param in node.parameters) {
         // Skip if already named
         if (param.isNamed) continue;
@@ -2279,16 +2284,23 @@ class AvoidUnnecessaryNullableReturnTypeRule extends SaropaLintRule {
     return returnsNull || hasImplicitReturn;
   }
 
-  bool _expressionCanBeNull(Expression expr) {
+  /// Checks if an expression can evaluate to null.
+  ///
+  /// Handles null literals, conditional expressions with null branches,
+  /// parenthesized expressions, and expressions whose static type is
+  /// nullable (e.g. Map[] operator, method calls returning nullable types).
+  static bool _expressionCanBeNull(Expression expr) {
     if (expr is NullLiteral) return true;
 
-    // Ternary with null in either branch
     if (expr is ConditionalExpression) {
       return _expressionCanBeNull(expr.thenExpression) ||
           _expressionCanBeNull(expr.elseExpression);
     }
 
-    // Check the static type of the expression
+    if (expr is ParenthesizedExpression) {
+      return _expressionCanBeNull(expr.expression);
+    }
+
     final DartType? staticType = expr.staticType;
     if (staticType != null &&
         staticType.nullabilitySuffix == NullabilitySuffix.question) {
@@ -2309,7 +2321,9 @@ class _NullReturnFinder extends RecursiveAstVisitor<void> {
 
   @override
   void visitReturnStatement(ReturnStatement node) {
-    if (node.expression == null || node.expression is NullLiteral) {
+    final Expression? expr = node.expression;
+    if (expr == null ||
+        AvoidUnnecessaryNullableReturnTypeRule._expressionCanBeNull(expr)) {
       onNullReturn();
     }
     super.visitReturnStatement(node);

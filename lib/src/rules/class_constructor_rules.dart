@@ -467,6 +467,59 @@ class _ShadowingChecker extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitForStatement(ForStatement node) {
+    // For-loop variables are scoped to the loop body. After the loop
+    // exits, they no longer exist. Save/restore so sequential loops
+    // reusing the same variable name are not treated as shadowing.
+    final Set<String> savedNames = Set<String>.from(outerNames);
+    super.visitForStatement(node);
+    outerNames
+      ..clear()
+      ..addAll(savedNames);
+  }
+
+  @override
+  void visitWhileStatement(WhileStatement node) {
+    final Set<String> savedNames = Set<String>.from(outerNames);
+    super.visitWhileStatement(node);
+    outerNames
+      ..clear()
+      ..addAll(savedNames);
+  }
+
+  @override
+  void visitDoStatement(DoStatement node) {
+    final Set<String> savedNames = Set<String>.from(outerNames);
+    super.visitDoStatement(node);
+    outerNames
+      ..clear()
+      ..addAll(savedNames);
+  }
+
+  @override
+  void visitBlock(Block node) {
+    // For blocks that are direct children of if/else/switch/try,
+    // variables declared inside should not leak to siblings.
+    final AstNode? parent = node.parent;
+    final bool isScopedBlock =
+        parent is IfStatement ||
+        parent is SwitchCase ||
+        parent is SwitchDefault ||
+        parent is TryStatement ||
+        parent is CatchClause;
+
+    if (isScopedBlock) {
+      final Set<String> savedNames = Set<String>.from(outerNames);
+      super.visitBlock(node);
+      outerNames
+        ..clear()
+        ..addAll(savedNames);
+    } else {
+      super.visitBlock(node);
+    }
+  }
+
+  @override
   void visitFunctionExpression(FunctionExpression node) {
     // When entering a closure, create a snapshot of outer names.
     // Variables declared in this closure should not leak to sibling closures.

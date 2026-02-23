@@ -263,12 +263,21 @@ class NoMagicNumberRule extends SaropaLintRule {
   bool _shouldReportInt(Literal node, int? value) {
     if (value == null) return false;
     if (_allowedInts.contains(value)) return false;
+    if (_isDefaultParameterValue(node)) return false;
     return !isLiteralInConstContext(node);
   }
 
   bool _shouldReportDouble(Literal node, double value) {
     if (_allowedDoubles.contains(value)) return false;
+    if (_isDefaultParameterValue(node)) return false;
     return !isLiteralInConstContext(node);
+  }
+
+  /// Returns true if the literal is a default value for a named or optional
+  /// parameter. The parameter name provides context, making it not "magic."
+  static bool _isDefaultParameterValue(AstNode node) {
+    final AstNode? parent = node.parent;
+    return parent is DefaultFormalParameter;
   }
 }
 
@@ -549,7 +558,8 @@ class PreferDigitSeparatorsRule extends SaropaLintRule {
         AddDigitSeparatorsFix(context: context),
   ];
 
-  static const int _threshold = 10000; // Numbers >= 10000 should use separators
+  static const int _threshold =
+      100000; // Numbers >= 100000 (6+ digits) should use separators
 
   static const LintCode _code = LintCode(
     'prefer_digit_separators',
