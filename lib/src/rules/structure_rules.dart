@@ -1393,10 +1393,14 @@ class PreferNamedParametersRule extends SaropaLintRule {
 
 /// Warns when a class only has static members and could be a namespace.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+/// Since: v0.1.4 | Updated: v5.0.0-beta.16 | Rule version: v6
 ///
 /// Classes with only static members are essentially namespaces. Consider
 /// using top-level functions and constants instead.
+///
+/// Classes with a private constructor are skipped — those are handled by
+/// [PreferAbstractFinalStaticClassRule] instead, since the developer has
+/// already signalled intent to prevent instantiation.
 class PreferStaticClassRule extends SaropaLintRule {
   PreferStaticClassRule() : super(code: _code);
 
@@ -1404,7 +1408,7 @@ class PreferStaticClassRule extends SaropaLintRule {
     'prefer_static_class',
     '[prefer_static_class] Class contains only static members and acts as a namespace. '
         'Static-only classes cannot be instantiated meaningfully, add unnecessary boilerplate, '
-        'and prevent tree-shaking of unused members in the class. {v5}',
+        'and prevent tree-shaking of unused members in the class. {v6}',
     correctionMessage:
         'Replace with top-level functions and constants, which are simpler, '
         'support tree-shaking, and follow idiomatic Dart conventions.',
@@ -1426,14 +1430,17 @@ class PreferStaticClassRule extends SaropaLintRule {
       // Check if all members are static
       bool hasNonStaticMember = false;
       bool hasStaticMember = false;
+      bool hasPrivateConstructor = false;
 
       for (final ClassMember member in node.members) {
         if (member is ConstructorDeclaration) {
-          // Allow private/factory constructors
-          if (member.name == null || !member.name!.lexeme.startsWith('_')) {
-            if (member.factoryKeyword == null) {
-              hasNonStaticMember = true;
-            }
+          final String? name = member.name?.lexeme;
+          if (name != null && name.startsWith('_')) {
+            // Private constructor — prefer_abstract_final_static_class
+            // handles this case instead.
+            hasPrivateConstructor = true;
+          } else if (member.factoryKeyword == null) {
+            hasNonStaticMember = true;
           }
         } else if (member is FieldDeclaration) {
           if (member.isStatic) {
@@ -1450,7 +1457,7 @@ class PreferStaticClassRule extends SaropaLintRule {
         }
       }
 
-      if (hasStaticMember && !hasNonStaticMember) {
+      if (hasStaticMember && !hasNonStaticMember && !hasPrivateConstructor) {
         reporter.atToken(node.name, code);
       }
     });
