@@ -1801,3 +1801,110 @@ class AvoidCachedImageUnboundedListRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// avoid_cached_image_web
+// =============================================================================
+
+/// Warns when CachedNetworkImage is used inside a `kIsWeb` true-branch.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// `CachedNetworkImage` from `package:cached_network_image` relies on a local
+/// file-system cache. On the web platform there is **no file system**, so the
+/// package falls back to a plain `Image.network` — providing zero caching
+/// benefit while carrying extra dependency weight.
+///
+/// **BAD:**
+/// ```dart
+/// if (kIsWeb) {
+///   return CachedNetworkImage(imageUrl: url); // No caching on web!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (kIsWeb) {
+///   return Image.network(url); // Browser HTTP cache handles it
+/// }
+/// return CachedNetworkImage(imageUrl: url); // File cache on mobile
+/// ```
+class AvoidCachedImageWebRule extends SaropaLintRule {
+  AvoidCachedImageWebRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'CachedNetworkImage'};
+
+  static const LintCode _code = LintCode(
+    'avoid_cached_image_web',
+    '[avoid_cached_image_web] CachedNetworkImage is used inside a kIsWeb '
+        'branch where it provides no caching benefit. On the web platform '
+        'there is no local file system, so cached_network_image falls back to '
+        'a plain Image.network internally. You carry an extra dependency and '
+        'misleading widget name for zero benefit. The browser\'s native HTTP '
+        'cache (Cache-Control, ETag) already handles image caching on web. '
+        '{v1}',
+    correctionMessage:
+        'Replace CachedNetworkImage with Image.network inside the kIsWeb '
+        'branch. The browser HTTP cache will handle image caching '
+        'automatically.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'CachedNetworkImage') return;
+
+      // Walk parents to find an IfStatement with kIsWeb condition
+      if (!_isInsideKIsWebTrueBranch(node)) return;
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+
+  /// Checks whether [node] sits inside the then-branch of an
+  /// `if (kIsWeb)` statement.
+  static bool _isInsideKIsWebTrueBranch(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        final String condition = current.expression.toSource();
+        if (condition == 'kIsWeb' || condition == 'kIsWeb == true') {
+          // Check that our node is in the then-branch, not the else-branch
+          final Statement thenBranch = current.thenStatement;
+          if (_containsNode(thenBranch, node)) return true;
+        }
+        // Negated form: if (!kIsWeb) { ... } else { CACHED_IMAGE_HERE }
+        if (condition == '!kIsWeb' || condition == 'kIsWeb == false') {
+          final Statement? elseBranch = current.elseStatement;
+          if (elseBranch != null && _containsNode(elseBranch, node)) {
+            return true;
+          }
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Returns true if [container] is an ancestor of [target].
+  static bool _containsNode(AstNode container, AstNode target) {
+    AstNode? current = target;
+    while (current != null) {
+      if (identical(current, container)) return true;
+      current = current.parent;
+    }
+    return false;
+  }
+}

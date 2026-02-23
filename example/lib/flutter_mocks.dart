@@ -1604,8 +1604,20 @@ class BorderRadius {
   static dynamic circular(double radius) => null;
 }
 
+class ClipRect extends Widget {
+  const ClipRect({super.key, dynamic clipper, Widget? child});
+}
+
 class ClipRRect extends Widget {
   const ClipRRect({super.key, dynamic borderRadius, Widget? child});
+}
+
+class ClipOval extends Widget {
+  const ClipOval({super.key, dynamic clipper, Widget? child});
+}
+
+class ClipPath extends Widget {
+  const ClipPath({super.key, dynamic clipper, Widget? child});
 }
 
 class BackdropFilter extends Widget {
@@ -3222,3 +3234,15 @@ class AssetBundle {
 }
 
 final AssetBundle rootBundle = AssetBundle();
+
+// ============================================================================
+// RxDart mocks
+// ============================================================================
+
+class BehaviorSubject<T> {
+  BehaviorSubject({T? seedValue});
+  T get value => throw UnimplementedError();
+  bool get isClosed => false;
+  void add(T value) {}
+  Future<void> close() async {}
+}
