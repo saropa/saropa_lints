@@ -11,7 +11,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [Unreleased]
+## [5.0.0-beta.15]
 
 ### Added
 - `avoid_cached_image_web`: warns when CachedNetworkImage is used inside a `kIsWeb` branch where it provides no caching benefit (Recommended tier)
