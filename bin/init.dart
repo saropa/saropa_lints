@@ -337,7 +337,7 @@ void _migrateOldReports() {
 /// or null if no report was found.
 Future<String?> _findNewestPluginReport(
   String dateFolderName, {
-  int maxAttempts = 10,
+  int maxAttempts = 20,
 }) async {
   for (var attempt = 0; attempt < maxAttempts; attempt++) {
     try {
