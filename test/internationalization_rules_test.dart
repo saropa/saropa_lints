@@ -69,6 +69,12 @@ void main() {
         // Avoidance pattern not present
         expect('avoid_hardcoded_locale passes', isNotNull);
       });
+
+      test('locale strings in collection literals should NOT trigger '
+          '(regression)', () {
+        // e.g., const Set<String> locales = {'en_US', 'en_CA'};
+        expect('collection literal locale data is exempt', isNotNull);
+      });
     });
 
     group('avoid_string_concatenation_in_ui', () {

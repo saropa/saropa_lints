@@ -438,8 +438,50 @@ class AvoidDatetimeComparisonWithoutPrecisionRule extends SaropaLintRule {
           rightType != null && rightType.getDisplayString() == 'DateTime';
 
       if (leftIsDateTime && rightIsDateTime) {
+        // Skip when either operand is a compile-time constant — exact
+        // equality is intentional (e.g., epoch sentinel checks)
+        if (_isConstantRef(node.leftOperand) ||
+            _isConstantRef(node.rightOperand)) {
+          return;
+        }
+
         reporter.atNode(node);
       }
     });
+  }
+
+  /// Returns true when [expr] is likely a compile-time constant reference.
+  ///
+  /// **Heuristic:** Uses uppercase-first-letter convention to identify
+  /// `ClassName.field` patterns.  This is reliable for Dart code where class
+  /// names are PascalCase by convention.
+  ///
+  /// Covers const constructors, static field access (`ClassName.field`),
+  /// and property access chains targeting static members.
+  static bool _isConstantRef(Expression expr) {
+    // const constructor: `const DateTime(1970, 1, 1)`
+    if (expr is InstanceCreationExpression && expr.isConst) return true;
+
+    // Static field access: `DateConstants.unixEpochDate`
+    // PrefixedIdentifier with an uppercase prefix is a ClassName.field pattern
+    if (expr is PrefixedIdentifier) {
+      final String prefix = expr.prefix.name;
+      if (prefix.isNotEmpty && prefix[0] == prefix[0].toUpperCase()) {
+        return true;
+      }
+    }
+
+    // PropertyAccess to a static field: `SomeClass.someField`
+    if (expr is PropertyAccess) {
+      final Expression? target = expr.target;
+      if (target is SimpleIdentifier) {
+        final String name = target.name;
+        if (name.isNotEmpty && name[0] == name[0].toUpperCase()) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 }

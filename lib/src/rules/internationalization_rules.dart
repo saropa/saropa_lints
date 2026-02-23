@@ -431,10 +431,32 @@ class AvoidHardcodedLocaleRule extends SaropaLintRule {
       final String value = node.value;
 
       // Check for locale patterns like 'en_US', 'de_DE', etc.
-      if (_localePattern.hasMatch("'$value'")) {
-        reporter.atNode(node);
-      }
+      if (!_localePattern.hasMatch("'$value'")) return;
+
+      // Skip locale strings used as data elements in collection literals
+      // (e.g., lookup tables, supported-locale lists, locale-to-name maps)
+      if (_isInsideCollectionLiteral(node)) return;
+
+      reporter.atNode(node);
     });
+  }
+
+  /// Returns true when [node] sits inside a [SetOrMapLiteral] or
+  /// [ListLiteral], indicating it is lookup data rather than a formatting
+  /// argument.  Stops walking at method/constructor invocations so that
+  /// `DateFormat('en_US')` is still flagged.
+  static bool _isInsideCollectionLiteral(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is SetOrMapLiteral || current is ListLiteral) return true;
+      // Stop at call boundaries — the string is an argument, not data
+      if (current is MethodInvocation ||
+          current is InstanceCreationExpression) {
+        return false;
+      }
+      current = current.parent;
+    }
+    return false;
   }
 
   // Note: No quick fix provided - the correct replacement depends on context

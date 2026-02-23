@@ -125,3 +125,15 @@ void _good278() {
     }
   }
 }
+
+// --- False-positive regression tests (bug fix) ---
+
+// GOOD: Early-skip guard pattern — continue as loop equivalent of early-return
+void _goodEarlySkipGuard() {
+  for (int i = 0; i < 10; i++) {
+    if (i < 3) {
+      continue; // Skip guard: simple if with only continue
+    }
+    process(items);
+  }
+}

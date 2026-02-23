@@ -13,6 +13,18 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Fixed
+- `prefer_static_class`: no longer fires on `abstract final class` declarations (regression from beta.15 fix)
+- `avoid_hardcoded_locale`: skip locale-pattern strings inside collection literals (Set, List, Map lookup data)
+- `avoid_datetime_comparison_without_precision`: skip comparisons against compile-time constants (e.g., epoch sentinel checks)
+- `avoid_unsafe_collection_methods`: strengthen guard detection with source-text fallback for length/isNotEmpty checks
+- `avoid_medium_length_files`: exempt files containing only `abstract final` utility namespace classes
+- `prefer_single_declaration_per_file`: exempt files where all classes are `abstract final` static-only namespaces
+- `prefer_no_continue_statement`: exempt early-skip guard pattern (`if (cond) { continue; }` at top of loop body)
+
+### Changed
+- `avoid_high_cyclomatic_complexity`: raise threshold from 10 to 15 to align with industry standards (SonarQube, ESLint)
+
 ---
 ## [5.0.0-beta.15]
 
