@@ -11,7 +11,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
-## [Unreleased]
+## [5.0.0-beta.14]
 
 ### Fixed
 - `avoid_variable_shadowing`: false positive on sequential for/while/do loops reusing the same variable name — loop variables are scoped to their body and don't shadow each other
