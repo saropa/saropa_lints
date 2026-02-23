@@ -4,6 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 
 import '../saropa_lint_rule.dart';
+import '../fixes/formatting/add_blank_line_fix.dart';
 import '../fixes/formatting/add_blank_line_before_return_fix.dart';
 
 /// Warns when case clauses don't have newlines before them.
@@ -44,6 +45,12 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_case',
@@ -123,6 +130,12 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_constructor',
@@ -212,6 +225,12 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_method',

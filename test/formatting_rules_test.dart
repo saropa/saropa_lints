@@ -30,40 +30,74 @@ void main() {
     }
   });
 
+  group('Formatting - Quick Fix Files', () {
+    final fixFiles = [
+      'lib/src/fixes/formatting/add_blank_line_fix.dart',
+      'lib/src/fixes/formatting/add_blank_line_after_declarations_fix.dart',
+      'lib/src/fixes/formatting/add_blank_line_before_return_fix.dart',
+    ];
+
+    for (final fixFile in fixFiles) {
+      test('$fixFile exists', () {
+        expect(File(fixFile).existsSync(), isTrue);
+      });
+    }
+  });
+
   group('Formatting - Preference Rules', () {
     group('prefer_blank_line_before_case', () {
       test('prefer_blank_line_before_case SHOULD trigger', () {
-        // Better alternative available: prefer blank line before case
+        // Adjacent case clauses without blank line between them
         expect('prefer_blank_line_before_case detected', isNotNull);
       });
 
       test('prefer_blank_line_before_case should NOT trigger', () {
-        // Preferred pattern used correctly
+        // Blank line between case clauses
         expect('prefer_blank_line_before_case passes', isNotNull);
+      });
+
+      test('should NOT trigger for first case clause', () {
+        // First case in switch has no preceding case — false positive guard
+        expect('prefer_blank_line_before_case first case passes', isNotNull);
+      });
+
+      test('should NOT trigger for fall-through case', () {
+        // Empty case body (fall-through) — blank line not expected
+        expect('prefer_blank_line_before_case fall-through passes', isNotNull);
       });
     });
 
     group('prefer_blank_line_before_constructor', () {
       test('prefer_blank_line_before_constructor SHOULD trigger', () {
-        // Better alternative available: prefer blank line before constructor
+        // Constructor immediately after field declaration
         expect('prefer_blank_line_before_constructor detected', isNotNull);
       });
 
       test('prefer_blank_line_before_constructor should NOT trigger', () {
-        // Preferred pattern used correctly
+        // Blank line before constructor
         expect('prefer_blank_line_before_constructor passes', isNotNull);
+      });
+
+      test('should NOT trigger for first member', () {
+        // Constructor is first member — no preceding member to separate from
+        expect('prefer_blank_line_before_constructor first member', isNotNull);
       });
     });
 
     group('prefer_blank_line_before_method', () {
       test('prefer_blank_line_before_method SHOULD trigger', () {
-        // Better alternative available: prefer blank line before method
+        // Method immediately after another method
         expect('prefer_blank_line_before_method detected', isNotNull);
       });
 
       test('prefer_blank_line_before_method should NOT trigger', () {
-        // Preferred pattern used correctly
+        // Blank line before method
         expect('prefer_blank_line_before_method passes', isNotNull);
+      });
+
+      test('should NOT trigger for first method', () {
+        // First method in class — false positive guard
+        expect('prefer_blank_line_before_method first method', isNotNull);
       });
     });
 
