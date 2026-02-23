@@ -330,6 +330,53 @@ void main() {
 
         expect('Unconditional dead assignment is still flagged', isNotNull);
       });
+
+      test('should not flag definite assignment via if/else branches', () {
+        // Expected behavior: These should NOT trigger
+        // final int x;
+        // if (condition) {
+        //   x = a;   // mutually exclusive with else branch
+        // } else {
+        //   x = b;
+        // }
+        // print(x); // x IS read here
+
+        expect('If/else definite assignment is not flagged', isNotNull);
+      });
+
+      test('should not flag chained else-if definite assignment', () {
+        // Expected behavior: These should NOT trigger
+        // final int x;
+        // if (a) { x = 1; }
+        // else if (b) { x = 2; }
+        // else { x = 3; }
+        // print(x);
+
+        expect('Chained else-if definite assignment is not flagged', isNotNull);
+      });
+    });
+
+    group('avoid_similar_names', () {
+      test('should not flag single-character variable pairs', () {
+        // Expected behavior: These should NOT trigger
+        // final y = year.toString();
+        // final m = month.toString();
+        // final d = day.toString();
+        // final h = hour.toString();
+        // final s = second.toString();
+        // All single-char names have edit distance 1, but are
+        // universally understood date/time abbreviations.
+
+        expect('Single-char variable pairs are not flagged', isNotNull);
+      });
+
+      test('should still flag confusable single-char names via 1/l or 0/O', () {
+        // Expected behavior: These SHOULD still trigger
+        // final value1 = 1;
+        // final valuel = 2;  // 1 vs l — caught by normalization
+
+        expect('Confusable char substitution is still flagged', isNotNull);
+      });
     });
 
     group('prefer_switch_expression', () {

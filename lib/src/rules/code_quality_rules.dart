@@ -2986,6 +2986,10 @@ class AvoidSimilarNamesRule extends SaropaLintRule {
 
     // Check edit distance for short names
     if (a.length <= 5 && b.length <= 5) {
+      // Single-character names always have edit distance 1 from each
+      // other, which is not meaningful. Confusable chars (1/l, 0/O)
+      // are already caught by the normalization check above.
+      if (a.length == 1 && b.length == 1) return false;
       final int distance = _editDistance(a.toLowerCase(), b.toLowerCase());
       if (distance == 1) return true;
     }
@@ -3711,6 +3715,10 @@ class AvoidUnusedAssignmentRule extends SaropaLintRule {
           // (e.g. `x = x.toLowerCase()` reads then overwrites).
           if (_nextAssignmentReadsVariable(next, entry.key)) continue;
 
+          // Don't flag if current and next are in opposite branches
+          // of the same if/else (mutually exclusive, not sequential).
+          if (_areInOppositeBranches(current, next)) continue;
+
           reporter.atNode(current, code);
         }
       }
@@ -3758,6 +3766,32 @@ class AvoidUnusedAssignmentRule extends SaropaLintRule {
     final finder = _QuickIdentifierFinder(name);
     node.visitChildren(finder);
     return finder.found;
+  }
+
+  /// Returns true if [a] and [b] are in opposite branches of the same
+  /// if/else statement (mutually exclusive execution paths).
+  static bool _areInOppositeBranches(AstNode a, AstNode b) {
+    AstNode? current = a.parent;
+    while (current != null) {
+      if (current is IfStatement && current.elseStatement != null) {
+        final bool aInThen = _isContainedIn(a, current.thenStatement);
+        if (aInThen && _isContainedIn(b, current.elseStatement!)) {
+          return true;
+        }
+        final bool aInElse = _isContainedIn(a, current.elseStatement!);
+        if (aInElse && _isContainedIn(b, current.thenStatement)) {
+          return true;
+        }
+      }
+      if (current is FunctionBody) break;
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Returns true if [node] is positionally within [container].
+  static bool _isContainedIn(AstNode node, AstNode container) {
+    return node.offset >= container.offset && node.end <= container.end;
   }
 }
 
