@@ -643,6 +643,15 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
       }
     }
 
+    // Fallback: check source text for guard patterns that the structured
+    // checks above may miss due to AST node type differences between
+    // analyzer versions (PrefixedIdentifier vs PropertyAccess).
+    final String src = condition.toSource();
+    if (src.contains('$collectionName.length') ||
+        src.contains('$collectionName.isNotEmpty')) {
+      return true;
+    }
+
     return false;
   }
 

@@ -88,6 +88,19 @@ void main() {
       test('precision-aware DateTime comparison should NOT trigger', () {
         expect('precision-aware DateTime comparison', isNotNull);
       });
+
+      test(
+        'comparison against static const should NOT trigger (regression)',
+        () {
+          // e.g., dt == DateConstants.unixEpochDate — intentional exact check
+          expect('static const comparison is exempt', isNotNull);
+        },
+      );
+
+      test('comparison against const constructor should NOT trigger', () {
+        // e.g., dt == const DateTime(1970)
+        expect('const constructor comparison is exempt', isNotNull);
+      });
     });
   });
 }

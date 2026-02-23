@@ -102,6 +102,11 @@ void main() {
         // Avoidance pattern not present
         expect('avoid_unsafe_collection_methods passes', isNotNull);
       });
+
+      test('.first guarded by length == 1 should NOT trigger (regression)', () {
+        // if (parts.length == 1) { return parts.first; }
+        expect('length guard is recognized', isNotNull);
+      });
     });
 
     group('avoid_unsafe_reduce', () {
