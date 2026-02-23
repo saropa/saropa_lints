@@ -117,3 +117,26 @@ class _good79_UserManager {}
 class AuthManager {}
 
 class CacheManager {}
+
+// GOOD: Static-const namespace with 16+ fields should NOT trigger
+// (static const/final fields are excluded from the field count)
+abstract final class _good79_DateConstants {
+  static const int a1 = 1;
+  static const int a2 = 2;
+  static const int a3 = 3;
+  static const int a4 = 4;
+  static const int a5 = 5;
+  static const int a6 = 6;
+  static const int a7 = 7;
+  static const int a8 = 8;
+  static const int a9 = 9;
+  static const int a10 = 10;
+  static const int a11 = 11;
+  static const int a12 = 12;
+  static const int a13 = 13;
+  static const int a14 = 14;
+  static const int a15 = 15;
+  static const int a16 = 16;
+  static const int a17 = 17;
+  static final DateTime a18 = DateTime.now();
+}

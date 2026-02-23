@@ -117,3 +117,10 @@ abstract final class _GoodUtils1057 {
   static const int kMax = 100;
   static void doThing() {} // abstract final prevents instantiation
 }
+
+// GOOD: Private constructor defers to prefer_abstract_final_static_class
+class _GoodUtils1057b {
+  _GoodUtils1057b._(); // Private constructor signals intent
+  static const int kMax = 100;
+  static void doThing() {}
+}

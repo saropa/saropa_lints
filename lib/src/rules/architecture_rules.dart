@@ -285,9 +285,12 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
 
 /// Warns when God class is detected (too many responsibilities).
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+/// Since: v0.1.4 | Updated: v5.0.0-beta.16 | Rule version: v6
 ///
-/// Classes with too many fields/methods violate Single Responsibility.
+/// Classes with too many fields (>15) or methods (>20) violate Single
+/// Responsibility. Static const and static final fields are excluded from
+/// the field count because they represent compile-time constants, not
+/// instance state.
 ///
 /// **BAD:**
 /// ```dart
@@ -301,6 +304,13 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
 /// class UserManager { ... }
 /// class AuthManager { ... }
 /// class CacheManager { ... }
+///
+/// // Static-const namespaces are NOT flagged regardless of field count:
+/// abstract final class DateConstants {
+///   static const int minMonth = 1;
+///   static const int maxMonth = 12;
+///   // ... 15+ static const fields are fine
+/// }
 /// ```
 class AvoidGodClassRule extends SaropaLintRule {
   AvoidGodClassRule() : super(code: _code);
@@ -314,7 +324,7 @@ class AvoidGodClassRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_god_class',
-    '[avoid_god_class] Class declares more than 15 fields or 20 methods, violating the Single Responsibility Principle. God classes accumulate unrelated responsibilities, making them difficult to understand, test, and maintain. Changes to one responsibility risk breaking others, and the class becomes a merge-conflict magnet as multiple developers modify it concurrently. {v5}',
+    '[avoid_god_class] Class declares more than 15 fields or 20 methods, violating the Single Responsibility Principle. God classes accumulate unrelated responsibilities, making them difficult to understand, test, and maintain. Changes to one responsibility risk breaking others, and the class becomes a merge-conflict magnet as multiple developers modify it concurrently. {v6}',
     correctionMessage:
         'Extract cohesive groups of related fields and methods into focused helper or delegate classes with clear responsibilities.',
     severity: DiagnosticSeverity.WARNING,
@@ -334,7 +344,14 @@ class AvoidGodClassRule extends SaropaLintRule {
 
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
-          fieldCount += member.fields.variables.length;
+          // Skip static const/final fields — they are compile-time or
+          // lazy constants, not instance state indicating a god class.
+          final bool isStaticConstant =
+              member.isStatic &&
+              (member.fields.isConst || member.fields.isFinal);
+          if (!isStaticConstant) {
+            fieldCount += member.fields.variables.length;
+          }
         } else if (member is MethodDeclaration) {
           if (!member.isGetter && !member.isSetter) {
             methodCount++;
