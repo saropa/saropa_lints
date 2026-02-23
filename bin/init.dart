@@ -1490,6 +1490,20 @@ Future<void> main(List<String> args) async {
         allRules,
       );
 
+      // Warn if manual edits in tier sections were recovered
+      final tierEdits = _detectManualTierEdits(existingContent, allRules);
+      if (tierEdits.isNotEmpty) {
+        _logTerminal(
+          '${_Colors.yellow}⚠ Recovered ${tierEdits.length} manually '
+          'edited rule(s) from tier sections${_Colors.reset}',
+        );
+        _logTerminal(
+          '${_Colors.dim}  Tip: add overrides to '
+          'analysis_options_custom.yaml RULE OVERRIDES '
+          'section instead${_Colors.reset}',
+        );
+      }
+
       // Merge v4 rules as customizations (v5 customizations take precedence)
       // Only import rules where v4 setting differs from v5 tier default
       if (v4MigratedRules.isNotEmpty) {
@@ -1857,13 +1871,15 @@ final RegExp _userCustomizationsSectionPattern = RegExp(
   multiLine: true,
 );
 
-/// Extract existing user customizations from the USER CUSTOMIZATIONS section.
+/// Extract existing user customizations from the generated YAML.
 ///
-/// Only rules that appear in the explicit USER CUSTOMIZATIONS section are
-/// considered customizations. Rules in tier sections are NOT customizations -
-/// they were set by the tier system and will be recalculated.
+/// Reads from two sources:
+/// 1. The USER CUSTOMIZATIONS section (explicitly marked overrides)
+/// 2. Tier sections where a rule value differs from the section's expected
+///    direction (e.g., `false` in ENABLED → user manually disabled it)
 ///
-/// This prevents tier changes from creating spurious "customizations".
+/// This prevents tier changes from creating spurious "customizations"
+/// while still preserving intentional manual edits.
 ///
 /// Parameters:
 /// - [yamlContent] - The existing YAML file content
@@ -1912,7 +1928,82 @@ Map<String, bool> _extractUserCustomizations(
     customizations[ruleName] = currentEnabled;
   }
 
+  // Detect manual edits in tier sections: the ENABLED section should only
+  // contain true entries and DISABLED should only contain false. Any rule
+  // with the opposite value was manually edited and should be preserved.
+  final manualEdits = _detectManualTierEdits(yamlContent, allRules);
+  for (final entry in manualEdits.entries) {
+    // Existing USER CUSTOMIZATIONS take precedence
+    if (!customizations.containsKey(entry.key)) {
+      customizations[entry.key] = entry.value;
+    }
+  }
+
   return customizations;
+}
+
+/// Detect rules manually edited in ENABLED/DISABLED tier sections.
+///
+/// Init generates `true` in ENABLED sections and `false` in DISABLED
+/// sections. Any opposite value was changed by the user after generation.
+Map<String, bool> _detectManualTierEdits(
+  String yamlContent,
+  Set<String> allRules,
+) {
+  final Map<String, bool> edits = <String, bool>{};
+
+  // ENABLED section: false entries are manual disables
+  _collectOppositeEntries(
+    yamlContent,
+    allRules,
+    sectionHeader: 'ENABLED RULES',
+    expectedValue: true,
+    edits: edits,
+  );
+
+  // DISABLED section: true entries are manual enables
+  _collectOppositeEntries(
+    yamlContent,
+    allRules,
+    sectionHeader: 'DISABLED RULES',
+    expectedValue: false,
+    edits: edits,
+  );
+
+  return edits;
+}
+
+/// Scan a tier section for rules whose value differs from [expectedValue].
+void _collectOppositeEntries(
+  String yamlContent,
+  Set<String> allRules, {
+  required String sectionHeader,
+  required bool expectedValue,
+  required Map<String, bool> edits,
+}) {
+  final headerMatch = RegExp(sectionHeader).firstMatch(yamlContent);
+  if (headerMatch == null) return;
+
+  final afterHeader = yamlContent.substring(headerMatch.end);
+
+  // Section ends at the next major section header
+  final nextSection = RegExp(
+    r'(USER CUSTOMIZATIONS|ENABLED RULES|DISABLED RULES|STYLISTIC RULES)',
+  ).firstMatch(afterHeader);
+
+  final section = nextSection != null
+      ? afterHeader.substring(0, nextSection.start)
+      : afterHeader;
+
+  for (final match in _ruleEntryPattern.allMatches(section)) {
+    final ruleName = match.group(1)!;
+    final value = match.group(2) == 'true';
+
+    if (!allRules.contains(ruleName)) continue;
+    if (value != expectedValue) {
+      edits[ruleName] = value;
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
