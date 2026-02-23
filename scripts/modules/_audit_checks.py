@@ -635,9 +635,12 @@ def print_duplicate_report(duplicates: dict) -> None:
         print_success("No duplicate rules, class names, or aliases found.")
 
 
-def print_owasp_coverage(coverage: OwaspCoverage) -> None:
+def print_owasp_coverage(
+    coverage: OwaspCoverage, *, show_header: bool = True,
+) -> None:
     """Print OWASP coverage statistics."""
-    print_subheader("OWASP Security Coverage")
+    if show_header:
+        print_subheader("OWASP Security Coverage")
     print_stat_bar("Mobile Top 10", coverage.mobile_covered, 10, Color.GREEN)
     print_stat_bar("Web Top 10", coverage.web_covered, 10, Color.CYAN)
     print()
@@ -665,9 +668,12 @@ def print_owasp_coverage(coverage: OwaspCoverage) -> None:
             )
 
 
-def print_tier_stats(stats: TierStats) -> None:
+def print_tier_stats(
+    stats: TierStats, *, show_header: bool = True,
+) -> None:
     """Print tier distribution statistics."""
-    print_subheader("Rules by Tier")
+    if show_header:
+        print_subheader("Rules by Tier")
 
     cumulative = 0
     tier_colors = {
@@ -695,9 +701,12 @@ def print_tier_stats(stats: TierStats) -> None:
     print_stat("Total in tier system", stats.total, Color.CYAN)
 
 
-def print_severity_stats(stats: SeverityStats) -> None:
+def print_severity_stats(
+    stats: SeverityStats, *, show_header: bool = True,
+) -> None:
     """Print severity distribution statistics."""
-    print_subheader("Rules by Severity")
+    if show_header:
+        print_subheader("Rules by Severity")
 
     severity_colors = {
         "critical": Color.RED,
@@ -717,9 +726,12 @@ def print_quality_metrics(
     rules: set[str],
     quick_fixes: int,
     with_corrections: set[str],
+    *,
+    show_header: bool = True,
 ) -> None:
     """Print code quality metrics."""
-    print_subheader("Quality Metrics")
+    if show_header:
+        print_subheader("Quality Metrics")
 
     total_rules = len(rules)
     fix_pct = (quick_fixes / total_rules * 100) if total_rules > 0 else 0
@@ -754,13 +766,18 @@ def print_quality_metrics(
     print_stat("Avg lines per rule", f"{avg_lines:.0f}", Color.DIM)
 
 
-def print_file_health(file_stats: list[FileStats]) -> None:
+def print_file_health(
+    file_stats: list[FileStats], *, show_headers: bool = True,
+) -> None:
     """Print file health analysis in two sections."""
     if not file_stats:
         return
 
     # Section 1: File sizes
-    print_subheader("File Sizes")
+    if show_headers:
+        print_subheader("File Sizes")
+    else:
+        print()
     sorted_by_rules = sorted(
         file_stats, key=lambda s: s.rules, reverse=True
     )
@@ -780,7 +797,10 @@ def print_file_health(file_stats: list[FileStats]) -> None:
         )
 
     # Section 2: Quick fix coverage
-    print_subheader("Quick Fix Coverage")
+    if show_headers:
+        print_subheader("Quick Fix Coverage")
+    else:
+        print()
     low_fix = sorted(
         [s for s in file_stats if s.rules >= 5 and s.fix_coverage < 10],
         key=lambda s: (s.fix_coverage, -s.rules),

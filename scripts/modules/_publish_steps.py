@@ -60,14 +60,7 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
       - ROADMAP sync
       - Quality metrics
     """
-    from scripts.modules._tier_integrity import (
-        check_tier_integrity,
-        print_tier_integrity_report,
-    )
     from scripts.modules._audit import run_full_audit
-
-    rules_dir = project_dir / "lib" / "src" / "rules"
-    tiers_path = project_dir / "lib" / "src" / "tiers.dart"
 
     # --- AUTO-FIX: Doc comment issues (before blocking checks) ---
     pubdev_issues = check_pubdev_lint_issues(project_dir)
@@ -94,55 +87,43 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
     else:
         print_success("No pub.dev doc issues found")
 
-    # --- BLOCKING: Tier integrity ---
-    tier_result = check_tier_integrity(rules_dir, tiers_path)
-    print_tier_integrity_report(tier_result)
-
-    if not tier_result.passed:
-        print_error(
-            f"Tier integrity FAILED with {tier_result.issues_count} issue(s)."
-        )
-        print_error("Fix tier assignments in lib/src/tiers.dart.")
-        return False
-
-    # --- BLOCKING + INFORMATIONAL: Full audit ---
-    audit_result = run_full_audit(
-        project_dir=project_dir,
-        skip_dx=False,
-        compact=True,
-    )
-
-    if audit_result.has_blocking_issues:
-        issues: list[str] = []
-        if (
-            audit_result.duplicate_report.get("class_names")
-            or audit_result.duplicate_report.get("rule_names")
-            or audit_result.duplicate_report.get("aliases")
-        ):
-            issues.append("duplicate rules")
-        if audit_result.rules_missing_prefix:
-            issues.append(
-                f"{len(audit_result.rules_missing_prefix)} rule(s) "
-                f"missing [rule_name] prefix"
-            )
-        print_error(
-            f"Blocking audit issues: {'; '.join(issues)}."
-        )
-        return False
-
-    # --- BLOCKING: US English spelling check ---
+    # --- US English spelling check (run before audit to feed into checks) ---
     from scripts.modules._us_spelling import (
         print_spelling_report,
         scan_directory,
     )
 
     spelling_hits = scan_directory(project_dir)
+    spelling_check: list[tuple[str, str, list[str]]] = []
     if spelling_hits:
-        print_spelling_report(
-            spelling_hits, project_dir, show_header=False,
-        )
+        spelling_check.append((
+            "fail",
+            f"{len(spelling_hits)} British English spelling(s) found",
+            [f"{h.file}:{h.line_number} — {h.uk_word} → {h.us_word}"
+             for h in spelling_hits[:10]],
+        ))
+    else:
+        spelling_check.append((
+            "pass", "No British English spellings found", [],
+        ))
+
+    # --- Full audit (includes tier integrity + quality checks) ---
+    audit_result = run_full_audit(
+        project_dir=project_dir,
+        skip_dx=False,
+        compact=True,
+        extra_checks=spelling_check,
+    )
+
+    # --- Blocking issues gate ---
+    if audit_result.has_blocking_issues or spelling_hits:
+        if audit_result.has_blocking_issues:
+            print_error("Blocking audit issues found.")
+        if spelling_hits:
+            print_spelling_report(
+                spelling_hits, project_dir, show_header=False,
+            )
         return False
-    print_success("No British English spellings found")
 
     print()
     print_success("All pre-publish audit checks passed.")
