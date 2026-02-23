@@ -73,6 +73,51 @@ void testGroupPattern() {
   });
 }
 
+/// Sequential for loops - should NOT trigger (non-overlapping scopes)
+void sequentialForLoops() {
+  const silentH = <String>['hour', 'honest'];
+  for (final ex in silentH) {
+    print(ex); // OK: scope A
+  }
+
+  const youSound = <String>['uni', 'use'];
+  for (final ex in youSound) {
+    print(ex); // OK: scope B — `ex` from scope A is gone
+  }
+}
+
+/// Sequential C-style for loops - should NOT trigger
+void sequentialCStyleLoops() {
+  for (int i = 0; i < 5; i++) {
+    print(i); // OK: scope A
+  }
+  for (int i = 10; i < 15; i++) {
+    print(i); // OK: scope B — `i` from scope A is gone
+  }
+}
+
+/// Nested loop shadowing - SHOULD trigger
+void nestedLoopShadowing() {
+  for (final x in [1, 2]) {
+    // expect_lint: avoid_variable_shadowing
+    for (final x in [3, 4]) {
+      print(x); // Shadows outer loop `x`
+    }
+  }
+}
+
+/// If/else sibling blocks - should NOT trigger
+void ifElseSiblingBlocks() {
+  final bool condition = true;
+  if (condition) {
+    final name = 'a';
+    print(name); // OK: scope A
+  } else {
+    final name = 'b';
+    print(name); // OK: scope B — sibling, not nested
+  }
+}
+
 /// Mixed case - outer variable with sibling closures
 void mixedCaseExample() {
   final outerValue = 'outer';
