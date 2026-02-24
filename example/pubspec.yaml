@@ -9,6 +9,5 @@ dependencies:
   crypto: ^3.0.0
 
 dev_dependencies:
-  custom_lint: ^0.8.0
   saropa_lints:
     path: ../

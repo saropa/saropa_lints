@@ -47,7 +47,7 @@ dart pub get
 dart test
 
 # Run the linter on itself
-dart run custom_lint
+dart analyze
 ```
 
 ## Configuration Reference
@@ -357,7 +357,7 @@ Run the fixture tests:
 ```bash
 cd example
 dart pub get
-dart run custom_lint
+dart analyze
 ```
 
 The `expect_lint` comments assert that a lint fires on the next line. If the lint doesn't fire, the test fails. If a lint fires without an `expect_lint` comment, that also fails.
@@ -412,7 +412,7 @@ Before submitting a PR with new or modified lint rules, review **only the files 
 - [ ] **Test fixtures added** — Created test fixtures in `example/lib/<category>/`
 - [ ] **BAD cases marked** — All expected violations have `// expect_lint: rule_name` comments
 - [ ] **GOOD cases included** — Include passing cases without expect_lint to verify no false positives
-- [ ] **Tests pass** — Run `cd example && dart run custom_lint` to verify
+- [ ] **Tests pass** — Run `cd example && dart analyze` to verify
 
 ### Project Updates
 
@@ -426,7 +426,7 @@ Before submitting a PR with new or modified lint rules, review **only the files 
 ```bash
 # Run these before submitting:
 dart analyze                           # Check for analyzer issues
-cd example && dart run custom_lint     # Verify test fixtures
+cd example && dart analyze             # Verify test fixtures
 dart test                              # Run unit tests
 ```
 
@@ -682,16 +682,13 @@ Open an issue or discussion. We're happy to help!
 
 Start small: pick a rule from the roadmap, add test fixtures, or improve documentation. Every contribution matters.
 
-**Keywords:** open source contribution, Flutter open source, Dart package development, custom_lint rules, AST visitor patterns, lint rule implementation, code review, pull request workflow, test fixtures, Dart analyzer plugins
+**Keywords:** open source contribution, Flutter open source, Dart package development, analyzer plugin rules, AST visitor patterns, lint rule implementation, code review, pull request workflow, test fixtures, Dart analyzer plugins
 
 **Hashtags:** #OpenSource #Flutter #Dart #Contributing #FlutterDev #DartLang #GitHub #CodeReview #Community #DevCommunity
 
 ---
 
 ## Sources
-
-- **custom_lint_builder** — API for building lint rules
-  https://pub.dev/packages/custom_lint_builder
 
 - **Dart Analyzer** — AST visitor patterns and node types
   https://pub.dev/documentation/analyzer/latest/

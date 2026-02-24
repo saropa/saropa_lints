@@ -138,7 +138,7 @@ async function runLints() {
         const tasks = await vscode.tasks.fetchTasks();
         const lintTask = tasks.find(t =>
             t.name === 'Run Saropa Lints' ||
-            t.name === 'custom_lint'
+            t.name === 'dart analyze'
         );
 
         if (lintTask) {
@@ -150,8 +150,8 @@ async function runLints() {
                 workspaceFolders[0],
                 'Run Saropa Lints',
                 'saropa',
-                new vscode.ShellExecution('dart run custom_lint'),
-                '$custom_lint'
+                new vscode.ShellExecution('dart analyze'),
+                '$dart-analyze'
             );
             task.presentationOptions = {
                 reveal: vscode.TaskRevealKind.Always,

@@ -2,8 +2,11 @@
 ///
 /// Parses baseline configuration from `analysis_options.yaml`:
 /// ```yaml
-/// custom_lint:
+/// plugins:
 ///   saropa_lints:
+///     diagnostics:
+///       # ... rule overrides ...
+///
 ///     baseline:
 ///       file: "saropa_baseline.json"
 ///       date: "2025-01-15"

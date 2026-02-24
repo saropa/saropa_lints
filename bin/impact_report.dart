@@ -1,14 +1,14 @@
 #!/usr/bin/env dart
 // ignore_for_file: avoid_print
 
-// CLI tool to run custom_lint and display impact summary.
+// CLI tool to run dart analyze and display impact summary.
 //
 // Usage:
 //   dart run saropa_lints:impact_report [path]
 //   dart run saropa_lints:impact_report --help
 //
 // This tool:
-// 1. Runs `dart run custom_lint` on your project
+// 1. Runs `dart analyze` on your project
 // 2. Parses the output to extract violations
 // 3. Displays a summary grouped by impact level
 // 4. Shows critical issues first
@@ -30,10 +30,10 @@ Future<void> main(List<String> args) async {
   print('Running lint analysis...');
   print('');
 
-  // Run custom_lint
+  // Run dart analyze
   final result = await Process.run(
     'dart',
-    ['run', 'custom_lint'],
+    ['analyze'],
     workingDirectory: path,
     runInShell: true,
   );
@@ -42,7 +42,7 @@ Future<void> main(List<String> args) async {
   final stderr = result.stderr.toString();
 
   if (stderr.isNotEmpty && !stderr.contains('Analyzing')) {
-    print('Error running custom_lint:');
+    print('Error running dart analyze:');
     print(stderr);
     exit(1);
   }
@@ -151,7 +151,7 @@ void _printUsage() {
   print('');
   print('Usage: dart run saropa_lints:impact_report [path]');
   print('');
-  print('Runs custom_lint and displays results grouped by impact level.');
+  print('Runs dart analyze and displays results grouped by impact level.');
   print('Critical issues are shown first, followed by high, medium, and low.');
   print('');
   print('Options:');
