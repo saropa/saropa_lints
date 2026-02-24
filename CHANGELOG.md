@@ -14,10 +14,26 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ## [Unreleased]
 
 ### Fixed
+- `prefer_list_first`: suppress false positives when the same collection is accessed with sibling indices (`list[0]` alongside `list[1]`), on assignment targets (`list[0] = value`), on String subscripts (`string[0]`), and on Map access (`map[0]`)
+- `prefer_list_last`: same false positive suppression — assignment targets, String/Map types, and sibling index accesses
+- `prefer_catch_over_on`: reversed rule logic — now only flags `on Object catch` and `on dynamic catch` (redundant, equivalent to bare `catch`), no longer flags specific `on` clauses like `on FormatException catch` which are intentional type filtering. Added quick fix to remove the redundant `on Object` clause.
 - `avoid_dynamic_type`: exempt `dynamic` in type arguments (`List<dynamic>`, `Map<dynamic, dynamic>`), closure/lambda parameters, and for-in loop variables — eliminates false positives in JSON utility code
 - `avoid_ignoring_return_values`: add `update`, `putIfAbsent`, `updateAll`, `addEntries` to safe-to-ignore list — these Map mutation methods are called for their side effect, not their return value
 - `avoid_medium_length_files` (and all 8 file length rules): count only code lines, excluding comments and blank lines — well-documented files are no longer penalised for thorough dartdoc
 - `prefer_no_commented_out_code`: tighten keyword and type-name patterns, add prose guard with strong-code-indicator bypass — fixes false positives on section headers (`// Iterable extensions`), inline prose (`// this is non-null`), and comments containing type names in natural language
+
+### Removed
+- `avoid_ignore_trailing_comment` rule, `MoveTrailingCommentFix` quick fix, and `trailingCommentOnIgnore` regex — the native Dart analyzer handles ignore directive trailing comments correctly, making this rule produce false positives
+- Trailing-comment fixer functions from `bin/init.dart` (`_fixTrailingIgnoreComments`, `_splitIgnoreParts`, etc.) — existed only to support the removed rule
+- `scripts/run_custom_lint_all.py` — obsolete v4 script
+- `example/custom_lint.yaml` — v4 configuration artifact
+
+### Changed
+- All CLI tools (`bin/baseline.dart`, `bin/impact_report.dart`) now use `dart analyze` instead of `dart run custom_lint`
+- YAML config examples updated from v4 `custom_lint:` format to v5 native `plugins: saropa_lints:` format across lib/, docs, and scripts
+- Tier parser in `_analyze_pubspec.py` updated to read v5 `plugins.saropa_lints.diagnostics` structure
+- Removed `_offer_custom_lint()` from publish script (no longer applicable)
+- VSCode extension updated to run `dart analyze` instead of `dart run custom_lint`
 
 ---
 ## [5.0.1]
