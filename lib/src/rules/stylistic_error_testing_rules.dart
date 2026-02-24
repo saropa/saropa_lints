@@ -53,6 +53,12 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => "throw Exception('bad input');";
+
+  @override
+  String get exampleGood => "throw FormatException('bad input');";
+
   static const LintCode _code = LintCode(
     'prefer_specific_exceptions',
     '[prefer_specific_exceptions] A generic Exception is thrown instead of a domain-specific type. Generic exceptions prevent callers from catching specific failures and limit targeted error recovery; define and throw a custom exception class. {v2}',
@@ -111,6 +117,12 @@ class PreferGenericExceptionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => "throw UserNotFoundException('not found');";
+
+  @override
+  String get exampleGood => "throw Exception('User not found');";
 
   /// Alias: prefer_generic_exception_type
   static const LintCode _code = LintCode(
@@ -329,6 +341,12 @@ class PreferOnOverCatchRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'try { } catch (e) { }';
+
+  @override
+  String get exampleGood => 'try { } on FormatException catch (e) { }';
+
   static const LintCode _code = LintCode(
     'prefer_on_over_catch',
     '[prefer_on_over_catch] A bare "catch" clause catches all exception types indiscriminately, which can mask unexpected errors and hinder targeted recovery. Use "on ExceptionType" to restrict handling to known failures. {v1}',
@@ -398,6 +416,12 @@ class PreferCatchOverOnRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'try { } on Object catch (e) { }';
+
+  @override
+  String get exampleGood => 'try { } catch (e) { }';
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -529,6 +553,13 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => "test('login', () { setup(); act(); verify(); });";
+
+  @override
+  String get exampleGood =>
+      "test('login', () { // Arrange ... // Act ... // Assert ... });";
+
   static const LintCode _code = LintCode(
     'prefer_given_when_then_comments',
     '[prefer_given_when_then_comments] Test body has three or more statements but lacks structural comments. Without Arrange/Act/Assert or Given/When/Then markers, readers must infer the setup, action, and verification phases. Add phase comments for clarity. {v1}',
@@ -621,6 +652,12 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => '// Arrange ... // Act ... // Assert ...';
+
+  @override
+  String get exampleGood => 'Clear variable names and focused assertions';
 
   static const LintCode _code = LintCode(
     'prefer_self_documenting_tests',
@@ -782,6 +819,12 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
+  @override
+  String get exampleBad => 'test(() { expect(a, 1); expect(b, 2); });';
+
+  @override
+  String get exampleGood => 'test(() { expect(a, 1); }); // one per test';
+
   static const LintCode _code = LintCode(
     'prefer_single_expectation_per_test',
     '[prefer_single_expectation_per_test] Test contains multiple logical assertions that verify unrelated behaviors. This is an opinionated rule - not included in any tier by default. {v4}',
@@ -884,6 +927,12 @@ class PreferGroupedExpectationsRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
+  @override
+  String get exampleBad => 'test(() { expect(a, 1); }); // split per assert';
+
+  @override
+  String get exampleGood => 'test(() { expect(a, 1); expect(b, 2); });';
+
   static const LintCode _code = LintCode(
     'prefer_grouped_expectations',
     '[prefer_grouped_expectations] Isolating every assertion into its own test duplicates setup logic and inflates the test suite. Group related assertions to reduce boilerplate. {v1}',
@@ -975,6 +1024,12 @@ class PreferTestNameShouldWhenRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => "test('login works')";
+
+  @override
+  String get exampleGood => "test('should succeed when credentials valid')";
+
   static const LintCode _code = LintCode(
     'prefer_test_name_should_when',
     '[prefer_test_name_should_when] Test name does not follow the "should X when Y" pattern, making it harder to understand the expected behavior and triggering condition at a glance. Restructure as "should [behavior] when [condition]". {v2}',
@@ -1043,6 +1098,12 @@ class PreferTestNameDescriptiveRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => "test('should return null when input is empty')";
+
+  @override
+  String get exampleGood => "test('returns null for empty input')";
 
   static const LintCode _code = LintCode(
     'prefer_test_name_descriptive',

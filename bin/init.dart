@@ -109,6 +109,7 @@ String? _getSaropaLintsRootUri() {
 
     return match?.group(1);
   } catch (_) {}
+
   return null;
 }
 
@@ -120,6 +121,7 @@ String? _rootUriToPath(String rootUri) {
     final dartToolDir = Directory('.dart_tool').absolute.path;
     return Directory('$dartToolDir/$rootUri').absolute.path;
   }
+
   return null;
 }
 
@@ -226,6 +228,7 @@ String _getPackageVersion() {
     ).firstMatch(content);
     return match?.group(1)?.trim() ?? 'unknown';
   } catch (_) {}
+
   return 'unknown';
 }
 
@@ -239,6 +242,7 @@ String _getPackageSource() {
   } else if (rootUri.contains('.pub-cache')) {
     return 'pub.dev';
   }
+
   return rootUri;
 }
 
@@ -365,6 +369,7 @@ Future<String?> _findNewestPluginReport(
     }
     await Future<void>.delayed(const Duration(milliseconds: 200));
   }
+
   return null;
 }
 
@@ -875,6 +880,7 @@ Map<String, _RuleMetadata> _getRuleMetadata() {
       );
     }
   }
+
   return _ruleMetadataCache!;
 }
 
@@ -916,6 +922,7 @@ String _stripRulePrefix(String msg) {
   if (prefixMatch != null) {
     return msg.substring(prefixMatch.end);
   }
+
   return msg;
 }
 
@@ -994,8 +1001,12 @@ const Map<String, String> tierDescriptions = <String, String>{
 
 /// Stylistic rule categories, mirroring the organization in tiers.dart.
 /// Used to generate the STYLISTIC RULES section in analysis_options_custom.yaml.
+///
+/// Categories containing "(conflicting - choose one)" in their name use a
+/// pick-one UI in the walkthrough; all others are reviewed rule-by-rule.
 const Map<String, List<String>> _stylisticRuleCategories =
     <String, List<String>>{
+      // ── Non-conflicting categories ──────────────────────────────────────
       'Debug/Test utility': <String>['prefer_fail_test_case'],
       'Ordering & Sorting': <String>[
         'prefer_member_ordering',
@@ -1029,10 +1040,8 @@ const Map<String, List<String>> _stylisticRuleCategories =
         'prefer_bloc_state_suffix',
         'prefer_use_prefix',
       ],
-      'Error handling style': <String>['prefer_catch_over_on'],
       'Code style preferences': <String>[
         'prefer_no_continue_statement',
-        'prefer_single_exit_point',
         'prefer_wildcard_for_unused_param',
         'prefer_rethrow_over_throw_e',
         'prefer_list_first',
@@ -1071,13 +1080,10 @@ const Map<String, List<String>> _stylisticRuleCategories =
         'prefer_explicit_this',
       ],
       'Formatting': <String>[
-        'prefer_trailing_comma_always',
         'prefer_blank_line_before_case',
         'prefer_blank_line_before_constructor',
         'prefer_blank_line_before_method',
-        'prefer_blank_line_before_return',
         'prefer_trailing_comma',
-        'unnecessary_trailing_comma',
         'double_literal_format',
         'format_comment_style',
       ],
@@ -1090,10 +1096,24 @@ const Map<String, List<String>> _stylisticRuleCategories =
         'prefer_no_commented_out_code',
       ],
       'Testing style': <String>['prefer_expect_over_assert_in_tests'],
+
+      // ── Conflicting categories (pick one) ───────────────────────────────
+
+      // Type & variable style
       'Type argument style (conflicting - choose one)': <String>[
         'prefer_inferred_type_arguments',
         'prefer_explicit_type_arguments',
       ],
+      'Variable type style (conflicting - choose one)': <String>[
+        'prefer_type_over_var',
+        'prefer_var_over_explicit_type',
+      ],
+      'Dynamic vs Object (conflicting - choose one)': <String>[
+        'prefer_dynamic_over_object',
+        'prefer_object_over_dynamic',
+      ],
+
+      // Imports & strings
       'Import style (conflicting - choose one)': <String>[
         'prefer_absolute_imports',
         'prefer_flat_imports',
@@ -1110,100 +1130,165 @@ const Map<String, List<String>> _stylisticRuleCategories =
         'prefer_doc_straight_apostrophe',
         'prefer_straight_apostrophe',
       ],
+      'String building (conflicting - choose one)': <String>[
+        'prefer_interpolation_over_concatenation',
+        'prefer_concatenation_over_interpolation',
+      ],
+
+      // Control flow & error handling
+      'Exit strategy (conflicting - choose one)': <String>[
+        'prefer_early_return',
+        'prefer_single_exit_point',
+      ],
+      'Boolean comparison (conflicting - choose one)': <String>[
+        'prefer_implicit_boolean_comparison',
+        'prefer_explicit_boolean_comparison',
+      ],
+      'Error handling (conflicting - choose one)': <String>[
+        'prefer_catch_over_on',
+        'prefer_on_over_catch',
+      ],
+      'Exception specificity (conflicting - choose one)': <String>[
+        'prefer_specific_exceptions',
+        'prefer_generic_exception',
+      ],
+
+      // Async & chaining
+      'Async style (conflicting - choose one)': <String>[
+        'prefer_await_over_then',
+        'prefer_then_over_await',
+      ],
+      'Method chaining (conflicting - choose one)': <String>[
+        'prefer_cascade_over_chained',
+        'prefer_chained_over_cascade',
+      ],
+
+      // Collections & null handling
+      'Spread vs addAll (conflicting - choose one)': <String>[
+        'prefer_spread_over_addall',
+        'prefer_addall_over_spread',
+      ],
+      'Collection conditionals (conflicting - choose one)': <String>[
+        'prefer_collection_if_over_ternary',
+        'prefer_ternary_over_collection_if',
+      ],
+      'Null ternary (conflicting - choose one)': <String>[
+        'prefer_if_null_over_ternary',
+        'prefer_ternary_over_if_null',
+      ],
+      'Null assignment (conflicting - choose one)': <String>[
+        'prefer_null_aware_assignment',
+        'prefer_explicit_null_assignment',
+      ],
+      'Nullable vs late (conflicting - choose one)': <String>[
+        'prefer_nullable_over_late',
+        'prefer_late_over_nullable',
+      ],
+
+      // Ordering & naming
       'Member ordering (conflicting - choose one)': <String>[
         'prefer_static_members_first',
         'prefer_instance_members_first',
         'prefer_public_members_first',
         'prefer_private_members_first',
       ],
-      'Opinionated prefer_* rules': <String>[
-        'prefer_addall_over_spread',
-        'prefer_await_over_then',
+      'Field/method order (conflicting - choose one)': <String>[
+        'prefer_fields_before_methods',
+        'prefer_methods_before_fields',
+      ],
+      'Constant case (conflicting - choose one)': <String>[
+        'prefer_lower_camel_case_constants',
+        'prefer_screaming_case_constants',
+      ],
+
+      // Formatting & spacing
+      'Trailing comma (conflicting - choose one)': <String>[
+        'prefer_trailing_comma_always',
+        'unnecessary_trailing_comma',
+      ],
+      'Blank line before return (conflicting - choose one)': <String>[
+        'prefer_blank_line_before_return',
+        'prefer_no_blank_line_before_return',
+      ],
+      'Declaration spacing (conflicting - choose one)': <String>[
         'prefer_blank_line_after_declarations',
+        'prefer_compact_declarations',
+      ],
+      'Member spacing (conflicting - choose one)': <String>[
         'prefer_blank_lines_between_members',
-        'prefer_cascade_over_chained',
-        'prefer_chained_over_cascade',
+        'prefer_compact_class_members',
+      ],
+
+      // Widget conflicts
+      'Container vs SizedBox (conflicting - choose one)': <String>[
+        'prefer_sizedbox_over_container',
+        'prefer_container_over_sizedbox',
+      ],
+      'Expanded vs Flexible (conflicting - choose one)': <String>[
+        'prefer_expanded_over_flexible',
+        'prefer_flexible_over_expanded',
+      ],
+      'EdgeInsets style (conflicting - choose one)': <String>[
+        'prefer_edgeinsets_symmetric',
+        'prefer_edgeinsets_only',
+      ],
+      'RichText widget (conflicting - choose one)': <String>[
+        'prefer_text_rich_over_richtext',
+        'prefer_richtext_over_text_rich',
+      ],
+      'Theme colors (conflicting - choose one)': <String>[
+        'prefer_material_theme_colors',
+        'prefer_explicit_colors',
+      ],
+
+      // Testing conflicts
+      'Test naming (conflicting - choose one)': <String>[
+        'prefer_test_name_should_when',
+        'prefer_test_name_descriptive',
+      ],
+      'Test comments (conflicting - choose one)': <String>[
+        'prefer_given_when_then_comments',
+        'prefer_self_documenting_tests',
+      ],
+      'Test expectations (conflicting - choose one)': <String>[
+        'prefer_single_expectation_per_test',
+        'prefer_grouped_expectations',
+      ],
+
+      // ── Remaining opinionated rules (no conflicts) ─────────────────────
+      'Opinionated rules': <String>[
         'prefer_clip_r_superellipse',
         'prefer_clip_r_superellipse_clipper',
-        'prefer_collection_if_over_ternary',
-        'prefer_compact_class_members',
-        'prefer_compact_declarations',
-        'prefer_concatenation_over_interpolation',
         'prefer_concise_variable_names',
         'prefer_constructor_assertion',
         'prefer_constructor_body_assignment',
-        'prefer_container_over_sizedbox',
         'prefer_curly_apostrophe',
         'prefer_default_enum_case',
         'prefer_descriptive_bool_names_strict',
         'prefer_descriptive_variable_names',
         'prefer_dot_shorthand',
-        'prefer_dynamic_over_object',
-        'prefer_edgeinsets_only',
-        'prefer_edgeinsets_symmetric',
         'prefer_exhaustive_enums',
-        'prefer_expanded_over_flexible',
-        'prefer_explicit_boolean_comparison',
-        'prefer_explicit_colors',
-        'prefer_explicit_null_assignment',
         'prefer_explicit_types',
         'prefer_factory_for_validation',
         'prefer_fake_over_mock',
-        'prefer_fields_before_methods',
-        'prefer_flexible_over_expanded',
         'prefer_future_void_function_over_async_callback',
-        'prefer_generic_exception',
-        'prefer_given_when_then_comments',
         'prefer_grouped_by_purpose',
-        'prefer_grouped_expectations',
         'prefer_guard_clauses',
-        'prefer_if_null_over_ternary',
-        'prefer_implicit_boolean_comparison',
         'prefer_initializing_formals',
-        'prefer_interpolation_over_concatenation',
         'prefer_keys_with_lookup',
-        'prefer_late_over_nullable',
-        'prefer_lower_camel_case_constants',
         'prefer_map_entries_iteration',
-        'prefer_material_theme_colors',
-        'prefer_methods_before_fields',
-        'prefer_no_blank_line_before_return',
+        'prefer_mutable_collections',
         'prefer_no_blank_line_inside_blocks',
-        'prefer_null_aware_assignment',
-        'prefer_nullable_over_late',
-        'prefer_object_over_dynamic',
-        'prefer_on_over_catch',
         'prefer_positive_conditions',
         'prefer_positive_conditions_first',
+        'prefer_record_over_equatable',
         'prefer_required_before_optional',
-        'prefer_richtext_over_text_rich',
-        'prefer_screaming_case_constants',
-        'prefer_self_documenting_tests',
         'prefer_single_blank_line_max',
-        'prefer_single_expectation_per_test',
-        'prefer_sizedbox_over_container',
-        'prefer_specific_exceptions',
-        'prefer_spread_over_addall',
         'prefer_super_parameters',
         'prefer_switch_statement',
         'prefer_sync_over_async_where_possible',
-        'prefer_ternary_over_collection_if',
-        'prefer_ternary_over_if_null',
         'prefer_test_data_builder',
-        'prefer_test_name_descriptive',
-        'prefer_test_name_should_when',
-        'prefer_text_rich_over_richtext',
-        'prefer_then_over_await',
         'prefer_wheretype_over_where_is',
-      ],
-      'Variable type style (conflicting - choose one)': <String>[
-        'prefer_type_over_var',
-        'prefer_var_over_explicit_type',
-      ],
-      'Control flow & collection style': <String>[
-        'prefer_early_return',
-        'prefer_mutable_collections',
-        'prefer_record_over_equatable',
       ],
     };
 
@@ -1255,12 +1340,15 @@ RuleTier _getTierFromSets(String ruleName) {
   if (tiers.comprehensiveOnlyRules.contains(ruleName)) {
     return RuleTier.comprehensive;
   }
+
   if (tiers.professionalOnlyRules.contains(ruleName)) {
     return RuleTier.professional;
   }
+
   if (tiers.recommendedOnlyRules.contains(ruleName)) {
     return RuleTier.recommended;
   }
+
   return RuleTier.professional;
 }
 
@@ -1319,6 +1407,7 @@ Future<void> main(List<String> args) async {
     exitCode = 1;
     return;
   }
+
   if (tier == null) {
     // No tier specified — prompt interactively or fall back to default
     tier = _promptForTier();
@@ -2388,6 +2477,7 @@ output: both
         settingBlock +
         content.substring(insertPos);
   }
+
   return settingBlock + content;
 }
 
@@ -2796,6 +2886,7 @@ void _logRemovedStylisticRules(String content) {
       _logTerminal('${_Colors.dim}  - $rule${_Colors.reset}');
     }
   }
+
   if (disabledRemoved.isNotEmpty) {
     _logTerminal(
       '${_Colors.dim}  Cleaned up ${disabledRemoved.length} obsolete '
@@ -2892,6 +2983,7 @@ int _findStylisticSectionEnd(String content, int sectionStart) {
   if (nextDivider != null) {
     return searchFrom + nextDivider.start + 1; // +1 for the leading \n
   }
+
   return content.length;
 }
 
@@ -3524,6 +3616,7 @@ CliArgs _parseArguments(List<String> args) {
   if (outputIndex == -1) {
     outputIndex = args.indexOf('-o');
   }
+
   if (outputIndex != -1) {
     if (outputIndex + 1 < args.length &&
         !args[outputIndex + 1].startsWith('-')) {
@@ -3541,6 +3634,7 @@ CliArgs _parseArguments(List<String> args) {
   if (tierIndex == -1) {
     tierIndex = args.indexOf('-t');
   }
+
   if (tierIndex != -1) {
     if (tierIndex + 1 < args.length && !args[tierIndex + 1].startsWith('-')) {
       requestedTier = args[tierIndex + 1];
@@ -3875,7 +3969,8 @@ class _CategoryResult {
   final int disabled;
   final int skipped;
 
-  /// Rule name to enabled/disabled decision (skipped rules omitted).
+  /// Rule name to enabled/disabled decision.
+  /// Skipped rules are included with their current value preserved.
   final Map<String, bool> decisions;
 }
 
@@ -3927,17 +4022,17 @@ _CategoryResult? _walkthroughCategory({
     _logTerminal('');
 
     if (meta != null) {
-      // Show code examples if available
-      if (meta.exampleBad != null) {
-        _logTerminal(
-          '  ${_Colors.red}BAD:${_Colors.reset}  '
-          '${meta.exampleBad}',
-        );
-      }
+      // Show code examples if available (GOOD first for readability)
       if (meta.exampleGood != null) {
         _logTerminal(
           '  ${_Colors.green}GOOD:${_Colors.reset} '
           '${meta.exampleGood}',
+        );
+      }
+      if (meta.exampleBad != null) {
+        _logTerminal(
+          '  ${_Colors.red}BAD:${_Colors.reset}  '
+          '${meta.exampleBad}',
         );
       }
       if (meta.exampleBad != null || meta.exampleGood != null) {
@@ -3958,7 +4053,8 @@ _CategoryResult? _walkthroughCategory({
     final after = rules.length - i - 1;
     final aLabel = after > 0 ? '[a] enable this + $after more  ' : '';
     stdout.write(
-      '  ${_Colors.cyan}[y] enable  [n] disable  [s] skip  '
+      '  ${_Colors.cyan}[y] enable  [n] disable  '
+      '[s] skip (keeps current)  '
       '$aLabel'
       '[q] quit: ${_Colors.reset}',
     );
@@ -3980,6 +4076,8 @@ _CategoryResult? _walkthroughCategory({
       case 's':
       case 'skip':
       case '':
+        // Mark as reviewed with current value so it won't be re-prompted
+        decisions[rule] = existingValues[rule] ?? false;
         skipped++;
       case 'a':
       case 'all':
@@ -3994,6 +4092,8 @@ _CategoryResult? _walkthroughCategory({
           '  ${_Colors.yellow}Unknown "$input", '
           'skipping${_Colors.reset}',
         );
+        // Mark as reviewed with current value so it won't be re-prompted
+        decisions[rule] = existingValues[rule] ?? false;
         skipped++;
     }
   }
@@ -4048,7 +4148,7 @@ _CategoryResult? _walkthroughConflicting({
   // Prompt
   final nums = List.generate(rules.length, (i) => '${i + 1}').join('/');
   stdout.write(
-    '  ${_Colors.cyan}Choose [$nums] or [s] skip  '
+    '  ${_Colors.cyan}Choose [$nums] or [s] skip (keeps current)  '
     '[q] quit: ${_Colors.reset}',
   );
 
@@ -4065,6 +4165,10 @@ _CategoryResult? _walkthroughConflicting({
   int skipped = 0;
 
   if (input == 's' || input == 'skip' || input.isEmpty) {
+    // Mark all rules in group as reviewed with current values
+    for (final rule in rules) {
+      decisions[rule] = existingValues[rule] ?? false;
+    }
     skipped += rules.length;
   } else {
     final choice = int.tryParse(input);
@@ -4084,6 +4188,10 @@ _CategoryResult? _walkthroughConflicting({
         '  ${_Colors.yellow}Unknown "$input", '
         'skipping${_Colors.reset}',
       );
+      // Mark all rules in group as reviewed with current values
+      for (final rule in rules) {
+        decisions[rule] = existingValues[rule] ?? false;
+      }
       skipped += rules.length;
     }
   }
