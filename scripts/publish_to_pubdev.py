@@ -197,8 +197,6 @@ from scripts.modules._rule_metrics import (
     count_rules,
     display_roadmap_summary,
     display_test_coverage,
-    display_todo_audit,
-    display_unit_test_coverage,
     sync_readme_badges,
 )
 from scripts.modules._timing import StepTimer
@@ -399,9 +397,9 @@ def main() -> int:
 
     display_changelog(project_dir)
     display_test_coverage(project_dir)
-    display_unit_test_coverage(project_dir)
-    display_todo_audit(project_dir)
-    display_roadmap_summary(project_dir, bugs_dir=bugs_dir)
+    todo_log = display_roadmap_summary(project_dir, bugs_dir=bugs_dir)
+    if todo_log:
+        print_info(f"TODO log: {todo_log.relative_to(project_dir)}")
 
     # --- Timed workflow ---
     audit_only = "--audit-only" in sys.argv
@@ -416,7 +414,7 @@ def main() -> int:
         # --- Step 1: Pre-publish audits (unless --skip-audit) ---
         if not skip_audit:  # Normal path: run full audit
             with timer.step("Pre-publish audit"):
-                print_header("STEP 1: PRE-PUBLISH AUDIT")
+                print_header("STEP 1: AUDIT")
                 if not run_pre_publish_audits(project_dir):  # Blocking issue
                     exit_with_error(
                         "Pre-publish audit failed. "
