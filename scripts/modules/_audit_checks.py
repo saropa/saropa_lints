@@ -266,7 +266,7 @@ def get_file_stats(rules_dir: Path) -> list[FileStats]:
     name_pattern = re.compile(
         r"LintCode\(\s*(?:name:\s*)?'([a-z0-9_]+)',"
     )
-    fix_pattern = re.compile(r"class \w+ extends DartFix")
+    fix_pattern = re.compile(r"get fixGenerators => \[")
     stats: list[FileStats] = []
 
     for dart_file in sorted(rules_dir.glob("**/*.dart")):
@@ -320,7 +320,7 @@ def get_implemented_rules(
     alias_pattern = re.compile(
         r"^///\s*Alias:\s*([a-zA-Z0-9_,\s]+)", re.MULTILINE
     )
-    fix_pattern = re.compile(r"class \w+ extends DartFix")
+    fix_pattern = re.compile(r"get fixGenerators => \[")
 
     for dart_file in rules_dir.glob("**/*.dart"):
         content = dart_file.read_text(encoding="utf-8")

@@ -557,6 +557,7 @@ class _WorkRow(NamedTuple):
     suffix: str
     color: Color
     done: bool
+    group: str = "active"
 
 
 def _collect_roadmap_rows(
@@ -568,6 +569,7 @@ def _collect_roadmap_rows(
         ("Roadmap", summary.roadmap_by_severity, summary.roadmap_total),
         ("Deferred", summary.deferred_by_severity, summary.deferred_total),
     ]:
+        group = "deferred" if source == "Deferred" else "active"
         max_count = max(by_sev.values(), default=1)
         for emoji in ["\U0001f6a8", "\u26a0\ufe0f", "\u2139\ufe0f"]:
             count = by_sev.get(emoji, 0)
@@ -582,6 +584,7 @@ def _collect_roadmap_rows(
                 suffix=f"{count:>4d} ({pct:5.1f}%)",
                 color=_severity_color(emoji, count),
                 done=False,
+                group=group,
             ))
     return rows
 
@@ -626,12 +629,14 @@ def _collect_bug_rows(bugs_dir: Path) -> list[_WorkRow]:
     if active:
         active_max = max(c.count for c in active)
         for cat in active:
+            is_deferred = cat.label.lower() == "discussion"
             rows.append(_WorkRow(
                 label=f"Bug Reports - {cat.label}",
                 bar=_make_bar(cat.count, active_max),
                 suffix=f"{cat.count:>4d}",
                 color=cat.color,
                 done=False,
+                group="deferred" if is_deferred else "active",
             ))
 
     for cat in resolved:
@@ -671,14 +676,24 @@ def display_roadmap_summary(
         return log_path
 
     pad = max(len(r.label) for r in rows)
-    not_done = [r for r in rows if not r.done]
+    active = [r for r in rows if not r.done and r.group == "active"]
+    deferred = [r for r in rows if not r.done and r.group == "deferred"]
     done = [r for r in rows if r.done]
 
-    for row in not_done:
+    for row in active:
         print_colored(
             f"    {row.label:<{pad}} {row.bar}  {row.suffix}",
             row.color,
         )
+
+    if deferred:
+        print()
+        print_colored("    Deferred:", Color.DIM)
+        for row in deferred:
+            print_colored(
+                f"    {row.label:<{pad}} {row.bar}  {row.suffix}",
+                row.color,
+            )
 
     if done:
         print()

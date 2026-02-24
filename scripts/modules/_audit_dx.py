@@ -447,6 +447,10 @@ def print_dx_audit_report(
     )
 
     total_needs_work = sum(len(v) for v in needs_work_by_impact.values())
+
+    if total_needs_work == 0:
+        return 0  # Summary ✓ line is sufficient
+
     print_subheader(f"DX Message Quality ({total_needs_work} total issues)")
 
     impact_colors = {
@@ -471,9 +475,11 @@ def print_dx_audit_report(
             else Color.RED
         )
         print(
-            f"    {color.value}{impact.capitalize():<12}{Color.RESET.value}"
+            f"    {color.value}{impact.capitalize():<12}"
+            f"{Color.RESET.value}"
             f"{passing:>3}/{total:<3} passing  "
-            f"{pct_color.value}({pct:>5.1f}%){Color.RESET.value}"
+            f"{pct_color.value}({pct:>5.1f}%)"
+            f"{Color.RESET.value}"
         )
 
     # Per-tier breakdown
