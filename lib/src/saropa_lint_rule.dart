@@ -96,7 +96,7 @@ export 'project_context.dart'
 // analysis performance. Rules taking >10ms are logged for investigation.
 //
 // Enable timing by setting the environment variable:
-//   SAROPA_LINTS_PROFILE=true dart run custom_lint
+//   SAROPA_LINTS_PROFILE=true dart analyze
 //
 // Timing data helps identify:
 // 1. Rules that need optimization
@@ -187,7 +187,7 @@ class _ProgressColors {
 // Tracks analysis progress to show the user that the linter is working.
 // Uses in-place updates with a visual progress bar (no scrolling).
 // Enabled by default. Disable via environment variable:
-//   dart run custom_lint --define=SAROPA_LINTS_PROGRESS=false
+//   dart analyze  # set SAROPA_LINTS_PROGRESS=false in env
 //
 // Progress output helps users see:
 // 1. That the linter is actively working (not frozen)
@@ -1185,7 +1185,7 @@ class RuleTimingRecord {
 // =============================================================================
 //
 // Enable by setting the environment variable:
-//   SAROPA_LINTS_REPORT=true dart run custom_lint
+//   SAROPA_LINTS_REPORT=true dart analyze
 //
 // Reports are written to: <project>/reports/saropa_lints/
 // - timing_report.txt: Rule timing summary
@@ -1834,7 +1834,7 @@ abstract class SaropaLintRule extends AnalysisRule {
 
   /// Alternate config keys that can be used to reference this rule.
   ///
-  /// Override to provide aliases that users can use in `custom_lint.yaml`
+  /// Override to provide aliases that users can use in `analysis_options.yaml`
   /// instead of the canonical rule name (`code.name`).
   ///
   /// This is useful when:
@@ -1848,11 +1848,13 @@ abstract class SaropaLintRule extends AnalysisRule {
   /// List<String> get configAliases => const ['arguments_ordering'];
   /// ```
   ///
-  /// Then both of these work in custom_lint.yaml:
+  /// Then both of these work in analysis_options.yaml:
   /// ```yaml
-  /// rules:
-  ///   prefer_arguments_ordering: false  # canonical name
-  ///   arguments_ordering: false           # alias
+  /// plugins:
+  ///   saropa_lints:
+  ///     diagnostics:
+  ///       prefer_arguments_ordering: false  # canonical name
+  ///       arguments_ordering: false           # alias
   /// ```
   ///
   /// Default: empty list (no aliases)

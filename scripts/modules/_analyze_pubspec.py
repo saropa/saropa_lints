@@ -295,10 +295,11 @@ def count_tier_rules() -> tuple[dict[str, int], int]:
             with open(tier_file, 'r', encoding='utf-8') as f:
                 tier_data = yaml.safe_load(f)
 
-            # Count rules in this tier's custom_lint.rules section
+            # Count rules in this tier's plugins.saropa_lints.diagnostics section
             rules_in_tier = 0
-            if tier_data and 'custom_lint' in tier_data:
-                rules = tier_data['custom_lint'].get('rules', {})
+            if tier_data and 'plugins' in tier_data:
+                saropa = tier_data['plugins'].get('saropa_lints', {})
+                rules = saropa.get('diagnostics', {}) if saropa else {}
                 if isinstance(rules, dict):
                     rules_in_tier = len([k for k, v in rules.items() if v is True])
 

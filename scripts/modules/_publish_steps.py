@@ -261,10 +261,10 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
 def run_tests(project_dir: Path) -> bool:
     """Step 5: Run unit tests.
 
-    Note: custom_lint integration tests (dart run custom_lint in example/)
-    are skipped during publish because 1700+ rules x 1500+ fixture files
-    takes too long. Run manually when needed:
-        cd example && dart run custom_lint
+    Note: full integration tests (dart analyze in example/) are skipped
+    during publish because 1700+ rules x 1500+ fixture files takes too long.
+    Run manually when needed:
+        cd example && dart analyze
     """
     print_header("STEP 5: RUNNING TESTS")
 

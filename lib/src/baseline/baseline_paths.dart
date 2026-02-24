@@ -9,8 +9,11 @@
 /// ## Usage
 ///
 /// ```yaml
-/// custom_lint:
+/// plugins:
 ///   saropa_lints:
+///     diagnostics:
+///       # ... rule overrides ...
+///
 ///     baseline:
 ///       paths:
 ///         - "lib/legacy/"

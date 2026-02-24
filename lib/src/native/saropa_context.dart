@@ -644,10 +644,10 @@ class SaropaContext {
   // No-op stubs
   // ===========================================================================
   // These methods have no native analyzer equivalent. They are provided so
-  // that rules ported from the custom_lint plugin still compile. The callbacks
+  // that rules ported from the v4 plugin still compile. The callbacks
   // are silently ignored.
 
-  /// No-op: custom_lint's post-run callback has no native equivalent.
+  /// No-op: v4 post-run callback has no native equivalent.
   void addPostRunCallback(void Function() callback) {}
 
   /// No-op: [FunctionBody] is not a visitable node in the native registry.

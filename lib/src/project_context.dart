@@ -2079,7 +2079,7 @@ class LazyPatternCache {
 // =============================================================================
 //
 // Provides parallel pre-analysis capabilities using Dart isolates. Since the
-// custom_lint framework controls rule execution order, we can't parallelize
+// analysis framework controls rule execution order, we can't parallelize
 // rule execution directly. Instead, we parallelize:
 //
 // 1. **File scanning**: Pre-scan files in parallel to populate caches
@@ -2594,7 +2594,7 @@ class ParallelAnalyzer {
 // =============================================================================
 //
 // Provides a framework for batch-executing independent rules in parallel.
-// While the custom_lint framework controls actual rule invocation, this
+// While the analysis framework controls actual rule invocation, this
 // allows pre-computation and result caching for rules that can be batched.
 // =============================================================================
 

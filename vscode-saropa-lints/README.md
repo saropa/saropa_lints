@@ -1,10 +1,10 @@
 # Saropa Lints Runner
 
-A simple VS Code extension that adds a button and keyboard shortcut to run Saropa custom lints.
+A simple VS Code extension that adds a button and keyboard shortcut to run Saropa Lints via `dart analyze`.
 
 ## Features
 
-- **Status bar button**: Click "Lints" in the status bar to run custom lints
+- **Status bar button**: Click "Lints" in the status bar to run `dart analyze`
 - **Editor title button**: A search icon appears in the editor title bar when viewing Dart files
 - **Keyboard shortcut**: `Ctrl+Shift+B` (or `Cmd+Shift+B` on Mac) runs the lints
 - **Scan file or folder**: Right-click any `.dart` file or folder in the Explorer and select "Scan with Saropa Lints" to instantly see all diagnostics for that path
@@ -53,4 +53,4 @@ This uses diagnostics already computed by the Dart analysis server — no re-sca
 
 - VS Code 1.74.0 or higher
 - Dart SDK
-- Project must have `custom_lint` in dev_dependencies
+- Project must have `saropa_lints` in dependencies

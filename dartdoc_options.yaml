@@ -1,3 +1,2 @@
 dartdoc:
-  exclude:
-    - custom_lint_client
+  exclude: []

@@ -668,9 +668,6 @@ const Set<String> essentialRules = <String>{
 /// Recommended tier rules - Essential + common mistakes, performance basics.
 /// Catches bugs that don't immediately crash but cause poor UX, sluggish performance.
 const Set<String> recommendedOnlyRules = <String>{
-  // Suppression comment validation
-  'avoid_ignore_trailing_comment',
-
   // v5.1.0 - Migration rules (Recommended)
   'prefer_dropdown_initial_value', // WARNING - deprecated in Flutter 3.35.0
   'prefer_on_pop_with_result', // WARNING - deprecated in Flutter 3.35.0
