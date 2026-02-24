@@ -8612,6 +8612,7 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
     'setState',
     'add',
     'addAll',
+    'addEntries',
     'remove',
     'removeAt',
     'removeLast',
@@ -8626,6 +8627,11 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
     'setAll',
     'setRange',
     'replaceRange',
+    // Map mutation methods — return value is a convenience, primary purpose
+    // is the in-place mutation of the map.
+    'update',
+    'putIfAbsent',
+    'updateAll',
     'addPostFrameCallback',
     'addPersistentFrameCallback',
     'scheduleMicrotask',

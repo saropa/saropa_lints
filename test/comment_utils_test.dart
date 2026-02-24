@@ -99,6 +99,136 @@ void main() {
       test('empty content', () {
         expect(CommentPatterns.isLikelyCode(''), isFalse);
       });
+
+      // Regression tests for reported false positives
+      test('inline prose: this is non-null, other is null', () {
+        expect(
+          CommentPatterns.isLikelyCode('this is non-null, other is null'),
+          isFalse,
+        );
+      });
+
+      test('section header: Iterable extensions', () {
+        expect(CommentPatterns.isLikelyCode('Iterable extensions'), isFalse);
+      });
+
+      test('section header: List extensions', () {
+        expect(CommentPatterns.isLikelyCode('List extensions'), isFalse);
+      });
+
+      test('section header: Map extensions and utilities', () {
+        expect(
+          CommentPatterns.isLikelyCode('Map extensions and utilities'),
+          isFalse,
+        );
+      });
+
+      test('section header: String extensions and utilities', () {
+        expect(
+          CommentPatterns.isLikelyCode('String extensions and utilities'),
+          isFalse,
+        );
+      });
+
+      test('prose: this is smaller', () {
+        expect(CommentPatterns.isLikelyCode('this is smaller'), isFalse);
+      });
+
+      test('prose: Map the list of enum values to a list', () {
+        expect(
+          CommentPatterns.isLikelyCode(
+            'Map the list of enum values to a list of their names as strings',
+          ),
+          isFalse,
+        );
+      });
+
+      test('prose: new set with the same elements as this iterable', () {
+        expect(
+          CommentPatterns.isLikelyCode(
+            'new set with the same elements as this iterable',
+          ),
+          isFalse,
+        );
+      });
+
+      test('prose: Use expand() method to flatten the 2D list', () {
+        expect(
+          CommentPatterns.isLikelyCode(
+            'Use expand() method to flatten the 2D list and create a',
+          ),
+          isFalse,
+        );
+      });
+
+      test('prose: Iterate over each row in the matrix', () {
+        expect(
+          CommentPatterns.isLikelyCode('Iterate over each row in the matrix'),
+          isFalse,
+        );
+      });
+
+      test('prose: Sort the list of names in alphabetical order', () {
+        expect(
+          CommentPatterns.isLikelyCode(
+            'Sort the list of names in alphabetical order',
+          ),
+          isFalse,
+        );
+      });
+    });
+
+    group('should still detect actual code after tightening', () {
+      test('this.name = value', () {
+        expect(CommentPatterns.isLikelyCode('this.name = value'), isTrue);
+      });
+
+      test('super.dispose()', () {
+        expect(CommentPatterns.isLikelyCode('super.dispose()'), isTrue);
+      });
+
+      test('new MyClass()', () {
+        expect(CommentPatterns.isLikelyCode('new MyClass()'), isTrue);
+      });
+
+      test('else {', () {
+        expect(CommentPatterns.isLikelyCode('else {'), isTrue);
+      });
+
+      test('String name;', () {
+        expect(CommentPatterns.isLikelyCode('String name;'), isTrue);
+      });
+
+      test('int value = 5;', () {
+        expect(CommentPatterns.isLikelyCode('int value = 5;'), isTrue);
+      });
+
+      test('return null;', () {
+        expect(CommentPatterns.isLikelyCode('return null;'), isTrue);
+      });
+
+      test('list.sort()', () {
+        expect(CommentPatterns.isLikelyCode('list.sort()'), isTrue);
+      });
+
+      // Strong code indicators should bypass prose guard
+      test('for (int i in list) — not prose despite for/in', () {
+        expect(CommentPatterns.isLikelyCode('for (int i in list)'), isTrue);
+      });
+
+      test('if (value != null) return;', () {
+        expect(
+          CommentPatterns.isLikelyCode('if (value != null) return;'),
+          isTrue,
+        );
+      });
+
+      test('final result = getValue();', () {
+        expect(
+          CommentPatterns.isLikelyCode('final result = getValue();'),
+          isTrue,
+        );
+      });
     });
   });
 
