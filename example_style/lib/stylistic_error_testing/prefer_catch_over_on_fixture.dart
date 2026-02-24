@@ -105,13 +105,58 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_catch_over_on
-// expect_lint: prefer_catch_over_on
+// BAD: on Object catch is equivalent to bare catch
 void _bad1100() {
-  // TODO: Add code that triggers prefer_catch_over_on
+  try {
+    int.parse('abc');
+    // expect_lint: prefer_catch_over_on
+  } on Object catch (e, stackTrace) {
+    print('$e\n$stackTrace');
+  }
 }
 
-// GOOD: Should NOT trigger prefer_catch_over_on
+// BAD: on dynamic catch is also redundant
+void _bad1101() {
+  try {
+    int.parse('abc');
+    // expect_lint: prefer_catch_over_on
+  } on dynamic catch (e) {
+    print(e);
+  }
+}
+
+// GOOD: bare catch — same behavior, clearer intent
 void _good1100() {
-  // TODO: Add compliant code for prefer_catch_over_on
+  try {
+    int.parse('abc');
+  } catch (e, stackTrace) {
+    print('$e\n$stackTrace');
+  }
+}
+
+// GOOD: specific type filtering is intentional
+void _good1101() {
+  try {
+    int.parse('abc');
+  } on FormatException catch (e, stackTrace) {
+    print('decode failed: $e\n$stackTrace');
+  }
+}
+
+// GOOD: on Exception is intentional (doesn't catch Error types)
+void _good1102() {
+  try {
+    int.parse('abc');
+  } on Exception catch (e) {
+    print(e);
+  }
+}
+
+// GOOD: on without catch is intentional type filtering
+void _good1103() {
+  try {
+    int.parse('abc');
+  } on FormatException {
+    print('parse failed');
+  }
 }

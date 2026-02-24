@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/source/source_range.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -350,38 +351,43 @@ class PreferOnOverCatchRule extends SaropaLintRule {
   }
 }
 
-/// Warns when bare catch is preferred over on clause (opposite).
+/// Flags `on Object catch` which is equivalent to a bare `catch`.
 ///
-/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
+/// Since: v2.7.0 | Updated: v5.0.3 | Rule version: v4
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
-/// **Pros of bare catch:**
-/// - Simpler syntax
-/// - Catches everything - no missed exceptions
-/// - Less boilerplate
+/// `on Object catch (e, stackTrace)` is functionally identical to
+/// `catch (e, stackTrace)` — both catch everything and give `e` a static
+/// type of `Object`. The `on Object` adds visual noise for zero benefit.
 ///
-/// **Cons (why some teams prefer on):**
-/// - May catch unexpected errors
-/// - Less type-safe
+/// Specific `on` clauses like `on FormatException catch` are intentional
+/// type filtering and are NOT flagged by this rule.
 ///
 /// ### Example
 ///
 /// #### BAD (with this rule enabled):
 /// ```dart
 /// try {
-///   fetchData();
-/// } on NetworkException catch (e) {
-///   handleError(e);
+///   parseJson(input);
+/// } on Object catch (e, stackTrace) {
+///   debugPrint('$e\n$stackTrace');
 /// }
 /// ```
 ///
 /// #### GOOD:
 /// ```dart
 /// try {
-///   fetchData();
-/// } catch (e) {
-///   handleError(e);
+///   parseJson(input);
+/// } catch (e, stackTrace) {
+///   debugPrint('$e\n$stackTrace');
+/// }
+///
+/// // Also GOOD — specific type filtering is intentional:
+/// try {
+///   parseJson(input);
+/// } on FormatException catch (e, stackTrace) {
+///   debugPrint('decode failed: $e\n$stackTrace');
 /// }
 /// ```
 class PreferCatchOverOnRule extends SaropaLintRule {
@@ -391,25 +397,82 @@ class PreferCatchOverOnRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
-  RuleCost get cost => RuleCost.medium;
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _PreferCatchOverOnFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_catch_over_on',
-    '[prefer_catch_over_on] Typed "on" clauses add complexity and risk missing unexpected exception types. A bare catch ensures no failure goes unhandled. {v3}',
+    '[prefer_catch_over_on] "on Object catch" is equivalent to a bare "catch" — both catch everything with the same static type for the exception variable. The redundant "on Object" clause adds visual noise without changing behavior. Remove it to clarify that this is an unfiltered catch-all handler. {v4}',
     correctionMessage:
-        'Replace the "on ExceptionType" clause with a bare "catch (e)" to simplify error handling and ensure all exceptions are caught.',
+        'Remove the redundant "on Object" clause. '
+        'A bare "catch (e)" has identical behavior and clearer intent.',
     severity: DiagnosticSeverity.INFO,
   );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addCatchClause((node) {
-      // Flag catch clauses with on type
-      if (node.exceptionType != null) {
+      final exceptionType = node.exceptionType;
+      if (exceptionType is! NamedType) return;
+
+      final typeName = exceptionType.name.lexeme;
+      if (typeName == 'Object' || typeName == 'dynamic') {
         reporter.atNode(node);
       }
+    });
+  }
+}
+
+/// Quick fix: remove `on Object` from `on Object catch (`.
+class _PreferCatchOverOnFix extends SaropaFixProducer {
+  _PreferCatchOverOnFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.preferCatchOverOn',
+    80,
+    "Remove redundant 'on Object'",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    if (node == null) return;
+
+    final catchClause = node is CatchClause
+        ? node
+        : node.thisOrAncestorOfType<CatchClause>();
+    if (catchClause == null) return;
+
+    final exceptionType = catchClause.exceptionType;
+    if (exceptionType == null) return;
+
+    // Replace from "on" keyword through exception type (including space)
+    // to leave just "catch (...)"
+    final onKeyword = catchClause.onKeyword;
+    if (onKeyword == null) return;
+
+    final catchKeyword = catchClause.catchKeyword;
+    if (catchKeyword == null) return;
+
+    // Remove from start of "on" to start of "catch"
+    final removeRange = SourceRange(
+      onKeyword.offset,
+      catchKeyword.offset - onKeyword.offset,
+    );
+
+    await builder.addDartFileEdit(file, (builder) {
+      builder.addSimpleReplacement(removeRange, '');
     });
   }
 }
