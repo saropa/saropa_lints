@@ -14,6 +14,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ## [Unreleased]
 
 ### Fixed
+- `prefer_trailing_comma_always`: suppress false positive when the last argument is a callback/closure whose body spans multiple lines
 - `init` walkthrough: skipped stylistic rules now marked as reviewed so they are not re-prompted on subsequent runs
 
 ### Changed

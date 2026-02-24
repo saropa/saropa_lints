@@ -516,6 +516,10 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
       if (node.arguments.isEmpty) return;
       if (!_isMultiLine(node)) return;
 
+      // Skip if last argument is a callback — the multi-line span
+      // comes from the function body, not from argument layout.
+      if (_lastArgIsCallback(node.arguments)) return;
+
       final Token rightParen = node.rightParenthesis;
       final Token? lastToken = node.arguments.last.endToken;
       if (lastToken == null) return;
@@ -531,6 +535,7 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
     context.addListLiteral((ListLiteral node) {
       if (node.elements.isEmpty) return;
       if (!_isMultiLine(node)) return;
+      if (node.elements.last is FunctionExpression) return;
 
       final Token rightBracket = node.rightBracket;
       final Token? lastToken = node.elements.last.endToken;
@@ -546,6 +551,7 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
     context.addSetOrMapLiteral((SetOrMapLiteral node) {
       if (node.elements.isEmpty) return;
       if (!_isMultiLine(node)) return;
+      if (node.elements.last is FunctionExpression) return;
 
       final Token rightBracket = node.rightBracket;
       final Token? lastToken = node.elements.last.endToken;
@@ -572,6 +578,16 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
         reporter.atToken(rightParen);
       }
     });
+  }
+
+  /// Returns true if the last argument is a function expression (callback).
+  /// Handles both positional and named arguments.
+  bool _lastArgIsCallback(NodeList<Expression> arguments) {
+    final Expression lastArg = arguments.last;
+    final Expression expr = lastArg is NamedExpression
+        ? lastArg.expression
+        : lastArg;
+    return expr is FunctionExpression;
   }
 
   bool _isMultiLine(AstNode node) {
