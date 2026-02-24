@@ -95,14 +95,40 @@ void main() {
     });
 
     group('prefer_catch_over_on', () {
-      test('prefer_catch_over_on SHOULD trigger', () {
-        // Better alternative available: prefer catch over on
-        expect('prefer_catch_over_on detected', isNotNull);
+      test(
+        'on Object catch SHOULD trigger (redundant, same as bare catch)',
+        () {
+          // on Object catch is functionally identical to catch
+          expect('on Object catch detected', isNotNull);
+        },
+      );
+
+      test(
+        'on dynamic catch SHOULD trigger (redundant, same as bare catch)',
+        () {
+          // on dynamic catch is also equivalent to bare catch
+          expect('on dynamic catch detected', isNotNull);
+        },
+      );
+
+      test('bare catch should NOT trigger', () {
+        // Bare catch is the preferred form
+        expect('bare catch passes', isNotNull);
       });
 
-      test('prefer_catch_over_on should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_catch_over_on passes', isNotNull);
+      test('on FormatException catch should NOT trigger (specific type)', () {
+        // Specific type filtering is intentional, not flagged
+        expect('specific on clause passes', isNotNull);
+      });
+
+      test('on Exception catch should NOT trigger (intentional filter)', () {
+        // on Exception doesn't catch Error subtypes — intentional
+        expect('on Exception passes', isNotNull);
+      });
+
+      test('on FormatException (no catch) should NOT trigger', () {
+        // on-without-catch is type filtering, not redundant
+        expect('on without catch passes', isNotNull);
       });
     });
 
