@@ -18,7 +18,7 @@ Usage:
     python scripts/install_vscode_extension.py
 
 The extension adds:
-    - Status bar button: Click "Lints" to run custom_lint
+    - Status bar button: Click "Lints" to run dart analyze
     - Editor title icon: Bug icon when viewing Dart files
     - Keyboard shortcut: Ctrl+Shift+B (same as build task)
 
@@ -333,7 +333,7 @@ def display_extension_info(source_dir: Path) -> None:
     print()
 
     print_colored("  Features:", Color.WHITE)
-    print_colored("      - Status bar button: Click 'Lints' to run custom_lint", Color.CYAN)
+    print_colored("      - Status bar button: Click 'Lints' to run dart analyze", Color.CYAN)
     print_colored("      - Editor title icon: Bug icon when viewing Dart files", Color.CYAN)
     print_colored("      - Keyboard shortcut: Ctrl+Shift+B (Cmd+Shift+B on Mac)", Color.CYAN)
     print()

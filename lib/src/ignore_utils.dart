@@ -97,24 +97,6 @@ class IgnoreUtils {
     return pattern.hasMatch(fileContent);
   }
 
-  /// Pattern that matches `// ignore:` or `// ignore_for_file:` comments
-  /// with a trailing `//` comment or ` - ` explanation after the rule names.
-  ///
-  /// `custom_lint_builder` parses everything after the colon as rule names
-  /// (splitting on commas), so trailing text like
-  /// `// ignore: my_rule // reason` or `// ignore: my_rule - reason`
-  /// causes the framework to store the extra text as part of the rule code,
-  /// breaking the `Set.contains()` lookup.
-  static final RegExp trailingCommentOnIgnore = RegExp(
-    r'//\s*ignore(?:_for_file)?\s*:'
-    r'(?:'
-    r'[^/\n]+//[^\n]*' // trailing // comment
-    r'|'
-    r'[^\n]*?\s+-\s+\S[^\n]*' // trailing - separator
-    r')$',
-    multiLine: true,
-  );
-
   /// Checks if a token has preceding comments containing an ignore directive
   /// for the given rule name (supports both underscore and hyphen formats).
   static bool hasIgnoreCommentOnToken(Token? token, String ruleName) {

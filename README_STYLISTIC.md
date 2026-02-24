@@ -20,11 +20,12 @@ After generating your base configuration, edit `analysis_options.yaml` to enable
 
 ```yaml
 # analysis_options.yaml
-custom_lint:
-  rules:
-    # Enable specific stylistic rules your team prefers
-    - prefer_single_quotes: true      # OR prefer_double_quotes
-    - prefer_relative_imports: true   # OR prefer_absolute_imports
+plugins:
+  saropa_lints:
+    diagnostics:
+      # Enable specific stylistic rules your team prefers
+      prefer_single_quotes: true      # OR prefer_double_quotes
+      prefer_relative_imports: true   # OR prefer_absolute_imports
 ```
 
 **Conflicting pairs** (e.g., `prefer_single_quotes` vs `prefer_double_quotes`) are NOT auto-enabled. You must explicitly enable one of the pair.

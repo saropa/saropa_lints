@@ -463,7 +463,7 @@ bool _isTestFile(String filePath) {
 ///
 /// Only **code lines** are counted — blank lines and lines containing only
 /// comments (`//`, `///`, `/* */`) are excluded.  This prevents
-/// well-documented files from being penalised for thorough dartdoc.
+/// well-documented files from being penalized for thorough dartdoc.
 void _checkFileLength({
   required SaropaDiagnosticReporter reporter,
   required SaropaContext context,
@@ -988,7 +988,7 @@ class AvoidVeryLongTestFilesRule extends SaropaLintRule {
 /// extracting parts into smaller functions.
 ///
 /// Comments and blank lines are excluded from the count so that
-/// well-documented code is never penalised for thorough documentation.
+/// well-documented code is never penalized for thorough documentation.
 ///
 /// ### Configuration
 /// Default maximum: 100 lines

@@ -19,14 +19,12 @@
 /// You can also enable/disable individual rules in the generated file:
 ///
 /// ```yaml
-/// custom_lint:
-///   rules:
-///     - avoid_debug_print: false  # disable a rule
-///     - no_magic_number: true     # enable a rule
+/// plugins:
+///   saropa_lints:
+///     diagnostics:
+///       avoid_debug_print: false  # disable a rule
+///       no_magic_number: true     # enable a rule
 /// ```
-///
-/// **IMPORTANT:** Rules must use YAML list format (with `-` prefix).
-/// Map format (without `-`) is silently ignored by custom_lint!
 library;
 
 import 'dart:io' show Directory, File, Platform, stderr;
@@ -1763,8 +1761,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidApiKeyInCodeRule.new,
   AvoidStoringSensitiveUnencryptedRule.new,
 
-  AvoidIgnoreTrailingCommentRule.new,
-
   // OWASP Coverage Gap Rules (v3.2.0)
   AvoidIgnoringSslErrorsRule.new,
   RequireHttpsOnlyRule.new,
@@ -2715,7 +2711,7 @@ void _checkConflictingRules(List<SaropaLintRule> enabledRules) {
 /// Examples:
 /// ```sh
 /// # One-off overrides via environment:
-/// SAROPA_LINTS_MAX=0 SAROPA_LINTS_OUTPUT=file dart run custom_lint
+/// SAROPA_LINTS_MAX=0 SAROPA_LINTS_OUTPUT=file dart analyze
 ///
 /// # Persistent config (analysis_options_custom.yaml):
 /// max_issues: 500

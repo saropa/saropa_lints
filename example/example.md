@@ -1,28 +1,28 @@
 # Saropa Lints Example Configuration
 
-This file shows a complete `custom_lint.yaml` configuration with all 475+ rules.
+This file shows how to configure saropa_lints with all 1677+ rules.
 
 ## Setup
 
 1. Add to `pubspec.yaml`:
 ```yaml
 dev_dependencies:
-  custom_lint: ^0.8.0
-  saropa_lints: ^0.1.1
+  saropa_lints: ^5.0.0
 ```
 
 2. Add to `analysis_options.yaml`:
 ```yaml
 analyzer:
   plugins:
-    - custom_lint
-```
+    - saropa_lints
 
-3. Copy `custom_lint.yaml` to your project root and enable the rules you want.
+saropa_lints:
+  tier: recommended # essential | recommended | professional | comprehensive | pedantic
+```
 
 ## Configuration Reference
 
-See [custom_lint.yaml](custom_lint.yaml) for the complete configuration with all rules organized by category:
+See [analysis_options_template.yaml](analysis_options_template.yaml) for the complete configuration with all rules organized by category:
 
 - **Security** - Credentials, encryption, input validation
 - **Accessibility** - Screen readers, touch targets, semantics
@@ -51,5 +51,5 @@ Each rule is tagged with an importance level:
 ## Running the Linter
 
 ```bash
-dart run custom_lint
+dart analyze
 ```

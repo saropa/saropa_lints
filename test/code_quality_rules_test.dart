@@ -29,7 +29,6 @@ void main() {
       'avoid_empty_build_when',
       'avoid_enum_values_by_index',
       'avoid_identical_exception_handling_blocks',
-      'avoid_ignore_trailing_comment',
       'avoid_incorrect_uri',
       'avoid_late_final_reassignment',
       'avoid_late_for_nullable',
@@ -781,12 +780,6 @@ void main() {
     group('prefer_use_prefix', () {
       test('Flutter Hooks without use prefix SHOULD trigger', () {
         expect('missing use prefix detected', isNotNull);
-      });
-    });
-
-    group('avoid_ignore_trailing_comment', () {
-      test('ignore comment with trailing text SHOULD trigger', () {
-        expect('trailing ignore comment detected', isNotNull);
       });
     });
   });

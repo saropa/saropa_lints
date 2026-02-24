@@ -16,8 +16,11 @@ import 'baseline_paths.dart';
 /// ## Configuration Example
 ///
 /// ```yaml
-/// custom_lint:
+/// plugins:
 ///   saropa_lints:
+///     diagnostics:
+///       # ... rule overrides ...
+///
 ///     baseline:
 ///       file: "saropa_baseline.json"    # Specific violations
 ///       date: "2025-01-15"              # Code unchanged since this date

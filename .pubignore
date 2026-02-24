@@ -27,7 +27,7 @@ example/.dart_tool/
 example/nul
 example/reports/
 
-# Example fixture packages (path dependencies, custom_lint dev dep)
+# Example fixture packages (path dependencies)
 example_async/
 example_core/
 example_packages/
@@ -59,8 +59,7 @@ cspell.json
 # Package dev config (not for consumers)
 analysis_options_custom.yaml
 
-# v4 custom_lint artifacts (obsolete for v5 native plugin)
-example/custom_lint.yaml
+# v4 artifacts (obsolete for v5 native plugin)
 example/analysis_options_template.yaml
 
 # Non-source file in lib/

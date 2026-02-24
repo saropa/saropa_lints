@@ -8,8 +8,11 @@ import 'dart:io';
 /// ## Usage
 ///
 /// ```yaml
-/// custom_lint:
+/// plugins:
 ///   saropa_lints:
+///     diagnostics:
+///       # ... rule overrides ...
+///
 ///     baseline:
 ///       date: "2025-01-15"  # Ignore violations in code unchanged since this date
 /// ```

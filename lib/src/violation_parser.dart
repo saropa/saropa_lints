@@ -16,7 +16,7 @@ Map<String, LintImpact> _buildRuleImpactMap() {
   return map;
 }
 
-/// Parse custom_lint output into violations.
+/// Parse lint analysis output into violations.
 List<Violation> parseViolations(String output) {
   final violations = <Violation>[];
 
