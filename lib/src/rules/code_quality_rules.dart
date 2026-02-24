@@ -8,11 +8,9 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/line_info.dart';
 
-import '../ignore_utils.dart';
 import '../saropa_lint_rule.dart';
 import '../type_annotation_utils.dart';
 import '../fixes/code_quality/prefer_returning_conditional_expressions_fix.dart';
-import '../fixes/code_quality/move_trailing_comment_fix.dart';
 import '../fixes/code_quality/simplify_boolean_comparison_fix.dart';
 
 /// Warns against any usage of adjacent strings.
@@ -8357,119 +8355,6 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
         return statements.first as ReturnStatement;
       }
     }
-    return null;
-  }
-}
-
-/// Warns when `// ignore:` or `// ignore_for_file:` has a trailing `//`
-///
-/// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v2
-///
-/// comment after the rule names.
-///
-/// The `custom_lint_builder` framework parses everything after the colon as
-/// rule names (splitting on commas and trimming). A trailing comment causes
-/// the last rule name to include the comment text, so the framework's
-/// `codes.contains('rule_name')` check silently fails.
-///
-/// **BAD:**
-/// ```dart
-/// // ignore_for_file: my_rule // reason why we ignore
-/// // ignore: my_rule // no web support needed
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// // reason why we ignore
-/// // ignore_for_file: my_rule
-/// // no web support needed
-/// // ignore: my_rule
-/// ```
-class AvoidIgnoreTrailingCommentRule extends SaropaLintRule {
-  AvoidIgnoreTrailingCommentRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.medium;
-
-  @override
-  RuleCost get cost => RuleCost.low;
-
-  @override
-  List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        MoveTrailingCommentFix(context: context),
-  ];
-
-  static const LintCode _code = LintCode(
-    'avoid_ignore_trailing_comment',
-    '[avoid_ignore_trailing_comment] '
-        'Trailing comment breaks ignore suppression. {v2}',
-    correctionMessage:
-        'Move the comment to the line above the ignore directive.',
-    severity: DiagnosticSeverity.WARNING,
-  );
-
-  @override
-  void runWithReporter(
-    SaropaDiagnosticReporter reporter,
-    SaropaContext context,
-  ) {
-    context.addCompilationUnit((CompilationUnit unit) {
-      Token? token = unit.beginToken;
-
-      while (token != null && !token.isEof) {
-        Token? comment = token.precedingComments;
-        while (comment != null) {
-          if (_hasTrailingComment(comment.lexeme)) {
-            reporter.atOffset(
-              offset: comment.offset,
-              length: comment.length,
-              errorCode: code,
-            );
-          }
-          comment = comment.next;
-        }
-        token = token.next;
-      }
-    });
-  }
-
-  static bool _hasTrailingComment(String lexeme) {
-    return IgnoreUtils.trailingCommentOnIgnore.hasMatch(lexeme);
-  }
-
-  /// Splits a comment like `// ignore: rule // reason` or
-  /// `// ignore: rule - reason` into the directive and trailing parts.
-  ///
-  /// The trailing part is always normalized to a `// ` comment.
-  /// Returns `null` if no trailing comment or separator is found.
-  static ({String directive, String trailing})? splitParts(String lexeme) {
-    final colonIndex = lexeme.indexOf(':');
-    if (colonIndex < 0) return null;
-
-    final afterColon = lexeme.substring(colonIndex + 1);
-
-    // Check for trailing // comment first (higher priority)
-    final trailingSlashIndex = afterColon.indexOf('//');
-    if (trailingSlashIndex >= 0) {
-      final directive = lexeme
-          .substring(0, colonIndex + 1 + trailingSlashIndex)
-          .trimRight();
-      final trailing = afterColon.substring(trailingSlashIndex).trim();
-      return (directive: directive, trailing: trailing);
-    }
-
-    // Check for trailing - separator (space-hyphen-space)
-    final dashMatch = RegExp(r'\s+-\s+').firstMatch(afterColon);
-    if (dashMatch != null) {
-      final directive = lexeme
-          .substring(0, colonIndex + 1 + dashMatch.start)
-          .trimRight();
-      final text = afterColon.substring(dashMatch.end).trim();
-      if (text.isEmpty) return null;
-      return (directive: directive, trailing: '// $text');
-    }
-
     return null;
   }
 }

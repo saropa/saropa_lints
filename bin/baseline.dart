@@ -7,7 +7,7 @@
 ///   dart run saropa_lints:baseline [options]
 ///
 /// This tool:
-/// 1. Runs `dart run custom_lint` on your project
+/// 1. Runs `dart analyze` on your project
 /// 2. Parses the output to extract violations
 /// 3. Generates a baseline JSON file
 /// 4. Optionally updates analysis_options.yaml
@@ -72,10 +72,10 @@ Future<void> main(List<String> args) async {
   print('Running lint analysis...');
   print('');
 
-  // Run custom_lint
+  // Run dart analyze
   final result = await Process.run(
     'dart',
-    ['run', 'custom_lint'],
+    ['analyze'],
     workingDirectory: workingDir,
     runInShell: true,
   );
@@ -86,7 +86,7 @@ Future<void> main(List<String> args) async {
   // Check for errors (but ignore "Analyzing" messages)
   if (result.exitCode != 0 && !stderr.contains('Analyzing')) {
     if (stderr.isNotEmpty) {
-      print('Warning: custom_lint returned errors:');
+      print('Warning: dart analyze returned errors:');
       print(stderr);
     }
   }
@@ -197,7 +197,7 @@ Future<void> main(List<String> args) async {
   }
 
   print('');
-  print('Done! Run `dart run custom_lint` again to see clean output.');
+  print('Done! Run `dart analyze` again to see clean output.');
   print('');
   print('As you fix violations, run `dart run saropa_lints:baseline --update`');
   print('to remove fixed items from the baseline.');
@@ -243,26 +243,10 @@ Future<bool> _updateAnalysisOptions(String baselinePath) async {
     return true;
   }
 
-  // If no saropa_lints section found, check for custom_lint section
-  final customLintPattern = RegExp(r'(custom_lint:\s*\n)', multiLine: true);
-
-  final customMatch = customLintPattern.firstMatch(content);
-  if (customMatch != null) {
-    // Add saropa_lints with baseline after custom_lint:
-    final baselineConfig =
-        '  saropa_lints:\n    baseline:\n      file: "$baselinePath"\n';
-    content = content.replaceFirst(
-      customMatch.group(0)!,
-      '${customMatch.group(0)}$baselineConfig',
-    );
-    file.writeAsStringSync(content);
-    return true;
-  }
-
   print('Note: Could not find saropa_lints section in analysis_options.yaml');
   print('Add this manually:');
   print('');
-  print('custom_lint:');
+  print('plugins:');
   print('  saropa_lints:');
   print('    baseline:');
   print('      file: "$baselinePath"');
@@ -316,6 +300,6 @@ void _printUsage() {
   print('  dart run saropa_lints:baseline --dry-run');
   print('  dart run saropa_lints:baseline ./my_project');
   print('');
-  print('After generating a baseline, run `dart run custom_lint` again.');
+  print('After generating a baseline, run `dart analyze` again.');
   print('Old violations will be hidden, but new ones will still be reported.');
 }

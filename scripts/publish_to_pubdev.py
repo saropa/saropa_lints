@@ -67,7 +67,6 @@ Exit Codes:
 from __future__ import annotations
 
 import re
-import subprocess
 import sys
 import time
 import webbrowser
@@ -157,7 +156,6 @@ from scripts.modules._utils import (
     enable_ansi_support,
     exit_with_error,
     get_project_dir,
-    get_shell_mode,
     print_colored,
     print_header,
     print_info,
@@ -287,47 +285,6 @@ def _prompt_version(default: str, timeout: int = 30) -> str:
 # HELPERS
 # =============================================================================
 
-
-def _offer_custom_lint(project_dir: Path) -> None:
-    """Launch custom_lint on example fixtures in background."""
-    # Collect example directories that have a pubspec (actual Dart packages)
-    example_dirs = [
-        project_dir / d
-        for d in [
-            "example", "example_core", "example_async",
-            "example_widgets", "example_style",
-            "example_packages", "example_platforms",
-        ]
-        if (project_dir / d / "pubspec.yaml").exists()
-    ]
-    if not example_dirs:  # No example fixtures found
-        return
-
-    print_info(
-        f"  Running custom_lint on {len(example_dirs)} "
-        f"example fixtures (background)..."
-    )
-    use_shell = get_shell_mode()
-    for example_dir in example_dirs:  # Launch lint in each fixture package
-        print_info(f"  Launching custom_lint in {example_dir.name}/")
-        subprocess.run(  # Ensure deps are up-to-date first
-            ["dart", "pub", "get"],
-            cwd=example_dir,
-            shell=use_shell,
-            capture_output=True,
-        )
-        subprocess.Popen(  # Fire-and-forget background process
-            ["dart", "run", "custom_lint"],
-            cwd=example_dir,
-            shell=use_shell,
-        )
-        print_success(
-            f"custom_lint launched in {len(example_dirs)} packages"
-        )
-    else:  # for/else: runs after loop completes (Python idiom)
-        print_info(
-            "Run manually: python scripts/run_custom_lint_all.py"
-        )
 
 
 def _print_success_banner(
@@ -740,7 +697,6 @@ def main() -> int:
     if succeeded:  # Publish completed successfully
         repo_path = extract_repo_path(remote_url)
         _print_success_banner(package_name, version, repo_path)
-        _offer_custom_lint(project_dir)
 
     return exit_code
 
