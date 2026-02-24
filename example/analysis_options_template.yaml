@@ -31,9 +31,6 @@
 # - You can override individual rules regardless of tier
 
 analyzer:
-  plugins:
-    - custom_lint
-
   # Directories to exclude from analysis
   exclude:
     # === Generated Code ===
@@ -81,15 +78,14 @@ analyzer:
 # SAROPA LINTS CONFIGURATION
 # ==============================================================================
 
-custom_lint:
-  saropa_lints:
-    # Choose one tier (required):
-    #   - essential      : ~340 rules (critical only)
-    #   - recommended    : ~850 rules (default) ← START HERE
-    #   - professional   : ~1590 rules (strict)
-    #   - comprehensive  : ~1640 rules (very strict)
-    #   - pedantic       : ~1650 rules (everything)
-    tier: recommended
+saropa_lints:
+  # Choose one tier (required):
+  #   - essential      : ~340 rules (critical only)
+  #   - recommended    : ~850 rules (default) ← START HERE
+  #   - professional   : ~1590 rules (strict)
+  #   - comprehensive  : ~1640 rules (very strict)
+  #   - pedantic       : ~1650 rules (everything)
+  tier: recommended
 
   # cspell:ignore shouldrepaint itemextent
 
@@ -597,20 +593,20 @@ custom_lint:
     - require_lifecycle_observer: false
 
     # =========================================================================
-    # FILE LENGTH (Opinionated)
+    # FILE LENGTH (Opinionated) — counts code lines only (comments/blanks excluded)
     # Production files: prefer_small_length_files (200), avoid_medium_length_files (300),
     #                   avoid_long_length_files (500), avoid_very_long_length_files (1000)
     # Test files:       prefer_small_length_test_files (400), avoid_medium_length_test_files (600),
     #                   avoid_long_length_test_files (1000), avoid_very_long_length_test_files (2000)
     # =========================================================================
-    - prefer_small_length_files: false           # 200 lines [LOW] Tier: pedantic
-    - avoid_medium_length_files: false           # 300 lines [LOW] Tier: professional
-    - avoid_long_length_files: false             # 500 lines [LOW] Tier: comprehensive
-    - avoid_very_long_length_files: false        # 1000 lines [LOW] Tier: recommended
-    - prefer_small_length_test_files: false      # 400 lines [LOW] Tier: pedantic (test files)
-    - avoid_medium_length_test_files: false      # 600 lines [LOW] Tier: professional (test files)
-    - avoid_long_length_test_files: false        # 1000 lines [LOW] Tier: comprehensive (test files)
-    - avoid_very_long_length_test_files: false   # 2000 lines [LOW] Tier: recommended (test files)
+    - prefer_small_length_files: false           # 200 code lines [LOW] Tier: pedantic
+    - avoid_medium_length_files: false           # 300 code lines [LOW] Tier: professional
+    - avoid_long_length_files: false             # 500 code lines [LOW] Tier: comprehensive
+    - avoid_very_long_length_files: false        # 1000 code lines [LOW] Tier: recommended
+    - prefer_small_length_test_files: false      # 400 code lines [LOW] Tier: pedantic (test files)
+    - avoid_medium_length_test_files: false      # 600 code lines [LOW] Tier: professional (test files)
+    - avoid_long_length_test_files: false        # 1000 code lines [LOW] Tier: comprehensive (test files)
+    - avoid_very_long_length_test_files: false   # 2000 code lines [LOW] Tier: recommended (test files)
 
     # =========================================================================
     # FUNCTIONS

@@ -13,6 +13,12 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Fixed
+- `avoid_dynamic_type`: exempt `dynamic` in type arguments (`List<dynamic>`, `Map<dynamic, dynamic>`), closure/lambda parameters, and for-in loop variables — eliminates false positives in JSON utility code
+- `avoid_ignoring_return_values`: add `update`, `putIfAbsent`, `updateAll`, `addEntries` to safe-to-ignore list — these Map mutation methods are called for their side effect, not their return value
+- `avoid_medium_length_files` (and all 8 file length rules): count only code lines, excluding comments and blank lines — well-documented files are no longer penalised for thorough dartdoc
+- `prefer_no_commented_out_code`: tighten keyword and type-name patterns, add prose guard with strong-code-indicator bypass — fixes false positives on section headers (`// Iterable extensions`), inline prose (`// this is non-null`), and comments containing type names in natural language
+
 ---
 ## [5.0.1]
 
