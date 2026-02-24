@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
@@ -1125,13 +1126,19 @@ class PreferContainsRule extends SaropaLintRule {
 
 /// Warns when `list[0]` is used instead of `list.first`.
 ///
-/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v3
+/// Since: v4.1.3 | Updated: v5.0.3 | Rule version: v4
 ///
 /// Alias: use_first_not_index, no_list_zero
 ///
 /// **Stylistic rule (opt-in only).** The `.first` getter calls `operator[]`
 /// with index 0 internally — there is no performance benefit. This is purely
 /// a readability preference.
+///
+/// **Suppressed when:**
+/// - The access is an assignment target (`list[0] = value`)
+/// - The target is `String` or `Map` (no `.first` getter)
+/// - The same collection is accessed with other indices in the same function
+///   (`list[0]` alongside `list[1]`, `list[i]`, etc.)
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -1161,7 +1168,7 @@ class PreferFirstRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_list_first',
-    '[prefer_list_first] Using [0] instead of .first is a stylistic choice. The .first getter calls [0] internally — there is no performance benefit. Enable via the stylistic tier. {v3}',
+    '[prefer_list_first] Using [0] instead of .first is a stylistic choice. The .first getter calls [0] internally — there is no performance benefit. Enable via the stylistic tier. {v4}',
     correctionMessage:
         'Replace [0] with .first or .firstOrNull to clearly communicate the intent of accessing the first element.',
     severity: DiagnosticSeverity.INFO,
@@ -1174,10 +1181,86 @@ class PreferFirstRule extends SaropaLintRule {
   ) {
     context.addIndexExpression((IndexExpression node) {
       final Expression index = node.index;
-      if (index is IntegerLiteral && index.value == 0) {
-        reporter.atNode(node);
+      if (index is! IntegerLiteral || index.value != 0) return;
+
+      // Skip: list[0] = value (assignment target)
+      final parent = node.parent;
+      if (parent is AssignmentExpression && parent.leftHandSide == node) {
+        return;
       }
+
+      // Skip: String[0] or Map[0] — no .first getter
+      final targetType = node.target?.staticType;
+      if (targetType != null &&
+          (targetType.isDartCoreString || targetType.isDartCoreMap)) {
+        return;
+      }
+
+      // Skip: sibling index accesses on same target in scope
+      if (_hasSiblingIndexAccess(node)) return;
+
+      reporter.atNode(node);
     });
+  }
+}
+
+/// Returns true if the same target has other index accesses with different
+/// indices in the enclosing function body.
+///
+/// Used by [PreferFirstRule] and [PreferLastRule] to suppress the lint when
+/// `target[0]` appears alongside `target[1]`, `target[i]`, etc.
+bool _hasSiblingIndexAccess(IndexExpression node) {
+  final target = node.target;
+  if (target == null) return false;
+
+  final targetSource = target.toSource();
+  final scope = node.thisOrAncestorOfType<FunctionBody>();
+  if (scope == null) return false;
+
+  final visitor = _SiblingIndexVisitor(targetSource, node);
+  scope.accept(visitor);
+  return visitor.found;
+}
+
+/// Searches for [IndexExpression] nodes on the same target that use a
+/// non-zero integer literal index, a variable index, or `[0]` as an
+/// assignment target.
+class _SiblingIndexVisitor extends RecursiveAstVisitor<void> {
+  _SiblingIndexVisitor(this._targetSource, this._excludeNode);
+
+  final String _targetSource;
+  final IndexExpression _excludeNode;
+  bool found = false;
+
+  @override
+  void visitIndexExpression(IndexExpression node) {
+    if (found) return;
+    if (identical(node, _excludeNode)) return;
+    if (node.target?.toSource() != _targetSource) {
+      super.visitIndexExpression(node);
+      return;
+    }
+
+    final index = node.index;
+    // Another integer literal index (e.g. [1], [2])
+    if (index is IntegerLiteral && index.value != 0) {
+      found = true;
+      return;
+    }
+    // A variable index (e.g. [i] in a loop)
+    if (index is SimpleIdentifier) {
+      found = true;
+      return;
+    }
+    // Same target[0] used as assignment target elsewhere
+    if (index is IntegerLiteral && index.value == 0) {
+      final parent = node.parent;
+      if (parent is AssignmentExpression && parent.leftHandSide == node) {
+        found = true;
+        return;
+      }
+    }
+    super.visitIndexExpression(node);
   }
 }
 
@@ -1247,13 +1330,18 @@ class PreferIterableOfRule extends SaropaLintRule {
 
 /// Warns when `list[length-1]` is used instead of `list.last`.
 ///
-/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v2
+/// Since: v4.1.3 | Updated: v5.0.3 | Rule version: v3
 ///
 /// Alias: use_last_not_index, no_length_minus_one
 ///
 /// **Stylistic rule (opt-in only).** The `.last` getter performs the same
 /// index computation internally — there is no performance benefit. This is
 /// purely a readability preference.
+///
+/// **Suppressed when:**
+/// - The access is an assignment target (`list[list.length - 1] = value`)
+/// - The target is `String` or `Map` (no `.last` getter)
+/// - The same collection is accessed with other indices in the same function
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -1267,9 +1355,15 @@ class PreferIterableOfRule extends SaropaLintRule {
 class PreferLastRule extends SaropaLintRule {
   PreferLastRule() : super(code: _code);
 
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     'prefer_list_last',
-    '[prefer_list_last] Using [length-1] instead of .last is a stylistic choice. The .last getter does the same indexing internally — no performance benefit. Enable via the stylistic tier. {v2}',
+    '[prefer_list_last] Using [length-1] instead of .last is a stylistic choice. The .last getter does the same indexing internally — no performance benefit. Enable via the stylistic tier. {v3}',
     correctionMessage:
         'Replace list[list.length - 1] with list.last to improve readability and reduce off-by-one error risk.',
     severity: DiagnosticSeverity.INFO,
@@ -1281,34 +1375,53 @@ class PreferLastRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addIndexExpression((IndexExpression node) {
-      final Expression index = node.index;
+      if (!_isLengthMinusOnePattern(node)) return;
 
-      // Check for pattern: length - 1
-      if (index is BinaryExpression && index.operator.type == TokenType.MINUS) {
-        final Expression right = index.rightOperand;
-        if (right is IntegerLiteral && right.value == 1) {
-          // Check if left operand is .length on the same target
-          final Expression left = index.leftOperand;
-          if (left is PropertyAccess && left.propertyName.name == 'length') {
-            // Check if the target matches
-            final Expression? indexTarget = node.target;
-            final Expression lengthTarget = left.target!;
-            if (indexTarget != null &&
-                indexTarget.toSource() == lengthTarget.toSource()) {
-              reporter.atNode(node);
-            }
-          }
-          // Also check for simple identifier.length pattern
-          if (left is PrefixedIdentifier && left.identifier.name == 'length') {
-            final Expression? indexTarget = node.target;
-            if (indexTarget is SimpleIdentifier &&
-                indexTarget.name == left.prefix.name) {
-              reporter.atNode(node);
-            }
-          }
-        }
+      // Skip: list[length-1] = value (assignment target)
+      final parent = node.parent;
+      if (parent is AssignmentExpression && parent.leftHandSide == node) {
+        return;
       }
+
+      // Skip: String or Map — no .last getter
+      final targetType = node.target?.staticType;
+      if (targetType != null &&
+          (targetType.isDartCoreString || targetType.isDartCoreMap)) {
+        return;
+      }
+
+      // Skip: sibling index accesses on same target in scope
+      if (_hasSiblingIndexAccess(node)) return;
+
+      reporter.atNode(node);
     });
+  }
+
+  /// Returns true if [node] matches `target[target.length - 1]`.
+  static bool _isLengthMinusOnePattern(IndexExpression node) {
+    final Expression index = node.index;
+    if (index is! BinaryExpression) return false;
+    if (index.operator.type != TokenType.MINUS) return false;
+
+    final Expression right = index.rightOperand;
+    if (right is! IntegerLiteral || right.value != 1) return false;
+
+    final Expression left = index.leftOperand;
+    final Expression? indexTarget = node.target;
+    if (indexTarget == null) return false;
+
+    // PropertyAccess pattern: obj.length
+    if (left is PropertyAccess && left.propertyName.name == 'length') {
+      return indexTarget.toSource() == left.target?.toSource();
+    }
+
+    // PrefixedIdentifier pattern: name.length
+    if (left is PrefixedIdentifier && left.identifier.name == 'length') {
+      return indexTarget is SimpleIdentifier &&
+          indexTarget.name == left.prefix.name;
+    }
+
+    return false;
   }
 
   @override

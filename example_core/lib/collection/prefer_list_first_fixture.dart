@@ -107,7 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic list;
 
-// BAD: Should trigger prefer_list_first
+// BAD: Should trigger prefer_list_first — isolated [0] access
 // expect_lint: prefer_list_first
 void _bad245() {
   final first = list[0];
@@ -116,4 +116,50 @@ void _bad245() {
 // GOOD: Should NOT trigger prefer_list_first
 void _good245() {
   final first = list.first;
+}
+
+// GOOD: Should NOT trigger — sibling index accesses on same variable
+void _goodSiblingAccess() {
+  final items = <String>['a', 'b', 'c'];
+  final first = items[0];
+  final second = items[1];
+}
+
+// GOOD: Should NOT trigger — multiple indices in same expression
+void _goodMultipleIndices() {
+  final parts = 'hello world foo'.split(' ');
+  final result = '${parts[0]} and ${parts[1]}';
+}
+
+// GOOD: Should NOT trigger — three indices in same function
+void _goodThreeIndices() {
+  final parts = <String>['x', 'y', 'z'];
+  final joined = '${parts[0]}, ${parts[1]}, and ${parts[2]}';
+}
+
+// GOOD: Should NOT trigger — [0] init before loop from [1]
+void _goodLoopFromOne() {
+  final items = <int>[1, 2, 3, 4];
+  var current = items[0];
+  for (int i = 1; i < items.length; i++) {
+    current += items[i];
+  }
+}
+
+// GOOD: Should NOT trigger — assignment target
+void _goodAssignmentTarget() {
+  final items = <String>['a', 'b', 'c'];
+  items[0] = 'z';
+}
+
+// GOOD: Should NOT trigger — String subscript (no .first getter)
+void _goodStringSubscript() {
+  final word = 'hello';
+  final firstChar = word[0];
+}
+
+// GOOD: Should NOT trigger — Map with int key (no .first getter)
+void _goodMapSubscript() {
+  final map = <int, String>{0: 'a', 1: 'b'};
+  final value = map[0];
 }
