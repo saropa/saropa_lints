@@ -11,6 +11,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ** See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
 
 ---
+## [Unreleased]
+
+---
 ## [5.0.2]
 
 ### Fixed
