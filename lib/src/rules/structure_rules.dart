@@ -459,6 +459,10 @@ bool _isTestFile(String filePath) {
 /// Checks if the file exceeds [maxLines] and reports a diagnostic if so.
 /// The [forTestFiles] parameter determines whether the rule applies to
 /// test files (true) or production files (false).
+///
+/// Only **code lines** are counted — blank lines and lines containing only
+/// comments (`//`, `///`, `/* */`) are excluded.  This prevents
+/// well-documented files from being penalised for thorough dartdoc.
 void _checkFileLength({
   required SaropaDiagnosticReporter reporter,
   required SaropaContext context,
@@ -471,14 +475,39 @@ void _checkFileLength({
   if (forTestFiles != isTest) return;
 
   context.addCompilationUnit((CompilationUnit unit) {
-    final Token endToken = unit.endToken;
-    final int lineCount = unit.lineInfo.getLocation(endToken.end).lineNumber;
+    final int codeLineCount = _countCodeLines(unit);
 
-    if (lineCount > maxLines) {
+    if (codeLineCount > maxLines) {
       if (exemptUtilityNamespaces && _isUtilityNamespaceFile(unit)) return;
       reporter.atToken(unit.beginToken, code);
     }
   });
+}
+
+/// Counts the number of lines that contain at least one code token.
+///
+/// Walks all non-comment tokens in [unit] and records which lines they
+/// occupy.  Lines that contain only comments or are blank are excluded.
+int _countCodeLines(CompilationUnit unit) {
+  final Set<int> codeLines = <int>{};
+  Token? token = unit.beginToken;
+
+  while (token != null && !token.isEof) {
+    final int startLine = unit.lineInfo.getLocation(token.offset).lineNumber;
+    codeLines.add(startLine);
+
+    // For multi-line tokens (e.g. multi-line strings), count all lines.
+    if (token.length > 1) {
+      final int endLine = unit.lineInfo.getLocation(token.end - 1).lineNumber;
+      for (int line = startLine + 1; line <= endLine; line++) {
+        codeLines.add(line);
+      }
+    }
+
+    token = token.next;
+  }
+
+  return codeLines.length;
 }
 
 /// Returns true when every top-level class in [unit] is an `abstract final`
@@ -533,7 +562,8 @@ class PreferSmallFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_small_length_files',
-    '[prefer_small_length_files] File has more than $_maxLines lines. '
+    '[prefer_small_length_files] File has more than $_maxLines code lines '
+        '(comments and blank lines excluded). '
         'Smaller files are easier to understand and maintain. {v5}',
     correctionMessage:
         'Split this file into focused modules with single responsibilities. '
@@ -579,7 +609,8 @@ class AvoidMediumFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_medium_length_files',
-    '[avoid_medium_length_files] File exceeds $_maxLines lines. '
+    '[avoid_medium_length_files] File exceeds $_maxLines code lines '
+        '(comments and blank lines excluded). '
         'Files beyond this threshold often contain multiple responsibilities, '
         'which makes navigation harder and increases merge conflict risk in team development. {v4}',
     correctionMessage:
@@ -627,7 +658,8 @@ class AvoidLongFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_long_length_files',
-    '[avoid_long_length_files] File exceeds $_maxLines lines. '
+    '[avoid_long_length_files] File exceeds $_maxLines code lines '
+        '(comments and blank lines excluded). '
         'Files this long are difficult to navigate, increase code review time, '
         'and frequently indicate that the file handles multiple unrelated concerns. {v4}',
     correctionMessage:
@@ -676,7 +708,8 @@ class AvoidVeryLongFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_very_long_length_files',
-    '[avoid_very_long_length_files] File exceeds $_maxLines lines. '
+    '[avoid_very_long_length_files] File exceeds $_maxLines code lines '
+        '(comments and blank lines excluded). '
         'Files this large significantly slow down IDE indexing, increase build times, '
         'and make it nearly impossible to understand the full scope of changes during code review. {v4}',
     correctionMessage:
@@ -757,7 +790,7 @@ class PreferSmallTestFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_small_length_test_files',
-    '[prefer_small_length_test_files] Test file has more than $_maxLines lines. While test files typically need more room than production code, very large test files can still indicate poor organization. Split by feature, scenario, or test category. {v3}',
+    '[prefer_small_length_test_files] Test file has more than $_maxLines code lines (comments and blank lines excluded). While test files typically need more room than production code, very large test files can still indicate poor organization. Split by feature, scenario, or test category. {v3}',
     correctionMessage:
         'Split tests by feature or scenario to improve organization. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Disable with: // ignore_for_file: prefer_small_length_test_files',
@@ -808,7 +841,7 @@ class AvoidMediumTestFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_medium_length_test_files',
-    '[avoid_medium_length_test_files] Test file exceeds $_maxLines lines. At 600+ lines, a test file may be covering too many scenarios or features. Split tests by domain, widget, or use case to improve maintainability and faster test runs. {v2}',
+    '[avoid_medium_length_test_files] Test file exceeds $_maxLines code lines (comments and blank lines excluded). At 600+ lines, a test file may be covering too many scenarios or features. Split tests by domain, widget, or use case to improve maintainability and faster test runs. {v2}',
     correctionMessage:
         'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Disable with: // ignore_for_file: avoid_medium_length_test_files',
@@ -859,7 +892,7 @@ class AvoidLongTestFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_long_length_test_files',
-    '[avoid_long_length_test_files] Test file exceeds $_maxLines lines. A 1000+ line test file is difficult to navigate and likely tests multiple distinct features. Extract test groups into separate files organized by feature area. {v2}',
+    '[avoid_long_length_test_files] Test file exceeds $_maxLines code lines (comments and blank lines excluded). A 1000+ line test file is difficult to navigate and likely tests multiple distinct features. Extract test groups into separate files organized by feature area. {v2}',
     correctionMessage:
         'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Disable with: // ignore_for_file: avoid_long_length_test_files',
@@ -910,7 +943,7 @@ class AvoidVeryLongTestFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_very_long_length_test_files',
-    '[avoid_very_long_length_test_files] Test file exceeds $_maxLines lines. Even with test files\' higher tolerance for length, 2000+ lines indicates the file is testing too much. Split into separate test files organized by feature, screen, or use case. {v2}',
+    '[avoid_very_long_length_test_files] Test file exceeds $_maxLines code lines (comments and blank lines excluded). Even with test files\' higher tolerance for length, 2000+ lines indicates the file is testing too much. Split into separate test files organized by feature, screen, or use case. {v2}',
     correctionMessage:
         'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior.'
         'Disable with: // ignore_for_file: avoid_very_long_length_test_files',

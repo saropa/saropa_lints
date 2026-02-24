@@ -121,3 +121,21 @@ Map<String, dynamic>? _good1223b() => null;
 
 // GOOD: Nested Map<String, dynamic> in type arguments
 List<Map<String, dynamic>> _good1223c() => [];
+
+// GOOD: List<dynamic> is canonical for JSON arrays
+List<dynamic> _good1223d() => [];
+
+// GOOD: Map<dynamic, dynamic> for generic map extensions
+void _good1223e(Map<dynamic, dynamic>? m) {}
+
+// GOOD: dynamic in closure/lambda parameter (type dictated by container)
+void _good1223f(List<dynamic> items) {
+  items.forEach((dynamic e) => e.toString());
+}
+
+// GOOD: dynamic in for-in loop variable (type dictated by iterable)
+void _good1223g(List<dynamic> items) {
+  for (dynamic item in items) {
+    item.toString();
+  }
+}

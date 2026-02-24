@@ -12,3 +12,10 @@ void _bad(List<int> list) {
 void _good(List<int> list) {
   final doubled = list.map((e) => e * 2).toList(); // Return value used
 }
+
+// GOOD: Map mutation methods — return value is a convenience, side effect is the goal
+void _goodMapMutation(Map<String, int> counts, Map<String, List<int>> grouped) {
+  counts.update('key', (v) => v + 1, ifAbsent: () => 1);
+  counts.putIfAbsent('other', () => 0);
+  grouped.update('key', (v) => [...v, 1], ifAbsent: () => <int>[1]);
+}
