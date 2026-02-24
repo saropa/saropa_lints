@@ -733,7 +733,7 @@ def get_tier_integrity_checks(
         ))
     else:
         checks.append((
-            _P, "flutterStylisticRules is subset of stylisticRules", [],
+            _P, "All flutterStylisticRules exist in stylisticRules", [],
         ))
 
     # 6. Package rules
