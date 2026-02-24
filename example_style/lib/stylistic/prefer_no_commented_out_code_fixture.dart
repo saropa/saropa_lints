@@ -99,6 +99,21 @@ void goodExamples() {
   // false indicates an error occurred
   // return when the condition is met
   // return to the previous state after completion
+
+  // Section headers with type names (should NOT trigger)
+  // Iterable extensions
+  // List extensions
+  // Map extensions and utilities
+  // String extensions and utilities
+
+  // Inline prose containing keywords (should NOT trigger)
+  // this is non-null, other is null
+  // this is smaller
+  // Map the list of enum values to a list of their names as strings
+  // new set with the same elements as this iterable
+  // Iterate over each row in the matrix
+  // Sort the list of names in alphabetical order
+  // Use expand() method to flatten the 2D list and create a
 }
 
 // =============================================================================

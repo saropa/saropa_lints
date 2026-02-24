@@ -224,7 +224,8 @@ class AvoidDynamicRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_dynamic_type',
     "[avoid_dynamic_type] 'dynamic' type disables static type checking, hiding errors until runtime. "
-        "Method calls on dynamic values are never verified by the compiler, so typos, missing methods, and wrong argument types only surface as NoSuchMethodError crashes in production. Map<String, dynamic> is exempt as the canonical Dart JSON type. {v4}",
+        "Method calls on dynamic values are never verified by the compiler, so typos, missing methods, and wrong argument types only surface as NoSuchMethodError crashes in production. "
+        "Exempt: type arguments (e.g. List<dynamic>, Map<String, dynamic>), closure parameters, and for-in loop variables. {v5}",
     correctionMessage:
         "Replace 'dynamic' with a specific type, Object (for truly unknown values with explicit casts), or a generic type parameter. "
         'If the actual type varies, use a sealed class hierarchy or union type to keep the compiler involved in checking correctness.',
@@ -238,24 +239,61 @@ class AvoidDynamicRule extends SaropaLintRule {
   ) {
     context.addNamedType((NamedType node) {
       if (node.name.lexeme == 'dynamic') {
-        if (_isMapValueType(node)) return;
+        if (_isExempt(node)) return;
         reporter.atNode(node);
       }
     });
   }
 
-  /// Returns true if [node] is the value type argument of a Map type.
+  /// Returns true if this `dynamic` usage is in an exempt context.
+  static bool _isExempt(NamedType node) {
+    // 1. Type argument of any generic type: List<dynamic>,
+    //    Map<String, dynamic>, MapEquality<dynamic, int>, etc.
+    if (_isTypeArgument(node)) return true;
+
+    // 2. Closure/lambda formal parameter: (dynamic e) => ...
+    //    The type is dictated by the container's generic type.
+    if (_isClosureParameter(node)) return true;
+
+    // 3. For-in loop variable: for (dynamic item in list)
+    //    The type is dictated by the iterable's element type.
+    if (_isForInLoopVariable(node)) return true;
+
+    return false;
+  }
+
+  /// Returns true if [node] is a type argument of any generic type.
   ///
-  /// `Map<String, dynamic>` is the canonical Dart JSON type and should
-  /// not be flagged — it is unavoidable when working with jsonDecode().
-  static bool _isMapValueType(NamedType node) {
+  /// Covers `List<dynamic>`, `Map<String, dynamic>`, `Set<dynamic>`,
+  /// `MapEquality<dynamic, int>`, etc. These are unavoidable when the
+  /// generic container holds untyped data (e.g. JSON).
+  static bool _isTypeArgument(NamedType node) {
+    return node.parent is TypeArgumentList;
+  }
+
+  /// Returns true if [node] is the type of a formal parameter in a
+  /// closure or function expression (lambda).
+  ///
+  /// Lambda parameters inherit their type from the enclosing context
+  /// (e.g. `list.forEach((dynamic e) => ...)` where the list is
+  /// `List<dynamic>`), so `dynamic` is imposed, not chosen.
+  static bool _isClosureParameter(NamedType node) {
     final AstNode? parent = node.parent;
-    if (parent is! TypeArgumentList) return false;
-    final AstNode? grandparent = parent.parent;
-    if (grandparent is! NamedType) return false;
-    if (grandparent.name.lexeme != 'Map') return false;
-    final NodeList<TypeAnnotation> args = parent.arguments;
-    return args.length == 2 && args[1] == node;
+    if (parent is! SimpleFormalParameter) return false;
+    final AstNode? paramList = parent.parent;
+    if (paramList is! FormalParameterList) return false;
+    final AstNode? paramListParent = paramList.parent;
+    return paramListParent is FunctionExpression;
+  }
+
+  /// Returns true if [node] is the type of a for-in loop variable.
+  ///
+  /// `for (dynamic item in collection)` — the type is dictated by the
+  /// collection's element type.
+  static bool _isForInLoopVariable(NamedType node) {
+    final AstNode? parent = node.parent;
+    if (parent is! DeclaredIdentifier) return false;
+    return parent.parent is ForEachPartsWithDeclaration;
   }
 }
 
