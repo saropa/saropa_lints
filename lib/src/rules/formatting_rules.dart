@@ -496,6 +496,12 @@ class UnnecessaryTrailingCommaRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'final list = [1, 2, 3,];';
+
+  @override
+  String get exampleGood => 'final list = [1, 2, 3];';
+
   static const LintCode _code = LintCode(
     'unnecessary_trailing_comma',
     '[unnecessary_trailing_comma] Removing trailing commas in single-line constructs is a formatting preference. No impact on code behavior or performance. Enable via the stylistic tier. {v4}',

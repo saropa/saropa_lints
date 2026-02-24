@@ -13,6 +13,15 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Fixed
+- `init` walkthrough: skipped stylistic rules now marked as reviewed so they are not re-prompted on subsequent runs
+
+### Changed
+- `init` walkthrough: show GOOD example before BAD for clearer readability
+- `init` walkthrough: restructured 77-rule "Opinionated prefer_* rules" bucket into 27 conflicting pick-one categories (e.g., `prefer_await_over_then` vs `prefer_then_over_await`) plus 32 non-conflicting opinionated rules
+- `init` walkthrough: skip prompt now says "keeps current" to clarify the rule won't be re-asked
+- Added `exampleBad`/`exampleGood` to 26 conflicting stylistic rules for clearer wizard descriptions
+
 ---
 ## [5.0.2]
 
