@@ -26,6 +26,7 @@ bool _isStaticMember(ClassMember member) {
   } else if (member is MethodDeclaration) {
     return member.isStatic;
   }
+
   return false;
 }
 
@@ -36,6 +37,7 @@ bool _isPrivateMember(ClassMember member) {
   } else if (member is MethodDeclaration) {
     return member.name.lexeme.startsWith('_');
   }
+
   return false;
 }
 
@@ -1114,6 +1116,12 @@ class PreferObjectOverDynamicRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad => 'dynamic value = getData();';
+
+  @override
+  String get exampleGood => 'Object? value = getData();';
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         PreferObjectOverDynamicFix(context: context),
@@ -1173,6 +1181,12 @@ class PreferDynamicOverObjectRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'Object? value = getData();';
+
+  @override
+  String get exampleGood => 'dynamic value = getData();';
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -1238,6 +1252,12 @@ class PreferLowerCamelCaseConstantsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'const MAX_RETRIES = 3;';
+
+  @override
+  String get exampleGood => 'const maxRetries = 3;';
 
   static const LintCode _code = LintCode(
     'prefer_lower_camel_case_constants',
@@ -1565,6 +1585,12 @@ class PreferImplicitBooleanComparisonRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'if (isReady == true) { }';
+
+  @override
+  String get exampleGood => 'if (isReady) { }';
+
   static const LintCode _code = LintCode(
     'prefer_implicit_boolean_comparison',
     '[prefer_implicit_boolean_comparison] Comparing a boolean expression to a boolean literal (== true or == false) is redundant and adds visual noise. Remove the comparison and use the expression directly for cleaner, idiomatic Dart. {v4}',
@@ -1623,6 +1649,12 @@ class PreferExplicitBooleanComparisonRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'if (user?.isActive ?? false) { }';
+
+  @override
+  String get exampleGood => 'if (user?.isActive == true) { }';
 
   static const LintCode _code = LintCode(
     'prefer_explicit_boolean_comparison',

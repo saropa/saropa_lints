@@ -24,6 +24,7 @@ bool _containsAwaitExpression(Expression expr) {
   for (final child in expr.childEntities) {
     if (child is Expression && _containsAwaitExpression(child)) return true;
   }
+
   return false;
 }
 
@@ -79,6 +80,13 @@ class PreferEarlyReturnRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'if (x != null) { if (y != null) { doWork(); } }';
+
+  @override
+  String get exampleGood =>
+      'if (x == null) return; if (y == null) return; doWork();';
 
   static const LintCode _code = LintCode(
     'prefer_early_return',
@@ -603,6 +611,12 @@ class PreferChainedOverCascadeRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'paint..color = red..strokeWidth = 2;';
+
+  @override
+  String get exampleGood => 'paint.color = red; paint.strokeWidth = 2;';
+
   static const LintCode _code = LintCode(
     'prefer_chained_over_cascade',
     '[prefer_chained_over_cascade] Cascade notation is unfamiliar to developers from other languages and breaks builder patterns. Separate statements are explicit about each operation. {v1}',
@@ -853,6 +867,12 @@ class PreferAwaitOverThenRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => 'fetchData().then((d) => process(d));';
+
+  @override
+  String get exampleGood => 'final d = await fetchData(); process(d);';
+
   static const LintCode _code = LintCode(
     'prefer_await_over_then',
     '[prefer_await_over_then] The .then() chain obscures sequential async logic and complicates error handling. Rewrite with await for clearer control flow. {v3}',
@@ -909,6 +929,12 @@ class PreferThenOverAwaitRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'final d = await fetchData(); process(d);';
+
+  @override
+  String get exampleGood => 'fetchData().then(process).then(save);';
 
   static const LintCode _code = LintCode(
     'prefer_then_over_await',

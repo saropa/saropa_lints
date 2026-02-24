@@ -389,6 +389,12 @@ class PreferLateOverNullableRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'String? name; // always set in initState';
+
+  @override
+  String get exampleGood => 'late final String name; // set in initState';
+
   static const LintCode _code = LintCode(
     'prefer_late_over_nullable',
     '[prefer_late_over_nullable] Use late instead of nullable for lazily initialized fields that are always set before first access. This is an opinionated rule - not included in any tier by default. {v2}',
@@ -620,6 +626,12 @@ class PreferAddAllOverSpreadRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'final all = [...list1, ...list2];';
+
+  @override
+  String get exampleGood => 'list1.toList()..addAll(list2);';
 
   static const LintCode _code = LintCode(
     'prefer_addall_over_spread',

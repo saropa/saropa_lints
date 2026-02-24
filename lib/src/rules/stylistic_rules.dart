@@ -1791,6 +1791,12 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'const maxRetries = 3;';
+
+  @override
+  String get exampleGood => 'const MAX_RETRIES = 3;';
+
   static const LintCode _code = LintCode(
     'prefer_screaming_case_constants',
     '[prefer_screaming_case_constants] Constant name does not use SCREAMING_SNAKE_CASE convention. Without visual distinction, constants blend with regular variables and their immutable intent is lost. {v5}',

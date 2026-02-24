@@ -151,6 +151,12 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad => 'final x = 1;\nprint(x);';
+
+  @override
+  String get exampleGood => 'final x = 1;\n\nprint(x);';
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         AddBlankLineAfterDeclarationsFix(context: context),
@@ -236,6 +242,12 @@ class PreferCompactDeclarationsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'final x = 1;\n\nprint(x);';
+
+  @override
+  String get exampleGood => 'final x = 1;\nprint(x);';
+
   static const LintCode _code = LintCode(
     'prefer_compact_declarations',
     '[prefer_compact_declarations] Unnecessary blank line after variable declarations pushes related logic further from the variables it uses, increasing the vertical distance readers must scan. {v3}',
@@ -314,6 +326,12 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'void a() {}\nvoid b() {}';
+
+  @override
+  String get exampleGood => 'void a() {}\n\nvoid b() {}';
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -397,6 +415,12 @@ class PreferCompactClassMembersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'void a() {}\n\nvoid b() {}';
+
+  @override
+  String get exampleGood => 'void a() {}\nvoid b() {}';
 
   static const LintCode _code = LintCode(
     'prefer_compact_class_members',
