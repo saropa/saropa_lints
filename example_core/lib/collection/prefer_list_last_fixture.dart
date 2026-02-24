@@ -107,7 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic list;
 
-// BAD: Should trigger prefer_list_last
+// BAD: Should trigger prefer_list_last — isolated [length-1] access
 // expect_lint: prefer_list_last
 void _bad247() {
   final last = list[list.length - 1];
@@ -116,4 +116,17 @@ void _bad247() {
 // GOOD: Should NOT trigger prefer_list_last
 void _good247() {
   final last = list.last;
+}
+
+// GOOD: Should NOT trigger — assignment target
+void _goodLastAssignment() {
+  final items = <String>['a', 'b', 'c'];
+  items[items.length - 1] = 'z';
+}
+
+// GOOD: Should NOT trigger — sibling index accesses in same scope
+void _goodLastWithSiblings() {
+  final items = <String>['a', 'b', 'c'];
+  final first = items[0];
+  final last = items[items.length - 1];
 }
