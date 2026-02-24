@@ -5,6 +5,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:analyzer/source/line_info.dart';
 
 import '../project_context.dart' show ProjectContext;
 import '../saropa_lint_rule.dart';
@@ -489,21 +490,35 @@ void _checkFileLength({
 /// Walks all non-comment tokens in [unit] and records which lines they
 /// occupy.  Lines that contain only comments or are blank are excluded.
 int _countCodeLines(CompilationUnit unit) {
+  return _countCodeLinesInTokenRange(unit.lineInfo, unit.beginToken);
+}
+
+/// Counts lines containing at least one code token in a token range.
+///
+/// Walks from [beginToken] until EOF (or [endToken] if provided) and records
+/// which lines contain non-comment tokens. Comment-only and blank lines are
+/// excluded.
+int _countCodeLinesInTokenRange(
+  LineInfo lineInfo,
+  Token beginToken, {
+  Token? endToken,
+}) {
   final Set<int> codeLines = <int>{};
-  Token? token = unit.beginToken;
+  Token? token = beginToken;
 
   while (token != null && !token.isEof) {
-    final int startLine = unit.lineInfo.getLocation(token.offset).lineNumber;
+    final int startLine = lineInfo.getLocation(token.offset).lineNumber;
     codeLines.add(startLine);
 
     // For multi-line tokens (e.g. multi-line strings), count all lines.
     if (token.length > 1) {
-      final int endLine = unit.lineInfo.getLocation(token.end - 1).lineNumber;
+      final int endLine = lineInfo.getLocation(token.end - 1).lineNumber;
       for (int line = startLine + 1; line <= endLine; line++) {
         codeLines.add(line);
       }
     }
 
+    if (endToken != null && token == endToken) break;
     token = token.next;
   }
 
@@ -967,10 +982,13 @@ class AvoidVeryLongTestFilesRule extends SaropaLintRule {
 
 /// Warns when a function or method body exceeds the maximum line count.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+/// Since: v0.1.4 | Updated: v5.0.3 | Rule version: v5
 ///
 /// Long functions are harder to understand and test. Consider
 /// extracting parts into smaller functions.
+///
+/// Comments and blank lines are excluded from the count so that
+/// well-documented code is never penalised for thorough documentation.
 ///
 /// ### Configuration
 /// Default maximum: 100 lines
@@ -988,9 +1006,10 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_long_functions',
-    '[avoid_long_functions] Function body exceeds $_maxLines lines. '
+    '[avoid_long_functions] Function body exceeds $_maxLines code lines '
+        '(comments and blank lines excluded). '
         'Long functions are harder to understand, test in isolation, and debug '
-        'because they typically handle multiple concerns and have complex control flow paths. {v4}',
+        'because they typically handle multiple concerns and have complex control flow paths. {v5}',
     correctionMessage:
         'Extract logical sections into smaller, well-named private functions. '
         'Each function should do one thing and be testable independently.',
@@ -1019,9 +1038,13 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
     if (body == null) return;
     if (body is EmptyFunctionBody) return;
 
-    // Count lines in the function body source
-    final String source = body.toSource();
-    final int lineCount = '\n'.allMatches(source).length + 1;
+    // Count only code lines (comments and blank lines excluded)
+    final unit = body.root as CompilationUnit;
+    final int lineCount = _countCodeLinesInTokenRange(
+      unit.lineInfo,
+      body.beginToken,
+      endToken: body.endToken,
+    );
 
     if (lineCount > _maxLines) {
       reporter.atToken(nameToken);
