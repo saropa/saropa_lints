@@ -105,13 +105,72 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_trailing_comma_always
-// expect_lint: prefer_trailing_comma_always
-void _bad1125() {
-  // TODO: Add code that triggers prefer_trailing_comma_always
+// --- BAD: Should trigger prefer_trailing_comma_always ---
+
+// Multi-line argument list without trailing comma
+void _badMultiLineArgs() {
+  _threeArgs(
+      'alpha',
+      'beta',
+      // expect_lint: prefer_trailing_comma_always
+      'gamma');
 }
 
-// GOOD: Should NOT trigger prefer_trailing_comma_always
-void _good1125() {
-  // TODO: Add compliant code for prefer_trailing_comma_always
+// Multi-line list literal without trailing comma
+void _badMultiLineList() {
+  final list = [
+    'first',
+    'second',
+    // expect_lint: prefer_trailing_comma_always
+    'third'
+  ];
 }
+
+// Multi-line parameter list without trailing comma
+void _badMultiLineParams(
+    int a,
+    int b,
+    // expect_lint: prefer_trailing_comma_always
+    int c) {}
+
+// --- GOOD: Should NOT trigger prefer_trailing_comma_always ---
+
+// Callback as last positional argument (false positive fix)
+void _goodCallbackPositional() {
+  final items = [1, 2, 3];
+  items.forEach((item) {
+    _threeArgs(item.toString(), '', '');
+  });
+}
+
+// Callback + other args (false positive fix)
+void _goodCallbackWithArgs() {
+  List<int>.generate(5, (_) {
+    return 0;
+  });
+}
+
+// Named callback argument (false positive fix)
+void _goodNamedCallback() {
+  _namedCallback(builder: (x) {
+    return x.toString();
+  });
+}
+
+// Already has trailing comma — compliant
+void _goodTrailingCommaPresent() {
+  _threeArgs(
+    'alpha',
+    'beta',
+    'gamma',
+  );
+}
+
+// Single-line argument list — not multi-line, no comma needed
+void _goodSingleLine() {
+  _threeArgs('a', 'b', 'c');
+}
+
+// Helpers
+void _threeArgs(String a, String b, String c) {}
+void _namedCallback({required String Function(int) builder}) {}
