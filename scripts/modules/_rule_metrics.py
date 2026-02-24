@@ -149,183 +149,21 @@ def _count_fixtures_for_category(
     return 0
 
 
-def display_test_coverage(project_dir: Path) -> None:
-    """Display test coverage report with bar chart visualization."""
-    rules_dir = project_dir / "lib" / "src" / "rules"
-    if not rules_dir.exists():
-        return
-
-    example_dirs = _get_example_dirs(project_dir)
-    categories = _collect_category_rules(rules_dir)
-    category_details: list[tuple[str, int, int]] = []
-    for cat in categories:
-        fixture_count = _count_fixtures_for_category(
-            example_dirs, cat.category,
-        )
-        category_details.append((cat.category, cat.rule_count, fixture_count))
-
-    total_rules = sum(c[1] for c in category_details)
-    # Cap each category at its rule count so excess fixtures don't mask gaps
-    total_fixtures = sum(min(c[2], c[1]) for c in category_details)
-    coverage_pct = (
-        (total_fixtures / total_rules * 100) if total_rules > 0 else 0
-    )
-
-    status_color, status = _status_for_percentage(coverage_pct)
-
-    print()
-    print_colored("  ▶ Test Coverage", Color.WHITE)
-    print()
-
-    # Top 5 worst offenders (compute early for column alignment)
-    ranked = sorted(
-        category_details,
-        key=lambda c: c[1] - c[2],
-        reverse=True,
-    )[:5]
-
-    # Top 5 lowest coverage (skip categories at 100%)
-    worst = [
-        (cat, r, f) for cat, r, f in ranked if r - f > 0
-    ]
-
-    # Unified column width for Overall + worst rows
-    pad = max(
-        len("Overall"),
-        max((len(c) for c, _, _ in worst), default=0),
-    )
-
-    # Overall bar
-    bar = _make_bar(total_fixtures, total_rules)
-    print_colored(
-        f"    {'Overall':<{pad}s} {bar}  "
-        f"{total_fixtures:>4d}/{total_rules:<4d} "
-        f"({coverage_pct:5.1f}%) {status}",
-        status_color,
-    )
-
-    if worst:
-        print()
-        print_colored("    Lowest coverage:", Color.WHITE)
-        for category, rules, fixtures in worst:
-            pct = (fixtures / rules * 100) if rules > 0 else 0
-            bar = _make_bar(fixtures, rules)
-            if pct < 10:
-                row_color = Color.RED
-            elif pct < 30:
-                row_color = Color.YELLOW
-            else:
-                row_color = Color.CYAN
-            print_colored(
-                f"    {category:<{pad}s} {bar}  "
-                f"{fixtures:>4d}/{rules:<4d} ({pct:5.1f}%)",
-                row_color,
-            )
-    print()
-
-
-_TODO_RE = re.compile(r"//\s*TODO:", re.IGNORECASE)
-
-
-def display_todo_audit(project_dir: Path) -> None:
-    """Display TODO audit with bar chart per package, write full log."""
-    example_dirs = _get_example_dirs(project_dir)
-    if not example_dirs:
-        return
-
-    # Collect TODOs per package and per file
-    pkg_counts: list[tuple[str, int]] = []
-    all_todos: list[str] = []  # "package/file:line: message"
-
-    for lib_dir in example_dirs:
-        pkg_name = lib_dir.parent.name
-        pkg_total = 0
-        for dart_file in sorted(lib_dir.rglob("*.dart")):
-            try:
-                lines = dart_file.read_text(
-                    encoding="utf-8", errors="replace",
-                ).splitlines()
-            except Exception:
-                continue
-            for line_no, line in enumerate(lines, 1):
-                if _TODO_RE.search(line):
-                    pkg_total += 1
-                    rel = dart_file.relative_to(project_dir)
-                    all_todos.append(f"  {rel}:{line_no}: {line.strip()}")
-        pkg_counts.append((pkg_name, pkg_total))
-
-    total = sum(c for _, c in pkg_counts)
-    if total == 0:
-        return
-
-    max_count = max(c for _, c in pkg_counts)
-
-    print()
-    print_colored("  ▶ Fixture TODOs (placeholder stubs)", Color.WHITE)
-    print()
-
-    # Overall count
-    print_colored(
-        f"    Total: {total} TODOs across fixture files",
-        Color.YELLOW if total > 0 else Color.GREEN,
-    )
-    print()
-
-    # Per-package breakdown with bars
-    for pkg_name, count in sorted(pkg_counts, key=lambda x: -x[1]):
-        if count == 0:
-            continue
-        bar = _make_bar(count, max_count)
-        label = pkg_name.replace("example_", "").replace("example", "mocks")
-        print_colored(
-            f"    {label:<12s} {bar}  {count:>3d}",
-            Color.YELLOW if count > 20 else Color.CYAN,
-        )
-
-    # Write full log to reports date subfolder
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    date_folder = timestamp[:8]
-    reports_dir = project_dir / "reports" / date_folder
-    reports_dir.mkdir(parents=True, exist_ok=True)
-    log_path = reports_dir / f"{timestamp}_todo_audit.log"
-    log_lines = [
-        f"TODO Audit - {total} items",
-        f"{'=' * 60}",
-        "",
-    ]
-    # Group by package
-    current_pkg = ""
-    for todo_line in all_todos:
-        parts = todo_line.strip().split(os.sep, 1)
-        pkg = parts[0] if len(parts) > 1 else ""
-        if pkg != current_pkg:
-            current_pkg = pkg
-            log_lines.append(f"\n--- {current_pkg} ---")
-        log_lines.append(todo_line)
-
-    log_path.write_text("\n".join(log_lines), encoding="utf-8")
-    print()
-    print_colored(
-        f"    Full log: {log_path.relative_to(project_dir)}",
-        Color.WHITE,
-    )
-    print()
-
-
 _TEST_COUNT_RE = re.compile(r"^\s+test\(", re.MULTILINE)
 
 
-def display_unit_test_coverage(project_dir: Path) -> None:
-    """Display unit test file coverage for each rule category.
+def _compute_unit_test_stats(
+    project_dir: Path, rules_dir: Path,
+) -> tuple[int, int, int, list[tuple[str, int]]]:
+    """Compute unit test coverage stats.
 
-    Counts ``test()`` calls in dedicated ``test/*_rules_test.dart``
-    files. This complements fixture coverage by showing behavior-level
-    test documentation.
+    Returns:
+        (tested_categories, total_categories, total_tests,
+         untested_top5) where untested_top5 is [(category, rule_count)].
     """
-    rules_dir = project_dir / "lib" / "src" / "rules"
     test_dir = project_dir / "test"
-    if not rules_dir.exists() or not test_dir.exists():
-        return
+    if not test_dir.exists():
+        return 0, 0, 0, []
 
     # Build index of test files → test() call count
     test_files: dict[str, int] = {}
@@ -346,44 +184,190 @@ def display_unit_test_coverage(project_dir: Path) -> None:
 
     tested = sum(1 for c in category_details if c[2] > 0)
     total_cats = len(category_details)
-    coverage_pct = (tested / total_cats * 100) if total_cats > 0 else 0
-
-    status_color, status = _status_for_percentage(coverage_pct)
-
-    print()
-    print_colored("  ▶ Unit Test Coverage", Color.WHITE)
-    print()
-
-    bar = _make_bar(tested, total_cats)
-    print_colored(
-        f"    Categories   {bar}  {tested:>4d}/{total_cats:<4d} "
-        f"({coverage_pct:5.1f}%) {status}",
-        status_color,
-    )
-
     total_tests = sum(c[2] for c in category_details)
-    print_colored(
-        f"    Total tests: {total_tests}",
-        Color.CYAN,
-    )
 
-    # Top 5 categories without test files
     untested = sorted(
         [(name, rules) for name, rules, tests in category_details if tests == 0],
         key=lambda c: c[1],
         reverse=True,
     )[:5]
 
-    if untested:
+    return tested, total_cats, total_tests, untested
+
+
+def display_test_coverage(project_dir: Path) -> None:
+    """Display combined fixture and unit test coverage report."""
+    rules_dir = project_dir / "lib" / "src" / "rules"
+    if not rules_dir.exists():
+        return
+
+    # --- Fixture coverage ---
+    example_dirs = _get_example_dirs(project_dir)
+    categories = _collect_category_rules(rules_dir)
+    category_details: list[tuple[str, int, int]] = []
+    for cat in categories:
+        fixture_count = _count_fixtures_for_category(
+            example_dirs, cat.category,
+        )
+        category_details.append((cat.category, cat.rule_count, fixture_count))
+
+    total_rules = sum(c[1] for c in category_details)
+    # Cap each category at its rule count so excess fixtures don't mask gaps
+    total_fixtures = sum(min(c[2], c[1]) for c in category_details)
+    fixture_pct = (
+        (total_fixtures / total_rules * 100) if total_rules > 0 else 0
+    )
+
+    fixture_color, fixture_status = _status_for_percentage(fixture_pct)
+
+    # --- Unit test coverage ---
+    unit_tested, unit_total_cats, unit_total_tests, unit_untested = (
+        _compute_unit_test_stats(project_dir, rules_dir)
+    )
+    unit_pct = (
+        (unit_tested / unit_total_cats * 100) if unit_total_cats > 0 else 0
+    )
+    unit_color, unit_status = _status_for_percentage(unit_pct)
+
+    print()
+    print_colored("  ▶ Test Coverage", Color.WHITE)
+    print()
+
+    # Fixture overall bar
+    bar = _make_bar(total_fixtures, total_rules)
+    print_colored(
+        f"    Fixtures     {bar}  "
+        f"{total_fixtures:>4d}/{total_rules:<4d} "
+        f"({fixture_pct:5.1f}%) {fixture_status}",
+        fixture_color,
+    )
+
+    # Unit test overall bar
+    bar = _make_bar(unit_tested, unit_total_cats)
+    print_colored(
+        f"    Unit tests   {bar}  "
+        f"{unit_tested:>4d}/{unit_total_cats:<4d} "
+        f"({unit_pct:5.1f}%) {unit_status}",
+        unit_color,
+    )
+
+    if unit_total_tests > 0:
+        print_colored(
+            f"    Total test() calls: {unit_total_tests}",
+            Color.CYAN,
+        )
+
+    # Lowest fixture coverage
+    ranked = sorted(
+        category_details,
+        key=lambda c: c[1] - c[2],
+        reverse=True,
+    )[:5]
+    worst = [
+        (cat, r, f) for cat, r, f in ranked if r - f > 0
+    ]
+
+    if worst:
+        pad = max(len(c) for c, _, _ in worst)
+        print()
+        print_colored("    Lowest fixture coverage:", Color.WHITE)
+        for category, rules, fixtures in worst:
+            pct = (fixtures / rules * 100) if rules > 0 else 0
+            bar = _make_bar(fixtures, rules)
+            if pct < 10:
+                row_color = Color.RED
+            elif pct < 30:
+                row_color = Color.YELLOW
+            else:
+                row_color = Color.CYAN
+            print_colored(
+                f"    {category:<{pad}s} {bar}  "
+                f"{fixtures:>4d}/{rules:<4d} ({pct:5.1f}%)",
+                row_color,
+            )
+
+    # Missing unit test files
+    if unit_untested:
         print()
         print_colored("    Missing test files:", Color.WHITE)
-        for category, rules in untested:
+        for category, rules in unit_untested:
             print_colored(
                 f"    {category:<14s} ({rules:>3d} rules) "
                 f"needs test/{category}_rules_test.dart",
                 Color.RED if rules > 20 else Color.YELLOW,
             )
     print()
+
+
+_TODO_RE = re.compile(r"//\s*TODO:", re.IGNORECASE)
+
+
+def _collect_todo_stats(
+    project_dir: Path,
+) -> tuple[int, list[tuple[str, int]], list[str]]:
+    """Collect fixture TODO counts and log lines.
+
+    Returns:
+        (total, pkg_counts, all_todo_lines)
+    """
+    example_dirs = _get_example_dirs(project_dir)
+    pkg_counts: list[tuple[str, int]] = []
+    all_todos: list[str] = []
+
+    for lib_dir in example_dirs:
+        pkg_name = lib_dir.parent.name
+        pkg_total = 0
+        for dart_file in sorted(lib_dir.rglob("*.dart")):
+            try:
+                lines = dart_file.read_text(
+                    encoding="utf-8", errors="replace",
+                ).splitlines()
+            except Exception:
+                continue
+            for line_no, line in enumerate(lines, 1):
+                if _TODO_RE.search(line):
+                    pkg_total += 1
+                    rel = dart_file.relative_to(project_dir)
+                    all_todos.append(f"  {rel}:{line_no}: {line.strip()}")
+        pkg_counts.append((pkg_name, pkg_total))
+
+    total = sum(c for _, c in pkg_counts)
+    return total, pkg_counts, all_todos
+
+
+def _write_todo_log(
+    project_dir: Path, total: int, all_todos: list[str],
+) -> Path:
+    """Write full TODO audit log and return the log path."""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    date_folder = timestamp[:8]
+    reports_dir = project_dir / "reports" / date_folder
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    log_path = reports_dir / f"{timestamp}_todo_audit.log"
+    log_lines = [
+        f"TODO Audit - {total} items",
+        f"{'=' * 60}",
+        "",
+    ]
+    current_pkg = ""
+    for todo_line in all_todos:
+        parts = todo_line.strip().split(os.sep, 1)
+        pkg = parts[0] if len(parts) > 1 else ""
+        if pkg != current_pkg:
+            current_pkg = pkg
+            log_lines.append(f"\n--- {current_pkg} ---")
+        log_lines.append(todo_line)
+
+    log_path.write_text("\n".join(log_lines), encoding="utf-8")
+    return log_path
+
+
+def display_todo_audit(project_dir: Path) -> None:
+    """No-op: TODO audit is now shown by display_roadmap_summary."""
+
+
+def display_unit_test_coverage(project_dir: Path) -> None:
+    """No-op: unit test coverage is now shown by display_test_coverage."""
 
 
 # =============================================================================
@@ -501,19 +485,6 @@ def get_roadmap_summary(project_dir: Path) -> RoadmapSummary:
     )
 
 
-def _format_severity_row(
-    emoji: str, count: int, total: int, max_count: int
-) -> str:
-    """Format a severity row with inverted bar (less remaining = more filled).
-
-    The bar represents completion: 0 remaining → full bar, max remaining → empty.
-    """
-    label, ascii_fallback = _SEVERITY_LABELS.get(emoji, ("OTHER", "[?]"))
-    pct = (count / total * 100) if total > 0 else 0
-    bar = _make_bar(max_count - count, max_count)
-    return f"    {label:<12s} {bar}  {count:>4d} ({pct:5.1f}%)"
-
-
 def _severity_color(emoji: str, count: int) -> Color:
     """Pick color based on remaining count: green if done, else by severity."""
     if count == 0:
@@ -578,137 +549,153 @@ def _collect_bug_categories(bugs_dir: Path) -> list[_BugCategory]:
     return categories
 
 
-def _display_bug_section(bugs_dir: Path) -> None:
-    """Display bug report summary grouped by status.
+class _WorkRow(NamedTuple):
+    """A display row for the remaining work section."""
 
-    Groups: resolved (green), active/in-progress (yellow),
-    unsolved (red).  Bars scale within the active group only.
-    """
+    label: str
+    bar: str
+    suffix: str
+    color: Color
+    done: bool
+
+
+def _collect_roadmap_rows(
+    summary: RoadmapSummary,
+) -> list[_WorkRow]:
+    """Build remaining-work rows for roadmap and deferred rules."""
+    rows: list[_WorkRow] = []
+    for source, by_sev, total in [
+        ("Roadmap", summary.roadmap_by_severity, summary.roadmap_total),
+        ("Deferred", summary.deferred_by_severity, summary.deferred_total),
+    ]:
+        max_count = max(by_sev.values(), default=1)
+        for emoji in ["\U0001f6a8", "\u26a0\ufe0f", "\u2139\ufe0f"]:
+            count = by_sev.get(emoji, 0)
+            sev_label, _ = _SEVERITY_LABELS.get(
+                emoji, ("OTHER", "[?]"),
+            )
+            pct = (count / total * 100) if total > 0 else 0
+            bar = _make_bar(max_count - count, max_count)
+            rows.append(_WorkRow(
+                label=f"{source} - {sev_label}",
+                bar=bar,
+                suffix=f"{count:>4d} ({pct:5.1f}%)",
+                color=_severity_color(emoji, count),
+                done=False,
+            ))
+    return rows
+
+
+def _collect_todo_rows(
+    project_dir: Path,
+) -> tuple[list[_WorkRow], Path | None]:
+    """Build remaining-work rows for fixture TODOs."""
+    todo_total, pkg_counts, all_todos = _collect_todo_stats(project_dir)
+    if todo_total == 0:
+        return [], None
+
+    rows: list[_WorkRow] = []
+    max_count = max(c for _, c in pkg_counts)
+    for pkg_name, count in sorted(pkg_counts, key=lambda x: -x[1]):
+        if count == 0:
+            continue
+        label_name = pkg_name.replace("example_", "").replace(
+            "example", "mocks",
+        )
+        rows.append(_WorkRow(
+            label=f"Fixture TODOs - {label_name}",
+            bar=_make_bar(count, max_count),
+            suffix=f"{count:>3d}",
+            color=Color.YELLOW if count > 20 else Color.CYAN,
+            done=False,
+        ))
+    log_path = _write_todo_log(project_dir, todo_total, all_todos)
+    return rows, log_path
+
+
+def _collect_bug_rows(bugs_dir: Path) -> list[_WorkRow]:
+    """Build remaining-work rows for bug reports."""
     categories = _collect_bug_categories(bugs_dir)
     if not categories:
-        return
+        return []
 
+    rows: list[_WorkRow] = []
+    active = [c for c in categories if c.color != Color.GREEN]
     resolved = [c for c in categories if c.color == Color.GREEN]
-    active = [c for c in categories if c.color == Color.YELLOW]
-    unsolved = [c for c in categories if c.color == Color.RED]
 
-    total = sum(c.count for c in categories)
-    resolved_count = sum(c.count for c in resolved)
-    active_count = sum(c.count for c in active)
-    unsolved_count = sum(c.count for c in unsolved)
-
-    pad = max(len(c.label) for c in categories)
-
-    print()
-    print_colored(
-        f"  \u25b6 Bug Reports ({total} total)",
-        Color.WHITE,
-    )
-
-    # Resolved (done)
-    if resolved:
-        print()
-        print_colored("    Done:", Color.DIM)
-        for cat in resolved:
-            bar = _make_bar(1, 1)  # full bar — 100% resolved
-            print_colored(
-                f"    {cat.label:<{pad}s} {bar}  "
-                f"{cat.count:>4d} resolved",
-                Color.GREEN,
-            )
-
-    # Active (in progress)
     if active:
         active_max = max(c.count for c in active)
-        print()
-        print_colored("    In progress:", Color.DIM)
         for cat in active:
-            bar = _make_bar(cat.count, active_max)
-            print_colored(
-                f"    {cat.label:<{pad}s} {bar}  {cat.count:>4d}",
-                Color.YELLOW,
-            )
+            rows.append(_WorkRow(
+                label=f"Bug Reports - {cat.label}",
+                bar=_make_bar(cat.count, active_max),
+                suffix=f"{cat.count:>4d}",
+                color=cat.color,
+                done=False,
+            ))
 
-    # Unsolved (critical)
-    if unsolved:
-        empty_bar = " " * _BAR_WIDTH
-        print()
-        print_colored("    Unsolved:", Color.DIM)
-        for cat in unsolved:
-            print_colored(
-                f"    {cat.label:<{pad}s} {empty_bar}  "
-                f"{cat.count:>4d}",
-                Color.RED,
-            )
+    for cat in resolved:
+        rows.append(_WorkRow(
+            label=f"Bug Reports - {cat.label}",
+            bar=_make_bar(1, 1),
+            suffix=f"{cat.count:>4d} resolved",
+            color=Color.GREEN,
+            done=True,
+        ))
 
-    # Summary line
-    print()
-    parts: list[str] = []
-    if resolved_count:
-        parts.append(f"{resolved_count} resolved")
-    if active_count:
-        parts.append(f"{active_count} in progress")
-    if unsolved_count:
-        parts.append(f"{unsolved_count} unsolved")
-    summary_color = (
-        Color.RED if unsolved_count
-        else Color.YELLOW if active_count
-        else Color.GREEN
-    )
-    print_colored(f"    {', '.join(parts)}", summary_color)
+    return rows
 
 
 def display_roadmap_summary(
     project_dir: Path, *, bugs_dir: Path | None = None,
-) -> None:
-    """Display a summary of rules remaining to implement."""
+) -> Path | None:
+    """Display remaining work as flat line items.
+
+    Returns:
+        Path to the TODO audit log file, or None if no TODOs.
+    """
     summary = get_roadmap_summary(project_dir)
 
     print()
-    print_header("ROADMAP SUMMARY")
+    print_header("WORK REPORT")
 
-    # Find max count for bar scaling
-    roadmap_max = max(summary.roadmap_by_severity.values(), default=1)
-    deferred_max = max(summary.deferred_by_severity.values(), default=1)
-
-    # ROADMAP.md breakdown by severity
-    print()
-    print_colored(
-        f"  ▶ ROADMAP.md ({summary.roadmap_total} implementable rules)",
-        Color.WHITE,
-    )
-    print()
-    for emoji in ["🚨", "⚠️", "ℹ️"]:
-        count = summary.roadmap_by_severity.get(emoji, 0)
-        row = _format_severity_row(emoji, count, summary.roadmap_total, roadmap_max)
-        print_colored(row, _severity_color(emoji, count))
-
-    # ROADMAP_DEFERRED.md breakdown by severity
-    print()
-    print_colored(
-        f"  ▶ ROADMAP_DEFERRED.md ({summary.deferred_total} blocked rules)",
-        Color.WHITE,
-    )
-    print()
-    for emoji in ["🚨", "⚠️", "ℹ️"]:
-        count = summary.deferred_by_severity.get(emoji, 0)
-        row = _format_severity_row(
-            emoji, count, summary.deferred_total, deferred_max
-        )
-        print_colored(row, _severity_color(emoji, count))
-
-    # Summary totals
-    print()
-    print_colored(
-        f"    Total remaining: {summary.grand_total} rules",
-        Color.WHITE,
-    )
-
-    # Bug reports (optional, from sibling project)
+    rows = _collect_roadmap_rows(summary)
+    todo_rows, log_path = _collect_todo_rows(project_dir)
+    rows.extend(todo_rows)
     if bugs_dir is not None:
-        _display_bug_section(bugs_dir)
+        rows.extend(_collect_bug_rows(bugs_dir))
+
+    if not rows:
+        print_colored("    No remaining work items.", Color.GREEN)
+        print()
+        return log_path
+
+    pad = max(len(r.label) for r in rows)
+    not_done = [r for r in rows if not r.done]
+    done = [r for r in rows if r.done]
+
+    for row in not_done:
+        print_colored(
+            f"    {row.label:<{pad}} {row.bar}  {row.suffix}",
+            row.color,
+        )
+
+    if done:
+        print()
+        print_colored("    Done:", Color.DIM)
+        for row in done:
+            print_colored(
+                f"    {row.label:<{pad}} {row.bar}  {row.suffix}",
+                row.color,
+            )
 
     print()
+    print_colored(
+        f"    Total remaining: {summary.grand_total} roadmap rules",
+        Color.WHITE,
+    )
+    print()
+    return log_path
 
 
 # =============================================================================

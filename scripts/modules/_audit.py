@@ -505,7 +505,6 @@ def run_full_audit(
         dx_messages = extract_rule_messages(rules_dir)
 
     # ===== AUDIT CHECKS (pass/fail — tier integrity + quality) =====
-    print_section("AUDIT CHECKS")
 
     checks: list[_Check] = list(tier_checks)
 
