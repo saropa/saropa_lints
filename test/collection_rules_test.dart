@@ -217,6 +217,31 @@ void main() {
         // Preferred pattern used correctly
         expect('prefer_list_first passes', isNotNull);
       });
+
+      test('should NOT trigger on sibling index accesses', () {
+        // list[0] alongside list[1] in same scope → suppressed
+        expect('prefer_list_first suppressed for siblings', isNotNull);
+      });
+
+      test('should NOT trigger on assignment target', () {
+        // list[0] = value → suppressed
+        expect('prefer_list_first suppressed for assignment', isNotNull);
+      });
+
+      test('should NOT trigger on String subscript', () {
+        // string[0] → String has no .first getter
+        expect('prefer_list_first suppressed for String', isNotNull);
+      });
+
+      test('should NOT trigger on Map subscript', () {
+        // map[0] → Map int key, not index
+        expect('prefer_list_first suppressed for Map', isNotNull);
+      });
+
+      test('should NOT trigger with loop variable index', () {
+        // list[0] init + list[i] in loop → suppressed
+        expect('prefer_list_first suppressed for loop', isNotNull);
+      });
     });
 
     group('prefer_iterable_of', () {
@@ -240,6 +265,16 @@ void main() {
       test('prefer_list_last should NOT trigger', () {
         // Preferred pattern used correctly
         expect('prefer_list_last passes', isNotNull);
+      });
+
+      test('should NOT trigger on assignment target', () {
+        // list[list.length - 1] = value → suppressed
+        expect('prefer_list_last suppressed for assignment', isNotNull);
+      });
+
+      test('should NOT trigger with sibling index accesses', () {
+        // list[0] alongside list[list.length - 1] → suppressed
+        expect('prefer_list_last suppressed for siblings', isNotNull);
       });
     });
 
