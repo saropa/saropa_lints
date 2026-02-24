@@ -105,10 +105,52 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// NOTE: avoid_long_functions fires when a function has > 100 lines.
-// A fixture file demonstrating this would itself be 100+ lines long.
-// In real code: split long functions into smaller, named helper functions.
+// NOTE: avoid_long_functions fires when a function body has > 100 CODE lines.
+// Comments and blank lines are excluded from the count (v5+).
 
-// BAD: A function with 101+ statements or declarations
+// GOOD: A function with many comments but few code lines should NOT trigger.
+// This tests the false-positive fix — documentation should never be penalised.
+void _wellDocumentedFunction() {
+  // ============================================
+  // Section 1: Setup
+  // ============================================
+  // This section handles initialization of the
+  // core data structures needed for processing.
+  // It ensures all invariants are maintained.
+  //
+  // The setup phase is critical because it
+  // validates input parameters, allocates
+  // temporary buffers, and establishes the
+  // initial state machine configuration.
+  var a = 1;
+
+  // ============================================
+  // Section 2: Processing
+  // ============================================
+  // This section performs the main computation.
+  // It iterates over the input data and applies
+  // the transformation rules defined above.
+  // Each step is carefully validated before
+  // proceeding to the next stage.
+  //
+  // Performance note: O(n log n) due to the
+  // sorting step in the middle of the pipeline.
+  var b = 2;
+
+  // ============================================
+  // Section 3: Cleanup
+  // ============================================
+  // Final cleanup and resource deallocation.
+  // All temporary buffers are released here.
+  //
+  // If an error occurred during processing,
+  // partial results are discarded and the
+  // original state is restored.
+  var c = a + b;
+
+  // ignore: unused_local_variable
+  var d = c;
+}
+
+// BAD: A function with 101+ CODE statements or declarations (LINT)
 // GOOD: Extract logical blocks into well-named helper functions
-void _placeholder1048() {}
