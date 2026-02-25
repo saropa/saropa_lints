@@ -111,6 +111,7 @@ dynamic _badAccessValue(BehaviorSubject<String> _subject) {
   if (_subject.isClosed) {
     return _subject.value; // Stale data from closed subject
   }
+
   return 'fallback';
 }
 
@@ -120,6 +121,7 @@ dynamic _badAccessValue2(BehaviorSubject<String> _subject) {
   if (_subject.isClosed == true) {
     return _subject.value;
   }
+
   return 'fallback';
 }
 
@@ -128,6 +130,7 @@ dynamic _goodAccessValue(BehaviorSubject<String> _subject) {
   if (!_subject.isClosed) {
     return _subject.value; // Subject is still active
   }
+
   return 'fallback';
 }
 

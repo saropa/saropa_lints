@@ -83,6 +83,7 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
             }
           }
         }
+        return;
       }
 
       // Check button labels
@@ -92,8 +93,81 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
             _checkForHardcodedText(arg.expression, reporter);
           }
         }
+        return;
+      }
+
+      // Check InputDecoration string parameters
+      if (constructorName == 'InputDecoration') {
+        for (final Expression arg in node.argumentList.arguments) {
+          if (arg is NamedExpression &&
+              _inputDecorationStringParams.contains(arg.name.label.name)) {
+            _checkForHardcodedString(arg.expression, reporter);
+          }
+        }
+        return;
+      }
+
+      // Check AlertDialog title/content, SimpleDialog title only
+      if (constructorName == 'AlertDialog') {
+        for (final Expression arg in node.argumentList.arguments) {
+          if (arg is NamedExpression) {
+            final String paramName = arg.name.label.name;
+            if (paramName == 'title' || paramName == 'content') {
+              _checkForHardcodedText(arg.expression, reporter);
+            }
+          }
+        }
+        return;
+      }
+      if (constructorName == 'SimpleDialog') {
+        for (final Expression arg in node.argumentList.arguments) {
+          if (arg is NamedExpression && arg.name.label.name == 'title') {
+            _checkForHardcodedText(arg.expression, reporter);
+          }
+        }
+        return;
+      }
+
+      // Check Tooltip message
+      if (constructorName == 'Tooltip') {
+        for (final Expression arg in node.argumentList.arguments) {
+          if (arg is NamedExpression && arg.name.label.name == 'message') {
+            _checkForHardcodedString(arg.expression, reporter);
+          }
+        }
+        return;
+      }
+
+      // Check SnackBar content
+      if (constructorName == 'SnackBar') {
+        for (final Expression arg in node.argumentList.arguments) {
+          if (arg is NamedExpression && arg.name.label.name == 'content') {
+            _checkForHardcodedText(arg.expression, reporter);
+          }
+        }
       }
     });
+  }
+
+  static const Set<String> _inputDecorationStringParams = <String>{
+    'labelText',
+    'hintText',
+    'errorText',
+    'helperText',
+    'counterText',
+    'prefixText',
+    'suffixText',
+  };
+
+  void _checkForHardcodedString(
+    Expression expr,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    if (expr is SimpleStringLiteral && expr.value.length > 1) {
+      reporter.atNode(expr);
+    } else if (expr is AdjacentStrings) {
+      reporter.atNode(expr);
+    }
   }
 
   void _checkForHardcodedText(
@@ -104,10 +178,10 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
       final String? name = expr.constructorName.type.element?.name;
       if (name == 'Text') {
         final NodeList<Expression> args = expr.argumentList.arguments;
-        if (args.isNotEmpty && args.first is SimpleStringLiteral) {
-          final SimpleStringLiteral literal = args.first as SimpleStringLiteral;
-          if (literal.value.length > 1) {
-            reporter.atNode(literal);
+        if (args.isNotEmpty) {
+          final Expression firstArg = args.first;
+          if (firstArg is SimpleStringLiteral && firstArg.value.length > 1) {
+            reporter.atNode(firstArg);
           }
         }
       }

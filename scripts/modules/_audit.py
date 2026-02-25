@@ -621,7 +621,7 @@ def run_full_audit(
             [", ".join(shown_rules) + suffix],
         ))
     else:
-        checks.append((_PASS, "ROADMAP is clean — no duplicates", []))
+        checks.append((_PASS, "ROADMAP has no duplicates", []))
 
     if near_matches:
         match_details = [

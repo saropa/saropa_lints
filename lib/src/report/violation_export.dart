@@ -273,6 +273,7 @@ String toRelativePath(String filePath, String projectRoot) {
   if (file.startsWith('$root/')) {
     return file.substring(root.length + 1);
   }
+
   return file;
 }
 

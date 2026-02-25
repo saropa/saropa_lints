@@ -100,40 +100,70 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_datetime_comparison_without_precision
-// Source: lib\src\rules\equality_rules.dart
+// Test fixture for: avoid_string_env_parsing
+// Source: lib\src\rules\config_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_datetime_comparison_without_precision
-// expect_lint: avoid_datetime_comparison_without_precision
-void _bad351() {
-  if (startTime == endTime) {}
+// ============================================================================
+// BAD: Should trigger avoid_string_env_parsing
+// ============================================================================
 
-  if (created != modified) {}
+// expect_lint: avoid_string_env_parsing
+const _bad1 = String.fromEnvironment('API_URL');
+
+// expect_lint: avoid_string_env_parsing
+const _bad2 = int.fromEnvironment('MAX_RETRIES');
+
+// expect_lint: avoid_string_env_parsing
+const _bad3 = bool.fromEnvironment('ENABLE_LOGS');
+
+// expect_lint: avoid_string_env_parsing
+const _bad4 = String.fromEnvironment('BASE_URL');
+
+// ============================================================================
+// GOOD: Should NOT trigger avoid_string_env_parsing
+// ============================================================================
+
+const _good1 = String.fromEnvironment(
+  'API_URL',
+  defaultValue: 'https://api.example.com',
+);
+
+const _good2 = int.fromEnvironment(
+  'MAX_RETRIES',
+  defaultValue: 3,
+);
+
+const _good3 = bool.fromEnvironment(
+  'ENABLE_LOGS',
+  defaultValue: false,
+);
+
+const _good4 = String.fromEnvironment(
+  'BASE_URL',
+  defaultValue: '',
+);
+
+// ============================================================================
+// FALSE POSITIVES: Should NOT trigger avoid_string_env_parsing
+// ============================================================================
+
+// OK: Custom fromEnvironment method on a different class
+class _EnvConfig {
+  static String fromEnvironment(String key) => '';
 }
 
-// GOOD: Should NOT trigger avoid_datetime_comparison_without_precision
-void _good351() {
-  if (startTime.difference(endTime).abs() < const Duration(seconds: 1)) {}
-
-  if (startTime.isAtSameMomentAs(endTime)) {}
+void _falsePositive1() {
+  // This is not String/int/bool.fromEnvironment
+  final value = _EnvConfig.fromEnvironment('MY_KEY');
 }
 
-// --- False-positive regression tests (bug fix) ---
-
-abstract final class _DateConstants {
-  static final DateTime unixEpochDate = DateTime(1970, 1, 1);
+// OK: Method named fromEnvironment on a user-defined class
+void _falsePositive2() {
+  final custom = CustomParser.fromEnvironment('KEY');
 }
 
-// GOOD: Comparison against a static constant is intentional (epoch sentinel)
-void _goodConstRef() {
-  final DateTime dt = DateTime.now();
-  if (dt == _DateConstants.unixEpochDate) {} // Static field — exact check
-}
-
-// GOOD: Comparison against a const constructor
-void _goodConstCtor() {
-  final DateTime dt = DateTime.now();
-  if (dt == const DateTime(1970)) {} // const — exact check
+class CustomParser {
+  static String fromEnvironment(String key) => '';
 }

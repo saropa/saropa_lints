@@ -100,40 +100,49 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_datetime_comparison_without_precision
-// Source: lib\src\rules\equality_rules.dart
+// Test fixture for: avoid_platform_specific_imports
+// Source: lib\src\rules\config_rules.dart
 
-import 'package:saropa_lints_example/flutter_mocks.dart';
+// NOTE: This rule detects bare `import 'dart:io'` in shared code.
+// The rule skips files in platform-specific directories
+// (/android/, /ios/, /native/, /platform/, etc.)
+// and conditional imports with configurations.
+//
+// Since this fixture file is NOT in a platform-specific directory,
+// a bare `import 'dart:io'` would trigger the rule.
+// However, we cannot add a bare `import 'dart:io'` that the
+// analyzer would also fail on (since dart:io may not resolve
+// in this example package), so this fixture tests the rule
+// documentation patterns.
 
-// BAD: Should trigger avoid_datetime_comparison_without_precision
-// expect_lint: avoid_datetime_comparison_without_precision
-void _bad351() {
-  if (startTime == endTime) {}
+// BAD: Should trigger avoid_platform_specific_imports
+// expect_lint: avoid_platform_specific_imports
+import 'dart:io';
 
-  if (created != modified) {}
-}
+// ============================================================================
+// GOOD: Should NOT trigger avoid_platform_specific_imports
+// ============================================================================
 
-// GOOD: Should NOT trigger avoid_datetime_comparison_without_precision
-void _good351() {
-  if (startTime.difference(endTime).abs() < const Duration(seconds: 1)) {}
+// OK: Conditional import is the correct cross-platform pattern
+// import 'stub_io.dart'
+//     if (dart.library.io) 'dart:io';
 
-  if (startTime.isAtSameMomentAs(endTime)) {}
-}
+// OK: universal_io is a cross-platform replacement
+// import 'package:universal_io/io.dart';
 
-// --- False-positive regression tests (bug fix) ---
+// OK: dart:convert and other non-platform libraries are fine
+import 'dart:convert';
 
-abstract final class _DateConstants {
-  static final DateTime unixEpochDate = DateTime(1970, 1, 1);
-}
+// ============================================================================
+// FALSE POSITIVES: Should NOT trigger avoid_platform_specific_imports
+// ============================================================================
 
-// GOOD: Comparison against a static constant is intentional (epoch sentinel)
-void _goodConstRef() {
-  final DateTime dt = DateTime.now();
-  if (dt == _DateConstants.unixEpochDate) {} // Static field — exact check
-}
+// OK: Other dart: imports are not platform-specific
+// import 'dart:async';
+// import 'dart:math';
+// import 'dart:typed_data';
 
-// GOOD: Comparison against a const constructor
-void _goodConstCtor() {
-  final DateTime dt = DateTime.now();
-  if (dt == const DateTime(1970)) {} // const — exact check
+void _useImports() {
+  // Reference imports to suppress unused warnings
+  final _ = utf8;
 }

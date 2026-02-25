@@ -127,6 +127,7 @@ Future<File> goodSanitizedStartsWith(String userPath) async {
   if (!file.path.startsWith('/data/')) {
     throw SecurityException('Invalid path');
   }
+
   return file;
 }
 
@@ -135,6 +136,7 @@ Future<File> goodDotDotCheck(String userPath) async {
   if (userPath.contains('..')) {
     throw SecurityException('Path traversal detected');
   }
+
   return File('/data/$userPath');
 }
 
@@ -150,6 +152,7 @@ Future<File> goodIsWithin(String userPath) async {
   if (!isWithin('/data', file.path)) {
     throw SecurityException('Invalid path');
   }
+
   return file;
 }
 

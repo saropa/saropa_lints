@@ -610,3 +610,90 @@ class PreferPermissionRequestInContextRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_permission_request_loop
+// =============================================================================
+
+/// Warns when `Permission.request()` is called inside a loop.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Alias: no_permission_loop, permission_request_once
+///
+/// Requesting permissions inside a loop bombards users with repeated
+/// system dialogs. After a user denies a permission, the OS may
+/// auto-deny subsequent requests, making the loop both annoying and
+/// futile. Request once, check the result, and direct the user to
+/// app settings if permanently denied.
+///
+/// **BAD:**
+/// ```dart
+/// while (!granted) {
+///   final status = await Permission.camera.request(); // Loop!
+///   granted = status.isGranted;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// var status = await Permission.camera.request();
+/// if (status.isPermanentlyDenied) {
+///   await openAppSettings();
+/// }
+/// ```
+class AvoidPermissionRequestLoopRule extends SaropaLintRule {
+  AvoidPermissionRequestLoopRule() : super(code: _code);
+
+  /// Permission loops annoy users and get auto-denied by the OS.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'avoid_permission_request_loop',
+    '[avoid_permission_request_loop] Permission.request() called inside a '
+        'loop. Repeated permission requests bombard the user with system '
+        'dialogs. After denial, the OS may auto-deny subsequent requests, '
+        'making the loop both annoying and futile. Request once, check the '
+        'result, and direct users to app settings via openAppSettings() if '
+        'the permission is permanently denied. {v1}',
+    correctionMessage:
+        'Remove the loop and request the permission once. '
+        'If denied, call openAppSettings() to let the user enable it '
+        'manually.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'request') return;
+
+      // Check if target is a Permission object (Permission.camera etc.)
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String targetSource = target.toSource();
+      if (!targetSource.startsWith('Permission')) return;
+
+      // Walk up to check if inside a loop
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is ForStatement ||
+            current is WhileStatement ||
+            current is DoStatement) {
+          reporter.atNode(node);
+          return;
+        }
+        // Stop at function boundary
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+    });
+  }
+}

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 34 Widget Lifecycle lint rules.
+/// Tests for 35 Widget Lifecycle lint rules.
 ///
 /// Test fixtures: example_widgets/lib/widget_lifecycle/*
 void main() {
@@ -42,6 +42,7 @@ void main() {
       'avoid_set_state_in_dispose',
       'require_widgets_binding_callback',
       'avoid_global_keys_in_state',
+      'avoid_expensive_did_change_dependencies',
     ];
 
     for (final fixture in fixtures) {
@@ -268,6 +269,18 @@ void main() {
       test('avoid_global_keys_in_state should NOT trigger', () {
         // Avoidance pattern not present
         expect('avoid_global_keys_in_state passes', isNotNull);
+      });
+    });
+
+    group('avoid_expensive_did_change_dependencies', () {
+      test('expensive work in didChangeDependencies SHOULD trigger', () {
+        // Pattern that should be avoided: heavy computation in didChangeDependencies
+        expect('avoid_expensive_did_change_dependencies detected', isNotNull);
+      });
+
+      test('lightweight didChangeDependencies should NOT trigger', () {
+        // Avoidance pattern not present
+        expect('avoid_expensive_did_change_dependencies passes', isNotNull);
       });
     });
   });

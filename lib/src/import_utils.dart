@@ -38,6 +38,7 @@ bool fileImportsPackage(AstNode node, Set<String> packagePrefixes) {
       }
     }
   }
+
   return false;
 }
 

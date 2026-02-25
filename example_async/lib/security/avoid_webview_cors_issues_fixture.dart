@@ -100,40 +100,89 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_datetime_comparison_without_precision
-// Source: lib\src\rules\equality_rules.dart
+// Test fixture for: avoid_webview_cors_issues
+// Source: lib\src\rules\security_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_datetime_comparison_without_precision
-// expect_lint: avoid_datetime_comparison_without_precision
-void _bad351() {
-  if (startTime == endTime) {}
+// ============================================================================
+// BAD: Should trigger avoid_webview_cors_issues
+// ============================================================================
 
-  if (created != modified) {}
+// expect_lint: avoid_webview_cors_issues
+void _bad1() {
+  final settings = InAppWebViewSettings(
+    allowUniversalAccessFromFileURLs: true, // CORS bypass!
+  );
 }
 
-// GOOD: Should NOT trigger avoid_datetime_comparison_without_precision
-void _good351() {
-  if (startTime.difference(endTime).abs() < const Duration(seconds: 1)) {}
-
-  if (startTime.isAtSameMomentAs(endTime)) {}
+// expect_lint: avoid_webview_cors_issues
+void _bad2() {
+  final settings = InAppWebViewSettings(
+    allowFileAccessFromFileURLs: true, // File access bypass!
+  );
 }
 
-// --- False-positive regression tests (bug fix) ---
-
-abstract final class _DateConstants {
-  static final DateTime unixEpochDate = DateTime(1970, 1, 1);
+// expect_lint: avoid_webview_cors_issues
+void _bad3() {
+  // Both dangerous settings enabled
+  final settings = InAppWebViewSettings(
+    allowUniversalAccessFromFileURLs: true,
+    allowFileAccessFromFileURLs: true,
+  );
 }
 
-// GOOD: Comparison against a static constant is intentional (epoch sentinel)
-void _goodConstRef() {
-  final DateTime dt = DateTime.now();
-  if (dt == _DateConstants.unixEpochDate) {} // Static field — exact check
+// ============================================================================
+// GOOD: Should NOT trigger avoid_webview_cors_issues
+// ============================================================================
+
+// OK: Settings explicitly set to false (secure default)
+void _good1() {
+  final settings = InAppWebViewSettings(
+    allowUniversalAccessFromFileURLs: false,
+  );
 }
 
-// GOOD: Comparison against a const constructor
-void _goodConstCtor() {
-  final DateTime dt = DateTime.now();
-  if (dt == const DateTime(1970)) {} // const — exact check
+// OK: Settings explicitly set to false
+void _good2() {
+  final settings = InAppWebViewSettings(
+    allowFileAccessFromFileURLs: false,
+  );
+}
+
+// OK: Settings omitted entirely (defaults to false)
+void _good3() {
+  final settings = InAppWebViewSettings();
+}
+
+// OK: Other settings are fine
+void _good4() {
+  final settings = InAppWebViewSettings(
+    javaScriptEnabled: true,
+  );
+}
+
+// ============================================================================
+// FALSE POSITIVES: Should NOT trigger avoid_webview_cors_issues
+// ============================================================================
+
+// OK: Similar named parameter on a custom class
+void _falsePositive1() {
+  final config = _CustomConfig(
+    allowUniversalAccessFromFileURLs: true,
+  );
+}
+
+// OK: Setting to false is always safe
+void _falsePositive2() {
+  final settings = InAppWebViewSettings(
+    allowUniversalAccessFromFileURLs: false,
+    allowFileAccessFromFileURLs: false,
+  );
+}
+
+class _CustomConfig {
+  final bool allowUniversalAccessFromFileURLs;
+
+  _CustomConfig({this.allowUniversalAccessFromFileURLs = false});
 }

@@ -362,6 +362,7 @@ String? _getDisposeMethodBody(ClassDeclaration node) {
       return member.body.toSource();
     }
   }
+
   return null;
 }
 

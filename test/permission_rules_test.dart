@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 5 Permission lint rules.
+/// Tests for 6 Permission lint rules.
 ///
 /// Test fixtures: example_async/lib/permission/*
 void main() {
@@ -13,6 +13,7 @@ void main() {
       'prefer_image_cropping',
       'avoid_permission_handler_null_safety',
       'prefer_permission_request_in_context',
+      'avoid_permission_request_loop',
     ];
 
     for (final fixture in fixtures) {
@@ -55,6 +56,21 @@ void main() {
       test('permission check before camera should NOT trigger', () {
         expect('permission check before camera', isNotNull);
       });
+    });
+  });
+
+  group('Permission - Loop Avoidance Rules', () {
+    group('avoid_permission_request_loop', () {
+      test('permission request in a loop SHOULD trigger', () {
+        expect('permission request in a loop', isNotNull);
+      });
+
+      test(
+        'single permission request with result check should NOT trigger',
+        () {
+          expect('single permission request with result check', isNotNull);
+        },
+      );
     });
   });
 

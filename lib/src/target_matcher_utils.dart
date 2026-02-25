@@ -90,5 +90,6 @@ bool hasChainedMethod(MethodInvocation node, String methodName) {
     }
     break;
   }
+
   return false;
 }

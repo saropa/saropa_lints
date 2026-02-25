@@ -6285,3 +6285,254 @@ class RequireSessionTimeoutRule extends SaropaLintRule {
     return null;
   }
 }
+
+// =============================================================================
+// avoid_stack_trace_in_production
+// =============================================================================
+
+/// Warns when stack traces are exposed to users in production code.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Alias: no_stack_trace_leak, hide_stack_trace
+///
+/// Stack traces contain internal architecture details: class names, file
+/// paths, package versions, and line numbers. Exposing them to users via
+/// `print()`, `Text()`, error dialogs, or `SnackBar` content leaks
+/// implementation details that aid attackers in crafting targeted exploits.
+///
+/// **OWASP:** [M10:Extraneous-Functionality]
+///
+/// **BAD:**
+/// ```dart
+/// try {
+///   await fetchData();
+/// } catch (e, stackTrace) {
+///   print(stackTrace);
+///   showDialog(
+///     context: context,
+///     builder: (_) => Text('$stackTrace'),
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   await fetchData();
+/// } catch (e, stackTrace) {
+///   // Log to crash reporter, not to user
+///   FirebaseCrashlytics.instance.recordError(e, stackTrace);
+///   if (kDebugMode) print(stackTrace);
+///   showDialog(
+///     context: context,
+///     builder: (_) => Text('Something went wrong. Please try again.'),
+///   );
+/// }
+/// ```
+class AvoidStackTraceInProductionRule extends SaropaLintRule {
+  AvoidStackTraceInProductionRule() : super(code: _code);
+
+  /// Stack trace leaks expose internal architecture to attackers.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'avoid_stack_trace_in_production',
+    '[avoid_stack_trace_in_production] Stack trace exposed to user-visible '
+        'output. Stack traces contain internal class names, file paths, '
+        'package versions, and line numbers that leak implementation details '
+        'to users and potential attackers. This violates OWASP M10 '
+        '(Extraneous Functionality) and aids in crafting targeted exploits '
+        'against your application architecture. {v1}',
+    correctionMessage:
+        'Send stack traces to a crash reporter (Crashlytics, Sentry) '
+        'instead of displaying them. Guard debug output with kDebugMode.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  OwaspMapping get owasp =>
+      const OwaspMapping(mobile: <OwaspMobile>{OwaspMobile.m10});
+
+  static const Set<String> _outputMethods = <String>{
+    'print',
+    'debugPrint',
+    'log',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_outputMethods.contains(methodName)) return;
+
+      // Check if any argument references a stack trace
+      if (!_hasStackTraceArg(node.argumentList)) return;
+
+      // Suppress if inside kDebugMode guard
+      if (_isInsideDebugGuard(node)) return;
+
+      reporter.atNode(node);
+    });
+
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String? typeName = node.constructorName.type.element?.name;
+      if (typeName != 'Text' &&
+          typeName != 'SelectableText' &&
+          typeName != 'RichText') {
+        return;
+      }
+
+      // Check if first argument references a stack trace
+      if (!_hasStackTraceArg(node.argumentList)) return;
+
+      // Suppress if inside kDebugMode guard
+      if (_isInsideDebugGuard(node)) return;
+
+      reporter.atNode(node);
+    });
+  }
+
+  bool _hasStackTraceArg(ArgumentList argList) {
+    for (final Expression arg in argList.arguments) {
+      // Prefer type-based detection when type info is available
+      final String typeName = arg.staticType?.element?.name ?? '';
+      if (typeName == 'StackTrace') return true;
+
+      // Fall back to source-text heuristic for interpolations and .toString()
+      final String source = arg.toSource().toLowerCase();
+      if (source.contains('stacktrace') || source.contains('stack_trace')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool _isInsideDebugGuard(AstNode targetNode) {
+    AstNode? current = targetNode.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        final String condition = current.expression.toSource();
+        if (condition.contains('kDebugMode') ||
+            condition.contains('kProfileMode') ||
+            condition.contains('!kReleaseMode')) {
+          // Only suppress if node is in the then-branch, not the else-branch
+          if (_isDescendantOf(targetNode, current.thenStatement)) {
+            return true;
+          }
+        }
+      }
+      if (current is FunctionBody) break;
+      current = current.parent;
+    }
+    return false;
+  }
+
+  bool _isDescendantOf(AstNode node, AstNode ancestor) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (identical(current, ancestor)) return true;
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when WebView CORS bypass settings are enabled.
+///
+/// Since: v5.1.0 | Updated: v5.1.0 | Rule version: v1
+///
+/// `allowUniversalAccessFromFileURLs` and `allowFileAccessFromFileURLs`
+/// disable the same-origin policy for `file://` URIs, allowing any local
+/// HTML page to read data from any origin. This is a major security hole
+/// on Android WebView.
+///
+/// **BAD:**
+/// ```dart
+/// InAppWebViewSettings(
+///   allowUniversalAccessFromFileURLs: true,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// InAppWebViewSettings(
+///   allowUniversalAccessFromFileURLs: false,
+/// )
+/// // Or: omit the setting entirely (default is false)
+/// ```
+///
+/// **OWASP:** [M8:Code-Tampering] [A05:Security-Misconfiguration]
+class AvoidWebViewCorsIssuesRule extends SaropaLintRule {
+  AvoidWebViewCorsIssuesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  OwaspMapping get owasp => const OwaspMapping(
+    mobile: <OwaspMobile>{OwaspMobile.m8},
+    web: <OwaspWeb>{OwaspWeb.a05},
+  );
+
+  static const LintCode _code = LintCode(
+    'avoid_webview_cors_issues',
+    '[avoid_webview_cors_issues] Enabling allowUniversalAccessFromFileURLs or allowFileAccessFromFileURLs disables the same-origin policy for file:// URIs in Android WebView. Any local HTML page can then read data from any origin, enabling cross-site data theft and content injection attacks. Leave these settings at their secure defaults (false). {v1}',
+    correctionMessage:
+        'Remove the setting or set it to false. If you need local HTML to access APIs, serve content via a local HTTP server or use loadHtmlString with inline resources instead.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Settings that bypass CORS security.
+  static const Set<String> _dangerousSettings = <String>{
+    'allowUniversalAccessFromFileURLs',
+    'allowFileAccessFromFileURLs',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Check named arguments in constructor calls (e.g., InAppWebViewSettings)
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            _dangerousSettings.contains(arg.name.label.name)) {
+          final String value = arg.expression.toSource();
+          if (value == 'true') {
+            reporter.atNode(arg);
+          }
+        }
+      }
+    });
+
+    // Check method invocations (e.g., controller.setAllowUniversalAccess...)
+    context.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      // cspell:ignore setallowuniversalaccessfromfileurls setallowfileaccessfromfileurls
+      final String lower = methodName.toLowerCase();
+      if (lower != 'setallowuniversalaccessfromfileurls' &&
+          lower != 'setallowfileaccessfromfileurls') {
+        return;
+      }
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg.toSource() == 'true') {
+          reporter.atNode(node);
+          return;
+        }
+      }
+    });
+  }
+}

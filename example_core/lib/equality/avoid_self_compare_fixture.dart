@@ -112,11 +112,13 @@ dynamic y;
 // expect_lint: avoid_self_compare
 void _bad348() {
   if (x == x) {}
+
   if (y != y) {} // Always false for non-NaN
 }
 
 // GOOD: Should NOT trigger avoid_self_compare
 void _good348() {
   if (x == y) {}
+
   if (x.isNaN) {} // Use isNaN to check for NaN
 }

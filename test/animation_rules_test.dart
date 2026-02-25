@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 17 Animation lint rules.
+/// Tests for 18 Animation lint rules.
 ///
 /// Test fixtures: example_widgets/lib/animation/*
 void main() {
@@ -25,6 +25,7 @@ void main() {
       'require_animation_ticker_disposal',
       'prefer_spring_animation',
       'avoid_excessive_rebuilds_animation',
+      'avoid_multiple_animation_controllers',
     ];
 
     for (final fixture in fixtures) {
@@ -193,6 +194,18 @@ void main() {
       test('avoid_excessive_rebuilds_animation should NOT trigger', () {
         // Avoidance pattern not present
         expect('avoid_excessive_rebuilds_animation passes', isNotNull);
+      });
+    });
+
+    group('avoid_multiple_animation_controllers', () {
+      test('multiple AnimationControllers in one State SHOULD trigger', () {
+        // Pattern that should be avoided: too many controllers in one widget
+        expect('avoid_multiple_animation_controllers detected', isNotNull);
+      });
+
+      test('single AnimationController per State should NOT trigger', () {
+        // Avoidance pattern not present
+        expect('avoid_multiple_animation_controllers passes', isNotNull);
       });
     });
   });

@@ -100,40 +100,140 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_datetime_comparison_without_precision
-// Source: lib\src\rules\equality_rules.dart
+// Test fixture for: avoid_expensive_did_change_dependencies
+// Source: lib\src\rules\widget_lifecycle_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_datetime_comparison_without_precision
-// expect_lint: avoid_datetime_comparison_without_precision
-void _bad351() {
-  if (startTime == endTime) {}
+// ============================================================================
+// BAD: Should trigger avoid_expensive_did_change_dependencies
+// ============================================================================
 
-  if (created != modified) {}
+class _BadWidget1 extends StatefulWidget {
+  @override
+  State createState() => _BadWidgetState1();
 }
 
-// GOOD: Should NOT trigger avoid_datetime_comparison_without_precision
-void _good351() {
-  if (startTime.difference(endTime).abs() < const Duration(seconds: 1)) {}
+// expect_lint: avoid_expensive_did_change_dependencies
+class _BadWidgetState1 extends State<_BadWidget1> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    fetchData(); // Expensive: runs on EVERY dependency change!
+  }
 
-  if (startTime.isAtSameMomentAs(endTime)) {}
+  void fetchData() {}
+
+  @override
+  Widget build(BuildContext context) => Container();
 }
 
-// --- False-positive regression tests (bug fix) ---
-
-abstract final class _DateConstants {
-  static final DateTime unixEpochDate = DateTime(1970, 1, 1);
+class _BadWidget2 extends StatefulWidget {
+  @override
+  State createState() => _BadWidgetState2();
 }
 
-// GOOD: Comparison against a static constant is intentional (epoch sentinel)
-void _goodConstRef() {
-  final DateTime dt = DateTime.now();
-  if (dt == _DateConstants.unixEpochDate) {} // Static field — exact check
+// expect_lint: avoid_expensive_did_change_dependencies
+class _BadWidgetState2 extends State<_BadWidget2> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadData(); // Expensive method name detected
+  }
+
+  void loadData() {}
+
+  @override
+  Widget build(BuildContext context) => Container();
 }
 
-// GOOD: Comparison against a const constructor
-void _goodConstCtor() {
-  final DateTime dt = DateTime.now();
-  if (dt == const DateTime(1970)) {} // const — exact check
+// ============================================================================
+// GOOD: Should NOT trigger avoid_expensive_did_change_dependencies
+// ============================================================================
+
+class _GoodWidget1 extends StatefulWidget {
+  @override
+  State createState() => _GoodWidgetState1();
+}
+
+// OK: Uses _initialized guard to run expensive work only once
+class _GoodWidgetState1 extends State<_GoodWidget1> {
+  bool _initialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _initialized = true;
+      fetchUserProfile();
+    }
+    final theme = Theme.of(context); // Cheap, OK here
+  }
+
+  void fetchUserProfile() {}
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+class _GoodWidget2 extends StatefulWidget {
+  @override
+  State createState() => _GoodWidgetState2();
+}
+
+// OK: Only lightweight InheritedWidget lookups
+class _GoodWidgetState2 extends State<_GoodWidget2> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final theme = Theme.of(context);
+    final media = MediaQuery.of(context);
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+class _GoodWidget3 extends StatefulWidget {
+  @override
+  State createState() => _GoodWidgetState3();
+}
+
+// OK: Empty didChangeDependencies
+class _GoodWidgetState3 extends State<_GoodWidget3> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// ============================================================================
+// FALSE POSITIVES: Should NOT trigger avoid_expensive_did_change_dependencies
+// ============================================================================
+
+class _FalsePositiveWidget extends StatefulWidget {
+  @override
+  State createState() => _FalsePositiveState();
+}
+
+// OK: Uses _isLoaded guard (alternative naming pattern)
+class _FalsePositiveState extends State<_FalsePositiveWidget> {
+  bool _isLoaded = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isLoaded) {
+      _isLoaded = true;
+      fetchData();
+    }
+  }
+
+  void fetchData() {}
+
+  @override
+  Widget build(BuildContext context) => Container();
 }

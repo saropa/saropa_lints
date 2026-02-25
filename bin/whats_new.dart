@@ -112,6 +112,7 @@ List<_Cat> _parseCategories(String sectionText) {
   if (currentName != null && items.isNotEmpty) {
     categories.add(_Cat(currentName, items));
   }
+
   return categories;
 }
 

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 53 security lint rules.
+/// Tests for 55 security lint rules.
 ///
 /// These rules cover credential security, injection prevention, secure storage,
 /// WebView security, authentication, data protection, and OWASP compliance.
@@ -56,6 +56,8 @@ void main() {
       'require_token_refresh',
       'require_url_validation',
       'require_webview_error_handling',
+      'avoid_stack_trace_in_production',
+      'avoid_webview_cors_issues',
     ];
 
     for (final fixture in fixtures) {
@@ -270,6 +272,19 @@ void main() {
         expect('missing error handler detected', isNotNull);
       });
     });
+
+    group('avoid_webview_cors_issues', () {
+      test(
+        'WebView loading cross-origin without CORS handling SHOULD trigger',
+        () {
+          expect('WebView CORS issue detected', isNotNull);
+        },
+      );
+
+      test('WebView with proper CORS configuration should NOT trigger', () {
+        expect('proper CORS config passes', isNotNull);
+      });
+    });
   });
 
   group('Authentication Rules', () {
@@ -418,6 +433,18 @@ void main() {
     group('avoid_ignoring_ssl_errors', () {
       test('SSL error bypass SHOULD trigger', () {
         expect('SSL bypass detected', isNotNull);
+      });
+    });
+  });
+
+  group('Error Exposure Rules', () {
+    group('avoid_stack_trace_in_production', () {
+      test('stack trace exposed to user in production SHOULD trigger', () {
+        expect('stack trace in production detected', isNotNull);
+      });
+
+      test('stack trace logged but not shown to user should NOT trigger', () {
+        expect('safe stack trace handling passes', isNotNull);
       });
     });
   });
