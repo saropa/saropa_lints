@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/packages/drift_rules.dart';
+import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:test/test.dart';
 
 /// Tests for 31 Drift database lint rules.
@@ -264,6 +266,11 @@ void main() {
           );
         },
       );
+
+      test('testRelevance is testOnly so rule runs on test files', () {
+        final rule = AvoidDriftCloseStreamsInTestsRule();
+        expect(rule.testRelevance, TestRelevance.testOnly);
+      });
     });
 
     group('avoid_drift_nullable_converter_mismatch', () {

@@ -321,9 +321,6 @@ class AvoidDriftUpdateWithoutWhereRule extends SaropaLintRule {
       if (RegExp(r'\.where\s*\(').hasMatch(chainSource)) return;
       if (chainSource.contains('..where(')) return;
 
-      // replace() is intentional single-row operation, don't flag
-      if (methodName == 'write' && hasDelete) return;
-
       reporter.atNode(node.methodName);
     });
   }
@@ -1762,6 +1759,9 @@ class AvoidDriftCloseStreamsInTestsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  TestRelevance get testRelevance => TestRelevance.testOnly;
 
   static const LintCode _code = LintCode(
     'avoid_drift_close_streams_in_tests',

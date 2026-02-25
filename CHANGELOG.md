@@ -12,6 +12,15 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- `avoid_drift_close_streams_in_tests` — rule never fired because `testRelevance` was not overridden; the framework skipped test files before the rule could run. Now correctly set to `TestRelevance.testOnly`
+- `avoid_drift_update_without_where` — removed unreachable dead code branch
+
+---
+
 ## [6.0.2]
 
 ### Changed
