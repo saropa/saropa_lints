@@ -152,15 +152,19 @@ bool _hasHeavyIoTarget(Expression target, [int depth = 0]) {
   if (target is SimpleIdentifier && _knownIoTargets.contains(target.name)) {
     return true;
   }
+
   if (target is PrefixedIdentifier) {
     return _knownIoTargets.contains(target.prefix.name);
   }
+
   if (target is MethodInvocation && target.target != null) {
     return _hasHeavyIoTarget(target.target!, depth + 1);
   }
+
   if (target is PropertyAccess && target.target != null) {
     return _hasHeavyIoTarget(target.target!, depth + 1);
   }
+
   return false;
 }
 
@@ -185,6 +189,7 @@ bool _isYieldToUI(Statement statement) {
     return inner.methodName.name == 'yieldToUI' ||
         inner.methodName.name == 'waitWithoutBlocking';
   }
+
   return false;
 }
 
@@ -237,6 +242,7 @@ AwaitExpression? _extractInlineAwait(Statement s) {
   if (s is ExpressionStatement && s.expression is AwaitExpression) {
     return s.expression as AwaitExpression;
   }
+
   if (s is VariableDeclarationStatement) {
     for (final v in s.variables.variables) {
       if (v.initializer is AwaitExpression) {
@@ -244,6 +250,7 @@ AwaitExpression? _extractInlineAwait(Statement s) {
       }
     }
   }
+
   return null;
 }
 
@@ -254,6 +261,7 @@ bool _isFollowedBySafe(List<Statement> stmts, int i) {
   if (next is ExpressionStatement && next.expression is ThrowExpression) {
     return true;
   }
+
   return false;
 }
 

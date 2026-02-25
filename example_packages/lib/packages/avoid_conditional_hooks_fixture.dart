@@ -115,6 +115,7 @@ Widget _bad632_build(BuildContext context) {
   if (condition) {
     final value = useState(0); // Wrong!
   }
+
   return condition ? useCallback() : null; // Wrong!
 }
 
@@ -124,5 +125,6 @@ Widget _good632_build(BuildContext context) {
   if (condition) {
     value.value = 42; // Use the value conditionally, not the hook
   }
+
   return Container();
 }

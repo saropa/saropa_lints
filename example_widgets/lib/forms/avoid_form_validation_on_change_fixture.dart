@@ -100,40 +100,96 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_datetime_comparison_without_precision
-// Source: lib\src\rules\equality_rules.dart
+// Test fixture for: avoid_form_validation_on_change
+// Source: lib\src\rules\forms_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_datetime_comparison_without_precision
-// expect_lint: avoid_datetime_comparison_without_precision
-void _bad351() {
-  if (startTime == endTime) {}
+final _formKey = GlobalKey<FormState>();
 
-  if (created != modified) {}
+// ============================================================================
+// BAD: Should trigger avoid_form_validation_on_change
+// ============================================================================
+
+// expect_lint: avoid_form_validation_on_change
+Widget _bad1() {
+  return TextField(
+    onChanged: (value) {
+      _formKey.currentState?.validate(); // Fires on every keystroke!
+    },
+  );
 }
 
-// GOOD: Should NOT trigger avoid_datetime_comparison_without_precision
-void _good351() {
-  if (startTime.difference(endTime).abs() < const Duration(seconds: 1)) {}
-
-  if (startTime.isAtSameMomentAs(endTime)) {}
+// expect_lint: avoid_form_validation_on_change
+Widget _bad2() {
+  return TextFormField(
+    onChanged: (value) {
+      _formKey.currentState?.validate();
+    },
+  );
 }
 
-// --- False-positive regression tests (bug fix) ---
+// ============================================================================
+// GOOD: Should NOT trigger avoid_form_validation_on_change
+// ============================================================================
 
-abstract final class _DateConstants {
-  static final DateTime unixEpochDate = DateTime(1970, 1, 1);
+// OK: validate on editing complete (when user finishes typing)
+Widget _good1() {
+  return TextField(
+    onEditingComplete: () {
+      _formKey.currentState?.validate();
+    },
+  );
 }
 
-// GOOD: Comparison against a static constant is intentional (epoch sentinel)
-void _goodConstRef() {
-  final DateTime dt = DateTime.now();
-  if (dt == _DateConstants.unixEpochDate) {} // Static field — exact check
+// OK: validate on form submission
+Widget _good2() {
+  return ElevatedButton(
+    onPressed: () {
+      _formKey.currentState?.validate();
+    },
+  );
 }
 
-// GOOD: Comparison against a const constructor
-void _goodConstCtor() {
-  final DateTime dt = DateTime.now();
-  if (dt == const DateTime(1970)) {} // const — exact check
+// OK: Use AutovalidateMode on the Form widget instead
+Widget _good3() {
+  return Form(
+    autovalidateMode: AutovalidateMode.onUserInteraction,
+    child: TextFormField(),
+  );
 }
+
+// OK: onChanged without validate is fine (e.g., updating state)
+Widget _good4() {
+  return TextField(
+    onChanged: (value) {
+      // Just updating local state, not validating
+      print(value);
+    },
+  );
+}
+
+// ============================================================================
+// FALSE POSITIVES: Should NOT trigger avoid_form_validation_on_change
+// ============================================================================
+
+// OK: validate() called in onChanged but on a different object
+Widget _falsePositive1() {
+  return TextField(
+    onChanged: (value) {
+      // This is a custom validate method, not form validation
+      _customValidator.validate(value);
+    },
+  );
+}
+
+// OK: validate called outside onChanged context
+void _falsePositive2() {
+  _formKey.currentState?.validate();
+}
+
+class _CustomValidator {
+  bool validate(String value) => value.isNotEmpty;
+}
+
+final _customValidator = _CustomValidator();

@@ -122,6 +122,7 @@ void _bad275() {
 // GOOD: Should NOT trigger avoid_conditions_with_boolean_literals
 void _good275() {
   if (y) {}
+
   if (z) {}
   final a = true;
   final b = false;

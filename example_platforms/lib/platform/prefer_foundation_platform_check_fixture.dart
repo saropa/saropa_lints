@@ -114,6 +114,7 @@ Widget _bad828_build(BuildContext context) {
     // dart:io import required, crashes on web
     return CupertinoButton();
   }
+
   return ElevatedButton();
 }
 
@@ -122,5 +123,6 @@ Widget _good828_build(BuildContext context) {
   if (defaultTargetPlatform == TargetPlatform.iOS) {
     return CupertinoButton();
   }
+
   return ElevatedButton();
 }

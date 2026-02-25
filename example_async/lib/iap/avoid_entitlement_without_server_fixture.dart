@@ -100,40 +100,120 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_datetime_comparison_without_precision
-// Source: lib\src\rules\equality_rules.dart
+// Test fixture for: avoid_entitlement_without_server
+// Source: lib\src\rules\iap_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_datetime_comparison_without_precision
-// expect_lint: avoid_datetime_comparison_without_precision
-void _bad351() {
-  if (startTime == endTime) {}
-
-  if (created != modified) {}
+// Local IAP mocks (not in flutter_mocks.dart)
+class PurchaseStatus {
+  static const purchased = PurchaseStatus._('purchased');
+  static const restored = PurchaseStatus._('restored');
+  static const pending = PurchaseStatus._('pending');
+  static const error = PurchaseStatus._('error');
+  final String _value;
+  const PurchaseStatus._(this._value);
 }
 
-// GOOD: Should NOT trigger avoid_datetime_comparison_without_precision
-void _good351() {
-  if (startTime.difference(endTime).abs() < const Duration(seconds: 1)) {}
-
-  if (startTime.isAtSameMomentAs(endTime)) {}
+class PurchaseDetails {
+  PurchaseStatus status = PurchaseStatus.purchased;
+  VerificationData verificationData = VerificationData();
 }
 
-// --- False-positive regression tests (bug fix) ---
-
-abstract final class _DateConstants {
-  static final DateTime unixEpochDate = DateTime(1970, 1, 1);
+class VerificationData {
+  String serverVerificationData = '';
 }
 
-// GOOD: Comparison against a static constant is intentional (epoch sentinel)
-void _goodConstRef() {
-  final DateTime dt = DateTime.now();
-  if (dt == _DateConstants.unixEpochDate) {} // Static field — exact check
+// ============================================================================
+// BAD: Should trigger avoid_entitlement_without_server
+// ============================================================================
+
+// expect_lint: avoid_entitlement_without_server
+void _bad1(PurchaseDetails purchaseDetails) {
+  // Client-only verification: bypassable on rooted devices!
+  if (purchaseDetails.status == PurchaseStatus.purchased) {
+    _isPremium = true;
+  }
 }
 
-// GOOD: Comparison against a const constructor
-void _goodConstCtor() {
-  final DateTime dt = DateTime.now();
-  if (dt == const DateTime(1970)) {} // const — exact check
+// expect_lint: avoid_entitlement_without_server
+void _bad2(PurchaseDetails purchaseDetails) {
+  // Restored purchases also need server verification
+  if (purchaseDetails.status == PurchaseStatus.restored) {
+    _isPremium = true;
+  }
 }
+
+// ============================================================================
+// GOOD: Should NOT trigger avoid_entitlement_without_server
+// ============================================================================
+
+// OK: Verifies with server before unlocking
+Future<void> _good1(PurchaseDetails purchaseDetails) async {
+  if (purchaseDetails.status == PurchaseStatus.purchased) {
+    final verified = await api.verifyReceipt(
+      purchaseDetails.verificationData.serverVerificationData,
+    );
+    if (verified) {
+      _isPremium = true;
+    }
+  }
+}
+
+// OK: Uses validatePurchase pattern
+Future<void> _good2(PurchaseDetails purchaseDetails) async {
+  if (purchaseDetails.status == PurchaseStatus.purchased) {
+    final valid = await api.validatePurchase(purchaseDetails);
+    if (valid) {
+      _isPremium = true;
+    }
+  }
+}
+
+// OK: Uses RevenueCat (handles server verification automatically)
+Future<void> _good3(PurchaseDetails purchaseDetails) async {
+  if (purchaseDetails.status == PurchaseStatus.purchased) {
+    // RevenueCat handles server-side validation
+    final entitlements = await RevenueCat.getEntitlements();
+    _isPremium = entitlements.isActive;
+  }
+}
+
+// ============================================================================
+// FALSE POSITIVES: Should NOT trigger avoid_entitlement_without_server
+// ============================================================================
+
+// OK: Checking pending status (not a purchase confirmation)
+void _falsePositive1(PurchaseDetails purchaseDetails) {
+  if (purchaseDetails.status == PurchaseStatus.pending) {
+    showPendingUI();
+  }
+}
+
+// OK: Checking error status
+void _falsePositive2(PurchaseDetails purchaseDetails) {
+  if (purchaseDetails.status == PurchaseStatus.error) {
+    showErrorUI();
+  }
+}
+
+// Helpers
+bool _isPremium = false;
+
+class _Api {
+  Future<bool> verifyReceipt(String data) async => true;
+  Future<bool> validatePurchase(PurchaseDetails details) async => true;
+}
+
+final api = _Api();
+
+class RevenueCat {
+  static Future<_Entitlements> getEntitlements() async => _Entitlements();
+}
+
+class _Entitlements {
+  bool isActive = true;
+}
+
+void showPendingUI() {}
+void showErrorUI() {}

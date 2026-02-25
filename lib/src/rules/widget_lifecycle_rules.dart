@@ -4018,6 +4018,152 @@ class AvoidGlobalKeysInStateRule extends SaropaLintRule {
 }
 
 // =============================================================================
+// avoid_expensive_did_change_dependencies
+// =============================================================================
+
+/// Warns when expensive operations run inside `didChangeDependencies()`.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Alias: no_heavy_did_change, expensive_dependency_callback
+///
+/// `didChangeDependencies()` runs every time an InheritedWidget changes,
+/// which can be very frequent (theme changes, locale changes, media query
+/// changes). Placing network calls, database queries, or heavy computation
+/// here causes redundant work and jank. Use `initState()` for one-time
+/// initialization or add an `_initialized` guard.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// void didChangeDependencies() {
+///   super.didChangeDependencies();
+///   fetchUserProfile();  // Runs on EVERY dependency change!
+///   await database.query('users');  // Expensive DB call repeated!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// bool _initialized = false;
+///
+/// @override
+/// void didChangeDependencies() {
+///   super.didChangeDependencies();
+///   if (!_initialized) {
+///     _initialized = true;
+///     fetchUserProfile();
+///   }
+///   final theme = Theme.of(context);  // Cheap, OK here
+/// }
+/// ```
+class AvoidExpensiveDidChangeDependenciesRule extends SaropaLintRule {
+  AvoidExpensiveDidChangeDependenciesRule() : super(code: _code);
+
+  /// Expensive work in frequent callbacks causes jank.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  @override
+  bool get requiresWidgets => true;
+
+  static const LintCode _code = LintCode(
+    'avoid_expensive_did_change_dependencies',
+    '[avoid_expensive_did_change_dependencies] Expensive operation detected '
+        'inside didChangeDependencies(). This callback runs every time an '
+        'InheritedWidget dependency changes (theme, locale, media query), '
+        'which can be very frequent. Network calls, database queries, and '
+        'heavy computation here cause redundant work, jank, and wasted '
+        'bandwidth on every dependency change. {v1}',
+    correctionMessage:
+        'Move one-time initialization to initState() or add an '
+        '_initialized guard. Only use didChangeDependencies for '
+        'lightweight InheritedWidget lookups like Theme.of(context).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'didChangeDependencies') return;
+
+      final FunctionBody body = node.body;
+      if (body is! BlockFunctionBody) return;
+
+      // Check for initialization guard pattern (string heuristic)
+      final String bodySource = body.toSource();
+      if (bodySource.contains('_initialized') ||
+          bodySource.contains('_isInitialized') ||
+          bodySource.contains('_didInit') ||
+          bodySource.contains('_hasInit') ||
+          bodySource.contains('_loaded') ||
+          bodySource.contains('_isLoaded') ||
+          bodySource.contains('_fetched') ||
+          bodySource.contains('_ready')) {
+        return;
+      }
+
+      // Look for await expressions (network/DB calls)
+      _visitExpensiveOps(body.block, reporter);
+    });
+  }
+
+  void _visitExpensiveOps(Block block, SaropaDiagnosticReporter reporter) {
+    for (final Statement stmt in block.statements) {
+      _checkStatement(stmt, reporter);
+    }
+  }
+
+  void _checkStatement(Statement stmt, SaropaDiagnosticReporter reporter) {
+    if (stmt is ExpressionStatement) {
+      final Expression expr = stmt.expression;
+      // Await expression = async operation
+      if (expr is AwaitExpression) {
+        reporter.atNode(stmt);
+        return;
+      }
+      // Method call that likely triggers expensive work
+      if (expr is MethodInvocation && _isExpensiveCall(expr)) {
+        reporter.atNode(stmt);
+        return;
+      }
+    }
+    if (stmt is VariableDeclarationStatement) {
+      for (final VariableDeclaration v in stmt.variables.variables) {
+        final Expression? init = v.initializer;
+        if (init is AwaitExpression) {
+          reporter.atNode(stmt);
+          return;
+        }
+      }
+    }
+  }
+
+  /// Exact method names that indicate expensive operations.
+  static const Set<String> _expensiveMethods = <String>{
+    'fetch',
+    'fetchData',
+    'loadData',
+    'getData',
+    'compute',
+    'query',
+  };
+
+  bool _isExpensiveCall(MethodInvocation node) {
+    return _expensiveMethods.contains(node.methodName.name);
+  }
+}
+
+// =============================================================================
 // avoid_static_route_config
 // =============================================================================
 
