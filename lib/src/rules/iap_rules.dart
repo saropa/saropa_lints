@@ -454,3 +454,128 @@ class PreferGracePeriodHandlingRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_entitlement_without_server
+// =============================================================================
+
+/// Warns when IAP purchase status is checked client-side without server
+/// verification.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Alias: iap_server_verify, require_receipt_validation
+///
+/// Client-side purchase verification (checking `PurchaseStatus.purchased`
+/// directly) can be bypassed on rooted/jailbroken devices. Server-side
+/// receipt validation is required for secure entitlement management.
+/// RevenueCat and Qonversion handle this automatically.
+///
+/// **OWASP:** [M1:Improper-Platform-Usage] [M4:Insecure-Authentication]
+///
+/// **BAD:**
+/// ```dart
+/// if (purchaseDetails.status == PurchaseStatus.purchased) {
+///   // Unlock premium features directly — bypassable!
+///   setState(() => _isPremium = true);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (purchaseDetails.status == PurchaseStatus.purchased) {
+///   // Verify with your server first
+///   final verified = await api.verifyReceipt(
+///     purchaseDetails.verificationData.serverVerificationData,
+///   );
+///   if (verified) {
+///     setState(() => _isPremium = true);
+///   }
+/// }
+/// ```
+class AvoidEntitlementWithoutServerRule extends SaropaLintRule {
+  AvoidEntitlementWithoutServerRule() : super(code: _code);
+
+  /// Client-only IAP verification is a critical security flaw.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+    'PurchaseStatus',
+    'PurchaseDetails',
+  };
+
+  static const LintCode _code = LintCode(
+    'avoid_entitlement_without_server',
+    '[avoid_entitlement_without_server] Client-side IAP entitlement check '
+        'without server-side receipt verification. PurchaseStatus.purchased '
+        'can be spoofed on rooted or jailbroken devices, allowing users to '
+        'unlock premium features without paying. Server-side receipt '
+        'validation via your backend or a service like RevenueCat is '
+        'required for secure in-app purchase verification (OWASP M1/M4). '
+        '{v1}',
+    correctionMessage:
+        'Send the receipt (serverVerificationData) to your backend '
+        'for verification before unlocking premium features. '
+        'RevenueCat and Qonversion handle this automatically.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _serverPatterns = <String>{
+    'verifyReceipt',
+    'serverVerificationData',
+    'validatePurchase',
+    'verifyPurchase',
+    'RevenueCat',
+    'Purchases.instance',
+    'Qonversion',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBinaryExpression((BinaryExpression node) {
+      final String op = node.operator.lexeme;
+      if (op != '==') return;
+
+      // Check for PurchaseStatus.purchased comparison
+      final String source = node.toSource();
+      if (!source.contains('PurchaseStatus.purchased') &&
+          !source.contains('PurchaseStatus.restored')) {
+        return;
+      }
+
+      // Check if the enclosing class/function has server verification
+      final String? bodySource = _findEnclosingBodySource(node);
+      if (bodySource == null) return;
+
+      for (final String pattern in _serverPatterns) {
+        if (bodySource.contains(pattern)) return;
+      }
+
+      reporter.atNode(node);
+    });
+  }
+
+  String? _findEnclosingBodySource(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      // Check method-level first — server verification in the same method
+      if (current is FunctionBody) {
+        return current.toSource();
+      }
+      // Fall back to class-level for field-based patterns
+      if (current is ClassDeclaration) {
+        return current.toSource();
+      }
+      current = current.parent;
+    }
+    return null;
+  }
+}

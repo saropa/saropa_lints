@@ -100,40 +100,98 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_datetime_comparison_without_precision
-// Source: lib\src\rules\equality_rules.dart
+// Test fixture for: avoid_shared_prefs_sync_race
+// Source: lib\src\rules\packages\shared_preferences_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_datetime_comparison_without_precision
-// expect_lint: avoid_datetime_comparison_without_precision
-void _bad351() {
-  if (startTime == endTime) {}
+dynamic prefs;
 
-  if (created != modified) {}
+// ============================================================================
+// BAD: Should trigger avoid_shared_prefs_sync_race
+// ============================================================================
+
+// expect_lint: avoid_shared_prefs_sync_race
+Future<void> _bad1() async {
+  // Un-awaited writes race with non-deterministic ordering
+  prefs.setBool('darkMode', true);
+  prefs.setString('locale', 'en');
+  prefs.setInt('fontSize', 16);
 }
 
-// GOOD: Should NOT trigger avoid_datetime_comparison_without_precision
-void _good351() {
-  if (startTime.difference(endTime).abs() < const Duration(seconds: 1)) {}
-
-  if (startTime.isAtSameMomentAs(endTime)) {}
+// expect_lint: avoid_shared_prefs_sync_race
+Future<void> _bad2() async {
+  // Single un-awaited write in async context
+  prefs.setDouble('volume', 0.8);
 }
 
-// --- False-positive regression tests (bug fix) ---
-
-abstract final class _DateConstants {
-  static final DateTime unixEpochDate = DateTime(1970, 1, 1);
+// expect_lint: avoid_shared_prefs_sync_race
+Future<void> _bad3() async {
+  // Un-awaited remove and clear in async
+  prefs.remove('session_token');
+  prefs.clear();
 }
 
-// GOOD: Comparison against a static constant is intentional (epoch sentinel)
-void _goodConstRef() {
-  final DateTime dt = DateTime.now();
-  if (dt == _DateConstants.unixEpochDate) {} // Static field — exact check
+// ============================================================================
+// GOOD: Should NOT trigger avoid_shared_prefs_sync_race
+// ============================================================================
+
+Future<void> _good1() async {
+  // All writes properly awaited
+  await prefs.setBool('darkMode', true);
+  await prefs.setString('locale', 'en');
+  await prefs.setInt('fontSize', 16);
 }
 
-// GOOD: Comparison against a const constructor
-void _goodConstCtor() {
-  final DateTime dt = DateTime.now();
-  if (dt == const DateTime(1970)) {} // const — exact check
+Future<void> _good2() async {
+  await prefs.setDouble('volume', 0.8);
+}
+
+Future<void> _good3() async {
+  await prefs.remove('session_token');
+  await prefs.clear();
+}
+
+// OK: Reads do not need await for race condition
+Future<void> _good4() async {
+  final value = prefs.getString('key');
+  final count = prefs.getInt('count');
+}
+
+// OK: Writes in synchronous context are not flagged
+void _good5() {
+  prefs.setBool('darkMode', true);
+  prefs.setString('locale', 'en');
+}
+
+// OK: Explicitly marked fire-and-forget with unawaited
+Future<void> _good6() async {
+  unawaited(prefs.setBool('darkMode', true));
+}
+
+// ============================================================================
+// FALSE POSITIVES: Should NOT trigger avoid_shared_prefs_sync_race
+// ============================================================================
+
+// OK: Write methods on non-SharedPreferences objects
+Future<void> _falsePositive1() async {
+  final storage = _CustomStorage();
+  storage.setBool('key', true);
+}
+
+// OK: Method named setBool on unrelated class
+Future<void> _falsePositive2() async {
+  final config = _AppConfig();
+  config.setBool('flag', false);
+}
+
+// Helpers
+void unawaited(Future<void> future) {}
+
+class _CustomStorage {
+  void setBool(String key, bool value) {}
+}
+
+class _AppConfig {
+  void setBool(String key, bool value) {}
 }

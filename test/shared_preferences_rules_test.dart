@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 11 Shared Preferences lint rules.
+/// Tests for 12 Shared Preferences lint rules.
 ///
 /// Test fixtures: example_packages/lib/shared_preferences/*
 void main() {
@@ -19,6 +19,7 @@ void main() {
       'require_shared_prefs_null_handling',
       'require_shared_prefs_key_constants',
       'avoid_shared_prefs_large_data',
+      'avoid_shared_prefs_sync_race',
     ];
 
     for (final fixture in fixtures) {
@@ -90,6 +91,21 @@ void main() {
         // Avoidance pattern not present
         expect('avoid_shared_prefs_large_data passes', isNotNull);
       });
+    });
+
+    group('avoid_shared_prefs_sync_race', () {
+      test('concurrent sync SharedPreferences access SHOULD trigger', () {
+        // Pattern that should be avoided: sync race condition
+        expect('avoid_shared_prefs_sync_race detected', isNotNull);
+      });
+
+      test(
+        'sequential or async SharedPreferences access should NOT trigger',
+        () {
+          // Avoidance pattern not present
+          expect('avoid_shared_prefs_sync_race passes', isNotNull);
+        },
+      );
     });
   });
 

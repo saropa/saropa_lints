@@ -100,40 +100,109 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_datetime_comparison_without_precision
-// Source: lib\src\rules\equality_rules.dart
+// Test fixture for: avoid_permission_request_loop
+// Source: lib\src\rules\permission_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_datetime_comparison_without_precision
-// expect_lint: avoid_datetime_comparison_without_precision
-void _bad351() {
-  if (startTime == endTime) {}
+// ============================================================================
+// BAD: Should trigger avoid_permission_request_loop
+// ============================================================================
 
-  if (created != modified) {}
+// expect_lint: avoid_permission_request_loop
+Future<void> _bad1() async {
+  bool granted = false;
+  while (!granted) {
+    final status = await Permission.camera.request(); // Loop!
+    granted = status.isGranted;
+  }
 }
 
-// GOOD: Should NOT trigger avoid_datetime_comparison_without_precision
-void _good351() {
-  if (startTime.difference(endTime).abs() < const Duration(seconds: 1)) {}
-
-  if (startTime.isAtSameMomentAs(endTime)) {}
+// expect_lint: avoid_permission_request_loop
+Future<void> _bad2() async {
+  for (int i = 0; i < 3; i++) {
+    final status = await Permission.location.request(); // Loop!
+    if (status.isGranted) break;
+  }
 }
 
-// --- False-positive regression tests (bug fix) ---
-
-abstract final class _DateConstants {
-  static final DateTime unixEpochDate = DateTime(1970, 1, 1);
+// expect_lint: avoid_permission_request_loop
+Future<void> _bad3() async {
+  bool granted = false;
+  do {
+    final status = await Permission.microphone.request(); // Loop!
+    granted = status.isGranted;
+  } while (!granted);
 }
 
-// GOOD: Comparison against a static constant is intentional (epoch sentinel)
-void _goodConstRef() {
-  final DateTime dt = DateTime.now();
-  if (dt == _DateConstants.unixEpochDate) {} // Static field — exact check
+// ============================================================================
+// GOOD: Should NOT trigger avoid_permission_request_loop
+// ============================================================================
+
+// OK: Request once and check result
+Future<void> _good1() async {
+  var status = await Permission.camera.request();
+  if (status.isPermanentlyDenied) {
+    await openAppSettings();
+  }
 }
 
-// GOOD: Comparison against a const constructor
-void _goodConstCtor() {
-  final DateTime dt = DateTime.now();
-  if (dt == const DateTime(1970)) {} // const — exact check
+// OK: Request once with rationale
+Future<void> _good2() async {
+  if (await Permission.location.isDenied) {
+    // Show rationale first
+    await showPermissionRationale();
+    final status = await Permission.location.request();
+    if (!status.isGranted) {
+      handleDenied();
+    }
+  }
 }
+
+// OK: Check status without requesting in loop
+Future<void> _good3() async {
+  final status = await Permission.camera.status;
+  if (status.isGranted) {
+    openCamera();
+  } else if (status.isPermanentlyDenied) {
+    await openAppSettings();
+  } else {
+    final newStatus = await Permission.camera.request();
+    if (newStatus.isGranted) {
+      openCamera();
+    }
+  }
+}
+
+// ============================================================================
+// FALSE POSITIVES: Should NOT trigger avoid_permission_request_loop
+// ============================================================================
+
+// OK: Non-Permission request() inside a loop
+Future<void> _falsePositive1() async {
+  for (final url in ['a', 'b', 'c']) {
+    await httpClient.request(url); // Not Permission.request()
+  }
+}
+
+// OK: Loop without Permission.request()
+Future<void> _falsePositive2() async {
+  final permissions = [Permission.camera, Permission.location];
+  // Just checking status, not requesting
+  for (final p in permissions) {
+    final status = await p.status;
+    print(status);
+  }
+}
+
+// Helpers
+Future<void> openAppSettings() async {}
+Future<void> showPermissionRationale() async {}
+void handleDenied() {}
+void openCamera() {}
+
+class _HttpClient {
+  Future<void> request(String url) async {}
+}
+
+final httpClient = _HttpClient();

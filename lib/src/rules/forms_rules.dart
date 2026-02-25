@@ -2164,3 +2164,98 @@ class RequireStepperStateManagementRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_form_validation_on_change
+// =============================================================================
+
+/// Warns when `validate()` is called inside an `onChanged` callback.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Alias: no_validate_on_change, defer_validation
+///
+/// Calling `formKey.currentState?.validate()` inside `onChanged` triggers
+/// full form validation on every keystroke. This causes visible input lag
+/// as validators run continuously, fires excessive error messages before
+/// the user finishes typing, and degrades UX with distracting red error
+/// text that appears character-by-character.
+///
+/// **BAD:**
+/// ```dart
+/// TextField(
+///   onChanged: (value) {
+///     _formKey.currentState?.validate(); // Fires on every keystroke!
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// TextField(
+///   onEditingComplete: () {
+///     _formKey.currentState?.validate(); // Fires when user is done
+///   },
+/// )
+///
+/// // Or use AutovalidateMode.onUserInteraction on the Form
+/// Form(
+///   autovalidateMode: AutovalidateMode.onUserInteraction,
+///   child: TextFormField(...),
+/// )
+/// ```
+class AvoidFormValidationOnChangeRule extends SaropaLintRule {
+  AvoidFormValidationOnChangeRule() : super(code: _code);
+
+  /// Per-keystroke validation degrades UX significantly.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    'avoid_form_validation_on_change',
+    '[avoid_form_validation_on_change] validate() called inside an onChanged '
+        'callback. This triggers full form validation on every keystroke, '
+        'causing visible input lag, excessive premature error messages, and '
+        'distracting red error text that appears character-by-character before '
+        'the user finishes typing. Validate on submit or focus-lost instead. '
+        '{v1}',
+    correctionMessage:
+        'Move validate() to onEditingComplete, onFieldSubmitted, '
+        'or a submit button handler. Alternatively, use '
+        'AutovalidateMode.onUserInteraction on the Form widget.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'validate') return;
+
+      // Walk up to find if we're inside an onChanged callback
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is NamedExpression &&
+            current.name.label.name == 'onChanged') {
+          reporter.atNode(node);
+          return;
+        }
+        // Stop at class/function/method declaration boundary
+        if (current is ClassDeclaration ||
+            current is FunctionDeclaration ||
+            current is MethodDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}

@@ -79,7 +79,7 @@ This prevents the IDE from becoming unresponsive on large codebases with many wa
 
 ```yaml
 # In analysis_options_custom.yaml
-max_issues: 500  # default; set 0 for unlimited
+max_issues: 500 # default; set 0 for unlimited
 ```
 
 Or via environment variable:
@@ -154,6 +154,7 @@ List<SaropaLintRule> getRulesFromRegistry(Set<String> ruleNames) {
       rules.add(factory());
     }
   }
+
   return rules;
 }
 ```
@@ -434,8 +435,8 @@ Potential improvements not yet implemented:
 
 | Optimization                | Where                       | Impact                           |
 | --------------------------- | --------------------------- | -------------------------------- |
-| Use lower tiers             | `analysis_options.yaml`     | 3-5x faster                     |
-| Exclude generated code      | `analysis_options.yaml`     | 2x faster                       |
+| Use lower tiers             | `analysis_options.yaml`     | 3-5x faster                      |
+| Exclude generated code      | `analysis_options.yaml`     | 2x faster                        |
 | Compile-time constant tiers | Built-in (v5.0.0)           | Zero runtime cost for tier sets  |
 | Lazy rule instantiation     | Built-in (v5.0.0)           | ~500MB vs ~4GB memory            |
 | Problems tab cap (500)      | Built-in (v5.0.0)           | Keeps IDE responsive             |

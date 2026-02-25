@@ -663,6 +663,8 @@ const Set<String> essentialRules = <String>{
   // v5.1.0 - Batch 2 (Essential)
   'require_auto_route_guard_resume', // WARNING - missing resolver.next()
   'require_auto_route_full_hierarchy', // WARNING - push() bypasses hierarchy
+  // v5.1.0 - Batch 3 (Essential)
+  'avoid_connectivity_equals_internet', // WARNING - ConnectivityResult != internet
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -1440,6 +1442,11 @@ const Set<String> recommendedOnlyRules = <String>{
   // v4.16.0 - ROADMAP ⭐ Rules (Recommended)
   'require_rtl_layout_support', // WARNING - hardcoded left/right in layouts
   'avoid_misused_test_matchers', // WARNING - raw literals as test matchers
+  // v5.1.0 - Batch 3 (Recommended)
+  'avoid_string_env_parsing', // WARNING - fromEnvironment without defaultValue
+  'avoid_platform_specific_imports', // WARNING - dart:io in shared code
+  'avoid_shared_prefs_sync_race', // WARNING - un-awaited SharedPreferences writes
+  'avoid_stack_trace_in_production', // WARNING - stack trace exposed to users
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -2433,6 +2440,13 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_hive_large_single_entry', // WARNING - large single Hive entry
   'avoid_firebase_user_data_in_auth', // WARNING - too many custom claims
   'require_firebase_app_check_production', // WARNING - missing App Check
+  // v5.1.0 - Batch 3 (Professional)
+  'avoid_entitlement_without_server', // WARNING - client-only IAP verification
+  'avoid_expensive_did_change_dependencies', // WARNING - heavy work in didChangeDependencies
+  'avoid_webview_cors_issues', // WARNING - CORS bypass in WebView settings
+  'avoid_form_validation_on_change', // WARNING - validate() in onChanged
+  'avoid_multiple_animation_controllers', // WARNING - 3+ AnimationControllers
+  'avoid_permission_request_loop', // WARNING - Permission.request() in loop
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).

@@ -112,6 +112,7 @@ bool isInThenBranch(AstNode node, IfStatement ifStmt) {
     if (current == ifStmt.elseStatement) return false;
     current = current.parent;
   }
+
   return false;
 }
 
@@ -132,6 +133,7 @@ bool hasAncestorMountedCheck(AstNode node) {
     if (current is FunctionExpression || current is MethodDeclaration) break;
     current = current.parent;
   }
+
   return false;
 }
 
@@ -152,6 +154,7 @@ bool containsEarlyExit(Statement stmt) {
   if (stmt is Block && stmt.statements.length == 1) {
     return containsEarlyExit(stmt.statements.first);
   }
+
   return false;
 }
 
@@ -172,9 +175,11 @@ bool isBuildContextParam(FormalParameter param) {
         typeSource == 'BuildContext?' ||
         typeSource.contains('BuildContext');
   }
+
   if (param is DefaultFormalParameter) {
     return isBuildContextParam(param.parameter);
   }
+
   return false;
 }
 
@@ -192,9 +197,11 @@ String? getBuildContextParamName(FormalParameter param) {
       return param.name?.lexeme;
     }
   }
+
   if (param is DefaultFormalParameter) {
     return getBuildContextParamName(param.parameter);
   }
+
   return null;
 }
 
@@ -386,6 +393,7 @@ bool isInsideIsolate(AstNode node) {
     }
     current = current.parent;
   }
+
   return false;
 }
 
@@ -409,6 +417,7 @@ bool isInAsyncContext(AstNode node) {
     }
     current = current.parent;
   }
+
   return false;
 }
 

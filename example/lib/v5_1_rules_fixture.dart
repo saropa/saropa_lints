@@ -18,6 +18,7 @@ Widget badCachedImageWeb() {
     // expect_lint: avoid_cached_image_web
     return CachedNetworkImage(imageUrl: 'https://example.com/image.png');
   }
+
   return CachedNetworkImage(imageUrl: 'https://example.com/image.png');
 }
 
@@ -41,6 +42,7 @@ Widget goodImageNetworkWeb() {
   if (kIsWeb) {
     return Image(image: NetworkImage('https://example.com/image.png'));
   }
+
   return CachedNetworkImage(imageUrl: 'https://example.com/image.png');
 }
 
@@ -87,16 +89,12 @@ Widget goodClipOutsideAnimation() {
 
 // GOOD: ClipRRect with no animated ancestor
 Widget goodClipAlone() {
-  return ClipRRect(
-    child: Container(),
-  );
+  return ClipRRect(child: Container());
 }
 
 // FALSE POSITIVE: Clip in non-animated Container
 Widget fpClipInContainer() {
-  return Container(
-    child: ClipRRect(child: Container()),
-  );
+  return Container(child: ClipRRect(child: Container()));
 }
 
 // =============================================================================
@@ -217,6 +215,7 @@ String badBehaviorSubjectValue() {
     // expect_lint: avoid_behavior_subject_last_value
     return subject.value;
   }
+
   return subject.value;
 }
 
@@ -226,6 +225,7 @@ String goodBehaviorSubjectValue() {
   if (!subject.isClosed) {
     return subject.value;
   }
+
   return 'fallback';
 }
 

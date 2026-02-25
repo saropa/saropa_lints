@@ -112,8 +112,11 @@ final context = BuildContext();
 // expect_lint: avoid_setstate_in_build
 Widget _bad787_build(BuildContext context) {
   if (condition) {
-    setState(() {/**/}); // Causes infinite loop!
+    setState(() {
+      /**/
+    }); // Causes infinite loop!
   }
+
   return Container();
 }
 
@@ -121,8 +124,11 @@ Widget _bad787_build(BuildContext context) {
 Widget _good787_build(BuildContext context) {
   if (condition) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {/**/});
+      setState(() {
+        /**/
+      });
     });
   }
+
   return Container();
 }

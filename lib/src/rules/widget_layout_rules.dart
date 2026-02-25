@@ -6272,6 +6272,7 @@ bool _isSubtypeOfAny(DartType? type, Set<String> targetNames) {
   for (final InterfaceType supertype in type.allSupertypes) {
     if (targetNames.contains(supertype.element.name)) return true;
   }
+
   return false;
 }
 

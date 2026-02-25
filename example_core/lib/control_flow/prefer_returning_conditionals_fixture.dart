@@ -111,6 +111,7 @@ bool _bad296_isValid(int x) {
   if (x > 0) {
     return true;
   }
+
   return false; // Simplify to: return x > 0
 }
 

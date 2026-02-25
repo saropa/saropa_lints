@@ -235,6 +235,7 @@ String _getPackageVersion() {
 /// Detect where the saropa_lints package is loaded from.
 String _getPackageSource() {
   final rootUri = _getSaropaLintsRootUri();
+
   if (rootUri == null) return 'unknown';
 
   if (rootUri.startsWith('file://') || rootUri.startsWith('../')) {
@@ -419,7 +420,9 @@ String _detailNote(
   Set<String> package,
 ) {
   if (customs.containsKey(rule)) return '  [custom override]';
+
   if (platform.contains(rule)) return '  [platform filtered]';
+
   if (package.contains(rule)) return '  [package filtered]';
   return '';
 }
@@ -474,6 +477,7 @@ void _logCheck(String label, {required bool pass, String? detail}) {
       : '${_Colors.yellow}[WARN]${_Colors.reset}';
   final msg = detail != null ? '$tag $label — $detail' : '$tag $label';
   _logTerminal(msg);
+
   if (!pass) {
     _warnings.add(detail != null ? '$label — $detail' : label);
   }
@@ -496,6 +500,7 @@ void _runPreflightChecks({required String version}) {
 /// Check that pubspec.yaml lists saropa_lints as a dependency.
 void _checkPubspecDependency() {
   final pubspec = File('pubspec.yaml');
+
   if (!pubspec.existsSync()) {
     _logCheck(
       'pubspec.yaml',
@@ -528,6 +533,7 @@ void _checkPubspecDependency() {
 void _checkDartSdkVersion() {
   final versionStr = Platform.version; // e.g. "3.10.0 (stable) ..."
   final match = RegExp(r'^(\d+)\.(\d+)').firstMatch(versionStr);
+
   if (match == null) {
     _logCheck(
       'Dart SDK version',
@@ -554,6 +560,7 @@ void _checkDartSdkVersion() {
 /// Audit an existing analysis_options.yaml for common issues.
 void _auditExistingConfig(String currentVersion) {
   final configFile = File('analysis_options.yaml');
+
   if (!configFile.existsSync()) {
     _logCheck('No existing analysis_options.yaml (fresh setup)', pass: true);
     return;
@@ -589,6 +596,7 @@ void _auditExistingConfig(String currentVersion) {
     r'version:\s*"?\^?([^"\s]+)"?',
     multiLine: true,
   ).firstMatch(content);
+
   if (versionMatch != null && currentVersion != 'unknown') {
     final existing = versionMatch.group(1)!;
     if (existing != currentVersion && !existing.startsWith(currentVersion)) {
@@ -620,6 +628,7 @@ bool _validateWrittenConfig(String filePath, int expectedRuleCount) {
   _logTerminal('${_Colors.bold}Post-write validation${_Colors.reset}');
 
   final file = File(filePath);
+
   if (!file.existsSync()) {
     _logCheck(filePath, pass: false, detail: 'file does not exist');
     return false;
@@ -663,6 +672,7 @@ bool _validateWrittenConfig(String filePath, int expectedRuleCount) {
   ).allMatches(content).length;
   final tolerance = (expectedRuleCount * 0.05).ceil();
   final diff = (ruleLines - expectedRuleCount).abs();
+
   if (diff <= tolerance) {
     _logCheck(
       'Rule count: $ruleLines (expected ~$expectedRuleCount)',
@@ -751,6 +761,7 @@ bool get _supportsColor {
 bool _detectColorSupport() {
   // Standard NO_COLOR / FORCE_COLOR environment variables
   if (Platform.environment.containsKey('NO_COLOR')) return false;
+
   if (Platform.environment.containsKey('FORCE_COLOR')) return true;
 
   // Not a terminal (piped, redirected)
@@ -887,6 +898,7 @@ Map<String, _RuleMetadata> _getRuleMetadata() {
 /// Gets the problem message for a rule (for YAML comment).
 String _getProblemMessage(String ruleName) {
   final metadata = _getRuleMetadata()[ruleName];
+
   if (metadata == null) return '';
 
   return _stripRulePrefix(metadata.problemMessage);
@@ -900,6 +912,7 @@ String _getProblemMessage(String ruleName) {
 /// redundant.
 String _getStylisticDescription(String ruleName) {
   final metadata = _getRuleMetadata()[ruleName];
+
   if (metadata == null) return '';
 
   final problem = _stripRulePrefix(metadata.problemMessage);
@@ -919,6 +932,7 @@ String _getStylisticDescription(String ruleName) {
 /// Remove rule name prefix if present (e.g., "`rule_name` ...").
 String _stripRulePrefix(String msg) {
   final prefixMatch = RegExp(r'^\[[\w_]+\]\s*').firstMatch(msg);
+
   if (prefixMatch != null) {
     return msg.substring(prefixMatch.end);
   }
@@ -1298,45 +1312,37 @@ const Map<String, List<String>> _stylisticRuleCategories =
 
 /// Maps RuleTier enum to tier string name.
 String _tierToString(RuleTier tier) {
-  switch (tier) {
-    case RuleTier.essential:
-      return 'essential';
-    case RuleTier.recommended:
-      return 'recommended';
-    case RuleTier.professional:
-      return 'professional';
-    case RuleTier.comprehensive:
-      return 'comprehensive';
-    case RuleTier.pedantic:
-      return 'pedantic';
-    case RuleTier.stylistic:
-      return 'stylistic';
-  }
+  return switch (tier) {
+    RuleTier.essential => 'essential',
+    RuleTier.recommended => 'recommended',
+    RuleTier.professional => 'professional',
+    RuleTier.comprehensive => 'comprehensive',
+    RuleTier.pedantic => 'pedantic',
+    RuleTier.stylistic => 'stylistic',
+  };
 }
 
 /// Returns the tier order index (lower = stricter requirements).
 int _tierIndex(RuleTier tier) {
-  switch (tier) {
-    case RuleTier.essential:
-      return 0;
-    case RuleTier.recommended:
-      return 1;
-    case RuleTier.professional:
-      return 2;
-    case RuleTier.comprehensive:
-      return 3;
-    case RuleTier.pedantic:
-      return 4;
-    case RuleTier.stylistic:
-      return -1; // Stylistic is opt-in, not part of tier progression
-  }
+  return switch (tier) {
+    RuleTier.essential => 0,
+    RuleTier.recommended => 1,
+    RuleTier.professional => 2,
+    RuleTier.comprehensive => 3,
+    RuleTier.pedantic => 4,
+    RuleTier.stylistic =>
+      -1, // Stylistic is opt-in, not part of tier progression
+  };
 }
 
 /// Gets tier from tiers.dart sets (single source of truth).
 RuleTier _getTierFromSets(String ruleName) {
   if (tiers.stylisticRules.contains(ruleName)) return RuleTier.stylistic;
+
   if (tiers.essentialRules.contains(ruleName)) return RuleTier.essential;
+
   if (tiers.pedanticOnlyRules.contains(ruleName)) return RuleTier.pedantic;
+
   if (tiers.comprehensiveOnlyRules.contains(ruleName)) {
     return RuleTier.comprehensive;
   }
@@ -1383,6 +1389,7 @@ Future<void> main(List<String> args) async {
   _logBuffer.writeln();
 
   final CliArgs cliArgs = _parseArguments(args);
+
   if (cliArgs.showHelp) {
     _printUsage();
     return;
@@ -1396,6 +1403,7 @@ Future<void> main(List<String> args) async {
 
   // Resolve tier (handle numeric input, or prompt if not specified)
   String? tier = _resolveTier(cliArgs.tier);
+
   if (tier == null && cliArgs.tier != null) {
     // User explicitly provided an invalid tier name/number
     _logTerminal(_error('✗ Error: Invalid tier "${cliArgs.tier}"'));
@@ -1437,6 +1445,7 @@ Future<void> main(List<String> args) async {
   // --no-stylistic: skip entirely, stylistic rules stay as-is in custom yaml.
   Set<String> finalEnabled = enabledRules;
   Set<String> finalDisabled = disabledRules;
+
   if (cliArgs.stylisticAll) {
     finalEnabled = finalEnabled.union(tiers.stylisticRules);
     finalDisabled = finalDisabled.difference(tiers.stylisticRules);
@@ -1682,6 +1691,7 @@ Future<void> main(List<String> args) async {
 
   // Project overrides summary
   final customCount = userCustomizations.length;
+
   if (customCount > 0) {
     final Map<String, int> customBySeverity = {
       'ERROR': 0,
@@ -1952,6 +1962,7 @@ Map<String, bool> _extractUserCustomizations(
   // Find USER CUSTOMIZATIONS section
   final Match? customizationsMatch = _userCustomizationsSectionPattern
       .firstMatch(yamlContent);
+
   if (customizationsMatch == null) {
     // No customizations section - file wasn't generated by this tool
     // or user hasn't made any customizations
@@ -2041,6 +2052,7 @@ void _collectOppositeEntries(
   required Map<String, bool> edits,
 }) {
   final headerMatch = RegExp(sectionHeader).firstMatch(yamlContent);
+
   if (headerMatch == null) return;
 
   final afterHeader = yamlContent.substring(headerMatch.end);
@@ -2085,6 +2097,7 @@ Map<String, bool> _extractV4Rules(String yamlContent, Set<String> allRules) {
   final Map<String, bool> rules = <String, bool>{};
 
   final Match? sectionMatch = _customLintSectionPattern.firstMatch(yamlContent);
+
   if (sectionMatch == null) return rules;
 
   // Get content from custom_lint: until next top-level key or EOF
@@ -2112,6 +2125,7 @@ Map<String, bool> _extractV4Rules(String yamlContent, Set<String> allRules) {
 /// (or end of file).
 String _removeCustomLintSection(String content) {
   final Match? sectionMatch = _customLintSectionPattern.firstMatch(content);
+
   if (sectionMatch == null) return content;
 
   final String before = content.substring(0, sectionMatch.start);
@@ -2142,12 +2156,14 @@ String _removeAnalyzerCustomLintPlugin(String content) {
 /// confirmation. Skips silently if not found in dev_dependencies.
 void _cleanPubspecCustomLint({required bool dryRun}) {
   final File pubspecFile = File('pubspec.yaml');
+
   if (!pubspecFile.existsSync()) return;
 
   final String content = pubspecFile.readAsStringSync();
 
   // Only match custom_lint inside the dev_dependencies section
   final String? cleaned = _removeDevDep(content, 'custom_lint');
+
   if (cleaned == null) return;
 
   _logTerminal('');
@@ -2199,6 +2215,7 @@ String? _removeDevDep(String content, String packageName) {
     multiLine: true,
   );
   final Match? devMatch = devDepsHeader.firstMatch(content);
+
   if (devMatch == null) return null;
 
   // Find the section boundaries
@@ -2213,6 +2230,7 @@ String? _removeDevDep(String content, String packageName) {
     '^\\ +${RegExp.escape(packageName)}:[^\\n]*\\n?',
     multiLine: true,
   );
+
   if (!depLine.hasMatch(devSection)) return null;
 
   // Remove only within the dev_dependencies section
@@ -2470,6 +2488,7 @@ output: both
 ''';
 
   final headerEndMatch = RegExp(r'╚[═]+╝\n*').firstMatch(content);
+
   if (headerEndMatch != null) {
     final insertPos = headerEndMatch.end;
     return content.substring(0, insertPos) +
@@ -2487,6 +2506,7 @@ String _addOutputSetting(String content) {
     r'^(max_issues:\s*\d+.*)\n',
     multiLine: true,
   ).firstMatch(content);
+
   if (maxIssuesMatch == null) return content;
 
   final insertPos = maxIssuesMatch.end;
@@ -2536,6 +2556,7 @@ platforms:
   // Insert after max_issues line if present, else after header
   final maxIssuesMatch = RegExp(r'max_issues:\s*\d+\n*').firstMatch(content);
   String newContent;
+
   if (maxIssuesMatch != null) {
     final insertPos = maxIssuesMatch.end;
     newContent =
@@ -2605,6 +2626,7 @@ $packageEntries
   ).firstMatch(content);
 
   String newContent;
+
   if (platformsEndMatch != null) {
     final insertPos = platformsEndMatch.end;
     newContent =
@@ -2848,6 +2870,7 @@ void _insertNewStylisticSection(
   ).firstMatch(content);
 
   String newContent;
+
   if (overridesHeaderMatch != null) {
     newContent =
         content.substring(0, overridesHeaderMatch.start) +
@@ -2868,6 +2891,7 @@ void _insertNewStylisticSection(
 /// get a dim info message.
 void _logRemovedStylisticRules(String content) {
   final removedRules = _extractRemovedStylisticRules(content);
+
   if (removedRules.isEmpty) return;
 
   final enabledRemoved =
@@ -2917,6 +2941,7 @@ void _logRemovedStylisticRules(String content) {
   }
 
   bool shouldMove = false;
+
   if (stdin.hasTerminal) {
     stdout.write(
       '${_Colors.cyan}Move to STYLISTIC RULES section? [y/N]: '
@@ -2965,6 +2990,7 @@ int _findStylisticSectionEnd(String content, int sectionStart) {
   // Find the next section header (─── divider) after the STYLISTIC RULES
   // header itself. Skip the first two divider lines (the section's own header).
   final afterHeader = content.indexOf('\n', sectionStart);
+
   if (afterHeader == -1) return content.length;
 
   // Skip past the "# STYLISTIC RULES" line and its closing divider
@@ -3082,6 +3108,7 @@ Map<String, bool> _extractOverrideSectionValues(String content) {
   final values = <String, bool>{};
 
   final sectionMatch = _ruleOverridesSectionHeader.firstMatch(content);
+
   if (sectionMatch == null) return values;
 
   // Content after the RULE OVERRIDES header until end of file
@@ -3104,6 +3131,7 @@ String _removeRulesFromOverridesSection(
   Set<String> rulesToRemove,
 ) {
   final sectionMatch = _ruleOverridesSectionHeader.firstMatch(content);
+
   if (sectionMatch == null) return content;
 
   // Only modify content after the RULE OVERRIDES header
@@ -3148,6 +3176,7 @@ Map<String, bool> _extractPlatformsFromFile(File file) {
     r'^platforms:\s*$',
     multiLine: true,
   ).firstMatch(content);
+
   if (sectionMatch == null) return platforms;
 
   // Extract indented entries after platforms:
@@ -3197,6 +3226,7 @@ Map<String, bool> _extractPackagesFromFile(File file) {
     r'^packages:\s*$',
     multiLine: true,
   ).firstMatch(content);
+
   if (sectionMatch == null) return packages;
 
   // Extract indented entries after packages:
@@ -3294,6 +3324,7 @@ String _generatePluginsYaml({
       .where((e) => !e.value)
       .map((e) => e.key)
       .toList();
+
   if (disabledPlatforms.isNotEmpty) {
     buffer.writeln('    # Disabled platforms: ${disabledPlatforms.join(', ')}');
     buffer.writeln('    #');
@@ -3304,6 +3335,7 @@ String _generatePluginsYaml({
       .where((e) => !e.value)
       .map((e) => e.key)
       .toList();
+
   if (disabledPackages.isNotEmpty) {
     buffer.writeln('    # Disabled packages: ${disabledPackages.join(', ')}');
     buffer.writeln('    #');
@@ -3613,6 +3645,7 @@ CliArgs _parseArguments(List<String> args) {
 
   String outputPath = 'analysis_options.yaml';
   int outputIndex = args.indexOf('--output');
+
   if (outputIndex == -1) {
     outputIndex = args.indexOf('-o');
   }
@@ -3631,6 +3664,7 @@ CliArgs _parseArguments(List<String> args) {
 
   String? requestedTier;
   int tierIndex = args.indexOf('--tier');
+
   if (tierIndex == -1) {
     tierIndex = args.indexOf('-t');
   }
@@ -3690,6 +3724,7 @@ String? _resolveTier(String? input) {
   if (input == null) return null;
 
   final int? numericTier = int.tryParse(input);
+
   if (numericTier != null) {
     for (final MapEntry<String, int> entry in tierIds.entries) {
       if (entry.value == numericTier) {
@@ -3700,6 +3735,7 @@ String? _resolveTier(String? input) {
   }
 
   final String normalized = input.toLowerCase();
+
   if (tierIds.containsKey(normalized)) {
     return normalized;
   }
@@ -3940,6 +3976,7 @@ _WalkthroughResult _runStylisticWalkthrough({
     '${_Colors.red}$disabled disabled${_Colors.reset}, '
     '${_Colors.dim}$skipped skipped${_Colors.reset})',
   );
+
   if (aborted) {
     _logTerminal(
       '${_Colors.dim}Run init again to resume from where you '
@@ -4154,6 +4191,7 @@ _CategoryResult? _walkthroughConflicting({
 
   final rawInput = stdin.readLineSync();
   _logTerminal('');
+
   if (rawInput == null) return null; // EOF → quit
   final input = rawInput.trim().toLowerCase();
 
@@ -4295,9 +4333,11 @@ String _promptForTier() {
   );
 
   final String input = stdin.readLineSync()?.trim() ?? '';
+
   if (input.isEmpty) return defaultTier;
 
   final String? resolved = _resolveTier(input);
+
   if (resolved != null) return resolved;
 
   _logTerminal(
@@ -4311,9 +4351,11 @@ String _promptForTier() {
 /// from the `# Tier: <name>` comment, or null if not found.
 String? _detectExistingTier() {
   final file = File('analysis_options.yaml');
+
   if (!file.existsSync()) return null;
 
   final match = RegExp(r'# Tier:\s*(\w+)').firstMatch(file.readAsStringSync());
+
   if (match == null) return null;
 
   final tier = match.group(1)!.toLowerCase();

@@ -427,3 +427,185 @@ class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
     return node.argumentList.arguments.first is StringLiteral;
   }
 }
+
+// =============================================================================
+// avoid_string_env_parsing
+// =============================================================================
+
+/// Warns when `fromEnvironment()` is called without a `defaultValue`.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Alias: env_no_default, missing_env_default
+///
+/// `String.fromEnvironment`, `int.fromEnvironment`, and
+/// `bool.fromEnvironment` silently return the type default (empty string,
+/// 0, or false) when the variable is not set via `--dart-define`. Without
+/// an explicit `defaultValue`, missing configuration is invisible at
+/// runtime, causing hard-to-debug failures across build environments.
+///
+/// **BAD:**
+/// ```dart
+/// const apiUrl = String.fromEnvironment('API_URL');
+/// const maxRetries = int.fromEnvironment('MAX_RETRIES');
+/// const enableLogs = bool.fromEnvironment('ENABLE_LOGS');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// const apiUrl = String.fromEnvironment(
+///   'API_URL',
+///   defaultValue: 'https://api.example.com',
+/// );
+/// const maxRetries = int.fromEnvironment(
+///   'MAX_RETRIES',
+///   defaultValue: 3,
+/// );
+/// const enableLogs = bool.fromEnvironment(
+///   'ENABLE_LOGS',
+///   defaultValue: false,
+/// );
+/// ```
+class AvoidStringEnvParsingRule extends SaropaLintRule {
+  AvoidStringEnvParsingRule() : super(code: _code);
+
+  /// Missing defaults cause subtle production bugs.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.trivial;
+
+  static const LintCode _code = LintCode(
+    'avoid_string_env_parsing',
+    '[avoid_string_env_parsing] fromEnvironment() called without a '
+        'defaultValue parameter. Environment variables set via --dart-define '
+        'silently return the type default (empty string, 0, or false) when '
+        'not provided. This makes missing configuration invisible at runtime '
+        'and causes hard-to-debug failures across build environments. {v1}',
+    correctionMessage:
+        'Add a defaultValue parameter to provide a safe fallback '
+        'when the variable is not defined.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _envTypes = <String>{'String', 'int', 'bool'};
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'fromEnvironment') return;
+
+      // Check if target is String, int, or bool
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (!_envTypes.contains(target.name)) return;
+
+      // Check for defaultValue named argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'defaultValue') {
+          return;
+        }
+      }
+
+      reporter.atNode(node);
+    });
+  }
+}
+
+// =============================================================================
+// avoid_platform_specific_imports
+// =============================================================================
+
+/// Warns when `dart:io` is imported in code that should be platform-agnostic.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Alias: no_dart_io, platform_agnostic_imports
+///
+/// `dart:io` is unavailable on web. Importing it in shared code causes
+/// compile failures when targeting web. Use conditional imports or
+/// `package:universal_io` for cross-platform code.
+///
+/// **BAD:**
+/// ```dart
+/// import 'dart:io';
+///
+/// Future<String> readFile(String path) async {
+///   return File(path).readAsStringSync();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'package:universal_io/io.dart';
+///
+/// // Or use conditional imports:
+/// import 'stub_io.dart'
+///     if (dart.library.io) 'dart:io';
+/// ```
+class AvoidPlatformSpecificImportsRule extends SaropaLintRule {
+  AvoidPlatformSpecificImportsRule() : super(code: _code);
+
+  /// Platform incompatibilities block entire build targets.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_platform_specific_imports',
+    '[avoid_platform_specific_imports] dart:io import detected in shared '
+        'code. dart:io is unavailable on web and will cause compile failures '
+        'when targeting browser platforms. Shared library code and packages '
+        'that support multiple platforms should use conditional imports or '
+        'package:universal_io to remain platform-agnostic. {v1}',
+    correctionMessage:
+        'Use conditional imports or package:universal_io instead of dart:io.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Path segments that indicate platform-specific directories.
+  /// Slash-wrapped entries match directory names; slash-prefixed suffix
+  /// entries match file/directory name endings (e.g. `widget_android/`).
+  static const Set<String> _platformDirs = <String>{
+    '/native/',
+    '/platform/',
+    '/android/',
+    '/ios/',
+    '/macos/',
+    '/windows/',
+    '/linux/',
+    '/_android/',
+    '/_ios/',
+    '/_macos/',
+    '/_windows/',
+    '/_linux/',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Skip platform-specific directories
+    final String path = context.filePath.replaceAll('\\', '/');
+    for (final String dir in _platformDirs) {
+      if (path.contains(dir)) return;
+    }
+
+    context.addImportDirective((ImportDirective node) {
+      final String? uri = node.uri.stringValue;
+      if (uri != 'dart:io') return;
+
+      // Conditional imports are the correct pattern — don't flag them
+      if (node.configurations.isNotEmpty) return;
+
+      reporter.atNode(node);
+    });
+  }
+}

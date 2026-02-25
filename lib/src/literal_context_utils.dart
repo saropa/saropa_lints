@@ -24,6 +24,7 @@ bool isLiteralInConstContext(AstNode node) {
     }
     current = current.parent;
   }
+
   return false;
 }
 
@@ -36,6 +37,7 @@ bool isInAnnotation(AstNode node) {
     if (current is Annotation) return true;
     current = current.parent;
   }
+
   return false;
 }
 
@@ -48,6 +50,7 @@ bool isInImportOrExport(AstNode node) {
     if (current is ImportDirective || current is ExportDirective) return true;
     current = current.parent;
   }
+
   return false;
 }
 
@@ -146,6 +149,7 @@ bool isTestDescription(AstNode node) {
       }
     }
   }
+
   return false;
 }
 
@@ -166,5 +170,6 @@ bool isInExpectCall(AstNode node) {
     if (current is FunctionBody) break;
     current = current.parent;
   }
+
   return false;
 }

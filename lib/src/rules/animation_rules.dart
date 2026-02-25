@@ -1895,3 +1895,112 @@ class AvoidClipDuringAnimationRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_multiple_animation_controllers
+// =============================================================================
+
+/// Warns when a State class declares three or more AnimationController fields.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Alias: too_many_animation_controllers, complex_animation_state
+///
+/// Multiple `AnimationController` instances in a single State class indicate
+/// overly complex animation logic that is hard to coordinate, test, and
+/// maintain. Each controller needs explicit disposal, vsync management,
+/// and careful lifecycle handling. Consider using `TweenSequence`,
+/// `staggered_animations`, or Rive/Lottie for complex animations.
+///
+/// Threshold: 3 controllers (2 is a common legitimate pattern).
+///
+/// **BAD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> with TickerProviderStateMixin {
+///   late final AnimationController _fadeController;
+///   late final AnimationController _slideController;
+///   late final AnimationController _scaleController; // Too many!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> with SingleTickerProviderStateMixin {
+///   late final AnimationController _controller;
+///   late final Animation<double> _fadeAnimation;
+///   late final Animation<Offset> _slideAnimation;
+///   // One controller drives multiple animations via TweenSequence
+/// }
+/// ```
+class AvoidMultipleAnimationControllersRule extends SaropaLintRule {
+  AvoidMultipleAnimationControllersRule() : super(code: _code);
+
+  /// Complex animation state is hard to maintain and dispose correctly.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    'avoid_multiple_animation_controllers',
+    '[avoid_multiple_animation_controllers] State class declares 3 or more '
+        'AnimationController fields. Multiple controllers are hard to '
+        'coordinate, each requiring explicit disposal and vsync management. '
+        'Complex multi-controller state increases the risk of lifecycle bugs, '
+        'memory leaks from missed disposal, and makes animation timing '
+        'difficult to reason about. {v1}',
+    correctionMessage:
+        'Use a single AnimationController with TweenSequence or '
+        'staggered_animations. For complex animations, consider Rive or '
+        'Lottie instead of manual controller management.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const int _threshold = 3;
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      // Only check State subclasses
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+      final String superclass = extendsClause.superclass.name2.lexeme;
+      if (superclass != 'State') return;
+
+      int controllerCount = 0;
+
+      for (final ClassMember member in node.members) {
+        if (member is! FieldDeclaration) continue;
+        final TypeAnnotation? type = member.fields.type;
+
+        if (type is NamedType) {
+          // Explicit type annotation: AnimationController or AnimationController?
+          if (type.name2.lexeme == 'AnimationController') {
+            controllerCount += member.fields.variables.length;
+          }
+        } else if (type == null) {
+          // Inferred type: check initializer expression
+          for (final VariableDeclaration v in member.fields.variables) {
+            final Expression? init = v.initializer;
+            if (init is InstanceCreationExpression &&
+                init.constructorName.type.name2.lexeme ==
+                    'AnimationController') {
+              controllerCount++;
+            }
+          }
+        }
+      }
+
+      if (controllerCount >= _threshold) {
+        reporter.atToken(node.name);
+      }
+    });
+  }
+}

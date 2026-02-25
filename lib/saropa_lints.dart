@@ -2498,6 +2498,19 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireAutoRouteFullHierarchyRule.new,
   AvoidFirebaseUserDataInAuthRule.new,
   RequireFirebaseAppCheckProductionRule.new,
+
+  // v5.1.0 — New rules
+  AvoidStringEnvParsingRule.new,
+  AvoidConnectivityEqualsInternetRule.new,
+  AvoidPlatformSpecificImportsRule.new,
+  AvoidSharedPrefsSyncRaceRule.new,
+  AvoidMultipleAnimationControllersRule.new,
+  AvoidFormValidationOnChangeRule.new,
+  AvoidStackTraceInProductionRule.new,
+  AvoidWebViewCorsIssuesRule.new,
+  AvoidExpensiveDidChangeDependenciesRule.new,
+  AvoidPermissionRequestLoopRule.new,
+  AvoidEntitlementWithoutServerRule.new,
 ];
 
 // =============================================================================
@@ -2518,6 +2531,7 @@ Map<String, SaropaLintRule Function()> _buildRuleFactoriesMap() {
     map[rule.code.name] = factory;
     // rule goes out of scope, can be GC'd
   }
+
   return map;
 }
 
@@ -2534,6 +2548,7 @@ List<SaropaLintRule> getRulesFromRegistry(Set<String> ruleNames) {
       rules.add(factory());
     }
   }
+
   return rules;
 }
 

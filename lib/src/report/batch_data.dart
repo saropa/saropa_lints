@@ -131,6 +131,7 @@ Map<String, List<Map<String, Object>>> _violationsToJson(
         )
         .toList();
   }
+
   return result;
 }
 
@@ -155,6 +156,7 @@ Map<LintImpact, List<ViolationRecord>> _violationsFromJson(dynamic raw) {
         )
         .toList();
   }
+
   return result;
 }
 

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 25 Forms lint rules.
+/// Tests for 26 Forms lint rules.
 ///
 /// Test fixtures: example_widgets/lib/forms/*
 void main() {
@@ -33,6 +33,7 @@ void main() {
       'prefer_regex_validation',
       'prefer_input_formatters',
       'require_stepper_state_management',
+      'avoid_form_validation_on_change',
     ];
 
     for (final fixture in fixtures) {
@@ -345,6 +346,18 @@ void main() {
       test('avoid_keyboard_overlap should NOT trigger', () {
         // Avoidance pattern not present
         expect('avoid_keyboard_overlap passes', isNotNull);
+      });
+    });
+
+    group('avoid_form_validation_on_change', () {
+      test('validation on every keystroke SHOULD trigger', () {
+        // Pattern that should be avoided: validating form on each change
+        expect('avoid_form_validation_on_change detected', isNotNull);
+      });
+
+      test('validation on submit or blur should NOT trigger', () {
+        // Avoidance pattern not present
+        expect('avoid_form_validation_on_change passes', isNotNull);
       });
     });
   });

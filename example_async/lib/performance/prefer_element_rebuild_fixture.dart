@@ -115,13 +115,13 @@ Widget _bad817_build(BuildContext context) {
   if (isLoading) {
     return CircularProgressIndicator(); // Type A
   }
+
   return MyContent(); // Type B - Element destroyed on toggle!
 }
 
 // GOOD: Should NOT trigger prefer_element_rebuild
 Widget _good817_build(BuildContext context) {
-  return Stack(children: [
-    MyContent(),
-    if (isLoading) CircularProgressIndicator(),
-  ]);
+  return Stack(
+    children: [MyContent(), if (isLoading) CircularProgressIndicator()],
+  );
 }

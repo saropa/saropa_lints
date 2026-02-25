@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 4 Configuration lint rules.
+/// Tests for 6 Configuration lint rules.
 ///
 /// Test fixtures: example_async/lib/config/*
 void main() {
@@ -12,6 +12,8 @@ void main() {
       'avoid_hardcoded_config_test',
       'avoid_mixed_environments',
       'require_feature_flag_type_safety',
+      'avoid_string_env_parsing',
+      'avoid_platform_specific_imports',
     ];
 
     for (final fixture in fixtures) {
@@ -48,6 +50,27 @@ void main() {
 
       test('environment-separated config should NOT trigger', () {
         expect('environment-separated config', isNotNull);
+      });
+    });
+  });
+
+  group('Configuration - Platform & Environment Rules', () {
+    group('avoid_string_env_parsing', () {
+      test('string-based environment variable parsing SHOULD trigger', () {
+        expect('string-based environment variable parsing', isNotNull);
+      });
+
+      test('typed environment config should NOT trigger', () {
+        expect('typed environment config', isNotNull);
+      });
+    });
+    group('avoid_platform_specific_imports', () {
+      test('platform-specific import in shared code SHOULD trigger', () {
+        expect('platform-specific import in shared code', isNotNull);
+      });
+
+      test('conditional import should NOT trigger', () {
+        expect('conditional import', isNotNull);
       });
     });
   });

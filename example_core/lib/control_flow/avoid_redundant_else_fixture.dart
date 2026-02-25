@@ -122,5 +122,6 @@ void _good287() {
   if (condition) {
     return 1;
   }
+
   return 2;
 }

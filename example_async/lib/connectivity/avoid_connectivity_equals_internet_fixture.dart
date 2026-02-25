@@ -100,40 +100,114 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_datetime_comparison_without_precision
-// Source: lib\src\rules\equality_rules.dart
+// Test fixture for: avoid_connectivity_equals_internet
+// Source: lib\src\rules\connectivity_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_datetime_comparison_without_precision
-// expect_lint: avoid_datetime_comparison_without_precision
-void _bad351() {
-  if (startTime == endTime) {}
+dynamic result;
 
-  if (created != modified) {}
+// ============================================================================
+// BAD: Should trigger avoid_connectivity_equals_internet
+// ============================================================================
+
+// expect_lint: avoid_connectivity_equals_internet
+void _bad1() async {
+  final connectResult = await Connectivity().checkConnectivity();
+  if (connectResult != ConnectivityResult.none) {
+    // Wrong: assumes internet is available just because transport exists
+    fetchData();
+  }
 }
 
-// GOOD: Should NOT trigger avoid_datetime_comparison_without_precision
-void _good351() {
-  if (startTime.difference(endTime).abs() < const Duration(seconds: 1)) {}
-
-  if (startTime.isAtSameMomentAs(endTime)) {}
+// expect_lint: avoid_connectivity_equals_internet
+void _bad2() async {
+  final connectResult = await Connectivity().checkConnectivity();
+  if (connectResult == ConnectivityResult.wifi) {
+    // Wrong: WiFi does not mean internet (captive portals, etc.)
+    syncData();
+  }
 }
 
-// --- False-positive regression tests (bug fix) ---
-
-abstract final class _DateConstants {
-  static final DateTime unixEpochDate = DateTime(1970, 1, 1);
+// expect_lint: avoid_connectivity_equals_internet
+void _bad3() async {
+  final connectResult = await Connectivity().checkConnectivity();
+  if (connectResult == ConnectivityResult.mobile) {
+    uploadFile();
+  }
 }
 
-// GOOD: Comparison against a static constant is intentional (epoch sentinel)
-void _goodConstRef() {
-  final DateTime dt = DateTime.now();
-  if (dt == _DateConstants.unixEpochDate) {} // Static field — exact check
+// ============================================================================
+// GOOD: Should NOT trigger avoid_connectivity_equals_internet
+// ============================================================================
+
+void _good1() async {
+  // Correct: use an actual HTTP ping to verify internet
+  try {
+    final lookupResult = await InternetAddress.lookup('example.com');
+    if (lookupResult.isNotEmpty) {
+      fetchData();
+    }
+  } catch (e) {
+    // No internet
+  }
 }
 
-// GOOD: Comparison against a const constructor
-void _goodConstCtor() {
-  final DateTime dt = DateTime.now();
-  if (dt == const DateTime(1970)) {} // const — exact check
+void _good2() async {
+  // Correct: use connectivity only for transport info, not internet status
+  final connectResult = await Connectivity().checkConnectivity();
+  logTransportType(connectResult);
+}
+
+void _good3() async {
+  // Correct: use a health-check endpoint
+  try {
+    final response = await httpClient.get('https://api.example.com/health');
+    if (response.statusCode == 200) {
+      syncData();
+    }
+  } catch (e) {
+    // Offline
+  }
+}
+
+// ============================================================================
+// FALSE POSITIVES: Should NOT trigger avoid_connectivity_equals_internet
+// ============================================================================
+
+// OK: Using ConnectivityResult without comparison (just logging)
+void _falsePositive1() async {
+  final connectResult = await Connectivity().checkConnectivity();
+  print('Transport: $connectResult');
+}
+
+// OK: User-defined class named ConnectivityResult with different semantics
+class _MyConnectivityResult {
+  static const none = _MyConnectivityResult();
+  const _MyConnectivityResult();
+}
+
+void _falsePositive2() {
+  final r = _MyConnectivityResult();
+  // This does not use the real ConnectivityResult prefix
+}
+
+// Helpers for the fixture
+void fetchData() {}
+void syncData() {}
+void uploadFile() {}
+void logTransportType(dynamic t) {}
+
+class InternetAddress {
+  static Future<List<dynamic>> lookup(String host) async => [];
+}
+
+dynamic httpClient = _HttpClient();
+
+class _HttpClient {
+  Future<_Response> get(String url) async => _Response();
+}
+
+class _Response {
+  int statusCode = 200;
 }

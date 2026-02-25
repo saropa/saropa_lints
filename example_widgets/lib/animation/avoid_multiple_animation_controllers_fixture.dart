@@ -100,40 +100,98 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_datetime_comparison_without_precision
-// Source: lib\src\rules\equality_rules.dart
+// Test fixture for: avoid_multiple_animation_controllers
+// Source: lib\src\rules\animation_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_datetime_comparison_without_precision
-// expect_lint: avoid_datetime_comparison_without_precision
-void _bad351() {
-  if (startTime == endTime) {}
+// ============================================================================
+// BAD: Should trigger avoid_multiple_animation_controllers
+// ============================================================================
 
-  if (created != modified) {}
+// expect_lint: avoid_multiple_animation_controllers
+class _BadComplexAnimState extends State<StatefulWidget> {
+  late final AnimationController _fadeController;
+  late final AnimationController _slideController;
+  late final AnimationController _scaleController; // 3rd controller = too many
+
+  @override
+  Widget build(BuildContext context) => Container();
 }
 
-// GOOD: Should NOT trigger avoid_datetime_comparison_without_precision
-void _good351() {
-  if (startTime.difference(endTime).abs() < const Duration(seconds: 1)) {}
+// expect_lint: avoid_multiple_animation_controllers
+class _BadFourControllers extends State<StatefulWidget> {
+  late final AnimationController _controller1;
+  late final AnimationController _controller2;
+  late final AnimationController _controller3;
+  late final AnimationController _controller4;
 
-  if (startTime.isAtSameMomentAs(endTime)) {}
+  @override
+  Widget build(BuildContext context) => Container();
 }
 
-// --- False-positive regression tests (bug fix) ---
+// ============================================================================
+// GOOD: Should NOT trigger avoid_multiple_animation_controllers
+// ============================================================================
 
-abstract final class _DateConstants {
-  static final DateTime unixEpochDate = DateTime(1970, 1, 1);
+// OK: Single controller driving multiple animations via TweenSequence
+class _GoodSingleController extends State<StatefulWidget>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<double> _slideAnimation;
+
+  @override
+  Widget build(BuildContext context) => Container();
 }
 
-// GOOD: Comparison against a static constant is intentional (epoch sentinel)
-void _goodConstRef() {
-  final DateTime dt = DateTime.now();
-  if (dt == _DateConstants.unixEpochDate) {} // Static field — exact check
+// OK: Two controllers is a common legitimate pattern (below threshold)
+class _GoodTwoControllers extends State<StatefulWidget> {
+  late final AnimationController _fadeController;
+  late final AnimationController _slideController;
+
+  @override
+  Widget build(BuildContext context) => Container();
 }
 
-// GOOD: Comparison against a const constructor
-void _goodConstCtor() {
-  final DateTime dt = DateTime.now();
-  if (dt == const DateTime(1970)) {} // const — exact check
+// OK: One controller only
+class _GoodOneController extends State<StatefulWidget> {
+  late final AnimationController _controller;
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// OK: No animation controllers at all
+class _GoodNoControllers extends State<StatefulWidget> {
+  String _title = '';
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// ============================================================================
+// FALSE POSITIVES: Should NOT trigger avoid_multiple_animation_controllers
+// ============================================================================
+
+// OK: AnimationController fields in a non-State class
+class _AnimationManager {
+  late final AnimationController _controller1;
+  late final AnimationController _controller2;
+  late final AnimationController _controller3;
+}
+
+// OK: AnimationController local variables (not fields)
+class _GoodLocalControllers extends State<StatefulWidget> {
+  @override
+  Widget build(BuildContext context) {
+    // These are locals, not class fields
+    return Container();
+  }
+
+  void _setupAnimations() {
+    final c1 = AnimationController();
+    final c2 = AnimationController();
+    final c3 = AnimationController();
+  }
 }

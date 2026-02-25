@@ -19,6 +19,7 @@ DartType? getReturnTypeFromBody(FunctionBody body) {
       return grandparent.returnType?.type;
     }
   }
+
   return null;
 }
 
