@@ -95,6 +95,9 @@ class PackageImports {
   /// Isar database package imports.
   static const Set<String> isar = {'package:isar/'};
 
+  /// Drift database package imports.
+  static const Set<String> drift = {'package:drift/', 'package:drift_flutter/'};
+
   /// SQFlite database package imports.
   static const Set<String> sqflite = {'package:sqflite/'};
 
