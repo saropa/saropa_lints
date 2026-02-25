@@ -1088,7 +1088,7 @@ class RequireSearchDebounceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_search_debounce',
-    '[require_search_debounce] Calling a search API on every keystroke can overwhelm your backend, degrade performance, and create a poor user experience. Without debouncing, users may see lag, rate limits, or unnecessary network traffic. {v2}',
+    '[require_search_debounce] Calling a search API on every keystroke can overwhelm your backend, degrade performance, and create a poor user experience. Without debouncing, users may see lag, rate limits, or unnecessary network traffic. {v3}',
     correctionMessage:
         'Wrap your search trigger in a Debouncer or Timer so the API is only called after the user stops typing for a short period (e.g., 300ms). This reduces load and improves responsiveness.',
     severity: DiagnosticSeverity.WARNING,
@@ -1133,18 +1133,54 @@ class RequireSearchDebounceRule extends SaropaLintRule {
         return;
       }
 
-      // Check for debounce mechanisms
-      final hasDebounce =
-          callbackSource.contains('debounce') ||
-          callbackSource.contains('throttle') ||
-          callbackSource.contains('timer') ||
-          callbackSource.contains('delay') ||
-          callbackSource.contains('cancellable');
+      // Check for debounce mechanisms in the callback source
+      if (_hasDebouncePattern(callbackSource)) return;
 
-      if (!hasDebounce) {
-        reporter.atNode(onChangedArg);
-      }
+      // If callback is a method reference, check the enclosing class
+      // for Timer/Debouncer fields or the referenced method's body
+      if (_hasDebounceInEnclosingClass(node)) return;
+
+      reporter.atNode(onChangedArg);
     });
+  }
+
+  static const Set<String> _debounceKeywords = <String>{
+    'debounce',
+    'throttle',
+    'timer',
+    'delay',
+    'cancellable',
+  };
+
+  bool _hasDebouncePattern(String source) {
+    return _debounceKeywords.any(source.contains);
+  }
+
+  /// Debounce-related type names (lowercased for comparison).
+  static const Set<String> _debounceTypeNames = <String>{
+    'timer',
+    'debouncer',
+    'restartabletimer',
+  };
+
+  /// Checks the enclosing class for Timer/Debouncer field declarations.
+  ///
+  /// Walks class members looking for field declarations whose type name
+  /// matches a known debounce utility, avoiding expensive full-class
+  /// `toSource()` serialization.
+  bool _hasDebounceInEnclosingClass(AstNode node) {
+    final ClassDeclaration? classDecl = node
+        .thisOrAncestorOfType<ClassDeclaration>();
+    if (classDecl == null) return false;
+
+    for (final ClassMember member in classDecl.members) {
+      if (member is FieldDeclaration) {
+        final String typeSource =
+            member.fields.type?.toSource().toLowerCase() ?? '';
+        if (_debounceTypeNames.any(typeSource.contains)) return true;
+      }
+    }
+    return false;
   }
 }
 

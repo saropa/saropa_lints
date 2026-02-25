@@ -69,6 +69,7 @@ export 'project_context.dart'
         ParallelAnalyzer,
         PatternIndex,
         ProfilingEntry,
+        ProjectContext,
         RuleBatchExecutor,
         RuleCost,
         RuleDependencyGraph,

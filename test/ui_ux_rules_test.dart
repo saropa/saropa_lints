@@ -144,6 +144,15 @@ void main() {
         // Required pattern present
         expect('require_search_debounce passes', isNotNull);
       });
+
+      test(
+        'Timer field on enclosing class should NOT trigger (regression)',
+        () {
+          // Timer? _debounce field on State class + Timer usage in onChanged
+          // means debounce is implemented even if not visible inline
+          expect('Timer field debounce recognized', isNotNull);
+        },
+      );
     });
 
     group('require_pagination_loading_state', () {

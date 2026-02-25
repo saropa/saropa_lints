@@ -3189,7 +3189,7 @@ class AvoidPathTraversalRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_path_traversal',
-    '[avoid_path_traversal] File paths constructed from user input may allow path traversal attacks (e.g., "../"), enabling access to sensitive files outside the intended directory. This is a critical security risk. {v7}',
+    '[avoid_path_traversal] File paths constructed from user input may allow path traversal attacks (e.g., "../"), enabling access to sensitive files outside the intended directory. This is a critical security risk. {v8}',
     correctionMessage:
         'Sanitize and validate file paths to prevent traversal (e.g., remove "../", use path package), and restrict access to allowed directories only.',
     severity: DiagnosticSeverity.WARNING,
@@ -3232,11 +3232,45 @@ class AvoidPathTraversalRule extends SaropaLintRule {
       // No parameter used in path - safe (e.g., system APIs, constants)
       if (usedParam == null) return;
 
+      // Check if the function body calls a trusted platform path API.
+      // If so, the parameter likely originates from that API, not user input.
+      if (_isFromPlatformPathApi(node)) return;
+
       // Parameter is used - check for validation
       if (_hasPathValidation(node)) return;
 
       reporter.atNode(node);
     });
+  }
+
+  /// Well-known platform path APIs that return trusted directory paths.
+  /// Also used in [RequireFilePathSanitizationRule] (file_handling_rules.dart).
+  static const Set<String> _platformPathApis = <String>{
+    'getApplicationDocumentsDirectory',
+    'getApplicationSupportDirectory',
+    'getApplicationCacheDirectory',
+    'getTemporaryDirectory',
+    'getLibraryDirectory',
+    'getExternalStorageDirectory',
+    'getDownloadsDirectory',
+    'getDatabasesPath',
+  };
+
+  /// Checks if the enclosing function calls a trusted platform path API.
+  ///
+  /// If the function body contains a call to a well-known platform directory
+  /// API (e.g., `getApplicationDocumentsDirectory`), parameters in that
+  /// function likely originate from trusted OS paths rather than user input.
+  /// This is a heuristic — see CONTRIBUTING.md for heuristic guidelines.
+  bool _isFromPlatformPathApi(AstNode node) {
+    final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
+    if (body == null) return false;
+
+    final String bodySource = body.toSource();
+    for (final String api in _platformPathApis) {
+      if (bodySource.contains(api)) return true;
+    }
+    return false;
   }
 
   /// Gets the parameters of the enclosing function or method.
