@@ -12,6 +12,36 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- 21 new Drift (SQLite) database lint rules covering data safety, resource management, SQL injection prevention, migration correctness, performance, and web platform safety
+  - `avoid_drift_enum_index_reorder` (Essential, ERROR)
+  - `require_drift_database_close` (Recommended, WARNING)
+  - `avoid_drift_update_without_where` (Recommended, WARNING)
+  - `require_await_in_drift_transaction` (Recommended, WARNING)
+  - `require_drift_foreign_key_pragma` (Recommended, WARNING)
+  - `avoid_drift_raw_sql_interpolation` (Recommended, ERROR)
+  - `prefer_drift_batch_operations` (Recommended, WARNING)
+  - `require_drift_stream_cancel` (Recommended, WARNING)
+  - `avoid_drift_database_on_main_isolate` (Professional, INFO)
+  - `avoid_drift_log_statements_production` (Professional, WARNING)
+  - `avoid_drift_get_single_without_unique` (Professional, INFO)
+  - `prefer_drift_use_columns_false` (Professional, INFO)
+  - `avoid_drift_lazy_database` (Professional, INFO)
+  - `prefer_drift_isolate_sharing` (Professional, INFO)
+  - `avoid_drift_query_in_migration` (Comprehensive, WARNING)
+  - `require_drift_schema_version_bump` (Comprehensive, INFO)
+  - `avoid_drift_foreign_key_in_migration` (Comprehensive, INFO)
+  - `require_drift_reads_from` (Comprehensive, INFO)
+  - `avoid_drift_unsafe_web_storage` (Comprehensive, INFO)
+  - `avoid_drift_close_streams_in_tests` (Comprehensive, INFO)
+  - `avoid_drift_nullable_converter_mismatch` (Comprehensive, INFO)
+- Drift added as supported package in package filtering system
+
+---
+
 ## [5.0.3]
 
 ### Added
