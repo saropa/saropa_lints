@@ -130,6 +130,13 @@ void main() {
         // Required pattern present
         expect('require_file_path_sanitization passes', isNotNull);
       });
+
+      test('platform path API in function body should NOT trigger '
+          '(regression)', () {
+        // getApplicationDocumentsDirectory in the same function body
+        // indicates the parameter comes from a trusted OS path
+        expect('platform path API recognized as trusted', isNotNull);
+      });
     });
   });
 

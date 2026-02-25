@@ -342,6 +342,11 @@ class ProjectContext {
     return null;
   }
 
+  /// Check if the project containing [filePath] has a specific dependency.
+  static bool hasDependency(String filePath, String packageName) {
+    return getProjectInfo(filePath)?.hasDependency(packageName) ?? false;
+  }
+
   /// Clear the project cache (useful for testing).
   static void clearCache() {
     _projectCache.clear();

@@ -320,7 +320,7 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_unsafe_collection_methods',
-    '[avoid_unsafe_collection_methods] Calling .first, .last, or .single on an empty collection throws a StateError at runtime, crashing the app. This is especially dangerous when the collection comes from an API response, database query, or user input where emptiness cannot be guaranteed at compile time. {v9}',
+    '[avoid_unsafe_collection_methods] Calling .first, .last, or .single on an empty collection throws a StateError at runtime, crashing the app. This is especially dangerous when the collection comes from an API response, database query, or user input where emptiness cannot be guaranteed at compile time. {v10}',
     correctionMessage:
         'Use .firstOrNull, .lastOrNull, or .singleOrNull from package:collection, or guard with an isEmpty check before accessing.',
     severity: DiagnosticSeverity.WARNING,
@@ -352,11 +352,16 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
           return;
         }
 
-        // Get the collection name for guard checking
-        final String? collectionName = _getCollectionName(node.realTarget);
+        // Check if collection is a callback parameter guaranteed non-empty
+        if (_isNonEmptyCallbackParam(node.realTarget)) return;
 
-        // Check if guarded by isNotEmpty/length check
-        if (collectionName != null && _isGuardedAccess(node, collectionName)) {
+        // Get the collection name for guard checking
+        final String? collectionName = _collectionNameOf(node.realTarget);
+
+        // Check if guarded by isNotEmpty/length check or early return
+        if (collectionName != null &&
+            (_isGuardedAccess(node, collectionName) ||
+                _isCollectionGuardedByEarlyReturn(node, collectionName))) {
           return;
         }
 
@@ -382,10 +387,14 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
           return;
         }
 
+        // Check if collection is a callback parameter guaranteed non-empty
+        if (_isNonEmptyCallbackParam(node.prefix)) return;
+
         final String collectionName = node.prefix.name;
 
-        // Check if guarded by isNotEmpty/length check
-        if (_isGuardedAccess(node, collectionName)) {
+        // Check if guarded by isNotEmpty/length check or early return
+        if (_isGuardedAccess(node, collectionName) ||
+            _isCollectionGuardedByEarlyReturn(node, collectionName)) {
           return;
         }
 
@@ -474,20 +483,6 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
     }
 
     return false;
-  }
-
-  /// Extracts the collection variable name from an expression.
-  String? _getCollectionName(Expression expr) {
-    if (expr is SimpleIdentifier) {
-      return expr.name;
-    }
-    if (expr is PrefixedIdentifier) {
-      return expr.toSource();
-    }
-    if (expr is PropertyAccess) {
-      return expr.toSource();
-    }
-    return null;
   }
 
   /// Checks if the access is guarded by an isNotEmpty or length check.
@@ -747,6 +742,138 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
     }
     return false;
   }
+
+  /// Flutter callbacks whose collection parameter is guaranteed non-empty.
+  static const Set<String> _nonEmptyCallbackNames = <String>{
+    'onSelectionChanged', // SegmentedButton enforces min selection of 1
+  };
+
+  /// Checks if [expr] is a parameter of a callback known to provide
+  /// a non-empty collection (e.g., SegmentedButton.onSelectionChanged).
+  bool _isNonEmptyCallbackParam(Expression expr) {
+    if (expr is! SimpleIdentifier) return false;
+
+    // Walk up to the enclosing FunctionExpression (the callback lambda)
+    final FunctionExpression? callback = expr
+        .thisOrAncestorOfType<FunctionExpression>();
+    if (callback == null) return false;
+
+    // Check if the callback is the value of a known named argument
+    final AstNode? callbackParent = callback.parent;
+    if (callbackParent is NamedExpression) {
+      final String argName = callbackParent.name.label.name;
+      if (_nonEmptyCallbackNames.contains(argName)) return true;
+    }
+
+    return false;
+  }
+}
+
+// =============================================================================
+// Shared collection guard utilities
+// =============================================================================
+
+/// Extracts the collection variable name from an expression.
+///
+/// Used by [AvoidUnsafeCollectionMethodsRule] and [AvoidUnsafeReduceRule].
+String? _collectionNameOf(Expression expr) {
+  if (expr is SimpleIdentifier) return expr.name;
+  if (expr is PrefixedIdentifier) return expr.toSource();
+  if (expr is PropertyAccess) return expr.toSource();
+  return null;
+}
+
+/// Checks if there's an early-return guard before [node] in the same block.
+///
+/// Recognizes patterns like:
+/// - `if (list.isEmpty) return;`
+/// - `if (list.length < N) return;` where N >= 1
+/// - `if (list.length == 0) return;`
+bool _isCollectionGuardedByEarlyReturn(AstNode node, String collectionName) {
+  final Block? block = node.thisOrAncestorOfType<Block>();
+  if (block == null) return false;
+
+  for (final Statement stmt in block.statements) {
+    // Only check statements before the node
+    if (stmt.offset >= node.offset) break;
+
+    if (stmt is! IfStatement) continue;
+    if (stmt.elseStatement != null) continue;
+    if (!_containsEarlyExit(stmt.thenStatement)) continue;
+
+    if (_isEmptinessCheck(stmt.expression, collectionName)) return true;
+  }
+
+  return false;
+}
+
+/// Checks if [node] is wrapped in an if-statement or ternary that guards
+/// against empty collections.
+bool _isCollectionGuardedByWrapper(AstNode node, String collectionName) {
+  AstNode? current = node.parent;
+  while (current != null) {
+    if (current is IfStatement) {
+      final String condSrc = current.expression.toSource();
+      if (condSrc.contains('$collectionName.isNotEmpty') ||
+          condSrc.contains('$collectionName.length')) {
+        return true;
+      }
+    }
+    if (current is ConditionalExpression) {
+      final String condSrc = current.condition.toSource();
+      if (condSrc.contains('$collectionName.isNotEmpty') ||
+          condSrc.contains('$collectionName.length')) {
+        return true;
+      }
+    }
+    current = current.parent;
+  }
+  return false;
+}
+
+/// Returns true if the statement contains a return or throw.
+bool _containsEarlyExit(Statement stmt) {
+  if (stmt is ReturnStatement) return true;
+  if (stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
+    return true;
+  }
+  if (stmt is Block) {
+    return stmt.statements.any(_containsEarlyExit);
+  }
+  return false;
+}
+
+/// Checks if [condition] is an emptiness or length check for [name].
+bool _isEmptinessCheck(Expression condition, String name) {
+  final String src = condition.toSource();
+
+  // list.isEmpty
+  if (src == '$name.isEmpty') return true;
+
+  // list.length < N, list.length == 0, list.length <= 0
+  if (condition is BinaryExpression) {
+    final Expression left = condition.leftOperand;
+    final Expression right = condition.rightOperand;
+    final TokenType op = condition.operator.type;
+
+    String? lengthTarget;
+    if (left is PrefixedIdentifier && left.identifier.name == 'length') {
+      lengthTarget = left.prefix.name;
+    } else if (left is PropertyAccess && left.propertyName.name == 'length') {
+      lengthTarget = left.target?.toSource();
+    }
+
+    if (lengthTarget == name && right is IntegerLiteral) {
+      final int? value = right.value;
+      if (value != null) {
+        if (op == TokenType.LT && value >= 1) return true;
+        if (op == TokenType.LT_EQ && value == 0) return true;
+        if (op == TokenType.EQ_EQ && value == 0) return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 /// Warns when reduce() is called on a potentially empty collection.
@@ -781,7 +908,7 @@ class AvoidUnsafeReduceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_unsafe_reduce',
-    '[avoid_unsafe_reduce] Calling reduce() on an empty collection throws a StateError at runtime, crashing the app. Unlike fold(), reduce() has no initial value and requires at least one element to operate. {v6}',
+    '[avoid_unsafe_reduce] Calling reduce() on an empty collection throws a StateError at runtime, crashing the app. Unlike fold(), reduce() has no initial value and requires at least one element to operate. {v7}',
     correctionMessage:
         'Replace reduce() with fold() and provide an initial value, or guard the call with an isEmpty check first.',
     severity: DiagnosticSeverity.WARNING,
@@ -807,6 +934,13 @@ class AvoidUnsafeReduceRule extends SaropaLintRule {
           typeName.startsWith('Set') ||
           typeName.startsWith('Iterable') ||
           typeName.startsWith('Queue')) {
+        final String? collectionName = _collectionNameOf(target);
+        if (collectionName != null &&
+            (_isCollectionGuardedByEarlyReturn(node, collectionName) ||
+                _isCollectionGuardedByWrapper(node, collectionName))) {
+          return;
+        }
+
         reporter.atNode(node);
       }
     });
