@@ -2,7 +2,7 @@
 
 Complete knowledge base for adding Drift database lint rules to saropa_lints. Contains all research findings, API surface analysis, common pitfalls, proposed rules with detection strategies, edge cases, open questions, and implementation notes.
 
----
+## <!-- cspell:disable -->
 
 ## Table of Contents
 
