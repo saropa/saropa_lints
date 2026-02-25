@@ -83,6 +83,7 @@ export 'platforms/windows_rules.dart';
 // Package-specific rule files
 export 'packages/bloc_rules.dart';
 export 'packages/dio_rules.dart';
+export 'packages/drift_rules.dart';
 export 'packages/equatable_rules.dart';
 export 'packages/firebase_rules.dart';
 export 'packages/flame_rules.dart';
