@@ -21,22 +21,22 @@ Complete knowledge base for adding Drift database lint rules to saropa_lints. Co
 13. [DAO Patterns](#13-dao-patterns)
 14. [Testing Patterns](#14-testing-patterns)
 15. [Current Project State](#15-current-project-state)
-16. [Shared Database Rules Gap Analysis](#16-shared-database-rules-gap-analysis) *(NEW)*
+16. [Shared Database Rules Gap Analysis](#16-shared-database-rules-gap-analysis) _(NEW)_
 17. [Proposed Rules (21 rules)](#17-proposed-rules-21-rules)
-18. [Additional Rule Candidates](#18-additional-rule-candidates) *(NEW)*
+18. [Additional Rule Candidates](#18-additional-rule-candidates) _(NEW)_
 19. [Detection Strategy](#19-detection-strategy)
 20. [Files to Create / Modify](#20-files-to-create--modify)
 21. [Implementation Notes](#21-implementation-notes)
-22. [Priority Scoring & Effort Estimates](#22-priority-scoring--effort-estimates) *(NEW)*
-23. [Updating db_yield_rules.dart for Drift](#23-updating-db_yield_rulesdart-for-drift) *(NEW)*
+22. [Priority Scoring & Effort Estimates](#22-priority-scoring--effort-estimates) _(NEW)_
+23. [Updating db_yield_rules.dart for Drift](#23-updating-db_yield_rulesdart-for-drift) _(NEW)_
 24. [Risk Assessment & Confidence Levels](#24-risk-assessment--confidence-levels)
 25. [Open Questions & Decisions](#25-open-questions--decisions)
 26. [Rules We Considered But Rejected](#26-rules-we-considered-but-rejected)
-27. [Drift Version History & Compatibility](#27-drift-version-history--compatibility) *(NEW)*
-28. [Generated Code Interaction](#28-generated-code-interaction) *(NEW)*
-29. [Cross-Package Integration Patterns](#29-cross-package-integration-patterns) *(NEW)*
-30. [Sample Fixture Code](#30-sample-fixture-code) *(NEW)*
-31. [Unresolved Risks & Validation Gaps](#31-unresolved-risks--validation-gaps) *(NEW)*
+27. [Drift Version History & Compatibility](#27-drift-version-history--compatibility) _(NEW)_
+28. [Generated Code Interaction](#28-generated-code-interaction) _(NEW)_
+29. [Cross-Package Integration Patterns](#29-cross-package-integration-patterns) _(NEW)_
+30. [Sample Fixture Code](#30-sample-fixture-code) _(NEW)_
+31. [Unresolved Risks & Validation Gaps](#31-unresolved-risks--validation-gaps) _(NEW)_
 32. [Comparison with Isar/Hive Rules](#32-comparison-with-isarhive-rules)
 33. [References](#33-references)
 
@@ -47,6 +47,7 @@ Complete knowledge base for adding Drift database lint rules to saropa_lints. Co
 Drift (formerly **moor**, renamed for inclusivity) is a type-safe, reactive SQLite wrapper for Dart/Flutter. It uses code generation (`build_runner`) to create type-safe table definitions, companions (partial-row classes), and DAOs.
 
 **Key differentiators from Isar/Hive:**
+
 - Full SQL database (not NoSQL / key-value)
 - Code generation for type safety (`*.g.dart` or `*.drift.dart`)
 - Explicit schema migrations with versioning
@@ -63,19 +64,20 @@ Drift (formerly **moor**, renamed for inclusivity) is a type-safe, reactive SQLi
 
 ## 2. Package Ecosystem
 
-| Package | Purpose | Required? |
-|---------|---------|-----------|
-| `drift` | Core persistence library with type-safe queries and reactive streams | Yes |
-| `drift_dev` | Code generator / compiler for tables, databases, DAOs; includes SQL IDE for Dart analyzer | Dev dependency |
-| `drift_flutter` | Platform utility — provides `driftDatabase()` helper that selects the right executor per platform | Recommended |
-| `drift_sqflite` | Flutter-only executor implementation using the `sqflite` package | Alternative to `drift_flutter` |
-| `sqlite3` | Low-level SQLite3 bindings used by `NativeDatabase` | Transitive |
-| `sqlite3_flutter_libs` | Bundled SQLite3 native libraries for Flutter | Required for mobile/desktop |
-| `sqlcipher_flutter_libs` | SQLCipher (AES-256 encrypted SQLite) native libraries | Optional, for encryption |
+| Package                  | Purpose                                                                                           | Required?                      |
+| ------------------------ | ------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `drift`                  | Core persistence library with type-safe queries and reactive streams                              | Yes                            |
+| `drift_dev`              | Code generator / compiler for tables, databases, DAOs; includes SQL IDE for Dart analyzer         | Dev dependency                 |
+| `drift_flutter`          | Platform utility — provides `driftDatabase()` helper that selects the right executor per platform | Recommended                    |
+| `drift_sqflite`          | Flutter-only executor implementation using the `sqflite` package                                  | Alternative to `drift_flutter` |
+| `sqlite3`                | Low-level SQLite3 bindings used by `NativeDatabase`                                               | Transitive                     |
+| `sqlite3_flutter_libs`   | Bundled SQLite3 native libraries for Flutter                                                      | Required for mobile/desktop    |
+| `sqlcipher_flutter_libs` | SQLCipher (AES-256 encrypted SQLite) native libraries                                             | Optional, for encryption       |
 
 **Package detection for lint rules**: Check for `drift` in `pubspec.yaml` dependencies. The `drift_dev` package alone (dev dependency only) doesn't indicate Drift usage in app code.
 
 **Typical pubspec.yaml:**
+
 ```yaml
 dependencies:
   drift: ^2.20.0
@@ -132,6 +134,7 @@ class TodoItems extends Table {
 **Critical pattern**: Each column definition MUST end with an extra pair of parentheses `()` — the final `()` is the builder terminator. This is a common source of confusion.
 
 **Column types:**
+
 - `integer()` → int
 - `int64()` → BigInt (for JS compatibility)
 - `text()` → String
@@ -141,6 +144,7 @@ class TodoItems extends Table {
 - `dateTime()` → DateTime (Unix timestamps by default, ISO-8601 strings optional)
 
 **Column modifiers:**
+
 - `.nullable()` → allows null (non-nullable by default)
 - `.withDefault(Constant(value))` → SQL-level default (requires migration on change)
 - `.clientDefault(() => value)` → Dart-level default (computed at insert time, NOT in DB)
@@ -154,6 +158,7 @@ class TodoItems extends Table {
 ### Companions (Insert/Update Objects)
 
 Generated `*Companion` classes use `Value<T>` wrappers:
+
 - `Value(data)` → set to this value
 - `Value.absent()` → leave unchanged (for updates) or use default (for inserts)
 - This design distinguishes "set to null" from "don't change" — important for nullable columns
@@ -173,6 +178,7 @@ await (update(todoItems)..where((t) => t.id.equals(1)))
 ### Query APIs
 
 **Typed Dart API (safe):**
+
 ```dart
 // Select
 select(todoItems).get(); // List<TodoItem>
@@ -196,6 +202,7 @@ select(todoItems).join([
 ```
 
 **Raw SQL API (UNSAFE if misused):**
+
 ```dart
 customSelect('SELECT * FROM todo_items WHERE id = ?',
   variables: [Variable.withInt(id)],
@@ -294,31 +301,39 @@ tableUpdates(TableUpdateQuery.onTable(todoItems)).listen((updates) { ... });
 ## 5. Performance Anti-Patterns
 
 ### Unbatched Bulk Operations
+
 Individual inserts in a loop instead of `batch((b) { b.insertAll(...); })`. Batches prepare SQL statements once and reuse them.
 
 **Magnitude**: Can be 10-100x slower without batching for large datasets.
 
 ### Missing Indexes
+
 Tables without indexes on frequently queried columns cause full table scans. Use `@TableIndex` annotation or `CREATE INDEX` in `.drift` files.
 
 ### Running Database on UI Isolate
+
 SQLite runs statements synchronously, blocking the thread. On mobile, this causes dropped frames and UI jank.
 
 **Solutions:**
+
 - `NativeDatabase.createInBackground()` — automatic background isolate
 - `DriftIsolate` — manual isolate control
 - `driftDatabase()` from `drift_flutter` — handles platform selection automatically
 
 ### Overly Broad Stream Queries
+
 Drift's stream invalidation is table-level. Streams that return many rows or are computationally expensive re-execute on every table change. Keep watched queries lightweight.
 
 ### N+1 Query Pattern
+
 Fetching a list of items, then querying related data one-by-one in a loop. Use joins instead:
+
 ```dart
 select(items).join([leftOuterJoin(categories, ...)]);
 ```
 
 ### Not Using `useColumns: false` on Irrelevant Joins
+
 When you join a table only for filtering/aggregation but don't need its columns, set `useColumns: false` to avoid unnecessary column reading overhead.
 
 ---
@@ -379,7 +394,7 @@ SQLite files stored in `getApplicationDocumentsDirectory()` by default. On Andro
 
 ### Stream Subscription Leaks
 
-- Drift stream queries that are subscribed but never cancelled cause memory leaks
+- Drift stream queries that are subscribed but never canceled cause memory leaks
 - They are tracked in an internal map and only removed on `.cancel()`
 - Always cancel stream subscriptions in `dispose()`
 - In widget tests: use `closeStreamsSynchronously: true` on `DatabaseConnection`
@@ -483,15 +498,15 @@ MigrationStrategy get migration => MigrationStrategy(
 
 ### Built-in Column Types
 
-| Dart Type | Column Builder | SQLite Storage |
-|-----------|---------------|----------------|
-| `int` | `integer()` | INTEGER |
-| `BigInt` | `int64()` | INTEGER (safe for JS) |
-| `String` | `text()` | TEXT |
-| `bool` | `boolean()` | INTEGER (0/1) |
-| `double` | `real()` | REAL |
-| `Uint8List` | `blob()` | BLOB |
-| `DateTime` | `dateTime()` | INTEGER (unix) or TEXT (ISO-8601) |
+| Dart Type   | Column Builder | SQLite Storage                    |
+| ----------- | -------------- | --------------------------------- |
+| `int`       | `integer()`    | INTEGER                           |
+| `BigInt`    | `int64()`      | INTEGER (safe for JS)             |
+| `String`    | `text()`       | TEXT                              |
+| `bool`      | `boolean()`    | INTEGER (0/1)                     |
+| `double`    | `real()`       | REAL                              |
+| `Uint8List` | `blob()`       | BLOB                              |
+| `DateTime`  | `dateTime()`   | INTEGER (unix) or TEXT (ISO-8601) |
 
 ### DateTime Storage Mode
 
@@ -538,6 +553,7 @@ enum Priority { low, medium, high }
 ### SQL Expressions Bypass Converters
 
 When using `Expression`-based filtering with type converters:
+
 - `column.equals(sqlValue)` → does NOT apply converter (expects raw SQL value)
 - `column.equalsValue(dartValue)` → DOES apply converter (converts to SQL first)
 - Forgetting to use `equalsValue()` causes queries that never match
@@ -607,6 +623,7 @@ Future<void> deleteCategory(Category category) {
 1. **Not awaiting queries**: Transaction commits when callback returns. Unawaited queries execute outside the transaction boundary — they may fail or lose atomicity.
 
 2. **Creating UpdateStatement outside transaction, writing inside**: Can cause deadlocks (fixed in recent versions but still anti-pattern).
+
    ```dart
    // BAD
    final stmt = update(users)..where((u) => u.id.equals(1));
@@ -718,12 +735,12 @@ test('stream emits updates', () async {
 
 ### Existing Database Support
 
-| Package | Rules | Status |
-|---------|-------|--------|
-| Isar | 21 specific + 7 shared = 28 | Fully implemented |
-| Hive | 21 specific + 7 shared = 28 | Fully implemented |
-| sqflite | 2 specific + 7 shared = 9 | Minimal |
-| Drift | 0 specific + 0 shared = 0 | **Not implemented** |
+| Package | Rules                       | Status              |
+| ------- | --------------------------- | ------------------- |
+| Isar    | 21 specific + 7 shared = 28 | Fully implemented   |
+| Hive    | 21 specific + 7 shared = 28 | Fully implemented   |
+| sqflite | 2 specific + 7 shared = 9   | Minimal             |
+| Drift   | 0 specific + 0 shared = 0   | **Not implemented** |
 
 ### Shared Database Rules (applied to ALL database packages)
 
@@ -776,16 +793,19 @@ The project has 7 shared database rules (`_databaseSharedRules` in `tiers.dart`)
 **How it detects**: Uses explicit method name sets + heuristic keyword matching + known IO targets.
 
 **Explicit write methods recognized** (from `db_yield_rules.dart` line 71):
+
 ```
 writeTxn, deleteAll, putAll, rawInsert, rawUpdate, rawDelete, writeAsString, writeAsBytes
 ```
 
 **Known IO targets** (line 172):
+
 ```
 isar, database, db, box, store, collection
 ```
 
 **Drift write patterns it MISSES**:
+
 - `await into(todoItems).insert(companion)` — `into` is not a write method, and the chain `into().insert()` doesn't match
 - `await (update(users)..where(...)).write(companion)` — `write` is in the keyword list but `update()` creates a builder, not an IO call
 - `await batch((b) { b.insertAll(...); })` — `batch` is not in any list
@@ -793,6 +813,7 @@ isar, database, db, box, store, collection
 - `await customUpdate('UPDATE ...')` — `customUpdate` is not in the explicit list (but `update` keyword would match via heuristic)
 
 **Drift write patterns it CATCHES** (via heuristic):
+
 - `await db.saveUser(user)` — matches `db` target + `save` keyword
 - `await database.insertRecord(record)` — matches `database` target + `insert` keyword
 
@@ -803,11 +824,13 @@ isar, database, db, box, store, collection
 **Explicit bulk read methods**: `findAll, rawQuery, readAsString, readAsBytes, readAsLines, loadJsonFromAsset`
 
 **Drift read patterns it MISSES**:
+
 - `await select(users).get()` — `get` is in keyword list but `select` creates a builder
 - `await customSelect('SELECT ...').get()` — `customSelect` not recognized as IO target
 - `select(users).watch()` — streaming, not awaited at all
 
 **Drift read patterns it CATCHES** (via heuristic):
+
 - `await db.fetchAllUsers()` — matches `db` target + `fetch` keyword
 - `await database.getSettings()` — matches `database` target + `get` keyword
 
@@ -820,6 +843,7 @@ Same detection as above — only catches Drift patterns when using wrapper metho
 **Located in**: `firebase_rules.dart` lines 97-220
 
 **Detection**: Looks for method chains containing patterns from `_databasePatterns`:
+
 ```
 collection, collectionGroup, rawQuery, query, database, firestore
 ```
@@ -827,12 +851,14 @@ collection, collectionGroup, rawQuery, query, database, firestore
 ...followed by `.get()` or `.snapshots()` inside `FutureBuilder`/`StreamBuilder` in `build()` methods.
 
 **Drift patterns it MISSES**:
+
 - `.watch()` — only checks for `.get()` and `.snapshots()`
 - `customSelect(...)` chains — no pattern match for `customSelect`
 - Drift accessor names like `.todoItems`, `.users` — not in pattern set
 - `select(table)` — not in pattern set
 
 **Drift patterns it CATCHES**:
+
 - `db.rawQuery('SELECT ...')` inside FutureBuilder — matches `rawQuery` pattern
 
 #### `require_database_migration` — NO Drift Support
@@ -857,15 +883,15 @@ Needs investigation. Likely uses heuristic detection of multiple sequential writ
 
 ### Summary: Shared Rules Effectiveness for Drift
 
-| Shared Rule | Drift Support | Issue |
-|---|---|---|
-| `require_yield_after_db_write` | ⚠️ Partial | Misses Drift's fluent builder API; catches wrapper methods |
-| `suggest_yield_after_db_read` | ⚠️ Partial | Same — fluent API invisible |
-| `avoid_return_await_db` | ⚠️ Partial | Same |
-| `avoid_database_in_build` | ⚠️ Partial | Misses `.watch()`, Drift-specific accessors |
-| `require_database_migration` | ❌ None | Hardcoded for Hive/Isar annotations |
-| `require_database_index` | ❌ None | Assumes `@Index()` annotations |
-| `prefer_transaction_for_batch` | ❓ Unknown | Needs investigation |
+| Shared Rule                    | Drift Support | Issue                                                      |
+| ------------------------------ | ------------- | ---------------------------------------------------------- |
+| `require_yield_after_db_write` | ⚠️ Partial    | Misses Drift's fluent builder API; catches wrapper methods |
+| `suggest_yield_after_db_read`  | ⚠️ Partial    | Same — fluent API invisible                                |
+| `avoid_return_await_db`        | ⚠️ Partial    | Same                                                       |
+| `avoid_database_in_build`      | ⚠️ Partial    | Misses `.watch()`, Drift-specific accessors                |
+| `require_database_migration`   | ❌ None       | Hardcoded for Hive/Isar annotations                        |
+| `require_database_index`       | ❌ None       | Assumes `@Index()` annotations                             |
+| `prefer_transaction_for_batch` | ❓ Unknown    | Needs investigation                                        |
 
 ### Impact
 
@@ -884,13 +910,13 @@ The claim "28 effective rules (21 Drift-specific + 7 shared)" is **misleading**.
 
 ### Tier Distribution
 
-| Tier | Count | Focus |
-|------|-------|-------|
-| Essential | 1 | Data corruption prevention |
-| Recommended | 7 | Runtime safety, security, resource management |
-| Professional | 6 | Performance, platform, query efficiency |
-| Comprehensive | 7 | Schema safety, advanced patterns, edge cases |
-| **Total** | **21** | + 7 shared = **28 effective rules** |
+| Tier          | Count  | Focus                                         |
+| ------------- | ------ | --------------------------------------------- |
+| Essential     | 1      | Data corruption prevention                    |
+| Recommended   | 7      | Runtime safety, security, resource management |
+| Professional  | 6      | Performance, platform, query efficiency       |
+| Comprehensive | 7      | Schema safety, advanced patterns, edge cases  |
+| **Total**     | **21** | + 7 shared = **28 effective rules**           |
 
 ---
 
@@ -906,21 +932,25 @@ The claim "28 effective rules (21 Drift-specific + 7 shared)" is **misleading**.
 **Problem**: Drift's `intEnum` type converter and custom `TypeConverter<EnumType, int>` classes that use `.index` store enums by their ordinal position. If enum values are reordered or new values are inserted before existing ones, all persisted data silently maps to wrong enum values. This is the same class of bug as Isar's enum corruption — the #1 most dangerous database anti-pattern.
 
 **Detection strategy**:
+
 1. Find classes extending `TypeConverter` where the SQL type is `int`
 2. Check if `toSql` method body contains `.index` on the first type parameter
 3. Also find `intEnum<T>()` column definitions (built-in enum converter)
 4. Flag `EnumType.values[fromDb]` in `fromSql` methods (index-based lookup)
 
 **AST patterns to detect**:
+
 - `class Foo extends TypeConverter<MyEnum, int>` where `toSql` returns `.index`
 - `intEnum<MyEnum>()` column builder call
 - `MyEnum.values[variable]` in TypeConverter subclass
 
 **False positive risks**:
+
 - Enums with explicit integer values stored via `.code` property (not `.index`) — should NOT flag
 - `textEnum<MyEnum>()` — stores by name, safe — should NOT flag
 
 **Bad**:
+
 ```dart
 class PriorityConverter extends TypeConverter<Priority, int> {
   @override
@@ -931,6 +961,7 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 ```
 
 **Good**:
+
 ```dart
 // By name (immune to reordering)
 class PriorityConverter extends TypeConverter<Priority, String> {
@@ -956,6 +987,7 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 ```
 
 **Edge cases**:
+
 - What if `toSql` calls a helper method that returns `.index`? (Hard to trace through function calls — accept false negative)
 - What if the enum has `@Deprecated` values that are never removed? (Still dangerous)
 - What about Drift's built-in `textEnum<T>()` converter? (Safe, don't flag)
@@ -973,16 +1005,19 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: Drift database instances hold file handles, isolate connections, and stream query tracking. Not calling `.close()` causes resource leaks, prevents database reopening, and can corrupt data if the process exits during a write.
 
 **Detection strategy**:
+
 1. Find class fields whose type name matches common Drift database patterns: ends with `Database`, or initializer calls `driftDatabase()` / `NativeDatabase` / `WasmDatabase`
 2. Check if the enclosing class has a `dispose()` method that calls `.close()` on the database field
 3. Only flag in widget-like classes (classes with `dispose` methods or extending `State`)
 
 **AST patterns to detect**:
+
 - Field declaration where type name contains `Database` (heuristic) or initializer contains `NativeDatabase`, `WasmDatabase`, `driftDatabase`
 - Check class members for `dispose` method
 - Check dispose body for `fieldName.close()` or `fieldName?.close()`
 
 **False positive risks**:
+
 - Non-Drift classes that happen to have `Database` in their name
 - Databases managed by a DI container (GetIt, Riverpod) that handles lifecycle elsewhere
 - Singleton patterns where close is called from a different class
@@ -1000,22 +1035,26 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: `update(table)` or `delete(table)` without `.where()` affects ALL rows. Drift docs explicitly warn about this.
 
 **Detection strategy**:
+
 1. Find `MethodInvocation` where method is `go` (terminal for delete) or `write` (terminal for update)
 2. Walk the method chain backward (via `target` property) to find the originating `update(table)` or `delete(table)` call
 3. Check if `.where()` appears anywhere in the chain
 4. If no `.where()` found, flag
 
 **AST patterns**:
+
 - `delete(table).go()` — no where clause
 - `(update(table)..write(companion))` — cascade without where
 - `update(table).replace(row)` — `replace` is intentionally whole-table, might be OK?
 
 **False positive risks**:
+
 - `replace()` method intentionally replaces a single row by primary key — should NOT flag
 - `deleteAll()` is an intentional "delete everything" — might be intentional
 - `customUpdate` / `customStatement` with DELETE/UPDATE — handled by different rule
 
 **Edge cases**:
+
 - Cascade notation `..where()..write()` vs chained `.where().write()`
 - What if `where` is called conditionally? (Hard to detect statically)
 
@@ -1030,6 +1069,7 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: Inside `transaction(() async { ... })`, all queries must be awaited. Unawaited futures execute outside the transaction boundary.
 
 **Detection strategy**:
+
 1. Find `MethodInvocation` where method name is `transaction`
 2. Get the callback argument (first positional, should be `FunctionExpression`)
 3. Inside the callback body, find `ExpressionStatement` nodes containing `MethodInvocation` for known Drift query methods (`insert`, `write`, `go`, `get`, `getSingle`, `delete`)
@@ -1037,10 +1077,12 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 5. Flag if not awaited
 
 **AST patterns**:
+
 - `transaction(() async { into(table).insert(c); })` — missing await on insert
 - `transaction(() async { update(table).write(c); })` — missing await on write
 
 **False positive risks**:
+
 - Intentionally fire-and-forget operations inside transactions (rare but possible)
 - Methods that don't return Future (synchronous operations)
 - `.then()` chains (technically awaited differently)
@@ -1058,6 +1100,7 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: SQLite does NOT enforce foreign keys by default. Without `PRAGMA foreign_keys = ON`, all foreign key constraints declared in table definitions are silently ignored.
 
 **Detection strategy**:
+
 1. Find classes whose superclass name starts with `_$` (Drift generated superclass pattern)
 2. Check if the class has a `migration` getter that returns `MigrationStrategy`
 3. Check if `MigrationStrategy` has a `beforeOpen` callback
@@ -1065,11 +1108,13 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 5. Flag if no foreign key pragma found
 
 **AST patterns**:
+
 - Class extending `_$AppDatabase` without `migration` getter → flag
 - Class with `migration` getter but no `beforeOpen` → flag
 - Class with `beforeOpen` that doesn't set `foreign_keys` → flag
 
 **False positive risks**:
+
 - Projects that intentionally don't use foreign keys (rare)
 - Projects that set foreign keys in a base class or mixin
 - Tables without any foreign key references (pragma is unnecessary)
@@ -1088,17 +1133,20 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: SQL injection. String interpolation in `customSelect`, `customStatement`, `customUpdate` allows arbitrary SQL execution.
 
 **Detection strategy**:
+
 1. Find `MethodInvocation` where method name is `customSelect`, `customStatement`, or `customUpdate`
 2. Check the first positional argument
 3. If it's a `StringInterpolation` node (contains `$variable` or `${expression}`), flag
 4. Also check for string concatenation: `'SELECT * FROM ' + tableName`
 
 **AST patterns**:
+
 - `customSelect('SELECT * FROM users WHERE id = $id')` — interpolation
 - `customSelect('SELECT * FROM users WHERE name = "$name"')` — interpolation in quotes
 - `customStatement('DROP TABLE ' + tableName)` — concatenation
 
 **False positive risks**:
+
 - Interpolation of table/column NAMES (not values) — still technically dangerous
 - Constants interpolated (e.g., `'SELECT * FROM $tableName'` where tableName is const) — less risky but still bad practice
 - Template strings used for readability with hardcoded values (no user input)
@@ -1116,16 +1164,19 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: Individual `into(table).insert()` calls in a loop are dramatically slower than `batch((b) { b.insertAll(...); })`.
 
 **Detection strategy**:
+
 1. Find `MethodInvocation` where method is `insert` and target chain includes `into(...)`
 2. Check if inside a `ForStatement`, `ForElement`, `ForEachParts`, or `.forEach()` callback
 3. Flag if found inside a loop
 
 **AST patterns**:
+
 - `for (final item in items) { await into(table).insert(item); }`
 - `items.forEach((item) { into(table).insert(item); })`
 - `for (var i = 0; i < n; i++) { await into(table).insert(items[i]); }`
 
 **False positive risks**:
+
 - Loop that inserts into DIFFERENT tables on each iteration (might be intentional)
 - Loops with <3 iterations (batch overhead not worth it)
 - `insertOnConflictUpdate` in loop (batch supports this too, but pattern is different)
@@ -1141,6 +1192,7 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: Drift stream queries tracked internally. Uncancelled subscriptions leak memory and re-execute on every table change.
 
 **Detection strategy**:
+
 1. Find `MethodInvocation` where method is `listen`
 2. Check if target chain contains `.watch()`, `.watchSingle()`, or `.watchSingleOrNull()`
 3. Check if result is assigned to a field (stored subscription)
@@ -1161,12 +1213,14 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: SQLite blocks the current isolate. On mobile, this causes UI jank.
 
 **Detection strategy**:
+
 1. Find `InstanceCreationExpression` for `NativeDatabase`
 2. Check if it's the basic constructor (not `.createInBackground()` or `.createBackgroundConnection()`)
 3. Skip if in test files
 4. Flag
 
 **False positive risks**:
+
 - Desktop apps where main isolate blocking is acceptable
 - Very simple databases with tiny queries
 - Already using `drift_flutter`'s `driftDatabase()` which handles isolation internally
@@ -1182,6 +1236,7 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: `logStatements: true` leaks SQL + data values in production logs.
 
 **Detection strategy**:
+
 1. Find `NamedExpression` where `name.label.name == 'logStatements'`
 2. Check if value is `BooleanLiteral(true)`
 3. Check if NOT inside `kDebugMode` / `kProfileMode` guard (use `usesFlutterModeConstants` utility)
@@ -1200,6 +1255,7 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: `getSingle()` / `watchSingle()` throw if query returns 0 or >1 rows.
 
 **Detection strategy**:
+
 1. Find `MethodInvocation` for `getSingle` or `watchSingle`
 2. Walk target chain to check for `.where()` clause
 3. If no `.where()` at all, flag (very likely to return multiple rows)
@@ -1218,6 +1274,7 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: Joined tables read all columns by default even when not needed.
 
 **Detection difficulty**: HIGH. Would need to trace:
+
 1. Which tables are joined
 2. Which table columns are actually read in the result mapping
 3. Whether `useColumns: false` is already set
@@ -1235,11 +1292,13 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: `LazyDatabase` loses stream synchronization with isolates.
 
 **Detection strategy**:
+
 1. Find `InstanceCreationExpression` for `LazyDatabase`
 2. Check if the callback body references `DriftIsolate`, `Isolate`, or `compute`
 3. Flag if isolate usage detected inside LazyDatabase
 
 **False positive risks**:
+
 - `LazyDatabase` used without isolates (perfectly fine, no flag needed)
 - The fix (`DatabaseConnection.delayed`) may not always be a drop-in replacement
 
@@ -1254,6 +1313,7 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: Multiple independent database instances on same file break stream sync.
 
 **Detection strategy**:
+
 1. Find `NativeDatabase(File('path'))` calls
 2. Check if the same string path appears in multiple locations
 3. Flag if duplicate path found without singleton pattern
@@ -1273,15 +1333,18 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: High-level query APIs inside `onUpgrade` use latest schema, but DB is still on old schema during migration.
 
 **Detection strategy**:
+
 1. Find the `onUpgrade` callback in `MigrationStrategy`
 2. Inside that callback, find `MethodInvocation` for `select`, `update`, `delete`, `into`
 3. Flag each one
 
 **AST patterns**:
+
 - `MigrationStrategy(onUpgrade: (m, from, to) async { await select(users).get(); })`
 - Named expression `onUpgrade:` → function body → method invocations
 
 **False positive risks**:
+
 - `customSelect` and `customStatement` are safe in migrations (raw SQL, not generated)
 - `migrator.createTable()`, `migrator.addColumn()` etc. are safe (designed for migrations)
 
@@ -1310,6 +1373,7 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: `PRAGMA foreign_keys` silently fails inside migration transactions.
 
 **Detection strategy**:
+
 1. Inside `onUpgrade` or `onCreate` callbacks
 2. Find `customStatement` calls
 3. Check if string argument contains `foreign_keys`
@@ -1328,6 +1392,7 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: `customSelect(...).watch()` without `readsFrom` → stream never updates.
 
 **Detection strategy**:
+
 1. Find `.watch()` or `.watchSingle()` calls
 2. Check if target is result of `customSelect`
 3. Check if `customSelect` call has `readsFrom` named parameter
@@ -1346,11 +1411,13 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: `unsafeIndexedDb` and `WebDatabase` without shared workers are not multi-tab safe.
 
 **Detection strategy**:
+
 1. Find references to `unsafeIndexedDb` identifier
 2. Find `WebDatabase(...)` constructor calls
 3. Flag
 
 **False positive risks**:
+
 - Apps that explicitly only support single-tab usage
 - Server-side Dart where multi-tab isn't relevant
 
@@ -1365,6 +1432,7 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: Missing `closeStreamsSynchronously: true` causes timer leaks in tests.
 
 **Detection strategy**:
+
 1. Only in test files (`_test.dart` suffix)
 2. Find `NativeDatabase.memory()` calls
 3. Check if wrapped in `DatabaseConnection(...)` with `closeStreamsSynchronously: true`
@@ -1381,6 +1449,7 @@ class PriorityConverter extends TypeConverter<Priority, int> {
 **Problem**: `TypeConverter<Foo?, int?>` (both nullable) applied to non-nullable column.
 
 **Detection strategy** (simplified):
+
 1. Find classes extending `TypeConverter`
 2. Check if BOTH type parameters end with `?` (nullable)
 3. Flag — this pattern is almost always wrong
@@ -1398,6 +1467,7 @@ Rules we identified during gap analysis that aren't in the original 21 but have 
 **Severity**: WARNING | **Impact**: high | **Cost**: medium
 
 **Problem**: Drift's `Companion` classes use `Value<T>` wrappers. `Value(null)` means "set this column to NULL". `Value.absent()` means "don't touch this column". Confusing the two causes:
+
 - `Value(null)` on a non-nullable column → runtime crash
 - `Value.absent()` when you meant to clear a value → data not updated
 - `Value(null)` in an insert → null violation if column has no default
@@ -1405,11 +1475,13 @@ Rules we identified during gap analysis that aren't in the original 21 but have 
 This is one of the most common Drift mistakes in StackOverflow questions.
 
 **Detection strategy**:
+
 1. Find `InstanceCreationExpression` for `Value` with `null` argument: `Value(null)` or `Value<String>(null)`
 2. If the column is non-nullable (hard to determine statically), flag
 3. Simpler heuristic: flag `Value(null)` and suggest reviewing whether `Value.absent()` was intended
 
 **Bad**:
+
 ```dart
 // Tries to set non-nullable 'title' to null → runtime crash
 await (update(todoItems)..where((t) => t.id.equals(id)))
@@ -1417,6 +1489,7 @@ await (update(todoItems)..where((t) => t.id.equals(id)))
 ```
 
 **Good**:
+
 ```dart
 // Don't touch title, only update 'completed'
 await (update(todoItems)..where((t) => t.id.equals(id)))
@@ -1437,11 +1510,13 @@ await (update(todoItems)..where((t) => t.id.equals(id)))
 **Problem**: When a column uses a `TypeConverter`, the `.equals()` method expects the raw SQL value (not the Dart type). You must use `.equalsValue()` to apply the converter automatically. Using `.equals()` with the Dart value produces queries that never match — a silent, hard-to-debug failure.
 
 **Detection strategy**:
+
 1. Find `.equals(value)` calls on Drift column expressions
 2. Check if the column has a `.map(converter)` modifier (hard without type resolution)
 3. Simpler heuristic: flag `.equals()` when the argument is an enum value (enums almost always use converters)
 
 **Bad**:
+
 ```dart
 // SILENTLY FAILS: Status.active is a Dart enum, not the SQL int
 (select(users)..where((u) => u.status.equals(Status.active))).get();
@@ -1449,6 +1524,7 @@ await (update(todoItems)..where((t) => t.id.equals(id)))
 ```
 
 **Good**:
+
 ```dart
 // equalsValue() runs the TypeConverter first
 (select(users)..where((u) => u.status.equalsValue(Status.active))).get();
@@ -1466,11 +1542,13 @@ await (update(todoItems)..where((t) => t.id.equals(id)))
 **Problem**: `replace()` replaces the ENTIRE row. Any column not specified in the companion becomes its default value (or null for nullable columns). Developers often confuse `replace()` with `write()` (which only updates specified columns), causing unexpected data loss.
 
 **Detection strategy**:
+
 1. Find `.replace(companion)` method calls on Drift update builders
 2. This is primarily a documentation/awareness rule — hard to detect misuse statically
 3. Could flag `replace()` calls and suggest verifying all columns are set, or suggest using `write()` instead
 
 **Bad**:
+
 ```dart
 // LOSES DATA: email, avatar, etc. become null/default
 await (update(users)..where((u) => u.id.equals(id)))
@@ -1479,6 +1557,7 @@ await (update(users)..where((u) => u.id.equals(id)))
 ```
 
 **Good**:
+
 ```dart
 // Only updates name, leaves everything else untouched
 await (update(users)..where((u) => u.id.equals(id)))
@@ -1496,11 +1575,13 @@ await (update(users)..where((u) => u.id.equals(id)))
 **Problem**: SQLite allows only one writer at a time. Without WAL mode and `busy_timeout`, concurrent writes from multiple isolates or database instances cause `SQLITE_BUSY` errors. Drift's default `NativeDatabase` doesn't set these pragmas automatically.
 
 **Detection strategy**:
+
 1. Find `NativeDatabase` constructors
 2. Check if the `setup` callback sets `PRAGMA journal_mode = WAL` and `PRAGMA busy_timeout`
 3. Only flag when `DriftIsolate` or `Isolate.spawn` is also used in the project (suggesting concurrent access)
 
 **Bad**:
+
 ```dart
 // No WAL mode + multiple isolates = SQLITE_BUSY errors
 final db1 = NativeDatabase(File('app.db'));
@@ -1508,6 +1589,7 @@ final db2 = NativeDatabase(File('app.db')); // Different isolate
 ```
 
 **Good**:
+
 ```dart
 NativeDatabase(File('app.db'), setup: (db) {
   db.execute('PRAGMA journal_mode = WAL');
@@ -1545,14 +1627,14 @@ NativeDatabase(File('app.db'), setup: (db) {
 
 ### Summary: Additional Rule Candidates
 
-| Rule | Tier | Confidence | Recommendation |
-|------|------|------------|----------------|
-| `avoid_drift_value_null_vs_absent` | Recommended | Medium | **Add to main 21** — very common mistake |
-| `require_drift_equals_value` | Recommended | Medium | **Add to main 21** — silent query failure |
-| `avoid_drift_replace_without_all_columns` | Professional | Low | Defer — hard to detect intent |
-| `avoid_drift_concurrent_write_contention` | Comprehensive | Low | Defer — cross-file analysis needed |
-| `avoid_drift_fts_without_rebuild` | Comprehensive | Low | Defer — rare usage |
-| `require_drift_error_handling` | Pedantic | Low | Defer — too many false positives |
+| Rule                                      | Tier          | Confidence | Recommendation                            |
+| ----------------------------------------- | ------------- | ---------- | ----------------------------------------- |
+| `avoid_drift_value_null_vs_absent`        | Recommended   | Medium     | **Add to main 21** — very common mistake  |
+| `require_drift_equals_value`              | Recommended   | Medium     | **Add to main 21** — silent query failure |
+| `avoid_drift_replace_without_all_columns` | Professional  | Low        | Defer — hard to detect intent             |
+| `avoid_drift_concurrent_write_contention` | Comprehensive | Low        | Defer — cross-file analysis needed        |
+| `avoid_drift_fts_without_rebuild`         | Comprehensive | Low        | Defer — rare usage                        |
+| `require_drift_error_handling`            | Pedantic      | Low        | Defer — too many false positives          |
 
 **Recommendation**: Add `avoid_drift_value_null_vs_absent` and `require_drift_equals_value` to the main rule set (bringing total to 23), or swap out the two lowest-confidence existing rules (12: `prefer_drift_use_columns_false` and 16: `require_drift_schema_version_bump`).
 
@@ -1569,6 +1651,7 @@ Since Drift is an optional dependency (not in saropa_lints' own deps), rules use
 Many rules should additionally check for `import 'package:drift/drift.dart'` or `import 'package:drift/native.dart'` to reduce false positives from similarly-named methods in non-Drift code. This is especially important for generic method names like `transaction`, `select`, `update`, `delete`, `watch`.
 
 **Utility function needed:**
+
 ```dart
 bool _hasDriftImport(CompilationUnit unit) {
   for (final directive in unit.directives) {
@@ -1583,30 +1666,32 @@ bool _hasDriftImport(CompilationUnit unit) {
 
 ### Key Detection Heuristics
 
-| Pattern | What to Look For | Confidence |
-|---------|-----------------|------------|
-| Database class | Superclass starts with `_$`, has `schemaVersion` getter | High |
-| Table class | Extends `Table`, has column builder methods | High |
-| DAO class | Extends `DatabaseAccessor`, has `@DriftAccessor` | High |
-| Transaction | `transaction(() async { ... })` method call | Medium (generic name) |
-| Raw SQL | `customSelect`, `customStatement`, `customUpdate` | High (unique names) |
-| Stream query | `.watch()`, `.watchSingle()` on select result | Medium (could be non-Drift) |
-| Migration | `MigrationStrategy`, `onUpgrade`, `beforeOpen` | High (unique names) |
-| Type converter | Class extending `TypeConverter` with `fromSql`/`toSql` | High |
-| Batch | `batch((b) { ... })` method call | Medium (generic name) |
-| `NativeDatabase` | Constructor calls | High (unique name) |
-| `LazyDatabase` | Constructor calls | High (unique name) |
-| `WebDatabase` | Constructor calls | High (unique name) |
+| Pattern          | What to Look For                                        | Confidence                  |
+| ---------------- | ------------------------------------------------------- | --------------------------- |
+| Database class   | Superclass starts with `_$`, has `schemaVersion` getter | High                        |
+| Table class      | Extends `Table`, has column builder methods             | High                        |
+| DAO class        | Extends `DatabaseAccessor`, has `@DriftAccessor`        | High                        |
+| Transaction      | `transaction(() async { ... })` method call             | Medium (generic name)       |
+| Raw SQL          | `customSelect`, `customStatement`, `customUpdate`       | High (unique names)         |
+| Stream query     | `.watch()`, `.watchSingle()` on select result           | Medium (could be non-Drift) |
+| Migration        | `MigrationStrategy`, `onUpgrade`, `beforeOpen`          | High (unique names)         |
+| Type converter   | Class extending `TypeConverter` with `fromSql`/`toSql`  | High                        |
+| Batch            | `batch((b) { ... })` method call                        | Medium (generic name)       |
+| `NativeDatabase` | Constructor calls                                       | High (unique name)          |
+| `LazyDatabase`   | Constructor calls                                       | High (unique name)          |
+| `WebDatabase`    | Constructor calls                                       | High (unique name)          |
 
 ### Import-Gated Rules
 
 These rules MUST check for Drift import before flagging (method names too generic):
+
 - `require_await_in_drift_transaction` — `transaction` is a common method name
 - `avoid_drift_update_without_where` — `update`, `delete`, `write` are generic
 - `prefer_drift_batch_operations` — `insert` is generic
 - `avoid_drift_get_single_without_unique` — `getSingle` is generic
 
 These rules DON'T need import check (method names are Drift-specific):
+
 - `avoid_drift_raw_sql_interpolation` — `customSelect` etc. are unique
 - `avoid_drift_database_on_main_isolate` — `NativeDatabase` is unique
 - `avoid_drift_lazy_database` — `LazyDatabase` is unique
@@ -1617,27 +1702,27 @@ These rules DON'T need import check (method names are Drift-specific):
 
 ### New Files
 
-| File | Purpose | Estimated Size |
-|------|---------|---------------|
-| `lib/src/rules/packages/drift_rules.dart` | All 21 Drift rule classes | ~1,700 lines |
-| `doc/guides/using_with_drift.md` | End-user guide | ~300 lines |
+| File                                      | Purpose                   | Estimated Size |
+| ----------------------------------------- | ------------------------- | -------------- |
+| `lib/src/rules/packages/drift_rules.dart` | All 21 Drift rule classes | ~1,700 lines   |
+| `doc/guides/using_with_drift.md`          | End-user guide            | ~300 lines     |
 
 ### Modified Files
 
-| File | Change | Lines Added |
-|------|--------|-------------|
-| `lib/src/rules/all_rules.dart` | Add `export 'packages/drift_rules.dart';` | 1 |
-| `lib/saropa_lints.dart` | Add 21 rule factories to `_allRuleFactories` | 21 |
-| `lib/src/tiers.dart` | Add `driftPackageRules` set, tier entries, `packageRuleSets` entry, `allPackages` entry | ~40 |
-| `ROADMAP.md` | Add 21 rules under "Local Database" section | ~25 |
-| `CHANGELOG.md` | Add entry under `[Unreleased]` | ~5 |
+| File                           | Change                                                                                  | Lines Added |
+| ------------------------------ | --------------------------------------------------------------------------------------- | ----------- |
+| `lib/src/rules/all_rules.dart` | Add `export 'packages/drift_rules.dart';`                                               | 1           |
+| `lib/saropa_lints.dart`        | Add 21 rule factories to `_allRuleFactories`                                            | 21          |
+| `lib/src/tiers.dart`           | Add `driftPackageRules` set, tier entries, `packageRuleSets` entry, `allPackages` entry | ~40         |
+| `ROADMAP.md`                   | Add 21 rules under "Local Database" section                                             | ~25         |
+| `CHANGELOG.md`                 | Add entry under `[Unreleased]`                                                          | ~5          |
 
 ### Future Test Files
 
-| File | Purpose |
-|------|---------|
-| `test/drift_rules_test.dart` | Unit tests for all 21 rules |
-| `example_packages/lib/drift/` | Test fixture directory |
+| File                                                  | Purpose                       |
+| ----------------------------------------------------- | ----------------------------- |
+| `test/drift_rules_test.dart`                          | Unit tests for all 21 rules   |
+| `example_packages/lib/drift/`                         | Test fixture directory        |
 | `example_packages/lib/drift/drift_rules_fixture.dart` | Bad/good examples for testing |
 
 ---
@@ -1700,6 +1785,7 @@ class AvoidDriftFooRule extends SaropaLintRule {
 ```
 
 ### Key requirements:
+
 - Problem message starts with `[rule_name]` prefix
 - Problem message >200 characters total
 - Problem message ends with `{v1}` version tag
@@ -1722,15 +1808,19 @@ class AvoidDriftFooRule extends SaropaLintRule {
 Since this is ~1,700 lines, implement in batches:
 
 **Batch 1** (highest value): Rules 1-8 (Essential + Recommended)
+
 - Core data safety, SQL injection, resource management
 
 **Batch 2**: Rules 9-14 (Professional)
+
 - Performance, platform, query patterns
 
 **Batch 3**: Rules 15-21 (Comprehensive)
+
 - Migration safety, web, testing, type converters
 
 **Batch 4**: Documentation & tests
+
 - `using_with_drift.md`, ROADMAP, CHANGELOG, test fixtures
 
 ---
@@ -1745,33 +1835,34 @@ Each rule scored on three axes (1-5 each, max 15):
 - **Confidence**: How reliably can we detect the pattern? (5 = unambiguous AST match)
 - **Effort**: How easy is implementation? (5 = <50 lines, clear pattern; 1 = >150 lines, complex analysis)
 
-| # | Rule | Value | Confidence | Effort | **Total** | Est. Lines |
-|---|------|-------|------------|--------|-----------|------------|
-| 1 | `avoid_drift_enum_index_reorder` | 5 | 4 | 3 | **12** | ~80 |
-| 6 | `avoid_drift_raw_sql_interpolation` | 5 | 5 | 5 | **15** | ~30 |
-| 3 | `avoid_drift_update_without_where` | 5 | 4 | 3 | **12** | ~60 |
-| 4 | `require_await_in_drift_transaction` | 4 | 4 | 3 | **11** | ~70 |
-| 10 | `avoid_drift_log_statements_production` | 4 | 5 | 5 | **14** | ~30 |
-| 7 | `prefer_drift_batch_operations` | 3 | 4 | 5 | **12** | ~30 |
-| 2 | `require_drift_database_close` | 4 | 3 | 3 | **10** | ~70 |
-| 8 | `require_drift_stream_cancel` | 4 | 3 | 3 | **10** | ~70 |
-| 5 | `require_drift_foreign_key_pragma` | 4 | 3 | 3 | **10** | ~80 |
-| 18 | `require_drift_reads_from` | 3 | 4 | 4 | **11** | ~40 |
-| 15 | `avoid_drift_query_in_migration` | 4 | 4 | 3 | **11** | ~60 |
-| 17 | `avoid_drift_foreign_key_in_migration` | 3 | 4 | 5 | **12** | ~30 |
-| 9 | `avoid_drift_database_on_main_isolate` | 3 | 4 | 4 | **11** | ~40 |
-| 20 | `avoid_drift_close_streams_in_tests` | 2 | 4 | 5 | **11** | ~30 |
-| 13 | `avoid_drift_lazy_database` | 3 | 3 | 4 | **10** | ~40 |
-| 11 | `avoid_drift_get_single_without_unique` | 3 | 3 | 3 | **9** | ~50 |
-| 21 | `avoid_drift_nullable_converter_mismatch` | 3 | 3 | 3 | **9** | ~50 |
-| 19 | `avoid_drift_unsafe_web_storage` | 2 | 3 | 4 | **9** | ~30 |
-| 14 | `prefer_drift_isolate_sharing` | 3 | 2 | 2 | **7** | ~80 |
-| 12 | `prefer_drift_use_columns_false` | 2 | 2 | 2 | **6** | ~100 |
-| 16 | `require_drift_schema_version_bump` | 3 | 1 | 1 | **5** | ~120 |
+| #   | Rule                                      | Value | Confidence | Effort | **Total** | Est. Lines |
+| --- | ----------------------------------------- | ----- | ---------- | ------ | --------- | ---------- |
+| 1   | `avoid_drift_enum_index_reorder`          | 5     | 4          | 3      | **12**    | ~80        |
+| 6   | `avoid_drift_raw_sql_interpolation`       | 5     | 5          | 5      | **15**    | ~30        |
+| 3   | `avoid_drift_update_without_where`        | 5     | 4          | 3      | **12**    | ~60        |
+| 4   | `require_await_in_drift_transaction`      | 4     | 4          | 3      | **11**    | ~70        |
+| 10  | `avoid_drift_log_statements_production`   | 4     | 5          | 5      | **14**    | ~30        |
+| 7   | `prefer_drift_batch_operations`           | 3     | 4          | 5      | **12**    | ~30        |
+| 2   | `require_drift_database_close`            | 4     | 3          | 3      | **10**    | ~70        |
+| 8   | `require_drift_stream_cancel`             | 4     | 3          | 3      | **10**    | ~70        |
+| 5   | `require_drift_foreign_key_pragma`        | 4     | 3          | 3      | **10**    | ~80        |
+| 18  | `require_drift_reads_from`                | 3     | 4          | 4      | **11**    | ~40        |
+| 15  | `avoid_drift_query_in_migration`          | 4     | 4          | 3      | **11**    | ~60        |
+| 17  | `avoid_drift_foreign_key_in_migration`    | 3     | 4          | 5      | **12**    | ~30        |
+| 9   | `avoid_drift_database_on_main_isolate`    | 3     | 4          | 4      | **11**    | ~40        |
+| 20  | `avoid_drift_close_streams_in_tests`      | 2     | 4          | 5      | **11**    | ~30        |
+| 13  | `avoid_drift_lazy_database`               | 3     | 3          | 4      | **10**    | ~40        |
+| 11  | `avoid_drift_get_single_without_unique`   | 3     | 3          | 3      | **9**     | ~50        |
+| 21  | `avoid_drift_nullable_converter_mismatch` | 3     | 3          | 3      | **9**     | ~50        |
+| 19  | `avoid_drift_unsafe_web_storage`          | 2     | 3          | 4      | **9**     | ~30        |
+| 14  | `prefer_drift_isolate_sharing`            | 3     | 2          | 2      | **7**     | ~80        |
+| 12  | `prefer_drift_use_columns_false`          | 2     | 2          | 2      | **6**     | ~100       |
+| 16  | `require_drift_schema_version_bump`       | 3     | 1          | 1      | **5**     | ~120       |
 
 ### Recommended Implementation Order (by priority score)
 
 **Phase 1 — Highest value, easiest wins** (score ≥12):
+
 1. `avoid_drift_raw_sql_interpolation` (15) — 30 lines, trivial detection
 2. `avoid_drift_log_statements_production` (14) — 30 lines, identical to Isar inspector pattern
 3. `avoid_drift_enum_index_reorder` (12) — 80 lines, clear pattern
@@ -1779,24 +1870,9 @@ Each rule scored on three axes (1-5 each, max 15):
 5. `prefer_drift_batch_operations` (12) — 30 lines
 6. `avoid_drift_foreign_key_in_migration` (12) — 30 lines
 
-**Phase 2 — Strong value** (score 10-11):
-7. `require_await_in_drift_transaction` (11) — 70 lines
-8. `require_drift_reads_from` (11) — 40 lines
-9. `avoid_drift_query_in_migration` (11) — 60 lines
-10. `avoid_drift_database_on_main_isolate` (11) — 40 lines
-11. `avoid_drift_close_streams_in_tests` (11) — 30 lines
-12. `require_drift_database_close` (10) — 70 lines
-13. `require_drift_stream_cancel` (10) — 70 lines
-14. `require_drift_foreign_key_pragma` (10) — 80 lines
-15. `avoid_drift_lazy_database` (10) — 40 lines
+**Phase 2 — Strong value** (score 10-11): 7. `require_await_in_drift_transaction` (11) — 70 lines 8. `require_drift_reads_from` (11) — 40 lines 9. `avoid_drift_query_in_migration` (11) — 60 lines 10. `avoid_drift_database_on_main_isolate` (11) — 40 lines 11. `avoid_drift_close_streams_in_tests` (11) — 30 lines 12. `require_drift_database_close` (10) — 70 lines 13. `require_drift_stream_cancel` (10) — 70 lines 14. `require_drift_foreign_key_pragma` (10) — 80 lines 15. `avoid_drift_lazy_database` (10) — 40 lines
 
-**Phase 3 — Lower confidence / niche** (score <10):
-16. `avoid_drift_get_single_without_unique` (9) — 50 lines
-17. `avoid_drift_nullable_converter_mismatch` (9) — 50 lines
-18. `avoid_drift_unsafe_web_storage` (9) — 30 lines
-19. `prefer_drift_isolate_sharing` (7) — 80 lines
-20. `prefer_drift_use_columns_false` (6) — 100 lines
-21. `require_drift_schema_version_bump` (5) — 120 lines
+**Phase 3 — Lower confidence / niche** (score <10): 16. `avoid_drift_get_single_without_unique` (9) — 50 lines 17. `avoid_drift_nullable_converter_mismatch` (9) — 50 lines 18. `avoid_drift_unsafe_web_storage` (9) — 30 lines 19. `prefer_drift_isolate_sharing` (7) — 80 lines 20. `prefer_drift_use_columns_false` (6) — 100 lines 21. `require_drift_schema_version_bump` (5) — 120 lines
 
 ### Total Estimated Lines
 
@@ -1808,6 +1884,7 @@ Each rule scored on three axes (1-5 each, max 15):
 ### If Time-Constrained
 
 If we can only ship 10 rules initially, take the top 10 by priority score:
+
 1. `avoid_drift_raw_sql_interpolation` (15)
 2. `avoid_drift_log_statements_production` (14)
 3. `avoid_drift_enum_index_reorder` (12)
@@ -1912,6 +1989,7 @@ If the target of `insert`/`get`/`write`/`go` is a call to one of these builder m
 ### Risk
 
 Low — changes to `_writeMethods` and `_bulkReadMethods` are additive. `transaction` and `batch` are somewhat generic names, but the rule also requires:
+
 1. The method is awaited
 2. The method is NOT followed by `yieldToUI()`
 3. The target is a known IO target OR matches `db*` prefix
@@ -1924,39 +2002,39 @@ So false positives are limited to non-Drift code that calls `await transaction(.
 
 ### High Confidence Rules (clear AST patterns)
 
-| Rule | Why High Confidence |
-|------|-------------------|
-| 1: `avoid_drift_enum_index_reorder` | Clear pattern: TypeConverter + `.index` |
-| 3: `avoid_drift_update_without_where` | Clear pattern: update/delete chain without where |
-| 6: `avoid_drift_raw_sql_interpolation` | Clear pattern: StringInterpolation in customSelect args |
-| 7: `prefer_drift_batch_operations` | Clear pattern: insert inside for loop |
-| 10: `avoid_drift_log_statements_production` | Clear pattern: `logStatements: true` |
-| 15: `avoid_drift_query_in_migration` | Clear pattern: select/update in onUpgrade callback |
-| 17: `avoid_drift_foreign_key_in_migration` | Clear pattern: customStatement('PRAGMA foreign_keys') in onUpgrade |
-| 18: `require_drift_reads_from` | Clear pattern: customSelect.watch() without readsFrom |
-| 20: `avoid_drift_close_streams_in_tests` | Clear pattern: NativeDatabase.memory() in test file |
+| Rule                                        | Why High Confidence                                                |
+| ------------------------------------------- | ------------------------------------------------------------------ |
+| 1: `avoid_drift_enum_index_reorder`         | Clear pattern: TypeConverter + `.index`                            |
+| 3: `avoid_drift_update_without_where`       | Clear pattern: update/delete chain without where                   |
+| 6: `avoid_drift_raw_sql_interpolation`      | Clear pattern: StringInterpolation in customSelect args            |
+| 7: `prefer_drift_batch_operations`          | Clear pattern: insert inside for loop                              |
+| 10: `avoid_drift_log_statements_production` | Clear pattern: `logStatements: true`                               |
+| 15: `avoid_drift_query_in_migration`        | Clear pattern: select/update in onUpgrade callback                 |
+| 17: `avoid_drift_foreign_key_in_migration`  | Clear pattern: customStatement('PRAGMA foreign_keys') in onUpgrade |
+| 18: `require_drift_reads_from`              | Clear pattern: customSelect.watch() without readsFrom              |
+| 20: `avoid_drift_close_streams_in_tests`    | Clear pattern: NativeDatabase.memory() in test file                |
 
 ### Medium Confidence Rules (heuristic matching)
 
-| Rule | Challenge |
-|------|-----------|
-| 2: `require_drift_database_close` | Heuristic: field type name containing "Database" |
-| 4: `require_await_in_drift_transaction` | Generic method name "transaction" needs import check |
-| 5: `require_drift_foreign_key_pragma` | Need to find database class and check migration strategy |
-| 8: `require_drift_stream_cancel` | May overlap with existing stream disposal rules |
-| 9: `avoid_drift_database_on_main_isolate` | May not be wrong for desktop apps |
-| 11: `avoid_drift_get_single_without_unique` | Hard to determine if where clause guarantees uniqueness |
-| 13: `avoid_drift_lazy_database` | Need to detect isolate usage in LazyDatabase callback |
-| 14: `prefer_drift_isolate_sharing` | Cross-expression path comparison |
-| 19: `avoid_drift_unsafe_web_storage` | Limited detection surface |
-| 21: `avoid_drift_nullable_converter_mismatch` | Simplified heuristic only |
+| Rule                                          | Challenge                                                |
+| --------------------------------------------- | -------------------------------------------------------- |
+| 2: `require_drift_database_close`             | Heuristic: field type name containing "Database"         |
+| 4: `require_await_in_drift_transaction`       | Generic method name "transaction" needs import check     |
+| 5: `require_drift_foreign_key_pragma`         | Need to find database class and check migration strategy |
+| 8: `require_drift_stream_cancel`              | May overlap with existing stream disposal rules          |
+| 9: `avoid_drift_database_on_main_isolate`     | May not be wrong for desktop apps                        |
+| 11: `avoid_drift_get_single_without_unique`   | Hard to determine if where clause guarantees uniqueness  |
+| 13: `avoid_drift_lazy_database`               | Need to detect isolate usage in LazyDatabase callback    |
+| 14: `prefer_drift_isolate_sharing`            | Cross-expression path comparison                         |
+| 19: `avoid_drift_unsafe_web_storage`          | Limited detection surface                                |
+| 21: `avoid_drift_nullable_converter_mismatch` | Simplified heuristic only                                |
 
 ### Lower Confidence Rules (complex detection)
 
-| Rule | Challenge |
-|------|-----------|
-| 12: `prefer_drift_use_columns_false` | Need cross-expression analysis of column usage in result mapping |
-| 16: `require_drift_schema_version_bump` | Need change tracking / multi-version comparison |
+| Rule                                    | Challenge                                                        |
+| --------------------------------------- | ---------------------------------------------------------------- |
+| 12: `prefer_drift_use_columns_false`    | Need cross-expression analysis of column usage in result mapping |
+| 16: `require_drift_schema_version_bump` | Need change tracking / multi-version comparison                  |
 
 ---
 
@@ -1973,11 +2051,13 @@ So false positives are limited to non-Drift code that calls `await transaction(.
 ### Q2: How to handle overlap with existing rules?
 
 **Context**: Several proposed rules overlap with existing generic rules:
+
 - `require_drift_stream_cancel` overlaps with stream subscription disposal rules
 - `require_drift_database_close` overlaps with `require_dispose`
 - `require_await_in_drift_transaction` may overlap with generic unawaited-future rules
 
 **Options**:
+
 1. Implement all Drift-specific rules anyway (more specific messages, better developer experience)
 2. Skip overlapping rules and rely on generic versions
 3. Implement Drift-specific rules that ADD to generic detection (e.g., check for `.watch().listen()` specifically)
@@ -1999,6 +2079,7 @@ So false positives are limited to non-Drift code that calls `await transaction(.
 ### Q5: How to handle `drift_flutter` vs `drift_sqflite` vs raw `NativeDatabase`?
 
 **Context**: Different executors have different patterns:
+
 - `drift_flutter`: `driftDatabase(name: 'app')` — handles isolation automatically
 - `drift_sqflite`: `SqfliteQueryExecutor(...)` — uses sqflite under the hood
 - Raw: `NativeDatabase(File('path'))` — manual setup
@@ -2022,6 +2103,7 @@ So false positives are limited to non-Drift code that calls `await transaction(.
 **Context**: Isar rules have 1 quick fix (`AddTryCatchTodoFix`). Adding quick fixes is valuable but adds implementation complexity.
 
 **Recommended quick fixes (if any)**:
+
 - Rule 6: Replace string interpolation with `Variable` parameters
 - Rule 10: Replace `true` with `kDebugMode`
 - Rule 18: Add `readsFrom: {}` parameter stub
@@ -2074,23 +2156,24 @@ So false positives are limited to non-Drift code that calls `await transaction(.
 
 ### Key Version Milestones
 
-| Version | Feature | Impact on Rules |
-|---------|---------|----------------|
-| 1.0 (moor) | Initial release as "moor" | Legacy — don't support |
+| Version     | Feature                                                | Impact on Rules                                                       |
+| ----------- | ------------------------------------------------------ | --------------------------------------------------------------------- |
+| 1.0 (moor)  | Initial release as "moor"                              | Legacy — don't support                                                |
 | 2.0 (drift) | Renamed to "drift"; nested transactions via savepoints | Rule 4 (transaction await) applies; nested transactions now supported |
-| 2.1 | `DatabaseConnection.delayed` added | Rule 13 (LazyDatabase) has a fix target |
-| 2.5 | Modular code generation (`*.drift.dart`) | Our stylistic_rules.dart already excludes these |
-| 2.8 | `NativeDatabase.createInBackground()` | Rule 9 (main isolate) has a fix target |
-| 2.12 | `drift_flutter` package introduced | Alternative to manual NativeDatabase setup |
-| 2.14 | Step-by-step migrations via `make-migrations` | Rule 16 (schema version bump) — tooling exists |
-| 2.16 | `closeStreamsSynchronously` added | Rule 20 (test streams) has a fix target |
-| 2.18 | Nested transaction deadlock issues | Fixed in 2.20.3 — our rules don't need to worry |
-| 2.20 | `NullAwareTypeConverter` added | Rule 21 (nullable converter) — migration path exists |
-| 2.20+ | Web OPFS support stabilized | Rule 19 (unsafe web storage) — modern alternatives exist |
+| 2.1         | `DatabaseConnection.delayed` added                     | Rule 13 (LazyDatabase) has a fix target                               |
+| 2.5         | Modular code generation (`*.drift.dart`)               | Our stylistic_rules.dart already excludes these                       |
+| 2.8         | `NativeDatabase.createInBackground()`                  | Rule 9 (main isolate) has a fix target                                |
+| 2.12        | `drift_flutter` package introduced                     | Alternative to manual NativeDatabase setup                            |
+| 2.14        | Step-by-step migrations via `make-migrations`          | Rule 16 (schema version bump) — tooling exists                        |
+| 2.16        | `closeStreamsSynchronously` added                      | Rule 20 (test streams) has a fix target                               |
+| 2.18        | Nested transaction deadlock issues                     | Fixed in 2.20.3 — our rules don't need to worry                       |
+| 2.20        | `NullAwareTypeConverter` added                         | Rule 21 (nullable converter) — migration path exists                  |
+| 2.20+       | Web OPFS support stabilized                            | Rule 19 (unsafe web storage) — modern alternatives exist              |
 
 ### Minimum Drift Version for Rules
 
 All proposed rules target Drift v2.0+ (the "drift" package, not legacy "moor"). We assume:
+
 - Type converters exist (v1.0+)
 - `MigrationStrategy` with `beforeOpen` (v1.0+)
 - `customSelect`/`customStatement` (v1.0+)
@@ -2109,18 +2192,22 @@ All proposed rules target Drift v2.0+ (the "drift" package, not legacy "moor"). 
 ### Will Our Rules Lint Generated Files?
 
 Drift generates two types of files:
+
 - `*.g.dart` — default mode (build_runner standard)
 - `*.drift.dart` — modular mode
 
 **Current project handling**:
+
 - `stylistic_rules.dart` lists `.drift.dart` in `_generatedFileSuffixes` (already excluded from stylistic linting)
 - `*.g.dart` files are typically excluded via `analysis_options.yaml`
 
 **Risk**: If generated files are NOT excluded from analysis, our Drift rules could fire on generated code (false positives). For example:
+
 - `avoid_drift_enum_index_reorder` could flag generated TypeConverter implementations
 - `require_drift_foreign_key_pragma` could flag generated database classes
 
 **Mitigation strategies**:
+
 1. **Check file suffix**: Skip files ending in `.g.dart` or `.drift.dart`
 2. **Check for generated comment**: Look for `// GENERATED CODE - DO NOT MODIFY BY HAND` header
 3. **Rely on existing exclusions**: The `analysis_options.yaml` exclude list should already handle this
@@ -2130,6 +2217,7 @@ Drift generates two types of files:
 ### Drift's Own Analyzer Plugin
 
 Drift ships a custom analyzer plugin via `drift_dev` that provides:
+
 - Compile-time validation of `.drift` SQL files
 - Type checking for SQL expressions
 - Migration generation
@@ -2160,6 +2248,7 @@ final todosProvider = StreamProvider<List<TodoItem>>((ref) {
 ```
 
 **Impact on rules**:
+
 - `require_drift_database_close` — might false-positive since close is in `ref.onDispose`, not a `dispose()` method
 - `require_drift_stream_cancel` — Riverpod auto-cancels streams in `StreamProvider`, no manual cancel needed
 
@@ -2185,6 +2274,7 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
 ```
 
 **Impact on rules**:
+
 - `require_drift_stream_cancel` — should check `close()` method too, not just `dispose()`
 - `require_drift_database_close` — Blocs use `close()` not `dispose()`
 
@@ -2199,6 +2289,7 @@ GetIt.I.registerLazySingleton<AppDatabase>(
 ```
 
 **Impact on rules**:
+
 - `require_drift_database_close` — close handled externally by GetIt
 - `prefer_drift_isolate_sharing` — GetIt singleton ensures single instance
 
@@ -2369,6 +2460,7 @@ void goodLogStatements() {
 **Risk**: ALL 21 proposed detection strategies are theoretical. We've designed them based on API documentation, common mistakes, and AST analysis patterns — but zero rules have been tested against actual Drift codebases.
 
 **What could go wrong**:
+
 - False positives on patterns we didn't anticipate
 - False negatives on variations of the patterns we described
 - AST structure differences from what we assumed (e.g., cascade notation `..\` vs chained `.`)
@@ -2376,6 +2468,7 @@ void goodLogStatements() {
 - Generated code triggering rules unexpectedly
 
 **Mitigation**:
+
 1. Start with the highest-confidence rules (score 4-5 in confidence column)
 2. Test each rule against 2-3 real Drift projects before publishing
 3. Use INFO severity for uncertain rules (can be upgraded later)
@@ -2384,6 +2477,7 @@ void goodLogStatements() {
 ### Drift's Analyzer Plugin Conflict
 
 **Risk**: Drift ships its own analyzer plugin (`drift_dev`). If both our plugin and Drift's plugin analyze the same file, there could be:
+
 - Performance impact (double analysis)
 - Conflicting suggestions
 - Duplicate warnings
@@ -2395,6 +2489,7 @@ void goodLogStatements() {
 ### Fixture Limitations
 
 **Risk**: We can't add `drift` as a dependency to the project (it would bloat the package and create version conflicts). This means:
+
 - Test fixtures can't use real Drift types
 - We can't do static type resolution on Drift-specific types (e.g., `GeneratedDatabase`, `TypeConverter<A, B>`)
 - All detection MUST be heuristic (string matching, method names, structural patterns)
@@ -2404,6 +2499,7 @@ void goodLogStatements() {
 ### False Positive Risk from Generic Method Names
 
 **Risk**: Drift uses generic method names that appear in non-Drift code:
+
 - `transaction()` — used by many database/ORM packages
 - `select()` — used by Flutter's SelectableText, SQL packages, etc.
 - `update()` — used everywhere
@@ -2419,6 +2515,7 @@ void goodLogStatements() {
 ### Drift API Evolution
 
 **Risk**: Drift is actively developed by Simon Binder. API changes in future versions could:
+
 - Rename methods (unlikely for stable APIs)
 - Add new patterns we should detect
 - Fix issues we're warning about (making our rules outdated)
@@ -2432,6 +2529,7 @@ void goodLogStatements() {
 We have no data on how many saropa_lints users use Drift. If adoption is low, the implementation effort (21 rules, ~1,400 lines) may not be justified.
 
 **Available signals**:
+
 - Drift has 1,700+ pub.dev likes (as of 2025), making it one of the top 3 Flutter database packages
 - The ROADMAP already lists Drift alongside Isar/Hive, suggesting user demand
 - Drift is the primary choice for projects that need SQL (not NoSQL)
@@ -2444,36 +2542,36 @@ We have no data on how many saropa_lints users use Drift. If adoption is low, th
 
 ### Structural Comparison
 
-| Aspect | Isar | Hive | Drift |
-|--------|------|------|-------|
-| Rule count | 21 | 21 | 21 (proposed) |
-| Essential | 1 | 1 | 1 |
-| Recommended | 7 | 7 | 7 |
-| Professional | 5 | 6 | 6 |
-| Comprehensive | 8 | 7 | 7 |
-| File | `isar_rules.dart` | `hive_rules.dart` | `drift_rules.dart` |
-| ~Lines | 1,745 | ~1,700 | ~1,700 (est) |
+| Aspect        | Isar              | Hive              | Drift              |
+| ------------- | ----------------- | ----------------- | ------------------ |
+| Rule count    | 21                | 21                | 21 (proposed)      |
+| Essential     | 1                 | 1                 | 1                  |
+| Recommended   | 7                 | 7                 | 7                  |
+| Professional  | 5                 | 6                 | 6                  |
+| Comprehensive | 8                 | 7                 | 7                  |
+| File          | `isar_rules.dart` | `hive_rules.dart` | `drift_rules.dart` |
+| ~Lines        | 1,745             | ~1,700            | ~1,700 (est)       |
 
 ### Conceptual Comparison
 
-| Concept | Isar | Drift |
-|---------|------|-------|
-| Enum corruption | `avoid_isar_enum_field` (stored by index) | `avoid_drift_enum_index_reorder` (TypeConverter with .index) |
-| DB close | `require_isar_close_on_dispose` | `require_drift_database_close` |
-| Batch writes | `prefer_isar_batch_operations` (put→putAll) | `prefer_drift_batch_operations` (insert→batch) |
-| Transaction safety | `avoid_isar_transaction_nesting` (deadlocks) | `require_await_in_drift_transaction` (unawaited queries) |
-| Debug in prod | `require_isar_inspector_debug_only` | `avoid_drift_log_statements_production` |
-| Clear/delete all | `avoid_isar_clear_in_production` | `avoid_drift_update_without_where` |
-| Stream safety | `avoid_cached_isar_stream` | `require_drift_stream_cancel` |
-| Web limitations | `avoid_isar_web_limitations` | `avoid_drift_unsafe_web_storage` |
-| SQL injection | N/A (NoSQL, no raw queries) | `avoid_drift_raw_sql_interpolation` |
-| Migration | N/A (auto-migration) | Rules 5, 15, 16, 17 (explicit migrations) |
-| Foreign keys | N/A (NoSQL, uses links) | Rules 5, 17 (PRAGMA enforcement) |
-| Isolates | N/A | Rules 9, 13, 14 (background processing) |
-| Type converters | N/A (built-in serialization) | Rules 1, 21 (custom converters) |
-| Query safety | `avoid_isar_float_equality_queries` | `avoid_drift_get_single_without_unique` |
-| Index optimization | `prefer_isar_index_for_queries` | Covered by shared `require_database_index` |
-| Links/relations | `require_isar_links_load` | N/A (SQL joins, not lazy links) |
+| Concept            | Isar                                         | Drift                                                        |
+| ------------------ | -------------------------------------------- | ------------------------------------------------------------ |
+| Enum corruption    | `avoid_isar_enum_field` (stored by index)    | `avoid_drift_enum_index_reorder` (TypeConverter with .index) |
+| DB close           | `require_isar_close_on_dispose`              | `require_drift_database_close`                               |
+| Batch writes       | `prefer_isar_batch_operations` (put→putAll)  | `prefer_drift_batch_operations` (insert→batch)               |
+| Transaction safety | `avoid_isar_transaction_nesting` (deadlocks) | `require_await_in_drift_transaction` (unawaited queries)     |
+| Debug in prod      | `require_isar_inspector_debug_only`          | `avoid_drift_log_statements_production`                      |
+| Clear/delete all   | `avoid_isar_clear_in_production`             | `avoid_drift_update_without_where`                           |
+| Stream safety      | `avoid_cached_isar_stream`                   | `require_drift_stream_cancel`                                |
+| Web limitations    | `avoid_isar_web_limitations`                 | `avoid_drift_unsafe_web_storage`                             |
+| SQL injection      | N/A (NoSQL, no raw queries)                  | `avoid_drift_raw_sql_interpolation`                          |
+| Migration          | N/A (auto-migration)                         | Rules 5, 15, 16, 17 (explicit migrations)                    |
+| Foreign keys       | N/A (NoSQL, uses links)                      | Rules 5, 17 (PRAGMA enforcement)                             |
+| Isolates           | N/A                                          | Rules 9, 13, 14 (background processing)                      |
+| Type converters    | N/A (built-in serialization)                 | Rules 1, 21 (custom converters)                              |
+| Query safety       | `avoid_isar_float_equality_queries`          | `avoid_drift_get_single_without_unique`                      |
+| Index optimization | `prefer_isar_index_for_queries`              | Covered by shared `require_database_index`                   |
+| Links/relations    | `require_isar_links_load`                    | N/A (SQL joins, not lazy links)                              |
 
 ### Key Differences
 
@@ -2489,6 +2587,7 @@ We have no data on how many saropa_lints users use Drift. If adoption is low, th
 ## 33. References
 
 ### Official Documentation
+
 - [Drift official docs](https://drift.simonbinder.eu/)
 - [Drift setup guide](https://drift.simonbinder.eu/setup/)
 - [Drift tables](https://drift.simonbinder.eu/dart_api/tables/)
@@ -2510,18 +2609,21 @@ We have no data on how many saropa_lints users use Drift. If adoption is low, th
 - [Drift FAQ](https://drift.simonbinder.eu/faq/)
 
 ### Package Pages
+
 - [drift on pub.dev](https://pub.dev/packages/drift)
 - [drift_dev on pub.dev](https://pub.dev/packages/drift_dev)
 - [drift_flutter on pub.dev](https://pub.dev/packages/drift_flutter)
 - [drift_sqflite on pub.dev](https://pub.dev/packages/drift_sqflite)
 
 ### Source Code
+
 - [Drift GitHub repository](https://github.com/simolus3/drift)
 - [Nested transaction deadlock issue #3260](https://github.com/simolus3/drift/issues/3260)
 - [Database locks during batch insert issue #245](https://github.com/simolus3/drift/issues/245)
 - [Multiple database instances issue #488](https://github.com/simolus3/drift/issues/488)
 
 ### Community Articles
+
 - [Drift Deep Dive: Optimizing Performance (Medium)](https://medium.com/@teesil2000z/drift-database-deep-dive-optimizing-performance-for-flutter-on-web-and-mobile-f7b9663d49fa)
 - [Drift reactive database overview (Medium)](https://medium.com/@rishad2002/drift-a-reactive-database-library-for-flutter-and-dart-powered-by-sqlite-99943ce84509)
 - [Testing Drift database (Medium)](https://chegebrian.medium.com/testing-drift-database-in-flutter-978c3eb620dd)
