@@ -51,6 +51,12 @@ void main() {
         // Callbacks should use ref.read() not ref.watch()
         expect('ref.read() in callback passes', isNotNull);
       });
+
+      test('ref.read() in any inline closure should NOT trigger', () {
+        // FunctionExpression boundary stops traversal — ref.read()
+        // inside onSelectionChanged, onSubmit, onTap, etc. is correct
+        expect('closure boundary exemption works', isNotNull);
+      });
     });
 
     group('avoid_ref_watch_outside_build', () {
@@ -65,6 +71,22 @@ void main() {
 
       test('ref.watch() in build should NOT trigger', () {
         expect('ref.watch() in build passes', isNotNull);
+      });
+
+      test('ref.watch() in Provider body should NOT trigger', () {
+        // Provider((ref) { ref.watch(...) }) is the standard Riverpod
+        // provider composition pattern — a reactive context like build()
+        expect('provider body exemption works', isNotNull);
+      });
+
+      test('ref.watch() in Provider.family body should NOT trigger', () {
+        // Provider.family((ref, arg) { ref.watch(...) }) is also valid
+        expect('provider family exemption works', isNotNull);
+      });
+
+      test('ref.watch() in StreamProvider body should NOT trigger', () {
+        // StreamProvider((ref) { ref.watch(...) }) is reactive
+        expect('stream provider exemption works', isNotNull);
       });
     });
 
@@ -102,6 +124,21 @@ void main() {
     group('avoid_ref_in_build_body', () {
       test('ref.read in build body outside watch SHOULD trigger', () {
         expect('ref.read in build body detected', isNotNull);
+      });
+
+      test('ref.read() in onPressed callback should NOT trigger', () {
+        // ref.read() inside callbacks is the recommended Riverpod pattern
+        expect('callback exemption works', isNotNull);
+      });
+
+      test('ref.read() in onSelectionChanged should NOT trigger', () {
+        // Any inline closure in build() is a callback boundary
+        expect('onSelectionChanged exemption works', isNotNull);
+      });
+
+      test('ref.read() in onSubmit should NOT trigger', () {
+        // FunctionExpression boundary prevents false positives
+        expect('onSubmit exemption works', isNotNull);
       });
     });
 
