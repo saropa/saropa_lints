@@ -28,6 +28,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
   - `prefer_drift_foreign_key_declaration` (Professional, INFO) — detects `Id`-suffixed columns without `references()`
   - `require_drift_onupgrade_handler` (Recommended, WARNING) — detects schemaVersion > 1 without `onUpgrade` handler
 
+### Fixed
+
+- `avoid_drift_missing_updates_param` — missing drift import check caused false positives on non-drift `customUpdate()` calls
+- `prefer_drift_foreign_key_declaration` — false positives on non-FK column names (`androidId`, `deviceId`, `sessionId`, etc.)
+- `require_drift_equals_value` — false positives on non-enum uppercase types (`DateTime`, `Duration`, `BigInt`, etc.)
+- `require_drift_onupgrade_handler` — reduced performance cost by checking individual members instead of full class `toSource()`
+
 ---
 
 ## [6.0.0]

@@ -2016,6 +2016,18 @@ class RequireDriftEqualsValueRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  /// Uppercase-prefix types that are valid raw SQL values, not enums.
+  static const _nonEnumPrefixes = <String>{
+    'Variable', // Drift's Variable type
+    'DateTime',
+    'Duration',
+    'Offset',
+    'BigInt',
+    'Uint8List',
+    'String',
+    'Object',
+  };
+
   static const LintCode _code = LintCode(
     'require_drift_equals_value',
     '[require_drift_equals_value] .equals() called with an enum argument '
@@ -2044,10 +2056,11 @@ class RequireDriftEqualsValueRule extends SaropaLintRule {
       // Check if argument is an enum-like pattern: Identifier.member
       final arg = args.first;
       if (arg is PrefixedIdentifier) {
-        // Heuristic: PrefixedIdentifier like Status.active looks like an enum
-        // Exclude common non-enum patterns
+        // Heuristic: PrefixedIdentifier like Status.active looks like an enum.
+        // Exclude common non-enum uppercase types that are valid raw values.
         final prefix = arg.prefix.name;
-        if (prefix[0].toUpperCase() == prefix[0] && prefix != 'Variable') {
+        if (prefix[0].toUpperCase() == prefix[0] &&
+            !_nonEnumPrefixes.contains(prefix)) {
           reporter.atNode(node.methodName);
         }
       }
@@ -2414,6 +2427,7 @@ class AvoidDriftMissingUpdatesParamRule extends SaropaLintRule {
   ) {
     context.addMethodInvocation((MethodInvocation node) {
       if (!_writeMethods.contains(node.methodName.name)) return;
+      if (!fileImportsPackage(node, PackageImports.drift)) return;
 
       // Check if updates parameter is present
       final args = node.argumentList.arguments;
@@ -2604,12 +2618,28 @@ class PreferDriftForeignKeyDeclarationRule extends SaropaLintRule {
     });
   }
 
+  /// Non-FK column names that happen to end with "Id".
+  static const _nonForeignKeyNames = <String>{
+    'androidId',
+    'deviceId',
+    'sessionId',
+    'trackingId',
+    'correlationId',
+    'transactionId',
+    'requestId',
+    'uuid',
+    'guid',
+  };
+
   bool _looksLikeForeignKey(String name) {
     // Match patterns like userId, categoryId, parentId
     if (!name.endsWith('Id')) return false;
     // Exclude just "id" (primary key) and "Id" alone
     if (name == 'id' || name == 'Id') return false;
-    return name.length > 2;
+    if (name.length <= 2) return false;
+    // Exclude known non-FK identifier patterns
+    if (_nonForeignKeyNames.contains(name)) return false;
+    return true;
   }
 }
 
@@ -2702,11 +2732,13 @@ class RequireDriftOnUpgradeHandlerRule extends SaropaLintRule {
 
       if (schemaVersion <= 1) return;
 
-      // Check if class source contains onUpgrade
-      final classSource = node.toSource();
-      if (!classSource.contains('onUpgrade')) {
-        reporter.atNode(node);
+      // Check if any member source mentions onUpgrade (cheaper than full
+      // class toSource() — only stringifies individual members)
+      for (final member in node.members) {
+        if (member.toSource().contains('onUpgrade')) return;
       }
+
+      reporter.atNode(node);
     });
   }
 }
