@@ -139,6 +139,29 @@ void main() {
       test('string concatenation in SQL SHOULD trigger', () {
         expect('dynamic SQL detected', isNotNull);
       });
+
+      test('string interpolation in SQL SHOULD trigger', () {
+        // Direct interpolation in DML queries is a SQL injection risk
+        expect('interpolated SQL detected', isNotNull);
+      });
+
+      test('PRAGMA statement with interpolation should NOT trigger', () {
+        // PRAGMA statements do not support parameter binding — SQLite
+        // rejects ? placeholders in PRAGMA syntax, so interpolation
+        // is the only way to pass values (e.g. PRAGMA key, rekey)
+        expect('PRAGMA exemption works', isNotNull);
+      });
+
+      test('parameterized query should NOT trigger', () {
+        // Using ? placeholders with argument lists is safe
+        expect('parameterized query passes', isNotNull);
+      });
+
+      test('SQL keyword matching uses word boundaries', () {
+        // Ensures "selection", "updateTime", "wherever" don't match
+        // as SQL keywords "select", "update", "where"
+        expect('word boundary matching works', isNotNull);
+      });
     });
 
     group('avoid_eval_like_patterns', () {

@@ -41,7 +41,7 @@ import '../../fixes/packages/riverpod/replace_read_with_watch_fix.dart';
 class AvoidRefReadInsideBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_ref_read_inside_build',
-    '[avoid_ref_read_inside_build] ref.read() called inside build() bypasses Riverpod reactivity. The widget will not rebuild when the provider state changes, resulting in stale data displayed to the user. This creates inconsistent UI state that fails silently and produces hard-to-diagnose rendering errors across dependent widgets. {v2}',
+    '[avoid_ref_read_inside_build] ref.read() called inside build() bypasses Riverpod reactivity. The widget will not rebuild when the provider state changes, resulting in stale data displayed to the user. This creates inconsistent UI state that fails silently and produces hard-to-diagnose rendering errors across dependent widgets. {v3}',
     correctionMessage:
         'Replace ref.read() with ref.watch() inside build() to subscribe to provider changes and trigger automatic widget rebuilds on state updates.',
     severity: DiagnosticSeverity.WARNING,
@@ -78,12 +78,20 @@ class _RefReadVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'read' &&
-        node.target != null &&
-        node.target.toString() == 'ref') {
-      reporter.atNode(node);
+    if (node.methodName.name == 'read') {
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier && target.name == 'ref') {
+        reporter.atNode(node);
+      }
     }
     super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Do not recurse into closures/callbacks defined in build().
+    // ref.read() inside callbacks (onPressed, onTap, etc.) is the
+    // correct Riverpod pattern — only direct build-body reads are wrong.
   }
 }
 
@@ -115,7 +123,7 @@ class _RefReadVisitor extends RecursiveAstVisitor<void> {
 class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_ref_watch_outside_build',
-    '[avoid_ref_watch_outside_build] ref.watch() detected outside build() method, breaking the Riverpod widget lifecycle. Subscriptions created outside build() leak memory, produce stale data, and cause missed UI updates that lead to inconsistent state and hard-to-debug rendering errors across dependent widgets. {v3}',
+    '[avoid_ref_watch_outside_build] ref.watch() detected outside build() method, breaking the Riverpod widget lifecycle. Subscriptions created outside build() leak memory, produce stale data, and cause missed UI updates that lead to inconsistent state and hard-to-debug rendering errors across dependent widgets. {v4}',
     correctionMessage:
         'Move ref.watch() calls into the build() method where Riverpod manages subscription lifecycle and automatic widget rebuilds on provider state changes.',
     severity: DiagnosticSeverity.ERROR,
@@ -138,21 +146,73 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name == 'watch' &&
-          node.target != null &&
-          node.target.toString() == 'ref') {
-        // Find parent method
-        AstNode? parent = node;
-        while (parent != null && parent is! MethodDeclaration) {
-          parent = parent.parent;
-        }
-        if (parent is MethodDeclaration && parent.name.lexeme == 'build') {
-          // OK
-        } else {
-          reporter.atNode(node);
+      if (node.methodName.name == 'watch') {
+        final Expression? target = node.target;
+        if (target is SimpleIdentifier && target.name == 'ref') {
+          if (!_isInReactiveContext(node)) {
+            reporter.atNode(node);
+          }
         }
       }
     });
+  }
+
+  /// Riverpod provider constructors whose body callbacks are reactive
+  /// contexts where ref.watch() is correct and expected.
+  static const Set<String> _providerConstructors = <String>{
+    'Provider',
+    'StreamProvider',
+    'FutureProvider',
+    'StateProvider',
+    'StateNotifierProvider',
+    'ChangeNotifierProvider',
+    'NotifierProvider',
+    'AsyncNotifierProvider',
+  };
+
+  /// Returns true if [node] is inside a build() method or a Riverpod
+  /// provider body callback — both are reactive contexts where
+  /// ref.watch() is correct.
+  static bool _isInReactiveContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      // Inside a build() method — allowed
+      if (current is MethodDeclaration && current.name.lexeme == 'build') {
+        return true;
+      }
+      // Inside a Riverpod provider body callback — allowed
+      if (current is FunctionExpression) {
+        final parent = current.parent;
+        if (parent is ArgumentList) {
+          final grandparent = parent.parent;
+          final name = _providerInvocationName(grandparent);
+          if (name != null && _providerConstructors.contains(name)) {
+            return true;
+          }
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Extracts the provider type name from a constructor or method call.
+  ///
+  /// Handles both direct construction (`Provider(...)`) and modifier
+  /// calls (`Provider.family(...)`, `Provider.autoDispose(...)`).
+  static String? _providerInvocationName(AstNode? node) {
+    if (node is InstanceCreationExpression) {
+      return node.constructorName.type.name.lexeme;
+    }
+    if (node is MethodInvocation) {
+      // For Provider.family(...) or Provider.autoDispose(...),
+      // the target is the provider type, not the method name.
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier) {
+        return target.name;
+      }
+    }
+    return null;
   }
 }
 
@@ -1662,9 +1722,12 @@ class AvoidRefInBuildBodyRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     'avoid_ref_in_build_body',
-    '[avoid_ref_in_build_body] Using ref.read() in build() does not trigger widget rebuilds when the provider changes, leading to stale UI, missed updates, and confusing bugs. This breaks the reactive model of Riverpod and can cause your app to display outdated information. {v4}',
+    '[avoid_ref_in_build_body] Using ref.read() in build() does not trigger widget rebuilds when the provider changes, leading to stale UI, missed updates, and confusing bugs. This breaks the reactive model of Riverpod and can cause your app to display outdated information. {v5}',
     correctionMessage:
         'Use ref.watch() for reactive updates in build(), or move ref.read() to a callback like onPressed to ensure the UI updates correctly.',
     severity: DiagnosticSeverity.ERROR,
@@ -1680,96 +1743,13 @@ class AvoidRefInBuildBodyRule extends SaropaLintRule {
       if (node.name.lexeme != 'build') return;
 
       // Visit the method body to find ref.read() calls
-      node.body.visitChildren(_RefReadInBuildVisitor(reporter, code));
+      node.body.visitChildren(_RefReadVisitor(reporter, code));
     });
   }
 }
 
-/// Visitor that finds ref.read() calls in build method bodies.
-class _RefReadInBuildVisitor extends RecursiveAstVisitor<void> {
-  _RefReadInBuildVisitor(this.reporter, this.code);
-
-  final SaropaDiagnosticReporter reporter;
-  final LintCode code;
-
-  /// Track depth inside callbacks where ref.read() is OK
-  int _callbackDepth = 0;
-
-  /// Names of callback parameters where ref.read() is acceptable.
-  ///
-  /// These are event handlers and Future callbacks where ref.read() is correct
-  /// because you want the value at the time of the event, not reactive updates.
-  static const Set<String> _callbackMethods = <String>{
-    // Button/gesture callbacks
-    'onPressed',
-    'onTap',
-    'onLongPress',
-    'onDoubleTap',
-    'onPanUpdate',
-    'onDragEnd',
-    // Form/input callbacks
-    'onChanged',
-    'onSubmitted',
-    'onSaved',
-    'onEditingComplete',
-    'onFieldSubmitted',
-    // Navigation/animation callbacks
-    'onDismissed',
-    'onEnd',
-    'onStatusChanged',
-    'onComplete',
-    // Future/async callbacks
-    'then',
-    'catchError',
-    'whenComplete',
-    'onError',
-    // Stream callbacks
-    'listen',
-    'add',
-    'addError',
-    // Lifecycle callbacks
-    'addPostFrameCallback',
-  };
-
-  @override
-  void visitMethodInvocation(MethodInvocation node) {
-    final String methodName = node.methodName.name;
-
-    // Check if entering a callback context
-    if (_callbackMethods.contains(methodName)) {
-      _callbackDepth++;
-      super.visitMethodInvocation(node);
-      _callbackDepth--;
-      return;
-    }
-
-    // Check for ref.read() outside callbacks
-    if (methodName == 'read' && _callbackDepth == 0) {
-      final Expression? target = node.target;
-      if (target is SimpleIdentifier && target.name == 'ref') {
-        reporter.atNode(node);
-      }
-    }
-
-    super.visitMethodInvocation(node);
-  }
-
-  @override
-  void visitFunctionExpression(FunctionExpression node) {
-    // Function expressions in callbacks are OK for ref.read()
-    // Only increment if parent is a callback argument
-    final AstNode? parent = node.parent;
-    if (parent is NamedExpression &&
-        _callbackMethods.contains(parent.name.label.name)) {
-      _callbackDepth++;
-      super.visitFunctionExpression(node);
-      _callbackDepth--;
-      return;
-    }
-
-    super.visitFunctionExpression(node);
-  }
-}
+// AvoidRefInBuildBodyRule reuses _RefReadVisitor (defined near line 73)
+// to avoid duplicating the same visitor logic.
 
 /// Warns when ref is used in dispose method.
 ///
