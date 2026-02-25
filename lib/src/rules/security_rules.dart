@@ -1446,7 +1446,7 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_dynamic_sql',
-    '[avoid_dynamic_sql] Constructing SQL queries by concatenating or interpolating user input directly into the query string exposes your application to SQL injection attacks. Attackers can craft input that alters the structure of your query, allowing them to read, modify, or delete arbitrary data, escalate privileges, or compromise the entire database. SQL injection is one of the most critical and well-documented security vulnerabilities in software development, and has led to major data breaches across industries. {v3}',
+    '[avoid_dynamic_sql] Constructing SQL queries by concatenating or interpolating user input directly into the query string exposes your application to SQL injection attacks. Attackers can craft input that alters the structure of your query, allowing them to read, modify, or delete arbitrary data, escalate privileges, or compromise the entire database. SQL injection is one of the most critical and well-documented security vulnerabilities in software development, and has led to major data breaches across industries. {v4}',
     correctionMessage:
         'Always use parameterized queries, prepared statements, or trusted query builders to safely insert user input into SQL queries. Never concatenate or interpolate user data directly into SQL strings. Audit your codebase for dynamic SQL construction and refactor to use safe patterns. Test your application for SQL injection vulnerabilities using automated tools or manual review. Document secure query practices in your team guidelines.',
     severity: DiagnosticSeverity.ERROR,
@@ -1476,6 +1476,11 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
 
       final Expression firstArg = node.argumentList.arguments.first;
 
+      // PRAGMA statements do not support parameter binding — SQLite
+      // rejects placeholders in PRAGMA syntax, so interpolation is
+      // the only option and flagging it is always a false positive.
+      if (_isPragmaStatement(firstArg)) return;
+
       // Check for string interpolation
       if (firstArg is StringInterpolation) {
         reporter.atNode(firstArg);
@@ -1484,14 +1489,7 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
 
       // Check for string concatenation (binary + with strings)
       if (firstArg is BinaryExpression && firstArg.operator.lexeme == '+') {
-        // Check if either side looks like SQL
-        final String leftSource = firstArg.leftOperand.toSource().toLowerCase();
-        if (leftSource.contains('select') ||
-            leftSource.contains('insert') ||
-            leftSource.contains('update') ||
-            leftSource.contains('delete') ||
-            leftSource.contains('from') ||
-            leftSource.contains('where')) {
+        if (_leftOperandContainsSqlKeyword(firstArg.leftOperand)) {
           reporter.atNode(firstArg);
           return;
         }
@@ -1507,6 +1505,54 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// Returns true if [expr] is a SQL string starting with PRAGMA.
+  ///
+  /// PRAGMA statements are SQLite meta-commands that never support
+  /// parameter binding (placeholders like `?`). String interpolation
+  /// is the only way to pass values to PRAGMA commands such as
+  /// `PRAGMA key`, `PRAGMA rekey`, or `PRAGMA journal_mode`.
+  static bool _isPragmaStatement(Expression expr) {
+    if (expr is StringInterpolation) {
+      final first = expr.elements.firstOrNull;
+      if (first is InterpolationString) {
+        return first.value.trimLeft().toUpperCase().startsWith('PRAGMA');
+      }
+    }
+    if (expr is AdjacentStrings) {
+      final first = expr.strings.firstOrNull;
+      if (first is SimpleStringLiteral) {
+        return first.value.trimLeft().toUpperCase().startsWith('PRAGMA');
+      }
+      if (first is StringInterpolation) {
+        return _isPragmaStatement(first);
+      }
+    }
+    return false;
+  }
+
+  /// Word-boundary regex for SQL keywords in string concatenation.
+  ///
+  /// Uses `\b` boundaries to avoid false positives from identifiers like
+  /// `selection`, `updateTime`, `whereToGo`, or `deleting`.
+  static final RegExp _sqlKeywordPattern = RegExp(
+    r'\b(?:select|insert|update|delete|from|where)\b',
+    caseSensitive: false,
+  );
+
+  /// Checks whether the left operand of a `+` expression contains a
+  /// SQL keyword, indicating string concatenation into a SQL query.
+  ///
+  /// Extracts the string value directly from [SimpleStringLiteral] nodes
+  /// to avoid the overhead of [Expression.toSource] when possible.
+  static bool _leftOperandContainsSqlKeyword(Expression left) {
+    if (left is SimpleStringLiteral) {
+      return _sqlKeywordPattern.hasMatch(left.value);
+    }
+    // Fall back to source text for complex expressions (e.g. adjacent
+    // strings or nested concatenation).
+    return _sqlKeywordPattern.hasMatch(left.toSource());
   }
 }
 
