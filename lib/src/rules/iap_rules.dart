@@ -471,7 +471,7 @@ class PreferGracePeriodHandlingRule extends SaropaLintRule {
 /// receipt validation is required for secure entitlement management.
 /// RevenueCat and Qonversion handle this automatically.
 ///
-/// **OWASP:** [M1:Improper-Platform-Usage] [M4:Insecure-Authentication]
+/// **OWASP:** `M1:Improper-Platform-Usage` `M4:Insecure-Authentication`
 ///
 /// **BAD:**
 /// ```dart

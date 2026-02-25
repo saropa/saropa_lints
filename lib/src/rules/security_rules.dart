@@ -6301,7 +6301,7 @@ class RequireSessionTimeoutRule extends SaropaLintRule {
 /// `print()`, `Text()`, error dialogs, or `SnackBar` content leaks
 /// implementation details that aid attackers in crafting targeted exploits.
 ///
-/// **OWASP:** [M10:Extraneous-Functionality]
+/// **OWASP:** `M10:Extraneous-Functionality`
 ///
 /// **BAD:**
 /// ```dart
@@ -6469,7 +6469,7 @@ class AvoidStackTraceInProductionRule extends SaropaLintRule {
 /// // Or: omit the setting entirely (default is false)
 /// ```
 ///
-/// **OWASP:** [M8:Code-Tampering] [A05:Security-Misconfiguration]
+/// **OWASP:** `M8:Code-Tampering` `A05:Security-Misconfiguration`
 class AvoidWebViewCorsIssuesRule extends SaropaLintRule {
   AvoidWebViewCorsIssuesRule() : super(code: _code);
 

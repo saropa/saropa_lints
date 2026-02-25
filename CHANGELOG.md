@@ -12,7 +12,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
-## [Unreleased]
+## [5.0.3]
 
 ### Added
 
