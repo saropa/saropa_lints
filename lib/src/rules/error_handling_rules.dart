@@ -2127,11 +2127,22 @@ class RequireAppStartupErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_app_startup_error_handling',
-    '[require_app_startup_error_handling] runApp() is called without runZonedGuarded or FlutterError.onError. Uncaught errors during app startup will crash the application silently with no crash report sent to monitoring services. Users see a blank or frozen screen with no diagnostic information available to the development team. {v2}',
+    '[require_app_startup_error_handling] runApp() is called without runZonedGuarded or FlutterError.onError. Uncaught errors during app startup will crash the application silently with no crash report sent to monitoring services. Users see a blank or frozen screen with no diagnostic information available to the development team. {v3}',
     correctionMessage:
         'Wrap runApp() in runZonedGuarded and set FlutterError.onError to capture all errors. Example: runZonedGuarded(() { runApp(MyApp()); }, (e, st) { reportToCrashlytics(e, st); });',
     severity: DiagnosticSeverity.WARNING,
   );
+
+  /// Crash reporting packages that warrant startup error handling.
+  static const Set<String> _crashReportingPackages = <String>{
+    'firebase_crashlytics',
+    'sentry_flutter',
+    'sentry',
+    'bugsnag_flutter',
+    'datadog_flutter_plugin',
+    'instabug_flutter',
+    'raygun4flutter',
+  };
 
   @override
   void runWithReporter(
@@ -2157,6 +2168,15 @@ class RequireAppStartupErrorHandlingRule extends SaropaLintRule {
           bodySource.contains('Isolate.current.addErrorListener')) {
         return; // Has error handling
       }
+
+      // Only flag if the project has a crash reporting dependency.
+      // Without a reporting service, adding runZonedGuarded with just
+      // debugPrint is not useful and may silently swallow errors.
+      final String filePath = context.filePath;
+      final bool hasCrashReporting = _crashReportingPackages.any(
+        (pkg) => ProjectContext.hasDependency(filePath, pkg),
+      );
+      if (!hasCrashReporting) return;
 
       reporter.atNode(node);
     });

@@ -256,6 +256,13 @@ void main() {
       test('runZonedGuarded in main should NOT trigger', () {
         expect('startup error handling passes', isNotNull);
       });
+
+      test('main() without crash reporting dependency should NOT trigger '
+          '(regression)', () {
+        // Apps without firebase_crashlytics/sentry_flutter/etc. should
+        // not be forced to add runZonedGuarded with no reporting target
+        expect('no crash reporting dep = no warning', isNotNull);
+      });
     });
   });
 

@@ -1885,7 +1885,7 @@ class RequireMinimumContrastRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_minimum_contrast',
-    '[require_minimum_contrast] Low contrast text excludes users with low vision, cataracts, or age-related sight loss who cannot distinguish foreground from background. WCAG 2.1 Success Criterion 1.4.3 requires a minimum contrast ratio of 4.5:1 for normal text and 3:1 for large text. Failing to meet this threshold makes content unreadable for millions of users worldwide. {v1}',
+    '[require_minimum_contrast] Low contrast text excludes users with low vision, cataracts, or age-related sight loss who cannot distinguish foreground from background. WCAG 2.1 Success Criterion 1.4.3 requires a minimum contrast ratio of 4.5:1 for normal text and 3:1 for large text. Failing to meet this threshold makes content unreadable for millions of users worldwide. {v2}',
     correctionMessage:
         'Increase the contrast ratio by using darker text on light backgrounds or lighter text on dark backgrounds, aiming for at least 4.5:1 for normal text.',
     severity: DiagnosticSeverity.WARNING,
@@ -1950,6 +1950,20 @@ class RequireMinimumContrastRule extends SaropaLintRule {
     });
   }
 
+  /// Light color keywords (lowercased) — if the background contains one
+  /// of these, the contrast problem persists and we should still fire.
+  static const Set<String> _lightBackgroundKeywords = <String>{
+    'white',
+    'grey[100]',
+    'grey[200]',
+    'grey.shade100',
+    'grey.shade200',
+    'yellow[100]',
+    'amber[100]',
+    'lime[100]',
+    'cyan[100]',
+  };
+
   bool _hasDarkBackgroundContext(AstNode node) {
     AstNode? current = node.parent;
     int depth = 0;
@@ -1957,16 +1971,15 @@ class RequireMinimumContrastRule extends SaropaLintRule {
     while (current != null && depth < 8) {
       if (current is InstanceCreationExpression) {
         final String typeName = current.constructorName.type.name.lexeme;
-        if (typeName == 'Container' || typeName == 'DecoratedBox') {
-          final String source = current.toSource();
-          // Check for dark background colors
-          if (source.contains('black') ||
-              source.contains('grey[800]') ||
-              source.contains('grey[900]') ||
-              source.contains('grey.shade800') ||
-              source.contains('grey.shade900')) {
-            return true;
-          }
+        if (typeName == 'Container' ||
+            typeName == 'DecoratedBox' ||
+            typeName == 'ColoredBox') {
+          final _BgColorResult bg = _getBackgroundColor(current);
+          if (bg == _BgColorResult.dark) return true;
+          // Background set but unresolvable (variable/expression) —
+          // assume developer chose an appropriate color.
+          if (bg == _BgColorResult.unresolvable) return true;
+          // If light or absent, keep walking up
         }
       }
       current = current.parent;
@@ -1974,7 +1987,39 @@ class RequireMinimumContrastRule extends SaropaLintRule {
     }
     return false;
   }
+
+  /// Classifies the background color of a container widget.
+  _BgColorResult _getBackgroundColor(InstanceCreationExpression node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is! NamedExpression) continue;
+      final String name = arg.name.label.name;
+      if (name != 'color' && name != 'decoration') continue;
+
+      final String colorSrc = arg.expression.toSource();
+
+      // Known dark backgrounds
+      if (colorSrc.contains('black') ||
+          colorSrc.contains('grey[800]') ||
+          colorSrc.contains('grey[900]') ||
+          colorSrc.contains('grey.shade800') ||
+          colorSrc.contains('grey.shade900')) {
+        return _BgColorResult.dark;
+      }
+
+      // Known light backgrounds — not helpful for contrast
+      if (_lightBackgroundKeywords.any(colorSrc.contains)) {
+        return _BgColorResult.light;
+      }
+
+      // Has a color but can't determine if dark or light (variable, etc.)
+      return _BgColorResult.unresolvable;
+    }
+    return _BgColorResult.absent;
+  }
 }
+
+/// Result of checking a container widget's background color.
+enum _BgColorResult { dark, light, unresolvable, absent }
 
 /// Warns when CircleAvatar lacks a semanticLabel for accessibility.
 ///

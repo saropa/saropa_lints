@@ -204,9 +204,9 @@ const Map<String, int> _baselineCounts = {
   'api_network_rules.dart': 143,
   'async_rules.dart': 59,
   'disposal_rules.dart': 29,
-  'security_rules.dart': 73,
+  'security_rules.dart': 74,
   'navigation_rules.dart': 52,
-  'file_handling_rules.dart': 28,
+  'file_handling_rules.dart': 29,
   'widget_lifecycle_rules.dart': 18,
   'permission_rules.dart': 23,
 

@@ -1605,7 +1605,7 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_file_path_sanitization',
     '[require_file_path_sanitization] File path constructed from parameter '
-        'without sanitization. Path traversal attack possible with ../ {v2}',
+        'without sanitization. Path traversal attack possible with ../ {v3}',
     correctionMessage:
         'Use path.basename() to extract filename and path.isWithin() to verify.',
     severity: DiagnosticSeverity.WARNING,
@@ -1664,6 +1664,9 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
       return; // Has some sanitization
     }
 
+    // Check for trusted platform path APIs
+    if (_isFromPlatformPathApi(bodySource)) return;
+
     // Get function parameters
     final FunctionDeclaration? funcDecl = node
         .thisOrAncestorOfType<FunctionDeclaration>();
@@ -1688,5 +1691,26 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
         return;
       }
     }
+  }
+
+  /// Well-known platform path APIs that return trusted directory paths.
+  /// Also used in [AvoidPathTraversalRule] (security_rules.dart).
+  static const Set<String> _platformPathApis = <String>{
+    'getApplicationDocumentsDirectory',
+    'getApplicationSupportDirectory',
+    'getApplicationCacheDirectory',
+    'getTemporaryDirectory',
+    'getLibraryDirectory',
+    'getExternalStorageDirectory',
+    'getDownloadsDirectory',
+    'getDatabasesPath',
+  };
+
+  /// Checks if the function body uses a trusted platform path API.
+  bool _isFromPlatformPathApi(String bodySource) {
+    for (final String api in _platformPathApis) {
+      if (bodySource.contains(api)) return true;
+    }
+    return false;
   }
 }

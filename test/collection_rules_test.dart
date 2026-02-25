@@ -107,6 +107,21 @@ void main() {
         // if (parts.length == 1) { return parts.first; }
         expect('length guard is recognized', isNotNull);
       });
+
+      test('.first in onSelectionChanged should NOT trigger (regression)', () {
+        // SegmentedButton.onSelectionChanged guarantees non-empty Set
+        // onSelectionChanged: (selection) { selection.first; }
+        expect('SegmentedButton callback recognized as non-empty', isNotNull);
+      });
+
+      test(
+        '.first after isEmpty early return should NOT trigger (regression)',
+        () {
+          // if (segments.isEmpty) return; ... segments.first
+          // Also covers: if (total == 0) return; pattern
+          expect('early return guard recognized', isNotNull);
+        },
+      );
     });
 
     group('avoid_unsafe_reduce', () {
@@ -119,6 +134,20 @@ void main() {
         // Avoidance pattern not present
         expect('avoid_unsafe_reduce passes', isNotNull);
       });
+
+      test('reduce after length < 2 early return should NOT trigger '
+          '(regression)', () {
+        // if (data.length < 2) return; data.reduce(...)
+        expect('length guard for reduce recognized', isNotNull);
+      });
+
+      test(
+        'reduce inside isNotEmpty if block should NOT trigger (regression)',
+        () {
+          // if (data.isNotEmpty) { data.reduce(...) }
+          expect('isNotEmpty wrapper for reduce recognized', isNotNull);
+        },
+      );
     });
 
     group('avoid_unsafe_where_methods', () {

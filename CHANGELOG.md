@@ -20,6 +20,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - `avoid_ref_read_inside_build` — false positive on `ref.read()` inside callbacks (onPressed, onSubmit, etc.) defined inline in `build()`; now stops traversal at closure boundaries
 - `avoid_ref_in_build_body` — same false positive as above; now shares the corrected visitor with `avoid_ref_read_inside_build`
 - `avoid_ref_watch_outside_build` — false positive on `ref.watch()` inside Riverpod provider bodies (`Provider`, `StreamProvider`, `FutureProvider`, etc.); now recognizes provider callbacks as reactive contexts alongside `build()`
+- `avoid_path_traversal` — false positive when file path parameter originates from platform path APIs (`getApplicationDocumentsDirectory`, `getTemporaryDirectory`, etc.); now recognizes these as trusted sources
+- `require_file_path_sanitization` — same false positive as `avoid_path_traversal`; now recognizes platform path APIs as trusted
+- `avoid_unsafe_collection_methods` — false positive on `.first`/`.last` when guarded by early-return (`if (list.isEmpty) return;`) or when the collection is a callback parameter guaranteed non-empty (e.g., `SegmentedButton.onSelectionChanged`)
+- `avoid_unsafe_reduce` — false positive on `reduce()` guarded by `if (list.length < N) return;` or `if (list.isEmpty) return;`; now detects early-return and if/ternary guards
+- `require_app_startup_error_handling` — false positive on apps without a crash reporting dependency; now only fires when a monitoring package (e.g., `firebase_crashlytics`, `sentry_flutter`) is detected in pubspec.yaml
+- `require_search_debounce` — false positive when Timer-based debounce is defined as a class field rather than inline in the callback; now checks enclosing class for Timer/Debouncer field declarations
+- `require_minimum_contrast` — false positive when text color is light but background is set via a variable that can't be resolved statically; now recognizes containers with unresolvable background colors as intentionally set
 
 ---
 
