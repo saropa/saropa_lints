@@ -27,6 +27,7 @@ enum Priority { low, medium, high }
 ```
 
 **What goes wrong:**
+
 1. User saves `Priority.medium` (stored as index `1`)
 2. You add a new priority: `enum Priority { low, urgent, medium, high }`
 3. Now `urgent` is index `1`, but existing data still has `1` stored
@@ -287,68 +288,68 @@ dart run custom_lint
 
 ### Essential Tier (1 rule)
 
-| Rule | Severity | What It Catches |
-|------|----------|-----------------|
-| `avoid_drift_enum_index_reorder` | ERROR | Enum TypeConverter using `.index` — data corruption on reorder |
+| Rule                             | Severity | What It Catches                                                |
+| -------------------------------- | -------- | -------------------------------------------------------------- |
+| `avoid_drift_enum_index_reorder` | ERROR    | Enum TypeConverter using `.index` — data corruption on reorder |
 
 ### Recommended Tier (13 rules)
 
-| Rule | Severity | What It Catches |
-|------|----------|-----------------|
-| `require_drift_database_close` | WARNING | Unclosed database connections leaking resources |
-| `avoid_drift_update_without_where` | WARNING | `update()`/`delete()` without `.where()` affecting all rows |
-| `require_await_in_drift_transaction` | WARNING | Unawaited queries escaping transaction boundaries |
-| `require_drift_foreign_key_pragma` | WARNING | Missing `PRAGMA foreign_keys = ON` in `beforeOpen` |
-| `avoid_drift_raw_sql_interpolation` | ERROR | String interpolation in `customSelect`/`customStatement` — SQL injection |
-| `prefer_drift_batch_operations` | WARNING | Individual inserts in a loop instead of `batch()` |
-| `require_drift_stream_cancel` | WARNING | Drift stream subscriptions not cancelled in `dispose()` |
-| `avoid_drift_value_null_vs_absent` | WARNING | `Value(null)` when `Value.absent()` was likely intended |
-| `require_drift_equals_value` | WARNING | `.equals()` with enum — should be `.equalsValue()` |
-| `require_drift_read_table_or_null` | WARNING | `readTable()` after left join crashes on null rows |
-| `require_drift_create_all_in_oncreate` | WARNING | Missing `createAll()` in `onCreate` callback |
-| `avoid_isar_import_with_drift` | WARNING | Importing both Isar and Drift — incomplete migration |
-| `require_drift_onupgrade_handler` | WARNING | `schemaVersion > 1` without `onUpgrade` handler |
+| Rule                                   | Severity | What It Catches                                                          |
+| -------------------------------------- | -------- | ------------------------------------------------------------------------ |
+| `require_drift_database_close`         | WARNING  | Unclosed database connections leaking resources                          |
+| `avoid_drift_update_without_where`     | WARNING  | `update()`/`delete()` without `.where()` affecting all rows              |
+| `require_await_in_drift_transaction`   | WARNING  | Unawaited queries escaping transaction boundaries                        |
+| `require_drift_foreign_key_pragma`     | WARNING  | Missing `PRAGMA foreign_keys = ON` in `beforeOpen`                       |
+| `avoid_drift_raw_sql_interpolation`    | ERROR    | String interpolation in `customSelect`/`customStatement` — SQL injection |
+| `prefer_drift_batch_operations`        | WARNING  | Individual inserts in a loop instead of `batch()`                        |
+| `require_drift_stream_cancel`          | WARNING  | Drift stream subscriptions not canceled in `dispose()`                   |
+| `avoid_drift_value_null_vs_absent`     | WARNING  | `Value(null)` when `Value.absent()` was likely intended                  |
+| `require_drift_equals_value`           | WARNING  | `.equals()` with enum — should be `.equalsValue()`                       |
+| `require_drift_read_table_or_null`     | WARNING  | `readTable()` after left join crashes on null rows                       |
+| `require_drift_create_all_in_oncreate` | WARNING  | Missing `createAll()` in `onCreate` callback                             |
+| `avoid_isar_import_with_drift`         | WARNING  | Importing both Isar and Drift — incomplete migration                     |
+| `require_drift_onupgrade_handler`      | WARNING  | `schemaVersion > 1` without `onUpgrade` handler                          |
 
 ### Professional Tier (10 rules)
 
-| Rule | Severity | What It Catches |
-|------|----------|-----------------|
-| `avoid_drift_database_on_main_isolate` | INFO | `NativeDatabase` without background isolate — UI jank |
-| `avoid_drift_log_statements_production` | WARNING | `logStatements: true` without debug guard — data exposure |
-| `avoid_drift_get_single_without_unique` | INFO | `getSingle()`/`watchSingle()` without `.where()` — throws on multiple rows |
-| `prefer_drift_use_columns_false` | INFO | Joined tables reading unnecessary columns |
-| `avoid_drift_lazy_database` | INFO | `LazyDatabase` with isolates — breaks stream synchronization |
-| `prefer_drift_isolate_sharing` | INFO | Multiple `NativeDatabase` instances on same file — breaks stream sync |
-| `avoid_drift_validate_schema_production` | WARNING | Debug-only `validateDatabaseSchema()` call in production |
-| `avoid_drift_replace_without_all_columns` | INFO | `replace()` instead of `write()` — unset columns reset to defaults |
-| `avoid_drift_missing_updates_param` | INFO | `customUpdate` without `updates` parameter — streams won't refresh |
-| `prefer_drift_foreign_key_declaration` | INFO | Foreign key column without `.references()` declaration |
+| Rule                                      | Severity | What It Catches                                                            |
+| ----------------------------------------- | -------- | -------------------------------------------------------------------------- |
+| `avoid_drift_database_on_main_isolate`    | INFO     | `NativeDatabase` without background isolate — UI jank                      |
+| `avoid_drift_log_statements_production`   | WARNING  | `logStatements: true` without debug guard — data exposure                  |
+| `avoid_drift_get_single_without_unique`   | INFO     | `getSingle()`/`watchSingle()` without `.where()` — throws on multiple rows |
+| `prefer_drift_use_columns_false`          | INFO     | Joined tables reading unnecessary columns                                  |
+| `avoid_drift_lazy_database`               | INFO     | `LazyDatabase` with isolates — breaks stream synchronization               |
+| `prefer_drift_isolate_sharing`            | INFO     | Multiple `NativeDatabase` instances on same file — breaks stream sync      |
+| `avoid_drift_validate_schema_production`  | WARNING  | Debug-only `validateDatabaseSchema()` call in production                   |
+| `avoid_drift_replace_without_all_columns` | INFO     | `replace()` instead of `write()` — unset columns reset to defaults         |
+| `avoid_drift_missing_updates_param`       | INFO     | `customUpdate` without `updates` parameter — streams won't refresh         |
+| `prefer_drift_foreign_key_declaration`    | INFO     | Foreign key column without `.references()` declaration                     |
 
 ### Comprehensive Tier (7 rules)
 
-| Rule | Severity | What It Catches |
-|------|----------|-----------------|
-| `avoid_drift_query_in_migration` | WARNING | High-level query APIs in `onUpgrade` — schema mismatch crash |
-| `require_drift_schema_version_bump` | INFO | Schema changes without incrementing `schemaVersion` |
-| `avoid_drift_foreign_key_in_migration` | INFO | `PRAGMA foreign_keys` inside migration transaction — silently fails |
-| `require_drift_reads_from` | INFO | `customSelect().watch()` without `readsFrom` — stream never updates |
-| `avoid_drift_unsafe_web_storage` | INFO | `unsafeIndexedDb` / `WebDatabase` — not multi-tab safe |
-| `avoid_drift_close_streams_in_tests` | INFO | `NativeDatabase.memory()` in tests without `closeStreamsSynchronously` |
-| `avoid_drift_nullable_converter_mismatch` | INFO | `TypeConverter<Foo?, int?>` (both nullable) — almost always wrong |
+| Rule                                      | Severity | What It Catches                                                        |
+| ----------------------------------------- | -------- | ---------------------------------------------------------------------- |
+| `avoid_drift_query_in_migration`          | WARNING  | High-level query APIs in `onUpgrade` — schema mismatch crash           |
+| `require_drift_schema_version_bump`       | INFO     | Schema changes without incrementing `schemaVersion`                    |
+| `avoid_drift_foreign_key_in_migration`    | INFO     | `PRAGMA foreign_keys` inside migration transaction — silently fails    |
+| `require_drift_reads_from`                | INFO     | `customSelect().watch()` without `readsFrom` — stream never updates    |
+| `avoid_drift_unsafe_web_storage`          | INFO     | `unsafeIndexedDb` / `WebDatabase` — not multi-tab safe                 |
+| `avoid_drift_close_streams_in_tests`      | INFO     | `NativeDatabase.memory()` in tests without `closeStreamsSynchronously` |
+| `avoid_drift_nullable_converter_mismatch` | INFO     | `TypeConverter<Foo?, int?>` (both nullable) — almost always wrong      |
 
 ### Shared Database Rules (7 rules)
 
 These rules apply to all database packages including Drift. They activate at the Recommended tier:
 
-| Rule | Severity | What It Catches |
-|------|----------|-----------------|
-| `avoid_database_in_build` | WARNING | Database queries inside `build()` methods |
-| `require_database_migration` | WARNING | Missing migration strategy |
-| `require_database_index` | INFO | Missing indexes on filtered columns |
-| `prefer_transaction_for_batch` | WARNING | Multiple writes not wrapped in a transaction |
-| `require_yield_after_db_write` | WARNING | Missing UI yield after database writes |
-| `suggest_yield_after_db_read` | INFO | Consider yielding after bulk reads |
-| `avoid_return_await_db` | INFO | Unnecessary `return await` on database calls |
+| Rule                           | Severity | What It Catches                              |
+| ------------------------------ | -------- | -------------------------------------------- |
+| `avoid_database_in_build`      | WARNING  | Database queries inside `build()` methods    |
+| `require_database_migration`   | WARNING  | Missing migration strategy                   |
+| `require_database_index`       | INFO     | Missing indexes on filtered columns          |
+| `prefer_transaction_for_batch` | WARNING  | Multiple writes not wrapped in a transaction |
+| `require_yield_after_db_write` | WARNING  | Missing UI yield after database writes       |
+| `suggest_yield_after_db_read`  | INFO     | Consider yielding after bulk reads           |
+| `avoid_return_await_db`        | INFO     | Unnecessary `return await` on database calls |
 
 ## Safe Patterns
 
