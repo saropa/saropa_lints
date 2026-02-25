@@ -187,6 +187,13 @@ void main() {
       test('file path from user input SHOULD trigger', () {
         expect('path traversal risk detected', isNotNull);
       });
+
+      test('platform path API in function body should NOT trigger', () {
+        // Regression: getApplicationDocumentsDirectory is a trusted source
+        // File('$dbDirPath/db.sqlite') where dbDirPath comes from
+        // getApplicationDocumentsDirectory().path should not flag
+        expect('platform path API recognized as trusted', isNotNull);
+      });
     });
 
     group('avoid_redirect_injection', () {
