@@ -13,9 +13,23 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 ## [Unreleased]
 
+### Added
+- `avoid_string_env_parsing`: warns when `fromEnvironment()` is called without `defaultValue` (Recommended)
+- `avoid_connectivity_equals_internet`: warns when `ConnectivityResult` is used as a proxy for internet access (Essential)
+- `avoid_platform_specific_imports`: warns when `dart:io` is imported in shared/web-capable code (Recommended)
+- `avoid_shared_prefs_sync_race`: warns when SharedPreferences writes are not awaited in async code (Recommended)
+- `avoid_multiple_animation_controllers`: warns when a State class has 3+ AnimationController fields (Professional)
+- `avoid_form_validation_on_change`: warns when `validate()` is called inside `onChanged` (Professional)
+- `avoid_stack_trace_in_production`: warns when stack traces are exposed to users (OWASP M10) (Recommended)
+- `avoid_expensive_did_change_dependencies`: warns when expensive operations run in `didChangeDependencies()` (Professional)
+- `avoid_permission_request_loop`: warns when `Permission.request()` is called inside a loop (Professional)
+- `avoid_entitlement_without_server`: warns when IAP purchases are verified client-side only (OWASP M1/M4) (Professional)
+
 ### Fixed
 - `prefer_trailing_comma_always`: suppress false positive when the last argument is a callback/closure whose body spans multiple lines
 - `init` walkthrough: skipped stylistic rules now marked as reviewed so they are not re-prompted on subsequent runs
+- `// ignore:` directives now work correctly on declarations with doc comments; previously, diagnostics reported on `MethodDeclaration`/`FunctionDeclaration`/`ClassDeclaration` nodes started at the doc comment offset, making `// ignore:` before the signature invisible to the analysis server (47 rules affected)
+- `avoid_long_parameter_list`: diagnostic now highlights the parameter list instead of the entire declaration
 
 ### Changed
 - `init` walkthrough: show GOOD example before BAD for clearer readability
