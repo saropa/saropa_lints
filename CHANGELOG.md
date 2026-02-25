@@ -14,6 +14,20 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
+### Added
+
+- 10 additional Drift lint rules covering common gotchas, Value semantics, migration safety, and Isar-to-Drift migration patterns (total: 31 Drift rules)
+  - `avoid_drift_value_null_vs_absent` (Recommended, WARNING) — detects `Value(null)` instead of `Value.absent()`
+  - `require_drift_equals_value` (Recommended, WARNING) — detects `.equals()` with enum/converter columns instead of `.equalsValue()`
+  - `require_drift_read_table_or_null` (Recommended, WARNING) — detects `readTable()` with leftOuterJoin instead of `readTableOrNull()`
+  - `require_drift_create_all_in_oncreate` (Recommended, WARNING) — detects `onCreate` callback missing `createAll()`
+  - `avoid_drift_validate_schema_production` (Professional, WARNING) — detects `validateDatabaseSchema()` without debug guard
+  - `avoid_drift_replace_without_all_columns` (Professional, INFO) — detects `.replace()` on update builder instead of `.write()`
+  - `avoid_drift_missing_updates_param` (Professional, INFO) — detects `customUpdate`/`customInsert` without `updates` parameter
+  - `avoid_isar_import_with_drift` (Recommended, WARNING) — detects files importing both Isar and Drift packages
+  - `prefer_drift_foreign_key_declaration` (Professional, INFO) — detects `Id`-suffixed columns without `references()`
+  - `require_drift_onupgrade_handler` (Recommended, WARNING) — detects schemaVersion > 1 without `onUpgrade` handler
+
 ---
 
 ## [6.0.0]

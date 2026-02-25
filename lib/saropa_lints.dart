@@ -1529,6 +1529,16 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidDriftUnsafeWebStorageRule.new,
   AvoidDriftCloseStreamsInTestsRule.new,
   AvoidDriftNullableConverterMismatchRule.new,
+  AvoidDriftValueNullVsAbsentRule.new,
+  RequireDriftEqualsValueRule.new,
+  RequireDriftReadTableOrNullRule.new,
+  RequireDriftCreateAllInOnCreateRule.new,
+  AvoidDriftValidateSchemaProductionRule.new,
+  AvoidDriftReplaceWithoutAllColumnsRule.new,
+  AvoidDriftMissingUpdatesParamRule.new,
+  AvoidIsarImportWithDriftRule.new,
+  PreferDriftForeignKeyDeclarationRule.new,
+  RequireDriftOnUpgradeHandlerRule.new,
 
   // Part 5 - sqflite Database rules
   RequireSqfliteWhereArgsRule.new,

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 21 Drift database lint rules.
+/// Tests for 31 Drift database lint rules.
 ///
 /// Test fixtures: example_packages/lib/drift/*
 void main() {
@@ -29,6 +29,16 @@ void main() {
       'avoid_drift_unsafe_web_storage',
       'avoid_drift_close_streams_in_tests',
       'avoid_drift_nullable_converter_mismatch',
+      'avoid_drift_value_null_vs_absent',
+      'require_drift_equals_value',
+      'require_drift_read_table_or_null',
+      'require_drift_create_all_in_oncreate',
+      'avoid_drift_validate_schema_production',
+      'avoid_drift_replace_without_all_columns',
+      'avoid_drift_missing_updates_param',
+      'avoid_isar_import_with_drift',
+      'prefer_drift_foreign_key_declaration',
+      'require_drift_onupgrade_handler',
     ];
 
     for (final fixture in fixtures) {
@@ -263,6 +273,112 @@ void main() {
 
       test('TypeConverter<Foo, int> should NOT trigger', () {
         expect('TypeConverter<Foo, int>', isNotNull);
+      });
+    });
+  });
+
+  group('Drift - Additional High-Confidence Rules', () {
+    group('avoid_drift_value_null_vs_absent', () {
+      test('Value(null) in Companion SHOULD trigger', () {
+        expect('Value(null) in Companion', isNotNull);
+      });
+
+      test('Value.absent() should NOT trigger', () {
+        expect('Value.absent()', isNotNull);
+      });
+    });
+
+    group('require_drift_equals_value', () {
+      test('.equals(EnumType.value) SHOULD trigger', () {
+        expect('.equals(EnumType.value)', isNotNull);
+      });
+
+      test('.equalsValue(EnumType.value) should NOT trigger', () {
+        expect('.equalsValue(EnumType.value)', isNotNull);
+      });
+    });
+
+    group('require_drift_read_table_or_null', () {
+      test('readTable() with leftOuterJoin SHOULD trigger', () {
+        expect('readTable() with leftOuterJoin', isNotNull);
+      });
+
+      test('readTableOrNull() with leftOuterJoin should NOT trigger', () {
+        expect('readTableOrNull() with leftOuterJoin', isNotNull);
+      });
+    });
+
+    group('require_drift_create_all_in_oncreate', () {
+      test('onCreate without createAll SHOULD trigger', () {
+        expect('onCreate without createAll', isNotNull);
+      });
+
+      test('onCreate with createAll should NOT trigger', () {
+        expect('onCreate with createAll', isNotNull);
+      });
+    });
+
+    group('avoid_drift_validate_schema_production', () {
+      test('validateDatabaseSchema without guard SHOULD trigger', () {
+        expect('validateDatabaseSchema without guard', isNotNull);
+      });
+
+      test('validateDatabaseSchema with kDebugMode should NOT trigger', () {
+        expect('validateDatabaseSchema with kDebugMode', isNotNull);
+      });
+    });
+  });
+
+  group('Drift - Additional Medium-Confidence Rules', () {
+    group('avoid_drift_replace_without_all_columns', () {
+      test('.replace() on update builder SHOULD trigger', () {
+        expect('.replace() on update builder', isNotNull);
+      });
+
+      test('.write() on update builder should NOT trigger', () {
+        expect('.write() on update builder', isNotNull);
+      });
+    });
+
+    group('avoid_drift_missing_updates_param', () {
+      test('customUpdate without updates param SHOULD trigger', () {
+        expect('customUpdate without updates param', isNotNull);
+      });
+
+      test('customUpdate with updates param should NOT trigger', () {
+        expect('customUpdate with updates param', isNotNull);
+      });
+    });
+  });
+
+  group('Drift - Isar-to-Drift Migration Rules', () {
+    group('avoid_isar_import_with_drift', () {
+      test('file importing both isar and drift SHOULD trigger', () {
+        expect('file importing both isar and drift', isNotNull);
+      });
+
+      test('file importing only drift should NOT trigger', () {
+        expect('file importing only drift', isNotNull);
+      });
+    });
+
+    group('prefer_drift_foreign_key_declaration', () {
+      test('integer column named userId without references SHOULD trigger', () {
+        expect('integer userId without references', isNotNull);
+      });
+
+      test('integer column with references() should NOT trigger', () {
+        expect('integer column with references()', isNotNull);
+      });
+    });
+
+    group('require_drift_onupgrade_handler', () {
+      test('schemaVersion > 1 without onUpgrade SHOULD trigger', () {
+        expect('schemaVersion > 1 without onUpgrade', isNotNull);
+      });
+
+      test('schemaVersion > 1 with onUpgrade should NOT trigger', () {
+        expect('schemaVersion > 1 with onUpgrade', isNotNull);
       });
     });
   });

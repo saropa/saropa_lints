@@ -1537,6 +1537,16 @@ saropa_lints:
     - avoid_drift_unsafe_web_storage: false            # INFO - multi-tab unsafe (v5.1.0)
     - avoid_drift_close_streams_in_tests: false        # INFO - timer leak (v5.1.0)
     - avoid_drift_nullable_converter_mismatch: false   # INFO - nullable mismatch (v5.1.0)
+    - avoid_drift_value_null_vs_absent: false          # WARNING - Value(null) vs absent (v6.0.0)
+    - require_drift_equals_value: false                # WARNING - equals vs equalsValue (v6.0.0)
+    - require_drift_read_table_or_null: false          # WARNING - readTable crash (v6.0.0)
+    - require_drift_create_all_in_oncreate: false      # WARNING - missing createAll (v6.0.0)
+    - avoid_drift_validate_schema_production: false    # WARNING - schema validation (v6.0.0)
+    - avoid_drift_replace_without_all_columns: false   # INFO - replace vs write (v6.0.0)
+    - avoid_drift_missing_updates_param: false         # INFO - missing updates (v6.0.0)
+    - avoid_isar_import_with_drift: false              # WARNING - mixed imports (v6.0.0)
+    - prefer_drift_foreign_key_declaration: false      # INFO - missing references (v6.0.0)
+    - require_drift_onupgrade_handler: false           # WARNING - missing onUpgrade (v6.0.0)
 
     # --- auto_route ---
     - require_auto_route_guard_resume: false           # WARNING - missing resolver.next() in guard (v5.1.0)
