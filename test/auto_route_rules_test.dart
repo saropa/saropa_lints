@@ -34,7 +34,7 @@ void main() {
   group('Auto Route Rules - Rule Instantiation', () {
     test('AvoidAutoRouteContextNavigationRule instantiates correctly', () {
       final rule = AvoidAutoRouteContextNavigationRule();
-      expect(rule.code.lowerCaseName, 'avoid_auto_route_context_navigation');
+      expect(rule.code.name, 'avoid_auto_route_context_navigation');
       expect(
         rule.code.problemMessage,
         contains('[avoid_auto_route_context_navigation]'),
@@ -45,7 +45,7 @@ void main() {
 
     test('AvoidAutoRouteKeepHistoryMisuseRule instantiates correctly', () {
       final rule = AvoidAutoRouteKeepHistoryMisuseRule();
-      expect(rule.code.lowerCaseName, 'avoid_auto_route_keep_history_misuse');
+      expect(rule.code.name, 'avoid_auto_route_keep_history_misuse');
       expect(
         rule.code.problemMessage,
         contains('[avoid_auto_route_keep_history_misuse]'),
@@ -56,7 +56,7 @@ void main() {
 
     test('RequireAutoRouteGuardResumeRule instantiates correctly', () {
       final rule = RequireAutoRouteGuardResumeRule();
-      expect(rule.code.lowerCaseName, 'require_auto_route_guard_resume');
+      expect(rule.code.name, 'require_auto_route_guard_resume');
       expect(
         rule.code.problemMessage,
         contains('[require_auto_route_guard_resume]'),
@@ -67,7 +67,7 @@ void main() {
 
     test('RequireAutoRouteFullHierarchyRule instantiates correctly', () {
       final rule = RequireAutoRouteFullHierarchyRule();
-      expect(rule.code.lowerCaseName, 'require_auto_route_full_hierarchy');
+      expect(rule.code.name, 'require_auto_route_full_hierarchy');
       expect(
         rule.code.problemMessage,
         contains('[require_auto_route_full_hierarchy]'),

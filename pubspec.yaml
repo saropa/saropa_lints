@@ -33,13 +33,13 @@ environment:
 # Runtime dependencies for lint rule implementation
 dependencies:
   # https://pub.dev/packages/analysis_server_plugin/changelog
-  analysis_server_plugin: ^0.3.5 # Native Dart analyzer plugin framework
+  analysis_server_plugin: 0.3.4 # Native Dart analyzer plugin framework (pinned for analyzer v9)
 
   # https://pub.dev/packages/analyzer/changelog
-  analyzer: ^10.0.0 # Dart AST, types, and diagnostic APIs
+  analyzer: ^9.0.0 # Dart AST, types, and diagnostic APIs
 
   # https://pub.dev/packages/analyzer_plugin/changelog
-  analyzer_plugin: ^0.14.0 # ChangeBuilder and FixKind for quick fixes
+  analyzer_plugin: 0.13.11 # ChangeBuilder and FixKind for quick fixes (pinned for analyzer v9)
 
   # https://pub.dev/packages/json2yaml/changelog
   json2yaml: ^3.0.1 # YAML serialization for CLI tool
