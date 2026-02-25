@@ -72,19 +72,20 @@ Widget build(BuildContext context) {
       children: [iconWidget, countWidget],  // Used correctly in Stack
     );
   }
+
   return iconWidget;
 }
 ```
 
 ## Affected files in saropa contacts app
 
-| File | Line | Category |
-|------|------|----------|
-| `common_pinch_scale_gesture.dart` | 274 | 1 (build returns Positioned.fill, used via OverlayEntry) |
-| `common_header_bar.dart` | 465 | 1 (BottomRightIcons.build returns Positioned, used in Stack at line 319) |
-| `common_icon.dart` | 240 | 2 (assigned to countWidget, used in Stack at line 316) |
-| `search_background_image.dart` | 34 | 1 (build returns Positioned, used in Stack in app_search_bar.dart:190) |
-| `search_contact_avatar.dart` | 40 | 1 (build returns Positioned, used in Indexer — a Stack subclass) |
+| File                              | Line | Category                                                                 |
+| --------------------------------- | ---- | ------------------------------------------------------------------------ |
+| `common_pinch_scale_gesture.dart` | 274  | 1 (build returns Positioned.fill, used via OverlayEntry)                 |
+| `common_header_bar.dart`          | 465  | 1 (BottomRightIcons.build returns Positioned, used in Stack at line 319) |
+| `common_icon.dart`                | 240  | 2 (assigned to countWidget, used in Stack at line 316)                   |
+| `search_background_image.dart`    | 34   | 1 (build returns Positioned, used in Stack in app_search_bar.dart:190)   |
+| `search_contact_avatar.dart`      | 40   | 1 (build returns Positioned, used in Indexer — a Stack subclass)         |
 
 ## Root cause
 
@@ -127,6 +128,7 @@ if (current is MethodDeclaration) {
   if (current.name.lexeme != 'build') {
     return _AncestorResult.indeterminate;
   }
+
   if (!passedThroughWidget) {
     return _AncestorResult.indeterminate;
   }
@@ -143,13 +145,13 @@ the root widget — return `indeterminate`. When true, an intermediate widget
 
 `_findWidgetAncestor` is shared by 5 rules. Impact analysis:
 
-| Rule | Result used | Impact |
-|------|------------|--------|
-| `avoid_table_cell_outside_table` | `found`, `indeterminate` | Benefits from same fix (same false positive pattern) |
-| `avoid_positioned_outside_stack` | `found`, `indeterminate` | Fixed |
-| `avoid_spacer_in_wrap` | `wrongParent` only | Unaffected |
-| `avoid_scrollable_in_intrinsic` | `found` only | Unaffected |
-| `avoid_unconstrained_dialog_column` | `found` only | Unaffected |
+| Rule                                | Result used              | Impact                                               |
+| ----------------------------------- | ------------------------ | ---------------------------------------------------- |
+| `avoid_table_cell_outside_table`    | `found`, `indeterminate` | Benefits from same fix (same false positive pattern) |
+| `avoid_positioned_outside_stack`    | `found`, `indeterminate` | Fixed                                                |
+| `avoid_spacer_in_wrap`              | `wrongParent` only       | Unaffected                                           |
+| `avoid_scrollable_in_intrinsic`     | `found` only             | Unaffected                                           |
+| `avoid_unconstrained_dialog_column` | `found` only             | Unaffected                                           |
 
 ## Remaining false negative
 

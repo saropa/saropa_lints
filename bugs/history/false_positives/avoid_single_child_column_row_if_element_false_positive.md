@@ -146,13 +146,13 @@ The problem is that the `else` branch lumps all non-spread `CollectionElement`
 types together as single static children. In the Dart analyzer AST, collection
 literals can contain these `CollectionElement` subtypes:
 
-| AST node type     | Can produce multiple children? | Handled by rule? |
-|-------------------|-------------------------------|------------------|
-| `Expression`      | No (always exactly 1)         | Yes (counted)    |
-| `SpreadElement`   | Yes (0..N at runtime)         | Yes (skipped)    |
+| AST node type     | Can produce multiple children?                                  | Handled by rule?      |
+| ----------------- | --------------------------------------------------------------- | --------------------- |
+| `Expression`      | No (always exactly 1)                                           | Yes (counted)         |
+| `SpreadElement`   | Yes (0..N at runtime)                                           | Yes (skipped)         |
 | `IfElement`       | Yes (different counts per branch, branches may contain spreads) | **No — counted as 1** |
-| `ForElement`      | Yes (0..N iterations at runtime) | **No — counted as 1** |
-| `MapLiteralEntry` | N/A (not used in widget lists) | N/A             |
+| `ForElement`      | Yes (0..N iterations at runtime)                                | **No — counted as 1** |
+| `MapLiteralEntry` | N/A (not used in widget lists)                                  | N/A                   |
 
 When the `children` list contains a single `IfElement`, the rule sees
 `nonSpreadCount == 1` and `hasSpread == false`, so it reports the violation.
@@ -229,6 +229,7 @@ bool _canProduceMultipleChildren(CollectionElement element) {
     if (_canProduceMultipleChildren(element.thenElement)) return true;
     if (_canProduceMultipleChildren(element.elseElement!)) return true;
   }
+
   return false;
 }
 ```

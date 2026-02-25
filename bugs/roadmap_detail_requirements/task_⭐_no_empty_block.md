@@ -1,6 +1,7 @@
 # Task: `no_empty_block`
 
 ## Summary
+
 - **Rule Name**: `no_empty_block`
 - **Tier**: Recommended
 - **Severity**: WARNING
@@ -15,9 +16,11 @@ The project MEMORY file explicitly states:
 > `no_empty_block` already exists in `unnecessary_code_rules.dart` — check before implementing
 
 **Before doing any work**, run:
+
 ```
 Grep for "no_empty_block" in lib/src/rules/
 ```
+
 If found, this ROADMAP entry should be deleted immediately and the task file archived. The implementation may already be complete and just not removed from ROADMAP.
 
 If the existing rule is a different `no_empty_block` from a different package (e.g., `dart_code_metrics`), then this is a NEW rule that overlaps. Investigate before proceeding.
@@ -25,6 +28,7 @@ If the existing rule is a different `no_empty_block` from a different package (e
 ## Problem Statement
 
 Empty blocks (`{}` with no statements, no comments) typically indicate one of:
+
 1. **Unfinished implementation** — placeholder that was never completed
 2. **Dead code** — a branch that should have been removed
 3. **Intentional no-op** — rare, and should be documented with a comment
@@ -38,10 +42,12 @@ An empty `catch {}` block silently swallows exceptions. An empty `if {}` block s
 ## Trigger Conditions
 
 Detect `Block` AST nodes (`{ }`) that:
+
 1. Contain zero statements AND
 2. Are NOT preceded by a `// ignore:` or comment explaining the intent (e.g., `// intentionally empty`)
 
 ### Block Types to Check
+
 - `catch {}` — **highest priority**, silently swallows exceptions
 - `if (...) {}` — logic error indicator
 - `else {}` — remove the else branch
@@ -51,6 +57,7 @@ Detect `Block` AST nodes (`{ }`) that:
 - Constructor body `MyClass() {}` — should be `: super()` or removed
 
 ### Exemptions
+
 - `abstract` methods — no body at all (no block)
 - Test file `setUp() {}` / `tearDown() {}` — intentional no-op when setup is not needed
 - `@override` methods with empty body indicating "do nothing" — should have a comment
@@ -72,12 +79,14 @@ context.registry.addBlock((node) {
 `_hasIntentComment`: check for inline comments inside the block or immediately preceding it using `node.leftBracket.precedingComments` and `node.rightBracket.precedingComments`.
 
 `_isExemptContext`: check if the block is:
+
 - Abstract method body (impossible — abstract has no body)
 - In a generated file (`.g.dart`, `.freezed.dart`)
 - Test `setUp`/`tearDown` callbacks
 - A `noSuchMethod` override returning `super.noSuchMethod(invocation)` ... actually that's not empty
 
 ### Detecting Intent Comments
+
 ```dart
 bool _hasIntentComment(Block node) {
   // Check inline comments between { }
@@ -86,6 +95,7 @@ bool _hasIntentComment(Block node) {
     if (token.precedingComments != null) return true;
     token = token.next;
   }
+
   return false;
 }
 ```
@@ -93,6 +103,7 @@ bool _hasIntentComment(Block node) {
 ## Code Examples
 
 ### Bad (Should trigger)
+
 ```dart
 // Empty catch — silently swallows exception
 try {
@@ -110,6 +121,7 @@ MyWidget() {}  // ← trigger
 ```
 
 ### Good (Should NOT trigger)
+
 ```dart
 // Intentional no-op with comment
 try {
@@ -133,29 +145,31 @@ void dispose() {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behavior | Notes |
-|---|---|---|
-| `catch (e) { rethrow; }` | **Suppress** — not empty | `rethrow` is a statement |
-| Empty `test('description', () {})` | **Trigger** — test body should have assertions | Unless it's a placeholder |
-| Empty `setUp(() {})` | **Suppress** — intentional no-op is common | Check function name context |
-| Empty `main() {}` in example file | **Suppress** | Generated example stubs |
-| Empty `@override void didUpdateWidget(...)` | **Trigger** — if overriding with nothing, remove the override | High false positive risk |
-| `void onPressed() {}` in Widget → intentional "do nothing" button | **Trigger** — should have a comment | Users will need to add comments to suppress |
-| Abstract interface method with `{}` body | **Suppress** — not possible in abstract, but extension types can have `{}` | Check context |
-| Generated files | **Suppress** | `.g.dart`, `.freezed.dart` |
-| Mixin with empty override body | **Trigger** | Should have comment |
-| `noSuchMethod(Invocation i) {}` — swallowing all method calls | **Trigger** with higher priority | This is particularly dangerous |
-| Empty function expression `() {}` in argument position | **Trigger** if it's the only expression and serves no purpose | But NOT if it's a deliberate no-op callback (`onPressed: () {}` is common!) |
+| Scenario                                                          | Expected Behavior                                                          | Notes                                                                       |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `catch (e) { rethrow; }`                                          | **Suppress** — not empty                                                   | `rethrow` is a statement                                                    |
+| Empty `test('description', () {})`                                | **Trigger** — test body should have assertions                             | Unless it's a placeholder                                                   |
+| Empty `setUp(() {})`                                              | **Suppress** — intentional no-op is common                                 | Check function name context                                                 |
+| Empty `main() {}` in example file                                 | **Suppress**                                                               | Generated example stubs                                                     |
+| Empty `@override void didUpdateWidget(...)`                       | **Trigger** — if overriding with nothing, remove the override              | High false positive risk                                                    |
+| `void onPressed() {}` in Widget → intentional "do nothing" button | **Trigger** — should have a comment                                        | Users will need to add comments to suppress                                 |
+| Abstract interface method with `{}` body                          | **Suppress** — not possible in abstract, but extension types can have `{}` | Check context                                                               |
+| Generated files                                                   | **Suppress**                                                               | `.g.dart`, `.freezed.dart`                                                  |
+| Mixin with empty override body                                    | **Trigger**                                                                | Should have comment                                                         |
+| `noSuchMethod(Invocation i) {}` — swallowing all method calls     | **Trigger** with higher priority                                           | This is particularly dangerous                                              |
+| Empty function expression `() {}` in argument position            | **Trigger** if it's the only expression and serves no purpose              | But NOT if it's a deliberate no-op callback (`onPressed: () {}` is common!) |
 
 ## Unit Tests
 
 ### Violations
+
 1. `catch (e) {}` → 1 lint
 2. `if (condition) {}` → 1 lint
 3. `void method() {}` (non-abstract, non-test) → 1 lint
 4. Empty for loop `for (var i = 0; i < 10; i++) {}` → 1 lint
 
 ### Non-Violations
+
 1. `catch (e) { // intentionally ignored\n }` → no lint
 2. `catch (e) { log(e.toString()); }` → no lint
 3. `void setUp() {}` in test file → no lint (or configure)
@@ -165,6 +179,7 @@ void dispose() {
 ## Quick Fix
 
 Offer "Add a comment to document intent":
+
 ```dart
 catch (e) {
   // ignore: intentionally empty
@@ -172,6 +187,7 @@ catch (e) {
 ```
 
 Or for empty methods, offer "Add // TODO comment":
+
 ```dart
 void handleError() {
   // TODO: implement

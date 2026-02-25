@@ -90,14 +90,14 @@ compile error.
 
 Found in the `contacts` project across 3 files, 6 warnings:
 
-| File | Line | Expression | Type |
-|------|------|-----------|------|
-| `common_icon_button.dart` | 196 | `options.isAnimated == false` | `bool?` field |
-| `common_checkbox_list_tile.dart` | 128 | `value == true` | `bool?` tristate |
-| `common_checkbox_list_tile.dart` | 130 | `value == false` | `bool?` tristate |
-| `today_islamic_prayer_times_information.dart` | 483 | `.nameAlternates?.contains(holidayName) == true` | `?.` → `bool?` |
-| `today_islamic_prayer_times_information.dart` | 488 | `.nameAlternates?.contains(holidayName) == true` | `?.` → `bool?` |
-| `today_islamic_prayer_times_information.dart` | 490 | `.nameAlternates?.contains(holidayName) == true` | `?.` → `bool?` |
+| File                                          | Line | Expression                                       | Type             |
+| --------------------------------------------- | ---- | ------------------------------------------------ | ---------------- |
+| `common_icon_button.dart`                     | 196  | `options.isAnimated == false`                    | `bool?` field    |
+| `common_checkbox_list_tile.dart`              | 128  | `value == true`                                  | `bool?` tristate |
+| `common_checkbox_list_tile.dart`              | 130  | `value == false`                                 | `bool?` tristate |
+| `today_islamic_prayer_times_information.dart` | 483  | `.nameAlternates?.contains(holidayName) == true` | `?.` → `bool?`   |
+| `today_islamic_prayer_times_information.dart` | 488  | `.nameAlternates?.contains(holidayName) == true` | `?.` → `bool?`   |
+| `today_islamic_prayer_times_information.dart` | 490  | `.nameAlternates?.contains(holidayName) == true` | `?.` → `bool?`   |
 
 ## Root cause
 
@@ -118,6 +118,7 @@ context.registry.addBinaryExpression((node) {
 ```
 
 The rule makes no distinction between:
+
 - `nonNullBool == true` (redundant, should lint)
 - `nullableBool == true` (necessary, should NOT lint)
 
@@ -172,16 +173,16 @@ This requires importing `NullabilitySuffix` from `package:analyzer/dart/element/
 
 ## Decision table after fix
 
-| Expression | Left type | Currently reports | Should report |
-|-----------|-----------|:-:|:-:|
-| `isValid == true` | `bool` | Yes | Yes |
-| `isValid == false` | `bool` | Yes | Yes |
-| `isValid != true` | `bool` | Yes | Yes |
-| `isValid != false` | `bool` | Yes | Yes |
-| `isValid == true` | `bool?` | Yes | **No** |
-| `isValid == false` | `bool?` | Yes | **No** |
-| `list?.contains(x) == true` | `bool?` | Yes | **No** |
-| `map?.containsKey(k) == false` | `bool?` | Yes | **No** |
+| Expression                     | Left type | Currently reports | Should report |
+| ------------------------------ | --------- | :---------------: | :-----------: |
+| `isValid == true`              | `bool`    |        Yes        |      Yes      |
+| `isValid == false`             | `bool`    |        Yes        |      Yes      |
+| `isValid != true`              | `bool`    |        Yes        |      Yes      |
+| `isValid != false`             | `bool`    |        Yes        |      Yes      |
+| `isValid == true`              | `bool?`   |        Yes        |    **No**     |
+| `isValid == false`             | `bool?`   |        Yes        |    **No**     |
+| `list?.contains(x) == true`    | `bool?`   |        Yes        |    **No**     |
+| `map?.containsKey(k) == false` | `bool?`   |        Yes        |    **No**     |
 
 ## Test fixture updates
 
@@ -194,6 +195,7 @@ bool checkNullableTrue(bool? isValid) {
   if (isValid == true) {
     return true;
   }
+
   return false;
 }
 

@@ -30,10 +30,11 @@ class MonthUtils {
 ```
 
 The function returns null in **two** distinct ways:
+
 1. **Explicit null:** when `month == null`, the ternary evaluates to `null`
 2. **Map lookup miss:** when `month` is non-null but not in 1-12, `monthShortNames[month]` returns `null`
 
-The rule reports: *"Return type is nullable but function never returns null."*
+The rule reports: _"Return type is nullable but function never returns null."_
 
 ### Case 2: Map index expression returning nullable
 
@@ -100,15 +101,15 @@ if (body is ExpressionFunctionBody) {
 
 This only recognizes the trivial case `=> null`. It misses all of the following:
 
-| Expression pattern | Returns null? | Detected? |
-|---|:---:|:---:|
-| `=> null` | Yes | Yes |
-| `=> condition ? null : value` | Yes | **No** |
-| `=> condition ? value : null` | Yes | **No** |
-| `=> map[key]` (Map operator []) | Yes | **No** |
-| `=> list.firstOrNull` | Yes | **No** |
-| `=> nullableVar` | Yes | **No** |
-| `=> someMethod()` where method returns `T?` | Yes | **No** |
+| Expression pattern                          | Returns null? | Detected? |
+| ------------------------------------------- | :-----------: | :-------: |
+| `=> null`                                   |      Yes      |    Yes    |
+| `=> condition ? null : value`               |      Yes      |  **No**   |
+| `=> condition ? value : null`               |      Yes      |  **No**   |
+| `=> map[key]` (Map operator [])             |      Yes      |  **No**   |
+| `=> list.firstOrNull`                       |      Yes      |  **No**   |
+| `=> nullableVar`                            |      Yes      |  **No**   |
+| `=> someMethod()` where method returns `T?` |      Yes      |  **No**   |
 
 ## Suggested fix
 
@@ -122,6 +123,7 @@ if (body is ExpressionFunctionBody) {
   if (expressionType != null && expressionType.nullabilitySuffix == NullabilitySuffix.question) {
     return true;  // Expression can produce null
   }
+
   return body.expression is NullLiteral;
 }
 ```

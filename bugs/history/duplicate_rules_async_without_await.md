@@ -31,31 +31,34 @@ static Future<String> _buildShortcutsTooltip() async {
   for (final provider in AppSearchProviderEnum.values) {
     // ... synchronous work only ...
   }
+
   return sb.toString();
 }
 ```
 
 ## Rule Comparison
 
-| Aspect | `avoid_redundant_async` | `prefer_async_only_when_awaiting` |
-|---|---|---|
-| **File** | `async_rules.dart:324-412` | `stylistic_control_flow_rules.dart:811-893` |
-| **Impact** | `LintImpact.high` | `LintImpact.opinionated` |
-| **Tier** | `professionalRules` (line 800) | `stylisticRules` (line 145) |
-| **Quick Fix** | None | Yes (`_PreferAsyncOnlyWhenAwaitingFix`) |
-| **Registry hook** | `addFunctionDeclaration` + `addMethodDeclaration` | `addFunctionBody` |
-| **Body types** | All async bodies (excludes generators) | `BlockFunctionBody` only |
-| **Await detection** | `RecursiveAstVisitor` (full AST walk) | Manual statement iteration + recursive expression check |
-| **Report target** | Reports at function/method node | Reports at function body node |
+| Aspect              | `avoid_redundant_async`                           | `prefer_async_only_when_awaiting`                       |
+| ------------------- | ------------------------------------------------- | ------------------------------------------------------- |
+| **File**            | `async_rules.dart:324-412`                        | `stylistic_control_flow_rules.dart:811-893`             |
+| **Impact**          | `LintImpact.high`                                 | `LintImpact.opinionated`                                |
+| **Tier**            | `professionalRules` (line 800)                    | `stylisticRules` (line 145)                             |
+| **Quick Fix**       | None                                              | Yes (`_PreferAsyncOnlyWhenAwaitingFix`)                 |
+| **Registry hook**   | `addFunctionDeclaration` + `addMethodDeclaration` | `addFunctionBody`                                       |
+| **Body types**      | All async bodies (excludes generators)            | `BlockFunctionBody` only                                |
+| **Await detection** | `RecursiveAstVisitor` (full AST walk)             | Manual statement iteration + recursive expression check |
+| **Report target**   | Reports at function/method node                   | Reports at function body node                           |
 
 ### Detection Scope Differences
 
 `avoid_redundant_async` is slightly broader:
+
 - Handles both `FunctionDeclaration` and `MethodDeclaration` explicitly
 - Works on any `FunctionBody` type (block and expression bodies)
 - Explicitly excludes generator functions (`async*`) via `!body.isGenerator`
 
 `prefer_async_only_when_awaiting` is narrower:
+
 - Only checks `BlockFunctionBody` (misses expression-bodied async functions)
 - No explicit generator exclusion (relies on `BlockFunctionBody` filter)
 - Manual statement-by-statement traversal may miss await in uncommon statement types (e.g., `SwitchStatement`, `DoStatement`, `YieldStatement`)
@@ -65,6 +68,7 @@ static Future<String> _buildShortcutsTooltip() async {
 `avoid_redundant_async` uses a `RecursiveAstVisitor` (`_AwaitFinder`) that walks the entire AST subtree. This is thorough and will find `await` in any nested position.
 
 `prefer_async_only_when_awaiting` manually recurses through known statement types (`ExpressionStatement`, `ReturnStatement`, `VariableDeclarationStatement`, `IfStatement`, `Block`, `ForStatement`, `WhileStatement`, `TryStatement`). This could miss `await` inside:
+
 - `SwitchStatement` / `SwitchExpression`
 - `DoStatement`
 - `ForEachStatement` (separate from `ForStatement`)
@@ -84,6 +88,7 @@ This means `prefer_async_only_when_awaiting` could false-positive on functions t
 ### Option A: Remove `prefer_async_only_when_awaiting` (recommended)
 
 `avoid_redundant_async` has:
+
 - Broader detection scope (expression bodies, explicit generator exclusion)
 - More robust await detection (full AST visitor vs manual statement list)
 - Higher impact classification matching the actual significance
