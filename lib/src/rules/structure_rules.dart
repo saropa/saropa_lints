@@ -7,7 +7,6 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/line_info.dart';
 
-import '../project_context.dart' show ProjectContext;
 import '../saropa_lint_rule.dart';
 
 /// Warns when a file only contains export statements (barrel file).
