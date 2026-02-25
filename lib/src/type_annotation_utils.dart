@@ -9,11 +9,14 @@ bool isOuterTypeNullable(TypeAnnotation typeAnnotation) {
   if (typeAnnotation is NamedType) {
     return typeAnnotation.question != null;
   }
+
   if (typeAnnotation is GenericFunctionType) {
     return typeAnnotation.question != null;
   }
+
   if (typeAnnotation is RecordTypeAnnotation) {
     return typeAnnotation.question != null;
   }
+
   return false;
 }

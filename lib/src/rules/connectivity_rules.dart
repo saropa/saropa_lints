@@ -113,3 +113,99 @@ class RequireConnectivityErrorHandlingRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_connectivity_equals_internet
+// =============================================================================
+
+/// Warns when `ConnectivityResult` is used as a proxy for internet access.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Alias: connectivity_not_internet, check_real_connectivity
+///
+/// `ConnectivityResult` only indicates the transport layer (WiFi, mobile,
+/// ethernet), not whether the internet is actually reachable. A device can
+/// be connected to WiFi behind a captive portal or on a mobile network with
+/// no data. Use an actual HTTP ping or DNS lookup to verify connectivity.
+///
+/// **BAD:**
+/// ```dart
+/// final result = await Connectivity().checkConnectivity();
+/// if (result != ConnectivityResult.none) {
+///   // WRONG: assumes internet is available
+///   await fetchData();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   final result = await InternetAddress.lookup('example.com');
+///   if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+///     await fetchData();
+///   }
+/// } on SocketException {
+///   // No internet
+/// }
+/// ```
+class AvoidConnectivityEqualsInternetRule extends SaropaLintRule {
+  AvoidConnectivityEqualsInternetRule() : super(code: _code);
+
+  /// Trusting transport type as internet causes silent failures.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_connectivity_equals_internet',
+    '[avoid_connectivity_equals_internet] ConnectivityResult compared as a '
+        'proxy for internet availability. ConnectivityResult only indicates '
+        'the transport layer (WiFi, mobile, ethernet) and does not verify '
+        'actual internet reachability. A device can report WiFi while behind '
+        'a captive portal, or mobile data with no route to the internet. '
+        'Use an actual HTTP ping or DNS lookup to verify connectivity. {v1}',
+    correctionMessage:
+        'Use InternetAddress.lookup or an HTTP health-check endpoint '
+        'instead of comparing ConnectivityResult values.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _connectivityValues = <String>{
+    'none',
+    'wifi',
+    'mobile',
+    'ethernet',
+    'bluetooth',
+    'vpn',
+    'other',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (node.prefix.name != 'ConnectivityResult') return;
+      if (!_connectivityValues.contains(node.identifier.name)) return;
+
+      // Walk up to find enclosing binary expression (== or !=)
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is BinaryExpression) {
+          final String op = current.operator.lexeme;
+          if (op == '==' || op == '!=') {
+            reporter.atNode(current);
+            return;
+          }
+        }
+        // Stop at statement boundary
+        if (current is Statement || current is FunctionBody) break;
+        current = current.parent;
+      }
+    });
+  }
+}

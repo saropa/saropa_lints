@@ -997,3 +997,121 @@ class AvoidSharedPrefsLargeDataRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_shared_prefs_sync_race
+// =============================================================================
+
+/// Warns when SharedPreferences write methods are not awaited in async code.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Alias: prefs_await_writes, shared_prefs_race_condition
+///
+/// SharedPreferences write methods (`setBool`, `setString`, etc.) return
+/// `Future<bool>`. When multiple writes are not awaited, they execute
+/// concurrently with non-deterministic ordering. The last write wins,
+/// potentially losing earlier values. This is especially dangerous during
+/// logout/cleanup flows where multiple preferences are cleared.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> saveSettings() async {
+///   prefs.setBool('darkMode', true);    // Not awaited!
+///   prefs.setString('locale', 'en');    // Race condition!
+///   prefs.setInt('fontSize', 16);       // May overwrite others!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> saveSettings() async {
+///   await prefs.setBool('darkMode', true);
+///   await prefs.setString('locale', 'en');
+///   await prefs.setInt('fontSize', 16);
+/// }
+/// ```
+class AvoidSharedPrefsSyncRaceRule extends SaropaLintRule {
+  AvoidSharedPrefsSyncRaceRule() : super(code: _code);
+
+  /// Race conditions cause silent data loss.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_shared_prefs_sync_race',
+    '[avoid_shared_prefs_sync_race] SharedPreferences write method called '
+        'without await in async context. Un-awaited writes execute concurrently '
+        'with non-deterministic ordering, so the last write wins and earlier '
+        'values may be silently lost. This is especially dangerous during '
+        'logout or cleanup flows where multiple preferences are cleared. {v1}',
+    correctionMessage:
+        'Add await before the SharedPreferences write call to ensure '
+        'sequential execution.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _writeMethods = <String>{
+    'setBool',
+    'setString',
+    'setInt',
+    'setDouble',
+    'setStringList',
+    'remove',
+    'clear',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_writeMethods.contains(node.methodName.name)) return;
+
+      // Check if target looks like SharedPreferences
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('pref') &&
+          !targetSource.contains('sharedpreferences')) {
+        return;
+      }
+
+      // Already awaited — OK
+      if (node.parent is AwaitExpression) return;
+
+      // Explicitly marked fire-and-forget — OK
+      final AstNode? grandparent = node.parent?.parent;
+      if (grandparent is MethodInvocation &&
+          grandparent.methodName.name == 'unawaited') {
+        return;
+      }
+
+      // Check if inside async function
+      if (!_isInsideAsyncFunction(node)) return;
+
+      reporter.atNode(node);
+    });
+  }
+
+  bool _isInsideAsyncFunction(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionExpression) {
+        return current.body.isAsynchronous;
+      }
+      if (current is MethodDeclaration) {
+        return current.body.isAsynchronous;
+      }
+      if (current is FunctionDeclaration) {
+        return current.functionExpression.body.isAsynchronous;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}

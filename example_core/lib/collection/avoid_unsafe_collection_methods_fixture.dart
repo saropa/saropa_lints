@@ -22,6 +22,7 @@ String _goodLengthGuard(List<String> parts) {
   if (parts.length == 1) {
     return parts.first; // Safe — length check guarantees non-empty
   }
+
   return parts.join(', ');
 }
 
@@ -30,6 +31,7 @@ String _goodIsNotEmptyGuard(List<String> parts) {
   if (parts.isNotEmpty) {
     return parts.first; // Safe — isNotEmpty guarantees non-empty
   }
+
   return '';
 }
 

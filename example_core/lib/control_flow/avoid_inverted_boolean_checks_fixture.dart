@@ -112,11 +112,13 @@ dynamic b;
 // expect_lint: avoid_inverted_boolean_checks
 void _bad281() {
   if (!(a == b)) {}
+
   if (!(a > b)) {}
 }
 
 // GOOD: Should NOT trigger avoid_inverted_boolean_checks
 void _good281() {
   if (a != b) {}
+
   if (a <= b) {}
 }

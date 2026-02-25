@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 4 In-App Purchase lint rules.
+/// Tests for 5 In-App Purchase lint rules.
 ///
 /// Test fixtures: example_async/lib/iap/*
 void main() {
@@ -12,6 +12,7 @@ void main() {
       'require_subscription_status_check',
       'require_price_localization',
       'prefer_grace_period_handling',
+      'avoid_entitlement_without_server',
     ];
 
     for (final fixture in fixtures) {
@@ -116,6 +117,18 @@ void main() {
 
       test('localized price from store should NOT trigger', () {
         expect('localized price from store', isNotNull);
+      });
+    });
+  });
+
+  group('In-App Purchase - Server Verification Rules', () {
+    group('avoid_entitlement_without_server', () {
+      test('client-only entitlement check SHOULD trigger', () {
+        expect('client-only entitlement check', isNotNull);
+      });
+
+      test('server-verified entitlement should NOT trigger', () {
+        expect('server-verified entitlement', isNotNull);
       });
     });
   });

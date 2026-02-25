@@ -120,6 +120,8 @@ void _bad1278() {
 // GOOD: Should NOT trigger avoid_unnecessary_negations
 void _good1278() {
   if (value) {}
+
   if (a != b) {}
+
   if (a <= b) {}
 }

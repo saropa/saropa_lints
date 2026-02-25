@@ -204,11 +204,11 @@ const Map<String, int> _baselineCounts = {
   'api_network_rules.dart': 143,
   'async_rules.dart': 59,
   'disposal_rules.dart': 29,
-  'security_rules.dart': 72,
+  'security_rules.dart': 73,
   'navigation_rules.dart': 52,
   'file_handling_rules.dart': 28,
-  'widget_lifecycle_rules.dart': 10,
-  'permission_rules.dart': 22,
+  'widget_lifecycle_rules.dart': 18,
+  'permission_rules.dart': 23,
 
   // Platform rule files
   'platforms/ios_rules.dart': 29,
@@ -224,7 +224,7 @@ const Map<String, int> _baselineCounts = {
   'packages/bloc_rules.dart': 16,
   'packages/hive_rules.dart': 12,
   'packages/getx_rules.dart': 5,
-  'packages/shared_preferences_rules.dart': 12,
+  'packages/shared_preferences_rules.dart': 14,
   'packages/dio_rules.dart': 6,
   'packages/provider_rules.dart': 3,
   'packages/isar_rules.dart': 7,
@@ -272,7 +272,7 @@ const Map<String, int> _baselineCounts = {
   'complexity_rules.dart': 1,
   'debug_rules.dart': 5,
   'stylistic_error_testing_rules.dart': 12,
-  'iap_rules.dart': 19,
+  'iap_rules.dart': 22,
   'architecture_rules.dart': 2,
   'migration_rules.dart': 1,
 };

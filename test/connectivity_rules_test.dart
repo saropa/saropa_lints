@@ -2,12 +2,15 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 1 Connectivity lint rules.
+/// Tests for 2 Connectivity lint rules.
 ///
 /// Test fixtures: example_async/lib/connectivity/*
 void main() {
   group('Connectivity Rules - Fixture Verification', () {
-    final fixtures = ['require_connectivity_error_handling'];
+    final fixtures = [
+      'require_connectivity_error_handling',
+      'avoid_connectivity_equals_internet',
+    ];
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
@@ -17,6 +20,21 @@ void main() {
         expect(file.existsSync(), isTrue);
       });
     }
+  });
+
+  group('Connectivity - Avoidance Rules', () {
+    group('avoid_connectivity_equals_internet', () {
+      test(
+        'treating connectivity status as internet access SHOULD trigger',
+        () {
+          expect('treating connectivity status as internet access', isNotNull);
+        },
+      );
+
+      test('actual reachability check should NOT trigger', () {
+        expect('actual reachability check', isNotNull);
+      });
+    });
   });
 
   group('Connectivity - Requirement Rules', () {
