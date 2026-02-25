@@ -10,7 +10,7 @@ Map<String, LintImpact> _buildRuleImpactMap() {
 
   // Get impact from each rule instance
   for (final rule in allSaropaRules) {
-    map[rule.code.lowerCaseName] = rule.impact;
+    map[rule.code.name] = rule.impact;
   }
 
   return map;
