@@ -460,6 +460,7 @@ const Set<String> essentialRules = <String>{
   'require_hive_initialization',
   'require_hive_type_adapter',
   'require_hive_encryption_key_secure',
+  'avoid_drift_enum_index_reorder', // ERROR - data corruption from enum .index storage
   'require_type_adapter_registration', // ERROR - adapter not registered before openBox
   'avoid_hive_field_index_reuse', // ERROR - data corruption from duplicate indices
   // Part 5 - HTTP/Dio Rules (Essential)
@@ -694,6 +695,14 @@ const Set<String> recommendedOnlyRules = <String>{
   // Database (Isar)
   'require_isar_nullable_field',
 
+  // Database (Drift)
+  'require_drift_database_close', // WARNING - resource leak from unclosed DB
+  'avoid_drift_update_without_where', // WARNING - accidental bulk update/delete
+  'require_await_in_drift_transaction', // WARNING - unawaited queries escape transaction
+  'require_drift_foreign_key_pragma', // WARNING - foreign keys silently ignored
+  'avoid_drift_raw_sql_interpolation', // ERROR - SQL injection
+  'prefer_drift_batch_operations', // WARNING - loop inserts instead of batch
+  'require_drift_stream_cancel', // WARNING - stream subscription memory leak
   // Database / IO (all DB packages + file I/O)
   'require_yield_after_db_write',
   'suggest_yield_after_db_read',
@@ -1790,6 +1799,12 @@ const Set<String> professionalOnlyRules = <String>{
   // require_animation_tests moved to Comprehensive
 
   // Part 5 - Database Rules (Professional)
+  'avoid_drift_database_on_main_isolate', // INFO - UI jank from main thread DB
+  'avoid_drift_log_statements_production', // WARNING - SQL logging in production
+  'avoid_drift_get_single_without_unique', // INFO - getSingle on multi-row query
+  'prefer_drift_use_columns_false', // INFO - unnecessary column reads on joins
+  'avoid_drift_lazy_database', // INFO - LazyDatabase breaks isolate sync
+  'prefer_drift_isolate_sharing', // INFO - multiple instances break stream sync
   'require_sqflite_transaction',
   'prefer_sqflite_batch',
   'require_sqflite_error_handling',
@@ -2467,6 +2482,14 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'require_repaint_boundary', // paint optimization
   'prefer_ble_mtu_negotiation', // BLE transfer efficiency
   'prefer_lazy_box_for_large', // Hive lazy loading
+  // Drift database (Comprehensive)
+  'avoid_drift_query_in_migration', // WARNING - high-level API in onUpgrade
+  'require_drift_schema_version_bump', // INFO - schema changes without version bump
+  'avoid_drift_foreign_key_in_migration', // INFO - PRAGMA in migration transaction
+  'require_drift_reads_from', // INFO - customSelect.watch() without readsFrom
+  'avoid_drift_unsafe_web_storage', // INFO - unsafeIndexedDb not multi-tab safe
+  'avoid_drift_close_streams_in_tests', // INFO - missing closeStreamsSynchronously
+  'avoid_drift_nullable_converter_mismatch', // INFO - both-nullable TypeConverter
   'prefer_geolocator_distance_filter', // battery optimization
   'prefer_inherited_widget_cache', // cache optimization
   'prefer_layout_builder_over_media_query', // rebuild optimization
@@ -3285,6 +3308,31 @@ const Set<String> sqflitePackageRules = <String>{
   'require_sqflite_migration',
 };
 
+/// Rules specific to the Drift database package.
+const Set<String> driftPackageRules = <String>{
+  'avoid_drift_enum_index_reorder',
+  'require_drift_database_close',
+  'avoid_drift_update_without_where',
+  'require_await_in_drift_transaction',
+  'require_drift_foreign_key_pragma',
+  'avoid_drift_raw_sql_interpolation',
+  'prefer_drift_batch_operations',
+  'require_drift_stream_cancel',
+  'avoid_drift_database_on_main_isolate',
+  'avoid_drift_log_statements_production',
+  'avoid_drift_get_single_without_unique',
+  'prefer_drift_use_columns_false',
+  'avoid_drift_lazy_database',
+  'prefer_drift_isolate_sharing',
+  'avoid_drift_query_in_migration',
+  'require_drift_schema_version_bump',
+  'avoid_drift_foreign_key_in_migration',
+  'require_drift_reads_from',
+  'avoid_drift_unsafe_web_storage',
+  'avoid_drift_close_streams_in_tests',
+  'avoid_drift_nullable_converter_mismatch',
+};
+
 // ---------------------------------------------------------------------------
 // Networking
 // ---------------------------------------------------------------------------
@@ -3410,6 +3458,7 @@ Map<String, Set<String>> get packageRuleSets => {
   'hive': hivePackageRules.union(_databaseSharedRules),
   'shared_preferences': sharedPreferencesPackageRules,
   'sqflite': sqflitePackageRules.union(_databaseSharedRules),
+  'drift': driftPackageRules.union(_databaseSharedRules),
   'dio': dioPackageRules,
   'graphql': graphqlPackageRules,
   'supabase': supabasePackageRules,
@@ -3435,6 +3484,7 @@ const List<String> allPackages = <String>[
   'hive',
   'shared_preferences',
   'sqflite',
+  'drift',
   'dio',
   'graphql',
   'supabase',
@@ -3464,6 +3514,7 @@ const Map<String, bool> defaultPackages = <String, bool>{
   'hive': true,
   'shared_preferences': true,
   'sqflite': true,
+  'drift': true,
   'dio': true,
   'graphql': true,
   'supabase': true,
