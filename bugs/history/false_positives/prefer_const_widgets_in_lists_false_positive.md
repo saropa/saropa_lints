@@ -40,6 +40,7 @@ extension SuperheroRatingValues on SuperheroRating {
 every rebuild. If elements are constant, the entire list can be const.`
 
 The diagnostic message is doubly wrong:
+
 1. This is not a widget list — it is a `List<Color>`.
 2. The list is already `const` (declared `static const`), so it is not
    "recreated on every rebuild."
@@ -77,6 +78,7 @@ and sets `hasWidgets = true`. The rule never verifies that the constructed type
 is actually a `Widget` subclass.
 
 This affects any non-widget class with a const constructor:
+
 - `Color(0xFF...)` — most common false positive
 - `Offset(0, 0)`
 - `Size(100, 200)`
@@ -129,6 +131,7 @@ bool _couldBeConst(InstanceCreationExpression node) {
       return false;
     }
   }
+
   return true;
 }
 ```
@@ -176,6 +179,7 @@ bool _isWidgetType(DartType type) {
     }
     t = t.element.supertype;
   }
+
   return false;
 }
 ```
@@ -224,6 +228,7 @@ bool _isInConstContext(AstNode node) {
     }
     current = current.parent;
   }
+
   return false;
 }
 ```

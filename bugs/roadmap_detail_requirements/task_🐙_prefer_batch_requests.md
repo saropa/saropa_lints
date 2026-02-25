@@ -1,6 +1,7 @@
 # Task: `prefer_batch_requests`
 
 ## Summary
+
 - **Rule Name**: `prefer_batch_requests`
 - **Tier**: Professional
 - **Severity**: INFO
@@ -14,6 +15,7 @@
 Making multiple small HTTP requests in a `for` loop (N+1 query problem at the network layer) incurs per-request overhead: DNS lookup (cached), TCP handshake, TLS handshake, HTTP headers, and server processing overhead. For N=10 requests, this could be 500ms instead of 50ms if batched. Many APIs support batch endpoints (e.g., Firebase Firestore `getAll`, GraphQL with multiple operations, REST APIs with comma-separated IDs).
 
 Common anti-pattern:
+
 ```dart
 // Fetching user details for each ID separately
 for (final id in userIds) {
@@ -58,6 +60,7 @@ context.registry.addForStatement((node) {
 `_looksLikeDataFetch`: check if method name starts/contains `get`, `fetch`, `load`, `read`, `query`, `find`.
 
 ### Handling `forEach`
+
 ```dart
 context.registry.addMethodInvocation((node) {
   if (node.methodName.name != 'forEach') return;
@@ -71,6 +74,7 @@ context.registry.addMethodInvocation((node) {
 ## Code Examples
 
 ### Bad (Should trigger)
+
 ```dart
 // N separate requests in a loop
 Future<List<User>> loadUsers(List<String> ids) async {
@@ -79,6 +83,7 @@ Future<List<User>> loadUsers(List<String> ids) async {
     final user = await apiClient.getUser(id);  // ← trigger
     users.add(user);
   }
+
   return users;
 }
 
@@ -91,6 +96,7 @@ Future<List<User>> loadUsers(List<String> ids) async {
 ```
 
 ### Good (Should NOT trigger)
+
 ```dart
 // Single batch request ✓
 Future<List<User>> loadUsers(List<String> ids) async {
@@ -108,27 +114,29 @@ for (final item in items) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behavior | Notes |
-|---|---|---|
-| Loop fetching from different APIs | **Suppress** — different APIs can't be batched | Check if receiver is the same object |
-| Loop with 1 iteration guaranteed | **Suppress** — not a pattern issue | Hard to detect statically |
-| `await` inside loop but method is `POST`/`create` (not fetch) | **Suppress** — writes often can't be batched | Method name heuristic |
-| Pagination loop (deliberate sequential pages) | **False positive** — pagination MUST be sequential | Hard to distinguish from N+1; may need to suppress `page` parameter pattern |
-| `await Future.delayed(...)` inside loop | **Suppress** — delay, not a data fetch | |
-| Firebase Firestore `collection.get()` in loop | **Trigger** — clearly N+1 | |
-| Loop over 2 items | **Suppress or lower severity** — 2 requests is barely overhead | Configurable minimum threshold (default 3+) |
-| Recursive fetch (parent→children recursion) | **Suppress** — recursive fetching is often unavoidable | Hard to detect the recursion pattern |
-| Test file | **Suppress** | |
-| Loop inside `compute()` (isolate) | **Note** — network calls from isolates have different semantics | |
+| Scenario                                                      | Expected Behavior                                               | Notes                                                                       |
+| ------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Loop fetching from different APIs                             | **Suppress** — different APIs can't be batched                  | Check if receiver is the same object                                        |
+| Loop with 1 iteration guaranteed                              | **Suppress** — not a pattern issue                              | Hard to detect statically                                                   |
+| `await` inside loop but method is `POST`/`create` (not fetch) | **Suppress** — writes often can't be batched                    | Method name heuristic                                                       |
+| Pagination loop (deliberate sequential pages)                 | **False positive** — pagination MUST be sequential              | Hard to distinguish from N+1; may need to suppress `page` parameter pattern |
+| `await Future.delayed(...)` inside loop                       | **Suppress** — delay, not a data fetch                          |                                                                             |
+| Firebase Firestore `collection.get()` in loop                 | **Trigger** — clearly N+1                                       |                                                                             |
+| Loop over 2 items                                             | **Suppress or lower severity** — 2 requests is barely overhead  | Configurable minimum threshold (default 3+)                                 |
+| Recursive fetch (parent→children recursion)                   | **Suppress** — recursive fetching is often unavoidable          | Hard to detect the recursion pattern                                        |
+| Test file                                                     | **Suppress**                                                    |                                                                             |
+| Loop inside `compute()` (isolate)                             | **Note** — network calls from isolates have different semantics |                                                                             |
 
 ## Unit Tests
 
 ### Violations
+
 1. `for` loop with `await apiClient.getUser(id)` → 1 lint
 2. `Future.wait(ids.map((id) => api.get(id)))` → 1 lint
 3. Async `forEach` with `await apiClient.fetchItem(id)` → 1 lint
 
 ### Non-Violations
+
 1. Single `await api.get(id)` outside a loop → no lint
 2. Loop with different method calls per iteration → no lint
 3. `for` loop with `await Future.delayed(...)` → no lint

@@ -8,9 +8,9 @@ The `avoid_dynamic_type` rule flags all uses of `dynamic` regardless of context,
 
 All 72 violations are in a single file:
 
-| File | Count |
-|------|------:|
-| `lib/json/json_utils.dart` | 72 |
+| File                       | Count |
+| -------------------------- | ----: |
+| `lib/json/json_utils.dart` |    72 |
 
 ## What gets flagged
 
@@ -25,6 +25,7 @@ static dynamic jsonDecodeSafe(String? jsonString) {
 ```
 
 `dart:convert`'s `jsonDecode()` signature is:
+
 ```dart
 dynamic jsonDecode(String source, {Object? Function(Object?, Object?)? reviver});
 ```
@@ -45,6 +46,7 @@ static Map<String, dynamic>? jsonDecodeToMap(String? jsonString) {
 ```
 
 `Map<String, dynamic>` is the **canonical Dart type for JSON objects**. It is used throughout:
+
 - Flutter's `jsonDecode()` returns it
 - Every JSON serialization package (json_serializable, freezed, built_value) uses it
 - All Firebase/Firestore APIs accept and return it
@@ -72,6 +74,7 @@ static List<Map<String, dynamic>>? tryJsonDecodeListMap(String? value) {
 ```
 
 This function takes untyped JSON, validates its structure with `is` checks, and returns a safely-typed result. Every `dynamic` here is either:
+
 1. The return value of `jsonDecode()` (inherently dynamic)
 2. A lambda parameter iterating over an untyped list (must be `dynamic`)
 3. `Map<String, dynamic>` — the standard JSON map type
@@ -87,6 +90,7 @@ static int countIterableJson(dynamic json, {String separator = ','}) {
   if (json == null) return 0;
   if (json is Iterable) return json.length;
   if (json is String) { ... }
+
   return 0;
 }
 ```
@@ -107,6 +111,7 @@ The rule suggests replacing `dynamic` with `Object?`. In JSON code, this creates
 ### Option A: Exempt JSON-related `dynamic` usages (recommended)
 
 Do not flag `dynamic` when it appears in:
+
 1. Return types or variables assigned from `jsonDecode()` / `json.decode()`
 2. `Map<String, dynamic>` — the canonical JSON map type
 3. Lambda parameters in collection operations on untyped lists (`data.every((dynamic e) => ...)`)
@@ -115,6 +120,7 @@ Do not flag `dynamic` when it appears in:
 ### Option B: Exempt files matching JSON patterns
 
 Suppress the rule entirely for files matching:
+
 - `*_json*.dart`
 - `*json_*.dart`
 - `*serialization*.dart`
@@ -127,6 +133,7 @@ At minimum, do not flag `Map<String, dynamic>` anywhere. This type is so pervasi
 ### Option D: Downgrade severity for `dynamic` in type arguments
 
 Distinguish between:
+
 - `dynamic x = ...` (variable typed as dynamic — worth flagging)
 - `Map<String, dynamic>` (type argument — standard idiom, should not flag)
 - `List<dynamic>` from jsonDecode (unavoidable, should not flag)
@@ -134,6 +141,7 @@ Distinguish between:
 ## What should still be flagged
 
 Uses of `dynamic` in non-serialization code remain valid warnings:
+
 - `dynamic result = someCalculation();` — should use a specific type
 - Function parameters typed as `dynamic` when a concrete type is known
 - `dynamic` in widget code, state management, or business logic
@@ -144,6 +152,7 @@ Uses of `dynamic` in non-serialization code remain valid warnings:
 - **Rule version:** v3
 - **saropa_lints version:** (current)
 - **Project:** saropa_dart_utils — 72 violations, all in `json_utils.dart`
+
 ---
 
 ## Resolution

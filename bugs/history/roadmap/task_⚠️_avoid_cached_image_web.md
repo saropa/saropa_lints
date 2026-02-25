@@ -1,6 +1,7 @@
 # Task: `avoid_cached_image_web`
 
 ## Summary
+
 - **Rule Name**: `avoid_cached_image_web`
 - **Tier**: Recommended
 - **Severity**: WARNING
@@ -28,7 +29,9 @@ For Flutter web, the browser's native HTTP cache handles image caching automatic
 2. OR: project targets web (detected in `pubspec.yaml` or `web/` directory exists) AND `CachedNetworkImage` is used anywhere
 
 ### Phase 1 (Conservative)
+
 Only fire if the usage is inside a `kIsWeb` guard:
+
 ```dart
 if (kIsWeb) {
   return CachedNetworkImage(...);  // ← trigger: explicitly in web code
@@ -36,6 +39,7 @@ if (kIsWeb) {
 ```
 
 ### Phase 2 (Broader)
+
 Fire if project has a `web/` directory AND uses `CachedNetworkImage`.
 
 ## Implementation Approach
@@ -54,6 +58,7 @@ context.registry.addInstanceCreationExpression((node) {
 ## Code Examples
 
 ### Bad (Should trigger — Phase 1)
+
 ```dart
 Widget buildImage(String url) {
   if (kIsWeb) {
@@ -63,16 +68,19 @@ Widget buildImage(String url) {
       placeholder: (_, __) => const CircularProgressIndicator(),
     );
   }
+
   return CachedNetworkImage(imageUrl: url);
 }
 ```
 
 ### Good (Should NOT trigger)
+
 ```dart
 Widget buildImage(String url) {
   if (kIsWeb) {
     return Image.network(url); // ← use native Image.network on web (browser caches)
   }
+
   return CachedNetworkImage(
     imageUrl: url,
     placeholder: (_, __) => const CircularProgressIndicator(),
@@ -82,20 +90,22 @@ Widget buildImage(String url) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behavior | Notes |
-|---|---|---|
-| Mobile-only app (no web/ dir) | **Suppress** | No web target |
-| `CachedNetworkImage` outside `kIsWeb` block | **Suppress** in Phase 1 | May run on mobile too |
-| `ExtendedNetworkImageProvider` or other alternatives | **Suppress** | Different packages |
-| Test files | **Suppress** | |
-| Generated code | **Suppress** | |
+| Scenario                                             | Expected Behavior       | Notes                 |
+| ---------------------------------------------------- | ----------------------- | --------------------- |
+| Mobile-only app (no web/ dir)                        | **Suppress**            | No web target         |
+| `CachedNetworkImage` outside `kIsWeb` block          | **Suppress** in Phase 1 | May run on mobile too |
+| `ExtendedNetworkImageProvider` or other alternatives | **Suppress**            | Different packages    |
+| Test files                                           | **Suppress**            |                       |
+| Generated code                                       | **Suppress**            |                       |
 
 ## Unit Tests
 
 ### Violations
+
 1. `CachedNetworkImage` inside `if (kIsWeb)` branch → 1 lint
 
 ### Non-Violations
+
 1. `CachedNetworkImage` in mobile-only context → no lint
 2. `Image.network` on web → no lint
 3. `CachedNetworkImage` with platform guard that excludes web → no lint
@@ -103,6 +113,7 @@ Widget buildImage(String url) {
 ## Quick Fix
 
 Offer "Replace with `Image.network`" when inside `kIsWeb` block:
+
 ```dart
 // Before
 if (kIsWeb) {

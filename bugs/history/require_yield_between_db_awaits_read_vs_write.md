@@ -26,7 +26,7 @@ rawQuery,                    // read
 rawInsert, rawUpdate, rawDelete, // writes
 ```
 
-There is no concept of "read operation" vs "write operation" in the detection logic. The `_isDbRelatedAwait` method returns a single boolean — it cannot communicate *what kind* of operation was matched, so the reporter cannot vary its severity or message.
+There is no concept of "read operation" vs "write operation" in the detection logic. The `_isDbRelatedAwait` method returns a single boolean — it cannot communicate _what kind_ of operation was matched, so the reporter cannot vary its severity or message.
 
 ---
 
@@ -66,7 +66,7 @@ The yield between reading and using the result opens a window where another writ
 
 ### 5. Bulk reads are the exception
 
-`findAll()` on an unbounded collection *can* block the UI during deserialization of thousands of objects. These genuinely benefit from a yield. But the rule cannot distinguish `findAll()` from `findFirst()` — both are flagged identically.
+`findAll()` on an unbounded collection _can_ block the UI during deserialization of thousands of objects. These genuinely benefit from a yield. But the rule cannot distinguish `findAll()` from `findFirst()` — both are flagged identically.
 
 ---
 
@@ -94,12 +94,12 @@ final List<Contact> all = await isar.contacts.findAll();
 
 The rule should differentiate by operation type:
 
-| Operation | Examples | Severity | Rationale |
-|-----------|----------|----------|-----------|
-| **Write/Delete** | `writeTxn`, `putAll`, `deleteAll`, `rawInsert`, `rawUpdate`, `rawDelete`, `writeAsString`, `writeAsBytes` | **WARNING** | Exclusive locks, must yield |
-| **Bulk Read** | `findAll`, `rawQuery`, `readAsString`, `readAsBytes`, `readAsLines`, `loadJsonFromAsset` | **INFO** | CPU-bound deserialization, yield is helpful but situational |
-| **Single Read** | `findFirst` | **None** or **INFO** | Fast, no lock, yield adds latency with no benefit |
-| **`db*` prefix methods** | `dbContactLoad`, `dbContactSaveList` | Depends on suffix heuristic (see proposal) | Currently all WARNING |
+| Operation                | Examples                                                                                                  | Severity                                   | Rationale                                                   |
+| ------------------------ | --------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ----------------------------------------------------------- |
+| **Write/Delete**         | `writeTxn`, `putAll`, `deleteAll`, `rawInsert`, `rawUpdate`, `rawDelete`, `writeAsString`, `writeAsBytes` | **WARNING**                                | Exclusive locks, must yield                                 |
+| **Bulk Read**            | `findAll`, `rawQuery`, `readAsString`, `readAsBytes`, `readAsLines`, `loadJsonFromAsset`                  | **INFO**                                   | CPU-bound deserialization, yield is helpful but situational |
+| **Single Read**          | `findFirst`                                                                                               | **None** or **INFO**                       | Fast, no lock, yield adds latency with no benefit           |
+| **`db*` prefix methods** | `dbContactLoad`, `dbContactSaveList`                                                                      | Depends on suffix heuristic (see proposal) | Currently all WARNING                                       |
 
 ---
 
@@ -119,6 +119,7 @@ Create separate rules with distinct severities:
    Exclude: `findFirst` (too fast to matter)
 
 **Benefits:**
+
 - Teams can suppress the INFO rule in code that needs low-latency reads
 - The WARNING on writes stays non-negotiable
 - No behavior change for existing codebases that already yield everywhere
@@ -136,18 +137,22 @@ DbOperationType _classifyDbOperation(String name) {
        'writeAsString', 'writeAsBytes'].contains(name)) {
     return DbOperationType.write;
   }
+
   if (['findAll', 'rawQuery', 'readAsString', 'readAsBytes', 'readAsLines',
        'loadJsonFromAsset'].contains(name)) {
     return DbOperationType.bulkRead;
   }
+
   if (name == 'findFirst') {
     return DbOperationType.singleRead;
   }
+
   return DbOperationType.unknown;
 }
 ```
 
 Then adjust the reporter severity:
+
 - `write` → WARNING
 - `bulkRead` → INFO
 - `singleRead` → skip (no lint)
@@ -157,12 +162,13 @@ Then adjust the reporter severity:
 
 For methods matching the `db*` prefix pattern, the rule could use a secondary name heuristic:
 
-| Substring in method name | Likely operation | Severity |
-|--------------------------|------------------|----------|
-| `Save`, `Add`, `Put`, `Delete`, `Remove`, `Update`, `Write`, `Insert` | Write | WARNING |
-| `Load`, `Get`, `Find`, `Read`, `Fetch`, `Query`, `Count`, `List`, `Stream` | Read | INFO |
+| Substring in method name                                                   | Likely operation | Severity |
+| -------------------------------------------------------------------------- | ---------------- | -------- |
+| `Save`, `Add`, `Put`, `Delete`, `Remove`, `Update`, `Write`, `Insert`      | Write            | WARNING  |
+| `Load`, `Get`, `Find`, `Read`, `Fetch`, `Query`, `Count`, `List`, `Stream` | Read             | INFO     |
 
 Example:
+
 - `dbContactSave()` → contains `Save` → WARNING
 - `dbContactLoad()` → contains `Load` → INFO
 - `dbContactDelete()` → contains `Delete` → WARNING
@@ -184,6 +190,7 @@ In the `contacts` project (`d:\src\contacts\`), there are ~250 `*_io.dart` files
 - **`findAll()` reads**: Sometimes followed by `yieldToUI()`, sometimes not — this inconsistency is the direct result of the rule not distinguishing severity
 
 A split rule would let developers:
+
 - Fix all write-related warnings (non-negotiable)
 - Address bulk-read suggestions where appropriate
 - Stop suppressing or ignoring warnings on trivial single reads

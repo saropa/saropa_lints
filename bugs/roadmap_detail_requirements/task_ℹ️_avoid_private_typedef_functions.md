@@ -1,6 +1,7 @@
 # Task: `avoid_private_typedef_functions`
 
 ## Summary
+
 - **Rule Name**: `avoid_private_typedef_functions`
 - **Tier**: Comprehensive
 - **Severity**: INFO
@@ -8,6 +9,7 @@
 - **Source**: ROADMAP.md §Code Style
 
 ## Problem Statement
+
 Dart supports typedef declarations for naming function types:
 
 ```dart
@@ -26,15 +28,19 @@ The key issues with private function typedefs:
 The exception is generic or complex function typedefs that significantly reduce the verbosity of repeated usage, or typedefs that serve as documentation markers. These should be suppressable with `// ignore:`.
 
 ## Description (from ROADMAP)
+
 Flag `typedef` declarations that are private (name starts with `_`) and define a function type (as opposed to a class type alias or record type alias), suggesting replacement with inline function types at each usage site.
 
 ## Trigger Conditions
+
 The rule triggers when:
+
 1. A `FunctionTypeAlias` or `GenericTypeAlias` is found.
 2. The typedef name starts with `_` (private).
 3. The right-hand side of the typedef defines a function type (i.e., `... = void Function(...)` or `... = T Function(...)`).
 
 It does NOT trigger for:
+
 - Public typedefs (no `_` prefix) — these may be part of the public API.
 - Typedefs that define non-function types (class aliases, record type aliases): `typedef _MyRecord = (String, int)`.
 - Generic typedefs where the type parameter changes the signature meaningfully and inlining would be verbose.
@@ -103,6 +109,7 @@ bool _isFunctionType(TypeAnnotation type) {
     // This would be a class type alias — not a function type
     return false;
   }
+
   return false;
 }
 ```
@@ -110,6 +117,7 @@ bool _isFunctionType(TypeAnnotation type) {
 ## Code Examples
 
 ### Bad (triggers rule)
+
 ```dart
 // Private function typedef — unnecessary, use inline type
 typedef _ClickHandler = void Function(BuildContext context);
@@ -127,6 +135,7 @@ void processErrors(List<String> items, _ErrorCallback onError) {
 ```
 
 ### Good (compliant)
+
 ```dart
 // Inline function types — clear at usage site
 class ButtonWidget {
@@ -153,6 +162,7 @@ typedef _Transformer<A, B, C> = C Function(A input, B config, String key);
 ```
 
 ## Edge Cases & False Positives
+
 - **Typedef used many times in one file**: If `_ErrorCallback` is used in 15 different method signatures across a 300-line file, the typedef saves significant repetition and the inline form would be tedious. A usage-count threshold (default: suppress if used 4+ times) would prevent flagging these. This is a configuration option.
 - **Complex generic function signatures**: `typedef _Mapper<T, R> = Future<R> Function(T input, {String? key, bool force})` — inlining this every time it is used adds real verbosity. The usage-count check or minimum-complexity threshold would handle this.
 - **Interop with external packages**: Some external packages define callbacks that match specific signatures. Using a typedef to name those signatures locally can improve clarity even in private scope.
@@ -164,6 +174,7 @@ typedef _Transformer<A, B, C> = C Function(A input, B config, String key);
 ## Unit Tests
 
 ### Should Trigger (violations)
+
 ```dart
 // Private function typedefs
 typedef _Handler = void Function(String event);    // LINT
@@ -175,6 +186,7 @@ typedef void _LegacyHandler(String event);         // LINT
 ```
 
 ### Should NOT Trigger (compliant)
+
 ```dart
 // Public function typedef — excluded
 typedef Handler = void Function(String event);     // OK
@@ -192,7 +204,9 @@ typedef _Complex<A, B, C> = C Function(A, B, {String? key}); // OK — suppresse
 ```
 
 ## Quick Fix
+
 There is no automated quick fix for this rule because:
+
 1. Replacing a typedef requires substituting the typedef name with the full inline type everywhere it is used.
 2. The replacement must happen across multiple usage sites in the same file.
 3. The quick fix would need to collect all `TypeName` references to the typedef and replace each one.
@@ -206,6 +220,7 @@ correctionMessage: 'Remove this private typedef and replace usages with the inli
 If time permits, implement a simple fix that replaces `_TypedefName` → inline type at the declaration, and adds a note that usages must be updated manually.
 
 ## Notes & Issues
+
 - The usage-count threshold (suppress if used 4+ times) would require scanning the entire compilation unit for type references, which is potentially expensive. Consider making this optional and disabled by default, or implementing it as a lazy count during block analysis.
 - This rule is Comprehensive tier (one level below Pedantic) because it is a stylistic preference rather than a clear best practice. Many experienced Dart developers legitimately disagree on whether private function typedefs are harmful.
 - Consider adding a `minUsageCount` option to `analysis_options.yaml` allowing teams to set their own threshold for when a private typedef is "justified." Default: `1` (always flag), configurable to `3` or `4` for teams that want some tolerance.

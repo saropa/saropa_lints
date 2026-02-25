@@ -1,6 +1,7 @@
 # Task: `require_input_validation`
 
 ## Summary
+
 - **Rule Name**: `require_input_validation`
 - **Tier**: Essential
 - **Severity**: WARNING
@@ -17,6 +18,7 @@ Sending raw, unvalidated user input to APIs or databases is a security vulnerabi
 4. **OWASP M1: Improper Platform Usage** — not validating inputs properly
 
 The classic pattern:
+
 ```dart
 // BUG: raw user input in API call
 final name = _nameController.text; // ← raw input
@@ -53,11 +55,13 @@ context.registry.addMethodInvocation((node) {
 `_isNetworkOrDatabaseCall`: check if the method is an HTTP call (`http.post`, `dio.post`, etc.) or database write (`db.insert`, `db.update`, `firestore.set`, etc.).
 
 ### Flow Analysis Alternative
+
 A more accurate approach: track `TextEditingController.text` assignments and check if any validation method is called on the value before it's used in a network call. This requires data flow analysis beyond what's typically available in lint rules.
 
 ## Code Examples
 
 ### Bad (Should trigger)
+
 ```dart
 Future<void> onSubmit() async {
   final name = _nameController.text; // raw input
@@ -72,6 +76,7 @@ await http.post(
 ```
 
 ### Good (Should NOT trigger)
+
 ```dart
 Future<void> onSubmit() async {
   final name = _nameController.text.trim();
@@ -79,6 +84,7 @@ Future<void> onSubmit() async {
     _showError('Name is required');
     return;
   }
+
   if (name.length > 100) {
     _showError('Name is too long');
     return;
@@ -98,24 +104,26 @@ Form(
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behavior | Notes |
-|---|---|---|
-| `TextFormField` with `validator` | **Suppress** if form `.validate()` called before API call | Cross-file analysis needed |
-| Dropdown/Select input (not freeform) | **Suppress** — user can't type arbitrary text | |
-| `TextInputType.number` keyboard | **Suppress** — limited to numeric input | Runtime only, can't detect statically |
-| `inputFormatters` applied | **Suppress** — formatted input is pre-validated | |
-| `.trim()` applied | **Suppress** — minimal processing, treat as validated | |
-| Empty check before call | **Suppress** — minimum validation present | |
-| Test files | **Suppress** | |
-| Generated code | **Suppress** | |
+| Scenario                             | Expected Behavior                                         | Notes                                 |
+| ------------------------------------ | --------------------------------------------------------- | ------------------------------------- |
+| `TextFormField` with `validator`     | **Suppress** if form `.validate()` called before API call | Cross-file analysis needed            |
+| Dropdown/Select input (not freeform) | **Suppress** — user can't type arbitrary text             |                                       |
+| `TextInputType.number` keyboard      | **Suppress** — limited to numeric input                   | Runtime only, can't detect statically |
+| `inputFormatters` applied            | **Suppress** — formatted input is pre-validated           |                                       |
+| `.trim()` applied                    | **Suppress** — minimal processing, treat as validated     |                                       |
+| Empty check before call              | **Suppress** — minimum validation present                 |                                       |
+| Test files                           | **Suppress**                                              |                                       |
+| Generated code                       | **Suppress**                                              |                                       |
 
 ## Unit Tests
 
 ### Violations
+
 1. `_controller.text` passed to `http.post()` body without any processing → 1 lint
 2. `_controller.text` assigned to variable then passed to API without validation → 1 lint
 
 ### Non-Violations
+
 1. `_controller.text.trim()` before use → no lint
 2. `_formKey.currentState?.validate()` called before API → no lint
 3. Explicit `isEmpty` check before API call → no lint

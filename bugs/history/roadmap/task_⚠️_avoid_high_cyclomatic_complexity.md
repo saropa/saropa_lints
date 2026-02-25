@@ -1,6 +1,7 @@
 # Task: `avoid_high_cyclomatic_complexity`
 
 ## Summary
+
 - **Rule Name**: `avoid_high_cyclomatic_complexity`
 - **Tier**: Professional
 - **Severity**: WARNING
@@ -10,6 +11,7 @@
 ## Problem Statement
 
 Cyclomatic complexity measures the number of linearly independent paths through a function. A function with complexity > 10 is hard to:
+
 1. **Understand** — too many branches to hold in working memory
 2. **Test** — N paths need N test cases for full branch coverage
 3. **Refactor** — high coupling between branches
@@ -24,6 +26,7 @@ Common sources of high complexity: nested if/else chains, long switch statements
 ## Complexity Calculation
 
 McCabe's cyclomatic complexity = number of decision points + 1:
+
 - `if` statement: +1
 - `else if` clause: +1 (each)
 - `for` / `while` / `do-while`: +1 each
@@ -84,17 +87,19 @@ class _ComplexityVisitor extends RecursiveAstVisitor<void> {
 ```
 
 ### Configuration
+
 ```yaml
 custom_lint:
   rules:
     avoid_high_cyclomatic_complexity:
-      max_complexity: 10  # default
-      count_logical_operators: true  # count && and ||
+      max_complexity: 10 # default
+      count_logical_operators: true # count && and ||
 ```
 
 ## Code Examples
 
 ### Bad (Should trigger with complexity > 10)
+
 ```dart
 // Complexity ≈ 12: many branches
 String processOrder(Order order) {  // ← trigger
@@ -119,11 +124,13 @@ String processOrder(Order order) {  // ← trigger
   } else if (order.status == 'shipped') {
     return order.express ? 'express shipped' : 'standard shipped';
   }
+
   return 'unknown';
 }
 ```
 
 ### Good (Should NOT trigger)
+
 ```dart
 // Refactored to smaller methods
 String processOrder(Order order) {
@@ -139,24 +146,26 @@ String processOrder(Order order) {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behavior | Notes |
-|---|---|---|
-| Generated code (`.g.dart`) | **Suppress** — generated code can be complex | |
-| `switch` on sealed class (exhaustive) | **Count each case** — but exhaustive switches are acceptable | May need to not count sealed switch cases |
-| `build()` method in Flutter widgets | **Trigger but note** — Flutter `build()` methods are often complex due to widget tree | May want separate threshold for `build()` |
-| Test methods with many assertions | **Trigger** — but test methods with many branches should also be refactored | |
-| Setter methods | **Count** — setters with validation logic can be complex | |
-| Abstract method | **Suppress** — no body | |
-| Getters with complex expressions | **Count** — getters can have complex logic | |
+| Scenario                              | Expected Behavior                                                                     | Notes                                     |
+| ------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Generated code (`.g.dart`)            | **Suppress** — generated code can be complex                                          |                                           |
+| `switch` on sealed class (exhaustive) | **Count each case** — but exhaustive switches are acceptable                          | May need to not count sealed switch cases |
+| `build()` method in Flutter widgets   | **Trigger but note** — Flutter `build()` methods are often complex due to widget tree | May want separate threshold for `build()` |
+| Test methods with many assertions     | **Trigger** — but test methods with many branches should also be refactored           |                                           |
+| Setter methods                        | **Count** — setters with validation logic can be complex                              |                                           |
+| Abstract method                       | **Suppress** — no body                                                                |                                           |
+| Getters with complex expressions      | **Count** — getters can have complex logic                                            |                                           |
 
 ## Unit Tests
 
 ### Violations
+
 1. Function with 11 decision points → 1 lint with complexity value
 2. Method with deeply nested if/else → 1 lint
 3. Switch with 12 cases (each +1) → 1 lint
 
 ### Non-Violations
+
 1. Function with 5 decision points → no lint
 2. Generated file → no lint
 3. Abstract method → no lint
@@ -166,6 +175,7 @@ String processOrder(Order order) {
 No automated fix — reducing complexity requires manual refactoring.
 
 The problem message should include the actual complexity count:
+
 ```
 [avoid_high_cyclomatic_complexity] Function 'processOrder' has cyclomatic complexity of 12, exceeding the threshold of 10. Refactor into smaller methods.
 ```
