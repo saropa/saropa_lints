@@ -113,5 +113,38 @@ dynamic config;
 // expect_lint: avoid_long_parameter_list
 void _bad1049_process(int a, int b, int c, int d, int e, int f, int g) {}
 
+/// Doc comment that precedes a function with too many parameters.
+/// The diagnostic should start at the parameter list, not the doc comment,
+/// so that `// ignore: avoid_long_parameter_list` before the signature works.
+// expect_lint: avoid_long_parameter_list
+void _badWithDocComment(int a, int b, int c, int d, int e, int f) {}
+
+class _BadMethodExample {
+  /// Returns true if all provided date/time components are within valid ranges.
+  /// This method intentionally has many named parameters.
+  // expect_lint: avoid_long_parameter_list
+  static bool isValidDateParts({
+    int? year,
+    int? month,
+    int? day,
+    int? hour,
+    int? minute,
+    int? second,
+  }) {
+    return true;
+  }
+}
+
 // GOOD: Should NOT trigger avoid_long_parameter_list
 void _good1049_process(ProcessConfig config) {}
+
+// GOOD: Exactly 5 parameters (at the limit, should not trigger)
+void _goodAtLimit(int a, int b, int c, int d, int e) {}
+
+// GOOD: Method with doc comment and <=5 parameters
+class _GoodMethodExample {
+  /// Validates a date with acceptable parameter count.
+  static bool isValid({int? year, int? month, int? day}) {
+    return true;
+  }
+}
