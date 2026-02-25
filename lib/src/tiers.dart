@@ -703,6 +703,12 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_drift_raw_sql_interpolation', // ERROR - SQL injection
   'prefer_drift_batch_operations', // WARNING - loop inserts instead of batch
   'require_drift_stream_cancel', // WARNING - stream subscription memory leak
+  'avoid_drift_value_null_vs_absent', // WARNING - Value(null) vs Value.absent()
+  'require_drift_equals_value', // WARNING - .equals() with enum silently fails
+  'require_drift_read_table_or_null', // WARNING - readTable() after left join crashes
+  'require_drift_create_all_in_oncreate', // WARNING - missing createAll() in onCreate
+  'avoid_isar_import_with_drift', // WARNING - incomplete database migration
+  'require_drift_onupgrade_handler', // WARNING - schema > 1 without onUpgrade
   // Database / IO (all DB packages + file I/O)
   'require_yield_after_db_write',
   'suggest_yield_after_db_read',
@@ -1805,6 +1811,10 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_drift_use_columns_false', // INFO - unnecessary column reads on joins
   'avoid_drift_lazy_database', // INFO - LazyDatabase breaks isolate sync
   'prefer_drift_isolate_sharing', // INFO - multiple instances break stream sync
+  'avoid_drift_validate_schema_production', // WARNING - debug-only call in prod
+  'avoid_drift_replace_without_all_columns', // INFO - replace() loses data
+  'avoid_drift_missing_updates_param', // INFO - streams won't update
+  'prefer_drift_foreign_key_declaration', // INFO - FK column without references()
   'require_sqflite_transaction',
   'prefer_sqflite_batch',
   'require_sqflite_error_handling',
@@ -3331,6 +3341,16 @@ const Set<String> driftPackageRules = <String>{
   'avoid_drift_unsafe_web_storage',
   'avoid_drift_close_streams_in_tests',
   'avoid_drift_nullable_converter_mismatch',
+  'avoid_drift_value_null_vs_absent',
+  'require_drift_equals_value',
+  'require_drift_read_table_or_null',
+  'require_drift_create_all_in_oncreate',
+  'avoid_drift_validate_schema_production',
+  'avoid_drift_replace_without_all_columns',
+  'avoid_drift_missing_updates_param',
+  'avoid_isar_import_with_drift',
+  'prefer_drift_foreign_key_declaration',
+  'require_drift_onupgrade_handler',
 };
 
 // ---------------------------------------------------------------------------
