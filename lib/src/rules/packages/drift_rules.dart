@@ -734,13 +734,13 @@ bool _isInsideLoop(AstNode node) {
 // require_drift_stream_cancel
 // =============================================================================
 
-/// Warns when a Drift .watch() stream subscription is not cancelled.
+/// Warns when a Drift .watch() stream subscription is not canceled.
 ///
 /// Since: v5.1.0 | Rule version: v1
 ///
 /// Drift stream queries are tracked internally. Subscriptions from
 /// `.watch()`, `.watchSingle()`, or `.watchSingleOrNull()` that are not
-/// cancelled cause memory leaks and re-execute on every table change.
+/// canceled cause memory leaks and re-execute on every table change.
 /// Always store the subscription and cancel it in dispose().
 ///
 /// **BAD:**
@@ -779,7 +779,7 @@ class RequireDriftStreamCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_drift_stream_cancel',
     '[require_drift_stream_cancel] Drift .watch() stream subscription is '
-        'created but may not be cancelled in dispose(). Uncancelled '
+        'created but may not be canceled in dispose(). Uncanceled '
         'subscriptions cause memory leaks and re-execute the query on every '
         'table change, wasting CPU and memory. Always store and cancel '
         'subscriptions. {v1}',
@@ -818,7 +818,7 @@ class RequireDriftStreamCancelRule extends SaropaLintRule {
         return;
       }
 
-      // Not assigned — the subscription is lost, can never be cancelled
+      // Not assigned — the subscription is lost, can never be canceled
       reporter.atNode(node.methodName);
     });
   }
