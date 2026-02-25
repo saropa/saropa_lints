@@ -426,11 +426,7 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
     }
 
     if (positionalCount >= _threshold) {
-      reporter.atOffset(
-        offset: nameNode.offset,
-        length: nameNode.length,
-        errorCode: code,
-      );
+      reporter.atOffset(offset: nameNode.offset, length: nameNode.length);
     }
   }
 }
@@ -1323,11 +1319,7 @@ class PreferTodoFormatRule extends SaropaLintRule {
           if (_anyTodoPattern.hasMatch(lexeme)) {
             // Check if it follows the correct format
             if (!_validTodoPattern.hasMatch(lexeme)) {
-              reporter.atOffset(
-                offset: comment.offset,
-                length: comment.length,
-                errorCode: code,
-              );
+              reporter.atOffset(offset: comment.offset, length: comment.length);
             }
           }
 
@@ -1418,11 +1410,7 @@ class PreferFixmeFormatRule extends SaropaLintRule {
           if (_anyFixmePattern.hasMatch(lexeme)) {
             // Check if it follows the correct format
             if (!_validFixmePattern.hasMatch(lexeme)) {
-              reporter.atOffset(
-                offset: comment.offset,
-                length: comment.length,
-                errorCode: code,
-              );
+              reporter.atOffset(offset: comment.offset, length: comment.length);
             }
           }
 
@@ -1619,11 +1607,7 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
 
     // Check if the first character is lowercase
     if (_lowercaseFirstChar.hasMatch(trimmed)) {
-      reporter.atOffset(
-        offset: comment.offset,
-        length: comment.length,
-        errorCode: code,
-      );
+      reporter.atOffset(offset: comment.offset, length: comment.length);
     }
   }
 }
@@ -2367,7 +2351,7 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
           reporter.atNode(library);
         } else {
           // Report at the beginning of the file
-          reporter.atOffset(offset: 0, length: 1, errorCode: code);
+          reporter.atOffset(offset: 0, length: 1);
         }
       }
     });
@@ -2686,7 +2670,6 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
       reporter.atOffset(
         offset: lastRegularComment.offset,
         length: lastRegularComment.length,
-        errorCode: code,
       );
     }
   }
