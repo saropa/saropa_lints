@@ -12,6 +12,18 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [6.0.2]
+
+### Changed
+
+- Widened `analysis_server_plugin` and `analyzer_plugin` dependency constraints from pinned to `^` range to reduce version conflicts for consumers
+
+### Fixed
+
+- CI publish workflow: dry run step failed on exit code 65 (warnings) due to `set -e` killing the shell before the exit code could be evaluated; warnings are now reported via GitHub Actions annotations without blocking the publish
+
+---
+
 ## [6.0.1]
 
 ### Added
@@ -28,13 +40,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
   - `prefer_drift_foreign_key_declaration` (Professional, INFO) — detects `Id`-suffixed columns without `references()`
   - `require_drift_onupgrade_handler` (Recommended, WARNING) — detects schemaVersion > 1 without `onUpgrade` handler
 
-### Changed
-
-- Widened `analysis_server_plugin` and `analyzer_plugin` dependency constraints from pinned to `^` range to reduce version conflicts for consumers
-
 ### Fixed
 
-- CI publish workflow: dry run step failed on exit code 65 (warnings) due to `set -e` killing the shell before the exit code could be evaluated; warnings are now reported via GitHub Actions annotations without blocking the publish
 - `avoid_drift_missing_updates_param` — missing drift import check caused false positives on non-drift `customUpdate()` calls
 - `prefer_drift_foreign_key_declaration` — false positives on non-FK column names (`androidId`, `deviceId`, `sessionId`, etc.)
 - `require_drift_equals_value` — false positives on non-enum uppercase types (`DateTime`, `Duration`, `BigInt`, etc.)
