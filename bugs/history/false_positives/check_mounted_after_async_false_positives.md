@@ -3,19 +3,21 @@
 ## Diagnostic Reference
 
 ```json
-[{
-  "resource": "/D:/src/contacts/lib/components/device_home_screen_widget/quick_launch_menu_utils.dart",
-  "owner": "_generated_diagnostic_collection_name_#2",
-  "code": "check_mounted_after_async",
-  "severity": 4,
-  "message": "[check_mounted_after_async] setState() after await without mounted check. State may be disposed during async gap, causing \"setState() called after dispose()\" crash. {v4}\nAdd if (mounted) { setState(...) } after the await.",
-  "source": "dart",
-  "startLineNumber": 259,
-  "startColumn": 17,
-  "endLineNumber": 274,
-  "endColumn": 12,
-  "origin": "extHost1"
-}]
+[
+  {
+    "resource": "/D:/src/contacts/lib/components/device_home_screen_widget/quick_launch_menu_utils.dart",
+    "owner": "_generated_diagnostic_collection_name_#2",
+    "code": "check_mounted_after_async",
+    "severity": 4,
+    "message": "[check_mounted_after_async] setState() after await without mounted check. State may be disposed during async gap, causing \"setState() called after dispose()\" crash. {v4}\nAdd if (mounted) { setState(...) } after the await.",
+    "source": "dart",
+    "startLineNumber": 259,
+    "startColumn": 17,
+    "endLineNumber": 274,
+    "endColumn": 12,
+    "origin": "extHost1"
+  }
+]
 ```
 
 ---
@@ -126,7 +128,7 @@ class QuickLaunchMenuUtils {
 
 This class is **not** a `State` subclass. There is no `mounted` property. There is no `dispose()` lifecycle. The `context` parameter is a `BuildContext` passed in by the caller — the only valid check is `context.mounted`, which IS present at line 256.
 
-The rule's problem message says *"State may be disposed during async gap, causing 'setState() called after dispose()' crash"* — but there is no `State` here and no `setState` is being called. The flagged call is `showDialog`, which is a top-level Flutter function, not a `State` method.
+The rule's problem message says _"State may be disposed during async gap, causing 'setState() called after dispose()' crash"_ — but there is no `State` here and no `setState` is being called. The flagged call is `showDialog`, which is a top-level Flutter function, not a `State` method.
 
 ---
 
@@ -166,11 +168,13 @@ bool _hasMountedGuard(FunctionBody body, AstNode target) {
     }
     current = current.parent;
   }
+
   return false;
 }
 ```
 
 This only walks **up** the AST from the target to the function body, looking for an enclosing `IfStatement`. It needs to also check for **preceding** `IfStatement` siblings in the same block that:
+
 1. Have a condition containing `mounted` (either `mounted`, `!mounted`, `context.mounted`, `!context.mounted`)
 2. Contain a `return`, `throw`, or `break` statement in their body (i.e., they are an early-exit guard)
 
@@ -226,11 +230,13 @@ bool _containsEarlyExit(Statement statement) {
         s is ReturnStatement ||
         (s is ExpressionStatement && s.expression is ThrowExpression));
   }
+
   return false;
 }
 ```
 
 Additionally, consider **not flagging** calls inside static methods of non-State classes, since:
+
 - There is no `State` lifecycle to dispose
 - The message about `setState() called after dispose()` is misleading
 - The developer is already using `context.mounted` which is the correct check for passed-in contexts
@@ -239,23 +245,23 @@ Additionally, consider **not flagging** calls inside static methods of non-State
 
 ## Patterns That Should Be Recognized as Safe
 
-| Pattern | Currently Recognized | Should Be Recognized |
-|---|---|---|
-| `if (mounted) { setState(...); }` | Yes | Yes |
-| `if (context.mounted) { setState(...); }` | Yes | Yes |
-| `if (!mounted) return; setState(...);` | **No** | **Yes** |
-| `if (!context.mounted) return; setState(...);` | **No** | **Yes** |
-| `if (!mounted) return; await ...; if (!mounted) return; setState(...);` | **No** | **Yes** |
-| Static method with `context.mounted` guard before `showDialog` | **No** | **Yes** |
+| Pattern                                                                 | Currently Recognized | Should Be Recognized |
+| ----------------------------------------------------------------------- | -------------------- | -------------------- |
+| `if (mounted) { setState(...); }`                                       | Yes                  | Yes                  |
+| `if (context.mounted) { setState(...); }`                               | Yes                  | Yes                  |
+| `if (!mounted) return; setState(...);`                                  | **No**               | **Yes**              |
+| `if (!context.mounted) return; setState(...);`                          | **No**               | **Yes**              |
+| `if (!mounted) return; await ...; if (!mounted) return; setState(...);` | **No**               | **Yes**              |
+| Static method with `context.mounted` guard before `showDialog`          | **No**               | **Yes**              |
 
 ---
 
 ## Affected Files
 
-| File | Line | What |
-|---|---|---|
-| `lib/src/rules/async_rules.dart` | 1837-1850 | `_hasMountedGuard()` — needs early-return guard detection |
-| `lib/src/rules/async_rules.dart` | 1784-1793 | Method name filter — consider skipping for static non-State methods |
+| File                             | Line      | What                                                                                                |
+| -------------------------------- | --------- | --------------------------------------------------------------------------------------------------- |
+| `lib/src/rules/async_rules.dart` | 1837-1850 | `_hasMountedGuard()` — needs early-return guard detection                                           |
+| `lib/src/rules/async_rules.dart` | 1784-1793 | Method name filter — consider skipping for static non-State methods                                 |
 | `lib/src/rules/async_rules.dart` | 1769-1776 | `_code` — problem message assumes `State.setState()`, misleading for `showDialog` in static methods |
 
 ## Priority

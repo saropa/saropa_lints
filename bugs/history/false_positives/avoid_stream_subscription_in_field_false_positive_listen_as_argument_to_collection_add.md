@@ -85,12 +85,12 @@ Stream<bool> _createRebuildTriggerStream() {
 
 ### Cleanup chain (correct, no leak)
 
-| Step | Action | Trigger |
-|------|--------|---------|
-| 1 | `dispose()` runs | Widget removed from tree |
-| 2 | `_rebuildTriggerSubscription?.cancel()` | Cancels outer subscription |
-| 3 | `Stream.multi`'s `controller.onCancel` fires | Outer subscription canceled |
-| 4 | All inner `subscriptions` are canceled in loop | `onCancel` callback |
+| Step | Action                                         | Trigger                     |
+| ---- | ---------------------------------------------- | --------------------------- |
+| 1    | `dispose()` runs                               | Widget removed from tree    |
+| 2    | `_rebuildTriggerSubscription?.cancel()`        | Cancels outer subscription  |
+| 3    | `Stream.multi`'s `controller.onCancel` fires   | Outer subscription canceled |
+| 4    | All inner `subscriptions` are canceled in loop | `onCancel` callback         |
 
 Every subscription is properly canceled. There is no leak.
 
@@ -107,11 +107,13 @@ while (current != null) {
     reporter.atNode(node);    // ← FALSE POSITIVE
     return;
   }
+
   if (current is VariableDeclaration ||
       current is AssignmentExpression ||
       current is ReturnStatement) {
     break;  // Being assigned or returned — OK
   }
+
   if (current is Block || current is MethodDeclaration) {
     break;
   }

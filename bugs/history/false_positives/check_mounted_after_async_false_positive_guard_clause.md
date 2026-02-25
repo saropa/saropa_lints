@@ -30,6 +30,7 @@ Timer(const Duration(milliseconds: 300), () async {
 ```
 
 **Diagnostic produced:**
+
 ```
 [check_mounted_after_async] setState() after await without mounted check.
 State may be disposed during async gap, causing "setState() called after dispose()" crash.
@@ -97,6 +98,7 @@ bool _hasMountedGuard(FunctionBody body, AstNode target) {
     }
     current = current.parent;
   }
+
   return false;
 }
 ```
@@ -140,6 +142,7 @@ Both patterns are recommended in Flutter documentation and are equally safe.
 The rule will false-positive on ALL of these idiomatic patterns:
 
 ### 1. Simple guard + setState
+
 ```dart
 Future<void> _load() async {
   final data = await fetchData();
@@ -149,6 +152,7 @@ Future<void> _load() async {
 ```
 
 ### 2. Multiple awaits with guard before setState
+
 ```dart
 Future<void> _init() async {
   await stepOne();
@@ -159,6 +163,7 @@ Future<void> _init() async {
 ```
 
 ### 3. Guard inside Timer/callback async closure
+
 ```dart
 Timer(duration, () async {
   if (!mounted) return;
@@ -169,6 +174,7 @@ Timer(duration, () async {
 ```
 
 ### 4. Guard using `context.mounted` (BuildContext version)
+
 ```dart
 Future<void> _load() async {
   await fetchData();
@@ -234,6 +240,7 @@ bool _isEarlyExit(Statement stmt) {
   if (stmt is Block && stmt.statements.length == 1) {
     return _isEarlyExit(stmt.statements.first);
   }
+
   return false;
 }
 ```
