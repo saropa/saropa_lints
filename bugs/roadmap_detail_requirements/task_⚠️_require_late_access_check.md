@@ -1,6 +1,7 @@
 # Task: `require_late_access_check`
 
 ## Summary
+
 - **Rule Name**: `require_late_access_check`
 - **Tier**: Professional
 - **Severity**: WARNING
@@ -27,6 +28,7 @@ class UserService {
 ```
 
 Common scenarios where this is a problem:
+
 1. Service locator initialization order is uncertain
 2. `initState()` sets up a `late` field but the widget can be accessed before `initState()` completes
 3. `late` factory dependencies that may not be registered
@@ -69,6 +71,7 @@ context.registry.addFieldDeclaration((node) {
 ## Code Examples
 
 ### Bad (Should trigger)
+
 ```dart
 class AuthService {
   late String _token; // ← late mutable
@@ -86,6 +89,7 @@ class AuthService {
 ```
 
 ### Good (Should NOT trigger)
+
 ```dart
 // Option 1: Use nullable instead of late
 class AuthService {
@@ -124,21 +128,23 @@ class AuthService {
 
 ## Edge Cases & False Positives
 
-| Scenario | Expected Behavior | Notes |
-|---|---|---|
-| `late final` (immutable after set) | **Different rule** — about double-assignment | |
-| `late` field initialized in `initState` | **Suppress** — Flutter lifecycle guarantees initState runs first | |
-| `late` field with `isInitialized` guard at access point | **Suppress** | |
-| `late` field in abstract class | **Complex** | |
-| Test files | **Suppress** | |
-| Generated code | **Suppress** | |
+| Scenario                                                | Expected Behavior                                                | Notes |
+| ------------------------------------------------------- | ---------------------------------------------------------------- | ----- |
+| `late final` (immutable after set)                      | **Different rule** — about double-assignment                     |       |
+| `late` field initialized in `initState`                 | **Suppress** — Flutter lifecycle guarantees initState runs first |       |
+| `late` field with `isInitialized` guard at access point | **Suppress**                                                     |       |
+| `late` field in abstract class                          | **Complex**                                                      |       |
+| Test files                                              | **Suppress**                                                     |       |
+| Generated code                                          | **Suppress**                                                     |       |
 
 ## Unit Tests
 
 ### Violations
+
 1. `late String _token` initialized in `setToken()` method, accessed in `getHeaders()` without check → 1 lint
 
 ### Non-Violations
+
 1. `late String _token` initialized in constructor → no lint
 2. `late String _token` with `_initialized` guard at access point → no lint
 3. `late final` (final after set) → no lint (different concern)
@@ -146,6 +152,7 @@ class AuthService {
 ## Quick Fix
 
 Offer "Convert to nullable (`String?`)":
+
 ```dart
 // Before
 late String _token;
@@ -156,6 +163,7 @@ String? _token;
 ```
 
 Or "Add initialization check":
+
 ```dart
 // Before
 String getToken() => _token;
@@ -165,6 +173,7 @@ String getToken() {
   if (!_isInitialized) {
     throw StateError('Service not initialized. Call initialize() first.');
   }
+
   return _token;
 }
 ```
@@ -176,6 +185,6 @@ String getToken() {
 3. **The real fix**: The Dart team recommends using `late` only when:
    - The field is definitely initialized before first access (lifecycle guarantee)
    - The field is expensive to compute and may not be needed (lazy initialization)
-   For service locator patterns, prefer constructor injection or factory methods.
+     For service locator patterns, prefer constructor injection or factory methods.
 4. **Static analysis limitation**: True "possibly uninitialized" detection requires control flow analysis (is there any execution path that reads the field before it's set?). This is beyond simple AST analysis. Phase 1 uses a heuristic: "field is set in non-constructor method AND accessed in other non-constructor methods."
 5. **Riverpod/get_it context**: Service locators with `late` initialization are a common pattern. The lint must avoid flagging correctly-ordered initialization in DI containers.

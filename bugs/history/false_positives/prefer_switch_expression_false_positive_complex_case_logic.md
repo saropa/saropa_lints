@@ -4,7 +4,6 @@
 
 **Fixed.** Rewritten to reject cases with multiple statements, control flow (`if`/`for`/`while`/`try`/`do`), and non-exhaustive switches with post-switch code.
 
-
 ## Summary
 
 The `prefer_switch_expression` rule incorrectly flags a `switch` statement as
@@ -94,8 +93,8 @@ the code more verbose and harder to scan. {v5}
 
 ### Affected location (1 instance)
 
-| File | Line | Method | Complex case |
-|------|------|--------|-------------|
+| File                                | Line | Method      | Complex case                                              |
+| ----------------------------------- | ---- | ----------- | --------------------------------------------------------- |
 | `lib/string/string_extensions.dart` | 1050 | `pluralize` | `case 'y':` contains `if` statement with two return paths |
 
 ## Root cause
@@ -108,10 +107,12 @@ whether any case branch contains **control flow statements** (like `if`, `for`,
 ### Likely detection gap
 
 The rule probably checks:
+
 - Does every case end with `return` or an assignment? → Yes
 - Is there a default case or does control flow after the switch? → (not checked)
 
 It does NOT check:
+
 - Does any case contain **multiple statements**?
 - Does any case contain **conditional logic** (`if`/`else`)?
 - Is the switch **non-exhaustive** with post-switch code?
@@ -193,6 +194,7 @@ String example2(String c) {
     case 'y':
       return 'why';
   }
+
   return c.toUpperCase();  // fallthrough for other cases
 }
 

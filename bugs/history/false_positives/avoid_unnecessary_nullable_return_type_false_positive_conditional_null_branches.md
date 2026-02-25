@@ -4,7 +4,6 @@
 
 **Fixed.** `_NullReturnFinder` and `_expressionCanBeNull` now recursively check `ConditionalExpression` branches, `ParenthesizedExpression`, and `staticType` nullability.
 
-
 ## Summary
 
 The `avoid_unnecessary_nullable_return_type` rule incorrectly flags methods that
@@ -89,12 +88,12 @@ safety. {v3}
 
 ### All affected locations (4 instances)
 
-| File | Line | Method | Null return path |
-|------|------|--------|------------------|
-| `lib/string/string_extensions.dart` | 177 | `encloseInParentheses` | `isEmpty && !wrapEmpty` branch returns `null` via nested ternary |
-| `lib/string/string_extensions.dart` | 766 | `removeSingleCharacterWords` | `result.isEmpty ? null : result` on line 775 |
-| `lib/string/string_extensions.dart` | 804 | `removeLeadingAndTrailing` | `value.isEmpty ? null : value` on line 815 |
-| `lib/string/string_extensions.dart` | 953 | `extractCurlyBraces` | `matches.isEmpty ? null : matches` on line 959 |
+| File                                | Line | Method                       | Null return path                                                 |
+| ----------------------------------- | ---- | ---------------------------- | ---------------------------------------------------------------- |
+| `lib/string/string_extensions.dart` | 177  | `encloseInParentheses`       | `isEmpty && !wrapEmpty` branch returns `null` via nested ternary |
+| `lib/string/string_extensions.dart` | 766  | `removeSingleCharacterWords` | `result.isEmpty ? null : result` on line 775                     |
+| `lib/string/string_extensions.dart` | 804  | `removeLeadingAndTrailing`   | `value.isEmpty ? null : value` on line 815                       |
+| `lib/string/string_extensions.dart` | 953  | `extractCurlyBraces`         | `matches.isEmpty ? null : matches` on line 959                   |
 
 ## Root cause
 
@@ -134,6 +133,7 @@ bool canExpressionBeNull(Expression expr) {
     return canExpressionBeNull(expr.thenExpression) ||
            canExpressionBeNull(expr.elseExpression);
   }
+
   if (expr is ParenthesizedExpression) {
     return canExpressionBeNull(expr.expression);
   }
@@ -142,6 +142,7 @@ bool canExpressionBeNull(Expression expr) {
   if (type != null && type.nullabilitySuffix == NullabilitySuffix.question) {
     return true;
   }
+
   return false;
 }
 ```

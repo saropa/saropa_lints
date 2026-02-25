@@ -4,7 +4,6 @@
 
 **Fixed.** Added three checks: skip loop-body assignments, skip may-overwrite conditionals (if without else), skip assignments where the next overwrite reads the variable on RHS.
 
-
 ## Summary
 
 The `avoid_unused_assignment` rule incorrectly flags assignments where the
@@ -67,6 +66,7 @@ first = this                          // initial assignment
 ```
 
 The assignment `first = first.toLowerCase()` on line 593:
+
 1. **Reads** the old `first` (from `this`) as `first.toLowerCase()`
 2. The new `first` is **read** on line 598 as `first.replaceAll(...)` (if `normalizeApostrophe` is true)
 3. The new `first` is **read** on line 602 as `first == second`
@@ -106,12 +106,12 @@ expression or return statement. {v3}
 
 ### All affected locations (4 instances)
 
-| File | Line | Variable | Overwrite reads old value? | Subsequent reads? |
-|------|------|----------|---------------------------|-------------------|
-| `lib/string/string_extensions.dart` | 593 | `first` | Yes (`first.toLowerCase()`) | Lines 598, 602 |
-| `lib/string/string_extensions.dart` | 594 | `second` | Yes (`second.toLowerCase()`) | Lines 599, 602 |
-| `lib/string/string_extensions.dart` | 770 | `result` | Yes (`result.replaceAll(...)`) | Lines 773, 775 |
-| `lib/string/string_extensions.dart` | 304 | `str` | Yes (`str.substringSafe(...)`) | Lines 307, 309, 312 |
+| File                                | Line | Variable | Overwrite reads old value?     | Subsequent reads?   |
+| ----------------------------------- | ---- | -------- | ------------------------------ | ------------------- |
+| `lib/string/string_extensions.dart` | 593  | `first`  | Yes (`first.toLowerCase()`)    | Lines 598, 602      |
+| `lib/string/string_extensions.dart` | 594  | `second` | Yes (`second.toLowerCase()`)   | Lines 599, 602      |
+| `lib/string/string_extensions.dart` | 770  | `result` | Yes (`result.replaceAll(...)`) | Lines 773, 775      |
+| `lib/string/string_extensions.dart` | 304  | `str`    | Yes (`str.substringSafe(...)`) | Lines 307, 309, 312 |
 
 ## Root cause
 
@@ -127,6 +127,7 @@ without checking whether:
 ### Analysis error pattern
 
 The rule sees this structure:
+
 ```dart
 x = A;          // assignment 1
 if (cond1) {
@@ -139,6 +140,7 @@ return x;
 ```
 
 But the correct analysis is:
+
 - Assignment 1 IS read: by `f(x)` in assignment 2 (RHS), and directly on `return x` if `cond1` is false
 - Assignment 2 IS read: by `g(x)` in assignment 3 (RHS), and directly on `return x` if `cond2` is false
 
@@ -187,6 +189,7 @@ use(x);        // reads x -- could be A (cond false) or B (cond true)
 
 Only flag an assignment as unused if it is **must-overwritten** on ALL paths
 before being read. This requires either:
+
 - Proper reaching-definitions analysis on the CFG, or
 - Recognizing that assignments inside `if` blocks without `else` are always
   may-overwrites
@@ -202,6 +205,7 @@ void pipeline(bool step1, bool step2) {
   if (step1) {
     value = value.toUpperCase();  // reads old value on RHS
   }
+
   if (step2) {
     value = value.trim();  // reads value (from step1 or original)
   }
@@ -223,6 +227,7 @@ void readAfter() {
   if (condition) {
     x = computeB(x);  // reads x from computeA()
   }
+
   return x;  // reads x (either from computeA or computeB)
 }
 
