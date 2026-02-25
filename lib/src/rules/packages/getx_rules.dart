@@ -2163,7 +2163,7 @@ class AvoidGetxRxNestedObsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addVariableDeclaration((VariableDeclaration node) {
-      final DartType? type = node.declaredElement?.type;
+      final DartType? type = node.declaredFragment?.element.type;
       if (type == null) return;
 
       final String typeStr = type.getDisplayString();

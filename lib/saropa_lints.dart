@@ -2551,7 +2551,7 @@ Map<String, SaropaLintRule Function()> _buildRuleFactoriesMap() {
   final map = <String, SaropaLintRule Function()>{};
   for (final factory in _allRuleFactories) {
     final rule = factory(); // temporary instance to get name
-    map[rule.code.name] = factory;
+    map[rule.code.lowerCaseName] = factory;
     // rule goes out of scope, can be GC'd
   }
 
@@ -2717,7 +2717,7 @@ const List<List<String>> _conflictingRulePairs = <List<String>>[
 /// two mutually exclusive stylistic rules.
 void _checkConflictingRules(List<SaropaLintRule> enabledRules) {
   final Set<String> enabledNames = enabledRules
-      .map((SaropaLintRule rule) => rule.code.name)
+      .map((SaropaLintRule rule) => rule.code.lowerCaseName)
       .toSet();
 
   for (final List<String> pair in _conflictingRulePairs) {

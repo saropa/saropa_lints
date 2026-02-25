@@ -42,7 +42,8 @@ class SaropaLintsPlugin extends Plugin {
   void register(PluginRegistry registry) {
     final disabled = SaropaLintRule.disabledRules;
     for (final rule in allSaropaRules) {
-      if (disabled != null && disabled.contains(rule.code.name)) continue;
+      if (disabled != null && disabled.contains(rule.code.lowerCaseName))
+        continue;
 
       registry.registerLintRule(rule);
 

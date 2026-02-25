@@ -869,7 +869,7 @@ Map<String, _RuleMetadata> _getRuleMetadata() {
   _ruleMetadataCache = <String, _RuleMetadata>{};
   for (final SaropaLintRule rule in allSaropaRules) {
     {
-      final String ruleName = rule.code.name;
+      final String ruleName = rule.code.lowerCaseName;
       final String message = rule.code.problemMessage;
       final String correction = rule.code.correctionMessage ?? '';
 

@@ -670,17 +670,6 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  /// Creates a [LintCode] with the specific ghost parameter name.
-  static LintCode _codeForName(String name) => LintCode(
-    'verify_documented_parameters_exist',
-    '[verify_documented_parameters_exist] Documentation references '
-        "'[$name]' which does not exist in the signature. {v3}",
-    correctionMessage:
-        'Remove the stale parameter reference or update it to match '
-        'an actual parameter name.',
-    severity: DiagnosticSeverity.WARNING,
-  );
-
   /// Pattern to extract `[bracketedName]` from doc comments.
   ///
   /// Matches `[name]` but not `[name.field]` (dotted refs are
@@ -771,7 +760,6 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
         reporter.atOffset(
           offset: match.start + token.offset,
           length: match.end - match.start,
-          errorCode: _codeForName(name),
         );
       }
       docTextOffset += lexeme.length + 1; // +1 for join('\n')

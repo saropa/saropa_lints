@@ -140,7 +140,7 @@ ClassDeclaration? _findEnclosingClass(AstNode node) {
 bool _extendsTypeConverter(ClassDeclaration classDecl) {
   final superclass = classDecl.extendsClause?.superclass;
   if (superclass == null) return false;
-  final name = superclass.name2.lexeme;
+  final name = superclass.name.lexeme;
   return name == 'TypeConverter' || name == 'NullAwareTypeConverter';
 }
 
@@ -215,7 +215,7 @@ class RequireDriftDatabaseCloseRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final typeAnnotation = member.fields.type;
           if (typeAnnotation is NamedType) {
-            final typeName = typeAnnotation.name2.lexeme;
+            final typeName = typeAnnotation.name.lexeme;
             if (typeName.endsWith('Database') ||
                 typeName == 'GeneratedDatabase') {
               for (final variable in member.fields.variables) {
@@ -535,7 +535,7 @@ class RequireDriftForeignKeyPragmaRule extends SaropaLintRule {
       // Check if class extends _$Something (Drift generated superclass)
       final superclass = node.extendsClause?.superclass;
       if (superclass == null) return;
-      final superName = superclass.name2.lexeme;
+      final superName = superclass.name.lexeme;
       if (!superName.startsWith(r'_$')) return;
       if (!fileImportsPackage(node, PackageImports.drift)) return;
 
@@ -882,7 +882,7 @@ class AvoidDriftDatabaseOnMainIsolateRule extends SaropaLintRule {
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final constructorName = node.constructorName;
-      final typeName = constructorName.type.name2.lexeme;
+      final typeName = constructorName.type.name.lexeme;
       if (typeName != 'NativeDatabase') return;
 
       // Skip NativeDatabase.memory() (used for testing)
@@ -1191,7 +1191,7 @@ class AvoidDriftLazyDatabaseRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final typeName = node.constructorName.type.name2.lexeme;
+      final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'LazyDatabase') return;
 
       // Check if callback body references isolate patterns
@@ -1268,7 +1268,7 @@ class PreferDriftIsolateSharingRule extends SaropaLintRule {
     final dbPaths = <String, InstanceCreationExpression>{};
 
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final typeName = node.constructorName.type.name2.lexeme;
+      final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'NativeDatabase') return;
 
       final args = node.argumentList.arguments;
@@ -1454,7 +1454,7 @@ class RequireDriftSchemaVersionBumpRule extends SaropaLintRule {
       // Check for _$ prefix superclass (Drift database pattern)
       final superclass = node.extendsClause?.superclass;
       if (superclass == null) return;
-      if (!superclass.name2.lexeme.startsWith(r'_$')) return;
+      if (!superclass.name.lexeme.startsWith(r'_$')) return;
       if (!fileImportsPackage(node, PackageImports.drift)) return;
 
       // Check @DriftDatabase annotation for table count
@@ -1708,7 +1708,7 @@ class AvoidDriftUnsafeWebStorageRule extends SaropaLintRule {
   ) {
     // Detect WebDatabase constructor
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final typeName = node.constructorName.type.name2.lexeme;
+      final typeName = node.constructorName.type.name.lexeme;
       if (typeName == 'WebDatabase') {
         reporter.atNode(node);
       }
@@ -1786,7 +1786,7 @@ class AvoidDriftCloseStreamsInTestsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final typeName = node.constructorName.type.name2.lexeme;
+      final typeName = node.constructorName.type.name.lexeme;
       final constructorName = node.constructorName.name?.name;
       if (typeName != 'NativeDatabase' || constructorName != 'memory') return;
 
@@ -1798,7 +1798,7 @@ class AvoidDriftCloseStreamsInTestsRule extends SaropaLintRule {
       if (parent is ArgumentList) {
         final grandparent = parent.parent;
         if (grandparent is InstanceCreationExpression) {
-          final wrapperType = grandparent.constructorName.type.name2.lexeme;
+          final wrapperType = grandparent.constructorName.type.name.lexeme;
           if (wrapperType == 'DatabaseConnection') {
             // Check for closeStreamsSynchronously parameter
             for (final arg in grandparent.argumentList.arguments) {
