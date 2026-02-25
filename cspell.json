@@ -126,6 +126,7 @@
     "jsonfile",
     "keepalive",
     "kvstore",
+    "kykto",
     "laggy",
     "latlong",
     "lifecycles",
