@@ -1971,7 +1971,7 @@ class AvoidMultipleAnimationControllersRule extends SaropaLintRule {
       // Only check State subclasses
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
-      final String superclass = extendsClause.superclass.name2.lexeme;
+      final String superclass = extendsClause.superclass.name.lexeme;
       if (superclass != 'State') return;
 
       int controllerCount = 0;
@@ -1982,7 +1982,7 @@ class AvoidMultipleAnimationControllersRule extends SaropaLintRule {
 
         if (type is NamedType) {
           // Explicit type annotation: AnimationController or AnimationController?
-          if (type.name2.lexeme == 'AnimationController') {
+          if (type.name.lexeme == 'AnimationController') {
             controllerCount += member.fields.variables.length;
           }
         } else if (type == null) {
@@ -1990,7 +1990,7 @@ class AvoidMultipleAnimationControllersRule extends SaropaLintRule {
           for (final VariableDeclaration v in member.fields.variables) {
             final Expression? init = v.initializer;
             if (init is InstanceCreationExpression &&
-                init.constructorName.type.name2.lexeme ==
+                init.constructorName.type.name.lexeme ==
                     'AnimationController') {
               controllerCount++;
             }

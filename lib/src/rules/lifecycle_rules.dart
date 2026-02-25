@@ -400,8 +400,11 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
       if (!superclass.startsWith('State<')) return;
 
       // Collect late fields
+      final classBody = node.body;
+      if (classBody is! BlockClassBody) return;
+
       final Set<String> lateFields = <String>{};
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in classBody.members) {
         if (member is FieldDeclaration && member.fields.isLate) {
           for (final VariableDeclaration variable in member.fields.variables) {
             // Only track uninitialized late fields
@@ -415,7 +418,7 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
       if (lateFields.isEmpty) return;
 
       // Find build method and check for late field assignments
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in classBody.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
           _checkBuildMethodForLateAssignments(member, lateFields, reporter);
         }
@@ -528,7 +531,7 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
       if (!_extendsState(node)) return;
       if (_hasLifecycleHandling(node)) return;
       if (_hasBackgroundWork(node)) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
       }
     });
   }
@@ -554,7 +557,10 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
       }
     }
 
-    for (final ClassMember member in node.members) {
+    final classBody = node.body;
+    if (classBody is! BlockClassBody) return false;
+
+    for (final ClassMember member in classBody.members) {
       if (member is MethodDeclaration &&
           member.name.lexeme == 'didChangeAppLifecycleState') {
         return true;
@@ -573,7 +579,10 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
   static final RegExp _timerConstructorPattern = RegExp(r'\bTimer\(');
 
   static bool _hasBackgroundWork(ClassDeclaration node) {
-    for (final ClassMember member in node.members) {
+    final classBody = node.body;
+    if (classBody is! BlockClassBody) return false;
+
+    for (final ClassMember member in classBody.members) {
       if (member is MethodDeclaration) {
         final String bodySource = member.body.toSource();
         if (bodySource.contains('Timer.periodic')) return true;

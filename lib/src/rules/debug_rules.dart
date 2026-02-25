@@ -379,11 +379,7 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
               // Find the end of the ignore directive
               final int length = _getIgnoreCommentLength(lines[i], columnStart);
 
-              reporter.atOffset(
-                offset: offset,
-                length: length,
-                errorCode: code,
-              );
+              reporter.atOffset(offset: offset, length: length);
             }
           }
         }

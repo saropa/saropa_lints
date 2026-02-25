@@ -1792,7 +1792,7 @@ class ViolationRecord {
 abstract class SaropaLintRule extends AnalysisRule {
   SaropaLintRule({required LintCode code})
     : _lintCode = code,
-      super(name: code.name, description: code.problemMessage);
+      super(name: code.lowerCaseName, description: code.problemMessage);
 
   final LintCode _lintCode;
 
@@ -1804,10 +1804,10 @@ abstract class SaropaLintRule extends AnalysisRule {
 
   @override
   DiagnosticCode get diagnosticCode {
-    final override = severityOverrides?[code.name];
+    final override = severityOverrides?[code.lowerCaseName];
     if (override == null) return _lintCode;
     return _overriddenCode ??= LintCode(
-      _lintCode.name,
+      _lintCode.lowerCaseName,
       _lintCode.problemMessage,
       correctionMessage: _lintCode.correctionMessage,
       severity: override,
@@ -2355,12 +2355,12 @@ abstract class SaropaLintRule extends AnalysisRule {
   /// Returns the documentation URL for this rule.
   ///
   /// Format: `https://pub.dev/packages/saropa_lints#rule_name`
-  String get documentationUrl => '$documentationBaseUrl#${code.name}';
+  String get documentationUrl => '$documentationBaseUrl#${code.lowerCaseName}';
 
   /// Returns the rule name in hyphenated format for display.
   ///
   /// Example: `no_empty_block` → `no-empty-block`
-  String get hyphenatedName => code.name.replaceAll('_', '-');
+  String get hyphenatedName => code.lowerCaseName.replaceAll('_', '-');
 
   // ============================================================
   // Severity Override Support (#5)
@@ -2383,11 +2383,11 @@ abstract class SaropaLintRule extends AnalysisRule {
   static Set<String>? disabledRules;
 
   /// Check if this rule is disabled via configuration.
-  bool get isDisabled => disabledRules?.contains(code.name) ?? false;
+  bool get isDisabled => disabledRules?.contains(code.lowerCaseName) ?? false;
 
   /// Get the effective severity for this rule, considering overrides.
   DiagnosticSeverity? get effectiveSeverity =>
-      severityOverrides?[code.name] ?? code.severity;
+      severityOverrides?[code.lowerCaseName] ?? code.severity;
 
   // ============================================================
   // Core Implementation
@@ -2477,7 +2477,7 @@ abstract class SaropaLintRule extends AnalysisRule {
   ///
   /// Essential-tier rules run even during rapid editing.
   bool _isEssentialTierRule() {
-    return essentialRules.contains(code.name);
+    return essentialRules.contains(code.lowerCaseName);
   }
 
   // =========================================================================
@@ -2500,7 +2500,7 @@ abstract class SaropaLintRule extends AnalysisRule {
     final saropaContext = SaropaContext(registry, this, ruleContext);
     final reporter = SaropaDiagnosticReporter(
       this,
-      code.name,
+      code.lowerCaseName,
       impact: impact,
       lintCode: _lintCode,
       ruleContext: ruleContext,
@@ -2578,14 +2578,7 @@ class SaropaDiagnosticReporter {
   }
 
   /// Reports a diagnostic at the given offset and length.
-  ///
-  /// The [errorCode] parameter is accepted for backwards compatibility
-  /// but ignored.
-  void atOffset({
-    required int offset,
-    required int length,
-    LintCode? errorCode,
-  }) {
+  void atOffset({required int offset, required int length}) {
     if (_isBaselined(offset)) return;
     _rule.reportAtOffset(offset, length);
     _trackViolation(offset);
