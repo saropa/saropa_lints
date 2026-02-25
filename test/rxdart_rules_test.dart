@@ -23,7 +23,7 @@ void main() {
   group('RxDart Rules - Rule Instantiation', () {
     test('AvoidBehaviorSubjectLastValueRule instantiates correctly', () {
       final rule = AvoidBehaviorSubjectLastValueRule();
-      expect(rule.code.lowerCaseName, 'avoid_behavior_subject_last_value');
+      expect(rule.code.name, 'avoid_behavior_subject_last_value');
       expect(
         rule.code.problemMessage,
         contains('[avoid_behavior_subject_last_value]'),
