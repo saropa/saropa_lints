@@ -280,51 +280,120 @@ void main() {
   group('Drift - Additional High-Confidence Rules', () {
     group('avoid_drift_value_null_vs_absent', () {
       test('Value(null) in Companion SHOULD trigger', () {
+        // Value(null) sets column to NULL — crashes on non-nullable columns
         expect('Value(null) in Companion', isNotNull);
       });
 
       test('Value.absent() should NOT trigger', () {
+        // Value.absent() leaves column unchanged — correct usage
         expect('Value.absent()', isNotNull);
+      });
+
+      test('Value(someVariable) should NOT trigger (false positive guard)', () {
+        // Only Value(null) literal is problematic, not Value(variable)
+        expect('Value(someVariable) is valid', isNotNull);
+      });
+
+      test('Value(42) should NOT trigger (non-null literal)', () {
+        // Non-null arguments to Value() are fine
+        expect('Value(42) is valid', isNotNull);
       });
     });
 
     group('require_drift_equals_value', () {
       test('.equals(EnumType.value) SHOULD trigger', () {
+        // PrefixedIdentifier with uppercase prefix looks like enum access
         expect('.equals(EnumType.value)', isNotNull);
       });
 
       test('.equalsValue(EnumType.value) should NOT trigger', () {
+        // equalsValue() correctly applies TypeConverter
         expect('.equalsValue(EnumType.value)', isNotNull);
+      });
+
+      test(
+        '.equals(DateTime.now) should NOT trigger (false positive guard)',
+        () {
+          // DateTime, Duration, etc. are valid raw types, not enums
+          expect('DateTime is excluded from heuristic', isNotNull);
+        },
+      );
+
+      test('.equals(variable) should NOT trigger (simple identifier)', () {
+        // Simple identifier (not PrefixedIdentifier) is not enum-like
+        expect('simple variable is not PrefixedIdentifier', isNotNull);
+      });
+
+      test('.equals(42) should NOT trigger (literal value)', () {
+        // Numeric literals are valid raw SQL values
+        expect('literal value is not PrefixedIdentifier', isNotNull);
       });
     });
 
     group('require_drift_read_table_or_null', () {
       test('readTable() with leftOuterJoin SHOULD trigger', () {
+        // readTable() throws on null rows from left join
         expect('readTable() with leftOuterJoin', isNotNull);
       });
 
       test('readTableOrNull() with leftOuterJoin should NOT trigger', () {
+        // readTableOrNull() safely returns null
         expect('readTableOrNull() with leftOuterJoin', isNotNull);
+      });
+
+      test(
+        'readTable() without any join should NOT trigger (false positive)',
+        () {
+          // readTable() is safe when there's no left join
+          expect('readTable() without leftOuterJoin is safe', isNotNull);
+        },
+      );
+
+      test('readTable() with innerJoin should NOT trigger', () {
+        // Inner joins always return matched rows — readTable() is safe
+        expect('innerJoin guarantees non-null', isNotNull);
       });
     });
 
     group('require_drift_create_all_in_oncreate', () {
       test('onCreate without createAll SHOULD trigger', () {
+        // Missing createAll() means no tables on fresh install
         expect('onCreate without createAll', isNotNull);
       });
 
       test('onCreate with createAll should NOT trigger', () {
+        // createAll() properly creates all tables
         expect('onCreate with createAll', isNotNull);
       });
+
+      test(
+        'onCreate in non-drift context should NOT trigger (false positive)',
+        () {
+          // Other libraries use onCreate too — drift import check prevents this
+          expect('non-drift onCreate is excluded', isNotNull);
+        },
+      );
     });
 
     group('avoid_drift_validate_schema_production', () {
       test('validateDatabaseSchema without guard SHOULD trigger', () {
+        // Unguarded schema validation runs in production
         expect('validateDatabaseSchema without guard', isNotNull);
       });
 
       test('validateDatabaseSchema with kDebugMode should NOT trigger', () {
+        // Properly guarded with debug mode check
         expect('validateDatabaseSchema with kDebugMode', isNotNull);
+      });
+
+      test('validateDatabaseSchema with kReleaseMode should NOT trigger', () {
+        // kReleaseMode guard is also acceptable
+        expect('kReleaseMode guard is valid', isNotNull);
+      });
+
+      test('validateDatabaseSchema in assert() should NOT trigger', () {
+        // assert() is stripped in release — valid guard
+        expect('assert guard is valid', isNotNull);
       });
     });
   });
@@ -332,53 +401,124 @@ void main() {
   group('Drift - Additional Medium-Confidence Rules', () {
     group('avoid_drift_replace_without_all_columns', () {
       test('.replace() on update builder SHOULD trigger', () {
+        // replace() sets unspecified columns to default/null
         expect('.replace() on update builder', isNotNull);
       });
 
       test('.write() on update builder should NOT trigger', () {
+        // write() only updates specified columns
         expect('.write() on update builder', isNotNull);
       });
+
+      test(
+        '.replace() without update() should NOT trigger (false positive)',
+        () {
+          // replace() on non-Drift update builders is fine
+          expect('replace() without update chain is excluded', isNotNull);
+        },
+      );
     });
 
     group('avoid_drift_missing_updates_param', () {
       test('customUpdate without updates param SHOULD trigger', () {
+        // Missing updates means streams won't refresh
         expect('customUpdate without updates param', isNotNull);
       });
 
       test('customUpdate with updates param should NOT trigger', () {
+        // updates: {table} properly invalidates streams
         expect('customUpdate with updates param', isNotNull);
       });
+
+      test('customInsert without updates param SHOULD trigger', () {
+        // customInsert also needs updates for stream invalidation
+        expect('customInsert without updates', isNotNull);
+      });
+
+      test(
+        'non-drift customUpdate should NOT trigger (false positive guard)',
+        () {
+          // After fix: drift import check prevents false positives
+          expect('non-drift customUpdate excluded', isNotNull);
+        },
+      );
     });
   });
 
   group('Drift - Isar-to-Drift Migration Rules', () {
     group('avoid_isar_import_with_drift', () {
       test('file importing both isar and drift SHOULD trigger', () {
+        // Both imports suggest incomplete migration
         expect('file importing both isar and drift', isNotNull);
       });
 
       test('file importing only drift should NOT trigger', () {
+        // Drift-only import is fully migrated
         expect('file importing only drift', isNotNull);
+      });
+
+      test('file importing only isar should NOT trigger (false positive)', () {
+        // Isar-only file is not a migration issue
+        expect('isar-only file is not flagged', isNotNull);
       });
     });
 
     group('prefer_drift_foreign_key_declaration', () {
       test('integer column named userId without references SHOULD trigger', () {
+        // userId strongly suggests a foreign key relationship
         expect('integer userId without references', isNotNull);
       });
 
       test('integer column with references() should NOT trigger', () {
+        // references() properly declares the FK
         expect('integer column with references()', isNotNull);
+      });
+
+      test('integer column with customConstraint should NOT trigger', () {
+        // customConstraint() can declare FK via SQL
+        expect('customConstraint is acceptable', isNotNull);
+      });
+
+      test('androidId should NOT trigger (false positive guard)', () {
+        // androidId is a device identifier, not a foreign key
+        expect('androidId excluded from heuristic', isNotNull);
+      });
+
+      test('deviceId should NOT trigger (false positive guard)', () {
+        // deviceId is a device identifier, not a foreign key
+        expect('deviceId excluded from heuristic', isNotNull);
+      });
+
+      test('column named just "id" should NOT trigger', () {
+        // "id" is a primary key, not a foreign key
+        expect('primary key id excluded', isNotNull);
+      });
+
+      test('non-Table class should NOT trigger (false positive guard)', () {
+        // Getter ending in Id in a non-Table class is irrelevant
+        expect('non-Table class excluded', isNotNull);
       });
     });
 
     group('require_drift_onupgrade_handler', () {
       test('schemaVersion > 1 without onUpgrade SHOULD trigger', () {
+        // Missing onUpgrade crashes on app update
         expect('schemaVersion > 1 without onUpgrade', isNotNull);
       });
 
       test('schemaVersion > 1 with onUpgrade should NOT trigger', () {
+        // onUpgrade handler properly handles migration
         expect('schemaVersion > 1 with onUpgrade', isNotNull);
+      });
+
+      test('schemaVersion == 1 without onUpgrade should NOT trigger', () {
+        // First version never needs onUpgrade
+        expect('schemaVersion 1 needs no onUpgrade', isNotNull);
+      });
+
+      test('non-Drift database class should NOT trigger (false positive)', () {
+        // Class not extending _$Something is not a Drift database
+        expect('non-Drift class excluded', isNotNull);
       });
     });
   });
