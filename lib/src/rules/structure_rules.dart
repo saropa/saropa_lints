@@ -543,6 +543,7 @@ bool _isUtilityNamespaceFile(CompilationUnit unit) {
       if (member is MethodDeclaration && !member.isStatic) return false;
     }
   }
+
   return true;
 }
 
@@ -1097,14 +1098,14 @@ class AvoidLongParameterListRule extends SaropaLintRule {
       final FunctionExpression function = node.functionExpression;
       final FormalParameterList? params = function.parameters;
       if (params != null && params.parameters.length > _maxParameters) {
-        reporter.atNode(node);
+        reporter.atNode(params);
       }
     });
 
     context.addMethodDeclaration((MethodDeclaration node) {
       final FormalParameterList? params = node.parameters;
       if (params != null && params.parameters.length > _maxParameters) {
-        reporter.atNode(node);
+        reporter.atNode(params);
       }
     });
   }

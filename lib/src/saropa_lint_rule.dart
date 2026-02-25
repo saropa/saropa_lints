@@ -161,6 +161,7 @@ bool get _supportsColor {
     final conEmu = Platform.environment['ConEmuANSI'];
     return wtSession != null || conEmu == 'ON' || term == 'xterm';
   }
+
   return true;
 }
 
@@ -2549,9 +2550,21 @@ class SaropaDiagnosticReporter {
 
   /// Reports a diagnostic at the given [node].
   ///
+  /// For [AnnotatedNode]s (declarations with doc comments or metadata), the
+  /// diagnostic start is adjusted to [firstTokenAfterCommentAndMetadata] so
+  /// that `// ignore:` directives placed before the signature work correctly.
+  ///
   /// The optional [code] parameter is accepted for backwards compatibility
   /// but ignored — the native system uses the rule's diagnosticCode.
   void atNode(AstNode node, [LintCode? code]) {
+    if (node is AnnotatedNode) {
+      final adjustedOffset = node.firstTokenAfterCommentAndMetadata.offset;
+      final length = node.end - adjustedOffset;
+      if (_isBaselined(adjustedOffset)) return;
+      _rule.reportAtOffset(adjustedOffset, length);
+      _trackViolation(adjustedOffset);
+      return;
+    }
     if (_isBaselined(node.offset)) return;
     _rule.reportAtNode(node);
     _trackViolation(node.offset);
