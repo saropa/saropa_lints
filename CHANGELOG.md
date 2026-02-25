@@ -14,6 +14,17 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
+---
+
+## [6.0.0]
+
+### Breaking
+
+- Upgraded `analyzer` from ^8.0.0 to ^10.0.0
+- Upgraded `analysis_server_plugin` from ^0.3.0 to ^0.3.5
+- Upgraded `analyzer_plugin` from ^0.13.0 to ^0.14.0
+- Requires Dart SDK >=3.10.0
+
 ### Added
 
 - 21 new Drift (SQLite) database lint rules covering data safety, resource management, SQL injection prevention, migration correctness, performance, and web platform safety
@@ -39,6 +50,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
   - `avoid_drift_close_streams_in_tests` (Comprehensive, INFO)
   - `avoid_drift_nullable_converter_mismatch` (Comprehensive, INFO)
 - Drift added as supported package in package filtering system
+
+### Changed
+
+- Migrated all `NamedType.name2` references to `NamedType.name` (analyzer v10 API)
+- Migrated `VariableDeclaration.declaredElement` to `declaredFragment.element` (analyzer v10 API)
+- Migrated `DiagnosticCode.name` to `DiagnosticCode.lowerCaseName` (analyzer v10 API)
+- Migrated `ClassDeclaration.members` to `ClassDeclaration.body.members` via `BlockClassBody` (analyzer v10 API)
+- Removed deprecated `errorCode` parameter from `SaropaDiagnosticReporter.atOffset()`
 
 ---
 

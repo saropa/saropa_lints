@@ -314,7 +314,7 @@ class RequireAutoRouteGuardResumeRule extends SaropaLintRule {
       final ImplementsClause? impl = node.implementsClause;
       if (impl == null) return;
       final bool isGuard = impl.interfaces.any(
-        (NamedType t) => t.name2.lexeme == 'AutoRouteGuard',
+        (NamedType t) => t.name.lexeme == 'AutoRouteGuard',
       );
       if (!isGuard) return;
 
