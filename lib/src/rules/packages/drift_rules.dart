@@ -1901,3 +1901,812 @@ class AvoidDriftNullableConverterMismatchRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// ADDITIONAL RULES — HIGH CONFIDENCE
+// =============================================================================
+
+// =============================================================================
+// avoid_drift_value_null_vs_absent
+// =============================================================================
+
+/// Warns when `Value(null)` is used in a Drift Companion, which may crash
+/// on non-nullable columns or silently differ from `Value.absent()`.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Drift's `Companion` classes use `Value<T>` wrappers where `Value(null)`
+/// means "set this column to NULL" and `Value.absent()` means "don't touch
+/// this column". Confusing the two causes:
+/// - `Value(null)` on a non-nullable column: runtime crash
+/// - `Value.absent()` when you meant to clear a value: data not updated
+///
+/// This is one of the most frequently asked questions about Drift on
+/// StackOverflow.
+///
+/// **BAD:**
+/// ```dart
+/// await (update(todoItems)..where((t) => t.id.equals(id)))
+///   .write(TodoItemsCompanion(title: Value(null))); // Crash if non-nullable!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await (update(todoItems)..where((t) => t.id.equals(id)))
+///   .write(TodoItemsCompanion(
+///     title: Value.absent(), // Leave unchanged
+///     completed: Value(true),
+///   ));
+/// ```
+class AvoidDriftValueNullVsAbsentRule extends SaropaLintRule {
+  AvoidDriftValueNullVsAbsentRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_drift_value_null_vs_absent',
+    '[avoid_drift_value_null_vs_absent] Value(null) used in a Drift '
+        'Companion. This sets the column to NULL, which crashes on '
+        'non-nullable columns. If you meant "leave this column unchanged", '
+        'use Value.absent() instead. Review whether null or absent is '
+        'the correct intent for this column. {v1}',
+    correctionMessage:
+        'Use Value.absent() to leave the column unchanged, '
+        'or ensure the column is nullable before using Value(null).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Value') return;
+      if (!fileImportsPackage(node, PackageImports.drift)) return;
+
+      final args = node.argumentList.arguments;
+      if (args.length != 1) return;
+
+      // Check if the single argument is null literal
+      if (args.first is NullLiteral) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_drift_equals_value
+// =============================================================================
+
+/// Warns when `.equals()` is called with an enum argument on a Drift column.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// When a Drift column uses a `TypeConverter`, the `.equals()` method
+/// expects the raw SQL value (not the Dart type). You must use
+/// `.equalsValue()` to apply the converter automatically. Using
+/// `.equals()` with a Dart enum produces queries that silently never
+/// match, because the enum's `toString()` is compared instead of the
+/// converted SQL value.
+///
+/// **BAD:**
+/// ```dart
+/// // SILENTLY FAILS: Status.active is a Dart enum, not the SQL int
+/// (select(users)..where((u) => u.status.equals(Status.active))).get();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // equalsValue() runs the TypeConverter first
+/// (select(users)..where((u) => u.status.equalsValue(Status.active))).get();
+/// ```
+class RequireDriftEqualsValueRule extends SaropaLintRule {
+  RequireDriftEqualsValueRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_drift_equals_value',
+    '[require_drift_equals_value] .equals() called with an enum argument '
+        'on a Drift column expression. For columns with TypeConverters, '
+        '.equals() expects the raw SQL type — using a Dart enum generates '
+        'a query that silently never matches. Use .equalsValue() instead, '
+        'which applies the TypeConverter automatically. {v1}',
+    correctionMessage:
+        'Replace .equals(EnumType.value) with '
+        '.equalsValue(EnumType.value) to apply the TypeConverter.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'equals') return;
+      if (!fileImportsPackage(node, PackageImports.drift)) return;
+
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      // Check if argument is an enum-like pattern: Identifier.member
+      final arg = args.first;
+      if (arg is PrefixedIdentifier) {
+        // Heuristic: PrefixedIdentifier like Status.active looks like an enum
+        // Exclude common non-enum patterns
+        final prefix = arg.prefix.name;
+        if (prefix[0].toUpperCase() == prefix[0] && prefix != 'Variable') {
+          reporter.atNode(node.methodName);
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_drift_read_table_or_null
+// =============================================================================
+
+/// Warns when `readTable()` is used in a query that contains a left join.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// After a `leftOuterJoin`, the joined table may have no matching rows.
+/// Using `readTable(joinedTable)` throws an `ArgumentError` when the
+/// joined row is null. You must use `readTableOrNull(joinedTable)` instead
+/// to safely handle the nullable result.
+///
+/// **BAD:**
+/// ```dart
+/// final rows = await (select(items).join([
+///   leftOuterJoin(categories, categories.id.equalsExp(items.category)),
+/// ])).get();
+/// for (final row in rows) {
+///   final category = row.readTable(categories); // Throws if no match!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final category = row.readTableOrNull(categories); // Returns null safely
+/// ```
+class RequireDriftReadTableOrNullRule extends SaropaLintRule {
+  RequireDriftReadTableOrNullRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'require_drift_read_table_or_null',
+    '[require_drift_read_table_or_null] readTable() used in a context '
+        'with leftOuterJoin. Left joins can return null for the joined '
+        'table — readTable() throws ArgumentError when the row is null. '
+        'Use readTableOrNull() instead to safely handle missing joined '
+        'rows. {v1}',
+    correctionMessage:
+        'Replace readTable(joinedTable) with '
+        'readTableOrNull(joinedTable) after left outer joins.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'readTable') return;
+      if (!fileImportsPackage(node, PackageImports.drift)) return;
+
+      // Check if the enclosing method/function body contains leftOuterJoin
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration || current is FunctionExpression) {
+          final bodySource = current.toSource();
+          if (bodySource.contains('leftOuterJoin')) {
+            reporter.atNode(node.methodName);
+          }
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_drift_create_all_in_oncreate
+// =============================================================================
+
+/// Warns when a Drift `onCreate` callback does not call `createAll()`.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// The `onCreate` callback in `MigrationStrategy` runs when the database
+/// is first created. It must call `migrator.createAll()` (or manually
+/// create each table) to set up the schema. Forgetting this causes
+/// "no such table" errors on first launch — a critical bug that only
+/// appears for new installations.
+///
+/// **BAD:**
+/// ```dart
+/// MigrationStrategy(
+///   onCreate: (m) async {
+///     // Forgot createAll()! First launch crashes.
+///   },
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// MigrationStrategy(
+///   onCreate: (m) async {
+///     await m.createAll();
+///   },
+/// );
+/// ```
+class RequireDriftCreateAllInOnCreateRule extends SaropaLintRule {
+  RequireDriftCreateAllInOnCreateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_drift_create_all_in_oncreate',
+    '[require_drift_create_all_in_oncreate] Drift MigrationStrategy '
+        'onCreate callback does not call createAll(). Without this call, '
+        'tables are never created on first launch, causing "no such table" '
+        'runtime errors. This only affects new installations, making it '
+        'easy to miss during development. {v1}',
+    correctionMessage:
+        'Add await m.createAll() in the onCreate callback '
+        'to create all tables on first launch.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addNamedExpression((NamedExpression node) {
+      if (node.name.label.name != 'onCreate') return;
+      if (!fileImportsPackage(node, PackageImports.drift)) return;
+
+      // Check if the callback body contains createAll
+      final callbackSource = node.expression.toSource();
+      if (!callbackSource.contains('createAll')) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// avoid_drift_validate_schema_production
+// =============================================================================
+
+/// Warns when `validateDatabaseSchema()` is called without a debug guard.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// `validateDatabaseSchema()` pulls in substantial code that's not needed
+/// outside of development. Running it in production wastes startup time
+/// and increases app binary size. Always guard with `kDebugMode` or
+/// assertions.
+///
+/// **BAD:**
+/// ```dart
+/// beforeOpen: (details) async {
+///   await validateDatabaseSchema();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// beforeOpen: (details) async {
+///   if (kDebugMode) {
+///     await validateDatabaseSchema();
+///   }
+/// }
+/// ```
+class AvoidDriftValidateSchemaProductionRule extends SaropaLintRule {
+  AvoidDriftValidateSchemaProductionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_drift_validate_schema_production',
+    '[avoid_drift_validate_schema_production] validateDatabaseSchema() '
+        'called without a debug mode guard. This function pulls in '
+        'substantial code not needed in production, wastes startup time, '
+        'and increases binary size. Guard with kDebugMode or an assertion '
+        'to only run during development. {v1}',
+    correctionMessage:
+        'Wrap in if (kDebugMode) { await validateDatabaseSchema(); }',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'validateDatabaseSchema') return;
+
+      // Check if inside a kDebugMode guard
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is IfStatement) {
+          final condSource = current.expression.toSource();
+          if (condSource.contains('kDebugMode') ||
+              condSource.contains('kReleaseMode')) {
+            return; // Properly guarded
+          }
+        }
+        if (current is AssertStatement) return; // assert() is fine
+        if (current is ClassDeclaration) break;
+        current = current.parent;
+      }
+
+      reporter.atNode(node);
+    });
+  }
+}
+
+// =============================================================================
+// ADDITIONAL RULES — MEDIUM CONFIDENCE
+// =============================================================================
+
+// =============================================================================
+// avoid_drift_replace_without_all_columns
+// =============================================================================
+
+/// Warns when `.replace()` is used on a Drift update builder.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// `replace()` replaces the ENTIRE row — any column not specified in
+/// the companion becomes its default value (or null for nullable
+/// columns). Developers often confuse `replace()` with `write()`, which
+/// only updates the specified columns. This confusion causes unexpected
+/// data loss that's difficult to debug.
+///
+/// **BAD:**
+/// ```dart
+/// // LOSES DATA: email, avatar, etc. become null/default
+/// await (update(users)..where((u) => u.id.equals(id)))
+///   .replace(UsersCompanion(name: Value('New Name')));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Only updates name, leaves everything else untouched
+/// await (update(users)..where((u) => u.id.equals(id)))
+///   .write(UsersCompanion(name: Value('New Name')));
+/// ```
+class AvoidDriftReplaceWithoutAllColumnsRule extends SaropaLintRule {
+  AvoidDriftReplaceWithoutAllColumnsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_drift_replace_without_all_columns',
+    '[avoid_drift_replace_without_all_columns] replace() used on a Drift '
+        'update builder. Unlike write() which only updates specified '
+        'columns, replace() replaces the ENTIRE row — unspecified columns '
+        'revert to defaults or null. This frequently causes silent data '
+        'loss. Use write() to update only the specified columns. {v1}',
+    correctionMessage:
+        'Use .write(companion) instead of .replace(companion) '
+        'to only update the columns you specify.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'replace') return;
+      if (!fileImportsPackage(node, PackageImports.drift)) return;
+
+      // Check if target chain contains update()
+      final target = node.target;
+      if (target == null) return;
+      final chainSource = _getFullChainSource(node);
+      if (chainSource == null) return;
+
+      if (RegExp(r'\bupdate\s*\(').hasMatch(chainSource)) {
+        reporter.atNode(node.methodName);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// avoid_drift_missing_updates_param
+// =============================================================================
+
+/// Warns when `customUpdate` or `customInsert` is missing the `updates`
+/// parameter.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Without the `updates` parameter, Drift doesn't know which tables were
+/// modified by the raw SQL statement. This means stream queries watching
+/// those tables will NOT update — they return stale data silently. This
+/// is the write-side counterpart of the `readsFrom` parameter on
+/// `customSelect`.
+///
+/// **BAD:**
+/// ```dart
+/// await customUpdate('UPDATE users SET name = ?',
+///   variables: [Variable.withString(name)]);
+/// // Streams watching 'users' table will NOT update!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await customUpdate('UPDATE users SET name = ?',
+///   variables: [Variable.withString(name)],
+///   updates: {users}); // Streams now properly invalidated
+/// ```
+class AvoidDriftMissingUpdatesParamRule extends SaropaLintRule {
+  AvoidDriftMissingUpdatesParamRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_drift_missing_updates_param',
+    '[avoid_drift_missing_updates_param] customUpdate() or customInsert() '
+        'called without the updates parameter. Without it, Drift cannot '
+        'track which tables were modified — stream queries watching those '
+        'tables will NOT update and return stale data silently. Always '
+        'specify the updates parameter for proper stream invalidation. {v1}',
+    correctionMessage:
+        'Add the updates parameter: '
+        'customUpdate(sql, variables: [...], updates: {tableName})',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _writeMethods = <String>{
+    'customUpdate',
+    'customInsert',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_writeMethods.contains(node.methodName.name)) return;
+
+      // Check if updates parameter is present
+      final args = node.argumentList.arguments;
+      for (final arg in args) {
+        if (arg is NamedExpression && arg.name.label.name == 'updates') {
+          return; // Has updates parameter
+        }
+      }
+
+      reporter.atNode(node.methodName);
+    });
+  }
+}
+
+// =============================================================================
+// ISAR-TO-DRIFT MIGRATION RULES
+// =============================================================================
+
+// =============================================================================
+// avoid_isar_import_with_drift
+// =============================================================================
+
+/// Warns when a file imports both Isar and Drift packages.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Having both `package:isar/` and `package:drift/` imports in the same
+/// file strongly suggests an incomplete migration from Isar to Drift.
+/// Both databases should not coexist in the same file long-term — it
+/// doubles memory usage, complicates resource management, and increases
+/// the risk of reading from the wrong database.
+///
+/// **BAD:**
+/// ```dart
+/// import 'package:isar/isar.dart';
+/// import 'package:drift/drift.dart';
+///
+/// class DataService {
+///   final Isar isar; // Old
+///   final AppDatabase drift; // New
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'package:drift/drift.dart';
+///
+/// class DataService {
+///   final AppDatabase db; // Fully migrated
+/// }
+/// ```
+class AvoidIsarImportWithDriftRule extends SaropaLintRule {
+  AvoidIsarImportWithDriftRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_isar_import_with_drift',
+    '[avoid_isar_import_with_drift] File imports both Isar and Drift '
+        'packages, suggesting an incomplete database migration. Having '
+        'both databases active doubles memory usage, complicates resource '
+        'management, and risks reading stale data from the old database. '
+        'Complete the migration to Drift and remove Isar imports. {v1}',
+    correctionMessage:
+        'Complete migration to Drift and remove all '
+        'Isar imports. If this is migration code, consider isolating it '
+        'in a dedicated migration file.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit node) {
+      bool hasDrift = false;
+      bool hasIsar = false;
+      ImportDirective? isarDirective;
+
+      for (final directive in node.directives) {
+        if (directive is! ImportDirective) continue;
+        final uri = directive.uri.stringValue ?? '';
+        if (uri.startsWith('package:drift/') ||
+            uri.startsWith('package:drift_flutter/')) {
+          hasDrift = true;
+        }
+        if (uri.startsWith('package:isar/')) {
+          hasIsar = true;
+          isarDirective = directive;
+        }
+      }
+
+      if (hasDrift && hasIsar && isarDirective != null) {
+        reporter.atNode(isarDirective);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_drift_foreign_key_declaration
+// =============================================================================
+
+/// Warns when an integer column in a Drift Table looks like a foreign key
+/// but lacks a `.references()` declaration.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// Columns named with patterns like `userId`, `categoryId`, or
+/// `parentId` strongly suggest foreign key relationships. Without a
+/// `.references()` declaration, Drift cannot enforce referential integrity
+/// and won't generate helpful join methods. This is especially common
+/// when migrating from Isar (which uses `IsarLink` for relations) — devs
+/// store the ID but forget to declare the SQL foreign key.
+///
+/// **BAD:**
+/// ```dart
+/// class TodoItems extends Table {
+///   IntColumn get categoryId => integer()(); // No FK declared!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class TodoItems extends Table {
+///   IntColumn get categoryId =>
+///     integer().references(Categories, #id)();
+/// }
+/// ```
+class PreferDriftForeignKeyDeclarationRule extends SaropaLintRule {
+  PreferDriftForeignKeyDeclarationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_drift_foreign_key_declaration',
+    '[prefer_drift_foreign_key_declaration] Integer column name suggests '
+        'a foreign key relationship (ends with "Id") but has no '
+        '.references() declaration. Without it, Drift cannot enforce '
+        'referential integrity or generate join helpers. This is common '
+        'when migrating from Isar, where IsarLink handled relations. {v1}',
+    correctionMessage:
+        'Add .references(OtherTable, #id) to declare the '
+        'foreign key relationship for this column.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.isGetter) return;
+      if (!fileImportsPackage(node, PackageImports.drift)) return;
+
+      // Check if the getter name ends with Id (case-sensitive)
+      final name = node.name.lexeme;
+      if (!_looksLikeForeignKey(name)) return;
+
+      // Check if enclosing class extends Table
+      final classDecl = _findEnclosingClass(node);
+      if (classDecl == null) return;
+      final superclass = classDecl.extendsClause?.superclass;
+      if (superclass == null) return;
+      if (superclass.name.lexeme != 'Table') return;
+
+      // Check if the getter body contains references()
+      final bodySource = node.body.toSource();
+      if (bodySource.contains('references(') ||
+          bodySource.contains('.customConstraint(')) {
+        return; // Already has FK or custom constraint
+      }
+
+      // Check it returns an integer column type
+      if (bodySource.contains('integer()')) {
+        reporter.atNode(node);
+      }
+    });
+  }
+
+  bool _looksLikeForeignKey(String name) {
+    // Match patterns like userId, categoryId, parentId
+    if (!name.endsWith('Id')) return false;
+    // Exclude just "id" (primary key) and "Id" alone
+    if (name == 'id' || name == 'Id') return false;
+    return name.length > 2;
+  }
+}
+
+// =============================================================================
+// require_drift_onupgrade_handler
+// =============================================================================
+
+/// Warns when a Drift database has schemaVersion > 1 but no onUpgrade.
+///
+/// Since: v5.1.0 | Rule version: v1
+///
+/// When `schemaVersion` is greater than 1, Drift expects an `onUpgrade`
+/// callback in `MigrationStrategy` to handle the schema migration.
+/// Without it, users upgrading from an earlier version get a database
+/// with the old schema but new code expecting the new schema, causing
+/// "no such column" or "no such table" runtime crashes. This is
+/// especially common when migrating from Isar (which auto-migrates).
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// int get schemaVersion => 2;
+/// @override
+/// MigrationStrategy get migration => MigrationStrategy(
+///   onCreate: (m) async => await m.createAll(),
+///   // No onUpgrade! Users on v1 will crash.
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @override
+/// int get schemaVersion => 2;
+/// @override
+/// MigrationStrategy get migration => MigrationStrategy(
+///   onCreate: (m) async => await m.createAll(),
+///   onUpgrade: (m, from, to) async {
+///     if (from < 2) await m.addColumn(users, users.email);
+///   },
+/// );
+/// ```
+class RequireDriftOnUpgradeHandlerRule extends SaropaLintRule {
+  RequireDriftOnUpgradeHandlerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.high;
+
+  static const LintCode _code = LintCode(
+    'require_drift_onupgrade_handler',
+    '[require_drift_onupgrade_handler] Drift database has schemaVersion '
+        'greater than 1 but no onUpgrade callback in MigrationStrategy. '
+        'Users upgrading from an earlier version will get the old schema '
+        'with new code, causing "no such column" or "no such table" '
+        'runtime crashes. Add an onUpgrade handler. {v1}',
+    correctionMessage:
+        'Add an onUpgrade callback to MigrationStrategy '
+        'that handles migration from each previous schema version.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      // Check for Drift database class (extends _$Something)
+      final superclass = node.extendsClause?.superclass;
+      if (superclass == null) return;
+      if (!superclass.name.lexeme.startsWith(r'_$')) return;
+      if (!fileImportsPackage(node, PackageImports.drift)) return;
+
+      // Find schemaVersion getter
+      int schemaVersion = 0;
+      for (final member in node.members) {
+        if (member is MethodDeclaration &&
+            member.name.lexeme == 'schemaVersion' &&
+            member.isGetter) {
+          final bodySource = member.body.toSource();
+          final match = RegExp(r'=>\s*(\d+)\s*;').firstMatch(bodySource);
+          if (match != null) {
+            schemaVersion = int.tryParse(match.group(1) ?? '') ?? 0;
+          }
+          break;
+        }
+      }
+
+      if (schemaVersion <= 1) return;
+
+      // Check if class source contains onUpgrade
+      final classSource = node.toSource();
+      if (!classSource.contains('onUpgrade')) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}

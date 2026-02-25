@@ -238,6 +238,7 @@ const Map<String, int> _baselineCounts = {
   'packages/equatable_rules.dart': 2,
   'packages/flutter_hooks_rules.dart': 1,
   'packages/geolocator_rules.dart': 5,
+  'packages/drift_rules.dart': 13,
 
   // Widget and UI rule files
   'build_method_rules.dart': 5,
