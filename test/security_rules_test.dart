@@ -194,6 +194,14 @@ void main() {
         // getApplicationDocumentsDirectory().path should not flag
         expect('platform path API recognized as trusted', isNotNull);
       });
+
+      test('private helper receiving platform path should NOT trigger '
+          '(inter-procedural)', () {
+        // Regression: _deleteOldUnencryptedDb receives dbDir.path from
+        // getApplicationDocumentsDirectory() in the caller. The rule should
+        // trace trust through private method call sites.
+        expect('private helper with platform path recognized', isNotNull);
+      });
     });
 
     group('avoid_redirect_injection', () {

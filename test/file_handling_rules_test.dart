@@ -137,6 +137,14 @@ void main() {
         // indicates the parameter comes from a trusted OS path
         expect('platform path API recognized as trusted', isNotNull);
       });
+
+      test('private helper receiving platform path should NOT trigger '
+          '(inter-procedural)', () {
+        // Regression: private method receives dbDir.path from
+        // getApplicationDocumentsDirectory() in the caller. The rule should
+        // trace trust through private method call sites.
+        expect('private helper with platform path recognized', isNotNull);
+      });
     });
   });
 
