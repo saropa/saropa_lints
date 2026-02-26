@@ -12,6 +12,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- `avoid_path_traversal` — false positive when trusted platform path (e.g., `getApplicationDocumentsDirectory`) is passed to a private helper method; now traces trust through call sites of private methods
+- `require_file_path_sanitization` — same false positive as `avoid_path_traversal`; shared inter-procedural platform path trust check
+
 ## [6.0.4]
 
 ### Fixed
