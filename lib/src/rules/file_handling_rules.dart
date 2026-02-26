@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:saropa_lints/src/platform_path_utils.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
 /// Warns when file read operations are used without exists() check or try-catch.
@@ -1664,8 +1665,9 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
       return; // Has some sanitization
     }
 
-    // Check for trusted platform path APIs
-    if (_isFromPlatformPathApi(bodySource)) return;
+    // Check for trusted platform path APIs (including caller context for
+    // private methods that receive platform paths as parameters)
+    if (isFromPlatformPathApi(node)) return;
 
     // Get function parameters
     final FunctionDeclaration? funcDecl = node
@@ -1691,26 +1693,5 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
         return;
       }
     }
-  }
-
-  /// Well-known platform path APIs that return trusted directory paths.
-  /// Also used in [AvoidPathTraversalRule] (security_rules.dart).
-  static const Set<String> _platformPathApis = <String>{
-    'getApplicationDocumentsDirectory',
-    'getApplicationSupportDirectory',
-    'getApplicationCacheDirectory',
-    'getTemporaryDirectory',
-    'getLibraryDirectory',
-    'getExternalStorageDirectory',
-    'getDownloadsDirectory',
-    'getDatabasesPath',
-  };
-
-  /// Checks if the function body uses a trusted platform path API.
-  bool _isFromPlatformPathApi(String bodySource) {
-    for (final String api in _platformPathApis) {
-      if (bodySource.contains(api)) return true;
-    }
-    return false;
   }
 }
