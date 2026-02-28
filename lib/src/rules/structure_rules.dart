@@ -2421,3 +2421,802 @@ class _NullReturnFinder extends RecursiveAstVisitor<void> {
     super.visitReturnStatement(node);
   }
 }
+
+/// Warns when a class has only static members (and optionally a private constructor).
+///
+/// Prefer top-level functions and constants instead of a static-only class.
+///
+/// **Bad:**
+/// ```dart
+/// class MathUtils {
+///   static double circleArea(double r) => 3.14 * r * r;
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// double circleArea(double r) => 3.14 * r * r;
+/// ```
+class AvoidClassesWithOnlyStaticMembersRule extends SaropaLintRule {
+  AvoidClassesWithOnlyStaticMembersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'avoid_classes_with_only_static_members',
+    '[avoid_classes_with_only_static_members] Class has only static members. In Dart, prefer top-level functions and constants for better tree-shaking and discoverability.',
+    correctionMessage:
+        'Refactor static members to top-level declarations or use extension methods where appropriate.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      if (node.abstractKeyword != null) return;
+      if (node.extendsClause != null ||
+          node.implementsClause != null ||
+          node.withClause != null) {
+        return;
+      }
+      final NodeList<ClassMember> members = node.members;
+      if (members.isEmpty) return;
+      for (final ClassMember m in members) {
+        if (m is ConstructorDeclaration) {
+          if (m.name == null || !m.name!.lexeme.startsWith('_')) return;
+          continue;
+        }
+        if (m is FieldDeclaration) {
+          if (!m.isStatic) return;
+          continue;
+        }
+        if (m is MethodDeclaration) {
+          if (!m.isStatic) return;
+          continue;
+        }
+        return;
+      }
+      reporter.atToken(node.name);
+    });
+  }
+}
+
+/// Warns when a setter has no corresponding getter in the class hierarchy.
+///
+/// Write-only setters create an asymmetric API; prefer a method (e.g. setPassword) or add a getter.
+///
+/// **Bad:**
+/// ```dart
+/// set timeout(Duration d) { _timeout = d; }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// Duration get timeout => _timeout;
+/// set timeout(Duration d) { _timeout = d; }
+/// ```
+class AvoidSettersWithoutGettersRule extends SaropaLintRule {
+  AvoidSettersWithoutGettersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'avoid_setters_without_getters',
+    '[avoid_setters_without_getters] Setter has no corresponding getter. Prefer adding a getter or using a named method for write-only semantics.',
+    correctionMessage:
+        'Add a getter for this property or replace the setter with a method (e.g. setTimeout).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.isSetter) return;
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (classDecl == null) return;
+      if (classDecl.abstractKeyword != null) return;
+      final String setterName = node.name.lexeme;
+      for (final ClassMember m in classDecl.members) {
+        if (m is FieldDeclaration) {
+          for (final VariableDeclaration v in m.fields.variables) {
+            if (v.name.lexeme == setterName) return;
+          }
+        }
+        if (m is MethodDeclaration &&
+            m.isGetter &&
+            m.name.lexeme == setterName) {
+          return;
+        }
+      }
+      reporter.atToken(node.name);
+    });
+  }
+}
+
+/// Prefer getter declared before setter when both exist for the same name.
+///
+/// Within a class, mixin, or extension, when a getter and a setter share the same
+/// name, the getter should be declared first. Readers see the type and return
+/// value before the write API. Aligns with Dart/Flutter convention.
+///
+/// **Bad:**
+/// ```dart
+/// set value(int v) => _v = v;
+/// int get value => _v;
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// int get value => _v;
+/// set value(int v) => _v = v;
+/// ```
+///
+/// Only reports when a setter appears before its paired getter; getter-only or
+/// setter-only members are not flagged.
+class PreferGettersBeforeSettersRule extends SaropaLintRule {
+  PreferGettersBeforeSettersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_getters_before_setters',
+    '[prefer_getters_before_setters] Setter should be declared after its getter. Place the getter first for consistent member ordering.',
+    correctionMessage:
+        'Move the setter to immediately after its paired getter.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    void checkMembers(NodeList<ClassMember> members) {
+      final getterIndexes = <String, int>{};
+      final setterNodes = <String, MethodDeclaration>{};
+      final setterIndexes = <String, int>{};
+
+      for (int i = 0; i < members.length; i++) {
+        final member = members[i];
+        if (member is! MethodDeclaration) continue;
+        if (member.isGetter) {
+          getterIndexes[member.name.lexeme] = i;
+        } else if (member.isSetter) {
+          setterIndexes[member.name.lexeme] = i;
+          setterNodes[member.name.lexeme] = member;
+        }
+      }
+
+      for (final name in setterIndexes.keys) {
+        final getterIdx = getterIndexes[name];
+        final setterIdx = setterIndexes[name]!;
+        if (getterIdx != null && setterIdx < getterIdx) {
+          reporter.atNode(setterNodes[name]!);
+        }
+      }
+    }
+
+    context.addClassDeclaration((ClassDeclaration node) {
+      checkMembers(node.members);
+    });
+    context.addMixinDeclaration((MixinDeclaration node) {
+      checkMembers(node.members);
+    });
+    context.addExtensionDeclaration((ExtensionDeclaration node) {
+      checkMembers(node.members);
+    });
+  }
+}
+
+/// Prefer static members declared before instance members of the same category.
+///
+/// Static members (type-level API) should appear before instance members of the
+/// same category (fields vs methods). Constructors and operators are excluded.
+/// Aligns with Effective Dart and Flutter framework ordering.
+class PreferStaticBeforeInstanceRule extends SaropaLintRule {
+  PreferStaticBeforeInstanceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_static_before_instance',
+    '[prefer_static_before_instance] Static member should be declared before instance members of the same category.',
+    correctionMessage:
+        'Move the static member before the first instance member of the same category.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      final members = node.members;
+      int firstInstanceField = -1;
+      int firstInstanceMethod = -1;
+      final outOfOrderStaticFields = <FieldDeclaration>[];
+      final outOfOrderStaticMethods = <MethodDeclaration>[];
+
+      for (int i = 0; i < members.length; i++) {
+        final m = members[i];
+        if (m is FieldDeclaration) {
+          if (m.isStatic) {
+            if (firstInstanceField != -1) outOfOrderStaticFields.add(m);
+          } else {
+            if (firstInstanceField == -1) firstInstanceField = i;
+          }
+        }
+        if (m is MethodDeclaration &&
+            !m.isGetter &&
+            !m.isSetter &&
+            !m.isOperator) {
+          if (m.isStatic) {
+            if (firstInstanceMethod != -1) outOfOrderStaticMethods.add(m);
+          } else {
+            if (firstInstanceMethod == -1) firstInstanceMethod = i;
+          }
+        }
+      }
+
+      for (final member in outOfOrderStaticFields) {
+        reporter.atNode(member);
+      }
+      for (final member in outOfOrderStaticMethods) {
+        reporter.atNode(member);
+      }
+    });
+  }
+}
+
+/// Prefer mixin over abstract class when used purely for code sharing.
+///
+/// An abstract class with no abstract members and no generative constructor is
+/// a candidate for a mixin. Mixins communicate composability and avoid misleading
+/// extends semantics.
+class PreferMixinOverAbstractRule extends SaropaLintRule {
+  PreferMixinOverAbstractRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_mixin_over_abstract',
+    '[prefer_mixin_over_abstract] Abstract class with no abstract members and no generative constructor should be a mixin.',
+    correctionMessage:
+        'Convert to mixin. Replace "abstract class" with "mixin" and update "extends" to "with" at use sites.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      if (node.abstractKeyword == null) return;
+      if (node.sealedKeyword != null) return;
+      if (node.extendsClause != null) return;
+      if (node.members.isEmpty) return;
+
+      for (final member in node.members) {
+        if (member is MethodDeclaration && member.isAbstract) return;
+        if (member is FieldDeclaration && member.abstractKeyword != null)
+          return;
+      }
+
+      final constructors = node.members
+          .whereType<ConstructorDeclaration>()
+          .toList();
+      final hasGenerative = constructors.any((c) => c.factoryKeyword == null);
+      if (hasGenerative) return;
+
+      reporter.atToken(node.abstractKeyword!);
+    });
+  }
+}
+
+/// Prefer record type over simple tuple-like class (Dart 3+).
+///
+/// A class with only final fields, a single generative constructor, and no
+/// behavior beyond toString/==/hashCode/copyWith is a candidate for a record
+/// type or typedef record. Records provide structural equality by default.
+/// Applies to classes with 2–5 fields only.
+class PreferRecordOverTupleClassRule extends SaropaLintRule {
+  PreferRecordOverTupleClassRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_record_over_tuple_class',
+    '[prefer_record_over_tuple_class] Simple data class with only final fields and a single constructor is a candidate for a record type.',
+    correctionMessage:
+        'Consider replacing with a record type or typedef record. Records provide structural equality by default.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _allowedMethodNames = {
+    'toString',
+    '==',
+    'hashCode',
+    'copyWith',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      if (node.abstractKeyword != null) return;
+      if (node.sealedKeyword != null) return;
+      if (node.extendsClause != null) return;
+      if (node.implementsClause != null) return;
+      if (node.withClause != null) return;
+
+      final fields = node.members.whereType<FieldDeclaration>().toList();
+      if (fields.any((f) => !f.fields.isFinal || f.isStatic)) return;
+
+      final totalFields = fields.fold<int>(
+        0,
+        (n, f) => n + f.fields.variables.length,
+      );
+      if (totalFields < 2 || totalFields > 5) return;
+
+      final methods = node.members.whereType<MethodDeclaration>();
+      if (methods.any((m) => !_allowedMethodNames.contains(m.name.lexeme)))
+        return;
+
+      final constructors = node.members
+          .whereType<ConstructorDeclaration>()
+          .toList();
+      if (constructors.length != 1) return;
+      if (constructors.first.factoryKeyword != null) return;
+
+      reporter.atToken(node.name);
+    });
+  }
+}
+
+/// Prefer sealed class when abstract class has multiple concrete subclasses in the same file.
+///
+/// Enables exhaustiveness checking in switch expressions. Requires Dart 3.0+.
+/// Only flags when two or more concrete subclasses extend the abstract class
+/// in the same compilation unit.
+class PreferSealedClassesRule extends SaropaLintRule {
+  PreferSealedClassesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_sealed_classes',
+    '[prefer_sealed_classes] Abstract class with multiple concrete subclasses in the same file should be sealed for exhaustiveness checking.',
+    correctionMessage:
+        'Add the sealed modifier to enable exhaustive switch checking.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit unit) {
+      final classes = unit.declarations.whereType<ClassDeclaration>().toList();
+      for (final cls in classes) {
+        if (cls.abstractKeyword == null) continue;
+        if (cls.sealedKeyword != null) continue;
+        if (cls.extendsClause != null) continue;
+
+        final className = cls.name.lexeme;
+        int subclassCount = 0;
+        for (final other in classes) {
+          if (other == cls) continue;
+          final superName = other.extendsClause?.superclass.name.lexeme;
+          if (superName == className && other.abstractKeyword == null) {
+            subclassCount++;
+          }
+        }
+        if (subclassCount >= 2) {
+          reporter.atToken(cls.abstractKeyword!);
+        }
+      }
+    });
+  }
+}
+
+/// Prefer sealed for state/event/result hierarchies (BLoC, Cubit, etc.).
+///
+/// Abstract classes whose names end in State, Event, Result, Status, Action,
+/// Intent, Effect, Failure, Success, or Response and have at least one concrete
+/// subclass in the same file should be sealed for exhaustive switch in UI.
+class PreferSealedForStateRule extends SaropaLintRule {
+  PreferSealedForStateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_sealed_for_state',
+    '[prefer_sealed_for_state] Abstract state/event/result class with local subclasses should be sealed.',
+    correctionMessage:
+        'Add the sealed modifier to enable exhaustive switch on state.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const List<String> _suffixes = <String>[
+    'State',
+    'Event',
+    'Result',
+    'Status',
+    'Action',
+    'Intent',
+    'Effect',
+    'Failure',
+    'Success',
+    'Response',
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit unit) {
+      final classes = unit.declarations.whereType<ClassDeclaration>().toList();
+      final subclassedNames = <String>{};
+      for (final cls in classes) {
+        final superName = cls.extendsClause?.superclass.name.lexeme;
+        if (superName != null) subclassedNames.add(superName);
+      }
+
+      for (final cls in classes) {
+        if (cls.abstractKeyword == null) continue;
+        if (cls.sealedKeyword != null) continue;
+        final name = cls.name.lexeme;
+        if (!_suffixes.any(name.endsWith)) continue;
+        if (!subclassedNames.contains(name)) continue;
+        reporter.atToken(cls.abstractKeyword!);
+      }
+    });
+  }
+}
+
+/// Warns when a constructor appears after a method in a class.
+///
+/// Dart style places constructors before other members for discoverability.
+///
+/// Since: v6.0.8 | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// class User {
+///   void login() {}
+///   User(this.name);
+///   final String name;
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class User {
+///   final String name;
+///   User(this.name);
+///   void login() {}
+/// }
+/// ```
+class PreferConstructorsFirstRule extends SaropaLintRule {
+  PreferConstructorsFirstRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_constructors_first',
+    '[prefer_constructors_first] Constructors should appear before non-constructor members (methods, getters, setters) in a class.',
+    correctionMessage: 'Move the constructor before methods and getters.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      int lastConstructorIndex = -1;
+      int firstMethodIndex = -1;
+
+      for (int i = 0; i < node.members.length; i++) {
+        final ClassMember member = node.members[i];
+        if (member is ConstructorDeclaration) {
+          lastConstructorIndex = i;
+        } else if (member is MethodDeclaration &&
+            !member.isGetter &&
+            !member.isSetter) {
+          if (firstMethodIndex == -1) firstMethodIndex = i;
+        }
+      }
+
+      if (firstMethodIndex == -1 ||
+          lastConstructorIndex == -1 ||
+          firstMethodIndex >= lastConstructorIndex)
+        return;
+
+      final ConstructorDeclaration outOfOrder = node.members
+          .whereType<ConstructorDeclaration>()
+          .firstWhere((c) => node.members.indexOf(c) > firstMethodIndex);
+      reporter.atNode(outOfOrder);
+    });
+  }
+}
+
+/// Warns when a top-level function could be an extension method on its first parameter type.
+///
+/// Extension methods are more discoverable and read naturally (e.g. `date.format()` vs `formatDate(date)`).
+///
+/// Since: v6.0.8 | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// String formatDateTime(DateTime dt) => DateFormat('yyyy-MM-dd').format(dt);
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// extension on DateTime {
+///   String format() => DateFormat('yyyy-MM-dd').format(this);
+/// }
+/// ```
+class PreferExtensionMethodsRule extends SaropaLintRule {
+  PreferExtensionMethodsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_extension_methods',
+    '[prefer_extension_methods] This top-level function could be an extension method on its first parameter type for better discoverability and readability.',
+    correctionMessage:
+        'Consider converting to an extension on the first parameter type.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
+      if (node.name.lexeme == 'main') return;
+      final FormalParameterList? params = node.functionExpression.parameters;
+      if (params == null || params.parameters.isEmpty) return;
+
+      final FormalParameter first = params.parameters.first;
+      final FormalParameter inner = first is DefaultFormalParameter
+          ? first.parameter
+          : first;
+      if (inner is! SimpleFormalParameter) return;
+
+      final TypeAnnotation? typeAnnotation = inner.type;
+      if (typeAnnotation is! NamedType) return;
+      final String typeName = typeAnnotation.name.lexeme;
+      if (typeName.isEmpty) return;
+      if (_primitiveTypeNames.contains(typeName)) return;
+
+      final String funcName = node.name.lexeme;
+      if (!funcName.toLowerCase().contains(typeName.toLowerCase())) return;
+
+      reporter.atNode(node);
+    });
+  }
+
+  static const Set<String> _primitiveTypeNames = <String>{
+    'int',
+    'double',
+    'num',
+    'bool',
+    'String',
+  };
+}
+
+/// Warns when a class with only static methods (utility class) could be an extension.
+///
+/// Since: v6.0.8 | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// class StringUtils {
+///   StringUtils._();
+///   static String capitalize(String s) => s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
+///   static bool isBlank(String s) => s.trim().isEmpty;
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// extension on String {
+///   String capitalize() => isEmpty ? this : '${this[0].toUpperCase()}${substring(1)}';
+///   bool get isBlank => trim().isEmpty;
+/// }
+/// ```
+class PreferExtensionOverUtilityClassRule extends SaropaLintRule {
+  PreferExtensionOverUtilityClassRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_extension_over_utility_class',
+    '[prefer_extension_over_utility_class] Class with only static methods that share the same first parameter type could be an extension on that type.',
+    correctionMessage:
+        'Consider converting to an extension on the common first parameter type.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      if (node.extendsClause != null ||
+          node.implementsClause != null ||
+          node.withClause != null)
+        return;
+
+      final List<MethodDeclaration> staticMethods = node.members
+          .whereType<MethodDeclaration>()
+          .where((m) => m.isStatic && !m.isGetter && !m.isSetter)
+          .toList();
+      if (staticMethods.length < 2) return;
+
+      final bool hasInstanceMember = node.members.any((m) {
+        if (m is FieldDeclaration && !m.isStatic) return true;
+        if (m is MethodDeclaration && !m.isStatic && !m.isGetter && !m.isSetter)
+          return true;
+        return false;
+      });
+      if (hasInstanceMember) return;
+
+      final Set<String> firstParamTypeNames = <String>{};
+      for (final MethodDeclaration m in staticMethods) {
+        final params = m.parameters?.parameters;
+        if (params == null || params.isEmpty) return;
+        final p = params.first;
+        final inner = p is DefaultFormalParameter ? p.parameter : p;
+        if (inner is SimpleFormalParameter && inner.type is NamedType) {
+          firstParamTypeNames.add((inner.type as NamedType).name.lexeme);
+        }
+      }
+      if (firstParamTypeNames.length != 1) return;
+
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Warns when a single-field wrapper class could be an extension type (Dart 3.3+).
+///
+/// Extension types provide the same type safety with zero runtime cost.
+///
+/// Since: v6.0.8 | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// class UserId {
+///   final int value;
+///   const UserId(this.value);
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// extension type UserId(int value) {}
+/// ```
+class PreferExtensionTypeForWrapperRule extends SaropaLintRule {
+  PreferExtensionTypeForWrapperRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_extension_type_for_wrapper',
+    '[prefer_extension_type_for_wrapper] Single-field wrapper class could be an extension type for zero runtime cost (Dart 3.3+).',
+    correctionMessage: 'Consider converting to an extension type.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      if (node.abstractKeyword != null ||
+          node.extendsClause != null ||
+          node.implementsClause != null ||
+          node.withClause != null)
+        return;
+
+      final List<FieldDeclaration> fields = node.members
+          .whereType<FieldDeclaration>()
+          .where((f) => !f.isStatic)
+          .toList();
+      if (fields.length != 1) return;
+      final FieldDeclaration single = fields.single;
+      if (!single.fields.isFinal || single.fields.isLate) return;
+      if (single.fields.variables.length != 1) return;
+
+      final List<ConstructorDeclaration> constructors = node.members
+          .whereType<ConstructorDeclaration>()
+          .where((c) => c.factoryKeyword == null)
+          .toList();
+      if (constructors.length != 1) return;
+
+      final ConstructorDeclaration ctor = constructors.single;
+      if (ctor.parameters.parameters.length != 1) return;
+      final FormalParameter p = ctor.parameters.parameters.single;
+      final FormalParameter inner = p is DefaultFormalParameter
+          ? p.parameter
+          : p;
+      if (inner is! FieldFormalParameter) return;
+
+      final int methodCount = node.members
+          .whereType<MethodDeclaration>()
+          .length;
+      if (methodCount > 4) return;
+
+      reporter.atNode(node);
+    });
+  }
+}

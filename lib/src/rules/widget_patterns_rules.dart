@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../saropa_lint_rule.dart';
 import '../fixes/widget_patterns/comment_out_print_fix.dart';
@@ -7859,5 +7860,285 @@ class PreferFeatureFolderStructureRule extends SaropaLintRule {
         }
       });
     }
+  }
+}
+
+/// Allowlisted bool parameter names used in Flutter SDK where bool is idiomatic.
+const Set<String> _widgetBoolParamAllowlist = <String>{
+  'enabled',
+  'disabled',
+  'autofocus',
+  'obscureText',
+  'readOnly',
+  'expands',
+  'autocorrect',
+  'enableSuggestions',
+  'selected',
+  'checked',
+  'dense',
+  'wrapped',
+  'visible',
+  'value',
+};
+
+/// Warns when a widget constructor has named bool parameters (except allowlisted).
+///
+/// Prefer enums or widget decomposition for clearer call sites.
+///
+/// **Bad:**
+/// ```dart
+/// class UserCard extends StatelessWidget {
+///   const UserCard({super.key, required this.isLoading, required this.showAvatar});
+///   final bool isLoading;
+///   final bool showAvatar;
+///   ...
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// enum UserCardState { loading, loaded }
+/// class UserCard extends StatelessWidget {
+///   const UserCard({super.key, required this.state});
+///   final UserCardState state;
+///   ...
+/// }
+/// ```
+class AvoidBoolInWidgetConstructorsRule extends SaropaLintRule {
+  AvoidBoolInWidgetConstructorsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    'avoid_bool_in_widget_constructors',
+    '[avoid_bool_in_widget_constructors] Widget constructor has a named bool parameter. Prefer an enum or widget decomposition for clearer call sites.',
+    correctionMessage:
+        'Replace with an enum, sealed class, or separate widgets so call sites are self-documenting.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (classDecl == null) return;
+      if (!_isWidgetClass(classDecl)) return;
+      final FormalParameterList params = node.parameters;
+      for (final FormalParameter p in params.parameters) {
+        final FormalParameter inner = p is DefaultFormalParameter
+            ? p.parameter
+            : p;
+        if (inner is! SimpleFormalParameter) continue;
+        if (!inner.isNamed) continue;
+        final String? name = inner.name?.lexeme;
+        if (name == null || _widgetBoolParamAllowlist.contains(name)) continue;
+        final TypeAnnotation? type = inner.type;
+        if (type is! NamedType) continue;
+        if (type.name.lexeme != 'bool') continue;
+        reporter.atNode(inner);
+      }
+    });
+  }
+
+  bool _isWidgetClass(ClassDeclaration node) {
+    final ExtendsClause? ext = node.extendsClause;
+    if (ext != null) {
+      final String sup = ext.superclass.name.lexeme;
+      if (sup == 'StatelessWidget' ||
+          sup == 'StatefulWidget' ||
+          sup == 'Widget' ||
+          sup == 'InheritedWidget' ||
+          sup == 'InheritedNotifier' ||
+          sup == 'InheritedModel' ||
+          sup == 'RenderObjectWidget' ||
+          sup.endsWith('Widget') ||
+          sup == 'State') {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+/// Container constructor args that justify its use (layout/paint). Key and child are excluded.
+const Set<String> _containerJustifyingArgNames = <String>{
+  'alignment',
+  'clipBehavior',
+  'color',
+  'constraints',
+  'decoration',
+  'foregroundDecoration',
+  'height',
+  'margin',
+  'padding',
+  'transform',
+  'transformAlignment',
+  'width',
+};
+
+/// Warns when a Container has only a child (or key + child), adding no value.
+///
+/// A Container with only `child` (and optionally `key`) is redundant; use the
+/// child directly. Use Padding, ColoredBox, SizedBox, or Align when you need
+/// those behaviors.
+///
+/// Since: v6.0.8 | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// Container(child: Text('Hello'));
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// Text('Hello');
+/// Container(padding: EdgeInsets.all(8), child: Text('Hello'));
+/// ```
+class AvoidUnnecessaryContainersRule extends SaropaLintRule {
+  AvoidUnnecessaryContainersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'Container('};
+
+  static const LintCode _code = LintCode(
+    'avoid_unnecessary_containers',
+    '[avoid_unnecessary_containers] Container adds no value when it only has a child (and optionally a key). It adds an extra layer to the widget tree with no benefit. Remove the Container and use the child directly, or use Padding, ColoredBox, SizedBox, or Align when you need those behaviors.',
+    correctionMessage:
+        'Remove the unnecessary Container and use the child directly. If you need padding, color, or alignment, use Padding, ColoredBox, or Align instead.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final DartType? type = node.staticType;
+      if (type is! InterfaceType) return;
+      if (type.element.name != 'Container') return;
+      final String? uri = type.element.library.uri.toString();
+      if (uri == null || !uri.contains('flutter')) return;
+
+      final Set<String> namedArgNames = <String>{};
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          namedArgNames.add(arg.name.label.name);
+        }
+      }
+
+      if (namedArgNames.any(_containerJustifyingArgNames.contains)) return;
+
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Warns when a non-const collection literal is passed to an @immutable constructor.
+///
+/// Use const on the literal to avoid allocating on every rebuild.
+///
+/// Since: v6.0.8 | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// BoxDecoration(boxShadow: [BoxShadow(color: Colors.black)]);
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// BoxDecoration(boxShadow: const [BoxShadow(color: Colors.black)]);
+/// ```
+class PreferConstLiteralsToCreateImmutablesRule extends SaropaLintRule {
+  PreferConstLiteralsToCreateImmutablesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    'prefer_const_literals_to_create_immutables',
+    '[prefer_const_literals_to_create_immutables] Non-const collection literal passed to an immutable class. Add const to avoid allocating on every rebuild.',
+    correctionMessage: 'Add the const keyword before the collection literal.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final DartType? type = node.staticType;
+      if (type is! InterfaceType) return;
+      if (!_isImmutableType(type)) return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        final Expression expr = arg is NamedExpression ? arg.expression : arg;
+        if (expr is ListLiteral &&
+            expr.constKeyword == null &&
+            _allElementsConst(expr.elements)) {
+          reporter.atNode(expr);
+        } else if (expr is SetOrMapLiteral &&
+            expr.constKeyword == null &&
+            _allElementsConst(expr.elements)) {
+          reporter.atNode(expr);
+        }
+      }
+    });
+  }
+
+  static bool _isImmutableType(InterfaceType type) {
+    for (InterfaceType? t = type; t != null; t = t.superclass) {
+      if (t.element.name == 'Widget' ||
+          t.element.name == 'StatelessWidget' ||
+          t.element.name == 'StatefulWidget') {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static bool _allElementsConst(NodeList<CollectionElement> elements) {
+    for (final CollectionElement e in elements) {
+      if (e is SpreadElement || e is IfElement || e is ForElement) return false;
+      if (e is Expression && !_isConstExpression(e)) return false;
+      if (e is MapLiteralEntry) {
+        if (!_isConstExpression(e.key) || !_isConstExpression(e.value))
+          return false;
+      }
+    }
+    return true;
+  }
+
+  static bool _isConstExpression(Expression e) {
+    if (e is Literal) return true;
+    if (e is InstanceCreationExpression && e.isConst) return true;
+    return false;
   }
 }

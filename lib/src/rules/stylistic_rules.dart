@@ -3298,7 +3298,10 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
   ];
 
   @override
-  List<String> get configAliases => const <String>['avoid_commented_out_code'];
+  List<String> get configAliases => const <String>[
+    'avoid_commented_out_code',
+    'prefer_no_commented_code',
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_no_commented_out_code',
@@ -3351,6 +3354,252 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
 
         token = token.next;
       }
+    });
+  }
+}
+
+/// Warns when a string literal uses escaped inner quotes that could be avoided by switching delimiters.
+///
+/// Single-quoted strings with `\'` can use double quotes; double-quoted with `\"` can use single quotes.
+///
+/// **Bad:**
+/// ```dart
+/// final message = 'It\'s a beautiful day';
+/// final json = "The key is \"name\"";
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// final message = "It's a beautiful day";
+/// final json = 'The key is "name"';
+/// ```
+class AvoidEscapingInnerQuotesRule extends SaropaLintRule {
+  AvoidEscapingInnerQuotesRule() : super(code: _avoidEscapingInnerQuotesCode);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _avoidEscapingInnerQuotesCode = LintCode(
+    'avoid_escaping_inner_quotes',
+    '[avoid_escaping_inner_quotes] String literal uses backslash-escaped quote characters when switching the string delimiter would eliminate the need for escaping, improving readability.',
+    correctionMessage:
+        'Switch to the other quote delimiter (single ↔ double) so inner quotes do not need escaping.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
+      if (node.isRaw) return;
+      final String lexeme = node.literal.lexeme;
+      if (lexeme.length < 2) return;
+      final String quote = lexeme[0];
+      if (quote == "'") {
+        if (!lexeme.contains(r"\'")) return;
+        if (lexeme.contains('"')) return;
+        reporter.atNode(node);
+      } else if (quote == '"') {
+        if (!lexeme.contains(r'\"')) return;
+        if (lexeme.contains("'")) return;
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+/// Warns when a cascade expression has exactly one section and is used as a statement.
+///
+/// Use a direct call instead: `list.add(item)` not `list..add(item)`.
+///
+/// **Bad:**
+/// ```dart
+/// list..add(item);
+/// config..timeout = 30;
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// list.add(item);
+/// config.timeout = 30;
+/// list..add('a')..add('b');
+/// ```
+class AvoidSingleCascadeInExpressionStatementsRule extends SaropaLintRule {
+  AvoidSingleCascadeInExpressionStatementsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_single_cascade_in_expression_statements',
+    '[avoid_single_cascade_in_expression_statements] Cascade with exactly one section used as a statement. Use a direct method call or property access instead of a single cascade.',
+    correctionMessage:
+        'Replace the single cascade with a direct call (e.g. list.add(item) instead of list..add(item)).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCascadeExpression((CascadeExpression node) {
+      if (node.cascadeSections.length != 1) return;
+      if (node.parent is! ExpressionStatement) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Warns when two string literals are concatenated with + instead of adjacent strings.
+///
+/// Adjacent string literals are merged at compile time and are the idiomatic Dart pattern.
+/// Use `'a' 'b'` instead of `'a' + 'b'`.
+///
+/// Since: v6.0.8 | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// final sql = 'SELECT * ' + 'FROM users';
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// final sql = 'SELECT * ' 'FROM users';
+/// ```
+class PreferAdjacentStringsRule extends SaropaLintRule {
+  PreferAdjacentStringsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_adjacent_strings',
+    '[prefer_adjacent_strings] Use adjacent string literals instead of + for literal concatenation. Adjacent strings are merged at compile time and are the idiomatic Dart pattern.',
+    correctionMessage:
+        'Replace + concatenation with adjacent string literals (e.g. \'a\' \'b\' instead of \'a\' + \'b\').',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBinaryExpression((BinaryExpression node) {
+      if (node.operator.type != TokenType.PLUS) return;
+      if (!_isPureStringLiteral(node.leftOperand)) return;
+      if (!_isPureStringLiteral(node.rightOperand)) return;
+      if (node.parent is BinaryExpression) {
+        final BinaryExpression parent = node.parent! as BinaryExpression;
+        if (parent.operator.type == TokenType.PLUS) return;
+      }
+      reporter.atNode(node);
+    });
+  }
+
+  static bool _isPureStringLiteral(Expression expr) =>
+      expr is SimpleStringLiteral || expr is AdjacentStrings;
+}
+
+/// Prefer string interpolation over + concatenation with string literals.
+///
+/// Flags BinaryExpression with operator + when result type is String and at least
+/// one operand is a string literal. Report only the outermost node of a chain.
+/// Adjacent string literals are handled by prefer_adjacent_strings.
+class PreferInterpolationToComposeRule extends SaropaLintRule {
+  PreferInterpolationToComposeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_interpolation_to_compose',
+    '[prefer_interpolation_to_compose] Prefer string interpolation over + concatenation with string literals.',
+    correctionMessage:
+        'Replace with string interpolation (e.g. \'Hello, \$name!\').',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBinaryExpression((BinaryExpression node) {
+      if (node.operator.type != TokenType.PLUS) return;
+      if (node.staticType?.isDartCoreString != true) return;
+      final left = node.leftOperand;
+      final right = node.rightOperand;
+      final leftLiteral =
+          left is SimpleStringLiteral ||
+          left is StringInterpolation ||
+          left is AdjacentStrings;
+      final rightLiteral =
+          right is SimpleStringLiteral ||
+          right is StringInterpolation ||
+          right is AdjacentStrings;
+      if (!leftLiteral && !rightLiteral) return;
+      if (node.parent is BinaryExpression) {
+        final BinaryExpression parent = node.parent! as BinaryExpression;
+        if (parent.operator.type == TokenType.PLUS &&
+            parent.staticType?.isDartCoreString == true) {
+          return;
+        }
+      }
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Prefer raw string literals when the string contains only escaped backslashes.
+///
+/// Flags non-raw SimpleStringLiteral containing \\. Skips strings with \n, \t,
+/// interpolation, etc. Use r'...' for regex and paths to avoid double backslashes.
+class PreferRawStringsRule extends SaropaLintRule {
+  PreferRawStringsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_raw_strings',
+    '[prefer_raw_strings] Prefer raw string literal when string contains only escaped backslashes (e.g. regex).',
+    correctionMessage: 'Use raw string (r\'...\') to avoid double backslashes.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addSimpleStringLiteral((SimpleStringLiteral node) {
+      if (node.isRaw) return;
+      if (node.isSynthetic) return;
+      final lexeme = node.literal.lexeme;
+      if (!lexeme.contains(r'\\')) return;
+      if (RegExp(r'\\[nrtbfv0xu]').hasMatch(lexeme)) return;
+      if (RegExp(r'\$\{').hasMatch(lexeme)) return;
+      if (RegExp(r'\$[a-zA-Z_]').hasMatch(lexeme)) return;
+      reporter.atNode(node);
     });
   }
 }
