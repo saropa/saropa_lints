@@ -1,5 +1,10 @@
 # Task: `avoid_null_checks_in_equality_operators`
 
+## Implemented (v6.0.8)
+Rule implemented. See CHANGELOG 6.0.6 and example/lib/roadmap_15_rules_fixture.dart.
+
+---
+
 ## Summary
 - **Rule Name**: `avoid_null_checks_in_equality_operators`
 - **Tier**: Professional

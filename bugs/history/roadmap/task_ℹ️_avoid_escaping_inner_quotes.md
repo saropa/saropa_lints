@@ -1,5 +1,10 @@
 # Task: `avoid_escaping_inner_quotes`
 
+## Implemented (v6.0.8)
+Rule implemented. See CHANGELOG 6.0.6 and example/lib/roadmap_15_rules_fixture.dart.
+
+---
+
 ## Summary
 - **Rule Name**: `avoid_escaping_inner_quotes`
 - **Tier**: Stylistic
