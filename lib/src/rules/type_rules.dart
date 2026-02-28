@@ -2056,3 +2056,228 @@ class AvoidShadowingTypeParametersRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when a private typedef defines a function type.
+///
+/// Prefer inline function types at the usage site for clarity.
+///
+/// **Bad:**
+/// ```dart
+/// typedef _ClickHandler = void Function(BuildContext context);
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// final void Function(BuildContext context) onTap;
+/// ```
+class AvoidPrivateTypedefFunctionsRule extends SaropaLintRule {
+  AvoidPrivateTypedefFunctionsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_private_typedef_functions',
+    '[avoid_private_typedef_functions] Private typedef that defines a function type. Prefer using the inline function type at each usage site.',
+    correctionMessage:
+        'Remove this private typedef and use the inline function type (e.g. void Function(BuildContext)) at usage sites.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addGenericTypeAlias((GenericTypeAlias node) {
+      if (!node.name.lexeme.startsWith('_')) return;
+      final TypeAnnotation? type = node.type;
+      if (type is! GenericFunctionType) return;
+      reporter.atToken(node.name);
+    });
+  }
+}
+
+/// Prefer final for local variables that are never reassigned.
+///
+/// Flags local variable declarations (var or typed) that are never reassigned
+/// in the same block. Conservative: only checks statements after the
+/// declaration in the same block; assignments in nested blocks or for-loop
+/// updaters are considered. For-in loop variables are not covered here.
+///
+/// **Bad:** `var count = items.length;` or `String message = 'Hi';` with no later assignment.
+/// **Good:** `final count = items.length;` or `final String message = 'Hi';`
+class PreferFinalLocalsRule extends SaropaLintRule {
+  PreferFinalLocalsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_final_locals',
+    '[prefer_final_locals] Local variable that is never reassigned should be declared final.',
+    correctionMessage: 'Add the final modifier (or replace var with final).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addVariableDeclarationList((VariableDeclarationList node) {
+      if (node.parent is! VariableDeclarationStatement) return;
+      final stmt = node.parent! as VariableDeclarationStatement;
+      if (node.keyword?.lexeme == 'final') return;
+      if (node.keyword?.lexeme == 'const') return;
+
+      final block = stmt.parent;
+      if (block is! Block) return;
+
+      final statements = block.statements;
+      final idx = statements.indexOf(stmt);
+      if (idx < 0) return;
+
+      for (final variable in node.variables) {
+        if (variable.name.lexeme.startsWith('_')) continue;
+        final name = variable.name.lexeme;
+        bool reassigned = false;
+        for (int i = idx + 1; i < statements.length; i++) {
+          if (_assignsToName(statements[i], name)) {
+            reassigned = true;
+            break;
+          }
+        }
+        if (!reassigned) {
+          reporter.atToken(variable.name);
+        }
+      }
+    });
+  }
+
+  bool _assignsToName(Statement stmt, String name) {
+    if (stmt is ExpressionStatement) {
+      return _exprAssignsToName(stmt.expression, name);
+    }
+    if (stmt is ForStatement) {
+      final parts = stmt.forLoopParts;
+      if (parts is ForParts) {
+        if (parts.updaters.isNotEmpty) {
+          for (final u in parts.updaters) {
+            if (u is AssignmentExpression && _lhsName(u) == name) return true;
+            if (u is PrefixExpression || u is PostfixExpression) {
+              if (_incDecTargetName(u) == name) return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  bool _exprAssignsToName(Expression expr, String name) {
+    if (expr is AssignmentExpression) {
+      return _lhsName(expr) == name;
+    }
+    if (expr is PrefixExpression || expr is PostfixExpression) {
+      return _incDecTargetName(expr) == name;
+    }
+    return false;
+  }
+
+  String? _lhsName(AssignmentExpression e) {
+    final left = e.leftHandSide;
+    if (left is SimpleIdentifier) return left.name;
+    return null;
+  }
+
+  String? _incDecTargetName(Expression e) {
+    if (e is PrefixExpression) {
+      if (e.operator.type == TokenType.PLUS_PLUS ||
+          e.operator.type == TokenType.MINUS_MINUS) {
+        final operand = e.operand;
+        if (operand is SimpleIdentifier) return operand.name;
+      }
+    }
+    if (e is PostfixExpression) {
+      if (e.operator.type == TokenType.PLUS_PLUS ||
+          e.operator.type == TokenType.MINUS_MINUS) {
+        final operand = e.operand;
+        if (operand is SimpleIdentifier) return operand.name;
+      }
+    }
+    return null;
+  }
+}
+
+/// Warns when a final variable could be const.
+///
+/// Since: v6.0.8 | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// final pi = 3.14159;
+/// final greeting = 'Hello';
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// const pi = 3.14159;
+/// const greeting = 'Hello';
+/// ```
+class PreferConstDeclarationsRule extends SaropaLintRule {
+  PreferConstDeclarationsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_const_declarations',
+    '[prefer_const_declarations] Variable with constant initializer could be declared const for better performance and clarity.',
+    correctionMessage: 'Use const instead of final for this declaration.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addVariableDeclarationList((VariableDeclarationList node) {
+      if (node.keyword?.lexeme != 'final') return;
+      if (node.isLate) return;
+      final AstNode? parent = node.parent;
+      if (parent is FieldDeclaration && !parent.isStatic) return;
+
+      for (final VariableDeclaration v in node.variables) {
+        final Expression? init = v.initializer;
+        if (init == null) continue;
+        if (!_isConstExpression(init)) continue;
+        reporter.atToken(v.name, _code);
+      }
+    });
+  }
+
+  static bool _isConstExpression(Expression e) {
+    if (e is NullLiteral ||
+        e is BooleanLiteral ||
+        e is IntegerLiteral ||
+        e is DoubleLiteral ||
+        e is SimpleStringLiteral) {
+      return true;
+    }
+    if (e is InstanceCreationExpression && e.isConst) return true;
+    if (e is ListLiteral && e.constKeyword != null) return true;
+    if (e is SetOrMapLiteral && e.constKeyword != null) return true;
+    return false;
+  }
+}

@@ -1062,6 +1062,19 @@ saropa_lints:
     - avoid_unnecessary_local_late: false
     - avoid_global_state: false
     - avoid_variable_shadowing: false
+    # Roadmap detail 12 rules (v6.0.8) — Recommended / Professional
+    - avoid_unnecessary_containers: false
+    - prefer_adjacent_strings: false
+    - prefer_adjective_bool_getters: false
+    - prefer_asserts_in_initializer_lists: false
+    - prefer_const_constructors_in_immutables: false
+    - prefer_const_declarations: false
+    - prefer_const_literals_to_create_immutables: false
+    - prefer_constructors_first: false
+    - prefer_extension_methods: false
+    - prefer_extension_over_utility_class: false
+    - prefer_extension_type_for_wrapper: false
+    - prefer_final_fields: false
     - avoid_generics_shadowing: false
     - avoid_similar_names: false
     - avoid_unused_assignment: false

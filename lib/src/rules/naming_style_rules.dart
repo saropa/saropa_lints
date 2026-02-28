@@ -2298,3 +2298,387 @@ class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
     super.visitSimpleIdentifier(node);
   }
 }
+
+const Set<String> _predicatePrefixes = <String>{
+  'is',
+  'has',
+  'can',
+  'should',
+  'was',
+  'will',
+  'needs',
+  'allows',
+  'contains',
+  'includes',
+  'supports',
+  'requires',
+  'provides',
+  'matches',
+  'exists',
+  'enables',
+  'disables',
+  'accepts',
+  'rejects',
+  'handles',
+};
+
+const Set<String> _verbPrefixes = <String>{
+  'get',
+  'set',
+  'load',
+  'save',
+  'fetch',
+  'send',
+  'receive',
+  'check',
+  'validate',
+  'verify',
+  'compute',
+  'calculate',
+  'parse',
+  'format',
+  'convert',
+  'process',
+  'execute',
+  'run',
+  'start',
+  'stop',
+  'create',
+  'build',
+  'make',
+  'update',
+  'delete',
+  'remove',
+  'add',
+  'insert',
+  'clear',
+  'read',
+  'write',
+  'open',
+  'close',
+  'show',
+  'hide',
+};
+
+/// Warns when a bool getter uses a verb name instead of a predicate/adjective.
+///
+/// Boolean getters should read naturally as predicates: `isAuthenticated`, `hasErrors`.
+/// Verb-named getters like `validate` or `load` are confusing at the call site.
+///
+/// Since: v6.0.8 | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// bool get validate => _isValid;
+/// bool get load => _loaded;
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// bool get isValid => _isValid;
+/// bool get isLoaded => _loaded;
+/// ```
+class PreferAdjectiveBoolGettersRule extends SaropaLintRule {
+  PreferAdjectiveBoolGettersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_adjective_bool_getters',
+    '[prefer_adjective_bool_getters] Boolean getter name should read as a predicate (e.g. isX, hasX, canX). Verb-named bool getters are confusing at the call site.',
+    correctionMessage:
+        'Rename this getter to start with "is", "has", "can", or "should" to read naturally as a predicate. For example, rename "validate" to "isValid" or "hasValidated".',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.isGetter) return;
+      final TypeAnnotation? returnTypeNode = node.returnType;
+      if (returnTypeNode == null) return;
+      if (returnTypeNode is! NamedType || returnTypeNode.name.lexeme != 'bool')
+        return;
+      if (_hasOverride(node)) return;
+
+      final String name = node.name.lexeme;
+      if (_hasPredicatePrefix(name)) return;
+      if (!_hasVerbPrefix(name)) return;
+
+      reporter.atToken(node.name, code);
+    });
+  }
+
+  static bool _hasOverride(MethodDeclaration node) {
+    for (final Annotation a in node.metadata) {
+      if (a.name.name == 'override') return true;
+    }
+    return false;
+  }
+
+  static bool _hasPredicatePrefix(String name) =>
+      _predicatePrefixes.any((p) => name.startsWith(p));
+
+  static bool _hasVerbPrefix(String name) =>
+      _verbPrefixes.any((v) => name.startsWith(v));
+}
+
+/// Prefer lowerCamelCase for const and static final constants.
+///
+/// Flags names matching SCREAMING_SNAKE_CASE (uppercase + underscores) on
+/// top-level or class-level const and static final. Per Dart style guide.
+/// Enum members and single-word names without underscore are not flagged.
+class PreferLowercaseConstantsRule extends SaropaLintRule {
+  PreferLowercaseConstantsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_lowercase_constants',
+    '[prefer_lowercase_constants] Use lowerCamelCase for constants per Dart style guide.',
+    correctionMessage:
+        'Rename to lowerCamelCase (e.g. maxRetries instead of MAX_RETRIES).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static final RegExp _screamingCase = RegExp(r'^[A-Z][A-Z0-9_]+$');
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addVariableDeclaration((VariableDeclaration node) {
+      final name = node.name.lexeme;
+      if (!_screamingCase.hasMatch(name) || !name.contains('_')) return;
+      final list = node.parent;
+      if (list is! VariableDeclarationList) return;
+      if (list.keyword?.lexeme != 'const') return;
+      final grandparent = list.parent;
+      if (grandparent is FieldDeclaration && !grandparent.isStatic) return;
+      if (grandparent is FieldDeclaration) {
+        final k = grandparent.fields.keyword?.lexeme;
+        if (k != 'final' && k != 'const') return;
+      }
+      reporter.atToken(node.name);
+    });
+    context.addFieldDeclaration((FieldDeclaration node) {
+      if (!node.isStatic) return;
+      final k = node.fields.keyword?.lexeme;
+      if (k != 'final' && k != 'const') return;
+      for (final v in node.fields.variables) {
+        final name = v.name.lexeme;
+        if (_screamingCase.hasMatch(name) && name.contains('_')) {
+          reporter.atToken(v.name);
+        }
+      }
+    });
+  }
+}
+
+/// Prefer noun/agent class names over gerund (-ing) or adjective (-able/-ible).
+///
+/// Concrete classes named with gerund (e.g. Parsing) or -able/-ible (e.g. Sortable)
+/// are flagged; abstract classes with -able/-ible are allowed (capability mixins).
+/// Common nouns ending in -ing (Padding, Binding, etc.) are allowlisted.
+class PreferNounClassNamesRule extends SaropaLintRule {
+  PreferNounClassNamesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_noun_class_names',
+    '[prefer_noun_class_names] Prefer noun/agent class names (e.g. Parser) over gerund (Parsing) or -able on concrete classes.',
+    correctionMessage:
+        'Rename to a noun form (e.g. Parser instead of Parsing).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _ingAllowlist = <String>{
+    'Padding',
+    'Spacing',
+    'Heading',
+    'Billing',
+    'Setting',
+    'Warning',
+    'Greeting',
+    'Logging',
+    'Encoding',
+    'Binding',
+    'Routing',
+    'Mapping',
+    'Sorting',
+    'Filtering',
+    'Caching',
+    'Loading',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      if (node.abstractKeyword != null) return;
+      final name = node.name.lexeme;
+      if (name.endsWith('ing') && !_ingAllowlist.contains(name)) {
+        reporter.atToken(node.name);
+        return;
+      }
+      if ((name.endsWith('able') || name.endsWith('ible'))) {
+        reporter.atToken(node.name);
+      }
+    });
+  }
+}
+
+/// Prefer verb method names; flag noun-like method names.
+///
+/// Methods (not getters) whose names are common nouns (data, error, status, etc.)
+/// or lack a verb prefix are flagged. @override methods are excluded.
+/// Suggests prefixing with get, fetch, compute, build, or handle.
+class PreferVerbMethodNamesRule extends SaropaLintRule {
+  PreferVerbMethodNamesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_verb_method_names',
+    '[prefer_verb_method_names] Method names should start with a verb (e.g. getData, reportError).',
+    correctionMessage:
+        'Prefix with a verb such as get, fetch, compute, build, or handle.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _suspectNames = <String>{
+    'error',
+    'errors',
+    'data',
+    'result',
+    'results',
+    'status',
+    'state',
+    'value',
+    'values',
+    'response',
+    'request',
+    'output',
+    'input',
+    'content',
+    'info',
+    'detail',
+    'details',
+    'item',
+    'items',
+    'entry',
+    'entries',
+    'key',
+    'keys',
+    'name',
+    'names',
+    'type',
+    'types',
+    'kind',
+    'category',
+    'size',
+    'count',
+    'length',
+    'total',
+    'message',
+    'messages',
+    'text',
+    'label',
+    'title',
+    'description',
+    'summary',
+  };
+
+  static const Set<String> _verbPrefixes = <String>{
+    'get',
+    'set',
+    'fetch',
+    'load',
+    'save',
+    'compute',
+    'calculate',
+    'build',
+    'create',
+    'make',
+    'handle',
+    'process',
+    'parse',
+    'format',
+    'convert',
+    'validate',
+    'check',
+    'find',
+    'search',
+    'update',
+    'delete',
+    'remove',
+    'add',
+    'insert',
+    'append',
+    'clear',
+    'reset',
+    'init',
+    'start',
+    'stop',
+    'run',
+    'execute',
+    'dispatch',
+    'emit',
+    'send',
+    'receive',
+    'read',
+    'write',
+    'open',
+    'close',
+    'show',
+    'hide',
+    'toggle',
+    'apply',
+    'render',
+    'notify',
+    'publish',
+    'subscribe',
+    'report',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (node.isGetter || node.isSetter || node.isOperator) return;
+      for (final a in node.metadata) {
+        if (a.name.name == 'override') return;
+      }
+      final name = node.name.lexeme;
+      if (_verbPrefixes.any((v) => name.startsWith(v))) return;
+      if (_suspectNames.contains(name)) {
+        reporter.atToken(node.name);
+      }
+    });
+  }
+}
