@@ -393,6 +393,82 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
   }
 }
 
+/// Warns when fixed-height Container or SizedBox contains Text, risking overflow at large text scale.
+///
+/// WCAG 2.1 (Resize Text) and store guidelines expect text to scale. A literal
+/// [height] on [Container] or [SizedBox] that wraps [Text] can clip or overflow
+/// when the user increases system font scale. This rule flags such constructors
+/// so teams can switch to [BoxConstraints.minHeight], padding, or flexible layout.
+///
+/// **Limitation:** Only inspects the direct [child] chain for [Text]; [Column]
+/// with [children] containing [Text] is not recursed (reduces false positives).
+///
+/// Since: ROADMAP §5.43 Accessibility Advanced | Rule version: v1
+class RequireTextScaleFactorAwarenessRule extends SaropaLintRule {
+  RequireTextScaleFactorAwarenessRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    'require_text_scale_factor_awareness',
+    '[require_text_scale_factor_awareness] Fixed-height container with Text child may clip or overflow when users increase text scale. Use flexible layout or minHeight instead. {v1}',
+    correctionMessage:
+        'Use constraints: BoxConstraints(minHeight: n), padding, or remove fixed height so text can scale.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String? name = node.constructorName.type.element?.name;
+      if (name != 'Container' && name != 'SizedBox') return;
+
+      double? height;
+      Expression? childArg;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          if (arg.name.label.name == 'height') {
+            final Expression expr = arg.expression;
+            if (expr is IntegerLiteral) {
+              height = expr.value?.toDouble();
+            } else if (expr is DoubleLiteral) {
+              height = expr.value;
+            }
+          } else if (arg.name.label.name == 'child') {
+            childArg = arg.expression;
+          }
+        }
+      }
+      if (height == null || childArg == null) return;
+      if (!_hasTextDescendant(childArg)) return;
+      reporter.atNode(node.constructorName, _code);
+    });
+  }
+
+  bool _hasTextDescendant(Expression node) {
+    if (node is InstanceCreationExpression) {
+      final String? name = node.constructorName.type.element?.name;
+      if (name == 'Text') return true;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'child') {
+          if (_hasTextDescendant(arg.expression)) return true;
+        }
+      }
+    }
+    return false;
+  }
+}
+
 /// Warns when GestureDetector is used without keyboard accessibility.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6

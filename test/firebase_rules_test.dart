@@ -60,6 +60,20 @@ void main() {
       );
       expect(file.existsSync(), isTrue);
     });
+
+    test('require_firebase_reauthentication fixture exists', () {
+      final file = File(
+        'example_packages/lib/firebase/require_firebase_reauthentication_fixture.dart',
+      );
+      expect(file.existsSync(), isTrue);
+    });
+
+    test('require_firebase_token_refresh fixture exists', () {
+      final file = File(
+        'example_packages/lib/firebase/require_firebase_token_refresh_fixture.dart',
+      );
+      expect(file.existsSync(), isTrue);
+    });
   });
 
   group('Firestore Query Rules', () {

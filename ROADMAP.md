@@ -699,6 +699,7 @@ Rules for popular Flutter packages based on common gotchas, anti-patterns, and b
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
+| ✅ `require_error_handling_graceful` | Essential | WARNING | Show friendly errors in UI, not raw exception messages or toString(). |
 | ℹ️ `require_error_recovery` | Professional | INFO | Error handlers should enable recovery. Detect catch without user-recoverable action. |
 | ℹ️ `prefer_result_type` | Professional | INFO | Use Result/Either types for expected failures. Detect try-catch for business logic. |
 | ℹ️ `prefer_zone_error_handler` | Comprehensive | INFO | Use Zone for unhandled async errors. Detect async without zone handling. |

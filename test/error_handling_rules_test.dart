@@ -30,6 +30,7 @@ void main() {
       'require_finally_cleanup',
       'require_error_logging',
       'require_app_startup_error_handling',
+      'require_error_handling_graceful',
       'avoid_assert_in_production',
     ];
 

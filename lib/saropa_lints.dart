@@ -162,6 +162,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidContextInStaticMethodsRule.new,
   AvoidIsarEnumFieldRule.new,
   AvoidAdjacentStringsRule.new,
+  AvoidDeprecatedUsageRule.new,
   AvoidContinueRule.new,
   AvoidEmptySpreadRule.new,
   AvoidOnlyRethrowRule.new,
@@ -549,6 +550,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidUnnecessaryNullableFieldsRule.new,
   AvoidUnnecessaryPatternsRule.new,
   AvoidWildcardCasesWithSealedClassesRule.new,
+  RequireExhaustiveSealedSwitchRule.new,
   NoEqualSwitchExpressionCasesRule.new,
   PreferBytesBuilderRule.new,
   PreferPushingConditionalExpressionsRule.new,
@@ -647,6 +649,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Performance rules (NEW)
   RequireKeysInAnimatedListsRule.new,
+  PreferBinaryFormatRule.new,
+  PreferPoolPatternRule.new,
   AvoidExpensiveBuildRule.new,
   // PreferConstChildWidgetsRule.new,
   AvoidSynchronousFileIoRule.new,
@@ -676,6 +680,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Error handling rules (NEW)
   AvoidSwallowingExceptionsRule.new,
+  HandleThrowingInvocationsRule.new,
   AvoidLosingStackTraceRule.new,
   AvoidPrintErrorRule.new,
   // RequireFutureErrorHandlingRule merged into AvoidUncaughtFutureErrorsRule
@@ -683,6 +688,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireErrorContextRule.new,
   PreferResultPatternRule.new,
   RequireAsyncErrorDocumentationRule.new,
+  RequireErrorHandlingGracefulRule.new,
   RequireErrorBoundaryRule.new,
   RequireErrorLoggingRule.new,
 
@@ -731,6 +737,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // API & Network rules (NEW)
   RequireHttpStatusCheckRule.new,
+  PreferBatchRequestsRule.new,
+  RequireCompressionRule.new,
   // RequireApiTimeoutRule merged into RequireRequestTimeoutRule
   AvoidHardcodedApiUrlsRule.new,
   RequireRetryLogicRule.new,
@@ -751,6 +759,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Memory Management rules (NEW)
   AvoidLargeObjectsInStateRule.new,
+  RequireExpandoCleanupRule.new,
   RequireImageDisposalRule.new,
   AvoidCapturingThisInCallbacksRule.new,
   RequireCacheEvictionPolicyRule.new,
@@ -1017,6 +1026,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // New accessibility rules
   AvoidTextScaleFactorIgnoreRule.new,
   RequireImageSemanticsRule.new,
+  RequireTextScaleFactorAwarenessRule.new,
   AvoidHiddenInteractiveRule.new,
 
   // New animation rules
@@ -1028,6 +1038,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // New forms rules
   PreferAutovalidateOnInteractionRule.new,
+  PreferFormBlocForComplexRule.new,
   RequireKeyboardTypeRule.new,
   RequireTextOverflowInRowRule.new,
   RequireSecureKeyboardRule.new,
@@ -1172,6 +1183,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidFindAllRule.new,
   RequireIntegrationTestSetupRule.new,
   RequireFirebaseInitBeforeUseRule.new,
+  RequireFirebaseReauthenticationRule.new,
+  RequireFirebaseTokenRefreshRule.new,
 
   // Security rules
   AvoidAuthStateInPrefsRule.new,
@@ -1195,6 +1208,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferKeyboardShortcutsRule.new,
   // Notification rules
   RequireNotificationChannelAndroidRule.new,
+  PreferLocalNotificationForImmediateRule.new,
   AvoidNotificationPayloadSensitiveRule.new,
 
   // Widget rules
@@ -2472,6 +2486,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferOauthPkceRule.new,
   AvoidContinuousLocationUpdatesRule.new,
   PreferAdaptiveIconsRule.new,
+  PreferMasterDetailForLargeRule.new,
   PreferGracePeriodHandlingRule.new,
   RequireCachedImageDevicePixelRatioRule.new,
   PreferForegroundServiceAndroidRule.new,
@@ -2544,6 +2559,22 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidExpensiveDidChangeDependenciesRule.new,
   AvoidPermissionRequestLoopRule.new,
   AvoidEntitlementWithoutServerRule.new,
+  // Roadmap detail requirements (15 new rules)
+  AvoidBoolInWidgetConstructorsRule.new,
+  AvoidClassesWithOnlyStaticMembersRule.new,
+  AvoidDoubleAndIntChecksRule.new,
+  AvoidEqualsAndHashCodeOnMutableClassesRule.new,
+  AvoidEscapingInnerQuotesRule.new,
+  AvoidFieldInitializersInConstClassesRule.new,
+  AvoidFunctionLiteralsInForeachCallsRule.new,
+  AvoidImplementingValueTypesRule.new,
+  AvoidJsRoundedIntsRule.new,
+  AvoidNullChecksInEqualityOperatorsRule.new,
+  AvoidPositionalBooleanParametersRule.new,
+  AvoidPrivateTypedefFunctionsRule.new,
+  AvoidRedundantArgumentValuesRule.new,
+  AvoidSettersWithoutGettersRule.new,
+  AvoidSingleCascadeInExpressionStatementsRule.new,
 ];
 
 // =============================================================================

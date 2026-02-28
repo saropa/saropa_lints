@@ -12,7 +12,45 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [6.0.7]
+
+### Added
+
+- 5 new Essential-tier lint rules from roadmap detail requirements:
+  - `require_exhaustive_sealed_switch` — switch on sealed types must use explicit cases; avoid default/wildcard (same logic as avoid_wildcard_cases_with_sealed_classes, Essential-tier name).
+  - `require_error_handling_graceful` — flag raw exception (e.toString(), e.message, \$e) shown in Text/SnackBar/AlertDialog inside catch blocks; recommend friendly messages.
+  - `require_firebase_reauthentication` — sensitive Firebase Auth ops (delete, updateEmail, updatePassword) must be preceded by reauthenticateWithCredential/reauthenticateWithProvider in the same method (firebase_auth only).
+  - `require_firebase_token_refresh` — getIdToken() result stored (variable/prefs) without idTokenChanges listener or forceRefresh (firebase_auth only).
+  - `require_text_scale_factor_awareness` — Container/SizedBox with literal height containing Text may overflow at large text scale; recommend flexible layout (widget files only).
+
+### Changed
+
+- **Firebase reauth rule:** Reauth is now compared by source offset (earliest reauth in method) so order is correct regardless of visit order.
+- **Firebase token rule:** Stored detection now includes VariableDeclaration initializer (e.g. `final t = await user.getIdToken()`).
+- **Performance:** Firebase Auth rules set requiredPatterns for earlier file skip when content does not match.
+
+---
+
 ## [6.0.6]
+
+### Added
+
+- 15 new lint rules from roadmap detail requirements:
+  - `avoid_bool_in_widget_constructors` (Professional, INFO) — widget constructors with named bool params; prefer enum or decomposition
+  - `avoid_classes_with_only_static_members` (Recommended, INFO) — prefer top-level functions/constants
+  - `avoid_double_and_int_checks` (Professional, INFO) — flag `is int && is double` (always false) and `is int || is double` (use `is num`)
+  - `avoid_equals_and_hash_code_on_mutable_classes` (Professional, INFO) — custom ==/hashCode with mutable fields breaks Set/Map
+  - `avoid_escaping_inner_quotes` (Stylistic, INFO) — switch quote delimiter to avoid escaped inner quotes
+  - `avoid_field_initializers_in_const_classes` (Professional, INFO) — move field initializers to const constructor initializer list
+  - `avoid_function_literals_in_foreach_calls` (Stylistic, INFO) — prefer for-in over .forEach with a literal
+  - `avoid_implementing_value_types` (Professional, INFO) — implements type with custom ==/hashCode without overriding them
+  - `avoid_js_rounded_ints` (Comprehensive, INFO) — integer literals exceeding JS safe integer range (2^53)
+  - `avoid_null_checks_in_equality_operators` (Professional, INFO) — redundant other == null when is! type test present
+  - `avoid_positional_boolean_parameters` (Professional, INFO) — use named parameters for bools
+  - `avoid_private_typedef_functions` (Comprehensive, INFO) — private typedef for function type; prefer inline type
+  - `avoid_redundant_argument_values` (Recommended, INFO) — named argument equals parameter default
+  - `avoid_setters_without_getters` (Professional, INFO) — setter with no matching getter
+  - `avoid_single_cascade_in_expression_statements` (Stylistic, INFO) — single cascade as statement; use direct call
 
 ### Changed
 

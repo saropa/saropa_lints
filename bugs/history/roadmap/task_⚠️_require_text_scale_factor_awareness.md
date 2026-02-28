@@ -1,10 +1,14 @@
+> **IMPLEMENTED — v6.0.7**
+>
+> `RequireTextScaleFactorAwarenessRule` in `lib/src/rules/accessibility_rules.dart`. Essential tier. Container/SizedBox with literal height and Text child (direct child chain only). applicableFileTypes: widget.
+
 # Task: `require_text_scale_factor_awareness`
 
 ## Summary
 - **Rule Name**: `require_text_scale_factor_awareness`
 - **Tier**: Essential
 - **Severity**: WARNING
-- **Status**: Planned
+- **Status**: Implemented
 - **Source**: ROADMAP.md §5.43 Accessibility Advanced Rules
 
 ## Problem Statement

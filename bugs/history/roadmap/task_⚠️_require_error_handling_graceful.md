@@ -1,10 +1,14 @@
+> **IMPLEMENTED — v6.0.7**
+>
+> `RequireErrorHandlingGracefulRule` in `lib/src/rules/error_handling_rules.dart`. Essential tier. Flags catch bodies that display exception in Text/SnackBar/AlertDialog (toString, message, interpolation).
+
 # Task: `require_error_handling_graceful`
 
 ## Summary
 - **Rule Name**: `require_error_handling_graceful`
 - **Tier**: Essential
 - **Severity**: WARNING
-- **Status**: Planned
+- **Status**: Implemented
 - **Source**: ROADMAP.md §5.19 http Package Security Rules
 
 ## Problem Statement

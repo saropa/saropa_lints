@@ -20,6 +20,7 @@ void main() {
       'avoid_image_buttons_without_tooltip',
       'avoid_text_scale_factor_ignore',
       'require_image_semantics',
+      'require_text_scale_factor_awareness',
       'avoid_hidden_interactive',
       'prefer_scalable_text',
       'require_button_semantics',

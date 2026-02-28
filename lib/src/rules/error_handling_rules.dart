@@ -8,6 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 
 import '../saropa_lint_rule.dart';
 import '../fixes/error_handling/change_exception_to_object_fix.dart';
@@ -1057,6 +1058,179 @@ class _PrintErrorVisitor extends RecursiveAstVisitor<void> {
     }
     if (expr is MethodInvocation && expr.target != null) {
       return _usesException(expr.target!);
+    }
+    return false;
+  }
+}
+
+/// Warns when raw exception message or toString() is shown in UI.
+///
+/// Since: ROADMAP §5.19 http Package Security | Rule version: v1
+///
+/// Show friendly errors to users, not technical ones. Raw exception messages
+/// in Text, SnackBar, or AlertDialog hurt UX and can leak internal details.
+///
+/// **Bad:**
+/// ```dart
+/// } catch (e) {
+///   ScaffoldMessenger.of(context).showSnackBar(
+///     SnackBar(content: Text(e.toString())),
+///   );
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// } catch (e, s) {
+///   logger.error('Load failed', error: e, stackTrace: s);
+///   _showFriendlyError(context, 'Unable to load. Please try again.');
+/// }
+/// ```
+class RequireErrorHandlingGracefulRule extends SaropaLintRule {
+  RequireErrorHandlingGracefulRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'require_error_handling_graceful',
+    '[require_error_handling_graceful] Raw exception message or toString() is shown in UI. Show user-friendly messages instead of technical errors to improve UX and avoid leaking internal details. {v1}',
+    correctionMessage:
+        "Log the exception and show a friendly message (e.g. 'An error occurred. Please try again.').",
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _uiWidgets = <String>{
+    'Text',
+    'SnackBar',
+    'AlertDialog',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCatchClause((CatchClause node) {
+      final CatchClauseParameter? exceptionParam = node.exceptionParameter;
+      if (exceptionParam == null) return;
+      final String exceptionName = exceptionParam.name.lexeme;
+
+      node.body.visitChildren(
+        _UiErrorDisplayVisitor(
+          exceptionName: exceptionName,
+          reporter: reporter,
+          code: _code,
+          uiWidgets: _uiWidgets,
+        ),
+      );
+    });
+  }
+}
+
+class _UiErrorDisplayVisitor extends RecursiveAstVisitor<void> {
+  _UiErrorDisplayVisitor({
+    required this.exceptionName,
+    required this.reporter,
+    required this.code,
+    required this.uiWidgets,
+  });
+
+  final String exceptionName;
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+  final Set<String> uiWidgets;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (methodName != 'toString') {
+      super.visitMethodInvocation(node);
+      return;
+    }
+    final Expression? target = node.target;
+    if (target == null) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+    if (target is! SimpleIdentifier || target.name != exceptionName) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+    if (!_isInsideUiWidget(node)) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+    reporter.atNode(node, code);
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    if (node.propertyName.name != 'message') {
+      super.visitPropertyAccess(node);
+      return;
+    }
+    final Expression? target = node.target;
+    if (target == null ||
+        target is! SimpleIdentifier ||
+        target.name != exceptionName) {
+      super.visitPropertyAccess(node);
+      return;
+    }
+    if (!_isInsideUiWidget(node)) {
+      super.visitPropertyAccess(node);
+      return;
+    }
+    reporter.atNode(node, code);
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitStringInterpolation(StringInterpolation node) {
+    if (!_usesExceptionInInterpolation(node)) {
+      super.visitStringInterpolation(node);
+      return;
+    }
+    if (!_isInsideUiWidget(node)) {
+      super.visitStringInterpolation(node);
+      return;
+    }
+    reporter.atNode(node, code);
+    super.visitStringInterpolation(node);
+  }
+
+  bool _usesExceptionInInterpolation(StringInterpolation node) {
+    for (final InterpolationElement element in node.elements) {
+      if (element is InterpolationExpression) {
+        final Expression expr = element.expression;
+        if (expr is SimpleIdentifier && expr.name == exceptionName) {
+          return true;
+        }
+        if (expr is MethodInvocation &&
+            expr.methodName.name == 'toString' &&
+            expr.target is SimpleIdentifier &&
+            (expr.target as SimpleIdentifier).name == exceptionName) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  bool _isInsideUiWidget(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression) {
+        final String? name =
+            current.constructorName.type.element?.name ??
+            current.constructorName.type.name.lexeme;
+        if (uiWidgets.contains(name)) return true;
+      }
+      current = current.parent;
     }
     return false;
   }
@@ -2285,6 +2459,101 @@ class AvoidAssertInProductionRule extends SaropaLintRule {
       if (condition.contains('!= null') || condition.contains('is!')) {
         reporter.atNode(node);
       }
+    });
+  }
+}
+
+// =============================================================================
+// handle_throwing_invocations
+// =============================================================================
+
+/// Invocations that can throw should be handled (try/catch or @Throws).
+///
+/// **BAD:**
+/// ```dart
+/// final content = File('config.json').readAsStringSync(); // no try/catch
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   final content = File('config.json').readAsStringSync();
+/// } catch (e) { handleError(e); }
+/// ```
+class HandleThrowingInvocationsRule extends SaropaLintRule {
+  HandleThrowingInvocationsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'handle_throwing_invocations',
+    '[handle_throwing_invocations] This invocation can throw. Wrap in try/catch '
+        'or annotate the containing method with @Throws to propagate.',
+    correctionMessage:
+        'Wrap this call in a try/catch block or annotate the containing method with @Throws to propagate the exception.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _knownThrowerNames = <String>{
+    'readAsStringSync',
+    'readAsBytesSync',
+    'writeAsStringSync',
+    'writeAsBytesSync',
+    'decode',
+    'parse',
+    'jsonDecode',
+  };
+
+  static bool _isInsideTry(AstNode node) {
+    AstNode? p = node.parent;
+    while (p != null) {
+      if (p is TryStatement) return true;
+      p = p.parent;
+    }
+    return false;
+  }
+
+  static bool _hasThrowsAnnotation(Element? element) {
+    if (element == null) return false;
+    for (final ann in element.metadata as dynamic) {
+      final name = (ann as dynamic).element?.enclosingElement?.name as String?;
+      if (name == 'Throws' || name == 'throws') return true;
+    }
+    return false;
+  }
+
+  static bool _isKnownThrower(Element? element) {
+    if (element == null) return false;
+    final name = element.name;
+    if (name == null || !_knownThrowerNames.contains(name)) return false;
+    final uri = element.library?.uri.toString() ?? '';
+    if (uri.startsWith('dart:io') &&
+        (name.startsWith('read') || name.startsWith('write')))
+      return true;
+    if (uri.contains('convert') && (name == 'decode' || name == 'jsonDecode'))
+      return true;
+    if (uri.startsWith('dart:core') && name == 'parse') return true;
+    return uri.startsWith('dart:io') ||
+        (uri.contains('convert') && name == 'decode');
+  }
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (context.isInTestDirectory) return;
+
+    context.addMethodInvocation((MethodInvocation node) {
+      if (_isInsideTry(node)) return;
+      final el = (node.methodName as dynamic).staticElement as Element?;
+      if (el == null) return;
+      if (!_hasThrowsAnnotation(el) && !_isKnownThrower(el)) return;
+      reporter.atNode(node);
     });
   }
 }
