@@ -1,11 +1,14 @@
 """
 Generates detailed migration report files from high-confidence lint candidates.
 
-Fetches PR details via `gh api` for additional context, then writes
-individual report files to the specified output directory.
+Historical script: not part of the build. Reads reports/_cache/_high_confidence_items.json
+and writes detailed reports under bugs/. Run after producing that JSON (e.g. from
+extract_lint_candidates or manual curation).
 
-Usage:
-    python scripts/_generate_migration_reports.py [--batch N] [--batch-size M]
+Fetches PR details via `gh api` for additional context.
+
+Usage (from project root):
+    python scripts/historical/_generate_migration_reports.py [--batch N] [--batch-size M]
 
     --batch N       Only generate batch N (1-indexed). Default: all batches.
     --batch-size M  Items per batch. Default: 25.
@@ -20,7 +23,7 @@ import time
 from typing import Dict, Optional
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.dirname(BASE_DIR)
+PROJECT_DIR = os.path.dirname(os.path.dirname(BASE_DIR))  # project root (script is in scripts/historical/)
 REPORTS_DIR = os.path.join(PROJECT_DIR, "reports")
 CACHE_DIR = os.path.join(REPORTS_DIR, "_cache")
 ITEMS_FILE = os.path.join(CACHE_DIR, "_high_confidence_items.json")

@@ -2,7 +2,7 @@
 
 ## Resolution
 
-Implemented and verified. 1719 rules across 95 files versioned with `{vN}` tags and `/// Since:` provenance lines. Scripts: `scripts/version_rules.py` + `scripts/modules/_rule_version_history.py`. Reports: `reports/rule_versions.json`, `reports/rule_versions_summary.txt`. 1 known gap: `prefer_debugPrint` has no changelog/git history (shows `Since: unknown`).
+Implemented and verified. 1719 rules across 95 files versioned with `{vN}` tags and `/// Since:` provenance lines. Scripts: `scripts/historical/version_rules.py` + `scripts/modules/_rule_version_history.py`. Reports: `reports/rule_versions.json`, `reports/rule_versions_summary.txt`. 1 known gap: `prefer_debugPrint` has no changelog/git history (shows `Since: unknown`).
 
 ## Goal
 
@@ -22,7 +22,7 @@ Add a **rule version number** (`{v1}`, `{v2}`, etc.) and **build provenance** (c
 
 ## Deliverables
 
-### 1. Python script: `scripts/version_rules.py`
+### 1. Python script: `scripts/historical/version_rules.py`
 
 **Phase 1 — Extract all rule names from Dart source**
 - Reuse the LintCode parser from `_extract_rule_messages.py`
@@ -121,7 +121,7 @@ Top 10 most-modified rules:
 
 ```
 scripts/
-  version_rules.py              # Main entry point
+  historical/version_rules.py   # Main entry point
   modules/
     _rule_version_history.py    # Phase 1-4: extraction + git scan + version computation
 ```
@@ -129,7 +129,7 @@ scripts/
 ### CLI interface
 
 ```
-python scripts/version_rules.py [OPTIONS]
+python scripts/historical/version_rules.py [OPTIONS]
 
 Options:
   --dry-run         Show what would change without modifying files
@@ -161,7 +161,7 @@ Functions:
   - Deduplicate by build version
   - Compute version number
 
-### Step 2: Create `scripts/version_rules.py`
+### Step 2: Create `scripts/historical/version_rules.py`
 
 Main entry point:
 - Parse CLI args

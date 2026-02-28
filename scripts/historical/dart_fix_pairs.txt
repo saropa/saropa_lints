@@ -1,3 +1,4 @@
+# Class.member pairs already covered by dart fix; used by extract_lint_candidates.py.
 Actions.find
 Actions.handler
 Actions.invoke

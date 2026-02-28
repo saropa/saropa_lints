@@ -2,6 +2,9 @@
 """
 Assign version numbers to every lint rule based on changelog and git history.
 
+Historical script: not part of the build or publish pipeline. Run when adding
+or updating rules to refresh {vN} tags and provenance.
+
 Scans CHANGELOG.md, CHANGELOG_ARCHIVE.md, and git history to determine:
   - When each rule was created (build version)
   - When each rule was last updated (build version)
@@ -10,12 +13,8 @@ Scans CHANGELOG.md, CHANGELOG_ARCHIVE.md, and git history to determine:
 Then updates every rule's problemMessage with a {vN} suffix and adds
 provenance to the DartDoc header.
 
-Usage:
-    python scripts/version_rules.py                 # Full run
-    python scripts/version_rules.py --dry-run       # Preview changes
-    python scripts/version_rules.py --report-only   # Reports only
-    python scripts/version_rules.py --skip-git      # Use cached git data
-    python scripts/version_rules.py --verbose        # Detailed progress
+Usage (from project root):
+    python scripts/historical/version_rules.py   # Prompts for mode, cache, verbose
 
 Exit Codes:
     0  - Success
@@ -25,7 +24,6 @@ Exit Codes:
 
 from __future__ import annotations
 
-import argparse
 import json
 import re
 import sys
@@ -33,9 +31,9 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-# Ensure scripts/ is on path for module imports
-SCRIPT_DIR = Path(__file__).resolve().parent
-sys.path.insert(0, str(SCRIPT_DIR))
+# Ensure scripts/ is on path so modules/ resolves (this script lives in scripts/historical/)
+_SCRIPTS_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_SCRIPTS_DIR))
 
 from modules._rule_version_history import (
     CACHE_PATH,
@@ -563,31 +561,43 @@ def validate_results(rules: dict[str, RuleInfo]) -> list[str]:
 # ---------------------------------------------------------------------------
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Assign version numbers to lint rules.",
-    )
-    parser.add_argument(
-        "--dry-run", action="store_true",
-        help="Show changes without modifying files",
-    )
-    parser.add_argument(
-        "--skip-git", action="store_true",
-        help="Use cached git data for faster reruns",
-    )
-    parser.add_argument(
-        "--report-only", action="store_true",
-        help="Generate reports without modifying Dart files",
-    )
-    parser.add_argument(
-        "--verbose", action="store_true",
-        help="Show progress for each rule",
-    )
-    parser.add_argument(
-        "--cache-file", type=Path, default=CACHE_PATH,
-        help="Override cache file location",
-    )
-    args = parser.parse_args()
+def _prompt_options() -> tuple[bool, bool, bool, bool]:
+    """Ask user for run mode and options. Returns (dry_run, report_only, skip_git, verbose)."""
+    print("  What do you want to do?")
+    print("    1) Full run (update files with version tags)")
+    print("    2) Dry run (preview changes only)")
+    print("    3) Report only (generate JSON/summary, no file changes)")
+    try:
+        raw = input("  Choice [1]: ").strip() or "1"
+        n = int(raw)
+        if n == 2:
+            return True, False, False, False
+        if n == 3:
+            return False, True, False, False
+    except (ValueError, EOFError, KeyboardInterrupt):
+        pass
+    # Full run: ask skip_git and verbose
+    skip_git = False
+    verbose = False
+    try:
+        s = input("  Use cached git data (faster)? [y/N]: ").strip().lower()
+        skip_git = s == "y"
+        v = input("  Show progress per rule? [y/N]: ").strip().lower()
+        verbose = v == "y"
+    except (EOFError, KeyboardInterrupt):
+        pass
+    return False, False, skip_git, verbose
+
+
+def main(
+    dry_run: bool = False,
+    report_only: bool = False,
+    skip_git: bool = False,
+    verbose: bool = False,
+    cache_file: Path | None = None,
+) -> int:
+    """Assign version numbers to lint rules. When run directly, prompts for options."""
+    cache_path = cache_file or CACHE_PATH
 
     enable_ansi_support()
 
@@ -618,7 +628,7 @@ def main() -> int:
 
     # Phase 3: Scan git history
     print(f"\n{_CYN}Phase 3: Scanning git history...{_R}")
-    if args.skip_git and args.cache_file.exists():
+    if skip_git and cache_path.exists():
         print(f"  {_DIM}Using cached data...{_R}")
     else:
         print(
@@ -628,9 +638,9 @@ def main() -> int:
     start = time.time()
     git_mentions = scan_git_history(
         list(rules.keys()),
-        cache_path=args.cache_file,
-        skip_git=args.skip_git,
-        verbose=args.verbose,
+        cache_path=cache_path,
+        skip_git=skip_git,
+        verbose=verbose,
     )
     rules_in_git = sum(
         1 for name in rules if name in git_mentions and git_mentions[name]
@@ -657,16 +667,16 @@ def main() -> int:
     generate_json_report(versions, json_path)
 
     # Phase 5: Update Dart files
-    if args.report_only:
-        print(f"\n{_DIM}--report-only: skipping Dart file modifications{_R}")
+    if report_only:
+        print(f"\n{_DIM}Report only: skipping Dart file modifications{_R}")
     else:
-        mode = f"{_YEL}DRY RUN{_R}" if args.dry_run else f"{_GRN}LIVE{_R}"
+        mode = f"{_YEL}DRY RUN{_R}" if dry_run else f"{_GRN}LIVE{_R}"
         print(f"\n{_CYN}Phase 5: Updating Dart files ({mode}{_CYN})...{_R}")
         start = time.time()
         changes = update_dart_files(
             rules, versions,
-            dry_run=args.dry_run,
-            verbose=args.verbose,
+            dry_run=dry_run,
+            verbose=verbose,
         )
         total_changes = sum(len(c) for c in changes.values())
         print(
@@ -674,7 +684,7 @@ def main() -> int:
             f"{_BLD}{total_changes}{_R} rules in {time.time() - start:.1f}s"
         )
 
-        if not args.dry_run:
+        if not dry_run:
             print(f"\n{_CYN}Validating results...{_R}")
             errors = validate_results(rules)
             if errors:
@@ -770,4 +780,5 @@ def _print_gaps_console(
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    dry_run, report_only, skip_git, verbose = _prompt_options()
+    sys.exit(main(dry_run=dry_run, report_only=report_only, skip_git=skip_git, verbose=verbose))

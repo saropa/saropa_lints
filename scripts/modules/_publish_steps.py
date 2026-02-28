@@ -1,7 +1,7 @@
 """
 Publish workflow step functions (steps 1-10).
 
-Extracted from publish_to_pubdev.py to keep the main script
+Extracted from publish.py to keep the main script
 focused on orchestration.
 
 Version:   1.0
