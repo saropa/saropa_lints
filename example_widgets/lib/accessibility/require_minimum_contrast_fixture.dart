@@ -131,3 +131,15 @@ void _good18() {
     child: Text('Hello', style: TextStyle(color: Colors.white)),
   );
 }
+
+// Intentional white-on-light with ignore: should NOT trigger
+void _ignoreSuppressesRequireMinimumContrast() {
+  return Text(
+    'Placeholder',
+    style: const TextStyle(
+      // ignore: require_minimum_contrast
+      color: Colors.white,
+      fontSize: 16,
+    ),
+  );
+}

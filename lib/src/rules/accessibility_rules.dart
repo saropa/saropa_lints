@@ -11,6 +11,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
+import '../ignore_utils.dart';
 import '../saropa_lint_rule.dart';
 import '../fixes/accessibility/increase_animation_duration_fix.dart';
 
@@ -1940,6 +1941,14 @@ class RequireMinimumContrastRule extends SaropaLintRule {
             if (colorSource.contains(lightColor)) {
               // Check if there's an explicit dark background nearby
               if (!_hasDarkBackgroundContext(node)) {
+                // Honor // ignore: and // ignore_for_file: (and hyphenated names).
+                if (IgnoreUtils.isIgnoredForFile(
+                  context.fileContent,
+                  _code.name,
+                )) {
+                  return;
+                }
+                if (IgnoreUtils.hasIgnoreComment(arg, _code.name)) return;
                 reporter.atNode(arg);
               }
               return;

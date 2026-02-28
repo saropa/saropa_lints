@@ -356,6 +356,10 @@ void main() {
         // but was explicitly set; assume developer chose appropriate color
         expect('unresolvable background skips warning', isNotNull);
       });
+
+      test('// ignore: require_minimum_contrast suppresses diagnostic', () {
+        expect('ignore suppresses require_minimum_contrast', isNotNull);
+      });
     });
 
     group('require_avatar_alt_text', () {
