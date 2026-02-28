@@ -8,6 +8,7 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/line_info.dart';
 
+import '../banned_usage_config.dart' as banned_usage_config;
 import '../saropa_lint_rule.dart';
 import '../type_annotation_utils.dart';
 import '../fixes/code_quality/prefer_returning_conditional_expressions_fix.dart';
@@ -8818,5 +8819,139 @@ class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
     if (type is! NamedType) return false;
     final String name = type.name.lexeme;
     return name == 'bool';
+  }
+}
+
+/// Prefer named boolean parameters for functions with few parameters.
+///
+/// Flags positional bool parameters in functions with 1–3 parameters. Complements
+/// avoid_positional_boolean_parameters; use one or the other. Excludes setters,
+/// operators, and @override methods.
+class PreferNamedBoolParamsRule extends SaropaLintRule {
+  PreferNamedBoolParamsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_named_bool_params',
+    '[prefer_named_bool_params] Prefer named parameter for boolean parameters.',
+    correctionMessage:
+        'Convert to a named parameter (e.g. {required bool visible}).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addFormalParameterList((FormalParameterList node) {
+      if (node.parameters.length > 3) return;
+      final parent = node.parent;
+      if (parent is MethodDeclaration) {
+        if (parent.isOperator || parent.isSetter) return;
+        if (parent.metadata.any((a) => a.name.name == 'override')) return;
+      } else if (parent is FunctionExpression) {
+        return;
+      }
+      for (final FormalParameter p in node.parameters) {
+        if (p is DefaultFormalParameter) {
+          if (p.parameter is! SimpleFormalParameter) continue;
+          if ((p.parameter as SimpleFormalParameter).isNamed) continue;
+          final sp = p.parameter as SimpleFormalParameter;
+          if (_isBoolType(sp)) reporter.atNode(p);
+        } else if (p is SimpleFormalParameter) {
+          if (p.isNamed) continue;
+          if (_isBoolType(p)) reporter.atNode(p);
+        }
+      }
+    });
+  }
+
+  bool _isBoolType(SimpleFormalParameter p) {
+    final TypeAnnotation? type = p.type;
+    if (type is! NamedType) return false;
+    return type.name.lexeme == 'bool' || type.name.lexeme == 'bool?';
+  }
+}
+
+// =============================================================================
+// banned_usage
+// =============================================================================
+
+/// Warns when a configured identifier is used.
+///
+/// Configurable rule to ban specific APIs, classes, or patterns. With no
+/// configuration the rule is a no-op. Configure in `analysis_options_custom.yaml`:
+/// ```yaml
+/// banned_usage:
+///   entries:
+///     - identifier: 'print'
+///       reason: 'Use Logger.debug() instead'
+/// ```
+///
+/// **BAD (when print is banned):**
+/// ```dart
+/// void logUserAction(String action) {
+///   print('User did: $action');
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void logUserAction(String action) {
+///   Logger.d('User did: $action');
+/// }
+/// ```
+class BannedUsageRule extends SaropaLintRule {
+  BannedUsageRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'banned_usage',
+    '[banned_usage] Usage of this identifier is banned. See analysis_options_custom.yaml banned_usage for the configured reason.',
+    correctionMessage:
+        'Replace with an allowed alternative from your project config.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final entries = banned_usage_config.bannedUsageEntries;
+    if (entries.isEmpty) return;
+
+    final filePath = context.filePath.replaceAll('\\', '/');
+
+    context.addSimpleIdentifier((SimpleIdentifier node) {
+      final name = node.name;
+      for (final ban in entries) {
+        if (!ban.matchesName(name)) continue;
+        if (ban.allowedFiles != null) {
+          final allowed = ban.allowedFiles!.any((p) {
+            if (p.endsWith('*')) {
+              final prefix = p.substring(0, p.length - 1);
+              return filePath.contains(prefix) ||
+                  filePath.endsWith(prefix.replaceAll('/', ''));
+            }
+            return filePath == p || filePath.endsWith(p);
+          });
+          if (allowed) return;
+        }
+        reporter.atNode(node);
+        return;
+      }
+    });
   }
 }
