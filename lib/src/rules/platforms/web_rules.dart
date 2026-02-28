@@ -22,6 +22,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -535,6 +536,183 @@ class RequireWebRendererAwarenessRule extends SaropaLintRule {
       }
 
       reporter.atNode(node.expression, code);
+    });
+  }
+}
+
+// =============================================================================
+// avoid_js_rounded_ints
+// =============================================================================
+
+/// JavaScript safe integer maximum (2^53). Integers above this are rounded when compiled to JS.
+const int _jsSafeIntegerMax = 9007199254740992;
+
+/// Warns when integer literals exceed the JavaScript safe integer range (2^53).
+///
+/// On Flutter Web, numbers are IEEE 754 doubles; integers above 2^53 can be silently rounded.
+///
+/// **Bad:**
+/// ```dart
+/// const userId = 9999999999999999;
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// final userId = BigInt.parse('9999999999999999');
+/// const safeId = 9007199254740992;
+/// ```
+class AvoidJsRoundedIntsRule extends SaropaLintRule {
+  AvoidJsRoundedIntsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_js_rounded_ints',
+    '[avoid_js_rounded_ints] Integer literal exceeds JavaScript safe integer maximum (2^53 = 9007199254740992). When compiled to JavaScript (e.g. Flutter Web), the value may be silently rounded, causing data corruption.',
+    correctionMessage:
+        'Use BigInt.parse for exact large integers, or a String for nominal IDs. For VM-only code, add // ignore: avoid_js_rounded_ints.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addIntegerLiteral((IntegerLiteral node) {
+      final int? value = node.value;
+      if (value == null) return;
+      final AstNode? parent = node.parent;
+      final int effectiveValue =
+          (parent is PrefixExpression &&
+              parent.operator.type == TokenType.MINUS)
+          ? -value
+          : value;
+      if (effectiveValue.abs() <= _jsSafeIntegerMax) return;
+      if (parent is PrefixExpression) {
+        reporter.atNode(parent);
+      } else {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_csrf_protection
+// =============================================================================
+
+/// Warns when state-changing HTTP requests use Cookie auth without CSRF token.
+///
+/// In web or WebView apps, cookie-based auth is vulnerable to CSRF. Use
+/// X-CSRF-Token header or Authorization: Bearer (JWT) for CSRF-resistant auth.
+///
+/// **OWASP:** M3: Insecure Authentication / CSRF
+///
+/// **BAD:**
+/// ```dart
+/// await http.post(
+///   Uri.parse('https://api.example.com/transfer'),
+///   headers: {'Cookie': sessionCookie},
+///   body: jsonEncode({'amount': 100}),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await http.post(
+///   Uri.parse('https://api.example.com/transfer'),
+///   headers: {
+///     'Cookie': sessionCookie,
+///     'X-CSRF-Token': csrfToken,
+///   },
+///   body: jsonEncode({'amount': 100}),
+/// );
+/// ```
+class PreferCsrfProtectionRule extends SaropaLintRule {
+  PreferCsrfProtectionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+    'Cookie',
+    'cookie',
+    '.post(',
+    '.put(',
+    '.delete(',
+    '.patch(',
+  };
+
+  @override
+  OwaspMapping? get owasp => const OwaspMapping(
+    mobile: <OwaspMobile>{OwaspMobile.m3},
+    web: <OwaspWeb>{OwaspWeb.a07},
+  );
+
+  static const LintCode _code = LintCode(
+    'prefer_csrf_protection',
+    '[prefer_csrf_protection] State-changing request with Cookie header but no CSRF token or Bearer auth. Cookie-based auth in web/WebView is vulnerable to CSRF.',
+    correctionMessage:
+        'Add X-CSRF-Token header or use Authorization: Bearer with JWT for CSRF-resistant auth.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _stateChangingMethods = <String>{
+    'post',
+    'put',
+    'delete',
+    'patch',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+    if (!ProjectContext.hasDependency(context.filePath, 'webview_flutter') &&
+        !ProjectContext.hasDependency(context.filePath, 'http')) {
+      return;
+    }
+
+    context.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_stateChangingMethods.contains(methodName)) return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('http') && !targetSource.contains('dio'))
+        return;
+
+      String? headersSource;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'headers') {
+          headersSource = arg.expression.toSource().toLowerCase();
+          break;
+        }
+      }
+      if (headersSource == null) {
+        return;
+      }
+      if (!headersSource.contains('cookie')) return;
+      if (headersSource.contains('csrf') || headersSource.contains('xsrf'))
+        return;
+      if (headersSource.contains('bearer') ||
+          headersSource.contains('authorization'))
+        return;
+
+      reporter.atNode(node);
     });
   }
 }

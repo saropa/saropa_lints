@@ -584,3 +584,91 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// require_conflict_resolution_strategy
+// =============================================================================
+
+/// Warns when sync methods may overwrite data without conflict resolution.
+///
+/// Offline-first sync (push/upload/reconcile) should compare timestamps or
+/// versions, or show a conflict UI, instead of blindly overwriting.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> syncToServer(Item localItem) async {
+///   await api.put('/items/${localItem.id}', localItem.toJson());
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> syncToServer(Item localItem) async {
+///   final remote = await api.get('/items/${localItem.id}');
+///   if (localItem.updatedAt.isAfter(remote.updatedAt)) {
+///     await api.put('/items/${localItem.id}', localItem.toJson());
+///   }
+/// }
+/// ```
+class RequireConflictResolutionStrategyRule extends SaropaLintRule {
+  RequireConflictResolutionStrategyRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+    'sync',
+    'upload',
+    'push',
+    'reconcile',
+    'pull',
+    '.put',
+    'putAll',
+  };
+
+  static const LintCode _code = LintCode(
+    'require_conflict_resolution_strategy',
+    '[require_conflict_resolution_strategy] Sync method may overwrite remote data without conflict check. Define last-write-wins, merge, or user prompt.',
+    correctionMessage:
+        'Compare timestamps (updatedAt/createdAt/version) or show conflict dialog before overwriting.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _syncMethodNames = <String>{
+    'sync',
+    'push',
+    'upload',
+    'reconcile',
+    'pull',
+  };
+  static const Set<String> _conflictIndicators = <String>{
+    'updatedat',
+    'createdat',
+    'modifiedat',
+    'version',
+    'revision',
+    'conflict',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      final String name = node.name.lexeme.toLowerCase();
+      if (!_syncMethodNames.any((s) => name.contains(s))) return;
+
+      final String bodySource = node.body.toSource().toLowerCase();
+      if (!bodySource.contains('.put') && !bodySource.contains('putall'))
+        return;
+      if (_conflictIndicators.any((s) => bodySource.contains(s))) return;
+
+      reporter.atNode(node);
+    });
+  }
+}

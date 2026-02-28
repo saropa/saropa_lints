@@ -219,3 +219,98 @@ class AvoidSqfliteTypeMismatchRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_sqflite_encryption
+// =============================================================================
+
+/// Warns when sqflite is used for potentially sensitive data without encryption.
+///
+/// **OWASP:** M9: Insecure Data Storage. Use sqflite_sqlcipher for sensitive DBs.
+///
+/// **BAD:**
+/// ```dart
+/// final db = await openDatabase('user_accounts.db', version: 1, ...);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'package:sqflite_sqlcipher/sqflite.dart';
+/// final db = await openDatabase(path, password: await _getKey(), version: 1, ...);
+/// ```
+class PreferSqfliteEncryptionRule extends SaropaLintRule {
+  PreferSqfliteEncryptionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'openDatabase'};
+
+  @override
+  OwaspMapping? get owasp =>
+      const OwaspMapping(mobile: <OwaspMobile>{OwaspMobile.m9});
+
+  static const LintCode _code = LintCode(
+    'prefer_sqflite_encryption',
+    '[prefer_sqflite_encryption] Sensitive database opened without encryption. Use sqflite_sqlcipher for user/auth/health/payment data.',
+    correctionMessage:
+        'Add sqflite_sqlcipher and open the database with a password, or use a non-sensitive path.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _sensitivePathPatterns = <String>{
+    'user',
+    'auth',
+    'account',
+    'payment',
+    'health',
+    'medical',
+    'private',
+    'credential',
+    'secret',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (!ProjectContext.hasDependency(context.filePath, 'sqflite')) return;
+    if (ProjectContext.hasDependency(context.filePath, 'sqflite_sqlcipher') ||
+        ProjectContext.hasDependency(
+          context.filePath,
+          'sqlcipher_flutter_libs',
+        )) {
+      return;
+    }
+    if (context.isInTestDirectory) return;
+
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'openDatabase') return;
+      final Expression? target = node.target;
+      if (target != null) {
+        final String targetSource = target.toSource();
+        if (!targetSource.contains('sqflite') &&
+            !targetSource.contains('databaseFactory'))
+          return;
+      }
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+      final String pathSource = args.first.toSource().toLowerCase();
+      if (pathSource.contains(':memory:')) return;
+      final pathValue = args.first is SimpleStringLiteral
+          ? (args.first as SimpleStringLiteral).value.toLowerCase()
+          : pathSource;
+      if (pathValue.isEmpty) return;
+      final isSensitive = _sensitivePathPatterns.any(
+        (p) => pathValue.contains(p),
+      );
+      if (!isSensitive) return;
+      reporter.atNode(node);
+    });
+  }
+}

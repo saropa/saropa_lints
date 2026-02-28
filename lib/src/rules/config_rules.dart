@@ -1,5 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
+import 'dart:io' show File;
+
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../mode_constants_utils.dart';
@@ -606,6 +608,69 @@ class AvoidPlatformSpecificImportsRule extends SaropaLintRule {
       if (node.configurations.isNotEmpty) return;
 
       reporter.atNode(node);
+    });
+  }
+}
+
+// =============================================================================
+// prefer_semver_version
+// =============================================================================
+
+/// Warns when pubspec.yaml version does not follow semantic versioning.
+///
+/// Version must be major.minor.patch (e.g. 1.0.0, 2.3.1+4, 1.0.0-beta.1).
+///
+/// **BAD:** `version: 1.0` or `version: 1` or `version: v1.0.0`
+///
+/// **GOOD:** `version: 1.0.0` or `version: 2.3.1+4`
+class PreferSemverVersionRule extends SaropaLintRule {
+  PreferSemverVersionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_semver_version',
+    '[prefer_semver_version] pubspec.yaml version should follow semantic versioning (major.minor.patch).',
+    correctionMessage: 'Use format 1.0.0 or 1.0.0+build (e.g. 2.3.1+4).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static final RegExp _semverPattern = RegExp(
+    r'^\d+\.\d+\.\d+(\+\d+)?(-[\w.]+)?$',
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final root = ProjectContext.findProjectRoot(context.filePath);
+    if (root == null) return;
+    final pubspec = File('$root/pubspec.yaml');
+    if (!pubspec.existsSync()) return;
+
+    final content = pubspec.readAsStringSync();
+    final versionRegex = RegExp(
+      '^version:\\s*["\']?([^"\'\\s#]+)',
+      multiLine: true,
+    );
+    final versionMatch = versionRegex.firstMatch(content);
+    if (versionMatch == null) return;
+
+    final version = versionMatch.group(1)!.trim().toLowerCase();
+    final normalized = version.startsWith('v') ? version.substring(1) : version;
+    if (version != 'null' && _semverPattern.hasMatch(normalized)) return;
+
+    final path = context.filePath.replaceAll('\\', '/');
+    if (!path.contains('/lib/')) return;
+    context.addCompilationUnit((CompilationUnit unit) {
+      final token = unit.beginToken;
+      if (token.isEof) return;
+      reporter.atOffset(offset: token.offset, length: token.length);
     });
   }
 }

@@ -209,3 +209,93 @@ class AvoidConnectivityEqualsInternetRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// require_connectivity_timeout
+// =============================================================================
+
+/// Warns when HTTP requests are made without a timeout.
+///
+/// Network requests without timeouts can hang indefinitely. Connectivity
+/// status can be misleading; always set a timeout so requests fail gracefully.
+///
+/// **BAD:**
+/// ```dart
+/// final response = await http.get(Uri.parse(url));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final response = await http.get(Uri.parse(url))
+///     .timeout(const Duration(seconds: 30));
+/// ```
+class RequireConnectivityTimeoutRule extends SaropaLintRule {
+  RequireConnectivityTimeoutRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+    '.get(',
+    '.post(',
+    '.put(',
+    '.delete(',
+    '.patch(',
+    '.head(',
+  };
+
+  static const LintCode _code = LintCode(
+    'require_connectivity_timeout',
+    '[require_connectivity_timeout] Network request has no timeout. Requests can hang indefinitely; set a timeout so they fail gracefully.',
+    correctionMessage:
+        'Add .timeout(const Duration(seconds: 30)) to the request or configure timeouts on the client.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _httpMethods = <String>{
+    'get',
+    'post',
+    'put',
+    'delete',
+    'patch',
+    'head',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_httpMethods.contains(methodName)) return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('http') &&
+          !targetSource.contains('client') &&
+          !targetSource.contains('dio')) {
+        return;
+      }
+
+      AstNode? parent = node.parent;
+      if (parent is MethodInvocation && parent.methodName.name == 'timeout') {
+        return;
+      }
+      if (parent is AwaitExpression) {
+        final awaitParent = parent.parent;
+        if (awaitParent is MethodInvocation &&
+            awaitParent.methodName.name == 'timeout') {
+          return;
+        }
+      }
+
+      reporter.atNode(node);
+    });
+  }
+}
