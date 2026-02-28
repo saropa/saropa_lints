@@ -154,7 +154,11 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidDebugPrintRule.new,
   AvoidUnguardedDebugRule.new,
   PreferConstStringListRule.new,
+  AvoidUnnecessaryContainersRule.new,
+  PreferConstLiteralsToCreateImmutablesRule.new,
+  RequireLateAccessCheckRule.new,
   AvoidContextInInitStateDisposeRule.new,
+  RequireInitStateIdempotentRule.new,
   AvoidStoringContextRule.new,
   AvoidContextAcrossAsyncRule.new,
   AvoidContextAfterAwaitInStaticRule.new,
@@ -162,6 +166,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidContextInStaticMethodsRule.new,
   AvoidIsarEnumFieldRule.new,
   AvoidAdjacentStringsRule.new,
+  BannedUsageRule.new,
   AvoidDeprecatedUsageRule.new,
   AvoidContinueRule.new,
   AvoidEmptySpreadRule.new,
@@ -315,6 +320,10 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidUnnecessaryGestureDetectorRule.new,
   PreferWidgetPrivateMembersRule.new,
   AvoidBarrelFilesRule.new,
+  PreferConstructorsFirstRule.new,
+  PreferExtensionMethodsRule.new,
+  PreferExtensionOverUtilityClassRule.new,
+  PreferExtensionTypeForWrapperRule.new,
   AvoidBottomTypeInPatternsRule.new,
   AvoidBottomTypeInRecordsRule.new,
   AvoidExtensionsOnRecordsRule.new,
@@ -406,6 +415,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   TagNameRule.new,
   AvoidNestedShorthandsRule.new,
   AvoidGetterPrefixRule.new,
+  PreferAdjectiveBoolGettersRule.new,
   AvoidEmptyTestGroupsRule.new,
   AvoidEnumValuesByIndexRule.new,
   AvoidUnnecessaryLengthCheckRule.new,
@@ -421,6 +431,9 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferPublicExceptionClassesRule.new,
   PreferSpecifyingFutureValueTypeRule.new,
   PreferDeclaringConstConstructorRule.new,
+  PreferAssertsInInitializerListsRule.new,
+  PreferConstConstructorsInImmutablesRule.new,
+  PreferFinalFieldsRule.new,
   AvoidUnnecessaryIfRule.new,
 
   // Noisy rules - disabled by default but available
@@ -635,6 +648,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireSecureStorageRule.new,
   AvoidHardcodedCredentialsRule.new,
   RequireInputSanitizationRule.new,
+  RequireInputValidationRule.new,
   AvoidWebViewJavaScriptEnabledRule.new,
   RequireBiometricFallbackRule.new,
   AvoidEvalLikePatternsRule.new,
@@ -739,6 +753,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireHttpStatusCheckRule.new,
   PreferBatchRequestsRule.new,
   RequireCompressionRule.new,
+  RequireSslPinningSensitiveRule.new,
   // RequireApiTimeoutRule merged into RequireRequestTimeoutRule
   AvoidHardcodedApiUrlsRule.new,
   RequireRetryLogicRule.new,
@@ -1302,6 +1317,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidShrinkWrapInScrollViewRule.new,
   AvoidNestedScrollablesConflictRule.new,
   AvoidListViewChildrenForLargeListsRule.new,
+  RequirePaginationForLargeListsRule.new,
   AvoidExcessiveBottomNavItemsRule.new,
   RequireTabControllerLengthSyncRule.new,
   AvoidRefreshWithoutAwaitRule.new,
@@ -1501,6 +1517,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Platform-specific rules (roadmap_up_next)
   AvoidPlatformChannelOnWebRule.new,
+  PreferCsrfProtectionRule.new,
   RequireCorsHandlingRule.new,
   PreferDeferredLoadingWebRule.new,
   RequireMenuBarForDesktopRule.new,
@@ -1641,6 +1658,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Part 6 - Lifecycle rules
   AvoidWorkInPausedStateRule.new,
+  RequireConflictResolutionStrategyRule.new,
   RequireResumeStateRefreshRule.new,
 
   // Part 6 - Security rules
@@ -2158,6 +2176,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // Configuration rules (config_rules.dart)
   AvoidHardcodedConfigRule.new,
   AvoidHardcodedConfigTestRule.new,
+  PreferSemverVersionRule.new,
   AvoidMixedEnvironmentsRule.new,
 
   // Lifecycle rules (lifecycle_rules.dart)
@@ -2235,6 +2254,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Connectivity rules (connectivity_rules.dart)
   RequireConnectivityErrorHandlingRule.new,
+  RequireConnectivityTimeoutRule.new,
 
   // Geolocator rules (geolocator_rules.dart)
   RequireGeolocatorBatteryAwarenessRule.new,
@@ -2246,6 +2266,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // SQLite rules (sqflite_rules.dart)
   AvoidSqfliteTypeMismatchRule.new,
+  PreferSqfliteEncryptionRule.new,
 
   // Firebase rules (firebase_rules.dart)
   RequireFirestoreIndexRule.new,
@@ -2575,6 +2596,24 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidRedundantArgumentValuesRule.new,
   AvoidSettersWithoutGettersRule.new,
   AvoidSingleCascadeInExpressionStatementsRule.new,
+  PreferAdjacentStringsRule.new,
+  PreferFinalLocalsRule.new,
+  PreferConstDeclarationsRule.new,
+  PreferGettersBeforeSettersRule.new,
+  PreferIfElementsToConditionalExpressionsRule.new,
+  PreferInlinedAddsRule.new,
+  PreferInterpolationToComposeRule.new,
+  PreferLowercaseConstantsRule.new,
+  PreferMixinOverAbstractRule.new,
+  PreferNamedBoolParamsRule.new,
+  PreferNounClassNamesRule.new,
+  PreferNullAwareMethodCallsRule.new,
+  PreferRawStringsRule.new,
+  PreferRecordOverTupleClassRule.new,
+  PreferSealedClassesRule.new,
+  PreferSealedForStateRule.new,
+  PreferStaticBeforeInstanceRule.new,
+  PreferVerbMethodNamesRule.new,
 ];
 
 // =============================================================================

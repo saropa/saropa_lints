@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 35 Api Network lint rules.
+/// Tests for 36 Api Network lint rules.
 ///
 /// Test fixtures: example_async/lib/api_network/*
 void main() {
@@ -43,6 +43,7 @@ void main() {
       'prefer_timeout_on_requests',
       'require_websocket_reconnection',
       'require_analytics_event_naming',
+      'require_ssl_pinning_sensitive',
     ];
 
     for (final fixture in fixtures) {
@@ -477,6 +478,18 @@ void main() {
       test('prefer_timeout_on_requests should NOT trigger', () {
         // Preferred pattern used correctly
         expect('prefer_timeout_on_requests passes', isNotNull);
+      });
+    });
+
+    group('require_ssl_pinning_sensitive', () {
+      test('require_ssl_pinning_sensitive SHOULD trigger', () {
+        // POST to auth/login/token URL without pinning package
+        expect('require_ssl_pinning_sensitive detected', isNotNull);
+      });
+
+      test('require_ssl_pinning_sensitive should NOT trigger', () {
+        // localhost or non-auth URL or pinning package in project
+        expect('require_ssl_pinning_sensitive passes', isNotNull);
       });
     });
   });

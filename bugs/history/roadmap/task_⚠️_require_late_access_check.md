@@ -1,5 +1,10 @@
 # Task: `require_late_access_check`
 
+## Implemented (Unreleased)
+Rule implemented in `lib/src/rules/class_constructor_rules.dart`. Flags late non-final fields set in non-constructor/initState methods and read in other methods. Uses `requiredPatterns: ['late ']` for performance. Fixture: `example_core/lib/class_constructor/require_late_access_check_fixture.dart`.
+
+---
+
 ## Summary
 
 - **Rule Name**: `require_late_access_check`

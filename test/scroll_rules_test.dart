@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 16 Scroll lint rules.
+/// Tests for 17 Scroll lint rules.
 ///
 /// Test fixtures: example_widgets/lib/scroll/*
 void main() {
@@ -24,6 +24,7 @@ void main() {
       'prefer_sliverfillremaining_for_empty',
       'avoid_infinite_scroll_duplicate_requests',
       'prefer_infinite_scroll_preload',
+      'require_pagination_for_large_lists',
     ];
 
     for (final fixture in fixtures) {
@@ -228,6 +229,18 @@ void main() {
       test('prefer_infinite_scroll_preload should NOT trigger', () {
         // Preferred pattern used correctly
         expect('prefer_infinite_scroll_preload passes', isNotNull);
+      });
+    });
+
+    group('require_pagination_for_large_lists', () {
+      test('require_pagination_for_large_lists SHOULD trigger', () {
+        // ListView.builder itemCount: bulk list length without pagination
+        expect('require_pagination_for_large_lists detected', isNotNull);
+      });
+
+      test('require_pagination_for_large_lists should NOT trigger', () {
+        // literal itemCount or non-bulk variable name or PagedListView
+        expect('require_pagination_for_large_lists passes', isNotNull);
       });
     });
   });

@@ -1,5 +1,10 @@
 # Task: `require_pagination_for_large_lists`
 
+## Implemented (Unreleased)
+Rule implemented in `lib/src/rules/scroll_rules.dart`. Flags ListView.builder/GridView.builder with itemCount from bulk-style list names (e.g. allProducts.length). Suppressed when project uses infinite_scroll_pagination or pagination in scope. Fixture: `example_widgets/lib/scroll/require_pagination_for_large_lists_fixture.dart`.
+
+---
+
 ## Summary
 - **Rule Name**: `require_pagination_for_large_lists`
 - **Tier**: Essential

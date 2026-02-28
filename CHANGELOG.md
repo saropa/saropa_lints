@@ -16,6 +16,38 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 
+- 12 new lint rules from roadmap detail requirements:
+  - `avoid_unnecessary_containers` (Recommended, INFO) — Container with only child (and optionally key); remove and use child directly (widget files only).
+  - `prefer_adjacent_strings` (Recommended, INFO) — use adjacent string literals instead of `+` for literal concatenation.
+  - `prefer_adjective_bool_getters` (Professional, INFO) — bool getters should use predicate names (is/has/can) not verb names (validate/load).
+  - `prefer_asserts_in_initializer_lists` (Professional, INFO) — move leading assert() from constructor body to initializer list.
+  - `prefer_const_constructors_in_immutables` (Professional, INFO) — @immutable or StatelessWidget/StatefulWidget subclasses with only final fields should have a const constructor.
+  - `prefer_const_declarations` (Recommended, INFO) — final variables with constant initializers could be const (locals, static, top-level).
+  - `prefer_const_literals_to_create_immutables` (Recommended, INFO) — non-const collection literals passed to immutable widget constructors (widget files only).
+  - `prefer_constructors_first` (Professional, INFO) — constructors should appear before methods in a class.
+  - `prefer_extension_methods` (Professional, INFO) — top-level functions that could be extension methods on first parameter type.
+  - `prefer_extension_over_utility_class` (Professional, INFO) — class with only static methods sharing first param type could be an extension.
+  - `prefer_extension_type_for_wrapper` (Professional, INFO) — single-field wrapper class could be an extension type (Dart 3.3+).
+  - `prefer_final_fields` (Professional, INFO) — fields never reassigned (except via setter) could be final.
+
+- 16 new lint rules from roadmap detail requirements:
+  - `prefer_final_locals` (Recommended, INFO) — local variables never reassigned should be final.
+  - `prefer_getters_before_setters` (Professional, INFO) — setter should appear after its getter.
+  - `prefer_if_elements_to_conditional_expressions` (Recommended, INFO) — use if element instead of ternary with null in collections.
+  - `prefer_inlined_adds` (Recommended, INFO) — prefer inline list/set literal over empty then add/addAll.
+  - `prefer_interpolation_to_compose` (Recommended, INFO) — prefer string interpolation over + with literals.
+  - `prefer_lowercase_constants` (Recommended, INFO) — const/static final should use lowerCamelCase.
+  - `prefer_mixin_over_abstract` (Professional, INFO) — abstract class with no abstract members and no generative constructor → mixin.
+  - `prefer_named_bool_params` (Professional, INFO) — prefer named bool parameters in small functions.
+  - `prefer_noun_class_names` (Professional, INFO) — concrete classes should use noun/agent names, not gerund/-able.
+  - `prefer_null_aware_method_calls` (Recommended, INFO) — use ?. instead of if (x != null) { x.foo(); }.
+  - `prefer_raw_strings` (Professional, INFO) — use raw string when only escaped backslashes (e.g. regex).
+  - `prefer_record_over_tuple_class` (Professional, INFO) — simple data class with only final fields → record.
+  - `prefer_sealed_classes` (Professional, INFO) — abstract class with 2+ concrete subclasses in same file → sealed.
+  - `prefer_sealed_for_state` (Professional, INFO) — state/event/result abstract with local subclasses → sealed.
+  - `prefer_static_before_instance` (Professional, INFO) — static members before instance in same category.
+  - `prefer_verb_method_names` (Professional, INFO) — methods should use verb names, not noun-only.
+
 - 10 new lint rules from roadmap detail requirements:
   - `avoid_deprecated_usage` (Recommended, WARNING) — use of deprecated APIs from other packages; same-package and generated files ignored.
   - `handle_throwing_invocations` (Professional, INFO) — invocations that can throw (e.g. @Throws, readAsStringSync, jsonDecode) not in try/catch.

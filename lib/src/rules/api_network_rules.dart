@@ -3490,3 +3490,129 @@ class RequireCompressionRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when HTTP POST/PUT/PATCH to sensitive (auth) endpoints is made
+/// without certificate pinning.
+///
+/// **Category:** API & network security (OWASP M5, M3).
+/// **Since:** v4.14.0 | **Rule version:** v1
+///
+/// Sensitive operations (login, token, credentials) should use SSL pinning
+/// to mitigate MitM on compromised or custom CAs. URL path is heuristic
+/// (e.g. /auth, /login, /token); false positives possible for non-auth paths.
+/// Suppressed when project uses `http_certificate_pinning` or
+/// `ssl_pinning_plugin`, and for localhost/127.0.0.1.
+///
+/// **Bad:**
+/// ```dart
+/// await http.post(
+///   Uri.parse('https://api.example.com/auth/login'),
+///   body: {'email': email, 'password': password},
+/// );
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// await HttpCertificatePinning.check(
+///   serverURL: 'https://api.example.com/auth/login',
+///   sha: SHA.SHA256,
+///   allowedSHAFingerprints: ['AB:CD:EF:...'],
+///   ...
+/// );
+/// ```
+class RequireSslPinningSensitiveRule extends SaropaLintRule {
+  RequireSslPinningSensitiveRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_ssl_pinning_sensitive',
+    '[require_ssl_pinning_sensitive] Sensitive API endpoint (auth/login/token) '
+        'called without certificate pinning. Use http_certificate_pinning or '
+        'ssl_pinning_plugin to mitigate MitM on compromised CAs. OWASP M5, M3. {v1}',
+    correctionMessage:
+        'Use a pinning-capable client (e.g. HttpCertificatePinning.check or '
+        'Dio with CertificatePinningInterceptor) for auth and sensitive endpoints.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _sensitivePathSegments = <String>{
+    'auth',
+    'login',
+    'signin',
+    'token',
+    'oauth',
+    'credentials',
+    'sign-in',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final path = context.filePath;
+    if (ProjectContext.hasDependency(path, 'http_certificate_pinning') ||
+        ProjectContext.hasDependency(path, 'ssl_pinning_plugin')) {
+      return;
+    }
+    if (context.isInTestDirectory) return;
+
+    context.addMethodInvocation((MethodInvocation node) {
+      final name = node.methodName.name;
+      if (name != 'post' && name != 'put' && name != 'patch') return;
+      final Expression? target = node.target;
+      if (target != null) {
+        final String targetSrc = target.toSource().toLowerCase();
+        if (!targetSrc.contains('http') && !targetSrc.contains('dio')) return;
+      }
+
+      final String? urlString = _getUrlStringFromInvocation(node);
+      if (urlString == null) return;
+      final lower = urlString.toLowerCase().trim();
+      if (lower.contains('localhost') || lower.contains('127.0.0.1')) return;
+      // Full URL must be HTTPS; path-only (e.g. Dio baseUrl + path) is checked below
+      if (lower.contains('://') && !lower.startsWith('https://')) return;
+
+      final hasSensitivePath = _sensitivePathSegments.any(
+        (s) => lower.contains('/$s'),
+      );
+      if (!hasSensitivePath) return;
+
+      reporter.atNode(node);
+    });
+  }
+
+  String? _getUrlStringFromInvocation(MethodInvocation node) {
+    final args = node.argumentList.arguments;
+    if (args.isEmpty) return null;
+    final first = args.first;
+    if (first is NamedExpression) {
+      final name = first.name.label.name;
+      if (name != 'url' && name != 'uri' && name != 'path') return null;
+      return _extractStringLiteral(first.expression);
+    }
+    return _extractStringLiteral(first);
+  }
+
+  String? _extractStringLiteral(Expression expr) {
+    if (expr is SimpleStringLiteral) return expr.value;
+    if (expr is MethodInvocation &&
+        expr.methodName.name == 'parse' &&
+        expr.argumentList.arguments.isNotEmpty) {
+      final arg = expr.argumentList.arguments.first;
+      if (arg is SimpleStringLiteral) return arg.value;
+      if (arg is AdjacentStrings) {
+        return arg.strings
+            .whereType<SimpleStringLiteral>()
+            .map((s) => s.value)
+            .join();
+      }
+    }
+    return null;
+  }
+}
