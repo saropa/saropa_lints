@@ -1,5 +1,10 @@
 # Task: `avoid_redundant_argument_values`
 
+## Implemented (v6.0.8)
+Rule implemented. See CHANGELOG 6.0.6 and example/lib/roadmap_15_rules_fixture.dart.
+
+---
+
 ## Summary
 - **Rule Name**: `avoid_redundant_argument_values`
 - **Tier**: Recommended
