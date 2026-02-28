@@ -632,6 +632,13 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  @override
+  String get exampleBad =>
+      'class C { bool enabled = true; }  // field or top-level';
+
+  @override
+  String get exampleGood => 'class C { bool isEnabled = true; }';
+
   static const List<String> _validPrefixes = <String>[
     'add',
     'allow',
@@ -830,6 +837,12 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  @override
+  String get exampleBad => 'void fn() { bool status = true; }  // local';
+
+  @override
+  String get exampleGood => 'void fn() { bool isActive = true; }';
+
   static const List<String> _validPrefixes = <String>[
     'add',
     'allow',
@@ -1003,6 +1016,13 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
         'Rename this boolean parameter to use a standard prefix (is, has, can, should, will, did) or suffix (Enabled, Active, Visible). Example: visible becomes isVisible.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  String get exampleBad =>
+      'void setVisibility({required bool visible}) {}  // param';
+
+  @override
+  String get exampleGood => 'void setVisibility({required bool isVisible}) {}';
 
   static const List<String> _validPrefixes = <String>[
     'add',

@@ -1928,6 +1928,14 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  @override
+  String get exampleBad =>
+      'bool flag = true;  // any boolean (field, param, local)';
+
+  @override
+  String get exampleGood =>
+      'bool isActive = true;  // or hasData, canEdit, shouldRefresh';
+
   /// Valid boolean prefixes (state-based)
   static final RegExp _validBoolPrefix = RegExp(
     r'^(is|has|have|can|should|will|was|did|does|allow|enable|disable|show|hide|include|exclude)[A-Z]',
