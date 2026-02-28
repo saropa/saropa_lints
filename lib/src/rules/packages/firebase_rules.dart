@@ -2840,8 +2840,9 @@ class RequireFirebaseTokenRefreshRule extends SaropaLintRule {
     AstNode? current = node.parent;
     for (int i = 0; i < 5 && current != null; i++) {
       if (current is AssignmentExpression) return true;
-      if (current is VariableDeclaration)
+      if (current is VariableDeclaration) {
         return true; // final t = await user.getIdToken()
+      }
       if (current is ArgumentList) {
         final AstNode? grand = current.parent;
         if (grand is MethodInvocation) {

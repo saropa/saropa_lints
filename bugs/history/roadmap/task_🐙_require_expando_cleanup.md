@@ -1,5 +1,7 @@
 # Task: `require_expando_cleanup`
 
+**Implemented.** Rule in `memory_management_rules.dart`; Comprehensive, INFO. Expando with ] = but no = null cleanup (heuristic).
+
 ## Summary
 - **Rule Name**: `require_expando_cleanup`
 - **Tier**: Comprehensive

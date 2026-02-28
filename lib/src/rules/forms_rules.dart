@@ -2259,3 +2259,74 @@ class AvoidFormValidationOnChangeRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_form_bloc_for_complex
+// =============================================================================
+
+/// Forms with >5 fields benefit from form state management (FormBloc, etc.).
+///
+/// Large forms with manual StatefulWidget + GlobalKey<FormState> are error-prone.
+/// This rule suggests flutter_form_bloc, reactive_forms, or flutter_form_builder.
+/// Skips when the project already uses one of those or formz. Test files skipped.
+/// Counts TextFormField/FormField in Form subtree with depth limit 4.
+class PreferFormBlocForComplexRule extends SaropaLintRule {
+  PreferFormBlocForComplexRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_form_bloc_for_complex',
+    '[prefer_form_bloc_for_complex] Form has more than 5 fields. Consider '
+        'flutter_form_bloc, reactive_forms, or flutter_form_builder for complex forms.',
+    correctionMessage:
+        'Consider flutter_form_bloc, reactive_forms, or flutter_form_builder for complex forms.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const int _maxDepth = 4;
+  static const int _threshold = 5;
+
+  static int _countFormFields(AstNode? node, int depth) {
+    if (depth > _maxDepth || node == null) return 0;
+    if (node is InstanceCreationExpression) {
+      final name = node.constructorName.type.name.lexeme;
+      if (name == 'TextFormField' || name == 'FormField') return 1;
+    }
+    var n = 0;
+    for (final child in node.childEntities) {
+      if (child is AstNode) n += _countFormFields(child, depth + 1);
+    }
+    return n;
+  }
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final path = context.filePath;
+    if (ProjectContext.hasDependency(path, 'form_bloc') ||
+        ProjectContext.hasDependency(path, 'flutter_form_bloc') ||
+        ProjectContext.hasDependency(path, 'reactive_forms') ||
+        ProjectContext.hasDependency(path, 'flutter_form_builder') ||
+        ProjectContext.hasDependency(path, 'formz')) {
+      return;
+    }
+    if (context.isInTestDirectory) {
+      return;
+    }
+
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (node.constructorName.type.name.lexeme != 'Form') return;
+      final count = _countFormFields(node, 0);
+      if (count > _threshold) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}

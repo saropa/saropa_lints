@@ -1,5 +1,7 @@
 # Task: `prefer_local_notification_for_immediate`
 
+**Implemented.** Rule in `notification_rules.dart`; Recommended, INFO. FCM vs flutter_local_notifications; package checks.
+
 ## Summary
 - **Rule Name**: `prefer_local_notification_for_immediate`
 - **Tier**: Recommended

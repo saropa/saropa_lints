@@ -1,5 +1,7 @@
 # Task: `handle_throwing_invocations`
 
+**Implemented.** Rule in `error_handling_rules.dart`; Professional, INFO. @Throws and known throwers (dart:io, convert, core).
+
 ## Summary
 - **Rule Name**: `handle_throwing_invocations`
 - **Tier**: Professional

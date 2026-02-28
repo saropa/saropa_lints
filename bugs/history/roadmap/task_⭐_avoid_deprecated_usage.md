@@ -1,5 +1,7 @@
 # Task: `avoid_deprecated_usage`
 
+**Implemented.** Rule in `code_quality_rules.dart`; Recommended, WARNING. Same-package and generated files ignored.
+
 ## Summary
 - **Rule Name**: `avoid_deprecated_usage`
 - **Tier**: Recommended

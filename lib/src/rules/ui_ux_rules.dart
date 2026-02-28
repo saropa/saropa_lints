@@ -1682,3 +1682,47 @@ class PreferAdaptiveIconsRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_master_detail_for_large
+// =============================================================================
+
+/// On tablets, list-detail flows should use master-detail (two-pane) layout.
+///
+/// ListView/ListTile with Navigator.push/go without MediaQuery/LayoutBuilder
+/// suggests stacked navigation only. Flags push/go/pushNamed when enclosing
+/// function body mentions ListTile/ListView but not MediaQuery/LayoutBuilder.
+/// Test files skipped. Heuristic: source-based; parent widget may handle breakpoints.
+class PreferMasterDetailForLargeRule extends SaropaLintRule {
+  PreferMasterDetailForLargeRule() : super(code: _code);
+  @override
+  LintImpact get impact => LintImpact.low;
+  @override
+  RuleCost get cost => RuleCost.medium;
+  static const LintCode _code = LintCode(
+    'prefer_master_detail_for_large',
+    '[prefer_master_detail_for_large] List navigation without responsive guard. Use LayoutBuilder or MediaQuery for tablets.',
+    correctionMessage:
+        'Use LayoutBuilder or MediaQuery for master-detail on wide screens.',
+    severity: DiagnosticSeverity.INFO,
+  );
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (context.isInTestDirectory) return;
+    context.addMethodInvocation((MethodInvocation node) {
+      final name = node.methodName.name;
+      if (name != 'push' && name != 'go' && name != 'pushNamed') return;
+      final String enclosing =
+          node.thisOrAncestorOfType<FunctionBody>()?.toSource() ?? '';
+      if (!enclosing.contains('ListTile') && !enclosing.contains('ListView'))
+        return;
+      if (enclosing.contains('MediaQuery') ||
+          enclosing.contains('LayoutBuilder'))
+        return;
+      reporter.atNode(node);
+    });
+  }
+}

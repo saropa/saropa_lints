@@ -1,5 +1,7 @@
 # Task: `prefer_pool_pattern`
 
+**Implemented.** Rule in `performance_rules.dart`; Comprehensive, INFO. Non-const allocation in timer/addListener; cheap-type skip.
+
 ## Summary
 - **Rule Name**: `prefer_pool_pattern`
 - **Tier**: Comprehensive

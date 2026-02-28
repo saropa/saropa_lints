@@ -1,5 +1,7 @@
 # Task: `require_compression`
 
+**Implemented.** Rule in `api_network_rules.dart`; Comprehensive, INFO. http/dio get/post without Accept-Encoding; target check.
+
 ## Summary
 - **Rule Name**: `require_compression`
 - **Tier**: Comprehensive

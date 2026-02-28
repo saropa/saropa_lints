@@ -12,6 +12,24 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- 10 new lint rules from roadmap detail requirements:
+  - `avoid_deprecated_usage` (Recommended, WARNING) — use of deprecated APIs from other packages; same-package and generated files ignored.
+  - `handle_throwing_invocations` (Professional, INFO) — invocations that can throw (e.g. @Throws, readAsStringSync, jsonDecode) not in try/catch.
+  - `prefer_form_bloc_for_complex` (Professional, INFO) — Form with >5 fields suggests form state management (FormBloc, reactive_forms, etc.).
+  - `prefer_local_notification_for_immediate` (Recommended, INFO) — FCM for server-triggered messages; use flutter_local_notifications for app-generated.
+  - `prefer_master_detail_for_large` (Professional, INFO) — list navigation without MediaQuery/LayoutBuilder; suggest master-detail on tablets.
+  - `prefer_batch_requests` (Professional, INFO) — await in for-loop with fetch-like method names; suggest batch endpoints.
+  - `prefer_binary_format` (Comprehensive, INFO) — jsonDecode in hot path (timer/stream); suggest protobuf/MessagePack or compute().
+  - `prefer_pool_pattern` (Comprehensive, INFO) — non-const allocation in hot path (timer/animation); suggest object pool.
+  - `require_compression` (Comprehensive, INFO) — HTTP get/post/put/delete without Accept-Encoding; suggest gzip.
+  - `require_expando_cleanup` (Comprehensive, INFO) — Expando with entries added but no cleanup (expando[key] = null).
+
+---
+
 ## [6.0.7]
 
 ### Added
