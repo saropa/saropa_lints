@@ -5,10 +5,7 @@ Lists recent failed workflow runs and re-runs them. Optionally
 watches until all re-triggered runs complete.
 
 Usage:
-    python scripts/retrigger_ci.py              # prompt before re-running
-    python scripts/retrigger_ci.py --all        # re-run all without prompt
-    python scripts/retrigger_ci.py --watch      # re-run and wait for results
-    python scripts/retrigger_ci.py --limit 20   # check last 20 runs
+    python -m scripts.modules._retrigger_ci   # standalone. Publish also calls offer_retrigger_ci after push.
 
 Version:   1.0
 Author:    Saropa
@@ -21,6 +18,12 @@ import json
 import subprocess
 import sys
 import time
+from pathlib import Path
+
+# Allow running as __main__ from scripts/modules/ (project root on path)
+_project_root = Path(__file__).resolve().parent.parent.parent
+if str(_project_root) not in sys.path:
+    sys.path.insert(0, str(_project_root))
 
 from scripts.modules._utils import (
     Color,
@@ -39,25 +42,28 @@ from scripts.modules._utils import (
 )
 
 
-def _parse_args() -> tuple[bool, bool, int]:
-    """Parse CLI arguments.
+def _prompt_limit() -> int:
+    """Ask how many recent runs to check. Default 10."""
+    try:
+        raw = input("  How many recent runs to check? [10]: ").strip() or "10"
+        n = int(raw)
+        return max(1, min(n, 50))
+    except (ValueError, EOFError, KeyboardInterrupt):
+        return 10
 
-    Returns:
-        (auto_rerun, watch, limit) tuple.
-    """
-    auto_rerun = "--all" in sys.argv
-    watch = "--watch" in sys.argv
-    limit = 10
-    for i, arg in enumerate(sys.argv):
-        if arg == "--limit" and i + 1 < len(sys.argv):
-            try:
-                limit = int(sys.argv[i + 1])
-            except ValueError:
-                exit_with_error(
-                    f"Invalid --limit value: {sys.argv[i + 1]}",
-                    ExitCode.PREREQUISITES_FAILED,
-                )
-    return auto_rerun, watch, limit
+
+def _prompt_rerun_and_watch() -> tuple[bool, bool]:
+    """After showing failed runs, ask to re-run and whether to watch. (rerun, watch)."""
+    try:
+        r = input("  Re-run all failed workflows? [y/N]: ").strip().lower()
+        rerun = r == "y"
+        watch = False
+        if rerun:
+            w = input("  Watch until runs complete? [y/N]: ").strip().lower()
+            watch = w == "y"
+        return rerun, watch
+    except (EOFError, KeyboardInterrupt):
+        return False, False
 
 
 def _check_gh_cli() -> None:
@@ -81,7 +87,7 @@ def _check_gh_cli() -> None:
 
 
 def _get_failed_runs(limit: int) -> list[dict]:
-    """Fetch recent failed workflow runs."""
+    """Fetch recent failed workflow runs. Exits on gh failure."""
     result = subprocess.run(
         [
             "gh", "run", "list",
@@ -100,6 +106,66 @@ def _get_failed_runs(limit: int) -> list[dict]:
         )
     runs = json.loads(result.stdout)
     return [r for r in runs if r.get("conclusion") == "failure"]
+
+
+def get_failed_runs_safe(limit: int = 10) -> tuple[bool, list[dict]]:
+    """Fetch recent failed workflow runs without exiting. For use by publish.
+
+    Returns:
+        (ok, runs): ok is True if gh succeeded, False otherwise. runs is list of failed runs.
+    """
+    if not command_exists("gh"):
+        return False, []
+    result = subprocess.run(
+        [
+            "gh", "run", "list",
+            "--limit", str(limit),
+            "--json", "databaseId,name,status,conclusion,event,headBranch,createdAt,workflowName",
+        ],
+        cwd=get_project_dir(),
+        capture_output=True,
+        text=True,
+        shell=get_shell_mode(),
+    )
+    if result.returncode != 0:
+        return False, []
+    try:
+        runs = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return False, []
+    failed = [r for r in runs if r.get("conclusion") == "failure"]
+    return True, failed
+
+
+def offer_retrigger_ci(limit: int = 10) -> None:
+    """If there are failed runs, display them and prompt to re-run / watch. Used by publish."""
+    ok, failed_runs = get_failed_runs_safe(limit)
+    if not ok or not failed_runs:
+        return
+    print_warning(f"Found {len(failed_runs)} failed CI run(s):")
+    print()
+    _display_failed_runs(failed_runs)
+    print()
+    try:
+        r = input("  Re-run failed workflows? [y/N]: ").strip().lower()
+        rerun = r == "y"
+    except (EOFError, KeyboardInterrupt):
+        return
+    if not rerun:
+        return
+    triggered = _rerun(failed_runs)
+    if not triggered:
+        return
+    print()
+    print_success(f"Re-triggered {len(triggered)} run(s).")
+    try:
+        w = input("  Watch until runs complete? [y/N]: ").strip().lower()
+        watch = w == "y"
+    except (EOFError, KeyboardInterrupt):
+        return
+    if watch:
+        print()
+        _watch_runs(triggered)
 
 
 def _display_failed_runs(runs: list[dict]) -> None:
@@ -170,7 +236,10 @@ def _watch_runs(run_ids: list[int]) -> bool:
             )
             if result.returncode != 0:
                 continue
-            data = json.loads(result.stdout)
+            try:
+                data = json.loads(result.stdout)
+            except json.JSONDecodeError:
+                continue
             if data.get("status") != "completed":
                 continue
             name = data.get("workflowName", run_id)
@@ -190,13 +259,13 @@ def _watch_runs(run_ids: list[int]) -> bool:
 
 
 def main() -> None:
-    """Entry point."""
+    """Entry point. Prompts for options (no CLI args)."""
     enable_ansi_support()
-    auto_rerun, watch, limit = _parse_args()
     print_header("RETRIGGER FAILED CI RUNS")
 
     _check_gh_cli()
 
+    limit = _prompt_limit()
     print_info(f"Checking last {limit} workflow runs...")
     failed_runs = _get_failed_runs(limit)
 
@@ -209,11 +278,10 @@ def main() -> None:
     _display_failed_runs(failed_runs)
     print()
 
+    auto_rerun, watch = _prompt_rerun_and_watch()
     if not auto_rerun:
-        answer = input("  Re-run all failed workflows? [y/N] ").strip().lower()
-        if answer != "y":
-            print_info("Canceled.")
-            sys.exit(ExitCode.USER_CANCELED.value)
+        print_info("Canceled.")
+        sys.exit(ExitCode.USER_CANCELED.value)
 
     triggered = _rerun(failed_runs)
     if not triggered:

@@ -24,13 +24,12 @@ Workflow:
     Step 15: Create GitHub release
     Post:    Bump version for next cycle (pubspec + [Unreleased])
 
-Options:
-    --audit-only      Run audit + integrity checks only, skip publish
-    --skip-audit      Skip audit (use with caution)
-    --fix-docs        Auto-fix doc comment issues (angle brackets, refs), then exit
-    --silent          Suppress all output except errors
-    --warnings-only   Only show warnings and errors
-    --verbose         Show all details (default)
+Run from project root: python scripts/publish.py. Prompts: full publish /
+audit only / fix doc comments. No flags. Other logic is in scripts/modules/
+(audit, DX improver, retrigger CI); run standalone with e.g.
+python -m scripts.modules._improve_dx_messages if needed. Historical scripts
+(version_rules, release-note scrapers, lint candidates) are in
+scripts/historical/ and are not part of the build.
 
 Version:   4.0
 Author:    Saropa
@@ -72,7 +71,7 @@ import time
 import webbrowser
 from pathlib import Path
 
-# Allow running as `python scripts/publish_to_pubdev.py` from project root
+# Allow running as `python scripts/publish.py` from project root
 _scripts_parent = str(Path(__file__).resolve().parent.parent)
 if _scripts_parent not in sys.path:
     sys.path.insert(0, _scripts_parent)
@@ -221,14 +220,8 @@ from scripts.modules._version_changelog import (
 
 
 def _parse_output_level() -> OutputLevel:
-    """Determine output level from CLI args."""
-    if "--silent" in sys.argv:  # Suppress all output except errors
-        return OutputLevel.SILENT
-    if "--warnings-only" in sys.argv:  # Show warnings and errors only
-        return OutputLevel.WARNINGS_ONLY
-    if "--verbose" in sys.argv:  # Explicitly requested verbose
-        return OutputLevel.VERBOSE
-    return OutputLevel.VERBOSE  # Default: show everything
+    """Default output level (verbose). No CLI flags."""
+    return OutputLevel.VERBOSE
 
 # cspell:ignore kbhit getwch
 def _prompt_version(default: str, timeout: int = 30) -> str:
@@ -327,10 +320,31 @@ def _print_success_banner(
 # =============================================================================
 
 
-def main() -> int:
-    """Main entry point - unified audit + publish workflow."""
+def _prompt_publish_mode() -> str:
+    """Ask user what to do when run as main script."""
+    print_header("PUBLISH OPTIONS")
+    print("  1) Full publish (audit → tests → version → publish → release)")
+    print("  2) Audit only (tier integrity, DX checks; no publish)")
+    print("  3) Fix doc comments (angle brackets, refs; then exit)")
+    try:
+        raw = input("  Choice [1]: ").strip() or "1"
+        n = int(raw)
+        if n == 2:
+            return "audit_only"
+        if n == 3:
+            return "fix_docs"
+    except (ValueError, EOFError, KeyboardInterrupt):
+        pass
+    return "full"
+
+
+def main(
+    mode: str = "full",
+    output_level: OutputLevel | None = None,
+) -> int:
+    """Main entry point. mode: 'full' | 'audit_only' | 'fix_docs'."""
     enable_ansi_support()
-    set_output_level(_parse_output_level())
+    set_output_level(output_level or _parse_output_level())
 
     show_saropa_logo()
 
@@ -352,8 +366,8 @@ def main() -> int:
             ExitCode.PREREQUISITES_FAILED,
         )
 
-    # --- Quick-exit: --fix-docs (standalone mode, exits after fixing) ---
-    if "--fix-docs" in sys.argv:
+    # --- fix_docs: standalone mode, then exit ---
+    if mode == "fix_docs":
         print_header("FIX DOC COMMENT ISSUES")
         issues = check_pubdev_lint_issues(project_dir)
         if not issues:  # Clean — nothing to fix
@@ -402,8 +416,8 @@ def main() -> int:
         print_info(f"TODO log: {todo_log.relative_to(project_dir)}")
 
     # --- Timed workflow ---
-    audit_only = "--audit-only" in sys.argv
-    skip_audit = "--skip-audit" in sys.argv
+    audit_only = mode == "audit_only"
+    skip_audit = False  # Always run audit unless mode is audit_only (then we stop after)
     timer = StepTimer()
     exit_code = ExitCode.SUCCESS.value
     version = pubspec_version
@@ -415,15 +429,45 @@ def main() -> int:
         if not skip_audit:  # Normal path: run full audit
             with timer.step("Pre-publish audit"):
                 print_header("STEP 1: AUDIT")
-                if not run_pre_publish_audits(project_dir):  # Blocking issue
-                    exit_with_error(
-                        "Pre-publish audit failed. "
-                        "Fix issues before publishing.",
-                        ExitCode.AUDIT_FAILED,
+                audit_ok = run_pre_publish_audits(project_dir)
+                while not audit_ok:
+                    try:
+                        response = (
+                            input(
+                                "  Run DX message improver to try to fix issues? [y/N]: "
+                            )
+                            .strip()
+                            .lower()
+                        )
+                    except (EOFError, KeyboardInterrupt):
+                        response = "n"
+                    if response != "y":
+                        exit_with_error(
+                            "Pre-publish audit failed. "
+                            "Fix issues before publishing.",
+                            ExitCode.AUDIT_FAILED,
+                        )
+                    from scripts.modules._improve_dx_messages import (
+                        apply_dx_result,
+                        run_dx_analysis,
                     )
 
-            if audit_only:  # --audit-only: stop after audit, don't publish
-                print_success("Audit complete (--audit-only mode).")
+                    print_info("Running DX message improver...")
+                    dx_result = run_dx_analysis()
+                    if dx_result.total > 0:
+                        apply_dx_result(dx_result)
+                        print_info("Re-running audit...")
+                        audit_ok = run_pre_publish_audits(project_dir)
+                    else:
+                        print_warning("No DX improvements to apply.")
+                        exit_with_error(
+                            "Pre-publish audit failed. "
+                            "Fix issues before publishing.",
+                            ExitCode.AUDIT_FAILED,
+                        )
+
+            if audit_only:  # Stop after audit, don't publish
+                print_success("Audit complete.")
                 succeeded = True
                 return ExitCode.SUCCESS.value
 
@@ -437,10 +481,7 @@ def main() -> int:
             if response.startswith("n"):  # User declined to continue
                 print_warning("Publish canceled by user.")
                 return ExitCode.USER_CANCELED.value
-        elif audit_only:  # --skip-audit + --audit-only = nonsensical
-            print_warning(
-                "--audit-only and --skip-audit are contradictory."
-            )
+        elif audit_only:
             return ExitCode.USER_CANCELED.value
 
         # --- Steps 2-7: Pre-publish analysis workflow ---
@@ -632,6 +673,12 @@ def main() -> int:
                     "Git operations failed", ExitCode.GIT_FAILED,
                 )
 
+        # --- Check for failed CI and offer to re-trigger ---
+        with timer.step("CI status"):
+            from scripts.modules._retrigger_ci import offer_retrigger_ci
+
+            offer_retrigger_ci(limit=10)
+
         with timer.step("Git tag"):  # Create vX.Y.Z tag
             if not create_git_tag(project_dir, version):
                 exit_with_error(
@@ -700,4 +747,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(mode=_prompt_publish_mode()))

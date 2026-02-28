@@ -3,14 +3,15 @@ Scans scraped release notes (Flutter SDK, Dart SDK, Dart-Code) to extract
 lint rule candidates — deprecations, new features, new parameters, breaking
 changes, and performance improvements that could be detected by static analysis.
 
-Excludes items already handled by `dart fix` (loaded from dart_fix_pairs.txt).
+Historical script: not part of the build. Run after download_flutter_release_notes.py.
+Excludes items already handled by `dart fix` (loaded from dart_fix_pairs.txt in this dir).
 Filters noise (reverts, CI, docs-only, engine internals) and scores relevance.
 
-Usage:
-    python scripts/extract_lint_candidates.py
+Usage (from project root):
+    python scripts/historical/extract_lint_candidates.py
 
 Output:
-    scripts/lint_candidates_report.md
+    reports/YYYYMMDD/<timestamp>_lint_candidates_report.md
 """
 
 import os
@@ -21,7 +22,7 @@ from typing import Dict, List, Set, Tuple
 
 # --- Configuration ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.dirname(BASE_DIR)
+PROJECT_DIR = os.path.dirname(os.path.dirname(BASE_DIR))  # project root (script is in scripts/historical/)
 REPORTS_DIR = os.path.join(PROJECT_DIR, "reports")
 DART_FIX_PAIRS_FILE = os.path.join(BASE_DIR, "dart_fix_pairs.txt")
 
@@ -284,7 +285,7 @@ def load_dart_fix_pairs() -> Tuple[Set[str], Set[str]]:
     with open(DART_FIX_PAIRS_FILE, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
-            if line and "." in line and not line.startswith("Total:"):
+            if line and "." in line and not line.startswith("Total:") and not line.startswith("#"):
                 pairs.add(line)
                 class_name, member = line.split(".", 1)
                 member_to_classes.setdefault(member, set()).add(class_name)
