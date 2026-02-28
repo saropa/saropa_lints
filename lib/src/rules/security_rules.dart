@@ -6587,3 +6587,80 @@ class AvoidWebViewCorsIssuesRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// require_input_validation
+// =============================================================================
+
+/// Warns when raw controller text is sent in API calls without validation.
+///
+/// **OWASP:** M1, M8. Validate user input before sending to APIs or databases.
+///
+/// **BAD:**
+/// ```dart
+/// await http.post(Uri.parse('/users'), body: {'name': _nameController.text});
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final name = _nameController.text.trim();
+/// if (name.isEmpty) return;
+/// await http.post(Uri.parse('/users'), body: {'name': name});
+/// ```
+class RequireInputValidationRule extends SaropaLintRule {
+  RequireInputValidationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+    '.text',
+    '.post(',
+    '.put(',
+    '.patch(',
+  };
+
+  @override
+  OwaspMapping? get owasp =>
+      const OwaspMapping(mobile: <OwaspMobile>{OwaspMobile.m1, OwaspMobile.m4});
+
+  static const LintCode _code = LintCode(
+    'require_input_validation',
+    '[require_input_validation] Raw controller text used in network call without validation. Validate (trim, isEmpty, length, format) before sending.',
+    correctionMessage:
+        'Validate user input (e.g. trim(), isEmpty check, length, validator) before sending to API.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _networkMethods = <String>{'post', 'put', 'patch'};
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_networkMethods.contains(node.methodName.name)) return;
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('http') && !targetSource.contains('dio'))
+        return;
+
+      for (final arg in node.argumentList.arguments) {
+        final String argSource = arg.toSource();
+        if (!argSource.contains('.text')) continue;
+        if (argSource.contains('.trim()') || argSource.contains('.trim('))
+          continue;
+        if (argSource.contains('validate') || argSource.contains('isEmpty'))
+          continue;
+        reporter.atNode(arg);
+        return;
+      }
+    });
+  }
+}

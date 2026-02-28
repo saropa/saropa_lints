@@ -16,6 +16,7 @@ import 'dart:io' show Directory, File, Platform;
 
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 
+import '../banned_usage_config.dart';
 import '../baseline/baseline_config.dart';
 import '../baseline/baseline_manager.dart';
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
@@ -28,6 +29,7 @@ void loadNativePluginConfig() {
   _loadSeverityOverrides(content);
   _loadDiagnosticsConfig();
   _loadBaselineConfig(content);
+  loadBannedUsageConfig(content);
   _loadOutputConfig(content);
 }
 

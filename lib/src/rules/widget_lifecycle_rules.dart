@@ -696,6 +696,130 @@ class _SetStateCallFinder extends RecursiveAstVisitor<void> {
   }
 }
 
+// =============================================================================
+// require_init_state_idempotent
+// =============================================================================
+
+/// Warns when initState registers listeners without matching remove in dispose.
+///
+/// initState may run multiple times (e.g. widget remount). Listeners must be
+/// removed in dispose to avoid leaks and duplicate callbacks.
+///
+/// **BAD:**
+/// ```dart
+/// void initState() {
+///   super.initState();
+///   eventBus.addListener('auth', _onAuthChange);
+/// }
+/// void dispose() { super.dispose(); }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void initState() {
+///   super.initState();
+///   eventBus.addListener('auth', _onAuthChange);
+/// }
+/// void dispose() {
+///   eventBus.removeListener('auth', _onAuthChange);
+///   super.dispose();
+/// }
+/// ```
+class RequireInitStateIdempotentRule extends SaropaLintRule {
+  RequireInitStateIdempotentRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+    'initState',
+    'addListener',
+    'addObserver',
+  };
+
+  static const LintCode _code = LintCode(
+    'require_init_state_idempotent',
+    '[require_init_state_idempotent] initState registers a listener without a matching removeListener/removeObserver in dispose. Widget remount or hot reload can cause duplicate listeners.',
+    correctionMessage:
+        'Add matching removeListener or removeObserver in dispose().',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _registerMethods = <String>{
+    'addListener',
+    'addObserver',
+  };
+  static const Set<String> _removeMethods = <String>{
+    'removeListener',
+    'removeObserver',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'initState') return;
+      final AstNode? parent = node.parent;
+      if (parent is! ClassDeclaration) return;
+      final ExtendsClause? extendsClause = parent.extendsClause;
+      if (extendsClause == null) return;
+      if (extendsClause.superclass.element?.name != 'State') return;
+
+      final List<MethodInvocation> registerCalls = [];
+      node.body.visitChildren(
+        _ListenerCallCollector(registerCalls, _registerMethods),
+      );
+
+      if (registerCalls.isEmpty) return;
+
+      MethodDeclaration? disposeMethod;
+      for (final member in parent.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeMethod = member;
+          break;
+        }
+      }
+      final String disposeBodySource =
+          disposeMethod?.body.toSource().toLowerCase() ?? '';
+      final bool hasRemove = _removeMethods.any(
+        (m) => disposeBodySource.contains(m),
+      );
+
+      if (!hasRemove) {
+        for (final call in registerCalls) {
+          reporter.atNode(call);
+        }
+      }
+    });
+  }
+}
+
+class _ListenerCallCollector extends RecursiveAstVisitor<void> {
+  _ListenerCallCollector(this.calls, this.methodNames);
+  final List<MethodInvocation> calls;
+  final Set<String> methodNames;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (methodNames.contains(node.methodName.name)) {
+      calls.add(node);
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
 /// Warns when a StatefulWidget could be a StatelessWidget.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
