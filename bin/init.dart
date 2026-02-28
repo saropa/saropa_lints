@@ -1034,17 +1034,13 @@ const Map<String, List<String>> _stylisticRuleCategories =
         'map_keys_ordering',
       ],
       'Naming conventions': <String>[
-        'prefer_boolean_prefixes',
         'prefer_no_getter_prefix',
         'prefer_kebab_tag_name',
         'prefer_capitalized_comment_start',
-        'prefer_descriptive_bool_names',
         'prefer_snake_case_files',
         'prefer_camel_case_method_names',
         'prefer_exception_suffix',
         'prefer_error_suffix',
-        'prefer_boolean_prefixes_for_params',
-        'prefer_boolean_prefixes_for_locals',
         'prefer_trailing_underscore_for_unused',
         'prefer_sliver_prefix',
         'prefer_correct_callback_field_name',
@@ -1053,6 +1049,12 @@ const Map<String, List<String>> _stylisticRuleCategories =
         'prefer_bloc_event_suffix',
         'prefer_bloc_state_suffix',
         'prefer_use_prefix',
+      ],
+      'Boolean naming': <String>[
+        'prefer_boolean_prefixes',
+        'prefer_descriptive_bool_names',
+        'prefer_boolean_prefixes_for_params',
+        'prefer_boolean_prefixes_for_locals',
       ],
       'Code style preferences': <String>[
         'prefer_no_continue_statement',
@@ -3848,10 +3850,21 @@ _WalkthroughResult _runStylisticWalkthrough({
     '${_Colors.bold}${_Colors.cyan}'
     '── Stylistic Rules Walkthrough ──${_Colors.reset}',
   );
+  // Use global counts so progress (e.g. 51/143) persists on resume, not 1/N.
+  final int totalAllRules = tiers.stylisticRules
+      .difference(irrelevantRules)
+      .length;
+  final int alreadyReviewed = totalAllRules - rulesToReview.length;
+  final int irrelevantCount = irrelevantRules
+      .intersection(tiers.stylisticRules)
+      .length;
   _logTerminal(
-    '${_Colors.dim}${rulesToReview.length} rules to review '
-    '(${irrelevantRules.intersection(tiers.stylisticRules).length} '
-    'skipped as irrelevant to project)${_Colors.reset}',
+    alreadyReviewed > 0
+        ? '${_Colors.dim}${rulesToReview.length} rules remaining '
+              '($alreadyReviewed already reviewed, $irrelevantCount '
+              'skipped as irrelevant to project)${_Colors.reset}'
+        : '${_Colors.dim}${rulesToReview.length} rules to review '
+              '($irrelevantCount skipped as irrelevant to project)${_Colors.reset}',
   );
   _logTerminal('');
   _logTerminal(
@@ -3881,8 +3894,8 @@ _WalkthroughResult _runStylisticWalkthrough({
           .length +
       (hasUncategorized ? 1 : 0);
   int categoryIndex = 0;
-  int ruleOffset = 0;
-  final int totalRules = rulesToReview.length;
+  int ruleOffset = alreadyReviewed;
+  final int totalRules = totalAllRules;
 
   for (final entry in categoryEntries) {
     final category = entry.key;
@@ -4062,13 +4075,13 @@ _CategoryResult? _walkthroughCategory({
       // Show code examples if available (GOOD first for readability)
       if (meta.exampleGood != null) {
         _logTerminal(
-          '  ${_Colors.green}GOOD:${_Colors.reset} '
+          '  ${_Colors.bold}${_Colors.green}GOOD:${_Colors.reset} '
           '${meta.exampleGood}',
         );
       }
       if (meta.exampleBad != null) {
         _logTerminal(
-          '  ${_Colors.red}BAD:${_Colors.reset}  '
+          '  ${_Colors.bold}${_Colors.red}BAD:${_Colors.reset}  '
           '${meta.exampleBad}',
         );
       }
