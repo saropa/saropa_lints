@@ -1,5 +1,7 @@
 # Task: `prefer_master_detail_for_large`
 
+**Implemented.** Rule in `ui_ux_rules.dart`; Professional, INFO. List push/go without MediaQuery/LayoutBuilder.
+
 ## Summary
 - **Rule Name**: `prefer_master_detail_for_large`
 - **Tier**: Professional

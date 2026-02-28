@@ -3367,3 +3367,126 @@ class RequireAnalyticsEventNamingRule extends SaropaLintRule {
     return null;
   }
 }
+
+// =============================================================================
+// prefer_batch_requests
+// =============================================================================
+
+/// Prefer batch API calls over multiple small requests in a loop.
+///
+/// N+1 network requests in a for loop add latency. This rule flags for-statements
+/// whose body contains await and a fetch-like method name (get, fetch, load,
+/// read, query, find). Test files skipped. Heuristic: does not verify same
+/// receiver across iterations; may have false positives (e.g. pagination).
+class PreferBatchRequestsRule extends SaropaLintRule {
+  PreferBatchRequestsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_batch_requests',
+    '[prefer_batch_requests] Multiple await calls in a loop. Consider a batch endpoint to reduce network overhead.',
+    correctionMessage:
+        'Consider using a batch endpoint (e.g., getUsers(ids)) instead of individual requests in a loop.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _fetchNames = <String>{
+    'get',
+    'fetch',
+    'load',
+    'read',
+    'query',
+    'find',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (context.isInTestDirectory) return;
+    context.addForStatement((ForStatement node) {
+      final String body = node.body.toSource();
+      if (!body.contains('await ')) return;
+      for (final name in _fetchNames) {
+        if (body.contains('.$name(') || body.contains('$name(')) {
+          reporter.atNode(node);
+          return;
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_compression
+// =============================================================================
+
+/// HTTP requests should request gzip compression when appropriate.
+///
+/// Requests without Accept-Encoding miss 60–80% bandwidth savings on typical
+/// JSON/text. Only runs when the project uses `http` or `dio`. Only flags
+/// invocations whose target source contains "http" or "dio" to avoid false
+/// positives on unrelated .get()/.post() calls. Test files are skipped.
+class RequireCompressionRule extends SaropaLintRule {
+  RequireCompressionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_compression',
+    '[require_compression] HTTP request without Accept-Encoding. Add headers: {\'Accept-Encoding\': \'gzip\'} to reduce bandwidth.',
+    correctionMessage:
+        'Add headers: {\'Accept-Encoding\': \'gzip\'} to request compressed responses.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final path = context.filePath;
+    if (!ProjectContext.hasDependency(path, 'http') &&
+        !ProjectContext.hasDependency(path, 'dio')) {
+      return;
+    }
+    if (context.isInTestDirectory) return;
+
+    context.addMethodInvocation((MethodInvocation node) {
+      final name = node.methodName.name;
+      if (name != 'get' && name != 'post' && name != 'put' && name != 'delete')
+        return;
+      // Only flag invocations on http/dio (e.g. http.get, dio.get).
+      final Expression? target = node.target;
+      if (target != null) {
+        final String targetSrc = target.toSource().toLowerCase();
+        if (!targetSrc.contains('http') && !targetSrc.contains('dio')) {
+          return;
+        }
+      }
+      bool hasGzip = false;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'headers') {
+          final String headers = arg.expression.toSource();
+          if (headers.contains('Accept-Encoding') || headers.contains('gzip')) {
+            hasGzip = true;
+          }
+          break;
+        }
+      }
+      if (!hasGzip) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}

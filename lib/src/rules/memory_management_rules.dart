@@ -1358,3 +1358,50 @@ class AvoidClosureCaptureLeaksRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// require_expando_cleanup
+// =============================================================================
+
+/// Expando entries should be cleared (e.g. expando[key] = null) when done.
+///
+/// Expando values are held strongly; long-lived Expandos that only add entries
+/// can grow unbounded. Flags classes whose source contains Expando and ] =
+/// but no = null cleanup. Test files skipped. Heuristic: source-based; does
+/// not parse field declarations or method bodies.
+class RequireExpandoCleanupRule extends SaropaLintRule {
+  RequireExpandoCleanupRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'require_expando_cleanup',
+    '[require_expando_cleanup] Expando field has entries added but no cleanup (expando[key] = null). Remove entries when done to avoid unbounded growth.',
+    correctionMessage:
+        'Add cleanup (e.g. expando[key] = null in dispose() or evict()) when the association is no longer needed.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (context.isInTestDirectory) return;
+    context.addClassDeclaration((ClassDeclaration node) {
+      final String body = node.toSource();
+      if (!body.contains('Expando')) return;
+      if (!body.contains('= null') && !body.contains('=null')) {
+        if (body.contains('[') &&
+            body.contains('] = ') &&
+            !body.contains('] = null')) {
+          reporter.atNode(node);
+        }
+      }
+    });
+  }
+}

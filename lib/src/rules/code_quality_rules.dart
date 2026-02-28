@@ -8652,8 +8652,14 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
 
 /// Warns when using deprecated APIs from other packages (WARNING severity).
 ///
-/// Dart's built-in deprecated_member_use is INFO; this rule provides a
-/// stronger signal and ignores same-package usage by default (migration).
+/// Dart's built-in `deprecated_member_use` is INFO and often suppressed; this
+/// rule provides a WARNING-level signal visible in CI. Same-package usage is
+/// ignored by default so migrations can call their own deprecated APIs.
+/// Generated files (`.g.dart`, `.freezed.dart`) are skipped.
+///
+/// **Trigger:** MethodInvocation, PropertyAccess, or InstanceCreationExpression
+/// that resolves to an element (or constructor's class) with `@Deprecated` or
+/// `@deprecated` from a different package.
 ///
 /// **BAD:**
 /// ```dart
@@ -8664,6 +8670,9 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
 /// ```dart
 /// final text = someWidget.textTheme.displayLarge;
 /// ```
+///
+/// **Heuristic:** Same-package is inferred from element.library.uri vs
+/// current project package name. No config yet (ignore_own_package Phase 2).
 class AvoidDeprecatedUsageRule extends SaropaLintRule {
   AvoidDeprecatedUsageRule() : super(code: _code);
 

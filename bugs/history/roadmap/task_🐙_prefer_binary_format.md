@@ -1,5 +1,7 @@
 # Task: `prefer_binary_format`
 
+**Implemented.** Rule in `performance_rules.dart`; Comprehensive, INFO. jsonDecode in hot path; protobuf/MessagePack skip.
+
 ## Summary
 - **Rule Name**: `prefer_binary_format`
 - **Tier**: Comprehensive

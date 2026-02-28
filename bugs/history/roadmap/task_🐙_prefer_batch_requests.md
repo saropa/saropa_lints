@@ -1,5 +1,7 @@
 # Task: `prefer_batch_requests`
 
+**Implemented.** Rule in `api_network_rules.dart`; Professional, INFO. for-loop with await + fetch-like names.
+
 ## Summary
 
 - **Rule Name**: `prefer_batch_requests`

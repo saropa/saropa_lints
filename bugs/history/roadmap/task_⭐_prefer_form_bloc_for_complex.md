@@ -1,5 +1,7 @@
 # Task: `prefer_form_bloc_for_complex`
 
+**Implemented.** Rule in `forms_rules.dart`; Professional, INFO. Form >5 fields; skips if form_bloc/reactive_forms/formz.
+
 ## Summary
 - **Rule Name**: `prefer_form_bloc_for_complex`
 - **Tier**: Professional

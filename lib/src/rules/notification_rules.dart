@@ -823,3 +823,61 @@ class AvoidNotificationSilentFailureRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_local_notification_for_immediate
+// =============================================================================
+
+/// Prefer flutter_local_notifications for app-generated notifications; FCM for server.
+///
+/// FCM is for server-to-device messages. When the app triggers notifications
+/// locally (timer, reminder), using FCM adds latency and network dependency.
+/// Only runs when the project has `firebase_messaging` and not
+/// `flutter_local_notifications`. Test files are skipped.
+///
+/// **Heuristic:** Flags `sendMessage` or `post` calls whose source mentions
+/// FirebaseMessaging/fcm. Phase 2 could restrict to Timer/Future.delayed context.
+class PreferLocalNotificationForImmediateRule extends SaropaLintRule {
+  PreferLocalNotificationForImmediateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_local_notification_for_immediate',
+    '[prefer_local_notification_for_immediate] FCM is for server-triggered messages. '
+        'Use flutter_local_notifications for app-generated (timer, reminder) notifications.',
+    correctionMessage:
+        'Use flutter_local_notifications for app-generated notifications. FCM is designed for server-to-device messages.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final path = context.filePath;
+    if (!ProjectContext.hasDependency(path, 'firebase_messaging')) {
+      return;
+    }
+    if (ProjectContext.hasDependency(path, 'flutter_local_notifications')) {
+      return;
+    }
+    if (context.isInTestDirectory) {
+      return;
+    }
+
+    context.addMethodInvocation((MethodInvocation node) {
+      final name = node.methodName.name;
+      if (name != 'sendMessage' && name != 'post') return;
+      final String source = node.toSource();
+      if (!source.contains('FirebaseMessaging') && !source.contains('fcm'))
+        return;
+      reporter.atNode(node);
+    });
+  }
+}

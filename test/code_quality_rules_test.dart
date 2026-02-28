@@ -14,6 +14,7 @@ void main() {
     final fixtures = [
       'avoid_accessing_collections_by_constant_index',
       'avoid_adjacent_strings',
+      'avoid_deprecated_usage',
       'avoid_always_null_parameters',
       'avoid_assigning_to_static_field',
       'avoid_async_call_in_sync_function',

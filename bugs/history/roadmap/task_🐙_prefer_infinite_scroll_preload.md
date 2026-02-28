@@ -1,5 +1,7 @@
 # Task: `prefer_infinite_scroll_preload`
 
+**Already implemented.** Rule exists in `scroll_rules.dart` (PreferInfiniteScrollPreloadRule); no change this session.
+
 ## Summary
 - **Rule Name**: `prefer_infinite_scroll_preload`
 - **Tier**: Professional

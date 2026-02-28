@@ -2469,6 +2469,11 @@ class AvoidAssertInProductionRule extends SaropaLintRule {
 
 /// Invocations that can throw should be handled (try/catch or @Throws).
 ///
+/// Detects calls to methods annotated @Throws or known throwers (e.g. dart:io
+/// readAsStringSync, dart:convert decode, int.parse) when not inside try/catch.
+/// Test files are skipped. Known throwers are matched by method name and
+/// library URI.
+///
 /// **BAD:**
 /// ```dart
 /// final content = File('config.json').readAsStringSync(); // no try/catch
@@ -2532,10 +2537,12 @@ class HandleThrowingInvocationsRule extends SaropaLintRule {
     if (name == null || !_knownThrowerNames.contains(name)) return false;
     final uri = element.library?.uri.toString() ?? '';
     if (uri.startsWith('dart:io') &&
-        (name.startsWith('read') || name.startsWith('write')))
+        (name.startsWith('read') || name.startsWith('write'))) {
       return true;
-    if (uri.contains('convert') && (name == 'decode' || name == 'jsonDecode'))
+    }
+    if (uri.contains('convert') && (name == 'decode' || name == 'jsonDecode')) {
       return true;
+    }
     if (uri.startsWith('dart:core') && name == 'parse') return true;
     return uri.startsWith('dart:io') ||
         (uri.contains('convert') && name == 'decode');

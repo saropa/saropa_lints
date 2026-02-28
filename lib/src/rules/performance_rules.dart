@@ -4580,3 +4580,115 @@ class AvoidCacheStampedeRule extends SaropaLintRule {
     return pattern.hasMatch(source);
   }
 }
+
+// =============================================================================
+// prefer_binary_format
+// =============================================================================
+
+/// Prefer Protocol Buffers or MessagePack for high-frequency or large JSON.
+///
+/// jsonDecode in hot paths (Timer.periodic, stream.listen/onData) can block the
+/// UI isolate. Suggests protobuf/MessagePack or compute(). Skips when project
+/// already uses protobuf, messagepack, or msgpack_dart. Test files skipped.
+/// Heuristic: hot path is inferred from enclosing FunctionBody source.
+class PreferBinaryFormatRule extends SaropaLintRule {
+  PreferBinaryFormatRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_binary_format',
+    '[prefer_binary_format] jsonDecode in a hot path (timer/stream). Consider protobuf or MessagePack for better performance.',
+    correctionMessage:
+        'For high-frequency or large payloads, consider Protocol Buffers (package:protobuf) or MessagePack, or use compute() to offload parsing.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final path = context.filePath;
+    if (ProjectContext.hasDependency(path, 'protobuf') ||
+        ProjectContext.hasDependency(path, 'messagepack') ||
+        ProjectContext.hasDependency(path, 'msgpack_dart')) {
+      return;
+    }
+    if (context.isInTestDirectory) return;
+
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'decode' &&
+          node.methodName.name != 'jsonDecode')
+        return;
+      final String outer =
+          node.thisOrAncestorOfType<FunctionBody>()?.toSource() ?? '';
+      if (!outer.contains('Timer.periodic') &&
+          !outer.contains('listen(') &&
+          !outer.contains('onData'))
+        return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+// =============================================================================
+// prefer_pool_pattern
+// =============================================================================
+
+/// Prefer object pools for high-frequency allocations in hot loops.
+///
+/// Non-const object creation inside Timer.periodic, addListener, or
+/// addPersistentFrameCallback can cause GC pressure. Skips cheap types (Offset,
+/// Size, Rect, Color, BorderRadius, Point). Test files skipped. Heuristic:
+/// hot path inferred from enclosing body source; no field-count check.
+class PreferPoolPatternRule extends SaropaLintRule {
+  PreferPoolPatternRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_pool_pattern',
+    '[prefer_pool_pattern] Non-const object creation in a hot path (timer/animation). Consider an object pool to reduce GC pressure.',
+    correctionMessage:
+        'Consider an object pool to reuse instances. See package:object_pool or implement a custom pool.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _cheapTypes = <String>{
+    'Offset',
+    'Size',
+    'Rect',
+    'Color',
+    'BorderRadius',
+    'Point',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (context.isInTestDirectory) return;
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (node.isConst) return;
+      final name = node.constructorName.type.name.lexeme;
+      if (_cheapTypes.contains(name)) return;
+      final String outer =
+          node.thisOrAncestorOfType<FunctionBody>()?.toSource() ?? '';
+      if (!outer.contains('Timer.periodic') &&
+          !outer.contains('addListener') &&
+          !outer.contains('addPersistentFrameCallback'))
+        return;
+      reporter.atNode(node);
+    });
+  }
+}
