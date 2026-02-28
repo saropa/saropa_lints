@@ -6,8 +6,8 @@ and add missing consequences. Always runs analysis first, then
 prompts to apply changes interactively.
 
 Usage:
-    python scripts/improve_dx_messages.py           # Analyze + prompt
-    python scripts/improve_dx_messages.py --apply   # Apply without prompt (CI)
+    python -m scripts.modules._improve_dx_messages   # standalone
+    # In CI (CI=1): auto-apply without prompting. Publish also calls this module when audit fails.
 
 Version:   1.0
 Author:    Saropa
@@ -23,16 +23,17 @@ Run from project root directory.
 
 from __future__ import annotations
 
+import os
 import re
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
-# Allow running as `python scripts/improve_dx_messages.py`
-_scripts_parent = str(Path(__file__).resolve().parent.parent)
-if _scripts_parent not in sys.path:
-    sys.path.insert(0, _scripts_parent)
+# Allow running as __main__ from scripts/modules/ (project root on path)
+_project_root = Path(__file__).resolve().parent.parent.parent
+if str(_project_root) not in sys.path:
+    sys.path.insert(0, str(_project_root))
 
 SCRIPT_VERSION = "1.0"
 
@@ -1157,7 +1158,7 @@ def write_report(
 
 
 # ═════════════════════════════════════════════════════════════════
-# PUBLIC API (for use by publish_to_pubdev.py)
+# PUBLIC API (for use by publish.py)
 # ═════════════════════════════════════════════════════════════════
 
 
@@ -1176,7 +1177,7 @@ class DxResult:
 def run_dx_analysis() -> DxResult:
     """Run DX analysis in dry-run mode and return structured results.
 
-    This is the public API for other scripts (e.g. publish_to_pubdev.py)
+    This is the public API for other scripts (e.g. publish.py)
     to call without triggering interactive prompts or file writes.
     Only the markdown report is written.
     """
@@ -1201,6 +1202,12 @@ def run_dx_analysis() -> DxResult:
         report_path=report_path,
         changes=all_changes,
     )
+
+
+def apply_dx_result(result: DxResult) -> None:
+    """Apply improvements from a previous run_dx_analysis(). Used by publish."""
+    if result.total > 0 and result.changes:
+        _apply_changes(result.changes)
 
 
 # ═════════════════════════════════════════════════════════════════
@@ -1284,7 +1291,7 @@ def main() -> int:
     enable_ansi_support()
     show_saropa_logo()
 
-    ci_mode = "--apply" in sys.argv
+    ci_mode = os.environ.get("CI", "").strip() in ("1", "true", "yes")
 
     print_header(f"DX MESSAGE IMPROVER v{SCRIPT_VERSION}")
     print_info(f"Rules dir: {RULES_DIR}")

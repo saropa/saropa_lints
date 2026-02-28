@@ -1,3 +1,7 @@
+# Scrapes Dart-Code, Flutter SDK, and Dart SDK release notes into reports/_cache/.
+# Historical script: not part of the build. Run before extract_lint_candidates.py.
+# Usage (from project root): python scripts/historical/download_flutter_release_notes.py
+#
 # --- Script Changelog ---
 # v4.0.0 (2026-02-21)
 # - Added: Flutter SDK release notes scraper (docs.flutter.dev).
@@ -61,7 +65,7 @@ from rich.panel import Panel
 
 # --- Configuration & Setup ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.dirname(BASE_DIR)
+PROJECT_DIR = os.path.dirname(os.path.dirname(BASE_DIR))  # project root (script is in scripts/historical/)
 REPORTS_DIR = os.path.join(PROJECT_DIR, "reports")
 CACHE_DIR = os.path.join(REPORTS_DIR, "_cache")
 EXTRACT_FILE = "all_features_report.md"
