@@ -49,6 +49,9 @@ const Set<String> stylisticRules = <String>{
   'prefer_catch_over_on',
 
   // === Code style preferences ===
+  'avoid_escaping_inner_quotes',
+  'avoid_function_literals_in_foreach_calls',
+  'avoid_single_cascade_in_expression_statements',
   'prefer_no_continue_statement',
   'prefer_single_exit_point',
   'prefer_wildcard_for_unused_param',
@@ -322,6 +325,7 @@ const Set<String> essentialRules = <String>{
   // Collections
   'avoid_duplicate_map_keys',
   'avoid_isar_enum_field',
+  'require_exhaustive_sealed_switch',
 
   // Equatable (Essential - missing fields cause equality bugs)
   'list_all_equatable_fields',
@@ -340,6 +344,7 @@ const Set<String> essentialRules = <String>{
   // Error Handling
   'avoid_swallowing_exceptions',
   'avoid_losing_stack_trace',
+  'require_error_handling_graceful',
 
   'avoid_print_error', // Print for error logging loses errors in production
   // Collection/Loop Safety (Phase 2)
@@ -412,6 +417,8 @@ const Set<String> essentialRules = <String>{
 
   // Firebase (Essential - prevent crashes)
   'require_firebase_init_before_use',
+  'require_firebase_reauthentication',
+  'require_firebase_token_refresh',
   'incorrect_firebase_event_name',
   'incorrect_firebase_parameter_name',
 
@@ -677,6 +684,8 @@ const Set<String> recommendedOnlyRules = <String>{
   // Moved from Essential (style/quality, not crash prevention)
   // 'prefer_list_first' moved to stylisticRules (opinionated)
   // 'prefer_list_last' moved to stylisticRules (opinionated)
+  'avoid_deprecated_usage', // WARNING - deprecated API from other packages
+  'prefer_local_notification_for_immediate', // INFO - FCM vs local notifications
   'avoid_variable_shadowing',
   'avoid_string_substring',
   'prefer_single_container',
@@ -758,6 +767,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_small_touch_targets',
   'avoid_text_scale_factor_ignore',
   'require_image_semantics',
+  'require_text_scale_factor_awareness',
   'prefer_scalable_text',
   'require_safe_area_handling',
   'require_semantic_label_icons',
@@ -1469,6 +1479,21 @@ const Set<String> recommendedOnlyRules = <String>{
 const Set<String> professionalOnlyRules = <String>{
   // Type Safety (moved from Essential - not crash prevention)
   'avoid_dynamic_type', // Type safety best practice
+  // Error handling
+  'handle_throwing_invocations', // INFO - wrap throwing calls in try/catch
+  // Forms & navigation
+  'prefer_form_bloc_for_complex', // INFO - complex forms
+  'prefer_master_detail_for_large', // INFO - tablet list-detail
+  'prefer_batch_requests', // INFO - batch API calls
+  // Code quality (roadmap detail requirements)
+  'avoid_bool_in_widget_constructors',
+  'avoid_double_and_int_checks',
+  'avoid_equals_and_hash_code_on_mutable_classes',
+  'avoid_field_initializers_in_const_classes',
+  'avoid_implementing_value_types',
+  'avoid_null_checks_in_equality_operators',
+  'avoid_positional_boolean_parameters',
+  'avoid_setters_without_getters',
   // Widget Best Practices
   'prefer_widget_private_members', // Widget fields should be final/private
   // Architecture
@@ -2006,6 +2031,8 @@ const Set<String> professionalOnlyRules = <String>{
   'require_analytics_event_naming', // INFO - snake_case analytics events
   // Best practices (auto-assigned by severity)
   'avoid_adjacent_strings',
+  'avoid_classes_with_only_static_members',
+  'avoid_redundant_argument_values',
   'avoid_always_null_parameters',
   'avoid_autoplay_audio',
   'avoid_barrel_files',
@@ -2478,6 +2505,9 @@ const Set<String> professionalOnlyRules = <String>{
 /// Comprehensive tier rules - stricter patterns, optimization hints, edge cases.
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
+  // Code style / Web (roadmap detail requirements)
+  'avoid_js_rounded_ints',
+  'avoid_private_typedef_functions',
   // Import sorting
   'prefer_sorted_imports', // alphabetical import sorting within groups
   // Performance micro-optimizations (moved from Professional)
@@ -2485,6 +2515,10 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_prototype_item', // consistent sizing optimization
   'require_add_automatic_keep_alives_off', // memory efficiency
   'prefer_http_connection_reuse', // connection reuse
+  'prefer_binary_format', // INFO - protobuf/MessagePack for hot JSON
+  'prefer_pool_pattern', // INFO - object pool in hot loops
+  'require_compression', // INFO - Accept-Encoding gzip
+  'require_expando_cleanup', // INFO - Expando entry cleanup
   'avoid_redundant_requests', // resource efficiency
   'prefer_coarse_location_when_sufficient', // battery/precision tradeoff
   'prefer_image_precache', // image loading optimization

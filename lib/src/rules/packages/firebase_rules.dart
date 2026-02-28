@@ -2640,3 +2640,219 @@ class RequireFirebaseAppCheckProductionRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when sensitive Firebase Auth operations are used without reauthentication.
+///
+/// Firebase Auth requires recent sign-in for sensitive operations: [User.delete],
+/// [User.updateEmail], [User.updatePassword], [User.verifyBeforeUpdateEmail].
+/// This rule reports those calls when they appear in a method body before any
+/// call to [User.reauthenticateWithCredential] or [User.reauthenticateWithProvider]
+/// (by source offset). Only runs when the project depends on `firebase_auth`.
+///
+/// **Heuristic:** Receiver is matched by name (user, User, currentUser); methods
+/// from other types with the same names may cause false positives.
+///
+/// Since: ROADMAP §5.29 Firebase Advanced | Rule version: v1
+class RequireFirebaseReauthenticationRule extends SaropaLintRule {
+  RequireFirebaseReauthenticationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+    'reauthenticate',
+    'delete',
+    'updateEmail',
+    'updatePassword',
+    'user',
+  };
+
+  static const LintCode _code = LintCode(
+    'require_firebase_reauthentication',
+    '[require_firebase_reauthentication] Sensitive Firebase Auth operation (delete, updateEmail, updatePassword) used without reauthentication. Call reauthenticateWithCredential or reauthenticateWithProvider first. {v1}',
+    correctionMessage:
+        'Call reauthenticateWithCredential or reauthenticateWithProvider before the sensitive operation.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _sensitiveMethods = <String>{
+    'delete',
+    'updateEmail',
+    'updatePassword',
+    'verifyBeforeUpdateEmail',
+  };
+
+  static const Set<String> _reauthMethods = <String>{
+    'reauthenticateWithCredential',
+    'reauthenticateWithProvider',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (!ProjectContext.hasDependency(context.filePath, 'firebase_auth')) {
+      return;
+    }
+
+    context.addMethodDeclaration((MethodDeclaration node) {
+      final _FirebaseAuthVisitor visitor = _FirebaseAuthVisitor(
+        sensitiveMethods: _sensitiveMethods,
+        reauthMethods: _reauthMethods,
+      );
+      node.body.visitChildren(visitor);
+      // Use earliest reauth offset in source order (visitor order is DFS, not source).
+      final int? firstReauthOffset = visitor.reauthOffsets.isEmpty
+          ? null
+          : visitor.reauthOffsets.reduce((int a, int b) => a < b ? a : b);
+      for (final MethodInvocation call in visitor.sensitiveCalls) {
+        if (firstReauthOffset == null || call.offset < firstReauthOffset) {
+          reporter.atNode(call, _code);
+        }
+      }
+    });
+  }
+}
+
+class _FirebaseAuthVisitor extends RecursiveAstVisitor<void> {
+  _FirebaseAuthVisitor({
+    required this.sensitiveMethods,
+    required this.reauthMethods,
+  });
+
+  final Set<String> sensitiveMethods;
+  final Set<String> reauthMethods;
+  final List<MethodInvocation> sensitiveCalls = <MethodInvocation>[];
+  final List<int> reauthOffsets = <int>[];
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String name = node.methodName.name;
+    if (reauthMethods.contains(name)) {
+      reauthOffsets.add(node.offset);
+    }
+    if (sensitiveMethods.contains(name)) {
+      final Expression? target = node.target;
+      if (target != null) {
+        final String targetSrc = target.toSource();
+        if (targetSrc.contains('user') ||
+            targetSrc.contains('User') ||
+            targetSrc.contains('currentUser')) {
+          sensitiveCalls.add(node);
+        }
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when getIdToken() result is stored without idTokenChanges refresh handling.
+///
+/// Firebase ID tokens expire in one hour. Storing the token (variable, prefs, or
+/// API client) without subscribing to [FirebaseAuth.idTokenChanges] or using
+/// [User.getIdToken] with `forceRefresh: true` can lead to 401s. Only runs when
+/// the project depends on `firebase_auth`.
+///
+/// **Heuristic:** "Stored" is detected by assignment, VariableDeclaration
+/// initializer, or argument to setString/set/write. In-listener check is by
+/// walking parents for listen() on idTokenChanges().
+///
+/// Since: ROADMAP §5.29 Firebase Advanced | Rule version: v1
+class RequireFirebaseTokenRefreshRule extends SaropaLintRule {
+  RequireFirebaseTokenRefreshRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+    'getIdToken',
+    'idTokenChanges',
+    'user',
+  };
+
+  static const LintCode _code = LintCode(
+    'require_firebase_token_refresh',
+    '[require_firebase_token_refresh] getIdToken() result may be stored without token refresh. Use idTokenChanges().listen() or getIdToken(true). {v1}',
+    correctionMessage:
+        'Use idTokenChanges().listen() to update the stored token, or getIdToken(true) for one-off.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (!ProjectContext.hasDependency(context.filePath, 'firebase_auth')) {
+      return;
+    }
+
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'getIdToken') return;
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String targetSrc = target.toSource();
+      if (!targetSrc.contains('user') &&
+          !targetSrc.contains('User') &&
+          !targetSrc.contains('currentUser')) {
+        return;
+      }
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isNotEmpty && args.first.toSource() == 'true') {
+        return;
+      }
+      if (_isInsideIdTokenChangesListener(node)) return;
+      if (_resultIsStored(node)) {
+        reporter.atNode(node, _code);
+      }
+    });
+  }
+
+  bool _isInsideIdTokenChangesListener(MethodInvocation node) {
+    AstNode? current = node.parent;
+    int depth = 0;
+    while (current != null && depth < 15) {
+      if (current is MethodInvocation) {
+        if (current.methodName.name == 'listen') {
+          final Expression? t = current.target;
+          if (t != null && t.toSource().contains('idTokenChanges')) {
+            return true;
+          }
+        }
+      }
+      current = current.parent;
+      depth++;
+    }
+    return false;
+  }
+
+  /// True if the getIdToken() result is stored (variable, assignment, or prefs).
+  bool _resultIsStored(MethodInvocation node) {
+    AstNode? current = node.parent;
+    for (int i = 0; i < 5 && current != null; i++) {
+      if (current is AssignmentExpression) return true;
+      if (current is VariableDeclaration)
+        return true; // final t = await user.getIdToken()
+      if (current is ArgumentList) {
+        final AstNode? grand = current.parent;
+        if (grand is MethodInvocation) {
+          final String name = grand.methodName.name;
+          if (name == 'setString' || name == 'set' || name == 'write') {
+            return true;
+          }
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}

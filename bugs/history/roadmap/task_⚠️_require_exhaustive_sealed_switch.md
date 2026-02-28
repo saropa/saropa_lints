@@ -1,10 +1,14 @@
+> **IMPLEMENTED — v6.0.7**
+>
+> `RequireExhaustiveSealedSwitchRule` in `lib/src/rules/code_quality_rules.dart`. Essential tier. Same logic as `avoid_wildcard_cases_with_sealed_classes`; Essential-tier name for teams that want exhaustiveness without full comprehensive set.
+
 # Task: `require_exhaustive_sealed_switch`
 
 ## Summary
 - **Rule Name**: `require_exhaustive_sealed_switch`
 - **Tier**: Essential
 - **Severity**: WARNING
-- **Status**: Planned
+- **Status**: Implemented
 - **Source**: ROADMAP.md §4.1 Dart 3.x Feature Rules
 
 ## Problem Statement

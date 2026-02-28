@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 4.7.6)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 4.7.7)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -17,7 +17,7 @@
 #
 # TIER GUIDE
 # ==========
-# - essential      : Critical rules (~340) - prevents crashes, security issues
+# - essential      : Critical rules (~345) - prevents crashes, security issues
 # - recommended    : Essential + common mistakes (~850) - default for most teams
 # - professional   : Recommended + architecture/testing (~1590) - enterprise teams
 # - comprehensive  : Professional + thorough coverage (~1640) - quality obsessed
@@ -1555,3 +1555,30 @@ saropa_lints:
     # --- Firebase ---
     - avoid_firebase_user_data_in_auth: false          # WARNING - too many custom claims (v5.1.0)
     - require_firebase_app_check_production: false     # WARNING - missing App Check (v5.1.0)
+
+    # =========================================================================
+    # V6.0.8 ROADMAP 15 RULES
+    # =========================================================================
+
+    # --- Stylistic ---
+    - avoid_escaping_inner_quotes: false                 # INFO - use opposite quote style (v6.0.8)
+    - avoid_single_cascade_in_expression_statements: false # INFO - single cascade, use normal call (v6.0.8)
+    - avoid_function_literals_in_foreach_calls: false   # INFO - forEach with function literal (v6.0.8)
+
+    # --- Recommended ---
+    - avoid_classes_with_only_static_members: false    # INFO - prefer top-level or mixin (v6.0.8)
+    - avoid_redundant_argument_values: false           # INFO - default value passed explicitly (v6.0.8)
+
+    # --- Professional ---
+    - avoid_bool_in_widget_constructors: false         # WARNING - positional bool in widget (v6.0.8)
+    - avoid_double_and_int_checks: false               # WARNING - is int / is double type checks (v6.0.8)
+    - avoid_equals_and_hash_code_on_mutable_classes: false # WARNING - equality on mutable class (v6.0.8)
+    - avoid_field_initializers_in_const_classes: false # WARNING - non-const field init in const class (v6.0.8)
+    - avoid_implementing_value_types: false            # WARNING - class implements value-type (v6.0.8)
+    - avoid_null_checks_in_equality_operators: false   # WARNING - == null in operator== (v6.0.8)
+    - avoid_positional_boolean_parameters: false       # WARNING - bool param without name (v6.0.8)
+    - avoid_setters_without_getters: false             # WARNING - setter without getter (v6.0.8)
+
+    # --- Comprehensive ---
+    - avoid_js_rounded_ints: false                     # INFO - int literal > JS safe integer (v6.0.8)
+    - avoid_private_typedef_functions: false           # INFO - private typedef for function (v6.0.8)

@@ -68,6 +68,7 @@ void main() {
       'avoid_weak_cryptographic_algorithms',
       'avoid_wildcard_cases_with_enums',
       'avoid_wildcard_cases_with_sealed_classes',
+      'require_exhaustive_sealed_switch',
       'function_always_returns_null',
       'function_always_returns_same_value',
       'match_base_class_default_value',

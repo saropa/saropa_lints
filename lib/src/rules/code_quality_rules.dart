@@ -5076,6 +5076,68 @@ class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
   }
 }
 
+/// Warns when switch on sealed types uses default or wildcard, defeating exhaustiveness.
+///
+/// Same logic as [AvoidWildcardCasesWithSealedClassesRule]; this rule is the
+/// Essential-tier name so teams can enable exhaustiveness without the full
+/// comprehensive set. Switch on a sealed type must list every subtype explicitly;
+/// [default:] or [_] hides new subtypes and defeats compile-time checking.
+///
+/// **Bad:** `default: return 0;` or `_ => x` on a sealed selector.
+/// **Good:** Explicit `case Circle():` / `case Square():` for every subtype.
+///
+/// Since: ROADMAP §4.1 Dart 3.x | Rule version: v1
+class RequireExhaustiveSealedSwitchRule extends SaropaLintRule {
+  RequireExhaustiveSealedSwitchRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'require_exhaustive_sealed_switch',
+    '[require_exhaustive_sealed_switch] Switch on a sealed class uses a default or wildcard case, suppressing exhaustiveness checking. Add explicit cases for every sealed subtype so the compiler reports an error when new subtypes are introduced. {v1}',
+    correctionMessage:
+        'Remove the default/wildcard case and add explicit case clauses for every sealed subtype.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addSwitchStatement((SwitchStatement node) {
+      final DartType? type = node.expression.staticType;
+      if (type == null) return;
+      final Element? element = type.element;
+      if (element is! ClassElement) return;
+      if (!element.isSealed) return;
+      for (final SwitchMember member in node.members) {
+        if (member is SwitchDefault) {
+          reporter.atNode(member);
+        }
+      }
+    });
+
+    context.addSwitchExpression((SwitchExpression node) {
+      final DartType? type = node.expression.staticType;
+      if (type == null) return;
+      final Element? element = type.element;
+      if (element is! ClassElement) return;
+      if (!element.isSealed) return;
+      for (final SwitchExpressionCase caseClause in node.cases) {
+        final DartPattern pattern = caseClause.guardedPattern.pattern;
+        if (pattern is WildcardPattern) {
+          reporter.atNode(pattern);
+        }
+      }
+    });
+  }
+}
+
 /// Warns when switch expression cases have identical expressions.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
@@ -8581,5 +8643,171 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
 
       reporter.atNode(expression);
     });
+  }
+}
+
+// =============================================================================
+// avoid_deprecated_usage
+// =============================================================================
+
+/// Warns when using deprecated APIs from other packages (WARNING severity).
+///
+/// Dart's built-in deprecated_member_use is INFO; this rule provides a
+/// stronger signal and ignores same-package usage by default (migration).
+///
+/// **BAD:**
+/// ```dart
+/// final text = someWidget.textTheme.headline1; // deprecated in Material3
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final text = someWidget.textTheme.displayLarge;
+/// ```
+class AvoidDeprecatedUsageRule extends SaropaLintRule {
+  AvoidDeprecatedUsageRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'avoid_deprecated_usage',
+    '[avoid_deprecated_usage] Using a deprecated API from another package. '
+        'Migrate to the replacement API. No migration guidance provided.',
+    correctionMessage:
+        'Replace with the non-deprecated API. Check the @Deprecated message for migration guidance.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static bool _isDeprecated(Element? element) {
+    if (element == null) return false;
+    for (final ann in element.metadata as dynamic) {
+      if ((ann as ElementAnnotation).isDeprecated) return true;
+    }
+    if (element is ConstructorElement) {
+      for (final ann in element.enclosingElement.metadata as dynamic) {
+        if ((ann as ElementAnnotation).isDeprecated) return true;
+      }
+    }
+    return false;
+  }
+
+  static bool _isSamePackage(Element? element, String filePath) {
+    if (element == null) return true;
+    final uri = element.library?.uri.toString() ?? '';
+    if (!uri.startsWith('package:')) return true;
+    final rest = uri.substring(8);
+    final slash = rest.indexOf('/');
+    final elementPackage = slash >= 0 ? rest.substring(0, slash) : rest;
+    final root = ProjectContext.findProjectRoot(filePath);
+    if (root == null) return true;
+    final currentPackage = ProjectContext.getPackageName(root);
+    return elementPackage == currentPackage;
+  }
+
+  static bool _isGeneratedFile(String path) {
+    return path.endsWith('.g.dart') ||
+        path.endsWith('.freezed.dart') ||
+        path.endsWith('.gen.dart');
+  }
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final path = context.filePath;
+    if (_isGeneratedFile(path)) return;
+
+    void checkElement(Element? element, AstNode node) {
+      if (element == null) return;
+      if (!_isDeprecated(element)) return;
+      if (_isSamePackage(element, path)) return;
+      reporter.atNode(node);
+    }
+
+    context.addMethodInvocation((MethodInvocation node) {
+      checkElement((node.methodName as dynamic).staticElement, node);
+    });
+    context.addPropertyAccess((PropertyAccess node) {
+      checkElement((node.propertyName as dynamic).staticElement, node);
+    });
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      checkElement((node.constructorName as dynamic).staticElement, node);
+    });
+  }
+}
+
+/// Warns when a function or constructor has positional bool parameters.
+///
+/// Named parameters make call sites readable: `login(rememberMe: true)` vs `login(true)`.
+///
+/// **Bad:**
+/// ```dart
+/// void setPermissions(bool canRead, bool canWrite) {}
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// void setPermissions({required bool canRead, required bool canWrite}) {}
+/// ```
+class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
+  AvoidPositionalBooleanParametersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_positional_boolean_parameters',
+    '[avoid_positional_boolean_parameters] Positional bool parameter makes call sites unreadable. Use named parameters for clarity.',
+    correctionMessage:
+        'Convert to a named parameter so call sites are self-documenting.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addFormalParameterList((FormalParameterList node) {
+      final AstNode? parent = node.parent;
+      if (parent is MethodDeclaration) {
+        if (parent.isOperator || parent.isSetter) return;
+        if (parent.metadata.any((a) => a.name.name == 'override')) return;
+      } else if (parent is FunctionExpression) {
+        return;
+      } else if (parent is FunctionTypedFormalParameter) {
+        return;
+      }
+      for (final FormalParameter p in node.parameters) {
+        if (p is DefaultFormalParameter) {
+          if (p.parameter is! SimpleFormalParameter) continue;
+          if (!_isPositional(node, p)) continue;
+          final SimpleFormalParameter sp = p.parameter as SimpleFormalParameter;
+          if (_isBoolType(sp)) reporter.atNode(p);
+        } else if (p is SimpleFormalParameter) {
+          if (!_isPositional(node, p)) continue;
+          if (_isBoolType(p)) reporter.atNode(p);
+        }
+      }
+    });
+  }
+
+  bool _isPositional(FormalParameterList list, FormalParameter p) {
+    return p.isNamed == false;
+  }
+
+  bool _isBoolType(SimpleFormalParameter p) {
+    final TypeAnnotation? type = p.type;
+    if (type is! NamedType) return false;
+    final String name = type.name.lexeme;
+    return name == 'bool';
   }
 }

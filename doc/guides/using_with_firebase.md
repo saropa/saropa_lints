@@ -23,6 +23,8 @@ Standard linters see valid Dart code. saropa_lints understands Firebase's requir
 | Missing background handler | Background messages lost | `require_background_message_handler` |
 | Missing Crashlytics user ID | Can't identify affected users | `require_crashlytics_user_id` |
 | Missing App Check | API abuse vulnerability | `require_firebase_app_check` |
+| Sensitive Auth op without reauth | requires-recent-login crash | `require_firebase_reauthentication` |
+| Stored ID token without refresh | 401 after 1 hour | `require_firebase_token_refresh` |
 
 ## What saropa_lints Catches
 
