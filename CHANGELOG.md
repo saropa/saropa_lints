@@ -16,6 +16,17 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 
+- 9 new lint rules from roadmap detail requirements (banned_usage, prefer_csrf_protection, prefer_no_commented_code alias, prefer_semver_version, prefer_sqflite_encryption, require_conflict_resolution_strategy, require_connectivity_timeout, require_init_state_idempotent, require_input_validation):
+  - `banned_usage` (Professional, WARNING) — Configurable ban list for identifiers (e.g. `print`). No-op without config in `analysis_options_custom.yaml`. Whole-word match; optional `allowedFiles` per entry.
+  - `prefer_csrf_protection` (Professional, WARNING) — State-changing HTTP with Cookie header must include CSRF token or Bearer auth. Web/WebView projects only. OWASP M3/A07.
+  - `prefer_no_commented_code` — Alias for existing `prefer_no_commented_out_code` (stylistic).
+  - `prefer_semver_version` (Essential, WARNING) — pubspec.yaml `version` must be major.minor.patch (e.g. 1.0.0, 2.3.1+4). Reports when invalid.
+  - `prefer_sqflite_encryption` (Professional, WARNING) — Sensitive DB paths (user/auth/health/payment etc.) with sqflite should use sqflite_sqlcipher. OWASP M9.
+  - `require_conflict_resolution_strategy` (Professional, WARNING) — Sync/upload/push methods that overwrite data should compare timestamps or show conflict UI.
+  - `require_connectivity_timeout` (Essential, WARNING) — HTTP/client/dio requests must have a timeout (e.g. `.timeout(Duration(seconds: 30))`).
+  - `require_init_state_idempotent` (Essential, WARNING) — addListener/addObserver in initState must have matching removeListener/removeObserver in dispose (Flutter widget files).
+  - `require_input_validation` (Essential, WARNING) — Raw controller `.text` in post/put/patch body without trim/validate/isEmpty. OWASP M1/M4.
+
 - 12 new lint rules from roadmap detail requirements:
   - `avoid_unnecessary_containers` (Recommended, INFO) — Container with only child (and optionally key); remove and use child directly (widget files only).
   - `prefer_adjacent_strings` (Recommended, INFO) — use adjacent string literals instead of `+` for literal concatenation.

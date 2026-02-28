@@ -2104,3 +2104,224 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 }
+
+/// Warns when combining `is int` and `is double` checks on the same expression.
+///
+/// `value is int && value is double` is always false (disjoint types).
+/// `value is int || value is double` is equivalent to `value is num`.
+///
+/// **Bad:**
+/// ```dart
+/// if (value is int && value is double) { }
+/// return value is int || value is double;
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// if (value is num) { }
+/// return value is num;
+/// ```
+class AvoidDoubleAndIntChecksRule extends SaropaLintRule {
+  AvoidDoubleAndIntChecksRule() : super(code: _codeAlwaysFalse);
+  @override
+  LintImpact get impact => LintImpact.medium;
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _codeAlwaysFalse = LintCode(
+    'avoid_double_and_int_checks',
+    '[avoid_double_and_int_checks] Condition is always false: int and double are disjoint types in Dart; no value can be both.',
+    correctionMessage:
+        'Remove this dead condition or use a single type check (e.g. is num).',
+    severity: DiagnosticSeverity.INFO,
+  );
+  static const LintCode _codePreferNum = LintCode(
+    'avoid_double_and_int_checks',
+    '[avoid_double_and_int_checks] Prefer "value is num" instead of "value is int || value is double".',
+    correctionMessage: 'Replace with: value is num',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBinaryExpression((BinaryExpression node) {
+      final TokenType op = node.operator.type;
+      if (op != TokenType.AMPERSAND_AMPERSAND && op != TokenType.BAR_BAR) {
+        return;
+      }
+      final Expression left = node.leftOperand;
+      final Expression right = node.rightOperand;
+      final IsExpression? leftIs = left is IsExpression ? left : null;
+      final IsExpression? rightIs = right is IsExpression ? right : null;
+      if (leftIs == null || rightIs == null) return;
+      final String? leftName = _typeName(leftIs.type);
+      final String? rightName = _typeName(rightIs.type);
+      if (leftName == null || rightName == null) return;
+      final bool oneInt = leftName == 'int' || rightName == 'int';
+      final bool oneDouble = leftName == 'double' || rightName == 'double';
+      if (!oneInt || !oneDouble) return;
+      if (_targetSource(leftIs) != _targetSource(rightIs)) return;
+      if (op == TokenType.AMPERSAND_AMPERSAND) {
+        reporter.atNode(node, _codeAlwaysFalse);
+      } else {
+        reporter.atNode(node, _codePreferNum);
+      }
+    });
+  }
+
+  String? _typeName(TypeAnnotation type) {
+    if (type is NamedType) return type.name.lexeme;
+    return null;
+  }
+
+  String _targetSource(IsExpression node) => node.expression.toSource();
+}
+
+/// Prefer if element over ternary with null in collection literals.
+///
+/// Detects ternary expressions inside list/set/map literals where one branch is
+/// null (e.g. `condition ? widget : null`). Use `if (condition) widget` instead
+/// to avoid null entries and downstream .whereType/.whereNotNull.
+///
+/// **Bad:** `[condition ? Widget() : null]`
+/// **Good:** `[if (condition) Widget()]`
+class PreferIfElementsToConditionalExpressionsRule extends SaropaLintRule {
+  PreferIfElementsToConditionalExpressionsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_if_elements_to_conditional_expressions',
+    '[prefer_if_elements_to_conditional_expressions] Use if element instead of ternary with null in collection literals.',
+    correctionMessage:
+        'Replace with if (condition) expr or if (!condition) expr for the non-null branch.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addConditionalExpression((ConditionalExpression node) {
+      final parent = node.parent;
+      if (parent is! ListLiteral && parent is! SetOrMapLiteral) return;
+      final thenNull = node.thenExpression is NullLiteral;
+      final elseNull = node.elseExpression is NullLiteral;
+      if (!thenNull && !elseNull) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Prefer null-aware call (?.) over explicit null check then call.
+///
+/// Flags `if (x != null) { x.method(); }` and `x != null ? x.method() : null`
+/// when the guarded expression is a simple identifier. Replacing with `x?.method()`
+/// is idiomatic and avoids redundant branches.
+class PreferNullAwareMethodCallsRule extends SaropaLintRule {
+  PreferNullAwareMethodCallsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_null_aware_method_calls',
+    '[prefer_null_aware_method_calls] Use null-aware operator (?.) instead of explicit null check and call.',
+    correctionMessage: 'Replace with receiver?.method().',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addIfStatement((IfStatement node) {
+      if (node.elseStatement != null) return;
+      final expr = node.expression;
+      if (expr is! BinaryExpression || expr.operator.type != TokenType.BANG_EQ)
+        return;
+      final left = expr.leftOperand;
+      final right = expr.rightOperand;
+      final isNullLeft = left is NullLiteral;
+      final isNullRight = right is NullLiteral;
+      if (!isNullLeft && !isNullRight) return;
+      final guarded = isNullLeft ? right : left;
+      if (guarded is! SimpleIdentifier && guarded is! PrefixedIdentifier)
+        return;
+      Statement thenStmt = node.thenStatement;
+      if (thenStmt is Block && thenStmt.statements.length == 1) {
+        thenStmt = thenStmt.statements.single;
+      }
+      if (thenStmt is! ExpressionStatement) return;
+      final inner = thenStmt.expression;
+      Expression? target;
+      if (inner is MethodInvocation) {
+        target = inner.target;
+      } else if (inner is PropertyAccess) {
+        target = inner.target;
+      } else {
+        return;
+      }
+      if (target == null) return;
+      String? guardedName;
+      if (guarded is SimpleIdentifier) {
+        guardedName = guarded.name;
+      } else if (guarded is PrefixedIdentifier) {
+        guardedName = guarded.identifier.name;
+      }
+      if (guardedName == null) return;
+      if (target is SimpleIdentifier && target.name == guardedName) {
+        reporter.atNode(node);
+      } else if (target is PrefixedIdentifier &&
+          target.identifier.name == guardedName) {
+        reporter.atNode(node);
+      }
+    });
+
+    context.addConditionalExpression((ConditionalExpression node) {
+      final cond = node.condition;
+      if (cond is! BinaryExpression || cond.operator.type != TokenType.BANG_EQ)
+        return;
+      final left = cond.leftOperand;
+      final right = cond.rightOperand;
+      final isNullLeft = left is NullLiteral;
+      final isNullRight = right is NullLiteral;
+      if (!isNullLeft && !isNullRight) return;
+      final guarded = isNullLeft ? right : left;
+      if (guarded is! SimpleIdentifier && guarded is! PrefixedIdentifier)
+        return;
+      if (node.elseExpression is! NullLiteral) return;
+      final thenExpr = node.thenExpression;
+      Expression? target;
+      if (thenExpr is MethodInvocation) {
+        target = thenExpr.target;
+      } else if (thenExpr is PropertyAccess) {
+        target = thenExpr.target;
+      } else {
+        return;
+      }
+      if (target == null) return;
+      final guardedName = guarded is SimpleIdentifier
+          ? guarded.name
+          : (guarded as PrefixedIdentifier).identifier.name;
+      if (target is SimpleIdentifier && target.name == guardedName) {
+        reporter.atNode(node);
+      } else if (target is PrefixedIdentifier &&
+          target.identifier.name == guardedName) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}

@@ -2529,3 +2529,130 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
     return false;
   }
 }
+
+/// Warns when .forEach() is called with a function literal instead of a for-in loop.
+///
+/// For-in supports break, continue, return, and await; forEach does not.
+///
+/// **Bad:**
+/// ```dart
+/// items.forEach((e) => print(e));
+/// items.forEach((e) { doSomething(e); });
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// for (final e in items) { print(e); }
+/// items.forEach(print);  // tearoff is OK
+/// ```
+class AvoidFunctionLiteralsInForeachCallsRule extends SaropaLintRule {
+  AvoidFunctionLiteralsInForeachCallsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_function_literals_in_foreach_calls',
+    '[avoid_function_literals_in_foreach_calls] forEach called with a function literal. Prefer a for-in loop for break/continue/return/await support.',
+    correctionMessage: 'Replace with: for (final element in target) { ... }',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'forEach') return;
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.length != 1) return;
+      if (args.first is! FunctionExpression) return;
+      final DartType? targetType = node.realTarget?.staticType;
+      if (targetType != null && _isMapType(targetType)) return;
+      reporter.atNode(node);
+    });
+  }
+
+  bool _isMapType(DartType type) {
+    if (type is InterfaceType) {
+      final String? name = type.element.name;
+      if (name == 'Map') return true;
+    }
+    return false;
+  }
+}
+
+/// Prefer inline collection literal over empty literal followed by add/addAll.
+///
+/// Flags a local variable initialized with an empty list/set literal and
+/// immediately followed by one or more .add() or .addAll() calls on the same
+/// variable with no other use in between. Only applies to consecutive
+/// statements in the same block (conditional or loop adds are not inlined).
+///
+/// **Bad:** `final items = <String>[];` then `items.add('a'); items.add('b');`
+/// **Good:** `final items = <String>['a', 'b'];`
+class PreferInlinedAddsRule extends SaropaLintRule {
+  PreferInlinedAddsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_inlined_adds',
+    '[prefer_inlined_adds] Prefer inline collection literal instead of empty literal followed by add/addAll.',
+    correctionMessage:
+        'Replace with a single literal containing the elements (e.g. <String>[\'a\', \'b\']).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBlock((Block block) {
+      final statements = block.statements;
+      for (int i = 0; i < statements.length - 1; i++) {
+        final stmt = statements[i];
+        if (stmt is! VariableDeclarationStatement) continue;
+        final decl = stmt.variables;
+        if (decl.variables.length != 1) continue;
+        final variable = decl.variables.first;
+        final init = variable.initializer;
+        if (!_isEmptyListOrSet(init)) continue;
+        final varName = variable.name.lexeme;
+        int j = i + 1;
+        while (j < statements.length && _isAddCall(statements[j], varName)) {
+          j++;
+        }
+        if (j > i + 1) {
+          reporter.atNode(variable);
+        }
+      }
+    });
+  }
+
+  bool _isEmptyListOrSet(Expression? expr) {
+    if (expr is ListLiteral) return expr.elements.isEmpty;
+    if (expr is SetOrMapLiteral) return expr.elements.isEmpty;
+    return false;
+  }
+
+  bool _isAddCall(Statement stmt, String varName) {
+    if (stmt is! ExpressionStatement) return false;
+    final expr = stmt.expression;
+    if (expr is! MethodInvocation) return false;
+    final target = expr.target;
+    if (target is! SimpleIdentifier) return false;
+    if (target.name != varName) return false;
+    final name = expr.methodName.name;
+    return name == 'add' || name == 'addAll';
+  }
+}
