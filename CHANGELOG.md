@@ -14,6 +14,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
+### Changed
+
+- **Init wizard (stylistic walkthrough):** Boolean naming rules are in their own category so "[a] enable all in category" applies to all four; progress shows global position (e.g. 51/143) on resume instead of resetting to 1/N; GOOD/BAD labels are bold and colored; the four boolean rules now have distinct good/bad examples (fields, params, locals, and all booleans) so the wizard differentiates them clearly.
+
 ### Fixed
 
 - `require_minimum_contrast` — ignore comments were not honored; rule now respects `// ignore: require_minimum_contrast` and `// ignore_for_file: require_minimum_contrast` (and hyphenated forms) via `IgnoreUtils`
