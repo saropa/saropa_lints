@@ -1,5 +1,10 @@
 # Task: `require_ssl_pinning_sensitive`
 
+## Implemented (Unreleased)
+Rule implemented in `lib/src/rules/api_network_rules.dart`. Flags HTTP POST/PUT/PATCH to URLs with /auth, /login, /token etc. when project lacks http_certificate_pinning or ssl_pinning_plugin. Suppressed for localhost and path-only URLs that are HTTPS in practice. Fixture: `example_async/lib/api_network/require_ssl_pinning_sensitive_fixture.dart`.
+
+---
+
 ## Summary
 - **Rule Name**: `require_ssl_pinning_sensitive`
 - **Tier**: Professional

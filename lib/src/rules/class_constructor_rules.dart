@@ -1544,6 +1544,573 @@ class AvoidUnusedConstructorParametersRule extends SaropaLintRule {
   }
 }
 
+/// Warns when a class with a const constructor has instance fields with inline initializers that should be in the initializer list.
+///
+/// **Bad:**
+/// ```dart
+/// class ApiClient {
+///   const ApiClient({required this.baseUrl});
+///   final String baseUrl;
+///   final Duration timeout = Duration(seconds: 30);
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class ApiClient {
+///   const ApiClient({required this.baseUrl}) : timeout = const Duration(seconds: 30);
+///   final String baseUrl;
+///   final Duration timeout;
+/// }
+/// ```
+class AvoidFieldInitializersInConstClassesRule extends SaropaLintRule {
+  AvoidFieldInitializersInConstClassesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'avoid_field_initializers_in_const_classes',
+    '[avoid_field_initializers_in_const_classes] Const class has a field with an inline initializer. Prefer moving it to the constructor initializer list for clarity.',
+    correctionMessage:
+        'Move the field initializer to the const constructor initializer list.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      bool hasConstConstructor = false;
+      for (final ClassMember m in node.members) {
+        if (m is ConstructorDeclaration &&
+            m.constKeyword != null &&
+            (m.factoryKeyword?.isSynthetic ?? true)) {
+          hasConstConstructor = true;
+          break;
+        }
+      }
+      if (!hasConstConstructor) return;
+      for (final ClassMember m in node.members) {
+        if (m is! FieldDeclaration || m.isStatic) continue;
+        for (final VariableDeclaration v in m.fields.variables) {
+          final Expression? init = v.initializer;
+          if (init == null) continue;
+          if (_isSimpleLiteralOrConst(init)) continue;
+          reporter.atNode(m);
+          return;
+        }
+      }
+    });
+  }
+
+  static bool _isSimpleLiteralOrConst(Expression e) {
+    if (e is NullLiteral ||
+        e is BooleanLiteral ||
+        e is IntegerLiteral ||
+        e is DoubleLiteral ||
+        e is SimpleStringLiteral) {
+      return true;
+    }
+    if (e is InstanceCreationExpression && e.isConst) {
+      return true;
+    }
+    return false;
+  }
+}
+
+/// Warns when a `late` non-final field is accessed without an initialization
+/// check when it may be set outside the constructor or initState.
+///
+/// **Category:** Class & constructor (late initialization safety).
+/// **Since:** v4.14.0 | **Rule version:** v1
+///
+/// `late` variables throw [LateInitializationError] if read before assignment.
+/// When a field is set in methods like `initialize()` or `setToken()` but
+/// read in other methods like `getHeaders()`, call order is uncertain and
+/// can cause runtime crashes. This rule uses a heuristic: it flags any read
+/// in a non-constructor, non-initState method when the field is assigned in
+/// any other such method. It does not perform full control-flow analysis.
+///
+/// **Bad:**
+/// ```dart
+/// class AuthService {
+///   late String _token;
+///   void setToken(String token) { _token = token; }
+///   Map<String, String> getHeaders() {
+///     return {'Authorization': 'Bearer $_token'}; // May crash
+///   }
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class AuthService {
+///   String? _token;
+///   Map<String, String> getHeaders() {
+///     final token = _token;
+///     if (token == null) return {};
+///     return {'Authorization': 'Bearer $token'};
+///   }
+/// }
+/// ```
+class RequireLateAccessCheckRule extends SaropaLintRule {
+  RequireLateAccessCheckRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => {'late '};
+
+  static const LintCode _code = LintCode(
+    'require_late_access_check',
+    '[require_late_access_check] late field may be read before initialization. '
+        'When a late non-final field is set in a method other than the '
+        'constructor or initState, access in other methods can throw '
+        'LateInitializationError if call order is wrong. {v1}',
+    correctionMessage:
+        'Use a nullable type (e.g. String?) and check before use, or add an '
+        'initialization guard (e.g. if (!_initialized) throw StateError(...)) '
+        'before reading the late field.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addFieldDeclaration((FieldDeclaration node) {
+      if (!node.fields.isLate || node.fields.isFinal) return;
+      final parent = node.parent;
+      if (parent is! ClassDeclaration) return;
+
+      final fieldNames = <String>{};
+      for (final v in node.fields.variables) {
+        fieldNames.add(v.name.lexeme);
+      }
+
+      final hasNonConstructorAssignment = _hasNonConstructorAssignment(
+        parent,
+        fieldNames,
+      );
+      if (!hasNonConstructorAssignment) return;
+
+      final unsafeReads = _findUncheckedAccesses(parent, fieldNames);
+      for (final read in unsafeReads) {
+        reporter.atNode(read);
+      }
+    });
+  }
+
+  static bool _hasNonConstructorAssignment(
+    ClassDeclaration classDecl,
+    Set<String> fieldNames,
+  ) {
+    for (final member in classDecl.members) {
+      if (member is! MethodDeclaration) continue;
+      final name = member.name.lexeme;
+      if (_isConstructorOrInitState(name)) continue;
+      if (_methodAssignsToFields(member, fieldNames)) return true;
+    }
+    return false;
+  }
+
+  static bool _isConstructorOrInitState(String methodName) {
+    return methodName == 'initState' || methodName == '';
+  }
+
+  static bool _methodAssignsToFields(
+    MethodDeclaration method,
+    Set<String> fieldNames,
+  ) {
+    var assigns = false;
+    method.visitChildren(_AssignmentFinder(fieldNames, (() => assigns = true)));
+    return assigns;
+  }
+
+  static List<SimpleIdentifier> _findUncheckedAccesses(
+    ClassDeclaration classDecl,
+    Set<String> fieldNames,
+  ) {
+    final reads = <SimpleIdentifier>[];
+    for (final member in classDecl.members) {
+      if (member is! MethodDeclaration) continue;
+      if (_isConstructorOrInitState(member.name.lexeme)) continue;
+      member.visitChildren(_ReadFinder(fieldNames, reads));
+    }
+    return reads;
+  }
+}
+
+class _AssignmentFinder extends RecursiveAstVisitor<void> {
+  _AssignmentFinder(this._fieldNames, this._onAssign);
+
+  final Set<String> _fieldNames;
+  final void Function() _onAssign;
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final left = node.leftHandSide;
+    if (left is SimpleIdentifier && _fieldNames.contains(left.name)) {
+      _onAssign();
+    }
+    super.visitAssignmentExpression(node);
+  }
+}
+
+class _ReadFinder extends RecursiveAstVisitor<void> {
+  _ReadFinder(this._fieldNames, this._reads);
+
+  final Set<String> _fieldNames;
+  final List<SimpleIdentifier> _reads;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (_fieldNames.contains(node.name)) _reads.add(node);
+    super.visitSimpleIdentifier(node);
+  }
+}
+
+/// Warns when assert() in a constructor body could be moved to the initializer list.
+///
+/// Initializer list asserts run before the body and work in const constructors.
+///
+/// Since: v6.0.8 | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// Radius(this.value) {
+///   assert(value >= 0, 'Radius must be non-negative');
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// Radius(this.value) : assert(value >= 0, 'Radius must be non-negative');
+/// ```
+class PreferAssertsInInitializerListsRule extends SaropaLintRule {
+  PreferAssertsInInitializerListsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_asserts_in_initializer_lists',
+    '[prefer_asserts_in_initializer_lists] assert() in constructor body could be moved to the initializer list. Initializer list asserts run at construction time and work in const constructors.',
+    correctionMessage:
+        'Move the assert to the constructor initializer list (after the parameter list, before the body).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
+      if (node.factoryKeyword != null) return;
+      final bool isRedirecting = node.initializers.any(
+        (ConstructorInitializer i) => i is RedirectingConstructorInvocation,
+      );
+      if (isRedirecting) return;
+
+      final FunctionBody body = node.body;
+      if (body is! BlockFunctionBody) return;
+
+      final List<Statement> statements = body.block.statements;
+      final Set<String> paramNames = _constructorParamNames(node);
+
+      for (final Statement stmt in statements) {
+        if (stmt is! AssertStatement) break;
+        if (!_assertConditionSafeForInitializerList(
+          stmt.condition,
+          paramNames,
+        )) {
+          continue;
+        }
+        reporter.atNode(stmt);
+      }
+    });
+  }
+
+  static Set<String> _constructorParamNames(ConstructorDeclaration node) {
+    final Set<String> names = <String>{};
+    for (final FormalParameter p in node.parameters.parameters) {
+      final FormalParameter inner = p is DefaultFormalParameter
+          ? p.parameter
+          : p;
+      if (inner is FieldFormalParameter && inner.name.lexeme.isNotEmpty) {
+        names.add(inner.name.lexeme);
+      } else if (inner is SimpleFormalParameter && inner.name?.lexeme != null) {
+        names.add(inner.name!.lexeme);
+      }
+    }
+    return names;
+  }
+
+  static bool _assertConditionSafeForInitializerList(
+    Expression condition,
+    Set<String> paramNames,
+  ) {
+    bool safe = true;
+    condition.visitChildren(
+      _AssertConditionVisitor(paramNames, () => safe = false),
+    );
+    return safe;
+  }
+}
+
+class _AssertConditionVisitor extends RecursiveAstVisitor<void> {
+  _AssertConditionVisitor(this._paramNames, this._onUnsafe);
+
+  final Set<String> _paramNames;
+  final void Function() _onUnsafe;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Only instance calls on this are unsafe in initializer list.
+    if (node.target is ThisExpression) {
+      _onUnsafe();
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    final Expression? target = node.target;
+    if (target is ThisExpression) {
+      if (!_paramNames.contains(node.propertyName.name)) {
+        _onUnsafe();
+      }
+    }
+    super.visitPropertyAccess(node);
+  }
+}
+
+/// Warns when an @immutable class (e.g. StatelessWidget) has no const constructor.
+///
+/// Immutable classes with only final fields should expose a const constructor
+/// so call sites can use const and reduce allocations.
+///
+/// **Bad:**
+/// ```dart
+/// @immutable
+/// class Config {
+///   Config({required this.url});
+///   final String url;
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// @immutable
+/// class Config {
+///   const Config({required this.url});
+///   final String url;
+/// }
+/// ```
+class PreferConstConstructorsInImmutablesRule extends SaropaLintRule {
+  PreferConstConstructorsInImmutablesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_const_constructors_in_immutables',
+    '[prefer_const_constructors_in_immutables] @immutable class has no const constructor. Add a const constructor so call sites can use const and reduce allocations.',
+    correctionMessage:
+        'Add the const keyword to the constructor. Ensure all field initializers are const-capable.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      if (!_isImmutableClass(node)) return;
+
+      bool allFinal = true;
+      bool hasGenerativeConstructor = false;
+      bool hasConstConstructor = false;
+
+      for (final ClassMember m in node.members) {
+        if (m is FieldDeclaration && !m.isStatic) {
+          if (!m.fields.isFinal || m.fields.isLate) allFinal = false;
+        } else if (m is ConstructorDeclaration) {
+          if (m.factoryKeyword == null) {
+            hasGenerativeConstructor = true;
+            if (m.constKeyword != null) hasConstConstructor = true;
+          }
+        }
+      }
+
+      if (!allFinal || !hasGenerativeConstructor || hasConstConstructor) return;
+
+      reporter.atNode(node);
+    });
+  }
+
+  static bool _isImmutableClass(ClassDeclaration node) {
+    for (final Annotation a in node.metadata) {
+      final String name = a.name.name;
+      if (name == 'immutable') return true;
+    }
+    final ExtendsClause? ext = node.extendsClause;
+    if (ext != null) {
+      final String sup = ext.superclass.name.lexeme;
+      if (sup == 'StatelessWidget' ||
+          sup == 'StatefulWidget' ||
+          sup == 'Widget') {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+/// Warns when a class field is never reassigned and could be final.
+///
+/// Since: v6.0.8 | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// class User {
+///   String name;
+///   User(this.name);
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class User {
+///   final String name;
+///   User(this.name);
+/// }
+/// ```
+class PreferFinalFieldsRule extends SaropaLintRule {
+  PreferFinalFieldsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_final_fields',
+    '[prefer_final_fields] Field is never reassigned and could be final. Marking it final makes immutability explicit and enables compiler optimizations.',
+    correctionMessage: 'Add the final modifier to the field declaration.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      final Set<String> mutableFieldNames = <String>{};
+      final Map<String, FieldDeclaration> mutableFieldByName =
+          <String, FieldDeclaration>{};
+
+      for (final ClassMember m in node.members) {
+        if (m is! FieldDeclaration || m.isStatic) continue;
+        if (m.fields.isFinal || m.fields.isConst || m.fields.isLate) continue;
+        for (final VariableDeclaration v in m.fields.variables) {
+          final String name = v.name.lexeme;
+          mutableFieldNames.add(name);
+          mutableFieldByName[name] = m;
+        }
+      }
+
+      if (mutableFieldNames.isEmpty) return;
+
+      final Set<String> assigned = <String>{};
+      for (final ClassMember m in node.members) {
+        if (m is ConstructorDeclaration) continue;
+        m.visitChildren(_AssignmentToFieldVisitor(mutableFieldNames, assigned));
+      }
+
+      for (final String name in mutableFieldNames) {
+        if (!assigned.contains(name)) {
+          reporter.atNode(mutableFieldByName[name]!);
+        }
+      }
+    });
+  }
+}
+
+class _AssignmentToFieldVisitor extends RecursiveAstVisitor<void> {
+  _AssignmentToFieldVisitor(this._fieldNames, this._assigned);
+
+  final Set<String> _fieldNames;
+  final Set<String> _assigned;
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final Expression left = node.leftHandSide;
+    if (left is SimpleIdentifier && _fieldNames.contains(left.name)) {
+      _assigned.add(left.name);
+    } else if (left is PropertyAccess) {
+      if (left.target is ThisExpression) {
+        final String name = left.propertyName.name;
+        if (_fieldNames.contains(name)) _assigned.add(name);
+      }
+    }
+    super.visitAssignmentExpression(node);
+  }
+
+  @override
+  void visitPrefixExpression(PrefixExpression node) {
+    if (node.operator.type == TokenType.PLUS_PLUS ||
+        node.operator.type == TokenType.MINUS_MINUS) {
+      final Expression operand = node.operand;
+      if (operand is SimpleIdentifier && _fieldNames.contains(operand.name)) {
+        _assigned.add(operand.name);
+      } else if (operand is PropertyAccess &&
+          operand.target is ThisExpression &&
+          _fieldNames.contains(operand.propertyName.name)) {
+        _assigned.add(operand.propertyName.name);
+      }
+    }
+    super.visitPrefixExpression(node);
+  }
+
+  @override
+  void visitPostfixExpression(PostfixExpression node) {
+    if (node.operator.type == TokenType.PLUS_PLUS ||
+        node.operator.type == TokenType.MINUS_MINUS) {
+      final Expression operand = node.operand;
+      if (operand is SimpleIdentifier && _fieldNames.contains(operand.name)) {
+        _assigned.add(operand.name);
+      } else if (operand is PropertyAccess &&
+          operand.target is ThisExpression &&
+          _fieldNames.contains(operand.propertyName.name)) {
+        _assigned.add(operand.propertyName.name);
+      }
+    }
+    super.visitPostfixExpression(node);
+  }
+}
+
 // =============================================================================
 // QUICK FIXES
 // =============================================================================

@@ -1642,3 +1642,140 @@ class PreferInfiniteScrollPreloadRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when ListView.builder or GridView.builder uses a bulk-loaded list
+/// length as itemCount without pagination.
+///
+/// **Category:** Scroll & list performance (OOM prevention).
+/// **Since:** v4.14.0 | **Rule version:** v1
+///
+/// Loading all items and passing length to itemCount keeps the full list in
+/// memory and can cause OOM and jank. Prefer PagedListView or cursor-based
+/// pagination. Uses a heuristic: variable names like `allProducts`, `items`,
+/// or names starting with `all` are treated as potentially bulk-loaded; small
+/// lists (e.g. categories) may be false positives. Suppressed when the project
+/// uses `infinite_scroll_pagination` or when pagination is detected in scope.
+///
+/// **Bad:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: allProducts.length,
+///   itemBuilder: (context, i) => ProductCard(allProducts[i]),
+/// );
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// PagedListView<int, Product>(
+///   pagingController: _pagingController,
+///   builderDelegate: PagedChildBuilderDelegate<Product>(
+///     itemBuilder: (context, item, index) => ProductCard(item),
+///   ),
+/// );
+/// ```
+class RequirePaginationForLargeListsRule extends SaropaLintRule {
+  RequirePaginationForLargeListsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'require_pagination_for_large_lists',
+    '[require_pagination_for_large_lists] ListView/GridView builder uses '
+        'itemCount from a list that may be bulk-loaded, risking OOM and slow '
+        'UI. Use PagedListView (infinite_scroll_pagination) or cursor-based '
+        'pagination to load items in pages. {v1}',
+    correctionMessage:
+        'Use PagedListView with PagingController (package:infinite_scroll_pagination) '
+        'or implement cursor-based pagination to avoid loading all items at once.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _builderTypes = <String>{'ListView', 'GridView'};
+
+  /// Variable names that commonly denote bulk-loaded data (heuristic).
+  static const Set<String> _bulkListNames = <String>{
+    'allProducts',
+    'allItems',
+    'allPosts',
+    'allUsers',
+    'allData',
+    'products',
+    'items',
+    'posts',
+    'entries',
+    'list',
+    'data',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final path = context.filePath;
+    if (ProjectContext.hasDependency(path, 'infinite_scroll_pagination')) {
+      return;
+    }
+
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (!_builderTypes.contains(typeName)) return;
+      if (node.constructorName.name?.name != 'builder') return;
+
+      final itemCountArg = _getItemCountArgument(node);
+      if (itemCountArg == null) return;
+      if (!_isLengthFromBulkList(itemCountArg)) return;
+      if (_hasPaginationPattern(context.fileContent, node)) return;
+
+      reporter.atNode(node);
+    });
+  }
+
+  NamedExpression? _getItemCountArgument(InstanceCreationExpression node) {
+    for (final arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'itemCount') {
+        return arg;
+      }
+    }
+    return null;
+  }
+
+  bool _isLengthFromBulkList(NamedExpression itemCountArg) {
+    final expr = itemCountArg.expression;
+    if (expr is! PropertyAccess) return false;
+    if (expr.propertyName.name != 'length') return false;
+    final target = expr.target;
+    if (target is SimpleIdentifier) {
+      final name = target.name;
+      if (_bulkListNames.contains(name)) return true;
+      if (name.startsWith('all') && name.length > 3) return true;
+    }
+    return false;
+  }
+
+  bool _hasPaginationPattern(String content, InstanceCreationExpression node) {
+    // Check if this list is inside a PagedListView or has pagination in scope.
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression) {
+        final typeName = current.constructorName.type.name.lexeme;
+        if (typeName == 'PagedListView' || typeName == 'PagingController') {
+          return true;
+        }
+        for (final arg in current.argumentList.arguments) {
+          if (arg is NamedExpression &&
+              arg.name.label.name == 'pagingController') {
+            return true;
+          }
+        }
+      }
+      current = current.parent;
+    }
+    return content.contains('PagingController') ||
+        content.contains('PagedListView');
+  }
+}

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 13 Class Constructor lint rules.
+/// Tests for 14 Class Constructor lint rules.
 ///
 /// Test fixtures: example_core/lib/class_constructor/*
 void main() {
@@ -21,6 +21,7 @@ void main() {
       'prefer_final_class',
       'prefer_interface_class',
       'prefer_base_class',
+      'require_late_access_check',
     ];
 
     for (final fixture in fixtures) {
@@ -191,6 +192,20 @@ void main() {
       test('proper_super_calls should NOT trigger', () {
         // Compliant code passes
         expect('proper_super_calls passes', isNotNull);
+      });
+    });
+  });
+
+  group('Class Constructor - Requirement Rules', () {
+    group('require_late_access_check', () {
+      test('require_late_access_check SHOULD trigger', () {
+        // late field set in method, read in another without guard
+        expect('require_late_access_check detected', isNotNull);
+      });
+
+      test('require_late_access_check should NOT trigger', () {
+        // nullable or constructor-init or late final
+        expect('require_late_access_check passes', isNotNull);
       });
     });
   });

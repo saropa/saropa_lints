@@ -281,6 +281,7 @@ const Set<String> essentialRules = <String>{
   'avoid_storing_context',
   'avoid_context_across_async',
   'avoid_context_after_await_in_static', // ERROR - context after await in static
+  'require_init_state_idempotent',
   // Security
   'avoid_hardcoded_credentials',
   'avoid_logging_sensitive_data',
@@ -290,6 +291,7 @@ const Set<String> essentialRules = <String>{
   'avoid_token_in_url',
   'avoid_clipboard_sensitive',
   'avoid_storing_passwords',
+  'require_input_validation',
   'avoid_dynamic_sql',
   'avoid_hardcoded_encryption_keys',
   'prefer_secure_random_for_crypto',
@@ -326,7 +328,7 @@ const Set<String> essentialRules = <String>{
   'avoid_duplicate_map_keys',
   'avoid_isar_enum_field',
   'require_exhaustive_sealed_switch',
-
+  'require_pagination_for_large_lists', // OOM when bulk list as itemCount
   // Equatable (Essential - missing fields cause equality bugs)
   'list_all_equatable_fields',
   'avoid_mutable_field_in_equatable', // Mutable fields break equality
@@ -347,6 +349,7 @@ const Set<String> essentialRules = <String>{
   'require_error_handling_graceful',
 
   'avoid_print_error', // Print for error logging loses errors in production
+  'prefer_semver_version', // pubspec version must be major.minor.patch
   // Collection/Loop Safety (Phase 2)
   'avoid_unreachable_for_loop',
 
@@ -511,6 +514,7 @@ const Set<String> essentialRules = <String>{
   'avoid_catch_exception_alone', // WARNING - misses Error types
   'require_form_key_in_stateful_widget', // WARNING - form state loss
   'prefer_timeout_on_requests', // WARNING - hang prevention
+  'require_connectivity_timeout', // WARNING - hang prevention
   'avoid_bloc_context_dependency', // WARNING - testability
   'avoid_provider_value_rebuild', // WARNING - memory leak
   'avoid_notification_same_id', // WARNING - overwrites
@@ -690,6 +694,18 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_string_substring',
   'prefer_single_container',
   'prefer_api_pagination',
+
+  // Code quality (roadmap detail requirements)
+  'prefer_final_locals',
+  'prefer_if_elements_to_conditional_expressions',
+  'prefer_inlined_adds',
+  'prefer_interpolation_to_compose',
+  'prefer_lowercase_constants',
+  'prefer_null_aware_method_calls',
+  'avoid_unnecessary_containers',
+  'prefer_adjacent_strings',
+  'prefer_const_declarations',
+  'prefer_const_literals_to_create_immutables',
 
   // v5.1.0 - New rules (Recommended)
   'avoid_cached_image_web',
@@ -1486,6 +1502,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_master_detail_for_large', // INFO - tablet list-detail
   'prefer_batch_requests', // INFO - batch API calls
   // Code quality (roadmap detail requirements)
+  'require_late_access_check', // late field access without init check
   'avoid_bool_in_widget_constructors',
   'avoid_double_and_int_checks',
   'avoid_equals_and_hash_code_on_mutable_classes',
@@ -1494,6 +1511,24 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_null_checks_in_equality_operators',
   'avoid_positional_boolean_parameters',
   'avoid_setters_without_getters',
+  'prefer_getters_before_setters',
+  'prefer_mixin_over_abstract',
+  'prefer_named_bool_params',
+  'prefer_noun_class_names',
+  'prefer_raw_strings',
+  'prefer_record_over_tuple_class',
+  'prefer_sealed_classes',
+  'prefer_sealed_for_state',
+  'prefer_static_before_instance',
+  'prefer_verb_method_names',
+  'prefer_adjective_bool_getters',
+  'prefer_asserts_in_initializer_lists',
+  'prefer_const_constructors_in_immutables',
+  'prefer_constructors_first',
+  'prefer_extension_methods',
+  'prefer_extension_over_utility_class',
+  'prefer_extension_type_for_wrapper',
+  'prefer_final_fields',
   // Widget Best Practices
   'prefer_widget_private_members', // Widget fields should be final/private
   // Architecture
@@ -1505,8 +1540,13 @@ const Set<String> professionalOnlyRules = <String>{
 
   // Security
   'require_certificate_pinning',
+  'require_ssl_pinning_sensitive', // Auth endpoints without pinning (OWASP M5, M3)
   'require_secure_storage',
   'require_input_sanitization',
+  'banned_usage',
+  'prefer_csrf_protection',
+  'prefer_sqflite_encryption',
+  'require_conflict_resolution_strategy',
   'avoid_hardcoded_asset_paths',
   'avoid_print_in_production',
   'avoid_webview_javascript_enabled',
