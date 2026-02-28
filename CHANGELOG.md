@@ -48,6 +48,11 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
   - `prefer_static_before_instance` (Professional, INFO) — static members before instance in same category.
   - `prefer_verb_method_names` (Professional, INFO) — methods should use verb names, not noun-only.
 
+- 3 new lint rules from roadmap detail requirements (late/pagination/SSL pinning):
+  - `require_late_access_check` (Professional, WARNING) — late non-final field set in a method other than constructor/initState and read in another method without initialization check; risk of LateInitializationError.
+  - `require_pagination_for_large_lists` (Essential, WARNING) — ListView.builder/GridView.builder with itemCount from bulk-style list (e.g. allProducts.length) without pagination; OOM and jank risk. Suppressed when project uses infinite_scroll_pagination.
+  - `require_ssl_pinning_sensitive` (Professional, WARNING) — HTTP POST/PUT/PATCH to sensitive paths (/auth, /login, /token) without certificate pinning; OWASP M5, M3. Suppressed when project uses http_certificate_pinning or ssl_pinning_plugin, and for localhost.
+
 - 10 new lint rules from roadmap detail requirements:
   - `avoid_deprecated_usage` (Recommended, WARNING) — use of deprecated APIs from other packages; same-package and generated files ignored.
   - `handle_throwing_invocations` (Professional, INFO) — invocations that can throw (e.g. @Throws, readAsStringSync, jsonDecode) not in try/catch.
