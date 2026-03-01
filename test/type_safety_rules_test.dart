@@ -17,23 +17,92 @@ void main() {
         expect(rule.code.correctionMessage, isNotNull);
       });
     }
-    testRule('AvoidUnsafeCastRule', 'avoid_unsafe_cast', () => AvoidUnsafeCastRule());
-    testRule('PreferConstrainedGenericsRule', 'prefer_constrained_generics', () => PreferConstrainedGenericsRule());
-    testRule('RequireCovariantDocumentationRule', 'require_covariant_documentation', () => RequireCovariantDocumentationRule());
-    testRule('RequireSafeJsonParsingRule', 'require_safe_json_parsing', () => RequireSafeJsonParsingRule());
-    testRule('RequireNullSafeExtensionsRule', 'require_null_safe_extensions', () => RequireNullSafeExtensionsRule());
-    testRule('PreferSpecificNumericTypesRule', 'prefer_specific_numeric_types', () => PreferSpecificNumericTypesRule());
-    testRule('AvoidNonNullAssertionRule', 'avoid_non_null_assertion', () => AvoidNonNullAssertionRule());
-    testRule('AvoidTypeCastsRule', 'avoid_type_casts', () => AvoidTypeCastsRule());
-    testRule('RequireFutureOrDocumentationRule', 'require_futureor_documentation', () => RequireFutureOrDocumentationRule());
-    testRule('PreferExplicitTypeArgumentsRule', 'prefer_explicit_type_arguments', () => PreferExplicitTypeArgumentsRule());
-    testRule('AvoidUnrelatedTypeCastsRule', 'avoid_unrelated_type_casts', () => AvoidUnrelatedTypeCastsRule());
-    testRule('AvoidDynamicJsonAccessRule', 'avoid_dynamic_json_access', () => AvoidDynamicJsonAccessRule());
-    testRule('RequireNullSafeJsonAccessRule', 'require_null_safe_json_access', () => RequireNullSafeJsonAccessRule());
-    testRule('AvoidDynamicJsonChainsRule', 'avoid_dynamic_json_chains', () => AvoidDynamicJsonChainsRule());
-    testRule('RequireEnumUnknownValueRule', 'require_enum_unknown_value', () => RequireEnumUnknownValueRule());
-    testRule('RequireValidatorReturnNullRule', 'require_validator_return_null', () => RequireValidatorReturnNullRule());
-    testRule('AvoidRedundantNullCheckRule', 'avoid_redundant_null_check', () => AvoidRedundantNullCheckRule());
+
+    testRule(
+      'AvoidUnsafeCastRule',
+      'avoid_unsafe_cast',
+      () => AvoidUnsafeCastRule(),
+    );
+    testRule(
+      'PreferConstrainedGenericsRule',
+      'prefer_constrained_generics',
+      () => PreferConstrainedGenericsRule(),
+    );
+    testRule(
+      'RequireCovariantDocumentationRule',
+      'require_covariant_documentation',
+      () => RequireCovariantDocumentationRule(),
+    );
+    testRule(
+      'RequireSafeJsonParsingRule',
+      'require_safe_json_parsing',
+      () => RequireSafeJsonParsingRule(),
+    );
+    testRule(
+      'RequireNullSafeExtensionsRule',
+      'require_null_safe_extensions',
+      () => RequireNullSafeExtensionsRule(),
+    );
+    testRule(
+      'PreferSpecificNumericTypesRule',
+      'prefer_specific_numeric_types',
+      () => PreferSpecificNumericTypesRule(),
+    );
+    testRule(
+      'AvoidNonNullAssertionRule',
+      'avoid_non_null_assertion',
+      () => AvoidNonNullAssertionRule(),
+    );
+    testRule(
+      'AvoidTypeCastsRule',
+      'avoid_type_casts',
+      () => AvoidTypeCastsRule(),
+    );
+    testRule(
+      'RequireFutureOrDocumentationRule',
+      'require_futureor_documentation',
+      () => RequireFutureOrDocumentationRule(),
+    );
+    testRule(
+      'PreferExplicitTypeArgumentsRule',
+      'prefer_explicit_type_arguments',
+      () => PreferExplicitTypeArgumentsRule(),
+    );
+    testRule(
+      'AvoidUnrelatedTypeCastsRule',
+      'avoid_unrelated_type_casts',
+      () => AvoidUnrelatedTypeCastsRule(),
+    );
+    testRule(
+      'AvoidDynamicJsonAccessRule',
+      'avoid_dynamic_json_access',
+      () => AvoidDynamicJsonAccessRule(),
+    );
+    testRule(
+      'RequireNullSafeJsonAccessRule',
+      'require_null_safe_json_access',
+      () => RequireNullSafeJsonAccessRule(),
+    );
+    testRule(
+      'AvoidDynamicJsonChainsRule',
+      'avoid_dynamic_json_chains',
+      () => AvoidDynamicJsonChainsRule(),
+    );
+    testRule(
+      'RequireEnumUnknownValueRule',
+      'require_enum_unknown_value',
+      () => RequireEnumUnknownValueRule(),
+    );
+    testRule(
+      'RequireValidatorReturnNullRule',
+      'require_validator_return_null',
+      () => RequireValidatorReturnNullRule(),
+    );
+    testRule(
+      'AvoidRedundantNullCheckRule',
+      'avoid_redundant_null_check',
+      () => AvoidRedundantNullCheckRule(),
+    );
   });
   group('Type Safety Rules - Fixture Verification', () {
     final fixtures = [

@@ -17,15 +17,52 @@ void main() {
         expect(rule.code.correctionMessage, isNotNull);
       });
     }
-    testRule('RequirePublicApiDocumentationRule', 'require_public_api_documentation', () => RequirePublicApiDocumentationRule());
-    testRule('AvoidMisleadingDocumentationRule', 'avoid_misleading_documentation', () => AvoidMisleadingDocumentationRule());
-    testRule('RequireDeprecationMessageRule', 'require_deprecation_message', () => RequireDeprecationMessageRule());
-    testRule('RequireComplexLogicCommentsRule', 'require_complex_logic_comments', () => RequireComplexLogicCommentsRule());
-    testRule('RequireParameterDocumentationRule', 'require_parameter_documentation', () => RequireParameterDocumentationRule());
-    testRule('RequireReturnDocumentationRule', 'require_return_documentation', () => RequireReturnDocumentationRule());
-    testRule('RequireExceptionDocumentationRule', 'require_exception_documentation', () => RequireExceptionDocumentationRule());
-    testRule('RequireExampleInDocumentationRule', 'require_example_in_documentation', () => RequireExampleInDocumentationRule());
-    testRule('VerifyDocumentedParametersExistRule', 'verify_documented_parameters_exist', () => VerifyDocumentedParametersExistRule());
+
+    testRule(
+      'RequirePublicApiDocumentationRule',
+      'require_public_api_documentation',
+      () => RequirePublicApiDocumentationRule(),
+    );
+    testRule(
+      'AvoidMisleadingDocumentationRule',
+      'avoid_misleading_documentation',
+      () => AvoidMisleadingDocumentationRule(),
+    );
+    testRule(
+      'RequireDeprecationMessageRule',
+      'require_deprecation_message',
+      () => RequireDeprecationMessageRule(),
+    );
+    testRule(
+      'RequireComplexLogicCommentsRule',
+      'require_complex_logic_comments',
+      () => RequireComplexLogicCommentsRule(),
+    );
+    testRule(
+      'RequireParameterDocumentationRule',
+      'require_parameter_documentation',
+      () => RequireParameterDocumentationRule(),
+    );
+    testRule(
+      'RequireReturnDocumentationRule',
+      'require_return_documentation',
+      () => RequireReturnDocumentationRule(),
+    );
+    testRule(
+      'RequireExceptionDocumentationRule',
+      'require_exception_documentation',
+      () => RequireExceptionDocumentationRule(),
+    );
+    testRule(
+      'RequireExampleInDocumentationRule',
+      'require_example_in_documentation',
+      () => RequireExampleInDocumentationRule(),
+    );
+    testRule(
+      'VerifyDocumentedParametersExistRule',
+      'verify_documented_parameters_exist',
+      () => VerifyDocumentedParametersExistRule(),
+    );
   });
   group('Documentation Rules - Fixture Verification', () {
     final fixtures = [

@@ -21,10 +21,7 @@ void main() {
     test('AvoidOnlyRethrowRule', () {
       final rule = AvoidOnlyRethrowRule();
       expect(rule.code.name, 'avoid_only_rethrow');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_only_rethrow]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_only_rethrow]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

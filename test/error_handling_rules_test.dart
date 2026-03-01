@@ -24,40 +24,28 @@ void main() {
     test('AvoidLosingStackTraceRule', () {
       final rule = AvoidLosingStackTraceRule();
       expect(rule.code.name, 'avoid_losing_stack_trace');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_losing_stack_trace]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_losing_stack_trace]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidGenericExceptionsRule', () {
       final rule = AvoidGenericExceptionsRule();
       expect(rule.code.name, 'avoid_generic_exceptions');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_generic_exceptions]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_generic_exceptions]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireErrorContextRule', () {
       final rule = RequireErrorContextRule();
       expect(rule.code.name, 'require_error_context');
-      expect(
-        rule.code.problemMessage,
-        contains('[require_error_context]'),
-      );
+      expect(rule.code.problemMessage, contains('[require_error_context]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('PreferResultPatternRule', () {
       final rule = PreferResultPatternRule();
       expect(rule.code.name, 'prefer_result_pattern');
-      expect(
-        rule.code.problemMessage,
-        contains('[prefer_result_pattern]'),
-      );
+      expect(rule.code.problemMessage, contains('[prefer_result_pattern]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -84,10 +72,7 @@ void main() {
     test('RequireErrorBoundaryRule', () {
       final rule = RequireErrorBoundaryRule();
       expect(rule.code.name, 'require_error_boundary');
-      expect(
-        rule.code.problemMessage,
-        contains('[require_error_boundary]'),
-      );
+      expect(rule.code.problemMessage, contains('[require_error_boundary]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -104,10 +89,7 @@ void main() {
     test('AvoidPrintErrorRule', () {
       final rule = AvoidPrintErrorRule();
       expect(rule.code.name, 'avoid_print_error');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_print_error]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_print_error]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -124,10 +106,7 @@ void main() {
     test('AvoidCatchAllRule', () {
       final rule = AvoidCatchAllRule();
       expect(rule.code.name, 'avoid_catch_all');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_catch_all]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_catch_all]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -184,20 +163,14 @@ void main() {
     test('RequireFinallyCleanupRule', () {
       final rule = RequireFinallyCleanupRule();
       expect(rule.code.name, 'require_finally_cleanup');
-      expect(
-        rule.code.problemMessage,
-        contains('[require_finally_cleanup]'),
-      );
+      expect(rule.code.problemMessage, contains('[require_finally_cleanup]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireErrorLoggingRule', () {
       final rule = RequireErrorLoggingRule();
       expect(rule.code.name, 'require_error_logging');
-      expect(
-        rule.code.problemMessage,
-        contains('[require_error_logging]'),
-      );
+      expect(rule.code.problemMessage, contains('[require_error_logging]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

@@ -31,10 +31,7 @@ void main() {
     test('AvoidReturnAwaitDbRule', () {
       final rule = AvoidReturnAwaitDbRule();
       expect(rule.code.name, 'avoid_return_await_db');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_return_await_db]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_return_await_db]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

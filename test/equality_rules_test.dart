@@ -11,10 +11,7 @@ void main() {
     test('AvoidEqualExpressionsRule', () {
       final rule = AvoidEqualExpressionsRule();
       expect(rule.code.name, 'avoid_equal_expressions');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_equal_expressions]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_equal_expressions]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -31,20 +28,14 @@ void main() {
     test('AvoidSelfAssignmentRule', () {
       final rule = AvoidSelfAssignmentRule();
       expect(rule.code.name, 'avoid_self_assignment');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_self_assignment]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_self_assignment]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidSelfCompareRule', () {
       final rule = AvoidSelfCompareRule();
       expect(rule.code.name, 'avoid_self_compare');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_self_compare]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_self_compare]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -61,10 +52,7 @@ void main() {
     test('NoEqualArgumentsRule', () {
       final rule = NoEqualArgumentsRule();
       expect(rule.code.name, 'no_equal_arguments');
-      expect(
-        rule.code.problemMessage,
-        contains('[no_equal_arguments]'),
-      );
+      expect(rule.code.problemMessage, contains('[no_equal_arguments]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

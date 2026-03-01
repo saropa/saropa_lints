@@ -592,7 +592,9 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
             final String bodySource = body.toSource();
 
             if (body is ExpressionFunctionBody) {
-              if (!_redirectConditionPatterns.any((p) => p.hasMatch(bodySource))) {
+              if (!_redirectConditionPatterns.any(
+                (p) => p.hasMatch(bodySource),
+              )) {
                 reporter.atNode(arg.expression, code);
               }
             } else if (body is BlockFunctionBody) {
@@ -1094,7 +1096,10 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
     'pin',
   };
 
-  static const Set<String> _paramSourceProps = {'queryParameters', 'pathSegments'};
+  static const Set<String> _paramSourceProps = {
+    'queryParameters',
+    'pathSegments',
+  };
 
   @override
   void runWithReporter(
@@ -1164,8 +1169,14 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  static const Set<String> _routeParamProps = {'pathParameters', 'queryParameters'};
-  static final RegExp _parseMethodPattern = RegExp(r'\bparse\b', caseSensitive: false);
+  static const Set<String> _routeParamProps = {
+    'pathParameters',
+    'queryParameters',
+  };
+  static final RegExp _parseMethodPattern = RegExp(
+    r'\bparse\b',
+    caseSensitive: false,
+  );
 
   @override
   void runWithReporter(
@@ -1273,7 +1284,9 @@ class RequireStepperValidationRule extends SaropaLintRule {
           if (callback is FunctionExpression) {
             final String bodySource = callback.body.toSource();
 
-            if (!_stepperValidationPatterns.any((p) => p.hasMatch(bodySource))) {
+            if (!_stepperValidationPatterns.any(
+              (p) => p.hasMatch(bodySource),
+            )) {
               reporter.atNode(arg);
             }
           }
@@ -2850,7 +2863,8 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
       return true;
     }
     if (_navigatorContextPatterns.any((p) => p.hasMatch(source)) ||
-        (_navigatorOfPattern.hasMatch(source) && _contextAfterNavigatorPattern.hasMatch(source))) {
+        (_navigatorOfPattern.hasMatch(source) &&
+            _contextAfterNavigatorPattern.hasMatch(source))) {
       return true;
     }
     return false;

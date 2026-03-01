@@ -93,7 +93,9 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
       if (!hasHttpCall) return;
 
       // Check if statusCode is checked (word-boundary to avoid FP on myStatusCode)
-      final hasStatusCheck = _statusCheckPatterns.any((p) => p.hasMatch(bodySource));
+      final hasStatusCheck = _statusCheckPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
       if (!hasStatusCheck) reporter.atNode(node);
     });
   }
@@ -1085,12 +1087,14 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      final bool hasApiCall =
-          _buildMethodApiPatterns.any((p) => p.hasMatch(bodySource));
+      final bool hasApiCall = _buildMethodApiPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
       if (!hasApiCall) return;
 
-      final bool hasCaching =
-          _buildMethodCachingPatterns.any((p) => p.hasMatch(bodySource));
+      final bool hasCaching = _buildMethodCachingPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
       if (!hasCaching) {
         reporter.atNode(node);
       }
@@ -1188,8 +1192,9 @@ class RequireResponseCachingRule extends SaropaLintRule {
 
       if (!_getRequestPatterns.any((p) => p.hasMatch(bodySource))) return;
 
-      final bool hasCaching =
-          _responseCachingPatterns.any((p) => p.hasMatch(bodySource));
+      final bool hasCaching = _responseCachingPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
 
       final AstNode? parent = node.parent;
       if (parent is ClassDeclaration) {
@@ -1260,8 +1265,9 @@ class PreferPaginationRule extends SaropaLintRule {
     RegExp(r'\bperPage\b'),
   ];
   static final RegExp _paginationAllPattern = RegExp(r'\ball\b');
-  static final RegExp _listOrIterableReturnPattern =
-      RegExp(r'List\s*<|Iterable\s*<');
+  static final RegExp _listOrIterableReturnPattern = RegExp(
+    r'List\s*<|Iterable\s*<',
+  );
 
   @override
   void runWithReporter(
@@ -1472,13 +1478,17 @@ class RequireCancelTokenRule extends SaropaLintRule {
 
       final String classSource = node.toSource();
 
-      final bool hasHttpCalls = _cancelTokenHttpPatterns.any((p) => p.hasMatch(classSource));
+      final bool hasHttpCalls = _cancelTokenHttpPatterns.any(
+        (p) => p.hasMatch(classSource),
+      );
       if (!hasHttpCalls) return;
 
-      final bool hasCancellation =
-          _cancelTokenCancellationPatterns.any((p) => p.hasMatch(classSource));
-      final bool hasMountedCheck =
-          _cancelTokenMountedPatterns.any((p) => p.hasMatch(classSource));
+      final bool hasCancellation = _cancelTokenCancellationPatterns.any(
+        (p) => p.hasMatch(classSource),
+      );
+      final bool hasMountedCheck = _cancelTokenMountedPatterns.any(
+        (p) => p.hasMatch(classSource),
+      );
 
       if (!hasCancellation && !hasMountedCheck) {
         reporter.atNode(node);
@@ -1548,7 +1558,9 @@ class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!_websocketListenTargetPatterns.any((p) => p.hasMatch(targetSource))) {
+      if (!_websocketListenTargetPatterns.any(
+        (p) => p.hasMatch(targetSource),
+      )) {
         return;
       }
 
@@ -2472,8 +2484,7 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
               final statements = nextNode.statements;
               final stmtIndex = statements.indexOf(stmt);
               if (stmtIndex >= 0 && stmtIndex < statements.length - 1) {
-                final nextSource =
-                    statements[stmtIndex + 1].toSource();
+                final nextSource = statements[stmtIndex + 1].toSource();
                 if (_nullCheckStmtPatterns.any((p) => p.hasMatch(nextSource))) {
                   return;
                 }
@@ -2935,16 +2946,18 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
       if (methodDeclaration == null) return;
 
       final bodySource = methodDeclaration.body.toSource().toLowerCase();
-      if (_notificationPermissionBodyPatterns
-          .any((p) => p.hasMatch(bodySource))) {
+      if (_notificationPermissionBodyPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      )) {
         return;
       }
 
       final classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl != null) {
         final classSource = classDecl.toSource().toLowerCase();
-        if (_notificationPermissionClassPatterns
-            .any((p) => p.hasMatch(classSource))) {
+        if (_notificationPermissionClassPatterns.any(
+          (p) => p.hasMatch(classSource),
+        )) {
           return;
         }
       }
@@ -3125,7 +3138,8 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
       }
 
       for (final String fieldName in sseFields) {
-        final bool isClosed = disposeBody != null &&
+        final bool isClosed =
+            disposeBody != null &&
             (_sseFieldClosePattern(disposeBody, fieldName, 'close') ||
                 _sseFieldClosePattern(disposeBody, fieldName, 'dispose') ||
                 _sseFieldClosePattern(disposeBody, fieldName, 'cancel'));
@@ -3335,8 +3349,9 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
         return;
       }
 
-      final bool hasReconnection =
-          _reconnectionClassPatterns.any((p) => p.hasMatch(classSource));
+      final bool hasReconnection = _reconnectionClassPatterns.any(
+        (p) => p.hasMatch(classSource),
+      );
 
       if (!hasReconnection) {
         reporter.atNode(node);

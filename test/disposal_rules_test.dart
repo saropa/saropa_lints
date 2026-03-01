@@ -111,20 +111,14 @@ void main() {
     test('RequireSocketCloseRule', () {
       final rule = RequireSocketCloseRule();
       expect(rule.code.name, 'require_socket_close');
-      expect(
-        rule.code.problemMessage,
-        contains('[require_socket_close]'),
-      );
+      expect(rule.code.problemMessage, contains('[require_socket_close]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireDebouncerCancelRule', () {
       final rule = RequireDebouncerCancelRule();
       expect(rule.code.name, 'require_debouncer_cancel');
-      expect(
-        rule.code.problemMessage,
-        contains('[require_debouncer_cancel]'),
-      );
+      expect(rule.code.problemMessage, contains('[require_debouncer_cancel]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -141,10 +135,7 @@ void main() {
     test('RequireFileHandleCloseRule', () {
       final rule = RequireFileHandleCloseRule();
       expect(rule.code.name, 'require_file_handle_close');
-      expect(
-        rule.code.problemMessage,
-        contains('[require_file_handle_close]'),
-      );
+      expect(rule.code.problemMessage, contains('[require_file_handle_close]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -171,10 +162,7 @@ void main() {
     test('DisposeClassFieldsRule', () {
       final rule = DisposeClassFieldsRule();
       expect(rule.code.name, 'dispose_class_fields');
-      expect(
-        rule.code.problemMessage,
-        contains('[dispose_class_fields]'),
-      );
+      expect(rule.code.problemMessage, contains('[dispose_class_fields]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

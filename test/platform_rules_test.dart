@@ -11,10 +11,7 @@ void main() {
     test('RequirePlatformCheckRule', () {
       final rule = RequirePlatformCheckRule();
       expect(rule.code.name, 'require_platform_check');
-      expect(
-        rule.code.problemMessage,
-        contains('[require_platform_check]'),
-      );
+      expect(rule.code.problemMessage, contains('[require_platform_check]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

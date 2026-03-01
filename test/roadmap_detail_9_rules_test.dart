@@ -18,9 +18,7 @@ void main() {
     'require_input_validation',
   ];
 
-  const recommendedRules = <String>[
-    'prefer_semver_version',
-  ];
+  const recommendedRules = <String>['prefer_semver_version'];
 
   const professionalRules = <String>[
     'banned_usage',

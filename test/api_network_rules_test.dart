@@ -17,44 +17,197 @@ void main() {
         expect(rule.code.correctionMessage, isNotNull);
       });
     }
-    testRule('RequireHttpStatusCheckRule', 'require_http_status_check', () => RequireHttpStatusCheckRule());
-    testRule('AvoidHardcodedApiUrlsRule', 'avoid_hardcoded_api_urls', () => AvoidHardcodedApiUrlsRule());
-    testRule('RequireRetryLogicRule', 'require_retry_logic', () => RequireRetryLogicRule());
-    testRule('RequireTypedApiResponseRule', 'require_typed_api_response', () => RequireTypedApiResponseRule());
-    testRule('RequireConnectivityCheckRule', 'require_connectivity_check', () => RequireConnectivityCheckRule());
-    testRule('RequireApiErrorMappingRule', 'require_api_error_mapping', () => RequireApiErrorMappingRule());
-    testRule('RequireRequestTimeoutRule', 'require_request_timeout', () => RequireRequestTimeoutRule());
-    testRule('RequireOfflineIndicatorRule', 'require_offline_indicator', () => RequireOfflineIndicatorRule());
-    testRule('PreferStreamingResponseRule', 'prefer_streaming_response', () => PreferStreamingResponseRule());
-    testRule('PreferHttpConnectionReuseRule', 'prefer_http_connection_reuse', () => PreferHttpConnectionReuseRule());
-    testRule('AvoidRedundantRequestsRule', 'avoid_redundant_requests', () => AvoidRedundantRequestsRule());
-    testRule('RequireResponseCachingRule', 'require_response_caching', () => RequireResponseCachingRule());
-    testRule('PreferPaginationRule', 'prefer_api_pagination', () => PreferPaginationRule());
-    testRule('AvoidOverFetchingRule', 'avoid_over_fetching', () => AvoidOverFetchingRule());
-    testRule('RequireCancelTokenRule', 'require_cancel_token', () => RequireCancelTokenRule());
-    testRule('RequireWebSocketErrorHandlingRule', 'require_websocket_error_handling', () => RequireWebSocketErrorHandlingRule());
-    testRule('RequireContentTypeCheckRule', 'require_content_type_check', () => RequireContentTypeCheckRule());
-    testRule('AvoidWebsocketWithoutHeartbeatRule', 'avoid_websocket_without_heartbeat', () => AvoidWebsocketWithoutHeartbeatRule());
-    testRule('RequireUrlLauncherErrorHandlingRule', 'require_url_launcher_error_handling', () => RequireUrlLauncherErrorHandlingRule());
-    testRule('RequireImagePickerErrorHandlingRule', 'require_image_picker_error_handling', () => RequireImagePickerErrorHandlingRule());
-    testRule('RequireImagePickerSourceChoiceRule', 'require_image_picker_source_choice', () => RequireImagePickerSourceChoiceRule());
-    testRule('RequireGeolocatorTimeoutRule', 'require_geolocator_timeout', () => RequireGeolocatorTimeoutRule());
-    testRule('RequireConnectivitySubscriptionCancelRule', 'require_connectivity_subscription_cancel', () => RequireConnectivitySubscriptionCancelRule());
-    testRule('RequireNotificationHandlerTopLevelRule', 'require_notification_handler_top_level', () => RequireNotificationHandlerTopLevelRule());
-    testRule('RequirePermissionDeniedHandlingRule', 'require_permission_denied_handling', () => RequirePermissionDeniedHandlingRule());
-    testRule('RequireImagePickerResultHandlingRule', 'require_image_picker_result_handling', () => RequireImagePickerResultHandlingRule());
-    testRule('AvoidCachedImageInBuildRule', 'avoid_cached_image_in_build', () => AvoidCachedImageInBuildRule());
-    testRule('RequireSqfliteMigrationRule', 'require_sqflite_migration', () => RequireSqfliteMigrationRule());
-    testRule('RequirePermissionRationaleRule', 'require_permission_rationale', () => RequirePermissionRationaleRule());
-    testRule('RequirePermissionStatusCheckRule', 'require_permission_status_check', () => RequirePermissionStatusCheckRule());
-    testRule('RequireNotificationPermissionAndroid13Rule', 'require_notification_permission_android13', () => RequireNotificationPermissionAndroid13Rule());
-    testRule('RequireSseSubscriptionCancelRule', 'require_sse_subscription_cancel', () => RequireSseSubscriptionCancelRule());
-    testRule('PreferTimeoutOnRequestsRule', 'prefer_timeout_on_requests', () => PreferTimeoutOnRequestsRule());
-    testRule('RequireWebsocketReconnectionRule', 'require_websocket_reconnection', () => RequireWebsocketReconnectionRule());
-    testRule('RequireAnalyticsEventNamingRule', 'require_analytics_event_naming', () => RequireAnalyticsEventNamingRule());
-    testRule('PreferBatchRequestsRule', 'prefer_batch_requests', () => PreferBatchRequestsRule());
-    testRule('RequireCompressionRule', 'require_compression', () => RequireCompressionRule());
-    testRule('RequireSslPinningSensitiveRule', 'require_ssl_pinning_sensitive', () => RequireSslPinningSensitiveRule());
+
+    testRule(
+      'RequireHttpStatusCheckRule',
+      'require_http_status_check',
+      () => RequireHttpStatusCheckRule(),
+    );
+    testRule(
+      'AvoidHardcodedApiUrlsRule',
+      'avoid_hardcoded_api_urls',
+      () => AvoidHardcodedApiUrlsRule(),
+    );
+    testRule(
+      'RequireRetryLogicRule',
+      'require_retry_logic',
+      () => RequireRetryLogicRule(),
+    );
+    testRule(
+      'RequireTypedApiResponseRule',
+      'require_typed_api_response',
+      () => RequireTypedApiResponseRule(),
+    );
+    testRule(
+      'RequireConnectivityCheckRule',
+      'require_connectivity_check',
+      () => RequireConnectivityCheckRule(),
+    );
+    testRule(
+      'RequireApiErrorMappingRule',
+      'require_api_error_mapping',
+      () => RequireApiErrorMappingRule(),
+    );
+    testRule(
+      'RequireRequestTimeoutRule',
+      'require_request_timeout',
+      () => RequireRequestTimeoutRule(),
+    );
+    testRule(
+      'RequireOfflineIndicatorRule',
+      'require_offline_indicator',
+      () => RequireOfflineIndicatorRule(),
+    );
+    testRule(
+      'PreferStreamingResponseRule',
+      'prefer_streaming_response',
+      () => PreferStreamingResponseRule(),
+    );
+    testRule(
+      'PreferHttpConnectionReuseRule',
+      'prefer_http_connection_reuse',
+      () => PreferHttpConnectionReuseRule(),
+    );
+    testRule(
+      'AvoidRedundantRequestsRule',
+      'avoid_redundant_requests',
+      () => AvoidRedundantRequestsRule(),
+    );
+    testRule(
+      'RequireResponseCachingRule',
+      'require_response_caching',
+      () => RequireResponseCachingRule(),
+    );
+    testRule(
+      'PreferPaginationRule',
+      'prefer_api_pagination',
+      () => PreferPaginationRule(),
+    );
+    testRule(
+      'AvoidOverFetchingRule',
+      'avoid_over_fetching',
+      () => AvoidOverFetchingRule(),
+    );
+    testRule(
+      'RequireCancelTokenRule',
+      'require_cancel_token',
+      () => RequireCancelTokenRule(),
+    );
+    testRule(
+      'RequireWebSocketErrorHandlingRule',
+      'require_websocket_error_handling',
+      () => RequireWebSocketErrorHandlingRule(),
+    );
+    testRule(
+      'RequireContentTypeCheckRule',
+      'require_content_type_check',
+      () => RequireContentTypeCheckRule(),
+    );
+    testRule(
+      'AvoidWebsocketWithoutHeartbeatRule',
+      'avoid_websocket_without_heartbeat',
+      () => AvoidWebsocketWithoutHeartbeatRule(),
+    );
+    testRule(
+      'RequireUrlLauncherErrorHandlingRule',
+      'require_url_launcher_error_handling',
+      () => RequireUrlLauncherErrorHandlingRule(),
+    );
+    testRule(
+      'RequireImagePickerErrorHandlingRule',
+      'require_image_picker_error_handling',
+      () => RequireImagePickerErrorHandlingRule(),
+    );
+    testRule(
+      'RequireImagePickerSourceChoiceRule',
+      'require_image_picker_source_choice',
+      () => RequireImagePickerSourceChoiceRule(),
+    );
+    testRule(
+      'RequireGeolocatorTimeoutRule',
+      'require_geolocator_timeout',
+      () => RequireGeolocatorTimeoutRule(),
+    );
+    testRule(
+      'RequireConnectivitySubscriptionCancelRule',
+      'require_connectivity_subscription_cancel',
+      () => RequireConnectivitySubscriptionCancelRule(),
+    );
+    testRule(
+      'RequireNotificationHandlerTopLevelRule',
+      'require_notification_handler_top_level',
+      () => RequireNotificationHandlerTopLevelRule(),
+    );
+    testRule(
+      'RequirePermissionDeniedHandlingRule',
+      'require_permission_denied_handling',
+      () => RequirePermissionDeniedHandlingRule(),
+    );
+    testRule(
+      'RequireImagePickerResultHandlingRule',
+      'require_image_picker_result_handling',
+      () => RequireImagePickerResultHandlingRule(),
+    );
+    testRule(
+      'AvoidCachedImageInBuildRule',
+      'avoid_cached_image_in_build',
+      () => AvoidCachedImageInBuildRule(),
+    );
+    testRule(
+      'RequireSqfliteMigrationRule',
+      'require_sqflite_migration',
+      () => RequireSqfliteMigrationRule(),
+    );
+    testRule(
+      'RequirePermissionRationaleRule',
+      'require_permission_rationale',
+      () => RequirePermissionRationaleRule(),
+    );
+    testRule(
+      'RequirePermissionStatusCheckRule',
+      'require_permission_status_check',
+      () => RequirePermissionStatusCheckRule(),
+    );
+    testRule(
+      'RequireNotificationPermissionAndroid13Rule',
+      'require_notification_permission_android13',
+      () => RequireNotificationPermissionAndroid13Rule(),
+    );
+    testRule(
+      'RequireSseSubscriptionCancelRule',
+      'require_sse_subscription_cancel',
+      () => RequireSseSubscriptionCancelRule(),
+    );
+    testRule(
+      'PreferTimeoutOnRequestsRule',
+      'prefer_timeout_on_requests',
+      () => PreferTimeoutOnRequestsRule(),
+    );
+    testRule(
+      'RequireWebsocketReconnectionRule',
+      'require_websocket_reconnection',
+      () => RequireWebsocketReconnectionRule(),
+    );
+    testRule(
+      'RequireAnalyticsEventNamingRule',
+      'require_analytics_event_naming',
+      () => RequireAnalyticsEventNamingRule(),
+    );
+    testRule(
+      'PreferBatchRequestsRule',
+      'prefer_batch_requests',
+      () => PreferBatchRequestsRule(),
+    );
+    testRule(
+      'RequireCompressionRule',
+      'require_compression',
+      () => RequireCompressionRule(),
+    );
+    testRule(
+      'RequireSslPinningSensitiveRule',
+      'require_ssl_pinning_sensitive',
+      () => RequireSslPinningSensitiveRule(),
+    );
   });
   group('Api Network Rules - Fixture Verification', () {
     final fixtures = [

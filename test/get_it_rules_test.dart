@@ -17,9 +17,22 @@ void main() {
         expect(rule.code.correctionMessage, isNotNull);
       });
     }
-    testRule('AvoidGetItInBuildRule', 'avoid_getit_in_build', () => AvoidGetItInBuildRule());
-    testRule('RequireGetItRegistrationOrderRule', 'require_getit_registration_order', () => RequireGetItRegistrationOrderRule());
-    testRule('RequireGetItResetInTestsRule', 'require_getit_reset_in_tests', () => RequireGetItResetInTestsRule());
+
+    testRule(
+      'AvoidGetItInBuildRule',
+      'avoid_getit_in_build',
+      () => AvoidGetItInBuildRule(),
+    );
+    testRule(
+      'RequireGetItRegistrationOrderRule',
+      'require_getit_registration_order',
+      () => RequireGetItRegistrationOrderRule(),
+    );
+    testRule(
+      'RequireGetItResetInTestsRule',
+      'require_getit_reset_in_tests',
+      () => RequireGetItResetInTestsRule(),
+    );
   });
   group('GetIt Rules - Fixture Verification', () {
     final fixtures = [

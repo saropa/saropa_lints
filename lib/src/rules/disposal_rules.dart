@@ -109,7 +109,7 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
           if (typeName != null) {
             if (_mediaControllerTypePatterns.any((p) => p.hasMatch(typeName))) {
               for (final VariableDeclaration variable
-                    in member.fields.variables) {
+                  in member.fields.variables) {
                 controllerNames.add(variable.name.lexeme);
               }
             }
@@ -130,7 +130,8 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
 
       // Check if controllers are disposed
       for (final String name in controllerNames) {
-        final bool isDisposed = disposeMethodBody != null &&
+        final bool isDisposed =
+            disposeMethodBody != null &&
             isFieldCleanedUp(name, 'dispose', disposeMethodBody);
 
         if (!isDisposed) {
@@ -258,7 +259,8 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
 
       // Check if controllers are disposed
       for (final String name in controllerNames) {
-        final bool isDisposed = disposeMethodBody != null &&
+        final bool isDisposed =
+            disposeMethodBody != null &&
             isFieldCleanedUp(name, 'dispose', disposeMethodBody);
 
         if (!isDisposed) {
@@ -854,8 +856,9 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
-  static final _videoPlayerControllerPattern =
-      RegExp(r'\bVideoPlayerController\b');
+  static final _videoPlayerControllerPattern = RegExp(
+    r'\bVideoPlayerController\b',
+  );
 
   @override
   void runWithReporter(
@@ -992,8 +995,9 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  static final _streamSubscriptionTypePattern =
-      RegExp(r'\bStreamSubscription\b');
+  static final _streamSubscriptionTypePattern = RegExp(
+    r'\bStreamSubscription\b',
+  );
 
   @override
   void runWithReporter(
@@ -1321,7 +1325,8 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
       }
 
       for (final String field in portFields) {
-        final bool isClosed = disposeMethodBody != null &&
+        final bool isClosed =
+            disposeMethodBody != null &&
             isFieldCleanedUp(field, 'close', disposeMethodBody);
         if (!isClosed) {
           for (final ClassMember member in node.members) {
@@ -1432,7 +1437,8 @@ class RequireSocketCloseRule extends SaropaLintRule {
       }
 
       for (final String field in socketFields) {
-        final bool isClosed = disposeMethodBody != null &&
+        final bool isClosed =
+            disposeMethodBody != null &&
             (isFieldCleanedUp(field, 'close', disposeMethodBody) ||
                 isFieldCleanedUp(field, 'destroy', disposeMethodBody));
         if (!isClosed) {
@@ -1547,7 +1553,8 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
       }
 
       for (final String field in timerFields) {
-        final bool isCanceled = disposeMethodBody != null &&
+        final bool isCanceled =
+            disposeMethodBody != null &&
             isFieldCleanedUp(field, 'cancel', disposeMethodBody);
         if (!isCanceled) {
           for (final ClassMember member in node.members) {
@@ -1689,7 +1696,8 @@ class RequireIntervalTimerCancelRule extends SaropaLintRule {
         }
       }
 
-      final bool isCanceled = disposeMethodBody != null &&
+      final bool isCanceled =
+          disposeMethodBody != null &&
           isFieldCleanedUp(fieldName, 'cancel', disposeMethodBody);
 
       if (!isCanceled) {
@@ -1789,7 +1797,8 @@ class RequireFileHandleCloseRule extends SaropaLintRule {
       }
 
       for (final String field in fileFields) {
-        final bool isClosed = disposeMethodBody != null &&
+        final bool isClosed =
+            disposeMethodBody != null &&
             (isFieldCleanedUp(field, 'close', disposeMethodBody) ||
                 isFieldCleanedUp(field, 'closeSync', disposeMethodBody));
         if (!isClosed) {
@@ -1923,8 +1932,9 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null) {
             for (final String disposableType in _disposableTypes) {
-              if (RegExp(r'\b' + RegExp.escape(disposableType) + r'\b')
-                  .hasMatch(typeName)) {
+              if (RegExp(
+                r'\b' + RegExp.escape(disposableType) + r'\b',
+              ).hasMatch(typeName)) {
                 for (final VariableDeclaration variable
                     in member.fields.variables) {
                   disposableFields.add(variable.name.lexeme);
@@ -2273,8 +2283,9 @@ class DisposeClassFieldsRule extends SaropaLintRule {
           final typeName = member.fields.type?.toSource();
           if (typeName != null) {
             for (final disposable in _disposableTypes) {
-              if (RegExp(r'\b' + RegExp.escape(disposable) + r'\b')
-                  .hasMatch(typeName)) {
+              if (RegExp(
+                r'\b' + RegExp.escape(disposable) + r'\b',
+              ).hasMatch(typeName)) {
                 for (final variable in member.fields.variables) {
                   final fieldName = variable.name.lexeme;
                   // Skip fields that are passed in via constructor

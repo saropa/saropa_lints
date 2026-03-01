@@ -2204,7 +2204,8 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
           if (methodName == 'dispose' || methodName == 'close') {
             final String? bodySource = member.body.toSource();
             if (bodySource != null) {
-              hasClose = hasClose || RegExp(r'\.close\s*\(').hasMatch(bodySource);
+              hasClose =
+                  hasClose || RegExp(r'\.close\s*\(').hasMatch(bodySource);
               hasDispose =
                   hasDispose || RegExp(r'\.dispose\s*\(').hasMatch(bodySource);
             }
@@ -2434,8 +2435,9 @@ class RequireFutureTimeoutRule extends SaropaLintRule {
     'export',
     'import',
   };
-  static final List<RegExp> _longRunningMethodPatterns =
-      _longRunningMethods.map((s) => RegExp('\\b${RegExp.escape(s)}\\b')).toList();
+  static final List<RegExp> _longRunningMethodPatterns = _longRunningMethods
+      .map((s) => RegExp('\\b${RegExp.escape(s)}\\b'))
+      .toList();
 
   @override
   void runWithReporter(
@@ -2448,8 +2450,9 @@ class RequireFutureTimeoutRule extends SaropaLintRule {
 
       final String methodName = expr.methodName.name.toLowerCase();
 
-      bool isLongRunning = _longRunningMethodPatterns
-          .any((p) => p.hasMatch(methodName));
+      bool isLongRunning = _longRunningMethodPatterns.any(
+        (p) => p.hasMatch(methodName),
+      );
 
       if (!isLongRunning) return;
 
@@ -2775,7 +2778,7 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
     '_sub',
   };
 
-  /// True if [type] is StreamSubscription, StreamSubscription?, or StreamSubscription<...>.
+  /// True if [type] is StreamSubscription, StreamSubscription?, or `StreamSubscription<...>`.
   static bool _isStreamSubscriptionType(String? type) {
     return type != null &&
         (type == 'StreamSubscription' ||
@@ -3484,8 +3487,9 @@ class PreferBroadcastStreamRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  static final RegExp _asBroadcastStreamPattern =
-      RegExp(r'\basBroadcastStream\b');
+  static final RegExp _asBroadcastStreamPattern = RegExp(
+    r'\basBroadcastStream\b',
+  );
 
   @override
   void runWithReporter(
@@ -4291,8 +4295,9 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
       final int nodeOffset = node.offset;
       final int bodyOffset = functionBody.offset;
 
-      if (!_streamControllerCreationPatterns
-          .any((p) => p.hasMatch(bodySource))) {
+      if (!_streamControllerCreationPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      )) {
         return;
       }
 

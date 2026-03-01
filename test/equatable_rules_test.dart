@@ -17,20 +17,77 @@ void main() {
         expect(rule.code.correctionMessage, isNotNull);
       });
     }
-    testRule('ExtendEquatableRule', 'require_extend_equatable', () => ExtendEquatableRule());
-    testRule('ListAllEquatableFieldsRule', 'list_all_equatable_fields', () => ListAllEquatableFieldsRule());
-    testRule('PreferEquatableMixinRule', 'prefer_equatable_mixin', () => PreferEquatableMixinRule());
-    testRule('PreferEquatableStringifyRule', 'prefer_equatable_stringify', () => PreferEquatableStringifyRule());
-    testRule('PreferImmutableAnnotationRule', 'prefer_immutable_annotation', () => PreferImmutableAnnotationRule());
-    testRule('PreferRecordOverEquatableRule', 'prefer_record_over_equatable', () => PreferRecordOverEquatableRule());
-    testRule('AvoidMutableFieldInEquatableRule', 'avoid_mutable_field_in_equatable', () => AvoidMutableFieldInEquatableRule());
-    testRule('RequireEquatableCopyWithRule', 'require_equatable_copy_with', () => RequireEquatableCopyWithRule());
-    testRule('RequireCopyWithNullHandlingRule', 'require_copy_with_null_handling', () => RequireCopyWithNullHandlingRule());
-    testRule('RequireDeepEqualityCollectionsRule', 'require_deep_equality_collections', () => RequireDeepEqualityCollectionsRule());
-    testRule('AvoidEquatableDatetimeRule', 'avoid_equatable_datetime', () => AvoidEquatableDatetimeRule());
-    testRule('PreferUnmodifiableCollectionsRule', 'prefer_unmodifiable_collections', () => PreferUnmodifiableCollectionsRule());
-    testRule('RequireEquatablePropsOverrideRule', 'require_equatable_props_override', () => RequireEquatablePropsOverrideRule());
-    testRule('AvoidEquatableNestedEqualityRule', 'avoid_equatable_nested_equality', () => AvoidEquatableNestedEqualityRule());
+
+    testRule(
+      'ExtendEquatableRule',
+      'require_extend_equatable',
+      () => ExtendEquatableRule(),
+    );
+    testRule(
+      'ListAllEquatableFieldsRule',
+      'list_all_equatable_fields',
+      () => ListAllEquatableFieldsRule(),
+    );
+    testRule(
+      'PreferEquatableMixinRule',
+      'prefer_equatable_mixin',
+      () => PreferEquatableMixinRule(),
+    );
+    testRule(
+      'PreferEquatableStringifyRule',
+      'prefer_equatable_stringify',
+      () => PreferEquatableStringifyRule(),
+    );
+    testRule(
+      'PreferImmutableAnnotationRule',
+      'prefer_immutable_annotation',
+      () => PreferImmutableAnnotationRule(),
+    );
+    testRule(
+      'PreferRecordOverEquatableRule',
+      'prefer_record_over_equatable',
+      () => PreferRecordOverEquatableRule(),
+    );
+    testRule(
+      'AvoidMutableFieldInEquatableRule',
+      'avoid_mutable_field_in_equatable',
+      () => AvoidMutableFieldInEquatableRule(),
+    );
+    testRule(
+      'RequireEquatableCopyWithRule',
+      'require_equatable_copy_with',
+      () => RequireEquatableCopyWithRule(),
+    );
+    testRule(
+      'RequireCopyWithNullHandlingRule',
+      'require_copy_with_null_handling',
+      () => RequireCopyWithNullHandlingRule(),
+    );
+    testRule(
+      'RequireDeepEqualityCollectionsRule',
+      'require_deep_equality_collections',
+      () => RequireDeepEqualityCollectionsRule(),
+    );
+    testRule(
+      'AvoidEquatableDatetimeRule',
+      'avoid_equatable_datetime',
+      () => AvoidEquatableDatetimeRule(),
+    );
+    testRule(
+      'PreferUnmodifiableCollectionsRule',
+      'prefer_unmodifiable_collections',
+      () => PreferUnmodifiableCollectionsRule(),
+    );
+    testRule(
+      'RequireEquatablePropsOverrideRule',
+      'require_equatable_props_override',
+      () => RequireEquatablePropsOverrideRule(),
+    );
+    testRule(
+      'AvoidEquatableNestedEqualityRule',
+      'avoid_equatable_nested_equality',
+      () => AvoidEquatableNestedEqualityRule(),
+    );
   });
   group('Equatable Rules - Fixture Verification', () {
     final fixtures = [

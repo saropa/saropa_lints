@@ -17,42 +17,187 @@ void main() {
         expect(rule.code.correctionMessage, isNotNull);
       });
     }
-    testRule('RequireUnknownRouteHandlerRule', 'require_unknown_route_handler', () => RequireUnknownRouteHandlerRule());
-    testRule('AvoidContextAfterNavigationRule', 'avoid_context_after_navigation', () => AvoidContextAfterNavigationRule());
-    testRule('RequireRouteTransitionConsistencyRule', 'require_route_transition_consistency', () => RequireRouteTransitionConsistencyRule());
-    testRule('AvoidNavigatorPushUnnamedRule', 'avoid_navigator_push_unnamed', () => AvoidNavigatorPushUnnamedRule());
-    testRule('RequireRouteGuardsRule', 'require_route_guards', () => RequireRouteGuardsRule());
-    testRule('AvoidCircularRedirectsRule', 'avoid_circular_redirects', () => AvoidCircularRedirectsRule());
-    testRule('AvoidPopWithoutResultRule', 'avoid_pop_without_result', () => AvoidPopWithoutResultRule());
-    testRule('PreferShellRouteForPersistentUiRule', 'prefer_shell_route_for_persistent_ui', () => PreferShellRouteForPersistentUiRule());
-    testRule('RequireDeepLinkFallbackRule', 'require_deep_link_fallback', () => RequireDeepLinkFallbackRule());
-    testRule('AvoidDeepLinkSensitiveParamsRule', 'avoid_deep_link_sensitive_params', () => AvoidDeepLinkSensitiveParamsRule());
-    testRule('PreferTypedRouteParamsRule', 'prefer_typed_route_params', () => PreferTypedRouteParamsRule());
-    testRule('RequireStepperValidationRule', 'require_stepper_validation', () => RequireStepperValidationRule());
-    testRule('RequireStepCountIndicatorRule', 'require_step_count_indicator', () => RequireStepCountIndicatorRule());
-    testRule('AvoidGoRouterInlineCreationRule', 'avoid_go_router_inline_creation', () => AvoidGoRouterInlineCreationRule());
-    testRule('RequireGoRouterErrorHandlerRule', 'require_go_router_error_handler', () => RequireGoRouterErrorHandlerRule());
-    testRule('RequireGoRouterRefreshListenableRule', 'require_go_router_refresh_listenable', () => RequireGoRouterRefreshListenableRule());
-    testRule('AvoidGoRouterStringPathsRule', 'avoid_go_router_string_paths', () => AvoidGoRouterStringPathsRule());
-    testRule('PreferGoRouterRedirectAuthRule', 'prefer_go_router_redirect_auth', () => PreferGoRouterRedirectAuthRule());
-    testRule('RequireGoRouterTypedParamsRule', 'require_go_router_typed_params', () => RequireGoRouterTypedParamsRule());
-    testRule('PreferGoRouterExtraTypedRule', 'prefer_go_router_extra_typed', () => PreferGoRouterExtraTypedRule());
-    testRule('PreferMaybePopRule', 'prefer_maybe_pop', () => PreferMaybePopRule());
-    testRule('PreferUrlLauncherUriOverStringRule', 'prefer_url_launcher_uri_over_string', () => PreferUrlLauncherUriOverStringRule());
-    testRule('AvoidGoRouterPushReplacementConfusionRule', 'avoid_go_router_push_replacement_confusion', () => AvoidGoRouterPushReplacementConfusionRule());
-    testRule('RequireUrlLauncherEncodingRule', 'require_url_launcher_encoding', () => RequireUrlLauncherEncodingRule());
-    testRule('AvoidNestedRoutesWithoutParentRule', 'avoid_nested_routes_without_parent', () => AvoidNestedRoutesWithoutParentRule());
-    testRule('PreferShellRouteSharedLayoutRule', 'prefer_shell_route_shared_layout', () => PreferShellRouteSharedLayoutRule());
-    testRule('RequireStatefulShellRouteTabsRule', 'require_stateful_shell_route_tabs', () => RequireStatefulShellRouteTabsRule());
-    testRule('RequireGoRouterFallbackRouteRule', 'require_go_router_fallback_route', () => RequireGoRouterFallbackRouteRule());
-    testRule('PreferRouteSettingsNameRule', 'prefer_route_settings_name', () => PreferRouteSettingsNameRule());
-    testRule('AvoidNavigatorContextIssueRule', 'avoid_navigator_context_issue', () => AvoidNavigatorContextIssueRule());
-    testRule('RequirePopResultTypeRule', 'require_pop_result_type', () => RequirePopResultTypeRule());
-    testRule('AvoidPushReplacementMisuseRule', 'avoid_push_replacement_misuse', () => AvoidPushReplacementMisuseRule());
-    testRule('AvoidNestedNavigatorsMisuseRule', 'avoid_nested_navigators_misuse', () => AvoidNestedNavigatorsMisuseRule());
-    testRule('RequireDeepLinkTestingRule', 'require_deep_link_testing', () => RequireDeepLinkTestingRule());
-    testRule('RequireNavigationResultHandlingRule', 'require_navigation_result_handling', () => RequireNavigationResultHandlingRule());
-    testRule('PreferGoRouterRedirectRule', 'prefer_go_router_redirect', () => PreferGoRouterRedirectRule());
+
+    testRule(
+      'RequireUnknownRouteHandlerRule',
+      'require_unknown_route_handler',
+      () => RequireUnknownRouteHandlerRule(),
+    );
+    testRule(
+      'AvoidContextAfterNavigationRule',
+      'avoid_context_after_navigation',
+      () => AvoidContextAfterNavigationRule(),
+    );
+    testRule(
+      'RequireRouteTransitionConsistencyRule',
+      'require_route_transition_consistency',
+      () => RequireRouteTransitionConsistencyRule(),
+    );
+    testRule(
+      'AvoidNavigatorPushUnnamedRule',
+      'avoid_navigator_push_unnamed',
+      () => AvoidNavigatorPushUnnamedRule(),
+    );
+    testRule(
+      'RequireRouteGuardsRule',
+      'require_route_guards',
+      () => RequireRouteGuardsRule(),
+    );
+    testRule(
+      'AvoidCircularRedirectsRule',
+      'avoid_circular_redirects',
+      () => AvoidCircularRedirectsRule(),
+    );
+    testRule(
+      'AvoidPopWithoutResultRule',
+      'avoid_pop_without_result',
+      () => AvoidPopWithoutResultRule(),
+    );
+    testRule(
+      'PreferShellRouteForPersistentUiRule',
+      'prefer_shell_route_for_persistent_ui',
+      () => PreferShellRouteForPersistentUiRule(),
+    );
+    testRule(
+      'RequireDeepLinkFallbackRule',
+      'require_deep_link_fallback',
+      () => RequireDeepLinkFallbackRule(),
+    );
+    testRule(
+      'AvoidDeepLinkSensitiveParamsRule',
+      'avoid_deep_link_sensitive_params',
+      () => AvoidDeepLinkSensitiveParamsRule(),
+    );
+    testRule(
+      'PreferTypedRouteParamsRule',
+      'prefer_typed_route_params',
+      () => PreferTypedRouteParamsRule(),
+    );
+    testRule(
+      'RequireStepperValidationRule',
+      'require_stepper_validation',
+      () => RequireStepperValidationRule(),
+    );
+    testRule(
+      'RequireStepCountIndicatorRule',
+      'require_step_count_indicator',
+      () => RequireStepCountIndicatorRule(),
+    );
+    testRule(
+      'AvoidGoRouterInlineCreationRule',
+      'avoid_go_router_inline_creation',
+      () => AvoidGoRouterInlineCreationRule(),
+    );
+    testRule(
+      'RequireGoRouterErrorHandlerRule',
+      'require_go_router_error_handler',
+      () => RequireGoRouterErrorHandlerRule(),
+    );
+    testRule(
+      'RequireGoRouterRefreshListenableRule',
+      'require_go_router_refresh_listenable',
+      () => RequireGoRouterRefreshListenableRule(),
+    );
+    testRule(
+      'AvoidGoRouterStringPathsRule',
+      'avoid_go_router_string_paths',
+      () => AvoidGoRouterStringPathsRule(),
+    );
+    testRule(
+      'PreferGoRouterRedirectAuthRule',
+      'prefer_go_router_redirect_auth',
+      () => PreferGoRouterRedirectAuthRule(),
+    );
+    testRule(
+      'RequireGoRouterTypedParamsRule',
+      'require_go_router_typed_params',
+      () => RequireGoRouterTypedParamsRule(),
+    );
+    testRule(
+      'PreferGoRouterExtraTypedRule',
+      'prefer_go_router_extra_typed',
+      () => PreferGoRouterExtraTypedRule(),
+    );
+    testRule(
+      'PreferMaybePopRule',
+      'prefer_maybe_pop',
+      () => PreferMaybePopRule(),
+    );
+    testRule(
+      'PreferUrlLauncherUriOverStringRule',
+      'prefer_url_launcher_uri_over_string',
+      () => PreferUrlLauncherUriOverStringRule(),
+    );
+    testRule(
+      'AvoidGoRouterPushReplacementConfusionRule',
+      'avoid_go_router_push_replacement_confusion',
+      () => AvoidGoRouterPushReplacementConfusionRule(),
+    );
+    testRule(
+      'RequireUrlLauncherEncodingRule',
+      'require_url_launcher_encoding',
+      () => RequireUrlLauncherEncodingRule(),
+    );
+    testRule(
+      'AvoidNestedRoutesWithoutParentRule',
+      'avoid_nested_routes_without_parent',
+      () => AvoidNestedRoutesWithoutParentRule(),
+    );
+    testRule(
+      'PreferShellRouteSharedLayoutRule',
+      'prefer_shell_route_shared_layout',
+      () => PreferShellRouteSharedLayoutRule(),
+    );
+    testRule(
+      'RequireStatefulShellRouteTabsRule',
+      'require_stateful_shell_route_tabs',
+      () => RequireStatefulShellRouteTabsRule(),
+    );
+    testRule(
+      'RequireGoRouterFallbackRouteRule',
+      'require_go_router_fallback_route',
+      () => RequireGoRouterFallbackRouteRule(),
+    );
+    testRule(
+      'PreferRouteSettingsNameRule',
+      'prefer_route_settings_name',
+      () => PreferRouteSettingsNameRule(),
+    );
+    testRule(
+      'AvoidNavigatorContextIssueRule',
+      'avoid_navigator_context_issue',
+      () => AvoidNavigatorContextIssueRule(),
+    );
+    testRule(
+      'RequirePopResultTypeRule',
+      'require_pop_result_type',
+      () => RequirePopResultTypeRule(),
+    );
+    testRule(
+      'AvoidPushReplacementMisuseRule',
+      'avoid_push_replacement_misuse',
+      () => AvoidPushReplacementMisuseRule(),
+    );
+    testRule(
+      'AvoidNestedNavigatorsMisuseRule',
+      'avoid_nested_navigators_misuse',
+      () => AvoidNestedNavigatorsMisuseRule(),
+    );
+    testRule(
+      'RequireDeepLinkTestingRule',
+      'require_deep_link_testing',
+      () => RequireDeepLinkTestingRule(),
+    );
+    testRule(
+      'RequireNavigationResultHandlingRule',
+      'require_navigation_result_handling',
+      () => RequireNavigationResultHandlingRule(),
+    );
+    testRule(
+      'PreferGoRouterRedirectRule',
+      'prefer_go_router_redirect',
+      () => PreferGoRouterRedirectRule(),
+    );
   });
   group('Navigation Rules - Fixture Verification', () {
     final fixtures = [

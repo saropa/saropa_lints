@@ -21,10 +21,7 @@ void main() {
     test('RequireImageDisposalRule', () {
       final rule = RequireImageDisposalRule();
       expect(rule.code.name, 'require_image_disposal');
-      expect(
-        rule.code.problemMessage,
-        contains('[require_image_disposal]'),
-      );
+      expect(rule.code.problemMessage, contains('[require_image_disposal]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -81,10 +78,7 @@ void main() {
     test('RequireCacheExpirationRule', () {
       final rule = RequireCacheExpirationRule();
       expect(rule.code.name, 'require_cache_expiration');
-      expect(
-        rule.code.problemMessage,
-        contains('[require_cache_expiration]'),
-      );
+      expect(rule.code.problemMessage, contains('[require_cache_expiration]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -131,10 +125,7 @@ void main() {
     test('RequireExpandoCleanupRule', () {
       final rule = RequireExpandoCleanupRule();
       expect(rule.code.name, 'require_expando_cleanup');
-      expect(
-        rule.code.problemMessage,
-        contains('[require_expando_cleanup]'),
-      );
+      expect(rule.code.problemMessage, contains('[require_expando_cleanup]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

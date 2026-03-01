@@ -17,15 +17,48 @@ void main() {
         expect(rule.code.correctionMessage, isNotNull);
       });
     }
-    testRule('AvoidDirectDataAccessInUiRule', 'avoid_direct_data_access_in_ui', () => AvoidDirectDataAccessInUiRule());
-    testRule('AvoidBusinessLogicInUiRule', 'avoid_business_logic_in_ui', () => AvoidBusinessLogicInUiRule());
-    testRule('AvoidCircularDependenciesRule', 'avoid_circular_dependencies', () => AvoidCircularDependenciesRule());
+
+    testRule(
+      'AvoidDirectDataAccessInUiRule',
+      'avoid_direct_data_access_in_ui',
+      () => AvoidDirectDataAccessInUiRule(),
+    );
+    testRule(
+      'AvoidBusinessLogicInUiRule',
+      'avoid_business_logic_in_ui',
+      () => AvoidBusinessLogicInUiRule(),
+    );
+    testRule(
+      'AvoidCircularDependenciesRule',
+      'avoid_circular_dependencies',
+      () => AvoidCircularDependenciesRule(),
+    );
     testRule('AvoidGodClassRule', 'avoid_god_class', () => AvoidGodClassRule());
-    testRule('AvoidUiInDomainLayerRule', 'avoid_ui_in_domain_layer', () => AvoidUiInDomainLayerRule());
-    testRule('AvoidCrossFeatureDependenciesRule', 'avoid_cross_feature_dependencies', () => AvoidCrossFeatureDependenciesRule());
-    testRule('AvoidSingletonPatternRule', 'avoid_singleton_pattern', () => AvoidSingletonPatternRule());
-    testRule('AvoidTouchOnlyGesturesRule', 'avoid_touch_only_gestures', () => AvoidTouchOnlyGesturesRule());
-    testRule('AvoidCircularImportsRule', 'avoid_circular_imports', () => AvoidCircularImportsRule());
+    testRule(
+      'AvoidUiInDomainLayerRule',
+      'avoid_ui_in_domain_layer',
+      () => AvoidUiInDomainLayerRule(),
+    );
+    testRule(
+      'AvoidCrossFeatureDependenciesRule',
+      'avoid_cross_feature_dependencies',
+      () => AvoidCrossFeatureDependenciesRule(),
+    );
+    testRule(
+      'AvoidSingletonPatternRule',
+      'avoid_singleton_pattern',
+      () => AvoidSingletonPatternRule(),
+    );
+    testRule(
+      'AvoidTouchOnlyGesturesRule',
+      'avoid_touch_only_gestures',
+      () => AvoidTouchOnlyGesturesRule(),
+    );
+    testRule(
+      'AvoidCircularImportsRule',
+      'avoid_circular_imports',
+      () => AvoidCircularImportsRule(),
+    );
   });
   group('Architecture Rules - Fixture Verification', () {
     final fixtures = [

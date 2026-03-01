@@ -11,10 +11,7 @@ void main() {
     test('AvoidHardcodedConfigRule', () {
       final rule = AvoidHardcodedConfigRule();
       expect(rule.code.name, 'avoid_hardcoded_config');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_hardcoded_config]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_hardcoded_config]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -31,10 +28,7 @@ void main() {
     test('AvoidMixedEnvironmentsRule', () {
       final rule = AvoidMixedEnvironmentsRule();
       expect(rule.code.name, 'avoid_mixed_environments');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_mixed_environments]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_mixed_environments]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -51,10 +45,7 @@ void main() {
     test('AvoidStringEnvParsingRule', () {
       final rule = AvoidStringEnvParsingRule();
       expect(rule.code.name, 'avoid_string_env_parsing');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_string_env_parsing]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_string_env_parsing]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -71,10 +62,7 @@ void main() {
     test('PreferSemverVersionRule', () {
       final rule = PreferSemverVersionRule();
       expect(rule.code.name, 'prefer_semver_version');
-      expect(
-        rule.code.problemMessage,
-        contains('[prefer_semver_version]'),
-      );
+      expect(rule.code.problemMessage, contains('[prefer_semver_version]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

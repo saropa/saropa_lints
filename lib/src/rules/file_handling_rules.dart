@@ -183,8 +183,10 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      final bool isPdfOperation = _pdfTypes.any((pdfType) =>
-          RegExp('\\b${RegExp.escape(pdfType)}\\b').hasMatch(targetSource));
+      final bool isPdfOperation = _pdfTypes.any(
+        (pdfType) =>
+            RegExp('\\b${RegExp.escape(pdfType)}\\b').hasMatch(targetSource),
+      );
 
       if (!isPdfOperation) return;
 
@@ -1233,8 +1235,10 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      final bool isPdfOperation = _pdfTypes.any((pdfType) =>
-          RegExp('\\b${RegExp.escape(pdfType)}\\b').hasMatch(targetSource));
+      final bool isPdfOperation = _pdfTypes.any(
+        (pdfType) =>
+            RegExp('\\b${RegExp.escape(pdfType)}\\b').hasMatch(targetSource),
+      );
 
       if (!isPdfOperation) return;
 
@@ -1514,13 +1518,16 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
     'archive',
     'report',
   };
-  static final List<RegExp> _largeFileSourcePatterns =
-      _largeFilePatterns.map((s) => RegExp('\\b${RegExp.escape(s)}\\b')).toList();
+  static final List<RegExp> _largeFileSourcePatterns = _largeFilePatterns
+      .map((s) => RegExp('\\b${RegExp.escape(s)}\\b'))
+      .toList();
   static final List<RegExp> _largeFileBodyPatterns = _largeFilePatterns
-      .expand((s) => [
-            RegExp('\\b${RegExp.escape(s)}file\\b'),
-            RegExp('\\b${RegExp.escape(s)}_file\\b'),
-          ])
+      .expand(
+        (s) => [
+          RegExp('\\b${RegExp.escape(s)}file\\b'),
+          RegExp('\\b${RegExp.escape(s)}_file\\b'),
+        ],
+      )
       .toList();
 
   @override

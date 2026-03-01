@@ -750,35 +750,50 @@ void main() {
         expect('PRAGMA exemption in fixture', isNotNull);
       });
 
-      test('word-boundary matching: identifiers selection/updateTime should NOT trigger', () {
-        // Variable names containing SQL substrings must not be treated as keywords.
-        expect('Word-boundary regression case in fixture', isNotNull);
-      });
+      test(
+        'word-boundary matching: identifiers selection/updateTime should NOT trigger',
+        () {
+          // Variable names containing SQL substrings must not be treated as keywords.
+          expect('Word-boundary regression case in fixture', isNotNull);
+        },
+      );
     });
 
     group('avoid_ref_read_inside_build / avoid_ref_in_build_body', () {
-      test('ref.read() inside inline callback (onPressed, onSubmit) should NOT trigger', () {
-        // Closure boundary stops traversal; ref.read() in callbacks is correct.
-        expect('Callback boundary exemption', isNotNull);
-      });
+      test(
+        'ref.read() inside inline callback (onPressed, onSubmit) should NOT trigger',
+        () {
+          // Closure boundary stops traversal; ref.read() in callbacks is correct.
+          expect('Callback boundary exemption', isNotNull);
+        },
+      );
     });
 
     group('avoid_ref_watch_outside_build', () {
-      test('ref.watch() inside Provider/StreamProvider/FutureProvider body should NOT trigger', () {
-        // Provider bodies are reactive contexts like build().
-        expect('Provider body exemption in fixture', isNotNull);
-      });
+      test(
+        'ref.watch() inside Provider/StreamProvider/FutureProvider body should NOT trigger',
+        () {
+          // Provider bodies are reactive contexts like build().
+          expect('Provider body exemption in fixture', isNotNull);
+        },
+      );
     });
 
     group('avoid_path_traversal / require_file_path_sanitization', () {
-      test('platform path API (getApplicationDocumentsDirectory) should NOT trigger', () {
-        expect('Platform path trusted source', isNotNull);
-      });
+      test(
+        'platform path API (getApplicationDocumentsDirectory) should NOT trigger',
+        () {
+          expect('Platform path trusted source', isNotNull);
+        },
+      );
 
-      test('private helper receiving path from platform API in caller should NOT trigger', () {
-        // 6.0.5: trust traced through private method call sites.
-        expect('Inter-procedural trust in fixture', isNotNull);
-      });
+      test(
+        'private helper receiving path from platform API in caller should NOT trigger',
+        () {
+          // 6.0.5: trust traced through private method call sites.
+          expect('Inter-procedural trust in fixture', isNotNull);
+        },
+      );
     });
 
     group('avoid_unsafe_collection_methods', () {
@@ -786,15 +801,21 @@ void main() {
         expect('Early-return and length guard in fixture', isNotNull);
       });
 
-      test('.first in SegmentedButton.onSelectionChanged should NOT trigger', () {
-        expect('Callback guaranteed non-empty in fixture', isNotNull);
-      });
+      test(
+        '.first in SegmentedButton.onSelectionChanged should NOT trigger',
+        () {
+          expect('Callback guaranteed non-empty in fixture', isNotNull);
+        },
+      );
     });
 
     group('avoid_unsafe_reduce', () {
-      test('reduce() after length < 2 or isNotEmpty guard should NOT trigger', () {
-        expect('Guarded reduce regression cases in fixture', isNotNull);
-      });
+      test(
+        'reduce() after length < 2 or isNotEmpty guard should NOT trigger',
+        () {
+          expect('Guarded reduce regression cases in fixture', isNotNull);
+        },
+      );
     });
 
     group('require_app_startup_error_handling', () {
@@ -805,9 +826,12 @@ void main() {
     });
 
     group('require_search_debounce', () {
-      test('Timer/Debouncer as class field used in onChanged should NOT trigger', () {
-        expect('Class field debouncer regression in fixture', isNotNull);
-      });
+      test(
+        'Timer/Debouncer as class field used in onChanged should NOT trigger',
+        () {
+          expect('Class field debouncer regression in fixture', isNotNull);
+        },
+      );
     });
 
     group('require_minimum_contrast', () {

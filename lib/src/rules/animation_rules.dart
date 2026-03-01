@@ -316,7 +316,8 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
 
       // Check if controllers are disposed
       for (final String name in controllerNames) {
-        final bool isDisposed = disposeMethodBody != null &&
+        final bool isDisposed =
+            disposeMethodBody != null &&
             isFieldCleanedUp(name, 'dispose', disposeMethodBody);
 
         if (!isDisposed) {

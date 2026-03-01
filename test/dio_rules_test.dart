@@ -17,20 +17,77 @@ void main() {
         expect(rule.code.correctionMessage, isNotNull);
       });
     }
-    testRule('RequireDioTimeoutRule', 'require_dio_timeout', () => RequireDioTimeoutRule());
-    testRule('RequireDioErrorHandlingRule', 'require_dio_error_handling', () => RequireDioErrorHandlingRule());
-    testRule('RequireDioInterceptorErrorHandlerRule', 'require_dio_interceptor_error_handler', () => RequireDioInterceptorErrorHandlerRule());
-    testRule('PreferDioCancelTokenRule', 'prefer_dio_cancel_token', () => PreferDioCancelTokenRule());
-    testRule('RequireDioSslPinningRule', 'require_dio_ssl_pinning', () => RequireDioSslPinningRule());
-    testRule('AvoidDioFormDataLeakRule', 'avoid_dio_form_data_leak', () => AvoidDioFormDataLeakRule());
-    testRule('AvoidDioDebugPrintProductionRule', 'avoid_dio_debug_print_production', () => AvoidDioDebugPrintProductionRule());
-    testRule('RequireDioSingletonRule', 'require_dio_singleton', () => RequireDioSingletonRule());
-    testRule('PreferDioBaseOptionsRule', 'prefer_dio_base_options', () => PreferDioBaseOptionsRule());
-    testRule('AvoidDioWithoutBaseUrlRule', 'avoid_dio_without_base_url', () => AvoidDioWithoutBaseUrlRule());
-    testRule('PreferDioOverHttpRule', 'prefer_dio_over_http', () => PreferDioOverHttpRule());
-    testRule('RequireDioResponseTypeRule', 'require_dio_response_type', () => RequireDioResponseTypeRule());
-    testRule('RequireDioRetryInterceptorRule', 'require_dio_retry_interceptor', () => RequireDioRetryInterceptorRule());
-    testRule('PreferDioTransformerRule', 'prefer_dio_transformer', () => PreferDioTransformerRule());
+
+    testRule(
+      'RequireDioTimeoutRule',
+      'require_dio_timeout',
+      () => RequireDioTimeoutRule(),
+    );
+    testRule(
+      'RequireDioErrorHandlingRule',
+      'require_dio_error_handling',
+      () => RequireDioErrorHandlingRule(),
+    );
+    testRule(
+      'RequireDioInterceptorErrorHandlerRule',
+      'require_dio_interceptor_error_handler',
+      () => RequireDioInterceptorErrorHandlerRule(),
+    );
+    testRule(
+      'PreferDioCancelTokenRule',
+      'prefer_dio_cancel_token',
+      () => PreferDioCancelTokenRule(),
+    );
+    testRule(
+      'RequireDioSslPinningRule',
+      'require_dio_ssl_pinning',
+      () => RequireDioSslPinningRule(),
+    );
+    testRule(
+      'AvoidDioFormDataLeakRule',
+      'avoid_dio_form_data_leak',
+      () => AvoidDioFormDataLeakRule(),
+    );
+    testRule(
+      'AvoidDioDebugPrintProductionRule',
+      'avoid_dio_debug_print_production',
+      () => AvoidDioDebugPrintProductionRule(),
+    );
+    testRule(
+      'RequireDioSingletonRule',
+      'require_dio_singleton',
+      () => RequireDioSingletonRule(),
+    );
+    testRule(
+      'PreferDioBaseOptionsRule',
+      'prefer_dio_base_options',
+      () => PreferDioBaseOptionsRule(),
+    );
+    testRule(
+      'AvoidDioWithoutBaseUrlRule',
+      'avoid_dio_without_base_url',
+      () => AvoidDioWithoutBaseUrlRule(),
+    );
+    testRule(
+      'PreferDioOverHttpRule',
+      'prefer_dio_over_http',
+      () => PreferDioOverHttpRule(),
+    );
+    testRule(
+      'RequireDioResponseTypeRule',
+      'require_dio_response_type',
+      () => RequireDioResponseTypeRule(),
+    );
+    testRule(
+      'RequireDioRetryInterceptorRule',
+      'require_dio_retry_interceptor',
+      () => RequireDioRetryInterceptorRule(),
+    );
+    testRule(
+      'PreferDioTransformerRule',
+      'prefer_dio_transformer',
+      () => PreferDioTransformerRule(),
+    );
   });
   group('Dio Rules - Fixture Verification', () {
     final fixtures = [

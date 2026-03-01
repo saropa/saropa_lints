@@ -389,8 +389,9 @@ class PreferImageCroppingRule extends SaropaLintRule {
           methodDeclaration?.name.lexeme.toLowerCase() ?? '';
 
       // Check if this is profile/avatar context (word-boundary to avoid FP)
-      final bool isProfileContext = _profileContextKeywordPatterns
-          .any((p) => p.hasMatch(bodySource) || p.hasMatch(methodNameLower));
+      final bool isProfileContext = _profileContextKeywordPatterns.any(
+        (p) => p.hasMatch(bodySource) || p.hasMatch(methodNameLower),
+      );
 
       if (!isProfileContext) return;
 
