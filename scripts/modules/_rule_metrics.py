@@ -150,6 +150,46 @@ def _count_fixtures_for_category(
 
 
 _TEST_COUNT_RE = re.compile(r"^\s+test\(", re.MULTILINE)
+_RULE_INSTANTIATION_MARKER = "Rule Instantiation"
+
+
+def _compute_rule_instantiation_stats(
+    project_dir: Path, rules_dir: Path,
+) -> tuple[int, int, list[str]]:
+    """Compute how many category test files have a Rule Instantiation group.
+
+    Scans test/*_rules_test.dart for the string 'Rule Instantiation' (the
+    group that instantiates each rule and asserts code.name, problemMessage,
+    correctionMessage). Does not read bugs/UNIT_TEST_COVERAGE_REVIEW.md.
+
+    Returns:
+        (categories_with_instantiation, total_categories_with_tests,
+         list of category names missing Rule Instantiation)
+    """
+    test_dir = project_dir / "test"
+    if not test_dir.exists():
+        return 0, 0, []
+
+    categories = _collect_category_rules(rules_dir)
+    with_instantiation: list[str] = []
+    without_instantiation: list[str] = []
+
+    for cat in categories:
+        test_path = test_dir / f"{cat.category}_rules_test.dart"
+        if not test_path.exists():
+            continue
+        try:
+            content = test_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            without_instantiation.append(cat.category)
+            continue
+        if _RULE_INSTANTIATION_MARKER in content:
+            with_instantiation.append(cat.category)
+        else:
+            without_instantiation.append(cat.category)
+
+    total_with_tests = len(with_instantiation) + len(without_instantiation)
+    return len(with_instantiation), total_with_tests, without_instantiation
 
 
 def _compute_unit_test_stats(
@@ -229,6 +269,13 @@ def display_test_coverage(project_dir: Path) -> None:
     )
     unit_color, unit_status = _status_for_percentage(unit_pct)
 
+    # --- Rule instantiation coverage (from code: presence of group in test) ---
+    ri_count, ri_total, ri_missing = _compute_rule_instantiation_stats(
+        project_dir, rules_dir,
+    )
+    ri_pct = (ri_count / ri_total * 100) if ri_total > 0 else 0
+    ri_color, ri_status = _status_for_percentage(ri_pct)
+
     print()
     print_colored("  ▶ Test Coverage", Color.WHITE)
     print()
@@ -250,6 +297,16 @@ def display_test_coverage(project_dir: Path) -> None:
         f"({unit_pct:5.1f}%) {unit_status}",
         unit_color,
     )
+
+    # Rule instantiation bar (categories with "Rule Instantiation" group)
+    if ri_total > 0:
+        bar = _make_bar(ri_count, ri_total)
+        print_colored(
+            f"    Rule inst.  {bar}  "
+            f"{ri_count:>4d}/{ri_total:<4d} "
+            f"({ri_pct:5.1f}%) {ri_status}",
+            ri_color,
+        )
 
     if unit_total_tests > 0:
         print_colored(
@@ -295,6 +352,21 @@ def display_test_coverage(project_dir: Path) -> None:
                 f"    {category:<14s} ({rules:>3d} rules) "
                 f"needs test/{category}_rules_test.dart",
                 Color.RED if rules > 20 else Color.YELLOW,
+            )
+
+    # Missing Rule Instantiation (test file exists but no group)
+    if ri_missing:
+        print()
+        print_colored("    Missing Rule Instantiation group:", Color.WHITE)
+        for category in ri_missing[:10]:
+            print_colored(
+                f"    {category} (add group in test/{category}_rules_test.dart)",
+                Color.YELLOW,
+            )
+        if len(ri_missing) > 10:
+            print_colored(
+                f"    ... and {len(ri_missing) - 10} more",
+                Color.YELLOW,
             )
     print()
 
