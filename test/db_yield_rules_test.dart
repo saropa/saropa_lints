@@ -42,6 +42,20 @@ void main() {
       test('yield/await after DB write should NOT trigger', () {
         expect('yield/await after DB write', isNotNull);
       });
+
+      test(
+        'write as last statement or followed by return should NOT trigger',
+        () {
+          expect('last statement or return suppression', isNotNull);
+        },
+      );
+
+      test(
+        'write inside compute/Isolate or in test file should NOT trigger',
+        () {
+          expect('isolate or test file suppression', isNotNull);
+        },
+      );
     });
   });
 

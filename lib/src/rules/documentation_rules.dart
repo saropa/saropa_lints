@@ -628,16 +628,20 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
   }
 }
 
-/// Warns when a dartdoc `[name]` references a parameter that does not exist
+/// Warns when a dartdoc `[name]` reference does not match any parameter,
+/// type, or field in scope.
 ///
-/// Since: v4.10.1 | Updated: v4.13.0 | Rule version: v2
-///
-/// in the function, method, or constructor signature.
+/// **Since:** v4.10.1 | **Updated:** v4.13.0 | **Rule version:** v3
 ///
 /// The existing `require_parameter_documentation` rule checks that real
 /// parameters are documented. This rule checks the inverse: that documented
-/// `[names]` actually correspond to real parameters (or valid type/field
-/// references).
+/// `[names]` correspond to real parameters, class fields, or known doc
+/// references (e.g. built-in types, literals).
+///
+/// **Suppressions:** No lint for `[String]`, `[int]`, `[null]`, `[true]`,
+/// `[false]`, or other `_knownDocRefNames`; single-letter uppercase (type
+/// params); PascalCase only when confirmed as parameter context (bullet or
+/// "parameter"/"argument" keyword); class field names.
 ///
 /// **BAD:**
 /// ```dart
@@ -682,6 +686,29 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
     'param',
     'argument',
     'arg',
+  };
+
+  /// Built-in types and literals that are valid doc references (not parameters).
+  /// Suppresses false positives for [String], [int], [null], [true], [false], etc.
+  static const Set<String> _knownDocRefNames = <String>{
+    'null',
+    'true',
+    'false',
+    'String',
+    'int',
+    'bool',
+    'double',
+    'num',
+    'List',
+    'Map',
+    'Set',
+    'Iterable',
+    'Future',
+    'Stream',
+    'Object',
+    'dynamic',
+    'void',
+    'Never',
   };
 
   @override
@@ -745,6 +772,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
         final String name = match.group(1)!;
 
         if (paramNames.contains(name)) continue;
+        if (_knownDocRefNames.contains(name)) continue;
         if (name.length == 1 && name == name.toUpperCase()) continue;
 
         if (name[0] == name[0].toUpperCase()) {

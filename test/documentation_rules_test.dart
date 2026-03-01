@@ -113,6 +113,13 @@ void main() {
       test('matching param names in docs should NOT trigger', () {
         expect('matching param names in docs', isNotNull);
       });
+
+      test(
+        'built-in type refs [String], [int], [bool] in docs should NOT trigger',
+        () {
+          expect('built-in type refs in docs', isNotNull);
+        },
+      );
     });
   });
 }

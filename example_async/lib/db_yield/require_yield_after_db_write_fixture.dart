@@ -106,9 +106,12 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // NOTE: require_yield_after_db_write fires on database write ops
-// (writeTxn, putAll) without yieldToUI() after.
-// Requires specific DB method name patterns.
+// (writeTxn, putAll) without a yield to the UI after.
 //
-// BAD: await isar.writeTxn(() async { ... }); // no yield
-// GOOD: await isar.writeTxn(() async { ... }); await yieldToUI();
+// BAD: await isar.writeTxn(() async { ... }); processData();
+// GOOD: await isar.writeTxn(() async { ... }); await yieldToUI(); processData();
+//
+// Suppressions (no lint): write as last statement; next stmt is return;
+// inside compute()/Isolate.run(); test directory; or followed by
+// yieldToUI, Future.microtask(() {}), Future.delayed(Duration.zero, ...).
 void _note303() {}

@@ -14,6 +14,16 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
+### Fixed
+
+- **require_yield_after_db_write:** Suppress when write is last statement, when next statement is `return`, when inside `compute()`/`Isolate.run()`, and when file is in test directory. Recognize `Future.microtask`, `Future.delayed(Duration.zero)`, and `SchedulerBinding.instance.endOfFrame` as valid yields. Replace fragile `toString()` check in SchedulerBinding detection with AST-based identifier check.
+- **verify_documented_parameters_exist:** Whitelist built-in types and literals (`[String]`, `[int]`, `[null]`, etc.) to avoid false positives on valid doc references.
+- **Style:** Satisfy `curly_braces_in_flow_control_structures` in rule implementation files (api_network, control_flow, lifecycle, naming_style, notification, sqflite, performance, web, security, structure, ui_ux, widget_patterns). Single-statement `if` bodies are now wrapped in blocks; no behavior change.
+
+### Changed
+
+- **no_empty_block:** Confirmed existing implementation in `unnecessary_code_rules.dart`; roadmap task archived.
+
 ### Added
 
 - 9 new lint rules from roadmap detail requirements (banned_usage, prefer_csrf_protection, prefer_no_commented_code alias, prefer_semver_version, prefer_sqflite_encryption, require_conflict_resolution_strategy, require_connectivity_timeout, require_init_state_idempotent, require_input_validation):
