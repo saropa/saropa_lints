@@ -12,7 +12,6 @@ Future<void> badNoTimeout() async {
 
 // GOOD: Request with timeout — should NOT trigger
 Future<void> goodWithTimeout() async {
-  final response = await http
-      .get(Uri.parse(url))
-      .timeout(const Duration(seconds: 30));
+  final response =
+      await http.get(Uri.parse(url)).timeout(const Duration(seconds: 30));
 }
