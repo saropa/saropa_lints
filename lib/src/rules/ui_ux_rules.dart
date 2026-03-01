@@ -1717,11 +1717,13 @@ class PreferMasterDetailForLargeRule extends SaropaLintRule {
       if (name != 'push' && name != 'go' && name != 'pushNamed') return;
       final String enclosing =
           node.thisOrAncestorOfType<FunctionBody>()?.toSource() ?? '';
-      if (!enclosing.contains('ListTile') && !enclosing.contains('ListView'))
+      if (!enclosing.contains('ListTile') && !enclosing.contains('ListView')) {
         return;
+      }
       if (enclosing.contains('MediaQuery') ||
-          enclosing.contains('LayoutBuilder'))
+          enclosing.contains('LayoutBuilder')) {
         return;
+      }
       reporter.atNode(node);
     });
   }

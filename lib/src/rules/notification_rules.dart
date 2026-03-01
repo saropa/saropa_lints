@@ -875,8 +875,9 @@ class PreferLocalNotificationForImmediateRule extends SaropaLintRule {
       final name = node.methodName.name;
       if (name != 'sendMessage' && name != 'post') return;
       final String source = node.toSource();
-      if (!source.contains('FirebaseMessaging') && !source.contains('fcm'))
+      if (!source.contains('FirebaseMessaging') && !source.contains('fcm')) {
         return;
+      }
       reporter.atNode(node);
     });
   }

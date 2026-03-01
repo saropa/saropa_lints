@@ -6648,16 +6648,19 @@ class RequireInputValidationRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target == null) return;
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('http') && !targetSource.contains('dio'))
+      if (!targetSource.contains('http') && !targetSource.contains('dio')) {
         return;
+      }
 
       for (final arg in node.argumentList.arguments) {
         final String argSource = arg.toSource();
         if (!argSource.contains('.text')) continue;
-        if (argSource.contains('.trim()') || argSource.contains('.trim('))
+        if (argSource.contains('.trim()') || argSource.contains('.trim(')) {
           continue;
-        if (argSource.contains('validate') || argSource.contains('isEmpty'))
+        }
+        if (argSource.contains('validate') || argSource.contains('isEmpty')) {
           continue;
+        }
         reporter.atNode(arg);
         return;
       }

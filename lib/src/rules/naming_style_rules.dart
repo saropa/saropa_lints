@@ -2404,8 +2404,9 @@ class PreferAdjectiveBoolGettersRule extends SaropaLintRule {
       if (!node.isGetter) return;
       final TypeAnnotation? returnTypeNode = node.returnType;
       if (returnTypeNode == null) return;
-      if (returnTypeNode is! NamedType || returnTypeNode.name.lexeme != 'bool')
+      if (returnTypeNode is! NamedType || returnTypeNode.name.lexeme != 'bool') {
         return;
+      }
       if (_hasOverride(node)) return;
 
       final String name = node.name.lexeme;

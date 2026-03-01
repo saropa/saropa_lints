@@ -18,7 +18,7 @@ Workflow:
     Step 9:  Validate CHANGELOG.md
     Step 10: Generate documentation
     Step 11: Pre-publish validation (dart pub publish --dry-run)
-    Step 12: Commit and push
+    Step 12: Commit and push (if no changes, strip 2nd/3rd party attribution from HEAD)
     Step 13: Create git tag
     Step 14: Publish via GitHub Actions
     Step 15: Create GitHub release

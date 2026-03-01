@@ -692,8 +692,9 @@ class PreferCsrfProtectionRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target == null) return;
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('http') && !targetSource.contains('dio'))
+      if (!targetSource.contains('http') && !targetSource.contains('dio')) {
         return;
+      }
 
       String? headersSource;
       for (final arg in node.argumentList.arguments) {
@@ -706,11 +707,13 @@ class PreferCsrfProtectionRule extends SaropaLintRule {
         return;
       }
       if (!headersSource.contains('cookie')) return;
-      if (headersSource.contains('csrf') || headersSource.contains('xsrf'))
+      if (headersSource.contains('csrf') || headersSource.contains('xsrf')) {
         return;
+      }
       if (headersSource.contains('bearer') ||
-          headersSource.contains('authorization'))
+          headersSource.contains('authorization')) {
         return;
+      }
 
       reporter.atNode(node);
     });

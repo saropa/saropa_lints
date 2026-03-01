@@ -4623,14 +4623,16 @@ class PreferBinaryFormatRule extends SaropaLintRule {
 
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'decode' &&
-          node.methodName.name != 'jsonDecode')
+          node.methodName.name != 'jsonDecode') {
         return;
+      }
       final String outer =
           node.thisOrAncestorOfType<FunctionBody>()?.toSource() ?? '';
       if (!outer.contains('Timer.periodic') &&
           !outer.contains('listen(') &&
-          !outer.contains('onData'))
+          !outer.contains('onData')) {
         return;
+      }
       reporter.atNode(node);
     });
   }
@@ -4686,8 +4688,9 @@ class PreferPoolPatternRule extends SaropaLintRule {
           node.thisOrAncestorOfType<FunctionBody>()?.toSource() ?? '';
       if (!outer.contains('Timer.periodic') &&
           !outer.contains('addListener') &&
-          !outer.contains('addPersistentFrameCallback'))
+          !outer.contains('addPersistentFrameCallback')) {
         return;
+      }
       reporter.atNode(node);
     });
   }

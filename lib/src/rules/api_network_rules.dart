@@ -3464,8 +3464,12 @@ class RequireCompressionRule extends SaropaLintRule {
 
     context.addMethodInvocation((MethodInvocation node) {
       final name = node.methodName.name;
-      if (name != 'get' && name != 'post' && name != 'put' && name != 'delete')
+      if (name != 'get' &&
+          name != 'post' &&
+          name != 'put' &&
+          name != 'delete') {
         return;
+      }
       // Only flag invocations on http/dio (e.g. http.get, dio.get).
       final Expression? target = node.target;
       if (target != null) {

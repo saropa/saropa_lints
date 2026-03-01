@@ -4,7 +4,7 @@
 ///
 /// Populated from `analysis_options_custom.yaml` under `banned_usage: entries:`.
 /// When empty, the rule is a no-op (no reports). Loaded once at plugin start via
-/// [loadBannedUsageConfig] from [config_loader]. Rule reads [bannedUsageEntries]
+/// [loadBannedUsageConfig] from `config_loader`. Rule reads [bannedUsageEntries]
 /// at run time; no race because analysis is single-threaded per plugin.
 ///
 /// **Config format:** See [loadBannedUsageConfig]. Parsing is line-based and

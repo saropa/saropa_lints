@@ -1,0 +1,21 @@
+#!/bin/sh
+# Reject commit messages that contain AI/tool attribution.
+# Enable: git config core.hooksPath .githooks
+
+msg_file="$1"
+msg=$(cat "$msg_file")
+
+blocked() {
+  echo "commit-msg: Commit message must not contain AI or tool attribution." >&2
+  echo "Remove: Co-Authored-By (Claude/Anthropic), Made-with: Cursor, 'Generated with' lines." >&2
+  exit 1
+}
+
+# Block common AI attribution patterns (case-insensitive where it matters)
+echo "$msg" | grep -qEi '^Made-with:\s*Cursor' && blocked
+echo "$msg" | grep -qE '^Co-Authored-By:.*[Cc]laude' && blocked
+echo "$msg" | grep -qE '^Co-Authored-By:.*[Aa]nthropic' && blocked
+echo "$msg" | grep -qEi '^Co-Authored-By:.*noreply@anthropic' && blocked
+echo "$msg" | grep -qEi '^Generated with.*(Cursor|Claude)' && blocked
+
+exit 0

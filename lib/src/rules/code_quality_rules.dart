@@ -5082,7 +5082,7 @@ class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
 /// Same logic as [AvoidWildcardCasesWithSealedClassesRule]; this rule is the
 /// Essential-tier name so teams can enable exhaustiveness without the full
 /// comprehensive set. Switch on a sealed type must list every subtype explicitly;
-/// [default:] or [_] hides new subtypes and defeats compile-time checking.
+/// `default:` or `_` hides new subtypes and defeats compile-time checking.
 ///
 /// **Bad:** `default: return 0;` or `_ => x` on a sealed selector.
 /// **Good:** Explicit `case Circle():` / `case Square():` for every subtype.

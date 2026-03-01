@@ -2250,16 +2250,19 @@ class PreferNullAwareMethodCallsRule extends SaropaLintRule {
     context.addIfStatement((IfStatement node) {
       if (node.elseStatement != null) return;
       final expr = node.expression;
-      if (expr is! BinaryExpression || expr.operator.type != TokenType.BANG_EQ)
+      if (expr is! BinaryExpression ||
+          expr.operator.type != TokenType.BANG_EQ) {
         return;
+      }
       final left = expr.leftOperand;
       final right = expr.rightOperand;
       final isNullLeft = left is NullLiteral;
       final isNullRight = right is NullLiteral;
       if (!isNullLeft && !isNullRight) return;
       final guarded = isNullLeft ? right : left;
-      if (guarded is! SimpleIdentifier && guarded is! PrefixedIdentifier)
+      if (guarded is! SimpleIdentifier && guarded is! PrefixedIdentifier) {
         return;
+      }
       Statement thenStmt = node.thenStatement;
       if (thenStmt is Block && thenStmt.statements.length == 1) {
         thenStmt = thenStmt.statements.single;
@@ -2292,16 +2295,19 @@ class PreferNullAwareMethodCallsRule extends SaropaLintRule {
 
     context.addConditionalExpression((ConditionalExpression node) {
       final cond = node.condition;
-      if (cond is! BinaryExpression || cond.operator.type != TokenType.BANG_EQ)
+      if (cond is! BinaryExpression ||
+          cond.operator.type != TokenType.BANG_EQ) {
         return;
+      }
       final left = cond.leftOperand;
       final right = cond.rightOperand;
       final isNullLeft = left is NullLiteral;
       final isNullRight = right is NullLiteral;
       if (!isNullLeft && !isNullRight) return;
       final guarded = isNullLeft ? right : left;
-      if (guarded is! SimpleIdentifier && guarded is! PrefixedIdentifier)
+      if (guarded is! SimpleIdentifier && guarded is! PrefixedIdentifier) {
         return;
+      }
       if (node.elseExpression is! NullLiteral) return;
       final thenExpr = node.thenExpression;
       Expression? target;
