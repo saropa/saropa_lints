@@ -34,6 +34,10 @@ void saveFile(String filePath, String data) {}
 /// Returns a [String] result.
 void parseValue(String input) {}
 
+/// Accepts [limit] (must be positive) and returns an [int] count.
+/// Built-in type [int] is a valid doc reference — should NOT trigger.
+int getCount(int limit) => limit.clamp(0, 999);
+
 /// Processes the item with [callback].
 void withCallback(void Function() callback) {}
 

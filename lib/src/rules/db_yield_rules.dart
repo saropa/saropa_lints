@@ -26,6 +26,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import '../async_context_utils.dart';
 import '../saropa_lint_rule.dart';
 
 // ---------------------------------------------------------------------------
@@ -182,14 +183,54 @@ const Set<String> _knownIoTargets = {
 
 bool _isYieldToUI(Statement statement) {
   if (statement is! ExpressionStatement) return false;
-  final expr = statement.expression;
+  final Expression expr = statement.expression;
   if (expr is! AwaitExpression) return false;
-  final inner = expr.expression;
+  final Expression inner = expr.expression;
   if (inner is MethodInvocation) {
-    return inner.methodName.name == 'yieldToUI' ||
-        inner.methodName.name == 'waitWithoutBlocking';
+    final String name = inner.methodName.name;
+    if (name == 'yieldToUI' || name == 'waitWithoutBlocking') return true;
+    if (name == 'yieldFrame' || name == 'yield_to_ui') return true;
+    if (name == 'microtask') return _isFutureMicrotask(inner);
+    if (name == 'delayed') return _isFutureDelayedZero(inner);
+    if (name == 'endOfFrame') return _isSchedulerEndOfFrame(inner);
   }
+  return false;
+}
 
+bool _isFutureMicrotask(MethodInvocation node) {
+  final Expression? target = node.target;
+  if (target is PrefixedIdentifier) return target.identifier.name == 'Future';
+  if (target is SimpleIdentifier) return node.methodName.name == 'microtask';
+  return false;
+}
+
+bool _isFutureDelayedZero(MethodInvocation node) {
+  final Expression? target = node.target;
+  if (target is! PrefixedIdentifier) return false;
+  if (target.identifier.name != 'Future') return false;
+  final List<Expression> args = node.argumentList.arguments;
+  if (args.isEmpty) return false;
+  final Expression durationArg = args.length == 2 && args[0] is NamedExpression
+      ? (args[0] as NamedExpression).expression
+      : args[0];
+  if (durationArg is PropertyAccess)
+    return durationArg.propertyName.name == 'zero';
+  return false;
+}
+
+bool _isSchedulerEndOfFrame(MethodInvocation node) {
+  final Expression? target = node.target;
+  if (target is! PropertyAccess || target.propertyName.name != 'instance') {
+    return false;
+  }
+  final Expression? receiver = target.target;
+  if (receiver == null) return false;
+  if (receiver is SimpleIdentifier) {
+    return receiver.name == 'SchedulerBinding';
+  }
+  if (receiver is PrefixedIdentifier) {
+    return receiver.identifier.name == 'SchedulerBinding';
+  }
   return false;
 }
 
@@ -255,13 +296,14 @@ AwaitExpression? _extractInlineAwait(Statement s) {
 }
 
 bool _isFollowedBySafe(List<Statement> stmts, int i) {
-  if (i >= stmts.length - 1) return false;
-  final next = stmts[i + 1];
+  // No subsequent code — nothing to block (task: "Write as last statement" / "followed by return" → no lint).
+  if (i >= stmts.length - 1) return true;
+  final Statement next = stmts[i + 1];
   if (_isYieldToUI(next)) return true;
+  if (next is ReturnStatement) return true;
   if (next is ExpressionStatement && next.expression is ThrowExpression) {
     return true;
   }
-
   return false;
 }
 
@@ -270,22 +312,37 @@ bool _isFollowedBySafe(List<Statement> stmts, int i) {
 // ---------------------------------------------------------------------------
 
 /// Warns when a database or I/O **write** `await` is not immediately followed
+/// by a yield to the UI thread.
 ///
-/// Since: v4.13.0 | Rule version: v1
-///
-/// by `yieldToUI()`.
+/// **Since:** v4.13.0 | **Rule version:** v1
 ///
 /// Write operations (`writeTxn`, `putAll`, `deleteAll`, `rawInsert`, etc.)
-/// acquire exclusive locks that block both the UI thread and other write
-/// transactions. A yield after the write releases the Dart event loop so
-/// the framework can paint pending frames.
+/// acquire exclusive locks that block the UI thread. A yield after the write
+/// releases the event loop so the framework can paint pending frames.
 ///
+/// **Accepted yield forms** (any of these after the write suppresses the lint):
+/// - `await yieldToUI()`, `await yieldFrame()`, `yield_to_ui`
+/// - `await Future.microtask(() {})`
+/// - `await Future.delayed(Duration.zero, ...)`
+/// - `await SchedulerBinding.instance.endOfFrame`
+///
+/// **Suppressions:** No lint is reported when:
+/// - The write is the last statement in the function (nothing after to block).
+/// - The next statement is `return` (no further UI work in this function).
+/// - The write is inside `compute(...)` or `Isolate.run(...)` (separate isolate).
+/// - The file is in a test directory (`_test.dart`, `test/`, `integration_test/`).
+///
+/// **Heuristic:** Detection uses method and target name matching; identically
+/// named methods in non-DB code may cause false positives. See file header.
+///
+/// **BAD:**
 /// ```dart
-/// // BAD
 /// await isar.writeTxn(() => isar.contacts.putAll(contacts));
 /// processData();
+/// ```
 ///
-/// // GOOD
+/// **GOOD:**
+/// ```dart
 /// await isar.writeTxn(() => isar.contacts.putAll(contacts));
 /// await DelayUtils.yieldToUI();
 /// processData();
@@ -316,6 +373,7 @@ class RequireYieldAfterDbWriteRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    if (context.isInTestDirectory) return;
     _registerYieldCheck(context, reporter, _code, _DbOperationType.write);
   }
 }
@@ -383,12 +441,13 @@ void _registerYieldCheck(
   void visit(FunctionBody body) {
     if (body is! BlockFunctionBody) return;
     _visitStatementsRecursive(body.block, (stmts, i) {
-      final s = stmts[i];
-      final awaitExpr = _extractInlineAwait(s);
+      final Statement s = stmts[i];
+      final AwaitExpression? awaitExpr = _extractInlineAwait(s);
       if (awaitExpr == null) return;
-      final opType = _classifyDbAwait(awaitExpr);
+      final _DbOperationType? opType = _classifyDbAwait(awaitExpr);
       if (opType != targetType) return;
       if (_isFollowedBySafe(stmts, i)) return;
+      if (isInsideIsolate(s)) return;
       reporter.atNode(s);
     });
   }

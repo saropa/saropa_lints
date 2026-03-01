@@ -1,5 +1,11 @@
 # Task: `verify_documented_parameters_exist`
 
+## ✅ Refinements implemented (2026-02-28)
+
+Rule existed; added _knownDocRefNames whitelist for built-in types/literals ([String], [int], [null], etc.) to avoid false positives. Task archived.
+
+---
+
 ## Summary
 - **Rule Name**: `verify_documented_parameters_exist`
 - **Tier**: Professional

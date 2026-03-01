@@ -1,5 +1,11 @@
 # Task: `require_yield_after_db_write`
 
+## ✅ Refinements implemented (2026-02-28)
+
+Rule existed; added suppressions (test directory, isolate, last statement, return), accepted yield forms (Future.microtask, Future.delayed(Duration.zero), SchedulerBinding.endOfFrame), and AST-based SchedulerBinding check. Task archived.
+
+---
+
 ## Summary
 - **Rule Name**: `require_yield_after_db_write`
 - **Tier**: Recommended

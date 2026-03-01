@@ -1,11 +1,17 @@
 # Task: `no_empty_block`
 
+## ✅ Implementation status (reviewed)
+
+**Rule already exists.** Implemented as `NoEmptyBlockRule` in `lib/src/rules/unnecessary_code_rules.dart` (around line 807). No implementation needed. This task file can be archived and the ROADMAP entry removed if still present.
+
+---
+
 ## Summary
 
 - **Rule Name**: `no_empty_block`
 - **Tier**: Recommended
-- **Severity**: WARNING
-- **Status**: Planned (⚠️ MAY ALREADY EXIST — see Notes)
+- **Severity**: WARNING (implemented as INFO)
+- **Status**: **Done** — exists in `unnecessary_code_rules.dart`
 - **Source**: ROADMAP.md §1.61 Code Quality Rules
 - **Priority**: ⭐ Next in line for implementation
 
