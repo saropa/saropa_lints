@@ -8126,19 +8126,28 @@ class PreferConstLiteralsToCreateImmutablesRule extends SaropaLintRule {
 
   static bool _allElementsConst(NodeList<CollectionElement> elements) {
     for (final CollectionElement e in elements) {
-      if (e is SpreadElement || e is IfElement || e is ForElement) return false;
-      if (e is Expression && !_isConstExpression(e)) return false;
+      if (e is SpreadElement || e is IfElement || e is ForElement) {
+        return false;
+      }
+      if (e is Expression && !_isConstExpression(e)) {
+        return false;
+      }
       if (e is MapLiteralEntry) {
-        if (!_isConstExpression(e.key) || !_isConstExpression(e.value))
+        if (!_isConstExpression(e.key) || !_isConstExpression(e.value)) {
           return false;
+        }
       }
     }
     return true;
   }
 
   static bool _isConstExpression(Expression e) {
-    if (e is Literal) return true;
-    if (e is InstanceCreationExpression && e.isConst) return true;
+    if (e is Literal) {
+      return true;
+    }
+    if (e is InstanceCreationExpression && e.isConst) {
+      return true;
+    }
     return false;
   }
 }
