@@ -1,11 +1,185 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/disposal_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 17 Disposal lint rules.
 ///
 /// Test fixtures: example_async/lib/disposal/*
 void main() {
+  group('Disposal Rules - Rule Instantiation', () {
+    test('RequireMediaPlayerDisposeRule', () {
+      final rule = RequireMediaPlayerDisposeRule();
+      expect(rule.code.name, 'require_media_player_dispose');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_media_player_dispose]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireTabControllerDisposeRule', () {
+      final rule = RequireTabControllerDisposeRule();
+      expect(rule.code.name, 'require_tab_controller_dispose');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_tab_controller_dispose]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireTextEditingControllerDisposeRule', () {
+      final rule = RequireTextEditingControllerDisposeRule();
+      expect(rule.code.name, 'require_text_editing_controller_dispose');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_text_editing_controller_dispose]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequirePageControllerDisposeRule', () {
+      final rule = RequirePageControllerDisposeRule();
+      expect(rule.code.name, 'require_page_controller_dispose');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_page_controller_dispose]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireLifecycleObserverRule', () {
+      final rule = RequireLifecycleObserverRule();
+      expect(rule.code.name, 'require_lifecycle_observer');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_lifecycle_observer]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidWebsocketMemoryLeakRule', () {
+      final rule = AvoidWebsocketMemoryLeakRule();
+      expect(rule.code.name, 'avoid_websocket_memory_leak');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_websocket_memory_leak]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireVideoPlayerControllerDisposeRule', () {
+      final rule = RequireVideoPlayerControllerDisposeRule();
+      expect(rule.code.name, 'require_video_player_controller_dispose');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_video_player_controller_dispose]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireStreamSubscriptionCancelRule', () {
+      final rule = RequireStreamSubscriptionCancelRule();
+      expect(rule.code.name, 'require_stream_subscription_cancel');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_stream_subscription_cancel]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireChangeNotifierDisposeRule', () {
+      final rule = RequireChangeNotifierDisposeRule();
+      expect(rule.code.name, 'require_change_notifier_dispose');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_change_notifier_dispose]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireReceivePortCloseRule', () {
+      final rule = RequireReceivePortCloseRule();
+      expect(rule.code.name, 'require_receive_port_close');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_receive_port_close]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireSocketCloseRule', () {
+      final rule = RequireSocketCloseRule();
+      expect(rule.code.name, 'require_socket_close');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_socket_close]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireDebouncerCancelRule', () {
+      final rule = RequireDebouncerCancelRule();
+      expect(rule.code.name, 'require_debouncer_cancel');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_debouncer_cancel]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireIntervalTimerCancelRule', () {
+      final rule = RequireIntervalTimerCancelRule();
+      expect(rule.code.name, 'require_interval_timer_cancel');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_interval_timer_cancel]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireFileHandleCloseRule', () {
+      final rule = RequireFileHandleCloseRule();
+      expect(rule.code.name, 'require_file_handle_close');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_file_handle_close]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireDisposeImplementationRule', () {
+      final rule = RequireDisposeImplementationRule();
+      expect(rule.code.name, 'require_dispose_implementation');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_dispose_implementation]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PreferDisposeBeforeNewInstanceRule', () {
+      final rule = PreferDisposeBeforeNewInstanceRule();
+      expect(rule.code.name, 'prefer_dispose_before_new_instance');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_dispose_before_new_instance]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('DisposeClassFieldsRule', () {
+      final rule = DisposeClassFieldsRule();
+      expect(rule.code.name, 'dispose_class_fields');
+      expect(
+        rule.code.problemMessage,
+        contains('[dispose_class_fields]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
   group('Disposal Rules - Fixture Verification', () {
     final fixtures = [
       'require_media_player_dispose',

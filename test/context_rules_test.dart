@@ -1,11 +1,75 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/context_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 6 Context lint rules.
 ///
 /// Test fixtures: example_async/lib/context/*
 void main() {
+  group('Context Rules - Rule Instantiation', () {
+    test('AvoidStoringContextRule', () {
+      final rule = AvoidStoringContextRule();
+      expect(rule.code.name, 'avoid_storing_context');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_storing_context]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidContextAcrossAsyncRule', () {
+      final rule = AvoidContextAcrossAsyncRule();
+      expect(rule.code.name, 'avoid_context_across_async');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_context_across_async]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidContextAfterAwaitInStaticRule', () {
+      final rule = AvoidContextAfterAwaitInStaticRule();
+      expect(rule.code.name, 'avoid_context_after_await_in_static');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_context_after_await_in_static]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidContextInAsyncStaticRule', () {
+      final rule = AvoidContextInAsyncStaticRule();
+      expect(rule.code.name, 'avoid_context_in_async_static');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_context_in_async_static]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidContextInStaticMethodsRule', () {
+      final rule = AvoidContextInStaticMethodsRule();
+      expect(rule.code.name, 'avoid_context_in_static_methods');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_context_in_static_methods]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidContextDependencyInCallbackRule', () {
+      final rule = AvoidContextDependencyInCallbackRule();
+      expect(rule.code.name, 'avoid_context_dependency_in_callback');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_context_dependency_in_callback]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
   group('Context Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_storing_context',

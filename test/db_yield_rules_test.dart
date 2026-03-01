@@ -1,11 +1,45 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/db_yield_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 3 Database Yield lint rules.
 ///
 /// Test fixtures: example_async/lib/db_yield/*
 void main() {
+  group('Database Yield Rules - Rule Instantiation', () {
+    test('RequireYieldAfterDbWriteRule', () {
+      final rule = RequireYieldAfterDbWriteRule();
+      expect(rule.code.name, 'require_yield_after_db_write');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_yield_after_db_write]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('SuggestYieldAfterDbReadRule', () {
+      final rule = SuggestYieldAfterDbReadRule();
+      expect(rule.code.name, 'suggest_yield_after_db_read');
+      expect(
+        rule.code.problemMessage,
+        contains('[suggest_yield_after_db_read]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidReturnAwaitDbRule', () {
+      final rule = AvoidReturnAwaitDbRule();
+      expect(rule.code.name, 'avoid_return_await_db');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_return_await_db]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
   group('Database Yield Rules - Fixture Verification', () {
     final fixtures = [
       'require_yield_after_db_write',

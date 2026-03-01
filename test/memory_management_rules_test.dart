@@ -1,11 +1,145 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/memory_management_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 11 Memory Management lint rules.
+/// Tests for 13 Memory Management lint rules.
 ///
 /// Test fixtures: example_async/lib/memory_management/*
 void main() {
+  group('Memory Management Rules - Rule Instantiation', () {
+    test('AvoidLargeObjectsInStateRule', () {
+      final rule = AvoidLargeObjectsInStateRule();
+      expect(rule.code.name, 'avoid_large_objects_in_state');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_large_objects_in_state]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireImageDisposalRule', () {
+      final rule = RequireImageDisposalRule();
+      expect(rule.code.name, 'require_image_disposal');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_image_disposal]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidCapturingThisInCallbacksRule', () {
+      final rule = AvoidCapturingThisInCallbacksRule();
+      expect(rule.code.name, 'avoid_capturing_this_in_callbacks');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_capturing_this_in_callbacks]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireCacheEvictionPolicyRule', () {
+      final rule = RequireCacheEvictionPolicyRule();
+      expect(rule.code.name, 'require_cache_eviction_policy');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_cache_eviction_policy]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PreferWeakReferencesForCacheRule', () {
+      final rule = PreferWeakReferencesForCacheRule();
+      expect(rule.code.name, 'prefer_weak_references_for_cache');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_weak_references_for_cache]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidExpandoCircularReferencesRule', () {
+      final rule = AvoidExpandoCircularReferencesRule();
+      expect(rule.code.name, 'avoid_expando_circular_references');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_expando_circular_references]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidLargeIsolateCommunicationRule', () {
+      final rule = AvoidLargeIsolateCommunicationRule();
+      expect(rule.code.name, 'avoid_large_isolate_communication');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_large_isolate_communication]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireCacheExpirationRule', () {
+      final rule = RequireCacheExpirationRule();
+      expect(rule.code.name, 'require_cache_expiration');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_cache_expiration]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidUnboundedCacheGrowthRule', () {
+      final rule = AvoidUnboundedCacheGrowthRule();
+      expect(rule.code.name, 'avoid_unbounded_cache_growth');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_unbounded_cache_growth]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireCacheKeyUniquenessRule', () {
+      final rule = RequireCacheKeyUniquenessRule();
+      expect(rule.code.name, 'require_cache_key_uniqueness');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_cache_key_uniqueness]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidRetainingDisposedWidgetsRule', () {
+      final rule = AvoidRetainingDisposedWidgetsRule();
+      expect(rule.code.name, 'avoid_retaining_disposed_widgets');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_retaining_disposed_widgets]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidClosureCaptureLeaksRule', () {
+      final rule = AvoidClosureCaptureLeaksRule();
+      expect(rule.code.name, 'avoid_closure_capture_leaks');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_closure_capture_leaks]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireExpandoCleanupRule', () {
+      final rule = RequireExpandoCleanupRule();
+      expect(rule.code.name, 'require_expando_cleanup');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_expando_cleanup]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
   group('Memory Management Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_large_objects_in_state',
@@ -19,6 +153,8 @@ void main() {
       'avoid_unbounded_cache_growth',
       'require_cache_key_uniqueness',
       'avoid_retaining_disposed_widgets',
+      'avoid_closure_capture_leaks',
+      'require_expando_cleanup',
     ];
 
     for (final fixture in fixtures) {

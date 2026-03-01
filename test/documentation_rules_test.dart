@@ -1,11 +1,32 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/documentation_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 9 Documentation lint rules.
 ///
 /// Test fixtures: example_style/lib/documentation/*
 void main() {
+  group('Documentation Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+    testRule('RequirePublicApiDocumentationRule', 'require_public_api_documentation', () => RequirePublicApiDocumentationRule());
+    testRule('AvoidMisleadingDocumentationRule', 'avoid_misleading_documentation', () => AvoidMisleadingDocumentationRule());
+    testRule('RequireDeprecationMessageRule', 'require_deprecation_message', () => RequireDeprecationMessageRule());
+    testRule('RequireComplexLogicCommentsRule', 'require_complex_logic_comments', () => RequireComplexLogicCommentsRule());
+    testRule('RequireParameterDocumentationRule', 'require_parameter_documentation', () => RequireParameterDocumentationRule());
+    testRule('RequireReturnDocumentationRule', 'require_return_documentation', () => RequireReturnDocumentationRule());
+    testRule('RequireExceptionDocumentationRule', 'require_exception_documentation', () => RequireExceptionDocumentationRule());
+    testRule('RequireExampleInDocumentationRule', 'require_example_in_documentation', () => RequireExampleInDocumentationRule());
+    testRule('VerifyDocumentedParametersExistRule', 'verify_documented_parameters_exist', () => VerifyDocumentedParametersExistRule());
+  });
   group('Documentation Rules - Fixture Verification', () {
     final fixtures = [
       'require_public_api_documentation',

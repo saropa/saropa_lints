@@ -1,11 +1,75 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/lifecycle_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 5 Lifecycle lint rules.
+/// Tests for 6 Lifecycle lint rules.
 ///
 /// Test fixtures: example_async/lib/lifecycle/*
 void main() {
+  group('Lifecycle Rules - Rule Instantiation', () {
+    test('AvoidWorkInPausedStateRule', () {
+      final rule = AvoidWorkInPausedStateRule();
+      expect(rule.code.name, 'avoid_work_in_paused_state');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_work_in_paused_state]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireResumeStateRefreshRule', () {
+      final rule = RequireResumeStateRefreshRule();
+      expect(rule.code.name, 'require_resume_state_refresh');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_resume_state_refresh]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireDidUpdateWidgetCheckRule', () {
+      final rule = RequireDidUpdateWidgetCheckRule();
+      expect(rule.code.name, 'require_did_update_widget_check');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_did_update_widget_check]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireLateInitializationInInitStateRule', () {
+      final rule = RequireLateInitializationInInitStateRule();
+      expect(rule.code.name, 'require_late_initialization_in_init_state');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_late_initialization_in_init_state]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireAppLifecycleHandlingRule', () {
+      final rule = RequireAppLifecycleHandlingRule();
+      expect(rule.code.name, 'require_app_lifecycle_handling');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_app_lifecycle_handling]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireConflictResolutionStrategyRule', () {
+      final rule = RequireConflictResolutionStrategyRule();
+      expect(rule.code.name, 'require_conflict_resolution_strategy');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_conflict_resolution_strategy]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
   group('Lifecycle Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_work_in_paused_state',

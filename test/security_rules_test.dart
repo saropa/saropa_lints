@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/security_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 55 security lint rules.
@@ -9,6 +10,75 @@ import 'package:test/test.dart';
 ///
 /// Test fixtures: example_async/lib/security/*
 void main() {
+  group('Security Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+    testRule('AvoidLoggingSensitiveDataRule', 'avoid_logging_sensitive_data', () => AvoidLoggingSensitiveDataRule());
+    testRule('RequireSecureStorageRule', 'require_secure_storage', () => RequireSecureStorageRule());
+    testRule('AvoidHardcodedCredentialsRule', 'avoid_hardcoded_credentials', () => AvoidHardcodedCredentialsRule());
+    testRule('RequireInputSanitizationRule', 'require_input_sanitization', () => RequireInputSanitizationRule());
+    testRule('AvoidWebViewJavaScriptEnabledRule', 'avoid_webview_javascript_enabled', () => AvoidWebViewJavaScriptEnabledRule());
+    testRule('RequireBiometricFallbackRule', 'require_biometric_fallback', () => RequireBiometricFallbackRule());
+    testRule('AvoidEvalLikePatternsRule', 'avoid_eval_like_patterns', () => AvoidEvalLikePatternsRule());
+    testRule('AvoidDynamicCodeLoadingRule', 'avoid_dynamic_code_loading', () => AvoidDynamicCodeLoadingRule());
+    testRule('AvoidUnverifiedNativeLibraryRule', 'avoid_unverified_native_library', () => AvoidUnverifiedNativeLibraryRule());
+    testRule('AvoidHardcodedSigningConfigRule', 'avoid_hardcoded_signing_config', () => AvoidHardcodedSigningConfigRule());
+    testRule('RequireCertificatePinningRule', 'require_certificate_pinning', () => RequireCertificatePinningRule());
+    testRule('AvoidTokenInUrlRule', 'avoid_token_in_url', () => AvoidTokenInUrlRule());
+    testRule('AvoidClipboardSensitiveRule', 'avoid_clipboard_sensitive', () => AvoidClipboardSensitiveRule());
+    testRule('AvoidStoringPasswordsRule', 'avoid_storing_passwords', () => AvoidStoringPasswordsRule());
+    testRule('AvoidDynamicSqlRule', 'avoid_dynamic_sql', () => AvoidDynamicSqlRule());
+    testRule('AvoidGenericKeyInUrlRule', 'avoid_generic_key_in_url', () => AvoidGenericKeyInUrlRule());
+    testRule('PreferSecureRandomRule', 'prefer_secure_random', () => PreferSecureRandomRule());
+    testRule('PreferTypedDataRule', 'prefer_typed_data', () => PreferTypedDataRule());
+    testRule('AvoidUnnecessaryToListRule', 'avoid_unnecessary_to_list', () => AvoidUnnecessaryToListRule());
+    testRule('RequireAuthCheckRule', 'require_auth_check', () => RequireAuthCheckRule());
+    testRule('RequireTokenRefreshRule', 'require_token_refresh', () => RequireTokenRefreshRule());
+    testRule('AvoidJwtDecodeClientRule', 'avoid_jwt_decode_client', () => AvoidJwtDecodeClientRule());
+    testRule('RequireLogoutCleanupRule', 'require_logout_cleanup', () => RequireLogoutCleanupRule());
+    testRule('AvoidAuthInQueryParamsRule', 'avoid_auth_in_query_params', () => AvoidAuthInQueryParamsRule());
+    testRule('RequireDeepLinkValidationRule', 'require_deep_link_validation', () => RequireDeepLinkValidationRule());
+    testRule('RequireDataEncryptionRule', 'require_data_encryption', () => RequireDataEncryptionRule());
+    testRule('PreferDataMaskingRule', 'prefer_data_masking', () => PreferDataMaskingRule());
+    testRule('AvoidScreenshotSensitiveRule', 'avoid_screenshot_sensitive', () => AvoidScreenshotSensitiveRule());
+    testRule('RequireSecurePasswordFieldRule', 'require_secure_password_field', () => RequireSecurePasswordFieldRule());
+    testRule('AvoidPathTraversalRule', 'avoid_path_traversal', () => AvoidPathTraversalRule());
+    testRule('PreferHtmlEscapeRule', 'prefer_html_escape', () => PreferHtmlEscapeRule());
+    testRule('RequireSecureStorageForAuthRule', 'require_secure_storage_for_auth', () => RequireSecureStorageForAuthRule());
+    testRule('RequireUrlValidationRule', 'require_url_validation', () => RequireUrlValidationRule());
+    testRule('AvoidRedirectInjectionRule', 'avoid_redirect_injection', () => AvoidRedirectInjectionRule());
+    testRule('AvoidExternalStorageSensitiveRule', 'avoid_external_storage_sensitive', () => AvoidExternalStorageSensitiveRule());
+    testRule('PreferLocalAuthRule', 'prefer_local_auth', () => PreferLocalAuthRule());
+    testRule('RequireSecureStorageAuthDataRule', 'require_secure_storage_auth_data', () => RequireSecureStorageAuthDataRule());
+    testRule('PreferWebViewJavaScriptDisabledRule', 'prefer_webview_javascript_disabled', () => PreferWebViewJavaScriptDisabledRule());
+    testRule('AvoidWebViewInsecureContentRule', 'avoid_webview_insecure_content', () => AvoidWebViewInsecureContentRule());
+    testRule('RequireWebViewErrorHandlingRule', 'require_webview_error_handling', () => RequireWebViewErrorHandlingRule());
+    testRule('AvoidApiKeyInCodeRule', 'avoid_api_key_in_code', () => AvoidApiKeyInCodeRule());
+    testRule('AvoidStoringSensitiveUnencryptedRule', 'avoid_storing_sensitive_unencrypted', () => AvoidStoringSensitiveUnencryptedRule());
+    testRule('AvoidIgnoringSslErrorsRule', 'avoid_ignoring_ssl_errors', () => AvoidIgnoringSslErrorsRule());
+    testRule('RequireHttpsOnlyRule', 'require_https_only', () => RequireHttpsOnlyRule());
+    testRule('RequireHttpsOnlyTestRule', 'require_https_only_test', () => RequireHttpsOnlyTestRule());
+    testRule('AvoidUnsafeDeserializationRule', 'avoid_unsafe_deserialization', () => AvoidUnsafeDeserializationRule());
+    testRule('AvoidUserControlledUrlsRule', 'avoid_user_controlled_urls', () => AvoidUserControlledUrlsRule());
+    testRule('RequireCatchLoggingRule', 'require_catch_logging', () => RequireCatchLoggingRule());
+    testRule('RequireSecureStorageErrorHandlingRule', 'require_secure_storage_error_handling', () => RequireSecureStorageErrorHandlingRule());
+    testRule('AvoidSecureStorageLargeDataRule', 'avoid_secure_storage_large_data', () => AvoidSecureStorageLargeDataRule());
+    testRule('AvoidSensitiveDataInClipboardRule', 'avoid_sensitive_data_in_clipboard', () => AvoidSensitiveDataInClipboardRule());
+    testRule('RequireClipboardPasteValidationRule', 'require_clipboard_paste_validation', () => RequireClipboardPasteValidationRule());
+    testRule('AvoidEncryptionKeyInMemoryRule', 'avoid_encryption_key_in_memory', () => AvoidEncryptionKeyInMemoryRule());
+    testRule('PreferOauthPkceRule', 'prefer_oauth_pkce', () => PreferOauthPkceRule());
+    testRule('RequireSessionTimeoutRule', 'require_session_timeout', () => RequireSessionTimeoutRule());
+    testRule('AvoidStackTraceInProductionRule', 'avoid_stack_trace_in_production', () => AvoidStackTraceInProductionRule());
+    testRule('AvoidWebViewCorsIssuesRule', 'avoid_webview_cors_issues', () => AvoidWebViewCorsIssuesRule());
+    testRule('RequireInputValidationRule', 'require_input_validation', () => RequireInputValidationRule());
+  });
   group('Security Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_api_key_in_code',

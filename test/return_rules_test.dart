@@ -1,11 +1,85 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/return_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 5 Return lint rules.
+/// Tests for 7 Return lint rules.
 ///
 /// Test fixtures: example_core/lib/return/*
 void main() {
+  group('Return Rules - Rule Instantiation', () {
+    test('AvoidReturningCascadesRule', () {
+      final rule = AvoidReturningCascadesRule();
+      expect(rule.code.name, 'avoid_returning_cascades');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_returning_cascades]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidReturningVoidRule', () {
+      final rule = AvoidReturningVoidRule();
+      expect(rule.code.name, 'avoid_returning_void');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_returning_void]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidUnnecessaryReturnRule', () {
+      final rule = AvoidUnnecessaryReturnRule();
+      expect(rule.code.name, 'avoid_unnecessary_return');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_unnecessary_return]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PreferImmediateReturnRule', () {
+      final rule = PreferImmediateReturnRule();
+      expect(rule.code.name, 'prefer_immediate_return');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_immediate_return]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PreferReturningShorthandsRule', () {
+      final rule = PreferReturningShorthandsRule();
+      expect(rule.code.name, 'prefer_returning_shorthands');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_returning_shorthands]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidReturningNullForVoidRule', () {
+      final rule = AvoidReturningNullForVoidRule();
+      expect(rule.code.name, 'avoid_returning_null_for_void');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_returning_null_for_void]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidReturningNullForFutureRule', () {
+      final rule = AvoidReturningNullForFutureRule();
+      expect(rule.code.name, 'avoid_returning_null_for_future');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_returning_null_for_future]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
   group('Return Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_returning_cascades',
@@ -13,6 +87,8 @@ void main() {
       'avoid_unnecessary_return',
       'prefer_immediate_return',
       'prefer_returning_shorthands',
+      'avoid_returning_null_for_void',
+      'avoid_returning_null_for_future',
     ];
 
     for (final fixture in fixtures) {

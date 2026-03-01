@@ -47,7 +47,6 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - **Tier reclassification (no orphans):** Rule logic, unit tests, and false-positive suppressors unchanged; only tier set membership in `lib/src/tiers.dart` updated. Moved **to Essential:** `check_mounted_after_async`, `avoid_drift_raw_sql_interpolation`. Moved **to Recommended:** `prefer_semver_version`, `prefer_correct_package_name`, `require_macos_notarization_ready`, `avoid_animation_rebuild_waste`, `require_deep_link_fallback`, `require_stepper_validation`, `require_immutable_bloc_state`.
 - **Severity reclassification:** `LintCode` severity only; when the rule fires is unchanged. CI using `--fatal-infos` may now fail where it did not. **WARNING → ERROR:** `require_unknown_route_handler`, `avoid_circular_redirects`, `check_mounted_after_async`, `require_https_only`, `require_route_guards`.
 - **Discussion 062 (false positive reduction review):** Completed; moved to `bugs/history/discussion_062_false_positive_reduction_review.md`. Ongoing guidance remains in CONTRIBUTING.md § Avoiding False Positives and `.claude/skills/lint-rules/SKILL.md` § Reducing False Positives.
-- **Tier and severity analysis:** Completed; moved to `bugs/history/TIER_AND_SEVERITY_ANALYSIS.md`. Tier and severity changes are in `lib/src/tiers.dart` and rule LintCodes; see CHANGELOG tier/severity entries.
 
 ### Added
 

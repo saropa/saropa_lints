@@ -117,11 +117,9 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
   ///
   /// Returns true if the match is within a safe pattern (e.g., "auth" in "oauth").
   static bool _isSafeMatch(String source, String sensitivePattern) {
-    // Check if any safe pattern contains this sensitive pattern
-    // and appears in the source
     for (final String safePattern in _safePatterns) {
       if (safePattern.contains(sensitivePattern) &&
-          source.contains(safePattern)) {
+          RegExp(RegExp.escape(safePattern)).hasMatch(source)) {
         return true;
       }
     }
@@ -248,6 +246,12 @@ class RequireSecureStorageRule extends SaropaLintRule {
     'private_key',
     'privatekey',
   };
+  static final List<RegExp> _prefSharedTargetPatterns = [
+    RegExp(r'\bpref\b'),
+    RegExp(r'\bshared\b'),
+  ];
+  static final List<RegExp> _sensitiveKeyPatterns =
+      _sensitiveKeys.map((s) => RegExp('\\b${RegExp.escape(s)}\\b')).toList();
 
   @override
   void runWithReporter(
@@ -257,29 +261,24 @@ class RequireSecureStorageRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      // Check for SharedPreferences set methods
       if (!methodName.startsWith('set')) return;
 
       final Expression? target = node.target;
       if (target == null) return;
 
-      // Check if it's a SharedPreferences or similar
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') && !targetSource.contains('shared')) {
+      if (!_prefSharedTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
-      // Check the key for sensitive patterns
       if (node.argumentList.arguments.isEmpty) return;
 
       final Expression firstArg = node.argumentList.arguments.first;
       final String keySource = firstArg.toSource().toLowerCase();
 
-      for (final String pattern in _sensitiveKeys) {
-        if (keySource.contains(pattern)) {
-          reporter.atNode(node);
-          return;
-        }
+      if (_sensitiveKeyPatterns.any((p) => p.hasMatch(keySource))) {
+        reporter.atNode(node);
+        return;
       }
     });
   }
@@ -619,6 +618,11 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _authBioTargetPatterns = [
+    RegExp(r'\bauth\b'),
+    RegExp(r'\bbio\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -633,7 +637,7 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('auth') && !targetSource.contains('bio')) {
+      if (!_authBioTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
@@ -1377,6 +1381,15 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final List<RegExp> _prefSharedTargetPatterns = [
+    RegExp(r'\bpref\b'),
+    RegExp(r'\bshared\b'),
+  ];
+  static final List<RegExp> _passwordKeyPatterns = [
+    RegExp(r'\bpassword\b'),
+    RegExp(r'\bpasswd\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1385,14 +1398,13 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      // Check for SharedPreferences set methods
       if (!methodName.startsWith('set')) return;
 
       final Expression? target = node.target;
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') && !targetSource.contains('shared')) {
+      if (!_prefSharedTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
@@ -1401,7 +1413,7 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
       final Expression firstArg = node.argumentList.arguments.first;
       final String keySource = firstArg.toSource().toLowerCase();
 
-      if (keySource.contains('password') || keySource.contains('passwd')) {
+      if (_passwordKeyPatterns.any((p) => p.hasMatch(keySource))) {
         reporter.atNode(node);
       }
     });
@@ -2225,6 +2237,20 @@ class RequireTokenRefreshRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  /// Whole-word match to avoid FPs (e.g. "Oauth" should not match "auth").
+  static bool _containsWord(String text, String word) {
+    return RegExp(
+      '\\b${RegExp.escape(word)}\\b',
+      caseSensitive: false,
+    ).hasMatch(text);
+  }
+
+  static final RegExp _refreshMethodPattern = RegExp(r'\brefresh\b');
+  static final List<RegExp> _expiryBodyPatterns = [
+    RegExp(r'\bexpir\b'),
+    RegExp(r'\bisbefore\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2233,10 +2259,10 @@ class RequireTokenRefreshRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
-      // Check if class is auth-related
-      if (!className.contains('auth') &&
-          !className.contains('session') &&
-          !className.contains('token')) {
+      // Check if class is auth-related (whole-word to avoid Oauth, SessionId, etc.)
+      if (!_containsWord(className, 'auth') &&
+          !_containsWord(className, 'session') &&
+          !_containsWord(className, 'token')) {
         return;
       }
 
@@ -2262,12 +2288,11 @@ class RequireTokenRefreshRule extends SaropaLintRule {
         }
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme.toLowerCase();
-          if (methodName.contains('refresh')) {
+          if (_refreshMethodPattern.hasMatch(methodName)) {
             hasRefreshMethod = true;
           }
-          // Check method body for expiry checks
           final String bodySource = member.body.toSource().toLowerCase();
-          if (bodySource.contains('expir') || bodySource.contains('isbefore')) {
+          if (_expiryBodyPatterns.any((p) => p.hasMatch(bodySource))) {
             hasExpiryCheck = true;
           }
         }
@@ -2332,6 +2357,19 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _jwtDecodeMethodPatterns = [
+    RegExp(r'\bdecode\b'),
+    RegExp(r'\bparse\b'),
+  ];
+  static final List<RegExp> _jwtTokenTargetPatterns = [
+    RegExp(r'\bjwt\b'),
+    RegExp(r'\btoken\b'),
+  ];
+  static final List<RegExp> _jwtTypePatterns = [
+    RegExp(r'\bjwt\b'),
+    RegExp(r'\bjsonwebtoken\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2340,15 +2378,14 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name.toLowerCase();
 
-      // Check for JWT decode calls
-      if (!methodName.contains('decode') && !methodName.contains('parse')) {
+      if (!_jwtDecodeMethodPatterns.any((p) => p.hasMatch(methodName))) {
         return;
       }
 
       final Expression? target = node.target;
       if (target != null) {
         final String targetSource = target.toSource().toLowerCase();
-        if (!targetSource.contains('jwt') && !targetSource.contains('token')) {
+        if (!_jwtTokenTargetPatterns.any((p) => p.hasMatch(targetSource))) {
           return;
         }
       }
@@ -2371,11 +2408,10 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
       }
     });
 
-    // Also check for direct JWT library usage
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name.lexeme
-          .toLowerCase();
-      if (typeName.contains('jwt') || typeName.contains('jsonwebtoken')) {
+      final String typeName =
+          node.constructorName.type.name.lexeme.toLowerCase();
+      if (_jwtTypePatterns.any((p) => p.hasMatch(typeName))) {
         reporter.atNode(node.constructorName, code);
       }
     });
@@ -2432,6 +2468,21 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _logoutStoragePatterns = [
+    RegExp(r'\bdelete\b'),
+    RegExp(r'\bremove\b'),
+    RegExp(r'\bclear\b'),
+  ];
+  static final List<RegExp> _logoutTokenPatterns = [
+    RegExp(r'\btoken\b'),
+    RegExp(r'\bcredential\b'),
+    RegExp(r'\bauth\b'),
+  ];
+  static final List<RegExp> _logoutCachePatterns = [
+    RegExp(r'\bcache\b'),
+    RegExp(r'\bstorage\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2448,21 +2499,13 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
 
       final String bodySource = node.body.toSource().toLowerCase();
 
-      // Check for cleanup operations
       final bool clearsStorage =
-          bodySource.contains('delete') ||
-          bodySource.contains('remove') ||
-          bodySource.contains('clear');
-
+          _logoutStoragePatterns.any((p) => p.hasMatch(bodySource));
       final bool clearsToken =
-          bodySource.contains('token') ||
-          bodySource.contains('credential') ||
-          bodySource.contains('auth');
-
+          _logoutTokenPatterns.any((p) => p.hasMatch(bodySource));
       final bool clearsCache =
-          bodySource.contains('cache') || bodySource.contains('storage');
+          _logoutCachePatterns.any((p) => p.hasMatch(bodySource));
 
-      // If logout method is too simple, warn
       if (!clearsStorage || (!clearsToken && !clearsCache)) {
         reporter.atToken(node.name, code);
       }
@@ -2627,22 +2670,30 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _queryParamTargetPatterns = [
+    RegExp(r'\bqueryParameters\b'),
+    RegExp(r'\bpathSegments\b'),
+    RegExp(r'\barguments\b'),
+  ];
+  static final List<RegExp> _routeSettingsTargetPatterns = [
+    RegExp(r'\bsettings\b'),
+    RegExp(r'\broute\b'),
+    RegExp(r'\bRouteSettings\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
-      // Check for queryParameters access
       if (node.methodName.name != '[]') return;
 
       final Expression? target = node.target;
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('queryParameters') &&
-          !targetSource.contains('pathSegments') &&
-          !targetSource.contains('arguments')) {
+      if (!_queryParamTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
@@ -2697,9 +2748,7 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
       if (node.propertyName.name != 'arguments') return;
 
       final String targetSource = node.target?.toSource() ?? '';
-      if (!targetSource.contains('settings') &&
-          !targetSource.contains('route') &&
-          !targetSource.contains('RouteSettings')) {
+      if (!_routeSettingsTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
@@ -2788,6 +2837,11 @@ class RequireDataEncryptionRule extends SaropaLintRule {
     'private_key',
     'privatekey',
   };
+  static final List<RegExp> _secureStorageTargetPatterns = [
+    RegExp(r'\bsecure\b'),
+    RegExp(r'\bencrypt\b'),
+    RegExp(r'\bencryptedbox\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -2797,7 +2851,6 @@ class RequireDataEncryptionRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      // Check for storage write operations
       if (methodName != 'setString' &&
           methodName != 'put' &&
           methodName != 'write' &&
@@ -2807,14 +2860,11 @@ class RequireDataEncryptionRule extends SaropaLintRule {
         return;
       }
 
-      // Check if target is secure storage (allowed)
       final Expression? target = node.target;
       if (target != null) {
         final String targetSource = target.toSource().toLowerCase();
-        if (targetSource.contains('secure') ||
-            targetSource.contains('encrypt') ||
-            targetSource.contains('encryptedbox')) {
-          return; // Using secure storage
+        if (_secureStorageTargetPatterns.any((p) => p.hasMatch(targetSource))) {
+          return;
         }
       }
 
@@ -3196,6 +3246,19 @@ class AvoidPathTraversalRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _pathTraversalThrowPatterns = [
+    RegExp(r'\.\.'),
+  ];
+  static final List<RegExp> _pathValidationPatterns = [
+    RegExp(r'\bbasename\b'),
+    RegExp(r'\bresolveSymbolicLinks\b'),
+    RegExp(r'\bstartsWith\b'),
+    RegExp(r'\bsanitize\b'),
+    RegExp(r'\bvalidate\b'),
+    RegExp(r'\bisWithin\b'),
+    RegExp(r'\bnormalize\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3204,7 +3267,6 @@ class AvoidPathTraversalRule extends SaropaLintRule {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
-      // Check for File/Directory creation
       if (typeName != 'File' && typeName != 'Directory') return;
 
       final ArgumentList args = node.argumentList;
@@ -3268,18 +3330,12 @@ class AvoidPathTraversalRule extends SaropaLintRule {
     while (current != null) {
       final String source = current.toSource();
 
-      // Check for path traversal validation patterns
-      if (source.contains('..') &&
-          (source.contains('throw') || source.contains('return'))) {
+      if (_pathTraversalThrowPatterns.any((p) => p.hasMatch(source)) &&
+          (RegExp(r'\bthrow\b').hasMatch(source) ||
+              RegExp(r'\breturn\b').hasMatch(source))) {
         return true;
       }
-      if (source.contains('basename') ||
-          source.contains('resolveSymbolicLinks') ||
-          source.contains('startsWith') ||
-          source.contains('sanitize') ||
-          source.contains('validate') ||
-          source.contains('isWithin') ||
-          source.contains('normalize')) {
+      if (_pathValidationPatterns.any((p) => p.hasMatch(source))) {
         return true;
       }
 
@@ -3456,6 +3512,12 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  /// Target source patterns for SharedPreferences (word-boundary).
+  static final List<RegExp> _prefTargetSourcePatterns = [
+    RegExp(r'\bpref\b'),
+    RegExp(r'\bsharedpreferences\b'),
+  ];
+
   /// Auth-specific patterns to check in VALUE (not key).
   /// Key-based detection is handled by `avoid_shared_prefs_sensitive_data`.
   static const Set<String> _authValuePatterns = <String>{
@@ -3487,8 +3549,7 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
 
       final bool isPrefs =
           targetType.contains('SharedPreferences') ||
-          targetSource.contains('pref') ||
-          targetSource.contains('sharedpreferences');
+          _prefTargetSourcePatterns.any((p) => p.hasMatch(targetSource));
 
       if (!isPrefs) return;
 
@@ -3671,6 +3732,13 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
     'destination',
   ];
 
+  /// Navigation method names (word-boundary to avoid substring false positives).
+  static final List<RegExp> _navMethodPatterns = [
+    RegExp(r'\bpush\b'),
+    RegExp(r'\bnavigate\b'),
+    RegExp(r'\bgo\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3680,9 +3748,7 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
       final methodName = node.methodName.name.toLowerCase();
 
       // Check for navigation methods
-      if (!methodName.contains('push') &&
-          !methodName.contains('navigate') &&
-          !methodName.contains('go') &&
+      if (!_navMethodPatterns.any((p) => p.hasMatch(methodName)) &&
           methodName != 'launch' &&
           methodName != 'launchurl') {
         return;
@@ -3950,16 +4016,16 @@ class PreferLocalAuthRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  static const _sensitiveOperations = [
-    'payment',
-    'charge',
-    'transfer',
-    'withdraw',
-    'delete_account',
-    'deleteaccount',
-    'change_password',
-    'changepassword',
-    'export',
+  static final List<RegExp> _sensitiveOperationPatterns = [
+    RegExp(r'\bpayment\b'),
+    RegExp(r'\bcharge\b'),
+    RegExp(r'\btransfer\b'),
+    RegExp(r'\bwithdraw\b'),
+    RegExp(r'\bdelete_account\b'),
+    RegExp(r'\bdeleteaccount\b'),
+    RegExp(r'\bchange_password\b'),
+    RegExp(r'\bchangepassword\b'),
+    RegExp(r'\bexport\b'),
   ];
 
   @override
@@ -3971,9 +4037,8 @@ class PreferLocalAuthRule extends SaropaLintRule {
       final methodName = node.name.lexeme.toLowerCase();
 
       // Check if method name suggests sensitive operation
-      final isSensitive = _sensitiveOperations.any(
-        (op) => methodName.contains(op),
-      );
+      final isSensitive =
+          _sensitiveOperationPatterns.any((p) => p.hasMatch(methodName));
 
       if (!isSensitive) {
         return;
@@ -4044,6 +4109,12 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final List<RegExp> _prefsTargetSourcePatterns = [
+    RegExp(r'\bprefs\b'),
+    RegExp(r'\bsharedpreferences\b'),
+    RegExp(r'\bpreferences\b'),
+  ];
+
   static const Set<String> _sensitiveKeys = <String>{
     'jwt',
     'token',
@@ -4075,9 +4146,7 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
       final target = node.target;
       if (target == null) return;
       final targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('prefs') &&
-          !targetSource.contains('sharedpreferences') &&
-          !targetSource.contains('preferences')) {
+      if (!_prefsTargetSourcePatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
@@ -4641,6 +4710,17 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
     'write',
   };
 
+  static final List<RegExp> _skipSecureTargetPatterns = [
+    RegExp(r'\bsecure\b'),
+    RegExp(r'\bencrypted\b'),
+  ];
+
+  static final List<RegExp> _storageTargetPatterns = [
+    RegExp(r'\bpref\b'),
+    RegExp(r'\bbox\b'),
+    RegExp(r'\bstorage\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -4656,16 +4736,13 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
 
       final String targetSource = target.toSource().toLowerCase();
       // Skip if using secure storage
-      if (targetSource.contains('secure') ||
-          targetSource.contains('encrypted')) {
+      if (_skipSecureTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
       // Check if it's SharedPreferences or Hive
       final bool isStorage =
-          targetSource.contains('pref') ||
-          targetSource.contains('box') ||
-          targetSource.contains('storage');
+          _storageTargetPatterns.any((p) => p.hasMatch(targetSource));
 
       if (!isStorage) return;
 
@@ -4898,7 +4975,7 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
     '[require_https_only] HTTP URL detected in network request. Unencrypted HTTP traffic is vulnerable to interception, modification, and eavesdropping by any attacker on the network path. Sensitive data including credentials, personal information, and session tokens transmitted over HTTP can be silently captured in plaintext. {v4}',
     correctionMessage:
         'Replace http:// with https:// to encrypt all network traffic and prevent man-in-the-middle attacks, data interception, and content tampering.',
-    severity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Localhost patterns that are safe to use HTTP.
@@ -5352,6 +5429,13 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
     'upload',
   };
 
+  static final List<RegExp> _httpClientTargetPatterns = [
+    RegExp(r'\bhttp\b'),
+    RegExp(r'\bdio\b'),
+    RegExp(r'\bclient\b'),
+    RegExp(r'\bapi\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -5369,10 +5453,7 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
 
       final String targetSource = target.toSource().toLowerCase();
       final bool isHttpClient =
-          targetSource.contains('http') ||
-          targetSource.contains('dio') ||
-          targetSource.contains('client') ||
-          targetSource.contains('api');
+          _httpClientTargetPatterns.any((p) => p.hasMatch(targetSource));
 
       if (!isHttpClient) return;
 
@@ -5570,8 +5651,14 @@ class RequireCatchLoggingRule extends SaropaLintRule {
   };
   // cspell:enable
 
-  /// Patterns that indicate the exception is being handled appropriately.
-  static const Set<String> _rethrowPatterns = <String>{'rethrow', 'throw'};
+  static final List<RegExp> _loggingBodyPatterns = [
+    for (final s in _loggingPatterns) RegExp(RegExp.escape(s)),
+  ];
+  /// Patterns that indicate the exception is being handled (rethrow/throw).
+  static final List<RegExp> _rethrowBodyPatterns = [
+    RegExp(r'\brethrow\b'),
+    RegExp(r'\bthrow\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -5590,16 +5677,14 @@ class RequireCatchLoggingRule extends SaropaLintRule {
       final String bodySource = body.toSource().toLowerCase();
 
       // Check for logging
-      final bool hasLogging = _loggingPatterns.any(
-        (pattern) => bodySource.contains(pattern),
-      );
+      final bool hasLogging =
+          _loggingBodyPatterns.any((p) => p.hasMatch(bodySource));
 
       if (hasLogging) return;
 
       // Check for rethrow
-      final bool hasRethrow = _rethrowPatterns.any(
-        (pattern) => bodySource.contains(pattern),
-      );
+      final bool hasRethrow =
+          _rethrowBodyPatterns.any((p) => p.hasMatch(bodySource));
 
       if (hasRethrow) return;
 
@@ -5608,7 +5693,8 @@ class RequireCatchLoggingRule extends SaropaLintRule {
       if (exceptionParam != null) {
         final String exceptionName = exceptionParam.name.lexeme;
         // Check if exception is used in a function call (might be custom logging)
-        if (bodySource.contains(exceptionName.toLowerCase())) {
+        final String exLower = exceptionName.toLowerCase();
+        if (RegExp(RegExp.escape(exLower)).hasMatch(bodySource)) {
           // Exception is referenced - might be passed to a custom logger
           // Only flag if it's just assignment or simple property access
           final bool isJustAssignment = _isOnlyAssignmentOrPropertyAccess(
@@ -5718,6 +5804,13 @@ class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
     'containsKey',
   };
 
+  static final List<RegExp> _secureStorageTargetPatterns = [
+    RegExp(r'\bsecurestorage\b'),
+    RegExp(r'\bflutter_secure_storage\b'),
+    RegExp(r'\b_storage\b'),
+    RegExp(r'\bkeychain\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -5736,10 +5829,7 @@ class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('securestorage') &&
-          !targetSource.contains('flutter_secure_storage') &&
-          !targetSource.contains('_storage') &&
-          !targetSource.contains('keychain')) {
+      if (!_secureStorageTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
@@ -5803,6 +5893,11 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _secureStorageTargetShortPatterns = [
+    RegExp(r'\bsecurestorage\b'),
+    RegExp(r'\b_storage\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -5816,8 +5911,7 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('securestorage') &&
-          !targetSource.contains('_storage')) {
+      if (!_secureStorageTargetShortPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
@@ -5964,6 +6058,15 @@ class RequireClipboardPasteValidationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _validationLogicPatterns = [
+    RegExp(r'\bisValid\b'),
+    RegExp(r'\bvalidate\b'),
+    RegExp(r'\bRegExp\b'),
+    RegExp(r'\.contains\('),
+    RegExp(r'\.startsWith\('),
+    RegExp(r'\.length\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -6002,14 +6105,8 @@ class RequireClipboardPasteValidationRule extends SaropaLintRule {
   }
 
   bool _hasValidationLogicForClipboard(AstNode block) {
-    final String source = block.toSource();
-    // Check for common validation patterns
-    return source.contains('isValid') ||
-        source.contains('validate') ||
-        source.contains('RegExp') ||
-        source.contains('.contains(') ||
-        source.contains('.startsWith(') ||
-        source.contains('.length');
+    final String blockSource = block.toSource();
+    return _validationLogicPatterns.any((p) => p.hasMatch(blockSource));
   }
 }
 
@@ -6148,6 +6245,13 @@ class PreferOauthPkceRule extends SaropaLintRule {
     'exchangeCode',
   };
 
+  static final List<RegExp> _oauthTargetPatterns = [
+    RegExp(r'appAuth'),
+    RegExp(r'AppAuth'),
+    RegExp(r'oauth'),
+    RegExp(r'OAuth'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -6182,10 +6286,7 @@ class PreferOauthPkceRule extends SaropaLintRule {
       if (targetSource == null) return;
 
       final bool isOAuth =
-          targetSource.contains('appAuth') ||
-          targetSource.contains('AppAuth') ||
-          targetSource.contains('oauth') ||
-          targetSource.contains('OAuth');
+          _oauthTargetPatterns.any((p) => p.hasMatch(targetSource));
 
       if (!isOAuth) return;
 
@@ -6311,7 +6412,7 @@ class RequireSessionTimeoutRule extends SaropaLintRule {
 
       // Check if timeout handling exists in the enclosing method
       for (final String indicator in _timeoutIndicators) {
-        if (bodySource.contains(indicator)) return;
+        if (RegExp(RegExp.escape(indicator)).hasMatch(bodySource)) return;
       }
 
       reporter.atNode(node);
@@ -6415,6 +6516,11 @@ class AvoidStackTraceInProductionRule extends SaropaLintRule {
     'log',
   };
 
+  static final List<RegExp> _stackTraceArgPatterns = [
+    RegExp(r'\bstacktrace\b'),
+    RegExp(r'\bstack_trace\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -6458,8 +6564,8 @@ class AvoidStackTraceInProductionRule extends SaropaLintRule {
       if (typeName == 'StackTrace') return true;
 
       // Fall back to source-text heuristic for interpolations and .toString()
-      final String source = arg.toSource().toLowerCase();
-      if (source.contains('stacktrace') || source.contains('stack_trace')) {
+      final String argSource = arg.toSource().toLowerCase();
+      if (_stackTraceArgPatterns.any((p) => p.hasMatch(argSource))) {
         return true;
       }
     }
@@ -6638,6 +6744,11 @@ class RequireInputValidationRule extends SaropaLintRule {
 
   static const Set<String> _networkMethods = <String>{'post', 'put', 'patch'};
 
+  static final List<RegExp> _networkTargetPatterns = [
+    RegExp(r'\bhttp\b'),
+    RegExp(r'\bdio\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -6648,7 +6759,7 @@ class RequireInputValidationRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target == null) return;
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('http') && !targetSource.contains('dio')) {
+      if (!_networkTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 

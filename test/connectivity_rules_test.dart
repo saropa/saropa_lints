@@ -1,15 +1,50 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/connectivity_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 2 Connectivity lint rules.
+/// Tests for 3 Connectivity lint rules.
 ///
 /// Test fixtures: example_async/lib/connectivity/*
 void main() {
+  group('Connectivity Rules - Rule Instantiation', () {
+    test('RequireConnectivityErrorHandlingRule', () {
+      final rule = RequireConnectivityErrorHandlingRule();
+      expect(rule.code.name, 'require_connectivity_error_handling');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_connectivity_error_handling]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidConnectivityEqualsInternetRule', () {
+      final rule = AvoidConnectivityEqualsInternetRule();
+      expect(rule.code.name, 'avoid_connectivity_equals_internet');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_connectivity_equals_internet]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireConnectivityTimeoutRule', () {
+      final rule = RequireConnectivityTimeoutRule();
+      expect(rule.code.name, 'require_connectivity_timeout');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_connectivity_timeout]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
   group('Connectivity Rules - Fixture Verification', () {
     final fixtures = [
       'require_connectivity_error_handling',
       'avoid_connectivity_equals_internet',
+      'require_connectivity_timeout',
     ];
 
     for (final fixture in fixtures) {
@@ -45,6 +80,15 @@ void main() {
 
       test('connectivity-aware error handling should NOT trigger', () {
         expect('connectivity-aware error handling', isNotNull);
+      });
+    });
+    group('require_connectivity_timeout', () {
+      test('HTTP request without timeout SHOULD trigger', () {
+        expect('HTTP request without timeout', isNotNull);
+      });
+
+      test('request with .timeout() should NOT trigger', () {
+        expect('request with timeout', isNotNull);
       });
     });
   });

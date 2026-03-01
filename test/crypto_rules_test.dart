@@ -1,11 +1,65 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/crypto_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 5 Cryptography lint rules.
 ///
 /// Test fixtures: example_async/lib/crypto/*
 void main() {
+  group('Cryptography Rules - Rule Instantiation', () {
+    test('AvoidHardcodedEncryptionKeysRule', () {
+      final rule = AvoidHardcodedEncryptionKeysRule();
+      expect(rule.code.name, 'avoid_hardcoded_encryption_keys');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_hardcoded_encryption_keys]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PreferSecureRandomForCryptoRule', () {
+      final rule = PreferSecureRandomForCryptoRule();
+      expect(rule.code.name, 'prefer_secure_random_for_crypto');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_secure_random_for_crypto]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidDeprecatedCryptoAlgorithmsRule', () {
+      final rule = AvoidDeprecatedCryptoAlgorithmsRule();
+      expect(rule.code.name, 'avoid_deprecated_crypto_algorithms');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_deprecated_crypto_algorithms]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireUniqueIvPerEncryptionRule', () {
+      final rule = RequireUniqueIvPerEncryptionRule();
+      expect(rule.code.name, 'require_unique_iv_per_encryption');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_unique_iv_per_encryption]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireSecureKeyGenerationRule', () {
+      final rule = RequireSecureKeyGenerationRule();
+      expect(rule.code.name, 'require_secure_key_generation');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_secure_key_generation]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
   group('Cryptography Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_hardcoded_encryption_keys',

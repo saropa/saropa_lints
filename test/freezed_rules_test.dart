@@ -1,11 +1,33 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/freezed_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 9 Freezed lint rules.
+/// Tests for 10 Freezed lint rules.
 ///
 /// Test fixtures: example_packages/lib/freezed/*
 void main() {
+  group('Freezed Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+    testRule('AvoidFreezedJsonSerializableConflictRule', 'avoid_freezed_json_serializable_conflict', () => AvoidFreezedJsonSerializableConflictRule());
+    testRule('RequireFreezedArrowSyntaxRule', 'require_freezed_arrow_syntax', () => RequireFreezedArrowSyntaxRule());
+    testRule('RequireFreezedPrivateConstructorRule', 'require_freezed_private_constructor', () => RequireFreezedPrivateConstructorRule());
+    testRule('RequireFreezedExplicitJsonRule', 'require_freezed_explicit_json', () => RequireFreezedExplicitJsonRule());
+    testRule('PreferFreezedDefaultValuesRule', 'prefer_freezed_default_values', () => PreferFreezedDefaultValuesRule());
+    testRule('RequireFreezedJsonConverterRule', 'require_freezed_json_converter', () => RequireFreezedJsonConverterRule());
+    testRule('RequireFreezedLintPackageRule', 'require_freezed_lint_package', () => RequireFreezedLintPackageRule());
+    testRule('AvoidFreezedForLogicClassesRule', 'avoid_freezed_for_logic_classes', () => AvoidFreezedForLogicClassesRule());
+    testRule('PreferFreezedForDataClassesRule', 'prefer_freezed_for_data_classes', () => PreferFreezedForDataClassesRule());
+    testRule('AvoidFreezedAnyMapIssueRule', 'avoid_freezed_any_map_issue', () => AvoidFreezedAnyMapIssueRule());
+  });
   group('Freezed Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_freezed_json_serializable_conflict',
@@ -17,6 +39,7 @@ void main() {
       'require_freezed_lint_package',
       'avoid_freezed_for_logic_classes',
       'prefer_freezed_for_data_classes',
+      'avoid_freezed_any_map_issue',
     ];
 
     for (final fixture in fixtures) {

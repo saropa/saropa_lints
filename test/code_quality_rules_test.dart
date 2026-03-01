@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 100 code quality lint rules.
+/// Tests for 101 code quality lint rules.
 ///
 /// These rules cover type safety, null handling, dead code detection,
 /// pattern matching, collection best practices, string handling,
@@ -15,6 +15,7 @@ void main() {
       'avoid_accessing_collections_by_constant_index',
       'avoid_adjacent_strings',
       'avoid_deprecated_usage',
+      'avoid_inferrable_type_arguments',
       'avoid_always_null_parameters',
       'avoid_assigning_to_static_field',
       'avoid_async_call_in_sync_function',

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/packages/bloc_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 52 Bloc and Cubit lint rules.
@@ -9,6 +10,69 @@ import 'package:test/test.dart';
 ///
 /// Test fixtures: example_packages/lib/bloc/*
 void main() {
+  group('Bloc Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+    testRule('AvoidBlocEventInConstructorRule', 'avoid_bloc_event_in_constructor', () => AvoidBlocEventInConstructorRule());
+    testRule('RequireBlocCloseRule', 'require_bloc_close', () => RequireBlocCloseRule());
+    testRule('RequireImmutableBlocStateRule', 'require_immutable_bloc_state', () => RequireImmutableBlocStateRule());
+    testRule('PreferCubitForSimpleRule', 'prefer_cubit_for_simple', () => PreferCubitForSimpleRule());
+    testRule('RequireBlocObserverRule', 'require_bloc_observer', () => RequireBlocObserverRule());
+    testRule('AvoidBlocEventMutationRule', 'avoid_bloc_event_mutation', () => AvoidBlocEventMutationRule());
+    testRule('PreferCopyWithForStateRule', 'prefer_copy_with_for_state', () => PreferCopyWithForStateRule());
+    testRule('AvoidBlocListenInBuildRule', 'avoid_bloc_listen_in_build', () => AvoidBlocListenInBuildRule());
+    testRule('RequireInitialStateRule', 'require_initial_state', () => RequireInitialStateRule());
+    testRule('RequireErrorStateRule', 'require_error_state', () => RequireErrorStateRule());
+    testRule('AvoidBlocInBlocRule', 'avoid_bloc_in_bloc', () => AvoidBlocInBlocRule());
+    testRule('PreferSealedEventsRule', 'prefer_sealed_events', () => PreferSealedEventsRule());
+    testRule('RequireBlocTransformerRule', 'require_bloc_transformer', () => RequireBlocTransformerRule());
+    testRule('AvoidLongEventHandlersRule', 'avoid_long_event_handlers', () => AvoidLongEventHandlersRule());
+    testRule('PreferMultiBlocProviderRule', 'prefer_multi_bloc_provider', () => PreferMultiBlocProviderRule());
+    testRule('AvoidInstantiatingInBlocValueProviderRule', 'avoid_instantiating_in_bloc_value_provider', () => AvoidInstantiatingInBlocValueProviderRule());
+    testRule('AvoidExistingInstancesInBlocProviderRule', 'avoid_existing_instances_in_bloc_provider', () => AvoidExistingInstancesInBlocProviderRule());
+    testRule('PreferCorrectBlocProviderRule', 'prefer_correct_bloc_provider', () => PreferCorrectBlocProviderRule());
+    testRule('CheckIsNotClosedAfterAsyncGapRule', 'check_is_not_closed_after_async_gap', () => CheckIsNotClosedAfterAsyncGapRule());
+    testRule('AvoidDuplicateBlocEventHandlersRule', 'avoid_duplicate_bloc_event_handlers', () => AvoidDuplicateBlocEventHandlersRule());
+    testRule('PreferImmutableBlocEventsRule', 'prefer_immutable_bloc_events', () => PreferImmutableBlocEventsRule());
+    testRule('PreferImmutableBlocStateRule', 'prefer_immutable_bloc_state', () => PreferImmutableBlocStateRule());
+    testRule('PreferSealedBlocEventsRule', 'prefer_sealed_bloc_events', () => PreferSealedBlocEventsRule());
+    testRule('PreferSealedBlocStateRule', 'prefer_sealed_bloc_state', () => PreferSealedBlocStateRule());
+    testRule('PreferBlocEventSuffixRule', 'prefer_bloc_event_suffix', () => PreferBlocEventSuffixRule());
+    testRule('PreferBlocStateSuffixRule', 'prefer_bloc_state_suffix', () => PreferBlocStateSuffixRule());
+    testRule('AvoidYieldInOnEventRule', 'avoid_yield_in_on_event', () => AvoidYieldInOnEventRule());
+    testRule('EmitNewBlocStateInstancesRule', 'emit_new_bloc_state_instances', () => EmitNewBlocStateInstancesRule());
+    testRule('AvoidBlocPublicFieldsRule', 'avoid_bloc_public_fields', () => AvoidBlocPublicFieldsRule());
+    testRule('AvoidBlocPublicMethodsRule', 'avoid_bloc_public_methods', () => AvoidBlocPublicMethodsRule());
+    testRule('RequireBlocSelectorRule', 'require_bloc_selector', () => RequireBlocSelectorRule());
+    testRule('AvoidBlocEmitAfterCloseRule', 'avoid_bloc_emit_after_close', () => AvoidBlocEmitAfterCloseRule());
+    testRule('AvoidBlocStateMutationRule', 'avoid_bloc_state_mutation', () => AvoidBlocStateMutationRule());
+    testRule('RequireBlocInitialStateRule', 'require_bloc_initial_state', () => RequireBlocInitialStateRule());
+    testRule('RequireBlocLoadingStateRule', 'require_bloc_loading_state', () => RequireBlocLoadingStateRule());
+    testRule('RequireBlocErrorStateRule', 'require_bloc_error_state', () => RequireBlocErrorStateRule());
+    testRule('RequireBlocManualDisposeRule', 'require_bloc_manual_dispose', () => RequireBlocManualDisposeRule());
+    testRule('PreferCubitForSimpleStateRule', 'prefer_cubit_for_simple_state', () => PreferCubitForSimpleStateRule());
+    testRule('PreferBlocListenerForSideEffectsRule', 'prefer_bloc_listener_for_side_effects', () => PreferBlocListenerForSideEffectsRule());
+    testRule('RequireBlocConsumerWhenBothRule', 'require_bloc_consumer_when_both', () => RequireBlocConsumerWhenBothRule());
+    testRule('AvoidBlocContextDependencyRule', 'avoid_bloc_context_dependency', () => AvoidBlocContextDependencyRule());
+    testRule('AvoidBlocBusinessLogicInUiRule', 'avoid_bloc_business_logic_in_ui', () => AvoidBlocBusinessLogicInUiRule());
+    testRule('RequireBlocEventSealedRule', 'require_bloc_event_sealed', () => RequireBlocEventSealedRule());
+    testRule('RequireBlocRepositoryAbstractionRule', 'require_bloc_repository_abstraction', () => RequireBlocRepositoryAbstractionRule());
+    testRule('PreferBlocTransformRule', 'prefer_bloc_transform', () => PreferBlocTransformRule());
+    testRule('AvoidPassingBlocToBlocRule', 'avoid_passing_bloc_to_bloc', () => AvoidPassingBlocToBlocRule());
+    testRule('AvoidPassingBuildContextToBlocsRule', 'avoid_passing_build_context_to_blocs', () => AvoidPassingBuildContextToBlocsRule());
+    testRule('AvoidReturningValueFromCubitMethodsRule', 'avoid_returning_value_from_cubit_methods', () => AvoidReturningValueFromCubitMethodsRule());
+    testRule('RequireBlocRepositoryInjectionRule', 'require_bloc_repository_injection', () => RequireBlocRepositoryInjectionRule());
+    testRule('PreferBlocHydrationRule', 'prefer_bloc_hydration', () => PreferBlocHydrationRule());
+    testRule('AvoidLargeBlocRule', 'avoid_large_bloc', () => AvoidLargeBlocRule());
+    testRule('AvoidOverengineeredBlocStatesRule', 'avoid_overengineered_bloc_states', () => AvoidOverengineeredBlocStatesRule());
+  });
   group('Bloc Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_bloc_business_logic_in_ui',
