@@ -704,3 +704,10 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ## [4.15.1] and Earlier
 
 For details on the initial release and versions 0.1.0 through 4.15.1, please refer to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md).
+
+---
+## [6.0.8]
+
+### Changed
+- Version bump
+
