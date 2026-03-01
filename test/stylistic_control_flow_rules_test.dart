@@ -2,10 +2,102 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/stylistic_control_flow_rules.dart';
+
 /// Tests for 13 Stylistic Control Flow lint rules.
 ///
 /// Test fixtures: example_style/lib/stylistic_control_flow/*
 void main() {
+  group('Stylistic Control Flow Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'PreferEarlyReturnRule',
+      'prefer_early_return',
+      () => PreferEarlyReturnRule(),
+    );
+
+    testRule(
+      'PreferSingleExitPointRule',
+      'prefer_single_exit_point',
+      () => PreferSingleExitPointRule(),
+    );
+
+    testRule(
+      'PreferGuardClausesRule',
+      'prefer_guard_clauses',
+      () => PreferGuardClausesRule(),
+    );
+
+    testRule(
+      'PreferPositiveConditionsFirstRule',
+      'prefer_positive_conditions_first',
+      () => PreferPositiveConditionsFirstRule(),
+    );
+
+    testRule(
+      'PreferSwitchStatementRule',
+      'prefer_switch_statement',
+      () => PreferSwitchStatementRule(),
+    );
+
+    testRule(
+      'PreferCascadeOverChainedRule',
+      'prefer_cascade_over_chained',
+      () => PreferCascadeOverChainedRule(),
+    );
+
+    testRule(
+      'PreferChainedOverCascadeRule',
+      'prefer_chained_over_cascade',
+      () => PreferChainedOverCascadeRule(),
+    );
+
+    testRule(
+      'PreferExhaustiveEnumsRule',
+      'prefer_exhaustive_enums',
+      () => PreferExhaustiveEnumsRule(),
+    );
+
+    testRule(
+      'PreferDefaultEnumCaseRule',
+      'prefer_default_enum_case',
+      () => PreferDefaultEnumCaseRule(),
+    );
+
+    testRule(
+      'PreferAwaitOverThenRule',
+      'prefer_await_over_then',
+      () => PreferAwaitOverThenRule(),
+    );
+
+    testRule(
+      'PreferThenOverAwaitRule',
+      'prefer_then_over_await',
+      () => PreferThenOverAwaitRule(),
+    );
+
+    testRule(
+      'PreferSyncOverAsyncWhereSimpleRule',
+      'prefer_sync_over_async_where_possible',
+      () => PreferSyncOverAsyncWhereSimpleRule(),
+    );
+
+    testRule(
+      'PreferPositiveConditionsRule',
+      'prefer_positive_conditions',
+      () => PreferPositiveConditionsRule(),
+    );
+  });
+
   group('Stylistic Control Flow Rules - Fixture Verification', () {
     final fixtures = [
       'prefer_early_return',

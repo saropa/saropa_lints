@@ -2,10 +2,84 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/formatting_rules.dart';
+
 /// Tests for 10 Formatting lint rules.
 ///
 /// Test fixtures: example_core/lib/formatting/*
 void main() {
+  group('Formatting Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'NewlineBeforeCaseRule',
+      'prefer_blank_line_before_case',
+      () => NewlineBeforeCaseRule(),
+    );
+
+    testRule(
+      'NewlineBeforeConstructorRule',
+      'prefer_blank_line_before_constructor',
+      () => NewlineBeforeConstructorRule(),
+    );
+
+    testRule(
+      'NewlineBeforeMethodRule',
+      'prefer_blank_line_before_method',
+      () => NewlineBeforeMethodRule(),
+    );
+
+    testRule(
+      'NewlineBeforeReturnRule',
+      'prefer_blank_line_before_return',
+      () => NewlineBeforeReturnRule(),
+    );
+
+    testRule(
+      'PreferTrailingCommaRule',
+      'prefer_trailing_comma',
+      () => PreferTrailingCommaRule(),
+    );
+
+    testRule(
+      'UnnecessaryTrailingCommaRule',
+      'unnecessary_trailing_comma',
+      () => UnnecessaryTrailingCommaRule(),
+    );
+
+    testRule(
+      'FormatCommentFormattingRule',
+      'format_comment_style',
+      () => FormatCommentFormattingRule(),
+    );
+
+    testRule(
+      'MemberOrderingFormattingRule',
+      'prefer_member_ordering',
+      () => MemberOrderingFormattingRule(),
+    );
+
+    testRule(
+      'ParametersOrderingConventionRule',
+      'enforce_parameters_ordering',
+      () => ParametersOrderingConventionRule(),
+    );
+
+    testRule(
+      'EnumConstantsOrderingRule',
+      'enum_constants_ordering',
+      () => EnumConstantsOrderingRule(),
+    );
+  });
+
   group('Formatting Rules - Fixture Verification', () {
     final fixtures = [
       'prefer_blank_line_before_case',

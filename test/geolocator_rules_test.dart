@@ -2,10 +2,42 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/packages/geolocator_rules.dart';
+
 /// Tests for 3 Geolocator lint rules.
 ///
 /// Test fixtures: example_packages/lib/geolocator/*
 void main() {
+  group('Geolocator Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'RequireGeolocatorBatteryAwarenessRule',
+      'require_geolocator_battery_awareness',
+      () => RequireGeolocatorBatteryAwarenessRule(),
+    );
+
+    testRule(
+      'PreferGeocodingCacheRule',
+      'prefer_geocoding_cache',
+      () => PreferGeocodingCacheRule(),
+    );
+
+    testRule(
+      'AvoidContinuousLocationUpdatesRule',
+      'avoid_continuous_location_updates',
+      () => AvoidContinuousLocationUpdatesRule(),
+    );
+  });
+
   group('Geolocator Rules - Fixture Verification', () {
     final fixtures = [
       'require_geolocator_battery_awareness',

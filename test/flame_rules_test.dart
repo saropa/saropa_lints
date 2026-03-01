@@ -2,10 +2,36 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/packages/flame_rules.dart';
+
 /// Tests for 2 Flame Engine lint rules.
 ///
 /// Test fixtures: example_packages/lib/flame/*
 void main() {
+  group('Flame Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'AvoidCreatingVectorInUpdateRule',
+      'avoid_creating_vector_in_update',
+      () => AvoidCreatingVectorInUpdateRule(),
+    );
+
+    testRule(
+      'AvoidRedundantAsyncOnLoadRule',
+      'avoid_redundant_async_on_load',
+      () => AvoidRedundantAsyncOnLoadRule(),
+    );
+  });
+
   group('Flame Engine Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_creating_vector_in_update',

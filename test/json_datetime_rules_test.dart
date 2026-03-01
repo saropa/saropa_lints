@@ -2,10 +2,102 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/json_datetime_rules.dart';
+
 /// Tests for 13 Json Datetime lint rules.
 ///
 /// Test fixtures: example_async/lib/json_datetime/*
 void main() {
+  group('Json Datetime Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'RequireJsonDecodeTryCatchRule',
+      'require_json_decode_try_catch',
+      () => RequireJsonDecodeTryCatchRule(),
+    );
+
+    testRule(
+      'AvoidDateTimeParseUnvalidatedRule',
+      'avoid_datetime_parse_unvalidated',
+      () => AvoidDateTimeParseUnvalidatedRule(),
+    );
+
+    testRule(
+      'PreferTryParseForDynamicDataRule',
+      'prefer_try_parse_for_dynamic_data',
+      () => PreferTryParseForDynamicDataRule(),
+    );
+
+    testRule(
+      'PreferDurationConstantsRule',
+      'prefer_duration_constants',
+      () => PreferDurationConstantsRule(),
+    );
+
+    testRule(
+      'AvoidDatetimeNowInTestsRule',
+      'avoid_datetime_now_in_tests',
+      () => AvoidDatetimeNowInTestsRule(),
+    );
+
+    testRule(
+      'AvoidNotEncodableInToJsonRule',
+      'avoid_not_encodable_in_to_json',
+      () => AvoidNotEncodableInToJsonRule(),
+    );
+
+    testRule(
+      'RequireDateFormatSpecificationRule',
+      'require_date_format_specification',
+      () => RequireDateFormatSpecificationRule(),
+    );
+
+    testRule(
+      'PreferIso8601DatesRule',
+      'prefer_iso8601_dates',
+      () => PreferIso8601DatesRule(),
+    );
+
+    testRule(
+      'AvoidOptionalFieldCrashRule',
+      'avoid_optional_field_crash',
+      () => AvoidOptionalFieldCrashRule(),
+    );
+
+    testRule(
+      'PreferExplicitJsonKeysRule',
+      'prefer_explicit_json_keys',
+      () => PreferExplicitJsonKeysRule(),
+    );
+
+    testRule(
+      'RequireJsonSchemaValidationRule',
+      'require_json_schema_validation',
+      () => RequireJsonSchemaValidationRule(),
+    );
+
+    testRule(
+      'PreferJsonSerializableRule',
+      'prefer_json_serializable',
+      () => PreferJsonSerializableRule(),
+    );
+
+    testRule(
+      'RequireTimezoneDisplayRule',
+      'require_timezone_display',
+      () => RequireTimezoneDisplayRule(),
+    );
+  });
+
   group('Json Datetime Rules - Fixture Verification', () {
     final fixtures = [
       'require_json_decode_try_catch',

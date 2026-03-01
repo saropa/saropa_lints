@@ -2,10 +2,108 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/stylistic_null_collection_rules.dart';
+
 /// Tests for 14 Stylistic Null Collection lint rules.
 ///
 /// Test fixtures: example_style/lib/stylistic_null_collection/*
 void main() {
+  group('Stylistic Null Collection Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'PreferNullAwareAssignmentRule',
+      'prefer_null_aware_assignment',
+      () => PreferNullAwareAssignmentRule(),
+    );
+
+    testRule(
+      'PreferExplicitNullAssignmentRule',
+      'prefer_explicit_null_assignment',
+      () => PreferExplicitNullAssignmentRule(),
+    );
+
+    testRule(
+      'PreferIfNullOverTernaryRule',
+      'prefer_if_null_over_ternary',
+      () => PreferIfNullOverTernaryRule(),
+    );
+
+    testRule(
+      'PreferTernaryOverIfNullRule',
+      'prefer_ternary_over_if_null',
+      () => PreferTernaryOverIfNullRule(),
+    );
+
+    testRule(
+      'PreferLateOverNullableRule',
+      'prefer_late_over_nullable',
+      () => PreferLateOverNullableRule(),
+    );
+
+    testRule(
+      'PreferNullableOverLateRule',
+      'prefer_nullable_over_late',
+      () => PreferNullableOverLateRule(),
+    );
+
+    testRule(
+      'PreferSpreadOverAddAllRule',
+      'prefer_spread_over_addall',
+      () => PreferSpreadOverAddAllRule(),
+    );
+
+    testRule(
+      'PreferAddAllOverSpreadRule',
+      'prefer_addall_over_spread',
+      () => PreferAddAllOverSpreadRule(),
+    );
+
+    testRule(
+      'PreferCollectionIfOverTernaryRule',
+      'prefer_collection_if_over_ternary',
+      () => PreferCollectionIfOverTernaryRule(),
+    );
+
+    testRule(
+      'PreferTernaryOverCollectionIfRule',
+      'prefer_ternary_over_collection_if',
+      () => PreferTernaryOverCollectionIfRule(),
+    );
+
+    testRule(
+      'PreferWhereTypeOverWhereIsRule',
+      'prefer_wheretype_over_where_is',
+      () => PreferWhereTypeOverWhereIsRule(),
+    );
+
+    testRule(
+      'PreferMapEntriesIterationRule',
+      'prefer_map_entries_iteration',
+      () => PreferMapEntriesIterationRule(),
+    );
+
+    testRule(
+      'PreferKeysIterationRule',
+      'prefer_keys_with_lookup',
+      () => PreferKeysIterationRule(),
+    );
+
+    testRule(
+      'PreferMutableCollectionsRule',
+      'prefer_mutable_collections',
+      () => PreferMutableCollectionsRule(),
+    );
+  });
+
   group('Stylistic Null Collection Rules - Fixture Verification', () {
     final fixtures = [
       'prefer_null_aware_assignment',

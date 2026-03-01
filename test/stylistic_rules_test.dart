@@ -2,10 +2,216 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/stylistic_rules.dart';
+
 /// Tests for 27 Stylistic lint rules.
 ///
 /// Test fixtures: example_style/lib/stylistic/*
 void main() {
+  group('Stylistic Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'PreferRelativeImportsRule',
+      'prefer_relative_imports',
+      () => PreferRelativeImportsRule(),
+    );
+
+    testRule(
+      'PreferOneWidgetPerFileRule',
+      'prefer_one_widget_per_file',
+      () => PreferOneWidgetPerFileRule(),
+    );
+
+    testRule(
+      'PreferArrowFunctionsRule',
+      'prefer_arrow_functions',
+      () => PreferArrowFunctionsRule(),
+    );
+
+    testRule(
+      'PreferAllNamedParametersRule',
+      'prefer_all_named_parameters',
+      () => PreferAllNamedParametersRule(),
+    );
+
+    testRule(
+      'PreferTrailingCommaAlwaysRule',
+      'prefer_trailing_comma_always',
+      () => PreferTrailingCommaAlwaysRule(),
+    );
+
+    testRule(
+      'PreferPrivateUnderscorePrefixRule',
+      'prefer_private_underscore_prefix',
+      () => PreferPrivateUnderscorePrefixRule(),
+    );
+
+    testRule(
+      'PreferWidgetMethodsOverClassesRule',
+      'prefer_widget_methods_over_classes',
+      () => PreferWidgetMethodsOverClassesRule(),
+    );
+
+    testRule(
+      'PreferExplicitTypesRule',
+      'prefer_explicit_types',
+      () => PreferExplicitTypesRule(),
+    );
+
+    testRule(
+      'PreferClassOverRecordReturnRule',
+      'prefer_class_over_record_return',
+      () => PreferClassOverRecordReturnRule(),
+    );
+
+    testRule(
+      'PreferInlineCallbacksRule',
+      'prefer_inline_callbacks',
+      () => PreferInlineCallbacksRule(),
+    );
+
+    testRule(
+      'PreferSingleQuotesRule',
+      'prefer_single_quotes',
+      () => PreferSingleQuotesRule(),
+    );
+
+    testRule(
+      'PreferTodoFormatRule',
+      'prefer_todo_format',
+      () => PreferTodoFormatRule(),
+    );
+
+    testRule(
+      'PreferFixmeFormatRule',
+      'prefer_fixme_format',
+      () => PreferFixmeFormatRule(),
+    );
+
+    testRule(
+      'PreferSentenceCaseCommentsRule',
+      'prefer_sentence_case_comments',
+      () => PreferSentenceCaseCommentsRule(),
+    );
+
+    testRule(
+      'PreferPeriodAfterDocRule',
+      'prefer_period_after_doc',
+      () => PreferPeriodAfterDocRule(),
+    );
+
+    testRule(
+      'PreferScreamingCaseConstantsRule',
+      'prefer_screaming_case_constants',
+      () => PreferScreamingCaseConstantsRule(),
+    );
+
+    testRule(
+      'PreferDescriptiveBoolNamesRule',
+      'prefer_descriptive_bool_names',
+      () => PreferDescriptiveBoolNamesRule(),
+    );
+
+    testRule(
+      'PreferDescriptiveBoolNamesStrictRule',
+      'prefer_descriptive_bool_names_strict',
+      () => PreferDescriptiveBoolNamesStrictRule(),
+    );
+
+    testRule(
+      'PreferSnakeCaseFilesRule',
+      'prefer_snake_case_files',
+      () => PreferSnakeCaseFilesRule(),
+    );
+
+    testRule(
+      'AvoidSmallTextRule',
+      'avoid_small_text',
+      () => AvoidSmallTextRule(),
+    );
+
+    testRule(
+      'PreferDocCommentsOverRegularRule',
+      'prefer_doc_comments_over_regular',
+      () => PreferDocCommentsOverRegularRule(),
+    );
+
+    testRule(
+      'PreferStraightApostropheRule',
+      'prefer_straight_apostrophe',
+      () => PreferStraightApostropheRule(),
+    );
+
+    testRule(
+      'PreferDocCurlyApostropheRule',
+      'prefer_doc_curly_apostrophe',
+      () => PreferDocCurlyApostropheRule(),
+    );
+
+    testRule(
+      'PreferDocStraightApostropheRule',
+      'prefer_doc_straight_apostrophe',
+      () => PreferDocStraightApostropheRule(),
+    );
+
+    testRule(
+      'PreferCurlyApostropheRule',
+      'prefer_curly_apostrophe',
+      () => PreferCurlyApostropheRule(),
+    );
+
+    testRule(
+      'ArgumentsOrderingRule',
+      'prefer_arguments_ordering',
+      () => ArgumentsOrderingRule(),
+    );
+
+    testRule(
+      'AvoidCommentedOutCodeRule',
+      'prefer_no_commented_out_code',
+      () => AvoidCommentedOutCodeRule(),
+    );
+
+    testRule(
+      'AvoidEscapingInnerQuotesRule',
+      'avoid_escaping_inner_quotes',
+      () => AvoidEscapingInnerQuotesRule(),
+    );
+
+    testRule(
+      'AvoidSingleCascadeInExpressionStatementsRule',
+      'avoid_single_cascade_in_expression_statements',
+      () => AvoidSingleCascadeInExpressionStatementsRule(),
+    );
+
+    testRule(
+      'PreferAdjacentStringsRule',
+      'prefer_adjacent_strings',
+      () => PreferAdjacentStringsRule(),
+    );
+
+    testRule(
+      'PreferInterpolationToComposeRule',
+      'prefer_interpolation_to_compose',
+      () => PreferInterpolationToComposeRule(),
+    );
+
+    testRule(
+      'PreferRawStringsRule',
+      'prefer_raw_strings',
+      () => PreferRawStringsRule(),
+    );
+  });
+
   group('Stylistic Rules - Fixture Verification', () {
     final fixtures = [
       'prefer_relative_imports',
