@@ -428,17 +428,31 @@ def create_github_release(
             f"This version has already been published."
         )
 
-    result = subprocess.run(
-        [
-            "gh", "release", "create", tag_name,
-            "--title", f"Release {tag_name}",
-            "--notes", release_notes,
-        ],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell,
-    )
+    # Use --notes-file to avoid "command line is too long" on Windows
+    notes_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            suffix=".md",
+            delete=False,
+            encoding="utf-8",
+        ) as f:
+            f.write(release_notes)
+            notes_path = Path(f.name)
+        result = subprocess.run(
+            [
+                "gh", "release", "create", tag_name,
+                "--title", f"Release {tag_name}",
+                "--notes-file", str(notes_path),
+            ],
+            cwd=project_dir,
+            capture_output=True,
+            text=True,
+            shell=use_shell,
+        )
+    finally:
+        if notes_path is not None and notes_path.exists():
+            notes_path.unlink(missing_ok=True)
 
     if result.returncode == 0:
         print_success(f"Created GitHub release {tag_name}")
