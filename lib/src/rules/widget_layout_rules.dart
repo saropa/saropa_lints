@@ -3088,7 +3088,9 @@ class PreferKeepAliveRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  static final RegExp _tabPageViewPattern = RegExp(r'\b(TabBarView|PageView)\b');
+  static final RegExp _tabPageViewPattern = RegExp(
+    r'\b(TabBarView|PageView)\b',
+  );
 
   @override
   void runWithReporter(

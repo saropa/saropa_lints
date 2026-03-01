@@ -17,14 +17,47 @@ void main() {
         expect(rule.code.correctionMessage, isNotNull);
       });
     }
-    testRule('AvoidPlatformChannelOnWebRule', 'avoid_platform_channel_on_web', () => AvoidPlatformChannelOnWebRule());
-    testRule('RequireCorsHandlingRule', 'require_cors_handling', () => RequireCorsHandlingRule());
-    testRule('PreferDeferredLoadingWebRule', 'prefer_deferred_loading_web', () => PreferDeferredLoadingWebRule());
-    testRule('AvoidWebOnlyDependenciesRule', 'avoid_web_only_dependencies', () => AvoidWebOnlyDependenciesRule());
-    testRule('PreferUrlStrategyForWebRule', 'prefer_url_strategy_for_web', () => PreferUrlStrategyForWebRule());
-    testRule('RequireWebRendererAwarenessRule', 'require_web_renderer_awareness', () => RequireWebRendererAwarenessRule());
-    testRule('AvoidJsRoundedIntsRule', 'avoid_js_rounded_ints', () => AvoidJsRoundedIntsRule());
-    testRule('PreferCsrfProtectionRule', 'prefer_csrf_protection', () => PreferCsrfProtectionRule());
+
+    testRule(
+      'AvoidPlatformChannelOnWebRule',
+      'avoid_platform_channel_on_web',
+      () => AvoidPlatformChannelOnWebRule(),
+    );
+    testRule(
+      'RequireCorsHandlingRule',
+      'require_cors_handling',
+      () => RequireCorsHandlingRule(),
+    );
+    testRule(
+      'PreferDeferredLoadingWebRule',
+      'prefer_deferred_loading_web',
+      () => PreferDeferredLoadingWebRule(),
+    );
+    testRule(
+      'AvoidWebOnlyDependenciesRule',
+      'avoid_web_only_dependencies',
+      () => AvoidWebOnlyDependenciesRule(),
+    );
+    testRule(
+      'PreferUrlStrategyForWebRule',
+      'prefer_url_strategy_for_web',
+      () => PreferUrlStrategyForWebRule(),
+    );
+    testRule(
+      'RequireWebRendererAwarenessRule',
+      'require_web_renderer_awareness',
+      () => RequireWebRendererAwarenessRule(),
+    );
+    testRule(
+      'AvoidJsRoundedIntsRule',
+      'avoid_js_rounded_ints',
+      () => AvoidJsRoundedIntsRule(),
+    );
+    testRule(
+      'PreferCsrfProtectionRule',
+      'prefer_csrf_protection',
+      () => PreferCsrfProtectionRule(),
+    );
   });
   group('Web Rules - Fixture Verification', () {
     final fixtures = [

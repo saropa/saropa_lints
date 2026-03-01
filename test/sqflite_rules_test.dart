@@ -21,10 +21,7 @@ void main() {
     test('PreferSqfliteEncryptionRule', () {
       final rule = PreferSqfliteEncryptionRule();
       expect(rule.code.name, 'prefer_sqflite_encryption');
-      expect(
-        rule.code.problemMessage,
-        contains('[prefer_sqflite_encryption]'),
-      );
+      expect(rule.code.problemMessage, contains('[prefer_sqflite_encryption]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

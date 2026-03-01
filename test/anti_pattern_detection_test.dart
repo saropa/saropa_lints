@@ -131,13 +131,12 @@ void main() {
         final file = File(p.join(rulesDir.path, name));
         expect(file.existsSync(), isTrue);
         final lines = file.readAsLinesSync();
-        final count = lines
-            .where((line) => _isDangerousContains(line))
-            .length;
+        final count = lines.where((line) => _isDangerousContains(line)).length;
         expect(
           count,
           0,
-          reason: '$name must have zero dangerous .contains() (false-positive '
+          reason:
+              '$name must have zero dangerous .contains() (false-positive '
               'reduction). If you reintroduced one, use word-boundary RegExp or '
               'target_matcher_utils instead.',
         );

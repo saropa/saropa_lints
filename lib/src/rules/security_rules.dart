@@ -250,8 +250,9 @@ class RequireSecureStorageRule extends SaropaLintRule {
     RegExp(r'\bpref\b'),
     RegExp(r'\bshared\b'),
   ];
-  static final List<RegExp> _sensitiveKeyPatterns =
-      _sensitiveKeys.map((s) => RegExp('\\b${RegExp.escape(s)}\\b')).toList();
+  static final List<RegExp> _sensitiveKeyPatterns = _sensitiveKeys
+      .map((s) => RegExp('\\b${RegExp.escape(s)}\\b'))
+      .toList();
 
   @override
   void runWithReporter(
@@ -2409,8 +2410,8 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
     });
 
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName =
-          node.constructorName.type.name.lexeme.toLowerCase();
+      final String typeName = node.constructorName.type.name.lexeme
+          .toLowerCase();
       if (_jwtTypePatterns.any((p) => p.hasMatch(typeName))) {
         reporter.atNode(node.constructorName, code);
       }
@@ -2499,12 +2500,15 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
 
       final String bodySource = node.body.toSource().toLowerCase();
 
-      final bool clearsStorage =
-          _logoutStoragePatterns.any((p) => p.hasMatch(bodySource));
-      final bool clearsToken =
-          _logoutTokenPatterns.any((p) => p.hasMatch(bodySource));
-      final bool clearsCache =
-          _logoutCachePatterns.any((p) => p.hasMatch(bodySource));
+      final bool clearsStorage = _logoutStoragePatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
+      final bool clearsToken = _logoutTokenPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
+      final bool clearsCache = _logoutCachePatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
 
       if (!clearsStorage || (!clearsToken && !clearsCache)) {
         reporter.atToken(node.name, code);
@@ -3246,9 +3250,7 @@ class AvoidPathTraversalRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  static final List<RegExp> _pathTraversalThrowPatterns = [
-    RegExp(r'\.\.'),
-  ];
+  static final List<RegExp> _pathTraversalThrowPatterns = [RegExp(r'\.\.')];
   static final List<RegExp> _pathValidationPatterns = [
     RegExp(r'\bbasename\b'),
     RegExp(r'\bresolveSymbolicLinks\b'),
@@ -4037,8 +4039,9 @@ class PreferLocalAuthRule extends SaropaLintRule {
       final methodName = node.name.lexeme.toLowerCase();
 
       // Check if method name suggests sensitive operation
-      final isSensitive =
-          _sensitiveOperationPatterns.any((p) => p.hasMatch(methodName));
+      final isSensitive = _sensitiveOperationPatterns.any(
+        (p) => p.hasMatch(methodName),
+      );
 
       if (!isSensitive) {
         return;
@@ -4741,8 +4744,9 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
       }
 
       // Check if it's SharedPreferences or Hive
-      final bool isStorage =
-          _storageTargetPatterns.any((p) => p.hasMatch(targetSource));
+      final bool isStorage = _storageTargetPatterns.any(
+        (p) => p.hasMatch(targetSource),
+      );
 
       if (!isStorage) return;
 
@@ -5452,8 +5456,9 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      final bool isHttpClient =
-          _httpClientTargetPatterns.any((p) => p.hasMatch(targetSource));
+      final bool isHttpClient = _httpClientTargetPatterns.any(
+        (p) => p.hasMatch(targetSource),
+      );
 
       if (!isHttpClient) return;
 
@@ -5654,6 +5659,7 @@ class RequireCatchLoggingRule extends SaropaLintRule {
   static final List<RegExp> _loggingBodyPatterns = [
     for (final s in _loggingPatterns) RegExp(RegExp.escape(s)),
   ];
+
   /// Patterns that indicate the exception is being handled (rethrow/throw).
   static final List<RegExp> _rethrowBodyPatterns = [
     RegExp(r'\brethrow\b'),
@@ -5677,14 +5683,16 @@ class RequireCatchLoggingRule extends SaropaLintRule {
       final String bodySource = body.toSource().toLowerCase();
 
       // Check for logging
-      final bool hasLogging =
-          _loggingBodyPatterns.any((p) => p.hasMatch(bodySource));
+      final bool hasLogging = _loggingBodyPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
 
       if (hasLogging) return;
 
       // Check for rethrow
-      final bool hasRethrow =
-          _rethrowBodyPatterns.any((p) => p.hasMatch(bodySource));
+      final bool hasRethrow = _rethrowBodyPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
 
       if (hasRethrow) return;
 
@@ -5911,7 +5919,9 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!_secureStorageTargetShortPatterns.any((p) => p.hasMatch(targetSource))) {
+      if (!_secureStorageTargetShortPatterns.any(
+        (p) => p.hasMatch(targetSource),
+      )) {
         return;
       }
 
@@ -6285,8 +6295,9 @@ class PreferOauthPkceRule extends SaropaLintRule {
       final String? targetSource = node.target?.toSource();
       if (targetSource == null) return;
 
-      final bool isOAuth =
-          _oauthTargetPatterns.any((p) => p.hasMatch(targetSource));
+      final bool isOAuth = _oauthTargetPatterns.any(
+        (p) => p.hasMatch(targetSource),
+      );
 
       if (!isOAuth) return;
 

@@ -18,31 +18,119 @@ void main() {
       });
     }
 
-    testRule('AvoidCollectionEqualityChecksRule', 'avoid_collection_equality_checks', () => AvoidCollectionEqualityChecksRule());
-    testRule('AvoidDuplicateMapKeysRule', 'avoid_duplicate_map_keys', () => AvoidDuplicateMapKeysRule());
-    testRule('AvoidMapKeysContainsRule', 'avoid_map_keys_contains', () => AvoidMapKeysContainsRule());
-    testRule('AvoidUnnecessaryCollectionsRule', 'avoid_unnecessary_collections', () => AvoidUnnecessaryCollectionsRule());
-    testRule('AvoidUnsafeCollectionMethodsRule', 'avoid_unsafe_collection_methods', () => AvoidUnsafeCollectionMethodsRule());
-    testRule('AvoidUnsafeReduceRule', 'avoid_unsafe_reduce', () => AvoidUnsafeReduceRule());
-    testRule('AvoidUnsafeWhereMethodsRule', 'avoid_unsafe_where_methods', () => AvoidUnsafeWhereMethodsRule());
-    testRule('PreferWhereOrNullRule', 'prefer_where_or_null', () => PreferWhereOrNullRule());
-    testRule('MapKeysOrderingRule', 'map_keys_ordering', () => MapKeysOrderingRule());
-    testRule('PreferContainsRule', 'prefer_list_contains', () => PreferContainsRule());
+    testRule(
+      'AvoidCollectionEqualityChecksRule',
+      'avoid_collection_equality_checks',
+      () => AvoidCollectionEqualityChecksRule(),
+    );
+    testRule(
+      'AvoidDuplicateMapKeysRule',
+      'avoid_duplicate_map_keys',
+      () => AvoidDuplicateMapKeysRule(),
+    );
+    testRule(
+      'AvoidMapKeysContainsRule',
+      'avoid_map_keys_contains',
+      () => AvoidMapKeysContainsRule(),
+    );
+    testRule(
+      'AvoidUnnecessaryCollectionsRule',
+      'avoid_unnecessary_collections',
+      () => AvoidUnnecessaryCollectionsRule(),
+    );
+    testRule(
+      'AvoidUnsafeCollectionMethodsRule',
+      'avoid_unsafe_collection_methods',
+      () => AvoidUnsafeCollectionMethodsRule(),
+    );
+    testRule(
+      'AvoidUnsafeReduceRule',
+      'avoid_unsafe_reduce',
+      () => AvoidUnsafeReduceRule(),
+    );
+    testRule(
+      'AvoidUnsafeWhereMethodsRule',
+      'avoid_unsafe_where_methods',
+      () => AvoidUnsafeWhereMethodsRule(),
+    );
+    testRule(
+      'PreferWhereOrNullRule',
+      'prefer_where_or_null',
+      () => PreferWhereOrNullRule(),
+    );
+    testRule(
+      'MapKeysOrderingRule',
+      'map_keys_ordering',
+      () => MapKeysOrderingRule(),
+    );
+    testRule(
+      'PreferContainsRule',
+      'prefer_list_contains',
+      () => PreferContainsRule(),
+    );
     testRule('PreferFirstRule', 'prefer_list_first', () => PreferFirstRule());
-    testRule('PreferIterableOfRule', 'prefer_iterable_of', () => PreferIterableOfRule());
+    testRule(
+      'PreferIterableOfRule',
+      'prefer_iterable_of',
+      () => PreferIterableOfRule(),
+    );
     testRule('PreferLastRule', 'prefer_list_last', () => PreferLastRule());
     testRule('PreferAddAllRule', 'prefer_add_all', () => PreferAddAllRule());
-    testRule('AvoidDuplicateNumberElementsRule', 'avoid_duplicate_number_elements', () => AvoidDuplicateNumberElementsRule());
-    testRule('AvoidDuplicateStringElementsRule', 'avoid_duplicate_string_elements', () => AvoidDuplicateStringElementsRule());
-    testRule('AvoidDuplicateObjectElementsRule', 'avoid_duplicate_object_elements', () => AvoidDuplicateObjectElementsRule());
-    testRule('PreferSetForLookupRule', 'prefer_set_for_lookup', () => PreferSetForLookupRule());
-    testRule('PreferCorrectForLoopIncrementRule', 'prefer_correct_for_loop_increment', () => PreferCorrectForLoopIncrementRule());
-    testRule('AvoidUnreachableForLoopRule', 'avoid_unreachable_for_loop', () => AvoidUnreachableForLoopRule());
-    testRule('PreferNullAwareElementsRule', 'prefer_null_aware_elements', () => PreferNullAwareElementsRule());
-    testRule('PreferIterableOperationsRule', 'prefer_iterable_operations', () => PreferIterableOperationsRule());
-    testRule('RequireKeyForCollectionRule', 'require_key_for_collection', () => RequireKeyForCollectionRule());
-    testRule('AvoidFunctionLiteralsInForeachCallsRule', 'avoid_function_literals_in_foreach_calls', () => AvoidFunctionLiteralsInForeachCallsRule());
-    testRule('PreferInlinedAddsRule', 'prefer_inlined_adds', () => PreferInlinedAddsRule());
+    testRule(
+      'AvoidDuplicateNumberElementsRule',
+      'avoid_duplicate_number_elements',
+      () => AvoidDuplicateNumberElementsRule(),
+    );
+    testRule(
+      'AvoidDuplicateStringElementsRule',
+      'avoid_duplicate_string_elements',
+      () => AvoidDuplicateStringElementsRule(),
+    );
+    testRule(
+      'AvoidDuplicateObjectElementsRule',
+      'avoid_duplicate_object_elements',
+      () => AvoidDuplicateObjectElementsRule(),
+    );
+    testRule(
+      'PreferSetForLookupRule',
+      'prefer_set_for_lookup',
+      () => PreferSetForLookupRule(),
+    );
+    testRule(
+      'PreferCorrectForLoopIncrementRule',
+      'prefer_correct_for_loop_increment',
+      () => PreferCorrectForLoopIncrementRule(),
+    );
+    testRule(
+      'AvoidUnreachableForLoopRule',
+      'avoid_unreachable_for_loop',
+      () => AvoidUnreachableForLoopRule(),
+    );
+    testRule(
+      'PreferNullAwareElementsRule',
+      'prefer_null_aware_elements',
+      () => PreferNullAwareElementsRule(),
+    );
+    testRule(
+      'PreferIterableOperationsRule',
+      'prefer_iterable_operations',
+      () => PreferIterableOperationsRule(),
+    );
+    testRule(
+      'RequireKeyForCollectionRule',
+      'require_key_for_collection',
+      () => RequireKeyForCollectionRule(),
+    );
+    testRule(
+      'AvoidFunctionLiteralsInForeachCallsRule',
+      'avoid_function_literals_in_foreach_calls',
+      () => AvoidFunctionLiteralsInForeachCallsRule(),
+    );
+    testRule(
+      'PreferInlinedAddsRule',
+      'prefer_inlined_adds',
+      () => PreferInlinedAddsRule(),
+    );
   });
 
   group('Collection Rules - Fixture Verification', () {

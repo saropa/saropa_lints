@@ -11,10 +11,7 @@ void main() {
     test('RequireDarkModeTestingRule', () {
       final rule = RequireDarkModeTestingRule();
       expect(rule.code.name, 'require_dark_mode_testing');
-      expect(
-        rule.code.problemMessage,
-        contains('[require_dark_mode_testing]'),
-      );
+      expect(rule.code.problemMessage, contains('[require_dark_mode_testing]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -31,20 +28,14 @@ void main() {
     test('PreferThemeExtensionsRule', () {
       final rule = PreferThemeExtensionsRule();
       expect(rule.code.name, 'prefer_theme_extensions');
-      expect(
-        rule.code.problemMessage,
-        contains('[prefer_theme_extensions]'),
-      );
+      expect(rule.code.problemMessage, contains('[prefer_theme_extensions]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireSemanticColorsRule', () {
       final rule = RequireSemanticColorsRule();
       expect(rule.code.name, 'require_semantic_colors');
-      expect(
-        rule.code.problemMessage,
-        contains('[require_semantic_colors]'),
-      );
+      expect(rule.code.problemMessage, contains('[require_semantic_colors]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

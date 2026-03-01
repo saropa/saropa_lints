@@ -17,51 +17,228 @@ void main() {
         expect(rule.code.correctionMessage, isNotNull);
       });
     }
-    testRule('AvoidBarrelFilesRule', 'avoid_barrel_files', () => AvoidBarrelFilesRule());
-    testRule('AvoidDoubleSlashImportsRule', 'avoid_double_slash_imports', () => AvoidDoubleSlashImportsRule());
-    testRule('AvoidDuplicateExportsRule', 'avoid_duplicate_exports', () => AvoidDuplicateExportsRule());
-    testRule('AvoidDuplicateMixinsRule', 'avoid_duplicate_mixins', () => AvoidDuplicateMixinsRule());
-    testRule('AvoidDuplicateNamedImportsRule', 'avoid_duplicate_named_imports', () => AvoidDuplicateNamedImportsRule());
-    testRule('AvoidGlobalStateRule', 'avoid_global_state', () => AvoidGlobalStateRule());
-    testRule('PreferSmallFilesRule', 'prefer_small_length_files', () => PreferSmallFilesRule());
-    testRule('AvoidMediumFilesRule', 'avoid_medium_length_files', () => AvoidMediumFilesRule());
-    testRule('AvoidLongFilesRule', 'avoid_long_length_files', () => AvoidLongFilesRule());
-    testRule('AvoidVeryLongFilesRule', 'avoid_very_long_length_files', () => AvoidVeryLongFilesRule());
-    testRule('PreferSmallTestFilesRule', 'prefer_small_length_test_files', () => PreferSmallTestFilesRule());
-    testRule('AvoidMediumTestFilesRule', 'avoid_medium_length_test_files', () => AvoidMediumTestFilesRule());
-    testRule('AvoidLongTestFilesRule', 'avoid_long_length_test_files', () => AvoidLongTestFilesRule());
-    testRule('AvoidVeryLongTestFilesRule', 'avoid_very_long_length_test_files', () => AvoidVeryLongTestFilesRule());
-    testRule('AvoidLongFunctionsRule', 'avoid_long_functions', () => AvoidLongFunctionsRule());
-    testRule('AvoidLongParameterListRule', 'avoid_long_parameter_list', () => AvoidLongParameterListRule());
-    testRule('AvoidLocalFunctionsRule', 'avoid_local_functions', () => AvoidLocalFunctionsRule());
+
+    testRule(
+      'AvoidBarrelFilesRule',
+      'avoid_barrel_files',
+      () => AvoidBarrelFilesRule(),
+    );
+    testRule(
+      'AvoidDoubleSlashImportsRule',
+      'avoid_double_slash_imports',
+      () => AvoidDoubleSlashImportsRule(),
+    );
+    testRule(
+      'AvoidDuplicateExportsRule',
+      'avoid_duplicate_exports',
+      () => AvoidDuplicateExportsRule(),
+    );
+    testRule(
+      'AvoidDuplicateMixinsRule',
+      'avoid_duplicate_mixins',
+      () => AvoidDuplicateMixinsRule(),
+    );
+    testRule(
+      'AvoidDuplicateNamedImportsRule',
+      'avoid_duplicate_named_imports',
+      () => AvoidDuplicateNamedImportsRule(),
+    );
+    testRule(
+      'AvoidGlobalStateRule',
+      'avoid_global_state',
+      () => AvoidGlobalStateRule(),
+    );
+    testRule(
+      'PreferSmallFilesRule',
+      'prefer_small_length_files',
+      () => PreferSmallFilesRule(),
+    );
+    testRule(
+      'AvoidMediumFilesRule',
+      'avoid_medium_length_files',
+      () => AvoidMediumFilesRule(),
+    );
+    testRule(
+      'AvoidLongFilesRule',
+      'avoid_long_length_files',
+      () => AvoidLongFilesRule(),
+    );
+    testRule(
+      'AvoidVeryLongFilesRule',
+      'avoid_very_long_length_files',
+      () => AvoidVeryLongFilesRule(),
+    );
+    testRule(
+      'PreferSmallTestFilesRule',
+      'prefer_small_length_test_files',
+      () => PreferSmallTestFilesRule(),
+    );
+    testRule(
+      'AvoidMediumTestFilesRule',
+      'avoid_medium_length_test_files',
+      () => AvoidMediumTestFilesRule(),
+    );
+    testRule(
+      'AvoidLongTestFilesRule',
+      'avoid_long_length_test_files',
+      () => AvoidLongTestFilesRule(),
+    );
+    testRule(
+      'AvoidVeryLongTestFilesRule',
+      'avoid_very_long_length_test_files',
+      () => AvoidVeryLongTestFilesRule(),
+    );
+    testRule(
+      'AvoidLongFunctionsRule',
+      'avoid_long_functions',
+      () => AvoidLongFunctionsRule(),
+    );
+    testRule(
+      'AvoidLongParameterListRule',
+      'avoid_long_parameter_list',
+      () => AvoidLongParameterListRule(),
+    );
+    testRule(
+      'AvoidLocalFunctionsRule',
+      'avoid_local_functions',
+      () => AvoidLocalFunctionsRule(),
+    );
     testRule('MaxImportsRule', 'limit_max_imports', () => MaxImportsRule());
-    testRule('PreferSortedParametersRule', 'prefer_sorted_parameters', () => PreferSortedParametersRule());
-    testRule('PreferNamedBooleanParametersRule', 'prefer_named_boolean_parameters', () => PreferNamedBooleanParametersRule());
-    testRule('PreferNamedImportsRule', 'prefer_named_imports', () => PreferNamedImportsRule());
-    testRule('PreferNamedParametersRule', 'prefer_named_parameters', () => PreferNamedParametersRule());
-    testRule('PreferStaticClassRule', 'prefer_static_class', () => PreferStaticClassRule());
-    testRule('AvoidUnnecessaryLocalVariableRule', 'avoid_unnecessary_local_variable', () => AvoidUnnecessaryLocalVariableRule());
-    testRule('AvoidUnnecessaryReassignmentRule', 'avoid_unnecessary_reassignment', () => AvoidUnnecessaryReassignmentRule());
-    testRule('PreferStaticMethodRule', 'prefer_static_method', () => PreferStaticMethodRule());
-    testRule('PreferAbstractFinalStaticClassRule', 'prefer_abstract_final_static_class', () => PreferAbstractFinalStaticClassRule());
-    testRule('AvoidHardcodedColorsRule', 'avoid_hardcoded_colors', () => AvoidHardcodedColorsRule());
-    testRule('AvoidUnusedGenericsRule', 'avoid_unused_generics', () => AvoidUnusedGenericsRule());
-    testRule('PreferTrailingUnderscoreForUnusedRule', 'prefer_trailing_underscore_for_unused', () => PreferTrailingUnderscoreForUnusedRule());
-    testRule('AvoidUnnecessaryFuturesRule', 'avoid_unnecessary_futures', () => AvoidUnnecessaryFuturesRule());
-    testRule('AvoidThrowInFinallyRule', 'avoid_throw_in_finally', () => AvoidThrowInFinallyRule());
-    testRule('AvoidUnnecessaryNullableReturnTypeRule', 'avoid_unnecessary_nullable_return_type', () => AvoidUnnecessaryNullableReturnTypeRule());
-    testRule('AvoidClassesWithOnlyStaticMembersRule', 'avoid_classes_with_only_static_members', () => AvoidClassesWithOnlyStaticMembersRule());
-    testRule('AvoidSettersWithoutGettersRule', 'avoid_setters_without_getters', () => AvoidSettersWithoutGettersRule());
-    testRule('PreferGettersBeforeSettersRule', 'prefer_getters_before_setters', () => PreferGettersBeforeSettersRule());
-    testRule('PreferStaticBeforeInstanceRule', 'prefer_static_before_instance', () => PreferStaticBeforeInstanceRule());
-    testRule('PreferMixinOverAbstractRule', 'prefer_mixin_over_abstract', () => PreferMixinOverAbstractRule());
-    testRule('PreferRecordOverTupleClassRule', 'prefer_record_over_tuple_class', () => PreferRecordOverTupleClassRule());
-    testRule('PreferSealedClassesRule', 'prefer_sealed_classes', () => PreferSealedClassesRule());
-    testRule('PreferSealedForStateRule', 'prefer_sealed_for_state', () => PreferSealedForStateRule());
-    testRule('PreferConstructorsFirstRule', 'prefer_constructors_first', () => PreferConstructorsFirstRule());
-    testRule('PreferExtensionMethodsRule', 'prefer_extension_methods', () => PreferExtensionMethodsRule());
-    testRule('PreferExtensionOverUtilityClassRule', 'prefer_extension_over_utility_class', () => PreferExtensionOverUtilityClassRule());
-    testRule('PreferExtensionTypeForWrapperRule', 'prefer_extension_type_for_wrapper', () => PreferExtensionTypeForWrapperRule());
+    testRule(
+      'PreferSortedParametersRule',
+      'prefer_sorted_parameters',
+      () => PreferSortedParametersRule(),
+    );
+    testRule(
+      'PreferNamedBooleanParametersRule',
+      'prefer_named_boolean_parameters',
+      () => PreferNamedBooleanParametersRule(),
+    );
+    testRule(
+      'PreferNamedImportsRule',
+      'prefer_named_imports',
+      () => PreferNamedImportsRule(),
+    );
+    testRule(
+      'PreferNamedParametersRule',
+      'prefer_named_parameters',
+      () => PreferNamedParametersRule(),
+    );
+    testRule(
+      'PreferStaticClassRule',
+      'prefer_static_class',
+      () => PreferStaticClassRule(),
+    );
+    testRule(
+      'AvoidUnnecessaryLocalVariableRule',
+      'avoid_unnecessary_local_variable',
+      () => AvoidUnnecessaryLocalVariableRule(),
+    );
+    testRule(
+      'AvoidUnnecessaryReassignmentRule',
+      'avoid_unnecessary_reassignment',
+      () => AvoidUnnecessaryReassignmentRule(),
+    );
+    testRule(
+      'PreferStaticMethodRule',
+      'prefer_static_method',
+      () => PreferStaticMethodRule(),
+    );
+    testRule(
+      'PreferAbstractFinalStaticClassRule',
+      'prefer_abstract_final_static_class',
+      () => PreferAbstractFinalStaticClassRule(),
+    );
+    testRule(
+      'AvoidHardcodedColorsRule',
+      'avoid_hardcoded_colors',
+      () => AvoidHardcodedColorsRule(),
+    );
+    testRule(
+      'AvoidUnusedGenericsRule',
+      'avoid_unused_generics',
+      () => AvoidUnusedGenericsRule(),
+    );
+    testRule(
+      'PreferTrailingUnderscoreForUnusedRule',
+      'prefer_trailing_underscore_for_unused',
+      () => PreferTrailingUnderscoreForUnusedRule(),
+    );
+    testRule(
+      'AvoidUnnecessaryFuturesRule',
+      'avoid_unnecessary_futures',
+      () => AvoidUnnecessaryFuturesRule(),
+    );
+    testRule(
+      'AvoidThrowInFinallyRule',
+      'avoid_throw_in_finally',
+      () => AvoidThrowInFinallyRule(),
+    );
+    testRule(
+      'AvoidUnnecessaryNullableReturnTypeRule',
+      'avoid_unnecessary_nullable_return_type',
+      () => AvoidUnnecessaryNullableReturnTypeRule(),
+    );
+    testRule(
+      'AvoidClassesWithOnlyStaticMembersRule',
+      'avoid_classes_with_only_static_members',
+      () => AvoidClassesWithOnlyStaticMembersRule(),
+    );
+    testRule(
+      'AvoidSettersWithoutGettersRule',
+      'avoid_setters_without_getters',
+      () => AvoidSettersWithoutGettersRule(),
+    );
+    testRule(
+      'PreferGettersBeforeSettersRule',
+      'prefer_getters_before_setters',
+      () => PreferGettersBeforeSettersRule(),
+    );
+    testRule(
+      'PreferStaticBeforeInstanceRule',
+      'prefer_static_before_instance',
+      () => PreferStaticBeforeInstanceRule(),
+    );
+    testRule(
+      'PreferMixinOverAbstractRule',
+      'prefer_mixin_over_abstract',
+      () => PreferMixinOverAbstractRule(),
+    );
+    testRule(
+      'PreferRecordOverTupleClassRule',
+      'prefer_record_over_tuple_class',
+      () => PreferRecordOverTupleClassRule(),
+    );
+    testRule(
+      'PreferSealedClassesRule',
+      'prefer_sealed_classes',
+      () => PreferSealedClassesRule(),
+    );
+    testRule(
+      'PreferSealedForStateRule',
+      'prefer_sealed_for_state',
+      () => PreferSealedForStateRule(),
+    );
+    testRule(
+      'PreferConstructorsFirstRule',
+      'prefer_constructors_first',
+      () => PreferConstructorsFirstRule(),
+    );
+    testRule(
+      'PreferExtensionMethodsRule',
+      'prefer_extension_methods',
+      () => PreferExtensionMethodsRule(),
+    );
+    testRule(
+      'PreferExtensionOverUtilityClassRule',
+      'prefer_extension_over_utility_class',
+      () => PreferExtensionOverUtilityClassRule(),
+    );
+    testRule(
+      'PreferExtensionTypeForWrapperRule',
+      'prefer_extension_type_for_wrapper',
+      () => PreferExtensionTypeForWrapperRule(),
+    );
   });
   group('Structure Rules - Fixture Verification', () {
     final fixtures = [

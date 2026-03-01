@@ -18,25 +18,101 @@ void main() {
       });
     }
 
-    testRule('RequireVsyncMixinRule', 'require_vsync_mixin', () => RequireVsyncMixinRule());
-    testRule('AvoidAnimationInBuildRule', 'avoid_animation_in_build', () => AvoidAnimationInBuildRule());
-    testRule('RequireAnimationControllerDisposeRule', 'require_animation_controller_dispose', () => RequireAnimationControllerDisposeRule());
-    testRule('RequireHeroTagUniquenessRule', 'require_hero_tag_uniqueness', () => RequireHeroTagUniquenessRule());
-    testRule('AvoidLayoutPassesRule', 'avoid_layout_passes', () => AvoidLayoutPassesRule());
-    testRule('AvoidHardcodedDurationRule', 'avoid_hardcoded_duration', () => AvoidHardcodedDurationRule());
-    testRule('RequireAnimationCurveRule', 'require_animation_curve', () => RequireAnimationCurveRule());
-    testRule('PreferImplicitAnimationsRule', 'prefer_implicit_animations', () => PreferImplicitAnimationsRule());
-    testRule('RequireStaggeredAnimationDelaysRule', 'require_staggered_animation_delays', () => RequireStaggeredAnimationDelaysRule());
-    testRule('PreferTweenSequenceRule', 'prefer_tween_sequence', () => PreferTweenSequenceRule());
-    testRule('RequireAnimationStatusListenerRule', 'require_animation_status_listener', () => RequireAnimationStatusListenerRule());
-    testRule('AvoidOverlappingAnimationsRule', 'avoid_overlapping_animations', () => AvoidOverlappingAnimationsRule());
-    testRule('AvoidAnimationRebuildWasteRule', 'avoid_animation_rebuild_waste', () => AvoidAnimationRebuildWasteRule());
-    testRule('PreferPhysicsSimulationRule', 'prefer_physics_simulation', () => PreferPhysicsSimulationRule());
-    testRule('RequireAnimationTickerDisposalRule', 'require_animation_ticker_disposal', () => RequireAnimationTickerDisposalRule());
-    testRule('PreferSpringAnimationRule', 'prefer_spring_animation', () => PreferSpringAnimationRule());
-    testRule('AvoidExcessiveRebuildsAnimationRule', 'avoid_excessive_rebuilds_animation', () => AvoidExcessiveRebuildsAnimationRule());
-    testRule('AvoidClipDuringAnimationRule', 'avoid_clip_during_animation', () => AvoidClipDuringAnimationRule());
-    testRule('AvoidMultipleAnimationControllersRule', 'avoid_multiple_animation_controllers', () => AvoidMultipleAnimationControllersRule());
+    testRule(
+      'RequireVsyncMixinRule',
+      'require_vsync_mixin',
+      () => RequireVsyncMixinRule(),
+    );
+    testRule(
+      'AvoidAnimationInBuildRule',
+      'avoid_animation_in_build',
+      () => AvoidAnimationInBuildRule(),
+    );
+    testRule(
+      'RequireAnimationControllerDisposeRule',
+      'require_animation_controller_dispose',
+      () => RequireAnimationControllerDisposeRule(),
+    );
+    testRule(
+      'RequireHeroTagUniquenessRule',
+      'require_hero_tag_uniqueness',
+      () => RequireHeroTagUniquenessRule(),
+    );
+    testRule(
+      'AvoidLayoutPassesRule',
+      'avoid_layout_passes',
+      () => AvoidLayoutPassesRule(),
+    );
+    testRule(
+      'AvoidHardcodedDurationRule',
+      'avoid_hardcoded_duration',
+      () => AvoidHardcodedDurationRule(),
+    );
+    testRule(
+      'RequireAnimationCurveRule',
+      'require_animation_curve',
+      () => RequireAnimationCurveRule(),
+    );
+    testRule(
+      'PreferImplicitAnimationsRule',
+      'prefer_implicit_animations',
+      () => PreferImplicitAnimationsRule(),
+    );
+    testRule(
+      'RequireStaggeredAnimationDelaysRule',
+      'require_staggered_animation_delays',
+      () => RequireStaggeredAnimationDelaysRule(),
+    );
+    testRule(
+      'PreferTweenSequenceRule',
+      'prefer_tween_sequence',
+      () => PreferTweenSequenceRule(),
+    );
+    testRule(
+      'RequireAnimationStatusListenerRule',
+      'require_animation_status_listener',
+      () => RequireAnimationStatusListenerRule(),
+    );
+    testRule(
+      'AvoidOverlappingAnimationsRule',
+      'avoid_overlapping_animations',
+      () => AvoidOverlappingAnimationsRule(),
+    );
+    testRule(
+      'AvoidAnimationRebuildWasteRule',
+      'avoid_animation_rebuild_waste',
+      () => AvoidAnimationRebuildWasteRule(),
+    );
+    testRule(
+      'PreferPhysicsSimulationRule',
+      'prefer_physics_simulation',
+      () => PreferPhysicsSimulationRule(),
+    );
+    testRule(
+      'RequireAnimationTickerDisposalRule',
+      'require_animation_ticker_disposal',
+      () => RequireAnimationTickerDisposalRule(),
+    );
+    testRule(
+      'PreferSpringAnimationRule',
+      'prefer_spring_animation',
+      () => PreferSpringAnimationRule(),
+    );
+    testRule(
+      'AvoidExcessiveRebuildsAnimationRule',
+      'avoid_excessive_rebuilds_animation',
+      () => AvoidExcessiveRebuildsAnimationRule(),
+    );
+    testRule(
+      'AvoidClipDuringAnimationRule',
+      'avoid_clip_during_animation',
+      () => AvoidClipDuringAnimationRule(),
+    );
+    testRule(
+      'AvoidMultipleAnimationControllersRule',
+      'avoid_multiple_animation_controllers',
+      () => AvoidMultipleAnimationControllersRule(),
+    );
   });
 
   group('Animation Rules - Fixture Verification', () {

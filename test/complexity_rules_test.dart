@@ -41,20 +41,14 @@ void main() {
     test('AvoidComplexConditionsRule', () {
       final rule = AvoidComplexConditionsRule();
       expect(rule.code.name, 'avoid_complex_conditions');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_complex_conditions]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_complex_conditions]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidDuplicateCascadesRule', () {
       final rule = AvoidDuplicateCascadesRule();
       expect(rule.code.name, 'avoid_duplicate_cascades');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_duplicate_cascades]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_duplicate_cascades]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -81,20 +75,14 @@ void main() {
     test('AvoidNestedShorthandsRule', () {
       final rule = AvoidNestedShorthandsRule();
       expect(rule.code.name, 'avoid_nested_shorthands');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_nested_shorthands]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_nested_shorthands]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidMultiAssignmentRule', () {
       final rule = AvoidMultiAssignmentRule();
       expect(rule.code.name, 'avoid_multi_assignment');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_multi_assignment]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_multi_assignment]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -111,10 +99,7 @@ void main() {
     test('PreferMovingToVariableRule', () {
       final rule = PreferMovingToVariableRule();
       expect(rule.code.name, 'prefer_moving_to_variable');
-      expect(
-        rule.code.problemMessage,
-        contains('[prefer_moving_to_variable]'),
-      );
+      expect(rule.code.problemMessage, contains('[prefer_moving_to_variable]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -131,10 +116,7 @@ void main() {
     test('AvoidDeepNestingRule', () {
       final rule = AvoidDeepNestingRule();
       expect(rule.code.name, 'avoid_deep_nesting');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_deep_nesting]'),
-      );
+      expect(rule.code.problemMessage, contains('[avoid_deep_nesting]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

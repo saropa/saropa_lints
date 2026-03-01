@@ -18,24 +18,96 @@ void main() {
       });
     }
 
-    testRule('AvoidCastingToExtensionTypeRule', 'avoid_casting_to_extension_type', () => AvoidCastingToExtensionTypeRule());
-    testRule('AvoidCollectionMethodsWithUnrelatedTypesRule', 'avoid_collection_methods_with_unrelated_types', () => AvoidCollectionMethodsWithUnrelatedTypesRule());
-    testRule('AvoidDynamicRule', 'avoid_dynamic_type', () => AvoidDynamicRule());
-    testRule('AvoidImplicitlyNullableExtensionTypesRule', 'avoid_implicitly_nullable_extension_types', () => AvoidImplicitlyNullableExtensionTypesRule());
-    testRule('AvoidNullableInterpolationRule', 'avoid_nullable_interpolation', () => AvoidNullableInterpolationRule());
-    testRule('AvoidNullableParametersWithDefaultValuesRule', 'avoid_nullable_parameters_with_default_values', () => AvoidNullableParametersWithDefaultValuesRule());
-    testRule('AvoidNullableToStringRule', 'avoid_nullable_tostring', () => AvoidNullableToStringRule());
-    testRule('AvoidNullAssertionRule', 'avoid_null_assertion', () => AvoidNullAssertionRule());
-    testRule('AvoidUnnecessaryTypeAssertionsRule', 'avoid_unnecessary_type_assertions', () => AvoidUnnecessaryTypeAssertionsRule());
-    testRule('AvoidUnnecessaryTypeCastsRule', 'avoid_unnecessary_type_casts', () => AvoidUnnecessaryTypeCastsRule());
-    testRule('AvoidUnrelatedTypeAssertionsRule', 'avoid_unrelated_type_assertions', () => AvoidUnrelatedTypeAssertionsRule());
-    testRule('PreferCorrectTypeNameRule', 'prefer_correct_type_name', () => PreferCorrectTypeNameRule());
-    testRule('PreferExplicitFunctionTypeRule', 'prefer_explicit_function_type', () => PreferExplicitFunctionTypeRule());
-    testRule('PreferTypeOverVarRule', 'prefer_type_over_var', () => PreferTypeOverVarRule());
-    testRule('AvoidShadowingTypeParametersRule', 'avoid_shadowing_type_parameters', () => AvoidShadowingTypeParametersRule());
-    testRule('AvoidPrivateTypedefFunctionsRule', 'avoid_private_typedef_functions', () => AvoidPrivateTypedefFunctionsRule());
-    testRule('PreferFinalLocalsRule', 'prefer_final_locals', () => PreferFinalLocalsRule());
-    testRule('PreferConstDeclarationsRule', 'prefer_const_declarations', () => PreferConstDeclarationsRule());
+    testRule(
+      'AvoidCastingToExtensionTypeRule',
+      'avoid_casting_to_extension_type',
+      () => AvoidCastingToExtensionTypeRule(),
+    );
+    testRule(
+      'AvoidCollectionMethodsWithUnrelatedTypesRule',
+      'avoid_collection_methods_with_unrelated_types',
+      () => AvoidCollectionMethodsWithUnrelatedTypesRule(),
+    );
+    testRule(
+      'AvoidDynamicRule',
+      'avoid_dynamic_type',
+      () => AvoidDynamicRule(),
+    );
+    testRule(
+      'AvoidImplicitlyNullableExtensionTypesRule',
+      'avoid_implicitly_nullable_extension_types',
+      () => AvoidImplicitlyNullableExtensionTypesRule(),
+    );
+    testRule(
+      'AvoidNullableInterpolationRule',
+      'avoid_nullable_interpolation',
+      () => AvoidNullableInterpolationRule(),
+    );
+    testRule(
+      'AvoidNullableParametersWithDefaultValuesRule',
+      'avoid_nullable_parameters_with_default_values',
+      () => AvoidNullableParametersWithDefaultValuesRule(),
+    );
+    testRule(
+      'AvoidNullableToStringRule',
+      'avoid_nullable_tostring',
+      () => AvoidNullableToStringRule(),
+    );
+    testRule(
+      'AvoidNullAssertionRule',
+      'avoid_null_assertion',
+      () => AvoidNullAssertionRule(),
+    );
+    testRule(
+      'AvoidUnnecessaryTypeAssertionsRule',
+      'avoid_unnecessary_type_assertions',
+      () => AvoidUnnecessaryTypeAssertionsRule(),
+    );
+    testRule(
+      'AvoidUnnecessaryTypeCastsRule',
+      'avoid_unnecessary_type_casts',
+      () => AvoidUnnecessaryTypeCastsRule(),
+    );
+    testRule(
+      'AvoidUnrelatedTypeAssertionsRule',
+      'avoid_unrelated_type_assertions',
+      () => AvoidUnrelatedTypeAssertionsRule(),
+    );
+    testRule(
+      'PreferCorrectTypeNameRule',
+      'prefer_correct_type_name',
+      () => PreferCorrectTypeNameRule(),
+    );
+    testRule(
+      'PreferExplicitFunctionTypeRule',
+      'prefer_explicit_function_type',
+      () => PreferExplicitFunctionTypeRule(),
+    );
+    testRule(
+      'PreferTypeOverVarRule',
+      'prefer_type_over_var',
+      () => PreferTypeOverVarRule(),
+    );
+    testRule(
+      'AvoidShadowingTypeParametersRule',
+      'avoid_shadowing_type_parameters',
+      () => AvoidShadowingTypeParametersRule(),
+    );
+    testRule(
+      'AvoidPrivateTypedefFunctionsRule',
+      'avoid_private_typedef_functions',
+      () => AvoidPrivateTypedefFunctionsRule(),
+    );
+    testRule(
+      'PreferFinalLocalsRule',
+      'prefer_final_locals',
+      () => PreferFinalLocalsRule(),
+    );
+    testRule(
+      'PreferConstDeclarationsRule',
+      'prefer_const_declarations',
+      () => PreferConstDeclarationsRule(),
+    );
   });
 
   group('Type Rules - Fixture Verification', () {
