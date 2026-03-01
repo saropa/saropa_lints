@@ -619,7 +619,9 @@ docs: update README with new tier
 test: add tests for avoid_abc rule
 ```
 
-**No AI attribution.** Do not add `Co-Authored-By` (e.g. Claude Opus, Claude Sonnet, Anthropic), `Made-with: Cursor`, or "Generated with" lines. The repo uses a commit-msg hook (`.githooks/commit-msg`) to reject these. Enable once per clone: `git config core.hooksPath .githooks`
+**Only human authors as contributors.** GitHub contributors must be humans. Do not add trailers or lines that credit tools or AI (e.g. `Co-Authored-By` Claude/Anthropic, `Made-with: Cursor`, "Generated with …"). The repo uses a commit-msg hook (`.githooks/commit-msg`) to reject these. Enable once per clone: `git config core.hooksPath .githooks`
+
+If you use Cursor IDE: it injects `Made-with: Cursor` into every commit. Disable that so the hook passes: **Cursor Settings → Agents → Attribution** — turn off the attribution toggle.
 
 ## Documentation Requirements
 

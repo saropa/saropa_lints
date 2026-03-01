@@ -1,17 +1,17 @@
 #!/bin/sh
-# Reject commit messages that contain AI/tool attribution.
+# Only human authors as contributors on GitHub. Reject commit messages that credit tools or AI.
 # Enable: git config core.hooksPath .githooks
 
 msg_file="$1"
 msg=$(cat "$msg_file")
 
 blocked() {
-  echo "commit-msg: Commit message must not contain AI or tool attribution." >&2
-  echo "Remove: Co-Authored-By (Claude/Anthropic), Made-with: Cursor, 'Generated with' lines." >&2
+  echo "commit-msg: Only human authors should be contributors on GitHub." >&2
+  echo "Remove Co-Authored-By (Claude/Anthropic), Made-with: Cursor, and 'Generated with' lines." >&2
   exit 1
 }
 
-# Block common AI attribution patterns (case-insensitive where it matters)
+# Block trailers/lines that credit tools or AI (case-insensitive where it matters)
 echo "$msg" | grep -qEi '^Made-with:\s*Cursor' && blocked
 echo "$msg" | grep -qE '^Co-Authored-By:.*[Cc]laude' && blocked
 echo "$msg" | grep -qE '^Co-Authored-By:.*[Aa]nthropic' && blocked

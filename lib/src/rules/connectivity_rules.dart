@@ -265,6 +265,11 @@ class RequireConnectivityTimeoutRule extends SaropaLintRule {
     'head',
   };
 
+  static final RegExp _httpTargetPattern = RegExp(
+    r'\b(http|client|dio)\b',
+    caseSensitive: false,
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -276,10 +281,8 @@ class RequireConnectivityTimeoutRule extends SaropaLintRule {
 
       final Expression? target = node.target;
       if (target == null) return;
-      final String targetSource = target.toSource();
-      if (!targetSource.contains('http') &&
-          !targetSource.contains('client') &&
-          !targetSource.contains('dio')) {
+      final String targetSource = target.toSource().toLowerCase();
+      if (!_httpTargetPattern.hasMatch(targetSource)) {
         return;
       }
 

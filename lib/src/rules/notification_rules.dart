@@ -10,6 +10,24 @@ import 'package:analyzer/dart/ast/ast.dart';
 
 import '../saropa_lint_rule.dart';
 
+// Shared patterns to avoid .contains() anti-patterns on source strings.
+final RegExp _notificationTargetPattern = RegExp(
+  r'\b(notification|plugin)\b',
+  caseSensitive: false,
+);
+final RegExp _showNotifyPattern = RegExp(
+  r'\b(show|notify)\b',
+  caseSensitive: false,
+);
+final RegExp _notificationContextPattern = RegExp(
+  r'\b(notification|notify)\b',
+  caseSensitive: false,
+);
+final RegExp _firebaseMessagingSourcePattern = RegExp(
+  r'\b(FirebaseMessaging|fcm)\b',
+  caseSensitive: false,
+);
+
 /// Warns when Android notifications don't specify a channel ID.
 ///
 /// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
@@ -424,9 +442,7 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target != null) {
         final String targetSource = target.toSource().toLowerCase();
-        // Only check notification plugin calls
-        if (!targetSource.contains('notification') &&
-            !targetSource.contains('plugin')) {
+        if (!_notificationTargetPattern.hasMatch(targetSource)) {
           return;
         }
       }
@@ -550,13 +566,10 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
   ) {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
-      if (!methodName.contains('show') && !methodName.contains('notify')) {
+      if (!_showNotifyPattern.hasMatch(methodName)) {
         return;
       }
-
-      // Check for notification-related method names
-      if (!methodName.toLowerCase().contains('notification') &&
-          !methodName.toLowerCase().contains('notify')) {
+      if (!_notificationContextPattern.hasMatch(methodName.toLowerCase())) {
         return;
       }
 
@@ -780,8 +793,7 @@ class AvoidNotificationSilentFailureRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('notification') &&
-          !targetSource.contains('plugin')) {
+      if (!_notificationTargetPattern.hasMatch(targetSource)) {
         return;
       }
 
@@ -875,7 +887,7 @@ class PreferLocalNotificationForImmediateRule extends SaropaLintRule {
       final name = node.methodName.name;
       if (name != 'sendMessage' && name != 'post') return;
       final String source = node.toSource();
-      if (!source.contains('FirebaseMessaging') && !source.contains('fcm')) {
+      if (!_firebaseMessagingSourcePattern.hasMatch(source)) {
         return;
       }
       reporter.atNode(node);

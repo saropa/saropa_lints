@@ -561,7 +561,7 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
       }
       if (member is FieldDeclaration) {
         final String? typeName = member.fields.type?.toSource();
-        if (typeName != null && typeName.contains('AppLifecycleListener')) {
+        if (typeName == 'AppLifecycleListener') {
           return true;
         }
       }
@@ -571,14 +571,16 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
   }
 
   static final RegExp _timerConstructorPattern = RegExp(r'\bTimer\(');
+  static final RegExp _timerPeriodicPattern = RegExp(r'\bTimer\.periodic\b');
+  static final RegExp _listenCallPattern = RegExp(r'\.listen\s*\(');
 
   static bool _hasBackgroundWork(ClassDeclaration node) {
     for (final ClassMember member in node.members) {
       if (member is MethodDeclaration) {
         final String bodySource = member.body.toSource();
-        if (bodySource.contains('Timer.periodic')) return true;
+        if (_timerPeriodicPattern.hasMatch(bodySource)) return true;
         if (_timerConstructorPattern.hasMatch(bodySource)) return true;
-        if (bodySource.contains('.listen(')) return true;
+        if (_listenCallPattern.hasMatch(bodySource)) return true;
       }
     }
     return false;
@@ -654,6 +656,8 @@ class RequireConflictResolutionStrategyRule extends SaropaLintRule {
     'conflict',
   };
 
+  static final RegExp _putPattern = RegExp(r'\.put\b|\bputall\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -664,10 +668,14 @@ class RequireConflictResolutionStrategyRule extends SaropaLintRule {
       if (!_syncMethodNames.any((s) => name.contains(s))) return;
 
       final String bodySource = node.body.toSource().toLowerCase();
-      if (!bodySource.contains('.put') && !bodySource.contains('putall')) {
+      if (!_putPattern.hasMatch(bodySource)) {
         return;
       }
-      if (_conflictIndicators.any((s) => bodySource.contains(s))) return;
+      if (_conflictIndicators.any(
+        (s) => RegExp(r'\b' + RegExp.escape(s) + r'\b').hasMatch(bodySource),
+      )) {
+        return;
+      }
 
       reporter.atNode(node);
     });

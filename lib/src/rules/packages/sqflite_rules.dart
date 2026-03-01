@@ -94,6 +94,11 @@ class AvoidSqfliteTypeMismatchRule extends SaropaLintRule {
     '_at',
   };
 
+  static final RegExp _rowTargetPattern = RegExp(
+    r'\b(row|map|result|data)\b',
+    caseSensitive: false,
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -108,10 +113,7 @@ class AvoidSqfliteTypeMismatchRule extends SaropaLintRule {
 
       // Check if target looks like a database row
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('row') &&
-          !targetSource.contains('map') &&
-          !targetSource.contains('result') &&
-          !targetSource.contains('data')) {
+      if (!_rowTargetPattern.hasMatch(targetSource)) {
         return;
       }
 
@@ -274,6 +276,11 @@ class PreferSqfliteEncryptionRule extends SaropaLintRule {
     'secret',
   };
 
+  static final RegExp _sqfliteTargetPattern = RegExp(
+    r'\b(sqflite|databaseFactory)\b',
+    caseSensitive: false,
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -294,8 +301,7 @@ class PreferSqfliteEncryptionRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target != null) {
         final String targetSource = target.toSource();
-        if (!targetSource.contains('sqflite') &&
-            !targetSource.contains('databaseFactory')) {
+        if (!_sqfliteTargetPattern.hasMatch(targetSource)) {
           return;
         }
       }
