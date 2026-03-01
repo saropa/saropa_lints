@@ -1580,15 +1580,11 @@ saropa_lints:
 
     # --- Recommended ---
     - avoid_classes_with_only_static_members: false    # INFO - prefer top-level or mixin (v6.0.8)
-    - avoid_redundant_argument_values: false           # INFO - default value passed explicitly (v6.0.8)
 
     # --- Professional ---
     - avoid_bool_in_widget_constructors: false         # WARNING - positional bool in widget (v6.0.8)
     - avoid_double_and_int_checks: false               # WARNING - is int / is double type checks (v6.0.8)
-    - avoid_equals_and_hash_code_on_mutable_classes: false # WARNING - equality on mutable class (v6.0.8)
     - avoid_field_initializers_in_const_classes: false # WARNING - non-const field init in const class (v6.0.8)
-    - avoid_implementing_value_types: false            # WARNING - class implements value-type (v6.0.8)
-    - avoid_null_checks_in_equality_operators: false   # WARNING - == null in operator== (v6.0.8)
     - avoid_positional_boolean_parameters: false       # WARNING - bool param without name (v6.0.8)
     - avoid_setters_without_getters: false             # WARNING - setter without getter (v6.0.8)
 

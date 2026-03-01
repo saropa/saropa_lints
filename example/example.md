@@ -1,6 +1,6 @@
 # Saropa Lints Example Configuration
 
-This file shows how to configure saropa_lints with all 1677+ rules.
+This file shows how to configure saropa_lints with all 1673+ rules.
 
 ## Setup
 
