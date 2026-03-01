@@ -15,16 +15,16 @@ Fixture work (66 rules) and Rule Instantiation (55 categories) are **done**. Sum
 | Item | Status | Notes |
 |------|--------|--------|
 | Fixtures (one per rule in reviewed categories) | **Done** | 27 categories, 0 missing. See §2. |
-| Rule instantiation tests (one per rule, metadata assertions) | **Done for 55 categories** | 55 test files have a Rule Instantiation group. See §3. |
-| Real behavioral tests (linter on code, assert lint present/absent) | **Not done** | 0 such tests. See §4. |
+| Rule instantiation tests (one per rule, metadata assertions) | **Done for 99 categories** | All category test files have a Rule Instantiation group. See §3. |
+| Real behavioral tests (linter on code, assert lint present/absent) | **Started** | One test in fixture_lint_integration_test.dart. See §4. |
 
 ---
 
 ## 1. Test quality (current state)
 
 - **Fixture verification:** Done. Test files that list fixtures have “fixture exists” tests (real assertions).
-- **Behavioral tests:** Almost all are placeholders (`expect('...', isNotNull)`). They do **not** run the linter on code or assert lint output.
-- **Rule instantiation tests:** Done for 55 categories. Each of those test files has a group that instantiates every rule and asserts `code.name`, `problemMessage`, `correctionMessage` (see bugs/history summary).
+- **Behavioral tests:** One integration test runs custom_lint on example_async and asserts specific rule codes appear in parsed output when violations exist. Most category tests still use placeholders (`expect('...', isNotNull)`).
+- **Rule instantiation tests:** Done for 99 categories. Each category test file has a group that instantiates every rule and asserts `code.name`, `problemMessage`, `correctionMessage` (see bugs/history summary).
 
 ---
 
@@ -64,19 +64,19 @@ All 27 categories that were in scope have **0 rules without a dedicated fixture*
 
 ---
 
-## 3. Rule instantiation tests — DONE for 55 categories
+## 3. Rule instantiation tests — DONE for 99 categories
 
-55 test files have a “Rule Instantiation” group (one test per rule: instantiate, assert `code.name`, `problemMessage` contains `[code_name]`, length > 50, `correctionMessage` non-null). Any other category test file can reuse the same pattern if needed.
+All 99 category test files have a “Rule Instantiation” group (one test per rule: instantiate, assert `code.name`, `problemMessage` contains `[code_name]`, length > 50, `correctionMessage` non-null). Any other category test file can reuse the same pattern if needed.
 
 **Publish script:** Rule-instantiation status is derived from the codebase in `scripts/modules/_rule_metrics.py` (`_compute_rule_instantiation_stats`): it scans each `test/{category}_rules_test.dart` for the string `Rule Instantiation`. The “Test Coverage” report shows a “Rule inst.” line (categories with that group / categories with a test file). This document is for human reference only; the script does not read it.
 
 ---
 
-## 4. Real behavioral tests — NOT DONE
+## 4. Real behavioral tests — STARTED
 
-**Status:** No tests currently run the linter on a code snippet and assert that violating code produces a lint and compliant code does not.
+**Status:** One integration test runs the linter on the example_async package and asserts that when custom_lint reports violations, specific rules (e.g. `avoid_catch_all`, `avoid_dialog_context_after_async`, `require_stream_controller_close`, `require_feature_flag_default`, `prefer_specifying_future_value_type`) appear in the parsed output. See `test/fixture_lint_integration_test.dart` — "custom_lint on example_async reports expected rules from fixtures". When custom_lint cannot run (e.g. resolver conflict) or reports no violations, the test skips per-rule assertions. Full per-rule behavioral coverage (violating snippet → lint, compliant snippet → no lint) is not yet done.
 
-**Recommendation:** Add a test pattern (e.g. custom_lint test helpers or a small runner) and then add, for at least high-impact rules:
+**Recommendation:** Add more rules to the expected list and/or a test pattern (e.g. custom_lint test helpers or a small runner) for at least high-impact rules:
 
 - One test: violating code → expect lint with expected `code.name`.
 - One test: compliant code → expect no lint for that rule.
@@ -90,7 +90,7 @@ Priority candidates: security, accessibility, error_handling, async rules.
 | Need | Status |
 |------|--------|
 | Fixtures (per-rule in reviewed categories) | **Done** |
-| Rule instantiation tests (per-rule metadata) | **Done for 55 categories** |
-| Real behavioral tests (linter on code) | **Not done** |
+| Rule instantiation tests (per-rule metadata) | **Done for 99 categories** |
+| Real behavioral tests (linter on code) | **Started** (one integration test) |
 
 Completed work is summarized in [bugs/history/unit_test_coverage_fixtures_and_instantiation_completed.md](history/unit_test_coverage_fixtures_and_instantiation_completed.md).
