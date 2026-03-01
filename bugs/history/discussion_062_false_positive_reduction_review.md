@@ -1,7 +1,8 @@
 # Discussion 062: Full Review — Reducing False Positives in saropa_lints
 
-**Status:** Completed — moved to `bugs/history/`  
+**Status:** Completed — archived in `bugs/history/`  
 **Created:** 2026-03-01  
+**Summary:** Replaced dangerous `.contains()` on identifier/source strings with word-boundary RegExp or `RegExp.escape` across multiple rule files. security_rules and disposal_rules reduced to 0 violations; CI baseline entries removed. Test added to lock zero count for those two files.  
 **Purpose:** Actionable review of how to reduce false positive occurrence across 1677+ rules. Ongoing guidance: CONTRIBUTING.md § Avoiding False Positives, `.claude/skills/lint-rules/SKILL.md` § Reducing False Positives, and `bugs/history/false_positives/` audit.
 
 ### Completed (2026-03-01)
@@ -17,9 +18,6 @@
 - **Phase 3 batch:** **animation_rules:** `require_animation_controller_dispose` — dispose check uses `isFieldCleanedUp(name, 'dispose', disposeMethodBody)` from `target_matcher_utils`. **async_rules:** `require_stream_controller_close` — `.close()`/`.dispose()` via regex; `avoid_stream_subscription_in_field` — exact StreamSubscription type + `_subscriptionVarNames`/`endsWith('Subscription')`; `require_stream_subscription_no_leak` — `startsWith('StreamSubscription')`; shared `_isStreamSubscriptionType()` helper.
 - **Phase 2 (batch 7):** **api_network_rules:** `require_typed_api_response` — dynamic index access via `RegExp(RegExp.escape(variableName) + r"\s*\[\s*['\"]")` instead of `bodySource.contains("$variableName['")`; `require_response_caching` — `_configOrSettingsMethodPatterns` (\bconfig\b, \bsettings\b); `prefer_api_pagination` — `_paginationAllPattern` (\ball\b), `_listOrIterableReturnPattern` (List\s*<|Iterable\s*<); `require_image_picker_result_handling` — `_nullCheckInContextPatterns`/`_nullCheckStmtPatterns` for == null/!= null/?; `require_sse_subscription_cancel` — typeName via word-boundary regex for sseType, dispose check via `_sseFieldClosePattern(body, fieldName, method)`. **api_network_rules** reached 0 dangerous `.contains()`; baseline entry **removed** from CI.
 - **Phase 2 (async_rules batch):** **async_rules:** `avoid_dialog_context_after_async` — `_mountedCheckPatterns` for .mounted/context.mounted/!mounted/if (mounted); `require_websocket_message_validation` — `_validationBodyPatterns` (try/catch/is Map/is List/containsKey/?./if (); DateTime UTC storage rule — `_dateTimeStorageMethodPatterns` (\bmilliseconds\b, \bmicroseconds\b); `require_loading_timeout` — `_longRunningMethodPatterns` (word-boundary from _longRunningMethods); `prefer_broadcast_stream` — `_asBroadcastStreamPattern`; `_MountedCheckVisitor` / `_ThenSetStateVisitor` — `_mountedInCondition`, `_setStateInBodyPattern`; `require_network_status_check` — `_networkCallPatterns`, `_connectivityCheckPatterns`; `require_pending_changes_indicator` — `_pendingChangesPatterns`, `_pendingNotificationPatterns`; `avoid_stream_sync_events` — `_streamControllerCreationPatterns`, `_streamSyncMitigationPatterns`, `_syncTruePattern`. **async_rules** reached 0; baseline entry **removed**.
-- **Phase 2 (navigation_rules batch):** **navigation_rules:** `avoid_circular_redirects` — `_redirectConditionPatterns`/`_redirectReturnPatterns` (null, ?, if, return null, return;); `require_deep_link_fallback` — `_deepLinkMethodPatterns`, `_deepLinkSignalPatterns`, `_deepLinkFallbackPatterns`; `prefer_typed_route_params` — `_parseMethodPattern`; `require_stepper_validation` — `_stepperValidationPatterns`; `require_step_count_indicator` — `_progressIndicatorPatterns`; `require_go_router_typed_params` — `_pathParamParsePatterns`; `require_url_launcher_encoding` — `_urlEncodePatterns`; `avoid_navigator_context_issue` — `_currentContextPattern`, `_navigatorContextPatterns`, `_navigatorOfPattern`, `_contextAfterNavigatorPattern`. **navigation_rules** reached 0; baseline entry **removed**.
-- **Phase 2 (file_handling_rules batch):** **file_handling_rules:** PDF rules — word-boundary regex for _pdfTypes; sqflite rules (whereargs, transaction, error handling, batch, close, reserved word, singleton, column constants), large-file rule, require_file_path_sanitization. file_handling_rules reached 0; baseline entry **removed**.
-- **Phase 2 (security_rules batch 1):** **security_rules:** RequireSecureStorageRule, RequireBiometricFallbackRule, AvoidStoringPasswordsRule — _prefSharedTargetPatterns, _sensitiveKeyPatterns, _authBioTargetPatterns, _passwordKeyPatterns; RequireTokenRefreshRule — _refreshMethodPattern, _expiryBodyPatterns; AvoidJwtDecodeClientRule — _jwtDecodeMethodPatterns, _jwtTokenTargetPatterns, _jwtTypePatterns; RequireLogoutCleanupRule — _logoutStoragePatterns, _logoutTokenPatterns, _logoutCachePatterns; RequireDeepLinkValidationRule — _queryParamTargetPatterns, _routeSettingsTargetPatterns; AvoidPathTraversalRule — _pathTraversalThrowPatterns, _pathValidationPatterns; RequireDataEncryptionRule — _secureStorageTargetPatterns; AvoidLoggingSensitiveDataRule — _isSafeMatch uses RegExp. Baseline: security_rules 74→41.
 - **Phase 2 (security_rules batch 2):** **security_rules:** RequireSecureStorageForAuthRule — _prefTargetSourcePatterns; AvoidRedirectInjectionRule — _navMethodPatterns; PreferLocalAuthRule — _sensitiveOperationPatterns; RequireSecureStorageAuthDataRule — _prefsTargetSourcePatterns; AvoidStoringSensitiveUnencryptedRule — _skipSecureTargetPatterns, _storageTargetPatterns; HTTP/user-input rule — _httpClientTargetPatterns; RequireCatchLoggingRule — _loggingBodyPatterns, _rethrowBodyPatterns, RegExp.escape(exceptionName); RequireSecureStorageErrorHandlingRule, AvoidSecureStorageLargeDataRule — _secureStorageTargetPatterns / _secureStorageTargetShortPatterns; RequireClipboardPasteValidationRule — _validationLogicPatterns; OAuth PKCE rule — _oauthTargetPatterns; session timeout — RegExp.escape(indicator) for bodySource; AvoidStackTraceInProductionRule — _stackTraceArgPatterns; RequireInputValidationRule — _networkTargetPatterns. **security_rules** reached 0 dangerous `.contains()`; baseline entry **removed** from CI.
 - **Phase 2 (disposal_rules):** **disposal_rules:** Replaced all `typeName.contains(...)` with word-boundary RegExp: RequireMediaPlayerControllerDisposeRule — _mediaControllerTypePatterns; RequireTabControllerDisposeRule — _tabControllerTypePattern; AvoidWebsocketMemoryLeakRule — _webSocketChannelTypePatterns; RequireVideoPlayerControllerDisposeRule — _videoPlayerControllerPattern; RequireStreamSubscriptionCancelRule — _streamSubscriptionTypePattern; RequireReceivePortCloseRule — _receivePortTypePattern; RequireSocketCloseRule — _secureSocketTypePattern; RequireDisposeImplementationRule and DisposeClassFieldsRule — `RegExp(r'\b' + RegExp.escape(disposableType) + r'\b').hasMatch(typeName)`. **disposal_rules** reached 0; baseline entry **removed**.
 - **Next batch:** Phase 3 or other files (e.g. test_rules 41, testing_best_practices 37, packages/firebase 37, widget_lifecycle 16).
@@ -45,8 +43,8 @@ False positives erode trust in lints: developers learn to ignore warnings or bla
 |----------|---------|
 | [CONTRIBUTING.md § Avoiding False Positives](../../CONTRIBUTING.md) | Anti-patterns table, lessons learned (e.g. `avoid_double_for_money`), “What TO do” table, pre-implementation questions |
 | [CLAUDE.md](../../CLAUDE.md) | Anti-patterns: string matching for types, assuming parent types, manual project-level queries; recommends type checks and `ProjectContext` |
-| [string_contains_false_positive_audit.md](../history/false_positives/string_contains_false_positive_audit.md) | Audit of 121+ `.contains()` usages, severity, remediation patterns (exact set, type check, AST, import check), phased plan, completed fixes |
-| [false_positives_kykto.md](../history/false_positives_kykto.md) | Real-world false positives from a consumer project: path sanitization, `ref.read` in callbacks, collection methods, guard clauses, etc. |
+| [string_contains_false_positive_audit.md](../false_positives/string_contains_false_positive_audit.md) | Audit of 121+ `.contains()` usages, severity, remediation patterns (exact set, type check, AST, import check), phased plan, completed fixes |
+| [false_positives_kykto.md](../false_positives_kykto.md) | Real-world false positives from a consumer project: path sanitization, `ref.read` in callbacks, collection methods, guard clauses, etc. |
 
 ### 2.2 Code and CI Safeguards
 
@@ -77,21 +75,21 @@ False positives erode trust in lints: developers learn to ignore warnings or bla
 - **Body/source string search:** `bodySource.contains('$name.dispose(')` is fragile to formatting and null-aware calls; should use AST or `isFieldCleanedUp`.
 - **Short or generic terms:** e.g. `iv` in variable names (activity, private), `cost`/`fee`/`balance` in money rules, `key` in security — require word-boundary or exact-set matching.
 
-**Remediation:** Prefer exact-match sets, `startsWith`/`endsWith` for known suffixes, type/element checks, AST visitors; use [target_matcher_utils.dart](../../lib/src/target_matcher_utils.dart) and [string_contains_false_positive_audit.md](../history/false_positives/string_contains_false_positive_audit.md) patterns.
+**Remediation:** Prefer exact-match sets, `startsWith`/`endsWith` for known suffixes, type/element checks, AST visitors; use [target_matcher_utils.dart](../../lib/src/target_matcher_utils.dart) and [string_contains_false_positive_audit.md](../false_positives/string_contains_false_positive_audit.md) patterns.
 
 ### 3.2 Context Blindness (Callbacks vs Build)
 
 - **`ref.read` / `context` in “build”:** Rules that flag “don’t use ref/context in build” often recurse into closures. Callbacks like `onPressed`, `onSelectionChanged`, `onSubmit` run *later*; using `ref.read()` there is correct. Flagging them is a false positive.
 - **`setState` in callbacks:** Same idea: `setState` inside a `Future.delayed` or stream listener callback is not “in initState” in the sense of synchronous build; it’s deferred and often guarded by `mounted`.
 
-**Remediation:** Treat “in build” as “directly in the build method body,” not inside nested `FunctionExpression`s. Stop recursion at closure boundaries where the rule semantics require it (documented in [avoid_unnecessary_setstate_false_positive_closure_callbacks.md](../history/false_positives/avoid_unnecessary_setstate_false_positive_closure_callbacks.md), [avoid_ref_in_build_body_false_positive_callbacks_inside_build.md](../history/avoid_ref_in_build_body_false_positive_callbacks_inside_build.md)).
+**Remediation:** Treat “in build” as “directly in the build method body,” not inside nested `FunctionExpression`s. Stop recursion at closure boundaries where the rule semantics require it (documented in [avoid_unnecessary_setstate_false_positive_closure_callbacks.md](../false_positives/avoid_unnecessary_setstate_false_positive_closure_callbacks.md), [avoid_ref_in_build_body_false_positive_callbacks_inside_build.md](../avoid_ref_in_build_body_false_positive_callbacks_inside_build.md)).
 
 ### 3.3 Trusted Sources and Semantics
 
 - **Path sanitization:** `require_file_path_sanitization` flags paths built from `getApplicationDocumentsDirectory()`, `getTemporaryDirectory()`, etc. Those are platform APIs, not user input — flagging is a false positive.
 - **Collection methods:** `.first`/`.last` on collections that are guaranteed non-empty by the API (e.g. `SegmentedButton.onSelectionChanged`’s `Set<T>`) or guarded by earlier control flow (e.g. early return when `fold == 0`) are false positives if the rule doesn’t account for framework or data-flow.
 
-**Remediation:** Maintain allowlists of “trusted” path sources and, where feasible, recognize callback shapes or simple data-flow that make a call safe (see [platform_path_utils.dart](../../lib/src/platform_path_utils.dart) and discussion in [false_positives_kykto.md](../history/false_positives_kykto.md)).
+**Remediation:** Maintain allowlists of “trusted” path sources and, where feasible, recognize callback shapes or simple data-flow that make a call safe (see [platform_path_utils.dart](../../lib/src/platform_path_utils.dart) and discussion in [false_positives_kykto.md](../false_positives_kykto.md)).
 
 ### 3.4 Package/Type Confusion
 
@@ -133,7 +131,7 @@ False positives erode trust in lints: developers learn to ignore warnings or bla
 
 ### 4.2 For the Codebase as a Whole
 
-- **Continue phased remediation** from [string_contains_false_positive_audit.md](../history/false_positives/string_contains_false_positive_audit.md): Phase 1 (disposal interpolation) → Phase 2 (context/location/http) → Phase 3 (framework terms) → Phase 4 (body/keyword). Track progress in that file.
+- **Continue phased remediation** from [string_contains_false_positive_audit.md](../false_positives/string_contains_false_positive_audit.md): Phase 1 (disposal interpolation) → Phase 2 (context/location/http) → Phase 3 (framework terms) → Phase 4 (body/keyword). Track progress in that file.
 - **Tighten CI baseline:** When `.contains()` usages are removed from a rule file, **decrease** the corresponding baseline in `test/anti_pattern_detection_test.dart` (and remove the file key when count reaches 0). Do not add new baseline entries for new files unless they contain grandfathered violations.
 - **Centralize “trusted path” and “safe callback” knowledge:** Extend `platform_path_utils` (or a small shared module) for trusted path APIs; consider a shared “is inside callback passed to build” helper so ref/context/setState rules stay consistent.
 - **Severity and tier:** For rules with **known unavoidable false positives**, consider WARNING instead of ERROR and/or moving to Comprehensive/Pedantic tier, and document in ROADMAP/rule doc.
@@ -179,8 +177,8 @@ Before submitting a new or modified rule:
 ## 7. References
 
 - [CONTRIBUTING.md § Avoiding False Positives](../../CONTRIBUTING.md) — Anti-patterns, lessons learned, what to do
-- [string_contains_false_positive_audit.md](../history/false_positives/string_contains_false_positive_audit.md) — Audit, patterns, phases, completed fixes
-- [false_positives_kykto.md](../history/false_positives_kykto.md) — Consumer-reported false positives and suggested improvements
+- [string_contains_false_positive_audit.md](../false_positives/string_contains_false_positive_audit.md) — Audit, patterns, phases, completed fixes
+- [false_positives_kykto.md](../false_positives_kykto.md) — Consumer-reported false positives and suggested improvements
 - [target_matcher_utils.dart](../../lib/src/target_matcher_utils.dart) — Exact target, disposal, chained method helpers
 - [import_utils.dart](../../lib/src/import_utils.dart) — Package import checks
 - [anti_pattern_detection_test.dart](../../test/anti_pattern_detection_test.dart) — CI guard and baseline
