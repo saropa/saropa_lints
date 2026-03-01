@@ -858,9 +858,11 @@ def print_orphan_analysis(
 # =============================================================================
 # FALSE-POSITIVE REDUCTION (.contains() ANTI-PATTERN AUDIT)
 # =============================================================================
-# Status is derived from code only: test/anti_pattern_detection_test.dart
-# (_baselineCounts) and lib/src/rules/**/*.dart (dangerous pattern counts).
-# No dependency on bugs/discussion or bugs/history documents.
+# Reports status of dangerous .contains() usage in rule files. Used by
+# run_full_audit() and the publish script. Status is derived from code only:
+# test/anti_pattern_detection_test.dart (_baselineCounts) and
+# lib/src/rules/**/*.dart (line counts). No dependency on bugs/ docs.
+# Patterns and skip rules (comment/import/export) must match the Dart test.
 
 # Patterns that match dangerous .contains() usage (must match Dart test).
 _DANGEROUS_CONTAINS_PATTERNS = [

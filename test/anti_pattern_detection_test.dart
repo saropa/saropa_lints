@@ -142,6 +142,17 @@ void main() {
         );
       }
     });
+
+    test('dangerous pattern count matches audit (Dart and publish script in sync)',
+        () {
+      expect(
+        _dangerousPatterns.length,
+        9,
+        reason:
+            'Publish script scripts/modules/_audit_checks.py uses the same '
+            '9 patterns. Update both if adding or removing a pattern.',
+      );
+    });
   });
 }
 
@@ -220,71 +231,65 @@ String _relativize(String path) {
 /// Files reduced to 0 and removed from baseline (no regression allowed):
 /// - security_rules.dart (2026-03-01)
 /// - disposal_rules.dart (2026-03-01)
-const Map<String, int> _baselineCounts = {
-  // Core rule files
-  'accessibility_rules.dart': 6,
-  'animation_rules.dart': 10,
-  'widget_lifecycle_rules.dart': 16,
-  // Platform rule files
-  'platforms/ios_rules.dart': 29,
-  'platforms/macos_rules.dart': 13,
-  'platforms/android_rules.dart': 16,
-  'platforms/linux_rules.dart': 2,
-  'platforms/windows_rules.dart': 13,
-
-  // Package rule files
-  'packages/firebase_rules.dart': 37,
-  'packages/riverpod_rules.dart': 28,
-  'packages/bloc_rules.dart': 16,
-  'packages/hive_rules.dart': 12,
-  'packages/getx_rules.dart': 5,
-  'packages/shared_preferences_rules.dart': 14,
-  'packages/dio_rules.dart': 6,
-  'packages/provider_rules.dart': 1,
-  'packages/isar_rules.dart': 7,
-  'packages/supabase_rules.dart': 8,
-  'packages/workmanager_rules.dart': 5,
-  'packages/url_launcher_rules.dart': 17,
-  'packages/package_specific_rules.dart': 19,
-  'packages/get_it_rules.dart': 9,
-  'packages/qr_scanner_rules.dart': 1,
-  'packages/equatable_rules.dart': 2,
-  'packages/flutter_hooks_rules.dart': 1,
-  'packages/geolocator_rules.dart': 5,
-  'packages/drift_rules.dart': 14,
-
-  // Widget and UI rule files
-  'build_method_rules.dart': 5,
-  'forms_rules.dart': 20,
-  'widget_layout_rules.dart': 10,
-  'widget_patterns_rules.dart': 2,
-  'scroll_rules.dart': 11,
-  'ui_ux_rules.dart': 4,
-
-  // Other rule files
-  'test_rules.dart': 41,
-  'testing_best_practices_rules.dart': 37,
-  'performance_rules.dart': 25,
-  'error_handling_rules.dart': 15,
-  'state_management_rules.dart': 4,
-  'resource_management_rules.dart': 24,
-  'collection_rules.dart': 5,
-  'image_rules.dart': 21,
-  'internationalization_rules.dart': 8,
-  'documentation_rules.dart': 6,
-  'media_rules.dart': 1,
-  'memory_management_rules.dart': 5,
-  'crypto_rules.dart': 2,
-  'dependency_injection_rules.dart': 12,
-  'bluetooth_hardware_rules.dart': 6,
-  'exception_rules.dart': 1,
-  'type_safety_rules.dart': 6,
-  'json_datetime_rules.dart': 12,
-  'dialog_snackbar_rules.dart': 2,
-  'complexity_rules.dart': 1,
-  'debug_rules.dart': 5,
-  'stylistic_error_testing_rules.dart': 12,
-  'iap_rules.dart': 22,
-  'architecture_rules.dart': 2,
-  'migration_rules.dart': 1,
-};
+/// - test_rules.dart (2026-03-01)
+/// - testing_best_practices_rules.dart (2026-03-01)
+/// - packages/firebase_rules.dart (2026-03-01)
+/// - platforms/ios_rules.dart (2026-03-01)
+/// - packages/riverpod_rules.dart (2026-03-01)
+/// - performance_rules.dart (2026-03-01)
+/// - resource_management_rules.dart (2026-03-01)
+/// - image_rules.dart (2026-03-01)
+/// - forms_rules.dart (2026-03-01)
+/// - iap_rules.dart (2026-03-01)
+/// - widget_lifecycle_rules.dart (2026-03-01)
+/// - scroll_rules.dart (2026-03-01)
+/// - widget_layout_rules.dart (2026-03-01)
+/// - accessibility_rules.dart (2026-03-01)
+/// - animation_rules.dart (2026-03-01)
+/// - build_method_rules.dart (2026-03-01)
+/// - widget_patterns_rules.dart (2026-03-01)
+/// - platforms/macos_rules.dart (2026-03-01)
+/// - platforms/android_rules.dart (2026-03-01)
+/// - platforms/linux_rules.dart (2026-03-01)
+/// - platforms/windows_rules.dart (2026-03-01)
+/// - packages/bloc_rules.dart (2026-03-01)
+/// - packages/hive_rules.dart (2026-03-01)
+/// - packages/getx_rules.dart (2026-03-01)
+/// - packages/shared_preferences_rules.dart (2026-03-01)
+/// - packages/dio_rules.dart (2026-03-01)
+/// - packages/provider_rules.dart (2026-03-01)
+/// - packages/isar_rules.dart (2026-03-01)
+/// - packages/supabase_rules.dart (2026-03-01)
+/// - packages/workmanager_rules.dart (2026-03-01)
+/// - packages/url_launcher_rules.dart (2026-03-01)
+/// - packages/package_specific_rules.dart (2026-03-01)
+/// - packages/get_it_rules.dart (2026-03-01)
+/// - packages/qr_scanner_rules.dart (2026-03-01)
+/// - packages/equatable_rules.dart (2026-03-01)
+/// - packages/flutter_hooks_rules.dart (2026-03-01)
+/// - packages/geolocator_rules.dart (2026-03-01)
+/// - packages/drift_rules.dart (2026-03-01)
+/// - ui_ux_rules.dart (2026-03-01)
+/// - error_handling_rules.dart (2026-03-01)
+/// - state_management_rules.dart (2026-03-01)
+/// - collection_rules.dart (2026-03-01)
+/// - internationalization_rules.dart (2026-03-01)
+/// - documentation_rules.dart (2026-03-01)
+/// - media_rules.dart (2026-03-01)
+/// - memory_management_rules.dart (2026-03-01)
+/// - crypto_rules.dart (2026-03-01)
+/// - dependency_injection_rules.dart (2026-03-01)
+/// - bluetooth_hardware_rules.dart (2026-03-01)
+/// - exception_rules.dart (2026-03-01)
+/// - type_safety_rules.dart (2026-03-01)
+/// - json_datetime_rules.dart (2026-03-01)
+/// - dialog_snackbar_rules.dart (2026-03-01)
+/// - complexity_rules.dart (2026-03-01)
+/// - debug_rules.dart (2026-03-01)
+/// - stylistic_error_testing_rules.dart (2026-03-01)
+/// - architecture_rules.dart (2026-03-01)
+/// - migration_rules.dart (2026-03-01)
+///
+/// All baseline entries removed; all rule files at 0. Any new .contains()
+/// anti-pattern will fail CI.
+const Map<String, int> _baselineCounts = {};
