@@ -121,3 +121,21 @@ void _good1264() {
     onChanged: (text) => _debouncer.run(() => searchApi(text)),
   );
 }
+
+/// GOOD (6.0.4 regression): Debounce as class field — rule checks enclosing
+/// class for Timer/Debouncer field; must NOT trigger.
+class SearchWithClassFieldDebouncer {
+  final void Function(String) searchApi = (String q) {};
+  Timer? _debounceTimer;
+
+  Widget build() {
+    return TextField(
+      onChanged: (text) {
+        _debounceTimer?.cancel();
+        _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+          searchApi(text);
+        });
+      },
+    );
+  }
+}

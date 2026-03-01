@@ -175,7 +175,7 @@ Standard linters don't understand these libraries. They see valid Dart code. Sar
 We build in public. We don't just show you what works; we explicitly document what *doesn't* work yet.
 
 * [**ROADMAP.md**](ROADMAP.md): Our active backlog. See exactly what rules are coming next and vote on priorities.
-* [**ROADMAP_DEFERRED.md**](ROADMAP_DEFERRED.md): The "Hard Problems." We document rules we *can't* implement yet due to technical limitations (like cross-file analysis). We invite the community to help us crack these barriers.
+* **Deferred rules** (in [ROADMAP.md](ROADMAP.md)#part-2-deferred-rules--technical-limitations): The "Hard Problems." Rules we *can't* implement yet due to technical limitations (cross-file analysis, heuristics). We invite the community to help crack these barriers.
 
 | Marker | Meaning | Example |
 |--------|---------|---------|
@@ -1011,7 +1011,7 @@ Contact: [saropa.com](https://saropa.com) | [services@saropa.com](mailto:service
 | [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)           | 175+ optional stylistic rules with examples   |
 | [PERFORMANCE.md](https://github.com/saropa/saropa_lints/blob/main/PERFORMANCE.md)                     | Performance optimization guide and profiling  |
 | [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md)                             | Planned rules and project direction           |
-| [ROADMAP_DEFERRED.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP_DEFERRED.md)           | Deferred rules (cross-file, heuristic)        |
+| [ROADMAP.md#part-2](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md#part-2-deferred-rules--technical-limitations) | Deferred rules (cross-file, heuristic)        |
 | [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md)                   | How to contribute rules and report issues     |
 | [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)                         | Version history and release notes             |
 | [SECURITY.md](https://github.com/saropa/saropa_lints/blob/main/SECURITY.md)                           | Security policy and reporting vulnerabilities |

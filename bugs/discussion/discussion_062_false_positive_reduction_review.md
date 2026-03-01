@@ -1,7 +1,9 @@
 # Discussion 062: Full Review — Reducing False Positives in saropa_lints
 
-**Status:** Completed — moved to `bugs/history/`  
+**Status:** In progress — not complete. Move to `bugs/history/` only when all work below is done (no remaining Next batch).  
 **Created:** 2026-03-01  
+**Last updated:** 2026-03-01  
+**Current state:** Files at 0 (baseline removed): api_network_rules, async_rules, navigation_rules, file_handling_rules, security_rules, disposal_rules. Remaining: see Next batch and `test/anti_pattern_detection_test.dart` _baselineCounts.  
 **Purpose:** Actionable review of how to reduce false positive occurrence across 1677+ rules. Ongoing guidance: CONTRIBUTING.md § Avoiding False Positives, `.claude/skills/lint-rules/SKILL.md` § Reducing False Positives, and `bugs/history/false_positives/` audit.
 
 ### Completed (2026-03-01)
@@ -23,6 +25,7 @@
 - **Phase 2 (security_rules batch 2):** **security_rules:** RequireSecureStorageForAuthRule — _prefTargetSourcePatterns; AvoidRedirectInjectionRule — _navMethodPatterns; PreferLocalAuthRule — _sensitiveOperationPatterns; RequireSecureStorageAuthDataRule — _prefsTargetSourcePatterns; AvoidStoringSensitiveUnencryptedRule — _skipSecureTargetPatterns, _storageTargetPatterns; HTTP/user-input rule — _httpClientTargetPatterns; RequireCatchLoggingRule — _loggingBodyPatterns, _rethrowBodyPatterns, RegExp.escape(exceptionName); RequireSecureStorageErrorHandlingRule, AvoidSecureStorageLargeDataRule — _secureStorageTargetPatterns / _secureStorageTargetShortPatterns; RequireClipboardPasteValidationRule — _validationLogicPatterns; OAuth PKCE rule — _oauthTargetPatterns; session timeout — RegExp.escape(indicator) for bodySource; AvoidStackTraceInProductionRule — _stackTraceArgPatterns; RequireInputValidationRule — _networkTargetPatterns. **security_rules** reached 0 dangerous `.contains()`; baseline entry **removed** from CI.
 - **Phase 2 (disposal_rules):** **disposal_rules:** Replaced all `typeName.contains(...)` with word-boundary RegExp: RequireMediaPlayerControllerDisposeRule — _mediaControllerTypePatterns; RequireTabControllerDisposeRule — _tabControllerTypePattern; AvoidWebsocketMemoryLeakRule — _webSocketChannelTypePatterns; RequireVideoPlayerControllerDisposeRule — _videoPlayerControllerPattern; RequireStreamSubscriptionCancelRule — _streamSubscriptionTypePattern; RequireReceivePortCloseRule — _receivePortTypePattern; RequireSocketCloseRule — _secureSocketTypePattern; RequireDisposeImplementationRule and DisposeClassFieldsRule — `RegExp(r'\b' + RegExp.escape(disposableType) + r'\b').hasMatch(typeName)`. **disposal_rules** reached 0; baseline entry **removed**.
 - **Next batch:** Phase 3 or other files (e.g. test_rules 41, testing_best_practices 37, packages/firebase 37, widget_lifecycle 16).
+- **2026-03-01 (committed):** Tier reclassification in `tiers.dart` (no orphans; rules moved Essential↔Recommended per TIER_AND_SEVERITY_ANALYSIS). FP fixes: provider_rules (Proxy/Multi set, endsWith Provider), permission_rules (rationale/camera/profile/crop/Permission target regex or exact match), widget_layout (TabBarView/PageView regex), widget_lifecycle (dispose regex), widget_patterns (Navigator exact). Audit script: `.contains()` baseline check and `print_contains_audit_status` in run_full_audit; CI fails if any rule file exceeds baseline. Tests: false_positive_fixes_test 6.0.4/6.0.5 group and regression fixture placeholders.
 
 ---
 

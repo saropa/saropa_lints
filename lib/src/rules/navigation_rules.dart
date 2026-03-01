@@ -65,7 +65,7 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
     '[require_unknown_route_handler] MaterialApp or CupertinoApp defines routes or onGenerateRoute but does not provide an onUnknownRoute handler. When a user navigates to an undefined route path via deep link, push notification, or programmatic navigation, the app throws an unhandled exception and crashes instead of showing a helpful error screen. {v4}',
     correctionMessage:
         'Add an onUnknownRoute callback to MaterialApp that returns a route to a user-friendly 404 error page when navigation targets an undefined route path.',
-    severity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -460,7 +460,7 @@ class RequireRouteGuardsRule extends SaropaLintRule {
     '[require_route_guards] Protected route path (profile, settings, admin, payment) lacks an authentication guard. Without a redirect callback, unauthorized users can access sensitive pages directly via deep link or URL manipulation, exposing personal data, financial information, or admin controls to unauthenticated sessions. {v3}',
     correctionMessage:
         'Add a redirect callback or middleware to check authentication before allowing access to this route. Ensure that only authorized users can reach protected pages, and redirect unauthenticated users to a login or error page. This helps prevent unauthorized access and protects user data.',
-    severity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _protectedRoutePatterns = <String>{
@@ -561,8 +561,18 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
     '[avoid_circular_redirects] GoRoute redirect callback always returns a path and never returns null, creating an unconditional redirect that forms an infinite loop. The router exhausts the redirect limit and throws an exception, crashing the app or permanently locking users out of all navigation when the redirect chain has no termination condition. {v2}',
     correctionMessage:
         'Update your redirect callback to always include a condition that returns null in some cases, breaking the redirect chain. This prevents infinite navigation loops and ensures users can access the intended pages without being stuck.',
-    severity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.ERROR,
   );
+
+  static final List<RegExp> _redirectConditionPatterns = [
+    RegExp(r'\bnull\b'),
+    RegExp(r'\?'),
+    RegExp(r'\bif\b'),
+  ];
+  static final List<RegExp> _redirectReturnPatterns = [
+    RegExp(r'\breturn\s+null\b'),
+    RegExp(r'\breturn\s*;\s*'),
+  ];
 
   @override
   void runWithReporter(
@@ -577,23 +587,16 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'redirect') {
           final Expression redirectExpr = arg.expression;
 
-          // Check if redirect always returns a value (no conditional null)
           if (redirectExpr is FunctionExpression) {
             final FunctionBody body = redirectExpr.body;
             final String bodySource = body.toSource();
 
-            // Check for unconditional redirect
             if (body is ExpressionFunctionBody) {
-              // => '/path' always redirects
-              if (!bodySource.contains('null') &&
-                  !bodySource.contains('?') &&
-                  !bodySource.contains('if')) {
+              if (!_redirectConditionPatterns.any((p) => p.hasMatch(bodySource))) {
                 reporter.atNode(arg.expression, code);
               }
             } else if (body is BlockFunctionBody) {
-              // Must have a return null somewhere
-              if (!bodySource.contains('return null') &&
-                  !bodySource.contains('return;')) {
+              if (!_redirectReturnPatterns.any((p) => p.hasMatch(bodySource))) {
                 reporter.atNode(arg.expression, code);
               }
             }
@@ -855,6 +858,38 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final List<RegExp> _deepLinkMethodPatterns = [
+    RegExp(r'\bdeeplink\b'),
+    RegExp(r'\blink\b'),
+    RegExp(r'\buri\b'),
+    RegExp(r'\broute\b'),
+  ];
+  static final List<RegExp> _deepLinkSignalPatterns = [
+    RegExp(r'\bUri\b'),
+    RegExp(r'\bpathSegments\b'),
+    RegExp(r'\bqueryParameters\b'),
+    RegExp(r'\bNavigator\b'),
+    RegExp(r'\bGoRouter\b'),
+    RegExp(r'\.go\s*\('),
+    RegExp(r'\.goNamed\s*\('),
+    RegExp(r'\.push\s*\('),
+    RegExp(r'\.pushNamed\s*\('),
+    RegExp(r'\.pushReplacement\b'),
+    RegExp(r'\bgetInitialLink\b'),
+    RegExp(r'\bgetInitialUri\b'),
+  ];
+  static final List<RegExp> _deepLinkFallbackPatterns = [
+    RegExp(r'\bNotFound\b'),
+    RegExp(r'\b404\b'),
+    RegExp(r'\berror\b'),
+    RegExp(r'null\s*\)'),
+    RegExp(r'\breturn\s+null\b'),
+    RegExp(r'==\s*null'),
+    RegExp(r'\bisEmpty\b'),
+    RegExp(r'\btry\b'),
+    RegExp(r'\bcatch\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -863,11 +898,7 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme.toLowerCase();
 
-      // Check for deep link handling methods
-      if (!methodName.contains('deeplink') &&
-          !methodName.contains('link') &&
-          !methodName.contains('uri') &&
-          !methodName.contains('route')) {
+      if (!_deepLinkMethodPatterns.any((p) => p.hasMatch(methodName))) {
         return;
       }
 
@@ -993,38 +1024,10 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
         }
       }
 
-      // Skip methods whose body has no deep link signals
-      // If the body doesn't parse URIs or navigate, it's not a handler
-      // regardless of method name
-      final bool hasDeepLinkSignal =
-          bodySource.contains('Uri') ||
-          bodySource.contains('pathSegments') ||
-          bodySource.contains('queryParameters') ||
-          bodySource.contains('Navigator') ||
-          bodySource.contains('GoRouter') ||
-          bodySource.contains('.go(') ||
-          bodySource.contains('.goNamed(') ||
-          bodySource.contains('.push(') ||
-          bodySource.contains('.pushNamed(') ||
-          bodySource.contains('.pushReplacement') ||
-          bodySource.contains('getInitialLink') ||
-          bodySource.contains('getInitialUri');
-
-      if (!hasDeepLinkSignal) return;
-
-      // Check for fallback patterns
-      final bool hasFallback =
-          bodySource.contains('NotFound') ||
-          bodySource.contains('404') ||
-          bodySource.contains('error') ||
-          bodySource.contains('null)') ||
-          bodySource.contains('return null') ||
-          bodySource.contains('== null') ||
-          bodySource.contains('isEmpty') ||
-          bodySource.contains('try') ||
-          bodySource.contains('catch');
-
-      if (!hasFallback) {
+      if (!_deepLinkSignalPatterns.any((p) => p.hasMatch(bodySource))) {
+        return;
+      }
+      if (!_deepLinkFallbackPatterns.any((p) => p.hasMatch(bodySource))) {
         reporter.atToken(node.name, code);
       }
     });
@@ -1051,6 +1054,13 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
 /// // Token is one-time use, fetches new password from server
 /// final token = uri.queryParameters['token'];
 /// ```
+String _indexTargetPropertyOrName(Expression target) {
+  if (target is PropertyAccess) return target.propertyName.name;
+  if (target is SimpleIdentifier) return target.name;
+  if (target is PrefixedIdentifier) return target.identifier.name;
+  return '';
+}
+
 class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
   AvoidDeepLinkSensitiveParamsRule() : super(code: _code);
 
@@ -1084,21 +1094,19 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
     'pin',
   };
 
+  static const Set<String> _paramSourceProps = {'queryParameters', 'pathSegments'};
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addIndexExpression((IndexExpression node) {
-      // Check for uri.queryParameters['password']
+      // Check for uri.queryParameters['password'] (exact property name to avoid FP)
       final Expression? target = node.target;
       if (target == null) return;
-      final String targetSource = target.toSource();
-
-      if (!targetSource.contains('queryParameters') &&
-          !targetSource.contains('pathSegments')) {
-        return;
-      }
+      final String prop = _indexTargetPropertyOrName(target);
+      if (!_paramSourceProps.contains(prop)) return;
 
       final Expression index = node.index;
       if (index is SimpleStringLiteral) {
@@ -1156,6 +1164,9 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static const Set<String> _routeParamProps = {'pathParameters', 'queryParameters'};
+  static final RegExp _parseMethodPattern = RegExp(r'\bparse\b', caseSensitive: false);
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1164,12 +1175,8 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
     context.addIndexExpression((IndexExpression node) {
       final Expression? target = node.target;
       if (target == null) return;
-      final String targetSource = target.toSource();
-
-      if (!targetSource.contains('pathParameters') &&
-          !targetSource.contains('queryParameters')) {
-        return;
-      }
+      final String prop = _indexTargetPropertyOrName(target);
+      if (!_routeParamProps.contains(prop)) return;
 
       // Check if result is immediately used without parsing
       final AstNode? parent = node.parent;
@@ -1179,7 +1186,7 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
         final AstNode? grandparent = parent.parent;
         if (grandparent is MethodInvocation) {
           final String methodName = grandparent.methodName.name;
-          if (methodName.contains('parse') || methodName.contains('Parse')) {
+          if (_parseMethodPattern.hasMatch(methodName)) {
             return;
           }
         }
@@ -1243,6 +1250,13 @@ class RequireStepperValidationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _stepperValidationPatterns = [
+    RegExp(r'\bvalidate\s*\(\s*\)'),
+    RegExp(r'\bisValid\b'),
+    RegExp(r'\bcanProceed\b'),
+    RegExp(r'\bif\s*\('),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1259,14 +1273,7 @@ class RequireStepperValidationRule extends SaropaLintRule {
           if (callback is FunctionExpression) {
             final String bodySource = callback.body.toSource();
 
-            // Check for validation patterns
-            final bool hasValidation =
-                bodySource.contains('validate()') ||
-                bodySource.contains('isValid') ||
-                bodySource.contains('canProceed') ||
-                bodySource.contains('if (');
-
-            if (!hasValidation) {
+            if (!_stepperValidationPatterns.any((p) => p.hasMatch(bodySource))) {
               reporter.atNode(arg);
             }
           }
@@ -1318,6 +1325,15 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _progressIndicatorPatterns = [
+    RegExp(r'\bProgressIndicator\b'),
+    RegExp(r'\bStepper\b'),
+    RegExp(r'\bStep\s+'),
+    RegExp(r'\bof\s+\$'),
+    RegExp(r'\btotalSteps\b'),
+    RegExp(r'\bstepCount\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1337,16 +1353,7 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
 
       if (!hasMultipleSteps) return;
 
-      // Check for progress indicator
-      final bool hasProgressIndicator =
-          bodySource.contains('ProgressIndicator') ||
-          bodySource.contains('Stepper') ||
-          bodySource.contains('Step ') ||
-          bodySource.contains('of \$') ||
-          bodySource.contains('totalSteps') ||
-          bodySource.contains('stepCount');
-
-      if (!hasProgressIndicator) {
+      if (!_progressIndicatorPatterns.any((p) => p.hasMatch(bodySource))) {
         reporter.atToken(node.name, code);
       }
     });
@@ -1776,13 +1783,17 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _pathParamParsePatterns = [
+    RegExp(r'\bparse\b'),
+    RegExp(r'\btryparse\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addIndexExpression((IndexExpression node) {
-      // Only apply to files that import go_router
       if (!fileImportsPackage(node, PackageImports.goRouter)) return;
 
       // Check if accessing pathParameters
@@ -1797,11 +1808,9 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
         if (current is MethodInvocation) {
           final String methodName = current.methodName.name.toLowerCase();
 
-          // cspell:ignore tryparse
-          if (methodName.contains('parse') ||
-              methodName.contains('tryparse') ||
+          if (_pathParamParsePatterns.any((p) => p.hasMatch(methodName)) ||
               methodName == 'tostring') {
-            return; // Already being parsed
+            return;
           }
         }
         if (current is VariableDeclaration) {
@@ -2297,6 +2306,11 @@ class RequireUrlLauncherEncodingRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _urlEncodePatterns = [
+    RegExp(r'\bencodeComponent\b'),
+    RegExp(r'\bencodeQueryComponent\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2326,10 +2340,8 @@ class RequireUrlLauncherEncodingRule extends SaropaLintRule {
 
         final Expression urlArg = parseArgs.arguments.first;
         if (urlArg is StringInterpolation) {
-          // Check if interpolation uses encodeComponent
           final String source = urlArg.toSource();
-          if (!source.contains('encodeComponent') &&
-              !source.contains('encodeQueryComponent')) {
+          if (!_urlEncodePatterns.any((p) => p.hasMatch(source))) {
             reporter.atNode(urlArg);
           }
         }
@@ -2774,6 +2786,13 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final RegExp _currentContextPattern = RegExp(r'\.currentContext\b');
+  static final List<RegExp> _navigatorContextPatterns = [
+    RegExp(r'\bnavigator\.context\b'),
+  ];
+  static final RegExp _navigatorOfPattern = RegExp(r'Navigator\.of\s*\(');
+  static final RegExp _contextAfterNavigatorPattern = RegExp(r'\)\.context\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2827,18 +2846,13 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
   /// - `.currentContext` (GlobalKey context access)
   /// - `navigator.context` or `Navigator.of(...).context`
   bool _hasProblematicContextUsage(String source) {
-    // Check for GlobalKey.currentContext patterns
-    if (source.contains('.currentContext')) {
+    if (_currentContextPattern.hasMatch(source)) {
       return true;
     }
-
-    // Check specifically for navigator.context (NavigatorState's context)
-    // but not general .context usage or property names containing "context"
-    if (source.contains('navigator.context') ||
-        (source.contains('Navigator.of(') && source.contains(').context'))) {
+    if (_navigatorContextPatterns.any((p) => p.hasMatch(source)) ||
+        (_navigatorOfPattern.hasMatch(source) && _contextAfterNavigatorPattern.hasMatch(source))) {
       return true;
     }
-
     return false;
   }
 }

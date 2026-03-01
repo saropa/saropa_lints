@@ -13,7 +13,7 @@ Archived releases 0.1.0 through 4.15.1. See [CHANGELOG.md](https://github.com/sa
 - **`avoid_color_only_meaning`** (Essential, WARNING): Warns when color is the sole visual indicator to convey meaning or state, violating WCAG 1.4.1. Checks multiple widget types (Container, Card, Material, etc.) and verifies a companion Icon/Text exists
 - **`avoid_excessive_rebuilds_animation`** (Essential, WARNING): Warns when animation builder callbacks (AnimatedBuilder, ValueListenableBuilder, StreamBuilder, etc.) contain more than 5 widget constructors, causing excessive rebuilds every frame
 - **`avoid_misused_hooks`** (Essential, WARNING): Warns when Flutter hook functions (useState, useEffect, etc.) are called inside callbacks or closures rather than at the top level of the build method
-- **`require_rtl_layout_support`** (Recommended, WARNING): Warns when hardcoded left/right directional values are used (TextAlign.left, Alignment.centerLeft, EdgeInsets.fromLTRB) instead of directional equivalents (start/end) for RTL language support. Quick fix converts to directional equivalents
+- **`require_rtl_layout_support`** (Recommended, WARNING): Warns when hardcoded left/right directional values are used (TextAlign.left, Alignment.centerLeft, EdgeInsets.fromLTRB) instead of directional equivalents (start/end) for RTL language support. Quick fix converts to directional equivalents. Resolves [#25](https://github.com/saropa/saropa_lints/issues/25), [#34](https://github.com/saropa/saropa_lints/issues/34). Issues closed with resolution version v4.15.1.
 - **`avoid_misused_test_matchers`** (Recommended, WARNING): Warns when raw literals (true, false, null) are used as test matchers instead of proper matchers (isTrue, isFalse, isNull, hasLength). Quick fix replaces with proper matchers
 
 ---
@@ -57,11 +57,11 @@ Archived releases 0.1.0 through 4.15.1. See [CHANGELOG.md](https://github.com/sa
 - **`prefer_grace_period_handling`** (Professional, INFO): Warns when IAP purchase verification only checks PurchaseStatus.purchased without handling pending/grace period states, locking out users during billing retry
 - **`require_cached_image_device_pixel_ratio`** (Professional, INFO): Warns when CachedNetworkImage uses fixed width/height without considering device pixel ratio, causing blurry images on high-DPI screens
 - **`prefer_foreground_service_android`** (Professional, INFO): Warns when Timer.periodic is used without a foreground service, since Android 8+ kills background tasks within minutes
-- **`prefer_sliverfillremaining_for_empty`** (Professional, INFO): Warns when SliverToBoxAdapter is used for empty state content in CustomScrollView instead of SliverFillRemaining
-- **`avoid_infinite_scroll_duplicate_requests`** (Professional, WARNING): Warns when scroll listeners trigger data loading without an isLoading guard, causing duplicate simultaneous requests
-- **`prefer_infinite_scroll_preload`** (Professional, INFO): Warns when infinite scroll triggers loading only at 100% scroll extent instead of preloading at 70-80%
+- **`prefer_sliverfillremaining_for_empty`** (Professional, INFO): Warns when SliverToBoxAdapter is used for empty state content in CustomScrollView instead of SliverFillRemaining. Resolves [#24](https://github.com/saropa/saropa_lints/issues/24), [#33](https://github.com/saropa/saropa_lints/issues/33). Issues closed with resolution version v4.14.5.
+- **`avoid_infinite_scroll_duplicate_requests`** (Professional, WARNING): Warns when scroll listeners trigger data loading without an isLoading guard, causing duplicate simultaneous requests. Resolves [#38](https://github.com/saropa/saropa_lints/issues/38). Issue closed with resolution version v4.14.5.
+- **`prefer_infinite_scroll_preload`** (Professional, INFO): Warns when infinite scroll triggers loading only at 100% scroll extent instead of preloading at 70-80%. Resolves [#28](https://github.com/saropa/saropa_lints/issues/28). Issue #28 was later commented with resolution version v4.14.5 and closed as completed.
 - **`prefer_use_callback`** (Professional, INFO): Warns when inline closures are passed as callbacks in HookWidget build methods instead of using useCallback for memoization
-- **`require_stepper_state_management`** (Professional, INFO): Warns when Stepper widget with form inputs lacks state management (GlobalKey, controllers), causing data loss on step navigation
+- **`require_stepper_state_management`** (Professional, INFO): Warns when Stepper widget with form inputs lacks state management (GlobalKey, controllers), causing data loss on step navigation. Resolves [#26](https://github.com/saropa/saropa_lints/issues/26), [#35](https://github.com/saropa/saropa_lints/issues/35). Issues closed with resolution version v4.14.5.
 - **`prefer_semantics_container` quick fix**: "Add container: true" inserts the parameter into the Semantics constructor
 - **`prefer_sliverfillremaining_for_empty` quick fix**: "Replace with SliverFillRemaining" renames SliverToBoxAdapter to SliverFillRemaining
 
@@ -108,9 +108,6 @@ Archived releases 0.1.0 through 4.15.1. See [CHANGELOG.md](https://github.com/sa
 - **TODO audit in publish pipeline**: New `display_todo_audit()` shows per-package bar chart of placeholder TODOs and writes full log to `example/reports/todo_audit.log`
 - **VSCode analysis exclusion**: Example sub-packages excluded from Dart analysis via `.vscode/settings.json` to keep Problems view clean
 - **TODO/FIXME/HACK suppression**: All example `analysis_options.yaml` files suppress `todo`, `fixme`, and `hack` diagnostics
-
-### Changed (continued)
-
 - **Removed version numbers from fixture filenames**: 16 fixture files and 1 test file renamed to remove hard-coded version suffixes (e.g., `stylistic_v270_fixture.dart` → `stylistic_fixture.dart`)
 - **Stripped version references from comments**: Removed `(from vX.Y.Z)` and `added in vX.Y.Z` from ~22 section headers and comments across fixture files
 
@@ -311,6 +308,11 @@ Archived releases 0.1.0 through 4.15.1. See [CHANGELOG.md](https://github.com/sa
 
 - **Removed duplicate rule `prefer_async_only_when_awaiting`**: This rule detected the same issue as `avoid_redundant_async` (async function without await), causing duplicate diagnostics. The quick fix has been ported to `avoid_redundant_async`, which has broader detection scope and more robust await detection.
 - **Registered 10 Windows/Linux platform rules**: 5 Windows rules (`avoid_hardcoded_drive_letters`, `avoid_forward_slash_path_assumption`, `avoid_case_sensitive_path_comparison`, `require_windows_single_instance_check`, `avoid_max_path_risk`) and 5 Linux rules (`avoid_hardcoded_unix_paths`, `prefer_xdg_directory_convention`, `avoid_x11_only_assumptions`, `require_linux_font_fallback`, `avoid_sudo_shell_commands`) were implemented but not registered in the plugin or assigned to tiers.
+- **Corrected misattributed DartDoc on 3 rules**: `avoid_unbounded_constraints` had keyboard-shortcuts DartDoc, `prefer_sliver_app_bar` had FutureBuilder error-handling DartDoc, and `require_should_rebuild` had TextStyle theming DartDoc. Each now has DartDoc matching its actual rule behavior.
+- **`avoid_expanded_outside_flex` no longer duplicates `prefer_expanded_at_call_site`**: When Expanded/Flexible/Spacer is returned directly from `build()` without an intermediate widget wrapper, `avoid_expanded_outside_flex` now defers to `prefer_expanded_at_call_site` instead of reporting a second diagnostic on the same node. Expanded nested inside a non-Flex widget within `build()` is still reported by `avoid_expanded_outside_flex`.
+- **`avoid_single_child_column_row` reduced false positives on collection-if and collection-for**: Rule now treats `IfElement` and `ForElement` as dynamic-count elements (like `SpreadElement`). Previously, a `children` list containing a single collection-if or collection-for was incorrectly flagged as a single-child Column/Row, even though these elements can produce 0, 1, or many children at runtime.
+- **`avoid_manual_date_formatting` reduced false positives on non-display contexts**: Rule now verifies the target object is actually `DateTime` via static type checking (properties named `year`, `month`, etc. on non-DateTime types are no longer flagged). Additionally, string interpolations used as map keys, cache keys, or arguments to map methods (`putIfAbsent`, `containsKey`, `remove`) are skipped. Variables with internal-use names containing `key`, `cache`, `tag`, `hash`, `bucket`, or `identifier` are also excluded.
+- **`avoid_nested_assignments` false positive on for-loop update clauses**: Compound assignments in standard for-loop updaters (`i += step`, `i *= 2`, `i = next(i)`, etc.) are no longer flagged. The rule now skips `ForParts` nodes alongside the existing `ForEachParts` skip.
 
 ### Added
 
@@ -334,14 +336,6 @@ Archived releases 0.1.0 through 4.15.1. See [CHANGELOG.md](https://github.com/sa
 - **`avoid_expanded_outside_flex` now detects `Spacer`**: Same `Spacer` gap fixed in the sibling rule.
 - **`prefer_expanded_at_call_site` quick fix now unwraps**: Replaced the `// HACK` comment insertion with a proper code transformation that extracts the `child` argument and returns it directly. Not offered for `Spacer` (no child to extract).
 - **`avoid_expanded_outside_flex` improved diagnostic messages**: Expanded `problemMessage` to explain the FlexParentData/RenderFlex mechanism and the indirect `build()` return case. Expanded `correctionMessage` with actionable guidance for reusable widgets. Added "Why This Crashes" dartdoc section explaining the ParentDataWidget error.
-
-### Fixed
-
-- **Corrected misattributed DartDoc on 3 rules**: `avoid_unbounded_constraints` had keyboard-shortcuts DartDoc, `prefer_sliver_app_bar` had FutureBuilder error-handling DartDoc, and `require_should_rebuild` had TextStyle theming DartDoc. Each now has DartDoc matching its actual rule behavior.
-- **`avoid_expanded_outside_flex` no longer duplicates `prefer_expanded_at_call_site`**: When Expanded/Flexible/Spacer is returned directly from `build()` without an intermediate widget wrapper, `avoid_expanded_outside_flex` now defers to `prefer_expanded_at_call_site` instead of reporting a second diagnostic on the same node. Expanded nested inside a non-Flex widget within `build()` is still reported by `avoid_expanded_outside_flex`.
-- **`avoid_single_child_column_row` reduced false positives on collection-if and collection-for**: Rule now treats `IfElement` and `ForElement` as dynamic-count elements (like `SpreadElement`). Previously, a `children` list containing a single collection-if or collection-for was incorrectly flagged as a single-child Column/Row, even though these elements can produce 0, 1, or many children at runtime.
-- **`avoid_manual_date_formatting` reduced false positives on non-display contexts**: Rule now verifies the target object is actually `DateTime` via static type checking (properties named `year`, `month`, etc. on non-DateTime types are no longer flagged). Additionally, string interpolations used as map keys, cache keys, or arguments to map methods (`putIfAbsent`, `containsKey`, `remove`) are skipped. Variables with internal-use names containing `key`, `cache`, `tag`, `hash`, `bucket`, or `identifier` are also excluded.
-- **`avoid_nested_assignments` false positive on for-loop update clauses**: Compound assignments in standard for-loop updaters (`i += step`, `i *= 2`, `i = next(i)`, etc.) are no longer flagged. The rule now skips `ForParts` nodes alongside the existing `ForEachParts` skip.
 
 ---
 ## [4.9.20]
@@ -583,6 +577,18 @@ Archived releases 0.1.0 through 4.15.1. See [CHANGELOG.md](https://github.com/sa
 
 - **Platform migration for existing configs**: Running `dart run saropa_lints:init` on projects with an existing `analysis_options_custom.yaml` automatically adds the `platforms:` section if missing, without disturbing existing settings.
 
+- **New rule: `avoid_ignore_trailing_comment`** (Recommended tier, WARNING): Warns when `// ignore:` or `// ignore_for_file:` directives have trailing text after the rule names — either a `//` comment or a ` - ` explanation. The `custom_lint_builder` framework uses exact string matching on rule codes, so any trailing text silently breaks suppression. Quick fix moves the text to a `//` comment on the line above the directive.
+
+- **New rule: `prefer_positive_conditions`** (Stylistic, INFO): Warns when an if/else or ternary uses a negative condition (`!expr` or `!=`) that can be flipped to a positive form with branches swapped. Only flags straightforward cases — skips compound conditions, else-if chains, and complex negations. Quick fix available to invert the condition and swap both branches.
+
+- **New rule: `prefer_positive_conditions_first`** (Stylistic, INFO): Warns when guard clauses use negated conditions (`== null`, `!expr`) with early returns, pushing the happy path deeper into the function. Suggests restructuring to place the positive condition first. Opinionated — not included in any tier by default.
+
+- **New rule: `missing_use_result_annotation`** (Comprehensive tier, INFO): Warns when a function returns a value without `@useResult` annotation. Callers may accidentally ignore the return value, leading to missed error handling or lost data transformations.
+
+- **VS Code extension: Scan file or folder**: Right-click any `.dart` file or folder in the Explorer sidebar and select "Scan with Saropa Lints" to instantly see all diagnostics for that path. Uses diagnostics already computed by the Dart analysis server — no re-scanning required.
+
+- **Quick fixes for 7 stylistic widget rules**: Added one-click fixes for `prefer_sizedbox_over_container`, `prefer_container_over_sizedbox`, `prefer_borderradius_circular`, `prefer_expanded_over_flexible`, `prefer_flexible_over_expanded`, `prefer_edgeinsets_symmetric`, and `prefer_edgeinsets_only`. Each fix handles const preservation and argument reordering.
+
 ### Removed
 
 - **Removed rule: `prefer_const_child_widgets`**: Redundant. When the parent widget is `const`, Dart's const context propagation already makes all children implicitly `const` — there is no additional performance benefit. When the parent is non-const, the built-in `prefer_const_literals_to_create_immutables` lint already covers the same case.
@@ -610,20 +616,6 @@ Archived releases 0.1.0 through 4.15.1. See [CHANGELOG.md](https://github.com/sa
 - **`init` skips writing unchanged `analysis_options.yaml`**: Running `dart run saropa_lints:init` with the same tier and options no longer overwrites the file if the content is identical. Shows `✓ No changes needed` instead.
 
 - **Plugin version now read dynamically from `pubspec.yaml`**: The version in `createPlugin()` was hardcoded at `4.8.0` and never updated. Replaced with a lazy resolver that reads the actual version from `pubspec.yaml` via `.dart_tool/package_config.json` at runtime. Works for both path dependencies and pub cache installs. The version string never needs manual updates again.
-
-### Added
-
-- **New rule: `avoid_ignore_trailing_comment`** (Recommended tier, WARNING): Warns when `// ignore:` or `// ignore_for_file:` directives have trailing text after the rule names — either a `//` comment or a ` - ` explanation. The `custom_lint_builder` framework uses exact string matching on rule codes, so any trailing text silently breaks suppression. Quick fix moves the text to a `//` comment on the line above the directive.
-
-- **New rule: `prefer_positive_conditions`** (Stylistic, INFO): Warns when an if/else or ternary uses a negative condition (`!expr` or `!=`) that can be flipped to a positive form with branches swapped. Only flags straightforward cases — skips compound conditions, else-if chains, and complex negations. Quick fix available to invert the condition and swap both branches.
-
-- **New rule: `prefer_positive_conditions_first`** (Stylistic, INFO): Warns when guard clauses use negated conditions (`== null`, `!expr`) with early returns, pushing the happy path deeper into the function. Suggests restructuring to place the positive condition first. Opinionated — not included in any tier by default.
-
-- **New rule: `missing_use_result_annotation`** (Comprehensive tier, INFO): Warns when a function returns a value without `@useResult` annotation. Callers may accidentally ignore the return value, leading to missed error handling or lost data transformations.
-
-- **VS Code extension: Scan file or folder**: Right-click any `.dart` file or folder in the Explorer sidebar and select "Scan with Saropa Lints" to instantly see all diagnostics for that path. Uses diagnostics already computed by the Dart analysis server — no re-scanning required.
-
-- **Quick fixes for 7 stylistic widget rules**: Added one-click fixes for `prefer_sizedbox_over_container`, `prefer_container_over_sizedbox`, `prefer_borderradius_circular`, `prefer_expanded_over_flexible`, `prefer_flexible_over_expanded`, `prefer_edgeinsets_symmetric`, and `prefer_edgeinsets_only`. Each fix handles const preservation and argument reordering.
 
 ---
 ## [4.9.4]
@@ -910,6 +902,8 @@ Archived releases 0.1.0 through 4.15.1. See [CHANGELOG.md](https://github.com/sa
 ### Added
 
 - **Quick fix for `avoid_unbounded_cache_growth`**: New quick fix adds a `static const int maxSize = 100;` field to cache classes. Developers need to manually add eviction logic in mutation methods.
+- **Quick fix for `avoid_flashing_content`**: New quick fix increases animation duration to 333ms (minimum WCAG 2.3.1 compliant threshold).
+- **Quick fix for `require_stream_controller_close`**: New quick fix adds `controller.close()` call to the dispose/close method.
 
 ### Fixed
 
@@ -923,11 +917,6 @@ Archived releases 0.1.0 through 4.15.1. See [CHANGELOG.md](https://github.com/sa
 - **`require_stream_controller_dispose` false positive with typed StreamControllers**: Fixed false positives when `StreamController<T>` has a concrete type parameter (e.g., `StreamController<String>`, `StreamController<(double, double)>`). The type classification logic incorrectly treated these as wrapper types. Also fixed wrapper types to accept both `.close()` and `.dispose()` methods.
 - **`avoid_expanded_outside_flex` false positive in helper methods**: Fixed false positives when `Expanded`/`Flexible` is created inside helper methods that return `List<Widget>`, or inside collection builders like `List.generate()` and `.map()`. These patterns are now trusted since the widgets typically end up inside Flex parents at runtime.
 - **`avoid_flashing_content` false positives on non-repeating animations**: Fixed false positives where the rule flagged all `AnimationController` instances with `duration < 333ms`, regardless of whether the animation actually repeats. Per WCAG 2.3.1, a "flash" requires alternating between states, so only `.repeat()` cascades now trigger the rule. Single-direction animations (`.forward()`, `.reverse()`, `.animateTo()`) are no longer flagged.
-
-### Added
-
-- **Quick fix for `avoid_flashing_content`**: New quick fix increases animation duration to 333ms (minimum WCAG 2.3.1 compliant threshold).
-- **Quick fix for `require_stream_controller_close`**: New quick fix adds `controller.close()` call to the dispose/close method.
 
 ---
 ## [4.7.3]

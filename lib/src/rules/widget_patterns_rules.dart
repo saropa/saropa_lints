@@ -6582,7 +6582,11 @@ class AvoidNavigationInBuildRule extends SaropaLintRule {
       if (target == null) return;
 
       final targetSource = target.toSource();
-      if (!targetSource.contains('Navigator')) return;
+      // Exact match to avoid FP on NavigatorHelper, CustomNavigator, etc.
+      if (targetSource != 'Navigator' &&
+          !targetSource.startsWith('Navigator.')) {
+        return;
+      }
 
       // Walk up to find enclosing method
       AstNode? current = node.parent;

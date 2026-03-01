@@ -113,6 +113,17 @@ Future<String> _getContainerPath() async {
   return '/app/container';
 }
 
+/// GOOD (6.0.5 regression): Private helper receives path from platform API in caller.
+/// Trust is traced through private method call sites — must NOT trigger.
+Future<File> goodCallerPassesPlatformPath() async {
+  final dir = await getApplicationDocumentsDirectory();
+  return _deleteOldUnencryptedDb(dir.path);
+}
+
+Future<File> _deleteOldUnencryptedDb(String dbDirPath) async {
+  return File('$dbDirPath/old_db.sqlite');
+}
+
 /// GOOD: User input WITH proper sanitization
 
 /// Sanitized user input - has basename check

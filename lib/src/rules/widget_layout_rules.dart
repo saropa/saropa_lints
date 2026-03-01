@@ -3088,6 +3088,8 @@ class PreferKeepAliveRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _tabPageViewPattern = RegExp(r'\b(TabBarView|PageView)\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3111,16 +3113,14 @@ class PreferKeepAliveRule extends SaropaLintRule {
         }
       }
 
-      // Check if this State builds a scrollable inside a tabbed/paged context
+      // Check if this State builds a scrollable inside a tabbed/paged context.
+      // Use word boundary so we match TabBarView/PageView as tokens, not
+      // substrings (e.g. avoids matching "Tab" in HomeTab.icon).
       final String classSource = node.toSource();
       if (classSource.contains('ListView') ||
           classSource.contains('GridView') ||
           classSource.contains('CustomScrollView')) {
-        // Only flag when the class references actual tab/page view containers,
-        // not any identifier that happens to contain "Tab" or "Page"
-        // (e.g. HomeTab.icon, DataTable, PageStorageKey).
-        if (classSource.contains('TabBarView') ||
-            classSource.contains('PageView')) {
+        if (_tabPageViewPattern.hasMatch(classSource)) {
           reporter.atToken(node.name, code);
         }
       }

@@ -1,9 +1,5 @@
-// ignore_for_file: unused_local_variable, unused_element
+// ignore_for_file: unused_element
+// Fixture for avoid_static_route_config.
+// Rule suggests dynamic or data-driven route config over static-only definitions.
 
-/// Fixture for `avoid_static_route_config` lint rule.
-
-// NOTE: avoid_static_route_config requires specific framework types
-// and widget/package context to trigger.
-// See rule documentation for bad/good examples.
-
-void main() {}
+void placeholderAvoidStaticRouteConfig() {}

@@ -1267,6 +1267,14 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final List<RegExp> _mountedCheckPatterns = [
+    RegExp(r'\.mounted\b'),
+    RegExp(r'context\.mounted'),
+    RegExp(r'!mounted\b'),
+    RegExp(r'if\s*\(\s*mounted\s*\)'),
+    RegExp(r'if\s*\(\s*!mounted\s*\)'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1341,21 +1349,11 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
     // Ensure we don't exceed the string bounds - toSource() may produce
     // a different length string than the original source
     if (targetOffset <= 0 || targetOffset > bodySource.length) {
-      // Search the entire body if offset is out of bounds
-      return bodySource.contains('.mounted') ||
-          bodySource.contains('context.mounted') ||
-          bodySource.contains('!mounted') ||
-          bodySource.contains('if (mounted)') ||
-          bodySource.contains('if (!mounted)');
+      return _mountedCheckPatterns.any((p) => p.hasMatch(bodySource));
     }
 
-    // Check for mounted check patterns before the target
     final String beforeTarget = bodySource.substring(0, targetOffset);
-    return beforeTarget.contains('.mounted') ||
-        beforeTarget.contains('context.mounted') ||
-        beforeTarget.contains('!mounted') ||
-        beforeTarget.contains('if (mounted)') ||
-        beforeTarget.contains('if (!mounted)');
+    return _mountedCheckPatterns.any((p) => p.hasMatch(beforeTarget));
   }
 }
 
@@ -1640,19 +1638,28 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _validationBodyPatterns = [
+    RegExp(r'\btry\b'),
+    RegExp(r'\bcatch\b'),
+    RegExp(r'\bis\s+Map\b'),
+    RegExp(r'\bis\s+List\b'),
+    RegExp(r'\bcontainsKey\b'),
+    RegExp(r'\?\s*\['),
+    RegExp(r'\?\s*\.'),
+    RegExp(r'\bif\s*\('),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
-      // Check for WebSocketChannel stream listen
       if (node.methodName.name != 'listen') return;
 
       final Expression? target = node.target;
       if (target == null) return;
 
-      // Check for WebSocket-related patterns
       final String targetSource = target.toSource();
       if (!targetSource.endsWith('socket') &&
           !targetSource.endsWith('Socket') &&
@@ -1661,30 +1668,18 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
         return;
       }
 
-      // Check the callback body for validation
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
       final Expression firstArg = args.arguments.first;
       if (firstArg is! FunctionExpression) return;
 
-      final FunctionBody body = firstArg.body;
-      final String bodySource = body.toSource();
-
-      // Check for validation patterns
-      final bool hasValidation =
-          bodySource.contains('try') ||
-          bodySource.contains('catch') ||
-          bodySource.contains('is Map') ||
-          bodySource.contains('is List') ||
-          bodySource.contains('containsKey') ||
-          bodySource.contains('?[') ||
-          bodySource.contains('?.') ||
-          bodySource.contains('if (');
-
-      if (!hasValidation) {
-        reporter.atNode(node);
+      final String bodySource = firstArg.body.toSource();
+      if (_validationBodyPatterns.any((p) => p.hasMatch(bodySource))) {
+        return;
       }
+
+      reporter.atNode(node);
     });
   }
 }
@@ -1867,6 +1862,10 @@ class PreferUtcForStorageRule extends SaropaLintRule {
     // Requires dot prefix to avoid matching setState, setRange, etc.
     RegExp(r'\.set\w*\s*\(', caseSensitive: false),
   ];
+  static final List<RegExp> _dateTimeStorageMethodPatterns = [
+    RegExp(r'\bmilliseconds\b'),
+    RegExp(r'\bmicroseconds\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -1874,13 +1873,9 @@ class PreferUtcForStorageRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
-      // Check for DateTime serialization methods commonly used for storage.
-      // Excludes toString() - it's rarely used for actual storage and mostly
-      // appears in logging/debugging, which would generate false positives.
       final String methodName = node.methodName.name;
       if (methodName != 'toIso8601String' &&
-          !methodName.contains('milliseconds') &&
-          !methodName.contains('microseconds')) {
+          !_dateTimeStorageMethodPatterns.any((p) => p.hasMatch(methodName))) {
         return;
       }
 
@@ -2439,6 +2434,8 @@ class RequireFutureTimeoutRule extends SaropaLintRule {
     'export',
     'import',
   };
+  static final List<RegExp> _longRunningMethodPatterns =
+      _longRunningMethods.map((s) => RegExp('\\b${RegExp.escape(s)}\\b')).toList();
 
   @override
   void runWithReporter(
@@ -2451,14 +2448,8 @@ class RequireFutureTimeoutRule extends SaropaLintRule {
 
       final String methodName = expr.methodName.name.toLowerCase();
 
-      // Check if method name suggests long-running operation
-      bool isLongRunning = false;
-      for (final pattern in _longRunningMethods) {
-        if (methodName.contains(pattern)) {
-          isLongRunning = true;
-          break;
-        }
-      }
+      bool isLongRunning = _longRunningMethodPatterns
+          .any((p) => p.hasMatch(methodName));
 
       if (!isLongRunning) return;
 
@@ -3493,12 +3484,14 @@ class PreferBroadcastStreamRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final RegExp _asBroadcastStreamPattern =
+      RegExp(r'\basBroadcastStream\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Track streams that are accessed multiple times
     context.addCompilationUnit((CompilationUnit unit) {
       final streamAccesses = <String, List<AstNode>>{};
 
@@ -3511,10 +3504,9 @@ class PreferBroadcastStreamRule extends SaropaLintRule {
       // Report streams accessed more than once
       for (final entry in streamAccesses.entries) {
         if (entry.value.length > 1) {
-          // Only report if no asBroadcastStream in the chain
           final hasConversion = entry.value.any((node) {
             if (node is MethodInvocation) {
-              return node.toSource().contains('asBroadcastStream');
+              return _asBroadcastStreamPattern.hasMatch(node.toSource());
             }
             return false;
           });
@@ -3731,6 +3723,8 @@ class _MountedCheckVisitor extends RecursiveAstVisitor<void> {
   bool _sawAwait = false;
   bool _hasMountedCheck = false;
 
+  static final RegExp _mountedInCondition = RegExp(r'\bmounted\b');
+
   @override
   void visitAwaitExpression(AwaitExpression node) {
     _sawAwait = true;
@@ -3740,8 +3734,7 @@ class _MountedCheckVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitIfStatement(IfStatement node) {
-    final condition = node.expression.toSource();
-    if (condition.contains('mounted')) {
+    if (_mountedInCondition.hasMatch(node.expression.toSource())) {
       _hasMountedCheck = true;
     }
     super.visitIfStatement(node);
@@ -3761,7 +3754,7 @@ class _MountedCheckVisitor extends RecursiveAstVisitor<void> {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is IfStatement) {
-        if (current.expression.toSource().contains('mounted')) {
+        if (_mountedInCondition.hasMatch(current.expression.toSource())) {
           return true;
         }
       }
@@ -3913,6 +3906,8 @@ class _ThenSetStateVisitor extends RecursiveAstVisitor<void> {
 
   final void Function(AstNode) onFound;
 
+  static final RegExp _setStateInBodyPattern = RegExp(r'\bsetState\b');
+
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'then') {
@@ -3921,7 +3916,7 @@ class _ThenSetStateVisitor extends RecursiveAstVisitor<void> {
       if (args.isNotEmpty) {
         final callback = args.first;
         if (callback is FunctionExpression) {
-          if (callback.body.toSource().contains('setState')) {
+          if (_setStateInBodyPattern.hasMatch(callback.body.toSource())) {
             onFound(node);
           }
         }
@@ -3978,43 +3973,41 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _networkCallPatterns = [
+    RegExp(r'\bhttp\.get\b'),
+    RegExp(r'\bhttp\.post\b'),
+    RegExp(r'\bhttp\.put\b'),
+    RegExp(r'\bhttp\.delete\b'),
+    RegExp(r'\bDio\s*\(\s*\)'),
+    RegExp(r'\.get\s*\('),
+    RegExp(r'\.post\s*\('),
+    RegExp(r'\bApiClient\b'),
+    RegExp(r'\bfetchData\b'),
+  ];
+  static final List<RegExp> _connectivityCheckPatterns = [
+    RegExp(r'\bConnectivity\b'),
+    RegExp(r'\bcheckConnectivity\b'),
+    RegExp(r'\bConnectivityResult\b'),
+    RegExp(r'\bisConnected\b'),
+    RegExp(r'\bhasConnection\b'),
+    RegExp(r'\bnetworkStatus\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
-      // Only check async methods
       if (!node.body.isAsynchronous) return;
 
       final bodySource = node.body.toSource();
 
-      // Check for network calls
-      final hasNetworkCall =
-          bodySource.contains('http.get') ||
-          bodySource.contains('http.post') ||
-          bodySource.contains('http.put') ||
-          bodySource.contains('http.delete') ||
-          bodySource.contains('Dio()') ||
-          bodySource.contains('.get(') ||
-          bodySource.contains('.post(') ||
-          bodySource.contains('ApiClient') ||
-          bodySource.contains('fetchData');
-
-      if (!hasNetworkCall) return;
-
-      // Check for connectivity check
-      final hasConnectivityCheck =
-          bodySource.contains('Connectivity') ||
-          bodySource.contains('checkConnectivity') ||
-          bodySource.contains('ConnectivityResult') ||
-          bodySource.contains('isConnected') ||
-          bodySource.contains('hasConnection') ||
-          bodySource.contains('networkStatus');
-
-      if (!hasConnectivityCheck) {
-        reporter.atNode(node);
+      if (!_networkCallPatterns.any((p) => p.hasMatch(bodySource))) return;
+      if (_connectivityCheckPatterns.any((p) => p.hasMatch(bodySource))) {
+        return;
       }
+      reporter.atNode(node);
     });
   }
 }
@@ -4159,6 +4152,21 @@ class RequirePendingChangesIndicatorRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _pendingChangesPatterns = [
+    RegExp(r'\b_pending\b'),
+    RegExp(r'\bpending\.add\b'),
+    RegExp(r'\b_queue\.add\b'),
+    RegExp(r'\b_unsaved\b'),
+    RegExp(r'\b_dirty\b'),
+  ];
+  static final List<RegExp> _pendingNotificationPatterns = [
+    RegExp(r'\bnotifyListeners\b'),
+    RegExp(r'\bsetState\b'),
+    RegExp(r'\bemit\s*\('),
+    RegExp(r'\badd\s*\('),
+    RegExp(r'\bstate\s*='),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -4167,27 +4175,11 @@ class RequirePendingChangesIndicatorRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       final bodySource = node.body.toSource();
 
-      // Check for pending changes pattern
-      final hasPendingPattern =
-          bodySource.contains('_pending') ||
-          bodySource.contains('pending.add') ||
-          bodySource.contains('_queue.add') ||
-          bodySource.contains('_unsaved') ||
-          bodySource.contains('_dirty');
-
-      if (!hasPendingPattern) return;
-
-      // Check for notification
-      final hasNotification =
-          bodySource.contains('notifyListeners') ||
-          bodySource.contains('setState') ||
-          bodySource.contains('emit(') ||
-          bodySource.contains('add(') || // Stream add
-          bodySource.contains('state =');
-
-      if (!hasNotification) {
-        reporter.atNode(node);
+      if (!_pendingChangesPatterns.any((p) => p.hasMatch(bodySource))) return;
+      if (_pendingNotificationPatterns.any((p) => p.hasMatch(bodySource))) {
+        return;
       }
+      reporter.atNode(node);
     });
   }
 }
@@ -4250,6 +4242,17 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _streamControllerCreationPatterns = [
+    RegExp(r'\bStreamController\s*\('),
+    RegExp(r'\bStreamController\s*<'),
+  ];
+  static final List<RegExp> _streamSyncMitigationPatterns = [
+    RegExp(r'\bscheduleMicrotask\b'),
+    RegExp(r'\bFuture\.microtask\b'),
+    RegExp(r'\bTimer\.run\b'),
+  ];
+  static final RegExp _syncTruePattern = RegExp(r'\bsync\s*:\s*true\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -4258,7 +4261,6 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      // Check for stream add methods
       if (methodName != 'add' && methodName != 'addError') return;
 
       // Check if target is a StreamController (exact name/endsWith to avoid FP)
@@ -4289,21 +4291,16 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
       final int nodeOffset = node.offset;
       final int bodyOffset = functionBody.offset;
 
-      // Check if StreamController is created in this function
-      if (!bodySource.contains('StreamController(') &&
-          !bodySource.contains('StreamController<')) {
+      if (!_streamControllerCreationPatterns
+          .any((p) => p.hasMatch(bodySource))) {
         return;
       }
 
-      // Check if the add is close to the controller creation (within a few statements)
       final String beforeAdd = bodySource.substring(0, nodeOffset - bodyOffset);
 
-      // Check for microtask wrapping
-      if (beforeAdd.contains('scheduleMicrotask') ||
-          beforeAdd.contains('Future.microtask') ||
-          beforeAdd.contains('Timer.run') ||
-          bodySource.contains('sync: true')) {
-        return; // Properly handled
+      if (_streamSyncMitigationPatterns.any((p) => p.hasMatch(beforeAdd)) ||
+          _syncTruePattern.hasMatch(bodySource)) {
+        return;
       }
 
       // Check if StreamController creation is within last 200 chars (rough heuristic)

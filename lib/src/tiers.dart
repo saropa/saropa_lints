@@ -349,7 +349,6 @@ const Set<String> essentialRules = <String>{
   'require_error_handling_graceful',
 
   'avoid_print_error', // Print for error logging loses errors in production
-  'prefer_semver_version', // pubspec version must be major.minor.patch
   // Collection/Loop Safety (Phase 2)
   'avoid_unreachable_for_loop',
 
@@ -563,10 +562,9 @@ const Set<String> essentialRules = <String>{
   'avoid_long_running_isolates', // WARNING - iOS kills isolates after 30 seconds
   'require_purchase_verification', // ERROR - IAP receipt fraud prevention
   'require_purchase_restoration', // ERROR - App Store requires restore purchases
-  'require_macos_notarization_ready', // INFO - macOS distribution requirement reminder
   'require_ios_data_protection', // WARNING - file encryption for sensitive data
   // =========================================================================
-  // Orphan Rule Assignment (v4.1.0) - Previously untiered critical/high rules
+  // Critical/High rules (no orphans - performance/UX rules moved to Recommended)
   // =========================================================================
 
   // Security (Critical)
@@ -580,11 +578,7 @@ const Set<String> essentialRules = <String>{
   'avoid_ref_in_build_body', // ERROR - ref.watch in wrong place
   'avoid_flashing_content', // ERROR - accessibility seizure risk
   // Animation (High)
-  'avoid_animation_rebuild_waste', // WARNING - animation performance
   'avoid_overlapping_animations', // WARNING - animation conflicts
-  // Navigation (High)
-  'require_deep_link_fallback', // WARNING - deep link error handling
-  'require_stepper_validation', // WARNING - stepper form validation
   // Firebase/Backend (High)
   'prefer_firebase_remote_config_defaults', // WARNING - config defaults
   'require_background_message_handler', // WARNING - FCM background
@@ -598,7 +592,6 @@ const Set<String> essentialRules = <String>{
   'prefer_html_escape', // WARNING - XSS prevention
   'require_error_widget', // WARNING - error boundary
   'require_feature_flag_default', // WARNING - feature flag safety
-  'require_immutable_bloc_state', // WARNING - state immutability
   'require_map_idle_callback', // WARNING - map performance
   'require_media_loading_state', // WARNING - loading indicators
   // Network (High)
@@ -622,6 +615,7 @@ const Set<String> essentialRules = <String>{
   'require_bloc_close',
   'require_error_state',
   'require_mounted_check',
+  'check_mounted_after_async', // setState after dispose crash (README Essential example)
   'require_scroll_controller_dispose',
   'require_tab_controller_dispose',
   'require_text_editing_controller_dispose',
@@ -656,7 +650,7 @@ const Set<String> essentialRules = <String>{
   'avoid_context_dependency_in_callback', // WARNING - stale context in async callbacks
   'avoid_hive_synchronous_in_ui', // WARNING - sync Hive I/O blocks UI thread
   // ROADMAP 🚨 Rules (Essential - ERROR severity)
-  'prefer_correct_package_name', // ERROR - package naming convention
+  'avoid_drift_raw_sql_interpolation', // ERROR - SQL injection (OWASP A03)
   'avoid_getx_build_context_bypass', // ERROR - bypasses BuildContext
   'avoid_permission_handler_null_safety', // ERROR - deprecated API
   'avoid_retaining_disposed_widgets', // ERROR - memory leak from widget refs
@@ -682,6 +676,14 @@ const Set<String> essentialRules = <String>{
 /// Recommended tier rules - Essential + common mistakes, performance basics.
 /// Catches bugs that don't immediately crash but cause poor UX, sluggish performance.
 const Set<String> recommendedOnlyRules = <String>{
+  // Moved from Essential (tier reclassification - no orphans; see bugs/TIER_AND_SEVERITY_ANALYSIS.md)
+  'prefer_semver_version', // pubspec version major.minor.patch - tooling correctness
+  'prefer_correct_package_name', // library/package naming - tooling/build
+  'require_macos_notarization_ready', // macOS distribution reminder (INFO)
+  'avoid_animation_rebuild_waste', // animation performance
+  'require_deep_link_fallback', // deep link error handling
+  'require_stepper_validation', // stepper form validation
+  'require_immutable_bloc_state', // state immutability best practice
   // v5.1.0 - Migration rules (Recommended)
   'prefer_dropdown_initial_value', // WARNING - deprecated in Flutter 3.35.0
   'prefer_on_pop_with_result', // WARNING - deprecated in Flutter 3.35.0
@@ -725,7 +727,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_drift_update_without_where', // WARNING - accidental bulk update/delete
   'require_await_in_drift_transaction', // WARNING - unawaited queries escape transaction
   'require_drift_foreign_key_pragma', // WARNING - foreign keys silently ignored
-  'avoid_drift_raw_sql_interpolation', // ERROR - SQL injection
   'prefer_drift_batch_operations', // WARNING - loop inserts instead of batch
   'require_drift_stream_cancel', // WARNING - stream subscription memory leak
   'avoid_drift_value_null_vs_absent', // WARNING - Value(null) vs Value.absent()
@@ -1426,7 +1427,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_unrelated_type_casts',
   'avoid_websocket_memory_leak',
   'avoid_webview_insecure_content',
-  'check_mounted_after_async',
   'prefer_dispose_before_new_instance',
   'proper_getx_super_calls',
   'require_bloc_initial_state',

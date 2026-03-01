@@ -28,6 +28,7 @@ from scripts.modules._audit_checks import (
     TIERS,
     find_duplicate_rules,
     find_orphan_rules,
+    get_contains_audit_status,
     get_file_stats,
     get_implemented_rules,
     get_owasp_coverage,
@@ -36,6 +37,7 @@ from scripts.modules._audit_checks import (
     get_rules_with_corrections,
     get_severity_stats,
     get_tier_stats,
+    print_contains_audit_status,
     print_file_health,
     print_owasp_coverage,
     print_quality_metrics,
@@ -94,6 +96,7 @@ class AuditResult:
     roadmap_duplicates: set[str] = field(default_factory=set)
     rules_missing_prefix: list[str] = field(default_factory=list)
     tier_integrity_passed: bool = True
+    contains_audit_over_baseline: bool = False
 
     @property
     def has_blocking_issues(self) -> bool:
@@ -103,6 +106,7 @@ class AuditResult:
         - Tier integrity checks failed
         - Duplicate class names, rule names, or aliases exist
         - Rules missing ``[rule_name]`` prefix in problemMessage
+        - Any rule file exceeds .contains() baseline (CI would fail)
         """
         return bool(
             not self.tier_integrity_passed
@@ -110,6 +114,7 @@ class AuditResult:
             or self.duplicate_report.get("rule_names")
             or self.duplicate_report.get("aliases")
             or self.rules_missing_prefix
+            or self.contains_audit_over_baseline
         )
 
 
@@ -652,6 +657,28 @@ def run_full_audit(
                 [],
             ))
 
+    # False-positive reduction: .contains() baseline (code-only audit)
+    contains_status = get_contains_audit_status(project_dir)
+    over_baseline = contains_status.get("over_baseline", [])
+    if over_baseline:
+        details = [
+            f"{f}: actual={a}, baseline={b}"
+            for f, a, b in sorted(over_baseline, key=lambda x: -x[1])[:10]
+        ]
+        if len(over_baseline) > 10:
+            details.append(f"+{len(over_baseline) - 10} more")
+        checks.append((
+            _FAIL,
+            "File(s) exceed .contains() baseline (CI would fail)",
+            details,
+        ))
+    else:
+        checks.append((
+            _PASS,
+            ".contains() counts within baseline (test/anti_pattern_detection_test.dart)",
+            [],
+        ))
+
     if extra_checks:
         checks.extend(extra_checks)
 
@@ -672,6 +699,7 @@ def run_full_audit(
         show_header=False,
     )
     print_file_health(file_stats, show_headers=False)
+    print_contains_audit_status(project_dir, status=contains_status)
 
     # DX message detail
     if not skip_dx:
@@ -730,4 +758,5 @@ def run_full_audit(
         roadmap_duplicates=roadmap_duplicates,
         rules_missing_prefix=rules_missing_prefix,
         tier_integrity_passed=tier_integrity_passed,
+        contains_audit_over_baseline=bool(over_baseline),
     )

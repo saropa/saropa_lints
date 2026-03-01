@@ -10,8 +10,7 @@
 
 ## Documentation
 
-- [ROADMAP.md](ROADMAP.md) — Planned rules and implementation priorities
-- [ROADMAP_DEFERRED.md](ROADMAP_DEFERRED.md) — Deferred rules (cross-file, heuristic, technical limitations)
+- [ROADMAP.md](ROADMAP.md) — Planned rules and implementation priorities; [Part 2](ROADMAP.md#part-2-deferred-rules--technical-limitations) covers deferred rules (cross-file, heuristic, technical limitations)
 
 ## Custom Lint Development
 

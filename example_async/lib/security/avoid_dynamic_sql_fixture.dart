@@ -125,3 +125,21 @@ void _good999() {
   db.rawQuery('SELECT * FROM users WHERE id = ?', [userId]);
   db.query('users', where: 'id = ?', whereArgs: [userId]);
 }
+
+// --- False-positive regression (6.0.4): PRAGMA does not support parameter binding ---
+// GOOD: PRAGMA with interpolation must NOT trigger (SQLite rejects ? in PRAGMA)
+void _goodPragmaNoTrigger() {
+  final key = 'encryption-key';
+  db.rawQuery("PRAGMA key = '$key'");
+  db.execute("PRAGMA rekey = '$key'");
+}
+
+// --- False-positive regression (6.0.4): word-boundary SQL keyword matching ---
+// GOOD: Parameterized query with args named selection/updateTime must NOT trigger
+// (rule must not treat identifier "updateTime" as SQL keyword "update")
+void _goodWordBoundaryNoTrigger() {
+  final updateTime = DateTime.now().toIso8601String();
+  db.rawQuery('SELECT * FROM logs WHERE updated_at = ?', [updateTime]);
+  final selection = 'id';
+  db.query('logs', columns: [selection], where: 'id = ?', whereArgs: [id]);
+}

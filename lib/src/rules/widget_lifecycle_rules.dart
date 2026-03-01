@@ -3426,13 +3426,13 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
               '\\s*dispose(Safe)?\\s*\\(',
             ).hasMatch(disposeBody);
 
-        // Iteration-based disposal
+        // Iteration-based disposal (regex to avoid disposeBody.contains)
         final bool isIterationDisposed =
             disposeBody != null &&
             RegExp(
               'in\\s+${RegExp.escape(name)}(\\.values)?\\)',
             ).hasMatch(disposeBody) &&
-            disposeBody.contains('.dispose()');
+            RegExp(r'\.dispose\s*\(\s*\)').hasMatch(disposeBody);
 
         final bool isDisposed = isDirectlyDisposed || isIterationDisposed;
 
@@ -3574,7 +3574,7 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
             RegExp(
               'in\\s+${RegExp.escape(name)}(\\.values)?\\)',
             ).hasMatch(disposeBody) &&
-            disposeBody.contains('.dispose()');
+            RegExp(r'\.dispose\s*\(\s*\)').hasMatch(disposeBody);
 
         final bool isDisposed = isDirectlyDisposed || isIterationDisposed;
 

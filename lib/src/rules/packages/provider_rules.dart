@@ -1765,6 +1765,7 @@ class PreferProxyProviderRule extends SaropaLintRule {
     'Provider',
     'ChangeNotifierProvider',
   };
+  static const Set<String> _proxyOrMulti = {'ProxyProvider', 'MultiProvider'};
 
   @override
   void runWithReporter(
@@ -1777,8 +1778,8 @@ class PreferProxyProviderRule extends SaropaLintRule {
       // Only check Provider and ChangeNotifierProvider
       if (!_providerTypes.contains(typeName)) return;
 
-      // Skip if this is already a ProxyProvider or MultiProvider
-      if (typeName.contains('Proxy') || typeName.contains('Multi')) return;
+      // Skip if this is already a ProxyProvider or MultiProvider (exact match to avoid FP)
+      if (_proxyOrMulti.contains(typeName)) return;
 
       // Find the create callback argument
       for (final Expression arg in node.argumentList.arguments) {
@@ -2133,9 +2134,9 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
       final String constructorName = node.constructorName.toSource();
       if (!constructorName.contains('.value')) return;
 
-      // Check if it's a Provider-like class
+      // Check if it's a Provider-like class (endsWith to avoid FP on non-Provider types)
       final String typeName = node.constructorName.type.name.lexeme;
-      if (!typeName.contains('Provider')) return;
+      if (!typeName.endsWith('Provider')) return;
 
       // Check value parameter
       for (final Expression arg in node.argumentList.arguments) {
