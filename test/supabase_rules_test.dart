@@ -2,10 +2,42 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/packages/supabase_rules.dart';
+
 /// Tests for 3 Supabase lint rules.
 ///
 /// Test fixtures: example_packages/lib/supabase/*
 void main() {
+  group('Supabase Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'RequireSupabaseErrorHandlingRule',
+      'require_supabase_error_handling',
+      () => RequireSupabaseErrorHandlingRule(),
+    );
+
+    testRule(
+      'AvoidSupabaseAnonKeyInCodeRule',
+      'avoid_supabase_anon_key_in_code',
+      () => AvoidSupabaseAnonKeyInCodeRule(),
+    );
+
+    testRule(
+      'RequireSupabaseRealtimeUnsubscribeRule',
+      'require_supabase_realtime_unsubscribe',
+      () => RequireSupabaseRealtimeUnsubscribeRule(),
+    );
+  });
+
   group('Supabase Rules - Fixture Verification', () {
     final fixtures = [
       'require_supabase_error_handling',

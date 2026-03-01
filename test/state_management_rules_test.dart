@@ -2,10 +2,90 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/state_management_rules.dart';
+
 /// Tests for 10 State Management lint rules.
 ///
 /// Test fixtures: example_async/lib/state_management/*
 void main() {
+  group('State Management Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'RequireNotifyListenersRule',
+      'require_notify_listeners',
+      () => RequireNotifyListenersRule(),
+    );
+
+    testRule(
+      'RequireStreamControllerDisposeRule',
+      'require_stream_controller_dispose',
+      () => RequireStreamControllerDisposeRule(),
+    );
+
+    testRule(
+      'RequireValueNotifierDisposeRule',
+      'require_value_notifier_dispose',
+      () => RequireValueNotifierDisposeRule(),
+    );
+
+    testRule(
+      'RequireMountedCheckRule',
+      'require_mounted_check',
+      () => RequireMountedCheckRule(),
+    );
+
+    testRule(
+      'AvoidStatefulWithoutStateRule',
+      'avoid_stateful_without_state',
+      () => AvoidStatefulWithoutStateRule(),
+    );
+
+    testRule(
+      'AvoidGlobalKeyInBuildRule',
+      'avoid_global_key_in_build',
+      () => AvoidGlobalKeyInBuildRule(),
+    );
+
+    testRule(
+      'AvoidSetStateInLargeStateClassRule',
+      'avoid_setstate_in_large_state_class',
+      () => AvoidSetStateInLargeStateClassRule(),
+    );
+
+    testRule(
+      'PreferImmutableSelectorValueRule',
+      'prefer_immutable_selector_value',
+      () => PreferImmutableSelectorValueRule(),
+    );
+
+    testRule(
+      'AvoidStaticStateRule',
+      'avoid_static_state',
+      () => AvoidStaticStateRule(),
+    );
+
+    testRule(
+      'PreferOptimisticUpdatesRule',
+      'prefer_optimistic_updates',
+      () => PreferOptimisticUpdatesRule(),
+    );
+
+    testRule(
+      'AvoidCollectionMutatingMethodsRule',
+      'avoid_collection_mutating_methods',
+      () => AvoidCollectionMutatingMethodsRule(),
+    );
+  });
+
   group('State Management Rules - Fixture Verification', () {
     final fixtures = [
       'require_notify_listeners',

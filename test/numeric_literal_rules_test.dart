@@ -2,10 +2,82 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/numeric_literal_rules.dart';
+
 /// Tests for 11 Numeric Literal lint rules.
 ///
 /// Test fixtures: example_core/lib/numeric_literal/*
 void main() {
+  group('Numeric Literal Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'AvoidInconsistentDigitSeparatorsRule',
+      'avoid_inconsistent_digit_separators',
+      () => AvoidInconsistentDigitSeparatorsRule(),
+    );
+
+    testRule(
+      'AvoidUnnecessaryDigitSeparatorsRule',
+      'avoid_unnecessary_digit_separators',
+      () => AvoidUnnecessaryDigitSeparatorsRule(),
+    );
+
+    testRule(
+      'DoubleLiteralFormatRule',
+      'double_literal_format',
+      () => DoubleLiteralFormatRule(),
+    );
+
+    testRule('NoMagicNumberRule', 'no_magic_number', () => NoMagicNumberRule());
+
+    testRule('NoMagicStringRule', 'no_magic_string', () => NoMagicStringRule());
+
+    testRule(
+      'PreferAdditionSubtractionAssignmentsRule',
+      'prefer_addition_subtraction_assignments',
+      () => PreferAdditionSubtractionAssignmentsRule(),
+    );
+
+    testRule(
+      'PreferCompoundAssignmentOperatorsRule',
+      'prefer_compound_assignment_operators',
+      () => PreferCompoundAssignmentOperatorsRule(),
+    );
+
+    testRule(
+      'PreferDigitSeparatorsRule',
+      'prefer_digit_separators',
+      () => PreferDigitSeparatorsRule(),
+    );
+
+    testRule(
+      'AvoidDigitSeparatorsRule',
+      'avoid_digit_separators',
+      () => AvoidDigitSeparatorsRule(),
+    );
+
+    testRule(
+      'NoMagicNumberInTestsRule',
+      'no_magic_number_in_tests',
+      () => NoMagicNumberInTestsRule(),
+    );
+
+    testRule(
+      'NoMagicStringInTestsRule',
+      'no_magic_string_in_tests',
+      () => NoMagicStringInTestsRule(),
+    );
+  });
+
   group('Numeric Literal Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_inconsistent_digit_separators',

@@ -2,10 +2,36 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/money_rules.dart';
+
 /// Tests for 2 Money/Currency lint rules.
 ///
 /// Test fixtures: example_async/lib/money/*
 void main() {
+  group('Money Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'AvoidDoubleForMoneyRule',
+      'avoid_double_for_money',
+      () => AvoidDoubleForMoneyRule(),
+    );
+
+    testRule(
+      'RequireCurrencyCodeWithAmountRule',
+      'require_currency_code_with_amount',
+      () => RequireCurrencyCodeWithAmountRule(),
+    );
+  });
+
   group('Money/Currency Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_double_for_money',

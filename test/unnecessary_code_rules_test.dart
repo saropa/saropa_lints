@@ -2,10 +2,92 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/unnecessary_code_rules.dart';
+
 /// Tests for 13 Unnecessary Code lint rules.
 ///
 /// Test fixtures: example_core/lib/unnecessary_code/*
 void main() {
+  group('Unnecessary Code Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'AvoidEmptySpreadRule',
+      'avoid_empty_spread',
+      () => AvoidEmptySpreadRule(),
+    );
+
+    testRule(
+      'AvoidUnnecessaryBlockRule',
+      'avoid_unnecessary_block',
+      () => AvoidUnnecessaryBlockRule(),
+    );
+
+    testRule(
+      'AvoidUnnecessaryCallRule',
+      'avoid_unnecessary_call',
+      () => AvoidUnnecessaryCallRule(),
+    );
+
+    testRule(
+      'AvoidUnnecessaryConstructorRule',
+      'avoid_unnecessary_constructor',
+      () => AvoidUnnecessaryConstructorRule(),
+    );
+
+    testRule(
+      'AvoidUnnecessaryEnumArgumentsRule',
+      'avoid_unnecessary_enum_arguments',
+      () => AvoidUnnecessaryEnumArgumentsRule(),
+    );
+
+    testRule(
+      'AvoidUnnecessaryEnumPrefixRule',
+      'avoid_unnecessary_enum_prefix',
+      () => AvoidUnnecessaryEnumPrefixRule(),
+    );
+
+    testRule(
+      'AvoidUnnecessaryExtendsRule',
+      'avoid_unnecessary_extends',
+      () => AvoidUnnecessaryExtendsRule(),
+    );
+
+    testRule(
+      'AvoidUnnecessaryGetterRule',
+      'avoid_unnecessary_getter',
+      () => AvoidUnnecessaryGetterRule(),
+    );
+
+    testRule(
+      'AvoidUnnecessaryLengthCheckRule',
+      'avoid_unnecessary_length_check',
+      () => AvoidUnnecessaryLengthCheckRule(),
+    );
+
+    testRule(
+      'AvoidUnnecessaryNegationsRule',
+      'avoid_unnecessary_negations',
+      () => AvoidUnnecessaryNegationsRule(),
+    );
+
+    testRule(
+      'AvoidUnnecessarySuperRule',
+      'avoid_unnecessary_super',
+      () => AvoidUnnecessarySuperRule(),
+    );
+
+    testRule('NoEmptyStringRule', 'no_empty_string', () => NoEmptyStringRule());
+  });
+
   group('Unnecessary Code Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_empty_spread',

@@ -2,10 +2,30 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/packages/graphql_rules.dart';
+
 /// Tests for 1 GraphQL lint rules.
 ///
 /// Test fixtures: example_packages/lib/graphql/*
 void main() {
+  group('Graphql Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'AvoidGraphqlStringQueriesRule',
+      'avoid_graphql_string_queries',
+      () => AvoidGraphqlStringQueriesRule(),
+    );
+  });
+
   group('GraphQL Rules - Fixture Verification', () {
     final fixtures = ['avoid_graphql_string_queries'];
 

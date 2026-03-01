@@ -2,10 +2,42 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/media_rules.dart';
+
 /// Tests for 3 Media lint rules.
 ///
 /// Test fixtures: example_async/lib/media/*
 void main() {
+  group('Media Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'AvoidAutoplayAudioRule',
+      'avoid_autoplay_audio',
+      () => AvoidAutoplayAudioRule(),
+    );
+
+    testRule(
+      'PreferCameraResolutionSelectionRule',
+      'prefer_camera_resolution_selection',
+      () => PreferCameraResolutionSelectionRule(),
+    );
+
+    testRule(
+      'PreferAudioSessionConfigRule',
+      'prefer_audio_session_config',
+      () => PreferAudioSessionConfigRule(),
+    );
+  });
+
   group('Media Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_autoplay_audio',

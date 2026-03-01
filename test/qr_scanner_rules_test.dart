@@ -2,10 +2,42 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/packages/qr_scanner_rules.dart';
+
 /// Tests for 3 QR Scanner lint rules.
 ///
 /// Test fixtures: example_packages/lib/qr_scanner/*
 void main() {
+  group('Qr Scanner Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'RequireQrScanFeedbackRule',
+      'require_qr_scan_feedback',
+      () => RequireQrScanFeedbackRule(),
+    );
+
+    testRule(
+      'AvoidQrScannerAlwaysActiveRule',
+      'avoid_qr_scanner_always_active',
+      () => AvoidQrScannerAlwaysActiveRule(),
+    );
+
+    testRule(
+      'RequireQrContentValidationRule',
+      'require_qr_content_validation',
+      () => RequireQrContentValidationRule(),
+    );
+  });
+
   group('QR Scanner Rules - Fixture Verification', () {
     final fixtures = [
       'require_qr_scan_feedback',

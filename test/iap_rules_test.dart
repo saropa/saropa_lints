@@ -2,10 +2,54 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/iap_rules.dart';
+
 /// Tests for 5 In-App Purchase lint rules.
 ///
 /// Test fixtures: example_async/lib/iap/*
 void main() {
+  group('Iap Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'AvoidPurchaseInSandboxProductionRule',
+      'avoid_purchase_in_sandbox_production',
+      () => AvoidPurchaseInSandboxProductionRule(),
+    );
+
+    testRule(
+      'RequireSubscriptionStatusCheckRule',
+      'require_subscription_status_check',
+      () => RequireSubscriptionStatusCheckRule(),
+    );
+
+    testRule(
+      'RequirePriceLocalizationRule',
+      'require_price_localization',
+      () => RequirePriceLocalizationRule(),
+    );
+
+    testRule(
+      'PreferGracePeriodHandlingRule',
+      'prefer_grace_period_handling',
+      () => PreferGracePeriodHandlingRule(),
+    );
+
+    testRule(
+      'AvoidEntitlementWithoutServerRule',
+      'avoid_entitlement_without_server',
+      () => AvoidEntitlementWithoutServerRule(),
+    );
+  });
+
   group('In-App Purchase Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_purchase_in_sandbox_production',

@@ -2,10 +2,108 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/resource_management_rules.dart';
+
 /// Tests for 14 Resource Management lint rules.
 ///
 /// Test fixtures: example_async/lib/resource_management/*
 void main() {
+  group('Resource Management Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'RequireFileCloseInFinallyRule',
+      'require_file_close_in_finally',
+      () => RequireFileCloseInFinallyRule(),
+    );
+
+    testRule(
+      'RequireDatabaseCloseRule',
+      'require_database_close',
+      () => RequireDatabaseCloseRule(),
+    );
+
+    testRule(
+      'RequireHttpClientCloseRule',
+      'require_http_client_close',
+      () => RequireHttpClientCloseRule(),
+    );
+
+    testRule(
+      'RequireNativeResourceCleanupRule',
+      'require_native_resource_cleanup',
+      () => RequireNativeResourceCleanupRule(),
+    );
+
+    testRule(
+      'RequireWebSocketCloseRule',
+      'require_websocket_close',
+      () => RequireWebSocketCloseRule(),
+    );
+
+    testRule(
+      'RequirePlatformChannelCleanupRule',
+      'require_platform_channel_cleanup',
+      () => RequirePlatformChannelCleanupRule(),
+    );
+
+    testRule(
+      'RequireIsolateKillRule',
+      'require_isolate_kill',
+      () => RequireIsolateKillRule(),
+    );
+
+    testRule(
+      'RequireCameraDisposeRule',
+      'require_camera_dispose',
+      () => RequireCameraDisposeRule(),
+    );
+
+    testRule(
+      'RequireImageCompressionRule',
+      'require_image_compression',
+      () => RequireImageCompressionRule(),
+    );
+
+    testRule(
+      'PreferCoarseLocationRule',
+      'prefer_coarse_location_when_sufficient',
+      () => PreferCoarseLocationRule(),
+    );
+
+    testRule(
+      'AvoidImagePickerWithoutSourceRule',
+      'avoid_image_picker_without_source',
+      () => AvoidImagePickerWithoutSourceRule(),
+    );
+
+    testRule(
+      'PreferGeolocatorAccuracyAppropriateRule',
+      'prefer_geolocator_accuracy_appropriate',
+      () => PreferGeolocatorAccuracyAppropriateRule(),
+    );
+
+    testRule(
+      'PreferGeolocatorLastKnownRule',
+      'prefer_geolocator_last_known',
+      () => PreferGeolocatorLastKnownRule(),
+    );
+
+    testRule(
+      'PreferImagePickerMultiSelectionRule',
+      'prefer_image_picker_multi_selection',
+      () => PreferImagePickerMultiSelectionRule(),
+    );
+  });
+
   group('Resource Management Rules - Fixture Verification', () {
     final fixtures = [
       'require_file_close_in_finally',

@@ -2,10 +2,134 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/packages/package_specific_rules.dart';
+
 /// Tests for 19 Package Specific lint rules.
 ///
 /// Test fixtures: example_packages/lib/package_specific/*
 void main() {
+  group('Package Specific Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'RequireGoogleSigninErrorHandlingRule',
+      'require_google_signin_error_handling',
+      () => RequireGoogleSigninErrorHandlingRule(),
+    );
+
+    testRule(
+      'RequireAppleSigninNonceRule',
+      'require_apple_signin_nonce',
+      () => RequireAppleSigninNonceRule(),
+    );
+
+    testRule(
+      'RequireWebviewSslErrorHandlingRule',
+      'require_webview_ssl_error_handling',
+      () => RequireWebviewSslErrorHandlingRule(),
+    );
+
+    testRule(
+      'AvoidWebviewFileAccessRule',
+      'avoid_webview_file_access',
+      () => AvoidWebviewFileAccessRule(),
+    );
+
+    testRule(
+      'RequireCalendarTimezoneHandlingRule',
+      'require_calendar_timezone_handling',
+      () => RequireCalendarTimezoneHandlingRule(),
+    );
+
+    testRule(
+      'RequireKeyboardVisibilityDisposeRule',
+      'require_keyboard_visibility_dispose',
+      () => RequireKeyboardVisibilityDisposeRule(),
+    );
+
+    testRule(
+      'RequireSpeechStopOnDisposeRule',
+      'require_speech_stop_on_dispose',
+      () => RequireSpeechStopOnDisposeRule(),
+    );
+
+    testRule(
+      'AvoidAppLinksSensitiveParamsRule',
+      'avoid_app_links_sensitive_params',
+      () => AvoidAppLinksSensitiveParamsRule(),
+    );
+
+    testRule(
+      'RequireEnviedObfuscationRule',
+      'require_envied_obfuscation',
+      () => RequireEnviedObfuscationRule(),
+    );
+
+    testRule(
+      'AvoidOpenaiKeyInCodeRule',
+      'avoid_openai_key_in_code',
+      () => AvoidOpenaiKeyInCodeRule(),
+    );
+
+    testRule(
+      'RequireOpenaiErrorHandlingRule',
+      'require_openai_error_handling',
+      () => RequireOpenaiErrorHandlingRule(),
+    );
+
+    testRule(
+      'RequireSvgErrorHandlerRule',
+      'require_svg_error_handler',
+      () => RequireSvgErrorHandlerRule(),
+    );
+
+    testRule(
+      'RequireGoogleFontsFallbackRule',
+      'require_google_fonts_fallback',
+      () => RequireGoogleFontsFallbackRule(),
+    );
+
+    testRule('PreferUuidV4Rule', 'prefer_uuid_v4', () => PreferUuidV4Rule());
+
+    testRule(
+      'PreferImagePickerMaxDimensionsRule',
+      'prefer_image_picker_max_dimensions',
+      () => PreferImagePickerMaxDimensionsRule(),
+    );
+
+    testRule(
+      'RequireUrlLauncherModeRule',
+      'require_url_launcher_mode',
+      () => RequireUrlLauncherModeRule(),
+    );
+
+    testRule(
+      'PreferGeolocatorDistanceFilterRule',
+      'prefer_geolocator_distance_filter',
+      () => PreferGeolocatorDistanceFilterRule(),
+    );
+
+    testRule(
+      'AvoidImagePickerQuickSuccessionRule',
+      'avoid_image_picker_quick_succession',
+      () => AvoidImagePickerQuickSuccessionRule(),
+    );
+
+    testRule(
+      'RequireAnalyticsErrorHandlingRule',
+      'require_analytics_error_handling',
+      () => RequireAnalyticsErrorHandlingRule(),
+    );
+  });
+
   group('Package Specific Rules - Fixture Verification', () {
     final fixtures = [
       'require_google_signin_error_handling',

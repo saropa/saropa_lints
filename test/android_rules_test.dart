@@ -2,10 +2,66 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/platforms/android_rules.dart';
+
 /// Tests for 7 Android lint rules.
 ///
 /// Test fixtures: example_platforms/lib/android/
 void main() {
+  group('Android Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'RequireAndroidPermissionRequestRule',
+      'require_android_permission_request',
+      () => RequireAndroidPermissionRequestRule(),
+    );
+
+    testRule(
+      'AvoidAndroidTaskAffinityDefaultRule',
+      'avoid_android_task_affinity_default',
+      () => AvoidAndroidTaskAffinityDefaultRule(),
+    );
+
+    testRule(
+      'RequireAndroid12SplashRule',
+      'require_android_12_splash',
+      () => RequireAndroid12SplashRule(),
+    );
+
+    testRule(
+      'PreferPendingIntentFlagsRule',
+      'prefer_pending_intent_flags',
+      () => PreferPendingIntentFlagsRule(),
+    );
+
+    testRule(
+      'AvoidAndroidCleartextTrafficRule',
+      'avoid_android_cleartext_traffic',
+      () => AvoidAndroidCleartextTrafficRule(),
+    );
+
+    testRule(
+      'RequireAndroidBackupRulesRule',
+      'require_android_backup_rules',
+      () => RequireAndroidBackupRulesRule(),
+    );
+
+    testRule(
+      'PreferForegroundServiceAndroidRule',
+      'prefer_foreground_service_android',
+      () => PreferForegroundServiceAndroidRule(),
+    );
+  });
+
   group('Android Rules - Fixture Verification', () {
     final fixtures = [
       'require_android_permission_request',

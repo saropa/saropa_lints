@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/packages/url_launcher_rules.dart';
+
 /// Tests for 3 URL launcher lint rules.
 ///
 /// These rules cover launch pre-checks, fallback handling, and simulator
@@ -9,6 +11,36 @@ import 'package:test/test.dart';
 ///
 /// Test fixtures: example_packages/lib/url_launcher/*
 void main() {
+  group('Url Launcher Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'RequireUrlLauncherCanLaunchCheckRule',
+      'require_url_launcher_can_launch_check',
+      () => RequireUrlLauncherCanLaunchCheckRule(),
+    );
+
+    testRule(
+      'AvoidUrlLauncherSimulatorTestsRule',
+      'avoid_url_launcher_simulator_tests',
+      () => AvoidUrlLauncherSimulatorTestsRule(),
+    );
+
+    testRule(
+      'PreferUrlLauncherFallbackRule',
+      'prefer_url_launcher_fallback',
+      () => PreferUrlLauncherFallbackRule(),
+    );
+  });
+
   group('URL Launcher Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_url_launcher_simulator_tests',

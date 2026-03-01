@@ -2,10 +2,138 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/record_pattern_rules.dart';
+
 /// Tests for 19 Record Pattern lint rules.
 ///
 /// Test fixtures: example_core/lib/record_pattern/*
 void main() {
+  group('Record Pattern Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'AvoidBottomTypeInPatternsRule',
+      'avoid_bottom_type_in_patterns',
+      () => AvoidBottomTypeInPatternsRule(),
+    );
+
+    testRule(
+      'AvoidBottomTypeInRecordsRule',
+      'avoid_bottom_type_in_records',
+      () => AvoidBottomTypeInRecordsRule(),
+    );
+
+    testRule(
+      'AvoidExplicitPatternFieldNameRule',
+      'avoid_explicit_pattern_field_name',
+      () => AvoidExplicitPatternFieldNameRule(),
+    );
+
+    testRule(
+      'AvoidExtensionsOnRecordsRule',
+      'avoid_extensions_on_records',
+      () => AvoidExtensionsOnRecordsRule(),
+    );
+
+    testRule(
+      'AvoidFunctionTypeInRecordsRule',
+      'avoid_function_type_in_records',
+      () => AvoidFunctionTypeInRecordsRule(),
+    );
+
+    testRule(
+      'AvoidKeywordsInWildcardPatternRule',
+      'avoid_keywords_in_wildcard_pattern',
+      () => AvoidKeywordsInWildcardPatternRule(),
+    );
+
+    testRule(
+      'AvoidLongRecordsRule',
+      'avoid_long_records',
+      () => AvoidLongRecordsRule(),
+    );
+
+    testRule(
+      'AvoidMixingNamedAndPositionalFieldsRule',
+      'avoid_mixing_named_and_positional_fields',
+      () => AvoidMixingNamedAndPositionalFieldsRule(),
+    );
+
+    testRule(
+      'AvoidNestedRecordsRule',
+      'avoid_nested_records',
+      () => AvoidNestedRecordsRule(),
+    );
+
+    testRule(
+      'AvoidOneFieldRecordsRule',
+      'avoid_one_field_records',
+      () => AvoidOneFieldRecordsRule(),
+    );
+
+    testRule(
+      'AvoidPositionalRecordFieldAccessRule',
+      'avoid_positional_record_field_access',
+      () => AvoidPositionalRecordFieldAccessRule(),
+    );
+
+    testRule(
+      'AvoidRedundantPositionalFieldNameRule',
+      'avoid_redundant_positional_field_name',
+      () => AvoidRedundantPositionalFieldNameRule(),
+    );
+
+    testRule(
+      'AvoidSingleFieldDestructuringRule',
+      'avoid_single_field_destructuring',
+      () => AvoidSingleFieldDestructuringRule(),
+    );
+
+    testRule(
+      'MoveRecordsToTypedefsRule',
+      'move_records_to_typedefs',
+      () => MoveRecordsToTypedefsRule(),
+    );
+
+    testRule(
+      'PatternFieldsOrderingRule',
+      'prefer_sorted_pattern_fields',
+      () => PatternFieldsOrderingRule(),
+    );
+
+    testRule(
+      'PreferSimplerPatternsNullCheckRule',
+      'prefer_simpler_patterns_null_check',
+      () => PreferSimplerPatternsNullCheckRule(),
+    );
+
+    testRule(
+      'PreferWildcardPatternRule',
+      'prefer_wildcard_pattern',
+      () => PreferWildcardPatternRule(),
+    );
+
+    testRule(
+      'RecordFieldsOrderingRule',
+      'prefer_sorted_record_fields',
+      () => RecordFieldsOrderingRule(),
+    );
+
+    testRule(
+      'PreferPatternDestructuringRule',
+      'prefer_pattern_destructuring',
+      () => PreferPatternDestructuringRule(),
+    );
+  });
+
   group('Record Pattern Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_bottom_type_in_patterns',

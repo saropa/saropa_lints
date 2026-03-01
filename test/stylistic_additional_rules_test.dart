@@ -2,10 +2,168 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/rules/stylistic_additional_rules.dart';
+
 /// Tests for 24 Stylistic Additional lint rules.
 ///
 /// Test fixtures: example_style/lib/stylistic_additional/*
 void main() {
+  group('Stylistic Additional Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule(
+      'PreferInterpolationOverConcatenationRule',
+      'prefer_interpolation_over_concatenation',
+      () => PreferInterpolationOverConcatenationRule(),
+    );
+
+    testRule(
+      'PreferConcatenationOverInterpolationRule',
+      'prefer_concatenation_over_interpolation',
+      () => PreferConcatenationOverInterpolationRule(),
+    );
+
+    testRule(
+      'PreferDoubleQuotesRule',
+      'prefer_double_quotes',
+      () => PreferDoubleQuotesRule(),
+    );
+
+    testRule(
+      'PreferAbsoluteImportsRule',
+      'prefer_absolute_imports',
+      () => PreferAbsoluteImportsRule(),
+    );
+
+    testRule(
+      'PreferGroupedImportsRule',
+      'prefer_grouped_imports',
+      () => PreferGroupedImportsRule(),
+    );
+
+    testRule(
+      'PreferFlatImportsRule',
+      'prefer_flat_imports',
+      () => PreferFlatImportsRule(),
+    );
+
+    testRule(
+      'PreferSortedImportsRule',
+      'prefer_sorted_imports',
+      () => PreferSortedImportsRule(),
+    );
+
+    testRule(
+      'PreferImportGroupCommentsRule',
+      'prefer_import_group_comments',
+      () => PreferImportGroupCommentsRule(),
+    );
+
+    testRule(
+      'PreferFieldsBeforeMethodsRule',
+      'prefer_fields_before_methods',
+      () => PreferFieldsBeforeMethodsRule(),
+    );
+
+    testRule(
+      'PreferMethodsBeforeFieldsRule',
+      'prefer_methods_before_fields',
+      () => PreferMethodsBeforeFieldsRule(),
+    );
+
+    testRule(
+      'PreferStaticMembersFirstRule',
+      'prefer_static_members_first',
+      () => PreferStaticMembersFirstRule(),
+    );
+
+    testRule(
+      'PreferInstanceMembersFirstRule',
+      'prefer_instance_members_first',
+      () => PreferInstanceMembersFirstRule(),
+    );
+
+    testRule(
+      'PreferPublicMembersFirstRule',
+      'prefer_public_members_first',
+      () => PreferPublicMembersFirstRule(),
+    );
+
+    testRule(
+      'PreferPrivateMembersFirstRule',
+      'prefer_private_members_first',
+      () => PreferPrivateMembersFirstRule(),
+    );
+
+    testRule(
+      'PreferVarOverExplicitTypeRule',
+      'prefer_var_over_explicit_type',
+      () => PreferVarOverExplicitTypeRule(),
+    );
+
+    testRule(
+      'PreferObjectOverDynamicRule',
+      'prefer_object_over_dynamic',
+      () => PreferObjectOverDynamicRule(),
+    );
+
+    testRule(
+      'PreferDynamicOverObjectRule',
+      'prefer_dynamic_over_object',
+      () => PreferDynamicOverObjectRule(),
+    );
+
+    testRule(
+      'PreferLowerCamelCaseConstantsRule',
+      'prefer_lower_camel_case_constants',
+      () => PreferLowerCamelCaseConstantsRule(),
+    );
+
+    testRule(
+      'PreferCamelCaseMethodNamesRule',
+      'prefer_camel_case_method_names',
+      () => PreferCamelCaseMethodNamesRule(),
+    );
+
+    testRule(
+      'PreferDescriptiveVariableNamesRule',
+      'prefer_descriptive_variable_names',
+      () => PreferDescriptiveVariableNamesRule(),
+    );
+
+    testRule(
+      'PreferConciseVariableNamesRule',
+      'prefer_concise_variable_names',
+      () => PreferConciseVariableNamesRule(),
+    );
+
+    testRule(
+      'PreferExplicitThisRule',
+      'prefer_explicit_this',
+      () => PreferExplicitThisRule(),
+    );
+
+    testRule(
+      'PreferImplicitBooleanComparisonRule',
+      'prefer_implicit_boolean_comparison',
+      () => PreferImplicitBooleanComparisonRule(),
+    );
+
+    testRule(
+      'PreferExplicitBooleanComparisonRule',
+      'prefer_explicit_boolean_comparison',
+      () => PreferExplicitBooleanComparisonRule(),
+    );
+  });
+
   group('Stylistic Additional Rules - Fixture Verification', () {
     final fixtures = [
       'prefer_interpolation_over_concatenation',
