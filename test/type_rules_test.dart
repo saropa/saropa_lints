@@ -1,11 +1,43 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/type_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 14 Type lint rules.
+/// Tests for 18 Type lint rules.
 ///
 /// Test fixtures: example_core/lib/type/*
 void main() {
+  group('Type Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule('AvoidCastingToExtensionTypeRule', 'avoid_casting_to_extension_type', () => AvoidCastingToExtensionTypeRule());
+    testRule('AvoidCollectionMethodsWithUnrelatedTypesRule', 'avoid_collection_methods_with_unrelated_types', () => AvoidCollectionMethodsWithUnrelatedTypesRule());
+    testRule('AvoidDynamicRule', 'avoid_dynamic_type', () => AvoidDynamicRule());
+    testRule('AvoidImplicitlyNullableExtensionTypesRule', 'avoid_implicitly_nullable_extension_types', () => AvoidImplicitlyNullableExtensionTypesRule());
+    testRule('AvoidNullableInterpolationRule', 'avoid_nullable_interpolation', () => AvoidNullableInterpolationRule());
+    testRule('AvoidNullableParametersWithDefaultValuesRule', 'avoid_nullable_parameters_with_default_values', () => AvoidNullableParametersWithDefaultValuesRule());
+    testRule('AvoidNullableToStringRule', 'avoid_nullable_tostring', () => AvoidNullableToStringRule());
+    testRule('AvoidNullAssertionRule', 'avoid_null_assertion', () => AvoidNullAssertionRule());
+    testRule('AvoidUnnecessaryTypeAssertionsRule', 'avoid_unnecessary_type_assertions', () => AvoidUnnecessaryTypeAssertionsRule());
+    testRule('AvoidUnnecessaryTypeCastsRule', 'avoid_unnecessary_type_casts', () => AvoidUnnecessaryTypeCastsRule());
+    testRule('AvoidUnrelatedTypeAssertionsRule', 'avoid_unrelated_type_assertions', () => AvoidUnrelatedTypeAssertionsRule());
+    testRule('PreferCorrectTypeNameRule', 'prefer_correct_type_name', () => PreferCorrectTypeNameRule());
+    testRule('PreferExplicitFunctionTypeRule', 'prefer_explicit_function_type', () => PreferExplicitFunctionTypeRule());
+    testRule('PreferTypeOverVarRule', 'prefer_type_over_var', () => PreferTypeOverVarRule());
+    testRule('AvoidShadowingTypeParametersRule', 'avoid_shadowing_type_parameters', () => AvoidShadowingTypeParametersRule());
+    testRule('AvoidPrivateTypedefFunctionsRule', 'avoid_private_typedef_functions', () => AvoidPrivateTypedefFunctionsRule());
+    testRule('PreferFinalLocalsRule', 'prefer_final_locals', () => PreferFinalLocalsRule());
+    testRule('PreferConstDeclarationsRule', 'prefer_const_declarations', () => PreferConstDeclarationsRule());
+  });
+
   group('Type Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_casting_to_extension_type',
@@ -22,6 +54,10 @@ void main() {
       'prefer_correct_type_name',
       'prefer_explicit_function_type',
       'prefer_type_over_var',
+      'avoid_shadowing_type_parameters',
+      'avoid_private_typedef_functions',
+      'prefer_final_locals',
+      'prefer_const_declarations',
     ];
 
     for (final fixture in fixtures) {

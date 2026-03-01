@@ -1,11 +1,45 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/platform_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 3 Platform lint rules.
 ///
 /// Test fixtures: example_platforms/lib/platform/*
 void main() {
+  group('Platform Rules - Rule Instantiation', () {
+    test('RequirePlatformCheckRule', () {
+      final rule = RequirePlatformCheckRule();
+      expect(rule.code.name, 'require_platform_check');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_platform_check]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PreferPlatformIoConditionalRule', () {
+      final rule = PreferPlatformIoConditionalRule();
+      expect(rule.code.name, 'prefer_platform_io_conditional');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_platform_io_conditional]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PreferFoundationPlatformCheckRule', () {
+      final rule = PreferFoundationPlatformCheckRule();
+      expect(rule.code.name, 'prefer_foundation_platform_check');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_foundation_platform_check]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
   group('Platform Rules - Fixture Verification', () {
     final fixtures = [
       'require_platform_check',

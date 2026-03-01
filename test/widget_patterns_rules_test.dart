@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 101 widget pattern lint rules.
+/// Tests for 104 widget pattern lint rules.
 ///
 /// These rules cover widget structure, accessibility, theming, navigation,
 /// form handling, image patterns, gesture handling, and platform integration.
@@ -36,10 +36,12 @@ void main() {
       'avoid_multiple_material_apps',
       'avoid_navigation_in_build',
       'avoid_navigator_push_without_route_name',
+      'avoid_print_in_production',
       'avoid_nullable_widget_methods',
       'avoid_opacity_animation',
       'avoid_raw_keyboard_listener',
       'avoid_regex_in_loop',
+      'avoid_static_route_config',
       'avoid_returning_widgets',
       'avoid_service_locator_overuse',
       'avoid_stateful_widget_in_list',
@@ -99,6 +101,7 @@ void main() {
       'require_placeholder_for_network',
       'require_refresh_indicator',
       'require_rethrow_preserve_stack',
+      'require_locale_for_text',
       'require_safe_area_handling',
       'require_text_form_field_in_form',
       'require_text_overflow_handling',

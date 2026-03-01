@@ -1,11 +1,55 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/theming_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 4 Theming lint rules.
 ///
 /// Test fixtures: example_widgets/lib/theming/*
 void main() {
+  group('Theming Rules - Rule Instantiation', () {
+    test('RequireDarkModeTestingRule', () {
+      final rule = RequireDarkModeTestingRule();
+      expect(rule.code.name, 'require_dark_mode_testing');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_dark_mode_testing]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidElevationOpacityInDarkRule', () {
+      final rule = AvoidElevationOpacityInDarkRule();
+      expect(rule.code.name, 'avoid_elevation_opacity_in_dark');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_elevation_opacity_in_dark]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PreferThemeExtensionsRule', () {
+      final rule = PreferThemeExtensionsRule();
+      expect(rule.code.name, 'prefer_theme_extensions');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_theme_extensions]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireSemanticColorsRule', () {
+      final rule = RequireSemanticColorsRule();
+      expect(rule.code.name, 'require_semantic_colors');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_semantic_colors]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
   group('Theming Rules - Fixture Verification', () {
     final fixtures = [
       'require_dark_mode_testing',

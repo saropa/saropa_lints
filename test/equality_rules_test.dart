@@ -1,11 +1,85 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/equality_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 7 Equality lint rules.
 ///
 /// Test fixtures: example_core/lib/equality/*
 void main() {
+  group('Equality Rules - Rule Instantiation', () {
+    test('AvoidEqualExpressionsRule', () {
+      final rule = AvoidEqualExpressionsRule();
+      expect(rule.code.name, 'avoid_equal_expressions');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_equal_expressions]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidNegationsInEqualityChecksRule', () {
+      final rule = AvoidNegationsInEqualityChecksRule();
+      expect(rule.code.name, 'avoid_negations_in_equality_checks');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_negations_in_equality_checks]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidSelfAssignmentRule', () {
+      final rule = AvoidSelfAssignmentRule();
+      expect(rule.code.name, 'avoid_self_assignment');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_self_assignment]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidSelfCompareRule', () {
+      final rule = AvoidSelfCompareRule();
+      expect(rule.code.name, 'avoid_self_compare');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_self_compare]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidUnnecessaryCompareToRule', () {
+      final rule = AvoidUnnecessaryCompareToRule();
+      expect(rule.code.name, 'avoid_unnecessary_compare_to');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_unnecessary_compare_to]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('NoEqualArgumentsRule', () {
+      final rule = NoEqualArgumentsRule();
+      expect(rule.code.name, 'no_equal_arguments');
+      expect(
+        rule.code.problemMessage,
+        contains('[no_equal_arguments]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidDatetimeComparisonWithoutPrecisionRule', () {
+      final rule = AvoidDatetimeComparisonWithoutPrecisionRule();
+      expect(rule.code.name, 'avoid_datetime_comparison_without_precision');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_datetime_comparison_without_precision]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
   group('Equality Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_equal_expressions',

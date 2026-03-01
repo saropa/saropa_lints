@@ -1,13 +1,40 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/packages/sqflite_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 1 Sqflite lint rules.
+/// Tests for 2 Sqflite lint rules.
 ///
 /// Test fixtures: example_packages/lib/sqflite/*
 void main() {
+  group('Sqflite Rules - Rule Instantiation', () {
+    test('AvoidSqfliteTypeMismatchRule', () {
+      final rule = AvoidSqfliteTypeMismatchRule();
+      expect(rule.code.name, 'avoid_sqflite_type_mismatch');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_sqflite_type_mismatch]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PreferSqfliteEncryptionRule', () {
+      final rule = PreferSqfliteEncryptionRule();
+      expect(rule.code.name, 'prefer_sqflite_encryption');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_sqflite_encryption]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
   group('Sqflite Rules - Fixture Verification', () {
-    final fixtures = ['avoid_sqflite_type_mismatch'];
+    final fixtures = [
+      'avoid_sqflite_type_mismatch',
+      'prefer_sqflite_encryption',
+    ];
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

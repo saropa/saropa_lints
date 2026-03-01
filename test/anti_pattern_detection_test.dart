@@ -123,6 +123,26 @@ void main() {
         );
       }
     });
+
+    test('security_rules and disposal_rules have zero dangerous .contains()', () {
+      final rulesDir = Directory(p.join('lib', 'src', 'rules'));
+      final files = ['security_rules.dart', 'disposal_rules.dart'];
+      for (final name in files) {
+        final file = File(p.join(rulesDir.path, name));
+        expect(file.existsSync(), isTrue);
+        final lines = file.readAsLinesSync();
+        final count = lines
+            .where((line) => _isDangerousContains(line))
+            .length;
+        expect(
+          count,
+          0,
+          reason: '$name must have zero dangerous .contains() (false-positive '
+              'reduction). If you reintroduced one, use word-boundary RegExp or '
+              'target_matcher_utils instead.',
+        );
+      }
+    });
   });
 }
 
@@ -197,16 +217,14 @@ String _relativize(String path) {
 /// When a file reaches 0, remove it from this map entirely.
 ///
 /// Baseline established: 2026-02-08
+///
+/// Files reduced to 0 and removed from baseline (no regression allowed):
+/// - security_rules.dart (2026-03-01)
+/// - disposal_rules.dart (2026-03-01)
 const Map<String, int> _baselineCounts = {
   // Core rule files
   'accessibility_rules.dart': 6,
   'animation_rules.dart': 10,
-  'api_network_rules.dart': 51,
-  'async_rules.dart': 47,
-  'disposal_rules.dart': 11,
-  'security_rules.dart': 74,
-  'navigation_rules.dart': 48,
-  'file_handling_rules.dart': 28,
   'widget_lifecycle_rules.dart': 16,
   // Platform rule files
   'platforms/ios_rules.dart': 29,

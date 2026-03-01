@@ -1,11 +1,44 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/animation_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 18 Animation lint rules.
+/// Tests for 19 Animation lint rules.
 ///
 /// Test fixtures: example_widgets/lib/animation/*
 void main() {
+  group('Animation Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule('RequireVsyncMixinRule', 'require_vsync_mixin', () => RequireVsyncMixinRule());
+    testRule('AvoidAnimationInBuildRule', 'avoid_animation_in_build', () => AvoidAnimationInBuildRule());
+    testRule('RequireAnimationControllerDisposeRule', 'require_animation_controller_dispose', () => RequireAnimationControllerDisposeRule());
+    testRule('RequireHeroTagUniquenessRule', 'require_hero_tag_uniqueness', () => RequireHeroTagUniquenessRule());
+    testRule('AvoidLayoutPassesRule', 'avoid_layout_passes', () => AvoidLayoutPassesRule());
+    testRule('AvoidHardcodedDurationRule', 'avoid_hardcoded_duration', () => AvoidHardcodedDurationRule());
+    testRule('RequireAnimationCurveRule', 'require_animation_curve', () => RequireAnimationCurveRule());
+    testRule('PreferImplicitAnimationsRule', 'prefer_implicit_animations', () => PreferImplicitAnimationsRule());
+    testRule('RequireStaggeredAnimationDelaysRule', 'require_staggered_animation_delays', () => RequireStaggeredAnimationDelaysRule());
+    testRule('PreferTweenSequenceRule', 'prefer_tween_sequence', () => PreferTweenSequenceRule());
+    testRule('RequireAnimationStatusListenerRule', 'require_animation_status_listener', () => RequireAnimationStatusListenerRule());
+    testRule('AvoidOverlappingAnimationsRule', 'avoid_overlapping_animations', () => AvoidOverlappingAnimationsRule());
+    testRule('AvoidAnimationRebuildWasteRule', 'avoid_animation_rebuild_waste', () => AvoidAnimationRebuildWasteRule());
+    testRule('PreferPhysicsSimulationRule', 'prefer_physics_simulation', () => PreferPhysicsSimulationRule());
+    testRule('RequireAnimationTickerDisposalRule', 'require_animation_ticker_disposal', () => RequireAnimationTickerDisposalRule());
+    testRule('PreferSpringAnimationRule', 'prefer_spring_animation', () => PreferSpringAnimationRule());
+    testRule('AvoidExcessiveRebuildsAnimationRule', 'avoid_excessive_rebuilds_animation', () => AvoidExcessiveRebuildsAnimationRule());
+    testRule('AvoidClipDuringAnimationRule', 'avoid_clip_during_animation', () => AvoidClipDuringAnimationRule());
+    testRule('AvoidMultipleAnimationControllersRule', 'avoid_multiple_animation_controllers', () => AvoidMultipleAnimationControllersRule());
+  });
+
   group('Animation Rules - Fixture Verification', () {
     final fixtures = [
       'require_vsync_mixin',
@@ -25,6 +58,7 @@ void main() {
       'require_animation_ticker_disposal',
       'prefer_spring_animation',
       'avoid_excessive_rebuilds_animation',
+      'avoid_clip_during_animation',
       'avoid_multiple_animation_controllers',
     ];
 

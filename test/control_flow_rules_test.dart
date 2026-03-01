@@ -1,11 +1,56 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/control_flow_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 28 Control Flow lint rules.
+/// Tests for 31 Control Flow lint rules.
 ///
 /// Test fixtures: example_core/lib/control_flow/*
 void main() {
+  group('Control Flow Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+
+    testRule('AvoidAssignmentsAsConditionsRule', 'avoid_assignments_as_conditions', () => AvoidAssignmentsAsConditionsRule());
+    testRule('AvoidCollapsibleIfRule', 'avoid_collapsible_if', () => AvoidCollapsibleIfRule());
+    testRule('AvoidConditionsWithBooleanLiteralsRule', 'avoid_conditions_with_boolean_literals', () => AvoidConditionsWithBooleanLiteralsRule());
+    testRule('AvoidConstantAssertConditionsRule', 'avoid_constant_assert_conditions', () => AvoidConstantAssertConditionsRule());
+    testRule('AvoidConstantSwitchesRule', 'avoid_constant_switches', () => AvoidConstantSwitchesRule());
+    testRule('AvoidContinueRule', 'prefer_no_continue_statement', () => AvoidContinueRule());
+    testRule('AvoidDuplicateSwitchCaseConditionsRule', 'avoid_duplicate_switch_case_conditions', () => AvoidDuplicateSwitchCaseConditionsRule());
+    testRule('AvoidIfWithManyBranchesRule', 'avoid_if_with_many_branches', () => AvoidIfWithManyBranchesRule());
+    testRule('AvoidInvertedBooleanChecksRule', 'avoid_inverted_boolean_checks', () => AvoidInvertedBooleanChecksRule());
+    testRule('AvoidNegatedConditionsRule', 'avoid_negated_conditions', () => AvoidNegatedConditionsRule());
+    testRule('AvoidNestedAssignmentsRule', 'avoid_nested_assignments', () => AvoidNestedAssignmentsRule());
+    testRule('AvoidNestedConditionalExpressionsRule', 'avoid_nested_conditional_expressions', () => AvoidNestedConditionalExpressionsRule());
+    testRule('AvoidNestedSwitchesRule', 'avoid_nested_switches', () => AvoidNestedSwitchesRule());
+    testRule('AvoidNestedSwitchExpressionsRule', 'avoid_nested_switch_expressions', () => AvoidNestedSwitchExpressionsRule());
+    testRule('AvoidNestedTryRule', 'avoid_nested_try', () => AvoidNestedTryRule());
+    testRule('AvoidRedundantElseRule', 'avoid_redundant_else', () => AvoidRedundantElseRule());
+    testRule('AvoidUnconditionalBreakRule', 'avoid_unconditional_break', () => AvoidUnconditionalBreakRule());
+    testRule('AvoidUnnecessaryConditionalsRule', 'avoid_unnecessary_conditionals', () => AvoidUnnecessaryConditionalsRule());
+    testRule('AvoidUnnecessaryContinueRule', 'avoid_unnecessary_continue', () => AvoidUnnecessaryContinueRule());
+    testRule('AvoidUnnecessaryIfRule', 'avoid_unnecessary_if', () => AvoidUnnecessaryIfRule());
+    testRule('NoEqualConditionsRule', 'no_equal_conditions', () => NoEqualConditionsRule());
+    testRule('NoEqualThenElseRule', 'no_equal_then_else', () => NoEqualThenElseRule());
+    testRule('PreferConditionalExpressionsRule', 'prefer_conditional_expressions', () => PreferConditionalExpressionsRule());
+    testRule('PreferCorrectSwitchLengthRule', 'prefer_correct_switch_length', () => PreferCorrectSwitchLengthRule());
+    testRule('PreferReturningConditionalsRule', 'prefer_returning_conditionals', () => PreferReturningConditionalsRule());
+    testRule('PreferReturningConditionRule', 'prefer_returning_condition', () => PreferReturningConditionRule());
+    testRule('PreferWhenGuardOverIfRule', 'prefer_when_guard_over_if', () => PreferWhenGuardOverIfRule());
+    testRule('PreferSimplerBooleanExpressionsRule', 'prefer_simpler_boolean_expressions', () => PreferSimplerBooleanExpressionsRule());
+    testRule('AvoidDoubleAndIntChecksRule', 'avoid_double_and_int_checks', () => AvoidDoubleAndIntChecksRule());
+    testRule('PreferIfElementsToConditionalExpressionsRule', 'prefer_if_elements_to_conditional_expressions', () => PreferIfElementsToConditionalExpressionsRule());
+    testRule('PreferNullAwareMethodCallsRule', 'prefer_null_aware_method_calls', () => PreferNullAwareMethodCallsRule());
+  });
+
   group('Control Flow Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_assignments_as_conditions',
@@ -13,6 +58,7 @@ void main() {
       'avoid_conditions_with_boolean_literals',
       'avoid_constant_assert_conditions',
       'avoid_constant_switches',
+      'avoid_double_and_int_checks',
       'prefer_no_continue_statement',
       'avoid_duplicate_switch_case_conditions',
       'avoid_if_with_many_branches',
@@ -36,6 +82,8 @@ void main() {
       'prefer_returning_condition',
       'prefer_when_guard_over_if',
       'prefer_simpler_boolean_expressions',
+      'prefer_if_elements_to_conditional_expressions',
+      'prefer_null_aware_method_calls',
     ];
 
     for (final fixture in fixtures) {

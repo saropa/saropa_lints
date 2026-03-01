@@ -1,11 +1,63 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/accessibility_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 39 Accessibility lint rules.
 ///
 /// Test fixtures: example_widgets/lib/accessibility/*
 void main() {
+  group('Accessibility Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+    testRule('AvoidIconButtonsWithoutTooltipRule', 'avoid_icon_buttons_without_tooltip', () => AvoidIconButtonsWithoutTooltipRule());
+    testRule('AvoidSmallTouchTargetsRule', 'avoid_small_touch_targets', () => AvoidSmallTouchTargetsRule());
+    testRule('RequireExcludeSemanticsJustificationRule', 'require_exclude_semantics_justification', () => RequireExcludeSemanticsJustificationRule());
+    testRule('AvoidColorOnlyIndicatorsRule', 'avoid_color_only_indicators', () => AvoidColorOnlyIndicatorsRule());
+    testRule('RequireTextScaleFactorAwarenessRule', 'require_text_scale_factor_awareness', () => RequireTextScaleFactorAwarenessRule());
+    testRule('AvoidGestureOnlyInteractionsRule', 'avoid_gesture_only_interactions', () => AvoidGestureOnlyInteractionsRule());
+    testRule('RequireSemanticsLabelRule', 'require_semantics_label', () => RequireSemanticsLabelRule());
+    testRule('AvoidMergedSemanticsHidingInfoRule', 'avoid_merged_semantics_hiding_info', () => AvoidMergedSemanticsHidingInfoRule());
+    testRule('RequireLiveRegionRule', 'require_live_region', () => RequireLiveRegionRule());
+    testRule('RequireHeadingSemanticsRule', 'require_heading_semantics', () => RequireHeadingSemanticsRule());
+    testRule('AvoidImageButtonsWithoutTooltipRule', 'avoid_image_buttons_without_tooltip', () => AvoidImageButtonsWithoutTooltipRule());
+    testRule('AvoidTextScaleFactorIgnoreRule', 'avoid_text_scale_factor_ignore', () => AvoidTextScaleFactorIgnoreRule());
+    testRule('RequireImageSemanticsRule', 'require_image_semantics', () => RequireImageSemanticsRule());
+    testRule('AvoidHiddenInteractiveRule', 'avoid_hidden_interactive', () => AvoidHiddenInteractiveRule());
+    testRule('PreferScalableTextRule', 'prefer_scalable_text', () => PreferScalableTextRule());
+    testRule('RequireButtonSemanticsRule', 'require_button_semantics', () => RequireButtonSemanticsRule());
+    testRule('PreferExplicitSemanticsRule', 'prefer_explicit_semantics', () => PreferExplicitSemanticsRule());
+    testRule('AvoidHoverOnlyRule', 'avoid_hover_only', () => AvoidHoverOnlyRule());
+    testRule('RequireErrorIdentificationRule', 'require_error_identification', () => RequireErrorIdentificationRule());
+    testRule('RequireMinimumContrastRule', 'require_minimum_contrast', () => RequireMinimumContrastRule());
+    testRule('RequireAvatarAltTextRule', 'require_avatar_alt_text', () => RequireAvatarAltTextRule());
+    testRule('RequireBadgeSemanticsRule', 'require_badge_semantics', () => RequireBadgeSemanticsRule());
+    testRule('RequireBadgeCountLimitRule', 'require_badge_count_limit', () => RequireBadgeCountLimitRule());
+    testRule('RequireImageDescriptionRule', 'require_image_description', () => RequireImageDescriptionRule());
+    testRule('AvoidSemanticsExclusionRule', 'avoid_semantics_exclusion', () => AvoidSemanticsExclusionRule());
+    testRule('PreferMergeSemanticsRule', 'prefer_merge_semantics', () => PreferMergeSemanticsRule());
+    testRule('RequireFocusIndicatorRule', 'require_focus_indicator', () => RequireFocusIndicatorRule());
+    testRule('AvoidFlashingContentRule', 'avoid_flashing_content', () => AvoidFlashingContentRule());
+    testRule('PreferAdequateSpacingRule', 'prefer_adequate_spacing', () => PreferAdequateSpacingRule());
+    testRule('AvoidMotionWithoutReduceRule', 'avoid_motion_without_reduce', () => AvoidMotionWithoutReduceRule());
+    testRule('RequireSemanticLabelIconsRule', 'require_semantic_label_icons', () => RequireSemanticLabelIconsRule());
+    testRule('RequireAccessibleImagesRule', 'require_accessible_images', () => RequireAccessibleImagesRule());
+    testRule('AvoidAutoPlayMediaRule', 'avoid_auto_play_media', () => AvoidAutoPlayMediaRule());
+    testRule('PreferLargeTouchTargetsRule', 'prefer_large_touch_targets', () => PreferLargeTouchTargetsRule());
+    testRule('AvoidTimeLimitsRule', 'avoid_time_limits', () => AvoidTimeLimitsRule());
+    testRule('RequireDragAlternativesRule', 'require_drag_alternatives', () => RequireDragAlternativesRule());
+    testRule('PreferFocusTraversalOrderRule', 'prefer_focus_traversal_order', () => PreferFocusTraversalOrderRule());
+    testRule('PreferSemanticsContainerRule', 'prefer_semantics_container', () => PreferSemanticsContainerRule());
+    testRule('AvoidRedundantSemanticsRule', 'avoid_redundant_semantics', () => AvoidRedundantSemanticsRule());
+    testRule('AvoidColorOnlyMeaningRule', 'avoid_color_only_meaning', () => AvoidColorOnlyMeaningRule());
+  });
   group('Accessibility Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_icon_buttons_without_tooltip',

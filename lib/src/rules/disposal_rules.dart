@@ -9,6 +9,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../saropa_lint_rule.dart';
+import '../target_matcher_utils.dart';
 
 /// Warns when VideoPlayerController or AudioPlayer is not disposed.
 ///
@@ -74,18 +75,18 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
-  static const Set<String> _mediaControllerTypes = <String>{
-    'VideoPlayerController',
-    'AudioPlayer',
-    'AudioCache',
-    'AssetsAudioPlayer',
-    'AudioPlayerHandler',
-    'JustAudioPlayer',
-    'ChewieController',
-    'BetterPlayerController',
-    'FlickManager',
-    'PodPlayerController',
-  };
+  static final List<RegExp> _mediaControllerTypePatterns = [
+    RegExp(r'\bVideoPlayerController\b'),
+    RegExp(r'\bAudioPlayer\b'),
+    RegExp(r'\bAudioCache\b'),
+    RegExp(r'\bAssetsAudioPlayer\b'),
+    RegExp(r'\bAudioPlayerHandler\b'),
+    RegExp(r'\bJustAudioPlayer\b'),
+    RegExp(r'\bChewieController\b'),
+    RegExp(r'\bBetterPlayerController\b'),
+    RegExp(r'\bFlickManager\b'),
+    RegExp(r'\bPodPlayerController\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -106,12 +107,10 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null) {
-            for (final String controllerType in _mediaControllerTypes) {
-              if (typeName.contains(controllerType)) {
-                for (final VariableDeclaration variable
+            if (_mediaControllerTypePatterns.any((p) => p.hasMatch(typeName))) {
+              for (final VariableDeclaration variable
                     in member.fields.variables) {
-                  controllerNames.add(variable.name.lexeme);
-                }
+                controllerNames.add(variable.name.lexeme);
               }
             }
           }
@@ -121,20 +120,18 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
       if (controllerNames.isEmpty) return;
 
       // Find dispose method
-      String? disposeBody;
+      FunctionBody? disposeMethodBody;
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
+          disposeMethodBody = member.body;
           break;
         }
       }
 
       // Check if controllers are disposed
       for (final String name in controllerNames) {
-        final bool isDisposed =
-            disposeBody != null &&
-            (disposeBody.contains('$name.dispose(') ||
-                disposeBody.contains('$name?.dispose('));
+        final bool isDisposed = disposeMethodBody != null &&
+            isFieldCleanedUp(name, 'dispose', disposeMethodBody);
 
         if (!isDisposed) {
           for (final ClassMember member in node.members) {
@@ -216,6 +213,8 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final _tabControllerTypePattern = RegExp(r'\bTabController\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -235,7 +234,8 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           final String fieldSource = member.toSource();
-          if ((typeName != null && typeName.contains('TabController')) ||
+          if ((typeName != null &&
+                  _tabControllerTypePattern.hasMatch(typeName)) ||
               fieldSource.contains('TabController(')) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
@@ -248,20 +248,18 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
       if (controllerNames.isEmpty) return;
 
       // Find dispose method
-      String? disposeBody;
+      FunctionBody? disposeMethodBody;
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
+          disposeMethodBody = member.body;
           break;
         }
       }
 
       // Check if controllers are disposed
       for (final String name in controllerNames) {
-        final bool isDisposed =
-            disposeBody != null &&
-            (disposeBody.contains('$name.dispose(') ||
-                disposeBody.contains('$name?.dispose('));
+        final bool isDisposed = disposeMethodBody != null &&
+            isFieldCleanedUp(name, 'dispose', disposeMethodBody);
 
         if (!isDisposed) {
           for (final ClassMember member in node.members) {
@@ -739,6 +737,12 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _webSocketChannelTypePatterns = [
+    RegExp(r'\bWebSocketChannel\b'),
+    RegExp(r'\bIOWebSocketChannel\b'),
+    RegExp(r'\bHtmlWebSocketChannel\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -753,9 +757,7 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toString();
           if (typeName != null &&
-              (typeName.contains('WebSocketChannel') ||
-                  typeName.contains('IOWebSocketChannel') ||
-                  typeName.contains('HtmlWebSocketChannel'))) {
+              _webSocketChannelTypePatterns.any((p) => p.hasMatch(typeName))) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
               wsFields.add(variable.name.lexeme);
@@ -852,6 +854,9 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final _videoPlayerControllerPattern =
+      RegExp(r'\bVideoPlayerController\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -865,7 +870,8 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toString();
-          if (typeName != null && typeName.contains('VideoPlayerController')) {
+          if (typeName != null &&
+              _videoPlayerControllerPattern.hasMatch(typeName)) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
               vpFields.add(variable.name.lexeme);
@@ -986,6 +992,9 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final _streamSubscriptionTypePattern =
+      RegExp(r'\bStreamSubscription\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1001,7 +1010,8 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toString();
-          if (typeName != null && typeName.contains('StreamSubscription')) {
+          if (typeName != null &&
+              _streamSubscriptionTypePattern.hasMatch(typeName)) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
               final String fieldName = variable.name.lexeme;
@@ -1275,6 +1285,8 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final _receivePortTypePattern = RegExp(r'\bReceivePort\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1288,7 +1300,7 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName != null && typeName.contains('ReceivePort')) {
+          if (typeName != null && _receivePortTypePattern.hasMatch(typeName)) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
               portFields.add(variable.name.lexeme);
@@ -1300,19 +1312,17 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
       if (portFields.isEmpty) return;
 
       // Check dispose method for close calls
-      String? disposeBody;
+      FunctionBody? disposeMethodBody;
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
+          disposeMethodBody = member.body;
           break;
         }
       }
 
       for (final String field in portFields) {
-        final bool isClosed =
-            disposeBody != null &&
-            (disposeBody.contains('$field.close()') ||
-                disposeBody.contains('$field?.close()'));
+        final bool isClosed = disposeMethodBody != null &&
+            isFieldCleanedUp(field, 'close', disposeMethodBody);
         if (!isClosed) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
@@ -1383,6 +1393,8 @@ class RequireSocketCloseRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final _secureSocketTypePattern = RegExp(r'\bSecureSocket\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1399,7 +1411,7 @@ class RequireSocketCloseRule extends SaropaLintRule {
           if (typeName != null &&
               (typeName == 'Socket' ||
                   typeName == 'Socket?' ||
-                  typeName.contains('SecureSocket'))) {
+                  _secureSocketTypePattern.hasMatch(typeName))) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
               socketFields.add(variable.name.lexeme);
@@ -1411,21 +1423,18 @@ class RequireSocketCloseRule extends SaropaLintRule {
       if (socketFields.isEmpty) return;
 
       // Check dispose method for close calls
-      String? disposeBody;
+      FunctionBody? disposeMethodBody;
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
+          disposeMethodBody = member.body;
           break;
         }
       }
 
       for (final String field in socketFields) {
-        final bool isClosed =
-            disposeBody != null &&
-            (disposeBody.contains('$field.close()') ||
-                disposeBody.contains('$field?.close()') ||
-                disposeBody.contains('$field.destroy()') ||
-                disposeBody.contains('$field?.destroy()'));
+        final bool isClosed = disposeMethodBody != null &&
+            (isFieldCleanedUp(field, 'close', disposeMethodBody) ||
+                isFieldCleanedUp(field, 'destroy', disposeMethodBody));
         if (!isClosed) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
@@ -1529,19 +1538,17 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
       if (timerFields.isEmpty) return;
 
       // Check dispose method for cancel calls
-      String? disposeBody;
+      FunctionBody? disposeMethodBody;
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
+          disposeMethodBody = member.body;
           break;
         }
       }
 
       for (final String field in timerFields) {
-        final bool isCanceled =
-            disposeBody != null &&
-            (disposeBody.contains('$field.cancel()') ||
-                disposeBody.contains('$field?.cancel()'));
+        final bool isCanceled = disposeMethodBody != null &&
+            isFieldCleanedUp(field, 'cancel', disposeMethodBody);
         if (!isCanceled) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
@@ -1674,18 +1681,16 @@ class RequireIntervalTimerCancelRule extends SaropaLintRule {
       }
 
       // Check dispose method for cancel call
-      String? disposeBody;
+      FunctionBody? disposeMethodBody;
       for (final ClassMember member in enclosingClass.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
+          disposeMethodBody = member.body;
           break;
         }
       }
 
-      final bool isCanceled =
-          disposeBody != null &&
-          (disposeBody.contains('$fieldName.cancel()') ||
-              disposeBody.contains('$fieldName?.cancel()'));
+      final bool isCanceled = disposeMethodBody != null &&
+          isFieldCleanedUp(fieldName, 'cancel', disposeMethodBody);
 
       if (!isCanceled) {
         reporter.atNode(node.methodName, code);
@@ -1775,21 +1780,18 @@ class RequireFileHandleCloseRule extends SaropaLintRule {
       if (fileFields.isEmpty) return;
 
       // Check dispose method for close calls
-      String? disposeBody;
+      FunctionBody? disposeMethodBody;
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
+          disposeMethodBody = member.body;
           break;
         }
       }
 
       for (final String field in fileFields) {
-        final bool isClosed =
-            disposeBody != null &&
-            (disposeBody.contains('$field.close()') ||
-                disposeBody.contains('$field?.close()') ||
-                disposeBody.contains('$field.closeSync()') ||
-                disposeBody.contains('$field?.closeSync()'));
+        final bool isClosed = disposeMethodBody != null &&
+            (isFieldCleanedUp(field, 'close', disposeMethodBody) ||
+                isFieldCleanedUp(field, 'closeSync', disposeMethodBody));
         if (!isClosed) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
@@ -1921,7 +1923,8 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null) {
             for (final String disposableType in _disposableTypes) {
-              if (typeName.contains(disposableType)) {
+              if (RegExp(r'\b' + RegExp.escape(disposableType) + r'\b')
+                  .hasMatch(typeName)) {
                 for (final VariableDeclaration variable
                     in member.fields.variables) {
                   disposableFields.add(variable.name.lexeme);
@@ -2270,7 +2273,8 @@ class DisposeClassFieldsRule extends SaropaLintRule {
           final typeName = member.fields.type?.toSource();
           if (typeName != null) {
             for (final disposable in _disposableTypes) {
-              if (typeName.contains(disposable)) {
+              if (RegExp(r'\b' + RegExp.escape(disposable) + r'\b')
+                  .hasMatch(typeName)) {
                 for (final variable in member.fields.variables) {
                   final fieldName = variable.name.lexeme;
                   // Skip fields that are passed in via constructor

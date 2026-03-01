@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 22 Stylistic Additional lint rules.
+/// Tests for 24 Stylistic Additional lint rules.
 ///
 /// Test fixtures: example_style/lib/stylistic_additional/*
 void main() {
@@ -14,6 +14,8 @@ void main() {
       'prefer_absolute_imports',
       'prefer_grouped_imports',
       'prefer_flat_imports',
+      'prefer_sorted_imports',
+      'prefer_import_group_comments',
       'prefer_fields_before_methods',
       'prefer_methods_before_fields',
       'prefer_static_members_first',

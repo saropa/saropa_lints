@@ -1,14 +1,238 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/error_handling_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 20 Error Handling lint rules.
+/// Tests for 22 Error Handling lint rules.
 ///
 /// These rules cover exception handling, error logging, stack trace
 /// preservation, and production error safety.
 ///
 /// Test fixtures: example_async/lib/error_handling/*
 void main() {
+  group('Error Handling Rules - Rule Instantiation', () {
+    test('AvoidSwallowingExceptionsRule', () {
+      final rule = AvoidSwallowingExceptionsRule();
+      expect(rule.code.name, 'avoid_swallowing_exceptions');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_swallowing_exceptions]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidLosingStackTraceRule', () {
+      final rule = AvoidLosingStackTraceRule();
+      expect(rule.code.name, 'avoid_losing_stack_trace');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_losing_stack_trace]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidGenericExceptionsRule', () {
+      final rule = AvoidGenericExceptionsRule();
+      expect(rule.code.name, 'avoid_generic_exceptions');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_generic_exceptions]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireErrorContextRule', () {
+      final rule = RequireErrorContextRule();
+      expect(rule.code.name, 'require_error_context');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_error_context]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PreferResultPatternRule', () {
+      final rule = PreferResultPatternRule();
+      expect(rule.code.name, 'prefer_result_pattern');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_result_pattern]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireAsyncErrorDocumentationRule', () {
+      final rule = RequireAsyncErrorDocumentationRule();
+      expect(rule.code.name, 'require_async_error_documentation');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_async_error_documentation]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidNestedTryStatementsRule', () {
+      final rule = AvoidNestedTryStatementsRule();
+      expect(rule.code.name, 'avoid_nested_try_statements');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_nested_try_statements]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireErrorBoundaryRule', () {
+      final rule = RequireErrorBoundaryRule();
+      expect(rule.code.name, 'require_error_boundary');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_error_boundary]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidUncaughtFutureErrorsRule', () {
+      final rule = AvoidUncaughtFutureErrorsRule();
+      expect(rule.code.name, 'avoid_uncaught_future_errors');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_uncaught_future_errors]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidPrintErrorRule', () {
+      final rule = AvoidPrintErrorRule();
+      expect(rule.code.name, 'avoid_print_error');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_print_error]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireErrorHandlingGracefulRule', () {
+      final rule = RequireErrorHandlingGracefulRule();
+      expect(rule.code.name, 'require_error_handling_graceful');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_error_handling_graceful]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidCatchAllRule', () {
+      final rule = AvoidCatchAllRule();
+      expect(rule.code.name, 'avoid_catch_all');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_catch_all]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidCatchExceptionAloneRule', () {
+      final rule = AvoidCatchExceptionAloneRule();
+      expect(rule.code.name, 'avoid_catch_exception_alone');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_catch_exception_alone]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidExceptionInConstructorRule', () {
+      final rule = AvoidExceptionInConstructorRule();
+      expect(rule.code.name, 'avoid_exception_in_constructor');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_exception_in_constructor]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireCacheKeyDeterminismRule', () {
+      final rule = RequireCacheKeyDeterminismRule();
+      expect(rule.code.name, 'require_cache_key_determinism');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_cache_key_determinism]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequirePermissionPermanentDenialHandlingRule', () {
+      final rule = RequirePermissionPermanentDenialHandlingRule();
+      expect(rule.code.name, 'require_permission_permanent_denial_handling');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_permission_permanent_denial_handling]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireNotificationActionHandlingRule', () {
+      final rule = RequireNotificationActionHandlingRule();
+      expect(rule.code.name, 'require_notification_action_handling');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_notification_action_handling]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireFinallyCleanupRule', () {
+      final rule = RequireFinallyCleanupRule();
+      expect(rule.code.name, 'require_finally_cleanup');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_finally_cleanup]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireErrorLoggingRule', () {
+      final rule = RequireErrorLoggingRule();
+      expect(rule.code.name, 'require_error_logging');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_error_logging]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('RequireAppStartupErrorHandlingRule', () {
+      final rule = RequireAppStartupErrorHandlingRule();
+      expect(rule.code.name, 'require_app_startup_error_handling');
+      expect(
+        rule.code.problemMessage,
+        contains('[require_app_startup_error_handling]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidAssertInProductionRule', () {
+      final rule = AvoidAssertInProductionRule();
+      expect(rule.code.name, 'avoid_assert_in_production');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_assert_in_production]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('HandleThrowingInvocationsRule', () {
+      final rule = HandleThrowingInvocationsRule();
+      expect(rule.code.name, 'handle_throwing_invocations');
+      expect(
+        rule.code.problemMessage,
+        contains('[handle_throwing_invocations]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
   group('Error Handling Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_swallowing_exceptions',

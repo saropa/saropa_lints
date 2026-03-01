@@ -1,11 +1,40 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/scroll_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 17 Scroll lint rules.
 ///
 /// Test fixtures: example_widgets/lib/scroll/*
 void main() {
+  group('Scroll Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+    testRule('AvoidShrinkWrapInScrollViewRule', 'avoid_shrinkwrap_in_scrollview', () => AvoidShrinkWrapInScrollViewRule());
+    testRule('AvoidNestedScrollablesConflictRule', 'avoid_nested_scrollables_conflict', () => AvoidNestedScrollablesConflictRule());
+    testRule('AvoidListViewChildrenForLargeListsRule', 'avoid_listview_children_for_large_lists', () => AvoidListViewChildrenForLargeListsRule());
+    testRule('AvoidExcessiveBottomNavItemsRule', 'avoid_excessive_bottom_nav_items', () => AvoidExcessiveBottomNavItemsRule());
+    testRule('RequireTabControllerLengthSyncRule', 'require_tab_controller_length_sync', () => RequireTabControllerLengthSyncRule());
+    testRule('AvoidRefreshWithoutAwaitRule', 'avoid_refresh_without_await', () => AvoidRefreshWithoutAwaitRule());
+    testRule('AvoidMultipleAutofocusRule', 'avoid_multiple_autofocus', () => AvoidMultipleAutofocusRule());
+    testRule('RequireRefreshIndicatorOnListsRule', 'require_refresh_indicator_on_lists', () => RequireRefreshIndicatorOnListsRule());
+    testRule('AvoidShrinkWrapExpensiveRule', 'avoid_shrink_wrap_expensive', () => AvoidShrinkWrapExpensiveRule());
+    testRule('PreferItemExtentRule', 'prefer_item_extent', () => PreferItemExtentRule());
+    testRule('PreferPrototypeItemRule', 'prefer_prototype_item', () => PreferPrototypeItemRule());
+    testRule('RequireKeyForReorderableRule', 'require_key_for_reorderable', () => RequireKeyForReorderableRule());
+    testRule('RequireAddAutomaticKeepAlivesOffRule', 'require_add_automatic_keep_alives_off', () => RequireAddAutomaticKeepAlivesOffRule());
+    testRule('PreferSliverFillRemainingForEmptyRule', 'prefer_sliverfillremaining_for_empty', () => PreferSliverFillRemainingForEmptyRule());
+    testRule('AvoidInfiniteScrollDuplicateRequestsRule', 'avoid_infinite_scroll_duplicate_requests', () => AvoidInfiniteScrollDuplicateRequestsRule());
+    testRule('PreferInfiniteScrollPreloadRule', 'prefer_infinite_scroll_preload', () => PreferInfiniteScrollPreloadRule());
+    testRule('RequirePaginationForLargeListsRule', 'require_pagination_for_large_lists', () => RequirePaginationForLargeListsRule());
+  });
   group('Scroll Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_shrinkwrap_in_scrollview',

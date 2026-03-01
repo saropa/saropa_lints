@@ -1,11 +1,51 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/naming_style_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 24 Naming Style lint rules.
+/// Tests for 28 Naming Style lint rules.
 ///
 /// Test fixtures: example_core/lib/naming_style/*
 void main() {
+  group('Naming Style Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+    testRule('AvoidGetterPrefixRule', 'prefer_no_getter_prefix', () => AvoidGetterPrefixRule());
+    testRule('AvoidNonAsciiSymbolsRule', 'avoid_non_ascii_symbols', () => AvoidNonAsciiSymbolsRule());
+    testRule('FormatCommentRule', 'prefer_capitalized_comment_start', () => FormatCommentRule());
+    testRule('MatchClassNamePatternRule', 'match_class_name_pattern', () => MatchClassNamePatternRule());
+    testRule('MatchGetterSetterFieldNamesRule', 'match_getter_setter_field_names', () => MatchGetterSetterFieldNamesRule());
+    testRule('MatchLibFolderStructureRule', 'match_lib_folder_structure', () => MatchLibFolderStructureRule());
+    testRule('MatchPositionalFieldNamesOnAssignmentRule', 'match_positional_field_names_on_assignment', () => MatchPositionalFieldNamesOnAssignmentRule());
+    testRule('PreferBooleanPrefixesRule', 'prefer_boolean_prefixes', () => PreferBooleanPrefixesRule());
+    testRule('PreferBooleanPrefixesForLocalsRule', 'prefer_boolean_prefixes_for_locals', () => PreferBooleanPrefixesForLocalsRule());
+    testRule('PreferBooleanPrefixesForParamsRule', 'prefer_boolean_prefixes_for_params', () => PreferBooleanPrefixesForParamsRule());
+    testRule('PreferCorrectCallbackFieldNameRule', 'prefer_correct_callback_field_name', () => PreferCorrectCallbackFieldNameRule());
+    testRule('PreferCorrectErrorNameRule', 'prefer_correct_error_name', () => PreferCorrectErrorNameRule());
+    testRule('PreferCorrectHandlerNameRule', 'prefer_correct_handler_name', () => PreferCorrectHandlerNameRule());
+    testRule('PreferCorrectIdentifierLengthRule', 'prefer_correct_identifier_length', () => PreferCorrectIdentifierLengthRule());
+    testRule('PreferCorrectSetterParameterNameRule', 'prefer_correct_setter_parameter_name', () => PreferCorrectSetterParameterNameRule());
+    testRule('PreferExplicitParameterNamesRule', 'prefer_explicit_parameter_names', () => PreferExplicitParameterNamesRule());
+    testRule('PreferMatchFileNameRule', 'prefer_match_file_name', () => PreferMatchFileNameRule());
+    testRule('PreferPrefixedGlobalConstantsRule', 'prefer_prefixed_global_constants', () => PreferPrefixedGlobalConstantsRule());
+    testRule('TagNameRule', 'prefer_kebab_tag_name', () => TagNameRule());
+    testRule('PreferNamedExtensionsRule', 'prefer_named_extensions', () => PreferNamedExtensionsRule());
+    testRule('PreferTypedefForCallbacksRule', 'prefer_typedef_for_callbacks', () => PreferTypedefForCallbacksRule());
+    testRule('PreferEnhancedEnumsRule', 'prefer_enhanced_enums', () => PreferEnhancedEnumsRule());
+    testRule('PreferWildcardForUnusedParamRule', 'prefer_wildcard_for_unused_param', () => PreferWildcardForUnusedParamRule());
+    testRule('PreferCorrectPackageNameRule', 'prefer_correct_package_name', () => PreferCorrectPackageNameRule());
+    testRule('PreferAdjectiveBoolGettersRule', 'prefer_adjective_bool_getters', () => PreferAdjectiveBoolGettersRule());
+    testRule('PreferLowercaseConstantsRule', 'prefer_lowercase_constants', () => PreferLowercaseConstantsRule());
+    testRule('PreferNounClassNamesRule', 'prefer_noun_class_names', () => PreferNounClassNamesRule());
+    testRule('PreferVerbMethodNamesRule', 'prefer_verb_method_names', () => PreferVerbMethodNamesRule());
+  });
   group('Naming Style Rules - Fixture Verification', () {
     final fixtures = [
       'prefer_no_getter_prefix',
@@ -32,6 +72,10 @@ void main() {
       'prefer_enhanced_enums',
       'prefer_wildcard_for_unused_param',
       'prefer_correct_package_name',
+      'prefer_adjective_bool_getters',
+      'prefer_lowercase_constants',
+      'prefer_noun_class_names',
+      'prefer_verb_method_names',
     ];
 
     for (final fixture in fixtures) {

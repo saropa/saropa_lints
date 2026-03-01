@@ -1,11 +1,31 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/platforms/web_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 6 Web lint rules.
+/// Tests for 8 Web lint rules.
 ///
 /// Test fixtures: example_platforms/lib/web/
 void main() {
+  group('Web Rules - Rule Instantiation', () {
+    void testRule(String name, String codeName, dynamic Function() create) {
+      test(name, () {
+        final rule = create();
+        expect(rule.code.name, codeName);
+        expect(rule.code.problemMessage, contains('[$codeName]'));
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+    }
+    testRule('AvoidPlatformChannelOnWebRule', 'avoid_platform_channel_on_web', () => AvoidPlatformChannelOnWebRule());
+    testRule('RequireCorsHandlingRule', 'require_cors_handling', () => RequireCorsHandlingRule());
+    testRule('PreferDeferredLoadingWebRule', 'prefer_deferred_loading_web', () => PreferDeferredLoadingWebRule());
+    testRule('AvoidWebOnlyDependenciesRule', 'avoid_web_only_dependencies', () => AvoidWebOnlyDependenciesRule());
+    testRule('PreferUrlStrategyForWebRule', 'prefer_url_strategy_for_web', () => PreferUrlStrategyForWebRule());
+    testRule('RequireWebRendererAwarenessRule', 'require_web_renderer_awareness', () => RequireWebRendererAwarenessRule());
+    testRule('AvoidJsRoundedIntsRule', 'avoid_js_rounded_ints', () => AvoidJsRoundedIntsRule());
+    testRule('PreferCsrfProtectionRule', 'prefer_csrf_protection', () => PreferCsrfProtectionRule());
+  });
   group('Web Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_platform_channel_on_web',
@@ -14,6 +34,8 @@ void main() {
       'avoid_web_only_dependencies',
       'prefer_url_strategy_for_web',
       'require_web_renderer_awareness',
+      'avoid_js_rounded_ints',
+      'prefer_csrf_protection',
     ];
 
     for (final fixture in fixtures) {
