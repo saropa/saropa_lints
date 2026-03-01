@@ -15,7 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          # head_ref only set on pull_request; use ref (e.g. main) on push
+          ref: ${{ github.head_ref || github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: dart-lang/setup-dart@v1
         with:
@@ -26,7 +27,9 @@ jobs:
         run: dart analyze --fatal-infos
       - name: Format
         run: dart format .
+      # Only on PRs so we don't push to main (avoids permission/loop issues)
       - name: Commit formatting changes
+        if: github.event_name == 'pull_request'
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"

@@ -524,9 +524,6 @@ class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
 class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
   RequireKeyboardVisibilityDisposeRule() : super(code: _code);
 
-  static final RegExp _disposeCancelPattern =
-      RegExp(r'[?.]\s*cancel\s*\(');
-
   @override
   LintImpact get impact => LintImpact.high;
 
@@ -549,6 +546,8 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Local regex so closure can reference it (analyzer scope).
+    final disposeCancelPattern = RegExp(r'[?.]\s*cancel\s*\(');
     context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -573,7 +572,7 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
 
       final bool hasCleanup =
           disposeMethod != null &&
-          (_disposeCancelPattern.hasMatch(disposeMethod.body.toSource()) ||
+          (disposeCancelPattern.hasMatch(disposeMethod.body.toSource()) ||
               RegExp(
                 r'\bdispose\s*\(\s*\)',
               ).hasMatch(disposeMethod.body.toSource()));
