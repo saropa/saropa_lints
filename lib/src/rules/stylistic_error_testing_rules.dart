@@ -593,12 +593,12 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
       final bodySource = source.substring(body.offset, body.end);
 
       final hasStructure =
-          bodySource.contains('// Arrange') ||
-          bodySource.contains('// Act') ||
-          bodySource.contains('// Assert') ||
-          bodySource.contains('// Given') ||
-          bodySource.contains('// When') ||
-          bodySource.contains('// Then');
+          RegExp(r'// Arrange').hasMatch(bodySource) ||
+          RegExp(r'// Act').hasMatch(bodySource) ||
+          RegExp(r'// Assert').hasMatch(bodySource) ||
+          RegExp(r'// Given').hasMatch(bodySource) ||
+          RegExp(r'// When').hasMatch(bodySource) ||
+          RegExp(r'// Then').hasMatch(bodySource);
 
       // Only flag if there are multiple statements (complex enough to warrant structure)
       if (!hasStructure && body.block.statements.length >= 3) {
@@ -690,12 +690,12 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
       final bodySource = source.substring(body.offset, body.end);
 
       final hasStructure =
-          bodySource.contains('// Arrange') ||
-          bodySource.contains('// Act') ||
-          bodySource.contains('// Assert') ||
-          bodySource.contains('// Given') ||
-          bodySource.contains('// When') ||
-          bodySource.contains('// Then');
+          RegExp(r'// Arrange').hasMatch(bodySource) ||
+          RegExp(r'// Act').hasMatch(bodySource) ||
+          RegExp(r'// Assert').hasMatch(bodySource) ||
+          RegExp(r'// Given').hasMatch(bodySource) ||
+          RegExp(r'// When').hasMatch(bodySource) ||
+          RegExp(r'// Then').hasMatch(bodySource);
 
       if (hasStructure) {
         reporter.atNode(node);

@@ -1257,6 +1257,16 @@ class RequireScrollTestsRule extends SaropaLintRule {
     'TabBarView',
     'NestedScrollView',
   };
+  static final List<RegExp> _scrollableWidgetPatterns = _scrollableWidgets
+      .map((w) => RegExp('\\b${RegExp.escape(w)}\\b'))
+      .toList();
+  static final List<RegExp> _scrollOpPatterns = [
+    RegExp(r'\.drag\s*\('),
+    RegExp(r'\.scroll\s*\('),
+    RegExp(r'\.fling\s*\('),
+    RegExp(r'\bscrollController\b'),
+    RegExp(r'\bScrollController\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -1282,24 +1292,17 @@ class RequireScrollTestsRule extends SaropaLintRule {
 
       final String bodySource = callback.body.toSource();
 
-      // Check if test creates a scrollable widget
-      bool hasScrollable = false;
-      for (final String widget in _scrollableWidgets) {
-        if (bodySource.contains(widget)) {
-          hasScrollable = true;
-          break;
-        }
-      }
+      // Check if test creates a scrollable widget (word-boundary to avoid FP)
+      final bool hasScrollable = _scrollableWidgetPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
 
       if (!hasScrollable) return;
 
-      // Check if test has scroll operations
-      final bool hasScrollTest =
-          bodySource.contains('.drag(') ||
-          bodySource.contains('.scroll(') ||
-          bodySource.contains('.fling(') ||
-          bodySource.contains('scrollController') ||
-          bodySource.contains('ScrollController');
+      // Check if test has scroll operations (word-boundary regex)
+      final bool hasScrollTest = _scrollOpPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
 
       if (!hasScrollTest) {
         reporter.atNode(node.methodName, code);
@@ -1364,6 +1367,15 @@ class RequireTextInputTestsRule extends SaropaLintRule {
     'CupertinoTextField',
     'EditableText',
   };
+  static final List<RegExp> _textInputWidgetPatterns = _textInputWidgets
+      .map((w) => RegExp('\\b${RegExp.escape(w)}\\b'))
+      .toList();
+  static final List<RegExp> _textInputOpPatterns = [
+    RegExp(r'\.enterText\s*\('),
+    RegExp(r'\.showKeyboard\s*\('),
+    RegExp(r'\btextEditingController\b'),
+    RegExp(r'\bTextEditingController\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -1389,23 +1401,17 @@ class RequireTextInputTestsRule extends SaropaLintRule {
 
       final String bodySource = callback.body.toSource();
 
-      // Check if test creates a text input widget
-      bool hasTextInput = false;
-      for (final String widget in _textInputWidgets) {
-        if (bodySource.contains(widget)) {
-          hasTextInput = true;
-          break;
-        }
-      }
+      // Check if test creates a text input widget (word-boundary to avoid FP)
+      final bool hasTextInput = _textInputWidgetPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
 
       if (!hasTextInput) return;
 
-      // Check if test has text input operations
-      final bool hasInputTest =
-          bodySource.contains('.enterText(') ||
-          bodySource.contains('.showKeyboard(') ||
-          bodySource.contains('textEditingController') ||
-          bodySource.contains('TextEditingController');
+      // Check if test has text input operations (word-boundary regex)
+      final bool hasInputTest = _textInputOpPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
 
       if (!hasInputTest) {
         reporter.atNode(node.methodName, code);
@@ -1567,6 +1573,31 @@ class RequireEdgeCaseTestsRule extends SaropaLintRule {
   // Cached regex patterns for performance
   static final RegExp _testPattern = RegExp(r'\btest\s*\(');
   static final RegExp _testWidgetsPattern = RegExp(r'\btestWidgets\s*\(');
+  static final List<RegExp> _emptyTestPatterns = [
+    RegExp(r'\bempty\b'),
+    RegExp(r'\[\s*\]'),
+    RegExp(r'\bisEmpty\b'),
+  ];
+  static final List<RegExp> _nullTestPatterns = [
+    RegExp(r'\bnull\b'),
+    RegExp(r'\bisNull\b'),
+    RegExp(r'\bNull\b'),
+  ];
+  static final List<RegExp> _boundaryTestPatterns = [
+    RegExp(r'\bmax\b'),
+    RegExp(r'\bmin\b'),
+    RegExp(r'\bboundary\b'),
+    RegExp(r'\blimit\b'),
+    RegExp(r'\boverflow\b'),
+  ];
+  static final List<RegExp> _negativeTestPatterns = [
+    RegExp(r'\bnegative\b'),
+    RegExp(r'\b-1\b'),
+  ];
+  static final List<RegExp> _errorTestPatterns = [
+    RegExp(r'\bthrows\b'),
+    RegExp(r'\berror\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -1591,25 +1622,20 @@ class RequireEdgeCaseTestsRule extends SaropaLintRule {
 
       if (testCount < 3) return; // Not enough tests to analyze
 
-      // Check for edge case patterns in test descriptions or assertions
-      final bool hasEmptyTest =
-          source.contains('empty') ||
-          source.contains('[]') ||
-          source.contains('isEmpty');
-      final bool hasNullTest =
-          source.contains('null') ||
-          source.contains('isNull') ||
-          source.contains('Null');
-      final bool hasBoundaryTest =
-          source.contains('max') ||
-          source.contains('min') ||
-          source.contains('boundary') ||
-          source.contains('limit') ||
-          source.contains('overflow');
-      final bool hasNegativeTest =
-          source.contains('negative') || source.contains('-1');
-      final bool hasErrorTest =
-          source.contains('throws') || source.contains('error');
+      // Check for edge case patterns (word-boundary to avoid FP)
+      final bool hasEmptyTest = _emptyTestPatterns.any(
+        (p) => p.hasMatch(source),
+      );
+      final bool hasNullTest = _nullTestPatterns.any((p) => p.hasMatch(source));
+      final bool hasBoundaryTest = _boundaryTestPatterns.any(
+        (p) => p.hasMatch(source),
+      );
+      final bool hasNegativeTest = _negativeTestPatterns.any(
+        (p) => p.hasMatch(source),
+      );
+      final bool hasErrorTest = _errorTestPatterns.any(
+        (p) => p.hasMatch(source),
+      );
 
       // Count how many edge case categories are covered
       int edgeCaseCoverage = 0;
@@ -2367,19 +2393,20 @@ class RequireTestCleanupRule extends SaropaLintRule {
   }
 
   /// Check for patterns that create test resources requiring cleanup.
-  /// Uses specific patterns to avoid false positives from methods like
+  /// Uses word-boundary regex to avoid false positives from methods like
   /// createWidget(), insertText(), output(), etc.
   bool _createsTestResources(String bodySource) {
-    // File system operations - exact constructor calls
-    if (bodySource.contains('File(') || bodySource.contains('Directory(')) {
+    // File system operations - exact constructor calls (word-boundary)
+    if (RegExp(r'\bFile\s*\(').hasMatch(bodySource) ||
+        RegExp(r'\bDirectory\s*\(').hasMatch(bodySource)) {
       return true;
     }
 
     // File write operations - specific method patterns
-    if (bodySource.contains('.writeAsBytes') ||
-        bodySource.contains('.writeAsString') ||
-        bodySource.contains('.writeAsBytesSync') ||
-        bodySource.contains('.writeAsStringSync')) {
+    if (RegExp(r'\.writeAsBytes\s*\(').hasMatch(bodySource) ||
+        RegExp(r'\.writeAsString\s*\(').hasMatch(bodySource) ||
+        RegExp(r'\.writeAsBytesSync\s*\(').hasMatch(bodySource) ||
+        RegExp(r'\.writeAsStringSync\s*\(').hasMatch(bodySource)) {
       return true;
     }
 
@@ -2483,10 +2510,10 @@ class PreferTestVariantRule extends SaropaLintRule {
         if (callback is FunctionExpression) {
           final String bodySource = callback.body.toSource();
 
-          // Check for screen size configuration
-          if (bodySource.contains('physicalSizeTestValue') ||
-              bodySource.contains('devicePixelRatio') ||
-              bodySource.contains('textScaleFactor')) {
+          // Check for screen size configuration (word-boundary to avoid FP)
+          if (RegExp(r'\bphysicalSizeTestValue\b').hasMatch(bodySource) ||
+              RegExp(r'\bdevicePixelRatio\b').hasMatch(bodySource) ||
+              RegExp(r'\btextScaleFactor\b').hasMatch(bodySource)) {
             sizeTests.add(node);
           }
         }
@@ -2578,7 +2605,8 @@ class RequireAccessibilityTestsRule extends SaropaLintRule {
 
     context.addCompilationUnit((CompilationUnit unit) {
       final String source = unit.toSource();
-      if (source.contains('testWidgets') && !hasAccessibilityTest) {
+      if (RegExp(r'\btestWidgets\b').hasMatch(source) &&
+          !hasAccessibilityTest) {
         // Report at first testWidgets call
         // This is a file-level suggestion, so we report once
       }
@@ -2644,6 +2672,14 @@ class RequireAnimationTestsRule extends SaropaLintRule {
     'ScaleTransition',
     'Hero',
   };
+  static final List<RegExp> _animatedWidgetPatterns = _animatedWidgets
+      .map((w) => RegExp('\\b${RegExp.escape(w)}\\b'))
+      .toList();
+  static final List<RegExp> _durationPumpPatterns = [
+    RegExp(r'\bpumpAndSettle\b'),
+    RegExp(r'\bpump\s*\(\s*const\s+Duration'),
+    RegExp(r'\bpump\s*\(\s*Duration\s*\('),
+  ];
 
   @override
   void runWithReporter(
@@ -2668,22 +2704,17 @@ class RequireAnimationTestsRule extends SaropaLintRule {
 
       final String bodySource = callback.body.toSource();
 
-      // Check if test uses animated widgets
-      bool hasAnimatedWidget = false;
-      for (final String widget in _animatedWidgets) {
-        if (bodySource.contains(widget)) {
-          hasAnimatedWidget = true;
-          break;
-        }
-      }
+      // Check if test uses animated widgets (word-boundary to avoid FP)
+      final bool hasAnimatedWidget = _animatedWidgetPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
 
       if (!hasAnimatedWidget) return;
 
-      // Check for proper pump usage
-      final bool hasDurationPump =
-          bodySource.contains('pumpAndSettle') ||
-          bodySource.contains('pump(const Duration') ||
-          bodySource.contains('pump(Duration');
+      // Check for proper pump usage (word-boundary regex)
+      final bool hasDurationPump = _durationPumpPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
 
       if (!hasDurationPump) {
         reporter.atNode(node.methodName, code);
@@ -2845,12 +2876,14 @@ class RequireMockHttpClientRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (targetSource == 'http' ||
-          targetSource.contains('http.') ||
+      final bool isHttpTarget =
+          targetSource == 'http' ||
+          targetSource.startsWith('http.') ||
           targetSource == 'client' ||
-          targetSource.contains('Client')) {
-        // Check if this looks like a mock
-        if (!targetSource.toLowerCase().contains('mock')) {
+          RegExp(r'\bClient\b').hasMatch(targetSource);
+      if (isHttpTarget) {
+        // Check if this looks like a mock (word-boundary to avoid FP)
+        if (!RegExp(r'\bmock\b', caseSensitive: false).hasMatch(targetSource)) {
           reporter.atNode(node);
         }
       }
@@ -2972,8 +3005,10 @@ class RequireTestWidgetPumpRule extends SaropaLintRule {
         final Expression? target = interaction.target;
         if (target == null) continue;
         final String targetSource = target.toSource();
-        if (!targetSource.contains('tester') &&
-            !targetSource.contains('Tester')) {
+        if (!RegExp(
+          r'\btester\b',
+          caseSensitive: false,
+        ).hasMatch(targetSource)) {
           continue;
         }
 

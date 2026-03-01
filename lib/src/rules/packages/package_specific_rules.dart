@@ -9,6 +9,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../target_matcher_utils.dart';
 import '../../fixes/packages/package_specific/replace_v1_with_v4_fix.dart';
 
 // =============================================================================
@@ -72,10 +73,9 @@ class RequireGoogleSigninErrorHandlingRule extends SaropaLintRule {
       final String? targetType = node.target?.toSource();
       if (targetType == null) return;
 
-      final bool isGoogleSignIn =
-          targetType.contains('googleSignIn') ||
-          targetType.contains('GoogleSignIn') ||
-          targetType.contains('_googleSignIn');
+      final bool isGoogleSignIn = RegExp(
+        r'\b(googleSignIn|GoogleSignIn|_googleSignIn)\b',
+      ).hasMatch(targetType);
 
       if (!isGoogleSignIn) return;
 
@@ -358,7 +358,7 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
     // Also check named parameters
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
-      if (!typeName.contains('WebView') && !typeName.contains('Settings')) {
+      if (!RegExp(r'\b(WebView|Settings)\b').hasMatch(typeName)) {
         return;
       }
 
@@ -524,6 +524,9 @@ class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
 class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
   RequireKeyboardVisibilityDisposeRule() : super(code: _code);
 
+  static final RegExp _disposeCancelPattern =
+      RegExp(r'[?.]\s*cancel\s*\(');
+
   @override
   LintImpact get impact => LintImpact.high;
 
@@ -555,30 +558,34 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
 
       // Check for KeyboardVisibilityController usage
       final String classSource = node.toSource();
-      if (!classSource.contains('KeyboardVisibilityController')) return;
+      if (!RegExp(r'\bKeyboardVisibilityController\b').hasMatch(classSource)) {
+        return;
+      }
 
-      // Check for proper cleanup patterns
-      String? disposeBody;
+      // Check for proper cleanup patterns in dispose
+      MethodDeclaration? disposeMethod;
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
+          disposeMethod = member;
           break;
         }
       }
 
-      // Check for cancel() or dispose() in dispose method
       final bool hasCleanup =
-          disposeBody != null &&
-          (disposeBody.contains('.cancel(') ||
-              disposeBody.contains('dispose()') ||
-              disposeBody.contains('?.cancel('));
+          disposeMethod != null &&
+          (_disposeCancelPattern.hasMatch(disposeMethod.body.toSource()) ||
+              RegExp(
+                r'\bdispose\s*\(\s*\)',
+              ).hasMatch(disposeMethod.body.toSource()));
 
-      if (!hasCleanup && classSource.contains('.listen(')) {
+      if (!hasCleanup && RegExp(r'\.listen\s*\(').hasMatch(classSource)) {
         // Find the field declaration to report on
         for (final ClassMember member in node.members) {
           if (member is FieldDeclaration) {
             final String fieldSource = member.toSource();
-            if (fieldSource.contains('KeyboardVisibilityController')) {
+            if (RegExp(
+              r'\bKeyboardVisibilityController\b',
+            ).hasMatch(fieldSource)) {
               reporter.atNode(member);
               return;
             }
@@ -664,7 +671,8 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName != null && typeName.contains('SpeechToText')) {
+          if (typeName != null &&
+              RegExp(r'\bSpeechToText\b').hasMatch(typeName)) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
               speechFieldNames.add(variable.name.lexeme);
@@ -676,10 +684,10 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
       if (speechFieldNames.isEmpty) return;
 
       // Find dispose method
-      String? disposeBody;
+      MethodDeclaration? disposeMethod;
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
+          disposeMethod = member;
           break;
         }
       }
@@ -687,10 +695,9 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
       // Check if speech is stopped
       for (final String name in speechFieldNames) {
         final bool isStopped =
-            disposeBody != null &&
-            (disposeBody.contains('$name.stop(') ||
-                disposeBody.contains('$name?.stop(') ||
-                disposeBody.contains('$name.cancel('));
+            disposeMethod != null &&
+            (isFieldCleanedUp(name, 'stop', disposeMethod.body) ||
+                isFieldCleanedUp(name, 'cancel', disposeMethod.body));
 
         if (!isStopped) {
           for (final ClassMember member in node.members) {
@@ -794,10 +801,10 @@ class AvoidAppLinksSensitiveParamsRule extends SaropaLintRule {
       if (node.operator.lexeme != '+') return;
 
       final String source = node.toSource();
-      if (!source.contains('://')) return;
+      if (!RegExp(r'://').hasMatch(source)) return;
 
       for (final String param in _sensitiveParams) {
-        if (source.contains('$param=')) {
+        if (RegExp(RegExp.escape(param) + r'=').hasMatch(source)) {
           reporter.atNode(node);
           return;
         }
@@ -1054,9 +1061,7 @@ class RequireOpenaiErrorHandlingRule extends SaropaLintRule {
       if (target != null) {
         final String targetSource = target.toSource().toLowerCase();
         // Should be called on something containing 'openai' or 'gpt'
-        if (!targetSource.contains('openai') &&
-            !targetSource.contains('gpt') &&
-            !targetSource.contains('_ai')) {
+        if (!RegExp(r'\b(openai|gpt|_ai)\b').hasMatch(targetSource)) {
           return;
         }
       }
@@ -1281,7 +1286,7 @@ class PreferUuidV4Rule extends SaropaLintRule {
 
       // Check if it's a Uuid call
       final String source = node.toSource();
-      if (source.contains('Uuid()') || source.contains('uuid.')) {
+      if (RegExp(r'\bUuid\s*\(\s*\)|uuid\.').hasMatch(source)) {
         reporter.atNode(node);
       }
     });
@@ -1548,8 +1553,7 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('Geolocator') &&
-          targetSource != 'Geolocator') {
+      if (!RegExp(r'\bGeolocator\b').hasMatch(targetSource)) {
         return;
       }
 
@@ -1699,11 +1703,9 @@ class AvoidImagePickerQuickSuccessionRule extends SaropaLintRule {
       final String? targetSource = node.target?.toSource();
       if (targetSource == null) return;
 
-      final bool isImagePicker =
-          targetSource.contains('picker') ||
-          targetSource.contains('Picker') ||
-          targetSource.contains('imagePicker') ||
-          targetSource.contains('ImagePicker');
+      final bool isImagePicker = RegExp(
+        r'\b(picker|Picker|imagePicker|ImagePicker)\b',
+      ).hasMatch(targetSource);
 
       if (!isImagePicker) return;
 
@@ -1712,12 +1714,9 @@ class AvoidImagePickerQuickSuccessionRule extends SaropaLintRule {
       while (current != null) {
         if (current is IfStatement) {
           final String condition = current.expression.toSource();
-          if (condition.contains('picking') ||
-              condition.contains('loading') ||
-              condition.contains('isLoading') ||
-              condition.contains('isPicking') ||
-              condition.contains('_picking') ||
-              condition.contains('_isPicking')) {
+          if (RegExp(
+            r'\b(picking|loading|isLoading|isPicking|_picking|_isPicking)\b',
+          ).hasMatch(condition)) {
             return; // Has a guard, OK
           }
         }
@@ -1818,7 +1817,9 @@ class RequireAnalyticsErrorHandlingRule extends SaropaLintRule {
       final String? targetSource = node.target?.toSource();
       if (targetSource == null) return;
 
-      final bool isAnalytics = _analyticsTargets.any(targetSource.contains);
+      final bool isAnalytics = _analyticsTargets.any(
+        (t) => RegExp(r'\b' + RegExp.escape(t) + r'\b').hasMatch(targetSource),
+      );
       if (!isAnalytics) return;
 
       // Check if wrapped in try-catch

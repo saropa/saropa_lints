@@ -251,11 +251,11 @@ class RequireLocaleAwareFormattingRule extends SaropaLintRule {
     // Check for manual date formatting in interpolations
     context.addStringInterpolation((StringInterpolation node) {
       final String source = node.toSource().toLowerCase();
-      if (source.contains('.day') ||
-          source.contains('.month') ||
-          source.contains('.year') ||
-          source.contains('.hour') ||
-          source.contains('.minute')) {
+      if (RegExp(r'\.day\b').hasMatch(source) ||
+          RegExp(r'\.month\b').hasMatch(source) ||
+          RegExp(r'\.year\b').hasMatch(source) ||
+          RegExp(r'\.hour\b').hasMatch(source) ||
+          RegExp(r'\.minute\b').hasMatch(source)) {
         reporter.atNode(node);
       }
     });
@@ -330,7 +330,8 @@ class RequireDirectionalWidgetsRule extends SaropaLintRule {
       // Check for Alignment with left/right
       if (constructorSource == 'Alignment') {
         final String source = node.toSource().toLowerCase();
-        if (source.contains('left') || source.contains('right')) {
+        if (RegExp(r'\bleft\b').hasMatch(source) ||
+            RegExp(r'\bright\b').hasMatch(source)) {
           reporter.atNode(node);
         }
       }
@@ -431,7 +432,7 @@ class RequirePluralHandlingRule extends SaropaLintRule {
 
       if (hasCountVariable) {
         for (final String plural in _pluralIndicators) {
-          if (source.contains(plural)) {
+          if (RegExp(r'\b' + RegExp.escape(plural) + r'\b').hasMatch(source)) {
             reporter.atNode(node);
             return;
           }
@@ -1801,7 +1802,7 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Already using Intl.plural - good!
-      if (bodySource.contains('Intl.plural')) return;
+      if (RegExp(r'\bIntl\.plural\b').hasMatch(bodySource)) return;
 
       // Check that the int parameter is compared to 1 (typical pluralization)
       // Only == 1 or != 1 patterns indicate pluralization logic.

@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../saropa_lint_rule.dart';
+import '../target_matcher_utils.dart';
 import '../fixes/scroll/replace_sliver_to_box_adapter_fix.dart';
 
 /// Warns when shrinkWrap: true is used inside a ScrollView.
@@ -750,15 +751,19 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _listViewGridViewPattern = RegExp(
+    r'\b(?:ListView|GridView)\b',
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((node) {
-      final typeName = node.constructorName.type.name.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
-      if (!typeName.contains('ListView') && !typeName.contains('GridView')) {
+      if (!_listViewGridViewPattern.hasMatch(typeName)) {
         return;
       }
 
@@ -897,8 +902,8 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
 
     for (final arg in argList.arguments) {
       if (arg is NamedExpression && arg.name.label.name == 'physics') {
-        final source = arg.expression.toSource().toLowerCase();
-        if (source.contains('neverscrollablescrollphysics')) {
+        final String exprSource = arg.expression.toSource().toLowerCase();
+        if (RegExp(r'neverscrollablescrollphysics').hasMatch(exprSource)) {
           return true;
         }
       }
@@ -1505,6 +1510,12 @@ class AvoidInfiniteScrollDuplicateRequestsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final RegExp _scrollControllerTargetPattern = RegExp(
+    r'scroll|controller',
+    caseSensitive: false,
+  );
+  static final RegExp _maxScrollExtentPattern = RegExp(r'\bmaxScrollExtent\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1513,12 +1524,9 @@ class AvoidInfiniteScrollDuplicateRequestsRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'addListener') return;
 
-      // Check if this is a scroll controller listener
-      final String targetSource = node.target?.toSource() ?? '';
-      if (!targetSource.contains('scroll') &&
-          !targetSource.contains('Scroll') &&
-          !targetSource.contains('controller') &&
-          !targetSource.contains('Controller')) {
+      final Expression? target = node.target;
+      if (target == null ||
+          !_scrollControllerTargetPattern.hasMatch(extractTargetName(target))) {
         return;
       }
 
@@ -1527,7 +1535,7 @@ class AvoidInfiniteScrollDuplicateRequestsRule extends SaropaLintRule {
       if (args.isEmpty) return;
 
       final String callbackSource = args.first.toSource();
-      if (!callbackSource.contains('maxScrollExtent')) return;
+      if (!_maxScrollExtentPattern.hasMatch(callbackSource)) return;
 
       // Check for loading guard patterns
       if (callbackSource.contains('isLoading') ||
@@ -1595,43 +1603,41 @@ class PreferInfiniteScrollPreloadRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _maxScrollExtentInSourcePattern = RegExp(
+    r'\bmaxScrollExtent\b',
+  );
+  static final RegExp _thresholdPattern = RegExp(r'\*|-\s*');
+  static final List<RegExp> _scrollListenerContextPatterns = <RegExp>[
+    RegExp(r'\baddListener\b'),
+    RegExp(r'\bonNotification\b'),
+    RegExp(r'\bScrollNotification\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addBinaryExpression((BinaryExpression node) {
-      final String source = node.toSource();
+      final String nodeSource = node.toSource();
 
-      // Detect exact equality check with maxScrollExtent
-      if (!source.contains('maxScrollExtent')) return;
+      if (!_maxScrollExtentInSourcePattern.hasMatch(nodeSource)) return;
 
-      // Check for == comparison (exact bottom check)
       if (node.operator.lexeme != '==' && node.operator.lexeme != '>=') {
         return;
       }
 
-      // Only flag == (exact match), not >= (which may use threshold)
       if (node.operator.lexeme == '>=') {
-        // If using >=, check that it's not multiplied by a threshold
-        if (source.contains('*') || source.contains('- ')) {
-          return; // Has threshold, OK
-        }
-        // >= maxScrollExtent without threshold is same as ==
+        if (_thresholdPattern.hasMatch(nodeSource)) return;
       }
 
-      if (node.operator.lexeme == '==') {
-        // pixels == maxScrollExtent — always a problem
-      }
-
-      // Verify it's in a scroll listener context
       AstNode? current = node.parent;
       while (current != null) {
         if (current is FunctionBody) {
           final String bodySource = current.toSource();
-          if (bodySource.contains('addListener') ||
-              bodySource.contains('onNotification') ||
-              bodySource.contains('ScrollNotification')) {
+          if (_scrollListenerContextPatterns.any(
+            (re) => re.hasMatch(bodySource),
+          )) {
             reporter.atNode(node);
             return;
           }

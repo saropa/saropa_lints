@@ -4780,9 +4780,9 @@ class RequireDisabledStateRule extends SaropaLintRule {
           final String argName = arg.name.label.name;
 
           if (argName == 'onPressed') {
-            final String source = arg.expression.toSource();
-            // Check for conditional pattern: condition ? fn : null
-            if (source.contains('?') && source.contains('null')) {
+            final String exprSource = arg.expression.toSource();
+            if (RegExp(r'\?').hasMatch(exprSource) &&
+                RegExp(r'\bnull\b').hasMatch(exprSource)) {
               hasConditionalOnPressed = true;
             }
           }
@@ -7395,10 +7395,8 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
       final target = node.target;
       if (target == null) return;
 
-      final targetSource = target.toSource();
-      if (targetSource.contains('Permission.')) {
-        reporter.atNode(node);
-      }
+      if (!RegExp(r'Permission\.').hasMatch(target.toSource())) return;
+      reporter.atNode(node);
     });
   }
 }

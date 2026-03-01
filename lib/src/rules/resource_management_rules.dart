@@ -9,6 +9,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../saropa_lint_rule.dart';
+import '../target_matcher_utils.dart';
 
 /// Warns when file handle is not closed in finally block.
 ///
@@ -61,20 +62,21 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  /// File-specific open methods that are unlikely to have false positives.
-  static const Set<String> _fileOpenMethods = <String>{
-    'openRead',
-    'openWrite',
-    'openSync',
-  };
-
-  /// Patterns that indicate file-related code is present.
-  static const Set<String> _fileIndicators = <String>{
-    'File(',
-    'IOSink',
-    'RandomAccessFile',
-    'dart:io',
-  };
+  static final RegExp _fileOpenMethodPattern = RegExp(
+    r'\.(?:openRead|openWrite|openSync)\s*\(',
+  );
+  static final RegExp _genericOpenPattern = RegExp(r'\.open\s*\(');
+  static final List<RegExp> _fileIndicatorPatterns = <RegExp>[
+    RegExp(r'File\s*\('),
+    RegExp(r'\bIOSink\b'),
+    RegExp(r'\bRandomAccessFile\b'),
+    RegExp(r'dart:io'),
+  ];
+  static final RegExp _finallyPattern = RegExp(r'\bfinally\b');
+  static final RegExp _closeCallPattern = RegExp(r'\.close\s*\(');
+  static final RegExp _readWriteConveniencePattern = RegExp(
+    r'\b(?:readAsString|readAsBytes|writeAsString|writeAsBytes)\s*\(',
+  );
 
   @override
   void runWithReporter(
@@ -85,41 +87,20 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for file-specific open methods (low false positive risk)
-      bool hasFileOpen = false;
-      for (final String method in _fileOpenMethods) {
-        if (bodySource.contains('.$method(')) {
-          hasFileOpen = true;
-          break;
-        }
-      }
-
-      // For generic '.open(' we need additional evidence of file handling
-      // to avoid false positives from other classes with open() methods
-      if (!hasFileOpen && bodySource.contains('.open(')) {
-        for (final String indicator in _fileIndicators) {
-          if (bodySource.contains(indicator)) {
-            hasFileOpen = true;
-            break;
-          }
-        }
-      }
+      bool hasFileOpen =
+          _fileOpenMethodPattern.hasMatch(bodySource) ||
+          (_genericOpenPattern.hasMatch(bodySource) &&
+              _fileIndicatorPatterns.any((re) => re.hasMatch(bodySource)));
 
       if (!hasFileOpen) return;
 
-      // Check for proper cleanup
-      final bool hasFinally = bodySource.contains('finally');
-      final bool hasClose = bodySource.contains('.close(');
+      final bool hasFinally = _finallyPattern.hasMatch(bodySource);
+      final bool hasClose = _closeCallPattern.hasMatch(bodySource);
 
       if (!hasFinally && hasClose) {
-        // Close without finally - may leak on exception
         reporter.atNode(node);
       } else if (!hasClose &&
-          !bodySource.contains('readAsString') &&
-          !bodySource.contains('readAsBytes') &&
-          !bodySource.contains('writeAsString') &&
-          !bodySource.contains('writeAsBytes')) {
-        // No close at all
+          !_readWriteConveniencePattern.hasMatch(bodySource)) {
         reporter.atNode(node);
       }
     });
@@ -180,6 +161,12 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
   static final RegExp _dbOpenPattern = RegExp(
     r'(?:^|[^a-zA-Z])(?:openDatabase|Database\(|SqliteDatabase)',
   );
+  static final List<RegExp> _closeOrDisposePattern = <RegExp>[
+    RegExp(r'\.close\s*\('),
+    RegExp(r'\.closeSafe\s*\('),
+    RegExp(r'\bdispose\s*\('),
+    RegExp(r'\bdisposeSafe\s*\('),
+  ];
 
   @override
   void runWithReporter(
@@ -197,10 +184,7 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
       }
 
       // Check for close (including *Safe extension variants)
-      if (!bodySource.contains('.close(') &&
-          !bodySource.contains('.closeSafe(') &&
-          !bodySource.contains('dispose') &&
-          !bodySource.contains('disposeSafe')) {
+      if (!_closeOrDisposePattern.any((re) => re.hasMatch(bodySource))) {
         reporter.atNode(node);
       }
     });
@@ -256,6 +240,13 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final RegExp _httpClientCtorPattern = RegExp(r'HttpClient\s*\(\s*\)');
+  static final List<RegExp> _httpClosePatterns = <RegExp>[
+    RegExp(r'\.close\s*\('),
+    RegExp(r'\.closeSafe\s*\('),
+    RegExp(r'\.close\s*;'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -265,13 +256,9 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for HttpClient creation
-      if (!bodySource.contains('HttpClient()')) return;
+      if (!_httpClientCtorPattern.hasMatch(bodySource)) return;
 
-      // Check for close (including *Safe extension variants)
-      if (!bodySource.contains('.close(') &&
-          !bodySource.contains('.closeSafe(') &&
-          !bodySource.contains('.close;')) {
+      if (!_httpClosePatterns.any((re) => re.hasMatch(bodySource))) {
         reporter.atNode(node);
       }
     });
@@ -323,12 +310,17 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  static const Set<String> _allocMethods = <String>{
-    'calloc<',
-    'malloc<',
-    'allocate(',
-    'Pointer.fromAddress',
-  };
+  static final List<RegExp> _allocPatterns = <RegExp>[
+    RegExp(r'calloc\s*<'),
+    RegExp(r'malloc\s*<'),
+    RegExp(r'\ballocate\s*\('),
+    RegExp(r'Pointer\.fromAddress'),
+  ];
+  static final List<RegExp> _nativeCleanupPatterns = <RegExp>[
+    RegExp(r'\.free\s*\('),
+    RegExp(r'\bfree\s*\('),
+    RegExp(r'\bfinally\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -339,21 +331,11 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for native allocation
-      bool hasAlloc = false;
-      for (final String method in _allocMethods) {
-        if (bodySource.contains(method)) {
-          hasAlloc = true;
-          break;
-        }
-      }
+      final bool hasAlloc = _allocPatterns.any((re) => re.hasMatch(bodySource));
 
       if (!hasAlloc) return;
 
-      // Check for cleanup
-      if (!bodySource.contains('.free(') &&
-          !bodySource.contains('free(') &&
-          !bodySource.contains('finally')) {
+      if (!_nativeCleanupPatterns.any((re) => re.hasMatch(bodySource))) {
         reporter.atNode(node);
       }
     });
@@ -699,6 +681,8 @@ class RequireCameraDisposeRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final RegExp _cameraControllerType = RegExp(r'\bCameraController\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -714,35 +698,31 @@ class RequireCameraDisposeRule extends SaropaLintRule {
 
       // Find CameraController fields
       final List<String> controllerNames = <String>[];
+      MethodDeclaration? disposeMethod;
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName != null && typeName.contains('CameraController')) {
+          if (typeName != null && _cameraControllerType.hasMatch(typeName)) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
               controllerNames.add(variable.name.lexeme);
             }
           }
         }
-      }
-
-      if (controllerNames.isEmpty) return;
-
-      // Find dispose method
-      String? disposeBody;
-      for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
-          break;
+          disposeMethod = member;
         }
       }
 
+      if (controllerNames.isEmpty || disposeMethod == null) return;
+
       // Check if controllers are disposed
       for (final String name in controllerNames) {
-        final bool isDisposed =
-            disposeBody != null &&
-            (disposeBody.contains('$name.dispose(') ||
-                disposeBody.contains('$name?.dispose('));
+        final bool isDisposed = isFieldCleanedUp(
+          name,
+          'dispose',
+          disposeMethod.body,
+        );
 
         if (!isDisposed) {
           for (final ClassMember member in node.members) {

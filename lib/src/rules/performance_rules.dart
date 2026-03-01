@@ -367,6 +367,10 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
     'convertImage',
   };
 
+  static final List<RegExp> _heavyMethodNameRegex = _heavyOperations
+      .map((p) => RegExp(r'\b' + RegExp.escape(p.toLowerCase()) + r'\b'))
+      .toList();
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -375,36 +379,34 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name.toLowerCase();
 
-      // Check if method name suggests heavy work
-      for (final String pattern in _heavyOperations) {
-        if (!methodName.contains(pattern.toLowerCase())) continue;
-
-        // Only flag inside widget lifecycle methods where blocking
-        // the UI thread is a real concern. Library utility methods
-        // have no UI thread — the consumer controls execution context.
-        if (!_isInsideWidgetLifecycle(node)) continue;
-
-        // Check if already inside compute or isolate
-        AstNode? current = node.parent;
-        bool insideIsolate = false;
-
-        while (current != null) {
-          if (current is MethodInvocation) {
-            final String parentMethod = current.methodName.name;
-            if (parentMethod == 'compute' ||
-                parentMethod == 'run' ||
-                parentMethod == 'spawn') {
-              insideIsolate = true;
-              break;
-            }
-          }
-          current = current.parent;
-        }
-
-        if (!insideIsolate) {
-          reporter.atNode(node);
-        }
+      if (!_heavyMethodNameRegex.any((re) => re.hasMatch(methodName))) {
         return;
+      }
+
+      // Only flag inside widget lifecycle methods where blocking
+      // the UI thread is a real concern. Library utility methods
+      // have no UI thread — the consumer controls execution context.
+      if (!_isInsideWidgetLifecycle(node)) return;
+
+      // Check if already inside compute or isolate
+      AstNode? current = node.parent;
+      bool insideIsolate = false;
+
+      while (current != null) {
+        if (current is MethodInvocation) {
+          final String parentMethod = current.methodName.name;
+          if (parentMethod == 'compute' ||
+              parentMethod == 'run' ||
+              parentMethod == 'spawn') {
+            insideIsolate = true;
+            break;
+          }
+        }
+        current = current.parent;
+      }
+
+      if (!insideIsolate) {
+        reporter.atNode(node);
       }
     });
   }
@@ -1144,6 +1146,15 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _stringOpSourceRegex = [
+    RegExp(r"'"),
+    RegExp(r'"'),
+    RegExp(r'string', caseSensitive: false),
+    RegExp(r'\bname\b'),
+    RegExp(r'\btext\b'),
+    RegExp(r'\bmessage\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1201,12 +1212,7 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
   }
 
   bool _looksLikeStringOperation(String source) {
-    return source.contains("'") ||
-        source.contains('"') ||
-        source.toLowerCase().contains('string') ||
-        source.contains('name') ||
-        source.contains('text') ||
-        source.contains('message');
+    return _stringOpSourceRegex.any((re) => re.hasMatch(source));
   }
 
   bool _looksLikeStringVariable(String name) {
@@ -1458,7 +1464,8 @@ class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final String? typeName = member.fields.type?.toSource();
-            if (typeName != null && typeName.contains('GlobalKey')) {
+            if (typeName != null &&
+                RegExp(r'\bGlobalKey\b').hasMatch(typeName)) {
               globalKeyFields.add(variable);
             }
             // Also check initializer
@@ -2218,6 +2225,16 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _imageMemberSourceRegex = [
+    RegExp(r'\bImage\.network\b'),
+    RegExp(r'\bImage\.asset\b'),
+    RegExp(r'\bCachedNetworkImage\b'),
+  ];
+  static final List<RegExp> _imageCacheClearRegex = [
+    RegExp(r'\bimageCache\.clear\b'),
+    RegExp(r'\bimageCache\.evict\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2229,13 +2246,10 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
 
       for (final ClassMember member in node.members) {
         final String source = member.toSource();
-        if (source.contains('Image.network') ||
-            source.contains('Image.asset') ||
-            source.contains('CachedNetworkImage')) {
+        if (_imageMemberSourceRegex.any((re) => re.hasMatch(source))) {
           imageCount++;
         }
-        if (source.contains('imageCache.clear') ||
-            source.contains('imageCache.evict')) {
+        if (_imageCacheClearRegex.any((re) => re.hasMatch(source))) {
           hasImageCacheClear = true;
         }
       }
@@ -2412,8 +2426,8 @@ class _StreamListenVisitor extends RecursiveAstVisitor<void> {
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is FunctionExpression) {
           final String bodySource = arg.body.toSource();
-          if (bodySource.contains('setState') &&
-              !bodySource.contains('mounted')) {
+          if (RegExp(r'\bsetState\b').hasMatch(bodySource) &&
+              !RegExp(r'\bmounted\b').hasMatch(bodySource)) {
             reporter.atNode(node);
           }
         }
@@ -2532,6 +2546,10 @@ class RequireDisposePatternRule extends SaropaLintRule {
     'Timer',
   };
 
+  static final List<RegExp> _disposableTypeNameRegex = _disposableTypes
+      .map((d) => RegExp(r'\b' + RegExp.escape(d) + r'\b'))
+      .toList();
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2567,13 +2585,9 @@ class RequireDisposePatternRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName != null) {
-            for (final String disposable in _disposableTypes) {
-              if (typeName.contains(disposable)) {
-                hasDisposable = true;
-                break;
-              }
-            }
+          if (typeName != null &&
+              _disposableTypeNameRegex.any((re) => re.hasMatch(typeName))) {
+            hasDisposable = true;
           }
         }
         if (member is MethodDeclaration) {
@@ -3651,6 +3665,11 @@ class AvoidRebuildOnScrollRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _scrollControllerTargetRegex = [
+    RegExp(r'\bscroll\b'),
+    RegExp(r'\bcontroller\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3664,8 +3683,9 @@ class AvoidRebuildOnScrollRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('scroll') &&
-          !targetSource.contains('controller')) {
+      if (!_scrollControllerTargetRegex.any(
+        (re) => re.hasMatch(targetSource),
+      )) {
         return;
       }
 
@@ -4493,6 +4513,12 @@ class AvoidCacheStampedeRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _cacheBodyRegex = [
+    RegExp(r'\bcontainsKey\b'),
+    RegExp(r'\['),
+    RegExp(r'\bputIfAbsent\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -4506,13 +4532,8 @@ class AvoidCacheStampedeRule extends SaropaLintRule {
 
       final String bodySource = body.toSource();
 
-      // Quick checks: must contain a cache-like pattern + await
-      if (!bodySource.contains('containsKey') &&
-          !bodySource.contains('[') &&
-          !bodySource.contains('putIfAbsent')) {
-        return;
-      }
-      if (!bodySource.contains('await')) return;
+      if (!_cacheBodyRegex.any((re) => re.hasMatch(bodySource))) return;
+      if (!RegExp(r'\bawait\b').hasMatch(bodySource)) return;
 
       // Check for in-flight dedup or lock patterns (suppression)
       if (_hasDeduplication(bodySource, node)) return;
@@ -4526,11 +4547,9 @@ class AvoidCacheStampedeRule extends SaropaLintRule {
 
   /// Checks if the method or enclosing class has in-flight dedup or a lock.
   static bool _hasDeduplication(String bodySource, MethodDeclaration node) {
-    // Check body for ??= pattern with Future
-    if (bodySource.contains('??=')) return true;
-
-    // Check body for Lock / synchronized
-    if (bodySource.contains('synchronized') || bodySource.contains('Lock(')) {
+    if (RegExp(r'\?\?=').hasMatch(bodySource)) return true;
+    if (RegExp(r'\bsynchronized\b').hasMatch(bodySource) ||
+        RegExp(r'\bLock\s*\(').hasMatch(bodySource)) {
       return true;
     }
 
@@ -4559,10 +4578,11 @@ class AvoidCacheStampedeRule extends SaropaLintRule {
     for (final Statement stmt in block.statements) {
       final String source = stmt.toSource();
 
-      if (source.contains('containsKey(') || source.contains('!= null')) {
+      if (RegExp(r'\bcontainsKey\s*\(').hasMatch(source) ||
+          RegExp(r'!=\s*null\b').hasMatch(source)) {
         sawContainsKey = true;
       }
-      if (sawContainsKey && source.contains('await ')) {
+      if (sawContainsKey && RegExp(r'\bawait\s+').hasMatch(source)) {
         sawAwait = true;
       }
       // Pattern: cache[key] = value (cache write after await)

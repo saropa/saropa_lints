@@ -11,6 +11,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../target_matcher_utils.dart';
 
 /// Warns when BLoC events are emitted in constructor.
 ///
@@ -174,11 +175,13 @@ class RequireBlocCloseRule extends SaropaLintRule {
             if (initializer == null) continue;
 
             final String? typeName = member.fields.type?.toSource();
-            if (typeName != null &&
+            final bool isBlocOrCubitType =
+                typeName != null &&
                 (typeName.endsWith('Bloc') ||
                     typeName.endsWith('Cubit') ||
-                    typeName.contains('Bloc<') ||
-                    typeName.contains('Cubit<'))) {
+                    RegExp(r'\bBloc\s*<').hasMatch(typeName) ||
+                    RegExp(r'\bCubit\s*<').hasMatch(typeName));
+            if (isBlocOrCubitType) {
               blocNames.add(variable.name.lexeme);
               continue;
             }
@@ -200,10 +203,10 @@ class RequireBlocCloseRule extends SaropaLintRule {
       if (blocNames.isEmpty) return;
 
       // Find dispose method body
-      String? disposeBody;
+      MethodDeclaration? disposeMethod;
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
+          disposeMethod = member;
           break;
         }
       }
@@ -211,12 +214,9 @@ class RequireBlocCloseRule extends SaropaLintRule {
       // Check if each bloc is closed
       for (final String name in blocNames) {
         final bool isClosed =
-            disposeBody != null &&
-            (disposeBody.contains('$name.close(') ||
-                disposeBody.contains('$name?.close(') ||
-                disposeBody.contains('$name.closeSafe(') ||
-                disposeBody.contains('$name?.closeSafe(') ||
-                disposeBody.contains('$name..close('));
+            disposeMethod != null &&
+            (isFieldCleanedUp(name, 'close', disposeMethod.body) ||
+                isFieldCleanedUp(name, 'closeSafe', disposeMethod.body));
 
         if (!isClosed) {
           // Find and report the field declaration
@@ -531,6 +531,13 @@ class RequireBlocObserverRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final RegExp _blocProviderRegex = RegExp(r'\bBlocProvider\b');
+  static final RegExp _multiBlocProviderRegex = RegExp(
+    r'\bMultiBlocProvider\b',
+  );
+  static final RegExp _blocObserverRegex = RegExp(r'\bBloc\.observer\b');
+  static final RegExp _blocObserverClassRegex = RegExp(r'\bBlocObserver\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -543,14 +550,14 @@ class RequireBlocObserverRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Check if using Bloc
-      if (!bodySource.contains('BlocProvider') &&
-          !bodySource.contains('MultiBlocProvider')) {
+      if (!_blocProviderRegex.hasMatch(bodySource) &&
+          !_multiBlocProviderRegex.hasMatch(bodySource)) {
         return;
       }
 
       // Check if BlocObserver is set
-      if (!bodySource.contains('Bloc.observer') &&
-          !bodySource.contains('BlocObserver')) {
+      if (!_blocObserverRegex.hasMatch(bodySource) &&
+          !_blocObserverClassRegex.hasMatch(bodySource)) {
         reporter.atNode(node);
       }
     });
@@ -971,6 +978,9 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final RegExp _blocWordRegex = RegExp(r'\bBloc\b');
+  static final RegExp _cubitWordRegex = RegExp(r'\bCubit\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -989,7 +999,8 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration field in member.fields.variables) {
             final String fieldType = member.fields.type?.toSource() ?? '';
-            if (fieldType.contains('Bloc') || fieldType.contains('Cubit')) {
+            if (_blocWordRegex.hasMatch(fieldType) ||
+                _cubitWordRegex.hasMatch(fieldType)) {
               blocFields.add(field.name.lexeme);
             }
           }
@@ -3153,7 +3164,9 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null) {
             for (final String disposableType in _disposableTypes) {
-              if (typeName.contains(disposableType)) {
+              if (RegExp(
+                r'\b' + RegExp.escape(disposableType) + r'\b',
+              ).hasMatch(typeName)) {
                 for (final VariableDeclaration variable
                     in member.fields.variables) {
                   disposableFields.add(variable.name.lexeme);
@@ -3809,6 +3822,10 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _repositoryWordRegex = RegExp(r'\bRepository\b');
+  static final RegExp _serviceWordRegex = RegExp(r'\bService\b');
+  static final RegExp _dataSourceWordRegex = RegExp(r'\bDataSource\b');
+
   /// Prefixes that indicate concrete implementations.
   static const Set<String> _concretePrefixes = <String>{
     'Firebase',
@@ -3849,9 +3866,9 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
           final typeName = type.toSource();
           for (final prefix in _concretePrefixes) {
             if (typeName.startsWith(prefix) &&
-                (typeName.contains('Repository') ||
-                    typeName.contains('Service') ||
-                    typeName.contains('DataSource'))) {
+                (_repositoryWordRegex.hasMatch(typeName) ||
+                    _serviceWordRegex.hasMatch(typeName) ||
+                    _dataSourceWordRegex.hasMatch(typeName))) {
               reporter.atNode(member);
               break;
             }

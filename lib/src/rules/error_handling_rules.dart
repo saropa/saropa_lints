@@ -1743,7 +1743,11 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
 
     final String targetSource = target.toSource().toLowerCase();
     for (final String pattern in _cacheReceiverPatterns) {
-      if (targetSource.contains(pattern)) return true;
+      if (RegExp(
+        r'\b' + RegExp.escape(pattern) + r'\b',
+      ).hasMatch(targetSource)) {
+        return true;
+      }
     }
     return false;
   }
@@ -1886,7 +1890,7 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('Permission.')) return;
+      if (!RegExp(r'\bPermission\.').hasMatch(targetSource)) return;
 
       // Look for isPermanentlyDenied check in surrounding code
       AstNode? current = node.parent;
@@ -1903,8 +1907,8 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
       if (enclosingBody == null) return;
 
       final String bodySource = enclosingBody.toSource();
-      if (!bodySource.contains('isPermanentlyDenied') &&
-          !bodySource.contains('openAppSettings')) {
+      if (!RegExp(r'\bisPermanentlyDenied\b').hasMatch(bodySource) &&
+          !RegExp(r'\bopenAppSettings\b').hasMatch(bodySource)) {
         reporter.atNode(node);
       }
     });
@@ -2220,30 +2224,23 @@ class RequireErrorLoggingRule extends SaropaLintRule {
   bool _hasLoggingCall(Block body) {
     final String bodySource = body.toSource();
 
-    // Quick check: does the body contain any known logging method names?
     for (final String method in _loggingMethods) {
-      // Check for method call pattern: methodName( or .methodName(
-      if (bodySource.contains('$method(') || bodySource.contains('.$method(')) {
+      if (RegExp(r'\b' + RegExp.escape(method) + r'\s*\(')
+              .hasMatch(bodySource) ||
+          RegExp(r'\.' + RegExp.escape(method) + r'\s*\(')
+              .hasMatch(bodySource)) {
         return true;
       }
     }
 
-    // Check for logger receiver patterns: logger.something(
     for (final String receiver in _loggerReceivers) {
-      if (bodySource.contains('$receiver.')) {
+      if (RegExp(RegExp.escape(receiver) + r'\.').hasMatch(bodySource)) {
         return true;
       }
     }
 
-    // Check for rethrow - error will be logged upstream
-    if (bodySource.contains('rethrow')) {
-      return true;
-    }
-
-    // Check for throw - error is being transformed and passed up
-    if (bodySource.contains('throw ')) {
-      return true;
-    }
+    if (RegExp(r'\brethrow\b').hasMatch(bodySource)) return true;
+    if (RegExp(r'\bthrow\s+').hasMatch(bodySource)) return true;
 
     return false;
   }
@@ -2335,17 +2332,21 @@ class RequireAppStartupErrorHandlingRule extends SaropaLintRule {
       final FunctionBody body = node.functionExpression.body;
       final String bodySource = body.toSource();
 
-      // Check for runApp call
-      if (!bodySource.contains('runApp(')) return;
+      if (!RegExp(r'\brunApp\s*\(').hasMatch(bodySource)) return;
 
-      // Check for error handling patterns
-      if (bodySource.contains('runZonedGuarded') ||
-          bodySource.contains('FlutterError.onError') ||
-          bodySource.contains('PlatformDispatcher.instance.onError') ||
-          bodySource.contains('try') ||
-          bodySource.contains('Zone.current.handleUncaughtError') ||
-          bodySource.contains('Isolate.current.addErrorListener')) {
-        return; // Has error handling
+      if (RegExp(r'\brunZonedGuarded\b').hasMatch(bodySource) ||
+          RegExp(r'\bFlutterError\.onError\b').hasMatch(bodySource) ||
+          RegExp(
+            r'\bPlatformDispatcher\.instance\.onError\b',
+          ).hasMatch(bodySource) ||
+          RegExp(r'\btry\b').hasMatch(bodySource) ||
+          RegExp(
+            r'\bZone\.current\.handleUncaughtError\b',
+          ).hasMatch(bodySource) ||
+          RegExp(
+            r'\bIsolate\.current\.addErrorListener\b',
+          ).hasMatch(bodySource)) {
+        return;
       }
 
       // Only flag if the project has a crash reporting dependency.

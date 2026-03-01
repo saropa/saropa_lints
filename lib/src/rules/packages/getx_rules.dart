@@ -11,6 +11,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../target_matcher_utils.dart';
 
 // =============================================================================
 // GetX Worker and Permanent Disposal Rules
@@ -105,7 +106,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
           if (typeName != null &&
               (typeName == 'Worker' ||
                   typeName == 'Worker?' ||
-                  typeName.contains('List<Worker>'))) {
+                  RegExp(r'\bList\s*<\s*Worker\s*>').hasMatch(typeName))) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
               workerFields.add(variable.name.lexeme);
@@ -117,10 +118,10 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
       if (workerFields.isEmpty) return;
 
       // Find onClose method and check for dispose calls
-      String? onCloseBody;
+      MethodDeclaration? onCloseMethod;
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'onClose') {
-          onCloseBody = member.body.toSource();
+          onCloseMethod = member;
           break;
         }
       }
@@ -128,9 +129,8 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
       // Report workers not disposed in onClose
       for (final String fieldName in workerFields) {
         final bool isDisposed =
-            onCloseBody != null &&
-            (onCloseBody.contains('$fieldName.dispose()') ||
-                onCloseBody.contains('$fieldName?.dispose()'));
+            onCloseMethod != null &&
+            isFieldCleanedUp(fieldName, 'dispose', onCloseMethod.body);
 
         if (!isDisposed) {
           for (final ClassMember member in node.members) {
@@ -268,13 +268,17 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
         }
       }
 
-      // Check if class has Get.delete() for this type
+      // Check if class has Get.delete() for this type (word-boundary)
       final String classSource = enclosingClass.toSource();
       final bool hasDelete =
-          classSource.contains('Get.delete') ||
-          classSource.contains('Get.deleteAll') ||
+          RegExp(r'\bGet\.delete\s*\(').hasMatch(classSource) ||
+          RegExp(r'\bGet\.deleteAll\s*\(').hasMatch(classSource) ||
           (controllerType != null &&
-              classSource.contains('Get.delete<$controllerType>'));
+              RegExp(
+                r'\bGet\.delete\s*<' +
+                    RegExp.escape(controllerType) +
+                    r'>\s*\(',
+              ).hasMatch(classSource));
 
       if (!hasDelete) {
         reporter.atNode(node);
@@ -781,16 +785,14 @@ class RequireGetxLazyPutRule extends SaropaLintRule {
         // Check if it's main() or setup-like function
         final String name = current.name.lexeme;
         if (name == 'main' ||
-            name.contains('init') ||
-            name.contains('setup') ||
-            name.contains('configure')) {
+            RegExp(r'\b(init|setup|configure)\b').hasMatch(name)) {
           return true;
         }
       }
       if (current is ClassDeclaration) {
         // Check if inside a Bindings class
         final String className = current.name.lexeme;
-        if (className.contains('Binding') || className.contains('Module')) {
+        if (className.endsWith('Binding') || className.endsWith('Module')) {
           return true;
         }
       }
@@ -979,7 +981,9 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null) {
             for (final String disposable in _disposableTypes) {
-              if (typeName.contains(disposable)) {
+              if (RegExp(
+                r'\b' + RegExp.escape(disposable) + r'\b',
+              ).hasMatch(typeName)) {
                 hasDisposable = true;
                 break;
               }
@@ -1621,12 +1625,12 @@ class PreferGetxBuilderRule extends SaropaLintRule {
     context.addPropertyAccess((PropertyAccess node) {
       if (node.propertyName.name != 'value') return;
 
-      // Check if target ends with .obs pattern
+      // Check if target ends with .obs pattern (word-boundary to avoid FPs)
       final Expression target = node.target!;
       final String targetSource = target.toSource();
-      if (!targetSource.contains('.obs') &&
-          !targetSource.contains('Rx') &&
-          !targetSource.contains('rx')) {
+      if (!RegExp(r'\.obs\b').hasMatch(targetSource) &&
+          !RegExp(r'\bRx\b').hasMatch(targetSource) &&
+          !RegExp(r'\brx\b').hasMatch(targetSource)) {
         return;
       }
 

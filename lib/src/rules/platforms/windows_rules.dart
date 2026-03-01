@@ -380,6 +380,30 @@ class RequireWindowsSingleInstanceCheckRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _runAppRegex = RegExp(r'\brunApp\b');
+  static final RegExp _singleInstanceRegex = RegExp(r'\bSingleInstance\b');
+  static final RegExp _singleInstanceCamelRegex = RegExp(r'\bsingleInstance\b');
+  static final RegExp _singleInstanceSnakeRegex = RegExp(
+    r'\bsingle_instance\b',
+  );
+  static final RegExp _mutexRegex = RegExp(r'\bmutex\b');
+  static final RegExp _mutexCapRegex = RegExp(r'\bMutex\b');
+  static final RegExp _namedPipeRegex = RegExp(r'\bnamedPipe\b');
+  static final RegExp _namedPipeCapRegex = RegExp(r'\bNamedPipe\b');
+  static final RegExp _ensureSingleInstanceRegex = RegExp(
+    r'\bensureSingleInstance\b',
+  );
+  static final RegExp _isFirstInstanceRegex = RegExp(r'\bisFirstInstance\b');
+  static final RegExp _platformIsWindowsRegex = RegExp(
+    r'\bPlatform\.isWindows\b',
+  );
+  static final RegExp _targetPlatformWindowsRegex = RegExp(
+    r'\bTargetPlatform\.windows\b',
+  );
+  static final RegExp _defaultTargetPlatformRegex = RegExp(
+    r'\bdefaultTargetPlatform\b',
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -393,25 +417,25 @@ class RequireWindowsSingleInstanceCheckRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Must contain runApp to be relevant
-      if (!bodySource.contains('runApp')) return;
+      if (!_runAppRegex.hasMatch(bodySource)) return;
 
       // Check for single instance patterns
-      if (bodySource.contains('SingleInstance') ||
-          bodySource.contains('singleInstance') ||
-          bodySource.contains('single_instance') ||
-          bodySource.contains('mutex') ||
-          bodySource.contains('Mutex') ||
-          bodySource.contains('namedPipe') ||
-          bodySource.contains('NamedPipe') ||
-          bodySource.contains('ensureSingleInstance') ||
-          bodySource.contains('isFirstInstance')) {
+      if (_singleInstanceRegex.hasMatch(bodySource) ||
+          _singleInstanceCamelRegex.hasMatch(bodySource) ||
+          _singleInstanceSnakeRegex.hasMatch(bodySource) ||
+          _mutexRegex.hasMatch(bodySource) ||
+          _mutexCapRegex.hasMatch(bodySource) ||
+          _namedPipeRegex.hasMatch(bodySource) ||
+          _namedPipeCapRegex.hasMatch(bodySource) ||
+          _ensureSingleInstanceRegex.hasMatch(bodySource) ||
+          _isFirstInstanceRegex.hasMatch(bodySource)) {
         return; // Has single instance handling
       }
 
       // Check for Windows platform guard
-      if (!bodySource.contains('Platform.isWindows') &&
-          !bodySource.contains('TargetPlatform.windows') &&
-          !bodySource.contains('defaultTargetPlatform')) {
+      if (!_platformIsWindowsRegex.hasMatch(bodySource) &&
+          !_targetPlatformWindowsRegex.hasMatch(bodySource) &&
+          !_defaultTargetPlatformRegex.hasMatch(bodySource)) {
         return; // Not clearly a Windows-targeted main
       }
 

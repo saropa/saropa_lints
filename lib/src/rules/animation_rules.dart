@@ -933,6 +933,8 @@ class PreferTweenSequenceRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _forwardCallPattern = RegExp(r'\.forward\s*\(\s*\)');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -941,19 +943,17 @@ class PreferTweenSequenceRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'then') return;
 
-      // Check if called on .forward()
       final Expression? target = node.target;
       if (target is! MethodInvocation) return;
       if (target.methodName.name != 'forward') return;
 
-      // Check if the callback also calls forward
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
       final Expression callback = args.arguments.first;
       if (callback is FunctionExpression) {
         final String bodySource = callback.body.toSource();
-        if (bodySource.contains('.forward()')) {
+        if (_forwardCallPattern.hasMatch(bodySource)) {
           reporter.atNode(node);
         }
       }
@@ -1025,9 +1025,8 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
       if (methodName == 'forward') {
         final Expression? target = node.target;
         if (target != null) {
-          // Skip if using repeat (continuous animation)
-          final String source = node.toSource();
-          if (!source.contains('repeat')) {
+          final String nodeSource = node.toSource();
+          if (!RegExp(r'\brepeat\b').hasMatch(nodeSource)) {
             forwardCalls[target.toSource()] = node;
           }
         }
@@ -1350,6 +1349,19 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _animateToBackPatterns = <RegExp>[
+    RegExp(r'\banimateTo\b'),
+    RegExp(r'\banimateBack\b'),
+  ];
+  static final List<RegExp> _physicsPatterns = <RegExp>[
+    RegExp(r'\bSimulation\b'),
+    RegExp(r'\banimateWith\b'),
+    RegExp(r'\bspring\b'),
+    RegExp(r'\bSpring\b'),
+    RegExp(r'\bfriction\b'),
+    RegExp(r'\bFriction\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1365,21 +1377,11 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
 
       final String bodySource = callback.body.toSource();
 
-      // Check if using animateTo/animateBack without physics
-      if (bodySource.contains('animateTo') ||
-          bodySource.contains('animateBack')) {
-        // OK if using physics simulation
-        if (bodySource.contains('Simulation') ||
-            bodySource.contains('animateWith') ||
-            bodySource.contains('spring') ||
-            bodySource.contains('Spring') ||
-            bodySource.contains('friction') ||
-            bodySource.contains('Friction')) {
-          return;
-        }
+      if (!_animateToBackPatterns.any((re) => re.hasMatch(bodySource))) return;
 
-        reporter.atNode(node);
-      }
+      if (_physicsPatterns.any((re) => re.hasMatch(bodySource))) return;
+
+      reporter.atNode(node);
     });
   }
 }

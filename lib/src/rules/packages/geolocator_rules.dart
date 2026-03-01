@@ -91,21 +91,21 @@ class RequireGeolocatorBatteryAwarenessRule extends SaropaLintRule {
       // Check for battery-aware settings
       final String nodeSource = node.toSource();
 
-      // Check for problematic patterns
+      // Check for problematic patterns (word-boundary / literal)
       bool hasBestAccuracy =
-          nodeSource.contains('LocationAccuracy.best') ||
-          nodeSource.contains('LocationAccuracy.bestForNavigation');
-      bool hasZeroDistanceFilter =
-          nodeSource.contains('distanceFilter: 0') ||
-          nodeSource.contains('distanceFilter:0');
+          RegExp(r'LocationAccuracy\.best\b').hasMatch(nodeSource) ||
+          RegExp(r'LocationAccuracy\.bestForNavigation').hasMatch(nodeSource);
+      bool hasZeroDistanceFilter = RegExp(
+        r'distanceFilter:\s*0',
+      ).hasMatch(nodeSource);
       bool hasNoIntervalDuration =
-          !nodeSource.contains('intervalDuration') &&
-          !nodeSource.contains('timeLimit');
+          !RegExp(r'\bintervalDuration\b').hasMatch(nodeSource) &&
+          !RegExp(r'\btimeLimit\b').hasMatch(nodeSource);
 
       // Check for platform-specific optimized settings
       bool hasPlatformSettings =
-          nodeSource.contains('AndroidSettings') ||
-          nodeSource.contains('AppleSettings');
+          RegExp(r'\bAndroidSettings\b').hasMatch(nodeSource) ||
+          RegExp(r'\bAppleSettings\b').hasMatch(nodeSource);
 
       // Flag if using best accuracy without platform optimization
       if (hasBestAccuracy && !hasPlatformSettings) {
@@ -130,11 +130,11 @@ class RequireGeolocatorBatteryAwarenessRule extends SaropaLintRule {
 
       // Check for problematic patterns
       bool hasBestAccuracy =
-          nodeSource.contains('LocationAccuracy.best') ||
-          nodeSource.contains('LocationAccuracy.bestForNavigation');
-      bool hasZeroDistanceFilter =
-          nodeSource.contains('distanceFilter: 0') ||
-          nodeSource.contains('distanceFilter:0');
+          RegExp(r'LocationAccuracy\.best\b').hasMatch(nodeSource) ||
+          RegExp(r'LocationAccuracy\.bestForNavigation').hasMatch(nodeSource);
+      bool hasZeroDistanceFilter = RegExp(
+        r'distanceFilter:\s*0',
+      ).hasMatch(nodeSource);
 
       if (hasBestAccuracy && hasZeroDistanceFilter) {
         reporter.atNode(node);
@@ -210,11 +210,11 @@ class PreferGeocodingCacheRule extends SaropaLintRule {
         if (current is FunctionBody) {
           final String bodySource = current.toSource();
           // Look for cache patterns
-          if (bodySource.contains('cache') ||
-              bodySource.contains('Cache') ||
-              bodySource.contains('_geocode') ||
-              bodySource.contains('_placemark') ||
-              bodySource.contains('cached')) {
+          if (RegExp(r'\bcache\b').hasMatch(bodySource) ||
+              RegExp(r'\bCache\b').hasMatch(bodySource) ||
+              RegExp(r'_geocode').hasMatch(bodySource) ||
+              RegExp(r'_placemark').hasMatch(bodySource) ||
+              RegExp(r'\bcached\b').hasMatch(bodySource)) {
             return; // Has cache, OK
           }
           break;
@@ -290,10 +290,9 @@ class AvoidContinuousLocationUpdatesRule extends SaropaLintRule {
 
       // Check if locationSettings or distanceFilter is specified
       final String argsSource = node.argumentList.toSource();
-      if (argsSource.contains('distanceFilter') ||
-          argsSource.contains('locationSettings') ||
-          argsSource.contains('LocationSettings') ||
-          argsSource.contains('significantChanges')) {
+      if (RegExp(
+        r'\b(distanceFilter|locationSettings|LocationSettings|significantChanges)\b',
+      ).hasMatch(argsSource)) {
         return; // Has filtering, OK
       }
 

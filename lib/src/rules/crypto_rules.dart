@@ -227,14 +227,19 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
       while (current != null) {
         if (current is VariableDeclaration) {
           final String varName = current.name.lexeme.toLowerCase();
-          if (_securityIndicators.any((s) => varName.contains(s))) {
+          if (_securityIndicators.any(
+            (s) => RegExp(r'\b' + RegExp.escape(s) + r'\b').hasMatch(varName),
+          )) {
             reporter.atNode(node);
             return;
           }
         }
         if (current is MethodDeclaration) {
           final String methodName = current.name.lexeme.toLowerCase();
-          if (_securityIndicators.any((s) => methodName.contains(s))) {
+          if (_securityIndicators.any(
+            (s) =>
+                RegExp(r'\b' + RegExp.escape(s) + r'\b').hasMatch(methodName),
+          )) {
             reporter.atNode(node);
             return;
           }
@@ -242,7 +247,9 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
         // Also check local functions (FunctionDeclaration)
         if (current is FunctionDeclaration) {
           final String funcName = current.name.lexeme.toLowerCase();
-          if (_securityIndicators.any((s) => funcName.contains(s))) {
+          if (_securityIndicators.any(
+            (s) => RegExp(r'\b' + RegExp.escape(s) + r'\b').hasMatch(funcName),
+          )) {
             reporter.atNode(node);
             return;
           }
@@ -410,6 +417,8 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
     web: <OwaspWeb>{OwaspWeb.a02},
   );
 
+  static final RegExp _ivWordRegex = RegExp(r'\bIV\b');
+
   // cspell:ignore ciphertexts plaintexts
   static const LintCode _code = LintCode(
     'require_unique_iv_per_encryption',
@@ -495,7 +504,7 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('IV')) return;
+      if (!_ivWordRegex.hasMatch(targetSource)) return;
 
       // Check if argument is a string literal (fixed IV)
       if (node.argumentList.arguments.isNotEmpty) {

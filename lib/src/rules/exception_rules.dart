@@ -228,22 +228,12 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  // Types that are known to have useful toString implementations
-  static const Set<String> _knownGoodTypes = <String>{
-    'Exception',
-    'Error',
-    'String',
-    'FormatException',
-    'ArgumentError',
-    'StateError',
-    'RangeError',
-    'UnsupportedError',
-    'UnimplementedError',
-    'ConcurrentModificationError',
-    'TypeError',
-    'AssertionError',
-    'NoSuchMethodError',
-  };
+  // Types that are known to have useful toString implementations (word-boundary)
+  static final RegExp _knownGoodTypesRegex = RegExp(
+    r'\b(Exception|Error|String|FormatException|ArgumentError|StateError|'
+    r'RangeError|UnsupportedError|UnimplementedError|'
+    r'ConcurrentModificationError|TypeError|AssertionError|NoSuchMethodError)\b',
+  );
 
   @override
   void runWithReporter(
@@ -260,7 +250,7 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
       final String typeName = type.getDisplayString();
 
       // Allow Exception and Error subtypes (they typically have good toString)
-      if (_knownGoodTypes.any((String t) => typeName.contains(t))) {
+      if (_knownGoodTypesRegex.hasMatch(typeName)) {
         return;
       }
 

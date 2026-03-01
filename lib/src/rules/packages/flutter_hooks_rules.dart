@@ -378,6 +378,8 @@ class PreferUseCallbackRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _useCallbackWordRegex = RegExp(r'\buseCallback\b');
+
   /// Callback parameter names commonly used in Flutter widgets.
   static const Set<String> _callbackParams = <String>{
     'onPressed',
@@ -411,7 +413,7 @@ class PreferUseCallbackRule extends SaropaLintRule {
 
       // Check if useCallback is already used in the body
       final String bodySource = node.body.toSource();
-      if (bodySource.contains('useCallback')) return;
+      if (_useCallbackWordRegex.hasMatch(bodySource)) return;
 
       // Look for inline closures in callback parameters
       final _InlineCallbackVisitor visitor = _InlineCallbackVisitor();

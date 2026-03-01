@@ -241,6 +241,8 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
     });
   }
 
+  static final RegExp _mountedInSourcePattern = RegExp(r'\bmounted\b');
+
   /// Walk ancestors to check if [node] is inside a `mounted` guard.
   ///
   /// Handles `if (mounted) setState(…)`, ternary guards, and
@@ -249,11 +251,11 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is IfStatement &&
-          current.expression.toSource().contains('mounted')) {
+          _mountedInSourcePattern.hasMatch(current.expression.toSource())) {
         return true;
       }
       if (current is ConditionalExpression &&
-          current.condition.toSource().contains('mounted')) {
+          _mountedInSourcePattern.hasMatch(current.condition.toSource())) {
         return true;
       }
       // Stop at method/function boundary
@@ -1094,20 +1096,13 @@ class AvoidUnsafeSetStateRule extends SaropaLintRule {
     return false;
   }
 
+  static final RegExp _mountedPattern = RegExp(r'\bmounted\b');
+
   /// Check if an expression is a mounted check
   bool _isMountedCheck(Expression condition) {
-    final String source = condition.toSource();
-
-    // Direct mounted check
-    if (source == 'mounted') {
-      return true;
-    }
-
-    // mounted == true or mounted != false
-    if (source.contains('mounted')) {
-      return true;
-    }
-
+    final String condSource = condition.toSource();
+    if (condSource == 'mounted') return true;
+    if (_mountedPattern.hasMatch(condSource)) return true;
     return false;
   }
 
@@ -1449,7 +1444,7 @@ class RequireDisposeRule extends SaropaLintRule {
     ];
 
     for (final String pattern in patterns) {
-      if (disposeBody.contains(pattern)) {
+      if (RegExp(RegExp.escape(pattern)).hasMatch(disposeBody)) {
         return true;
       }
     }
@@ -1690,7 +1685,7 @@ class RequireTimerCancellationRule extends SaropaLintRule {
     ];
 
     for (final String pattern in patterns) {
-      if (disposeBody.contains(pattern)) {
+      if (RegExp(RegExp.escape(pattern)).hasMatch(disposeBody)) {
         return true;
       }
     }
@@ -3734,6 +3729,10 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final RegExp _superDisposePattern = RegExp(
+    r'super\.dispose\s*\(\s*\)',
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3742,7 +3741,6 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'dispose') return;
 
-      // Check if in State<T> class
       final parent = node.parent;
       if (parent is! ClassDeclaration) return;
 
@@ -3750,9 +3748,8 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
       if (extendsClause == null) return;
       if (extendsClause.superclass.name.lexeme != 'State') return;
 
-      // Check if super.dispose() is called
-      final bodySource = node.body.toSource();
-      if (!bodySource.contains('super.dispose()')) {
+      final String bodySource = node.body.toSource();
+      if (!_superDisposePattern.hasMatch(bodySource)) {
         reporter.atNode(node);
       }
     });
@@ -3810,6 +3807,10 @@ class RequireSuperInitStateCallRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final RegExp _superInitStatePattern = RegExp(
+    r'super\.initState\s*\(\s*\)',
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3818,7 +3819,6 @@ class RequireSuperInitStateCallRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'initState') return;
 
-      // Check if in State<T> class
       final parent = node.parent;
       if (parent is! ClassDeclaration) return;
 
@@ -3826,9 +3826,8 @@ class RequireSuperInitStateCallRule extends SaropaLintRule {
       if (extendsClause == null) return;
       if (extendsClause.superclass.name.lexeme != 'State') return;
 
-      // Check if super.initState() is called
-      final bodySource = node.body.toSource();
-      if (!bodySource.contains('super.initState()')) {
+      final String bodySource = node.body.toSource();
+      if (!_superInitStatePattern.hasMatch(bodySource)) {
         reporter.atNode(node);
       }
     });
@@ -4089,22 +4088,20 @@ class AvoidGlobalKeysInStateRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final RegExp _globalKeyTypePattern = RegExp(r'\bGlobalKey\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      // Check if this is a StatefulWidget
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
       final String superclass = extendsClause.superclass.toSource();
       if (!superclass.contains('StatefulWidget')) return;
 
-      // Collect field names set via constructor parameters (this.xxx).
-      // These are pass-through references from the parent, not keys
-      // created by this widget, so they should not be flagged.
       final Set<String> constructorFieldParams = <String>{};
       for (final ClassMember member in node.members) {
         if (member is ConstructorDeclaration) {
@@ -4125,7 +4122,7 @@ class AvoidGlobalKeysInStateRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final TypeAnnotation? type = member.fields.type;
-          if (type != null && type.toSource().contains('GlobalKey')) {
+          if (type != null && _globalKeyTypePattern.hasMatch(type.toSource())) {
             // Skip if all variables are constructor parameters
             final bool isPassThrough = member.fields.variables.every(
               (VariableDeclaration v) =>
@@ -4212,6 +4209,17 @@ class AvoidExpensiveDidChangeDependenciesRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _initGuardPatterns = <RegExp>[
+    RegExp(r'\b_initialized\b'),
+    RegExp(r'\b_isInitialized\b'),
+    RegExp(r'\b_didInit\b'),
+    RegExp(r'\b_hasInit\b'),
+    RegExp(r'\b_loaded\b'),
+    RegExp(r'\b_isLoaded\b'),
+    RegExp(r'\b_fetched\b'),
+    RegExp(r'\b_ready\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -4223,16 +4231,8 @@ class AvoidExpensiveDidChangeDependenciesRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       if (body is! BlockFunctionBody) return;
 
-      // Check for initialization guard pattern (string heuristic)
       final String bodySource = body.toSource();
-      if (bodySource.contains('_initialized') ||
-          bodySource.contains('_isInitialized') ||
-          bodySource.contains('_didInit') ||
-          bodySource.contains('_hasInit') ||
-          bodySource.contains('_loaded') ||
-          bodySource.contains('_isLoaded') ||
-          bodySource.contains('_fetched') ||
-          bodySource.contains('_ready')) {
+      if (_initGuardPatterns.any((re) => re.hasMatch(bodySource))) {
         return;
       }
 

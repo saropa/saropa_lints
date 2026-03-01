@@ -751,6 +751,9 @@ class PreferMovingToVariableRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _hasDotRegex = RegExp(r'\.');
+  static final RegExp _hasParenRegex = RegExp(r'\(');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -765,7 +768,8 @@ class PreferMovingToVariableRule extends SaropaLintRule {
         _ExpressionCollector((Expression expr) {
           final String source = expr.toSource();
           // Only track non-trivial expressions
-          if (source.contains('.') || source.contains('(')) {
+          if (_hasDotRegex.hasMatch(source) ||
+              _hasParenRegex.hasMatch(source)) {
             expressions.putIfAbsent(source, () => <Expression>[]).add(expr);
           }
         }),

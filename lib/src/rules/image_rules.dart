@@ -1,7 +1,9 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
+
+import '../saropa_lint_rule.dart';
+import '../target_matcher_utils.dart';
 
 /// Warns when Image.network is used inside ListView.builder without caching.
 ///
@@ -706,6 +708,15 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _feedbackPatterns = <RegExp>[
+    RegExp(r'\bshowSnackBar\b'),
+    RegExp(r'\bScaffoldMessenger\b'),
+    RegExp(r'\bToast\b'),
+    RegExp(r'\bFluttertoast\b'),
+    RegExp(r'\bshowToast\b'),
+    RegExp(r'\bshowMessage\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -735,13 +746,9 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
       if (enclosingBody == null) return;
 
       final String bodySource = enclosingBody.toSource();
-      final bool hasFeedback =
-          bodySource.contains('showSnackBar') ||
-          bodySource.contains('ScaffoldMessenger') ||
-          bodySource.contains('Toast') ||
-          bodySource.contains('Fluttertoast') ||
-          bodySource.contains('showToast') ||
-          bodySource.contains('showMessage');
+      final bool hasFeedback = _feedbackPatterns.any(
+        (re) => re.hasMatch(bodySource),
+      );
 
       if (!hasFeedback) {
         reporter.atNode(node);
@@ -1227,10 +1234,10 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
       if (!hasAddListener) return;
 
       // Find dispose method and check for removeListener calls
-      String? disposeBody;
+      MethodDeclaration? disposeMethod;
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
+          disposeMethod = member;
           break;
         }
       }
@@ -1238,9 +1245,8 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
       // Report ImageStreams without removeListener in dispose
       for (final String fieldName in imageStreamFields) {
         final bool hasRemoveListener =
-            disposeBody != null &&
-            (disposeBody.contains('$fieldName.removeListener(') ||
-                disposeBody.contains('$fieldName?.removeListener('));
+            disposeMethod != null &&
+            isFieldCleanedUp(fieldName, 'removeListener', disposeMethod.body);
 
         if (!hasRemoveListener) {
           for (final ClassMember member in node.members) {
@@ -1309,6 +1315,12 @@ class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static const Set<String> _imagePickerTargets = <String>{
+    'ImagePicker',
+    'picker',
+    'imagePicker',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1326,13 +1338,9 @@ class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
 
       // Check if called on ImagePicker
       final Expression? target = node.target;
-      if (target != null) {
-        final String targetSource = target.toSource();
-        if (!targetSource.contains('ImagePicker') &&
-            !targetSource.contains('picker') &&
-            !targetSource.contains('imagePicker')) {
-          return;
-        }
+      if (target != null &&
+          !_imagePickerTargets.contains(extractTargetName(target))) {
+        return;
       }
 
       // Check for requestFullMetadata parameter
@@ -1404,6 +1412,12 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static const Set<String> _imagePickerTargets = <String>{
+    'ImagePicker',
+    'picker',
+    'imagePicker',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1419,13 +1433,9 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
 
       // Check if called on ImagePicker
       final Expression? target = node.target;
-      if (target != null) {
-        final String targetSource = target.toSource();
-        if (!targetSource.contains('ImagePicker') &&
-            !targetSource.contains('picker') &&
-            !targetSource.contains('imagePicker')) {
-          return;
-        }
+      if (target != null &&
+          !_imagePickerTargets.contains(extractTargetName(target))) {
+        return;
       }
 
       // Check for imageQuality or size constraint parameters
@@ -1638,6 +1648,12 @@ class RequireCachedImageDevicePixelRatioRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _dprPatterns = <RegExp>[
+    RegExp(r'\bdevicePixelRatio\b'),
+    RegExp(r'\bdpr\b'),
+    RegExp(r'\bDPR\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1670,10 +1686,8 @@ class RequireCachedImageDevicePixelRatioRule extends SaropaLintRule {
 
       // Check if the size expressions reference devicePixelRatio
       if (hasFixedSize) {
-        final String source = node.toSource();
-        if (source.contains('devicePixelRatio') ||
-            source.contains('dpr') ||
-            source.contains('DPR')) {
+        final String nodeSource = node.toSource();
+        if (_dprPatterns.any((re) => re.hasMatch(nodeSource))) {
           hasDprScaling = true;
         }
       }
@@ -1786,17 +1800,20 @@ class AvoidCachedImageUnboundedListRule extends SaropaLintRule {
     return false;
   }
 
+  static final List<RegExp> _listBuilderSuffixPatterns = <RegExp>[
+    RegExp(r'\.builder\b'),
+    RegExp(r'\.separated\b'),
+    RegExp(r'\.count\b'),
+    RegExp(r'\.extent\b'),
+  ];
+
   /// Checks if a constructor source matches a scrollable list builder.
   static bool _isListBuilderConstructor(String source) {
-    // Match ListView.builder, ListView.separated, GridView.builder, etc.
     if (source.startsWith('ListView') ||
         source.startsWith('GridView') ||
         source.startsWith('SliverList') ||
         source.startsWith('SliverGrid')) {
-      return source.contains('.builder') ||
-          source.contains('.separated') ||
-          source.contains('.count') ||
-          source.contains('.extent');
+      return _listBuilderSuffixPatterns.any((re) => re.hasMatch(source));
     }
     return false;
   }

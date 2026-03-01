@@ -511,8 +511,8 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
 
       // Check if target is likely an Expando
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('expando') &&
-          !targetSource.contains('_meta')) {
+      if (!RegExp(r'\bexpando\b').hasMatch(targetSource) &&
+          !RegExp(r'_meta').hasMatch(targetSource)) {
         return;
       }
 
@@ -605,8 +605,8 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
         final Expression? target = node.target;
         if (target != null) {
           final String targetSource = target.toSource().toLowerCase();
-          if (targetSource.contains('port') ||
-              targetSource.contains('sendport')) {
+          if (RegExp(r'\bport\b').hasMatch(targetSource) ||
+              RegExp(r'\bsendport\b').hasMatch(targetSource)) {
             final NodeList<Expression> args = node.argumentList.arguments;
             if (args.isNotEmpty) {
               final String argSource = args.first.toSource().toLowerCase();
@@ -1352,8 +1352,7 @@ class AvoidClosureCaptureLeaksRule extends SaropaLintRule {
       if (stmt.offset >= setStateOffset) break;
 
       final String source = stmt.toSource();
-      // Common patterns: `if (!mounted) return;`  `if (!context.mounted)`
-      if (source.contains('mounted')) return true;
+      if (RegExp(r'\bmounted\b').hasMatch(source)) return true;
     }
     return false;
   }

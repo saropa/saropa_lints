@@ -57,6 +57,10 @@ class AvoidAssetManifestJsonRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final RegExp _assetManifestLiteralRegex = RegExp(
+    RegExp.escape('AssetManifest.json'),
+  );
+
   @override
   Set<String>? get requiredPatterns => const <String>{'AssetManifest.json'};
 
@@ -73,7 +77,7 @@ class AvoidAssetManifestJsonRule extends SaropaLintRule {
 
     context.addStringInterpolation((StringInterpolation node) {
       final source = node.toSource();
-      if (source.contains('AssetManifest.json')) {
+      if (_assetManifestLiteralRegex.hasMatch(source)) {
         reporter.atNode(node);
       }
     });
