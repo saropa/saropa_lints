@@ -853,3 +853,184 @@ def print_orphan_analysis(
             f"... and {len(non_stylistic) - 10} more"
             f"{Color.RESET.value}"
         )
+
+
+# =============================================================================
+# FALSE-POSITIVE REDUCTION (.contains() ANTI-PATTERN AUDIT)
+# =============================================================================
+# Status is derived from code only: test/anti_pattern_detection_test.dart
+# (_baselineCounts) and lib/src/rules/**/*.dart (dangerous pattern counts).
+# No dependency on bugs/discussion or bugs/history documents.
+
+# Patterns that match dangerous .contains() usage (must match Dart test).
+_DANGEROUS_CONTAINS_PATTERNS = [
+    re.compile(r"methodName\.contains\("),
+    re.compile(r"targetSource\.contains\("),
+    re.compile(r"typeName\.contains\("),
+    re.compile(r"bodySource\.contains\("),
+    re.compile(r"\.toSource\(\)\.contains\("),
+    re.compile(r"fieldType\.contains\("),
+    re.compile(r"disposeBody\.contains\("),
+    re.compile(r"createSource\.contains\("),
+    re.compile(r"\bsource\.contains\("),
+]
+
+
+def _parse_baseline_counts(test_path: Path) -> dict[str, int]:
+    """Parse _baselineCounts from test/anti_pattern_detection_test.dart."""
+    if not test_path.exists():
+        return {}
+    text = test_path.read_text(encoding="utf-8")
+    # Find the const Map block: _baselineCounts = { ... };
+    start = text.find("_baselineCounts = {")
+    if start == -1:
+        return {}
+    start += len("_baselineCounts = {")
+    depth = 1
+    i = start
+    end = start
+    while i < len(text) and depth:
+        if text[i] == "{":
+            depth += 1
+        elif text[i] == "}":
+            depth -= 1
+            if depth == 0:
+                end = i
+                break
+        i += 1
+    block = text[start:end]
+    # Parse 'key': value, lines (key is quoted, value is int)
+    result: dict[str, int] = {}
+    for m in re.finditer(r"'([^']+)'\s*:\s*(\d+)", block):
+        result[m.group(1)] = int(m.group(2))
+    return result
+
+
+def _relativize_rules_path(file_path: Path, rules_dir: Path) -> str:
+    """Return path relative to rules dir, forward slashes (matches Dart test)."""
+    try:
+        rel = file_path.relative_to(rules_dir)
+    except ValueError:
+        return file_path.name
+    return str(rel).replace("\\", "/")
+
+
+def _is_dangerous_contains_line(line: str) -> bool:
+    """True if line contains a dangerous .contains() pattern (matches Dart)."""
+    trimmed = line.strip()
+    if trimmed.startswith("//") or trimmed.startswith("*"):
+        return False
+    if trimmed.startswith("import ") or trimmed.startswith("export "):
+        return False
+    return any(p.search(trimmed) for p in _DANGEROUS_CONTAINS_PATTERNS)
+
+
+def _count_dangerous_contains(file_path: Path) -> int:
+    """Count lines with dangerous .contains() in a rule file."""
+    if not file_path.exists():
+        return 0
+    count = 0
+    for line in file_path.read_text(encoding="utf-8").splitlines():
+        if _is_dangerous_contains_line(line):
+            count += 1
+    return count
+
+
+def get_contains_audit_status(project_dir: Path) -> dict:
+    """Compute false-positive reduction status from code only.
+
+    Reads baseline from test/anti_pattern_detection_test.dart and scans
+    lib/src/rules/**/*.dart for dangerous .contains() patterns. Returns
+    a dict with:
+      - baseline: dict[str, int] from test file
+      - actual: dict[str, int] file -> current count
+      - files_at_zero: list of rule files with 0 violations (done)
+      - files_with_baseline: list of files still in baseline (remaining work)
+      - total_remaining: sum of actual counts for files in baseline
+      - over_baseline: list of (file, actual, baseline) where actual > baseline
+      - stale_baseline: list of files in baseline with actual 0 (can remove)
+    """
+    rules_dir = project_dir / "lib" / "src" / "rules"
+    test_path = project_dir / "test" / "anti_pattern_detection_test.dart"
+    baseline = _parse_baseline_counts(test_path)
+    actual: dict[str, int] = {}
+    for path in sorted(rules_dir.rglob("*.dart")):
+        rel = _relativize_rules_path(path, rules_dir)
+        actual[rel] = _count_dangerous_contains(path)
+    files_at_zero = [f for f, c in actual.items() if c == 0]
+    files_with_baseline = list(baseline.keys())
+    total_remaining = sum(actual.get(f, 0) for f in baseline)
+    over_baseline = [
+        (f, actual.get(f, 0), baseline[f])
+        for f in baseline
+        if actual.get(f, 0) > baseline[f]
+    ]
+    stale_baseline = [f for f in baseline if actual.get(f, 0) == 0]
+    return {
+        "baseline": baseline,
+        "actual": actual,
+        "files_at_zero": files_at_zero,
+        "files_with_baseline": files_with_baseline,
+        "total_remaining": total_remaining,
+        "over_baseline": over_baseline,
+        "stale_baseline": stale_baseline,
+    }
+
+
+def print_contains_audit_status(
+    project_dir: Path,
+    status: dict | None = None,
+) -> None:
+    """Print false-positive reduction status (derived from code only).
+
+    If status is provided (e.g. from run_full_audit), it is used;
+    otherwise status is computed from project_dir.
+    """
+    if status is None:
+        status = get_contains_audit_status(project_dir)
+    baseline = status["baseline"]
+    actual = status["actual"]
+    total_remaining = status["total_remaining"]
+    over_baseline = status["over_baseline"]
+    stale_baseline = status["stale_baseline"]
+    files_at_zero = status["files_at_zero"]
+    n_in_baseline = len(baseline)
+    n_rule_files = len(actual)
+
+    print_subheader("False-positive reduction (.contains() audit)")
+    print(
+        "    Source: test/anti_pattern_detection_test.dart (baseline) + "
+        "lib/src/rules/**/*.dart (counts)."
+    )
+    print_stat(
+        "Rule files with 0 dangerous .contains()",
+        len(files_at_zero),
+        Color.GREEN,
+    )
+    print_stat(
+        "Rule files still in baseline (remaining work)",
+        n_in_baseline,
+        Color.YELLOW,
+    )
+    print_stat("Total violations across baseline files", total_remaining, Color.YELLOW)
+    if over_baseline:
+        print_error(
+            f"{len(over_baseline)} file(s) exceed baseline (CI would fail)"
+        )
+        for f, a, b in over_baseline[:5]:
+            print(f"      {f}: actual={a}, baseline={b}")
+        if len(over_baseline) > 5:
+            print(f"      ... and {len(over_baseline) - 5} more")
+    if stale_baseline:
+        print_warning(
+            f"{len(stale_baseline)} baseline entry(ies) can be removed "
+            f"(file at 0): {', '.join(sorted(stale_baseline)[:5])}"
+            + (f" +{len(stale_baseline)-5} more" if len(stale_baseline) > 5 else "")
+        )
+    if not over_baseline and n_in_baseline == 0:
+        print_success("All rule files at 0; no baseline entries (audit complete).")
+    elif not over_baseline:
+        print_info(
+            f"Next: reduce violations in baseline files or remove entries "
+            f"when a file reaches 0 (see test/anti_pattern_detection_test.dart)."
+        )

@@ -69,6 +69,15 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _rationalePatterns = [
+    RegExp(r'\bshowDialog\b'),
+    RegExp(r'\bAlertDialog\b'),
+    RegExp(r'\bshowModalBottomSheet\b'),
+    RegExp(r'\bSnackBar\b'),
+    RegExp(r'\bshouldShowRationale\b'),
+    RegExp(r'\bshouldShowRequestRationale\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -108,13 +117,8 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
 
       final String bodySource = functionBody.toSource();
 
-      // Check for rationale patterns using specific function/class names
-      if (bodySource.contains('showDialog') ||
-          bodySource.contains('AlertDialog') ||
-          bodySource.contains('showModalBottomSheet') ||
-          bodySource.contains('SnackBar') ||
-          bodySource.contains('shouldShowRationale') ||
-          bodySource.contains('shouldShowRequestRationale')) {
+      // Check for rationale patterns (word-boundary to avoid FP on substrings)
+      if (_rationalePatterns.any((p) => p.hasMatch(bodySource))) {
         return; // Has rationale
       }
 
@@ -185,6 +189,13 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final List<RegExp> _cameraCheckPatterns = [
+    RegExp(r'Permission\.camera'),
+    RegExp(r'\.camera\.request'),
+    RegExp(r'\.camera\.status'),
+    RegExp(r'\bisGranted\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -219,11 +230,7 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
 
       if (functionBody != null) {
         final String bodySource = functionBody.toSource();
-
-        if (bodySource.contains('Permission.camera') ||
-            bodySource.contains('.camera.request') ||
-            bodySource.contains('.camera.status') ||
-            bodySource.contains('isGranted')) {
+        if (_cameraCheckPatterns.any((p) => p.hasMatch(bodySource))) {
           return; // Has permission check
         }
       }
@@ -267,12 +274,9 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
       if (functionBody == null) return;
 
       final String bodySource = functionBody.toSource();
-
-      if (!bodySource.contains('Permission.camera') &&
-          !bodySource.contains('.camera.request') &&
-          !bodySource.contains('.camera.status') &&
-          !bodySource.contains('checkCameraPermission') &&
-          !bodySource.contains('requestCameraPermission')) {
+      if (!_cameraCheckPatterns.any((p) => p.hasMatch(bodySource)) &&
+          !RegExp(r'\bcheckCameraPermission\b').hasMatch(bodySource) &&
+          !RegExp(r'\brequestCameraPermission\b').hasMatch(bodySource)) {
         reporter.atNode(node);
       }
     });
@@ -346,6 +350,10 @@ class PreferImageCroppingRule extends SaropaLintRule {
     'user_image',
     'userimage',
   };
+  static final List<RegExp> _profileContextKeywordPatterns =
+      _profileContextKeywords
+          .map((k) => RegExp('\\b${RegExp.escape(k)}\\b'))
+          .toList();
 
   @override
   void runWithReporter(
@@ -380,22 +388,17 @@ class PreferImageCroppingRule extends SaropaLintRule {
       final String methodNameLower =
           methodDeclaration?.name.lexeme.toLowerCase() ?? '';
 
-      // Check if this is profile/avatar context
-      bool isProfileContext = false;
-      for (final String keyword in _profileContextKeywords) {
-        if (bodySource.contains(keyword) || methodNameLower.contains(keyword)) {
-          isProfileContext = true;
-          break;
-        }
-      }
+      // Check if this is profile/avatar context (word-boundary to avoid FP)
+      final bool isProfileContext = _profileContextKeywordPatterns
+          .any((p) => p.hasMatch(bodySource) || p.hasMatch(methodNameLower));
 
       if (!isProfileContext) return;
 
-      // Check for cropping
-      if (bodySource.contains('cropper') ||
-          bodySource.contains('crop') ||
-          bodySource.contains('ImageCropper') ||
-          bodySource.contains('cropImage')) {
+      // Check for cropping (word-boundary to avoid FP on substrings)
+      if (RegExp(r'\bcropper\b').hasMatch(bodySource) ||
+          RegExp(r'\bcrop\b').hasMatch(bodySource) ||
+          RegExp(r'\bImageCropper\b').hasMatch(bodySource) ||
+          RegExp(r'\bcropImage\b').hasMatch(bodySource)) {
         return; // Has cropping
       }
 
@@ -581,13 +584,13 @@ class PreferPermissionRequestInContextRule extends SaropaLintRule {
       // Check if this is a .request() call
       if (node.methodName.name != 'request') return;
 
-      // Check if target looks like a Permission
+      // Exact match: Permission or Permission.something (avoids FP on unrelated classes)
       final String? targetSource = node.target?.toSource();
       if (targetSource == null) return;
 
       final bool isPermission =
-          targetSource.contains('Permission') ||
-          targetSource.contains('permission');
+          targetSource == 'Permission' ||
+          targetSource.startsWith('Permission.');
       if (!isPermission) return;
 
       // Check if inside a startup function

@@ -143,3 +143,12 @@ void _ignoreSuppressesRequireMinimumContrast() {
     ),
   );
 }
+
+/// GOOD (6.0.4 regression): Background from variable that cannot be resolved
+/// statically — rule treats as intentionally set; must NOT trigger.
+void _unresolvableBackgroundNoTrigger(dynamic backgroundColor) {
+  Container(
+    color: backgroundColor,
+    child: Text('Hello', style: TextStyle(color: Colors.white)),
+  );
+}

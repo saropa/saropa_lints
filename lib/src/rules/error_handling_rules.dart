@@ -2262,6 +2262,11 @@ class RequireErrorLoggingRule extends SaropaLintRule {
 /// Unhandled errors in app startup can cause silent crashes. Wrap runApp in
 /// runZonedGuarded or set FlutterError.onError for proper error reporting.
 ///
+/// This rule only runs when the project depends on a crash-reporting package
+/// (e.g. firebase_crashlytics, sentry_flutter). Projects without such a
+/// dependency do not get this warning, since adding runZonedGuarded with only
+/// debugPrint is not useful.
+///
 /// **BAD:**
 /// ```dart
 /// void main() {

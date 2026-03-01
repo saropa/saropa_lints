@@ -54,32 +54,47 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static const Set<String> _httpPackagePrefixes = <String>{
+    'package:http/',
+    'package:dio/',
+  };
+
+  static final List<RegExp> _httpCallPatterns = [
+    RegExp(r'\bhttp\.get\s*\('),
+    RegExp(r'\bhttp\.post\s*\('),
+    RegExp(r'\bhttp\.put\s*\('),
+    RegExp(r'\bhttp\.delete\s*\('),
+    RegExp(r'\bdio\.get\s*\('),
+    RegExp(r'\bdio\.post\s*\('),
+    RegExp(r'\bclient\.get\s*\('),
+    RegExp(r'\bclient\.post\s*\('),
+  ];
+  static final List<RegExp> _statusCheckPatterns = [
+    RegExp(r'\bstatusCode\b'),
+    RegExp(r'\bisSuccessful\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
-      final FunctionBody body = node.body;
-      final String bodySource = body.toSource();
-
-      // Check for HTTP calls (specific client patterns only)
-      if (!bodySource.contains('http.get') &&
-          !bodySource.contains('http.post') &&
-          !bodySource.contains('http.put') &&
-          !bodySource.contains('http.delete') &&
-          !bodySource.contains('dio.get') &&
-          !bodySource.contains('dio.post') &&
-          !bodySource.contains('client.get') &&
-          !bodySource.contains('client.post')) {
+      // Only run in files that use HTTP client (avoids FP on Map.get, GetIt.get, etc.)
+      if (!fileImportsPackage(node, _httpPackagePrefixes)) {
         return;
       }
 
-      // Check if statusCode is checked
-      if (!bodySource.contains('statusCode') &&
-          !bodySource.contains('isSuccessful')) {
-        reporter.atNode(node);
-      }
+      final FunctionBody body = node.body;
+      final String bodySource = body.toSource();
+
+      // Check for HTTP calls (word-boundary regex to avoid FP on myhttp.get, dio.getSomething)
+      final hasHttpCall = _httpCallPatterns.any((p) => p.hasMatch(bodySource));
+      if (!hasHttpCall) return;
+
+      // Check if statusCode is checked (word-boundary to avoid FP on myStatusCode)
+      final hasStatusCheck = _statusCheckPatterns.any((p) => p.hasMatch(bodySource));
+      if (!hasStatusCheck) reporter.atNode(node);
     });
   }
 }
@@ -187,6 +202,18 @@ class RequireRetryLogicRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _httpCallPatternsRetry = [
+    RegExp(r'\bhttp\.'),
+    RegExp(r'\bdio\.'),
+    RegExp(r'\bclient\.get\s*\('),
+    RegExp(r'\bclient\.post\s*\('),
+  ];
+  static final List<RegExp> _retryPatterns = [
+    RegExp(r'\bretry\b'),
+    RegExp(r'\bRetry\b'),
+    RegExp(r'\bmaxRetries\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -205,18 +232,13 @@ class RequireRetryLogicRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for HTTP calls (specific client patterns only)
-      if (!bodySource.contains('http.') &&
-          !bodySource.contains('dio.') &&
-          !bodySource.contains('client.get') &&
-          !bodySource.contains('client.post')) {
+      // Check for HTTP calls (word-boundary to avoid FP)
+      if (!_httpCallPatternsRetry.any((p) => p.hasMatch(bodySource))) {
         return;
       }
 
       // Check for retry logic
-      if (!bodySource.contains('retry') &&
-          !bodySource.contains('Retry') &&
-          !bodySource.contains('maxRetries')) {
+      if (!_retryPatterns.any((p) => p.hasMatch(bodySource))) {
         reporter.atNode(node);
       }
     });
@@ -288,9 +310,10 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
           final AstNode? methodBody = _findMethodBody(parent);
           if (methodBody != null) {
             final String bodySource = methodBody.toSource();
-            // Check for dynamic access like data['key']
-            if (bodySource.contains("$variableName['") ||
-                bodySource.contains('$variableName["')) {
+            final dynamicAccessPattern = RegExp(
+              '${RegExp.escape(variableName)}\\s*\\[\\s*[\'"]',
+            );
+            if (dynamicAccessPattern.hasMatch(bodySource)) {
               reporter.atNode(node);
             }
           }
@@ -357,6 +380,19 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _connectivityHttpPatterns = [
+    RegExp(r'\bhttp\.'),
+    RegExp(r'\bdio\.'),
+    RegExp(r'\bclient\.post\s*\('),
+    RegExp(r'\bclient\.get\s*\('),
+  ];
+  static final List<RegExp> _connectivityCheckPatterns = [
+    RegExp(r'\bConnectivity\b'),
+    RegExp(r'\bcheckConnectivity\b'),
+    RegExp(r'\bisConnected\b'),
+    RegExp(r'\bhasConnection\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -380,19 +416,13 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for HTTP calls (specific client patterns only)
-      if (!bodySource.contains('http.') &&
-          !bodySource.contains('dio.') &&
-          !bodySource.contains('client.post') &&
-          !bodySource.contains('client.get')) {
+      // Check for HTTP calls (word-boundary to avoid FP)
+      if (!_connectivityHttpPatterns.any((p) => p.hasMatch(bodySource))) {
         return;
       }
 
       // Check for connectivity check
-      if (!bodySource.contains('Connectivity') &&
-          !bodySource.contains('checkConnectivity') &&
-          !bodySource.contains('isConnected') &&
-          !bodySource.contains('hasConnection')) {
+      if (!_connectivityCheckPatterns.any((p) => p.hasMatch(bodySource))) {
         reporter.atNode(node);
       }
     });
@@ -537,6 +567,12 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
     'readString',
     'send',
   };
+  static final List<RegExp> _timeoutConfigPatterns = [
+    RegExp(r'\bconnectTimeout\b'),
+    RegExp(r'\breceiveTimeout\b'),
+    RegExp(r'\bsendTimeout\b'),
+    RegExp(r'\bBaseOptions\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -586,16 +622,13 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
       }
 
       // Check if timeout is configured in the surrounding context
-      // (e.g., Dio with connectTimeout in options)
+      // (e.g., Dio with connectTimeout in options; word-boundary to avoid FP)
       AstNode? current = node.parent;
       int depth = 0;
       while (current != null && depth < 10) {
         if (current is MethodDeclaration || current is FunctionDeclaration) {
           final String bodySource = current.toSource();
-          if (bodySource.contains('connectTimeout') ||
-              bodySource.contains('receiveTimeout') ||
-              bodySource.contains('sendTimeout') ||
-              bodySource.contains('BaseOptions')) {
+          if (_timeoutConfigPatterns.any((p) => p.hasMatch(bodySource))) {
             return; // Timeout likely configured at client level
           }
           break;
@@ -662,6 +695,22 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _connectivityTargetPatterns = [
+    RegExp(r'\bonConnectivityChanged\b'),
+    RegExp(r'\bconnectivityStream\b'),
+  ];
+  static final List<RegExp> _uiFeedbackPatterns = [
+    RegExp(r'\bshowSnackBar\b'),
+    RegExp(r'\bshowDialog\b'),
+    RegExp(r'\bBanner\b'),
+    RegExp(r'\bOverlay\b'),
+    RegExp(r'\bshowToast\b'),
+    RegExp(r'\bshowNotification\b'),
+    RegExp(r'\bofflineWidget\b'),
+    RegExp(r'\bOfflineBuilder\b'),
+    RegExp(r'\bNoInternetWidget\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -670,37 +719,22 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      // Check for connectivity stream listening
       if (methodName != 'listen') return;
 
       final Expression? target = node.target;
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('onConnectivityChanged') &&
-          !targetSource.contains('connectivityStream')) {
+      if (!_connectivityTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
-      // Check if the callback contains UI feedback
       if (node.argumentList.arguments.isEmpty) return;
 
       final Expression callback = node.argumentList.arguments.first;
       final String callbackSource = callback.toSource();
 
-      // Look for common UI feedback patterns
-      final bool hasUiFeedback =
-          callbackSource.contains('showSnackBar') ||
-          callbackSource.contains('showDialog') ||
-          callbackSource.contains('Banner') ||
-          callbackSource.contains('Overlay') ||
-          callbackSource.contains('showToast') ||
-          callbackSource.contains('showNotification') ||
-          callbackSource.contains('offlineWidget') ||
-          callbackSource.contains('OfflineBuilder') ||
-          callbackSource.contains('NoInternetWidget');
-
-      if (!hasUiFeedback) {
+      if (!_uiFeedbackPatterns.any((p) => p.hasMatch(callbackSource))) {
         reporter.atNode(node.methodName, code);
       }
     });
@@ -747,6 +781,31 @@ class PreferStreamingResponseRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _responseTargetPatterns = [
+    RegExp(r'\bresponse\b'),
+    RegExp(r'\bhttp\b'),
+    RegExp(r'\bdio\b'),
+  ];
+  static final List<RegExp> _fileContextPatterns = [
+    RegExp(r'\bwriteAsBytes\b'),
+    RegExp(r'\bwriteAsBytesSync\b'),
+    RegExp(r'\.pdf\b'),
+    RegExp(r'\.zip\b'),
+    RegExp(r'\.mp4\b'),
+    RegExp(r'\.mp3\b'),
+    RegExp(r'\.png\b'),
+    RegExp(r'\.jpg\b'),
+    RegExp(r'\.jpeg\b'),
+    RegExp(r'\bdownload\b'),
+    RegExp(r'\bDownload\b'),
+    RegExp(r'\bfile\b'),
+  ];
+  static final List<RegExp> _fileOpPatterns = [
+    RegExp(r'\bwriteAsBytes\b'),
+    RegExp(r'\bFile\s*\('),
+    RegExp(r'\bsavePath\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -755,42 +814,23 @@ class PreferStreamingResponseRule extends SaropaLintRule {
     context.addPropertyAccess((PropertyAccess node) {
       final String propertyName = node.propertyName.name;
 
-      // Check for bodyBytes access which loads entire response into memory
-      if (propertyName != 'bodyBytes' && propertyName != 'body') {
-        return;
-      }
+      if (propertyName != 'bodyBytes' && propertyName != 'body') return;
 
-      // Check if target looks like an HTTP response
       final Expression? target = node.target;
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('response') &&
-          !targetSource.contains('http') &&
-          !targetSource.contains('dio')) {
+      if (!_responseTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
-      // Check if this is likely a large file context
-      // Look for file-related operations nearby
       AstNode? current = node.parent;
       int depth = 0;
       bool isFileContext = false;
 
       while (current != null && depth < 10) {
         final String source = current.toSource();
-        if (source.contains('writeAsBytes') ||
-            source.contains('writeAsBytesSync') ||
-            source.contains('.pdf') ||
-            source.contains('.zip') ||
-            source.contains('.mp4') ||
-            source.contains('.mp3') ||
-            source.contains('.png') ||
-            source.contains('.jpg') ||
-            source.contains('.jpeg') ||
-            source.contains('download') ||
-            source.contains('Download') ||
-            source.contains('file')) {
+        if (_fileContextPatterns.any((p) => p.hasMatch(source))) {
           isFileContext = true;
           break;
         }
@@ -803,44 +843,37 @@ class PreferStreamingResponseRule extends SaropaLintRule {
       }
     });
 
-    // Also check for dio's response.data in file context
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      // Check for dio download without streaming
       if (methodName != 'get' && methodName != 'download') return;
 
       final Expression? target = node.target;
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('dio') && !targetSource.contains('http')) {
+      if (!RegExp(r'\bdio\b').hasMatch(targetSource) &&
+          !RegExp(r'\bhttp\b').hasMatch(targetSource)) {
         return;
       }
 
-      // Check for responseType configuration
       final String nodeSource = node.toSource();
-      if (nodeSource.contains('ResponseType.stream') ||
-          nodeSource.contains('responseType: ResponseType.bytes')) {
-        return; // Already using streaming or explicit bytes
+      if (RegExp(r'\bResponseType\.stream\b').hasMatch(nodeSource) ||
+          RegExp(r'responseType:\s*ResponseType\.bytes').hasMatch(nodeSource)) {
+        return;
       }
 
-      // Check if downloading to file
-      if (nodeSource.contains('.pdf') ||
-          nodeSource.contains('.zip') ||
-          nodeSource.contains('.mp4') ||
-          nodeSource.contains('download')) {
-        // Check parent context for file operations
+      if (RegExp(r'\.pdf\b').hasMatch(nodeSource) ||
+          RegExp(r'\.zip\b').hasMatch(nodeSource) ||
+          RegExp(r'\.mp4\b').hasMatch(nodeSource) ||
+          RegExp(r'\bdownload\b').hasMatch(nodeSource)) {
         AstNode? current = node.parent;
         int depth = 0;
 
         while (current != null && depth < 5) {
           final String source = current.toSource();
-          if (source.contains('writeAsBytes') ||
-              source.contains('File(') ||
-              source.contains('savePath')) {
-            // If not using streaming response type, warn
-            if (!nodeSource.contains('ResponseType.stream')) {
+          if (_fileOpPatterns.any((p) => p.hasMatch(source))) {
+            if (!RegExp(r'\bResponseType\.stream\b').hasMatch(nodeSource)) {
               reporter.atNode(node.methodName, code);
             }
             break;
@@ -901,6 +934,19 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _clientCreationPatterns = [
+    RegExp(r'\bhttp\.Client\s*\(\s*\)'),
+    RegExp(r'\bClient\s*\(\s*\)'),
+    RegExp(r'\bDio\s*\(\s*\)'),
+  ];
+  static final List<RegExp> _clientLocalVarPatterns = [
+    RegExp(r'\bfinal\s+client\s*='),
+    RegExp(r'\bvar\s+client\s*='),
+    RegExp(r'\bfinal\s+dio\s*='),
+    RegExp(r'\bvar\s+dio\s*='),
+  ];
+  static final RegExp _closeCallPattern = RegExp(r'\.close\s*\(\s*\)');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -910,22 +956,15 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for client creation inside method
-      if (!bodySource.contains('http.Client()') &&
-          !bodySource.contains('Client()') &&
-          !bodySource.contains('Dio()')) {
+      // Check for client creation inside method (word-boundary to avoid FP)
+      if (!_clientCreationPatterns.any((p) => p.hasMatch(bodySource))) {
         return;
       }
 
       // Check if client is created as local variable (not returned)
-      if (bodySource.contains('final client = ') ||
-          bodySource.contains('var client = ') ||
-          bodySource.contains('final dio = ') ||
-          bodySource.contains('var dio = ')) {
-        // Check if closed in same method (ephemeral pattern)
-        if (bodySource.contains('.close()')) {
-          reporter.atNode(node);
-        }
+      if (_clientLocalVarPatterns.any((p) => p.hasMatch(bodySource)) &&
+          _closeCallPattern.hasMatch(bodySource)) {
+        reporter.atNode(node);
       }
     });
 
@@ -1010,6 +1049,23 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _buildMethodApiPatterns = [
+    RegExp(r'\bhttp\.get\s*\('),
+    RegExp(r'\bclient\.get\s*\('),
+    RegExp(r'\bdio\.get\s*\('),
+    RegExp(r'\.post\s*\('),
+    RegExp(r'\.fetch\s*\('),
+    RegExp(r'\bhttp\.'),
+    RegExp(r'\bdio\.'),
+  ];
+  static final List<RegExp> _buildMethodCachingPatterns = [
+    RegExp(r'\bcache\b'),
+    RegExp(r'\bCache\b'),
+    RegExp(r'\b_pending\b'),
+    RegExp(r'\bputIfAbsent\b'),
+    RegExp(r'\bmemoize\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1029,27 +1085,12 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for HTTP API calls without caching
-      // Note: Avoid matching generic .get() which could be Map.get() or Box.get()
       final bool hasApiCall =
-          bodySource.contains('http.get(') ||
-          bodySource.contains('client.get(') ||
-          bodySource.contains('dio.get(') ||
-          bodySource.contains('.post(') ||
-          bodySource.contains('.fetch(') ||
-          bodySource.contains('http.') ||
-          bodySource.contains('dio.');
-
+          _buildMethodApiPatterns.any((p) => p.hasMatch(bodySource));
       if (!hasApiCall) return;
 
-      // Check for caching patterns
       final bool hasCaching =
-          bodySource.contains('cache') ||
-          bodySource.contains('Cache') ||
-          bodySource.contains('_pending') ||
-          bodySource.contains('putIfAbsent') ||
-          bodySource.contains('memoize');
-
+          _buildMethodCachingPatterns.any((p) => p.hasMatch(bodySource));
       if (!hasCaching) {
         reporter.atNode(node);
       }
@@ -1104,6 +1145,29 @@ class RequireResponseCachingRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _getRequestPatterns = [
+    RegExp(r'\.get\s*\('),
+    RegExp(r'\bhttp\.get\s*\('),
+  ];
+  static final List<RegExp> _responseCachingPatterns = [
+    RegExp(r'\bcache\b'),
+    RegExp(r'\bCache\b'),
+    RegExp(r'\b_cached\b'),
+    RegExp(r'\bcached\b'),
+    RegExp(r'\bttl\b'),
+    RegExp(r'\bTTL\b'),
+    RegExp(r'\bDuration\b'),
+  ];
+  static final List<RegExp> _classCachePatterns = [
+    RegExp(r'\b_cache\b'),
+    RegExp(r'\bCache\b'),
+    RegExp(r'\b_cached\b'),
+  ];
+  static final List<RegExp> _configOrSettingsMethodPatterns = [
+    RegExp(r'\bconfig\b'),
+    RegExp(r'\bsettings\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1112,40 +1176,25 @@ class RequireResponseCachingRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme.toLowerCase();
 
-      // Check for getter methods that likely fetch data
       if (!methodName.startsWith('get') &&
           !methodName.startsWith('fetch') &&
           !methodName.startsWith('load') &&
-          !methodName.contains('config') &&
-          !methodName.contains('settings')) {
+          !_configOrSettingsMethodPatterns.any((p) => p.hasMatch(methodName))) {
         return;
       }
 
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for GET requests
-      if (!bodySource.contains('.get(') && !bodySource.contains('http.get')) {
-        return;
-      }
+      if (!_getRequestPatterns.any((p) => p.hasMatch(bodySource))) return;
 
-      // Check for caching patterns
       final bool hasCaching =
-          bodySource.contains('cache') ||
-          bodySource.contains('Cache') ||
-          bodySource.contains('_cached') ||
-          bodySource.contains('cached') ||
-          bodySource.contains('ttl') ||
-          bodySource.contains('TTL') ||
-          bodySource.contains('Duration');
+          _responseCachingPatterns.any((p) => p.hasMatch(bodySource));
 
-      // Check class for cache fields
       final AstNode? parent = node.parent;
       if (parent is ClassDeclaration) {
         final String classSource = parent.toSource();
-        if (classSource.contains('_cache') ||
-            classSource.contains('Cache') ||
-            classSource.contains('_cached')) {
+        if (_classCachePatterns.any((p) => p.hasMatch(classSource))) {
           return; // Class has caching infrastructure
         }
       }
@@ -1197,6 +1246,23 @@ class PreferPaginationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _paginationApiPatterns = [
+    RegExp(r'\.get\s*\('),
+    RegExp(r'\bhttp\.'),
+    RegExp(r'\bdio\.'),
+  ];
+  static final List<RegExp> _paginationParamPatterns = [
+    RegExp(r'\blimit\b'),
+    RegExp(r'\boffset\b'),
+    RegExp(r'\bpage\b'),
+    RegExp(r'\bcursor\b'),
+    RegExp(r'\bpageSize\b'),
+    RegExp(r'\bperPage\b'),
+  ];
+  static final RegExp _paginationAllPattern = RegExp(r'\ball\b');
+  static final RegExp _listOrIterableReturnPattern =
+      RegExp(r'List\s*<|Iterable\s*<');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1205,8 +1271,7 @@ class PreferPaginationRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme.toLowerCase();
 
-      // Check for methods that fetch collections
-      if (!methodName.contains('all') &&
+      if (!_paginationAllPattern.hasMatch(methodName) &&
           !methodName.startsWith('get') &&
           !methodName.startsWith('fetch') &&
           !methodName.startsWith('list') &&
@@ -1214,35 +1279,22 @@ class PreferPaginationRule extends SaropaLintRule {
         return;
       }
 
-      // Check return type for List
       final TypeAnnotation? returnType = node.returnType;
       if (returnType == null) return;
       final String returnTypeStr = returnType.toSource();
-      if (!returnTypeStr.contains('List<') &&
-          !returnTypeStr.contains('Iterable<')) {
+      if (!_listOrIterableReturnPattern.hasMatch(returnTypeStr)) {
         return;
       }
 
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for API calls
-      if (!bodySource.contains('.get(') &&
-          !bodySource.contains('http.') &&
-          !bodySource.contains('dio.')) {
-        return;
-      }
+      if (!_paginationApiPatterns.any((p) => p.hasMatch(bodySource))) return;
 
-      // Check for pagination patterns
+      final String paramsSource = node.parameters?.toSource() ?? '';
       final bool hasPagination =
-          bodySource.contains('limit') ||
-          bodySource.contains('offset') ||
-          bodySource.contains('page') ||
-          bodySource.contains('cursor') ||
-          bodySource.contains('pageSize') ||
-          bodySource.contains('perPage') ||
-          node.parameters?.toSource().contains('limit') == true ||
-          node.parameters?.toSource().contains('page') == true;
+          _paginationParamPatterns.any((p) => p.hasMatch(bodySource)) ||
+          _paginationParamPatterns.any((p) => p.hasMatch(paramsSource));
 
       if (!hasPagination) {
         reporter.atNode(node);
@@ -1318,13 +1370,9 @@ class AvoidOverFetchingRule extends SaropaLintRule {
         r'\.(get|fetch|post|query)\(',
       ).allMatches(bodySource).length;
 
-      // If we have an API call and very few property accesses relative
-      // to typical object size, might be over-fetching
       if (apiCalls > 0 && propertyAccesses <= 3 && bodySource.length < 500) {
-        // Additional heuristic: check for .name, .id, .title only patterns
-        if (bodySource.contains('.name') ||
-            bodySource.contains('.title') ||
-            bodySource.contains('.id')) {
+        // Additional heuristic: check for .name, .id, .title only (word-boundary)
+        if (RegExp(r'\.(name|title|id)\b').hasMatch(bodySource)) {
           final int totalProps = RegExp(
             r'\.(name|title|id|label|text)\b',
           ).allMatches(bodySource).length;
@@ -1389,13 +1437,33 @@ class RequireCancelTokenRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _cancelTokenHttpPatterns = [
+    RegExp(r'\.get\s*\('),
+    RegExp(r'\.post\s*\('),
+    RegExp(r'\.fetch\s*\('),
+    RegExp(r'\bhttp\.'),
+    RegExp(r'\bdio\.'),
+  ];
+  static final List<RegExp> _cancelTokenCancellationPatterns = [
+    RegExp(r'\bCancelToken\b'),
+    RegExp(r'\bcancelToken\b'),
+    RegExp(r'\b_cancelled\b'),
+    RegExp(r'\bisCancelled\b'),
+    RegExp(r'\b_canceled\b'),
+    RegExp(r'\bisCanceled\b'),
+    RegExp(r'\.cancel\s*\(\s*\)'),
+  ];
+  static final List<RegExp> _cancelTokenMountedPatterns = [
+    RegExp(r'\bif\s*\(\s*mounted\s*\)'),
+    RegExp(r'\bif\s*\(\s*!mounted\s*\)'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      // Check if it's a State class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
@@ -1404,30 +1472,13 @@ class RequireCancelTokenRule extends SaropaLintRule {
 
       final String classSource = node.toSource();
 
-      // Check for HTTP calls
-      final bool hasHttpCalls =
-          classSource.contains('.get(') ||
-          classSource.contains('.post(') ||
-          classSource.contains('.fetch(') ||
-          classSource.contains('http.') ||
-          classSource.contains('dio.');
-
+      final bool hasHttpCalls = _cancelTokenHttpPatterns.any((p) => p.hasMatch(classSource));
       if (!hasHttpCalls) return;
 
-      // Check for cancellation patterns
       final bool hasCancellation =
-          classSource.contains('CancelToken') ||
-          classSource.contains('cancelToken') ||
-          classSource.contains('_cancelled') || // US spelling
-          classSource.contains('isCancelled') || // US spelling
-          classSource.contains('_canceled') || // UK spelling
-          classSource.contains('isCanceled') || // UK spelling
-          classSource.contains('cancel()');
-
-      // Check for mounted check (partial mitigation)
+          _cancelTokenCancellationPatterns.any((p) => p.hasMatch(classSource));
       final bool hasMountedCheck =
-          classSource.contains('if (mounted)') ||
-          classSource.contains('if (!mounted)');
+          _cancelTokenMountedPatterns.any((p) => p.hasMatch(classSource));
 
       if (!hasCancellation && !hasMountedCheck) {
         reporter.atNode(node);
@@ -1477,6 +1528,14 @@ class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _websocketListenTargetPatterns = [
+    RegExp(r'\bsocket\b'),
+    RegExp(r'\bSocket\b'),
+    RegExp(r'\bchannel\b'),
+    RegExp(r'\bChannel\b'),
+    RegExp(r'\.stream\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1485,16 +1544,11 @@ class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'listen') return;
 
-      // Check if target is WebSocket-related
       final Expression? target = node.target;
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('socket') &&
-          !targetSource.contains('Socket') &&
-          !targetSource.contains('channel') &&
-          !targetSource.contains('Channel') &&
-          !targetSource.contains('.stream')) {
+      if (!_websocketListenTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
@@ -1647,19 +1701,24 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _heartbeatClassPatterns = [
+    RegExp(r'\bping\b'),
+    RegExp(r'\bheartbeat\b'),
+    RegExp(r'\bkeepalive\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addMethodInvocation((node) {
-      // Check for WebSocketChannel.connect
       final target = node.target;
       if (target is! SimpleIdentifier) {
         return;
       }
 
-      if (!target.name.contains('WebSocket')) {
+      if (!RegExp(r'WebSocket').hasMatch(target.name)) {
         return;
       }
 
@@ -1685,12 +1744,9 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
 
       final classSource = enclosingClass.toSource().toLowerCase();
 
-      // Check for heartbeat patterns
-      if (classSource.contains('ping') ||
-          classSource.contains('heartbeat') ||
-          classSource.contains('keepalive') ||
-          (classSource.contains('timer.periodic') &&
-              classSource.contains('sink.add'))) {
+      if (_heartbeatClassPatterns.any((p) => p.hasMatch(classSource)) ||
+          (RegExp(r'\btimer\.periodic\b').hasMatch(classSource) &&
+              RegExp(r'\bsink\.add\b').hasMatch(classSource))) {
         return;
       }
 
@@ -2372,6 +2428,16 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _nullCheckInContextPatterns = [
+    RegExp(r'==\s*null'),
+    RegExp(r'!=\s*null'),
+    RegExp(r'\?'),
+  ];
+  static final List<RegExp> _nullCheckStmtPatterns = [
+    RegExp(r'==\s*null'),
+    RegExp(r'!=\s*null'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2394,14 +2460,11 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
             parent is IfStatement ||
             parent is BinaryExpression) {
           final source = parent.toSource();
-          if (source.contains('== null') ||
-              source.contains('!= null') ||
-              source.contains('?')) {
-            return; // Has null check
+          if (_nullCheckInContextPatterns.any((p) => p.hasMatch(source))) {
+            return;
           }
         }
         if (parent is VariableDeclaration) {
-          // Check if followed by null check
           AstNode? stmt = parent.parent?.parent;
           if (stmt is VariableDeclarationStatement) {
             AstNode? nextNode = stmt.parent;
@@ -2409,10 +2472,10 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
               final statements = nextNode.statements;
               final stmtIndex = statements.indexOf(stmt);
               if (stmtIndex >= 0 && stmtIndex < statements.length - 1) {
-                final nextStmt = statements[stmtIndex + 1];
-                if (nextStmt.toSource().contains('== null') ||
-                    nextStmt.toSource().contains('!= null')) {
-                  return; // Has null check after
+                final nextSource =
+                    statements[stmtIndex + 1].toSource();
+                if (_nullCheckStmtPatterns.any((p) => p.hasMatch(nextSource))) {
+                  return;
                 }
               }
             }
@@ -2575,14 +2638,9 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
         return;
       }
 
-      // Check if body contains version check
       final bodySource = node.body.toSource();
-      if (bodySource.contains('oldVersion <') ||
-          bodySource.contains('oldVersion <=') ||
-          bodySource.contains('oldVersion >') ||
-          bodySource.contains('oldVersion >=') ||
-          bodySource.contains('oldVersion ==')) {
-        return; // Has version check
+      if (RegExp(r'oldVersion\s*[<>=]').hasMatch(bodySource)) {
+        return;
       }
 
       // cspell:ignore onupgrade
@@ -2652,6 +2710,15 @@ class RequirePermissionRationaleRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _permissionTypeOrSource = RegExp(r'Permission');
+  static final RegExp _permissionSourceLower = RegExp(r'\bpermission\b');
+  static final List<RegExp> _rationaleBodyPatterns = [
+    RegExp(r'shouldshowrequestrationale'),
+    RegExp(r'shouldshowrationale'),
+  ];
+  static final RegExp _rationaleShow = RegExp(r'\bshow\b');
+  static final RegExp _rationaleWord = RegExp(r'\brationale\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2660,32 +2727,28 @@ class RequirePermissionRationaleRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final methodName = node.methodName.name;
 
-      // Check for permission request patterns
       if (methodName != 'request' && methodName != 'requestPermission') {
         return;
       }
 
-      // Check if target is Permission related
       final target = node.target;
       if (target == null) return;
 
       final targetType = target.staticType?.toString() ?? '';
       final targetSource = target.toSource().toLowerCase();
-      if (!targetType.contains('Permission') &&
-          !targetSource.contains('permission')) {
+      if (!_permissionTypeOrSource.hasMatch(targetType) &&
+          !_permissionSourceLower.hasMatch(targetSource)) {
         return;
       }
 
-      // Look for shouldShowRequestRationale check in parent method
       final methodDeclaration = node.thisOrAncestorOfType<MethodDeclaration>();
       if (methodDeclaration == null) return;
 
-      // cspell:ignore shouldshowrequestrationale shouldshowrationale
       final bodySource = methodDeclaration.body.toSource().toLowerCase();
-      if (bodySource.contains('shouldshowrequestrationale') ||
-          bodySource.contains('shouldshowrationale') ||
-          bodySource.contains('show') && bodySource.contains('rationale')) {
-        return; // Has rationale check
+      if (_rationaleBodyPatterns.any((p) => p.hasMatch(bodySource)) ||
+          (_rationaleShow.hasMatch(bodySource) &&
+              _rationaleWord.hasMatch(bodySource))) {
+        return;
       }
 
       reporter.atNode(node);
@@ -2730,6 +2793,16 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _permissionCheckBodyPatterns = [
+    RegExp(r'\bisgranted\b'),
+    RegExp(r'\bis_granted\b'),
+    RegExp(r'permissionstatus\.granted'),
+    RegExp(r'status\s*==\s*permissionstatus\.granted'),
+    RegExp(r'\.request\s*\(\s*\)'),
+    RegExp(r'\bhaspermission\b'),
+    RegExp(r'\bcheckpermission\b'),
+  ];
+
   static const _gatedFeatures = <String>{
     'getCurrentPosition',
     'getLastKnownPosition',
@@ -2764,16 +2837,8 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
 
       final bodySource = methodDeclaration.body.toSource().toLowerCase();
 
-      // cspell:ignore isgranted permissionstatus haspermission checkpermission
-      // Check for common permission check patterns
-      if (bodySource.contains('isgranted') ||
-          bodySource.contains('is_granted') ||
-          bodySource.contains('permissionstatus.granted') ||
-          bodySource.contains('status == permissionstatus.granted') ||
-          bodySource.contains('.request()') ||
-          bodySource.contains('haspermission') ||
-          bodySource.contains('checkpermission')) {
-        return; // Has permission check
+      if (_permissionCheckBodyPatterns.any((p) => p.hasMatch(bodySource))) {
+        return;
       }
 
       reporter.atNode(node);
@@ -2828,6 +2893,22 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
     'zonedSchedule',
   };
 
+  static final RegExp _notificationTypeOrTarget = RegExp(
+    r'notification|local_notifications|flutterlocalnoti',
+    caseSensitive: false,
+  );
+  static final List<RegExp> _notificationPermissionBodyPatterns = [
+    RegExp(r'permission\.notification'),
+    RegExp(r'post_notifications'),
+    RegExp(r'notificationpermission'),
+    RegExp(r'notification_permission'),
+    RegExp(r'requestnotificationpermission'),
+  ];
+  static final List<RegExp> _notificationPermissionClassPatterns = [
+    RegExp(r'permission\.notification'),
+    RegExp(r'notificationpermission'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2840,42 +2921,30 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
         return;
       }
 
-      // Check if target is notification-related
       final target = node.target;
       if (target == null) return;
 
-      // cspell:ignore flutterlocalnoti
-      final targetType = target.staticType?.toString() ?? '';
+      final targetType = target.staticType?.toString().toLowerCase() ?? '';
       final targetSource = target.toSource().toLowerCase();
-      if (!targetType.toLowerCase().contains('notification') &&
-          !targetSource.contains('notification') &&
-          !targetSource.contains('local_notifications') &&
-          !targetSource.contains('flutterlocalnoti')) {
+      if (!_notificationTypeOrTarget.hasMatch(targetType) &&
+          !_notificationTypeOrTarget.hasMatch(targetSource)) {
         return;
       }
 
-      // Look for notification permission check in the method or class
       final methodDeclaration = node.thisOrAncestorOfType<MethodDeclaration>();
       if (methodDeclaration == null) return;
 
       final bodySource = methodDeclaration.body.toSource().toLowerCase();
-
-      // cspell:ignore notificationpermission requestnotificationpermission
-      // Check for notification permission patterns
-      if (bodySource.contains('permission.notification') ||
-          bodySource.contains('post_notifications') ||
-          bodySource.contains('notificationpermission') ||
-          bodySource.contains('notification_permission') ||
-          bodySource.contains('requestnotificationpermission')) {
-        return; // Has permission check
+      if (_notificationPermissionBodyPatterns
+          .any((p) => p.hasMatch(bodySource))) {
+        return;
       }
 
-      // Check class-level for permission check
       final classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl != null) {
         final classSource = classDecl.toSource().toLowerCase();
-        if (classSource.contains('permission.notification') ||
-            classSource.contains('notificationpermission')) {
+        if (_notificationPermissionClassPatterns
+            .any((p) => p.hasMatch(classSource))) {
           return;
         }
       }
@@ -2971,6 +3040,16 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
     'SSEConnection',
   };
 
+  static bool _sseFieldClosePattern(
+    String body,
+    String fieldName,
+    String method,
+  ) {
+    return RegExp(
+      '${RegExp.escape(fieldName)}\\s*[?.]\\s*$method\\s*\\(',
+    ).hasMatch(body);
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2998,10 +3077,12 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
             final String fieldNameLower = fieldNameOriginal.toLowerCase();
             bool isSseField = false;
 
-            // Check by type name
             if (typeName != null) {
               for (final String sseType in _sseTypes) {
-                if (typeName.contains(sseType)) {
+                if (RegExp(
+                  '\\b${RegExp.escape(sseType)}\\b',
+                  caseSensitive: false,
+                ).hasMatch(typeName)) {
                   isSseField = true;
                   break;
                 }
@@ -3043,16 +3124,11 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
         }
       }
 
-      // Report SSE fields not closed in dispose
       for (final String fieldName in sseFields) {
-        final bool isClosed =
-            disposeBody != null &&
-            (disposeBody.contains('$fieldName.close()') ||
-                disposeBody.contains('$fieldName?.close()') ||
-                disposeBody.contains('$fieldName.dispose()') ||
-                disposeBody.contains('$fieldName?.dispose()') ||
-                disposeBody.contains('$fieldName.cancel()') ||
-                disposeBody.contains('$fieldName?.cancel()'));
+        final bool isClosed = disposeBody != null &&
+            (_sseFieldClosePattern(disposeBody, fieldName, 'close') ||
+                _sseFieldClosePattern(disposeBody, fieldName, 'dispose') ||
+                _sseFieldClosePattern(disposeBody, fieldName, 'cancel'));
 
         if (!isClosed) {
           for (final ClassMember member in node.members) {
@@ -3119,6 +3195,14 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
     'readBytes',
   };
 
+  static final List<RegExp> _httpTimeoutTargetPatterns = [
+    RegExp(r'\bhttp\b'),
+    RegExp(r'\bclient\b'),
+    RegExp(r'\bClient\b'),
+    RegExp(r'\bdio\b'),
+    RegExp(r'\bDio\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3128,16 +3212,11 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       if (!_httpMethods.contains(methodName)) return;
 
-      // Check if target looks like an http call
       final Expression? target = node.target;
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('http') &&
-          !targetSource.contains('client') &&
-          !targetSource.contains('Client') &&
-          !targetSource.contains('dio') &&
-          !targetSource.contains('Dio')) {
+      if (!_httpTimeoutTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
@@ -3228,6 +3307,18 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _websocketClassPatterns = [
+    RegExp(r'\bWebSocketChannel\b'),
+    RegExp(r'\bWebSocket\b'),
+  ];
+  static final List<RegExp> _reconnectionClassPatterns = [
+    RegExp(r'\breconnect\b'),
+    RegExp(r'\bretry\b'),
+    RegExp(r'\bonDone\s*:'),
+    RegExp(r'\bonError\s*:'),
+    RegExp(r'\bbackoff\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3236,25 +3327,16 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
 
-      // Skip WebSocket class definitions — only check classes that USE
-      // WebSocket, not classes that ARE WebSocket stubs/mocks.
       if (className == 'WebSocketChannel' || className == 'WebSocket') return;
 
       final String classSource = node.toSource();
 
-      // Check if class uses WebSocket
-      if (!classSource.contains('WebSocketChannel') &&
-          !classSource.contains('WebSocket')) {
+      if (!_websocketClassPatterns.any((p) => p.hasMatch(classSource))) {
         return;
       }
 
-      // Check for reconnection logic indicators
       final bool hasReconnection =
-          classSource.contains('reconnect') ||
-          classSource.contains('retry') ||
-          classSource.contains('onDone:') ||
-          classSource.contains('onError:') ||
-          classSource.contains('backoff');
+          _reconnectionClassPatterns.any((p) => p.hasMatch(classSource));
 
       if (!hasReconnection) {
         reporter.atNode(node);

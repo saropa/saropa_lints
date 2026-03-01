@@ -183,17 +183,11 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      bool isPdfOperation = false;
-      for (final String pdfType in _pdfTypes) {
-        if (targetSource.contains(pdfType)) {
-          isPdfOperation = true;
-          break;
-        }
-      }
+      final bool isPdfOperation = _pdfTypes.any((pdfType) =>
+          RegExp('\\b${RegExp.escape(pdfType)}\\b').hasMatch(targetSource));
 
       if (!isPdfOperation) return;
 
-      // Check if inside try-catch
       bool insideTryCatch = false;
       AstNode? current = node.parent;
 
@@ -357,6 +351,11 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
     'delete',
     'update',
   };
+  static final List<RegExp> _dbTargetPatterns = [
+    RegExp(r'\bdb\b'),
+    RegExp(r'\bdatabase\b'),
+    RegExp(r'\bbatch\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -372,9 +371,7 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('db') &&
-          !targetSource.contains('database') &&
-          !targetSource.contains('batch')) {
+      if (!_dbTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
@@ -466,6 +463,10 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
     'rawUpdate',
     'rawDelete',
   };
+  static final List<RegExp> _countWritesDbPatterns = [
+    RegExp(r'\bdb\b'),
+    RegExp(r'\bdatabase\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -511,8 +512,7 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
         final Expression? target = node.target;
         if (target != null) {
           final String targetSource = target.toSource().toLowerCase();
-          if (targetSource.contains('db') ||
-              targetSource.contains('database')) {
+          if (_countWritesDbPatterns.any((p) => p.hasMatch(targetSource))) {
             onWrite(node);
           }
         }
@@ -576,6 +576,13 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
     'rawDelete',
     'execute',
   };
+  static final List<RegExp> _dbTxnTargetPatterns = [
+    RegExp(r'\bdb\b'),
+    RegExp(r'\bdatabase\b'),
+    RegExp(r'\btxn\b'),
+    RegExp(r'\bbatch\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -585,15 +592,11 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       if (!_dbMethods.contains(methodName)) return;
 
-      // Check if target looks like a database
       final Expression? target = node.target;
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('db') &&
-          !targetSource.contains('database') &&
-          !targetSource.contains('txn') &&
-          !targetSource.contains('batch')) {
+      if (!_dbTxnTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
@@ -648,6 +651,12 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _preferBatchDbPatterns = [
+    RegExp(r'\bdb\b'),
+    RegExp(r'\bdatabase\b'),
+  ];
+  static final RegExp _batchTargetPattern = RegExp(r'\bbatch\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -674,11 +683,9 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (targetSource.contains('db') || targetSource.contains('database')) {
-        // Check it's not already a batch
-        if (!targetSource.contains('batch')) {
-          reporter.atNode(node);
-        }
+      if (_preferBatchDbPatterns.any((p) => p.hasMatch(targetSource)) &&
+          !_batchTargetPattern.hasMatch(targetSource)) {
+        reporter.atNode(node);
       }
     });
   }
@@ -737,6 +744,8 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final RegExp _closeCallInBodyPattern = RegExp(r'\.close\s*\(\s*\)');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -773,7 +782,8 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
           final String methodName = member.name.lexeme;
           if (methodName == 'dispose' || methodName == 'close') {
             final String? bodySource = member.body.toSource();
-            if (bodySource != null && bodySource.contains('.close()')) {
+            if (bodySource != null &&
+                _closeCallInBodyPattern.hasMatch(bodySource)) {
               hasClose = true;
               break;
             }
@@ -970,6 +980,10 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
     'with',
     'without',
   };
+  static final List<RegExp> _reservedWordDbPatterns = [
+    RegExp(r'\bdb\b'),
+    RegExp(r'\bdatabase\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -979,7 +993,6 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      // Check for SQL execution methods
       if (methodName != 'execute' &&
           methodName != 'rawQuery' &&
           methodName != 'rawInsert' &&
@@ -993,7 +1006,7 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('db') && !targetSource.contains('database')) {
+      if (!_reservedWordDbPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
@@ -1220,13 +1233,8 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      bool isPdfOperation = false;
-      for (final String pdfType in _pdfTypes) {
-        if (targetSource.contains(pdfType)) {
-          isPdfOperation = true;
-          break;
-        }
-      }
+      final bool isPdfOperation = _pdfTypes.any((pdfType) =>
+          RegExp('\\b${RegExp.escape(pdfType)}\\b').hasMatch(targetSource));
 
       if (!isPdfOperation) return;
 
@@ -1309,6 +1317,11 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _singletonBodyPatterns = [
+    RegExp(r'\?\?='),
+    RegExp(r'\b_db\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1332,8 +1345,7 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
         if (method.isGetter) return;
         if (method.isStatic) {
           final String bodySource = enclosingBody.toSource();
-          // Check for caching patterns like ??= or if (_db != null)
-          if (bodySource.contains('??=') || bodySource.contains('_db')) return;
+          if (_singletonBodyPatterns.any((p) => p.hasMatch(bodySource))) return;
         }
       }
 
@@ -1399,6 +1411,11 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
     'rawUpdate',
     'rawDelete',
   };
+  static final List<RegExp> _columnConstantsDbPatterns = [
+    RegExp(r'\bdb\b'),
+    RegExp(r'\bdatabase\b'),
+    RegExp(r'\bDatabase\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -1409,14 +1426,11 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       if (!_dbMethods.contains(methodName)) return;
 
-      // Check if target looks like a database
       final Expression? target = node.target;
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('db') &&
-          !targetSource.contains('database') &&
-          !targetSource.contains('Database')) {
+      if (!_columnConstantsDbPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
       }
 
@@ -1500,6 +1514,14 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
     'archive',
     'report',
   };
+  static final List<RegExp> _largeFileSourcePatterns =
+      _largeFilePatterns.map((s) => RegExp('\\b${RegExp.escape(s)}\\b')).toList();
+  static final List<RegExp> _largeFileBodyPatterns = _largeFilePatterns
+      .expand((s) => [
+            RegExp('\\b${RegExp.escape(s)}file\\b'),
+            RegExp('\\b${RegExp.escape(s)}_file\\b'),
+          ])
+      .toList();
 
   @override
   void runWithReporter(
@@ -1524,26 +1546,20 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
             current is InstanceCreationExpression) {
           final String source = current.toSource().toLowerCase();
 
-          for (final String pattern in _largeFilePatterns) {
-            if (source.contains(pattern)) {
-              reporter.atNode(node);
-              return;
-            }
+          if (_largeFileSourcePatterns.any((p) => p.hasMatch(source))) {
+            reporter.atNode(node);
+            return;
           }
         }
         current = current.parent;
       }
 
-      // Also check variable names in the context
       final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
       if (body != null) {
         final String bodySource = body.toSource().toLowerCase();
-        for (final String pattern in _largeFilePatterns) {
-          if (bodySource.contains('${pattern}file') ||
-              bodySource.contains('${pattern}_file')) {
-            reporter.atNode(node);
-            return;
-          }
+        if (_largeFileBodyPatterns.any((p) => p.hasMatch(bodySource))) {
+          reporter.atNode(node);
+          return;
         }
       }
     });
@@ -1612,6 +1628,15 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _sanitizationBodyPatterns = [
+    RegExp(r'\bbasename\b'),
+    RegExp(r'\bisWithin\b'),
+    RegExp(r'\bnormalize\b'),
+    RegExp(r'\bsanitize\b'),
+    RegExp(r'\breplaceAll\b'),
+    RegExp(r'\.\.'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1620,7 +1645,6 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
-      // Check for File or Directory creation
       if (typeName != 'File' && typeName != 'Directory') return;
 
       // Check if path is constructed with string interpolation using parameter
@@ -1655,14 +1679,8 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
 
     final String bodySource = body.toSource();
 
-    // Check for sanitization patterns
-    if (bodySource.contains('basename') ||
-        bodySource.contains('isWithin') ||
-        bodySource.contains('normalize') ||
-        bodySource.contains('sanitize') ||
-        bodySource.contains('replaceAll') ||
-        bodySource.contains('..')) {
-      return; // Has some sanitization
+    if (_sanitizationBodyPatterns.any((p) => p.hasMatch(bodySource))) {
+      return;
     }
 
     // Check for trusted platform path APIs (including caller context for

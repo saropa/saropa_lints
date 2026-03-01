@@ -137,3 +137,19 @@ void _good382() async {
     return file;
   }
 }
+
+/// GOOD (6.0.4 regression): Path from platform API only — no user input.
+Future<File> goodPlatformPathOnly() async {
+  final dir = await getApplicationDocumentsDirectory();
+  return File('${dir.path}/app_data.json');
+}
+
+/// GOOD (6.0.5 regression): Private helper receives path from platform API in caller.
+Future<File> goodPrivateHelperWithPlatformPath() async {
+  final dir = await getApplicationDocumentsDirectory();
+  return _openDbInAppDir(dir.path);
+}
+
+Future<File> _openDbInAppDir(String appDirPath) async {
+  return File('$appDirPath/db.sqlite');
+}
