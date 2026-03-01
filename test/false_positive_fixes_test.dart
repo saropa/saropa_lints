@@ -12,6 +12,8 @@ import 'package:test/test.dart';
 /// 7. avoid_unused_instances - fire-and-forget constructor allowlist
 /// 8. prefer_late_final - method call-site awareness
 /// 9. avoid_nested_assignments - for-loop update clause exclusion
+/// 10. .contains() reduction (2026-03-01) - typeName/bodySource/targetSource
+///     checks use word-boundary RegExp or exact sets so substrings do not trigger.
 ///
 /// Test fixtures are located in:
 /// - example/lib/require_subscription_status_check_example.dart
@@ -664,6 +666,21 @@ void main() {
         // - late field assigned in init() AND reset()
 
         expect('Multiple direct assignments prevent flagging', isNotNull);
+      });
+    });
+
+    group('contains_reduction_word_boundary', () {
+      test('type/body/target checks use word-boundary regex to avoid substring FPs',
+          () {
+        // After 2026-03-01 refactor: rules no longer use .contains() on
+        // typeName, bodySource, targetSource, etc. They use RegExp with \b
+        // or exact sets. Expected: identifiers that contain a substring
+        // (e.g. MyValueNotifierHelper, SomeStreamControllerUtil) should
+        // NOT trigger require_value_notifier_dispose / stream rules.
+        expect(
+          'Word-boundary and exact-match checks prevent substring false positives',
+          isNotNull,
+        );
       });
     });
 
