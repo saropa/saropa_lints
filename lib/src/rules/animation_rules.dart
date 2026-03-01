@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../saropa_lint_rule.dart';
+import '../target_matcher_utils.dart';
 
 /// Warns when AnimationController is created without vsync.
 ///
@@ -304,23 +305,19 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
 
       if (controllerNames.isEmpty) return;
 
-      // Find dispose method
-      String? disposeBody;
+      // Find dispose method body for isFieldCleanedUp checks
+      FunctionBody? disposeMethodBody;
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeBody = member.body.toSource();
+          disposeMethodBody = member.body;
           break;
         }
       }
 
       // Check if controllers are disposed
       for (final String name in controllerNames) {
-        final bool isDisposed =
-            disposeBody != null &&
-            RegExp(
-              '${RegExp.escape(name)}\\s*[?.]+'
-              '\\s*dispose(Safe)?\\s*\\(',
-            ).hasMatch(disposeBody);
+        final bool isDisposed = disposeMethodBody != null &&
+            isFieldCleanedUp(name, 'dispose', disposeMethodBody);
 
         if (!isDisposed) {
           for (final ClassMember member in node.members) {

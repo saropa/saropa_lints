@@ -12,6 +12,41 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **False positive reduction (disposal_rules):** Replaced `disposeBody.contains(...)` with `isFieldCleanedUp()` from `target_matcher_utils` so disposal detection is robust to formatting and null-aware calls. Rules updated: `require_media_player_dispose`, `require_tab_controller_dispose`, `require_receive_port_close`, `require_socket_close`, `require_debouncer_cancel`, `require_interval_timer_cancel`, `require_file_handle_close`. CI baseline for `disposal_rules.dart` reduced (anti_pattern_detection_test).
+- **False positive reduction (Phase 2):** Replaced substring checks with exact or word-boundary checks. **navigation_rules:** `avoid_deep_link_sensitive_params`, `prefer_typed_route_params` — use exact property name (`_indexTargetPropertyOrName`) for `queryParameters`/`pathSegments`/`pathParameters` instead of `targetSource.contains(...)`. **api_network_rules:** `require_http_status_check` — use word-boundary regex for `http.get`/`dio.get`/`statusCode`/`isSuccessful` to avoid FPs on identifiers like `myhttp.get`, `myStatusCode`. CI baselines updated for `navigation_rules.dart` and `api_network_rules.dart`.
+- **False positive reduction (Phase 2 batch 2):** **provider_rules:** `avoid_provider_for_single_value` — use exact set for Proxy/Multi skip (`_proxyOrMulti`); `prefer_selector_over_single_watch` — use regex `\.select\s*\(` instead of `bodySource.contains('.select(')`; `avoid_provider_value_rebuild` — use `typeName.endsWith('Provider')` instead of `typeName.contains('Provider')`. **permission_rules:** `require_location_permission_rationale` — word-boundary regex for rationale patterns (`_rationalePatterns`); `require_camera_permission_check` — word-boundary regex for camera check (`_cameraCheckPatterns`); `prefer_image_cropping` — word-boundary regex for cropper/crop/ImageCropper/cropImage. **api_network_rules:** `require_retry_logic` — word-boundary regex for http/dio/client and retry/maxRetries. CI baselines updated for `api_network_rules.dart`, `permission_rules.dart`, `packages/provider_rules.dart`.
+- **False positive reduction (Phase 2 batch 3):** **permission_rules:** `prefer_image_cropping` — profile-context check uses word-boundary regex (`_profileContextKeywordPatterns`) instead of `bodySource.contains(keyword)`. **api_network_rules:** `require_connectivity_check` — word-boundary regex for HTTP and connectivity patterns (`_connectivityHttpPatterns`, `_connectivityCheckPatterns`); `require_request_timeout` — word-boundary regex for timeout config (`_timeoutConfigPatterns`). **async_rules:** `require_feature_flag_default` — exact target set (`_remoteConfigTargetNames`) via `extractTargetName` instead of `targetSource.contains`; DateTime UTC rule — regex for `.toUtc()`/`.utc`; stream listen and StreamController rules — `extractTargetName` + `endsWith('stream'|'controller')` instead of `targetSource.contains`. CI baselines: api_network_rules 126→114, async_rules 59→50; permission_rules removed (count 0).
+- **False positive reduction (Phase 2 batch 4):** **widget_lifecycle_rules:** `require_scroll_controller_dispose`, `require_focus_node_dispose` — iteration disposal check uses `RegExp(r'\.dispose\s*\(\s*\)')` instead of `disposeBody.contains('.dispose()')`. **api_network_rules:** `prefer_http_connection_reuse` — word-boundary regex for client creation and `.close()` (`_clientCreationPatterns`, `_clientLocalVarPatterns`, `_closeCallPattern`); `avoid_redundant_requests` — `_buildMethodApiPatterns`, `_buildMethodCachingPatterns`; `require_response_caching` — `_getRequestPatterns`, `_responseCachingPatterns`, `_classCachePatterns`; `prefer_api_pagination` — `_paginationApiPatterns`, `_paginationParamPatterns`. CI baselines: api_network_rules 114→75, widget_lifecycle_rules 18→16, async_rules 50→47.
+- **False positive reduction (Phase 2 batch 5):** **api_network_rules:** `require_offline_indicator` — `_connectivityTargetPatterns`, `_uiFeedbackPatterns` (word-boundary regex); `prefer_streaming_response` — `_responseTargetPatterns`, `_fileContextPatterns`, `_fileOpPatterns` for response/file context; `avoid_over_fetching` — regex for `.name`/`.title`/`.id`; `require_cancel_token` — `_cancelTokenHttpPatterns`, `_cancelTokenCancellationPatterns`, `_cancelTokenMountedPatterns`. CI baseline: api_network_rules 75→51.
+- **False positive reduction (Phase 3 batch):** **animation_rules:** `require_animation_controller_dispose` — dispose check uses `isFieldCleanedUp(name, 'dispose', disposeMethodBody)` from `target_matcher_utils` instead of regex on `disposeBody` source. **async_rules:** `require_stream_controller_close` — `.close()`/`.dispose()` detection uses `RegExp(r'\.close\s*\(|\.dispose\s*\(')` instead of `bodySource.contains(...)`; `avoid_stream_subscription_in_field` — StreamSubscription field/type checks use exact type (`StreamSubscription` / `StreamSubscription?` / `StreamSubscription<...>`) and exact variable-name set plus `endsWith('Subscription')` instead of `contains('subscription'|'Subscription')`; `require_stream_subscription_no_leak` — cancel target type uses `startsWith('StreamSubscription')` instead of `contains('StreamSubscription')`.
+- **prefer_permission_request_in_context:** Use exact match for Permission target (`Permission` or `Permission.*`) instead of substring match to avoid false positives on unrelated types.
+
+### Changed
+
+- **Roadmap:**
+  - Verified all 185 `bugs/roadmap` task files against `lib/src/tiers.dart`; none correspond to implemented rules.
+  - Rule quality subsection made self-contained: describes the String.contains() anti-pattern audit (121+ instances across rule files; remediation via exact-match sets or type checks) and `test/anti_pattern_detection_test.dart`; removed references to obsolete review documents.
+  - Planned Enhancements table (Discussion #55–#61) removed; details live in `bugs/discussion/` (one file per discussion).
+  - Planned rules that have a task file in `bugs/roadmap/` were removed from ROADMAP tables; ROADMAP now points to [bugs/roadmap/](bugs/roadmap/) for task specs.
+  - Deferred content merged into ROADMAP.md (Part 2). ROADMAP_DEFERRED.md removed as redundant.
+  - Cross-File Analysis CLI roadmap (formerly ROADMAP_CLI.md) merged into ROADMAP.md as **Part 3: Cross-File Analysis CLI Tool Roadmap**. ROADMAP_CLI.md removed.
+- **CHANGELOG:** 6.0.7 Added section — consolidated six separate "new lint rules" lists into one list of 55 rules, removed redundant rule-name headers, and ordered entries alphabetically for readability.
+- **require_app_startup_error_handling:** Documented that the rule only runs when the project has a crash-reporting dependency (e.g. firebase_crashlytics, sentry_flutter).
+- **Tier reclassification (no orphans):** Rule logic, unit tests, and false-positive suppressors unchanged; only tier set membership in `lib/src/tiers.dart` updated. Moved **to Essential:** `check_mounted_after_async`, `avoid_drift_raw_sql_interpolation`. Moved **to Recommended:** `prefer_semver_version`, `prefer_correct_package_name`, `require_macos_notarization_ready`, `avoid_animation_rebuild_waste`, `require_deep_link_fallback`, `require_stepper_validation`, `require_immutable_bloc_state`.
+- **Severity reclassification:** `LintCode` severity only; when the rule fires is unchanged. CI using `--fatal-infos` may now fail where it did not. **WARNING → ERROR:** `require_unknown_route_handler`, `avoid_circular_redirects`, `check_mounted_after_async`, `require_https_only`, `require_route_guards`.
+
+### Added
+
+- **Tests:** `test/fixture_lint_integration_test.dart` — runs `dart run custom_lint` on example_async and asserts output is parseable with `parseViolations`.
+- **Missing fixtures (single-per-category):** Added fixtures and test list entries for: freezed (`avoid_freezed_any_map_issue`), notification (`prefer_local_notification_for_immediate`), type_safety (`avoid_redundant_null_check`), ui_ux (`prefer_master_detail_for_large`), widget_lifecycle (`require_init_state_idempotent`).
+- **Tests (rule instantiation + fixtures):** Added rule-instantiation tests (code.name, problemMessage, correctionMessage) and/or missing fixtures for: **Debug:** `prefer_fail_test_case`, `avoid_debug_print`, `avoid_unguarded_debug`, `prefer_commenting_analyzer_ignores`, `prefer_debugPrint`, `avoid_print_in_release`, `require_structured_logging`, `avoid_sensitive_in_logs`, `require_log_level_for_production`. **Complexity:** `avoid_bitwise_operators_with_booleans`, `avoid_cascade_after_if_null`, `avoid_complex_arithmetic_expressions`, `avoid_complex_conditions`, `avoid_duplicate_cascades`, `avoid_excessive_expressions`, `avoid_immediately_invoked_functions`, `avoid_nested_shorthands`, `avoid_multi_assignment`, `binary_expression_operand_order`, `prefer_moving_to_variable`, `prefer_parentheses_with_if_null`, `avoid_deep_nesting`, `avoid_high_cyclomatic_complexity`. **Connectivity:** `require_connectivity_error_handling`, `avoid_connectivity_equals_internet`, `require_connectivity_timeout` (fixture added). **Sqflite:** `avoid_sqflite_type_mismatch`, `prefer_sqflite_encryption` (fixture added). **Config:** `avoid_hardcoded_config`, `avoid_hardcoded_config_test`, `avoid_mixed_environments`, `require_feature_flag_type_safety`, `avoid_string_env_parsing`, `avoid_platform_specific_imports`, `prefer_semver_version`. **Lifecycle:** `avoid_work_in_paused_state`, `require_resume_state_refresh`, `require_did_update_widget_check`, `require_late_initialization_in_init_state`, `require_app_lifecycle_handling`, `require_conflict_resolution_strategy`. **Return:** `avoid_returning_cascades`, `avoid_returning_void`, `avoid_unnecessary_return`, `prefer_immediate_return`, `prefer_returning_shorthands`, `avoid_returning_null_for_void`, `avoid_returning_null_for_future`. **Exception:** `avoid_non_final_exception_class_fields`, `avoid_only_rethrow`, `avoid_throw_in_catch_block`, `avoid_throw_objects_without_tostring`, `prefer_public_exception_classes`. **Equality:** `avoid_equal_expressions`, `avoid_negations_in_equality_checks`, `avoid_self_assignment`, `avoid_self_compare`, `avoid_unnecessary_compare_to`, `no_equal_arguments`, `avoid_datetime_comparison_without_precision`. **Crypto:** `avoid_hardcoded_encryption_keys`, `prefer_secure_random_for_crypto`, `avoid_deprecated_crypto_algorithms`, `require_unique_iv_per_encryption`, `require_secure_key_generation`. **Db_yield:** `require_yield_after_db_write`, `suggest_yield_after_db_read`, `avoid_return_await_db`. **Context:** `avoid_storing_context`, `avoid_context_across_async`, `avoid_context_after_await_in_static`, `avoid_context_in_async_static`, `avoid_context_in_static_methods`, `avoid_context_dependency_in_callback`. **Theming:** `require_dark_mode_testing`, `avoid_elevation_opacity_in_dark`, `prefer_theme_extensions`, `require_semantic_colors`. **Platform:** `require_platform_check`, `prefer_platform_io_conditional`, `prefer_foundation_platform_check`. **Notification:** `require_notification_channel_android`, `avoid_notification_payload_sensitive`, `require_notification_initialize_per_platform`, `require_notification_timezone_awareness`, `avoid_notification_same_id`, `prefer_notification_grouping`, `avoid_notification_silent_failure`, `prefer_local_notification_for_immediate`. **Memory management:** `avoid_large_objects_in_state`, `require_image_disposal`, `avoid_capturing_this_in_callbacks`, `require_cache_eviction_policy`, `prefer_weak_references_for_cache`, `avoid_expando_circular_references`, `avoid_large_isolate_communication`, `require_cache_expiration`, `avoid_unbounded_cache_growth`, `require_cache_key_uniqueness`, `avoid_retaining_disposed_widgets`, `avoid_closure_capture_leaks`, `require_expando_cleanup`. **Disposal:** `require_media_player_dispose`, `require_tab_controller_dispose`, `require_text_editing_controller_dispose`, `require_page_controller_dispose`, `require_lifecycle_observer`, `avoid_websocket_memory_leak`, `require_video_player_controller_dispose`, `require_stream_subscription_cancel`, `require_change_notifier_dispose`, `require_receive_port_close`, `require_socket_close`, `require_debouncer_cancel`, `require_interval_timer_cancel`, `require_file_handle_close`, `require_dispose_implementation`, `prefer_dispose_before_new_instance`, `dispose_class_fields`. **Error handling:** `avoid_swallowing_exceptions`, `avoid_losing_stack_trace`, `avoid_generic_exceptions`, `require_error_context`, `prefer_result_pattern`, `require_async_error_documentation`, `avoid_nested_try_statements`, `require_error_boundary`, `avoid_uncaught_future_errors`, `avoid_print_error`, `require_error_handling_graceful`, `avoid_catch_all`, `avoid_catch_exception_alone`, `avoid_exception_in_constructor`, `require_cache_key_determinism`, `require_permission_permanent_denial_handling`, `require_notification_action_handling`, `require_finally_cleanup`, `require_error_logging`, `require_app_startup_error_handling`, `avoid_assert_in_production`, `handle_throwing_invocations`.
+
+---
+
 ## [6.0.7]
 
 ### Fixed
@@ -27,75 +62,68 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - **Firebase token rule:** Stored detection now includes VariableDeclaration initializer (e.g. `final t = await user.getIdToken()`).
 - **Performance:** Firebase Auth rules set requiredPatterns for earlier file skip when content does not match.
 - **no_empty_block:** Confirmed existing implementation in `unnecessary_code_rules.dart`; roadmap task archived.
+- **GitHub:**
+  - Closed issues [#13](https://github.com/saropa/saropa_lints/issues/13) (prefer_pool_pattern), [#14](https://github.com/saropa/saropa_lints/issues/14) (require_expando_cleanup), [#15](https://github.com/saropa/saropa_lints/issues/15) (require_compression), [#16](https://github.com/saropa/saropa_lints/issues/16) (prefer_batch_requests), [#18](https://github.com/saropa/saropa_lints/issues/18) (prefer_binary_format). Each was commented with resolution version v6.0.7 and closed as completed.
+  - Closed issues [#20](https://github.com/saropa/saropa_lints/issues/20), [#29](https://github.com/saropa/saropa_lints/issues/29) (require_pagination_for_large_lists, v6.0.7), [#25](https://github.com/saropa/saropa_lints/issues/25), [#34](https://github.com/saropa/saropa_lints/issues/34) (require_rtl_layout_support, v4.15.1), [#24](https://github.com/saropa/saropa_lints/issues/24), [#33](https://github.com/saropa/saropa_lints/issues/33) (prefer_sliverfillremaining_for_empty, v4.14.5), [#26](https://github.com/saropa/saropa_lints/issues/26), [#35](https://github.com/saropa/saropa_lints/issues/35) (require_stepper_state_management, v4.14.5), [#38](https://github.com/saropa/saropa_lints/issues/38) (avoid_infinite_scroll_duplicate_requests, v4.14.5). Each was commented with the resolution version and closed as completed.
 
 ### Added
 
-- 5 new Essential-tier lint rules from roadmap detail requirements:
-  - `require_exhaustive_sealed_switch` — switch on sealed types must use explicit cases; avoid default/wildcard (same logic as avoid_wildcard_cases_with_sealed_classes, Essential-tier name).
-  - `require_error_handling_graceful` — flag raw exception (e.toString(), e.message, $e) shown in Text/SnackBar/AlertDialog inside catch blocks; recommend friendly messages.
-  - `require_firebase_reauthentication` — sensitive Firebase Auth ops (delete, updateEmail, updatePassword) must be preceded by reauthenticateWithCredential/reauthenticateWithProvider in the same method (firebase_auth only).
-  - `require_firebase_token_refresh` — getIdToken() result stored (variable/prefs) without idTokenChanges listener or forceRefresh (firebase_auth only).
-  - `require_text_scale_factor_awareness` — Container/SizedBox with literal height containing Text may overflow at large text scale; recommend flexible layout (widget files only).
-
-- 9 new lint rules from roadmap detail requirements (banned_usage, prefer_csrf_protection, prefer_no_commented_code alias, prefer_semver_version, prefer_sqflite_encryption, require_conflict_resolution_strategy, require_connectivity_timeout, require_init_state_idempotent, require_input_validation):
-  - `banned_usage` (Professional, WARNING) — Configurable ban list for identifiers (e.g. `print`). No-op without config in `analysis_options_custom.yaml`. Whole-word match; optional `allowedFiles` per entry.
-  - `prefer_csrf_protection` (Professional, WARNING) — State-changing HTTP with Cookie header must include CSRF token or Bearer auth. Web/WebView projects only. OWASP M3/A07.
-  - `prefer_no_commented_code` — Alias for existing `prefer_no_commented_out_code` (stylistic).
-  - `prefer_semver_version` (Essential, WARNING) — pubspec.yaml `version` must be major.minor.patch (e.g. 1.0.0, 2.3.1+4). Reports when invalid.
-  - `prefer_sqflite_encryption` (Professional, WARNING) — Sensitive DB paths (user/auth/health/payment etc.) with sqflite should use sqflite_sqlcipher. OWASP M9.
-  - `require_conflict_resolution_strategy` (Professional, WARNING) — Sync/upload/push methods that overwrite data should compare timestamps or show conflict UI.
-  - `require_connectivity_timeout` (Essential, WARNING) — HTTP/client/dio requests must have a timeout (e.g. `.timeout(Duration(seconds: 30))`).
-  - `require_init_state_idempotent` (Essential, WARNING) — addListener/addObserver in initState must have matching removeListener/removeObserver in dispose (Flutter widget files).
-  - `require_input_validation` (Essential, WARNING) — Raw controller `.text` in post/put/patch body without trim/validate/isEmpty. OWASP M1/M4.
-
-- 12 new lint rules from roadmap detail requirements:
+- 55 new lint rules:
+  - `avoid_deprecated_usage` (Recommended, WARNING) — use of deprecated APIs from other packages; same-package and generated files ignored.
   - `avoid_unnecessary_containers` (Recommended, INFO) — Container with only child (and optionally key); remove and use child directly (widget files only).
+  - `banned_usage` (Professional, WARNING) — Configurable ban list for identifiers (e.g. `print`). No-op without config in `analysis_options_custom.yaml`. Whole-word match; optional `allowedFiles` per entry.
+  - `handle_throwing_invocations` (Professional, INFO) — invocations that can throw (e.g. @Throws, readAsStringSync, jsonDecode) not in try/catch.
   - `prefer_adjacent_strings` (Recommended, INFO) — use adjacent string literals instead of `+` for literal concatenation.
   - `prefer_adjective_bool_getters` (Professional, INFO) — bool getters should use predicate names (is/has/can) not verb names (validate/load).
   - `prefer_asserts_in_initializer_lists` (Professional, INFO) — move leading assert() from constructor body to initializer list.
+  - `prefer_batch_requests` (Professional, INFO) — await in for-loop with fetch-like method names; suggest batch endpoints. Resolves [#16](https://github.com/saropa/saropa_lints/issues/16).
+  - `prefer_binary_format` (Comprehensive, INFO) — jsonDecode in hot path (timer/stream); suggest protobuf/MessagePack or compute(). Resolves [#18](https://github.com/saropa/saropa_lints/issues/18).
   - `prefer_const_constructors_in_immutables` (Professional, INFO) — @immutable or StatelessWidget/StatefulWidget subclasses with only final fields should have a const constructor.
   - `prefer_const_declarations` (Recommended, INFO) — final variables with constant initializers could be const (locals, static, top-level).
   - `prefer_const_literals_to_create_immutables` (Recommended, INFO) — non-const collection literals passed to immutable widget constructors (widget files only).
   - `prefer_constructors_first` (Professional, INFO) — constructors should appear before methods in a class.
+  - `prefer_csrf_protection` (Professional, WARNING) — State-changing HTTP with Cookie header must include CSRF token or Bearer auth. Web/WebView projects only. OWASP M3/A07.
   - `prefer_extension_methods` (Professional, INFO) — top-level functions that could be extension methods on first parameter type.
   - `prefer_extension_over_utility_class` (Professional, INFO) — class with only static methods sharing first param type could be an extension.
   - `prefer_extension_type_for_wrapper` (Professional, INFO) — single-field wrapper class could be an extension type (Dart 3.3+).
   - `prefer_final_fields` (Professional, INFO) — fields never reassigned (except via setter) could be final.
-
-- 16 new lint rules from roadmap detail requirements:
   - `prefer_final_locals` (Recommended, INFO) — local variables never reassigned should be final.
+  - `prefer_form_bloc_for_complex` (Professional, INFO) — Form with >5 fields suggests form state management (FormBloc, reactive_forms, etc.).
   - `prefer_getters_before_setters` (Professional, INFO) — setter should appear after its getter.
   - `prefer_if_elements_to_conditional_expressions` (Recommended, INFO) — use if element instead of ternary with null in collections.
   - `prefer_inlined_adds` (Recommended, INFO) — prefer inline list/set literal over empty then add/addAll.
   - `prefer_interpolation_to_compose` (Recommended, INFO) — prefer string interpolation over + with literals.
+  - `prefer_local_notification_for_immediate` (Recommended, INFO) — FCM for server-triggered messages; use flutter_local_notifications for app-generated.
   - `prefer_lowercase_constants` (Recommended, INFO) — const/static final should use lowerCamelCase.
+  - `prefer_master_detail_for_large` (Professional, INFO) — list navigation without MediaQuery/LayoutBuilder; suggest master-detail on tablets.
   - `prefer_mixin_over_abstract` (Professional, INFO) — abstract class with no abstract members and no generative constructor → mixin.
   - `prefer_named_bool_params` (Professional, INFO) — prefer named bool parameters in small functions.
+  - `prefer_no_commented_code` — Alias for existing `prefer_no_commented_out_code` (stylistic).
   - `prefer_noun_class_names` (Professional, INFO) — concrete classes should use noun/agent names, not gerund/-able.
   - `prefer_null_aware_method_calls` (Recommended, INFO) — use ?. instead of if (x != null) { x.foo(); }.
+  - `prefer_pool_pattern` (Comprehensive, INFO) — non-const allocation in hot path (timer/animation); suggest object pool. Resolves [#13](https://github.com/saropa/saropa_lints/issues/13).
   - `prefer_raw_strings` (Professional, INFO) — use raw string when only escaped backslashes (e.g. regex).
   - `prefer_record_over_tuple_class` (Professional, INFO) — simple data class with only final fields → record.
   - `prefer_sealed_classes` (Professional, INFO) — abstract class with 2+ concrete subclasses in same file → sealed.
   - `prefer_sealed_for_state` (Professional, INFO) — state/event/result abstract with local subclasses → sealed.
+  - `prefer_semver_version` (Essential, WARNING) — pubspec.yaml `version` must be major.minor.patch (e.g. 1.0.0, 2.3.1+4). Reports when invalid.
+  - `prefer_sqflite_encryption` (Professional, WARNING) — Sensitive DB paths (user/auth/health/payment etc.) with sqflite should use sqflite_sqlcipher. OWASP M9.
   - `prefer_static_before_instance` (Professional, INFO) — static members before instance in same category.
   - `prefer_verb_method_names` (Professional, INFO) — methods should use verb names, not noun-only.
-
-- 3 new lint rules from roadmap detail requirements (late/pagination/SSL pinning):
+  - `require_compression` (Comprehensive, INFO) — HTTP get/post/put/delete without Accept-Encoding; suggest gzip. Resolves [#15](https://github.com/saropa/saropa_lints/issues/15).
+  - `require_conflict_resolution_strategy` (Professional, WARNING) — Sync/upload/push methods that overwrite data should compare timestamps or show conflict UI.
+  - `require_connectivity_timeout` (Essential, WARNING) — HTTP/client/dio requests must have a timeout (e.g. `.timeout(Duration(seconds: 30))`).
+  - `require_error_handling_graceful` — flag raw exception (e.toString(), e.message, $e) shown in Text/SnackBar/AlertDialog inside catch blocks; recommend friendly messages.
+  - `require_exhaustive_sealed_switch` — switch on sealed types must use explicit cases; avoid default/wildcard (same logic as avoid_wildcard_cases_with_sealed_classes, Essential-tier name).
+  - `require_expando_cleanup` (Comprehensive, INFO) — Expando with entries added but no cleanup (expando[key] = null). Resolves [#14](https://github.com/saropa/saropa_lints/issues/14).
+  - `require_firebase_reauthentication` — sensitive Firebase Auth ops (delete, updateEmail, updatePassword) must be preceded by reauthenticateWithCredential/reauthenticateWithProvider in the same method (firebase_auth only).
+  - `require_firebase_token_refresh` — getIdToken() result stored (variable/prefs) without idTokenChanges listener or forceRefresh (firebase_auth only).
+  - `require_init_state_idempotent` (Essential, WARNING) — addListener/addObserver in initState must have matching removeListener/removeObserver in dispose (Flutter widget files).
+  - `require_input_validation` (Essential, WARNING) — Raw controller `.text` in post/put/patch body without trim/validate/isEmpty. OWASP M1/M4.
   - `require_late_access_check` (Professional, WARNING) — late non-final field set in a method other than constructor/initState and read in another method without initialization check; risk of LateInitializationError.
-  - `require_pagination_for_large_lists` (Essential, WARNING) — ListView.builder/GridView.builder with itemCount from bulk-style list (e.g. allProducts.length) without pagination; OOM and jank risk. Suppressed when project uses infinite_scroll_pagination.
+  - `require_pagination_for_large_lists` (Essential, WARNING) — ListView.builder/GridView.builder with itemCount from bulk-style list (e.g. allProducts.length) without pagination; OOM and jank risk. Suppressed when project uses infinite_scroll_pagination. Resolves [#20](https://github.com/saropa/saropa_lints/issues/20), [#29](https://github.com/saropa/saropa_lints/issues/29).
   - `require_ssl_pinning_sensitive` (Professional, WARNING) — HTTP POST/PUT/PATCH to sensitive paths (/auth, /login, /token) without certificate pinning; OWASP M5, M3. Suppressed when project uses http_certificate_pinning or ssl_pinning_plugin, and for localhost.
-
-- 10 new lint rules from roadmap detail requirements:
-  - `avoid_deprecated_usage` (Recommended, WARNING) — use of deprecated APIs from other packages; same-package and generated files ignored.
-  - `handle_throwing_invocations` (Professional, INFO) — invocations that can throw (e.g. @Throws, readAsStringSync, jsonDecode) not in try/catch.
-  - `prefer_form_bloc_for_complex` (Professional, INFO) — Form with >5 fields suggests form state management (FormBloc, reactive_forms, etc.).
-  - `prefer_local_notification_for_immediate` (Recommended, INFO) — FCM for server-triggered messages; use flutter_local_notifications for app-generated.
-  - `prefer_master_detail_for_large` (Professional, INFO) — list navigation without MediaQuery/LayoutBuilder; suggest master-detail on tablets.
-  - `prefer_batch_requests` (Professional, INFO) — await in for-loop with fetch-like method names; suggest batch endpoints.
-  - `prefer_binary_format` (Comprehensive, INFO) — jsonDecode in hot path (timer/stream); suggest protobuf/MessagePack or compute().
-  - `prefer_pool_pattern` (Comprehensive, INFO) — non-const allocation in hot path (timer/animation); suggest object pool.
-  - `require_compression` (Comprehensive, INFO) — HTTP get/post/put/delete without Accept-Encoding; suggest gzip.
-  - `require_expando_cleanup` (Comprehensive, INFO) — Expando with entries added but no cleanup (expando[key] = null).
+  - `require_text_scale_factor_awareness` — Container/SizedBox with literal height containing Text may overflow at large text scale; recommend flexible layout (widget files only).
 
 ---
 
@@ -103,7 +131,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 
-- 15 new lint rules from roadmap detail requirements:
+- 15 new lint rules:
   - `avoid_bool_in_widget_constructors` (Professional, INFO) — widget constructors with named bool params; prefer enum or decomposition
   - `avoid_classes_with_only_static_members` (Recommended, INFO) — prefer top-level functions/constants
   - `avoid_double_and_int_checks` (Professional, INFO) — flag `is int && is double` (always false) and `is int || is double` (use `is num`)

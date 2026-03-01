@@ -1,0 +1,19 @@
+#!/bin/sh
+# Strip Cursor/Claude attribution lines from the commit message so they never
+# get committed and never trigger the commit-msg hook. Run before commit-msg.
+# Enable: git config core.hooksPath .githooks
+
+msg_file="$1"
+[ -f "$msg_file" ] || exit 0
+
+# Remove lines that credit tools/AI (same set commit-msg would reject).
+# Use .new suffix for portability (mktemp not in all Git for Windows sh).
+tmp="${msg_file}.new"
+grep -vEi '^Made-with:\s*Cursor$' "$msg_file" | \
+grep -vE '^Co-Authored-By:.*[Cc]laude' | \
+grep -vE '^Co-Authored-By:.*[Aa]nthropic' | \
+grep -vEi '^Co-Authored-By:.*noreply@anthropic' | \
+grep -vEi '^Generated with.*(Cursor|Claude)' > "$tmp" 2>/dev/null || exit 0
+
+[ -s "$tmp" ] && mv "$tmp" "$msg_file" || rm -f "$tmp"
+exit 0

@@ -6,6 +6,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../saropa_lint_rule.dart';
+import '../target_matcher_utils.dart';
 import '../fixes/async/avoid_redundant_async_fix.dart';
 import '../fixes/async/change_to_future_void_function_fix.dart';
 import '../fixes/async/replace_async_callback_with_future_void_function_fix.dart';
@@ -1428,7 +1429,7 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
         'State may be disposed during async gap, causing "setState() called after dispose()" crash. {v5}',
     correctionMessage:
         'Add if (mounted) { setState(...) } or if (!mounted) return; before the call.',
-    severity: DiagnosticSeverity.WARNING,
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -1727,6 +1728,13 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static const Set<String> _remoteConfigTargetNames = {
+    'remoteConfig',
+    'RemoteConfig',
+    'featureFlag',
+    'FeatureFlag',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1740,13 +1748,7 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target == null) return;
 
-      final String targetSource = target.toSource();
-      if (!targetSource.contains('remoteConfig') &&
-          !targetSource.contains('RemoteConfig') &&
-          !targetSource.contains('featureFlag') &&
-          !targetSource.contains('FeatureFlag')) {
-        return;
-      }
+      if (!_remoteConfigTargetNames.contains(extractTargetName(target))) return;
 
       // Check if there's a null-aware operator or default
       final AstNode? parent = node.parent;
@@ -1892,9 +1894,10 @@ class PreferUtcForStorageRule extends SaropaLintRule {
       final String typeName = type.getDisplayString();
       if (!typeName.startsWith('DateTime')) return;
 
-      // Check if already UTC
+      // Check if already UTC (regex to avoid FP on substrings)
       final String targetSource = target.toSource();
-      if (targetSource.contains('.toUtc()') || targetSource.contains('.utc')) {
+      if (RegExp(r'\.toUtc\s*\(\s*\)').hasMatch(targetSource) ||
+          RegExp(r'\.utc\b').hasMatch(targetSource)) {
         return;
       }
 
@@ -2206,8 +2209,9 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
           if (methodName == 'dispose' || methodName == 'close') {
             final String? bodySource = member.body.toSource();
             if (bodySource != null) {
-              hasClose = hasClose || bodySource.contains('.close()');
-              hasDispose = hasDispose || bodySource.contains('.dispose()');
+              hasClose = hasClose || RegExp(r'\.close\s*\(').hasMatch(bodySource);
+              hasDispose =
+                  hasDispose || RegExp(r'\.dispose\s*\(').hasMatch(bodySource);
             }
           }
         }
@@ -2363,11 +2367,11 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
       if (target == null) return;
 
       final String? typeName = target.staticType?.element?.name;
-      // Check type or source for stream indicators
-      final String targetSource = target.toSource().toLowerCase();
+      // Check type or target name for stream indicators (exact/endsWith to avoid FP)
+      final String targetNameLower = extractTargetName(target).toLowerCase();
       if (typeName != 'Stream' &&
-          !targetSource.contains('stream') &&
-          !targetSource.contains('controller')) {
+          !targetNameLower.endsWith('stream') &&
+          !targetNameLower.endsWith('controller')) {
         return;
       }
 
@@ -2773,6 +2777,21 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static const Set<String> _subscriptionVarNames = {
+    'subscription',
+    '_subscription',
+    'sub',
+    '_sub',
+  };
+
+  /// True if [type] is StreamSubscription, StreamSubscription?, or StreamSubscription<...>.
+  static bool _isStreamSubscriptionType(String? type) {
+    return type != null &&
+        (type == 'StreamSubscription' ||
+            type == 'StreamSubscription?' ||
+            type.startsWith('StreamSubscription<'));
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2801,10 +2820,7 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
           final AstNode? fieldParent = current.parent?.parent;
           if (fieldParent is FieldDeclaration) {
             final String? fieldType = fieldParent.fields.type?.toSource();
-            // If the field type is StreamSubscription, this is proper storage
-            if (fieldType != null && fieldType.contains('StreamSubscription')) {
-              return;
-            }
+            if (_isStreamSubscriptionType(fieldType)) return;
             // If stored to a non-subscription field (like _ or void), it's bad
             reporter.atNode(node);
             return;
@@ -2815,10 +2831,10 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
         if (current is AssignmentExpression) {
           final Expression leftSide = current.leftHandSide;
           if (leftSide is SimpleIdentifier) {
-            // Check if the left side is a StreamSubscription field
+            // Check if the left side is a StreamSubscription field (exact names)
             final String leftSource = leftSide.name;
-            if (leftSource.contains('subscription') ||
-                leftSource.contains('Subscription')) {
+            if (_subscriptionVarNames.contains(leftSource) ||
+                leftSource.endsWith('Subscription')) {
               return; // Likely storing properly
             }
           }
@@ -2826,7 +2842,7 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
           final DartType? leftType = leftSide.staticType;
           if (leftType != null) {
             final String leftTypeName = leftType.getDisplayString();
-            if (leftTypeName.contains('StreamSubscription')) {
+            if (leftTypeName.startsWith('StreamSubscription')) {
               return;
             }
           }
@@ -2835,9 +2851,7 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
         // If assigned to a local variable declaration, check its type
         if (current is VariableDeclarationStatement) {
           final String? declType = current.variables.type?.toSource();
-          if (declType != null && declType.contains('StreamSubscription')) {
-            return;
-          }
+          if (_isStreamSubscriptionType(declType)) return;
         }
 
         // Stop at method or class level
@@ -3099,7 +3113,7 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
       final DartType? targetType = target.staticType;
       if (targetType != null) {
         final String targetTypeName = targetType.getDisplayString();
-        if (!targetTypeName.contains('StreamSubscription')) {
+        if (!targetTypeName.startsWith('StreamSubscription')) {
           return false;
         }
       }
@@ -4247,13 +4261,13 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
       // Check for stream add methods
       if (methodName != 'add' && methodName != 'addError') return;
 
-      // Check if target is a StreamController
+      // Check if target is a StreamController (exact name/endsWith to avoid FP)
       final Expression? target = node.target;
       if (target == null) return;
 
-      final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('controller') &&
-          !targetSource.contains('stream')) {
+      final String targetNameLower = extractTargetName(target).toLowerCase();
+      if (!targetNameLower.endsWith('controller') &&
+          !targetNameLower.endsWith('stream')) {
         return;
       }
 
