@@ -1505,10 +1505,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_late_access_check', // late field access without init check
   'avoid_bool_in_widget_constructors',
   'avoid_double_and_int_checks',
-  'avoid_equals_and_hash_code_on_mutable_classes',
   'avoid_field_initializers_in_const_classes',
-  'avoid_implementing_value_types',
-  'avoid_null_checks_in_equality_operators',
   'avoid_positional_boolean_parameters',
   'avoid_setters_without_getters',
   'prefer_getters_before_setters',
@@ -2072,7 +2069,6 @@ const Set<String> professionalOnlyRules = <String>{
   // Best practices (auto-assigned by severity)
   'avoid_adjacent_strings',
   'avoid_classes_with_only_static_members',
-  'avoid_redundant_argument_values',
   'avoid_always_null_parameters',
   'avoid_autoplay_audio',
   'avoid_barrel_files',
