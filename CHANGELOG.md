@@ -12,7 +12,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
-## [Unreleased]
+## [6.0.7]
 
 ### Fixed
 
@@ -23,9 +23,19 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Changed
 
+- **Firebase reauth rule:** Reauth is now compared by source offset (earliest reauth in method) so order is correct regardless of visit order.
+- **Firebase token rule:** Stored detection now includes VariableDeclaration initializer (e.g. `final t = await user.getIdToken()`).
+- **Performance:** Firebase Auth rules set requiredPatterns for earlier file skip when content does not match.
 - **no_empty_block:** Confirmed existing implementation in `unnecessary_code_rules.dart`; roadmap task archived.
 
 ### Added
+
+- 5 new Essential-tier lint rules from roadmap detail requirements:
+  - `require_exhaustive_sealed_switch` — switch on sealed types must use explicit cases; avoid default/wildcard (same logic as avoid_wildcard_cases_with_sealed_classes, Essential-tier name).
+  - `require_error_handling_graceful` — flag raw exception (e.toString(), e.message, $e) shown in Text/SnackBar/AlertDialog inside catch blocks; recommend friendly messages.
+  - `require_firebase_reauthentication` — sensitive Firebase Auth ops (delete, updateEmail, updatePassword) must be preceded by reauthenticateWithCredential/reauthenticateWithProvider in the same method (firebase_auth only).
+  - `require_firebase_token_refresh` — getIdToken() result stored (variable/prefs) without idTokenChanges listener or forceRefresh (firebase_auth only).
+  - `require_text_scale_factor_awareness` — Container/SizedBox with literal height containing Text may overflow at large text scale; recommend flexible layout (widget files only).
 
 - 9 new lint rules from roadmap detail requirements (banned_usage, prefer_csrf_protection, prefer_no_commented_code alias, prefer_semver_version, prefer_sqflite_encryption, require_conflict_resolution_strategy, require_connectivity_timeout, require_init_state_idempotent, require_input_validation):
   - `banned_usage` (Professional, WARNING) — Configurable ban list for identifiers (e.g. `print`). No-op without config in `analysis_options_custom.yaml`. Whole-word match; optional `allowedFiles` per entry.
@@ -86,25 +96,6 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
   - `prefer_pool_pattern` (Comprehensive, INFO) — non-const allocation in hot path (timer/animation); suggest object pool.
   - `require_compression` (Comprehensive, INFO) — HTTP get/post/put/delete without Accept-Encoding; suggest gzip.
   - `require_expando_cleanup` (Comprehensive, INFO) — Expando with entries added but no cleanup (expando[key] = null).
-
----
-
-## [6.0.7]
-
-### Added
-
-- 5 new Essential-tier lint rules from roadmap detail requirements:
-  - `require_exhaustive_sealed_switch` — switch on sealed types must use explicit cases; avoid default/wildcard (same logic as avoid_wildcard_cases_with_sealed_classes, Essential-tier name).
-  - `require_error_handling_graceful` — flag raw exception (e.toString(), e.message, \$e) shown in Text/SnackBar/AlertDialog inside catch blocks; recommend friendly messages.
-  - `require_firebase_reauthentication` — sensitive Firebase Auth ops (delete, updateEmail, updatePassword) must be preceded by reauthenticateWithCredential/reauthenticateWithProvider in the same method (firebase_auth only).
-  - `require_firebase_token_refresh` — getIdToken() result stored (variable/prefs) without idTokenChanges listener or forceRefresh (firebase_auth only).
-  - `require_text_scale_factor_awareness` — Container/SizedBox with literal height containing Text may overflow at large text scale; recommend flexible layout (widget files only).
-
-### Changed
-
-- **Firebase reauth rule:** Reauth is now compared by source offset (earliest reauth in method) so order is correct regardless of visit order.
-- **Firebase token rule:** Stored detection now includes VariableDeclaration initializer (e.g. `final t = await user.getIdToken()`).
-- **Performance:** Firebase Auth rules set requiredPatterns for earlier file skip when content does not match.
 
 ---
 

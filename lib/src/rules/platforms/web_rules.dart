@@ -164,6 +164,14 @@ class RequireCorsHandlingRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final RegExp _httpTargetPattern = RegExp(
+    r'\b(http|Http)\b',
+    caseSensitive: true,
+  );
+  static final RegExp _corsSourcePattern = RegExp(
+    r'\b(cors|CORS|Access-Control)\b',
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -188,17 +196,14 @@ class RequireCorsHandlingRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('http') && !targetSource.contains('Http')) {
+      if (!_httpTargetPattern.hasMatch(targetSource)) {
         return;
       }
 
       // Check if inside web-specific code or has CORS consideration
       if (path.contains('_web.dart') || path.contains('/web/')) {
-        // Web-specific file, check for CORS handling
         final String source = node.toSource();
-        if (!source.contains('cors') &&
-            !source.contains('CORS') &&
-            !source.contains('Access-Control')) {
+        if (!_corsSourcePattern.hasMatch(source)) {
           reporter.atNode(node);
         }
       }
@@ -521,7 +526,9 @@ class RequireWebRendererAwarenessRule extends SaropaLintRule {
         'sessionstorage',
       ];
 
-      final usesHtmlApis = htmlPatterns.any((p) => bodySource.contains(p));
+      final usesHtmlApis = htmlPatterns.any(
+        (p) => RegExp(RegExp.escape(p)).hasMatch(bodySource),
+      );
 
       if (!usesHtmlApis) {
         return;
@@ -673,6 +680,11 @@ class PreferCsrfProtectionRule extends SaropaLintRule {
     'patch',
   };
 
+  static final RegExp _httpDioTargetPattern = RegExp(
+    r'\b(http|dio)\b',
+    caseSensitive: false,
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -692,7 +704,7 @@ class PreferCsrfProtectionRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target == null) return;
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('http') && !targetSource.contains('dio')) {
+      if (!_httpDioTargetPattern.hasMatch(targetSource)) {
         return;
       }
 
