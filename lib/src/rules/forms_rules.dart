@@ -2266,7 +2266,7 @@ class AvoidFormValidationOnChangeRule extends SaropaLintRule {
 
 /// Forms with >5 fields benefit from form state management (FormBloc, etc.).
 ///
-/// Large forms with manual StatefulWidget + GlobalKey<FormState> are error-prone.
+/// Large forms with manual StatefulWidget + `GlobalKey<FormState>` are error-prone.
 /// This rule suggests flutter_form_bloc, reactive_forms, or flutter_form_builder.
 /// Skips when the project already uses one of those or formz. Test files skipped.
 /// Counts TextFormField/FormField in Form subtree with depth limit 4.

@@ -295,8 +295,9 @@ class PreferSqfliteEncryptionRule extends SaropaLintRule {
       if (target != null) {
         final String targetSource = target.toSource();
         if (!targetSource.contains('sqflite') &&
-            !targetSource.contains('databaseFactory'))
+            !targetSource.contains('databaseFactory')) {
           return;
+        }
       }
       final args = node.argumentList.arguments;
       if (args.isEmpty) return;

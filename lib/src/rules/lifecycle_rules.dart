@@ -664,8 +664,9 @@ class RequireConflictResolutionStrategyRule extends SaropaLintRule {
       if (!_syncMethodNames.any((s) => name.contains(s))) return;
 
       final String bodySource = node.body.toSource().toLowerCase();
-      if (!bodySource.contains('.put') && !bodySource.contains('putall'))
+      if (!bodySource.contains('.put') && !bodySource.contains('putall')) {
         return;
+      }
       if (_conflictIndicators.any((s) => bodySource.contains(s))) return;
 
       reporter.atNode(node);

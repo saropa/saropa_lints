@@ -13,8 +13,10 @@ from __future__ import annotations
 
 import re
 import subprocess
+import tempfile
 from pathlib import Path
 
+from scripts.modules.strip_commit_msg_trailers import strip_commit_message
 from scripts.modules._utils import (
     Color,
     get_shell_mode,
@@ -109,8 +111,45 @@ def git_commit_and_push(
             return False
     else:
         print_success("No changes to commit.")
+        # Ensure HEAD (commit that will be tagged) has no AI attribution
+        _strip_ai_attribution_from_head(project_dir, use_shell)
 
     return True
+
+
+def _strip_ai_attribution_from_head(project_dir: Path, use_shell: bool) -> None:
+    """If HEAD commit message contains AI attribution, amend to remove it."""
+    result = subprocess.run(
+        ["git", "log", "-1", "--format=%B"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    if result.returncode != 0:
+        return
+    original = result.stdout
+    stripped = strip_commit_message(original)
+    if stripped == original:
+        return
+    with tempfile.NamedTemporaryFile(
+        mode="w",
+        suffix=".txt",
+        delete=False,
+        encoding="utf-8",
+    ) as f:
+        f.write(stripped)
+        f.flush()
+        tmp = f.name
+    try:
+        run_command(
+            ["git", "commit", "--amend", "-F", tmp],
+            project_dir,
+            "Stripping AI attribution from HEAD commit message",
+        )
+        print_success("Stripped AI attribution from HEAD commit message.")
+    finally:
+        Path(tmp).unlink(missing_ok=True)
 
 
 def _push_with_retry(

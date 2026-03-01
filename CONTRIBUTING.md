@@ -619,6 +619,8 @@ docs: update README with new tier
 test: add tests for avoid_abc rule
 ```
 
+**No AI attribution.** Do not add `Co-Authored-By` (e.g. Claude Opus, Claude Sonnet, Anthropic), `Made-with: Cursor`, or "Generated with" lines. The repo uses a commit-msg hook (`.githooks/commit-msg`) to reject these. Enable once per clone: `git config core.hooksPath .githooks`
+
 ## Documentation Requirements
 
 **All documentation files must be referenced in README.md.** The README serves as the central hub for discoverability.

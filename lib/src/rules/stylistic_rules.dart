@@ -3374,7 +3374,7 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
 /// final json = 'The key is "name"';
 /// ```
 class AvoidEscapingInnerQuotesRule extends SaropaLintRule {
-  AvoidEscapingInnerQuotesRule() : super(code: _avoidEscapingInnerQuotesCode);
+  AvoidEscapingInnerQuotesRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.opinionated;
@@ -3382,7 +3382,7 @@ class AvoidEscapingInnerQuotesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
-  static const LintCode _avoidEscapingInnerQuotesCode = LintCode(
+  static const LintCode _code = LintCode(
     'avoid_escaping_inner_quotes',
     '[avoid_escaping_inner_quotes] String literal uses backslash-escaped quote characters when switching the string delimiter would eliminate the need for escaping, improving readability.',
     correctionMessage:

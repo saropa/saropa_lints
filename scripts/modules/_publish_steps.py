@@ -188,6 +188,65 @@ def check_working_tree(project_dir: Path) -> tuple[bool, bool]:
     return True, False
 
 
+def _ask_remote_sync_recovery(
+    project_dir: Path,
+    branch: str,
+    use_shell: bool,
+    behind_count: int,
+    *,
+    unrelated: bool = False,
+) -> bool:
+    """When pull fails, ask user how to proceed. Returns True to continue."""
+    print()
+    print_colored(
+        "  Sync failed. What do you want to do?",
+        Color.CYAN,
+    )
+    if unrelated:
+        print_colored(
+            "  (Reset is recommended when local and remote have unrelated "
+            "histories.)",
+            Color.CYAN,
+        )
+    print_colored(
+        "    1) Reset local branch to remote (git reset --hard origin/"
+        f"{branch})\n"
+        "       → Discards local commit history on this branch; "
+        "uncommitted changes to tracked files may be lost.\n"
+        "    2) Continue without syncing (push may fail later)\n"
+        "    3) Abort",
+        Color.CYAN,
+    )
+    try:
+        raw = input("  Choice [1]: ").strip() or "1"
+    except (KeyboardInterrupt, EOFError):
+        print()
+        return False
+    choice = raw.strip().lower()
+    if choice == "2":
+        print_warning("Continuing without syncing.")
+        return True
+    if choice == "3" or choice not in ("1", ""):
+        print_info("Aborting. Fix sync manually (e.g. git fetch && git reset --hard origin/main) and re-run publish.")
+        return False
+    # Choice 1: reset to remote
+    print_info(f"Resetting local {branch} to origin/{branch}...")
+    reset_result = subprocess.run(
+        ["git", "reset", "--hard", f"origin/{branch}"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    if reset_result.returncode != 0:
+        print_error("Reset failed.")
+        if reset_result.stderr:
+            print_colored(reset_result.stderr, Color.RED)
+        return False
+    print_success(f"Local branch reset to remote ({behind_count} commit(s) applied).")
+    return True
+
+
 def check_remote_sync(project_dir: Path, branch: str) -> bool:
     """Step 4: Check if local branch is in sync with remote."""
     print_header("STEP 4: CHECKING REMOTE SYNC")
@@ -233,7 +292,21 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
                 print_error("Failed to pull changes from remote.")
                 if pull_result.stderr:
                     print_colored(pull_result.stderr, Color.RED)
-                return False
+                unrelated = "unrelated histories" in (
+                    pull_result.stderr or ""
+                ).lower()
+                if unrelated:
+                    print_info(
+                        "Local and remote branches have unrelated histories "
+                        "(e.g. history was rewritten or repo recreated)."
+                    )
+                return _ask_remote_sync_recovery(
+                    project_dir,
+                    branch,
+                    use_shell,
+                    behind_count,
+                    unrelated=unrelated,
+                )
             print_success(f"Pulled {behind_count} commit(s) from remote")
 
     # Check if ahead

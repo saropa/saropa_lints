@@ -2727,8 +2727,9 @@ class PreferMixinOverAbstractRule extends SaropaLintRule {
 
       for (final member in node.members) {
         if (member is MethodDeclaration && member.isAbstract) return;
-        if (member is FieldDeclaration && member.abstractKeyword != null)
+        if (member is FieldDeclaration && member.abstractKeyword != null) {
           return;
+        }
       }
 
       final constructors = node.members
@@ -2794,8 +2795,9 @@ class PreferRecordOverTupleClassRule extends SaropaLintRule {
       if (totalFields < 2 || totalFields > 5) return;
 
       final methods = node.members.whereType<MethodDeclaration>();
-      if (methods.any((m) => !_allowedMethodNames.contains(m.name.lexeme)))
+      if (methods.any((m) => !_allowedMethodNames.contains(m.name.lexeme))) {
         return;
+      }
 
       final constructors = node.members
           .whereType<ConstructorDeclaration>()
@@ -2980,8 +2982,9 @@ class PreferConstructorsFirstRule extends SaropaLintRule {
 
       if (firstMethodIndex == -1 ||
           lastConstructorIndex == -1 ||
-          firstMethodIndex >= lastConstructorIndex)
+          firstMethodIndex >= lastConstructorIndex) {
         return;
+      }
 
       final ConstructorDeclaration outOfOrder = node.members
           .whereType<ConstructorDeclaration>()
@@ -3108,8 +3111,9 @@ class PreferExtensionOverUtilityClassRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.extendsClause != null ||
           node.implementsClause != null ||
-          node.withClause != null)
+          node.withClause != null) {
         return;
+      }
 
       final List<MethodDeclaration> staticMethods = node.members
           .whereType<MethodDeclaration>()
@@ -3119,8 +3123,12 @@ class PreferExtensionOverUtilityClassRule extends SaropaLintRule {
 
       final bool hasInstanceMember = node.members.any((m) {
         if (m is FieldDeclaration && !m.isStatic) return true;
-        if (m is MethodDeclaration && !m.isStatic && !m.isGetter && !m.isSetter)
+        if (m is MethodDeclaration &&
+            !m.isStatic &&
+            !m.isGetter &&
+            !m.isSetter) {
           return true;
+        }
         return false;
       });
       if (hasInstanceMember) return;
@@ -3185,8 +3193,9 @@ class PreferExtensionTypeForWrapperRule extends SaropaLintRule {
       if (node.abstractKeyword != null ||
           node.extendsClause != null ||
           node.implementsClause != null ||
-          node.withClause != null)
+          node.withClause != null) {
         return;
+      }
 
       final List<FieldDeclaration> fields = node.members
           .whereType<FieldDeclaration>()
