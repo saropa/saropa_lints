@@ -199,17 +199,15 @@ String _relativize(String path) {
 /// Baseline established: 2026-02-08
 const Map<String, int> _baselineCounts = {
   // Core rule files
-  'accessibility_rules.dart': 11,
+  'accessibility_rules.dart': 6,
   'animation_rules.dart': 10,
-  'api_network_rules.dart': 143,
-  'async_rules.dart': 59,
-  'disposal_rules.dart': 29,
+  'api_network_rules.dart': 51,
+  'async_rules.dart': 47,
+  'disposal_rules.dart': 11,
   'security_rules.dart': 74,
-  'navigation_rules.dart': 52,
-  'file_handling_rules.dart': 29,
-  'widget_lifecycle_rules.dart': 18,
-  'permission_rules.dart': 23,
-
+  'navigation_rules.dart': 48,
+  'file_handling_rules.dart': 28,
+  'widget_lifecycle_rules.dart': 16,
   // Platform rule files
   'platforms/ios_rules.dart': 29,
   'platforms/macos_rules.dart': 13,
@@ -225,7 +223,7 @@ const Map<String, int> _baselineCounts = {
   'packages/getx_rules.dart': 5,
   'packages/shared_preferences_rules.dart': 14,
   'packages/dio_rules.dart': 6,
-  'packages/provider_rules.dart': 3,
+  'packages/provider_rules.dart': 1,
   'packages/isar_rules.dart': 7,
   'packages/supabase_rules.dart': 8,
   'packages/workmanager_rules.dart': 5,
@@ -242,7 +240,7 @@ const Map<String, int> _baselineCounts = {
   'build_method_rules.dart': 5,
   'forms_rules.dart': 20,
   'widget_layout_rules.dart': 10,
-  'widget_patterns_rules.dart': 3,
+  'widget_patterns_rules.dart': 2,
   'scroll_rules.dart': 11,
   'ui_ux_rules.dart': 4,
 

@@ -8,14 +8,18 @@ import 'package:test/test.dart';
 /// require_conflict_resolution_strategy, require_connectivity_timeout,
 /// require_init_state_idempotent, require_input_validation).
 ///
+/// Tier expectations: essential (3), recommended (prefer_semver_version), professional (4).
 /// Verifies each rule is registered, assigned to the correct tier, and
 /// fixture exists for bad/good and false-positive coverage.
 void main() {
   const essentialRules = <String>[
-    'prefer_semver_version',
     'require_connectivity_timeout',
     'require_init_state_idempotent',
     'require_input_validation',
+  ];
+
+  const recommendedRules = <String>[
+    'prefer_semver_version',
   ];
 
   const professionalRules = <String>[
@@ -25,7 +29,11 @@ void main() {
     'require_conflict_resolution_strategy',
   ];
 
-  final allNewRules = [...essentialRules, ...professionalRules];
+  final allNewRules = [
+    ...essentialRules,
+    ...recommendedRules,
+    ...professionalRules,
+  ];
 
   group('Roadmap detail 9 rules - registration', () {
     test('all 8 new rules are registered in allSaropaRules', () {
@@ -60,6 +68,17 @@ void main() {
           essential.contains(name),
           isTrue,
           reason: '$name should be in essential',
+        );
+      }
+    });
+
+    test('recommended rules are in recommended tier', () {
+      final recommended = getRulesForTier('recommended');
+      for (final name in recommendedRules) {
+        expect(
+          recommended.contains(name),
+          isTrue,
+          reason: '$name should be in recommended',
         );
       }
     });

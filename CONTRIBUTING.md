@@ -488,6 +488,8 @@ Ask yourself:
 
 **If you must use heuristics:** Use word-boundary matching (split camelCase/snake_case into words) and test extensively with real codebases.
 
+Root causes and safeguards are summarized in this section; use `target_matcher_utils`, `import_utils`, and the CI guard in `test/anti_pattern_detection_test.dart`.
+
 ## Rule Naming Conventions
 
 | Prefix | Meaning | Example |
@@ -621,7 +623,7 @@ test: add tests for avoid_abc rule
 
 **Only human authors as contributors.** GitHub contributors must be humans. Do not add trailers or lines that credit tools or AI (e.g. `Co-Authored-By` Claude/Anthropic, `Made-with: Cursor`, "Generated with …"). The repo uses a commit-msg hook (`.githooks/commit-msg`) to reject these. Enable once per clone: `git config core.hooksPath .githooks`
 
-If you use Cursor IDE: it injects `Made-with: Cursor` into every commit. Disable that so the hook passes: **Cursor Settings → Agents → Attribution** — turn off the attribution toggle.
+A **prepare-commit-msg** hook (`.githooks/prepare-commit-msg`) automatically strips those attribution lines from the message before commit-msg runs, so commits from Cursor (or any tool that injects them) succeed and the final commit contains no tool attribution. You can also disable injection at source: **Cursor Settings → Agents → Attribution** — turn off the attribution toggle.
 
 ## Documentation Requirements
 
