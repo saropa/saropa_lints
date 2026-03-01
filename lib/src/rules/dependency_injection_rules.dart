@@ -872,10 +872,10 @@ class RequireDefaultConfigRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('dotenv') &&
-          !targetSource.contains('config') &&
-          !targetSource.contains('env') &&
-          !targetSource.contains('prefs')) {
+      if (!RegExp(r'\bdotenv\b').hasMatch(targetSource) &&
+          !RegExp(r'\bconfig\b').hasMatch(targetSource) &&
+          !RegExp(r'\benv\b').hasMatch(targetSource) &&
+          !RegExp(r'\bprefs\b').hasMatch(targetSource)) {
         return;
       }
 
@@ -1075,8 +1075,8 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
   ) {
     final String methodName = method.name.lexeme.toLowerCase();
 
-    // Check if method name suggests dependency injection
-    if (!_injectionMethodNames.any((name) => methodName.contains(name))) {
+    if (!_injectionMethodNames.any((name) =>
+        RegExp(r'\b' + RegExp.escape(name) + r'\b').hasMatch(methodName))) {
       return;
     }
 
@@ -1191,10 +1191,10 @@ class RequireDiScopeAwarenessRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('GetIt') &&
-          !targetSource.contains('sl') &&
-          !targetSource.contains('locator') &&
-          !targetSource.contains('getIt')) {
+      if (!RegExp(r'\bGetIt\b').hasMatch(targetSource) &&
+          !RegExp(r'\bsl\b').hasMatch(targetSource) &&
+          !RegExp(r'\blocator\b').hasMatch(targetSource) &&
+          !RegExp(r'\bgetIt\b').hasMatch(targetSource)) {
         return;
       }
 
@@ -1324,7 +1324,8 @@ class AvoidDiInWidgetsRule extends SaropaLintRule {
         final ExtendsClause? extendsClause = current.extendsClause;
         if (extendsClause != null) {
           final String superclass = extendsClause.superclass.toSource();
-          return superclass.contains('Widget') || superclass.contains('State<');
+          return RegExp(r'\bWidget\b').hasMatch(superclass) ||
+              RegExp(r'\bState\s*<').hasMatch(superclass);
         }
       }
       current = current.parent;
@@ -1333,9 +1334,14 @@ class AvoidDiInWidgetsRule extends SaropaLintRule {
   }
 
   bool _isServiceLocatorCall(String targetSource, String methodName) {
-    // GetIt patterns
-    if (targetSource.contains('GetIt') && methodName == 'call') return true;
-    if (targetSource.contains('GetIt') && methodName == 'get') return true;
+    if (RegExp(r'\bGetIt\b').hasMatch(targetSource) &&
+        methodName == 'call') {
+      return true;
+    }
+    if (RegExp(r'\bGetIt\b').hasMatch(targetSource) &&
+        methodName == 'get') {
+      return true;
+    }
 
     // Common service locator aliases
     if ((targetSource == 'sl' || targetSource == 'locator') &&
@@ -1442,7 +1448,7 @@ class PreferAbstractionInjectionRule extends SaropaLintRule {
 
   bool _isLikelyConcrete(String typeName) {
     for (final String pattern in _concretePatterns) {
-      if (typeName.contains(pattern)) {
+      if (RegExp(r'\b' + RegExp.escape(pattern) + r'\b').hasMatch(typeName)) {
         return true;
       }
     }

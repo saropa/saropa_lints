@@ -76,8 +76,8 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
       // Check if it's a Workmanager call
       final String? targetSource = node.target?.toSource();
       if (targetSource == null) return;
-      if (!targetSource.contains('Workmanager') &&
-          !targetSource.contains('workmanager')) {
+      if (!RegExp(r'\bWorkmanager\b').hasMatch(targetSource) &&
+          !RegExp(r'\bworkmanager\b').hasMatch(targetSource)) {
         return;
       }
 
@@ -156,8 +156,8 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
       // Check if it's a Workmanager call
       final String? targetSource = node.target?.toSource();
       if (targetSource == null) return;
-      if (!targetSource.contains('Workmanager') &&
-          !targetSource.contains('workmanager')) {
+      if (!RegExp(r'\bWorkmanager\b').hasMatch(targetSource) &&
+          !RegExp(r'\bworkmanager\b').hasMatch(targetSource)) {
         return;
       }
 
@@ -171,10 +171,8 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
       final FunctionBody body = callback.body;
       final String bodySource = body.toSource();
 
-      // Check for any return statement - the callback must return something
-      // We use a simple heuristic: if there's no 'return' keyword followed by
-      // something, the callback likely doesn't return properly
-      if (!bodySource.contains('return ')) {
+      // Check for any return statement (word-boundary to avoid FPs)
+      if (!RegExp(r'\breturn\s+').hasMatch(bodySource)) {
         reporter.atNode(callback);
       }
     });
@@ -241,8 +239,7 @@ class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
     final String fileSource = context.fileContent;
 
     // Skip if workmanager is already being used
-    if (fileSource.contains('Workmanager') ||
-        fileSource.contains('workmanager')) {
+    if (RegExp(r'\b(Workmanager|workmanager)\b').hasMatch(fileSource)) {
       return;
     }
 

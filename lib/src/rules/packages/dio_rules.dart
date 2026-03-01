@@ -12,6 +12,10 @@ import 'package:analyzer/dart/ast/ast.dart';
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
 
+// Word-boundary regex for Dio target matching
+final RegExp _dioTargetRegex = RegExp(r'\bdio\b');
+final RegExp _dioClassRegex = RegExp(r'\bDio\b');
+
 // =============================================================================
 // DIO HTTP CLIENT RULES
 // =============================================================================
@@ -150,7 +154,7 @@ class RequireDioErrorHandlingRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('dio')) return;
+      if (!_dioTargetRegex.hasMatch(targetSource)) return;
 
       // Check if inside try-catch
       AstNode? current = node.parent;
@@ -279,7 +283,7 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('dio')) return;
+      if (!_dioTargetRegex.hasMatch(targetSource)) return;
 
       // Check for cancelToken parameter
       bool hasCancelToken = false;
@@ -365,7 +369,7 @@ class RequireDioSslPinningRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('dio')) return;
+      if (!_dioTargetRegex.hasMatch(targetSource)) return;
 
       // Check URL argument for auth endpoints
       final NodeList<Expression> args = node.argumentList.arguments;
@@ -678,7 +682,7 @@ class PreferDioBaseOptionsRule extends SaropaLintRule {
       if (target == null) return;
 
       final targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('dio')) return;
+      if (!_dioTargetRegex.hasMatch(targetSource)) return;
 
       // Check for options parameter
       for (final arg in node.argumentList.arguments) {
@@ -748,7 +752,7 @@ class AvoidDioWithoutBaseUrlRule extends SaropaLintRule {
       if (target == null) return;
 
       final targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('dio')) return;
+      if (!_dioTargetRegex.hasMatch(targetSource)) return;
 
       // Check first argument for full URL
       final args = node.argumentList.arguments;
@@ -874,7 +878,8 @@ class RequireDioResponseTypeRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('dio') && !targetSource.contains('Dio')) {
+      if (!_dioTargetRegex.hasMatch(targetSource) &&
+          !_dioClassRegex.hasMatch(targetSource)) {
         return;
       }
 

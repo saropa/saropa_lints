@@ -48,6 +48,11 @@ class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final RegExp _widgetWordRegex = RegExp(r'\bWidget\b');
+  static final RegExp _stateWordRegex = RegExp(r'\bState\b');
+  static RegExp _dataLayerWordRegex(String word) =>
+      RegExp(r'\b' + RegExp.escape(word) + r'\b');
+
   static const Set<String> _dataLayerPatterns = <String>{
     'Repository',
     'DataSource',
@@ -69,7 +74,8 @@ class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
       if (extendsClause == null) return;
 
       final String superName = extendsClause.superclass.name.lexeme;
-      if (!superName.contains('Widget') && !superName.contains('State')) {
+      if (!_widgetWordRegex.hasMatch(superName) &&
+          !_stateWordRegex.hasMatch(superName)) {
         return;
       }
 
@@ -79,7 +85,7 @@ class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null) {
             for (final String pattern in _dataLayerPatterns) {
-              if (typeName.contains(pattern)) {
+              if (_dataLayerWordRegex(pattern).hasMatch(typeName)) {
                 reporter.atNode(member);
                 break;
               }
@@ -151,6 +157,9 @@ class AvoidBusinessLogicInUiRule extends SaropaLintRule {
     'aggregate',
   };
 
+  static RegExp _indicatorWordRegex(String word) =>
+      RegExp(r'\b' + RegExp.escape(word) + r'\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -179,7 +188,7 @@ class AvoidBusinessLogicInUiRule extends SaropaLintRule {
           }
 
           for (final String indicator in _businessLogicIndicators) {
-            if (methodName.contains(indicator)) {
+            if (_indicatorWordRegex(indicator).hasMatch(methodName)) {
               reporter.atNode(member);
               break;
             }

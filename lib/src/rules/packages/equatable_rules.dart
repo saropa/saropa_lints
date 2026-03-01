@@ -879,12 +879,11 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
 
       if (nullableParams.isEmpty) return;
 
-      // Check if body uses ?? with nullable params
+      // Check if body uses ?? with nullable params (word-boundary to avoid FPs)
       final String bodySource = body.toSource();
       for (final String paramName in nullableParams) {
-        // Pattern: paramName ?? this.paramName
-        if (bodySource.contains('$paramName ??') ||
-            bodySource.contains('$paramName??')) {
+        final pattern = RegExp(r'\b' + RegExp.escape(paramName) + r'\s*\?\?');
+        if (pattern.hasMatch(bodySource)) {
           reporter.atNode(node);
           return;
         }
@@ -982,12 +981,14 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
           final String propsSource = member.toSource();
 
           // Check if collections are used without DeepCollectionEquality
+          final hasEqualityHelper = RegExp(
+            r'\b(DeepCollectionEquality|ListEquality|SetEquality|MapEquality)\b',
+          ).hasMatch(propsSource);
           for (final String fieldName in collectionFields) {
-            if (propsSource.contains(fieldName) &&
-                !propsSource.contains('DeepCollectionEquality') &&
-                !propsSource.contains('ListEquality') &&
-                !propsSource.contains('SetEquality') &&
-                !propsSource.contains('MapEquality')) {
+            if (RegExp(
+                  r'\b' + RegExp.escape(fieldName) + r'\b',
+                ).hasMatch(propsSource) &&
+                !hasEqualityHelper) {
               reporter.atNode(member);
               return;
             }
@@ -1059,7 +1060,8 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeSource = member.fields.type?.toSource();
-          if (typeSource != null && typeSource.contains('DateTime')) {
+          if (typeSource != null &&
+              RegExp(r'\bDateTime\b').hasMatch(typeSource)) {
             for (final VariableDeclaration field in member.fields.variables) {
               final String? fieldName = field.name.lexeme;
               if (fieldName != null) {
@@ -1079,14 +1081,16 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
             member.isGetter) {
           final String propsSource = member.toSource();
 
-          // Check if DateTime fields are used directly
+          // Check if DateTime fields are used directly (word-boundary)
           for (final String fieldName in dateTimeFields) {
-            // Check for direct field reference without conversion
-            if (propsSource.contains(fieldName) &&
-                !propsSource.contains('$fieldName.millisecondsSinceEpoch') &&
-                !propsSource.contains('$fieldName.toIso8601String') &&
-                !propsSource.contains('$fieldName?.millisecondsSinceEpoch') &&
-                !propsSource.contains('$fieldName?.toIso8601String')) {
+            final fieldRef = RegExp(r'\b' + RegExp.escape(fieldName) + r'\b');
+            final withEpoch = RegExp(
+              r'\b' +
+                  RegExp.escape(fieldName) +
+                  r'\s*[?.]\s*(millisecondsSinceEpoch|toIso8601String)\b',
+            );
+            if (fieldRef.hasMatch(propsSource) &&
+                !withEpoch.hasMatch(propsSource)) {
               reporter.atNode(member);
               return;
             }
@@ -1146,6 +1150,10 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    final unmodifiablePattern = RegExp(
+      r'\b(List\.unmodifiable|Map\.unmodifiable|UnmodifiableSetView|List\.of)\b'
+      r'|\.(toList|toSet|toMap)\s*\(\)',
+    );
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if it's a state/model class (extends Equatable or has immutable intent)
       final ExtendsClause? extendsClause = node.extendsClause;
@@ -1154,8 +1162,8 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
       if (extendsClause != null) {
         final String superName = extendsClause.superclass.name.lexeme;
         if (superName == 'Equatable' ||
-            superName.contains('State') ||
-            superName.contains('Event')) {
+            superName.endsWith('State') ||
+            superName.endsWith('Event')) {
           isImmutableClass = true;
         }
       }
@@ -1187,13 +1195,7 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
                     .map((e) => e.toSource())
                     .join();
                 if (initSource != null &&
-                    (initSource.contains('List.unmodifiable') ||
-                        initSource.contains('Map.unmodifiable') ||
-                        initSource.contains('UnmodifiableSetView') ||
-                        initSource.contains('List.of') ||
-                        initSource.contains('.toList()') ||
-                        initSource.contains('.toSet()') ||
-                        initSource.contains('.toMap()'))) {
+                    unmodifiablePattern.hasMatch(initSource)) {
                   madeUnmodifiable = true;
                   break;
                 }

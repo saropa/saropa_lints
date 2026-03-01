@@ -168,6 +168,18 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
   /// Pre-compiled patterns for performance - avoid creating RegExp in loops
   static final RegExp _isDebugPattern = RegExp(r'\bisDebug\w*\b');
   static final RegExp _debugSuffixPattern = RegExp(r'\bis\w*Debug\b');
+  static final RegExp _kDebugModeRegex = RegExp(r'\bkDebugMode\b');
+  static final RegExp _debugTypeDotRegex = RegExp(r'\bDebugType\.');
+  static final RegExp _dotIsDebugRegex = RegExp(r'\.isDebug\b');
+  static final RegExp _mainSettingsDebugRegex = RegExp(
+    r'\bMainSettings\.isDebugMode\b',
+  );
+  static final RegExp _mainSettingsProfileRegex = RegExp(
+    r'\bMainSettings\.isProfileMode\b',
+  );
+  static final RegExp _userPreferenceDebugRegex = RegExp(
+    r'\bUserPreferenceType\.Debug\b',
+  );
 
   @override
   void runWithReporter(
@@ -260,18 +272,19 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
     final String source = condition.toSource();
 
     // kDebugMode
-    if (source.contains('kDebugMode')) {
+    if (_kDebugModeRegex.hasMatch(source)) {
       return true;
     }
 
     // DebugType.*.isDebug
-    if (source.contains('DebugType.') && source.contains('.isDebug')) {
+    if (_debugTypeDotRegex.hasMatch(source) &&
+        _dotIsDebugRegex.hasMatch(source)) {
       return true;
     }
 
     // MainSettings.isDebugMode or MainSettings.isProfileMode
-    if (source.contains('MainSettings.isDebugMode') ||
-        source.contains('MainSettings.isProfileMode')) {
+    if (_mainSettingsDebugRegex.hasMatch(source) ||
+        _mainSettingsProfileRegex.hasMatch(source)) {
       return true;
     }
 
@@ -286,7 +299,7 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
     }
 
     // UserPreferenceType.Debug* patterns
-    if (source.contains('UserPreferenceType.Debug')) {
+    if (_userPreferenceDebugRegex.hasMatch(source)) {
       return true;
     }
 

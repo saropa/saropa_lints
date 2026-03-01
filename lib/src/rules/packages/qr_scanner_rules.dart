@@ -145,6 +145,10 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
     'BarcodeCamera',
   };
 
+  static final RegExp _scannerControllerWordRegex = RegExp(
+    r'\b(' + _scannerControllers.map(RegExp.escape).join(r'|') + r')\b',
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -155,13 +159,9 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
       final String? typeName = node.fields.type?.toSource();
       if (typeName == null) return;
 
-      bool isScannerController = false;
-      for (final String controller in _scannerControllers) {
-        if (typeName.contains(controller)) {
-          isScannerController = true;
-          break;
-        }
-      }
+      final bool isScannerController = _scannerControllerWordRegex.hasMatch(
+        typeName,
+      );
 
       if (!isScannerController) return;
 

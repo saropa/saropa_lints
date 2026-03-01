@@ -2020,6 +2020,8 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
+  static final RegExp _selectCallRegex = RegExp(r'\.select\s*\(');
+
   static const LintCode _code = LintCode(
     'prefer_selector_over_consumer',
     '[prefer_selector_over_consumer] Consumer accessing single property. Use Selector for granular rebuilds. Consumer rebuilds on any change to the provider. Selector only rebuilds when the selected value changes, providing more granular control. {v3}',
@@ -2059,7 +2061,7 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
             // provider, suggest using Selector
             if (matches.length == 1) {
               // Also check that there's no .select() already being used
-              if (!bodySource.contains('.select(')) {
+              if (!_selectCallRegex.hasMatch(bodySource)) {
                 reporter.atNode(node.constructorName, code);
               }
             }

@@ -664,19 +664,21 @@ class _ValidatorVisitor extends RecursiveAstVisitor<void> {
   final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
+  static final List<RegExp> _validatorDangerPatterns = <RegExp>[
+    RegExp(r'\basync\b'),
+    RegExp(r'\bawait\b'),
+    RegExp(r'\bhttp\b'),
+    RegExp(r'\bdio\b'),
+    RegExp(r'\.get\s*\('),
+    RegExp(r'\.post\s*\('),
+  ];
+
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    // Check for validator argument in TextFormField
     for (final Expression arg in node.argumentList.arguments) {
       if (arg is NamedExpression && arg.name.label.name == 'validator') {
-        final String source = arg.expression.toSource();
-        // Check for async or expensive patterns
-        if (source.contains('async') ||
-            source.contains('await') ||
-            source.contains('http') ||
-            source.contains('dio') ||
-            source.contains('.get(') ||
-            source.contains('.post(')) {
+        final String exprSource = arg.expression.toSource();
+        if (_validatorDangerPatterns.any((re) => re.hasMatch(exprSource))) {
           reporter.atNode(arg.name, code);
         }
       }
@@ -731,6 +733,15 @@ class RequireSubmitButtonStateRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _buttonTypePattern = RegExp(r'Button$');
+  static final RegExp _asyncPattern = RegExp(r'\basync\b');
+  static final List<RegExp> _loadingIndicatorPatterns = <RegExp>[
+    RegExp(r'\bLoading\b'),
+    RegExp(r'\bloading\b'),
+    RegExp(r'\bisLoading\b'),
+    RegExp(r'\b_loading\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -738,18 +749,13 @@ class RequireSubmitButtonStateRule extends SaropaLintRule {
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
-      if (!typeName.contains('Button')) return;
+      if (!_buttonTypePattern.hasMatch(typeName)) return;
 
-      // Find onPressed argument
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'onPressed') {
-          final String source = arg.expression.toSource();
-          // Check for async without loading state
-          if (source.contains('async') &&
-              !source.contains('Loading') &&
-              !source.contains('loading') &&
-              !source.contains('isLoading') &&
-              !source.contains('_loading')) {
+          final String exprSource = arg.expression.toSource();
+          if (_asyncPattern.hasMatch(exprSource) &&
+              !_loadingIndicatorPatterns.any((re) => re.hasMatch(exprSource))) {
             reporter.atNode(arg.name, code);
           }
         }
@@ -802,6 +808,13 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _validateCallPattern = RegExp(r'\.validate\s*\(\s*\)');
+  static final List<RegExp> _unfocusPatterns = <RegExp>[
+    RegExp(r'\bunfocus\b'),
+    RegExp(r'\bFocusManager\b'),
+    RegExp(r'\bFocusScope\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -809,7 +822,6 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
       final String name = node.name.lexeme.toLowerCase();
-      // Look for submit-related methods
       if (!name.contains('submit') &&
           !name.contains('save') &&
           !name.contains('send')) {
@@ -818,11 +830,8 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
 
       final String bodySource = node.body.toSource();
 
-      // Check if it validates a form but doesn't unfocus
-      if (bodySource.contains('.validate()') &&
-          !bodySource.contains('unfocus') &&
-          !bodySource.contains('FocusManager') &&
-          !bodySource.contains('FocusScope')) {
+      if (_validateCallPattern.hasMatch(bodySource) &&
+          !_unfocusPatterns.any((re) => re.hasMatch(bodySource))) {
         reporter.atNode(node);
       }
     });
@@ -872,20 +881,23 @@ class RequireFormRestorationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final RegExp _textEditingControllerType = RegExp(
+    r'\bTextEditingController\b',
+  );
+  static final RegExp _formConstructorPattern = RegExp(r'\bForm\s*\(');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      // Check if extends State
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
       final String superName = extendsClause.superclass.name.lexeme;
       if (superName != 'State') return;
 
-      // Check if has RestorationMixin
       final WithClause? withClause = node.withClause;
       if (withClause != null) {
         for (final NamedType mixin in withClause.mixinTypes) {
@@ -893,21 +905,20 @@ class RequireFormRestorationRule extends SaropaLintRule {
         }
       }
 
-      // Count form-related fields (TextEditingController only)
       int controllerCount = 0;
       bool hasForm = false;
 
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName != null && typeName.contains('TextEditingController')) {
+          if (typeName != null &&
+              _textEditingControllerType.hasMatch(typeName)) {
             controllerCount += member.fields.variables.length;
           }
         }
-        // Check if class has Form in build method
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
-          final String source = member.body.toSource();
-          if (source.contains('Form(')) {
+          final String buildSource = member.body.toSource();
+          if (_formConstructorPattern.hasMatch(buildSource)) {
             hasForm = true;
           }
         }
@@ -1823,6 +1834,10 @@ class RequireFormKeyInStatefulWidgetRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final RegExp _globalKeyFormStatePattern = RegExp(
+    r'GlobalKey\s*<\s*FormState\s*>\s*\(',
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1835,9 +1850,7 @@ class RequireFormKeyInStatefulWidgetRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for GlobalKey creation in build
-      if (bodySource.contains('GlobalKey<FormState>()') ||
-          bodySource.contains('GlobalKey<FormState>(')) {
+      if (_globalKeyFormStatePattern.hasMatch(bodySource)) {
         reporter.atNode(node);
       }
     });

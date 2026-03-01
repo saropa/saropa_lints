@@ -567,6 +567,10 @@ class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
     'NativeFunction',
   };
 
+  static final RegExp _sensitiveOpsWordRegex = RegExp(
+    r'\b(' + _sensitiveOperations.map(RegExp.escape).join(r'|') + r')\b',
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -582,12 +586,10 @@ class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
       // Check for Process.run, DynamicLibrary.open, etc.
       if (target != null) {
         final String targetSource = target.toSource();
-        for (final String op in _sensitiveOperations) {
-          if (targetSource.contains(op)) {
-            reporter.atNode(node);
-            hasReported = true;
-            return;
-          }
+        if (_sensitiveOpsWordRegex.hasMatch(targetSource)) {
+          reporter.atNode(node);
+          hasReported = true;
+          return;
         }
       }
     });
@@ -597,12 +599,10 @@ class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
 
       final String typeName = node.typeName;
 
-      for (final String op in _sensitiveOperations) {
-        if (typeName.contains(op)) {
-          reporter.atNode(node);
-          hasReported = true;
-          return;
-        }
+      if (_sensitiveOpsWordRegex.hasMatch(typeName)) {
+        reporter.atNode(node);
+        hasReported = true;
+        return;
       }
     });
   }
@@ -681,6 +681,10 @@ class AvoidMacosCatalystUnsupportedApisRule extends SaropaLintRule {
     'NFCNDEFReaderSession',
   };
 
+  static final RegExp _unsupportedApisWordRegex = RegExp(
+    r'\b(' + _unsupportedApis.map(RegExp.escape).join(r'|') + r')\b',
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -689,11 +693,9 @@ class AvoidMacosCatalystUnsupportedApisRule extends SaropaLintRule {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
-      for (final String api in _unsupportedApis) {
-        if (typeName.contains(api)) {
-          reporter.atNode(node);
-          return;
-        }
+      if (_unsupportedApisWordRegex.hasMatch(typeName)) {
+        reporter.atNode(node);
+        return;
       }
     });
 
@@ -702,11 +704,9 @@ class AvoidMacosCatalystUnsupportedApisRule extends SaropaLintRule {
 
       if (target != null) {
         final String targetSource = target.toSource();
-        for (final String api in _unsupportedApis) {
-          if (targetSource.contains(api)) {
-            reporter.atNode(node);
-            return;
-          }
+        if (_unsupportedApisWordRegex.hasMatch(targetSource)) {
+          reporter.atNode(node);
+          return;
         }
       }
     });
@@ -739,6 +739,8 @@ class RequireMacosWindowRestorationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _windowManagerWordRegex = RegExp(r'\bwindowManager\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -756,7 +758,8 @@ class RequireMacosWindowRestorationRule extends SaropaLintRule {
 
     context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
-      if (target != null && target.toSource().contains('windowManager')) {
+      if (target != null &&
+          _windowManagerWordRegex.hasMatch(target.toSource())) {
         final String methodName = node.methodName.name;
         if (methodName == 'setSize' || methodName == 'setPosition') {
           reporter.atNode(node);
@@ -851,6 +854,9 @@ class RequireMacosSandboxEntitlementsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final RegExp _httpWordRegex = RegExp(r'\bhttp\b');
+  static final RegExp _dioWordRegex = RegExp(r'\bdio\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -868,11 +874,13 @@ class RequireMacosSandboxEntitlementsRule extends SaropaLintRule {
           methodName == 'post' ||
           methodName == 'fetch') {
         final Expression? target = node.target;
-        if (target != null &&
-            (target.toSource().contains('http') ||
-                target.toSource().contains('dio'))) {
-          reporter.atNode(node);
-          hasReported = true;
+        if (target != null) {
+          final String targetSrc = target.toSource();
+          if (_httpWordRegex.hasMatch(targetSrc) ||
+              _dioWordRegex.hasMatch(targetSrc)) {
+            reporter.atNode(node);
+            hasReported = true;
+          }
         }
       }
     });
@@ -928,6 +936,12 @@ class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final RegExp _httpTargetRegex = RegExp(r'\b(http|Http)\b');
+  static final RegExp _dioTargetRegex = RegExp(r'\bDio\b');
+  static final RegExp _cameraWordRegex = RegExp(r'\bCamera\b');
+  static final RegExp _microphoneWordRegex = RegExp(r'\bMicrophone\b');
+  static final RegExp _startRecordingRegex = RegExp(r'\bstartRecording\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -950,18 +964,17 @@ class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
         final Expression? target = node.target;
         if (target != null) {
           final String targetSource = target.toSource();
-          if (targetSource.contains('http') ||
-              targetSource.contains('Http') ||
-              targetSource.contains('Dio')) {
+          if (_httpTargetRegex.hasMatch(targetSource) ||
+              _dioTargetRegex.hasMatch(targetSource)) {
             reporter.atNode(node);
           }
         }
       }
 
-      // Detect camera/microphone
-      if (methodName.contains('Camera') ||
-          methodName.contains('Microphone') ||
-          methodName.contains('startRecording')) {
+      // Detect camera/microphone (word-boundary)
+      if (_cameraWordRegex.hasMatch(methodName) ||
+          _microphoneWordRegex.hasMatch(methodName) ||
+          _startRecordingRegex.hasMatch(methodName)) {
         reporter.atNode(node);
       }
     });

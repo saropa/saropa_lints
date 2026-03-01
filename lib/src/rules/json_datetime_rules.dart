@@ -1007,16 +1007,15 @@ class RequireJsonSchemaValidationRule extends SaropaLintRule {
 
       final String bodySource = functionBody.toSource();
 
-      // Check for validation patterns
-      if (bodySource.contains('try') ||
-          bodySource.contains('fromJson') ||
-          bodySource.contains('validate') ||
-          bodySource.contains('containsKey') ||
-          bodySource.contains('is Map') ||
-          bodySource.contains('is List') ||
-          bodySource.contains('?[') || // Safe access
-          bodySource.contains('??')) {
-        return; // Has some validation
+      if (RegExp(r'\btry\b').hasMatch(bodySource) ||
+          RegExp(r'\bfromJson\b').hasMatch(bodySource) ||
+          RegExp(r'\bvalidate\b').hasMatch(bodySource) ||
+          RegExp(r'\bcontainsKey\b').hasMatch(bodySource) ||
+          RegExp(r'\bis Map\b').hasMatch(bodySource) ||
+          RegExp(r'\bis List\b').hasMatch(bodySource) ||
+          RegExp(r'\?\s*\[').hasMatch(bodySource) ||
+          RegExp(r'\?\?').hasMatch(bodySource)) {
+        return;
       }
 
       reporter.atNode(node);
@@ -1128,16 +1127,16 @@ class PreferJsonSerializableRule extends SaropaLintRule {
               member.name?.lexeme == 'fromJson') {
             // Check if it's manual (not calling _$ClassName...)
             final String bodySource = member.body.toSource();
-            if (!bodySource.contains(r'_$') &&
-                (bodySource.contains("json['") ||
-                    bodySource.contains('json["'))) {
+            if (!RegExp(r'_\$').hasMatch(bodySource) &&
+                (RegExp(r"json\s*\['").hasMatch(bodySource) ||
+                    RegExp(r'json\s*\["').hasMatch(bodySource))) {
               hasManualFromJson = true;
             }
           }
         }
         if (member is MethodDeclaration && member.name.lexeme == 'toJson') {
           final String bodySource = member.body.toSource();
-          if (!bodySource.contains(r'_$')) {
+          if (!RegExp(r'_\$').hasMatch(bodySource)) {
             hasManualToJson = true;
           }
         }

@@ -91,6 +91,9 @@ class RequireTestAssertionsRule extends SaropaLintRule {
     'fail',
     'throwsA',
   };
+  static final List<RegExp> _assertionPatterns = _assertionMethods
+      .map((a) => RegExp('\\b${RegExp.escape(a)}\\s*\\('))
+      .toList();
 
   @override
   void runWithReporter(
@@ -123,14 +126,10 @@ class RequireTestAssertionsRule extends SaropaLintRule {
 
       final String bodySource = bodyArg.toSource();
 
-      // Check if any assertion methods are called
-      bool hasAssertion = false;
-      for (final String assertion in _assertionMethods) {
-        if (bodySource.contains('$assertion(')) {
-          hasAssertion = true;
-          break;
-        }
-      }
+      // Check if any assertion methods are called (word-boundary to avoid FP)
+      final bool hasAssertion = _assertionPatterns.any(
+        (p) => p.hasMatch(bodySource),
+      );
 
       if (!hasAssertion) {
         reporter.atNode(node.methodName, code);
@@ -300,6 +299,13 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
     'dio.put(',
     'dio.delete(',
   };
+  static final List<RegExp> _networkPatternRegexps = _networkPatterns
+      .map((p) => RegExp('\\b${RegExp.escape(p)}'))
+      .toList();
+  static final List<RegExp> _mockSkipPatterns = [
+    RegExp(r'\bMock\b'),
+    RegExp(r'\bmock\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -330,15 +336,12 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
 
       final String bodySource = bodyArg.toSource();
 
-      // Skip if using mocks
-      if (bodySource.contains('Mock') || bodySource.contains('mock')) return;
+      // Skip if using mocks (word-boundary to avoid FP)
+      if (_mockSkipPatterns.any((p) => p.hasMatch(bodySource))) return;
 
-      // Check for network patterns
-      for (final String pattern in _networkPatterns) {
-        if (bodySource.contains(pattern)) {
-          reporter.atNode(node.methodName, code);
-          return;
-        }
+      // Check for network patterns (word-boundary regex)
+      if (_networkPatternRegexps.any((p) => p.hasMatch(bodySource))) {
+        reporter.atNode(node.methodName, code);
       }
     });
   }
@@ -501,10 +504,10 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
           'test('.allMatches(bodySource).length +
           'testWidgets('.allMatches(bodySource).length;
 
-      // If multiple tests, check for setUp
+      // If multiple tests, check for setUp (word-boundary to avoid FP)
       if (testCount > 2) {
-        if (!bodySource.contains('setUp(') &&
-            !bodySource.contains('setUpAll(')) {
+        if (!RegExp(r'\bsetUp\s*\(').hasMatch(bodySource) &&
+            !RegExp(r'\bsetUpAll\s*\(').hasMatch(bodySource)) {
           reporter.atNode(node);
         }
       }
@@ -1782,10 +1785,10 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
       if (testName.contains('responsive') ||
           testName.contains('layout') ||
           testName.contains('adaptive')) {
-        // Check if test sets screen size
+        // Check if test sets screen size (word-boundary to avoid FP)
         final String bodySource = args.arguments[1].toSource();
-        if (!bodySource.contains('physicalSizeTestValue') &&
-            !bodySource.contains('devicePixelRatio')) {
+        if (!RegExp(r'\bphysicalSizeTestValue\b').hasMatch(bodySource) &&
+            !RegExp(r'\bdevicePixelRatio\b').hasMatch(bodySource)) {
           reporter.atNode(node.methodName, code);
         }
       }
@@ -1837,6 +1840,15 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _mutationPatterns = [
+    RegExp(r'\.add\s*\('),
+    RegExp(r'\.addAll\s*\('),
+    RegExp(r'\.remove\s*\('),
+    RegExp(r'\.clear\s*\('),
+    RegExp(r'\+\+'),
+    RegExp(r'--'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1858,13 +1870,8 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
 
       final String bodySource = args.arguments.first.toSource();
 
-      // Check for mutation methods
-      if (bodySource.contains('.add(') ||
-          bodySource.contains('.addAll(') ||
-          bodySource.contains('.remove(') ||
-          bodySource.contains('.clear(') ||
-          bodySource.contains('++') ||
-          bodySource.contains('--')) {
+      // Check for mutation methods (word-boundary regex to avoid FP)
+      if (_mutationPatterns.any((p) => p.hasMatch(bodySource))) {
         reporter.atNode(node);
       }
     });
@@ -2008,8 +2015,8 @@ class RequireGoldenTestRule extends SaropaLintRule {
         // Check if test has golden assertion
         if (args.arguments.length >= 2) {
           final String bodySource = args.arguments[1].toSource();
-          if (!bodySource.contains('matchesGoldenFile') &&
-              !bodySource.contains('goldenFileComparator')) {
+          if (!RegExp(r'\bmatchesGoldenFile\b').hasMatch(bodySource) &&
+              !RegExp(r'\bgoldenFileComparator\b').hasMatch(bodySource)) {
             reporter.atNode(node.methodName, code);
           }
         }
@@ -2109,6 +2116,12 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
 
   /// Regex to detect seeded Random (any numeric seed is acceptable)
   static final RegExp _seededRandomPattern = RegExp(r'Random\(\s*\d');
+  static final List<RegExp> _safePatternRegexps = _safePatterns
+      .map((s) => RegExp('\\b${RegExp.escape(s)}'))
+      .toList();
+  static final List<RegExp> _flakyPatternRegexps = _flakyPatterns
+      .map((p) => RegExp('\\b${RegExp.escape(p)}'))
+      .toList();
 
   @override
   void runWithReporter(
@@ -2136,40 +2149,36 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
       final Expression bodyArg = args.arguments[1];
       final String bodySource = bodyArg.toSource();
 
-      // Skip if test has safe patterns (mocking in place)
-      for (final String safePattern in _safePatterns) {
-        if (bodySource.contains(safePattern)) {
-          return; // Test appears to use mocking
-        }
+      // Skip if test has safe patterns (mocking in place; word-boundary)
+      if (_safePatternRegexps.any((p) => p.hasMatch(bodySource))) {
+        return; // Test appears to use mocking
       }
 
       // Skip if Random is seeded (deterministic)
-      if (bodySource.contains('Random(') &&
+      if (RegExp(r'\bRandom\s*\(').hasMatch(bodySource) &&
           _seededRandomPattern.hasMatch(bodySource)) {
-        // Has seeded Random, check other patterns
-        final bool hasOtherFlaky = _flakyPatterns
-            .where((p) => p != 'Random()')
-            .any((p) => bodySource.contains(p));
+        final bool hasOtherFlaky = _flakyPatternRegexps.any((p) {
+          if (p.pattern.contains('Random')) return false;
+          return p.hasMatch(bodySource);
+        });
         if (!hasOtherFlaky) return;
       }
 
-      // Check for flaky patterns
-      for (final String flakyPattern in _flakyPatterns) {
-        if (bodySource.contains(flakyPattern)) {
-          // Special case: Random() is only flaky if not seeded
-          if (flakyPattern == 'Random()' &&
-              _seededRandomPattern.hasMatch(bodySource)) {
-            continue;
-          }
-          reporter.atNode(node.methodName, code);
-          return; // Report once per test
+      // Check for flaky patterns (word-boundary regex)
+      for (final RegExp re in _flakyPatternRegexps) {
+        if (!re.hasMatch(bodySource)) continue;
+        if (re.pattern.contains('Random') &&
+            _seededRandomPattern.hasMatch(bodySource)) {
+          continue; // Seeded Random is OK
         }
+        reporter.atNode(node.methodName, code);
+        return;
       }
 
       // Check for Future.delayed without pump (common flaky pattern)
-      if (bodySource.contains('Future.delayed') &&
-          !bodySource.contains('pump') &&
-          !bodySource.contains('fakeAsync')) {
+      if (RegExp(r'\bFuture\.delayed\b').hasMatch(bodySource) &&
+          !RegExp(r'\bpump\b').hasMatch(bodySource) &&
+          !RegExp(r'\bfakeAsync\b').hasMatch(bodySource)) {
         reporter.atNode(node.methodName, code);
       }
     });
@@ -2431,8 +2440,10 @@ class RequireIntegrationTestSetupRule extends SaropaLintRule {
 
       final String bodySource = node.functionExpression.body.toSource();
 
-      // Check for the complete binding initialization pattern
-      if (!bodySource.contains('IntegrationTestWidgetsFlutterBinding')) {
+      // Check for the complete binding initialization pattern (word-boundary)
+      if (!RegExp(
+        r'\bIntegrationTestWidgetsFlutterBinding\b',
+      ).hasMatch(bodySource)) {
         reporter.atToken(node.name, code);
       }
     });
@@ -2649,12 +2660,14 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
         return;
       }
 
-      // Check for expect with isA<*Exception>
+      // Check for expect with isA<*Exception> (word-boundary regex)
       if (methodName == 'expect') {
         final String source = node.toSource();
-        if ((source.contains('isA<') && source.contains('Exception')) ||
-            (source.contains('isA<') && source.contains('Error')) ||
-            source.contains('throwsA')) {
+        if ((RegExp(r'isA\s*<').hasMatch(source) &&
+                RegExp(r'\bException\b').hasMatch(source)) ||
+            (RegExp(r'isA\s*<').hasMatch(source) &&
+                RegExp(r'\bError\b').hasMatch(source)) ||
+            RegExp(r'\bthrowsA\b').hasMatch(source)) {
           hasErrorCaseTest = true;
           return;
         }
@@ -3218,10 +3231,15 @@ class PreferBlocTestPackageRule extends SaropaLintRule {
 
       final source = node.toSource();
 
-      // Check for Bloc testing patterns without blocTest
-      if ((source.contains('.add(') || source.contains('.emit(')) &&
-          (source.contains('Bloc') || source.contains('Cubit')) &&
-          !source.contains('blocTest')) {
+      // Check for Bloc testing patterns without blocTest (word-boundary regex)
+      final hasAddOrEmit =
+          RegExp(r'\.add\s*\(').hasMatch(source) ||
+          RegExp(r'\.emit\s*\(').hasMatch(source);
+      final hasBlocOrCubit =
+          RegExp(r'\bBloc\b').hasMatch(source) ||
+          RegExp(r'\bCubit\b').hasMatch(source);
+      final hasBlocTest = RegExp(r'\bblocTest\b').hasMatch(source);
+      if (hasAddOrEmit && hasBlocOrCubit && !hasBlocTest) {
         reporter.atNode(node);
       }
     });
@@ -3295,12 +3313,16 @@ class PreferMockVerifyRule extends SaropaLintRule {
 
       final source = node.toSource();
 
-      // Check for when() setup without verify()
-      if (source.contains('when(') &&
-          (source.contains('.thenReturn') || source.contains('.thenAnswer')) &&
-          !source.contains('verify(') &&
-          !source.contains('verifyNever(') &&
-          !source.contains('verifyInOrder(')) {
+      // Check for when() setup without verify() (word-boundary regex)
+      final hasWhen = RegExp(r'\bwhen\s*\(').hasMatch(source);
+      final hasThen =
+          RegExp(r'\.thenReturn\s*\(').hasMatch(source) ||
+          RegExp(r'\.thenAnswer\s*\(').hasMatch(source);
+      final hasVerify =
+          RegExp(r'\bverify\s*\(').hasMatch(source) ||
+          RegExp(r'\bverifyNever\s*\(').hasMatch(source) ||
+          RegExp(r'\bverifyInOrder\s*\(').hasMatch(source);
+      if (hasWhen && hasThen && !hasVerify) {
         reporter.atNode(node);
       }
     });
@@ -3612,11 +3634,11 @@ class RequireTestDocumentationRule extends SaropaLintRule {
       final int lineCount = bodySource.split('\n').length;
 
       if (lineCount > _complexTestThreshold) {
-        // Check for comments
+        // Check for comments (regex to avoid FP on string literals)
         final bool hasComments =
-            bodySource.contains('//') ||
-            bodySource.contains('/*') ||
-            bodySource.contains('///');
+            RegExp(r'//').hasMatch(bodySource) ||
+            RegExp(r'/\*').hasMatch(bodySource) ||
+            RegExp(r'///').hasMatch(bodySource);
 
         if (!hasComments) {
           reporter.atNode(node);

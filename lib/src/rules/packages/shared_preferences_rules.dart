@@ -10,6 +10,11 @@ import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../saropa_lint_rule.dart';
 
+// Shared word-boundary regexes for target matching (avoid .contains false positives)
+final RegExp _prefWordRegex = RegExp(r'\bpref\b');
+final RegExp _sharedWordRegex = RegExp(r'\bshared\b');
+final RegExp _sharedPreferencesWordRegex = RegExp(r'\bsharedpreferences\b');
+
 // =============================================================================
 // avoid_prefs_for_large_data (from firebase_rules.dart)
 // =============================================================================
@@ -76,7 +81,8 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
 
       // Check if target looks like SharedPreferences
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') && !targetSource.contains('shared')) {
+      if (!_prefWordRegex.hasMatch(targetSource) &&
+          !_sharedWordRegex.hasMatch(targetSource)) {
         return;
       }
 
@@ -413,7 +419,8 @@ class PreferTypedPrefsWrapperRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') && !targetSource.contains('shared')) {
+      if (!_prefWordRegex.hasMatch(targetSource) &&
+          !_sharedWordRegex.hasMatch(targetSource)) {
         return;
       }
 
@@ -516,7 +523,8 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') && !targetSource.contains('shared')) {
+      if (!_prefWordRegex.hasMatch(targetSource) &&
+          !_sharedWordRegex.hasMatch(targetSource)) {
         return;
       }
 
@@ -621,7 +629,8 @@ class PreferEncryptedPrefsRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') && !targetSource.contains('shared')) {
+      if (!_prefWordRegex.hasMatch(targetSource) &&
+          !_sharedWordRegex.hasMatch(targetSource)) {
         return;
       }
 
@@ -726,8 +735,8 @@ class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') &&
-          !targetSource.contains('sharedpreferences')) {
+      if (!_prefWordRegex.hasMatch(targetSource) &&
+          !_sharedPreferencesWordRegex.hasMatch(targetSource)) {
         return;
       }
 
@@ -817,8 +826,8 @@ class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (targetSource.contains('pref') ||
-          targetSource.contains('sharedpreferences')) {
+      if (_prefWordRegex.hasMatch(targetSource) ||
+          _sharedPreferencesWordRegex.hasMatch(targetSource)) {
         reporter.atNode(node);
       }
     });
@@ -894,8 +903,8 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') &&
-          !targetSource.contains('sharedpreferences')) {
+      if (!_prefWordRegex.hasMatch(targetSource) &&
+          !_sharedPreferencesWordRegex.hasMatch(targetSource)) {
         return;
       }
 
@@ -978,8 +987,8 @@ class AvoidSharedPrefsLargeDataRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') &&
-          !targetSource.contains('sharedpreferences')) {
+      if (!_prefWordRegex.hasMatch(targetSource) &&
+          !_sharedPreferencesWordRegex.hasMatch(targetSource)) {
         return;
       }
 
@@ -1076,8 +1085,8 @@ class AvoidSharedPrefsSyncRaceRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target == null) return;
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') &&
-          !targetSource.contains('sharedpreferences')) {
+      if (!_prefWordRegex.hasMatch(targetSource) &&
+          !_sharedPreferencesWordRegex.hasMatch(targetSource)) {
         return;
       }
 

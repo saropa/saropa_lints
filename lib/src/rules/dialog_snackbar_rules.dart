@@ -358,6 +358,11 @@ class PreferAdaptiveDialogRule extends SaropaLintRule {
         UseAdaptiveDialogFix(context: context),
   ];
 
+  static final RegExp _platformIsRegex = RegExp(r'\bplatform\.is\b');
+  static final RegExp _defaultTargetPlatformRegex = RegExp(
+    r'\bdefaulttargetplatform\b',
+  );
+
   static const LintCode _code = LintCode(
     'prefer_adaptive_dialog',
     '[prefer_adaptive_dialog] AlertDialog without adaptive styling. May look non-native on iOS. Dialogs should adapt to the platform (Material on Android, Cupertino on iOS) for native look and feel. {v3}',
@@ -391,8 +396,8 @@ class PreferAdaptiveDialogRule extends SaropaLintRule {
             current is IfStatement ||
             current is IfElement) {
           final source = current.toSource().toLowerCase();
-          if (source.contains('platform.is') ||
-              source.contains('defaulttargetplatform')) {
+          if (_platformIsRegex.hasMatch(source) ||
+              _defaultTargetPlatformRegex.hasMatch(source)) {
             return;
           }
         }

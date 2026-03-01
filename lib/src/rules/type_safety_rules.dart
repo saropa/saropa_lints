@@ -297,7 +297,8 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
       // Pattern: map['key'] as Type (not Type? or dynamic)
       if (_unsafeCastPattern.hasMatch(bodySource)) {
         // Check if there's null handling nearby
-        if (!bodySource.contains('??') && !bodySource.contains('?[')) {
+        if (!RegExp(r'\?\?').hasMatch(bodySource) &&
+            !RegExp(r'\?\s*\[').hasMatch(bodySource)) {
           reporter.atNode(node);
         }
       }
@@ -1120,7 +1121,8 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
       // Check for .byName() calls on enum.values
       if (methodName == 'byName') {
         final Expression? target = node.target;
-        if (target != null && target.toSource().contains('.values')) {
+        if (target != null &&
+            RegExp(r'\.values\b').hasMatch(target.toSource())) {
           // Check if result has fallback
           if (!_hasFallback(node)) {
             reporter.atNode(node);
@@ -1131,7 +1133,8 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
       // Check for .firstWhere() on enum.values without orElse
       if (methodName == 'firstWhere') {
         final Expression? target = node.target;
-        if (target != null && target.toSource().contains('.values')) {
+        if (target != null &&
+            RegExp(r'\.values\b').hasMatch(target.toSource())) {
           // Check if has orElse parameter
           bool hasOrElse = false;
           for (final Expression arg in node.argumentList.arguments) {
@@ -1164,7 +1167,7 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
     // Check if assigned to nullable variable
     if (parent is VariableDeclaration) {
       final String source = parent.toSource();
-      if (source.contains('?')) return true;
+      if (RegExp(r'\?').hasMatch(source)) return true;
     }
 
     return false;
@@ -1254,8 +1257,7 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
   bool _hasNullReturn(FunctionBody body) {
     final String source = body.toSource();
 
-    // Check for explicit return null
-    if (source.contains('return null')) return true;
+    if (RegExp(r'\breturn\s+null\b').hasMatch(source)) return true;
 
     // Check for conditional with null
     // Pattern: condition ? 'error' : null
@@ -1272,8 +1274,8 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
       return true;
     }
 
-    // Check for switch expression with null case
-    if (source.contains('=> null') || source.contains('_ => null')) {
+    if (RegExp(r'=>\s*null\b').hasMatch(source) ||
+        RegExp(r'_\s*=>\s*null\b').hasMatch(source)) {
       return true;
     }
 

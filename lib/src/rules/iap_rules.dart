@@ -64,6 +64,12 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final List<RegExp> _envCheckPatterns = <RegExp>[
+    RegExp(r'\bEnvironment\.'),
+    RegExp(r'\bisProduction\b'),
+    RegExp(r'\bisSandbox\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -89,11 +95,8 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
 
         if (functionBody != null) {
           final String bodySource = functionBody.toSource();
-          // If there's environment checking, it's likely handled correctly
           if (usesFlutterModeConstants(bodySource) ||
-              bodySource.contains('Environment.') ||
-              bodySource.contains('isProduction') ||
-              bodySource.contains('isSandbox')) {
+              _envCheckPatterns.any((re) => re.hasMatch(bodySource))) {
             return;
           }
         }
@@ -126,8 +129,7 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
         if (functionBody != null) {
           final String bodySource = functionBody.toSource();
           if (!usesFlutterModeConstants(bodySource) &&
-              !bodySource.contains('isProduction') &&
-              !bodySource.contains('isSandbox')) {
+              !_envCheckPatterns.any((re) => re.hasMatch(bodySource))) {
             reporter.atNode(node);
           }
         }
@@ -216,6 +218,21 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
     'purchased',
   };
 
+  static final List<RegExp> _statusCheckPatterns = <RegExp>[
+    RegExp(r'\bFutureBuilder\b'),
+    RegExp(r'\bStreamBuilder\b'),
+    RegExp(r'\bcheckStatus\b'),
+    RegExp(r'\bcheckSubscription\b'),
+    RegExp(r'\bverifyPurchase\b'),
+    RegExp(r'\bgetEntitlements\b'),
+    RegExp(r'\bcustomerInfo\b'),
+    RegExp(r'\bpurchaseStream\b'),
+    RegExp(r'\bConsumer\s*<'),
+    RegExp(r'\bBlocBuilder\b'),
+    RegExp(r'\bwatch\s*\('),
+    RegExp(r'\bref\.watch\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -227,9 +244,6 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check if build method references premium features
-      // Use word boundary regex to avoid false positives
-      // (e.g., "isProportional" should not match "isPro")
       bool hasPremiumReference = false;
       for (final String indicator in _premiumIndicators) {
         final RegExp pattern = RegExp(
@@ -244,20 +258,8 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
 
       if (!hasPremiumReference) return;
 
-      // Check if there's a status check
-      if (bodySource.contains('FutureBuilder') ||
-          bodySource.contains('StreamBuilder') ||
-          bodySource.contains('checkStatus') ||
-          bodySource.contains('checkSubscription') ||
-          bodySource.contains('verifyPurchase') ||
-          bodySource.contains('getEntitlements') ||
-          bodySource.contains('customerInfo') ||
-          bodySource.contains('purchaseStream') ||
-          bodySource.contains('Consumer<') ||
-          bodySource.contains('BlocBuilder') ||
-          bodySource.contains('watch(') ||
-          bodySource.contains('ref.watch')) {
-        return; // Has proper subscription checking
+      if (_statusCheckPatterns.any((re) => re.hasMatch(bodySource))) {
+        return;
       }
 
       reporter.atNode(node);
@@ -417,16 +419,18 @@ class PreferGracePeriodHandlingRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _purchasedPattern = RegExp(r'PurchaseStatus\.purchased');
+  static final RegExp _statusPattern = RegExp(r'\bstatus\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addBinaryExpression((BinaryExpression node) {
-      // Check for purchaseDetails.status == PurchaseStatus.purchased
-      final String source = node.toSource();
-      if (!source.contains('PurchaseStatus.purchased')) return;
-      if (!source.contains('status')) return;
+      final String nodeSource = node.toSource();
+      if (!_purchasedPattern.hasMatch(nodeSource)) return;
+      if (!_statusPattern.hasMatch(nodeSource)) return;
 
       // Check if the enclosing if/switch also checks for pending
       AstNode? current = node.parent;
@@ -525,15 +529,18 @@ class AvoidEntitlementWithoutServerRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  static const Set<String> _serverPatterns = <String>{
-    'verifyReceipt',
-    'serverVerificationData',
-    'validatePurchase',
-    'verifyPurchase',
-    'RevenueCat',
-    'Purchases.instance',
-    'Qonversion',
-  };
+  static final List<RegExp> _serverPatternRegexes = <RegExp>[
+    RegExp(r'\bverifyReceipt\b'),
+    RegExp(r'\bserverVerificationData\b'),
+    RegExp(r'\bvalidatePurchase\b'),
+    RegExp(r'\bverifyPurchase\b'),
+    RegExp(r'\bRevenueCat\b'),
+    RegExp(r'\bPurchases\.instance\b'),
+    RegExp(r'\bQonversion\b'),
+  ];
+  static final RegExp _purchaseStatusPattern = RegExp(
+    r'PurchaseStatus\.(?:purchased|restored)',
+  );
 
   @override
   void runWithReporter(
@@ -544,20 +551,13 @@ class AvoidEntitlementWithoutServerRule extends SaropaLintRule {
       final String op = node.operator.lexeme;
       if (op != '==') return;
 
-      // Check for PurchaseStatus.purchased comparison
-      final String source = node.toSource();
-      if (!source.contains('PurchaseStatus.purchased') &&
-          !source.contains('PurchaseStatus.restored')) {
-        return;
-      }
+      final String nodeSource = node.toSource();
+      if (!_purchaseStatusPattern.hasMatch(nodeSource)) return;
 
-      // Check if the enclosing class/function has server verification
       final String? bodySource = _findEnclosingBodySource(node);
       if (bodySource == null) return;
 
-      for (final String pattern in _serverPatterns) {
-        if (bodySource.contains(pattern)) return;
-      }
+      if (_serverPatternRegexes.any((re) => re.hasMatch(bodySource))) return;
 
       reporter.atNode(node);
     });

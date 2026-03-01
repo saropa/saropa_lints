@@ -541,6 +541,11 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
     'FocusNode',
   };
 
+  static final List<RegExp> _valueChangeNotifierTypeRegex = [
+    RegExp(r'\bValueNotifier\b'),
+    RegExp(r'\bChangeNotifier\b'),
+  ];
+
   /// Lifecycle methods where notifier initialization is valid.
   static const Set<String> _lifecycleMethods = <String>{
     'initState',
@@ -608,8 +613,7 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
     if (expr is InstanceCreationExpression) {
       final typeName = expr.constructorName.type.name.lexeme;
       return _flutterNotifierTypes.contains(typeName) ||
-          typeName.contains('ValueNotifier') ||
-          typeName.contains('ChangeNotifier');
+          _valueChangeNotifierTypeRegex.any((re) => re.hasMatch(typeName));
     }
     return false;
   }
@@ -934,9 +938,8 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
       final String propertyName = node.propertyName.name;
       if (propertyName != 'value') return;
 
-      // Check if target looks like asyncValue access
       final String targetSource = node.target?.toSource() ?? '';
-      if (targetSource.contains('AsyncValue') ||
+      if (RegExp(r'\bAsyncValue\b').hasMatch(targetSource) ||
           targetSource.endsWith('async') ||
           targetSource.endsWith('Async')) {
         reporter.atNode(node);
@@ -1005,6 +1008,16 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _refWatchReadRegex = [
+    RegExp(r'\bref\.watch\b'),
+    RegExp(r'\bref\.read\b'),
+  ];
+  static final List<RegExp> _asyncFutureStreamRegex = [
+    RegExp(r'\basync\b'),
+    RegExp(r'\bfuture\b'),
+    RegExp(r'\bstream\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1017,13 +1030,8 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
       final Expression target = node.target!;
       final String targetSource = target.toSource().toLowerCase();
 
-      // Check if it looks like AsyncValue access
-      if (targetSource.contains('ref.watch') ||
-          targetSource.contains('ref.read')) {
-        // Check if the provider name suggests async
-        if (targetSource.contains('async') ||
-            targetSource.contains('future') ||
-            targetSource.contains('stream')) {
+      if (_refWatchReadRegex.any((re) => re.hasMatch(targetSource))) {
+        if (_asyncFutureStreamRegex.any((re) => re.hasMatch(targetSource))) {
           reporter.atNode(node);
         }
       }
@@ -1314,9 +1322,8 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
         final String? typeName = _getProviderTypeName(initializer);
         if (typeName == null || !_providerTypes.contains(typeName)) return;
 
-        // Check if already using autoDispose
         final String source = initializer.toSource();
-        if (source.contains('.autoDispose')) return;
+        if (RegExp(r'\.autoDispose\b').hasMatch(source)) return;
 
         reporter.atNode(initializer);
       }
@@ -1396,8 +1403,7 @@ class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
       final RegExp nullablePattern = RegExp(r'StateProvider<\w+\?>');
       if (!nullablePattern.hasMatch(source)) return;
 
-      // Check if the initializer returns null (pattern: (ref) => null)
-      if (!source.contains('=> null')) return;
+      if (!RegExp(r'=>\s*null\b').hasMatch(source)) return;
 
       reporter.atNode(initializer);
     });
@@ -1460,6 +1466,10 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
     'AsyncNotifierProvider',
   };
 
+  static final List<RegExp> _providerMethodNameRegex = _providerTypes
+      .map((t) => RegExp(r'\b' + RegExp.escape(t) + r'\b'))
+      .toList();
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1469,9 +1479,8 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
       for (final VariableDeclaration variable in node.variables.variables) {
         final Expression? initializer = variable.initializer;
         if (initializer is MethodInvocation) {
-          // Check for provider creation
           final String methodName = initializer.methodName.name;
-          if (_providerTypes.any((String t) => methodName.contains(t))) {
+          if (_providerMethodNameRegex.any((re) => re.hasMatch(methodName))) {
             reporter.atNode(variable);
           }
         }
@@ -1670,7 +1679,7 @@ class RequireAutoDisposeRule extends SaropaLintRule {
           if (_providerTypes.contains(typeName)) {
             // Check if it uses autoDispose constructor
             if (constructorName != 'autoDispose' &&
-                !typeName.contains('AutoDispose')) {
+                !RegExp(r'\bAutoDispose\b').hasMatch(typeName)) {
               reporter.atNode(variable);
             }
           }
@@ -1879,6 +1888,12 @@ class RequireProviderScopeRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final List<RegExp> _mainBodyRiverpodRegex = [
+    RegExp(r'\bConsumer\b'),
+    RegExp(r'\bref\.watch\b'),
+    RegExp(r'\bref\.read\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1890,11 +1905,9 @@ class RequireProviderScopeRule extends SaropaLintRule {
       final FunctionBody body = node.functionExpression.body;
       final String bodySource = body.toSource();
 
-      // Check if using Riverpod (has ConsumerWidget, ref.watch, etc.)
-      final bool usesRiverpod =
-          bodySource.contains('Consumer') ||
-          bodySource.contains('ref.watch') ||
-          bodySource.contains('ref.read');
+      final bool usesRiverpod = _mainBodyRiverpodRegex.any(
+        (re) => re.hasMatch(bodySource),
+      );
 
       // Also check the whole file for Riverpod patterns
       final CompilationUnit? unit = node
@@ -1910,8 +1923,7 @@ class RequireProviderScopeRule extends SaropaLintRule {
 
       if (!usesRiverpod && !fileUsesRiverpod) return;
 
-      // Check if ProviderScope is present
-      if (!bodySource.contains('ProviderScope')) {
+      if (!RegExp(r'\bProviderScope\b').hasMatch(bodySource)) {
         reporter.atToken(node.name, code);
       }
     });
@@ -2096,8 +2108,7 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
-      // Check if it's a provider type
-      if (!typeName.contains('Provider')) return;
+      if (!RegExp(r'\bProvider\b').hasMatch(typeName)) return;
 
       // Check if the create callback takes extra parameters beyond ref
       final ArgumentList args = node.argumentList;
@@ -2504,12 +2515,10 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
     // Count .notifier.state mutations
     context.addAssignmentExpression((AssignmentExpression node) {
       final String source = node.leftHandSide.toSource();
-      if (source.contains('.notifier.state')) {
-        // Extract provider name
-        for (final String name in stateProviderMutations.keys) {
-          if (source.contains(name)) {
-            stateProviderMutations[name] = stateProviderMutations[name]! + 1;
-          }
+      if (!RegExp(r'\.notifier\.state\b').hasMatch(source)) return;
+      for (final String name in stateProviderMutations.keys) {
+        if (RegExp(r'\b' + RegExp.escape(name) + r'\b').hasMatch(source)) {
+          stateProviderMutations[name] = stateProviderMutations[name]! + 1;
         }
       }
     });
@@ -2574,6 +2583,18 @@ class RequireRiverpodLintRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _riverpodLintSourceRegex = [
+    RegExp(r'\b@riverpod\b'),
+    RegExp(r'\.g\.dart\b'),
+    RegExp(r'\briverpod_annotation\b'),
+  ];
+  static final List<RegExp> _classicProviderSourceRegex = [
+    RegExp(r'\bProvider\s*\('),
+    RegExp(r'\bStateProvider\s*\('),
+    RegExp(r'\bFutureProvider\s*\('),
+    RegExp(r'\bStreamProvider\s*\('),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2599,19 +2620,12 @@ class RequireRiverpodLintRule extends SaropaLintRule {
       if (root is CompilationUnit) {
         final String source = root.toSource();
 
-        // Look for riverpod_lint annotations or generated code
-        if (source.contains('@riverpod') ||
-            source.contains('.g.dart') ||
-            source.contains('riverpod_annotation')) {
+        if (_riverpodLintSourceRegex.any((re) => re.hasMatch(source))) {
           // Using code generation - riverpod_lint likely configured
           return;
         }
 
-        // Check for classic provider definitions without lint annotations
-        if (source.contains('Provider(') ||
-            source.contains('StateProvider(') ||
-            source.contains('FutureProvider(') ||
-            source.contains('StreamProvider(')) {
+        if (_classicProviderSourceRegex.any((re) => re.hasMatch(source))) {
           // Using classic providers - suggest riverpod_lint
           // Only report once per file
           reporter.atNode(node);
@@ -2673,7 +2687,7 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target == null) return;
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('context')) return;
+      if (!RegExp(r'\bcontext\b').hasMatch(targetSource)) return;
 
       // Check if inside async function
       AstNode? current = node.parent;
@@ -3139,8 +3153,7 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
 
       if (typeName == null) return;
 
-      // Check for GlobalKey<NavigatorState> in provider context
-      if (typeName.contains('GlobalKey<NavigatorState>')) {
+      if (RegExp(r'GlobalKey\s*<\s*NavigatorState\s*>').hasMatch(typeName)) {
         // Check if this is inside a Provider
         AstNode? current = node.parent;
         while (current != null) {

@@ -13,6 +13,7 @@ import 'package:analyzer/dart/element/type.dart';
 
 import '../saropa_lint_rule.dart';
 import '../fixes/navigation/add_mounted_check_fix.dart';
+import '../target_matcher_utils.dart';
 
 /// Warns when ChangeNotifier subclass doesn't call notifyListeners.
 ///
@@ -232,13 +233,19 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
       }
 
       if (disposeMethod == null) return;
-      final String? bodySource = disposeMethod.body.toSource();
-      if (bodySource == null) return;
 
       for (final controller in controllers) {
         final String name = controller.variable.name.lexeme;
-        final bool hasClose = bodySource.contains('$name.close()');
-        final bool hasDispose = bodySource.contains('$name.dispose()');
+        final bool hasClose = isFieldCleanedUp(
+          name,
+          'close',
+          disposeMethod.body,
+        );
+        final bool hasDispose = isFieldCleanedUp(
+          name,
+          'dispose',
+          disposeMethod.body,
+        );
         if (controller.isWrapper) {
           // Accept .dispose() OR .close() for wrapper types
           if (!hasDispose && !hasClose) {
@@ -361,8 +368,8 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
                 collectionNotifierNames.add(variable.name.lexeme);
                 continue;
               }
-              // Check for single ValueNotifier
-              if (typeName.contains('ValueNotifier')) {
+              // Check for single ValueNotifier (word-boundary to avoid FPs)
+              if (RegExp(r'\bValueNotifier\b').hasMatch(typeName)) {
                 singleNotifierNames.add(variable.name.lexeme);
                 continue;
               }
@@ -935,7 +942,7 @@ class _GlobalKeyVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     final String? typeName = node.constructorName.type.element?.name;
-    if (typeName != null && typeName.contains('GlobalKey')) {
+    if (typeName != null && RegExp(r'\bGlobalKey\b').hasMatch(typeName)) {
       reporter.atNode(node);
     }
     super.visitInstanceCreationExpression(node);

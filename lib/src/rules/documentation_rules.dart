@@ -139,19 +139,22 @@ class AvoidMisleadingDocumentationRule extends SaropaLintRule {
           .join(' ')
           .toLowerCase();
 
-      // Check for common mismatches
-      if (methodName.contains('get') && docText.contains('sets ')) {
+      // Check for common mismatches (word-boundary for method name)
+      if ((methodName == 'get' || methodName.startsWith('get')) &&
+          docText.contains('sets ')) {
         reporter.atNode(docComment);
       }
-      if (methodName.contains('set') &&
+      if ((methodName == 'set' || methodName.startsWith('set')) &&
           docText.contains('gets ') &&
           !docText.contains('sets ')) {
         reporter.atNode(docComment);
       }
-      if (methodName.contains('delete') && docText.contains('creates ')) {
+      if ((methodName == 'delete' || methodName.startsWith('delete')) &&
+          docText.contains('creates ')) {
         reporter.atNode(docComment);
       }
-      if (methodName.contains('create') && docText.contains('deletes ')) {
+      if ((methodName == 'create' || methodName.startsWith('create')) &&
+          docText.contains('deletes ')) {
         reporter.atNode(docComment);
       }
     });
@@ -270,6 +273,8 @@ class RequireComplexLogicCommentsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _lineCommentRegex = RegExp(r'//');
+  static final RegExp _blockCommentStartRegex = RegExp(r'/\*');
   static const int _complexityThreshold = 3;
 
   @override
@@ -297,7 +302,8 @@ class RequireComplexLogicCommentsRule extends SaropaLintRule {
       if (complexity >= _complexityThreshold) {
         // Check if there are any comments
         final bool hasComments =
-            bodySource.contains('//') || bodySource.contains('/*');
+            _lineCommentRegex.hasMatch(bodySource) ||
+            _blockCommentStartRegex.hasMatch(bodySource);
         if (!hasComments && node.documentationComment == null) {
           reporter.atNode(node);
         }
@@ -499,6 +505,8 @@ class RequireExceptionDocumentationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  static final RegExp _throwKeywordRegex = RegExp(r'\bthrow\s');
+
   static const LintCode _code = LintCode(
     'require_exception_documentation',
     '[require_exception_documentation] Thrown exceptions must be documented. Methods that throw should document the exceptions. Exception documentation is missing. {v4}',
@@ -520,7 +528,7 @@ class RequireExceptionDocumentationRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Check if method throws
-      if (!bodySource.contains('throw ')) return;
+      if (!_throwKeywordRegex.hasMatch(bodySource)) return;
 
       final Comment? docComment = node.documentationComment;
       if (docComment == null) {

@@ -27,6 +27,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../info_plist_utils.dart';
+import '../../target_matcher_utils.dart';
 import '../../mode_constants_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/platforms/ios/replace_http_with_https_fix.dart';
@@ -370,7 +371,7 @@ class PreferIosHapticFeedbackRule extends SaropaLintRule {
 
       // Check if HapticFeedback is already used in the callback
       final String source = onPressedArg.toSource();
-      if (source.contains('HapticFeedback')) {
+      if (RegExp(r'\bHapticFeedback\b').hasMatch(source)) {
         return;
       }
 
@@ -1044,15 +1045,9 @@ class RequireAppleSignInRule extends SaropaLintRule {
       if (_thirdPartySignInMethods.contains(methodName)) {
         // Verify it's from a third-party sign-in class
         final Expression? target = node.target;
-        if (target != null) {
-          final String targetSource = target.toSource();
-          for (final String className in _thirdPartySignInClasses) {
-            if (targetSource.contains(className)) {
-              hasThirdPartySignIn = true;
-              firstThirdPartyNode ??= node;
-              break;
-            }
-          }
+        if (target != null && isExactTarget(target, _thirdPartySignInClasses)) {
+          hasThirdPartySignIn = true;
+          firstThirdPartyNode ??= node;
         }
       }
     });
@@ -1464,11 +1459,8 @@ class RequireIosMinimumVersionCheckRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      for (final String api in _versionSpecificApis) {
-        if (methodName.contains(api)) {
-          reporter.atNode(node);
-          return;
-        }
+      if (_versionSpecificApis.contains(methodName)) {
+        reporter.atNode(node);
       }
     });
   }
@@ -1650,6 +1642,10 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
     'ASIdentifierManager',
   };
 
+  static final List<RegExp> _trackingTypeNameRegex = _trackingPatterns
+      .map((p) => RegExp(r'\b' + RegExp.escape(p) + r'\b'))
+      .toList();
+
   /// ATT-related patterns that indicate proper handling.
   static const Set<String> _attPatterns = {
     'AppTrackingTransparency',
@@ -1677,11 +1673,9 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
       if (hasATT) return;
 
       final String typeName = node.typeName;
-      for (final String pattern in _trackingPatterns) {
-        if (typeName.contains(pattern)) {
-          reporter.atNode(node);
-          return;
-        }
+      if (_trackingTypeNameRegex.any((re) => re.hasMatch(typeName))) {
+        reporter.atNode(node);
+        return;
       }
     });
 
@@ -1892,15 +1886,8 @@ class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
         return;
       }
 
-      // Check target class
-      if (target != null) {
-        final String targetSource = target.toSource();
-        for (final String pattern in _photoSavePatterns) {
-          if (targetSource.contains(pattern)) {
-            reporter.atNode(node);
-            return;
-          }
-        }
+      if (target != null && isExactTarget(target, _photoSavePatterns)) {
+        reporter.atNode(node);
       }
     });
   }
@@ -2211,6 +2198,11 @@ class RequireIosKeychainAccessibilityRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static const Set<String> _secureStorageTargets = {
+    'secureStorage',
+    'FlutterSecureStorage',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2222,24 +2214,20 @@ class RequireIosKeychainAccessibilityRule extends SaropaLintRule {
       // Check for secure storage write without IOSOptions
       if (methodName == 'write') {
         final Expression? target = node.target;
-        if (target != null) {
-          final String targetSource = target.toSource();
-          if (targetSource.contains('secureStorage') ||
-              targetSource.contains('FlutterSecureStorage')) {
-            // Check if iOptions is specified
-            bool hasIOSOptions = false;
-            for (final Expression arg in node.argumentList.arguments) {
-              if (arg is NamedExpression) {
-                if (arg.name.label.name == 'iOptions' ||
-                    arg.name.label.name == 'aOptions') {
-                  hasIOSOptions = true;
-                  break;
-                }
+        if (target != null &&
+            _secureStorageTargets.contains(extractTargetName(target))) {
+          bool hasIOSOptions = false;
+          for (final Expression arg in node.argumentList.arguments) {
+            if (arg is NamedExpression) {
+              if (arg.name.label.name == 'iOptions' ||
+                  arg.name.label.name == 'aOptions') {
+                hasIOSOptions = true;
+                break;
               }
             }
-            if (!hasIOSOptions) {
-              reporter.atNode(node);
-            }
+          }
+          if (!hasIOSOptions) {
+            reporter.atNode(node);
           }
         }
       }
@@ -2442,16 +2430,9 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
         return;
       }
 
-      // Check target for push notification class names only
-      if (target != null) {
-        final String targetSource = target.toSource();
-        for (final String className in _pushClassPatterns) {
-          if (targetSource.contains(className)) {
-            reporter.atNode(node);
-            hasReported = true;
-            return;
-          }
-        }
+      if (target != null && isExactTarget(target, _pushClassPatterns)) {
+        reporter.atNode(node);
+        hasReported = true;
       }
     });
   }
@@ -2618,6 +2599,11 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
     'showWeeklyAtDayAndTime',
   };
 
+  static const Set<String> _notificationTargets = {
+    'Notification',
+    'notification',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2638,12 +2624,9 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
 
       if (_scheduleMethods.contains(methodName)) {
         final Expression? target = node.target;
-        if (target != null) {
-          final String targetSource = target.toSource();
-          if (targetSource.contains('Notification') ||
-              targetSource.contains('notification')) {
-            reporter.atNode(node);
-          }
+        if (target != null &&
+            _notificationTargets.contains(extractTargetName(target))) {
+          reporter.atNode(node);
         }
       }
     });
@@ -2981,6 +2964,10 @@ class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
     'shortcutIdentifier',
   };
 
+  static final List<RegExp> _siriPatternsRegex = _siriPatterns
+      .map((p) => RegExp(r'\b' + RegExp.escape(p) + r'\b'))
+      .toList();
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2993,12 +2980,9 @@ class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
 
       final String typeName = node.typeName;
 
-      for (final String pattern in _siriPatterns) {
-        if (typeName.contains(pattern)) {
-          reporter.atNode(node);
-          hasReported = true;
-          return;
-        }
+      if (_siriPatternsRegex.any((re) => re.hasMatch(typeName))) {
+        reporter.atNode(node);
+        hasReported = true;
       }
     });
 
@@ -3099,15 +3083,9 @@ class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
         return;
       }
 
-      if (target != null) {
-        final String targetSource = target.toSource();
-        for (final String pattern in _widgetPatterns) {
-          if (targetSource.contains(pattern)) {
-            reporter.atNode(node);
-            hasReported = true;
-            return;
-          }
-        }
+      if (target != null && isExactTarget(target, _widgetPatterns)) {
+        reporter.atNode(node);
+        hasReported = true;
       }
     });
   }
@@ -3275,15 +3253,9 @@ class RequireIosDatabaseConflictResolutionRule extends SaropaLintRule {
       if (hasReported) return;
 
       final Expression? target = node.target;
-      if (target != null) {
-        final String targetSource = target.toSource();
-        for (final String pattern in _syncPatterns) {
-          if (targetSource.contains(pattern)) {
-            reporter.atNode(node);
-            hasReported = true;
-            return;
-          }
-        }
+      if (target != null && isExactTarget(target, _syncPatterns)) {
+        reporter.atNode(node);
+        hasReported = true;
       }
     });
   }
@@ -3472,6 +3444,8 @@ class PreferIosStoreKit2Rule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static const Set<String> _inAppPurchaseTargets = {'InAppPurchase'};
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3483,7 +3457,7 @@ class PreferIosStoreKit2Rule extends SaropaLintRule {
       if (hasReported) return;
 
       final Expression? target = node.target;
-      if (target != null && target.toSource().contains('InAppPurchase')) {
+      if (target != null && isExactTarget(target, _inAppPurchaseTargets)) {
         reporter.atNode(node);
         hasReported = true;
       }
@@ -3626,6 +3600,11 @@ class RequireIosKeychainSyncAwarenessRule extends SaropaLintRule {
     'device_key',
   };
 
+  static final List<RegExp> _keychainSecureRegex = [
+    RegExp(r'\bsecure\b'),
+    RegExp(r'\bkeychain\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3638,8 +3617,7 @@ class RequireIosKeychainSyncAwarenessRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('secure') &&
-          !targetSource.contains('keychain')) {
+      if (!_keychainSecureRegex.any((re) => re.hasMatch(targetSource))) {
         return;
       }
 
@@ -4143,6 +4121,10 @@ class RequireIosCarplaySetupRule extends SaropaLintRule {
     'flutter_carplay',
   };
 
+  static final List<RegExp> _carplayPatternsRegex = _carplayPatterns
+      .map((p) => RegExp(r'\b' + RegExp.escape(p) + r'\b'))
+      .toList();
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -4154,12 +4136,9 @@ class RequireIosCarplaySetupRule extends SaropaLintRule {
       if (hasReported) return;
 
       final String typeName = node.typeName;
-      for (final String pattern in _carplayPatterns) {
-        if (typeName.contains(pattern)) {
-          reporter.atNode(node);
-          hasReported = true;
-          return;
-        }
+      if (_carplayPatternsRegex.any((re) => re.hasMatch(typeName))) {
+        reporter.atNode(node);
+        hasReported = true;
       }
     });
   }
@@ -4201,6 +4180,10 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
     'live_activities',
   };
 
+  static final List<RegExp> _liveActivityTypeNameRegex = _liveActivityPatterns
+      .map((p) => RegExp(r'\b' + RegExp.escape(p) + r'\b'))
+      .toList();
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -4212,12 +4195,9 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
       if (hasReported) return;
 
       final String typeName = node.typeName;
-      for (final String pattern in _liveActivityPatterns) {
-        if (typeName.contains(pattern)) {
-          reporter.atNode(node);
-          hasReported = true;
-          return;
-        }
+      if (_liveActivityTypeNameRegex.any((re) => re.hasMatch(typeName))) {
+        reporter.atNode(node);
+        hasReported = true;
       }
     });
 
@@ -4454,13 +4434,10 @@ class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       final Expression? target = node.target;
 
-      for (final String pattern in _backgroundPatterns) {
-        if (methodName.contains(pattern) ||
-            (target != null && target.toSource().contains(pattern))) {
-          reporter.atNode(node);
-          hasReported = true;
-          return;
-        }
+      if (_backgroundPatterns.contains(methodName) ||
+          (target != null && isExactTarget(target, _backgroundPatterns))) {
+        reporter.atNode(node);
+        hasReported = true;
       }
     });
   }
@@ -4632,6 +4609,11 @@ class AvoidIosForceUnwrapInCallbacksRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _forceUnwrapSourceRegex = [
+    RegExp(r'\bresult\b'),
+    RegExp(r'\bResponse\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -4647,9 +4629,8 @@ class AvoidIosForceUnwrapInCallbacksRule extends SaropaLintRule {
 
     context.addPostfixExpression((PostfixExpression node) {
       if (node.operator.lexeme == '!') {
-        // Check if this is related to invokeMethod result
         final String source = node.toSource();
-        if (source.contains('result') || source.contains('Response')) {
+        if (_forceUnwrapSourceRegex.any((re) => re.hasMatch(source))) {
           reporter.atNode(node);
         }
       }
@@ -4930,6 +4911,10 @@ class RequireIosAgeRatingConsiderationRule extends SaropaLintRule {
     'tobacco',
   };
 
+  static final List<RegExp> _ageRatingTriggersRegex = _ageRatingTriggers
+      .map((t) => RegExp(r'\b' + RegExp.escape(t) + r'\b'))
+      .toList();
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -4941,12 +4926,9 @@ class RequireIosAgeRatingConsiderationRule extends SaropaLintRule {
       if (hasReported) return;
 
       final String typeName = node.typeName;
-      for (final String trigger in _ageRatingTriggers) {
-        if (typeName.contains(trigger)) {
-          reporter.atNode(node);
-          hasReported = true;
-          return;
-        }
+      if (_ageRatingTriggersRegex.any((re) => re.hasMatch(typeName))) {
+        reporter.atNode(node);
+        hasReported = true;
       }
     });
   }
@@ -5551,6 +5533,11 @@ class PreferDelayedPermissionPromptRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _permissionPromptSourceRegex = [
+    RegExp(r'\bnotification\b'),
+    RegExp(r'\bpermission\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -5564,7 +5551,7 @@ class PreferDelayedPermissionPromptRule extends SaropaLintRule {
           methodName == 'requestPermissions' ||
           methodName == 'request') {
         final String source = node.toSource().toLowerCase();
-        if (source.contains('notification') || source.contains('permission')) {
+        if (_permissionPromptSourceRegex.any((re) => re.hasMatch(source))) {
           // Check if we're in main() or initState()
           AstNode? current = node.parent;
           while (current != null) {
@@ -5937,6 +5924,10 @@ class PreferBackgroundSyncRule extends SaropaLintRule {
     'updateData',
   };
 
+  static final List<RegExp> _syncPatternsBodyRegex = _syncPatterns
+      .map((p) => RegExp(r'\b' + RegExp.escape(p) + r'\b'))
+      .toList();
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -5953,11 +5944,8 @@ class PreferBackgroundSyncRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme == 'initState') {
         final String bodySource = node.body.toSource();
-        for (final String pattern in _syncPatterns) {
-          if (bodySource.contains(pattern)) {
-            reporter.atNode(node);
-            return;
-          }
+        if (_syncPatternsBodyRegex.any((re) => re.hasMatch(bodySource))) {
+          reporter.atNode(node);
         }
       }
     });
@@ -6145,6 +6133,10 @@ class AvoidIosWifiOnlyAssumptionRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final RegExp _methodNameDownload = RegExp(r'\bdownload\b');
+  static final RegExp _methodNameLarge = RegExp(r'\blarge\b');
+  static final RegExp _methodNameFile = RegExp(r'\bfile\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -6162,8 +6154,9 @@ class AvoidIosWifiOnlyAssumptionRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name.toLowerCase();
 
-      if (methodName.contains('download') &&
-          (methodName.contains('large') || methodName.contains('file'))) {
+      if (_methodNameDownload.hasMatch(methodName) &&
+          (_methodNameLarge.hasMatch(methodName) ||
+              _methodNameFile.hasMatch(methodName))) {
         reporter.atNode(node);
       }
     });
@@ -6307,6 +6300,11 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _themeSourceRegex = [
+    RegExp(r'\btextTheme\b'),
+    RegExp(r'\bThemeData\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -6331,8 +6329,8 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
         // Check parent to see if this is from a theme
         AstNode? current = node.parent;
         while (current != null) {
-          if (current.toSource().contains('textTheme') ||
-              current.toSource().contains('ThemeData')) {
+          final String currentSource = current.toSource();
+          if (_themeSourceRegex.any((re) => re.hasMatch(currentSource))) {
             return; // Part of theme definition
           }
           current = current.parent;
@@ -6751,6 +6749,11 @@ class PreferIosSpotlightIndexingRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _spotlightBodyRegex = [
+    RegExp(r'\bListView\b'),
+    RegExp(r'\bitems\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -6775,7 +6778,7 @@ class PreferIosSpotlightIndexingRule extends SaropaLintRule {
 
       if (className.contains('search') || className.contains('list')) {
         final String bodySource = node.toSource();
-        if (bodySource.contains('ListView') || bodySource.contains('items')) {
+        if (_spotlightBodyRegex.any((re) => re.hasMatch(bodySource))) {
           reporter.atNode(node);
         }
       }

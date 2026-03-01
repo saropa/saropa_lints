@@ -169,6 +169,11 @@ class PreferAudioSessionConfigRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  static final RegExp _playerWordRegex = RegExp(r'\bplayer\b');
+  static final RegExp _audioWordRegex = RegExp(r'\baudio\b');
+  static final RegExp _audiosessionWordRegex = RegExp(r'\baudiosession\b');
+  static final RegExp _audioSessionSnakeRegex = RegExp(r'\baudio_session\b');
+
   static const LintCode _code = LintCode(
     'prefer_audio_session_config',
     '[prefer_audio_session_config] AudioPlayer used without audio session config. May conflict with other audio. Audio session determines how your app interacts with other audio. Without configuration, audio may behave unexpectedly. {v2}',
@@ -191,7 +196,8 @@ class PreferAudioSessionConfigRule extends SaropaLintRule {
       }
 
       final targetSource = node.target?.toSource().toLowerCase() ?? '';
-      if (!targetSource.contains('player') && !targetSource.contains('audio')) {
+      if (!_playerWordRegex.hasMatch(targetSource) &&
+          !_audioWordRegex.hasMatch(targetSource)) {
         return;
       }
 
@@ -214,8 +220,8 @@ class PreferAudioSessionConfigRule extends SaropaLintRule {
       final methodSource = enclosingMethod.toSource().toLowerCase();
 
       // Check for audio session configuration
-      if (methodSource.contains('audiosession') ||
-          methodSource.contains('audio_session')) {
+      if (_audiosessionWordRegex.hasMatch(methodSource) ||
+          _audioSessionSnakeRegex.hasMatch(methodSource)) {
         return;
       }
 

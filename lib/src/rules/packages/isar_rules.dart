@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../mode_constants_utils.dart';
 import '../../saropa_lint_rule.dart';
+import '../../target_matcher_utils.dart';
 import '../../fixes/packages/package_specific/add_try_catch_todo_fix.dart';
 
 /// Warns when enum types are used directly as fields in Isar `@collection` classes.
@@ -441,10 +442,8 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
         return;
       }
 
-      final disposeBody = disposeMethod.body.toSource();
       for (final field in isarFields) {
-        if (!disposeBody.contains('$field.close()') &&
-            !disposeBody.contains('$field?.close()')) {
+        if (!isFieldCleanedUp(field, 'close', disposeMethod.body)) {
           reporter.atNode(disposeMethod);
         }
       }
@@ -928,7 +927,8 @@ class RequireIsarLinksLoadRule extends SaropaLintRule {
       // This is a simplified check - in production, would need type analysis
       // to confirm the target is actually IsarLinks
       final targetSource = node.target?.toSource() ?? '';
-      if (targetSource.contains('links') || targetSource.contains('Links')) {
+      if (RegExp(r'\blinks\b').hasMatch(targetSource) ||
+          RegExp(r'\bLinks\b').hasMatch(targetSource)) {
         reporter.atNode(node.propertyName, code);
       }
     });
@@ -985,7 +985,7 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Check for Timer.periodic
       final constructorName = node.constructorName.toString();
-      if (!constructorName.contains('Timer.periodic')) return;
+      if (!RegExp(r'Timer\.periodic').hasMatch(constructorName)) return;
 
       // Check if the callback contains Isar queries
       final args = node.argumentList.arguments;
@@ -994,9 +994,9 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
       final callback = args[1];
       final callbackSource = callback.toSource();
 
-      if (callbackSource.contains('.where()') ||
-          callbackSource.contains('.findAll()') ||
-          callbackSource.contains('.findFirst()')) {
+      if (RegExp(
+        r'\.where\s*\(\s*\)|\.findAll\s*\(\s*\)|\.findFirst\s*\(\s*\)',
+      ).hasMatch(callbackSource)) {
         reporter.atNode(node.constructorName, code);
       }
     });
@@ -1627,10 +1627,10 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
       if (methodName.endsWith('Contains') ||
           methodName.endsWith('Matches') ||
           methodName == 'contains') {
-        // Check if this is in a filter context
+        // Check if this is in a filter context (word-boundary to avoid FPs)
         final targetSource = node.target?.toSource() ?? '';
-        if (targetSource.contains('filter()') ||
-            targetSource.contains('.filter')) {
+        if (RegExp(r'\.filter\s*\(\s*\)').hasMatch(targetSource) ||
+            RegExp(r'\.filter\b').hasMatch(targetSource)) {
           reporter.atNode(node.methodName, code);
         }
       }
@@ -1724,8 +1724,8 @@ class AvoidCachedIsarStreamRule extends SaropaLintRule {
       final Expression? init = node.initializer;
       if (init == null) return;
       final String source = init.toSource().toLowerCase();
-      // Heuristic: look for isar stream creation
-      if (source.contains('isar') && source.contains('watch')) {
+      if (RegExp(r'\bisar\b').hasMatch(source) &&
+          RegExp(r'\bwatch\b').hasMatch(source)) {
         reporter.atNode(node);
       }
     });
@@ -1736,7 +1736,8 @@ class AvoidCachedIsarStreamRule extends SaropaLintRule {
         final Expression? init = variable.initializer;
         if (init == null) continue;
         final String source = init.toSource().toLowerCase();
-        if (source.contains('isar') && source.contains('watch')) {
+        if (RegExp(r'\bisar\b').hasMatch(source) &&
+            RegExp(r'\bwatch\b').hasMatch(source)) {
           reporter.atNode(variable);
         }
       }

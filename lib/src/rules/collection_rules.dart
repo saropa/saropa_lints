@@ -1099,11 +1099,10 @@ class PreferWhereOrNullRule extends SaropaLintRule {
       if (targetType != null) {
         final String typeName = targetType.getDisplayString();
         // Skip if definitely not an iterable type
-        if (!typeName.contains('List') &&
-            !typeName.contains('Set') &&
-            !typeName.contains('Iterable') &&
-            !typeName.contains('Queue') &&
-            !typeName.contains('Iterable')) {
+        if (!RegExp(r'\bList\b').hasMatch(typeName) &&
+            !RegExp(r'\bSet\b').hasMatch(typeName) &&
+            !RegExp(r'\bIterable\b').hasMatch(typeName) &&
+            !RegExp(r'\bQueue\b').hasMatch(typeName)) {
           return;
         }
       }

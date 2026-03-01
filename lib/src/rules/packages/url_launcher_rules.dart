@@ -42,6 +42,8 @@ import '../../saropa_lint_rule.dart';
 class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
   RequireUrlLauncherCanLaunchCheckRule() : super(code: _code);
 
+  static final RegExp _canLaunchPattern = RegExp(r'\bcanLaunch(Url)?\b');
+
   @override
   LintImpact get impact => LintImpact.medium;
 
@@ -83,9 +85,8 @@ class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
 
       final String bodySource = functionBody.toSource();
 
-      // Check for canLaunchUrl check
-      if (bodySource.contains('canLaunchUrl') ||
-          bodySource.contains('canLaunch')) {
+      // Check for canLaunchUrl check (word-boundary to avoid false positives)
+      if (_canLaunchPattern.hasMatch(bodySource)) {
         return; // Has the check
       }
 
@@ -184,6 +185,9 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
       return;
     }
 
+    final mockPattern = RegExp(r'\b(mock|Mock)\b');
+    final whenCallPattern = RegExp(r'\bwhen\s*\(');
+    final skipParamPattern = RegExp(r'skip\s*:');
     context.addMethodInvocation((MethodInvocation node) {
       // Only match individual test calls, not group() which is too coarse
       final String methodName = node.methodName.name;
@@ -203,25 +207,24 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
 
         final String bodySource = arg.body.toSource();
 
-        // Must contain a problematic scheme string
-        final bool hasScheme = _problematicSchemes.any(
-          (scheme) =>
-              bodySource.contains("'$scheme") ||
-              bodySource.contains('"$scheme'),
-        );
+        // Must contain a problematic scheme string (word-boundary to avoid FPs)
+        final bool hasScheme = _problematicSchemes.any((scheme) {
+          final escaped = RegExp.escape(scheme);
+          return RegExp("'$escaped").hasMatch(bodySource) ||
+              RegExp('"$escaped').hasMatch(bodySource);
+        });
         if (!hasScheme) continue;
 
-        // Must also contain launcher API usage
         final bool hasLauncherUsage = _launcherIndicators.any(
-          bodySource.contains,
+          (ind) =>
+              RegExp(r'\b' + RegExp.escape(ind) + r'\b').hasMatch(bodySource),
         );
         if (!hasLauncherUsage) continue;
 
-        // Check if there's mocking or skip
-        if (bodySource.contains('mock') ||
-            bodySource.contains('Mock') ||
-            bodySource.contains('when(') ||
-            node.toSource().contains('skip:')) {
+        // Check if there's mocking or skip (word-boundary / structured)
+        if (mockPattern.hasMatch(bodySource) ||
+            whenCallPattern.hasMatch(bodySource) ||
+            skipParamPattern.hasMatch(node.toSource())) {
           return;
         }
 
@@ -265,6 +268,11 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
 /// ```
 class PreferUrlLauncherFallbackRule extends SaropaLintRule {
   PreferUrlLauncherFallbackRule() : super(code: _code);
+
+  static final RegExp _fallbackPattern = RegExp(
+    r'\b(else|catch|Clipboard|showSnackBar|showDialog|showError|'
+    r'ScaffoldMessenger|onError|catchError)\b',
+  );
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -330,16 +338,8 @@ class PreferUrlLauncherFallbackRule extends SaropaLintRule {
 
       final String bodySource = functionBody.toSource();
 
-      // Check for fallback patterns
-      if (bodySource.contains('else') ||
-          bodySource.contains('catch') ||
-          bodySource.contains('Clipboard') ||
-          bodySource.contains('showSnackBar') ||
-          bodySource.contains('showDialog') ||
-          bodySource.contains('showError') ||
-          bodySource.contains('ScaffoldMessenger') ||
-          bodySource.contains('onError') ||
-          bodySource.contains('catchError')) {
+      // Check for fallback patterns (word-boundary to avoid false positives)
+      if (_fallbackPattern.hasMatch(bodySource)) {
         return; // Has fallback handling
       }
 

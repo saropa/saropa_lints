@@ -179,6 +179,9 @@ class _DatabaseInBuildVisitor extends RecursiveAstVisitor<void> {
     'database',
     'firestore',
   };
+  static final List<RegExp> _databasePatternRegexps = _databasePatterns
+      .map((p) => RegExp('\\b${RegExp.escape(p)}\\b'))
+      .toList();
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
@@ -205,8 +208,8 @@ class _DatabaseInBuildVisitor extends RecursiveAstVisitor<void> {
 
     if (target != null) {
       final String targetSource = target.toSource().toLowerCase();
-      bool looksLikeDatabase = _databasePatterns.any(
-        (String p) => targetSource.contains(p),
+      final bool looksLikeDatabase = _databasePatternRegexps.any(
+        (re) => re.hasMatch(targetSource),
       );
 
       if (looksLikeDatabase &&
@@ -556,6 +559,29 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _queryMethodPatterns = [
+    RegExp(r'\bfilter\b'),
+    RegExp(r'\bwhere\b'),
+    RegExp(r'\bquery\b'),
+    RegExp(r'\bfind\b'),
+  ];
+  static final List<RegExp> _dbSourcePatterns = [
+    RegExp(r'\.products\b'),
+    RegExp(r'\.users\b'),
+    RegExp(r'\.items\b'),
+    RegExp(r'\.documents\b'),
+    RegExp(r'\bcollection\s*\('),
+    RegExp(r'\bisar\.'),
+    RegExp(r'\brealm\.'),
+  ];
+  static final List<RegExp> _filterQueryPatterns = [
+    RegExp(r'\bEqualTo\b'),
+    RegExp(r'\bGreaterThan\b'),
+    RegExp(r'\bLessThan\b'),
+    RegExp(r'\bBetween\b'),
+    RegExp(r'\bwhere\s*\('),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -564,27 +590,17 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      // Check for query/filter methods
-      if (!methodName.contains('filter') &&
-          !methodName.contains('where') &&
-          !methodName.contains('query') &&
-          !methodName.contains('find')) {
-        return;
-      }
+      final bool hasQueryMethod = _queryMethodPatterns.any(
+        (re) => re.hasMatch(methodName),
+      );
+      if (!hasQueryMethod) return;
 
-      // Check parent chain for database patterns
       AstNode? current = node.parent;
       bool isDatabaseQuery = false;
 
       while (current != null) {
         final String source = current.toSource();
-        if (source.contains('.products') ||
-            source.contains('.users') ||
-            source.contains('.items') ||
-            source.contains('.documents') ||
-            source.contains('collection(') ||
-            source.contains('isar.') ||
-            source.contains('realm.')) {
+        if (_dbSourcePatterns.any((re) => re.hasMatch(source))) {
           isDatabaseQuery = true;
           break;
         }
@@ -594,14 +610,8 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
 
       if (!isDatabaseQuery) return;
 
-      // Check if the query includes field filtering
       final String nodeSource = node.toSource();
-      if (nodeSource.contains('EqualTo') ||
-          nodeSource.contains('GreaterThan') ||
-          nodeSource.contains('LessThan') ||
-          nodeSource.contains('Between') ||
-          nodeSource.contains('where(')) {
-        // This is a filter query - suggest indexing
+      if (_filterQueryPatterns.any((re) => re.hasMatch(nodeSource))) {
         reporter.atNode(node.methodName, code);
       }
     });
@@ -1021,11 +1031,11 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
               if (methodName == 'set' ||
                   methodName == 'update' ||
                   methodName == 'delete') {
-                // Check if it's a Firestore operation
+                // Check if it's a Firestore operation (word-boundary regex)
                 final String source = awaited.toSource();
-                if (source.contains('.doc(') ||
-                    source.contains('DocumentReference') ||
-                    source.contains('Firestore')) {
+                if (RegExp(r'\.doc\s*\(').hasMatch(source) ||
+                    RegExp(r'\bDocumentReference\b').hasMatch(source) ||
+                    RegExp(r'\bFirestore\b').hasMatch(source)) {
                   firestoreWriteCount++;
                   firstWrite ??= awaited;
                 }
@@ -1104,9 +1114,10 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
         return;
       }
 
-      // Check if it's Firestore-related
+      // Check if it's Firestore-related (word-boundary to avoid FP)
       final String source = node.toSource();
-      if (!source.contains('Firestore') && !source.contains('firestore')) {
+      if (!RegExp(r'\bFirestore\b').hasMatch(source) &&
+          !RegExp(r'\bfirestore\b').hasMatch(source)) {
         return;
       }
 
@@ -1136,7 +1147,7 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
     while (current != null) {
       if (current is InstanceCreationExpression) {
         final String typeName = current.constructorName.type.name.lexeme;
-        if (typeName.contains('Builder')) {
+        if (typeName.endsWith('Builder')) {
           return true;
         }
       }
@@ -1210,8 +1221,8 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
         if (target == null) return;
 
         final String targetSource = target.toSource();
-        if (!targetSource.contains('remoteConfig') &&
-            !targetSource.contains('RemoteConfig')) {
+        if (!RegExp(r'\bremoteConfig\b').hasMatch(targetSource) &&
+            !RegExp(r'\bRemoteConfig\b').hasMatch(targetSource)) {
           return;
         }
 
@@ -1285,9 +1296,9 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
         if (target == null) return;
 
         final String targetSource = target.toSource();
-        if (targetSource.contains('messaging') ||
-            targetSource.contains('Messaging') ||
-            targetSource.contains('FirebaseMessaging')) {
+        if (RegExp(r'\bmessaging\b').hasMatch(targetSource) ||
+            RegExp(r'\bMessaging\b').hasMatch(targetSource) ||
+            RegExp(r'\bFirebaseMessaging\b').hasMatch(targetSource)) {
           getTokenCall = node;
         }
       }
@@ -1364,7 +1375,8 @@ class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
     context.addPropertyAccess((PropertyAccess node) {
       if (node.propertyName.name == 'onMessage') {
         final String source = node.toSource();
-        if (source.contains('Messaging') || source.contains('messaging')) {
+        if (RegExp(r'\bMessaging\b').hasMatch(source) ||
+            RegExp(r'\bmessaging\b').hasMatch(source)) {
           onMessageAccess = node;
         }
       }
@@ -1502,6 +1514,16 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final List<RegExp> _fetchLoadPatterns = [
+    RegExp(r'\bfetch\b'),
+    RegExp(r'\bload\b'),
+    RegExp(r'\bget\b'),
+    RegExp(r'\bhttp\b'),
+    RegExp(r'\bHttp\b'),
+    RegExp(r'\bapi\b'),
+    RegExp(r'\bApi\b'),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1515,13 +1537,7 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
       if (value is! FunctionExpression) return;
 
       final String bodySource = value.body.toSource();
-      if (bodySource.contains('fetch') ||
-          bodySource.contains('load') ||
-          bodySource.contains('get') ||
-          bodySource.contains('http') ||
-          bodySource.contains('Http') ||
-          bodySource.contains('api') ||
-          bodySource.contains('Api')) {
+      if (_fetchLoadPatterns.any((re) => re.hasMatch(bodySource))) {
         reporter.atNode(node);
       }
     });
@@ -1652,9 +1668,9 @@ class RequireCrashlyticsUserIdRule extends SaropaLintRule {
         return;
       }
 
-      // Check target is FirebaseCrashlytics
+      // Check target is FirebaseCrashlytics (word-boundary to avoid FP)
       final targetSource = node.target?.toSource() ?? '';
-      if (!targetSource.contains('Crashlytics')) {
+      if (!RegExp(r'\bCrashlytics\b').hasMatch(targetSource)) {
         return;
       }
 
@@ -1947,9 +1963,9 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('FirebaseAuth') &&
-          !targetSource.contains('firebaseAuth') &&
-          !targetSource.contains('_auth')) {
+      if (!RegExp(r'\bFirebaseAuth\b').hasMatch(targetSource) &&
+          !RegExp(r'\bfirebaseAuth\b').hasMatch(targetSource) &&
+          !RegExp(r'\b_auth\b').hasMatch(targetSource)) {
         return;
       }
 
@@ -1971,20 +1987,18 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
 
       if (functionBody == null) return;
 
-      // Look for setPersistence call before this sign-in
       final String functionSource = functionBody.toSource();
-      if (functionSource.contains('setPersistence')) {
-        return; // Already handles persistence
+      if (RegExp(r'\bsetPersistence\b').hasMatch(functionSource)) {
+        return;
       }
 
       // Check if file has web check (kIsWeb) - only relevant for web
       final CompilationUnit? root = node.root as CompilationUnit?;
       if (root != null) {
         final String fullSource = root.toSource();
-        // If there's platform checking, assume developer is aware
-        if (fullSource.contains('kIsWeb') ||
-            fullSource.contains('Platform.isWeb') ||
-            fullSource.contains('defaultTargetPlatform')) {
+        if (RegExp(r'\bkIsWeb\b').hasMatch(fullSource) ||
+            RegExp(r'\bPlatform\.isWeb\b').hasMatch(fullSource) ||
+            RegExp(r'\bdefaultTargetPlatform\b').hasMatch(fullSource)) {
           return;
         }
       }
@@ -2072,17 +2086,16 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
     });
   }
 
+  static final List<RegExp> _firebaseClassPatterns = _firebaseClasses
+      .map((c) => RegExp('\\b${RegExp.escape(c)}\\b'))
+      .toList();
+
   bool _isFirebaseCall(MethodInvocation node) {
     final Expression? target = node.target;
     if (target == null) return false;
 
     final String targetSource = target.toSource();
-    for (final String firebaseClass in _firebaseClasses) {
-      if (targetSource.contains(firebaseClass)) {
-        return true;
-      }
-    }
-    return false;
+    return _firebaseClassPatterns.any((re) => re.hasMatch(targetSource));
   }
 
   bool _isInsideTryCatch(AstNode node) {
@@ -2632,7 +2645,8 @@ class RequireFirebaseAppCheckProductionRule extends SaropaLintRule {
       if (body == null) return;
 
       final String source = body.toSource();
-      if (source.contains('FirebaseAppCheck') || source.contains('AppCheck')) {
+      if (RegExp(r'\bFirebaseAppCheck\b').hasMatch(source) ||
+          RegExp(r'\bAppCheck\b').hasMatch(source)) {
         return;
       }
 
@@ -2740,9 +2754,9 @@ class _FirebaseAuthVisitor extends RecursiveAstVisitor<void> {
       final Expression? target = node.target;
       if (target != null) {
         final String targetSrc = target.toSource();
-        if (targetSrc.contains('user') ||
-            targetSrc.contains('User') ||
-            targetSrc.contains('currentUser')) {
+        if (RegExp(r'\buser\b').hasMatch(targetSrc) ||
+            RegExp(r'\bUser\b').hasMatch(targetSrc) ||
+            RegExp(r'\bcurrentUser\b').hasMatch(targetSrc)) {
           sensitiveCalls.add(node);
         }
       }
@@ -2801,9 +2815,9 @@ class RequireFirebaseTokenRefreshRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target == null) return;
       final String targetSrc = target.toSource();
-      if (!targetSrc.contains('user') &&
-          !targetSrc.contains('User') &&
-          !targetSrc.contains('currentUser')) {
+      if (!RegExp(r'\buser\b').hasMatch(targetSrc) &&
+          !RegExp(r'\bUser\b').hasMatch(targetSrc) &&
+          !RegExp(r'\bcurrentUser\b').hasMatch(targetSrc)) {
         return;
       }
       final NodeList<Expression> args = node.argumentList.arguments;
@@ -2824,7 +2838,8 @@ class RequireFirebaseTokenRefreshRule extends SaropaLintRule {
       if (current is MethodInvocation) {
         if (current.methodName.name == 'listen') {
           final Expression? t = current.target;
-          if (t != null && t.toSource().contains('idTokenChanges')) {
+          if (t != null &&
+              RegExp(r'\bidTokenChanges\b').hasMatch(t.toSource())) {
             return true;
           }
         }

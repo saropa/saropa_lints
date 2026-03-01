@@ -167,9 +167,9 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
 
       if (enclosingBody != null) {
         final String bodySource = enclosingBody.toSource();
-        if (bodySource.contains('adapterState') ||
-            bodySource.contains('isAvailable') ||
-            bodySource.contains('BluetoothAdapterState')) {
+        if (RegExp(r'\badapterState\b').hasMatch(bodySource) ||
+            RegExp(r'\bisAvailable\b').hasMatch(bodySource) ||
+            RegExp(r'\bBluetoothAdapterState\b').hasMatch(bodySource)) {
           hasStateCheck = true;
         }
       }
@@ -543,8 +543,8 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
       if (enclosingBody == null) return;
 
       final String bodySource = enclosingBody.toSource();
-      if (!bodySource.contains('checkPermission') &&
-          !bodySource.contains('requestPermission')) {
+      if (!RegExp(r'\bcheckPermission\b').hasMatch(bodySource) &&
+          !RegExp(r'\brequestPermission\b').hasMatch(bodySource)) {
         reporter.atNode(node);
       }
     });
@@ -616,7 +616,7 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
       if (enclosingBody == null) return;
 
       final String bodySource = enclosingBody.toSource();
-      if (!bodySource.contains('isLocationServiceEnabled')) {
+      if (!RegExp(r'\bisLocationServiceEnabled\b').hasMatch(bodySource)) {
         reporter.atNode(node);
       }
     });

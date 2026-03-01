@@ -75,10 +75,10 @@ class AvoidGetItInBuildRule extends SaropaLintRule {
       if (returnType != 'Widget') return;
 
       final String bodySource = node.body.toSource();
-      if (bodySource.contains('GetIt.I') ||
-          bodySource.contains('GetIt.instance') ||
-          bodySource.contains('getIt<') ||
-          bodySource.contains('getIt(')) {
+      if (RegExp(r'\bGetIt\.I\b').hasMatch(bodySource) ||
+          RegExp(r'\bGetIt\.instance\b').hasMatch(bodySource) ||
+          RegExp(r'getIt\s*<').hasMatch(bodySource) ||
+          RegExp(r'getIt\s*\(').hasMatch(bodySource)) {
         // Find the actual GetIt usage
         node.body.visitChildren(_GetItBuildVisitor(reporter, code));
       }
@@ -283,7 +283,8 @@ class _DependencyFinder extends RecursiveAstVisitor<void> {
     if (typeArgs != null && typeArgs.arguments.isNotEmpty) {
       final Expression function = node.function;
       if (function is SimpleIdentifier &&
-          (function.name == 'getIt' || function.name.contains('GetIt'))) {
+          (function.name == 'getIt' ||
+              RegExp(r'\bGetIt\b').hasMatch(function.name))) {
         dependencies.add(typeArgs.arguments.first.toSource());
       }
     }
@@ -361,17 +362,17 @@ class RequireGetItResetInTestsRule extends SaropaLintRule {
     context.addCompilationUnit((CompilationUnit unit) {
       final String source = unit.toSource();
 
-      // Check if GetIt is used
-      if (!source.contains('GetIt.I') && !source.contains('GetIt.instance')) {
+      // Check if GetIt is used (word-boundary to avoid FPs)
+      if (!RegExp(r'\bGetIt\.I\b').hasMatch(source) &&
+          !RegExp(r'\bGetIt\.instance\b').hasMatch(source)) {
         return;
       }
 
-      // Check if reset is called (typically in setUp/setUpAll)
       final bool hasReset =
-          source.contains('.reset()') ||
-          source.contains('.resetLazySingleton') ||
-          source.contains('GetIt.I.reset') ||
-          source.contains('getIt.reset');
+          RegExp(r'\.reset\s*\(\s*\)').hasMatch(source) ||
+          RegExp(r'\.resetLazySingleton\b').hasMatch(source) ||
+          RegExp(r'GetIt\.I\.reset\b').hasMatch(source) ||
+          RegExp(r'getIt\.reset\b').hasMatch(source);
 
       // Only report if GetIt is used but never reset
       if (!hasReset) {

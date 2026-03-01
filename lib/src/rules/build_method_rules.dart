@@ -600,6 +600,14 @@ class AvoidCanvasInBuildRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final List<RegExp> _canvasInBuildPatterns = <RegExp>[
+    RegExp(r'\bCanvas\s*\('),
+    RegExp(r'\.drawRect\s*\('),
+    RegExp(r'\.drawCircle\s*\('),
+    RegExp(r'\.drawPath\s*\('),
+    RegExp(r'\.drawLine\s*\('),
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -612,11 +620,7 @@ class AvoidCanvasInBuildRule extends SaropaLintRule {
       if (returnType != 'Widget') return;
 
       final String bodySource = node.body.toSource();
-      if (bodySource.contains('Canvas(') ||
-          bodySource.contains('.drawRect') ||
-          bodySource.contains('.drawCircle') ||
-          bodySource.contains('.drawPath') ||
-          bodySource.contains('.drawLine')) {
+      if (_canvasInBuildPatterns.any((re) => re.hasMatch(bodySource))) {
         reporter.atNode(node);
       }
     });

@@ -63,6 +63,7 @@ class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     // Look for the .from('table') pattern which is unique to Supabase
+    final supabaseWordRegex = RegExp(r'\bsupabase\b');
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'from') return;
 
@@ -71,7 +72,7 @@ class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('supabase')) return;
+      if (!supabaseWordRegex.hasMatch(targetSource)) return;
 
       // Found a supabase.from() call - now check if it's in a try-catch
       AstNode? current = node.parent;
@@ -130,6 +131,9 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
 
   // Supabase JWT tokens start with this pattern
   static final RegExp _jwtPattern = RegExp(r'eyJ[A-Za-z0-9_-]{20,}');
+  static final RegExp _supabaseCapRegex = RegExp(r'\bSupabase\b');
+  static final RegExp _anonKeyRegex = RegExp(r'\banonKey\b');
+  static final RegExp _supabaseWordRegex = RegExp(r'\bsupabase\b');
 
   @override
   void runWithReporter(
@@ -145,9 +149,9 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
         AstNode? current = node.parent;
         while (current != null) {
           final String source = current.toSource();
-          if (source.contains('Supabase') ||
-              source.contains('anonKey') ||
-              source.contains('supabase')) {
+          if (_supabaseCapRegex.hasMatch(source) ||
+              _anonKeyRegex.hasMatch(source) ||
+              _supabaseWordRegex.hasMatch(source)) {
             reporter.atNode(node);
             return;
           }
@@ -223,6 +227,10 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    final realtimeChannelRegex = RegExp(r'\bRealtimeChannel\b');
+    final removeChannelRegex = RegExp(r'\bremoveChannel\b');
+    RegExp unsubscribeRegex(String name) =>
+        RegExp(RegExp.escape(name) + r'\s*[?.]?\s*\.\s*unsubscribe\s*\(');
     context.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -235,7 +243,7 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName != null && typeName.contains('RealtimeChannel')) {
+          if (typeName != null && realtimeChannelRegex.hasMatch(typeName)) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
               channelNames.add(variable.name.lexeme);
@@ -259,9 +267,8 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
       for (final String name in channelNames) {
         final bool isUnsubscribed =
             disposeBody != null &&
-            (disposeBody.contains('$name.unsubscribe(') ||
-                disposeBody.contains('$name?.unsubscribe(') ||
-                disposeBody.contains('removeChannel'));
+            (unsubscribeRegex(name).hasMatch(disposeBody) ||
+                removeChannelRegex.hasMatch(disposeBody));
 
         if (!isUnsubscribed) {
           for (final ClassMember member in node.members) {

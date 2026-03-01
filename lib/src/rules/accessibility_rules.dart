@@ -1856,12 +1856,19 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  // Cached regex for performance
-  // cspell:ignore errorcolor redaccent
   static final RegExp _errorColorPattern = RegExp(
     r'colors\.red|\.red\b|\.error\b|errorcolor|redaccent',
     caseSensitive: false,
   );
+  static final List<RegExp> _nonColorIndicatorPatterns = <RegExp>[
+    RegExp(r'\bIcon\s*\('),
+    RegExp(r'\bIcons\.error\b'),
+    RegExp(r'\bIcons\.warning\b'),
+    RegExp(r'\berrorText\b'),
+    RegExp(r'\bhelperText\b'),
+    RegExp(r'decoration\s*:'),
+    RegExp(r'\berror\b'),
+  ];
 
   @override
   void runWithReporter(
@@ -1898,13 +1905,14 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
       bool hasNonColorIndicator = false;
 
       while (current != null && depth < 10) {
-        final String source = current.toSource();
-        if (source.contains('Icon(') ||
-            source.contains('Icons.error') ||
-            source.contains('Icons.warning') ||
-            source.contains('errorText') ||
-            source.contains('helperText') ||
-            source.contains('decoration:') && source.contains('error')) {
+        final String nodeSource = current.toSource();
+        final bool hasIconOrText = _nonColorIndicatorPatterns
+            .sublist(0, 5)
+            .any((re) => re.hasMatch(nodeSource));
+        final bool hasDecorationAndError =
+            _nonColorIndicatorPatterns[5].hasMatch(nodeSource) &&
+            _nonColorIndicatorPatterns[6].hasMatch(nodeSource);
+        if (hasIconOrText || hasDecorationAndError) {
           hasNonColorIndicator = true;
           break;
         }

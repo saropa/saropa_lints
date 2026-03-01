@@ -40,7 +40,7 @@ bool _isHiveBoxField(String typeSource, String variableName) {
   final String nameLower = variableName.toLowerCase();
 
   // Type contains Box (LazyBox, Box<T>, etc.)
-  if (typeLower.contains('box<') || typeLower == 'box') {
+  if (RegExp(r'box\s*<').hasMatch(typeLower) || typeLower == 'box') {
     return true;
   }
 
@@ -289,7 +289,8 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
       for (final member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           final String? bodySource = member.body.toSource();
-          if (bodySource != null && bodySource.contains('.close()')) {
+          if (bodySource != null &&
+              RegExp(r'\.close\s*\(').hasMatch(bodySource)) {
             hasClose = true;
             break;
           }
@@ -379,7 +380,8 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
       final String keySource = args.first.toSource().toLowerCase();
 
       for (final pattern in _sensitiveKeys) {
-        if (keySource.contains(pattern)) {
+        if (RegExp(r'\b' + RegExp.escape(pattern) + r'\b')
+            .hasMatch(keySource)) {
           reporter.atNode(node);
           return;
         }
@@ -452,7 +454,8 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
       if (keyArg is MethodInvocation) {
         final String source = keyArg.toSource();
         // Look for decode with string literal
-        if (source.contains("decode('") || source.contains('decode("')) {
+        if (RegExp(r"decode\s*\(\s*'").hasMatch(source) ||
+            RegExp(r'decode\s*\(\s*"').hasMatch(source)) {
           reporter.atNode(node);
         }
       }
@@ -517,22 +520,22 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       final String classSource = node.toSource();
 
-      // Check for database open patterns
+      // Check for database open patterns (word-boundary)
       final bool opensDatabase =
-          classSource.contains('Isar.open') ||
-          classSource.contains('Hive.openBox') ||
-          classSource.contains('openDatabase') ||
-          classSource.contains('Realm.open') ||
-          classSource.contains('Database.open');
+          RegExp(r'\bIsar\.open\b').hasMatch(classSource) ||
+          RegExp(r'\bHive\.openBox\b').hasMatch(classSource) ||
+          RegExp(r'\bopenDatabase\b').hasMatch(classSource) ||
+          RegExp(r'\bRealm\.open\b').hasMatch(classSource) ||
+          RegExp(r'\bDatabase\.open\b').hasMatch(classSource);
 
       if (!opensDatabase) return;
 
       // Check for close patterns
       final bool hasClose =
-          classSource.contains('.close()') ||
-          classSource.contains('dispose()') ||
-          classSource.contains('_close') ||
-          classSource.contains('closeDatabase');
+          RegExp(r'\.close\s*\(').hasMatch(classSource) ||
+          RegExp(r'\bdispose\s*\(\s*\)').hasMatch(classSource) ||
+          RegExp(r'\b_close\b').hasMatch(classSource) ||
+          RegExp(r'\bcloseDatabase\b').hasMatch(classSource);
 
       if (!hasClose) {
         reporter.atNode(node);
@@ -598,7 +601,7 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('Hive')) return;
+      if (!RegExp(r'\bHive\b').hasMatch(targetSource)) return;
 
       // Check if opening a typed box
       final NodeList<TypeAnnotation>? typeArgs = node.typeArguments?.arguments;
@@ -629,8 +632,9 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
       final String scopeSource = current.toSource();
       final String adapterName = '${typeArg}Adapter';
 
-      if (!scopeSource.contains('registerAdapter') ||
-          !scopeSource.contains(adapterName)) {
+      if (!RegExp(r'\bregisterAdapter\b').hasMatch(scopeSource) ||
+          !RegExp(r'\b' + RegExp.escape(adapterName) + r'\b')
+              .hasMatch(scopeSource)) {
         reporter.atNode(node);
       }
     });
@@ -707,7 +711,7 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('Hive')) return;
+      if (!RegExp(r'\bHive\b').hasMatch(targetSource)) return;
 
       // Check box name argument
       final ArgumentList args = node.argumentList;
@@ -718,7 +722,8 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
 
       // Check if this looks like a potentially large collection
       for (final String largeName in _largeCollectionNames) {
-        if (boxName.contains(largeName)) {
+        if (RegExp(r'\b' + RegExp.escape(largeName) + r'\b')
+            .hasMatch(boxName)) {
           reporter.atNode(node);
           return;
         }
@@ -729,7 +734,8 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
       if (typeArgs != null && typeArgs.isNotEmpty) {
         final String typeArg = typeArgs.first.toSource().toLowerCase();
         for (final String largeName in _largeCollectionNames) {
-          if (typeArg.contains(largeName)) {
+          if (RegExp(r'\b' + RegExp.escape(largeName) + r'\b')
+              .hasMatch(typeArg)) {
             reporter.atNode(node);
             return;
           }
@@ -806,9 +812,7 @@ class RequireHiveTypeIdManagementRule extends SaropaLintRule {
       if (parent is ClassDeclaration) {
         final String? docComment = parent.documentationComment?.toSource();
         if (docComment != null &&
-            (docComment.contains('typeId') ||
-                docComment.contains('type_id') ||
-                docComment.contains('Hive type'))) {
+            RegExp(r'\b(typeId|type_id|Hive type)\b').hasMatch(docComment)) {
           return; // Has documentation
         }
       }
@@ -1377,13 +1381,14 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
 
       final String bodySource = body.toSource();
 
-      // Check for Hive put/delete operations
-      if ((bodySource.contains('.put(') ||
-              bodySource.contains('.delete(') ||
-              bodySource.contains('.add(') ||
-              bodySource.contains('.putAll(') ||
-              bodySource.contains('.deleteAll(')) &&
-          (bodySource.contains('box') || bodySource.contains('Box'))) {
+      // Check for Hive put/delete operations (word-boundary)
+      if ((RegExp(r'\.put\s*\(').hasMatch(bodySource) ||
+              RegExp(r'\.delete\s*\(').hasMatch(bodySource) ||
+              RegExp(r'\.add\s*\(').hasMatch(bodySource) ||
+              RegExp(r'\.putAll\s*\(').hasMatch(bodySource) ||
+              RegExp(r'\.deleteAll\s*\(').hasMatch(bodySource)) &&
+          (RegExp(r'\bbox\b').hasMatch(bodySource) ||
+              RegExp(r'\bBox\b').hasMatch(bodySource))) {
         reporter.atNode(node);
       }
     });
@@ -1447,7 +1452,8 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
       if (typeName == null) return;
 
       // Check for Box<T> but not LazyBox<T>
-      if (typeName.startsWith('Box<') && !typeName.contains('Lazy')) {
+      if (typeName.startsWith('Box<') &&
+          !RegExp(r'\bLazy\b').hasMatch(typeName)) {
         // Heuristic: warn if the type suggests a collection
         // (messages, items, logs, history, etc.)
         for (final variable in node.fields.variables) {
@@ -1576,7 +1582,8 @@ class AvoidHiveBinaryStorageRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final typeName = member.fields.type?.toSource();
           if (typeName != null &&
-              _binaryTypes.any((t) => typeName.contains(t))) {
+              _binaryTypes.any((t) =>
+                  RegExp(r'\b' + RegExp.escape(t) + r'\b').hasMatch(typeName))) {
             for (final variable in member.fields.variables) {
               reporter.atNode(variable);
             }
@@ -1959,7 +1966,7 @@ class AvoidHiveDatetimeLocalRule extends SaropaLintRule {
       final Expression? target = node.realTarget;
       if (target == null) return;
       final String targetStr = target.staticType?.getDisplayString() ?? '';
-      if (!targetStr.contains('Box')) return;
+      if (!RegExp(r'\bBox\b').hasMatch(targetStr)) return;
 
       // Get the value argument (second positional arg)
       final NodeList<Expression> args = node.argumentList.arguments;
@@ -1977,7 +1984,7 @@ class AvoidHiveDatetimeLocalRule extends SaropaLintRule {
       // Allow DateTime.utc(...) constructor
       if (value is InstanceCreationExpression) {
         final String ctorName = value.constructorName.toSource();
-        if (ctorName.contains('DateTime.utc')) return;
+        if (RegExp(r'DateTime\.utc').hasMatch(ctorName)) return;
       }
 
       reporter.atNode(value);
@@ -2139,7 +2146,7 @@ class AvoidHiveLargeSingleEntryRule extends SaropaLintRule {
       final Expression? target = node.realTarget;
       if (target == null) return;
       final String targetStr = target.staticType?.getDisplayString() ?? '';
-      if (!targetStr.contains('Box')) return;
+      if (!RegExp(r'\bBox\b').hasMatch(targetStr)) return;
 
       // Get the value argument
       final NodeList<Expression> args = node.argumentList.arguments;

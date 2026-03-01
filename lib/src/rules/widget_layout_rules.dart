@@ -3471,11 +3471,13 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
     return null;
   }
 
+  static final RegExp _horizontalPattern = RegExp(r'\bhorizontal\b');
+
   /// Whether SingleChildScrollView has scrollDirection: Axis.horizontal.
   static bool _hasHorizontalScrollDirection(InstanceCreationExpression node) {
     for (final Expression arg in node.argumentList.arguments) {
       if (arg is NamedExpression && arg.name.label.name == 'scrollDirection') {
-        return arg.expression.toSource().contains('horizontal');
+        return _horizontalPattern.hasMatch(arg.expression.toSource());
       }
     }
     return false;
@@ -3490,13 +3492,16 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
         if (childrenExpr is ListLiteral) {
           return _elementsContainExpandedFlexible(childrenExpr.elements);
         }
-        // Non-literal children list — fall back to string check
-        final String source = childrenExpr.toSource();
-        return source.contains('Expanded') || source.contains('Flexible');
+        final String childrenSource = childrenExpr.toSource();
+        return _expandedFlexibleInSourcePattern.hasMatch(childrenSource);
       }
     }
     return false;
   }
+
+  static final RegExp _expandedFlexibleInSourcePattern = RegExp(
+    r'\b(?:Expanded|Flexible)\b',
+  );
 
   /// Checks top-level list elements (including if-branches) for
   /// Expanded/Flexible, without descending into nested widget trees.
@@ -5986,19 +5991,18 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
 
   /// Checks if there's a bounds check for the specific list variable.
   bool _hasBoundsCheckForList(String bodySource, String listName) {
-    // Check for: listName.length with comparison
-    // Patterns: index >= list.length, index < list.length, list.length > index
+    final RegExp lengthPattern = RegExp(
+      r'\b' + RegExp.escape(listName) + r'\.length\b',
+    );
+    final RegExp comparisonOpPattern = RegExp(r'>=|>|<|<=');
     final bool hasLengthCheck =
-        bodySource.contains('$listName.length') &&
-        (bodySource.contains('>=') ||
-            bodySource.contains('>') ||
-            bodySource.contains('<') ||
-            bodySource.contains('<='));
+        lengthPattern.hasMatch(bodySource) &&
+        comparisonOpPattern.hasMatch(bodySource);
 
-    // Check for: listName.isEmpty or listName.isNotEmpty
-    final bool hasEmptyCheck =
-        bodySource.contains('$listName.isEmpty') ||
-        bodySource.contains('$listName.isNotEmpty');
+    final RegExp emptyPattern = RegExp(
+      r'\b' + RegExp.escape(listName) + r'\.(?:isEmpty|isNotEmpty)\b',
+    );
+    final bool hasEmptyCheck = emptyPattern.hasMatch(bodySource);
 
     return hasLengthCheck || hasEmptyCheck;
   }
@@ -6708,6 +6712,8 @@ class AvoidUnconstrainedDialogColumnRule extends SaropaLintRule {
     'SimpleDialog',
   };
 
+  static final RegExp _minPattern = RegExp(r'\bmin\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -6720,7 +6726,7 @@ class AvoidUnconstrainedDialogColumnRule extends SaropaLintRule {
       // Check if mainAxisSize: MainAxisSize.min is already set.
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'mainAxisSize') {
-          if (arg.expression.toSource().contains('min')) return;
+          if (_minPattern.hasMatch(arg.expression.toSource())) return;
         }
       }
 

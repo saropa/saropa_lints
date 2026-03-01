@@ -909,8 +909,9 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
     context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
-      // Check list builders
-      if (!typeName.contains('ListView') && !typeName.contains('GridView')) {
+      // Check list builders (word-boundary to avoid FPs)
+      if (!RegExp(r'\bListView\b').hasMatch(typeName) &&
+          !RegExp(r'\bGridView\b').hasMatch(typeName)) {
         return;
       }
 
@@ -939,15 +940,16 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         final source = current.toSource().toLowerCase();
-        // cspell:ignore isnotempty
-        if (source.contains('.isempty') || source.contains('.isnotempty')) {
+        // cspell:ignore isnotempty (word-boundary to avoid FPs)
+        if (RegExp(r'\.isempty\b').hasMatch(source) ||
+            RegExp(r'\.isnotempty\b').hasMatch(source)) {
           return; // Has empty check
         }
         if (current is ConditionalExpression ||
             current is IfStatement ||
             current is IfElement) {
-          // Check if condition checks for empty
-          if (source.contains('length') && source.contains('0')) {
+          if (RegExp(r'\blength\b').hasMatch(source) &&
+              RegExp(r'\b0\b').hasMatch(source)) {
             return;
           }
         }
@@ -1153,7 +1155,9 @@ class RequireSearchDebounceRule extends SaropaLintRule {
   };
 
   bool _hasDebouncePattern(String source) {
-    return _debounceKeywords.any(source.contains);
+    return _debounceKeywords.any(
+      (k) => RegExp(r'\b' + RegExp.escape(k) + r'\b').hasMatch(source),
+    );
   }
 
   /// Debounce-related type names (lowercased for comparison).
@@ -1239,7 +1243,8 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
     context.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
-      if (!typeName.contains('ListView') && !typeName.contains('GridView')) {
+      if (!RegExp(r'\bListView\b').hasMatch(typeName) &&
+          !RegExp(r'\bGridView\b').hasMatch(typeName)) {
         return;
       }
 

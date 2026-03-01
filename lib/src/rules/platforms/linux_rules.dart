@@ -233,6 +233,9 @@ class AvoidX11OnlyAssumptionsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  static final RegExp _envWordRegex = RegExp(r'\benvironment\b');
+  static final RegExp _xdgSessionTypeRegex = RegExp(r'\bXDG_SESSION_TYPE\b');
+
   /// X11-specific tool names commonly invoked via Process.run.
   static const Set<String> _x11Tools = <String>{
     'xdotool',
@@ -271,7 +274,7 @@ class AvoidX11OnlyAssumptionsRule extends SaropaLintRule {
 
       // Check for Platform.environment or similar map access
       final String targetSource = target.toSource();
-      if (!targetSource.contains('environment')) return;
+      if (!_envWordRegex.hasMatch(targetSource)) return;
 
       final Expression index = node.index;
       if (index is! SimpleStringLiteral) return;
@@ -287,7 +290,7 @@ class AvoidX11OnlyAssumptionsRule extends SaropaLintRule {
         if (current == null) return;
 
         final String bodySource = current.toSource();
-        if (!bodySource.contains('XDG_SESSION_TYPE')) {
+        if (!_xdgSessionTypeRegex.hasMatch(bodySource)) {
           reporter.atNode(node);
         }
       }

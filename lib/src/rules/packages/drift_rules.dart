@@ -10,6 +10,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../import_utils.dart';
+import '../../target_matcher_utils.dart';
 import '../../saropa_lint_rule.dart';
 
 // =============================================================================
@@ -240,10 +241,8 @@ class RequireDriftDatabaseCloseRule extends SaropaLintRule {
       if (disposeMethod == null) return;
 
       // Check if dispose body calls .close() on each db field
-      final bodySource = disposeMethod.body.toSource();
       for (final field in dbFields) {
-        if (!bodySource.contains('$field.close()') &&
-            !bodySource.contains('$field?.close()')) {
+        if (!isFieldCleanedUp(field, 'close', disposeMethod.body)) {
           reporter.atNode(disposeMethod);
           return;
         }
@@ -319,7 +318,7 @@ class AvoidDriftUpdateWithoutWhereRule extends SaropaLintRule {
 
       // Check if where() appears in the chain
       if (RegExp(r'\.where\s*\(').hasMatch(chainSource)) return;
-      if (chainSource.contains('..where(')) return;
+      if (RegExp(r'\.\.where\s*\(').hasMatch(chainSource)) return;
 
       reporter.atNode(node.methodName);
     });
@@ -538,7 +537,7 @@ class RequireDriftForeignKeyPragmaRule extends SaropaLintRule {
 
       // Check the full class source for foreign_keys pragma
       final classSource = node.toSource();
-      if (classSource.contains('foreign_keys')) return;
+      if (RegExp(r'\bforeign_keys\b').hasMatch(classSource)) return;
 
       reporter.atNode(node);
     });
@@ -805,7 +804,11 @@ class RequireDriftStreamCancelRule extends SaropaLintRule {
       final target = node.target;
       if (target == null) return;
       final targetSource = target.toSource();
-      final hasWatch = _watchMethods.any((m) => targetSource.contains('.$m()'));
+      final hasWatch = _watchMethods.any(
+        (m) => RegExp(
+          r'\.' + RegExp.escape(m) + r'\s*\(\)',
+        ).hasMatch(targetSource),
+      );
       if (!hasWatch) return;
 
       // Check if result is assigned to a field
@@ -1047,7 +1050,7 @@ class AvoidDriftGetSingleWithoutUniqueRule extends SaropaLintRule {
       if (chainSource == null) return;
 
       if (RegExp(r'\.where\s*\(').hasMatch(chainSource)) return;
-      if (chainSource.contains('..where(')) return;
+      if (RegExp(r'\.\.where\s*\(').hasMatch(chainSource)) return;
 
       reporter.atNode(node.methodName);
     });
@@ -1197,9 +1200,7 @@ class AvoidDriftLazyDatabaseRule extends SaropaLintRule {
 
       final callback = args.first;
       final source = callback.toSource();
-      if (source.contains('DriftIsolate') ||
-          source.contains('Isolate') ||
-          source.contains('compute')) {
+      if (RegExp(r'\b(DriftIsolate|Isolate|compute)\b').hasMatch(source)) {
         reporter.atNode(node);
       }
     });
@@ -1479,7 +1480,7 @@ class RequireDriftSchemaVersionBumpRule extends SaropaLintRule {
             member.name.lexeme == 'schemaVersion' &&
             member.isGetter) {
           final bodySource = member.body.toSource();
-          if (bodySource.contains('=> 1;') || bodySource.contains('=> 1 ;')) {
+          if (RegExp(r'=>\s*1\s*;').hasMatch(bodySource)) {
             reporter.atNode(member);
           }
           return;
@@ -1559,7 +1560,7 @@ class AvoidDriftForeignKeyInMigrationRule extends SaropaLintRule {
       if (args.isEmpty) return;
 
       final sqlArg = args.first.toSource().toLowerCase();
-      if (!sqlArg.contains('foreign_keys')) return;
+      if (!RegExp(r'foreign_keys').hasMatch(sqlArg)) return;
 
       // Check if inside onCreate or onUpgrade
       AstNode? current = node.parent;
@@ -1642,10 +1643,9 @@ class RequireDriftReadsFromRule extends SaropaLintRule {
       final target = node.target;
       if (target == null) return;
       final targetSource = target.toSource();
-      if (!targetSource.contains('customSelect')) return;
+      if (!RegExp(r'\bcustomSelect\b').hasMatch(targetSource)) return;
 
-      // Check if customSelect call has readsFrom parameter
-      if (targetSource.contains('readsFrom')) return;
+      if (RegExp(r'\breadsFrom\b').hasMatch(targetSource)) return;
 
       reporter.atNode(node.methodName);
     });
@@ -2131,7 +2131,7 @@ class RequireDriftReadTableOrNullRule extends SaropaLintRule {
       while (current != null) {
         if (current is MethodDeclaration || current is FunctionExpression) {
           final bodySource = current.toSource();
-          if (bodySource.contains('leftOuterJoin')) {
+          if (RegExp(r'\bleftOuterJoin\b').hasMatch(bodySource)) {
             reporter.atNode(node.methodName);
           }
           return;
@@ -2206,7 +2206,7 @@ class RequireDriftCreateAllInOnCreateRule extends SaropaLintRule {
 
       // Check if the callback body contains createAll
       final callbackSource = node.expression.toSource();
-      if (!callbackSource.contains('createAll')) {
+      if (!RegExp(r'\bcreateAll\b').hasMatch(callbackSource)) {
         reporter.atNode(node);
       }
     });
@@ -2275,8 +2275,7 @@ class AvoidDriftValidateSchemaProductionRule extends SaropaLintRule {
       while (current != null) {
         if (current is IfStatement) {
           final condSource = current.expression.toSource();
-          if (condSource.contains('kDebugMode') ||
-              condSource.contains('kReleaseMode')) {
+          if (RegExp(r'\b(kDebugMode|kReleaseMode)\b').hasMatch(condSource)) {
             return; // Properly guarded
           }
         }
@@ -2606,13 +2605,13 @@ class PreferDriftForeignKeyDeclarationRule extends SaropaLintRule {
 
       // Check if the getter body contains references()
       final bodySource = node.body.toSource();
-      if (bodySource.contains('references(') ||
-          bodySource.contains('.customConstraint(')) {
+      if (RegExp(r'\breferences\s*\(').hasMatch(bodySource) ||
+          RegExp(r'\.customConstraint\s*\(').hasMatch(bodySource)) {
         return; // Already has FK or custom constraint
       }
 
       // Check it returns an integer column type
-      if (bodySource.contains('integer()')) {
+      if (RegExp(r'\binteger\s*\(\s*\)').hasMatch(bodySource)) {
         reporter.atNode(node);
       }
     });
@@ -2735,7 +2734,7 @@ class RequireDriftOnUpgradeHandlerRule extends SaropaLintRule {
       // Check if any member source mentions onUpgrade (cheaper than full
       // class toSource() — only stringifies individual members)
       for (final member in node.members) {
-        if (member.toSource().contains('onUpgrade')) return;
+        if (RegExp(r'\bonUpgrade\b').hasMatch(member.toSource())) return;
       }
 
       reporter.atNode(node);

@@ -75,6 +75,17 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
     'startScan': 'bluetooth',
   };
 
+  static final RegExp _requestParenRegex = RegExp(r'\.request\s*\(\s*\)');
+  static final RegExp _requestPermissionRegex = RegExp(
+    r'\brequestPermission\b',
+  );
+  static final RegExp _permissionDotRegex = RegExp(r'\bPermission\.');
+  static final RegExp _permissionHandlerRegex = RegExp(
+    r'\bpermission_handler\b',
+  );
+  static final RegExp _isGrantedRegex = RegExp(r'\.isGranted\b');
+  static final RegExp _checkPermissionRegex = RegExp(r'\bcheckPermission\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -103,12 +114,12 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
       final String bodySource = functionBody.toSource();
 
       // Check for permission request patterns
-      if (bodySource.contains('.request()') ||
-          bodySource.contains('requestPermission') ||
-          bodySource.contains('Permission.') ||
-          bodySource.contains('permission_handler') ||
-          bodySource.contains('.isGranted') ||
-          bodySource.contains('checkPermission')) {
+      if (_requestParenRegex.hasMatch(bodySource) ||
+          _requestPermissionRegex.hasMatch(bodySource) ||
+          _permissionDotRegex.hasMatch(bodySource) ||
+          _permissionHandlerRegex.hasMatch(bodySource) ||
+          _isGrantedRegex.hasMatch(bodySource) ||
+          _checkPermissionRegex.hasMatch(bodySource)) {
         return; // Has permission handling
       }
 
@@ -136,9 +147,9 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
 
       final String bodySource = functionBody.toSource();
 
-      if (!bodySource.contains('.request()') &&
-          !bodySource.contains('Permission.') &&
-          !bodySource.contains('.isGranted')) {
+      if (!_requestParenRegex.hasMatch(bodySource) &&
+          !_permissionDotRegex.hasMatch(bodySource) &&
+          !_isGrantedRegex.hasMatch(bodySource)) {
         reporter.atNode(node);
       }
     });
@@ -518,6 +529,8 @@ class RequireAndroidBackupRulesRule extends SaropaLintRule {
   // Cached regex patterns for performance
   static final RegExp _camelCaseBoundary = RegExp(r'([a-z])([A-Z])');
   static final RegExp _wordSplitPattern = RegExp(r'[_\s]+');
+  static final RegExp _prefWordRegex = RegExp(r'\bpref\b');
+  static final RegExp _sharedWordRegex = RegExp(r'\bshared\b');
 
   /// Sensitive key patterns that should use secure storage.
   /// Uses word-boundary matching to avoid false positives like
@@ -567,7 +580,8 @@ class RequireAndroidBackupRulesRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') && !targetSource.contains('shared')) {
+      if (!_prefWordRegex.hasMatch(targetSource) &&
+          !_sharedWordRegex.hasMatch(targetSource)) {
         return;
       }
 
@@ -656,6 +670,17 @@ class PreferForegroundServiceAndroidRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _foregroundTaskRegex = RegExp(r'\bForegroundTask\b');
+  static final RegExp _foregroundServiceRegex = RegExp(
+    r'\bforegroundService\b',
+  );
+  static final RegExp _foregroundServiceCapRegex = RegExp(
+    r'\bForegroundService\b',
+  );
+  static final RegExp _workManagerRegex = RegExp(r'\bWorkManager\b');
+  static final RegExp _startForegroundRegex = RegExp(r'\bstartForeground\b');
+  static final RegExp _alarmManagerRegex = RegExp(r'\bAlarmManager\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -675,12 +700,12 @@ class PreferForegroundServiceAndroidRule extends SaropaLintRule {
       while (current != null) {
         if (current is FunctionBody) {
           final String bodySource = current.toSource();
-          if (bodySource.contains('ForegroundTask') ||
-              bodySource.contains('foregroundService') ||
-              bodySource.contains('ForegroundService') ||
-              bodySource.contains('WorkManager') ||
-              bodySource.contains('startForeground') ||
-              bodySource.contains('AlarmManager')) {
+          if (_foregroundTaskRegex.hasMatch(bodySource) ||
+              _foregroundServiceRegex.hasMatch(bodySource) ||
+              _foregroundServiceCapRegex.hasMatch(bodySource) ||
+              _workManagerRegex.hasMatch(bodySource) ||
+              _startForegroundRegex.hasMatch(bodySource) ||
+              _alarmManagerRegex.hasMatch(bodySource)) {
             return; // Has foreground service, OK
           }
           break;
