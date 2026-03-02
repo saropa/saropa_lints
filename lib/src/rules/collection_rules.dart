@@ -1006,6 +1006,152 @@ class PreferFoldOverReduceRule extends SaropaLintRule {
   }
 }
 
+/// Suggests for-in loop over .forEach(callback) for readability and control flow.
+///
+/// Stylistic: for-in is often clearer and allows break/continue/return.
+///
+/// **Bad:**
+/// ```dart
+/// items.forEach((x) => print(x));
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// for (final x in items) print(x);
+/// ```
+class PreferForeachRule extends SaropaLintRule {
+  PreferForeachRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_foreach',
+    '[prefer_foreach] Prefer for-in loop over .forEach() for clarity and to allow break/continue/return.',
+    correctionMessage: 'Replace with a for-in loop.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'forEach') return;
+      final Expression? target = node.realTarget;
+      if (target == null) return;
+      final DartType? type = target.staticType;
+      if (type == null) return;
+      final String name = type.getDisplayString();
+      if (!name.startsWith('Iterable') &&
+          !name.startsWith('List') &&
+          !name.startsWith('Set')) {
+        return;
+      }
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Suggests for-in over map.entries when iterating map entries.
+///
+/// Stylistic: for (final e in map.entries) is often clearer than map.forEach((k,v)=>).
+///
+/// **Bad:**
+/// ```dart
+/// map.forEach((k, v) => doSomething(k, v));
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// for (final e in map.entries) doSomething(e.key, e.value);
+/// ```
+class PreferForeachOverMapEntriesRule extends SaropaLintRule {
+  PreferForeachOverMapEntriesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_foreach_over_map_entries',
+    '[prefer_foreach_over_map_entries] Prefer for-in over map.entries instead of Map.forEach for consistency with iterable style.',
+    correctionMessage: 'Replace with for (final e in map.entries) { ... }.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'forEach') return;
+      final Expression? target = node.realTarget;
+      if (target == null) return;
+      final DartType? type = target.staticType;
+      if (type == null) return;
+      final String name = type.getDisplayString();
+      if (!name.startsWith('Map')) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Suggests List.empty()/Map()/Set.empty() over empty literals in some contexts.
+///
+/// Stylistic: constructor form makes mutability/growability explicit.
+///
+/// **Bad:**
+/// ```dart
+/// final list = [];
+/// final map = <String, int>{};
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// final list = List.empty();
+/// final map = <String, int>{};
+/// ```
+class PreferConstructorOverLiteralsRule extends SaropaLintRule {
+  PreferConstructorOverLiteralsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_constructor_over_literals',
+    '[prefer_constructor_over_literals] Prefer List.empty()/Map()/Set.empty() over empty literals for explicitness.',
+    correctionMessage:
+        'Consider using List.empty(), Map(), or Set.empty() instead of literals.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addListLiteral((ListLiteral node) {
+      if (node.elements.isNotEmpty) return;
+      reporter.atNode(node);
+    });
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
+      if (node.elements.isNotEmpty) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
 /// Warns when firstWhere/lastWhere/singleWhere is used without orElse.
 ///
 /// Since: v1.4.0 | Updated: v4.13.0 | Rule version: v4
@@ -1925,6 +2071,139 @@ class AvoidDuplicateObjectElementsRule extends SaropaLintRule {
         _checkForDuplicateObjects(node.elements, reporter, code);
       }
     });
+  }
+}
+
+/// Suggests const constructor calls in list literals when possible.
+///
+/// Since: v4.13.0 | Rule version: v1
+///
+/// List items should be const when possible. Non-const static items
+/// (e.g. no-argument constructor calls) in list literals can be marked
+/// const to avoid repeated allocation. Only no-argument constructor
+/// calls are flagged; constructors with arguments are skipped.
+///
+/// **Bad:**
+/// ```dart
+/// const list = [SizedBox(), Icon(Icons.add)];
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// const list = [const SizedBox(), Icon(Icons.add)];
+/// ```
+class RequireConstListItemsRule extends SaropaLintRule {
+  RequireConstListItemsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_const_list_items',
+    '[require_const_list_items] List item could be const. Prefer const for static constructor calls in list literals when possible.',
+    correctionMessage:
+        'Add const before the constructor call so the item is const.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addListLiteral((ListLiteral node) {
+      for (final CollectionElement element in node.elements) {
+        if (element is! InstanceCreationExpression) continue;
+        final expr = element;
+        if (expr.keyword?.lexeme == 'const') continue;
+        if (expr.argumentList.arguments.isNotEmpty) continue;
+        reporter.atNode(expr, _code);
+      }
+    });
+  }
+}
+
+/// Prefer asMap().entries for indexed iteration over manual index.
+///
+/// Since: v4.13.0 | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// for (var i = 0; i < list.length; i++) {
+///   print(list[i]);
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// for (final entry in list.asMap().entries) {
+///   print('${entry.key}: ${entry.value}');
+/// }
+/// ```
+class PreferAsmapOverIndexedIterationRule extends SaropaLintRule {
+  PreferAsmapOverIndexedIterationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_asmap_over_indexed_iteration',
+    '[prefer_asmap_over_indexed_iteration] Prefer asMap().entries for indexed iteration over manual index variable.',
+    correctionMessage:
+        'Consider using list.asMap().entries to iterate with index and value.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addForStatement((ForStatement node) {
+      final parts = node.forLoopParts;
+      if (parts is! ForPartsWithDeclarations) return;
+      final NodeList<VariableDeclaration> vars = parts.variables.variables;
+      if (vars.length != 1) return;
+      final indexVar = vars.first;
+      final indexName = indexVar.name.lexeme;
+      final condition = parts.condition;
+      if (condition is! BinaryExpression) return;
+      if (condition.operator.type != TokenType.LT) return;
+      if (condition.rightOperand is! PropertyAccess) return;
+      final pa = condition.rightOperand as PropertyAccess;
+      if (pa.propertyName.name != 'length') return;
+      if (parts.updaters.length != 1) return;
+      if (!_bodyUsesIndex(node.body, indexName)) return;
+      reporter.atNode(node);
+    });
+  }
+
+  static bool _bodyUsesIndex(Statement body, String indexName) {
+    var found = false;
+    body.visitChildren(_IndexAccessVisitor(indexName, () => found = true));
+    return found;
+  }
+}
+
+class _IndexAccessVisitor extends RecursiveAstVisitor<void> {
+  _IndexAccessVisitor(this._indexName, this._onMatch);
+
+  final String _indexName;
+  final void Function() _onMatch;
+
+  @override
+  void visitIndexExpression(IndexExpression node) {
+    if (node.index is SimpleIdentifier &&
+        (node.index as SimpleIdentifier).name == _indexName) {
+      _onMatch();
+    }
+    super.visitIndexExpression(node);
   }
 }
 

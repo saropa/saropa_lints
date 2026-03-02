@@ -1919,6 +1919,88 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
   }
 }
 
+/// Prefer inline function types over typedef for function types.
+///
+/// **Bad:**
+/// ```dart
+/// typedef Predicate = bool Function(int);
+/// void f(Predicate p) {}
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// void f(bool Function(int) p) {}
+/// ```
+class PreferInlineFunctionTypesRule extends SaropaLintRule {
+  PreferInlineFunctionTypesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_inline_function_types',
+    '[prefer_inline_function_types] Prefer inline function type over typedef for clarity at use site.',
+    correctionMessage:
+        'Consider inlining the function type where it is used instead of a typedef.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addGenericTypeAlias((GenericTypeAlias node) {
+      final TypeAnnotation? type = node.type;
+      if (type is! GenericFunctionType) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Prefer explicit return type on function declarations.
+///
+/// **Bad:**
+/// ```dart
+/// doSomething() => 1;
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// int doSomething() => 1;
+/// ```
+class PreferResultTypeRule extends SaropaLintRule {
+  PreferResultTypeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_result_type',
+    '[prefer_result_type] Prefer explicit return type on function declarations for clarity.',
+    correctionMessage: 'Add an explicit return type to the function.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
+      if (node.returnType != null) return;
+      if (node.name.lexeme == 'main') return;
+      reporter.atNode(node);
+    });
+  }
+}
+
 /// Warns when `var` is used instead of explicit type.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4

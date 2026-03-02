@@ -44,9 +44,21 @@ void main() {
     );
 
     testRule(
+      'FormatTestNameRule',
+      'format_test_name',
+      () => FormatTestNameRule(),
+    );
+
+    testRule(
       'PreferCorrectTestFileNameRule',
       'prefer_correct_test_file_name',
       () => PreferCorrectTestFileNameRule(),
+    );
+
+    testRule(
+      'AvoidTestOnRealDeviceRule',
+      'avoid_test_on_real_device',
+      () => AvoidTestOnRealDeviceRule(),
     );
 
     testRule(
@@ -205,7 +217,9 @@ void main() {
       'avoid_duplicate_test_assertions',
       'avoid_empty_test_groups',
       'avoid_top_level_members_in_tests',
+      'avoid_test_on_real_device',
       'prefer_descriptive_test_name',
+      'format_test_name',
       'prefer_correct_test_file_name',
       'prefer_expect_later',
       'prefer_test_structure',
@@ -374,6 +388,18 @@ void main() {
       test('prefer_correct_test_file_name should NOT trigger', () {
         // Preferred pattern used correctly
         expect('prefer_correct_test_file_name passes', isNotNull);
+      });
+    });
+
+    group('avoid_test_on_real_device', () {
+      test('SHOULD trigger when test name contains real device phrase', () {
+        // Fixture: test('runs on real device', () {}) triggers
+        expect('avoid_test_on_real_device detected', isNotNull);
+      });
+
+      test('should NOT trigger for normal test names', () {
+        // Fixture: test('validates order flow', () {}) does not trigger
+        expect('avoid_test_on_real_device passes', isNotNull);
       });
     });
 

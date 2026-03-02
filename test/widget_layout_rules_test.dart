@@ -257,6 +257,12 @@ void main() {
     );
 
     testRule(
+      'PreferLayoutBuilderForConstraintsRule',
+      'prefer_layout_builder_for_constraints',
+      () => PreferLayoutBuilderForConstraintsRule(),
+    );
+
+    testRule(
       'AvoidUnconstrainedBoxMisuseRule',
       'avoid_unconstrained_box_misuse',
       () => AvoidUnconstrainedBoxMisuseRule(),
@@ -495,6 +501,7 @@ void main() {
       'prefer_correct_edge_insets_constructor',
       'prefer_custom_single_child_layout',
       'prefer_fractional_sizing',
+      'prefer_layout_builder_for_constraints',
       'prefer_ignore_pointer',
       'prefer_intrinsic_dimensions',
       'prefer_keep_alive',

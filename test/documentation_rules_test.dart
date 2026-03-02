@@ -24,6 +24,11 @@ void main() {
       () => RequirePublicApiDocumentationRule(),
     );
     testRule(
+      'PreferCorrectThrowsRule',
+      'prefer_correct_throws',
+      () => PreferCorrectThrowsRule(),
+    );
+    testRule(
       'AvoidMisleadingDocumentationRule',
       'avoid_misleading_documentation',
       () => AvoidMisleadingDocumentationRule(),
@@ -67,6 +72,7 @@ void main() {
   group('Documentation Rules - Fixture Verification', () {
     final fixtures = [
       'require_public_api_documentation',
+      'prefer_correct_throws',
       'avoid_misleading_documentation',
       'require_deprecation_message',
       'require_complex_logic_comments',

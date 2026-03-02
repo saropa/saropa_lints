@@ -24,6 +24,11 @@ void main() {
       () => AvoidDeclaringCallMethodRule(),
     );
     testRule(
+      'AvoidReferencingSubclassesRule',
+      'avoid_referencing_subclasses',
+      () => AvoidReferencingSubclassesRule(),
+    );
+    testRule(
       'AvoidGenericsShadowingRule',
       'avoid_generics_shadowing',
       () => AvoidGenericsShadowingRule(),
@@ -52,6 +57,16 @@ void main() {
       'PreferDeclaringConstConstructorRule',
       'prefer_declaring_const_constructor',
       () => PreferDeclaringConstConstructorRule(),
+    );
+    testRule(
+      'PreferNonConstConstructorsRule',
+      'prefer_non_const_constructors',
+      () => PreferNonConstConstructorsRule(),
+    );
+    testRule(
+      'PreferFactoryConstructorRule',
+      'prefer_factory_constructor',
+      () => PreferFactoryConstructorRule(),
     );
     testRule(
       'PreferPrivateExtensionTypeFieldRule',
@@ -128,12 +143,15 @@ void main() {
   group('Class Constructor Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_declaring_call_method',
+      'avoid_referencing_subclasses',
       'avoid_generics_shadowing',
       'avoid_incomplete_copy_with',
       'avoid_non_empty_constructor_bodies',
       'avoid_variable_shadowing',
       'prefer_const_string_list',
       'prefer_declaring_const_constructor',
+      'prefer_non_const_constructors',
+      'prefer_factory_constructor',
       'prefer_private_extension_type_field',
       'proper_super_calls',
       'avoid_unmarked_public_class',

@@ -225,6 +225,36 @@ void main() {
       () => PreferConstructorsFirstRule(),
     );
     testRule(
+      'PreferFactoryBeforeNamedRule',
+      'prefer_factory_before_named',
+      () => PreferFactoryBeforeNamedRule(),
+    );
+    testRule(
+      'PreferOverridesLastRule',
+      'prefer_overrides_last',
+      () => PreferOverridesLastRule(),
+    );
+    testRule(
+      'PreferConstructorsOverStaticMethodsRule',
+      'prefer_constructors_over_static_methods',
+      () => PreferConstructorsOverStaticMethodsRule(),
+    );
+    testRule(
+      'PreferFunctionOverStaticMethodRule',
+      'prefer_function_over_static_method',
+      () => PreferFunctionOverStaticMethodRule(),
+    );
+    testRule(
+      'PreferStaticMethodOverFunctionRule',
+      'prefer_static_method_over_function',
+      () => PreferStaticMethodOverFunctionRule(),
+    );
+    testRule(
+      'PreferImportOverPartRule',
+      'prefer_import_over_part',
+      () => PreferImportOverPartRule(),
+    );
+    testRule(
       'PreferExtensionMethodsRule',
       'prefer_extension_methods',
       () => PreferExtensionMethodsRule(),
@@ -284,6 +314,12 @@ void main() {
       'prefer_sealed_classes',
       'prefer_sealed_for_state',
       'prefer_constructors_first',
+      'prefer_factory_before_named',
+      'prefer_overrides_last',
+      'prefer_constructors_over_static_methods',
+      'prefer_function_over_static_method',
+      'prefer_static_method_over_function',
+      'prefer_import_over_part',
       'prefer_extension_methods',
       'prefer_extension_over_utility_class',
       'prefer_extension_type_for_wrapper',

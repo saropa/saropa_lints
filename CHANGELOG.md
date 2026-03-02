@@ -66,7 +66,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - **prefer_correct_throws** (Professional): Suggest @Throws annotation for methods/functions that throw.
 - **prefer_layout_builder_for_constraints** (Professional): Prefer LayoutBuilder for constraint-aware layout instead of MediaQuery for widget sizing.
 
-Roadmap tasks for these rules were moved from `bugs/roadmap/` to `bugs/history/roadmap/`. ROADMAP.md count: 1745 implemented, 445 remaining.
+Fixtures for the 10 rules above include good/bad examples and false-positive guards; task specs were moved to `bugs/history/roadmap/`. ROADMAP.md count: 1745 implemented, 445 remaining.
 
 ### Fixed
 
