@@ -774,6 +774,10 @@ class AvoidNegatedConditionsRule extends SaropaLintRule {
 /// y = compute();
 /// list.add(y);
 /// ```
+///
+/// **Exempt:** For-loop update clauses (e.g. `i += step`) and arrow function
+/// bodies that are a single assignment (e.g. `() => _field = value`) are
+/// not flagged.
 class AvoidNestedAssignmentsRule extends SaropaLintRule {
   AvoidNestedAssignmentsRule() : super(code: _code);
 

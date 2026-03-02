@@ -1,5 +1,7 @@
 # Bug: `avoid_nested_assignments` false positive on for-loop update clause
 
+**Integrated 2026-03-02:** Rule DartDoc exempt (for-loop update), CHANGELOG_ARCHIVE intent, false_positive_fixes_test + fixture.
+
 ## Summary
 
 The `avoid_nested_assignments` rule incorrectly flags compound assignment

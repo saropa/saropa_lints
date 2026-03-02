@@ -16,6 +16,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Documentation
 
+- **History integration (false_positives 11–20):** Rule DartDoc **Exempt** blocks and CHANGELOG_ARCHIVE intent notes for: `avoid_ignoring_return_values` (property setter), `avoid_ios_hardcoded_device_model` (word boundary), `avoid_manual_date_formatting` (map/cache keys), `avoid_medium_length_files` (code-only count, abstract final exempt), `avoid_missing_enum_constant_in_map` (complete maps), `avoid_money_arithmetic_on_double` (word boundary), `avoid_nested_assignments` (for-loop update, arrow body), `avoid_non_ascii_symbols` (invisible/confusable only). False-positive test groups and fixture coverage (e.g. `avoid_nested_assignments` arrow body) added. See `bugs/HISTORY_INTEGRATION_CHECKLIST.md`.
+
 - **No stub fixtures:** Policy and docs now prohibit stub test fixtures (files with `// expect_lint` and placeholder BAD/GOOD code when the rule does not run or report on that code). Fixtures may only be added when the rule is implemented and the fixture is validated. Updated: `bugs/UNIT_TEST_COVERAGE.md` (policy + §6.3), `CONTRIBUTING.md` (§8 and Testing checklist), `CLAUDE.md` (Test step), `.claude/skills/lint-rules/SKILL.md` (fixture step).
 
 ### Fixed

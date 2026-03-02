@@ -1,5 +1,7 @@
 # Bug: `avoid_medium_length_files` counts dartdoc and comments toward file length
 
+**Integrated 2026-03-02:** Rule DartDoc (code-only count), CHANGELOG_ARCHIVE intent, false_positive_fixes_test group.
+
 ## Summary
 
 The `avoid_medium_length_files` rule (v4) counts **all** lines equally — dartdoc

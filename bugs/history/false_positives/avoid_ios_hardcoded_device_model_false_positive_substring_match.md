@@ -1,5 +1,7 @@
 # Bug Report: `avoid_ios_hardcoded_device_model` — False Positive on Substring Match in Domain Names
 
+**Integrated 2026-03-02:** Rule DartDoc exempt (word boundary), CHANGELOG_ARCHIVE intent, false_positive_fixes_test group.
+
 ## Diagnostic Reference
 
 ```json

@@ -1,5 +1,7 @@
 # Bug: `avoid_missing_enum_constant_in_map` false positive on complete enum maps
 
+**Integrated 2026-03-02:** Rule DartDoc exempt (complete maps), CHANGELOG_ARCHIVE intent, false_positive_fixes_test group.
+
 ## Summary
 
 The `avoid_missing_enum_constant_in_map` rule flags map literals that include

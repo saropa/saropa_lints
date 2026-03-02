@@ -1,5 +1,7 @@
 # Bug: `avoid_manual_date_formatting` false positive on internal map keys
 
+**Integrated 2026-03-02:** Rule DartDoc exempt (map/cache keys), CHANGELOG_ARCHIVE intent, false_positive_fixes_test group.
+
 ## Summary
 
 The `avoid_manual_date_formatting` rule incorrectly flags string

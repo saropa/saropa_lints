@@ -727,34 +727,15 @@ class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
   }
 }
 
-/// Warns when push notifications are used without capability reminder.
+/// Warns when hardcoded iOS device model strings (e.g. iPhone, iPad) are detected.
 ///
 /// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v3
 ///
-/// iOS push notifications require:
-/// 1. Push Notifications capability in Xcode
-/// 2. APNs certificate or key configured in Apple Developer Console
-/// 3. Proper provisioning profile
+/// Device-specific code breaks when new devices are released. Use platform
+/// APIs to detect capabilities instead of device names.
 ///
-/// Without proper configuration, push notifications silently fail.
-///
-/// ## Required Setup
-///
-/// 1. Enable Push Notifications capability in Xcode
-/// 2. Create APNs key or certificate in Apple Developer Console
-/// 3. Configure Firebase/OneSignal with APNs credentials
-/// 4. Use proper provisioning profile
-///
-/// ## Example
-///
-/// **Triggers reminder:**
-/// ```dart
-/// await FirebaseMessaging.instance.requestPermission();
-/// await FirebaseMessaging.instance.getToken();
-/// ```
-///
-/// @see [Push Notifications](https://developer.apple.com/documentation/usernotifications)
-/// @see [firebase_messaging](https://pub.dev/packages/firebase_messaging)
+/// **Exempt:** Word-boundary matching avoids substring false positives
+/// (e.g. domain names containing device substrings like 'tripadvisor').
 class AvoidIosHardcodedDeviceModelRule extends SaropaLintRule {
   /// Creates a new instance of [AvoidIosHardcodedDeviceModelRule].
   AvoidIosHardcodedDeviceModelRule() : super(code: _code);

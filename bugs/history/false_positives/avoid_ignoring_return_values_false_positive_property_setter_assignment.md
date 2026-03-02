@@ -1,5 +1,7 @@
 # `avoid_ignoring_return_values` false positive: property setter assignment
 
+**Integrated 2026-03-02:** Rule DartDoc exempt (property setter), CHANGELOG_ARCHIVE intent, false_positive_fixes_test group.
+
 ## Status: RESOLVED
 
 ## Resolution

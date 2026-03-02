@@ -5,6 +5,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../comment_utils.dart';
+import '../fixes/stylistic/capitalize_comment_fix.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when a getter name starts with 'get'.
@@ -73,6 +74,10 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
 /// ```dart
 /// final text = 'Hello World';
 /// ```
+///
+/// **Exempt:** Only invisible or confusable characters (zero-width, invisible
+/// formatters, non-standard whitespace) are flagged; visible non-ASCII
+/// (e.g. emoji, accented letters) is allowed.
 class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
   AvoidNonAsciiSymbolsRule() : super(code: _code);
 
@@ -281,9 +286,13 @@ class FormatCommentRule extends SaropaLintRule {
       }
     });
   }
-}
 
-/// Quick fix that capitalizes the first letter of a comment.
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        CapitalizeCommentFix(context: context),
+  ];
+}
 
 /// Warns when class names don't match expected patterns.
 ///

@@ -1,5 +1,7 @@
 # Bug: `avoid_nested_assignments` false positive on arrow function body assignments
 
+**Integrated 2026-03-02:** Rule DartDoc exempt (arrow body), CHANGELOG_ARCHIVE intent, false_positive_fixes_test + fixture.
+
 ## Rule
 
 `avoid_nested_assignments` in `lib/src/rules/control_flow_rules.dart` (line 934)
