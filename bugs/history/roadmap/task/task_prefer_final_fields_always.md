@@ -66,3 +66,7 @@ This rule aims to improve code quality, security, or maintainability by enforcin
 
 - Before implementing: confirm no overlap with existing rules in [CODE_INDEX.md](../../CODE_INDEX.md).
 - Checklist: exact-match or type checks (no `.contains()` on names); consider all AST shapes; document edge cases.
+
+## Resolution
+
+- **Implemented** and assigned to **Stylistic** tier (moved from Professional for tier-integrity: all prefer_* opinionated rules live in stylisticRules). Rule code: `prefer_final_fields_always`.

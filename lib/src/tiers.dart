@@ -49,7 +49,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_catch_over_on',
   'prefer_then_catcherror',
   'prefer_fire_and_forget',
-  'prefer_foreach',
+  'prefer_for_in_over_foreach',
   'prefer_foreach_over_map_entries',
   'prefer_base_prefix',
   'prefer_extension_suffix',
@@ -80,11 +80,12 @@ const Set<String> stylisticRules = <String>{
   'avoid_escaping_inner_quotes',
   'avoid_function_literals_in_foreach_calls',
   'avoid_single_cascade_in_expression_statements',
-  'avoid_cascades',
+  'avoid_cascade_notation',
   'avoid_returning_this',
-  'avoid_cubits',
+  'avoid_cubit_usage',
   'prefer_fold_over_reduce',
   'prefer_expression_body_getters',
+  'prefer_block_body_setters',
   'avoid_types_on_closure_parameters',
   'prefer_no_continue_statement',
   'prefer_single_exit_point',
@@ -124,6 +125,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_class_over_record_return',
   'prefer_private_underscore_prefix',
   'prefer_explicit_this',
+  'prefer_final_fields_always', // Moved from professional (opinionated)
 
   // === Formatting ===
   'prefer_trailing_comma_always',
@@ -1578,7 +1580,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_ssl_pinning_sensitive', // Auth endpoints without pinning (OWASP M5, M3)
   'require_secure_storage',
   'require_input_sanitization',
-  'banned_usage',
+  'banned_identifier_usage',
   'prefer_csrf_protection',
   'prefer_sqflite_encryption',
   'require_conflict_resolution_strategy',
@@ -1586,7 +1588,6 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_print_in_production',
   'avoid_expensive_log_string_construction',
   'avoid_riverpod_string_provider_name',
-  'prefer_final_fields_always',
   'avoid_webview_javascript_enabled',
   'require_biometric_fallback',
   'require_token_refresh',
@@ -2628,9 +2629,8 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'require_add_automatic_keep_alives_off', // memory efficiency
   'prefer_http_connection_reuse', // connection reuse
   'prefer_binary_format', // INFO - protobuf/MessagePack for hot JSON
-  'prefer_block_body_setters',
   'prefer_pool_pattern', // INFO - object pool in hot loops
-  'require_compression', // INFO - Accept-Encoding gzip
+  'require_accept_encoding_header', // INFO - Accept-Encoding gzip
   'require_expando_cleanup', // INFO - Expando entry cleanup
   'avoid_redundant_requests', // resource efficiency
   'prefer_coarse_location_when_sufficient', // battery/precision tradeoff

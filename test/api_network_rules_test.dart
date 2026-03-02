@@ -200,7 +200,7 @@ void main() {
     );
     testRule(
       'RequireCompressionRule',
-      'require_compression',
+      'require_accept_encoding_header',
       () => RequireCompressionRule(),
     );
     testRule(
@@ -227,7 +227,7 @@ void main() {
       'prefer_batch_requests',
       'avoid_over_fetching',
       'require_cancel_token',
-      'require_compression',
+      'require_accept_encoding_header',
       'require_websocket_error_handling',
       'require_content_type_check',
       'avoid_websocket_without_heartbeat',

@@ -5,14 +5,14 @@
 import 'package:http/http.dart' as http;
 
 // -----------------------------------------------------------------------------
-// banned_usage — requires config in analysis_options_custom.yaml:
+// banned_identifier_usage — requires config in analysis_options_custom.yaml:
 //   banned_usage:
 //     entries:
 //       - identifier: 'print'
 //         reason: 'Use Logger instead'
 // With that config, the following triggers:
 void bannedUsageBad() {
-  print('hello'); // LINT: banned_usage when print is in config
+  print('hello'); // LINT: banned_identifier_usage when print is in config
 }
 
 void bannedUsageGood() {

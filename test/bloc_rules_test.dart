@@ -43,7 +43,7 @@ void main() {
     );
     testRule(
       'AvoidCubitsRule',
-      'avoid_cubits',
+      'avoid_cubit_usage',
       () => AvoidCubitsRule(),
     );
     testRule(

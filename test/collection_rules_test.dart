@@ -55,7 +55,7 @@ void main() {
     );
     testRule(
       'PreferForeachRule',
-      'prefer_foreach',
+      'prefer_for_in_over_foreach',
       () => PreferForeachRule(),
     );
     testRule(
@@ -172,7 +172,7 @@ void main() {
       'avoid_unsafe_collection_methods',
       'avoid_unsafe_reduce',
       'prefer_fold_over_reduce',
-      'prefer_foreach',
+      'prefer_for_in_over_foreach',
       'prefer_foreach_over_map_entries',
       'prefer_constructor_over_literals',
       'avoid_unsafe_where_methods',

@@ -8790,14 +8790,28 @@ class AvoidDeprecatedUsageRule extends SaropaLintRule {
       reporter.atNode(node);
     }
 
+    // Support both analyzer APIs: .element (analyzer 9+) and .staticElement (older).
+    Element? elementFromIdentifier(dynamic id) {
+      if (id == null) return null;
+      try {
+        final e = id.element;
+        if (e is Element) return e;
+      } catch (_) {}
+      try {
+        final s = id.staticElement;
+        if (s is Element) return s;
+      } catch (_) {}
+      return null;
+    }
+
     context.addMethodInvocation((MethodInvocation node) {
-      checkElement(node.methodName.element, node);
+      checkElement(elementFromIdentifier(node.methodName), node);
     });
     context.addPropertyAccess((PropertyAccess node) {
-      checkElement(node.propertyName.element, node);
+      checkElement(elementFromIdentifier(node.propertyName), node);
     });
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      checkElement(node.constructorName.element, node);
+      checkElement(elementFromIdentifier(node.constructorName), node);
     });
   }
 }
@@ -8968,12 +8982,15 @@ class BannedUsageRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    'banned_usage',
-    '[banned_usage] Usage of this identifier is banned. See analysis_options_custom.yaml banned_usage for the configured reason.',
+    'banned_identifier_usage',
+    '[banned_identifier_usage] Usage of this identifier is banned. See analysis_options_custom.yaml banned_usage for the configured reason.',
     correctionMessage:
         'Replace with an allowed alternative from your project config.',
     severity: DiagnosticSeverity.WARNING,
   );
+
+  @override
+  List<String> get configAliases => const ['banned_usage'];
 
   @override
   void runWithReporter(

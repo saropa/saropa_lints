@@ -3521,7 +3521,7 @@ class PreferBatchRequestsRule extends SaropaLintRule {
 }
 
 // =============================================================================
-// require_compression
+// require_accept_encoding_header
 // =============================================================================
 
 /// HTTP requests should request gzip compression when appropriate.
@@ -3540,12 +3540,15 @@ class RequireCompressionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    'require_compression',
-    '[require_compression] HTTP request without Accept-Encoding. Add headers: {\'Accept-Encoding\': \'gzip\'} to reduce bandwidth.',
+    'require_accept_encoding_header',
+    '[require_accept_encoding_header] HTTP request without Accept-Encoding. Add headers: {\'Accept-Encoding\': \'gzip\'} to reduce bandwidth.',
     correctionMessage:
         'Add headers: {\'Accept-Encoding\': \'gzip\'} to request compressed responses.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<String> get configAliases => const ['require_compression'];
 
   @override
   void runWithReporter(

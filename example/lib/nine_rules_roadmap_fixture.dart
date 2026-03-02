@@ -5,12 +5,12 @@
 import 'dart:developer' as developer;
 
 // -----------------------------------------------------------------------------
-// avoid_cascades
+// avoid_cascade_notation
 // -----------------------------------------------------------------------------
 void avoidCascadesBad() {
   final list = <int>[]
     ..add(1)
-    ..add(2); // LINT: avoid_cascades
+    ..add(2); // LINT: avoid_cascade_notation
 }
 
 void avoidCascadesGood() {
@@ -63,12 +63,12 @@ class AvoidReturningThisGood {
 }
 
 // -----------------------------------------------------------------------------
-// avoid_cubits (requires bloc package; fixture may not trigger without it)
+// avoid_cubit_usage (requires bloc package; fixture may not trigger without it)
 // -----------------------------------------------------------------------------
 // class CounterCubit extends Cubit<int> {
 //   CounterCubit() : super(0);
 //   void increment() => emit(state + 1);
-// } // LINT: avoid_cubits when bloc is dependency
+// } // LINT: avoid_cubit_usage when bloc is dependency
 
 // -----------------------------------------------------------------------------
 // prefer_expression_body_getters

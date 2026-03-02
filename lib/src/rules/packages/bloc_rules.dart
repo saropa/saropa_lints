@@ -498,12 +498,15 @@ class AvoidCubitsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
-    'avoid_cubits',
-    '[avoid_cubits] Prefer Bloc over Cubit for better event traceability and debugging. {v1}',
+    'avoid_cubit_usage',
+    '[avoid_cubit_usage] Prefer Bloc over Cubit for better event traceability and debugging. {v1}',
     correctionMessage:
         'Refactor to extend Bloc<Event, State> and use add() for events instead of Cubit.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<String> get configAliases => const ['avoid_cubits'];
 
   @override
   void runWithReporter(
