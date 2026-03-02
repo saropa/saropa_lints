@@ -36,7 +36,8 @@ void preferFoldGood() {
 // avoid_expensive_log_string_construction
 // -----------------------------------------------------------------------------
 void avoidExpensiveLogBad(int id, String action) {
-  developer.log('User $id did $action'); // LINT: avoid_expensive_log_string_construction
+  developer.log(
+      'User $id did $action'); // LINT: avoid_expensive_log_string_construction
 }
 
 void avoidExpensiveLogGood(int id, String action) {
