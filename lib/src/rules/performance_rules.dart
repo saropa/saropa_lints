@@ -12,6 +12,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../async_context_utils.dart';
+import '../fixes/performance/prefer_const_widgets_fix.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when AnimatedList or AnimatedGrid items don't have keys.
@@ -1900,6 +1901,12 @@ class PreferConstWidgetsRule extends SaropaLintRule {
     });
   }
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferConstWidgetsFix(context: context),
+  ];
+
   bool _isConstExpression(Expression expr) {
     if (expr is Literal) return true;
     if (expr is InstanceCreationExpression) return expr.isConst;
@@ -3506,6 +3513,9 @@ class AvoidBlockingDatabaseUiRule extends SaropaLintRule {
 /// int totalCents = priceCents * quantity;
 /// Decimal total = Decimal.parse('10.00') * quantity;
 /// ```
+///
+/// **Exempt:** Operands are matched by camelCase word boundary; names like
+/// `totalWidth` or `frameRate` are not flagged as financial.
 class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
   AvoidMoneyArithmeticOnDoubleRule() : super(code: _code);
 

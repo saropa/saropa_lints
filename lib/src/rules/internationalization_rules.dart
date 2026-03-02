@@ -477,6 +477,9 @@ class RequirePluralHandlingRule extends SaropaLintRule {
 /// DateFormat('yyyy-MM-dd', Localizations.localeOf(context).toString())
 /// NumberFormat.currency(locale: locale).format(price)
 /// ```
+///
+/// **Exempt:** Locale-pattern strings inside collection literals (e.g. lookup
+/// sets or lists) are treated as data, not formatting arguments.
 class AvoidHardcodedLocaleRule extends SaropaLintRule {
   AvoidHardcodedLocaleRule() : super(code: _code);
 
@@ -1434,6 +1437,10 @@ class RequireNumberFormatLocaleRule extends SaropaLintRule {
 /// DateFormat.yMd(locale).format(date)
 /// DateFormat('yyyy-MM-dd', locale).format(date)
 /// ```
+///
+/// **Exempt:** Map keys, cache keys, and internal identifiers (e.g. names
+/// containing `key`, `cache`, `tag`, `hash`, `bucket`, `identifier`) are
+/// not flagged; only user-facing date formatting is in scope.
 class AvoidManualDateFormattingRule extends SaropaLintRule {
   AvoidManualDateFormattingRule() : super(code: _code);
 

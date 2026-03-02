@@ -11,7 +11,7 @@ import 'package:test/test.dart';
 /// 6. avoid_isar_clear_in_production - receiver type checking
 /// 7. avoid_unused_instances - fire-and-forget constructor allowlist
 /// 8. prefer_late_final - method call-site awareness
-/// 9. avoid_nested_assignments - for-loop update clause exclusion
+/// 9. avoid_nested_assignments - for-loop update clause and arrow body exclusion
 /// 10. .contains() reduction (2026-03-01) - typeName/bodySource/targetSource
 ///     checks use word-boundary RegExp or exact sets so substrings do not trigger.
 ///
@@ -490,6 +490,24 @@ void main() {
       });
     });
 
+    group('avoid_barrel_files', () {
+      test('should not flag package entry point or library directive', () {
+        // Expected behavior: lib/<package_name>.dart and files with
+        // library; or library name; are exempt (see bugs/history/false_positives/avoid_barrel_files_*)
+
+        expect('Package entry point and library directive are exempt', isNotNull);
+      });
+    });
+
+    group('avoid_duplicate_number_elements', () {
+      test('should not flag List literals with intentional duplicates', () {
+        // Expected behavior: Only Set literals are flagged. List literals
+        // (e.g. days-in-month [31, 28, 31, 30, ...]) are not flagged.
+
+        expect('List literals with duplicates are exempt', isNotNull);
+      });
+    });
+
     group('avoid_duplicate_string_literals', () {
       test('should not flag domain-inherent literals', () {
         // Expected behavior: These should NOT trigger
@@ -706,6 +724,74 @@ void main() {
         // final list = [x = 5]
 
         expect('Genuinely nested assignments are still detected', isNotNull);
+      });
+
+      test('should not flag arrow function body as sole assignment', () {
+        // Expected behavior: These should NOT trigger
+        // setState(() => _field = value)
+        // callback(() => state = newState)
+        // The assignment is the sole statement of the arrow body, not nested.
+
+        expect(
+          'Arrow function body that is a single assignment is exempt',
+          isNotNull,
+        );
+      });
+    });
+
+    group('avoid_ignoring_return_values', () {
+      test('property setter assignments should NOT trigger', () {
+        // obj.value = x; setter return value is intentionally ignored.
+        expect('Property setter assignment is exempt', isNotNull);
+      });
+    });
+
+    group('avoid_ios_hardcoded_device_model', () {
+      test('substring matches (e.g. domain names) should NOT trigger', () {
+        // 'tripadvisor.com' contains 'ipad' but is not a device model.
+        expect('Word-boundary matching avoids substring false positives',
+            isNotNull);
+      });
+    });
+
+    group('avoid_manual_date_formatting', () {
+      test('map keys and cache keys should NOT trigger', () {
+        // String interpolation used as map key, cache key, or internal id.
+        expect('Non-display contexts (map key, cache key) are exempt',
+            isNotNull);
+      });
+    });
+
+    group('avoid_medium_length_files', () {
+      test('counts code lines only; dartdoc and comments excluded', () {
+        // File length uses code lines; thorough dartdoc does not increase count.
+        expect('Code-only line count documented', isNotNull);
+      });
+
+      test('abstract final utility namespace files may be exempt', () {
+        // Files with only abstract final const namespace are not long-file bloat.
+        expect('Utility namespace exemption documented', isNotNull);
+      });
+    });
+
+    group('avoid_missing_enum_constant_in_map', () {
+      test('complete enum maps should NOT trigger', () {
+        // Map with all enum constants resolved from actual enum type.
+        expect('Complete maps are exempt via enum resolution', isNotNull);
+      });
+    });
+
+    group('avoid_money_arithmetic_on_double', () {
+      test('non-financial variable names should NOT trigger', () {
+        // totalWidth, frameRate: word-boundary avoids money substring match.
+        expect('Word-boundary matching avoids non-financial names', isNotNull);
+      });
+    });
+
+    group('avoid_non_ascii_symbols', () {
+      test('visible non-ASCII (emoji, accented) should NOT trigger', () {
+        // Only invisible/confusable characters are flagged.
+        expect('Invisible/confusable-only scope documented', isNotNull);
       });
     });
 

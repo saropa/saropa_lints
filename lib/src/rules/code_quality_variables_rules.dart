@@ -120,6 +120,9 @@ class _LateFinalAssignmentCounter extends RecursiveAstVisitor<void> {
 /// ```dart
 /// completer.completeError(error, stackTrace);
 /// ```
+///
+/// **Exempt:** Maps that include all enum constants (resolved from the
+/// actual enum type) are not flagged.
 class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
   AvoidMissingEnumConstantInMapRule() : super(code: _code);
 

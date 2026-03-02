@@ -1,5 +1,7 @@
 # `avoid_non_ascii_symbols` false positive: Unicode processing library requires non-ASCII characters
 
+**Integrated 2026-03-02:** Rule DartDoc exempt (invisible/confusable only), CHANGELOG_ARCHIVE intent, false_positive_fixes_test group.
+
 ## Status: RESOLVED
 
 ## Resolution

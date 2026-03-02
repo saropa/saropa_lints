@@ -6,8 +6,16 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
-import '../banned_usage_config.dart' as banned_usage_config;
 import '../analyzer_metadata_compat_utils.dart';
+import '../banned_usage_config.dart' as banned_usage_config;
+import '../fixes/code_quality/avoid_substring_todo_fix.dart';
+import '../fixes/code_quality/delete_unknown_pragma_fix.dart';
+import '../fixes/code_quality/prefix_unused_parameter_fix.dart';
+import '../fixes/code_quality/remove_inferrable_type_arguments_fix.dart';
+import '../fixes/code_quality/remove_redundant_pragma_inline_fix.dart';
+import '../fixes/code_quality/remove_unnecessary_override_fix.dart';
+import '../fixes/code_quality/remove_unnecessary_statement_fix.dart';
+import '../fixes/code_quality/weak_crypto_todo_fix.dart';
 import '../saropa_lint_rule.dart';
 
 class AvoidAdjacentStringsRule extends SaropaLintRule {
@@ -37,6 +45,7 @@ class AvoidAdjacentStringsRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
 }
 
 /// Warns when accessing enum values by index (`EnumName.values[i]`).
@@ -238,6 +247,7 @@ class AvoidLateKeywordRule extends SaropaLintRule {
       }
     });
   }
+
 }
 
 /// Warns when a getter is called without parentheses in print/debugPrint.
@@ -400,6 +410,7 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
       }
     });
   }
+
 }
 
 /// Warns when an object is passed as an argument to its own method.
@@ -745,6 +756,7 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
       }
     });
   }
+
 }
 
 /// Warns when @pragma('vm:prefer-inline') is used redundantly.
@@ -828,6 +840,12 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveRedundantPragmaInlineFix(context: context),
+  ];
 }
 
 /// Warns when String.substring() is used.
@@ -881,6 +899,12 @@ class AvoidSubstringRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AvoidSubstringTodoFix(context: context),
+  ];
 }
 
 /// Warns when unknown pragma annotations are used.
@@ -953,6 +977,12 @@ class AvoidUnknownPragmaRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        DeleteUnknownPragmaFix(context: context),
+  ];
 }
 
 /// Warns when a function parameter is unused.
@@ -1048,6 +1078,12 @@ class AvoidUnusedParametersRule extends SaropaLintRule {
       }
     }
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PrefixUnusedParameterFix(context: context),
+  ];
 }
 
 class _IdentifierCollector extends RecursiveAstVisitor<void> {
@@ -1117,6 +1153,12 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        WeakCryptoTodoFix(context: context),
+  ];
 }
 
 /// Warns when a function returns a value that should have @useResult.
@@ -1235,6 +1277,7 @@ class NoObjectDeclarationRule extends SaropaLintRule {
       }
     });
   }
+
 }
 
 /// Warns when only one inlining annotation is used.
@@ -2014,6 +2057,7 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
       }
     });
   }
+
 }
 
 /// Warns when the same constant value is defined multiple times.
@@ -2064,6 +2108,7 @@ class AvoidDuplicateConstantValuesRule extends SaropaLintRule {
       }
     });
   }
+
 }
 
 /// Warns when the same initializer expression is used twice.
@@ -2122,6 +2167,7 @@ class AvoidDuplicateInitializersRule extends SaropaLintRule {
       }
     });
   }
+
 }
 
 /// Warns when an override just calls super without additional logic.
@@ -2199,6 +2245,12 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryOverrideFix(context: context),
+  ];
 }
 
 /// Warns when a statement has no effect.
@@ -2259,6 +2311,12 @@ class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryStatementFix(context: context),
+  ];
 }
 
 /// Warns when an assignment is never used.
@@ -2466,6 +2524,12 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
       reporter.atNode(typeArgs);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveInferrableTypeArgumentsFix(context: context),
+  ];
 }
 
 /// Warns when an empty collection default value is passed explicitly.
@@ -2622,6 +2686,9 @@ class AvoidShadowedExtensionMethodsRule extends SaropaLintRule {
 ///   final x = compute();  // No late needed
 /// }
 /// ```
+///
+/// **Exempt:** Domain-inherent literals (`'true'`, `'false'`, `'null'`,
+/// `'none'`) are self-documenting and are not flagged.
 class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
   AvoidDuplicateStringLiteralsRule() : super(code: _code);
 
@@ -2890,6 +2957,7 @@ class AvoidExpensiveLogStringConstructionRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
 }
 
 /// Suggests using typedefs for callback function types.
@@ -3035,6 +3103,7 @@ class AvoidMissingInterpolationRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
 }
 
 // =============================================================================
@@ -3057,6 +3126,10 @@ class AvoidMissingInterpolationRule extends SaropaLintRule {
 ///   int.parse('42');        // Parsed value discarded
 /// }
 /// ```
+///
+/// **Exempt:** Map mutation methods (`update`, `putIfAbsent`, `updateAll`) and
+/// property setter assignments (e.g. `obj.value = x`) are not flagged when
+/// used for their in-place side effect.
 ///
 /// **GOOD:**
 /// ```dart
@@ -3180,6 +3253,7 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
       reporter.atNode(expression);
     });
   }
+
 }
 
 // =============================================================================
@@ -3307,6 +3381,8 @@ class AvoidDeprecatedUsageRule extends SaropaLintRule {
       checkElement(elementFromIdentifier(node.constructorName), node);
     });
   }
+
+  @override
 }
 
 /// Warns when a function or constructor has positional bool parameters.

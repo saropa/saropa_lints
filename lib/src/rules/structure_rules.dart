@@ -7,6 +7,11 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/line_info.dart';
 
+import '../fixes/structure/delete_duplicate_export_fix.dart';
+import '../fixes/structure/delete_duplicate_import_fix.dart';
+import '../fixes/structure/delete_duplicate_mixin_fix.dart';
+import '../fixes/structure/prefer_trailing_underscore_for_unused_fix.dart';
+import '../fixes/structure/remove_double_slash_imports_fix.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when a file only contains export statements (barrel file).
@@ -31,6 +36,10 @@ import '../saropa_lint_rule.dart';
 /// // Import specific files where needed
 /// import 'package:app/src/user.dart';
 /// ```
+///
+/// **Exempt:** Files with a `library` directive or the package entry point
+/// (`lib/<package_name>.dart`) are not flagged; the latter is required by the
+/// Dart package layout convention.
 class AvoidBarrelFilesRule extends SaropaLintRule {
   AvoidBarrelFilesRule() : super(code: _code);
 
@@ -169,6 +178,12 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveDoubleSlashImportsFix(context: context),
+  ];
 }
 
 /// Warns when the same file is exported multiple times.
@@ -228,6 +243,12 @@ class AvoidDuplicateExportsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        DeleteDuplicateExportFix(context: context),
+  ];
 }
 
 /// Warns when the same mixin is applied multiple times in a class hierarchy.
@@ -286,6 +307,12 @@ class AvoidDuplicateMixinsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        DeleteDuplicateMixinFix(context: context),
+  ];
 }
 
 /// Warns when the same import is declared with different prefixes.
@@ -345,6 +372,12 @@ class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        DeleteDuplicateImportFix(context: context),
+  ];
 }
 
 /// Warns when mutable global state is declared.
@@ -408,6 +441,8 @@ class AvoidGlobalStateRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
 }
 
 // =============================================================================
@@ -606,6 +641,9 @@ class PreferSmallFilesRule extends SaropaLintRule {
 /// Since: v3.1.2 | Updated: v4.13.0 | Rule version: v4
 ///
 /// This is ESLint's default threshold. Many valid files exceed this.
+///
+/// Only code lines are counted; comments and blank lines are excluded.
+/// Files with only `abstract final` utility namespaces may be exempt.
 ///
 /// Disable for files where size is intentional:
 /// ```dart
@@ -1621,6 +1659,7 @@ class AvoidUnnecessaryLocalVariableRule extends SaropaLintRule {
       }
     });
   }
+
 }
 
 /// Warns when a variable is assigned the same value it already has.
@@ -2020,6 +2059,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
     });
   }
 
+  @override
   bool _isTypeUsedInClass(ClassDeclaration node, String typeName) {
     bool found = false;
     node.visitChildren(_TypeNameFinder(typeName, () => found = true));
@@ -2131,6 +2171,12 @@ class PreferTrailingUnderscoreForUnusedRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferTrailingUnderscoreForUnusedFix(context: context),
+  ];
 }
 
 class _IdentifierCollectorStructure extends RecursiveAstVisitor<void> {

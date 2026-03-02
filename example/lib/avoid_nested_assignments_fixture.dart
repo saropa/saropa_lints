@@ -40,3 +40,11 @@ void standaloneAssignments() {
   x = _getValue();
   x += 1;
 }
+
+/// Arrow function body as sole assignment - should NOT trigger
+/// (assignment is the only statement, not nested inside another expression)
+int _field = 0;
+void arrowBodyAssignment() {
+  void setState(void Function() fn) => fn();
+  setState(() => _field = 1);
+}

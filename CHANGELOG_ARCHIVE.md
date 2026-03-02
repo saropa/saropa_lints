@@ -48,9 +48,9 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 - `prefer_list_first`: suppress false positives when the same collection is accessed with sibling indices (`list[0]` alongside `list[1]`), on assignment targets (`list[0] = value`), on String subscripts (`string[0]`), and on Map access (`map[0]`)
 - `prefer_list_last`: same false positive suppression — assignment targets, String/Map types, and sibling index accesses
 - `prefer_catch_over_on`: reversed rule logic — now only flags `on Object catch` and `on dynamic catch` (redundant, equivalent to bare `catch`), no longer flags specific `on` clauses like `on FormatException catch` which are intentional type filtering. Added quick fix to remove the redundant `on Object` clause.
-- `avoid_dynamic_type`: exempt `dynamic` in type arguments (`List<dynamic>`, `Map<dynamic, dynamic>`), closure/lambda parameters, and for-in loop variables — eliminates false positives in JSON utility code
-- `avoid_ignoring_return_values`: add `update`, `putIfAbsent`, `updateAll`, `addEntries` to safe-to-ignore list — these Map mutation methods are called for their side effect, not their return value
-- `avoid_medium_length_files` (and all 8 file length rules): count only code lines, excluding comments and blank lines — well-documented files are no longer penalised for thorough dartdoc
+- `avoid_dynamic_type`: exempt `dynamic` in type arguments (`List<dynamic>`, `Map<dynamic, dynamic>`), closure/lambda parameters, and for-in loop variables — eliminates false positives in JSON utility code. Intent: allow JSON/decode boundaries and type arguments; flag lazy dynamic in business logic.
+- `avoid_ignoring_return_values`: add `update`, `putIfAbsent`, `updateAll`, `addEntries` to safe-to-ignore list — these Map mutation methods are called for their side effect, not their return value. Intent: flag discarded results that indicate bugs; Map mutation for side effect is idiomatic.
+- `avoid_medium_length_files` (and all 8 file length rules): count only code lines, excluding comments and blank lines — well-documented files are no longer penalised for thorough dartdoc. Intent: flag files with too much code; dartdoc and comments do not contribute to length.
 - `avoid_long_functions`: count only code lines in function bodies, excluding comments and blank lines — well-documented functions are no longer penalised for thorough comments (v5)
 - `prefer_no_commented_out_code`: tighten keyword and type-name patterns, add prose guard with strong-code-indicator bypass — fixes false positives on section headers (`// Iterable extensions`), inline prose (`// this is non-null`), and comments containing type names in natural language
 
@@ -87,10 +87,10 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 
 - Publish report: test coverage "Overall" percentage now caps per-category fixture counts at rule counts, preventing excess fixtures from masking gaps
 - `prefer_static_class`: no longer fires on `abstract final class` declarations (regression from beta.15 fix)
-- `avoid_hardcoded_locale`: skip locale-pattern strings inside collection literals (Set, List, Map lookup data)
+- `avoid_hardcoded_locale`: skip locale-pattern strings inside collection literals (Set, List, Map lookup data). Intent: flag locale passed to formatting APIs; locale strings as lookup data are exempt.
 - `avoid_datetime_comparison_without_precision`: skip comparisons against compile-time constants (e.g., epoch sentinel checks)
 - `avoid_unsafe_collection_methods`: strengthen guard detection with source-text fallback for length/isNotEmpty checks
-- `avoid_medium_length_files`: exempt files containing only `abstract final` utility namespace classes
+- `avoid_medium_length_files`: exempt files containing only `abstract final` utility namespace classes. Intent: constant-only namespaces are not long-file bloat.
 - `prefer_single_declaration_per_file`: exempt files where all classes are `abstract final` static-only namespaces
 - `prefer_no_continue_statement`: exempt early-skip guard pattern (`if (cond) { continue; }` at top of loop body)
 
@@ -135,7 +135,7 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 
 ### Fixed
 
-- `avoid_god_class`: false positive on static-constant namespace classes — `static const` and `static final` fields are now excluded from the field count since they represent compile-time constants, not instance state
+- `avoid_god_class`: false positive on static-constant namespace classes — `static const` and `static final` fields are now excluded from the field count since they represent compile-time constants, not instance state. Intent: flag instance-state bloat; constant namespaces are not god classes.
 - `prefer_static_class`: conflicting diagnostic with `prefer_abstract_final_static_class` on classes with private constructors — `prefer_static_class` now defers to `prefer_abstract_final_static_class` when a private constructor is present
 - `avoid_similar_names`: false positive on single-character variable pairs (`y`, `m`, `d`, `h`, `s`) — edit distance is always 1 for any two single-char names, which is not meaningful; confusable-char detection (1/l, 0/O) still catches genuinely dangerous cases
 - `avoid_unused_assignment`: false positive on definite assignment via if/else branches — assignments in mutually exclusive branches of the same if/else are now recognized as alternatives, not sequential overwrites
@@ -153,8 +153,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 - `avoid_unnecessary_to_list` / `avoid_large_list_copy`: false positive when `.toList()` is required by return type, method chain, expression function body, or argument position
 - `prefer_named_boolean_parameters`: false positive on lambda/closure parameters — their signature is constrained by the expected function type
 - `avoid_unnecessary_nullable_return_type`: false positive on ternary expressions with null branches, map `[]` operator, and nullable method delegation — now checks static type nullability recursively
-- `avoid_duplicate_string_literals` / `avoid_duplicate_string_literals_pair`: false positive on domain-inherent literals (`'true'`, `'false'`, `'null'`, `'none'`) that are self-documenting
-- `avoid_excessive_expressions`: false positive on guard clauses (early-return if-statements) and symmetric structural patterns — guard clauses now allowed up to 10 operators, symmetric repeating patterns are exempt
+- `avoid_duplicate_string_literals` / `avoid_duplicate_string_literals_pair`: false positive on domain-inherent literals (`'true'`, `'false'`, `'null'`, `'none'`) that are self-documenting. Intent: reduce magic strings; domain vocabulary is self-documenting and exempt.
+- `avoid_excessive_expressions`: false positive on guard clauses (early-return if-statements) and symmetric structural patterns — guard clauses now allowed up to 10 operators, symmetric repeating patterns are exempt. Intent: flag high cognitive complexity; guard clauses and symmetric patterns are low complexity.
 - `prefer_digit_separators`: false positive on 5-digit numbers — threshold raised from 10,000 to 100,000 (6+ digits) to match common style guide recommendations
 - `require_list_preallocate`: false positive when `List.add()` is inside a conditional branch within a loop — preallocation is impossible when the number of additions is data-dependent
 
@@ -168,7 +168,7 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 - `prefer_match_file_name`: false positive when file has multiple public classes — second class was reported even when first class matched
 - `avoid_unnecessary_nullable_return_type`: false positive on expression-bodied functions — ternaries with null branches, map lookups, and other nullable expressions were not recognized
 - `prefer_unique_test_names`: false positives when same test name appears in different `group()` blocks — now builds fully-qualified names from group hierarchy, matching Flutter's test runner behavior
-- `avoid_dynamic_type`: false positives for `Map<String, dynamic>` — the canonical Dart JSON type is now exempt
+- `avoid_dynamic_type`: false positives for `Map<String, dynamic>` — the canonical Dart JSON type is now exempt. Intent: allow JSON boundary types; flag lazy dynamic elsewhere.
 - `no_magic_number_in_tests`: expanded allowed integers to include 6–31 (day/month numbers), common round numbers (10000, 100000, 1000000), and exemptions for DateTime constructor arguments and expect() calls
 - `no_magic_string_in_tests`: false positives for test fixture data — strings passed as arguments to functions under test and strings in expect() calls are now exempt
 - `avoid_large_list_copy`: false positives for required copies — `List<T>.from()` with explicit type arguments (type-casting pattern) is now exempt; `.toList()` is exempt when returned, assigned, or otherwise structurally required
@@ -222,11 +222,11 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 - `require_envied_obfuscation`: skip class-level `@Envied` warning when all `@EnviedField` annotations explicitly specify `obfuscate`
 - `require_https_only_test`: skip HTTP URLs inside test infrastructure calls (`test()`, `expect()`, `group()`, etc.) since URL utility tests must exercise HTTP
 - `require_ios_callkit_integration`: replace brand name string matching (Agora, Twilio, Vonage, WebRTC) with import-based detection for 13 VoIP packages; keep only unambiguous technical terms for string matching
-- `avoid_barrel_files`: skip files with `library` directive and the mandatory package entry point (`lib/<package_name>.dart`)
-- `avoid_duplicate_number_elements`: only flag `Set` literals — duplicate numeric values in `List` literals are intentional (e.g. days-in-month)
-- `avoid_ignoring_return_values`: skip property setter assignments (`obj.prop = value`) which have no return value
-- `avoid_money_arithmetic_on_double`: use camelCase word-boundary matching instead of substring matching to avoid false positives on `totalWidth`, `frameRate`, etc.
-- `avoid_non_ascii_symbols`: narrow from all non-ASCII to invisible/confusable characters only (zero-width, invisible formatters, non-standard whitespace)
+- `avoid_barrel_files`: skip files with `library` directive and the mandatory package entry point (`lib/<package_name>.dart`). Intent: flag internal barrel files; package entry point and library directive are required by convention.
+- `avoid_duplicate_number_elements`: only flag `Set` literals — duplicate numeric values in `List` literals are intentional (e.g. days-in-month). Intent: flag Set duplicates (silently dropped); List duplicates at different indices are intentional.
+- `avoid_ignoring_return_values`: skip property setter assignments (`obj.prop = value`) which have no return value. Intent: property setter has no return value to use.
+- `avoid_money_arithmetic_on_double`: use camelCase word-boundary matching instead of substring matching to avoid false positives on `totalWidth`, `frameRate`, etc. Intent: flag financial operands only; non-financial names with money substrings (e.g. totalWidth) are exempt.
+- `avoid_non_ascii_symbols`: narrow from all non-ASCII to invisible/confusable characters only (zero-width, invisible formatters, non-standard whitespace). Intent: flag encoding/confusability risks; intentional non-ASCII (emoji, symbols, i18n) is exempt.
 - `avoid_static_state`: skip `static const` and `static final` with known-immutable types (`RegExp`, `DateTime`, etc.); retain detection of `static final` mutable collections
 - `avoid_stream_subscription_in_field`: skip `.listen()` calls whose return value is passed as an argument (e.g. `subs.add(stream.listen(...))`)
 - `avoid_string_concatenation_l10n`: skip numeric-only interpolated strings (e.g. `'$a / $b'`) that contain no translatable word content
@@ -531,9 +531,9 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ### Fixed
 
-- **`avoid_ios_hardcoded_device_model` false positive on substring matches**: Added word boundary assertions to the device model regex so strings like `'tripadvisor.com'` (containing `ipad` as a substring) are no longer flagged as hardcoded iOS device models (v3)
+- **`avoid_ios_hardcoded_device_model` false positive on substring matches**: Added word boundary assertions to the device model regex so strings like `'tripadvisor.com'` (containing `ipad` as a substring) are no longer flagged as hardcoded iOS device models (v3). Intent: flag actual device model strings; domain names and other substrings are exempt.
 - **`check_mounted_after_async` false positive on early-return guards**: Rule now recognizes `if (!mounted) return;` and `if (!context.mounted) return;` guard patterns as valid mounted checks, not just wrapping `if (mounted) { ... }` blocks. Also correctly invalidates guards when a subsequent await occurs between the guard and the target call (v5)
-- **`avoid_missing_enum_constant_in_map` false positive on complete maps**: Rule now resolves the actual enum type instead of using a 2-5 key heuristic, eliminating false positives on maps that include all enum constants
+- **`avoid_missing_enum_constant_in_map` false positive on complete maps**: Rule now resolves the actual enum type instead of using a 2-5 key heuristic, eliminating false positives on maps that include all enum constants. Intent: flag incomplete enum maps only; complete maps are exempt.
 - **`no_equal_conditions` false positive on `if-case` pattern matching**: Rule now includes the `caseClause` in the condition key so `if (x case A) ... else if (x case B)` chains with different patterns are no longer flagged as duplicate conditions (v5)
 - **`function_always_returns_null` false positive on generators**: Rule no longer flags `async*` and `sync*` generator functions or methods where bare `return;` statements end the stream/iterable rather than returning null. Covers both top-level functions (`addFunctionDeclaration`) and class methods (`addMethodDeclaration`)
 
@@ -768,8 +768,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - **Corrected misattributed DartDoc on 3 rules**: `avoid_unbounded_constraints` had keyboard-shortcuts DartDoc, `prefer_sliver_app_bar` had FutureBuilder error-handling DartDoc, and `require_should_rebuild` had TextStyle theming DartDoc. Each now has DartDoc matching its actual rule behavior.
 - **`avoid_expanded_outside_flex` no longer duplicates `prefer_expanded_at_call_site`**: When Expanded/Flexible/Spacer is returned directly from `build()` without an intermediate widget wrapper, `avoid_expanded_outside_flex` now defers to `prefer_expanded_at_call_site` instead of reporting a second diagnostic on the same node. Expanded nested inside a non-Flex widget within `build()` is still reported by `avoid_expanded_outside_flex`.
 - **`avoid_single_child_column_row` reduced false positives on collection-if and collection-for**: Rule now treats `IfElement` and `ForElement` as dynamic-count elements (like `SpreadElement`). Previously, a `children` list containing a single collection-if or collection-for was incorrectly flagged as a single-child Column/Row, even though these elements can produce 0, 1, or many children at runtime.
-- **`avoid_manual_date_formatting` reduced false positives on non-display contexts**: Rule now verifies the target object is actually `DateTime` via static type checking (properties named `year`, `month`, etc. on non-DateTime types are no longer flagged). Additionally, string interpolations used as map keys, cache keys, or arguments to map methods (`putIfAbsent`, `containsKey`, `remove`) are skipped. Variables with internal-use names containing `key`, `cache`, `tag`, `hash`, `bucket`, or `identifier` are also excluded.
-- **`avoid_nested_assignments` false positive on for-loop update clauses**: Compound assignments in standard for-loop updaters (`i += step`, `i *= 2`, `i = next(i)`, etc.) are no longer flagged. The rule now skips `ForParts` nodes alongside the existing `ForEachParts` skip.
+- **`avoid_manual_date_formatting` reduced false positives on non-display contexts**: Rule now verifies the target object is actually `DateTime` via static type checking (properties named `year`, `month`, etc. on non-DateTime types are no longer flagged). Additionally, string interpolations used as map keys, cache keys, or arguments to map methods (`putIfAbsent`, `containsKey`, `remove`) are skipped. Variables with internal-use names containing `key`, `cache`, `tag`, `hash`, `bucket`, or `identifier` are also excluded. Intent: flag user-facing date formatting; map keys and internal identifiers are exempt.
+- **`avoid_nested_assignments` false positive on for-loop update clauses**: Compound assignments in standard for-loop updaters (`i += step`, `i *= 2`, `i = next(i)`, etc.) are no longer flagged. The rule now skips `ForParts` nodes alongside the existing `ForEachParts` skip. Intent: flag assignments inside conditions/arguments; for-loop update clause is idiomatic and exempt.
 
 ### Added
 
@@ -804,7 +804,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ### Fixed
 
-- **`avoid_nested_assignments` reduced false positives on arrow function bodies**: Rule now skips `ExpressionFunctionBody` parents — `setState(() => _field = value)` and other arrow functions whose sole body is an assignment are no longer flagged. The arrow syntax `() => x = value` is semantically equivalent to `() { x = value; }`, which was already correctly skipped. Also downgraded severity from WARNING to INFO.
+- **`avoid_nested_assignments` reduced false positives on arrow function bodies**: Rule now skips `ExpressionFunctionBody` parents — `setState(() => _field = value)` and other arrow functions whose sole body is an assignment are no longer flagged. The arrow syntax `() => x = value` is semantically equivalent to `() { x = value; }`, which was already correctly skipped. Also downgraded severity from WARNING to INFO. Intent: flag nested assignments that obscure data flow; arrow body as sole statement is exempt.
 - **`require_intl_currency_format` reduced false positives on non-currency interpolations**: The `StringInterpolation` handler used `node.toSource()` to check for currency symbols, but every interpolated string's source representation contains `$` (Dart's interpolation syntax), causing `r'$'` in `_currencySymbols` to always match. This made the rule flag any `toStringAsFixed()` inside a string interpolation — compass bearings, GPS coordinates, temperatures, percentages, etc. — as manual currency formatting. The fix checks only the literal text segments (`InterpolationString.value`) for currency symbols, consistent with how the `BinaryExpression` handler already works.
 - **`prefer_implicit_boolean_comparison` reduced false positives on nullable booleans**: Rule now checks the static type of the left operand and only fires when it is non-nullable `bool`. Previously the rule flagged `== true` / `== false` on `bool?` operands, where the explicit comparison is semantically necessary — removing it either causes a compile error or changes runtime behavior (treating `null` the same as `false`). This also resolves a conflict with the sibling rule `prefer_explicit_boolean_comparison`, which recommends `== true` for nullable booleans.
 - **`prefer_stream_distinct` reduced false positives**: Three fixes — (1) rule now skips `Stream<void>` and `Stream<Null>` where `.distinct()` would suppress all events after the first (breaks `Stream.periodic` timers and signal-only streams like Isar's `watchLazy()`); (2) chain detection now walks the full method invocation chain instead of only checking the immediate parent, so `stream.distinct().map(f).listen(...)` is correctly recognized as already having `.distinct()`; (3) replaced string-based type matching (`getDisplayString().contains('Stream')`) with proper `InterfaceType` checking to avoid false matches on non-stream types.
