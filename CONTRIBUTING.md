@@ -336,7 +336,9 @@ When adding fixes, prioritize by impact:
 
 ### 8. Add tests
 
-Create a fixture file in `example/lib/<category>/`:
+**No stub fixtures.** Do not add a fixture file for a rule until the rule is implemented and the fixture is validated. A "stub" (a file with `// expect_lint` and placeholder BAD/GOOD code when the rule does not actually run or report on that code) is prohibited—it only inflates coverage without testing anything.
+
+Create a fixture file in `example/lib/<category>/` only when the rule runs and reports on the BAD example:
 
 ```dart
 // ignore_for_file: unused_local_variable
@@ -360,7 +362,7 @@ dart pub get
 dart analyze
 ```
 
-The `expect_lint` comments assert that a lint fires on the next line. If the lint doesn't fire, the test fails. If a lint fires without an `expect_lint` comment, that also fails.
+The `expect_lint` comments assert that a lint fires on the next line. If the lint doesn't fire, the test fails. If a lint fires without an `expect_lint` comment, that also fails. If the rule is not implemented yet, do not add the fixture.
 
 ## Audit New Rules Checklist
 
@@ -409,7 +411,7 @@ Before submitting a PR with new or modified lint rules, review **only the files 
 
 ### Testing
 
-- [ ] **Test fixtures added** — Created test fixtures in `example/lib/<category>/`
+- [ ] **Test fixtures added** — Created test fixtures in `example/lib/<category>/` only for rules that are implemented and that actually report on the BAD example (no stub fixtures)
 - [ ] **BAD cases marked** — All expected violations have `// expect_lint: rule_name` comments
 - [ ] **GOOD cases included** — Include passing cases without expect_lint to verify no false positives
 - [ ] **Tests pass** — Run `cd example && dart analyze` to verify

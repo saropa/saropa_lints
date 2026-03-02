@@ -14,6 +14,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
+### Documentation
+
+- **No stub fixtures:** Policy and docs now prohibit stub test fixtures (files with `// expect_lint` and placeholder BAD/GOOD code when the rule does not run or report on that code). Fixtures may only be added when the rule is implemented and the fixture is validated. Updated: `bugs/UNIT_TEST_COVERAGE.md` (policy + §6.3), `CONTRIBUTING.md` (§8 and Testing checklist), `CLAUDE.md` (Test step), `.claude/skills/lint-rules/SKILL.md` (fixture step).
+
 ### Fixed
 
 - **CI workflow:** Checkout now uses the exact commit (`github.sha`) on push events instead of the branch ref to avoid races; test job uses the same checkout configuration as the analyze job for consistency.
@@ -290,7 +294,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
-- `avoid_dynamic_sql` — false positive on SQLite PRAGMA statements which do not support parameter binding; now exempts PRAGMA syntax. Also improved SQL keyword matching to use word boundaries (prevents false positives from identifiers like `selection`, `updateTime`)
+- `avoid_dynamic_sql` — false positive on SQLite PRAGMA statements which do not support parameter binding; now exempts PRAGMA syntax. Also improved SQL keyword matching to use word boundaries (prevents false positives from identifiers like `selection`, `updateTime`). Intent: flag only user-input interpolation in executable SQL; PRAGMA and other meta-commands are out of scope.
 - `avoid_ref_read_inside_build` — false positive on `ref.read()` inside callbacks (onPressed, onSubmit, etc.) defined inline in `build()`; now stops traversal at closure boundaries
 - `avoid_ref_in_build_body` — same false positive as above; now shares the corrected visitor with `avoid_ref_read_inside_build`
 - `avoid_ref_watch_outside_build` — false positive on `ref.watch()` inside Riverpod provider bodies (`Provider`, `StreamProvider`, `FutureProvider`, etc.); now recognizes provider callbacks as reactive contexts alongside `build()`
