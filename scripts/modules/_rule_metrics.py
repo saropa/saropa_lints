@@ -283,18 +283,18 @@ def display_test_coverage(project_dir: Path) -> None:
     # Fixture overall bar
     bar = _make_bar(total_fixtures, total_rules)
     print_colored(
-        f"    Fixtures     {bar}  "
-        f"{total_fixtures:>4d}/{total_rules:<4d} "
-        f"({fixture_pct:5.1f}%) {fixture_status}",
+        f"    Fixtures     {bar}    "
+        f"{total_fixtures:>5d}/{total_rules:>5d}   "
+        f"({fixture_pct:6.1f}%)   {fixture_status}",
         fixture_color,
     )
 
     # Unit test overall bar
     bar = _make_bar(unit_tested, unit_total_cats)
     print_colored(
-        f"    Unit tests   {bar}  "
-        f"{unit_tested:>4d}/{unit_total_cats:<4d} "
-        f"({unit_pct:5.1f}%) {unit_status}",
+        f"    Unit tests   {bar}    "
+        f"{unit_tested:>5d}/{unit_total_cats:>5d}   "
+        f"({unit_pct:6.1f}%)   {unit_status}",
         unit_color,
     )
 
@@ -302,9 +302,9 @@ def display_test_coverage(project_dir: Path) -> None:
     if ri_total > 0:
         bar = _make_bar(ri_count, ri_total)
         print_colored(
-            f"    Rule inst.  {bar}  "
-            f"{ri_count:>4d}/{ri_total:<4d} "
-            f"({ri_pct:5.1f}%) {ri_status}",
+            f"    Rule inst.  {bar}    "
+            f"{ri_count:>5d}/{ri_total:>5d}   "
+            f"({ri_pct:6.1f}%)   {ri_status}",
             ri_color,
         )
 
@@ -338,8 +338,8 @@ def display_test_coverage(project_dir: Path) -> None:
             else:
                 row_color = Color.CYAN
             print_colored(
-                f"    {category:<{pad}s} {bar}  "
-                f"{fixtures:>4d}/{rules:<4d} ({pct:5.1f}%)",
+                f"    {category:<{pad}s} {bar}    "
+                f"{fixtures:>5d}/{rules:>5d}   ({pct:6.1f}%)",
                 row_color,
             )
 

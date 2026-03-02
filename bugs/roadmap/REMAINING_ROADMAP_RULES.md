@@ -6,14 +6,15 @@
 
 ## Status key
 
-| Status | Meaning |
-|--------|--------|
-| **Done** | Rule is in tiers (implemented). |
+| Status          | Meaning                                                    |
+| --------------- | ---------------------------------------------------------- |
+| **Done**        | Rule is in tiers (implemented).                            |
 | **Skip (Hard)** | Cross-file, heuristics, or YAML; defer per PLAN_100_RULES. |
-| **To do** | Not in tiers; single-file AST feasible (Easy or Medium). |
+| **To do**       | Not in tiers; single-file AST feasible (Easy or Medium).   |
 
 ## Implemented / covered
 
+<!-- cspell:ignore asmap rxdart -->
 These task rule names are already implemented (or covered by an existing rule):
 
 - **require_riverpod_lint_package** → covered by **require_riverpod_lint**
@@ -39,17 +40,17 @@ These task rule names are already implemented (or covered by an existing rule):
 
 Implement only when cross-file/heuristics/YAML support exists.
 
-| Task | Importance |
-|------|------------|
-| task_avoid_importing_entrypoint_exports.md | High |
-| task_handle_bloc_event_subclasses.md | High |
-| task_prefer_automatic_dispose.md | High |
-| task_prefer_composition_over_inheritance.md | High |
-| task_prefer_correct_screenshots.md | High |
-| task_prefer_inline_comments_sparingly.md | Medium |
-| task_prefer_intent_filter_export.md | High |
-| task_require_di_module_separation.md | High |
-| task_require_resource_tracker.md | Medium |
+| Task                                        | Importance |
+| ------------------------------------------- | ---------- |
+| task_avoid_importing_entrypoint_exports.md  | High       |
+| task_handle_bloc_event_subclasses.md        | High       |
+| task_prefer_automatic_dispose.md            | High       |
+| task_prefer_composition_over_inheritance.md | High       |
+| task_prefer_correct_screenshots.md          | High       |
+| task_prefer_inline_comments_sparingly.md    | Medium     |
+| task_prefer_intent_filter_export.md         | High       |
+| task_require_di_module_separation.md        | High       |
+| task_require_resource_tracker.md            | Medium     |
 
 ## To do (Easy then Medium; prefer High importance)
 
@@ -57,111 +58,111 @@ Implement in this order: **Easy** first, then **Medium**, and within each group 
 
 ### Easy – to do
 
-| Rule name | Importance | Note |
-|-----------|------------|------|
-| (All Easy from index are implemented or covered; none left.) | | |
+| Rule name                                                    | Importance | Note |
+| ------------------------------------------------------------ | ---------- | ---- |
+| (All Easy from index are implemented or covered; none left.) |            |      |
 
 ### Medium – to do (High importance first)
 
 **Implemented (26 rules):** prefer_auto_route_path_params_simple, prefer_auto_route_typed_args, prefer_bloc_extensions, prefer_branch_io_or_firebase_links, prefer_builder_pattern, prefer_cancellation_token_pattern, prefer_class_destructuring, prefer_closest_context, prefer_compile_time_config, prefer_conditional_logging, prefer_connectivity_debounce, prefer_correct_json_casts, prefer_correct_topics, prefer_dark_mode_colors, prefer_deactivate_for_cleanup, prefer_deep_link_auth, prefer_disk_cache_for_persistence, prefer_find_child_index_callback, prefer_firebase_transaction_for_counters, prefer_flavor_configuration, prefer_flex_for_complex_layout, prefer_freezed_union_types, prefer_geolocation_coarse_location, prefer_getx_builder_over_obx, prefer_go_router_builder, prefer_high_contrast_mode.
 
-| Rule name | Importance |
-|-----------|------------|
-| prefer_hive_compact_periodically | High |
-| prefer_hive_compact | High |
-| prefer_hive_web_aware | High |
-| prefer_injectable_package | High |
-| prefer_internet_connection_checker | High |
-| prefer_json_codegen | High |
-| prefer_late_lazy_initialization | High |
-| prefer_log_levels | High |
-| prefer_log_timestamp | High |
-| prefer_lru_cache | High |
-| prefer_named_routes_for_deep_links | High |
-| prefer_notification_custom_sound | High |
-| prefer_overlay_portal_layout_builder | High |
-| prefer_permission_minimal_request | High |
-| prefer_platform_widget_adaptive | High |
-| prefer_readable_line_length | High |
-| prefer_riverpod_code_gen | High |
-| prefer_riverpod_keep_alive | High |
-| prefer_root_detection | High |
-| prefer_rxdart_for_complex_streams | High |
-| prefer_semantics_sort | High |
-| prefer_sliver_for_mixed_scroll | High |
-| prefer_stale_while_revalidate | High |
-| prefer_stream_transformer | High |
-| prefer_streams_over_polling | High |
-| prefer_using_for_temp_resources | High |
-| prefer_webview_sandbox | High |
-| prefer_whitelist_validation | High |
-| require_addAutomaticKeepAlives_off | High |
-| require_api_response_validation | High |
-| require_api_version_handling | High |
-| require_auto_route_deep_link_config | High |
-| require_backup_exclusion | High |
-| require_cancellable_operations | High |
-| require_config_validation | High |
-| require_complex_logic_comments | High |
-| require_connectivity_resume_check | High |
-| require_content_type_validation | High |
-| require_context_in_build_descendants | High |
-| require_dispose_verification_tests | High |
-| require_error_context_in_logs | High |
-| require_error_handling_graceful | High |
-| require_error_message_clarity | High |
-| require_error_recovery | High |
-| require_exception_documentation | High |
-| require_example_in_documentation | High |
-| require_firebase_email_enumeration_protection | High |
-| require_firebase_composite_index | High |
-| require_firebase_offline_persistence | High |
-| require_focus_order | High |
-| require_getit_dispose_registration | High |
-| require_heading_hierarchy | High |
-| require_https_only_test | High |
-| require_image_memory_cache_limit | High |
-| require_interface_for_dependency | High |
-| require_json_date_format_consistency | High |
-| require_keychain_access | High |
-| require_performance_test | High |
-| require_parameter_documentation | High |
-| require_permission_lifecycle_observer | High |
-| require_provider_update_should_notify | High |
-| require_reduced_motion_support | High |
-| require_return_documentation | High |
-| require_rtl_support | High |
-| require_sqflite_index_for_queries | High |
-| require_stream_cancel_on_error | High |
-| require_subscription_composite | High |
-| require_webview_user_agent | High |
-| require_will_pop_scope | High |
-| suggest_yield_after_db_read | High |
-| tag_name | High |
-| use_closest_build_context | High |
-| use_specific_deprecation | High |
+| Rule name                                     | Importance |
+| --------------------------------------------- | ---------- |
+| prefer_hive_compact_periodically              | High       |
+| prefer_hive_compact                           | High       |
+| prefer_hive_web_aware                         | High       |
+| prefer_injectable_package                     | High       |
+| prefer_internet_connection_checker            | High       |
+| prefer_json_codegen                           | High       |
+| prefer_late_lazy_initialization               | High       |
+| prefer_log_levels                             | High       |
+| prefer_log_timestamp                          | High       |
+| prefer_lru_cache                              | High       |
+| prefer_named_routes_for_deep_links            | High       |
+| prefer_notification_custom_sound              | High       |
+| prefer_overlay_portal_layout_builder          | High       |
+| prefer_permission_minimal_request             | High       |
+| prefer_platform_widget_adaptive               | High       |
+| prefer_readable_line_length                   | High       |
+| prefer_riverpod_code_gen                      | High       |
+| prefer_riverpod_keep_alive                    | High       |
+| prefer_root_detection                         | High       |
+| prefer_rxdart_for_complex_streams             | High       |
+| prefer_semantics_sort                         | High       |
+| prefer_sliver_for_mixed_scroll                | High       |
+| prefer_stale_while_revalidate                 | High       |
+| prefer_stream_transformer                     | High       |
+| prefer_streams_over_polling                   | High       |
+| prefer_using_for_temp_resources               | High       |
+| prefer_webview_sandbox                        | High       |
+| prefer_whitelist_validation                   | High       |
+| require_addAutomaticKeepAlives_off            | High       |
+| require_api_response_validation               | High       |
+| require_api_version_handling                  | High       |
+| require_auto_route_deep_link_config           | High       |
+| require_backup_exclusion                      | High       |
+| require_cancellable_operations                | High       |
+| require_config_validation                     | High       |
+| require_complex_logic_comments                | High       |
+| require_connectivity_resume_check             | High       |
+| require_content_type_validation               | High       |
+| require_context_in_build_descendants          | High       |
+| require_dispose_verification_tests            | High       |
+| require_error_context_in_logs                 | High       |
+| require_error_handling_graceful               | High       |
+| require_error_message_clarity                 | High       |
+| require_error_recovery                        | High       |
+| require_exception_documentation               | High       |
+| require_example_in_documentation              | High       |
+| require_firebase_email_enumeration_protection | High       |
+| require_firebase_composite_index              | High       |
+| require_firebase_offline_persistence          | High       |
+| require_focus_order                           | High       |
+| require_getit_dispose_registration            | High       |
+| require_heading_hierarchy                     | High       |
+| require_https_only_test                       | High       |
+| require_image_memory_cache_limit              | High       |
+| require_interface_for_dependency              | High       |
+| require_json_date_format_consistency          | High       |
+| require_keychain_access                       | High       |
+| require_performance_test                      | High       |
+| require_parameter_documentation               | High       |
+| require_permission_lifecycle_observer         | High       |
+| require_provider_update_should_notify         | High       |
+| require_reduced_motion_support                | High       |
+| require_return_documentation                  | High       |
+| require_rtl_support                           | High       |
+| require_sqflite_index_for_queries             | High       |
+| require_stream_cancel_on_error                | High       |
+| require_subscription_composite                | High       |
+| require_webview_user_agent                    | High       |
+| require_will_pop_scope                        | High       |
+| suggest_yield_after_db_read                   | High       |
+| tag_name                                      | High       |
+| use_closest_build_context                     | High       |
+| use_specific_deprecation                      | High       |
 
 ### Medium – to do (Medium / Low importance)
 
-| Rule name | Importance |
-|-----------|------------|
-| avoid_screenshot_in_ci | Medium |
-| avoid_semantics_in_animation | Medium |
-| prefer_announce_for_changes | Medium |
-| prefer_deferred_imports | Medium |
-| prefer_external_keyboard | Medium |
-| prefer_isar_for_complex_queries | Medium |
-| prefer_outlined_icons | Medium |
-| prefer_show_hide | Medium |
-| prefer_test_report | Medium |
-| prefer_weak_references | Medium |
-| prefer_zone_error_handler | Medium |
-| require_link_distinction | Medium |
-| require_multi_factor | Medium |
-| require_switch_control | Medium |
-| pattern_fields_ordering | Low |
-| prefer_part_over_import | Low |
-| record_fields_ordering | Low |
+| Rule name                       | Importance |
+| ------------------------------- | ---------- |
+| avoid_screenshot_in_ci          | Medium     |
+| avoid_semantics_in_animation    | Medium     |
+| prefer_announce_for_changes     | Medium     |
+| prefer_deferred_imports         | Medium     |
+| prefer_external_keyboard        | Medium     |
+| prefer_isar_for_complex_queries | Medium     |
+| prefer_outlined_icons           | Medium     |
+| prefer_show_hide                | Medium     |
+| prefer_test_report              | Medium     |
+| prefer_weak_references          | Medium     |
+| prefer_zone_error_handler       | Medium     |
+| require_link_distinction        | Medium     |
+| require_multi_factor            | Medium     |
+| require_switch_control          | Medium     |
+| pattern_fields_ordering         | Low        |
+| prefer_part_over_import         | Low        |
+| record_fields_ordering          | Low        |
 
 ---
 
