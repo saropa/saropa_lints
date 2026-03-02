@@ -8277,8 +8277,7 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
     'no_boolean_literal_compare',
     '[no_boolean_literal_compare] Comparing a boolean to true/false literally (x == true) instead of using the value directly (x) is a stylistic choice with no correctness or performance impact. Enable via the stylistic tier. {v3}',
     correctionMessage:
-        'Use the boolean expression directly: write x instead of x == true, and !x instead of x == false. '
-        '!x instead of x == false.',
+        'Use the boolean expression directly: write x instead of x == true, and !x instead of x == false.',
     severity: DiagnosticSeverity.INFO,
   );
 

@@ -322,8 +322,8 @@ class PreferEquatableMixinRule extends SaropaLintRule {
     'prefer_equatable_mixin',
     '[prefer_equatable_mixin] Use EquatableMixin instead of extending Equatable. Using EquatableMixin is preferred when: - The class already extends another class - You want to preserve the class hierarchy. {v2}',
     correctionMessage:
-        'EquatableMixin allows you to extend other classes while keeping. Verify the change works correctly with existing tests and add coverage for the new behavior.'
-        'Equatable functionality. Change to: class X with EquatableMixin',
+        'EquatableMixin allows you to extend other classes while keeping '
+        'Equatable functionality. Change to: class X with EquatableMixin. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.INFO,
   );
 

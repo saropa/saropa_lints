@@ -167,8 +167,8 @@ class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
     'avoid_explicit_pattern_field_name',
     '[avoid_explicit_pattern_field_name] Explicit pattern field name matches variable name. Explicit field names are used in pattern matching when they match the variable name. This pattern matching usage can cause unexpected behavior or miss important type information. {v3}',
     correctionMessage:
-        'Use shorthand syntax: `:fieldName` instead of. Verify the change works correctly with existing tests and add coverage for the new behavior.'
-        '`fieldName: fieldName`.',
+        'Use shorthand syntax: `:fieldName` instead of '
+        '`fieldName: fieldName`. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.INFO,
   );
 

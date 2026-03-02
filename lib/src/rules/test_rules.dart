@@ -829,8 +829,8 @@ class AvoidTestCouplingRule extends SaropaLintRule {
     'avoid_test_coupling',
     '[avoid_test_coupling] Test appears to depend on shared mutable state from other tests. Tests must be independent and run in any order. Depending on state from previous tests creates fragile, unreliable tests. {v2}',
     correctionMessage:
-        'Make tests independent. Use setUp/tearDown for shared state,. Update related tests to reflect the new structure and verify they still pass.'
-        'or combine dependent tests.',
+        'Make tests independent. Use setUp/tearDown for shared state, '
+        'or combine dependent tests. Update related tests to reflect the new structure and verify they still pass.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -1032,8 +1032,8 @@ class RequireTestIsolationRule extends SaropaLintRule {
     'require_test_isolation',
     '[require_test_isolation] Mutable top-level variable may cause test coupling. Tests must not share mutable state. Use setUp/tearDown to reset state between tests for proper isolation. {v4}',
     correctionMessage:
-        'Use setUp() to initialize shared state before each test,. Update related tests to reflect the new structure and verify they still pass.'
-        'ensuring tests are isolated.',
+        'Use setUp() to initialize shared state before each test, '
+        'ensuring tests are isolated. Update related tests to reflect the new structure and verify they still pass.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -1121,8 +1121,8 @@ class AvoidRealDependenciesInTestsRule extends SaropaLintRule {
     'avoid_real_dependencies_in_tests',
     '[avoid_real_dependencies_in_tests] Test uses real network/database call. Use mocks instead. Tests must be fast, reliable, and not depend on external systems. Use mocks or fakes for external dependencies. {v3}',
     correctionMessage:
-        'Replace real HTTP/database calls with mocks for faster,. Update related tests to reflect the new structure and verify they still pass.'
-        'more reliable tests.',
+        'Replace real HTTP/database calls with mocks for faster, '
+        'more reliable tests. Update related tests to reflect the new structure and verify they still pass.',
     severity: DiagnosticSeverity.WARNING,
   );
 

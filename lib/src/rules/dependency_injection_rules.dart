@@ -955,7 +955,7 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
     'prefer_constructor_injection',
     '[prefer_constructor_injection] Setter/method injection hides dependencies. Use constructor injection. Constructor injection makes dependencies explicit and ensures objects are fully initialized when created. Setter injection allows partially initialized objects and makes dependencies implicit. {v2}',
     correctionMessage:
-        'Make this a final field and add a constructor parameter:. Verify the change works correctly with existing tests and add coverage for the new behavior.'
+        'Make this a final field and add a constructor parameter. Verify the change works correctly with existing tests and add coverage for the new behavior. '
         'MyClass(this._service);',
     severity: DiagnosticSeverity.INFO,
   );

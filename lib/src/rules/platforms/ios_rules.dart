@@ -1522,7 +1522,7 @@ class AvoidIosDeprecatedUikitRule extends SaropaLintRule {
     'avoid_ios_deprecated_uikit',
     '[avoid_ios_deprecated_uikit] Deprecated UIKit API pattern detected in platform channel code. Platform channel code (Swift/Objective-C) that uses deprecated UIKit APIs will generate warnings during Xcode builds and may be rejected by App Store in future iOS versions. {v2}',
     correctionMessage:
-        'Update platform channel code to use modern iOS APIs. Verify the change works correctly with existing tests and add coverage for the new behavior.'
+        'Update platform channel code to use modern iOS APIs. Verify the change works correctly with existing tests and add coverage for the new behavior. '
         'See Xcode warnings for specific replacements.',
     severity: DiagnosticSeverity.WARNING,
   );

@@ -2383,8 +2383,8 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
     'prefer_spacing_over_sizedbox',
     '[prefer_spacing_over_sizedbox] Using SizedBox for gaps instead of the spacing parameter is a stylistic API choice. Both achieve the same layout with no performance difference. Enable via the stylistic tier. {v4}',
     correctionMessage:
-        'Remove spacer children and add spacing: <value> to the. Test on multiple screen sizes to verify the layout adapts correctly.'
-        'Row/Column constructor.',
+        'Remove spacer children and add spacing: <value> to the '
+        'Row/Column constructor. Test on multiple screen sizes to verify the layout adapts correctly.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -4194,7 +4194,7 @@ class AvoidDeepWidgetNestingRule extends SaropaLintRule {
     'avoid_deep_widget_nesting',
     '[avoid_deep_widget_nesting] Widget tree exceeds 15 levels of nesting. Deeply nested widget trees are hard to read, maintain, and debug. They often indicate a need to extract widgets into separate components. {v5}',
     correctionMessage:
-        'Extract nested widgets into separate methods or widget classes. Test on multiple screen sizes to verify the layout adapts correctly.'
+        'Extract nested widgets into separate methods or widget classes. Test on multiple screen sizes to verify the layout adapts correctly. '
         'for better readability and maintainability.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -4285,8 +4285,8 @@ class PreferSafeAreaAwareRule extends SaropaLintRule {
     'prefer_safe_area_aware',
     '[prefer_safe_area_aware] Content may overlap device notch or system UI. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v4}',
     correctionMessage:
-        'Wrap body content in SafeArea, or use AppBar which handles it. Test on multiple screen sizes to verify the layout adapts correctly.'
-        'automatically.',
+        'Wrap body content in SafeArea, or use AppBar which handles it '
+        'automatically. Test on multiple screen sizes to verify the layout adapts correctly.',
     severity: DiagnosticSeverity.INFO,
   );
 

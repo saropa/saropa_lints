@@ -2073,8 +2073,8 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
     'avoid_flaky_tests',
     '[avoid_flaky_tests] Test contains patterns that may cause flakiness. Flaky tests fail intermittently, eroding confidence in the test suite. This rule detects common causes of test flakiness. {v4}',
     correctionMessage:
-        'Use seeded Random, mock time sources, use tester.pump() instead of. Run the full test suite to confirm the refactored tests maintain equivalent coverage.'
-        'Future.delayed, and mock network/file system access.',
+        'Use seeded Random, mock time sources, use tester.pump() instead of '
+        'Future.delayed, and mock network/file system access. Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     severity: DiagnosticSeverity.WARNING,
   );
 

@@ -807,7 +807,7 @@ class PreferSmallTestFilesRule extends SaropaLintRule {
     'prefer_small_length_test_files',
     '[prefer_small_length_test_files] Test file has more than $_maxLines code lines (comments and blank lines excluded). While test files typically need more room than production code, very large test files can still indicate poor organization. Split by feature, scenario, or test category. {v3}',
     correctionMessage:
-        'Split tests by feature or scenario to improve organization. Verify the change works correctly with existing tests and add coverage for the new behavior.'
+        'Split tests by feature or scenario to improve organization. Verify the change works correctly with existing tests and add coverage for the new behavior. '
         'Disable with: // ignore_for_file: prefer_small_length_test_files',
     severity: DiagnosticSeverity.INFO,
   );
@@ -858,7 +858,7 @@ class AvoidMediumTestFilesRule extends SaropaLintRule {
     'avoid_medium_length_test_files',
     '[avoid_medium_length_test_files] Test file exceeds $_maxLines code lines (comments and blank lines excluded). At 600+ lines, a test file may be covering too many scenarios or features. Split tests by domain, widget, or use case to improve maintainability and faster test runs. {v2}',
     correctionMessage:
-        'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior.'
+        'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior. '
         'Disable with: // ignore_for_file: avoid_medium_length_test_files',
     severity: DiagnosticSeverity.INFO,
   );
@@ -909,7 +909,7 @@ class AvoidLongTestFilesRule extends SaropaLintRule {
     'avoid_long_length_test_files',
     '[avoid_long_length_test_files] Test file exceeds $_maxLines code lines (comments and blank lines excluded). A 1000+ line test file is difficult to navigate and likely tests multiple distinct features. Extract test groups into separate files organized by feature area. {v2}',
     correctionMessage:
-        'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior.'
+        'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior. '
         'Disable with: // ignore_for_file: avoid_long_length_test_files',
     severity: DiagnosticSeverity.INFO,
   );
@@ -960,7 +960,7 @@ class AvoidVeryLongTestFilesRule extends SaropaLintRule {
     'avoid_very_long_length_test_files',
     '[avoid_very_long_length_test_files] Test file exceeds $_maxLines code lines (comments and blank lines excluded). Even with test files\' higher tolerance for length, 2000+ lines indicates the file is testing too much. Split into separate test files organized by feature, screen, or use case. {v2}',
     correctionMessage:
-        'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior.'
+        'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior. '
         'Disable with: // ignore_for_file: avoid_very_long_length_test_files',
     severity: DiagnosticSeverity.INFO,
   );
