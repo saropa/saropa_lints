@@ -143,7 +143,7 @@ class IosPermissionMapping {
   /// Note: ImagePicker is NOT included here because the rule uses
   /// smart method-level detection to check the actual ImageSource
   /// (gallery vs camera) and only require the relevant permission.
-  /// See RequireIosPermissionDescription in ios_rules.dart.
+  /// See RequireIosPermissionDescription in ios_capabilities_permissions_rules.dart.
   static const Map<String, List<String>> typeToKeys = {
     // Camera/Photo
     // Note: ImagePicker handled separately with smart source detection

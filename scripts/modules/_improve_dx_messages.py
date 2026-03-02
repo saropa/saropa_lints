@@ -167,6 +167,14 @@ CONSEQUENCES: dict[str, str] = {
         "This creates a security vulnerability that attackers can "
         "exploit to compromise user data or application integrity."
     ),
+    "security_auth_storage": (
+        "This creates a security vulnerability that attackers can "
+        "exploit to compromise user data or application integrity."
+    ),
+    "security_network_input": (
+        "This creates a security vulnerability that attackers can "
+        "exploit to compromise user data or application integrity."
+    ),
     "performance": (
         "This introduces unnecessary computational overhead that "
         "degrades responsiveness and increases battery drain on mobile."
@@ -190,6 +198,26 @@ CONSEQUENCES: dict[str, str] = {
     "navigation": (
         "This causes navigation state inconsistencies that can "
         "leave users stuck or lose their navigation history."
+    ),
+    "widget_layout_constraints": (
+        "This increases layout and render cost, causing unnecessary "
+        "rebuilds or relayouts that degrade scroll performance."
+    ),
+    "widget_layout_flex_scroll": (
+        "This increases layout and render cost, causing unnecessary "
+        "rebuilds or relayouts that degrade scroll performance."
+    ),
+    "widget_patterns_avoid_prefer": (
+        "This increases build() and widget tree complexity, risking "
+        "jank, hard-to-maintain UI code, and inconsistent UX."
+    ),
+    "widget_patterns_require": (
+        "This increases build() and widget tree complexity, risking "
+        "jank, hard-to-maintain UI code, and inconsistent UX."
+    ),
+    "widget_patterns_ux": (
+        "This increases build() and widget tree complexity, risking "
+        "jank, hard-to-maintain UI code, and inconsistent UX."
     ),
     "async": (
         "This introduces concurrency issues that can cause race "
@@ -1283,7 +1311,7 @@ def _apply_changes(all_changes: list[dict]) -> None:
             change["new_content"], encoding="utf-8",
         )
     print_success(f"Applied changes to {len(all_changes)} file(s).")
-    print_info("Run 'dart format .' to fix line lengths.")
+    print_info("Run 'dart format lib test' to fix line lengths.")
 
 
 def main() -> int:

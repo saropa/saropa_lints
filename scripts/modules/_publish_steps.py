@@ -375,25 +375,24 @@ def run_tests(project_dir: Path) -> bool:
     return True
 
 
-def _collect_format_paths(project_dir: Path) -> list[str]:
-    """Collect top-level paths to format, excluding example fixtures.
+# Paths passed to ``dart format``. Must match CI (.github/workflows/ci.yml) and
+# analysis_options.yaml exclude list: only format what we analyze. Example and
+# example_* dirs use experimental syntax (inline-class, digit-separators, etc.)
+# that the formatter cannot parse; formatting them would cause exit code 65.
+_FORMAT_SCOPE = ("lib", "test")
 
-    Example directories contain intentional lint violations and future
-    language features that ``dart format`` cannot parse.  Excluding
-    them avoids exit-code 65 warnings entirely.
+
+def _collect_format_paths(project_dir: Path) -> list[str]:
+    """Return paths to format: only lib and test (same as CI and analyzer scope).
+
+    Never format example/ or example_*/ — they contain intentional violations
+    and experimental language features the formatter cannot parse.
     """
-    skip_prefixes = (".", "example")
-    skip_names = {"build"}
-    paths: list[str] = []
-    for entry in sorted(project_dir.iterdir()):
-        name = entry.name
-        if any(name.startswith(p) for p in skip_prefixes):
-            continue
-        if name in skip_names:
-            continue
-        if entry.is_dir() or name.endswith(".dart"):
-            paths.append(name)
-    return paths or ["."]
+    paths = [p for p in _FORMAT_SCOPE if (project_dir / p).exists()]
+    if not paths:
+        # Fallback only if both missing (wrong cwd); never use "." (would format examples).
+        paths = ["lib"]
+    return paths
 
 
 def run_format(project_dir: Path) -> bool:

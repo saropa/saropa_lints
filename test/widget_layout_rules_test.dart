@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/widget_layout_rules.dart';
+import 'package:saropa_lints/src/rules/widget_layout_constraints_rules.dart';
+import 'package:saropa_lints/src/rules/widget_layout_flex_scroll_rules.dart';
 
 /// Tests for 73 widget layout lint rules.
 ///

@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/widget_patterns_rules.dart';
+import 'package:saropa_lints/src/rules/widget_patterns_avoid_prefer_rules.dart';
+import 'package:saropa_lints/src/rules/widget_patterns_require_rules.dart';
+import 'package:saropa_lints/src/rules/widget_patterns_ux_rules.dart';
 
 /// Tests for 104 widget pattern lint rules.
 ///

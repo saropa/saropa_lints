@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/code_quality_rules.dart';
+import 'package:saropa_lints/src/rules/code_quality_avoid_rules.dart';
+import 'package:saropa_lints/src/rules/code_quality_control_flow_rules.dart';
+import 'package:saropa_lints/src/rules/code_quality_prefer_rules.dart';
+import 'package:saropa_lints/src/rules/code_quality_variables_rules.dart';
 
 /// Tests for 101 code quality lint rules.
 ///
