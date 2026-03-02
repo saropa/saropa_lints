@@ -126,7 +126,6 @@ const Set<String> stylisticRules = <String>{
   'prefer_private_underscore_prefix',
   'prefer_explicit_this',
   'prefer_final_fields_always', // Moved from professional (opinionated)
-
   // === Formatting ===
   'prefer_trailing_comma_always',
   'prefer_blank_line_before_case', // Moved from professional (opinionated)

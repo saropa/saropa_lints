@@ -40,8 +40,10 @@ from scripts.modules._version_changelog import (
 )
 
 
-def run_pre_publish_audits(project_dir: Path) -> bool:
-    """Run all audits before publish. Returns True if publish can proceed.
+def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
+    """Run all audits before publish. Returns (True, None) if publish can proceed.
+
+    On failure returns (False, audit_result) so callers can fix e.g. missing prefix.
 
     BLOCKING checks (fail = no publish):
       - Tier integrity: orphans, phantoms, multi-tier, misplaced opinionated,
@@ -137,11 +139,11 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
             print_spelling_report(
                 spelling_hits, project_dir, show_header=False,
             )
-        return False
+        return False, audit_result
 
     print()
     print_success("All pre-publish audit checks passed.")
-    return True
+    return True, None
 
 
 def check_prerequisites() -> bool:
