@@ -7502,6 +7502,58 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
   }
 }
 
+/// Don't build expensive strings for logs that won't print.
+///
+/// Flags [MethodInvocation] where method name is `log` and the first argument
+/// is a [StringInterpolation]. No level guard detection (single-file only).
+/// Heuristic: any `log(...)` with interpolated first arg may be expensive.
+///
+/// **Bad:**
+/// ```dart
+/// log('User $id did $action');  // Always evaluates interpolation
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// if (Logger.level <= Level.FINE) log('User $id did $action');
+/// // or use a logging API that accepts a closure: log(() => 'User $id');
+/// ```
+class AvoidExpensiveLogStringConstructionRule extends SaropaLintRule {
+  AvoidExpensiveLogStringConstructionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_expensive_log_string_construction',
+    '[avoid_expensive_log_string_construction] Log call uses string interpolation; the string is built even when the log level would not print it. Add a level guard or use a lazy message. {v1}',
+    correctionMessage:
+        'Guard the log call with a level check or use a logging API that accepts a closure for the message.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'log') return;
+
+      final List<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression first = args.first;
+      if (first is! StringInterpolation) return;
+
+      reporter.atNode(node);
+    });
+  }
+}
+
 /// Suggests using typedefs for callback function types.
 ///
 /// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2

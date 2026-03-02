@@ -560,6 +560,12 @@ void main() {
     );
 
     testRule(
+      'AvoidExpensiveLogStringConstructionRule',
+      'avoid_expensive_log_string_construction',
+      () => AvoidExpensiveLogStringConstructionRule(),
+    );
+
+    testRule(
       'PreferTypedefsForCallbacksRule',
       'prefer_typedefs_for_callbacks',
       () => PreferTypedefsForCallbacksRule(),

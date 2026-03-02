@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/stylistic_control_flow_rules.dart';
 
-/// Tests for 13 Stylistic Control Flow lint rules.
+/// Tests for 14 Stylistic Control Flow lint rules.
 ///
 /// Test fixtures: example_style/lib/stylistic_control_flow/*
 void main() {
@@ -62,6 +62,12 @@ void main() {
     );
 
     testRule(
+      'AvoidCascadesRule',
+      'avoid_cascades',
+      () => AvoidCascadesRule(),
+    );
+
+    testRule(
       'PreferExhaustiveEnumsRule',
       'prefer_exhaustive_enums',
       () => PreferExhaustiveEnumsRule(),
@@ -107,6 +113,7 @@ void main() {
       'prefer_switch_statement',
       'prefer_cascade_over_chained',
       'prefer_chained_over_cascade',
+      'avoid_cascades',
       'prefer_exhaustive_enums',
       'prefer_default_enum_case',
       'prefer_await_over_then',

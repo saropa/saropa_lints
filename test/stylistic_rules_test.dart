@@ -36,6 +36,16 @@ void main() {
       'prefer_arrow_functions',
       () => PreferArrowFunctionsRule(),
     );
+    testRule(
+      'PreferExpressionBodyGettersRule',
+      'prefer_expression_body_getters',
+      () => PreferExpressionBodyGettersRule(),
+    );
+    testRule(
+      'PreferBlockBodySettersRule',
+      'prefer_block_body_setters',
+      () => PreferBlockBodySettersRule(),
+    );
 
     testRule(
       'PreferAllNamedParametersRule',

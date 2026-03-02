@@ -166,6 +166,7 @@ saropa_lints:
     # =========================================================================
     - avoid_unsafe_collection_methods: false
     - avoid_unsafe_reduce: false
+    - prefer_fold_over_reduce: false
     - avoid_unsafe_where_methods: false
     - prefer_where_or_null: false
     - avoid_map_keys_contains: false
@@ -260,6 +261,7 @@ saropa_lints:
     - avoid_swallowing_exceptions: false
     - avoid_losing_stack_trace: false
     - avoid_print_error: false                # WARNING - print() for error logging (v2.3.9)
+    - avoid_expensive_log_string_construction: false # INFO - log() with interpolation (roadmap)
     - avoid_generic_exceptions: false
     - require_error_context: false
     - prefer_result_pattern: false
@@ -639,6 +641,7 @@ saropa_lints:
     - pass_correct_accepted_type: false
     - pass_optional_argument: false
     - avoid_returning_cascades: false
+    - avoid_returning_this: false
     - avoid_returning_void: false
     - prefer_returning_shorthands: false
     - avoid_unnecessary_return: false
@@ -905,6 +908,7 @@ saropa_lints:
     - avoid_bloc_in_bloc: false
     - prefer_sealed_events: false
     - prefer_cubit_for_simple: false
+    - avoid_cubits: false
     - require_bloc_observer: false
     - avoid_provider_of_in_build: false
     - avoid_get_find_in_build: false
@@ -920,6 +924,7 @@ saropa_lints:
     - avoid_provider_value_rebuild: false        # WARNING - inline creation (v2.3.10)
     - avoid_riverpod_notifier_in_build: false    # WARNING - state loss (v2.3.11)
     - require_riverpod_async_value_guard: false  # WARNING - error handling (v2.3.11)
+    - avoid_riverpod_string_provider_name: false # INFO - prefer auto-generated provider name
     - avoid_bloc_business_logic_in_ui: false     # WARNING - testability (v2.3.11)
     - prefer_change_notifier_proxy: false        # INFO - Provider.of without listen:false (v2.5.0)
     - prefer_selector_widget: false              # INFO - targeted rebuilds over Consumer (v2.5.0)
@@ -1075,6 +1080,7 @@ saropa_lints:
     - prefer_extension_over_utility_class: false
     - prefer_extension_type_for_wrapper: false
     - prefer_final_fields: false
+    - prefer_final_fields_always: false
     - avoid_generics_shadowing: false
     - avoid_similar_names: false
     - avoid_unused_assignment: false
@@ -1182,6 +1188,8 @@ saropa_lints:
     - prefer_relative_imports: false
     - prefer_one_widget_per_file: false
     - prefer_arrow_functions: false
+    - prefer_expression_body_getters: false
+    - prefer_block_body_setters: false
     - prefer_all_named_parameters: false
     - prefer_trailing_comma_always: false
     - prefer_private_underscore_prefix: false
@@ -1576,6 +1584,7 @@ saropa_lints:
     # --- Stylistic ---
     - avoid_escaping_inner_quotes: false                 # INFO - use opposite quote style (v6.0.8)
     - avoid_single_cascade_in_expression_statements: false # INFO - single cascade, use normal call (v6.0.8)
+    - avoid_cascades: false                              # INFO - discourage cascade (..) (roadmap)
     - avoid_function_literals_in_foreach_calls: false   # INFO - forEach with function literal (v6.0.8)
 
     # --- Recommended ---

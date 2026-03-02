@@ -12,6 +12,24 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **avoid_cascades** (Stylistic): Discourage use of cascade notation (..) for clarity and maintainability. Reports every cascade expression. Fixture: `example_style/lib/stylistic_control_flow/avoid_cascades_fixture.dart`.
+- **prefer_fold_over_reduce** (Stylistic): Prefer fold() with an explicit initial value over reduce() for collections (clarity and empty-collection safety). Fixture: `example_core/lib/collection/prefer_fold_over_reduce_fixture.dart`.
+- **avoid_expensive_log_string_construction** (Professional): Flag log() calls whose message argument is a string interpolation; the string is built even when the log level would not print it. Suggests a level guard or lazy message.
+- **avoid_returning_this** (Stylistic): Flag methods that return `this`; prefer explicit return types or void.
+- **avoid_cubits** (Stylistic): Prefer Bloc over Cubit for event traceability (Bloc package only). Runs only when bloc package is a dependency.
+- **prefer_expression_body_getters** (Stylistic): Prefer arrow (=>) for getters with a single return statement.
+- **prefer_final_fields_always** (Professional): All instance fields should be final. Stricter than `prefer_final_fields` (which only flags when never reassigned).
+- **prefer_block_body_setters** (Comprehensive): Prefer block body {} for setters instead of expression body.
+- **avoid_riverpod_string_provider_name** (Professional): Detect manual name strings in Riverpod providers; prefer auto-generated name. Documented in `doc/guides/using_with_riverpod.md`. `avoid_cubits` documented in `doc/guides/using_with_bloc.md`.
+
+Roadmap tasks for these rules were moved from `bugs/roadmap/` to `bugs/history/roadmap/`. ROADMAP.md count: 1735 implemented, 455 remaining.
+
+---
+
 ## [6.0.10]
 
 ### Fixed

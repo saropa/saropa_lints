@@ -469,6 +469,61 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
   }
 }
 
+/// Prefer Bloc over Cubit for better event traceability.
+///
+/// Runs only when `bloc` package is present ([ProjectContext.hasDependency]).
+/// Flags [ClassDeclaration] whose [ExtendsClause] superclass name is exactly
+/// `Cubit` (no .contains). [applicableFileTypes] restricts to FileType.bloc for
+/// early exit. No recursion or shared mutable state.
+///
+/// **Bad:**
+/// ```dart
+/// class CounterCubit extends Cubit<int> { ... }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class CounterBloc extends Bloc<CounterEvent, int> { ... }
+/// ```
+class AvoidCubitsRule extends SaropaLintRule {
+  AvoidCubitsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
+  static const LintCode _code = LintCode(
+    'avoid_cubits',
+    '[avoid_cubits] Prefer Bloc over Cubit for better event traceability and debugging. {v1}',
+    correctionMessage:
+        'Refactor to extend Bloc<Event, State> and use add() for events instead of Cubit.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (!ProjectContext.hasDependency(context.filePath, 'bloc')) return;
+
+    context.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Cubit') return;
+
+      reporter.atNode(node);
+    });
+  }
+}
+
 /// Warns when BlocProvider is used without a BlocObserver setup.
 ///
 /// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v3

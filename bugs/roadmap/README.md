@@ -27,9 +27,6 @@ This folder contains one detailed task report per planned rule from [ROADMAP.md]
 | Filename | Ease of implementation | Importance |
 |----------|------------------------|------------|
 | task_add_resolution_workspace.md | Medium | High |
-| task_avoid_cascades.md | Easy | Low |
-| task_avoid_cubits.md | Medium | Low |
-| task_avoid_expensive_log_string_construction.md | Medium | High |
 | task_avoid_explicit_type_declaration.md | Easy | Low |
 | task_avoid_freezed_invalid_annotation_target.md | Medium | High |
 | task_avoid_hardcoded_config_test.md | Medium | High |
@@ -37,8 +34,6 @@ This folder contains one detailed task report per planned rule from [ROADMAP.md]
 | task_avoid_misleading_documentation.md | Medium | High |
 | task_avoid_referencing_subclasses.md | Medium | High |
 | task_avoid_renaming_representation_getters.md | Medium | High |
-| task_avoid_returning_this.md | Easy | Low |
-| task_avoid_riverpod_string_provider_name.md | Medium | High |
 | task_avoid_screenshot_in_ci.md | Medium | Medium |
 | task_avoid_semantics_in_animation.md | Medium | Medium |
 | task_avoid_test_on_real_device.md | Medium | High |
@@ -58,7 +53,6 @@ This folder contains one detailed task report per planned rule from [ROADMAP.md]
 | task_prefer_base_prefix.md | Easy | Medium |
 | task_prefer_biometric_protection.md | Medium | High |
 | task_prefer_bloc_extensions.md | Medium | High |
-| task_prefer_block_body_setters.md | Easy | Medium |
 | task_prefer_branch_io_or_firebase_links.md | Medium | High |
 | task_prefer_builder_pattern.md | Medium | High |
 | task_prefer_cache_extent.md | Medium | High |
@@ -86,18 +80,15 @@ This folder contains one detailed task report per planned rule from [ROADMAP.md]
 | task_prefer_deferred_imports.md | Medium | Medium |
 | task_prefer_disk_cache_for_persistence.md | Medium | High |
 | task_prefer_explicit_null_checks.md | Easy | Low |
-| task_prefer_expression_body_getters.md | Easy | High |
 | task_prefer_extension_suffix.md | Easy | Medium |
 | task_prefer_external_keyboard.md | Medium | Medium |
 | task_prefer_factory_before_named.md | Easy | Medium |
 | task_prefer_factory_constructor.md | Easy | Low |
-| task_prefer_final_fields_always.md | Medium | High |
 | task_prefer_find_child_index_callback.md | Medium | High |
 | task_prefer_fire_and_forget.md | Easy | Low |
 | task_prefer_firebase_transaction_for_counters.md | Medium | High |
 | task_prefer_flavor_configuration.md | Medium | High |
 | task_prefer_flex_for_complex_layout.md | Medium | High |
-| task_prefer_fold_over_reduce.md | Easy | Low |
 | task_prefer_foreach_over_map_entries.md | Easy | Low |
 | task_prefer_foreach.md | Easy | Low |
 | task_prefer_freezed_union_types.md | Medium | High |

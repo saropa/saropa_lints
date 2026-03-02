@@ -69,6 +69,55 @@ class AvoidReturningCascadesRule extends SaropaLintRule {
   }
 }
 
+/// Avoid returning this from methods; prefer explicit return types.
+///
+/// Reports [ReturnStatement] whose expression is [ThisExpression]. Single-node
+/// callback; no recursion. Opinionated (fluent APIs intentionally return this).
+///
+/// **Bad:**
+/// ```dart
+/// class Builder {
+///   Builder setX(int x) { _x = x; return this; }
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class Builder {
+///   void setX(int x) { _x = x; }
+/// }
+/// ```
+class AvoidReturningThisRule extends SaropaLintRule {
+  AvoidReturningThisRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_returning_this',
+    '[avoid_returning_this] Returning this from a method encourages fluent chaining but obscures return type and can confuse readers. Prefer explicit return types or void. {v1}',
+    correctionMessage:
+        'Change the method to return void or a concrete type instead of returning this.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addReturnStatement((ReturnStatement node) {
+      final Expression? expression = node.expression;
+      if (expression is ThisExpression) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
 /// Warns when a function explicitly returns `void`.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6

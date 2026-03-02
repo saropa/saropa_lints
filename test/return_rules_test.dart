@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/return_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 7 Return lint rules.
+/// Tests for 8 Return lint rules.
 ///
 /// Test fixtures: example_core/lib/return/*
 void main() {
@@ -12,6 +12,13 @@ void main() {
       final rule = AvoidReturningCascadesRule();
       expect(rule.code.name, 'avoid_returning_cascades');
       expect(rule.code.problemMessage, contains('[avoid_returning_cascades]'));
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('AvoidReturningThisRule', () {
+      final rule = AvoidReturningThisRule();
+      expect(rule.code.name, 'avoid_returning_this');
+      expect(rule.code.problemMessage, contains('[avoid_returning_this]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

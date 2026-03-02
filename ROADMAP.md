@@ -6,7 +6,7 @@
 # Roadmap: Aiming for 2,200 Lint Rules
 <!-- cspell:disable -->
 
-See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1726 implemented, 464 remaining).
+See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1735 implemented, 455 remaining).
 
 > **When implementing**: Remove from ROADMAP, add to CHANGELOG, register in `all_rules.dart` + `tiers.dart`. See [CONTRIBUTING.md](CONTRIBUTING.md).
 

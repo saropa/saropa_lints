@@ -7,7 +7,7 @@ This guide explains how saropa_lints enhances your Riverpod development with spe
 | Aspect | riverpod_lint | saropa_lints |
 |--------|--------------|--------------|
 | **Focus** | Riverpod-specific syntax | Cross-cutting concerns |
-| **Rule count** | ~20 rules | 1450+ rules (8+ Riverpod-specific) |
+| **Rule count** | ~20 rules | 1450+ rules (9+ Riverpod-specific) |
 | **Catches** | Provider syntax issues | Memory leaks, lifecycle bugs, architecture |
 
 **Key insight**: These packages are *complementary*. Use both for comprehensive coverage.
@@ -54,6 +54,20 @@ class MyWidget extends ConsumerWidget {
 ```
 
 **Rule**: `avoid_ref_read_in_build`
+
+### Manual provider name
+
+Prefer auto-generated provider names; avoid passing a string to the `name` parameter.
+
+```dart
+// BAD - manual name string
+final p = Provider((ref) => 0, name: 'myProvider');
+
+// GOOD - no name (auto-generated) or use @riverpod
+final p = Provider((ref) => 0);
+```
+
+**Rule**: `avoid_riverpod_string_provider_name`
 
 ### Missing ProviderScope
 

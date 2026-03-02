@@ -42,6 +42,11 @@ void main() {
       () => PreferCubitForSimpleRule(),
     );
     testRule(
+      'AvoidCubitsRule',
+      'avoid_cubits',
+      () => AvoidCubitsRule(),
+    );
+    testRule(
       'RequireBlocObserverRule',
       'require_bloc_observer',
       () => RequireBlocObserverRule(),

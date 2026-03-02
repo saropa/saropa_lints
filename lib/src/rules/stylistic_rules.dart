@@ -319,6 +319,102 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
   }
 }
 
+/// Prefer arrow (=>) for simple getters.
+///
+/// Flags [MethodDeclaration] where [isGetter], body is [BlockFunctionBody] with
+/// exactly one [ReturnStatement] with non-null expression. Single-node callback.
+///
+/// **Bad:**
+/// ```dart
+/// int get value { return _x; }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// int get value => _x;
+/// ```
+class PreferExpressionBodyGettersRule extends SaropaLintRule {
+  PreferExpressionBodyGettersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_expression_body_getters',
+    '[prefer_expression_body_getters] Getter has a block body with a single return; use expression body (=>) for clarity. {v1}',
+    correctionMessage:
+        'Convert the getter to use expression body (=> expression).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.isGetter) return;
+      final FunctionBody? body = node.body;
+      if (body == null) return;
+      if (body is ExpressionFunctionBody) return;
+      if (body is! BlockFunctionBody) return;
+      final Block block = body.block;
+      if (block.statements.length != 1) return;
+      final Statement stmt = block.statements.first;
+      if (stmt is! ReturnStatement || stmt.expression == null) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Prefer block body {} for setters.
+///
+/// Flags [MethodDeclaration] where [isSetter] and body is [ExpressionFunctionBody].
+/// Single-node callback; no recursion.
+///
+/// **Bad:**
+/// ```dart
+/// set value(int x) => _x = x;
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// set value(int x) { _x = x; }
+/// ```
+class PreferBlockBodySettersRule extends SaropaLintRule {
+  PreferBlockBodySettersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_block_body_setters',
+    '[prefer_block_body_setters] Setter uses expression body; use block body for consistency and to allow multiple statements. {v1}',
+    correctionMessage: 'Convert the setter to use a block body { }.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.isSetter) return;
+      final FunctionBody? body = node.body;
+      if (body == null) return;
+      if (body is! ExpressionFunctionBody) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
 /// Warns when functions have multiple positional parameters that could be named.
 ///
 /// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v2

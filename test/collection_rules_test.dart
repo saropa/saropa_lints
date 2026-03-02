@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/collection_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 25 Collection lint rules.
+/// Tests for 26 Collection lint rules.
 ///
 /// Test fixtures: example_core/lib/collection/*
 void main() {
@@ -47,6 +47,11 @@ void main() {
       'AvoidUnsafeReduceRule',
       'avoid_unsafe_reduce',
       () => AvoidUnsafeReduceRule(),
+    );
+    testRule(
+      'PreferFoldOverReduceRule',
+      'prefer_fold_over_reduce',
+      () => PreferFoldOverReduceRule(),
     );
     testRule(
       'AvoidUnsafeWhereMethodsRule',
@@ -141,6 +146,7 @@ void main() {
       'avoid_unnecessary_collections',
       'avoid_unsafe_collection_methods',
       'avoid_unsafe_reduce',
+      'prefer_fold_over_reduce',
       'avoid_unsafe_where_methods',
       'prefer_where_or_null',
       'map_keys_ordering',

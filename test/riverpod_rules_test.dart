@@ -117,6 +117,11 @@ void main() {
       () => RequireAutoDisposeRule(),
     );
     testRule(
+      'AvoidRiverpodStringProviderNameRule',
+      'avoid_riverpod_string_provider_name',
+      () => AvoidRiverpodStringProviderNameRule(),
+    );
+    testRule(
       'AvoidRefInBuildBodyRule',
       'avoid_ref_in_build_body',
       () => AvoidRefInBuildBodyRule(),
