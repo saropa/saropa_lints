@@ -670,18 +670,20 @@ void main() {
     });
 
     group('contains_reduction_word_boundary', () {
-      test('type/body/target checks use word-boundary regex to avoid substring FPs',
-          () {
-        // After 2026-03-01 refactor: rules no longer use .contains() on
-        // typeName, bodySource, targetSource, etc. They use RegExp with \b
-        // or exact sets. Expected: identifiers that contain a substring
-        // (e.g. MyValueNotifierHelper, SomeStreamControllerUtil) should
-        // NOT trigger require_value_notifier_dispose / stream rules.
-        expect(
-          'Word-boundary and exact-match checks prevent substring false positives',
-          isNotNull,
-        );
-      });
+      test(
+        'type/body/target checks use word-boundary regex to avoid substring FPs',
+        () {
+          // After 2026-03-01 refactor: rules no longer use .contains() on
+          // typeName, bodySource, targetSource, etc. They use RegExp with \b
+          // or exact sets. Expected: identifiers that contain a substring
+          // (e.g. MyValueNotifierHelper, SomeStreamControllerUtil) should
+          // NOT trigger require_value_notifier_dispose / stream rules.
+          expect(
+            'Word-boundary and exact-match checks prevent substring false positives',
+            isNotNull,
+          );
+        },
+      );
     });
 
     group('avoid_nested_assignments', () {

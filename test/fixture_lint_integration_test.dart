@@ -71,15 +71,26 @@ void main() {
         final ruleCodes = violations.map((v) => v.rule).toSet();
         // Fixtures in example_async/lib with expect_lint for these rules;
         // assert they appear when custom_lint runs (behavioral coverage).
+        // Priority: async, error_handling, security (see UNIT_TEST_COVERAGE_REVIEW.md §4).
         const expectedFromFixtures = [
           'avoid_catch_all',
           'avoid_dialog_context_after_async',
           'require_stream_controller_close',
           'require_feature_flag_default',
           'prefer_specifying_future_value_type',
+          'avoid_exception_in_constructor',
+          'avoid_hardcoded_encryption_keys',
+          'check_mounted_after_async',
+          'avoid_async_in_build',
+          'require_stream_subscription_cancel',
+          'avoid_future_then_in_async',
+          'avoid_context_across_async',
+          'prefer_secure_random_for_crypto',
+          'require_completer_error_handling',
         ];
 
-        for (final rule in expectedFromFixtures) {
+        final expectedSet = expectedFromFixtures.toSet();
+        for (final rule in expectedSet) {
           expect(
             ruleCodes.contains(rule),
             isTrue,
@@ -88,5 +99,34 @@ void main() {
         }
       },
     );
+
+    /// Behavioral test: compliant-only file must produce no violations.
+    /// Proves "compliant code → no lint" for the rules exercised in that file.
+    test('compliant-only fixture has no violations', () async {
+      final exampleDir = Directory('example_async');
+      if (!exampleDir.existsSync()) {
+        return;
+      }
+
+      final result = await Process.run(
+        'dart',
+        ['run', 'custom_lint'],
+        workingDirectory: exampleDir.path,
+        runInShell: true,
+      );
+
+      final output = result.stdout as String;
+      final violations = parseViolations(output);
+      final compliantFileViolations = violations
+          .where((v) => v.file.contains('behavioral_test_compliant_only.dart'))
+          .toList();
+
+      expect(
+        compliantFileViolations,
+        isEmpty,
+        reason:
+            'Compliant-only file should have no lints; got ${compliantFileViolations.length}',
+      );
+    });
   });
 }

@@ -370,6 +370,337 @@ class PreferExpressionBodyGettersRule extends SaropaLintRule {
   }
 }
 
+/// Warns when closure (function expression) parameters have explicit types that can usually be inferred.
+///
+/// Stylistic: inferred types reduce clutter; explicit types can aid readability.
+///
+/// **Bad:**
+/// ```dart
+/// list.map((int x) => x + 1);
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// list.map((x) => x + 1);
+/// ```
+class AvoidTypesOnClosureParametersRule extends SaropaLintRule {
+  AvoidTypesOnClosureParametersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_types_on_closure_parameters',
+    '[avoid_types_on_closure_parameters] Closure parameter has an explicit type; consider removing it when the type can be inferred.',
+    correctionMessage:
+        'Remove the type annotation to let the type be inferred.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addSimpleFormalParameter((SimpleFormalParameter node) {
+      if (node.type == null) return;
+      AstNode? parent = node.parent;
+      while (parent != null) {
+        if (parent is FunctionExpression) {
+          reporter.atNode(node);
+          return;
+        }
+        if (parent is MethodDeclaration ||
+            parent is FunctionDeclaration ||
+            parent is ConstructorDeclaration) {
+          return;
+        }
+        parent = parent.parent;
+      }
+    });
+  }
+}
+
+/// Warns when local or top-level variable has explicit type that could be inferred.
+///
+/// Stylistic: inferred types reduce clutter.
+///
+/// **Bad:**
+/// ```dart
+/// final String name = 'x';
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// final name = 'x';
+/// ```
+class AvoidExplicitTypeDeclarationRule extends SaropaLintRule {
+  AvoidExplicitTypeDeclarationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_explicit_type_declaration',
+    '[avoid_explicit_type_declaration] Variable has explicit type; consider removing it when the type can be inferred.',
+    correctionMessage:
+        'Remove the type annotation to let the type be inferred.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addVariableDeclarationList((VariableDeclarationList node) {
+      if (node.type == null) return;
+      final hasInitializer = node.variables.any((v) => v.initializer != null);
+      if (!hasInitializer) return;
+      reporter.atNode(node.type!);
+    });
+  }
+}
+
+/// Suggests explicit == null / != null over postfix ! when clearer.
+///
+/// Stylistic: explicit null checks can be easier to read.
+///
+/// **Bad:**
+/// ```dart
+/// return value!;
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// if (value == null) throw StateError('expected non-null');
+/// return value;
+/// ```
+class PreferExplicitNullChecksRule extends SaropaLintRule {
+  PreferExplicitNullChecksRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_explicit_null_checks',
+    '[prefer_explicit_null_checks] Prefer explicit == null or != null check over postfix ! when it improves clarity.',
+    correctionMessage: 'Consider replacing with an explicit null check.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addPostfixExpression((PostfixExpression node) {
+      if (node.operator.type != TokenType.BANG) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Prefer optional named parameters over optional positional for clarity.
+///
+/// **Bad:**
+/// ```dart
+/// void f([int x, int y = 0]) {}
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// void f({int? x, int y = 0}) {}
+/// ```
+class PreferOptionalNamedParamsRule extends SaropaLintRule {
+  PreferOptionalNamedParamsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_optional_named_params',
+    '[prefer_optional_named_params] Prefer optional named parameters over optional positional for call-site clarity.',
+    correctionMessage:
+        'Consider converting optional positional parameters to named parameters.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    void check(FormalParameterList? parameters, AstNode reportNode) {
+      if (parameters == null) return;
+      for (final FormalParameter p in parameters.parameters) {
+        if (p.isOptionalPositional) {
+          reporter.atNode(reportNode);
+          return;
+        }
+      }
+    }
+
+    context.addMethodDeclaration((MethodDeclaration node) {
+      check(node.parameters, node);
+    });
+    context.addFunctionDeclaration((FunctionDeclaration node) {
+      check(node.functionExpression.parameters, node);
+    });
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
+      check(node.parameters, node);
+    });
+  }
+}
+
+/// Prefer optional positional parameters over optional named for simple flags.
+///
+/// **Bad:**
+/// ```dart
+/// void f({bool verbose = false}) {}
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// void f([bool verbose = false]) {}
+/// ```
+class PreferOptionalPositionalParamsRule extends SaropaLintRule {
+  PreferOptionalPositionalParamsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_optional_positional_params',
+    '[prefer_optional_positional_params] Prefer optional positional over optional named for simple boolean or flag parameters.',
+    correctionMessage:
+        'Consider converting optional named parameter to optional positional.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    bool isBoolParam(FormalParameter p) {
+      final TypeAnnotation? t = _getTypeAnnotation(p);
+      if (t == null || t is! NamedType) return false;
+      final String name = t.name.lexeme;
+      return name == 'bool' || name == 'bool?';
+    }
+
+    void check(FormalParameterList? parameters, AstNode reportNode) {
+      if (parameters == null) return;
+      for (final FormalParameter p in parameters.parameters) {
+        if (p.isNamed && isBoolParam(p)) {
+          reporter.atNode(reportNode);
+          return;
+        }
+      }
+    }
+
+    context.addMethodDeclaration((MethodDeclaration node) {
+      check(node.parameters, node);
+    });
+    context.addFunctionDeclaration((FunctionDeclaration node) {
+      check(node.functionExpression.parameters, node);
+    });
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
+      check(node.parameters, node);
+    });
+  }
+
+  static TypeAnnotation? _getTypeAnnotation(FormalParameter p) {
+    if (p is SimpleFormalParameter) return p.type;
+    if (p is DefaultFormalParameter) return _getTypeAnnotation(p.parameter);
+    return null;
+  }
+}
+
+/// Prefer positional boolean parameters (optional) over named for call-site brevity.
+///
+/// **Bad:**
+/// ```dart
+/// void showDialog({bool dismissible = true}) {}
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// void showDialog([bool dismissible = true]) {}
+/// ```
+class PreferPositionalBoolParamsRule extends SaropaLintRule {
+  PreferPositionalBoolParamsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_positional_bool_params',
+    '[prefer_positional_bool_params] Boolean parameters are clearer as optional positional at call sites.',
+    correctionMessage:
+        'Consider making the boolean parameter optional positional.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    bool isBoolParam(FormalParameter p) {
+      final TypeAnnotation? t = _getTypeAnnotation(p);
+      if (t == null || t is! NamedType) return false;
+      final String name = t.name.lexeme;
+      return name == 'bool' || name == 'bool?';
+    }
+
+    void check(FormalParameterList? parameters, AstNode reportNode) {
+      if (parameters == null) return;
+      for (final FormalParameter p in parameters.parameters) {
+        if (p.isNamed && isBoolParam(p)) {
+          reporter.atNode(reportNode);
+          return;
+        }
+      }
+    }
+
+    context.addMethodDeclaration((MethodDeclaration node) {
+      check(node.parameters, node);
+    });
+    context.addFunctionDeclaration((FunctionDeclaration node) {
+      check(node.functionExpression.parameters, node);
+    });
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
+      check(node.parameters, node);
+    });
+  }
+
+  static TypeAnnotation? _getTypeAnnotation(FormalParameter p) {
+    if (p is SimpleFormalParameter) return p.type;
+    if (p is DefaultFormalParameter) return _getTypeAnnotation(p.parameter);
+    return null;
+  }
+}
+
 /// Prefer block body {} for setters.
 ///
 /// Flags [MethodDeclaration] where [isSetter] and body is [ExpressionFunctionBody].

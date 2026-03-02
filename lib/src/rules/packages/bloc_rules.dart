@@ -4798,10 +4798,7 @@ class PreferBlocExtensionsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  static const Set<String> _providerOfNames = <String>{
-    'of',
-    'value',
-  };
+  static const Set<String> _providerOfNames = <String>{'of', 'value'};
 
   @override
   void runWithReporter(

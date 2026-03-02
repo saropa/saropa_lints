@@ -1075,8 +1075,10 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
   ) {
     final String methodName = method.name.lexeme.toLowerCase();
 
-    if (!_injectionMethodNames.any((name) =>
-        RegExp(r'\b' + RegExp.escape(name) + r'\b').hasMatch(methodName))) {
+    if (!_injectionMethodNames.any(
+      (name) =>
+          RegExp(r'\b' + RegExp.escape(name) + r'\b').hasMatch(methodName),
+    )) {
       return;
     }
 
@@ -1334,12 +1336,10 @@ class AvoidDiInWidgetsRule extends SaropaLintRule {
   }
 
   bool _isServiceLocatorCall(String targetSource, String methodName) {
-    if (RegExp(r'\bGetIt\b').hasMatch(targetSource) &&
-        methodName == 'call') {
+    if (RegExp(r'\bGetIt\b').hasMatch(targetSource) && methodName == 'call') {
       return true;
     }
-    if (RegExp(r'\bGetIt\b').hasMatch(targetSource) &&
-        methodName == 'get') {
+    if (RegExp(r'\bGetIt\b').hasMatch(targetSource) && methodName == 'get') {
       return true;
     }
 

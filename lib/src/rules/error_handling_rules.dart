@@ -2225,10 +2225,12 @@ class RequireErrorLoggingRule extends SaropaLintRule {
     final String bodySource = body.toSource();
 
     for (final String method in _loggingMethods) {
-      if (RegExp(r'\b' + RegExp.escape(method) + r'\s*\(')
-              .hasMatch(bodySource) ||
-          RegExp(r'\.' + RegExp.escape(method) + r'\s*\(')
-              .hasMatch(bodySource)) {
+      if (RegExp(
+            r'\b' + RegExp.escape(method) + r'\s*\(',
+          ).hasMatch(bodySource) ||
+          RegExp(
+            r'\.' + RegExp.escape(method) + r'\s*\(',
+          ).hasMatch(bodySource)) {
         return true;
       }
     }

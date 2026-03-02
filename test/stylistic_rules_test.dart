@@ -42,6 +42,36 @@ void main() {
       () => PreferExpressionBodyGettersRule(),
     );
     testRule(
+      'AvoidTypesOnClosureParametersRule',
+      'avoid_types_on_closure_parameters',
+      () => AvoidTypesOnClosureParametersRule(),
+    );
+    testRule(
+      'AvoidExplicitTypeDeclarationRule',
+      'avoid_explicit_type_declaration',
+      () => AvoidExplicitTypeDeclarationRule(),
+    );
+    testRule(
+      'PreferExplicitNullChecksRule',
+      'prefer_explicit_null_checks',
+      () => PreferExplicitNullChecksRule(),
+    );
+    testRule(
+      'PreferOptionalNamedParamsRule',
+      'prefer_optional_named_params',
+      () => PreferOptionalNamedParamsRule(),
+    );
+    testRule(
+      'PreferOptionalPositionalParamsRule',
+      'prefer_optional_positional_params',
+      () => PreferOptionalPositionalParamsRule(),
+    );
+    testRule(
+      'PreferPositionalBoolParamsRule',
+      'prefer_positional_bool_params',
+      () => PreferPositionalBoolParamsRule(),
+    );
+    testRule(
       'PreferBlockBodySettersRule',
       'prefer_block_body_setters',
       () => PreferBlockBodySettersRule(),
@@ -251,6 +281,12 @@ void main() {
       'prefer_curly_apostrophe',
       'prefer_arguments_ordering',
       'prefer_no_commented_out_code',
+      'avoid_types_on_closure_parameters',
+      'avoid_explicit_type_declaration',
+      'prefer_explicit_null_checks',
+      'prefer_optional_named_params',
+      'prefer_optional_positional_params',
+      'prefer_positional_bool_params',
     ];
 
     for (final fixture in fixtures) {

@@ -380,8 +380,9 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
       final String keySource = args.first.toSource().toLowerCase();
 
       for (final pattern in _sensitiveKeys) {
-        if (RegExp(r'\b' + RegExp.escape(pattern) + r'\b')
-            .hasMatch(keySource)) {
+        if (RegExp(
+          r'\b' + RegExp.escape(pattern) + r'\b',
+        ).hasMatch(keySource)) {
           reporter.atNode(node);
           return;
         }
@@ -633,8 +634,9 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
       final String adapterName = '${typeArg}Adapter';
 
       if (!RegExp(r'\bregisterAdapter\b').hasMatch(scopeSource) ||
-          !RegExp(r'\b' + RegExp.escape(adapterName) + r'\b')
-              .hasMatch(scopeSource)) {
+          !RegExp(
+            r'\b' + RegExp.escape(adapterName) + r'\b',
+          ).hasMatch(scopeSource)) {
         reporter.atNode(node);
       }
     });
@@ -722,8 +724,9 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
 
       // Check if this looks like a potentially large collection
       for (final String largeName in _largeCollectionNames) {
-        if (RegExp(r'\b' + RegExp.escape(largeName) + r'\b')
-            .hasMatch(boxName)) {
+        if (RegExp(
+          r'\b' + RegExp.escape(largeName) + r'\b',
+        ).hasMatch(boxName)) {
           reporter.atNode(node);
           return;
         }
@@ -734,8 +737,9 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
       if (typeArgs != null && typeArgs.isNotEmpty) {
         final String typeArg = typeArgs.first.toSource().toLowerCase();
         for (final String largeName in _largeCollectionNames) {
-          if (RegExp(r'\b' + RegExp.escape(largeName) + r'\b')
-              .hasMatch(typeArg)) {
+          if (RegExp(
+            r'\b' + RegExp.escape(largeName) + r'\b',
+          ).hasMatch(typeArg)) {
             reporter.atNode(node);
             return;
           }
@@ -1582,8 +1586,10 @@ class AvoidHiveBinaryStorageRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final typeName = member.fields.type?.toSource();
           if (typeName != null &&
-              _binaryTypes.any((t) =>
-                  RegExp(r'\b' + RegExp.escape(t) + r'\b').hasMatch(typeName))) {
+              _binaryTypes.any(
+                (t) =>
+                    RegExp(r'\b' + RegExp.escape(t) + r'\b').hasMatch(typeName),
+              )) {
             for (final variable in member.fields.variables) {
               reporter.atNode(variable);
             }

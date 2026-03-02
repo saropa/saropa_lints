@@ -115,6 +115,36 @@ void main() {
       () => PreferNamedExtensionsRule(),
     );
     testRule(
+      'PreferBasePrefixRule',
+      'prefer_base_prefix',
+      () => PreferBasePrefixRule(),
+    );
+    testRule(
+      'PreferExtensionSuffixRule',
+      'prefer_extension_suffix',
+      () => PreferExtensionSuffixRule(),
+    );
+    testRule(
+      'PreferMixinPrefixRule',
+      'prefer_mixin_prefix',
+      () => PreferMixinPrefixRule(),
+    );
+    testRule(
+      'PreferIPrefixInterfacesRule',
+      'prefer_i_prefix_interfaces',
+      () => PreferIPrefixInterfacesRule(),
+    );
+    testRule(
+      'PreferNoIPrefixInterfacesRule',
+      'prefer_no_i_prefix_interfaces',
+      () => PreferNoIPrefixInterfacesRule(),
+    );
+    testRule(
+      'PreferImplSuffixRule',
+      'prefer_impl_suffix',
+      () => PreferImplSuffixRule(),
+    );
+    testRule(
       'PreferTypedefForCallbacksRule',
       'prefer_typedef_for_callbacks',
       () => PreferTypedefForCallbacksRule(),
@@ -177,6 +207,12 @@ void main() {
       'prefer_prefixed_global_constants',
       'prefer_kebab_tag_name',
       'prefer_named_extensions',
+      'prefer_base_prefix',
+      'prefer_extension_suffix',
+      'prefer_mixin_prefix',
+      'prefer_i_prefix_interfaces',
+      'prefer_no_i_prefix_interfaces',
+      'prefer_impl_suffix',
       'prefer_typedef_for_callbacks',
       'prefer_enhanced_enums',
       'prefer_wildcard_for_unused_param',

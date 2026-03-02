@@ -649,7 +649,11 @@ void main() {
       () => PreferNamedBoolParamsRule(),
     );
 
-    testRule('BannedUsageRule', 'banned_identifier_usage', () => BannedUsageRule());
+    testRule(
+      'BannedUsageRule',
+      'banned_identifier_usage',
+      () => BannedUsageRule(),
+    );
   });
 
   group('Code Quality Rules - Fixture Verification', () {

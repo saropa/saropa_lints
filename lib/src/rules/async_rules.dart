@@ -4671,7 +4671,7 @@ class PreferCancellationTokenPatternRule extends SaropaLintRule {
     'prefer_cancellation_token_pattern',
     '[prefer_cancellation_token_pattern] Prefer passing a cancellation '
         'token (e.g. Dio CancelToken) to async operations so they can be '
-        'cancelled when the caller is disposed.',
+        'canceled when the caller is disposed.',
     correctionMessage:
         'Use CancelToken or similar to support cancellation of in-flight requests.',
     severity: DiagnosticSeverity.INFO,

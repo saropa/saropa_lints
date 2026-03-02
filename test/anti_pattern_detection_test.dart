@@ -143,16 +143,18 @@ void main() {
       }
     });
 
-    test('dangerous pattern count matches audit (Dart and publish script in sync)',
-        () {
-      expect(
-        _dangerousPatterns.length,
-        9,
-        reason:
-            'Publish script scripts/modules/_audit_checks.py uses the same '
-            '9 patterns. Update both if adding or removing a pattern.',
-      );
-    });
+    test(
+      'dangerous pattern count matches audit (Dart and publish script in sync)',
+      () {
+        expect(
+          _dangerousPatterns.length,
+          9,
+          reason:
+              'Publish script scripts/modules/_audit_checks.py uses the same '
+              '9 patterns. Update both if adding or removing a pattern.',
+        );
+      },
+    );
   });
 }
 
