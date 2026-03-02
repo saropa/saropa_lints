@@ -131,6 +131,7 @@ void main() {
   });
   group('Image Rules - Fixture Verification', () {
     final fixtures = [
+      'avoid_cached_image_web',
       'avoid_image_rebuild_on_scroll',
       'require_avatar_fallback',
       'prefer_video_loading_placeholder',

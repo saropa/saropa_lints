@@ -45,6 +45,8 @@ void main() {
     final fixtures = [
       'require_dark_mode_testing',
       'avoid_elevation_opacity_in_dark',
+      'prefer_dark_mode_colors',
+      'prefer_high_contrast_mode',
       'prefer_theme_extensions',
       'require_semantic_colors',
     ];

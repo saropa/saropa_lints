@@ -82,6 +82,7 @@ void main() {
       'require_freezed_private_constructor',
       'require_freezed_explicit_json',
       'prefer_freezed_default_values',
+      'prefer_freezed_union_types',
       'require_freezed_json_converter',
       'require_freezed_lint_package',
       'avoid_freezed_for_logic_classes',

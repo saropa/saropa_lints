@@ -77,6 +77,7 @@ void main() {
       'require_did_update_widget_check',
       'require_late_initialization_in_init_state',
       'require_app_lifecycle_handling',
+      'require_conflict_resolution_strategy',
     ];
 
     for (final fixture in fixtures) {

@@ -651,6 +651,7 @@ void main() {
 
   group('Widget Patterns Rules - Fixture Verification', () {
     final fixtures = [
+      'avoid_bool_in_widget_constructors',
       'avoid_brightness_check_for_theme',
       'avoid_catching_generic_exception',
       'avoid_double_tap_submit',
@@ -689,6 +690,7 @@ void main() {
       'avoid_uncontrolled_text_field',
       'avoid_unnecessary_gesture_detector',
       'avoid_unrestricted_text_field_length',
+      'avoid_unnecessary_containers',
       'avoid_unused_callback_parameters',
       'prefer_action_button_tooltip',
       'prefer_actions_and_shortcuts',
@@ -696,6 +698,7 @@ void main() {
       'prefer_cached_network_image',
       'prefer_carousel_view',
       'prefer_color_scheme_from_seed',
+      'prefer_const_literals_to_create_immutables',
       'prefer_cupertino_for_ios_feel',
       'prefer_cursor_for_buttons',
       'prefer_define_hero_tag',

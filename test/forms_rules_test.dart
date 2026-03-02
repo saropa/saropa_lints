@@ -175,6 +175,7 @@ void main() {
       'require_form_auto_validate_mode',
       'require_autofill_hints',
       'prefer_on_field_submitted',
+      'prefer_form_bloc_for_complex',
       'require_text_input_type',
       'prefer_text_input_action',
       'require_form_key_in_stateful_widget',

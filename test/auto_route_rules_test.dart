@@ -17,6 +17,8 @@ void main() {
     final fixtures = [
       'avoid_auto_route_context_navigation',
       'avoid_auto_route_keep_history_misuse',
+      'prefer_auto_route_path_params_simple',
+      'prefer_auto_route_typed_args',
       'require_auto_route_guard_resume',
       'require_auto_route_full_hierarchy',
     ];

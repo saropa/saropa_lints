@@ -185,6 +185,7 @@ void main() {
       'require_interval_timer_cancel',
       'require_file_handle_close',
       'require_dispose_implementation',
+      'prefer_deactivate_for_cleanup',
       'prefer_dispose_before_new_instance',
       'dispose_class_fields',
     ];

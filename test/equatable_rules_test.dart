@@ -93,6 +93,7 @@ void main() {
     final fixtures = [
       'require_extend_equatable',
       'list_all_equatable_fields',
+      'avoid_equatable_nested_equality',
       'prefer_equatable_mixin',
       'prefer_equatable_stringify',
       'prefer_immutable_annotation',

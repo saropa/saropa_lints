@@ -854,8 +854,10 @@ class NoEmptyBlockRule extends SaropaLintRule {
 
   static const String _name = 'no_empty_block';
 
+  /// String literal required here so scripts/modules/_rule_metrics.py can
+  /// parse the rule name for fixture coverage (LintCode first argument).
   static const LintCode _code = LintCode(
-    _name,
+    'no_empty_block', // keep in sync with _name for ignore comments
     '[no_empty_block] An empty code block (i.e., {}) does not perform any action and may indicate incomplete code, a forgotten implementation, or a placeholder left by mistake. Empty blocks can confuse maintainers and may hide bugs or unfinished features.',
     correctionMessage:
         'Add meaningful implementation or a comment inside the block to clarify its purpose. If the block is intentionally left empty, use `// ignore: $_name` to suppress the lint and document why the block is empty.',

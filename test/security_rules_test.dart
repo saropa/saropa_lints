@@ -356,6 +356,7 @@ void main() {
       'require_deep_link_validation',
       'require_https_only',
       'require_https_only_test',
+      'require_input_validation',
       'require_input_sanitization',
       'require_logout_cleanup',
       'require_secure_password_field',

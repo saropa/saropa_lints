@@ -150,6 +150,7 @@ void main() {
       'avoid_redundant_positional_field_name',
       'avoid_single_field_destructuring',
       'move_records_to_typedefs',
+      'prefer_class_destructuring',
       'prefer_sorted_pattern_fields',
       'prefer_simpler_patterns_null_check',
       'prefer_wildcard_pattern',

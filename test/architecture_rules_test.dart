@@ -71,6 +71,7 @@ void main() {
       'avoid_singleton_pattern',
       'avoid_touch_only_gestures',
       'avoid_circular_imports',
+      'prefer_builder_pattern',
     ];
 
     for (final fixture in fixtures) {

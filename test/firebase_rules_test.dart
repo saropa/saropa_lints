@@ -246,6 +246,27 @@ void main() {
       );
       expect(file.existsSync(), isTrue);
     });
+
+    test('prefer_firebase_transaction_for_counters fixture exists', () {
+      final file = File(
+        'example_packages/lib/firebase/prefer_firebase_transaction_for_counters_fixture.dart',
+      );
+      expect(file.existsSync(), isTrue);
+    });
+
+    test('prefer_correct_topics fixture exists', () {
+      final file = File(
+        'example_packages/lib/firebase/prefer_correct_topics_fixture.dart',
+      );
+      expect(file.existsSync(), isTrue);
+    });
+
+    test('prefer_deep_link_auth fixture exists', () {
+      final file = File(
+        'example_packages/lib/firebase/prefer_deep_link_auth_fixture.dart',
+      );
+      expect(file.existsSync(), isTrue);
+    });
   });
 
   group('Firestore Query Rules', () {

@@ -287,6 +287,7 @@ void main() {
     final fixtures = [
       'avoid_bloc_business_logic_in_ui',
       'avoid_bloc_context_dependency',
+      'avoid_cubit_usage',
       'avoid_bloc_emit_after_close',
       'avoid_bloc_event_in_constructor',
       'avoid_bloc_event_mutation',
@@ -299,6 +300,7 @@ void main() {
       'avoid_overengineered_bloc_states',
       'emit_new_bloc_state_instances',
       'prefer_bloc_event_suffix',
+      'prefer_bloc_extensions',
       'prefer_bloc_hydration',
       'prefer_bloc_listener_for_side_effects',
       'prefer_bloc_state_suffix',

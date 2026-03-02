@@ -270,6 +270,7 @@ void main() {
       'avoid_expensive_build',
       'avoid_synchronous_file_io',
       'prefer_compute_for_heavy_work',
+      'prefer_disk_cache_for_persistence',
       'avoid_object_creation_in_hot_loops',
       'prefer_cached_getter',
       'avoid_excessive_widget_depth',
