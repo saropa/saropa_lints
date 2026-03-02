@@ -1,6 +1,6 @@
 # Unit Test Coverage: Current Status
 
-**Last updated:** 2025-03-01  
+**Last updated:** 2026-03-02  
 **Scope:** All lint rules in `lib/src/rules/` and all rule-related tests in `test/`.
 
 **Completed work (archived in bugs/history):**  
@@ -16,14 +16,14 @@ Fixture work (66 rules) and Rule Instantiation (55 categories) are **done**. Sum
 |------|--------|--------|
 | Fixtures (one per rule in reviewed categories) | **Done** | 27 categories, 0 missing. See §2. |
 | Rule instantiation tests (one per rule, metadata assertions) | **Done for 99 categories** | All category test files have a Rule Instantiation group. See §3. |
-| Real behavioral tests (linter on code, assert lint present/absent) | **Started** | One test in fixture_lint_integration_test.dart. See §4. |
+| Real behavioral tests (linter on code, assert lint present/absent) | **In progress** | Violating→lint and compliant→no lint patterns in fixture_lint_integration_test.dart. See §4. |
 
 ---
 
 ## 1. Test quality (current state)
 
 - **Fixture verification:** Done. Test files that list fixtures have “fixture exists” tests (real assertions).
-- **Behavioral tests:** One integration test runs custom_lint on example_async and asserts specific rule codes appear in parsed output when violations exist. Most category tests still use placeholders (`expect('...', isNotNull)`).
+- **Behavioral tests:** Integration tests in `fixture_lint_integration_test.dart`: (1) run custom_lint on example_async and assert 15 expected rule codes (async, error_handling, security) appear when violations exist; (2) run custom_lint and assert that the compliant-only fixture file has zero violations. Most category tests still use placeholders (`expect('...', isNotNull)`).
 - **Rule instantiation tests:** Done for 99 categories. Each category test file has a group that instantiates every rule and asserts `code.name`, `problemMessage`, `correctionMessage` (see bugs/history summary).
 
 ---
@@ -91,6 +91,6 @@ Priority candidates: security, accessibility, error_handling, async rules.
 |------|--------|
 | Fixtures (per-rule in reviewed categories) | **Done** |
 | Rule instantiation tests (per-rule metadata) | **Done for 99 categories** |
-| Real behavioral tests (linter on code) | **Started** (one integration test) |
+| Real behavioral tests (linter on code) | **In progress** (violating→lint + compliant→no lint in fixture_lint_integration_test.dart) |
 
 Completed work is summarized in [bugs/history/unit_test_coverage_fixtures_and_instantiation_completed.md](history/unit_test_coverage_fixtures_and_instantiation_completed.md).
