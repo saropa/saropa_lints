@@ -12,6 +12,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [6.1.1]
+
+### Fixed
+
+- **avoid_deprecated_usage plugin crash:** On analyzer versions where `Element.metadata` is a wrapper (e.g. `MetadataImpl`) rather than an `Iterable`, the rule no longer crashes with "MetadataImpl is not a subtype of Iterable". Deprecation detection now uses `lib/src/analyzer_metadata_compat_utils.dart` so metadata is read safely across analyzer API shapes. Regression test: `test/avoid_deprecated_usage_crash_test.dart`. See `bugs/history/rule_bugs/report_avoid_deprecated_usage_metadataimpl_not_iterable_crash.md`.
+
+---
+
 ## [6.1.0]
 
 ### Added
@@ -75,6 +83,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - **Publish script (audit failure):** When the pre-publish audit fails, the script now auto-fixes only the missing `[rule_name]` prefix in problem messages when applicable, then re-runs the audit. For other blocking issues (tier integrity, duplicates, spelling, .contains() baseline), it exits with a single clear message pointing to the ✗ lines in the audit output instead of offering the DX message improver (which cannot fix those).
 
 - **Report duplicate paths:** The analysis report log counted the same violation twice when the same issue was reported with both relative and absolute file paths (e.g. `lib/foo.dart` and `D:\proj\lib\foo.dart`). Consolidation now normalizes all paths to project-relative form before deduplication and in stored violation records, so totals and "files with issues" are accurate. See `bugs/history/report_duplicate_paths_deduplication.md`.
+
+### Changed
+
+- **Rule file split (refactor):** Five large rule files were split into smaller, thematically grouped files for maintainability. No behavior or rule counts changed. **code_quality_rules.dart** (106 rules) → `code_quality_avoid_rules.dart`, `code_quality_control_flow_rules.dart`, `code_quality_prefer_rules.dart`, `code_quality_variables_rules.dart`. **widget_patterns_rules.dart** (105) → `widget_patterns_avoid_prefer_rules.dart`, `widget_patterns_require_rules.dart`, `widget_patterns_ux_rules.dart`. **platforms/ios_rules.dart** (86) → `ios_capabilities_permissions_rules.dart`, `ios_platform_lifecycle_rules.dart`, `ios_ui_security_rules.dart`. **widget_layout_rules.dart** (76) → `widget_layout_constraints_rules.dart`, `widget_layout_flex_scroll_rules.dart`. **security_rules.dart** (59) → `security_auth_storage_rules.dart`, `security_network_input_rules.dart`. Exports updated in `all_rules.dart`; tests updated to import the new files. Tier assignments and rule codes unchanged.
 
 ### Archive
 

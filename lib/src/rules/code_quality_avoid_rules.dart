@@ -7,6 +7,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../banned_usage_config.dart' as banned_usage_config;
+import '../analyzer_metadata_compat_utils.dart';
 import '../saropa_lint_rule.dart';
 
 class AvoidAdjacentStringsRule extends SaropaLintRule {
@@ -3226,47 +3227,22 @@ class AvoidDeprecatedUsageRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  static Iterable<ElementAnnotation> _readAnnotations(Element element) {
-    final meta = (element as dynamic).metadata;
-
-    // analyzer 9+: `metadata` is a wrapper (e.g. MetadataImpl) that exposes an
-    // `.annotations` list.
-    if (meta is Metadata) return meta.annotations;
-
-    // Older analyzer: metadata may be a direct iterable.
-    if (meta is Iterable<ElementAnnotation>) return meta;
-    if (meta is Iterable) return meta.whereType<ElementAnnotation>();
-
-    // Unknown shape (should never crash the plugin).
-    return const <ElementAnnotation>[];
-  }
-
-  static bool _hasDeprecatedFlag(Element element) {
-    try {
-      final v = (element as dynamic).hasDeprecated;
-      if (v is bool) return v;
-    } catch (_) {}
-
-    try {
-      final v = (element as dynamic).isDeprecated;
-      if (v is bool) return v;
-    } catch (_) {}
-
-    return false;
-  }
-
   static bool _isDeprecated(Element? element) {
     if (element == null) return false;
-    if (_hasDeprecatedFlag(element)) return true;
+    if (hasDeprecatedFlag(element)) return true;
 
-    for (final ann in _readAnnotations(element)) {
+    for (final ann in readElementAnnotationsFromMetadata(
+      (element as dynamic).metadata,
+    )) {
       if (ann.isDeprecated) return true;
     }
     if (element is ConstructorElement) {
       final enclosing = element.enclosingElement;
-      if (_hasDeprecatedFlag(enclosing)) return true;
+      if (hasDeprecatedFlag(enclosing)) return true;
 
-      for (final ann in _readAnnotations(enclosing)) {
+      for (final ann in readElementAnnotationsFromMetadata(
+        (enclosing as dynamic).metadata,
+      )) {
         if (ann.isDeprecated) return true;
       }
     }

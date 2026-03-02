@@ -1,6 +1,6 @@
 # Bug: `avoid_deprecated_usage` crashes analyzer plugin — `MetadataImpl` is not `Iterable`
 
-**Status:** Fixed (pending release)  
+**Status:** Fixed (6.1.1)  
 **Rule:** `avoid_deprecated_usage` (`AvoidDeprecatedUsageRule`)  
 **Type:** Analyzer plugin crash (hard failure)  
 **First observed:** 2026-03-02  
