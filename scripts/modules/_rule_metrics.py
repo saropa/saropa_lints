@@ -30,7 +30,14 @@ from scripts.modules._utils import (
 )
 
 _RULE_CLASS_RE = re.compile(
-    r"class \w+ extends (?:SaropaLintRule|DartLintRule)"
+    r"^(?!\s*//)\s*class \w+ extends (?:SaropaLintRule|DartLintRule)",
+    re.MULTILINE,
+)
+
+# First string literal argument in LintCode(...) is the rule code name.
+_LINT_NAME_RE = re.compile(
+    r"LintCode\s*\(\s*[\s\n]*'([a-z][a-z0-9_]*)'",
+    re.MULTILINE,
 )
 
 
@@ -82,6 +89,7 @@ class _CategoryInfo(NamedTuple):
     category: str
     rule_count: int
     dart_file: Path
+    rule_names: list[str]
 
 
 def _collect_category_rules(rules_dir: Path) -> list[_CategoryInfo]:
@@ -93,7 +101,16 @@ def _collect_category_rules(rules_dir: Path) -> list[_CategoryInfo]:
         category = dart_file.stem.replace("_rules", "")
         content = dart_file.read_text(encoding="utf-8")
         rule_count = len(_RULE_CLASS_RE.findall(content))
-        result.append(_CategoryInfo(category, rule_count, dart_file))
+        names = _LINT_NAME_RE.findall(content)
+        # Dedupe preserving order (some rules define multiple codes).
+        seen: set[str] = set()
+        rule_names: list[str] = []
+        for n in names:
+            if n in seen:
+                continue
+            seen.add(n)
+            rule_names.append(n)
+        result.append(_CategoryInfo(category, rule_count, dart_file, rule_names))
     return result
 
 
@@ -121,16 +138,48 @@ def _get_example_dirs(project_dir: Path) -> list[Path]:
     ]
 
 
+def _fixture_category_alias(category: str) -> str:
+    """Map split category names to their shared fixture directory name.
+
+    When rule files are split (e.g. security_*), fixtures typically remain in
+    the original shared folder (e.g. example_async/lib/security/). We must map
+    split categories to that folder and then count fixtures by rule name to
+    avoid double-counting.
+    """
+    if category.startswith("code_quality_"):
+        return "code_quality"
+    if category.startswith("security_"):
+        return "security"
+    if category.startswith("widget_layout_"):
+        return "widget_layout"
+    if category.startswith("widget_patterns_"):
+        return "widget_patterns"
+    if category.startswith("ios_"):
+        return "ios"
+    return category
+
+
 def _count_fixtures_for_category(
-    example_dirs: list[Path], category: str,
+    example_dirs: list[Path],
+    category: str,
+    *,
+    rule_names: list[str] | None = None,
 ) -> int:
     """Count fixture files for a category across all sub-packages."""
+    fixture_category = _fixture_category_alias(category)
+
     # Primary: exact directory match (e.g., lib/ios/, lib/scroll/)
-    for suffix in [category, f"{category}s"]:
+    for suffix in [fixture_category, f"{fixture_category}s"]:
         for lib_dir in example_dirs:
             fixture_dir = lib_dir / suffix
             if fixture_dir.exists():
-                return len(list(fixture_dir.glob("*_fixture.dart")))
+                fixtures = list(fixture_dir.glob("*_fixture.dart"))
+                if rule_names:
+                    basenames = {
+                        f.stem.replace("_fixture", "") for f in fixtures
+                    }
+                    return len(basenames.intersection(rule_names))
+                return len(fixtures)
 
     # Fallback: search subdirs for prefix-matched fixtures
     for lib_dir in example_dirs:
@@ -142,7 +191,8 @@ def _count_fixtures_for_category(
         except OSError:
             continue
         for sub in subdirs:
-            count += len(list(sub.glob(f"{category}_*_fixture.dart")))
+            for prefix in {fixture_category, category}:
+                count += len(list(sub.glob(f"{prefix}_*_fixture.dart")))
         if count > 0:
             return count
 
@@ -247,7 +297,9 @@ def display_test_coverage(project_dir: Path) -> None:
     category_details: list[tuple[str, int, int]] = []
     for cat in categories:
         fixture_count = _count_fixtures_for_category(
-            example_dirs, cat.category,
+            example_dirs,
+            cat.category,
+            rule_names=cat.rule_names,
         )
         category_details.append((cat.category, cat.rule_count, fixture_count))
 

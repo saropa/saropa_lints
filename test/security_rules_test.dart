@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/security_rules.dart';
+import 'package:saropa_lints/src/rules/security_auth_storage_rules.dart';
+import 'package:saropa_lints/src/rules/security_network_input_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 56 security lint rules.

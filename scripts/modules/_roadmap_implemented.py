@@ -42,7 +42,8 @@ def get_stale_roadmap_tasks(project_dir: Path) -> list[tuple[str, Path]]:
         return []
     implemented = get_implemented_rules(project_dir)
     stale: list[tuple[str, Path]] = []
-    for path in sorted(roadmap_dir.glob("task_*.md")):
+    # Task files may live in nested folders (e.g. bugs/roadmap/open_issues/).
+    for path in sorted(roadmap_dir.rglob("task_*.md")):
         rule_name = path.stem.replace("task_", "", 1)
         if rule_name in implemented:
             stale.append((rule_name, path))
