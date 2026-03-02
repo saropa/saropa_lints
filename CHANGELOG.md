@@ -12,6 +12,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **CI workflow:** Checkout now uses the exact commit (`github.sha`) on push events instead of the branch ref to avoid races; test job uses the same checkout configuration as the analyze job for consistency.
+
+---
+
 ## [6.1.1]
 
 ### Added
