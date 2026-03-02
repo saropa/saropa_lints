@@ -768,6 +768,89 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
   }
 }
 
+/// Suggests non-const constructor when const is not required (stylistic opposite).
+///
+/// Stylistic: some teams prefer non-const constructors for consistency or debugging.
+class PreferNonConstConstructorsRule extends SaropaLintRule {
+  PreferNonConstConstructorsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_non_const_constructors',
+    '[prefer_non_const_constructors] Prefer non-const constructor when const is not required (stylistic preference).',
+    correctionMessage: 'Consider removing the const keyword.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
+      if (node.constKeyword == null) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Prefer factory constructor over static method that returns an instance of the same class.
+///
+/// **Bad:**
+/// ```dart
+/// class C {
+///   static C create() => C();
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class C {
+///   factory C.create() => C();
+/// }
+/// ```
+class PreferFactoryConstructorRule extends SaropaLintRule {
+  PreferFactoryConstructorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_factory_constructor',
+    '[prefer_factory_constructor] Prefer factory constructor over static method that returns an instance of the same class.',
+    correctionMessage: 'Convert the static method to a factory constructor.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.isStatic) return;
+      if (node.body is! ExpressionFunctionBody) return;
+      final ExpressionFunctionBody body = node.body as ExpressionFunctionBody;
+      final Expression? expr = body.expression;
+      if (expr is! InstanceCreationExpression) return;
+      final AstNode? parent = node.parent;
+      if (parent is! ClassDeclaration) return;
+      final String className = parent.name.lexeme;
+      final String createdName = expr.constructorName.type.name.lexeme;
+      if (createdName != className) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
 /// Warns when extension type representation fields are public.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
@@ -2159,6 +2242,90 @@ class _AssignmentToFieldVisitor extends RecursiveAstVisitor<void> {
       }
     }
     super.visitPostfixExpression(node);
+  }
+}
+
+/// Warns when a base class references its subclasses directly.
+///
+/// Since: v4.13.0 | Rule version: v1
+///
+/// Base classes should not reference their subclasses (e.g. return types,
+/// parameter types) to keep the hierarchy one-way and avoid circular coupling.
+///
+/// **Bad:**
+/// ```dart
+/// class Base { Sub create() => Sub(); }
+/// class Sub extends Base {}
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class Base { Base create() => Sub(); }
+/// class Sub extends Base {}
+/// ```
+class AvoidReferencingSubclassesRule extends SaropaLintRule {
+  AvoidReferencingSubclassesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'avoid_referencing_subclasses',
+    '[avoid_referencing_subclasses] Base class should not reference its subclasses directly. Referencing subclasses creates circular coupling and makes the hierarchy harder to evolve.',
+    correctionMessage:
+        'Use the base type (or an interface) instead of the subclass type in the base class.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit unit) {
+      final Map<String, Set<String>> baseToSubs =
+          <String, Set<String>>{};
+      for (final Declaration d in unit.declarations) {
+        if (d is ClassDeclaration) {
+          final base = d.extendsClause?.superclass.name.lexeme;
+          if (base != null) {
+            baseToSubs.putIfAbsent(base, () => <String>{}).add(d.name.lexeme);
+          }
+        }
+      }
+      for (final Declaration d in unit.declarations) {
+        if (d is! ClassDeclaration) continue;
+        final baseName = d.name.lexeme;
+        final subs = baseToSubs[baseName];
+        if (subs == null || subs.isEmpty) continue;
+        d.visitChildren(
+          _SubclassReferenceVisitor(subs, reporter, _code),
+        );
+      }
+    });
+  }
+}
+
+class _SubclassReferenceVisitor extends RecursiveAstVisitor<void> {
+  _SubclassReferenceVisitor(
+    this._subclassNames,
+    this._reporter,
+    this._code,
+  );
+
+  final Set<String> _subclassNames;
+  final SaropaDiagnosticReporter _reporter;
+  final LintCode _code;
+
+  @override
+  void visitNamedType(NamedType node) {
+    if (_subclassNames.contains(node.name.lexeme)) {
+      _reporter.atNode(node, _code);
+    }
+    super.visitNamedType(node);
   }
 }
 

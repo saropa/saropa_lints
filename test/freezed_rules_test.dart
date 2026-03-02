@@ -24,6 +24,11 @@ void main() {
       () => AvoidFreezedJsonSerializableConflictRule(),
     );
     testRule(
+      'AvoidFreezedInvalidAnnotationTargetRule',
+      'avoid_freezed_invalid_annotation_target',
+      () => AvoidFreezedInvalidAnnotationTargetRule(),
+    );
+    testRule(
       'RequireFreezedArrowSyntaxRule',
       'require_freezed_arrow_syntax',
       () => RequireFreezedArrowSyntaxRule(),
@@ -72,6 +77,7 @@ void main() {
   group('Freezed Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_freezed_json_serializable_conflict',
+      'avoid_freezed_invalid_annotation_target',
       'require_freezed_arrow_syntax',
       'require_freezed_private_constructor',
       'require_freezed_explicit_json',

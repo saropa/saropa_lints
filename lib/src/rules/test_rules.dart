@@ -325,6 +325,59 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
   }
 }
 
+/// Warns when test name is not in snake_case format.
+///
+/// Stylistic: consistent test name format (e.g. snake_case) improves readability.
+///
+/// **Bad:**
+/// ```dart
+/// test('Returns True When Valid', () {});
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// test('returns_true_when_valid', () {});
+/// ```
+class FormatTestNameRule extends SaropaLintRule {
+  FormatTestNameRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
+  static const LintCode _code = LintCode(
+    'format_test_name',
+    '[format_test_name] Test name should be in snake_case format.',
+    correctionMessage: 'Rename the test to use snake_case (e.g. words_with_underscores).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static final RegExp _snakeCase = RegExp(r'^[a-z][a-z0-9]*(_[a-z0-9]+)*$');
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'test' && node.methodName.name != 'testWidgets') return;
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+      final Expression firstArg = args.arguments.first;
+      if (firstArg is! StringLiteral) return;
+      final String? name = firstArg.stringValue;
+      if (name == null || name.isEmpty) return;
+      if (_snakeCase.hasMatch(name)) return;
+      reporter.atNode(firstArg);
+    });
+  }
+}
+
 /// Warns when a test file doesn't follow naming conventions.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
@@ -414,6 +467,89 @@ class _TestCallFinder extends RecursiveAstVisitor<void> {
       onFound();
     }
     super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when test name suggests running on real device.
+///
+/// Since: v4.13.0 | Rule version: v1
+///
+/// Real devices vary in performance and state. Use emulators/simulators
+/// in CI for consistent, reproducible results.
+///
+/// **Heuristic:** Detection uses substring matching on the test description
+/// string (e.g. "real device", "on device"). Descriptions that merely
+/// mention avoiding real device may be flagged; use a suppression if needed.
+///
+/// **Bad:**
+/// ```dart
+/// test('runs on real device', () { });
+/// testWidgets('real_device integration', (t) async { });
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// test('validates order flow', () { });
+/// testWidgets('renders list', (t) async { });
+/// ```
+class AvoidTestOnRealDeviceRule extends SaropaLintRule {
+  AvoidTestOnRealDeviceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
+  static const LintCode _code = LintCode(
+    'avoid_test_on_real_device',
+    '[avoid_test_on_real_device] Test name suggests running on real device. Real devices vary in performance and state; use emulators/simulators in CI for consistent, reproducible results.',
+    correctionMessage:
+        'Rename or move the test to run on emulator/simulator, or document why real device is required.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const List<String> _phrases = <String>[
+    'real device',
+    'real_device',
+    'on real device',
+    'on device',
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final String path = context.filePath;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.addMethodInvocation((MethodInvocation node) {
+      final String name = node.methodName.name;
+      if (name != 'test' && name != 'testWidgets') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression firstArg = args.arguments.first;
+      if (firstArg is! StringLiteral) return;
+
+      final String testName =
+          (firstArg.stringValue ?? firstArg.toSource()).toLowerCase();
+      for (final String phrase in _phrases) {
+        if (testName.contains(phrase)) {
+          reporter.atNode(firstArg);
+          return;
+        }
+      }
+    });
   }
 }
 

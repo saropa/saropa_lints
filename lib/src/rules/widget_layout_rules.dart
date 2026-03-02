@@ -3645,6 +3645,86 @@ class PreferFractionalSizingRule extends SaropaLintRule {
   }
 }
 
+/// Suggests LayoutBuilder for constraint-aware layout instead of MediaQuery sizing.
+///
+/// Since: v4.13.0 | Rule version: v1
+///
+/// Use LayoutBuilder when sizing widgets from constraints; MediaQuery for
+/// widget sizing causes rebuilds on any MediaQuery change.
+///
+/// **Bad:**
+/// ```dart
+/// width: MediaQuery.of(context).size.width,
+/// height: MediaQuery.sizeOf(context).height,
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// LayoutBuilder(
+///   builder: (context, constraints) => SizedBox(
+///     width: constraints.maxWidth,
+///     height: constraints.maxHeight,
+///   ),
+/// )
+/// ```
+class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
+  PreferLayoutBuilderForConstraintsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    'prefer_layout_builder_for_constraints',
+    '[prefer_layout_builder_for_constraints] Use LayoutBuilder for constraint-aware layout instead of MediaQuery for widget sizing. MediaQuery-based sizing rebuilds on any MediaQuery change.',
+    correctionMessage:
+        'Consider LayoutBuilder with constraints.maxWidth/maxHeight for constraint-dependent sizing.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addPropertyAccess((PropertyAccess node) {
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String name = node.propertyName.name;
+      if (name == 'size' && _isMediaQueryOf(target)) {
+        reporter.atNode(node, _code);
+        return;
+      }
+      if ((name == 'width' || name == 'height') &&
+          _isMediaQuerySizeAccess(target)) {
+        reporter.atNode(node, _code);
+      }
+    });
+  }
+
+  static bool _isMediaQueryOf(Expression target) {
+    if (target is MethodInvocation) {
+      final String methodName = target.methodName.name;
+      if (methodName != 'of' && methodName != 'sizeOf') return false;
+      final Expression? rec = target.target;
+      if (rec is SimpleIdentifier && rec.name == 'MediaQuery') return true;
+    }
+    return false;
+  }
+
+  static bool _isMediaQuerySizeAccess(Expression target) {
+    if (target is! PropertyAccess) return false;
+    if (target.propertyName.name != 'size') return false;
+    final Expression? rec = target.target;
+    return rec != null && _isMediaQueryOf(rec);
+  }
+}
+
 /// Warns when UnconstrainedBox is used improperly causing overflow.
 ///
 /// Since: v1.4.2 | Updated: v4.13.0 | Rule version: v5

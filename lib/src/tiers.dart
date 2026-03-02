@@ -47,6 +47,34 @@ const Set<String> stylisticRules = <String>{
   'prefer_use_prefix', // Moved from comprehensive (opinionated)
   // === Error handling style ===
   'prefer_catch_over_on',
+  'prefer_then_catcherror',
+  'prefer_fire_and_forget',
+  'prefer_foreach',
+  'prefer_foreach_over_map_entries',
+  'prefer_base_prefix',
+  'prefer_extension_suffix',
+  'prefer_mixin_prefix',
+  'prefer_overrides_last',
+  'prefer_i_prefix_interfaces',
+  'prefer_no_i_prefix_interfaces',
+  'prefer_impl_suffix',
+  'prefer_constructor_over_literals',
+  'prefer_constructors_over_static_methods',
+  'format_test_name',
+  'avoid_explicit_type_declaration',
+  'prefer_explicit_null_checks',
+  'prefer_non_const_constructors',
+  'prefer_separate_assignments',
+  'prefer_optional_named_params',
+  'prefer_optional_positional_params',
+  'prefer_positional_bool_params',
+  'prefer_if_else_over_guards',
+  'prefer_cascade_assignments',
+  'prefer_factory_constructor',
+  'require_auto_route_page_suffix',
+  'prefer_inline_function_types',
+  'prefer_function_over_static_method',
+  'prefer_static_method_over_function',
 
   // === Code style preferences ===
   'avoid_escaping_inner_quotes',
@@ -57,6 +85,7 @@ const Set<String> stylisticRules = <String>{
   'avoid_cubits',
   'prefer_fold_over_reduce',
   'prefer_expression_body_getters',
+  'avoid_types_on_closure_parameters',
   'prefer_no_continue_statement',
   'prefer_single_exit_point',
   'prefer_wildcard_for_unused_param',
@@ -126,6 +155,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_named_imports',
   'prefer_relative_imports',
   'prefer_import_group_comments',
+  'prefer_import_over_part',
 
   // === Quote style (conflicting pair - opt-in only) ===
   'prefer_double_quotes',
@@ -1240,6 +1270,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_deferred_loading_web', // INFO - web bundle splitting
   'prefer_fit_cover_for_background', // INFO - BoxFit.cover
   'prefer_fractional_sizing', // INFO - fractional vs fixed
+  'prefer_layout_builder_for_constraints', // INFO - LayoutBuilder vs MediaQuery sizing
   'prefer_intrinsic_dimensions', // INFO - intrinsic sizing
   'prefer_keep_alive', // INFO - AutomaticKeepAliveClientMixin
   'prefer_page_storage_key', // INFO - scroll position persistence
@@ -1354,6 +1385,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_duplicate_string_elements',
   'avoid_duplicate_object_elements',
   'avoid_duplicate_exports',
+  'prefer_asmap_over_indexed_iteration',
   'avoid_duplicate_mixins',
   'avoid_duplicate_named_imports',
   'avoid_duplicate_patterns',
@@ -1423,6 +1455,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_bloc_state_mutation',
   'avoid_dynamic_json_chains',
   'avoid_freezed_json_serializable_conflict',
+  'avoid_freezed_invalid_annotation_target',
   'avoid_isar_clear_in_production',
   'avoid_isar_transaction_nesting',
   'avoid_navigation_in_build',
@@ -1582,6 +1615,7 @@ const Set<String> professionalOnlyRules = <String>{
   // Error Handling
   'require_error_context',
   'prefer_result_pattern',
+  'prefer_result_type',
   'require_error_boundary',
   // Note: require_async_error_documentation moved to Comprehensive
 
@@ -1653,6 +1687,7 @@ const Set<String> professionalOnlyRules = <String>{
 
   // Documentation
   'require_public_api_documentation',
+  'prefer_correct_throws', // INFO - @Throws for methods that throw
   'avoid_misleading_documentation',
   'require_complex_logic_comments',
   'require_parameter_documentation',
@@ -1715,6 +1750,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_unwrapping_future_or',
   'prefer_specifying_future_value_type',
   'prefer_expect_later',
+  'avoid_test_on_real_device', // INFO - use emulator/simulator in CI
   'prefer_assigning_await_expressions',
   'avoid_unnecessary_futures',
   'prefer_async_callback',
@@ -2088,6 +2124,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_complex_loop_conditions',
   'avoid_context_in_static_methods',
   'avoid_declaring_call_method',
+  'avoid_referencing_subclasses', // INFO - base should not reference subclasses
   'avoid_default_tostring',
   'avoid_digit_separators',
   'avoid_duplicate_constant_values',
@@ -2175,6 +2212,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_unnecessary_local_late',
   'avoid_unnecessary_local_variable',
   'avoid_unnecessary_negations',
+  'avoid_unnecessary_null_aware_elements',
   'avoid_unnecessary_nullable_fields',
   'avoid_unnecessary_nullable_parameters',
   'avoid_unnecessary_nullable_return_type',
@@ -2583,6 +2621,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_inherited_widget_cache', // cache optimization
   'prefer_layout_builder_over_media_query', // rebuild optimization
   'require_list_preallocate', // list allocation
+  'require_const_list_items', // const constructor items in lists when possible
   'prefer_compute_over_isolate_run', // isolate efficiency
   'prefer_itemextent_when_known', // scroll optimization
   'prefer_cached_paint_objects', // paint object reuse
@@ -2628,6 +2667,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_notifier_over_state',
   'prefer_provider_extensions',
   'prefer_redirecting_superclass_constructor',
+  'prefer_factory_before_named',
 
   // Kept from original Comprehensive
   'prefer_element_rebuild', // conditional returns destroy Elements
@@ -3280,6 +3320,7 @@ const Set<String> freezedPackageRules = <String>{
   'require_freezed_arrow_syntax',
   'require_freezed_private_constructor',
   'avoid_freezed_json_serializable_conflict',
+  'avoid_freezed_invalid_annotation_target',
   'require_freezed_json_converter',
   'require_freezed_lint_package',
   'avoid_freezed_for_logic_classes',

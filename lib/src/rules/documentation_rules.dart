@@ -8,6 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -855,5 +856,86 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
       return param.name.lexeme;
     }
     return null;
+  }
+}
+
+/// Suggests documenting thrown exceptions with `@Throws` annotation.
+///
+/// Since: v4.13.0 | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// void loadUser(String id) {
+///   if (id.isEmpty) throw ArgumentError('id');
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// @Throws(ArgumentError)
+/// void loadUser(String id) {
+///   if (id.isEmpty) throw ArgumentError('id');
+/// }
+/// ```
+class PreferCorrectThrowsRule extends SaropaLintRule {
+  PreferCorrectThrowsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_correct_throws',
+    '[prefer_correct_throws] Document thrown exceptions with @Throws annotation. Methods that throw should declare @Throws so callers know what to catch.',
+    correctionMessage:
+        'Add @Throws(ExceptionType) to the declaration (e.g. from package:documentation or a custom annotation).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme.startsWith('_')) return;
+      if (_hasThrowsAnnotation(node.metadata)) return;
+      if (!_bodyContainsThrow(node.body)) return;
+      reporter.atNode(node, _code);
+    });
+    context.addFunctionDeclaration((FunctionDeclaration node) {
+      if (node.name.lexeme.startsWith('_')) return;
+      if (node.name.lexeme == 'main') return;
+      if (_hasThrowsAnnotation(node.metadata)) return;
+      if (!_bodyContainsThrow(node.functionExpression.body)) return;
+      reporter.atNode(node, _code);
+    });
+  }
+
+  static bool _hasThrowsAnnotation(NodeList<Annotation> metadata) {
+    for (final Annotation a in metadata) {
+      if (a.name.name == 'Throws') return true;
+    }
+    return false;
+  }
+
+  static bool _bodyContainsThrow(FunctionBody body) {
+    var found = false;
+    body.visitChildren(_ThrowFinder(() => found = true));
+    return found;
+  }
+}
+
+class _ThrowFinder extends RecursiveAstVisitor<void> {
+  _ThrowFinder(this._onThrow);
+
+  final void Function() _onThrow;
+
+  @override
+  void visitThrowExpression(ThrowExpression node) {
+    _onThrow();
+    super.visitThrowExpression(node);
   }
 }

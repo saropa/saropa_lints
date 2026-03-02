@@ -84,6 +84,16 @@ void main() {
       () => PreferExplicitFunctionTypeRule(),
     );
     testRule(
+      'PreferInlineFunctionTypesRule',
+      'prefer_inline_function_types',
+      () => PreferInlineFunctionTypesRule(),
+    );
+    testRule(
+      'PreferResultTypeRule',
+      'prefer_result_type',
+      () => PreferResultTypeRule(),
+    );
+    testRule(
       'PreferTypeOverVarRule',
       'prefer_type_over_var',
       () => PreferTypeOverVarRule(),
@@ -125,6 +135,8 @@ void main() {
       'avoid_unrelated_type_assertions',
       'prefer_correct_type_name',
       'prefer_explicit_function_type',
+      'prefer_inline_function_types',
+      'prefer_result_type',
       'prefer_type_over_var',
       'avoid_shadowing_type_parameters',
       'avoid_private_typedef_functions',

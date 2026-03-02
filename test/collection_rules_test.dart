@@ -54,6 +54,21 @@ void main() {
       () => PreferFoldOverReduceRule(),
     );
     testRule(
+      'PreferForeachRule',
+      'prefer_foreach',
+      () => PreferForeachRule(),
+    );
+    testRule(
+      'PreferForeachOverMapEntriesRule',
+      'prefer_foreach_over_map_entries',
+      () => PreferForeachOverMapEntriesRule(),
+    );
+    testRule(
+      'PreferConstructorOverLiteralsRule',
+      'prefer_constructor_over_literals',
+      () => PreferConstructorOverLiteralsRule(),
+    );
+    testRule(
       'AvoidUnsafeWhereMethodsRule',
       'avoid_unsafe_where_methods',
       () => AvoidUnsafeWhereMethodsRule(),
@@ -136,6 +151,16 @@ void main() {
       'prefer_inlined_adds',
       () => PreferInlinedAddsRule(),
     );
+    testRule(
+      'PreferAsmapOverIndexedIterationRule',
+      'prefer_asmap_over_indexed_iteration',
+      () => PreferAsmapOverIndexedIterationRule(),
+    );
+    testRule(
+      'RequireConstListItemsRule',
+      'require_const_list_items',
+      () => RequireConstListItemsRule(),
+    );
   });
 
   group('Collection Rules - Fixture Verification', () {
@@ -147,6 +172,9 @@ void main() {
       'avoid_unsafe_collection_methods',
       'avoid_unsafe_reduce',
       'prefer_fold_over_reduce',
+      'prefer_foreach',
+      'prefer_foreach_over_map_entries',
+      'prefer_constructor_over_literals',
       'avoid_unsafe_where_methods',
       'prefer_where_or_null',
       'map_keys_ordering',
@@ -155,6 +183,8 @@ void main() {
       'prefer_iterable_of',
       'prefer_list_last',
       'prefer_add_all',
+      'prefer_asmap_over_indexed_iteration',
+      'require_const_list_items',
       'avoid_duplicate_number_elements',
       'avoid_duplicate_string_elements',
       'avoid_duplicate_object_elements',

@@ -80,6 +80,12 @@ void main() {
     );
 
     testRule(
+      'AvoidUnnecessaryNullAwareElementsRule',
+      'avoid_unnecessary_null_aware_elements',
+      () => AvoidUnnecessaryNullAwareElementsRule(),
+    );
+
+    testRule(
       'AvoidUnnecessarySuperRule',
       'avoid_unnecessary_super',
       () => AvoidUnnecessarySuperRule(),
@@ -91,6 +97,7 @@ void main() {
   group('Unnecessary Code Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_empty_spread',
+      'avoid_unnecessary_null_aware_elements',
       'avoid_unnecessary_block',
       'avoid_unnecessary_call',
       'avoid_unnecessary_constructor',
