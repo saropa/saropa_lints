@@ -1531,7 +1531,7 @@ class RequireTimerCancellationRule extends SaropaLintRule {
     'require_timer_cancellation',
     '[require_timer_cancellation] Timer or StreamSubscription must be canceled in dispose(). Timers and stream subscriptions that aren\'t canceled will continue running after the widget is disposed, causing: - Crashes if they call setState on a disposed widget - Memory leaks from retained references - Wasted CPU cycles. {v5}',
     correctionMessage:
-        'Add cancel() in dispose() to prevent crashes and memory leaks. Verify the change works correctly with existing tests and add coverage for the new behavior.'
+        'Add cancel() in dispose() to prevent crashes and memory leaks. Verify the change works correctly with existing tests and add coverage for the new behavior. '
         'Uncanceled timers continue firing after widget disposal.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -1749,7 +1749,7 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
     'nullify_after_dispose',
     '[nullify_after_dispose] Nullable disposable field must be set to null after disposal. When a nullable disposable field (Timer?, StreamSubscription?, etc.) is disposed/canceled, it\'s good practice to also set it to null. This: - Helps garbage collection - Prevents accidental reuse of disposed resources - Makes it clear the resource has been cleaned up. {v7}',
     correctionMessage:
-        'Add `fieldName = null;` after disposing to help garbage collection. Verify the change works correctly with existing tests and add coverage for the new behavior.'
+        'Add `fieldName = null;` after disposing to help garbage collection. Verify the change works correctly with existing tests and add coverage for the new behavior. '
         'and prevent accidental reuse.',
     severity: DiagnosticSeverity.INFO,
   );

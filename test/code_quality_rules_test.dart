@@ -1168,6 +1168,17 @@ void main() {
       test('comparing boolean to true/false SHOULD trigger', () {
         expect('boolean literal compare detected', isNotNull);
       });
+      test('correction message has no duplicated phrase', () {
+        final rule = NoBooleanLiteralCompareRule();
+        final msg = rule.code.correctionMessage!;
+        const phrase = '!x instead of x == false';
+        expect(msg, contains(phrase));
+        expect(
+          msg.indexOf(phrase),
+          equals(msg.lastIndexOf(phrase)),
+          reason: 'correctionMessage must not duplicate "$phrase"',
+        );
+      });
     });
   });
 
