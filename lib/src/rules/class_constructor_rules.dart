@@ -904,6 +904,85 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
   }
 }
 
+/// Warns when an extension type exposes the representation under a different name.
+///
+/// Since: v4.13.0 | Rule version: v1
+///
+/// **Purpose for developers:** In Dart extension types, the representation is
+/// the single field declared in the primary constructor (e.g. `int _id` in
+/// `extension type UserId(int _id)`). That field is exposed as an implicit
+/// getter with the same name. This rule flags explicit getters in the extension
+/// type body that return the same type as the representation but use a
+/// different name (e.g. `int get value => _id`), which "renames" the
+/// representation and can confuse readers. Detection compares return type
+/// source to representation type source; no string heuristics. Methods with
+/// parameters are ignored (only parameterless getters are considered).
+///
+/// **BAD:**
+/// ```dart
+/// extension type UserId(int _id) {
+///   int get value => _id;  // Renames representation getter
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// extension type UserId(int id) {
+///   // Use representation name directly
+/// }
+/// ```
+class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
+  AvoidRenamingRepresentationGettersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_renaming_representation_getters',
+    '[avoid_renaming_representation_getters] Extension type should not expose '
+        'the representation via a getter with a different name. {v1}',
+    correctionMessage:
+        'Use the representation name directly or keep a single public getter name matching the representation.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+      final RepresentationDeclaration representation = node.representation;
+      final String repFieldName = representation.fieldName.lexeme;
+      final String repTypeSource = representation.fieldType
+          .toSource()
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trim();
+
+      for (final ClassMember m in node.members) {
+        if (m is! MethodDeclaration) continue;
+        // Getters have no parameters
+        if (m.parameters != null && m.parameters!.parameters.isNotEmpty) {
+          continue;
+        }
+        final String getterName = m.name.lexeme;
+        if (getterName == repFieldName) continue;
+
+        final TypeAnnotation? returnType = m.returnType;
+        if (returnType == null) continue;
+        final String returnTypeSource =
+            returnType.toSource().replaceAll(RegExp(r'\s+'), ' ').trim();
+        if (returnTypeSource != repTypeSource) continue;
+
+        reporter.atToken(m.name, code);
+      }
+    });
+  }
+}
+
 /// Warns when super lifecycle methods are called in wrong order.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5

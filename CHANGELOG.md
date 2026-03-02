@@ -65,8 +65,11 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - **avoid_referencing_subclasses** (Professional): Base classes should not reference their subclasses (e.g. return/parameter types).
 - **prefer_correct_throws** (Professional): Suggest @Throws annotation for methods/functions that throw.
 - **prefer_layout_builder_for_constraints** (Professional): Prefer LayoutBuilder for constraint-aware layout instead of MediaQuery for widget sizing.
+- **prefer_cache_extent** (Comprehensive): ListView.builder/GridView.builder should specify cacheExtent for predictable scroll performance. Fixture: `example_widgets/lib/scroll/prefer_cache_extent_fixture.dart`.
+- **prefer_biometric_protection** (Professional): FlutterSecureStorage should use authenticationRequired in AndroidOptions/IOSOptions. Fixture: `example_async/lib/security/prefer_biometric_protection_fixture.dart`.
+- **avoid_renaming_representation_getters** (Professional): Extension type should not expose the representation via a getter with a different name. Fixture: `example_core/lib/class_constructor/avoid_renaming_representation_getters_fixture.dart`.
 
-Fixtures for the 10 rules above include good/bad examples and false-positive guards; task specs were moved to `bugs/history/roadmap/`. ROADMAP.md count: 1745 implemented, 445 remaining.
+Fixtures for the rules above include good/bad examples and false-positive guards; task specs were moved to `bugs/history/roadmap/`. ROADMAP.md count: 1745 implemented, 445 remaining.
 
 ### Fixed
 

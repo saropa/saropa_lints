@@ -1,42 +1,45 @@
-# Task: `avoid_renaming_representation_getters`
+**IMPLEMENTED:** Rule added in `scroll_rules.dart` (v4.13.0). Flags ListView.builder/GridView.builder without cacheExtent; tier Comprehensive.
+
+---
+
+# Task: `prefer_cache_extent`
 
 ## Summary
-- **Rule Name**: `avoid_renaming_representation_getters`
+- **Rule Name**: `prefer_cache_extent`
 - **Tier**: Professional
 - **Severity**: INFO
-- **Status**: Planned
-- **Source**: ROADMAP.md — 1.58 Class & Inheritance Rules
+- **Status**: Implemented
+- **Source**: ROADMAP.md — 5.25 ListView/GridView Performance Rules
 
 ## Problem Statement
 
-Extension type representation getters should not be renamed.
+Tune cacheExtent for performance. Detect default cacheExtent with issues.
 
 This rule aims to improve code quality, security, or maintainability by enforcing a specific practice. Implementation must reliably detect true violations while avoiding false positives.
 
 ## Description (from ROADMAP)
 
-> Extension type representation getters should not be renamed.
+> Tune cacheExtent for performance. Detect default cacheExtent with issues.
 
 ## Code Examples
 
 ### Bad (should trigger)
 
 ```dart
-// Example violation: code that the rule should report.
-// TODO: Replace with concrete example for `avoid_renaming_representation_getters`.
+// Violation: see Problem Statement. Add concrete example before implementing.
 ```
 
 ### Good (should not trigger)
 
 ```dart
-// Compliant code that must not be flagged.
-// TODO: Replace with concrete example for `avoid_renaming_representation_getters`.
+// Compliant: see Problem Statement. Add concrete example before implementing.
 ```
 
 ## Detection: True Positives
 
 - **Goal**: Reliably detect all real violations of the practice.
-- **Approach**: Prefer type/element checks and exact-match sets over substring or `toSource()` matching (see [bugs/history/false_positives/string_contains_false_positive_audit.md](../../history/false_positives/string_contains_false_positive_audit.md)).
+- **Detection approach**: Visit the AST nodes that can exhibit the pattern (see Problem Statement); report when the pattern is found. Before implementing: add concrete bad/good examples above and refine this (or mark "Needs design" if the pattern requires cross-file/heuristic work).
+- **Approach**: Prefer type/element checks and exact-match sets over substring or `toSource()` matching (see [bugs/history/false_positives/string_contains_false_positive_audit.md](../false_positives/string_contains_false_positive_audit.md)).
 - **AST coverage**: Consider all AST shapes for the same pattern (e.g. both `MethodDeclaration` and `FunctionDeclaration`) so violations are not missed.
 - **Edge cases**: Document which constructs are in scope (e.g. test files, generated code, platform-specific code) and ensure detection is consistent.
 
@@ -53,7 +56,7 @@ This rule aims to improve code quality, security, or maintainability by enforcin
 - [Flutter API docs](https://api.flutter.dev/) — for widget/API-specific rules.
 - [OWASP Mobile](https://owasp.org/www-project-mobile-top-10/) — for security rules.
 - [Dart custom_lint](https://pub.dev/packages/custom_lint) — plugin API and performance.
-- Add package/docs links relevant to `avoid_renaming_representation_getters` (e.g. bloc, riverpod, hive).
+- Add package/docs links relevant to `prefer_cache_extent` (e.g. bloc, riverpod, hive).
 
 ## Quality & Performance
 

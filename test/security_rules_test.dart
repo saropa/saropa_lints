@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/security_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 55 security lint rules.
+/// Tests for 56 security lint rules.
 ///
 /// These rules cover credential security, injection prevention, secure storage,
 /// WebView security, authentication, data protection, and OWASP compliance.
@@ -272,6 +272,11 @@ void main() {
       () => AvoidSecureStorageLargeDataRule(),
     );
     testRule(
+      'PreferBiometricProtectionRule',
+      'prefer_biometric_protection',
+      () => PreferBiometricProtectionRule(),
+    );
+    testRule(
       'AvoidSensitiveDataInClipboardRule',
       'avoid_sensitive_data_in_clipboard',
       () => AvoidSensitiveDataInClipboardRule(),
@@ -356,6 +361,7 @@ void main() {
       'require_secure_storage',
       'require_secure_storage_auth_data',
       'require_secure_storage_for_auth',
+      'prefer_biometric_protection',
       'require_token_refresh',
       'require_url_validation',
       'require_webview_error_handling',

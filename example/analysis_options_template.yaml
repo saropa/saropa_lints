@@ -279,6 +279,7 @@ saropa_lints:
     - avoid_nested_extension_types: false
     - avoid_implicitly_nullable_extension_types: false
     - prefer_private_extension_type_field: false
+    - avoid_renaming_representation_getters: false  # INFO - extension type getter name (v4.13.0)
     - avoid_shadowed_extension_methods: false
 
     # =========================================================================
@@ -307,6 +308,7 @@ saropa_lints:
     - avoid_firestore_unbounded_query: false
     - avoid_database_in_build: false
     - avoid_secure_storage_on_web: false
+    - prefer_biometric_protection: false  # INFO - FlutterSecureStorage authenticationRequired (v4.13.0)
     - require_firebase_init_before_use: false
     - require_database_migration: false
     - require_database_index: false
@@ -452,6 +454,7 @@ saropa_lints:
     - avoid_shrinkwrap_in_scrollview: false
     - avoid_nested_scrollables_conflict: false
     - avoid_listview_children_for_large_lists: false
+    - prefer_cache_extent: false  # INFO - ListView/GridView.builder cacheExtent (v4.13.0)
     - avoid_excessive_bottom_nav_items: false
     - require_tab_controller_length_sync: false
     - avoid_refresh_without_await: false

@@ -1785,3 +1785,85 @@ class RequirePaginationForLargeListsRule extends SaropaLintRule {
         content.contains('PagedListView');
   }
 }
+
+/// Warns when ListView.builder or GridView.builder does not specify cacheExtent.
+///
+/// Since: v4.13.0 | Rule version: v1
+///
+/// **Purpose for developers:** Tuning [cacheExtent](https://api.flutter.dev/flutter/widgets/ScrollView/cacheExtent.html)
+/// controls how many off-screen items are kept in memory. The default (viewport-based)
+/// may be suboptimal for long lists or large items; setting it explicitly improves
+/// predictable scroll performance and can reduce jank. Applies to ListView.builder
+/// and ListView.separated, and GridView.builder / GridView.separated only (not
+/// default constructors). No heuristics: exact type and constructor name checks only.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: 1000,
+///   itemBuilder: (context, i) => ListTile(title: Text('$i')),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: 1000,
+///   cacheExtent: 500,
+///   itemBuilder: (context, i) => ListTile(title: Text('$i')),
+/// )
+/// ```
+class PreferCacheExtentRule extends SaropaLintRule {
+  PreferCacheExtentRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    'prefer_cache_extent',
+    '[prefer_cache_extent] ListView/GridView builder should specify cacheExtent for predictable scroll performance. Default cacheExtent may be suboptimal for long lists. {v1}',
+    correctionMessage:
+        'Add cacheExtent to tune how many off-screen items are cached. Use a value appropriate for your item size and viewport.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _builderTypes = <String>{'ListView', 'GridView'};
+  static const Set<String> _builderConstructors =
+      <String>{'builder', 'separated'};
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_builderTypes.contains(typeName)) return;
+
+      final String? constructorName = node.constructorName.name?.name;
+      if (constructorName == null ||
+          !_builderConstructors.contains(constructorName)) {
+        return;
+      }
+
+      bool hasCacheExtent = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'cacheExtent') {
+          hasCacheExtent = true;
+          break;
+        }
+      }
+
+      if (!hasCacheExtent) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}

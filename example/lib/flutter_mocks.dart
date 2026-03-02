@@ -1550,8 +1550,19 @@ class AudioPlayer {
   void dispose() {}
 }
 
+class AndroidOptions {
+  const AndroidOptions({bool? authenticationRequired});
+}
+
+class IOSOptions {
+  const IOSOptions({bool? authenticationRequired});
+}
+
 class FlutterSecureStorage {
-  const FlutterSecureStorage();
+  const FlutterSecureStorage({
+    AndroidOptions? aOptions,
+    IOSOptions? iOptions,
+  });
   Future<void> write({required String key, required String? value}) async {}
   Future<String?> read({required String key}) async => null;
 }
