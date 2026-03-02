@@ -895,7 +895,8 @@ class PreferBuilderPatternRule extends SaropaLintRule {
     'prefer_builder_pattern',
     '[prefer_builder_pattern] Prefer builder pattern for complex or '
         'optional construction to improve readability and flexibility.',
-    correctionMessage: 'Consider a builder or factory for complex construction.',
+    correctionMessage:
+        'Consider a builder or factory for complex construction.',
     severity: DiagnosticSeverity.INFO,
   );
 

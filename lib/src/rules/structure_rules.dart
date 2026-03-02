@@ -808,7 +808,7 @@ class PreferSmallTestFilesRule extends SaropaLintRule {
     '[prefer_small_length_test_files] Test file has more than $_maxLines code lines (comments and blank lines excluded). While test files typically need more room than production code, very large test files can still indicate poor organization. Split by feature, scenario, or test category. {v3}',
     correctionMessage:
         'Split tests by feature or scenario to improve organization. Verify the change works correctly with existing tests and add coverage for the new behavior. '
-        'Disable with: // ignore_for_file: prefer_small_length_test_files',
+        'To disable, use: // ignore_for_file: prefer_small_length_test_files',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -859,7 +859,7 @@ class AvoidMediumTestFilesRule extends SaropaLintRule {
     '[avoid_medium_length_test_files] Test file exceeds $_maxLines code lines (comments and blank lines excluded). At 600+ lines, a test file may be covering too many scenarios or features. Split tests by domain, widget, or use case to improve maintainability and faster test runs. {v2}',
     correctionMessage:
         'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior. '
-        'Disable with: // ignore_for_file: avoid_medium_length_test_files',
+        'To disable, use: // ignore_for_file: avoid_medium_length_test_files',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -910,7 +910,7 @@ class AvoidLongTestFilesRule extends SaropaLintRule {
     '[avoid_long_length_test_files] Test file exceeds $_maxLines code lines (comments and blank lines excluded). A 1000+ line test file is difficult to navigate and likely tests multiple distinct features. Extract test groups into separate files organized by feature area. {v2}',
     correctionMessage:
         'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior. '
-        'Disable with: // ignore_for_file: avoid_long_length_test_files',
+        'To disable, use: // ignore_for_file: avoid_long_length_test_files',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -961,7 +961,7 @@ class AvoidVeryLongTestFilesRule extends SaropaLintRule {
     '[avoid_very_long_length_test_files] Test file exceeds $_maxLines code lines (comments and blank lines excluded). Even with test files\' higher tolerance for length, 2000+ lines indicates the file is testing too much. Split into separate test files organized by feature, screen, or use case. {v2}',
     correctionMessage:
         'Split tests by feature or scenario. Verify the change works correctly with existing tests and add coverage for the new behavior. '
-        'Disable with: // ignore_for_file: avoid_very_long_length_test_files',
+        'To disable, use: // ignore_for_file: avoid_very_long_length_test_files',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -2994,6 +2994,253 @@ class PreferConstructorsFirstRule extends SaropaLintRule {
   }
 }
 
+/// Warns when a named constructor appears before a factory constructor.
+///
+/// Conventional ordering places factory constructors before named constructors
+/// so that the primary construction API is grouped first.
+///
+/// **Bad:**
+/// ```dart
+/// class C {
+///   C.named();
+///   factory C.foo() => C.named();
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class C {
+///   factory C.foo() => C.named();
+///   C.named();
+/// }
+/// ```
+class PreferFactoryBeforeNamedRule extends SaropaLintRule {
+  PreferFactoryBeforeNamedRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_factory_before_named',
+    '[prefer_factory_before_named] Place factory constructors before named constructors for conventional class member order.',
+    correctionMessage: 'Move factory constructors before named constructors.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      int firstNamedIndex = -1;
+      for (int i = 0; i < node.members.length; i++) {
+        final ClassMember member = node.members[i];
+        if (member is ConstructorDeclaration &&
+            member.name != null &&
+            member.factoryKeyword == null) {
+          firstNamedIndex = i;
+          break;
+        }
+      }
+      if (firstNamedIndex < 0) return;
+
+      for (int i = firstNamedIndex + 1; i < node.members.length; i++) {
+        final ClassMember member = node.members[i];
+        if (member is ConstructorDeclaration && member.factoryKeyword != null) {
+          reporter.atNode(member);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when an override method appears before a non-override method.
+///
+/// Conventional member ordering places override methods last.
+///
+/// **Bad:**
+/// ```dart
+/// class C extends B {
+///   @override
+///   void foo() {}
+///   void bar() {}
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class C extends B {
+///   void bar() {}
+///   @override
+///   void foo() {}
+/// }
+/// ```
+class PreferOverridesLastRule extends SaropaLintRule {
+  PreferOverridesLastRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_overrides_last',
+    '[prefer_overrides_last] Place override methods after non-override members.',
+    correctionMessage: 'Move the override method after other members.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static bool _hasOverrideAnnotation(MethodDeclaration m) {
+    for (final Annotation a in m.metadata) {
+      if (a.name.name == 'override') return true;
+    }
+    return false;
+  }
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      int lastOverrideIndex = -1;
+      int firstNonOverrideAfterOverride = -1;
+      for (int i = 0; i < node.members.length; i++) {
+        final ClassMember member = node.members[i];
+        if (member is MethodDeclaration && _hasOverrideAnnotation(member)) {
+          lastOverrideIndex = i;
+        } else if (member is MethodDeclaration &&
+            !_hasOverrideAnnotation(member) &&
+            lastOverrideIndex >= 0) {
+          firstNonOverrideAfterOverride = i;
+          break;
+        }
+      }
+      if (lastOverrideIndex < 0 || firstNonOverrideAfterOverride < 0) return;
+      final ClassMember outOfOrder = node.members[lastOverrideIndex];
+      reporter.atNode(outOfOrder);
+    });
+  }
+}
+
+/// Suggests named constructor over static factory method.
+///
+/// Stylistic: static X create() => X._(); could be factory X.create() => X._();
+///
+/// **Bad:**
+/// ```dart
+/// class C {
+///   C._();
+///   static C create() => C._();
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class C {
+///   C._();
+///   factory C.create() => C._();
+/// }
+/// ```
+class PreferConstructorsOverStaticMethodsRule extends SaropaLintRule {
+  PreferConstructorsOverStaticMethodsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_constructors_over_static_methods',
+    '[prefer_constructors_over_static_methods] Prefer factory constructor over static method that returns an instance.',
+    correctionMessage: 'Convert the static method to a factory constructor.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.isStatic) return;
+      if (node.body is! ExpressionFunctionBody) return;
+      final ExpressionFunctionBody body = node.body as ExpressionFunctionBody;
+      final Expression? expr = body.expression;
+      if (expr is! InstanceCreationExpression) return;
+      final AstNode? parent = node.parent;
+      if (parent is! ClassDeclaration) return;
+      final String className = parent.name.lexeme;
+      final String createdName = expr.constructorName.type.name.lexeme;
+      if (createdName != className) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Prefer top-level function over static method when the method does not use instance state.
+///
+/// **Bad:**
+/// ```dart
+/// class C {
+///   static int add(int a, int b) => a + b;
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// int add(int a, int b) => a + b;
+/// ```
+class PreferFunctionOverStaticMethodRule extends SaropaLintRule {
+  PreferFunctionOverStaticMethodRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_function_over_static_method',
+    '[prefer_function_over_static_method] Static method that does not reference "this" could be a top-level function.',
+    correctionMessage:
+        'Consider moving to a top-level function for clearer scope.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.isStatic) return;
+      bool hasThis = false;
+      node.visitChildren(_ThisExpressionFinder(() => hasThis = true));
+      if (hasThis) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+class _ThisExpressionFinder extends RecursiveAstVisitor<void> {
+  _ThisExpressionFinder(this._onFound);
+  final void Function() _onFound;
+
+  @override
+  void visitThisExpression(ThisExpression node) {
+    _onFound();
+    super.visitThisExpression(node);
+  }
+}
+
 /// Warns when a top-level function could be an extension method on its first parameter type.
 ///
 /// Extension methods are more discoverable and read naturally (e.g. `date.format()` vs `formatDate(date)`).
@@ -3064,6 +3311,112 @@ class PreferExtensionMethodsRule extends SaropaLintRule {
     'bool',
     'String',
   };
+}
+
+/// Prefer static method or extension over top-level function when the function's first parameter is a class type.
+///
+/// **Bad:**
+/// ```dart
+/// String formatDate(DateTime dt) => DateFormat('yyyy').format(dt);
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// extension on DateTime {
+///   String formatDate() => DateFormat('yyyy').format(this);
+/// }
+/// ```
+class PreferStaticMethodOverFunctionRule extends SaropaLintRule {
+  PreferStaticMethodOverFunctionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_static_method_over_function',
+    '[prefer_static_method_over_function] Top-level function with first parameter of class type could be a static method or extension for better discoverability.',
+    correctionMessage:
+        'Consider converting to a static method or an extension on the first parameter type.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
+      if (node.name.lexeme == 'main') return;
+      final FormalParameterList? params = node.functionExpression.parameters;
+      if (params == null || params.parameters.isEmpty) return;
+
+      final FormalParameter first = params.parameters.first;
+      final FormalParameter inner = first is DefaultFormalParameter
+          ? first.parameter
+          : first;
+      if (inner is! SimpleFormalParameter) return;
+
+      final TypeAnnotation? typeAnnotation = inner.type;
+      if (typeAnnotation is! NamedType) return;
+      final String typeName = typeAnnotation.name.lexeme;
+      if (_primitiveTypeNames.contains(typeName)) return;
+
+      reporter.atNode(node);
+    });
+  }
+
+  static const Set<String> _primitiveTypeNames = <String>{
+    'int',
+    'double',
+    'num',
+    'bool',
+    'String',
+  };
+}
+
+/// Prefer import over part for modularity and clearer dependencies.
+///
+/// **Bad:**
+/// ```dart
+/// part 'foo.dart';
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// import 'package:my_package/foo.dart';
+/// ```
+class PreferImportOverPartRule extends SaropaLintRule {
+  PreferImportOverPartRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_import_over_part',
+    '[prefer_import_over_part] Prefer import over part for clearer module boundaries and tooling support.',
+    correctionMessage: 'Consider converting part to import where possible.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit node) {
+      for (final Directive d in node.directives) {
+        if (d is PartDirective) {
+          reporter.atNode(d);
+        }
+      }
+    });
+  }
 }
 
 /// Warns when a class with only static methods (utility class) could be an extension.

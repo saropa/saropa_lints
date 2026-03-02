@@ -2924,8 +2924,7 @@ class PreferCorrectTopicsRule extends SaropaLintRule {
     'prefer_correct_topics',
     '[prefer_correct_topics] Use valid FCM topic format (e.g. /topics/name) '
         'and subscribe/unsubscribe in pairs to avoid leaks.',
-    correctionMessage:
-        'Follow FCM topic naming and lifecycle best practices.',
+    correctionMessage: 'Follow FCM topic naming and lifecycle best practices.',
     severity: DiagnosticSeverity.INFO,
   );
 

@@ -973,8 +973,10 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
 
         final TypeAnnotation? returnType = m.returnType;
         if (returnType == null) continue;
-        final String returnTypeSource =
-            returnType.toSource().replaceAll(RegExp(r'\s+'), ' ').trim();
+        final String returnTypeSource = returnType
+            .toSource()
+            .replaceAll(RegExp(r'\s+'), ' ')
+            .trim();
         if (returnTypeSource != repTypeSource) continue;
 
         reporter.atToken(m.name, code);
@@ -2365,8 +2367,7 @@ class AvoidReferencingSubclassesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addCompilationUnit((CompilationUnit unit) {
-      final Map<String, Set<String>> baseToSubs =
-          <String, Set<String>>{};
+      final Map<String, Set<String>> baseToSubs = <String, Set<String>>{};
       for (final Declaration d in unit.declarations) {
         if (d is ClassDeclaration) {
           final base = d.extendsClause?.superclass.name.lexeme;
@@ -2380,20 +2381,14 @@ class AvoidReferencingSubclassesRule extends SaropaLintRule {
         final baseName = d.name.lexeme;
         final subs = baseToSubs[baseName];
         if (subs == null || subs.isEmpty) continue;
-        d.visitChildren(
-          _SubclassReferenceVisitor(subs, reporter, _code),
-        );
+        d.visitChildren(_SubclassReferenceVisitor(subs, reporter, _code));
       }
     });
   }
 }
 
 class _SubclassReferenceVisitor extends RecursiveAstVisitor<void> {
-  _SubclassReferenceVisitor(
-    this._subclassNames,
-    this._reporter,
-    this._code,
-  );
+  _SubclassReferenceVisitor(this._subclassNames, this._reporter, this._code);
 
   final Set<String> _subclassNames;
   final SaropaDiagnosticReporter _reporter;

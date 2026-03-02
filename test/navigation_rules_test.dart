@@ -198,6 +198,11 @@ void main() {
       'prefer_go_router_redirect',
       () => PreferGoRouterRedirectRule(),
     );
+    testRule(
+      'RequireAutoRoutePageSuffixRule',
+      'require_auto_route_page_suffix',
+      () => RequireAutoRoutePageSuffixRule(),
+    );
   });
   group('Navigation Rules - Fixture Verification', () {
     final fixtures = [
@@ -237,6 +242,7 @@ void main() {
       'require_deep_link_testing',
       'require_navigation_result_handling',
       'prefer_go_router_redirect',
+      'require_auto_route_page_suffix',
     ];
 
     for (final fixture in fixtures) {

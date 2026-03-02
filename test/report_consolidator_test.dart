@@ -48,11 +48,7 @@ void main() {
         issuesByFile: {'lib/foo.dart': 1},
         issuesByRule: {'test_rule': 1},
         ruleSeverities: {'test_rule': 'WARNING'},
-        severityCounts: const SeverityCounts(
-          error: 0,
-          warning: 1,
-          info: 0,
-        ),
+        severityCounts: const SeverityCounts(error: 0, warning: 1, info: 0),
         violations: {
           LintImpact.high: [violationRel],
         },
@@ -66,11 +62,7 @@ void main() {
         issuesByFile: {'$rootNorm/lib/foo.dart': 1},
         issuesByRule: {'test_rule': 1},
         ruleSeverities: {'test_rule': 'WARNING'},
-        severityCounts: const SeverityCounts(
-          error: 0,
-          warning: 1,
-          info: 0,
-        ),
+        severityCounts: const SeverityCounts(error: 0, warning: 1, info: 0),
         violations: {
           LintImpact.high: [violationAbs],
         },
@@ -79,8 +71,10 @@ void main() {
       ReportConsolidator.writeBatch(projectRoot, batch1);
       ReportConsolidator.writeBatch(projectRoot, batch2);
 
-      final consolidated =
-          ReportConsolidator.consolidate(projectRoot, sessionId);
+      final consolidated = ReportConsolidator.consolidate(
+        projectRoot,
+        sessionId,
+      );
 
       expect(consolidated, isNotNull);
       expect(consolidated!.total, 1);

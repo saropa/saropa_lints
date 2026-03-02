@@ -1957,6 +1957,193 @@ class PreferNamedExtensionsRule extends SaropaLintRule {
   }
 }
 
+/// Warns when abstract or base class name does not end with Base.
+class PreferBasePrefixRule extends SaropaLintRule {
+  PreferBasePrefixRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_base_prefix',
+    '[prefer_base_prefix] Abstract or base class name should end with Base for clarity.',
+    correctionMessage: 'Rename the class to end with Base.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      if (node.abstractKeyword == null) return;
+      final String name = node.name.lexeme;
+      if (name.endsWith('Base')) return;
+      reporter.atToken(node.name, code);
+    });
+  }
+}
+
+/// Warns when extension name does not end with Ext.
+class PreferExtensionSuffixRule extends SaropaLintRule {
+  PreferExtensionSuffixRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_extension_suffix',
+    '[prefer_extension_suffix] Extension name should end with Ext for clarity.',
+    correctionMessage: 'Rename the extension to end with Ext.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addExtensionDeclaration((ExtensionDeclaration node) {
+      final String? name = node.name?.lexeme;
+      if (name == null || name.endsWith('Ext')) return;
+      reporter.atToken(node.name!, code);
+    });
+  }
+}
+
+/// Warns when mixin name does not end with Mixin.
+class PreferMixinPrefixRule extends SaropaLintRule {
+  PreferMixinPrefixRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_mixin_prefix',
+    '[prefer_mixin_prefix] Mixin name should end with Mixin for clarity.',
+    correctionMessage: 'Rename the mixin to end with Mixin.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMixinDeclaration((MixinDeclaration node) {
+      final String name = node.name.lexeme;
+      if (name.endsWith('Mixin')) return;
+      reporter.atToken(node.name, code);
+    });
+  }
+}
+
+/// Warns when abstract class (used as interface) name does not start with I.
+class PreferIPrefixInterfacesRule extends SaropaLintRule {
+  PreferIPrefixInterfacesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_i_prefix_interfaces',
+    '[prefer_i_prefix_interfaces] Abstract class used as interface should start with I.',
+    correctionMessage: 'Rename the class to start with I (e.g. IRepository).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      if (node.abstractKeyword == null) return;
+      final String name = node.name.lexeme;
+      if (name.startsWith('I') && name.length > 1) return;
+      reporter.atToken(node.name, code);
+    });
+  }
+}
+
+/// Warns when abstract class name starts with I (opposite style).
+class PreferNoIPrefixInterfacesRule extends SaropaLintRule {
+  PreferNoIPrefixInterfacesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_no_i_prefix_interfaces',
+    '[prefer_no_i_prefix_interfaces] Abstract class name should not start with I; use a noun without prefix.',
+    correctionMessage: 'Rename the class to remove the I prefix.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      if (node.abstractKeyword == null) return;
+      final String name = node.name.lexeme;
+      if (!name.startsWith('I') || name.length < 2) return;
+      final String second = name[1];
+      if (second != second.toUpperCase() && second != '_') return;
+      reporter.atToken(node.name, code);
+    });
+  }
+}
+
+/// Warns when a class that implements an interface does not end with Impl.
+class PreferImplSuffixRule extends SaropaLintRule {
+  PreferImplSuffixRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_impl_suffix',
+    '[prefer_impl_suffix] Implementation class should end with Impl for clarity.',
+    correctionMessage: 'Rename the class to end with Impl.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      if (node.implementsClause == null) return;
+      if (node.implementsClause!.interfaces.isEmpty) return;
+      final String name = node.name.lexeme;
+      if (name.endsWith('Impl')) return;
+      reporter.atToken(node.name, code);
+    });
+  }
+}
+
 /// Future rule: prefer-typedef-for-callbacks
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5

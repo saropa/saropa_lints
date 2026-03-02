@@ -334,13 +334,15 @@ class ReportConsolidator {
           final normFile = _normalizePath(v.file, projectRoot);
           final key = '$normFile:${v.line}:${v.rule}';
           if (seen.add(key)) {
-            deduped.add(ViolationRecord(
-              rule: v.rule,
-              file: normFile,
-              line: v.line,
-              message: v.message,
-              correction: v.correction,
-            ));
+            deduped.add(
+              ViolationRecord(
+                rule: v.rule,
+                file: normFile,
+                line: v.line,
+                message: v.message,
+                correction: v.correction,
+              ),
+            );
           }
         }
       }

@@ -353,7 +353,8 @@ class FormatTestNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'format_test_name',
     '[format_test_name] Test name should be in snake_case format.',
-    correctionMessage: 'Rename the test to use snake_case (e.g. words_with_underscores).',
+    correctionMessage:
+        'Rename the test to use snake_case (e.g. words_with_underscores).',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -365,7 +366,10 @@ class FormatTestNameRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'test' && node.methodName.name != 'testWidgets') return;
+      if (node.methodName.name != 'test' &&
+          node.methodName.name != 'testWidgets') {
+        return;
+      }
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
       final Expression firstArg = args.arguments.first;
@@ -541,8 +545,8 @@ class AvoidTestOnRealDeviceRule extends SaropaLintRule {
       final Expression firstArg = args.arguments.first;
       if (firstArg is! StringLiteral) return;
 
-      final String testName =
-          (firstArg.stringValue ?? firstArg.toSource()).toLowerCase();
+      final String testName = (firstArg.stringValue ?? firstArg.toSource())
+          .toLowerCase();
       for (final String phrase in _phrases) {
         if (testName.contains(phrase)) {
           reporter.atNode(firstArg);

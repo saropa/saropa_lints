@@ -452,7 +452,9 @@ class PreferDarkModeColorsRule extends SaropaLintRule {
           if (name == 'darkTheme') hasDarkTheme = true;
         }
       }
-      if (hasTheme && !hasDarkTheme) reporter.atNode(node.constructorName, code);
+      if (hasTheme && !hasDarkTheme) {
+        reporter.atNode(node.constructorName, code);
+      }
     });
   }
 }

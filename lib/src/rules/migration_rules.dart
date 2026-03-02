@@ -280,7 +280,7 @@ class PreferOnPopWithResultRule extends SaropaLintRule {
       final parent = node.parent;
       if (parent is! ArgumentList) return;
 
-      reporter.atNode(node.name);
+      reporter.atNode(node);
     });
 
     // Detect onPop as a method declaration override.

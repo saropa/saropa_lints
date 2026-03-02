@@ -66,6 +66,46 @@ class AvoidEmptySpreadRule extends SaropaLintRule {
   }
 }
 
+/// Warns when null-aware spread (...?) is used for collections that cannot be null.
+///
+/// **Bad:**
+/// ```dart
+/// final List<int> list = [1, 2];
+/// final combined = [0, ...?list];  // list is never null
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// final combined = [0, ...list];
+/// ```
+class AvoidUnnecessaryNullAwareElementsRule extends SaropaLintRule {
+  AvoidUnnecessaryNullAwareElementsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_unnecessary_null_aware_elements',
+    '[avoid_unnecessary_null_aware_elements] Null-aware spread (...?) is unnecessary when the collection is never null. Use ... instead.',
+    correctionMessage: 'Replace ...? with ... if the collection is non-null.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addSpreadElement((SpreadElement node) {
+      if (!node.isNullAware) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
 /// Warns when unnecessary block braces are used.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4

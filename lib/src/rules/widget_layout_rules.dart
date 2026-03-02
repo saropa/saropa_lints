@@ -7226,8 +7226,7 @@ class PreferFindChildIndexCallbackRule extends SaropaLintRule {
     '[prefer_find_child_index_callback] Use findChildIndexCallback in '
         'ListView.builder when item order can change (e.g. reordering) for '
         'correct scroll-to-index behavior.',
-    correctionMessage:
-        'Add findChildIndexCallback when list order is dynamic.',
+    correctionMessage: 'Add findChildIndexCallback when list order is dynamic.',
     severity: DiagnosticSeverity.INFO,
   );
 

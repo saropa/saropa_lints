@@ -1834,8 +1834,10 @@ class PreferCacheExtentRule extends SaropaLintRule {
   );
 
   static const Set<String> _builderTypes = <String>{'ListView', 'GridView'};
-  static const Set<String> _builderConstructors =
-      <String>{'builder', 'separated'};
+  static const Set<String> _builderConstructors = <String>{
+    'builder',
+    'separated',
+  };
 
   @override
   void runWithReporter(
@@ -1854,8 +1856,7 @@ class PreferCacheExtentRule extends SaropaLintRule {
 
       bool hasCacheExtent = false;
       for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'cacheExtent') {
+        if (arg is NamedExpression && arg.name.label.name == 'cacheExtent') {
           hasCacheExtent = true;
           break;
         }
