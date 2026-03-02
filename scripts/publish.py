@@ -99,6 +99,7 @@ _REQUIRED_MODULES = [
     "modules/_us_spelling.py",
     "modules/_timing.py",
     "modules/_roadmap_implemented.py",
+    "modules/_duplicated_messages.py",
 ]
 
 

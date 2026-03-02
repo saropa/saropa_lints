@@ -53,6 +53,11 @@ from scripts.modules._audit_dx import (
     extract_rule_messages,
     print_dx_audit_report,
 )
+from scripts.modules._duplicated_messages import (
+    DuplicatedMessagesResult,
+    find_duplicated_messages,
+    print_duplicated_messages_report,
+)
 from scripts.modules._utils import (
     Color,
     get_project_dir,
@@ -459,6 +464,7 @@ def run_full_audit(
         rules_dir
     )
     duplicates = find_duplicate_rules(rules_dir)
+    msg_dups: DuplicatedMessagesResult = find_duplicated_messages(rules_dir)
     severity_stats = get_severity_stats(rules_dir)
     owasp_coverage = get_owasp_coverage(rules_dir)
     rules_missing_prefix = get_rules_missing_prefix(rules_dir)
@@ -641,6 +647,30 @@ def run_full_audit(
             match_details,
         ))
 
+    # Duplicated/suspicious message text (informational)
+    if msg_dups.has_issues:
+        total = msg_dups.total_count()
+        details = []
+        if msg_dups.verify_twice:
+            details.append(f"VERIFY_PHRASE twice: {len(msg_dups.verify_twice)}")
+        if msg_dups.dup_multiline:
+            details.append(f"multiline dup: {len(msg_dups.dup_multiline)}")
+        if msg_dups.missing_space:
+            details.append(f"missing space: {len(msg_dups.missing_space)}")
+        if msg_dups.dup_inline:
+            details.append(f"inline repeated: {len(msg_dups.dup_inline)}")
+        checks.append((
+            _WARN,
+            f"{total} duplicated or suspicious LintCode message(s)",
+            details,
+        ))
+    else:
+        checks.append((
+            _PASS,
+            "No duplicated or suspicious message text",
+            [],
+        ))
+
     # DX message quality
     if not skip_dx:
         dx_failing = sum(1 for m in dx_messages if m.dx_issues)
@@ -683,6 +713,9 @@ def run_full_audit(
         checks.extend(extra_checks)
 
     _print_quality_checks(checks)
+
+    if msg_dups.has_issues:
+        print_duplicated_messages_report(msg_dups, verbose=True)
 
     # ===== METRICS (distribution + coverage + quality) =====
     print_section("METRICS")
