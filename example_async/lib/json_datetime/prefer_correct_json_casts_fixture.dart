@@ -2,7 +2,11 @@
 
 /// Fixture for `prefer_correct_json_casts` lint rule.
 
-// NOTE: Rule flags incorrect JSON/datetime type casts.
-// See rule documentation for bad/good examples.
+// BAD: Incorrect cast from JSON to DateTime
+// expect_lint: prefer_correct_json_casts
+DateTime bad(Map<String, dynamic> json) => json['at'] as DateTime;
+
+// GOOD: Parse ISO string to DateTime
+DateTime good(Map<String, dynamic> json) => DateTime.parse(json['at'] as String);
 
 void main() {}

@@ -2,7 +2,11 @@
 
 /// Fixture for `avoid_cubit_usage` lint rule.
 
-// NOTE: Rule flags Cubit in favor of Bloc when bloc package is used.
-// See rule documentation for bad/good examples.
+// BAD: Cubit when Bloc preferred
+// expect_lint: avoid_cubit_usage
+class BadCounterCubit {} // use Bloc<Event, State> instead
+
+// GOOD: Bloc with events
+class GoodCounterBloc {}
 
 void main() {}

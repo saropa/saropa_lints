@@ -321,6 +321,9 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
 ///   // ... 15+ static const fields are fine
 /// }
 /// ```
+///
+/// **Exempt:** Static const and static final fields are excluded from the
+/// field count (constant namespaces are not treated as god classes).
 class AvoidGodClassRule extends SaropaLintRule {
   AvoidGodClassRule() : super(code: _code);
 

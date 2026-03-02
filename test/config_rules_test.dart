@@ -66,6 +66,26 @@ void main() {
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
+    test('PreferCompileTimeConfigRule', () {
+      final rule = PreferCompileTimeConfigRule();
+      expect(rule.code.name, 'prefer_compile_time_config');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_compile_time_config]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PreferFlavorConfigurationRule', () {
+      final rule = PreferFlavorConfigurationRule();
+      expect(rule.code.name, 'prefer_flavor_configuration');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_flavor_configuration]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
   });
 
   group('Configuration Rules - Fixture Verification', () {

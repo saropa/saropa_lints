@@ -2,7 +2,11 @@
 
 /// Fixture for `prefer_auto_route_typed_args` lint rule.
 
-// NOTE: Rule requires auto_route typed arguments to trigger.
-// See rule documentation for bad/good examples.
+// BAD: Untyped route args
+// expect_lint: prefer_auto_route_typed_args
+void bad(Object args) {}
+
+// GOOD: Typed route args
+void good({required String id, int? tab}) {}
 
 void main() {}

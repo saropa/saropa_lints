@@ -377,6 +377,9 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
 /// final condition2 = c && d;
 /// if (condition1 || condition2) { }
 /// ```
+///
+/// **Exempt:** Guard clauses (early-return conditions) and symmetric
+/// structural patterns have higher thresholds or are exempt.
 class AvoidExcessiveExpressionsRule extends SaropaLintRule {
   AvoidExcessiveExpressionsRule() : super(code: _code);
 

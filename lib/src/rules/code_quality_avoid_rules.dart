@@ -45,7 +45,6 @@ class AvoidAdjacentStringsRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
-
 }
 
 /// Warns when accessing enum values by index (`EnumName.values[i]`).
@@ -247,7 +246,6 @@ class AvoidLateKeywordRule extends SaropaLintRule {
       }
     });
   }
-
 }
 
 /// Warns when a getter is called without parentheses in print/debugPrint.
@@ -410,7 +408,6 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
       }
     });
   }
-
 }
 
 /// Warns when an object is passed as an argument to its own method.
@@ -756,7 +753,6 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
       }
     });
   }
-
 }
 
 /// Warns when @pragma('vm:prefer-inline') is used redundantly.
@@ -1277,7 +1273,6 @@ class NoObjectDeclarationRule extends SaropaLintRule {
       }
     });
   }
-
 }
 
 /// Warns when only one inlining annotation is used.
@@ -2057,7 +2052,6 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
       }
     });
   }
-
 }
 
 /// Warns when the same constant value is defined multiple times.
@@ -2108,7 +2102,6 @@ class AvoidDuplicateConstantValuesRule extends SaropaLintRule {
       }
     });
   }
-
 }
 
 /// Warns when the same initializer expression is used twice.
@@ -2167,7 +2160,6 @@ class AvoidDuplicateInitializersRule extends SaropaLintRule {
       }
     });
   }
-
 }
 
 /// Warns when an override just calls super without additional logic.
@@ -2957,7 +2949,6 @@ class AvoidExpensiveLogStringConstructionRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
-
 }
 
 /// Suggests using typedefs for callback function types.
@@ -3103,7 +3094,6 @@ class AvoidMissingInterpolationRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
-
 }
 
 // =============================================================================
@@ -3253,7 +3243,6 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
       reporter.atNode(expression);
     });
   }
-
 }
 
 // =============================================================================

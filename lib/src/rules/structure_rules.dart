@@ -1647,7 +1647,6 @@ class AvoidUnnecessaryLocalVariableRule extends SaropaLintRule {
       }
     });
   }
-
 }
 
 /// Warns when a variable is assigned the same value it already has.

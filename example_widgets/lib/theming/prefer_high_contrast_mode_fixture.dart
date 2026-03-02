@@ -3,7 +3,11 @@
 
 /// Fixture for `prefer_high_contrast_mode` lint rule.
 
-// NOTE: Rule requires theme/accessibility context to trigger.
-// See rule documentation for bad/good examples.
+// BAD: No high-contrast consideration
+// expect_lint: prefer_high_contrast_mode
+const badContrast = 0.5;
+
+// GOOD: Respect high contrast
+// final goodContrast = MediaQuery.highContrastOf(context) ? 0.9 : 0.5;
 
 void main() {}

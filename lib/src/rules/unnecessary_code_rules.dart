@@ -6,10 +6,17 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import '../saropa_lint_rule.dart';
 import '../fixes/unnecessary_code/comment_out_empty_spread_fix.dart';
 import '../fixes/unnecessary_code/comment_out_unnecessary_constructor_fix.dart';
+import '../fixes/unnecessary_code/invert_unnecessary_negation_fix.dart';
 import '../fixes/unnecessary_code/remove_extends_object_fix.dart';
 import '../fixes/unnecessary_code/use_is_empty_or_is_not_empty_fix.dart';
 import '../fixes/unnecessary_code/remove_unnecessary_call_fix.dart';
+import '../fixes/unnecessary_code/no_empty_block_todo_fix.dart';
+import '../fixes/unnecessary_code/no_empty_string_prefer_is_empty_fix.dart';
+import '../fixes/unnecessary_code/remove_unnecessary_block_fix.dart';
+import '../fixes/unnecessary_code/remove_unnecessary_enum_argument_fix.dart';
+import '../fixes/unnecessary_code/remove_unnecessary_enum_prefix_fix.dart';
 import '../fixes/unnecessary_code/remove_unnecessary_super_fix.dart';
+import '../fixes/unnecessary_code/replace_null_aware_spread_fix.dart';
 
 /// Warns when an empty spread is used.
 ///
@@ -104,6 +111,12 @@ class AvoidUnnecessaryNullAwareElementsRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceNullAwareSpreadFix(context: context),
+  ];
 }
 
 /// Warns when unnecessary block braces are used.
@@ -166,6 +179,12 @@ class AvoidUnnecessaryBlockRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryBlockFix(context: context),
+  ];
 }
 
 /// Warns when `.call()` is used explicitly on a callable.
@@ -378,6 +397,12 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryEnumArgumentFix(context: context),
+  ];
 }
 
 /// Warns when using enum name prefix inside the enum declaration.
@@ -413,6 +438,12 @@ class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
       node.accept(_EnumPrefixVisitor(enumName, reporter, code));
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryEnumPrefixFix(context: context),
+  ];
 }
 
 class _EnumPrefixVisitor extends RecursiveAstVisitor<void> {
@@ -761,6 +792,12 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        InvertUnnecessaryNegationFix(context: context),
+  ];
 }
 
 /// Warns when super call is unnecessary in constructor.
@@ -916,6 +953,12 @@ class NoEmptyBlockRule extends SaropaLintRule {
     });
   }
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        NoEmptyBlockTodoFix(context: context),
+  ];
+
   /// Checks if there's an ignore comment for this rule on the same line as the node.
   bool _hasIgnoreCommentOnLine(SaropaContext context, AstNode node) {
     try {
@@ -1011,4 +1054,10 @@ class NoEmptyStringRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        NoEmptyStringPreferIsEmptyFix(context: context),
+  ];
 }

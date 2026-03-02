@@ -184,7 +184,8 @@ void main() {
       expect(
         analyze.exitCode,
         0,
-        reason: 'Code in try/catch should not trigger:\n${analyze.stdout}\n${analyze.stderr}',
+        reason:
+            'Code in try/catch should not trigger:\n${analyze.stdout}\n${analyze.stderr}',
       );
       expect(
         '${analyze.stdout}\n${analyze.stderr}',

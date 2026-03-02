@@ -1031,6 +1031,9 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
 /// // Use flutter_secure_storage
 /// await secureStorage.write(key: 'password', value: userPassword);
 /// ```
+///
+/// **Exempt:** PRAGMA statements (e.g. `PRAGMA key`, `PRAGMA rekey`) do not
+/// support parameter binding in SQLite; interpolation in them is not flagged.
 class AvoidDynamicSqlRule extends SaropaLintRule {
   AvoidDynamicSqlRule() : super(code: _code);
 

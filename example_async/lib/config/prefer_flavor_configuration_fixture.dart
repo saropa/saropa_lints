@@ -2,7 +2,11 @@
 
 /// Fixture for `prefer_flavor_configuration` lint rule.
 
-// NOTE: Rule requires flavor/build configuration context to trigger.
-// See rule documentation for bad/good examples.
+// BAD: No flavor-based configuration for multi-environment
+// expect_lint: prefer_flavor_configuration
+const isProduction = true; // hardcoded, not flavor-driven
+
+// GOOD: Flavor-based configuration
+const isProduction = String.fromEnvironment('FLAVOR') == 'prod';
 
 void main() {}

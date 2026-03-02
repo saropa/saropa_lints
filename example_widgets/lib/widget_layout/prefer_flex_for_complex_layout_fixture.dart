@@ -5,7 +5,11 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// NOTE: Rule flags Row/Column with complex children; use Flex when appropriate.
-// See rule documentation for bad/good examples.
+// BAD: Row/Column where Flex would be clearer
+// expect_lint: prefer_flex_for_complex_layout
+Widget bad() => Row(children: [const Text('a'), const Text('b')]);
+
+// GOOD: Flex for conditional direction
+Widget good() => Flex(direction: Axis.horizontal, children: [const Text('a')]);
 
 void main() {}

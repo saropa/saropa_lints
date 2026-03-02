@@ -77,6 +77,28 @@ void main() {
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
     });
+
+    test('PreferAutoRoutePathParamsSimpleRule instantiates correctly', () {
+      final rule = PreferAutoRoutePathParamsSimpleRule();
+      expect(rule.code.name, 'prefer_auto_route_path_params_simple');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_auto_route_path_params_simple]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+
+    test('PreferAutoRouteTypedArgsRule instantiates correctly', () {
+      final rule = PreferAutoRouteTypedArgsRule();
+      expect(rule.code.name, 'prefer_auto_route_typed_args');
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_auto_route_typed_args]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
   });
 
   group('avoid_auto_route_context_navigation', () {

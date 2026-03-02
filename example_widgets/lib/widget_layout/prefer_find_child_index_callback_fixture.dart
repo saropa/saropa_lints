@@ -5,7 +5,11 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// NOTE: Rule prefers SliverChildBuilderDelegate over list when using index.
-// See rule documentation for bad/good examples.
+// BAD: List of children with index instead of builder
+// expect_lint: prefer_find_child_index_callback
+Widget bad() => ListView(children: [const Text('0'), const Text('1')]);
+
+// GOOD: findChildIndexCallback or SliverChildBuilderDelegate
+Widget good() => ListView.builder(itemBuilder: (context, i) => Text('$i'));
 
 void main() {}
