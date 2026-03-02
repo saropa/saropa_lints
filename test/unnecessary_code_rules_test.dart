@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/unnecessary_code_rules.dart';
 
-/// Tests for 13 Unnecessary Code lint rules.
+/// Tests for 14 Unnecessary Code lint rules.
 ///
 /// Test fixtures: example_core/lib/unnecessary_code/*
 void main() {
@@ -91,6 +91,7 @@ void main() {
       () => AvoidUnnecessarySuperRule(),
     );
 
+    testRule('NoEmptyBlockRule', 'no_empty_block', () => NoEmptyBlockRule());
     testRule('NoEmptyStringRule', 'no_empty_string', () => NoEmptyStringRule());
   });
 

@@ -76,6 +76,8 @@ void main() {
       'require_feature_flag_type_safety',
       'avoid_string_env_parsing',
       'avoid_platform_specific_imports',
+      'prefer_compile_time_config',
+      'prefer_flavor_configuration',
       'prefer_semver_version',
     ];
 

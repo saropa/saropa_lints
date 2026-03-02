@@ -171,6 +171,7 @@ void main() {
       'prefer_asserts_in_initializer_lists',
       'prefer_const_constructors_in_immutables',
       'prefer_final_fields',
+      'prefer_final_fields_always',
     ];
 
     for (final fixture in fixtures) {

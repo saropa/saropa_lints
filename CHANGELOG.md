@@ -14,7 +14,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [6.1.1]
 
+### Added
+
+- **Fixture coverage 100%:** Added 54 missing fixture files so the publish script Test Coverage report reaches 1963/1963 (100%) fixture coverage. Categories: stylistic (7), widget_patterns (3), firebase (3), code_quality (4), async (3), widget_layout (2), theming (2), navigation (2), getx (2), config (2), bloc (2), auto_route (2), and one each for state_management, security, riverpod, return, record_pattern, performance, lifecycle, json_datetime, image, geolocator, freezed, forms, error_handling, equatable, disposal, debug, context, connectivity, class_constructor, architecture. All new fixtures are verified in their category test files (Fixture Verification). No new rules; existing rules now have dedicated fixture files for coverage reporting.
+
 ### Fixed
+
+- **no_empty_block metrics:** `NoEmptyBlockRule` now uses a string literal for its `LintCode` first argument so `scripts/modules/_rule_metrics.py` can parse the rule name and count the existing fixture. Unnecessary_code category reports 14/14 fixtures.
 
 - **avoid_deprecated_usage plugin crash:** On analyzer versions where `Element.metadata` is a wrapper (e.g. `MetadataImpl`) rather than an `Iterable`, the rule no longer crashes with "MetadataImpl is not a subtype of Iterable". Deprecation detection now uses `lib/src/analyzer_metadata_compat_utils.dart` so metadata is read safely across analyzer API shapes. Regression test: `test/avoid_deprecated_usage_crash_test.dart`. See `bugs/history/rule_bugs/report_avoid_deprecated_usage_metadataimpl_not_iterable_crash.md`.
 

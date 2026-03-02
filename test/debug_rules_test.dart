@@ -88,6 +88,7 @@ void main() {
       'avoid_debug_print',
       'avoid_unguarded_debug',
       'prefer_commenting_analyzer_ignores',
+      'prefer_conditional_logging',
       'prefer_debugPrint',
       'avoid_print_in_release',
       'require_structured_logging',

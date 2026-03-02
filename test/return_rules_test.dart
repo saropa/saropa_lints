@@ -78,6 +78,7 @@ void main() {
   group('Return Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_returning_cascades',
+      'avoid_returning_this',
       'avoid_returning_void',
       'avoid_unnecessary_return',
       'prefer_immediate_return',

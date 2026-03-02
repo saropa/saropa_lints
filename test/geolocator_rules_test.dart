@@ -42,6 +42,7 @@ void main() {
     final fixtures = [
       'require_geolocator_battery_awareness',
       'prefer_geocoding_cache',
+      'prefer_geolocation_coarse_location',
       'avoid_continuous_location_updates',
     ];
 

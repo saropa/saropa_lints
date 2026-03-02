@@ -71,6 +71,7 @@ void main() {
     final fixtures = [
       'avoid_storing_context',
       'avoid_context_across_async',
+      'prefer_closest_context',
       'avoid_context_after_await_in_static',
       'avoid_context_in_async_static',
       'avoid_context_in_static_methods',

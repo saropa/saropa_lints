@@ -44,6 +44,7 @@ void main() {
     final fixtures = [
       'require_connectivity_error_handling',
       'avoid_connectivity_equals_internet',
+      'prefer_connectivity_debounce',
       'require_connectivity_timeout',
     ];
 

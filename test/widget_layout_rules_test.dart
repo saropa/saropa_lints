@@ -501,6 +501,8 @@ void main() {
       'prefer_const_widgets_in_lists',
       'prefer_correct_edge_insets_constructor',
       'prefer_custom_single_child_layout',
+      'prefer_find_child_index_callback',
+      'prefer_flex_for_complex_layout',
       'prefer_fractional_sizing',
       'prefer_layout_builder_for_constraints',
       'prefer_ignore_pointer',

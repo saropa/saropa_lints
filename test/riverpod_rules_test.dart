@@ -216,6 +216,7 @@ void main() {
     final fixtures = [
       'avoid_global_riverpod_providers',
       'avoid_riverpod_navigation',
+      'avoid_riverpod_string_provider_name',
       'avoid_riverpod_notifier_in_build',
       'avoid_riverpod_state_mutation',
       'prefer_riverpod_auto_dispose',

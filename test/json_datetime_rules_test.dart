@@ -108,6 +108,7 @@ void main() {
       'avoid_not_encodable_in_to_json',
       'require_date_format_specification',
       'prefer_iso8601_dates',
+      'prefer_correct_json_casts',
       'avoid_optional_field_crash',
       'prefer_explicit_json_keys',
       'require_json_schema_validation',

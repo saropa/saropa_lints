@@ -90,6 +90,7 @@ void main() {
     final fixtures = [
       'require_notify_listeners',
       'require_stream_controller_dispose',
+      'avoid_collection_mutating_methods',
       'require_value_notifier_dispose',
       'require_mounted_check',
       'avoid_stateful_without_state',

@@ -265,6 +265,8 @@ void main() {
   group('Async Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_dialog_context_after_async',
+      'avoid_redundant_await',
+      'avoid_void_async',
       'avoid_future_ignore',
       'avoid_future_tostring',
       'avoid_multiple_stream_listeners',
@@ -283,6 +285,7 @@ void main() {
       'prefer_async_await',
       'prefer_async_callback',
       'prefer_async_init_state',
+      'prefer_cancellation_token_pattern',
       'prefer_commenting_future_delayed',
       'prefer_correct_future_return_type',
       'prefer_correct_stream_return_type',

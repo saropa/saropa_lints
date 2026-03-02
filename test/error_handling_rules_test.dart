@@ -210,6 +210,7 @@ void main() {
     final fixtures = [
       'avoid_swallowing_exceptions',
       'avoid_losing_stack_trace',
+      'handle_throwing_invocations',
       'avoid_generic_exceptions',
       'require_error_context',
       'prefer_result_pattern',

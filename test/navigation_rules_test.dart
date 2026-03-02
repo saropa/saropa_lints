@@ -242,6 +242,8 @@ void main() {
       'require_deep_link_testing',
       'require_navigation_result_handling',
       'prefer_go_router_redirect',
+      'prefer_go_router_builder',
+      'prefer_branch_io_or_firebase_links',
       'require_auto_route_page_suffix',
     ];
 
