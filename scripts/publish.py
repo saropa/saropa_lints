@@ -79,6 +79,12 @@ if _scripts_parent not in sys.path:
 
 SCRIPT_VERSION = "4.0"
 
+# Message when pre-publish audit fails and no auto-fix applies (tier/duplicates/spelling).
+_AUDIT_FAILED_MSG = (
+    "Pre-publish audit failed. Fix the blocking issue(s) "
+    "marked with ✗ above and re-run."
+)
+
 
 # =============================================================================
 # MODULE CHECK (runs before any module imports)
@@ -431,42 +437,34 @@ def main(
         if not skip_audit:  # Normal path: run full audit
             with timer.step("Pre-publish audit"):
                 print_header("STEP 1: AUDIT")
-                audit_ok = run_pre_publish_audits(project_dir)
-                while not audit_ok:
-                    try:
-                        response = (
-                            input(
-                                "  Run DX message improver to try to fix issues? [y/N]: "
-                            )
-                            .strip()
-                            .lower()
-                        )
-                    except (EOFError, KeyboardInterrupt):
-                        response = "n"
-                    if response != "y":
-                        exit_with_error(
-                            "Pre-publish audit failed. "
-                            "Fix issues before publishing.",
-                            ExitCode.AUDIT_FAILED,
-                        )
-                    from scripts.modules._improve_dx_messages import (
-                        apply_dx_result,
-                        run_dx_analysis,
+                audit_ok, audit_result = run_pre_publish_audits(project_dir)
+                while not audit_ok and audit_result:
+                    rules_dir = project_dir / "lib" / "src" / "rules"
+                    missing_prefix = getattr(
+                        audit_result, "rules_missing_prefix", None
                     )
+                    if missing_prefix:
+                        from scripts.modules._audit_checks import fix_missing_prefix
 
-                    print_info("Running DX message improver...")
-                    dx_result = run_dx_analysis()
-                    if dx_result.total > 0:
-                        apply_dx_result(dx_result)
-                        print_info("Re-running audit...")
-                        audit_ok = run_pre_publish_audits(project_dir)
-                    else:
-                        print_warning("No DX improvements to apply.")
-                        exit_with_error(
-                            "Pre-publish audit failed. "
-                            "Fix issues before publishing.",
-                            ExitCode.AUDIT_FAILED,
-                        )
+                        n = fix_missing_prefix(rules_dir)
+                        if n:
+                            print_success(
+                                f"Added [rule_name] prefix to {n} rule(s)."
+                            )
+                            print_info("Re-running audit...")
+                            audit_ok, audit_result = run_pre_publish_audits(
+                                project_dir
+                            )
+                            if audit_ok:
+                                break
+                            continue
+                    # No fixable issue: exit (cause is in audit output above)
+                    exit_with_error(
+                        _AUDIT_FAILED_MSG,
+                        ExitCode.AUDIT_FAILED,
+                    )
+                if not audit_ok:
+                    exit_with_error(_AUDIT_FAILED_MSG, ExitCode.AUDIT_FAILED)
 
             if audit_only:  # Stop after audit, don't publish
                 print_success("Audit complete.")

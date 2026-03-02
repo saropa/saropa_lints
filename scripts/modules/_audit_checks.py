@@ -468,6 +468,58 @@ def get_rules_missing_prefix(rules_dir: Path) -> list[str]:
     return sorted(missing)
 
 
+def fix_missing_prefix(rules_dir: Path) -> int:
+    """Add missing [rule_name] prefix to problemMessage in Dart files.
+
+    Edits files in place. Use after get_rules_missing_prefix() to resolve
+    the publish-blocking "missing prefix" issue. Returns the number of
+    rules that were fixed.
+    """
+    missing_set = set(get_rules_missing_prefix(rules_dir))
+    if not missing_set:
+        return 0
+
+    lint_code_pattern = re.compile(
+        r"LintCode\(\s*"
+        r"(?:name:\s*)?'([a-z0-9_]+)',\s*"
+        r"(?:problemMessage:\s*)?"
+        r"(?:'([^']*)'|\"([^\"]*)\")",
+        re.DOTALL,
+    )
+
+    def escape_dart(s: str, quote: str) -> str:
+        if quote == "'":
+            return s.replace("\\", "\\\\").replace("'", "\\'")
+        return s.replace("\\", "\\\\").replace('"', '\\"')
+
+    fixed_count = 0
+    for dart_file in rules_dir.glob("**/*.dart"):
+        if dart_file.name == "all_rules.dart":
+            continue
+        content = dart_file.read_text(encoding="utf-8")
+        replacements: list[tuple[int, int, str]] = []  # (start, end, new_quoted_msg)
+        for match in lint_code_pattern.finditer(content):
+            name = match.group(1)
+            if name not in missing_set:
+                continue
+            problem_msg = match.group(2) if match.group(2) is not None else match.group(3)
+            if problem_msg.startswith(f"[{name}]"):
+                continue
+            quote = "'" if match.group(2) is not None else '"'
+            msg_start = match.start(2) if match.group(2) is not None else match.start(3)
+            msg_end = match.end(2) if match.group(2) is not None else match.end(3)
+            new_msg = f"[{name}] " + problem_msg
+            replacements.append((msg_start, msg_end, quote + escape_dart(new_msg, quote) + quote))
+        if not replacements:
+            continue
+        # Apply from end to start so earlier indices remain valid.
+        for start, end, new_str in sorted(replacements, key=lambda r: -r[0]):
+            content = content[:start] + new_str + content[end:]
+        dart_file.write_text(content, encoding="utf-8")
+        fixed_count += len(replacements)
+    return fixed_count
+
+
 def get_owasp_coverage(rules_dir: Path) -> OwaspCoverage:
     """Extract OWASP coverage from rule files."""
     coverage = OwaspCoverage()
