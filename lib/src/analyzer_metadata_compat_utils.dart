@@ -9,7 +9,9 @@ import 'package:analyzer/dart/element/element.dart';
 /// These functions are intentionally defensive: if metadata/flags cannot be
 /// read safely, they return empty/false instead of throwing (plugin safety).
 
-Iterable<ElementAnnotation> readElementAnnotationsFromMetadata(Object? metadata) {
+Iterable<ElementAnnotation> readElementAnnotationsFromMetadata(
+  Object? metadata,
+) {
   if (metadata == null) return const <ElementAnnotation>[];
 
   // analyzer 9+: `metadata` is a wrapper (e.g. MetadataImpl) that exposes an
@@ -46,4 +48,3 @@ bool hasDeprecatedFlag(Object? element) {
 
   return false;
 }
-

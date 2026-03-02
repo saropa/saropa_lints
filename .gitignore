@@ -31,16 +31,6 @@ format_output*.txt
 .DS_Store
 Thumbs.db
 
-# Claude Code (local only)
-/.claude
-.claude/settings.local.json
-CLAUDE.md
-CLAUDE.local.md
-CLAUDE_SETUP.md
-CODEBASE_INDEX.md
-CODE_INDEX.md
-BROKEN_TIERS.md
-
 # Articles (not part of the package)
 articles/
 __pycache__/
@@ -56,3 +46,23 @@ google-services.json
 
 # Other local config
 .github/copilot-instructions.md
+
+# Cursor & AI (exclude all — do not track or index)
+.cursor/
+.cursorignore
+.cursorrules
+mcps/
+agent-transcripts/
+.aider*
+AGENTS.md
+*.cursorrules
+# Claude Code (local only)
+/.claude
+.claude/
+.claude/settings.local.json
+CLAUDE.md
+CLAUDE.local.md
+CLAUDE_SETUP.md
+CODEBASE_INDEX.md
+CODE_INDEX.md
+BROKEN_TIERS.md

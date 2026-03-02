@@ -13,6 +13,7 @@ grep -vEi '^Made-with:\s*Cursor$' "$msg_file" | \
 grep -vE '^Co-Authored-By:.*[Cc]laude' | \
 grep -vE '^Co-Authored-By:.*[Aa]nthropic' | \
 grep -vEi '^Co-Authored-By:.*noreply@anthropic' | \
+grep -vEi '^Co-Authored-By:.*(Cursor|Copilot|GPT|OpenAI|noreply@github)' | \
 grep -vEi '^Generated with.*(Cursor|Claude)' > "$tmp" 2>/dev/null || exit 0
 
 [ -s "$tmp" ] && mv "$tmp" "$msg_file" || rm -f "$tmp"

@@ -15,12 +15,13 @@ from __future__ import annotations
 import re
 import sys
 
-# Strip: Made-with Cursor, Co-Authored-By Claude (Opus, Sonnet, any), Anthropic, tool attribution
+# Strip: Made-with Cursor, Co-Authored-By Claude/Anthropic/Cursor/Copilot/GPT/OpenAI, tool attribution
 SKIP_PATTERNS = [
     re.compile(r"^Made-with:\s*Cursor\s*$", re.I),
     re.compile(r"^Co-Authored-By:\s*.*[Cc]laude.*$"),  # Claude Opus 4.6, Claude Sonnet 4.5, etc.
     re.compile(r"^Co-Authored-By:\s*.*[Aa]nthropic.*$"),
     re.compile(r"^Co-Authored-By:\s*.*noreply@anthropic\.com.*$", re.I),
+    re.compile(r"^Co-Authored-By:\s*.*(?:Cursor|Copilot|GPT|OpenAI|noreply@github).*$", re.I),
     re.compile(r"^Generated with\s+.*(?:Cursor|Claude).*$", re.I),
 ]
 

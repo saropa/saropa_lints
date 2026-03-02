@@ -16,6 +16,7 @@ echo "$msg" | grep -qEi '^Made-with:\s*Cursor' && blocked
 echo "$msg" | grep -qE '^Co-Authored-By:.*[Cc]laude' && blocked
 echo "$msg" | grep -qE '^Co-Authored-By:.*[Aa]nthropic' && blocked
 echo "$msg" | grep -qEi '^Co-Authored-By:.*noreply@anthropic' && blocked
+echo "$msg" | grep -qEi '^Co-Authored-By:.*(Cursor|Copilot|GPT|OpenAI|noreply@github)' && blocked
 echo "$msg" | grep -qEi '^Generated with.*(Cursor|Claude)' && blocked
 
 exit 0
