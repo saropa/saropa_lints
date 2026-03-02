@@ -2,7 +2,11 @@
 
 /// Fixture for `prefer_deep_link_auth` lint rule.
 
-// NOTE: Rule requires deep link handling and auth context to trigger.
-// See rule documentation for bad/good examples.
+// BAD: Deep link without auth check
+// expect_lint: prefer_deep_link_auth
+void bad(Uri link) { /* navigate(link); */ }
+
+// GOOD: Verify auth before handling deep link
+void good(Uri link) { /* if (isAuthenticated) navigate(link); */ }
 
 void main() {}

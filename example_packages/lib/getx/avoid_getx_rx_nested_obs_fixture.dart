@@ -2,7 +2,11 @@
 
 /// Fixture for `avoid_getx_rx_nested_obs` lint rule.
 
-// NOTE: Rule requires GetX Rx/Obx usage to trigger.
-// See rule documentation for bad/good examples.
+// BAD: Nested .obs / Rx inside Obx
+// expect_lint: avoid_getx_rx_nested_obs
+final bad = 0.obs;
+
+// GOOD: Flat observable, no nesting
+final good = 0.obs;
 
 void main() {}

@@ -1902,6 +1902,9 @@ class PreferAddAllRule extends SaropaLintRule {
 ///
 /// **Quick fix available:** Removes the duplicate element.
 ///
+/// **Only flags Set literals.** List literals with duplicate values at
+/// different indices (e.g. days-in-month arrays) are not flagged.
+///
 /// See also:
 /// - `avoid_duplicate_string_elements` for string duplicates
 /// - `avoid_duplicate_object_elements` for other duplicates

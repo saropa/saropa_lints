@@ -2,7 +2,16 @@
 
 /// Fixture for `prefer_class_destructuring` lint rule.
 
-// NOTE: Rule prefers record/pattern destructuring over repeated property access.
-// See rule documentation for bad/good examples.
+// BAD: Repeated property access instead of destructuring
+// expect_lint: prefer_class_destructuring
+void bad((int a, int b) r) {
+  final x = r.$1;
+  final y = r.$2;
+}
+
+// GOOD: Destructuring
+void good((int a, int b) r) {
+  final (a, b) = r;
+}
 
 void main() {}

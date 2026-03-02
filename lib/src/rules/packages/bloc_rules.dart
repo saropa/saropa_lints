@@ -10,6 +10,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
+import '../../fixes/packages/bloc/remove_bloc_event_in_constructor_fix.dart';
 import '../../saropa_lint_rule.dart';
 import '../../target_matcher_utils.dart';
 
@@ -78,6 +79,12 @@ class AvoidBlocEventInConstructorRule extends SaropaLintRule {
       body.visitChildren(_AddCallVisitor(reporter, code));
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveBlocEventInConstructorFix(context: context),
+  ];
 }
 
 class _AddCallVisitor extends RecursiveAstVisitor<void> {

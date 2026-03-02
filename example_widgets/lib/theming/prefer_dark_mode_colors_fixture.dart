@@ -3,7 +3,11 @@
 
 /// Fixture for `prefer_dark_mode_colors` lint rule.
 
-// NOTE: Rule requires theme/ColorScheme context to trigger.
-// See rule documentation for bad/good examples.
+// BAD: Hardcoded light-only colors
+// expect_lint: prefer_dark_mode_colors
+const badColor = 0xFF000000;
+
+// GOOD: Theme-aware colors
+// Color goodColor(BuildContext c) => Theme.of(c).colorScheme.surface;
 
 void main() {}

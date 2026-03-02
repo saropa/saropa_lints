@@ -2,7 +2,11 @@
 
 /// Fixture for `avoid_riverpod_string_provider_name` lint rule.
 
-// NOTE: Rule requires Riverpod provider names to trigger.
-// See rule documentation for bad/good examples.
+// BAD: String literal as provider name
+// expect_lint: avoid_riverpod_string_provider_name
+final bad = Provider((ref) => 0); // use named provider
+
+// GOOD: Named provider
+final good = Provider<int>((ref) => 0);
 
 void main() {}

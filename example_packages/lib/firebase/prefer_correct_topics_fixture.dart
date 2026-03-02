@@ -2,7 +2,11 @@
 
 /// Fixture for `prefer_correct_topics` lint rule.
 
-// NOTE: Rule requires FCM topic subscribe/unsubscribe usage to trigger.
-// See rule documentation for bad/good examples.
+// BAD: Invalid or unsafe FCM topic name
+// expect_lint: prefer_correct_topics
+const badTopic = 'user/123'; // slashes not allowed
+
+// GOOD: Valid topic format
+const goodTopic = 'user_123';
 
 void main() {}

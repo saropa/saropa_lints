@@ -495,7 +495,10 @@ void main() {
         // Expected behavior: lib/<package_name>.dart and files with
         // library; or library name; are exempt (see bugs/history/false_positives/avoid_barrel_files_*)
 
-        expect('Package entry point and library directive are exempt', isNotNull);
+        expect(
+          'Package entry point and library directive are exempt',
+          isNotNull,
+        );
       });
     });
 
@@ -749,16 +752,20 @@ void main() {
     group('avoid_ios_hardcoded_device_model', () {
       test('substring matches (e.g. domain names) should NOT trigger', () {
         // 'tripadvisor.com' contains 'ipad' but is not a device model.
-        expect('Word-boundary matching avoids substring false positives',
-            isNotNull);
+        expect(
+          'Word-boundary matching avoids substring false positives',
+          isNotNull,
+        );
       });
     });
 
     group('avoid_manual_date_formatting', () {
       test('map keys and cache keys should NOT trigger', () {
         // String interpolation used as map key, cache key, or internal id.
-        expect('Non-display contexts (map key, cache key) are exempt',
-            isNotNull);
+        expect(
+          'Non-display contexts (map key, cache key) are exempt',
+          isNotNull,
+        );
       });
     });
 

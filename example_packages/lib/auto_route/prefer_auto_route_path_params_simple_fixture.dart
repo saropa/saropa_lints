@@ -2,7 +2,11 @@
 
 /// Fixture for `prefer_auto_route_path_params_simple` lint rule.
 
-// NOTE: Rule requires auto_route path/param usage to trigger.
-// See rule documentation for bad/good examples.
+// BAD: Complex path params instead of simple
+// expect_lint: prefer_auto_route_path_params_simple
+const badPath = '/user/:id/posts/:postId/comments/:commentId';
+
+// GOOD: Simple path params
+const goodPath = '/user/:id';
 
 void main() {}

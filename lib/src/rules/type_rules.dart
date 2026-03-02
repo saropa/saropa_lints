@@ -7,6 +7,8 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../fixes/type/prefer_const_declarations_fix.dart';
+import '../fixes/type/prefer_final_locals_fix.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when casting to an extension type.
@@ -2243,6 +2245,12 @@ class PreferFinalLocalsRule extends SaropaLintRule {
     });
   }
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferFinalLocalsFix(context: context),
+  ];
+
   bool _assignsToName(Statement stmt, String name) {
     if (stmt is ExpressionStatement) {
       return _exprAssignsToName(stmt.expression, name);
@@ -2348,6 +2356,12 @@ class PreferConstDeclarationsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferConstDeclarationsFix(context: context),
+  ];
 
   static bool _isConstExpression(Expression e) {
     if (e is NullLiteral ||
