@@ -25,8 +25,48 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - **prefer_final_fields_always** (Professional): All instance fields should be final. Stricter than `prefer_final_fields` (which only flags when never reassigned).
 - **prefer_block_body_setters** (Comprehensive): Prefer block body {} for setters instead of expression body.
 - **avoid_riverpod_string_provider_name** (Professional): Detect manual name strings in Riverpod providers; prefer auto-generated name. Documented in `doc/guides/using_with_riverpod.md`. `avoid_cubits` documented in `doc/guides/using_with_bloc.md`.
+- **prefer_factory_before_named** (Comprehensive): Place factory constructors before named constructors in class member order.
+- **prefer_then_catcherror** (Stylistic): Prefer .then().catchError() over try/catch for async error handling when handling a single Future.
+- **avoid_types_on_closure_parameters** (Stylistic): Closure parameters with explicit types; consider removing when the type can be inferred.
+- **prefer_fire_and_forget** (Stylistic): Suggest unawaited/fire-and-forget when await result is unused.
+- **prefer_foreach** (Stylistic): Prefer for-in over .forEach() on iterables.
+- **prefer_foreach_over_map_entries** (Stylistic): Prefer for-in over map.entries instead of Map.forEach.
+- **prefer_base_prefix** (Stylistic): Abstract class names should end with Base.
+- **prefer_extension_suffix** (Stylistic): Extension names should end with Ext.
+- **prefer_mixin_prefix** (Stylistic): Mixin names should end with Mixin.
+- **prefer_overrides_last** (Stylistic): Place override methods after non-override members.
+- **prefer_i_prefix_interfaces** (Stylistic): Abstract class (interface) names should start with I.
+- **prefer_no_i_prefix_interfaces** (Stylistic): Abstract class names should not start with I (opposite of prefer_i_prefix_interfaces).
+- **prefer_impl_suffix** (Stylistic): Classes that implement an interface should end with Impl.
+- **prefer_constructor_over_literals** (Stylistic): Prefer List.empty(), Map(), Set.empty() over empty list/set/map literals.
+- **prefer_constructors_over_static_methods** (Stylistic): Prefer factory constructor when static method only returns new SameClass().
+- **format_test_name** (Stylistic): Test names (first argument to test/testWidgets) must be snake_case.
+- **avoid_explicit_type_declaration** (Stylistic): Prefer type inference when variable has initializer.
+- **prefer_explicit_null_checks** (Stylistic): Prefer explicit == null / != null over !.
+- **prefer_non_const_constructors** (Stylistic): Prefer omitting const on constructors (opinionated).
+- **prefer_separate_assignments** (Stylistic): Prefer separate statements over cascade assignments (..).
+- **prefer_optional_named_params** (Stylistic): Prefer optional named parameters over optional positional.
+- **prefer_optional_positional_params** (Stylistic): Prefer optional positional over optional named for bool/flag parameters.
+- **prefer_positional_bool_params** (Stylistic): Boolean parameters as optional positional at call sites.
+- **prefer_if_else_over_guards** (Stylistic): Consecutive guard clauses could be expressed as if-else.
+- **prefer_cascade_assignments** (Stylistic): Consecutive method calls on same target; consider cascade (..).
+- **prefer_factory_constructor** (Stylistic): Prefer factory constructor over static method returning same class.
+- **require_auto_route_page_suffix** (Stylistic): AutoRoute page classes should have a Page suffix.
+- **prefer_inline_function_types** (Stylistic): Prefer inline function type over typedef.
+- **prefer_function_over_static_method** (Stylistic): Static method without "this" could be top-level function.
+- **prefer_static_method_over_function** (Stylistic): Top-level function with class-typed first param could be static/extension.
+- **avoid_unnecessary_null_aware_elements** (Professional): Flag spread elements using `...?` when the collection is non-null; suggest `...` instead.
+- **prefer_import_over_part** (Stylistic): Prefer import over part/part of for modularity.
+- **prefer_result_type** (Professional): Functions should declare an explicit return type (except main).
+- **avoid_freezed_invalid_annotation_target** (Professional): @freezed should only be used on class declarations.
+- **require_const_list_items** (Comprehensive): List items that are no-argument constructor calls should be const when possible.
+- **prefer_asmap_over_indexed_iteration** (Professional): Prefer asMap().entries for indexed iteration over manual index loops.
+- **avoid_test_on_real_device** (Professional): Flag test names that suggest running on real device; prefer emulators/simulators in CI.
+- **avoid_referencing_subclasses** (Professional): Base classes should not reference their subclasses (e.g. return/parameter types).
+- **prefer_correct_throws** (Professional): Suggest @Throws annotation for methods/functions that throw.
+- **prefer_layout_builder_for_constraints** (Professional): Prefer LayoutBuilder for constraint-aware layout instead of MediaQuery for widget sizing.
 
-Roadmap tasks for these rules were moved from `bugs/roadmap/` to `bugs/history/roadmap/`. ROADMAP.md count: 1735 implemented, 455 remaining.
+Roadmap tasks for these rules were moved from `bugs/roadmap/` to `bugs/history/roadmap/`. ROADMAP.md count: 1745 implemented, 445 remaining.
 
 ### Fixed
 
@@ -38,6 +78,7 @@ Roadmap tasks for these rules were moved from `bugs/roadmap/` to `bugs/history/r
 
 ### Fixed
 
+- **avoid_deprecated_usage (analyzer 9):** Fixed plugin crash (`NoSuchMethodError: SimpleIdentifierImpl has no getter 'staticElement'`) when running under analyzer 9.x. Rule now uses a compatibility helper that supports both `.element` (analyzer 9+) and `.staticElement` (older). See `bugs/history/report_avoid_deprecated_usage_analyzer_api_crash.md`.
 - **Lint message text:** Removed duplicated or malformed text in `correctionMessage` across 11 rule files. No rule logic, tiers, or behavior changed. **code_quality_rules:** `no_boolean_literal_compare` — removed duplicate phrase "!x instead of x == false". **structure_rules:** `prefer_small_length_test_files`, `avoid_medium_length_test_files`, `avoid_long_length_test_files`, `avoid_very_long_length_test_files` — added missing space before "Disable with:". **dependency_injection_rules:** `prefer_constructor_injection` — typo "parameter:." → "parameter.", added space before example. **equatable_rules:** `prefer_equatable_mixin` — fixed "keeping." → "keeping " and sentence order. **widget_lifecycle_rules:** `require_timer_cancellation`, `nullify_after_dispose` — added space before continuation. **ios_rules:** `avoid_ios_deprecated_uikit` — added space before "See Xcode warnings...". **record_pattern_rules:** `avoid_explicit_pattern_field_name` — fixed "instead of." and message order. **widget_layout_rules:** `prefer_spacing_over_sizedbox`, `avoid_deep_widget_nesting`, `prefer_safe_area_aware` — fixed split/space so sentences read correctly. **testing_best_practices_rules:** `avoid_flaky_tests` — fixed "instead of." and sentence order. **test_rules:** `avoid_test_coupling`, `require_test_isolation`, `avoid_real_dependencies_in_tests` — fixed comma/period and continuation order.
 
 ---
