@@ -28,6 +28,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 Roadmap tasks for these rules were moved from `bugs/roadmap/` to `bugs/history/roadmap/`. ROADMAP.md count: 1735 implemented, 455 remaining.
 
+### Fixed
+
+- **Report duplicate paths:** The analysis report log counted the same violation twice when the same issue was reported with both relative and absolute file paths (e.g. `lib/foo.dart` and `D:\proj\lib\foo.dart`). Consolidation now normalizes all paths to project-relative form before deduplication and in stored violation records, so totals and "files with issues" are accurate. See `bugs/history/report_duplicate_paths_deduplication.md`.
+
 ---
 
 ## [6.0.10]

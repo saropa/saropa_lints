@@ -120,10 +120,12 @@ class ReportConsolidator {
   ///
   /// If no batch files exist, returns null. Corrupted or locked
   /// batch files are silently skipped.
+  /// Paths are normalized to project-relative form so the same file
+  /// reported with absolute vs relative path is counted once.
   static ConsolidatedData? consolidate(String projectRoot, String sessionId) {
     final batches = _readAllBatches(projectRoot, sessionId);
     if (batches.isEmpty) return null;
-    return _merge(batches);
+    return _merge(projectRoot, batches);
   }
 
   /// The report filename for a session.
@@ -229,11 +231,26 @@ class ReportConsolidator {
     return batches;
   }
 
+  /// Normalize a file path to project-relative form with forward slashes.
+  ///
+  /// Same semantics as `toRelativePath()` in violation_export.dart; not shared
+  /// to avoid circular dependency. Ensures the same file is not counted twice when
+  /// reported as both absolute and relative path.
+  static String _normalizePath(String path, String projectRoot) {
+    final root = projectRoot.replaceAll('\\', '/');
+    final file = path.replaceAll('\\', '/');
+    if (file.startsWith('$root/')) {
+      return file.substring(root.length + 1);
+    }
+    return file;
+  }
+
   /// Merge multiple batches into a single [ConsolidatedData].
   ///
-  /// Violations are deduplicated by `(file, line, rule)`. All summary
-  /// statistics are recomputed from the deduplicated violation set.
-  static ConsolidatedData _merge(List<BatchData> batches) {
+  /// Violations are deduplicated by `(file, line, rule)` using
+  /// normalized paths so absolute vs relative path for the same file
+  /// count as one. All summary statistics use normalized paths.
+  static ConsolidatedData _merge(String projectRoot, List<BatchData> batches) {
     // Use config from first batch (all should be identical).
     final config = batches
         .map((b) => b.config)
@@ -245,16 +262,18 @@ class ReportConsolidator {
       ruleSeverities.addAll(batch.ruleSeverities);
     }
 
-    // Collect all analyzed files (union).
+    // Collect all analyzed files (union) with normalized paths.
     final allFiles = <String>{};
     for (final batch in batches) {
-      allFiles.addAll(batch.analyzedFiles);
+      for (final path in batch.analyzedFiles) {
+        allFiles.add(_normalizePath(path, projectRoot));
+      }
     }
 
-    // Deduplicate violations across batches.
-    final deduped = _deduplicateViolations(batches);
+    // Deduplicate violations using normalized paths.
+    final deduped = _deduplicateViolations(projectRoot, batches);
 
-    // Recompute statistics from deduplicated violations.
+    // Recompute statistics from deduplicated violations (paths already normalized).
     final issuesByFile = <String, int>{};
     final issuesByRule = <String, int>{};
     var errorCount = 0;
@@ -293,7 +312,12 @@ class ReportConsolidator {
   }
 
   /// Deduplicate violations by `(file, line, rule)` across all batches.
+  ///
+  /// Uses normalized paths for the key and stores [ViolationRecord] with
+  /// normalized file path so the same issue is not listed twice when
+  /// reported with different path forms.
   static Map<LintImpact, List<ViolationRecord>> _deduplicateViolations(
+    String projectRoot,
     List<BatchData> batches,
   ) {
     final seen = <String>{};
@@ -307,9 +331,16 @@ class ReportConsolidator {
         if (list == null) continue;
 
         for (final v in list) {
-          final key = '${v.file}:${v.line}:${v.rule}';
+          final normFile = _normalizePath(v.file, projectRoot);
+          final key = '$normFile:${v.line}:${v.rule}';
           if (seen.add(key)) {
-            deduped.add(v);
+            deduped.add(ViolationRecord(
+              rule: v.rule,
+              file: normFile,
+              line: v.line,
+              message: v.message,
+              correction: v.correction,
+            ));
           }
         }
       }
