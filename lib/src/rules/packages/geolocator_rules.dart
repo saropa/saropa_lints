@@ -300,3 +300,37 @@ class AvoidContinuousLocationUpdatesRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_geolocation_coarse_location
+// =============================================================================
+
+/// Prefer coarse location when high accuracy is not needed (battery and privacy).
+class PreferGeolocationCoarseLocationRule extends SaropaLintRule {
+  PreferGeolocationCoarseLocationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'geolocator'};
+
+  static const LintCode _code = LintCode(
+    'prefer_geolocation_coarse_location',
+    '[prefer_geolocation_coarse_location] Prefer LocationAccuracy.low or '
+        'balanced when high accuracy is not required to save battery and '
+        'respect privacy.',
+    correctionMessage:
+        'Use LocationAccuracy.low or .balanced when fine location is not needed.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

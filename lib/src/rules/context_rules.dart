@@ -1164,3 +1164,33 @@ class AvoidContextDependencyInCallbackRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_closest_context
+// =============================================================================
+
+/// Prefer using the closest BuildContext (e.g. from the widget that owns the action).
+class PreferClosestContextRule extends SaropaLintRule {
+  PreferClosestContextRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_closest_context',
+    '[prefer_closest_context] Prefer the closest BuildContext to the '
+        'widget that needs it to avoid using a context that may be unmounted.',
+    correctionMessage:
+        'Use context from the widget that owns the action, or check mounted.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

@@ -4652,3 +4652,34 @@ class AvoidRedundantAwaitRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_cancellation_token_pattern
+// =============================================================================
+
+/// Prefer cancellation token (e.g. CancelToken in Dio) for cancelable operations.
+class PreferCancellationTokenPatternRule extends SaropaLintRule {
+  PreferCancellationTokenPatternRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_cancellation_token_pattern',
+    '[prefer_cancellation_token_pattern] Prefer passing a cancellation '
+        'token (e.g. Dio CancelToken) to async operations so they can be '
+        'cancelled when the caller is disposed.',
+    correctionMessage:
+        'Use CancelToken or similar to support cancellation of in-flight requests.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

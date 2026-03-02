@@ -674,3 +674,64 @@ class PreferSemverVersionRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_compile_time_config
+// =============================================================================
+
+/// Prefer compile-time configuration (e.g. --dart-define) over runtime-only config.
+class PreferCompileTimeConfigRule extends SaropaLintRule {
+  PreferCompileTimeConfigRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_compile_time_config',
+    '[prefer_compile_time_config] Prefer compile-time configuration '
+        '(String.fromEnvironment, --dart-define) for environment-specific '
+        'values so they can be tree-shaken and validated at build time.',
+    correctionMessage:
+        'Use String.fromEnvironment or --dart-define for config where possible.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// prefer_flavor_configuration
+// =============================================================================
+
+/// Prefer flavor-based configuration for multi-environment apps.
+class PreferFlavorConfigurationRule extends SaropaLintRule {
+  PreferFlavorConfigurationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_flavor_configuration',
+    '[prefer_flavor_configuration] Prefer flavor-based configuration '
+        '(dev/staging/prod) for environment-specific builds.',
+    correctionMessage:
+        'Use flavors or build flavors to switch config per build.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

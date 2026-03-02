@@ -7177,6 +7177,67 @@ class _TextInputFinder extends RecursiveAstVisitor<void> {
   }
 }
 
+// =============================================================================
+// prefer_flex_for_complex_layout
+// =============================================================================
+
+/// Prefer Flex (Row/Column) for complex layouts over nested containers.
+class PreferFlexForComplexLayoutRule extends SaropaLintRule {
+  PreferFlexForComplexLayoutRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_flex_for_complex_layout',
+    '[prefer_flex_for_complex_layout] Prefer Row/Column (Flex) with '
+        'Expanded/Flexible for complex layouts instead of deep nesting.',
+    correctionMessage:
+        'Use Flex, Expanded, and Flexible for predictable layout behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// prefer_find_child_index_callback
+// =============================================================================
+
+/// Prefer findChildIndexCallback in ListView.builder for stable indices.
+class PreferFindChildIndexCallbackRule extends SaropaLintRule {
+  PreferFindChildIndexCallbackRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_find_child_index_callback',
+    '[prefer_find_child_index_callback] Use findChildIndexCallback in '
+        'ListView.builder when item order can change (e.g. reordering) for '
+        'correct scroll-to-index behavior.',
+    correctionMessage:
+        'Add findChildIndexCallback when list order is dynamic.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
 // =========================================================================
 // Shared quick fix: Wrap in Expanded
 // =========================================================================

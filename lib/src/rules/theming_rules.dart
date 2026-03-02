@@ -407,3 +407,85 @@ class RequireSemanticColorsRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_dark_mode_colors
+// =============================================================================
+
+/// Prefer theme-aware colors for dark mode support.
+///
+/// Use Theme.of(context).colorScheme or theme extensions instead of
+/// hardcoded Colors when the color should adapt to brightness.
+class PreferDarkModeColorsRule extends SaropaLintRule {
+  PreferDarkModeColorsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_dark_mode_colors',
+    '[prefer_dark_mode_colors] Prefer theme-aware colors (e.g. '
+        'Theme.of(context).colorScheme) so UI adapts to dark mode.',
+    correctionMessage:
+        'Use Theme.of(context).colorScheme or theme extensions for brightness-aware colors.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Narrow: only flag in MaterialApp/CupertinoApp when theme is set but darkTheme is not
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'MaterialApp' && typeName != 'CupertinoApp') return;
+      bool hasTheme = false;
+      bool hasDarkTheme = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'theme') hasTheme = true;
+          if (name == 'darkTheme') hasDarkTheme = true;
+        }
+      }
+      if (hasTheme && !hasDarkTheme) reporter.atNode(node.constructorName, code);
+    });
+  }
+}
+
+// =============================================================================
+// prefer_high_contrast_mode
+// =============================================================================
+
+/// Prefer high-contrast-aware styling for accessibility.
+class PreferHighContrastModeRule extends SaropaLintRule {
+  PreferHighContrastModeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_high_contrast_mode',
+    '[prefer_high_contrast_mode] Consider high-contrast mode for '
+        'accessibility. Use MediaQuery.highContrastOf(context) or '
+        'semantic contrast when styling critical UI.',
+    correctionMessage:
+        'Respect high-contrast mode via MediaQuery or ensure sufficient contrast.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // INFO-only suggestion; no automatic detection to avoid false positives
+  }
+}

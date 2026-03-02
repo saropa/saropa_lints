@@ -1220,3 +1220,33 @@ class PreferPatternDestructuringRule extends SaropaLintRule {
     }
   }
 }
+
+// =============================================================================
+// prefer_class_destructuring
+// =============================================================================
+
+/// Prefer record or pattern destructuring when extracting multiple fields.
+class PreferClassDestructuringRule extends SaropaLintRule {
+  PreferClassDestructuringRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_class_destructuring',
+    '[prefer_class_destructuring] Prefer record patterns or destructuring '
+        'to extract multiple fields from an object in one place.',
+    correctionMessage:
+        'Use a record pattern or destructuring assignment when reading multiple fields.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

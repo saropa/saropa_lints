@@ -3373,3 +3373,149 @@ class PreferGoRouterRedirectRule extends SaropaLintRule {
     });
   }
 }
+
+/// Prefer go_router_builder for compile-time route safety.
+///
+/// Hand-written GoRoute path strings bypass type safety. Use go_router_builder
+/// to generate typed route classes.
+///
+/// **Bad:**
+/// ```dart
+/// GoRouter(
+///   routes: [
+///     GoRoute(path: '/user/:id', builder: (_, state) => UserPage(...)),
+///   ],
+/// );
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// GoRouter(
+///   routes: $appRoutes, // from go_router_builder
+/// );
+/// ```
+class PreferGoRouterBuilderRule extends SaropaLintRule {
+  PreferGoRouterBuilderRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_go_router_builder',
+    '[prefer_go_router_builder] GoRoute is defined with a hand-written path '
+        'string. Use go_router_builder for compile-time route safety and '
+        'typed navigation.',
+    correctionMessage:
+        'Use go_router_builder to generate route classes and replace hand-written paths.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GoRoute') return;
+
+      if (!fileImportsPackage(node, PackageImports.goRouter)) return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'path' &&
+            (arg.expression is SimpleStringLiteral ||
+                arg.expression is StringInterpolation ||
+                arg.expression is AdjacentStrings)) {
+          reporter.atNode(arg.expression, code);
+          return;
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_branch_io_or_firebase_links
+// =============================================================================
+
+/// Prefer Branch.io or Firebase Dynamic Links for deferred deep linking.
+class PreferBranchIoOrFirebaseLinksRule extends SaropaLintRule {
+  PreferBranchIoOrFirebaseLinksRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_branch_io_or_firebase_links',
+    '[prefer_branch_io_or_firebase_links] Prefer Branch.io or Firebase '
+        'Dynamic Links for deferred deep linking and attribution.',
+    correctionMessage:
+        'Use Branch.io or Firebase Dynamic Links for robust deep link handling.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+/// Warns when an AutoRoute page class does not have a Page suffix.
+///
+/// When using the auto_route package, page classes annotated with @RoutePage
+/// should be named with a Page suffix for consistency.
+///
+/// **Bad:**
+/// ```dart
+/// @RoutePage()
+/// class Home {}
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// @RoutePage()
+/// class HomePage {}
+/// ```
+class RequireAutoRoutePageSuffixRule extends SaropaLintRule {
+  RequireAutoRoutePageSuffixRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_auto_route_page_suffix',
+    '[require_auto_route_page_suffix] AutoRoute page class should have a Page suffix.',
+    correctionMessage: 'Rename the class to end with Page.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (!ProjectContext.hasDependency(context.filePath, 'auto_route')) return;
+
+    context.addClassDeclaration((ClassDeclaration node) {
+      final String name = node.name.lexeme;
+      if (name.endsWith('Page')) return;
+      for (final Annotation a in node.metadata) {
+        if (a.name.name == 'RoutePage') {
+          reporter.atNode(node);
+          return;
+        }
+      }
+    });
+  }
+}

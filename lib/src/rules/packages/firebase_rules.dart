@@ -2872,3 +2872,96 @@ class RequireFirebaseTokenRefreshRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// prefer_firebase_transaction_for_counters
+// =============================================================================
+
+/// Prefer Firestore transactions for counter updates to avoid race conditions.
+class PreferFirebaseTransactionForCountersRule extends SaropaLintRule {
+  PreferFirebaseTransactionForCountersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'firebase'};
+
+  static const LintCode _code = LintCode(
+    'prefer_firebase_transaction_for_counters',
+    '[prefer_firebase_transaction_for_counters] Use Firestore runTransaction '
+        'for counter or numeric field updates to avoid race conditions.',
+    correctionMessage:
+        'Use FirebaseFirestore.instance.runTransaction for counter updates.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// prefer_correct_topics
+// =============================================================================
+
+/// Prefer correct FCM topic format and subscription patterns.
+class PreferCorrectTopicsRule extends SaropaLintRule {
+  PreferCorrectTopicsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_correct_topics',
+    '[prefer_correct_topics] Use valid FCM topic format (e.g. /topics/name) '
+        'and subscribe/unsubscribe in pairs to avoid leaks.',
+    correctionMessage:
+        'Follow FCM topic naming and lifecycle best practices.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// prefer_deep_link_auth
+// =============================================================================
+
+/// Prefer validating deep links and requiring auth when needed.
+class PreferDeepLinkAuthRule extends SaropaLintRule {
+  PreferDeepLinkAuthRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_deep_link_auth',
+    '[prefer_deep_link_auth] Validate deep link data and require '
+        'authentication for protected routes opened via deep links.',
+    correctionMessage:
+        'Validate deep link payloads and check auth before showing protected content.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

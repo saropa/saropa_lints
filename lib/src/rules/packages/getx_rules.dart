@@ -2191,3 +2191,57 @@ class AvoidGetxRxNestedObsRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// prefer_getx_builder_over_obx
+// =============================================================================
+
+/// Prefer GetBuilder over Obx when reactivity is not needed.
+///
+/// Obx subscribes to all used observables; GetBuilder only rebuilds when
+/// update() is called. Use GetBuilder for simpler, non-reactive UI.
+///
+/// **Bad:**
+/// ```dart
+/// Obx(() => Text(controller.label)); // if label is not .obs
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// GetBuilder<MyController>(builder: (_) => Text(controller.label));
+/// ```
+class PreferGetxBuilderOverObxRule extends SaropaLintRule {
+  PreferGetxBuilderOverObxRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'get'};
+
+  static const LintCode _code = LintCode(
+    'prefer_getx_builder_over_obx',
+    '[prefer_getx_builder_over_obx] Consider GetBuilder instead of Obx when '
+        'you do not need reactive updates. GetBuilder only rebuilds on '
+        'update(), reducing overhead.',
+    correctionMessage:
+        'Use GetBuilder<YourController> when the widget does not depend on .obs variables.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Obx') return;
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}

@@ -92,6 +92,49 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
   }
 }
 
+/// Warns when @freezed is used on a non-class declaration.
+///
+/// **Bad:**
+/// ```dart
+/// @freezed
+/// void myFunction() {}
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// @freezed
+/// class User with _$User { ... }
+/// ```
+class AvoidFreezedInvalidAnnotationTargetRule extends SaropaLintRule {
+  AvoidFreezedInvalidAnnotationTargetRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_freezed_invalid_annotation_target',
+    '[avoid_freezed_invalid_annotation_target] @freezed is only valid on class declarations.',
+    correctionMessage: 'Remove @freezed or apply it to a class.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addAnnotation((Annotation node) {
+      if (node.name.name != 'freezed') return;
+      final AstNode? parent = node.parent;
+      if (parent is ClassDeclaration) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
 // cspell:ignore freezed_fromjson_syntax
 /// Warns when Freezed fromJson has block body instead of arrow syntax.
 ///
@@ -1029,6 +1072,87 @@ class AvoidFreezedAnyMapIssueRule extends SaropaLintRule {
       if (!hasFromJson) return;
 
       reporter.atToken(node.name);
+    });
+  }
+}
+
+// =============================================================================
+// prefer_freezed_union_types
+// =============================================================================
+
+/// Prefer Freezed union types for sealed state instead of manual class hierarchies.
+///
+/// **Bad:**
+/// ```dart
+/// abstract class State {}
+/// class Initial extends State {}
+/// class Loaded extends State {}
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// @freezed
+/// class State with _$State {
+///   factory State.initial() = _Initial;
+///   factory State.loaded(Data d) = _Loaded;
+/// }
+/// ```
+class PreferFreezedUnionTypesRule extends SaropaLintRule {
+  PreferFreezedUnionTypesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'freezed'};
+
+  static const LintCode _code = LintCode(
+    'prefer_freezed_union_types',
+    '[prefer_freezed_union_types] Manual sealed class hierarchy could be '
+        'replaced with a Freezed union type for exhaustive pattern matching '
+        'and less boilerplate.',
+    correctionMessage:
+        'Consider using @freezed union types instead of abstract class + subclasses.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit unit) {
+      // Phase 1: collect subclass map (superclass name -> list of subclasses).
+      final Map<String, List<ClassDeclaration>> hierarchy = {};
+      for (final CompilationUnitMember member in unit.declarations) {
+        if (member is ClassDeclaration) {
+          final ExtendsClause? extendsClause = member.extendsClause;
+          if (extendsClause == null) continue;
+          final String superName = extendsClause.superclass.name.lexeme;
+          hierarchy.putIfAbsent(superName, () => []).add(member);
+        }
+      }
+      // Phase 2: report abstract classes with 2+ subclasses and no @freezed.
+      for (final CompilationUnitMember member in unit.declarations) {
+        if (member is! ClassDeclaration ||
+            !(member.abstractKeyword?.isKeyword ?? false)) {
+          continue;
+        }
+        final String name = member.name.lexeme;
+        final List<ClassDeclaration>? subclasses = hierarchy[name];
+        if (subclasses == null || subclasses.length < 2) continue;
+        bool hasFreezed = false;
+        for (final Annotation a in member.metadata) {
+          if (a.name.name == 'freezed') {
+            hasFreezed = true;
+            break;
+          }
+        }
+        if (!hasFreezed) reporter.atNode(member, code);
+      }
     });
   }
 }

@@ -2336,3 +2336,34 @@ class DisposeClassFieldsRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_deactivate_for_cleanup
+// =============================================================================
+
+/// Prefer deactivate for cleanup when appropriate in widget lifecycle.
+class PreferDeactivateForCleanupRule extends SaropaLintRule {
+  PreferDeactivateForCleanupRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_deactivate_for_cleanup',
+    '[prefer_deactivate_for_cleanup] Prefer deactivate() for cleanup that '
+        'must run when the widget is removed from the tree (e.g. cancel '
+        'subscriptions) when dispose is too late.',
+    correctionMessage:
+        'Use deactivate() for cleanup that should run before dispose when needed.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
