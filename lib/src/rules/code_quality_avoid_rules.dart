@@ -3381,8 +3381,6 @@ class AvoidDeprecatedUsageRule extends SaropaLintRule {
       checkElement(elementFromIdentifier(node.constructorName), node);
     });
   }
-
-  @override
 }
 
 /// Warns when a function or constructor has positional bool parameters.
