@@ -22,20 +22,19 @@ This rule aims to improve code quality, security, or maintainability by enforcin
 ### Bad (should trigger)
 
 ```dart
-// Example violation: code that the rule should report.
-// TODO: Replace with concrete example for `require_heading_hierarchy`.
+// Violation: see Problem Statement. Add concrete example before implementing.
 ```
 
 ### Good (should not trigger)
 
 ```dart
-// Compliant code that must not be flagged.
-// TODO: Replace with concrete example for `require_heading_hierarchy`.
+// Compliant: see Problem Statement. Add concrete example before implementing.
 ```
 
 ## Detection: True Positives
 
 - **Goal**: Reliably detect all real violations of the practice.
+- **Detection approach**: Visit the AST nodes that can exhibit the pattern (see Problem Statement); report when the pattern is found. Before implementing: add concrete bad/good examples above and refine this (or mark "Needs design" if the pattern requires cross-file/heuristic work).
 - **Approach**: Prefer type/element checks and exact-match sets over substring or `toSource()` matching (see [bugs/history/false_positives/string_contains_false_positive_audit.md](../../history/false_positives/string_contains_false_positive_audit.md)).
 - **AST coverage**: Consider all AST shapes for the same pattern (e.g. both `MethodDeclaration` and `FunctionDeclaration`) so violations are not missed.
 - **Edge cases**: Document which constructs are in scope (e.g. test files, generated code, platform-specific code) and ensure detection is consistent.

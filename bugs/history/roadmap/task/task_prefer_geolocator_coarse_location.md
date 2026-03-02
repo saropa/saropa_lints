@@ -1,41 +1,40 @@
-# Task: `prefer_i_prefix_interfaces`
+# Task: `prefer_geolocator_coarse_location`
 
 ## Summary
-- **Rule Name**: `prefer_i_prefix_interfaces`
-- **Tier**: Comprehensive
+- **Rule Name**: `prefer_geolocator_coarse_location`
+- **Tier**: Recommended
 - **Severity**: INFO
 - **Status**: Planned
-- **Source**: ROADMAP.md — Miscellaneous Rules
+- **Source**: ROADMAP.md — 5.9 Platform & Permissions (sqflite, permission_handler, geolocator, notifications)
 
 ## Problem Statement
 
-Interface classes use `I` prefix (`IRepository`)
+ACCESS_COARSE_LOCATION for city-level. Detect fine permission for coarse needs.
 
 This rule aims to improve code quality, security, or maintainability by enforcing a specific practice. Implementation must reliably detect true violations while avoiding false positives.
 
 ## Description (from ROADMAP)
 
-> Interface classes use `I` prefix (`IRepository`)
+> ACCESS_COARSE_LOCATION for city-level. Detect fine permission for coarse needs.
 
 ## Code Examples
 
 ### Bad (should trigger)
 
 ```dart
-// Example violation: code that the rule should report.
-// TODO: Replace with concrete example for `prefer_i_prefix_interfaces`.
+// Violation: see Problem Statement. Add concrete example before implementing.
 ```
 
 ### Good (should not trigger)
 
 ```dart
-// Compliant code that must not be flagged.
-// TODO: Replace with concrete example for `prefer_i_prefix_interfaces`.
+// Compliant: see Problem Statement. Add concrete example before implementing.
 ```
 
 ## Detection: True Positives
 
 - **Goal**: Reliably detect all real violations of the practice.
+- **Detection approach**: Visit the AST nodes that can exhibit the pattern (see Problem Statement); report when the pattern is found. Before implementing: add concrete bad/good examples above and refine this (or mark "Needs design" if the pattern requires cross-file/heuristic work).
 - **Approach**: Prefer type/element checks and exact-match sets over substring or `toSource()` matching (see [bugs/history/false_positives/string_contains_false_positive_audit.md](../../history/false_positives/string_contains_false_positive_audit.md)).
 - **AST coverage**: Consider all AST shapes for the same pattern (e.g. both `MethodDeclaration` and `FunctionDeclaration`) so violations are not missed.
 - **Edge cases**: Document which constructs are in scope (e.g. test files, generated code, platform-specific code) and ensure detection is consistent.
@@ -53,7 +52,7 @@ This rule aims to improve code quality, security, or maintainability by enforcin
 - [Flutter API docs](https://api.flutter.dev/) — for widget/API-specific rules.
 - [OWASP Mobile](https://owasp.org/www-project-mobile-top-10/) — for security rules.
 - [Dart custom_lint](https://pub.dev/packages/custom_lint) — plugin API and performance.
-- Add package/docs links relevant to `prefer_i_prefix_interfaces` (e.g. bloc, riverpod, hive).
+- Add package/docs links relevant to `prefer_geolocator_coarse_location` (e.g. bloc, riverpod, hive).
 
 ## Quality & Performance
 
