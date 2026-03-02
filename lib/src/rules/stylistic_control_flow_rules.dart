@@ -638,6 +638,53 @@ class PreferChainedOverCascadeRule extends SaropaLintRule {
   }
 }
 
+/// Discourages use of cascade notation (..) for clarity and maintainability.
+///
+/// Reports every [CascadeExpression]. Teams that prefer explicit statements
+/// over fluent-style cascades can enable this (Stylistic tier). No recursion
+/// or cross-file logic; single-node callback only.
+///
+/// **Bad:**
+/// ```dart
+/// controller..forward()..repeat();
+/// list..add(1)..add(2);
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// controller.forward();
+/// controller.repeat();
+/// list.add(1);
+/// list.add(2);
+/// ```
+class AvoidCascadesRule extends SaropaLintRule {
+  AvoidCascadesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_cascades',
+    '[avoid_cascades] Cascade notation (..) can reduce clarity and maintainability. Use separate statements for each operation. {v1}',
+    correctionMessage:
+        'Replace cascade (..) with separate method calls or property assignments.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCascadeExpression((node) {
+      reporter.atNode(node);
+    });
+  }
+}
+
 /// Warns when default case is used in enum switch instead of exhaustive cases.
 ///
 /// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2

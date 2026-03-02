@@ -118,6 +118,11 @@ void main() {
       'prefer_final_fields',
       () => PreferFinalFieldsRule(),
     );
+    testRule(
+      'PreferFinalFieldsAlwaysRule',
+      'prefer_final_fields_always',
+      () => PreferFinalFieldsAlwaysRule(),
+    );
   });
 
   group('Class Constructor Rules - Fixture Verification', () {

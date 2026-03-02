@@ -947,6 +947,65 @@ class AvoidUnsafeReduceRule extends SaropaLintRule {
   }
 }
 
+/// Prefer fold over reduce for collections when an initial value is needed.
+///
+/// Flags [MethodInvocation] with method name `reduce` on List/Set/Iterable/Queue.
+/// Uses type display name (exact prefix match); no string heuristics. Distinct
+/// from [AvoidUnsafeReduceRule], which only flags when collection may be empty.
+///
+/// **Bad:**
+/// ```dart
+/// final sum = numbers.reduce((a, b) => a + b);
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// final sum = numbers.fold(0, (a, b) => a + b);
+/// ```
+class PreferFoldOverReduceRule extends SaropaLintRule {
+  PreferFoldOverReduceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_fold_over_reduce',
+    '[prefer_fold_over_reduce] Prefer fold() with an explicit initial value for clarity and to avoid empty-collection errors. {v1}',
+    correctionMessage:
+        'Replace reduce() with fold() and provide an initial value.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'reduce') return;
+
+      final Expression? target = node.realTarget;
+      if (target == null) return;
+
+      final DartType? targetType = target.staticType;
+      if (targetType == null) return;
+
+      final String typeName = targetType.getDisplayString();
+      if (!typeName.startsWith('List') &&
+          !typeName.startsWith('Set') &&
+          !typeName.startsWith('Iterable') &&
+          !typeName.startsWith('Queue')) {
+        return;
+      }
+
+      reporter.atNode(node);
+    });
+  }
+}
+
 /// Warns when firstWhere/lastWhere/singleWhere is used without orElse.
 ///
 /// Since: v1.4.0 | Updated: v4.13.0 | Rule version: v4

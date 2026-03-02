@@ -1,0 +1,14 @@
+// ignore_for_file: unused_local_variable
+// Fixture for avoid_cascades: bad/good and false-positive cases.
+
+void bad() {
+  final list = <int>[]
+    ..add(1)
+    ..add(2); // expect_lint: avoid_cascades
+}
+
+void good() {
+  final list = <int>[];
+  list.add(1);
+  list.add(2);
+}

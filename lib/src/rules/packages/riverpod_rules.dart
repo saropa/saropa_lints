@@ -1689,6 +1689,76 @@ class RequireAutoDisposeRule extends SaropaLintRule {
   }
 }
 
+/// Provider.name should be auto-generated; detect manual name strings.
+///
+/// Flags [InstanceCreationExpression] whose type is a known Riverpod provider
+/// and which has a named argument `name` with [SimpleStringLiteral] or
+/// [StringInterpolation]. Uses exact set [_providerTypes]; [applicableFileTypes]
+/// restricts to FileType.provider. No recursion.
+///
+/// **Bad:**
+/// ```dart
+/// final p = Provider((ref) => 0, name: 'myProvider');
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// final p = Provider((ref) => 0);
+/// // or use @riverpod for code-gen name
+/// ```
+class AvoidRiverpodStringProviderNameRule extends SaropaLintRule {
+  AvoidRiverpodStringProviderNameRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
+  static const LintCode _code = LintCode(
+    'avoid_riverpod_string_provider_name',
+    '[avoid_riverpod_string_provider_name] Provider uses manual name string; prefer auto-generated name or code-gen. {v1}',
+    correctionMessage:
+        'Remove the name argument to use auto-generated name, or use @riverpod for code-gen.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _providerTypes = <String>{
+    'Provider',
+    'StateProvider',
+    'FutureProvider',
+    'StreamProvider',
+    'NotifierProvider',
+    'AsyncNotifierProvider',
+    'StateNotifierProvider',
+    'ChangeNotifierProvider',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_providerTypes.contains(typeName)) return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+        if (arg.name.label.name != 'name') continue;
+        final Expression value = arg.expression;
+        if (value is SimpleStringLiteral || value is StringInterpolation) {
+          reporter.atNode(arg);
+          return;
+        }
+      }
+    });
+  }
+}
+
 /// Warns when ref.read() is used inside a build() method body.
 ///
 /// Since: v1.4.3 | Updated: v4.13.0 | Rule version: v4

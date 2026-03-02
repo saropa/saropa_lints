@@ -194,6 +194,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferBooleanPrefixesForLocalsRule.new,
   PreferBooleanPrefixesForParamsRule.new,
   AvoidReturningCascadesRule.new,
+  AvoidReturningThisRule.new,
   AvoidPositionalRecordFieldAccessRule.new,
   AvoidDeclaringCallMethodRule.new,
   AvoidUnmarkedPublicClassRule.new,
@@ -294,6 +295,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidUnnecessaryNegationsRule.new,
   PreferCorrectIdentifierLengthRule.new,
   AvoidUnsafeReduceRule.new,
+  PreferFoldOverReduceRule.new,
   PreferNamedParametersRule.new,
   AvoidRecursiveCallsRule.new,
   AvoidRecursiveToStringRule.new,
@@ -434,6 +436,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferAssertsInInitializerListsRule.new,
   PreferConstConstructorsInImmutablesRule.new,
   PreferFinalFieldsRule.new,
+  PreferFinalFieldsAlwaysRule.new,
   AvoidUnnecessaryIfRule.new,
 
   // Noisy rules - disabled by default but available
@@ -868,6 +871,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireBlocCloseRule.new,
   PreferConsumerWidgetRule.new,
   RequireAutoDisposeRule.new,
+  AvoidRiverpodStringProviderNameRule.new,
 
   // New security rule
   AvoidDynamicSqlRule.new,
@@ -876,6 +880,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferRelativeImportsRule.new,
   PreferOneWidgetPerFileRule.new,
   PreferArrowFunctionsRule.new,
+  PreferExpressionBodyGettersRule.new,
+  PreferBlockBodySettersRule.new,
   PreferAllNamedParametersRule.new,
   PreferTrailingCommaAlwaysRule.new,
   PreferPrivateUnderscorePrefixRule.new,
@@ -941,6 +947,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferSwitchStatementRule.new,
   PreferCascadeOverChainedRule.new,
   PreferChainedOverCascadeRule.new,
+  AvoidCascadesRule.new,
   PreferExhaustiveEnumsRule.new,
   PreferDefaultEnumCaseRule.new,
   PreferAwaitOverThenRule.new,
@@ -1096,6 +1103,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferImplicitAnimationsRule.new,
   RequireStaggeredAnimationDelaysRule.new,
   PreferCubitForSimpleRule.new,
+  AvoidCubitsRule.new,
 
   RequireBlocObserverRule.new,
   RequireRouteTransitionConsistencyRule.new,
@@ -1231,6 +1239,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // Code quality rules
   AvoidDuplicateStringLiteralsRule.new,
   AvoidDuplicateStringLiteralsPairRule.new,
+  AvoidExpensiveLogStringConstructionRule.new,
   // State management rules
   AvoidSetStateInLargeStateClassRule.new,
 

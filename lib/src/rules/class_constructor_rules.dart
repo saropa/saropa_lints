@@ -2058,6 +2058,57 @@ class PreferFinalFieldsRule extends SaropaLintRule {
   }
 }
 
+/// All instance fields should be final.
+///
+/// Flags [FieldDeclaration] that are not static and not final/const. Stricter
+/// than [PreferFinalFieldsRule] (which only flags when never reassigned).
+/// Single registry callback; no recursion.
+///
+/// **Bad:**
+/// ```dart
+/// class C {
+///   int x = 0;
+///   String name;
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class C {
+///   final int x = 0;
+///   final String name;
+///   C(this.name);
+/// }
+/// ```
+class PreferFinalFieldsAlwaysRule extends SaropaLintRule {
+  PreferFinalFieldsAlwaysRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_final_fields_always',
+    '[prefer_final_fields_always] Instance field should be final for immutability and clarity. {v1}',
+    correctionMessage: 'Add the final modifier to the field declaration.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addFieldDeclaration((FieldDeclaration node) {
+      if (node.isStatic) return;
+      if (node.fields.isFinal || node.fields.isConst) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
 class _AssignmentToFieldVisitor extends RecursiveAstVisitor<void> {
   _AssignmentToFieldVisitor(this._fieldNames, this._assigned);
 
