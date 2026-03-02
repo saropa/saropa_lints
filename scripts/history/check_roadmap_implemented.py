@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-"""Find task_*.md in bugs/roadmap whose rule is already in tiers.dart; optionally delete them."""
+"""ARCHIVED: Logic moved to scripts/modules/_roadmap_implemented.py and runs as part of publish.
+
+Find task_*.md in bugs/roadmap whose rule is already in tiers.dart; optionally delete them.
+Run from project root: python scripts/history/check_roadmap_implemented.py
+"""
 
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-TIERS = ROOT / "lib" / "src" / "tiers.dart"
-BUGS_ROADMAP = ROOT / "bugs" / "roadmap"
+_root = Path(__file__).resolve().parent.parent.parent
+TIERS = _root / "lib" / "src" / "tiers.dart"
+BUGS_ROADMAP = _root / "bugs" / "roadmap"
 
 
 def main() -> None:

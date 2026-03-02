@@ -12,11 +12,18 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
-## [6.0.9]
+## [6.0.10]
 
 ### Fixed
 
 - **Lint message text:** Removed duplicated or malformed text in `correctionMessage` across 11 rule files. No rule logic, tiers, or behavior changed. **code_quality_rules:** `no_boolean_literal_compare` — removed duplicate phrase "!x instead of x == false". **structure_rules:** `prefer_small_length_test_files`, `avoid_medium_length_test_files`, `avoid_long_length_test_files`, `avoid_very_long_length_test_files` — added missing space before "Disable with:". **dependency_injection_rules:** `prefer_constructor_injection` — typo "parameter:." → "parameter.", added space before example. **equatable_rules:** `prefer_equatable_mixin` — fixed "keeping." → "keeping " and sentence order. **widget_lifecycle_rules:** `require_timer_cancellation`, `nullify_after_dispose` — added space before continuation. **ios_rules:** `avoid_ios_deprecated_uikit` — added space before "See Xcode warnings...". **record_pattern_rules:** `avoid_explicit_pattern_field_name` — fixed "instead of." and message order. **widget_layout_rules:** `prefer_spacing_over_sizedbox`, `avoid_deep_widget_nesting`, `prefer_safe_area_aware` — fixed split/space so sentences read correctly. **testing_best_practices_rules:** `avoid_flaky_tests` — fixed "instead of." and sentence order. **test_rules:** `avoid_test_coupling`, `require_test_isolation`, `avoid_real_dependencies_in_tests` — fixed comma/period and continuation order.
+
+---
+
+## [6.0.9]
+
+### Fixed
+
 - **False positive reduction:** Replaced substring/`.contains()` with exact match, word-boundary regex, or type checks. CI baselines updated or removed where violations reached 0. Grouped by rule file; all affected rules listed:
   - **animation_rules:** `require_animation_controller_dispose` — dispose check uses `isFieldCleanedUp()` from `target_matcher_utils` instead of regex on `disposeBody`.
   - **api_network_rules:** `require_http_status_check`, `require_retry_logic`, `require_connectivity_check`, `require_request_timeout`, `prefer_http_connection_reuse`, `avoid_redundant_requests`, `require_response_caching`, `prefer_api_pagination`, `require_offline_indicator`, `prefer_streaming_response`, `avoid_over_fetching`, `require_cancel_token`, `require_websocket_error_handling`, `avoid_websocket_without_heartbeat`, `prefer_timeout_on_requests`, `require_permission_rationale`, `require_permission_status_check`, `require_notification_permission_android13`, `require_sqflite_migration`, `require_websocket_reconnection`, `require_typed_api_response`, `require_image_picker_result_handling`, `require_sse_subscription_cancel` — word-boundary regex or exact sets. Baseline removed (0 violations).

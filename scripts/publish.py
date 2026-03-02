@@ -98,6 +98,7 @@ _REQUIRED_MODULES = [
     "modules/_version_changelog.py",
     "modules/_us_spelling.py",
     "modules/_timing.py",
+    "modules/_roadmap_implemented.py",
 ]
 
 
