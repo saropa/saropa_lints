@@ -11,5 +11,7 @@ void f() {
 void g() {
   final list = <int>[];
   // OK: cascade
-  list..add(1)..add(2);
+  list
+    ..add(1)
+    ..add(2);
 }

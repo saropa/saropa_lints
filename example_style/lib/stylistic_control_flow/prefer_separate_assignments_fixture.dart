@@ -4,7 +4,9 @@
 void f() {
   final buf = StringBuffer();
   // LINT: cascade assignment
-  buf..write('a')..write('b');
+  buf
+    ..write('a')
+    ..write('b');
 }
 
 void g() {

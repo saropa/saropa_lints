@@ -26,7 +26,8 @@ jobs:
       - name: Analyze
         run: dart analyze --fatal-infos
       - name: Format
-        run: dart format .
+        # Only format lib/ and test/; example_* use experimental features and are excluded from analyze
+        run: dart format lib test
       # Only on PRs so we don't push to main (avoids permission/loop issues)
       - name: Commit formatting changes
         if: github.event_name == 'pull_request'
