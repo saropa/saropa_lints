@@ -14,6 +14,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
+### Removed
+
+- **Insert-TODO quick fixes:** Removed 18 quick fixes that only inserted a `// TODO: ...` comment at the violation (no real code change). They added no value over the lint. Prohibition documented in `bugs/QUICK_FIX_PLAN.md` and `CLAUDE.md`. Rules affected: `avoid_adjacent_strings`, `avoid_late_keyword`, `no_object_declaration`, `avoid_deprecated_usage`, `avoid_duplicate_initializers`, `avoid_duplicate_constant_values`, `avoid_referencing_discarded_variables`, `avoid_duplicate_string_literals_pair`, `avoid_expensive_log_string_construction`, `avoid_missing_interpolation`, `avoid_ignoring_return_values`, `avoid_positional_boolean_parameters`, `avoid_default_to_string`, `avoid_misused_set_literals`, `avoid_global_state`, `avoid_unnecessary_nullable_return_type`, `avoid_unnecessary_local_variable`, `avoid_unused_generics`.
+
 ### Documentation
 
 - **History integration (false_positives 11–20):** Rule DartDoc **Exempt** blocks and CHANGELOG_ARCHIVE intent notes for: `avoid_ignoring_return_values` (property setter), `avoid_ios_hardcoded_device_model` (word boundary), `avoid_manual_date_formatting` (map/cache keys), `avoid_medium_length_files` (code-only count, abstract final exempt), `avoid_missing_enum_constant_in_map` (complete maps), `avoid_money_arithmetic_on_double` (word boundary), `avoid_nested_assignments` (for-loop update, arrow body), `avoid_non_ascii_symbols` (invisible/confusable only). False-positive test groups and fixture coverage (e.g. `avoid_nested_assignments` arrow body) added. See `bugs/HISTORY_INTEGRATION_CHECKLIST.md`.

@@ -130,8 +130,6 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
 /// import 'package:foo/bar.dart';
 /// import 'src/violation_parser.dart';
 /// ```
-///
-/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDoubleSlashImportsRule extends SaropaLintRule {
   AvoidDoubleSlashImportsRule() : super(code: _code);
 
@@ -200,8 +198,6 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
 /// ```dart
 /// export 'violation_parser.dart';
 /// ```
-///
-/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDuplicateExportsRule extends SaropaLintRule {
   AvoidDuplicateExportsRule() : super(code: _code);
 
@@ -264,8 +260,6 @@ class AvoidDuplicateExportsRule extends SaropaLintRule {
 /// ```dart
 /// class MyClass extends BaseClass with MixinA, MixinB { }
 /// ```
-///
-/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDuplicateMixinsRule extends SaropaLintRule {
   AvoidDuplicateMixinsRule() : super(code: _code);
 
@@ -329,8 +323,6 @@ class AvoidDuplicateMixinsRule extends SaropaLintRule {
 /// ```dart
 /// import 'package:foo/foo.dart' as foo;
 /// ```
-///
-/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
   AvoidDuplicateNamedImportsRule() : super(code: _code);
 
@@ -397,8 +389,6 @@ class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
 /// const int maxItems = 100;  // Immutable
 /// final List<String> defaultItems = const ['a', 'b'];  // Immutable
 /// ```
-///
-/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidGlobalStateRule extends SaropaLintRule {
   AvoidGlobalStateRule() : super(code: _code);
 
@@ -441,8 +431,6 @@ class AvoidGlobalStateRule extends SaropaLintRule {
       }
     });
   }
-
-  @override
 }
 
 // =============================================================================
@@ -2059,7 +2047,6 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
     });
   }
 
-  @override
   bool _isTypeUsedInClass(ClassDeclaration node, String typeName) {
     bool found = false;
     node.visitChildren(_TypeNameFinder(typeName, () => found = true));
