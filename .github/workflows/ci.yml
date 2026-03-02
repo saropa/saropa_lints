@@ -15,8 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # head_ref only set on pull_request; use ref (e.g. main) on push
-          ref: ${{ github.head_ref || github.ref }}
+          # PR: checkout head branch; push: checkout exact commit that triggered the run
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: dart-lang/setup-dart@v1
         with:
@@ -40,6 +40,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Same ref/token as analyze job so both jobs see identical code
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: '3.10.8'

@@ -14,4 +14,11 @@ GitHub CI was failing repeatedly due to:
 - **`.github/workflows/ci.yml`:** Use `ref: ${{ github.head_ref || github.ref }}`; run "Commit formatting changes" only when `github.event_name == 'pull_request'`.
 - **Rule files:** Where the analyzer could not see static members in callbacks, regexes/helpers were moved to local variables or inlined in `runWithReporter` (e.g. `architecture_rules.dart`, `bloc_rules.dart`, `supabase_rules.dart`, `url_launcher_rules.dart`, `equatable_rules.dart`, `package_specific_rules.dart`). `error_handling_rules.dart`: brace style for linter. `bloc_rules.dart`: use `isFieldCleanedUp` from `target_matcher_utils` for dispose checks.
 
+### Follow-up (March 2026)
+
+CI was still showing failed runs after push. Further hardening:
+
+- **Checkout ref on push:** Use `github.sha` (exact commit that triggered the run) instead of `github.ref` (branch ref) on push events to avoid any race where the branch ref might not yet point to the pushed commit.
+- **Test job alignment:** Test job now uses the same checkout `ref` and `token` as the analyze job so both jobs operate on identical code; previously test used default checkout.
+
 No new bug report was opened; this file records the resolution.
