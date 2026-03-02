@@ -53,6 +53,7 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
 
     AUTO-FIX (runs first, before blocking checks):
       - Doc comment angle brackets and references
+      - Roadmap: remove task files for rules already in tiers.dart
 
     INFORMATIONAL checks (warn but don't block):
       - DX message quality
@@ -86,6 +87,19 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
             )
     else:
         print_success("No pub.dev doc issues found")
+
+    # --- AUTO-FIX: Remove roadmap task files for implemented rules ---
+    from scripts.modules._roadmap_implemented import check_and_fix_roadmap_implemented
+
+    removed_rules, had_stale = check_and_fix_roadmap_implemented(
+        project_dir, fix=True
+    )
+    if had_stale:
+        print_success(
+            f"Removed {len(removed_rules)} stale roadmap task(s): "
+            f"{', '.join(removed_rules[:8])}"
+            + (f" ... +{len(removed_rules) - 8}" if len(removed_rules) > 8 else "")
+        )
 
     # --- US English spelling check (run before audit to feed into checks) ---
     from scripts.modules._us_spelling import (

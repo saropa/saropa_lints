@@ -2563,7 +2563,7 @@ class HandleThrowingInvocationsRule extends SaropaLintRule {
 
     context.addMethodInvocation((MethodInvocation node) {
       if (_isInsideTry(node)) return;
-      final el = (node.methodName as dynamic).staticElement as Element?;
+      final el = node.methodName.element;
       if (el == null) return;
       if (!_hasThrowsAnnotation(el) && !_isKnownThrower(el)) return;
       reporter.atNode(node);

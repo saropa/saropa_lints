@@ -2,7 +2,7 @@
 
 This folder contains one detailed task report per planned rule from [ROADMAP.md](../../ROADMAP.md). Each report covers examples, detection vs. false positives, external references, and quality/performance notes.
 
-**Implemented check:** All task filenames have been checked against `lib/src/tiers.dart`; no task file in this folder corresponds to an already-implemented rule. Re-run `scripts/check_roadmap_implemented.py` after adding new task files to find and remove any that are implemented.
+**Implemented check:** Task filenames are checked against `lib/src/tiers.dart`. During **publish** (Step 1), any task file whose rule is already in tiers is removed automatically. No need to run a separate script; the logic lives in `scripts/modules/_roadmap_implemented.py`.
 
 ## Legend
 

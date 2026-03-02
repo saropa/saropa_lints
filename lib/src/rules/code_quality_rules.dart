@@ -8739,13 +8739,13 @@ class AvoidDeprecatedUsageRule extends SaropaLintRule {
     }
 
     context.addMethodInvocation((MethodInvocation node) {
-      checkElement((node.methodName as dynamic).staticElement, node);
+      checkElement(node.methodName.element, node);
     });
     context.addPropertyAccess((PropertyAccess node) {
-      checkElement((node.propertyName as dynamic).staticElement, node);
+      checkElement(node.propertyName.element, node);
     });
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      checkElement((node.constructorName as dynamic).staticElement, node);
+      checkElement(node.constructorName.element, node);
     });
   }
 }
