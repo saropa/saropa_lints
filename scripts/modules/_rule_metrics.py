@@ -36,7 +36,7 @@ _RULE_CLASS_RE = re.compile(
 
 # First string literal argument in LintCode(...) is the rule code name.
 _LINT_NAME_RE = re.compile(
-    r"LintCode\s*\(\s*[\s\n]*'([a-z][a-z0-9_]*)'",
+    r"LintCode\s*\(\s*[\s\n]*'([A-Za-z][A-Za-z0-9_]*)'",
     re.MULTILINE,
 )
 
@@ -159,6 +159,25 @@ def _fixture_category_alias(category: str) -> str:
     return category
 
 
+def _test_category_alias(category: str) -> str:
+    """Map split category names to their shared unit test file category.
+
+    Tests are typically maintained at the original category granularity even
+    when rule files are split.
+    """
+    if category.startswith("code_quality_"):
+        return "code_quality"
+    if category.startswith("security_"):
+        return "security"
+    if category.startswith("widget_layout_"):
+        return "widget_layout"
+    if category.startswith("widget_patterns_"):
+        return "widget_patterns"
+    if category.startswith("ios_"):
+        return "ios"
+    return category
+
+
 def _count_fixtures_for_category(
     example_dirs: list[Path],
     category: str,
@@ -225,8 +244,13 @@ def _compute_rule_instantiation_stats(
     without_instantiation: list[str] = []
 
     for cat in categories:
-        test_path = test_dir / f"{cat.category}_rules_test.dart"
-        if not test_path.exists():
+        alias = _test_category_alias(cat.category)
+        candidates = [
+            test_dir / f"{cat.category}_rules_test.dart",
+            test_dir / f"{alias}_rules_test.dart",
+        ]
+        test_path = next((p for p in candidates if p.exists()), None)
+        if test_path is None:
             continue
         try:
             content = test_path.read_text(encoding="utf-8")
@@ -266,7 +290,14 @@ def _compute_unit_test_stats(
     for cat in categories:
         # Match: {category}_rules_test or {category}_test
         test_count = 0
-        for stem in [f"{cat.category}_rules_test", f"{cat.category}_test"]:
+        alias = _test_category_alias(cat.category)
+        stems = [
+            f"{cat.category}_rules_test",
+            f"{cat.category}_test",
+        ]
+        if alias != cat.category:
+            stems.extend([f"{alias}_rules_test", f"{alias}_test"])
+        for stem in stems:
             if stem in test_files:
                 test_count = test_files[stem]
                 break
