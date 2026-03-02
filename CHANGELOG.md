@@ -26,6 +26,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
+- **handle_throwing_invocations plugin crash:** On analyzer versions where `Element.metadata` is a wrapper (e.g. `MetadataImpl`) rather than an `Iterable`, the rule no longer crashes with "MetadataImpl is not a subtype of Iterable". `_hasThrowsAnnotation` now uses `readElementAnnotationsFromMetadata` from `lib/src/analyzer_metadata_compat_utils.dart`. Regression test: `test/handle_throwing_invocations_metadata_crash_test.dart`. See `bugs/history/rule_bugs/report_element_metadata_not_iterable_handle_throwing_invocations.md`.
+
 - **CI workflow:** Checkout now uses the exact commit (`github.sha`) on push events instead of the branch ref to avoid races; test job uses the same checkout configuration as the analyze job for consistency.
 
 ---

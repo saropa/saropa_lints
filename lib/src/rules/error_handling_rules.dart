@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 
+import '../analyzer_metadata_compat_utils.dart';
 import '../saropa_lint_rule.dart';
 import '../fixes/error_handling/change_exception_to_object_fix.dart';
 
@@ -2311,6 +2312,7 @@ class RequireAppStartupErrorHandlingRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  // cspell:ignore bugsnag_flutter datadog_flutter_plugin instabug_flutter raygun4flutter
   /// Crash reporting packages that warrant startup error handling.
   static const Set<String> _crashReportingPackages = <String>{
     'firebase_crashlytics',
@@ -2530,10 +2532,12 @@ class HandleThrowingInvocationsRule extends SaropaLintRule {
     return false;
   }
 
+  /// Reads annotations via compat helper so both Iterable and MetadataImpl
+  /// (analyzer 9+) metadata shapes are supported without plugin crash.
   static bool _hasThrowsAnnotation(Element? element) {
     if (element == null) return false;
-    for (final ann in element.metadata as dynamic) {
-      final name = (ann as dynamic).element?.enclosingElement?.name as String?;
+    for (final ann in readElementAnnotationsFromMetadata(element.metadata)) {
+      final name = ann.element?.enclosingElement?.name;
       if (name == 'Throws' || name == 'throws') return true;
     }
     return false;
