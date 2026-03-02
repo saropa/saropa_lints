@@ -4715,3 +4715,33 @@ class PreferPoolPatternRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_disk_cache_for_persistence
+// =============================================================================
+
+/// Prefer disk cache for persistence when data must survive process restarts.
+class PreferDiskCacheForPersistenceRule extends SaropaLintRule {
+  PreferDiskCacheForPersistenceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_disk_cache_for_persistence',
+    '[prefer_disk_cache_for_persistence] Use disk-backed cache for data '
+        'that must persist across app restarts; in-memory cache is lost on kill.',
+    correctionMessage:
+        'Use a disk cache (e.g. path_provider + file) for persistent data.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

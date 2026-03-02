@@ -69,7 +69,6 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - **prefer_biometric_protection** (Professional): FlutterSecureStorage should use authenticationRequired in AndroidOptions/IOSOptions. Fixture: `example_async/lib/security/prefer_biometric_protection_fixture.dart`.
 - **avoid_renaming_representation_getters** (Professional): Extension type should not expose the representation via a getter with a different name. Fixture: `example_core/lib/class_constructor/avoid_renaming_representation_getters_fixture.dart`.
 
-Fixtures for the rules above include good/bad examples and false-positive guards; task specs were moved to `bugs/history/roadmap/`. ROADMAP.md count: 1745 implemented, 445 remaining.
 
 ### Fixed
 
@@ -822,13 +821,3 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ## [4.15.1] and Earlier
 
 For details on the initial release and versions 0.1.0 through 4.15.1, please refer to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md).
-
----
-## [Unreleased]
-
----
-## [6.0.8]
-
-### Changed
-- Version bump
-

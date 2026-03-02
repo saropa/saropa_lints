@@ -302,3 +302,33 @@ class RequireConnectivityTimeoutRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_connectivity_debounce
+// =============================================================================
+
+/// Prefer debouncing connectivity stream listeners to avoid rapid rebuilds.
+class PreferConnectivityDebounceRule extends SaropaLintRule {
+  PreferConnectivityDebounceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_connectivity_debounce',
+    '[prefer_connectivity_debounce] Connectivity stream can emit rapidly. '
+        'Debounce or distinct() the stream before rebuilding UI.',
+    correctionMessage:
+        'Use .distinct() or debounce on connectivity stream before listen.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

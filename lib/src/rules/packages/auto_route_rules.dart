@@ -403,3 +403,132 @@ class RequireAutoRouteFullHierarchyRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_auto_route_path_params_simple
+// =============================================================================
+
+/// Prefer simple types for auto_route path parameters.
+///
+/// Path params should be simple types (e.g. id, string). Passing complex
+/// objects in route constructors makes serialization and deep linking
+/// error-prone.
+///
+/// **Bad:**
+/// ```dart
+/// context.router.push(ProductRoute(product: myProduct));
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// context.router.push(ProductRoute(productId: myProduct.id));
+/// ```
+class PreferAutoRoutePathParamsSimpleRule extends SaropaLintRule {
+  PreferAutoRoutePathParamsSimpleRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'auto_route'};
+
+  static const LintCode _code = LintCode(
+    'prefer_auto_route_path_params_simple',
+    '[prefer_auto_route_path_params_simple] Route constructor receives a '
+        'complex object as a parameter. Path parameters should be simple '
+        'types (String, int, bool) for serialization and deep linking.',
+    correctionMessage:
+        'Pass simple values (e.g. id, slug) instead of full objects.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!typeName.endsWith('Route')) return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final Expression expr = arg.expression;
+          if (expr is InstanceCreationExpression) {
+            reporter.atNode(arg.expression, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_auto_route_typed_args
+// =============================================================================
+
+/// Prefer typed route arguments over Map or dynamic.
+///
+/// Using typed route classes from auto_route codegen ensures compile-time
+/// safety and better refactoring.
+///
+/// **Bad:**
+/// ```dart
+/// context.router.push(ProfileRoute(extra: dataMap));
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// context.router.push(ProfileRoute(userId: userId));
+/// ```
+class PreferAutoRouteTypedArgsRule extends SaropaLintRule {
+  PreferAutoRouteTypedArgsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'auto_route'};
+
+  static const LintCode _code = LintCode(
+    'prefer_auto_route_typed_args',
+    '[prefer_auto_route_typed_args] Route is passed Map or dynamic '
+        'arguments. Use typed route parameters from code generation for '
+        'compile-time safety.',
+    correctionMessage:
+        'Use typed route class parameters instead of Map or dynamic.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!typeName.endsWith('Route')) return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final Expression expr = arg.expression;
+          final String? typeStr = expr.staticType?.getDisplayString();
+          if (typeStr != null &&
+              (typeStr == 'Map<String, dynamic>' ||
+                  typeStr == 'Map<dynamic, dynamic>' ||
+                  typeStr == 'dynamic')) {
+            reporter.atNode(arg.expression, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}

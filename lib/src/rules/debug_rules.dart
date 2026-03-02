@@ -1044,3 +1044,68 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// prefer_conditional_logging
+// =============================================================================
+
+/// Prefer conditional logging so expensive message construction is not done when log level is disabled.
+///
+/// **Bad:**
+/// ```dart
+/// log.info('User: $user'); // always builds string
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// if (logLevelEnabled) log.info('User: $user');
+/// ```
+class PreferConditionalLoggingRule extends SaropaLintRule {
+  PreferConditionalLoggingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_conditional_logging',
+    '[prefer_conditional_logging] Log call with interpolated or expensive '
+        'message is always evaluated. Wrap in a log-level check to avoid '
+        'unnecessary string construction when the level is disabled.',
+    correctionMessage:
+        'Guard with a log-level check, e.g. if (Logger.level <= Level.info) log.info(...).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _logMethods = <String>{
+    'info',
+    'warning',
+    'severe',
+    'fine',
+    'finer',
+    'finest',
+    'shout',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.target is! SimpleIdentifier) return;
+      final SimpleIdentifier target = node.target as SimpleIdentifier;
+      if (target.name != 'log') return;
+      if (!_logMethods.contains(node.methodName.name)) return;
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+      final Expression first = args.first is NamedExpression
+          ? (args.first as NamedExpression).expression
+          : args.first;
+      if (first is! StringInterpolation && first is! AdjacentStrings) return;
+      reporter.atNode(node.methodName, code);
+    });
+  }
+}

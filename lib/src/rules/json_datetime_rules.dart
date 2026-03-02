@@ -1266,3 +1266,54 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_correct_json_casts
+// =============================================================================
+
+/// Prefer proper type casts when working with JSON (null-safe).
+///
+/// **Bad:**
+/// ```dart
+/// final name = (json['name']) as String;
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// final name = json['name'] as String?;
+/// final name = json['name'] != null ? json['name'] as String : null;
+/// ```
+class PreferCorrectJsonCastsRule extends SaropaLintRule {
+  PreferCorrectJsonCastsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_correct_json_casts',
+    '[prefer_correct_json_casts] JSON map access cast to non-nullable type '
+        'can throw at runtime if the key is missing or null. Use nullable '
+        'casts or null checks.',
+    correctionMessage:
+        'Use "as String?" or check for null before casting to non-nullable.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addAsExpression((AsExpression node) {
+      final Expression operand = node.expression;
+      if (operand is! IndexExpression) return;
+      final String typeStr = node.type.toSource();
+      if (typeStr.endsWith('?')) return;
+      if (typeStr == 'dynamic' || typeStr == 'Object') return;
+      reporter.atNode(node, code);
+    });
+  }
+}

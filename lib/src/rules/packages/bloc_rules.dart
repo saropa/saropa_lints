@@ -4757,3 +4757,69 @@ class AvoidOverengineeredBlocStatesRule extends SaropaLintRule {
     }
   }
 }
+
+// =============================================================================
+// prefer_bloc_extensions
+// =============================================================================
+
+/// Prefer Bloc extension methods (context.read, context.watch) over BlocProvider.of.
+///
+/// **Bad:**
+/// ```dart
+/// BlocProvider.of<MyBloc>(context);
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// context.read<MyBloc>();
+/// context.watch<MyBloc>();
+/// ```
+class PreferBlocExtensionsRule extends SaropaLintRule {
+  PreferBlocExtensionsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'BlocProvider'};
+
+  static const LintCode _code = LintCode(
+    'prefer_bloc_extensions',
+    '[prefer_bloc_extensions] Use Bloc extension methods (context.read, '
+        'context.watch) instead of BlocProvider.of for cleaner code.',
+    correctionMessage:
+        'Replace BlocProvider.of<T>(context) with context.read<T>() or context.watch<T>().',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _providerOfNames = <String>{
+    'of',
+    'value',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_providerOfNames.contains(methodName)) return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String targetSource = target.toSource();
+      if (targetSource != 'BlocProvider' &&
+          !targetSource.endsWith('BlocProvider') &&
+          targetSource != 'RepositoryProvider' &&
+          !targetSource.endsWith('RepositoryProvider')) {
+        return;
+      }
+
+      reporter.atNode(node.methodName, code);
+    });
+  }
+}

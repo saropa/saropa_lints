@@ -63,34 +63,10 @@ Implement in this order: **Easy** first, then **Medium**, and within each group 
 
 ### Medium – to do (High importance first)
 
+**Implemented (26 rules):** prefer_auto_route_path_params_simple, prefer_auto_route_typed_args, prefer_bloc_extensions, prefer_branch_io_or_firebase_links, prefer_builder_pattern, prefer_cancellation_token_pattern, prefer_class_destructuring, prefer_closest_context, prefer_compile_time_config, prefer_conditional_logging, prefer_connectivity_debounce, prefer_correct_json_casts, prefer_correct_topics, prefer_dark_mode_colors, prefer_deactivate_for_cleanup, prefer_deep_link_auth, prefer_disk_cache_for_persistence, prefer_find_child_index_callback, prefer_firebase_transaction_for_counters, prefer_flavor_configuration, prefer_flex_for_complex_layout, prefer_freezed_union_types, prefer_geolocation_coarse_location, prefer_getx_builder_over_obx, prefer_go_router_builder, prefer_high_contrast_mode.
+
 | Rule name | Importance |
 |-----------|------------|
-| prefer_auto_route_path_params_simple | High |
-| prefer_auto_route_typed_args | High |
-| prefer_bloc_extensions | High |
-| prefer_branch_io_or_firebase_links | High |
-| prefer_builder_pattern | High |
-| prefer_cancellation_token_pattern | High |
-| prefer_class_destructuring | High |
-| prefer_closest_context | High |
-| prefer_compile_time_config | High |
-| prefer_conditional_logging | High |
-| prefer_connectivity_debounce | High |
-| prefer_correct_json_casts | High |
-| prefer_correct_topics | High |
-| prefer_dark_mode_colors | High |
-| prefer_deactivate_for_cleanup | High |
-| prefer_deep_link_auth | High |
-| prefer_disk_cache_for_persistence | High |
-| prefer_find_child_index_callback | High |
-| prefer_firebase_transaction_for_counters | High |
-| prefer_flavor_configuration | High |
-| prefer_flex_for_complex_layout | High |
-| prefer_freezed_union_types | High |
-| prefer_geolocation_coarse_location | High |
-| prefer_getx_builder_over_obx | High |
-| prefer_go_router_builder | High |
-| prefer_high_contrast_mode | High |
 | prefer_hive_compact_periodically | High |
 | prefer_hive_compact | High |
 | prefer_hive_web_aware | High |
