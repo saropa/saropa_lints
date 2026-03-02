@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/class_constructor_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 20 Class Constructor lint rules.
+/// Tests for 21 Class Constructor lint rules.
 ///
 /// Test fixtures: example_core/lib/class_constructor/*
 void main() {
@@ -72,6 +72,11 @@ void main() {
       'PreferPrivateExtensionTypeFieldRule',
       'prefer_private_extension_type_field',
       () => PreferPrivateExtensionTypeFieldRule(),
+    );
+    testRule(
+      'AvoidRenamingRepresentationGettersRule',
+      'avoid_renaming_representation_getters',
+      () => AvoidRenamingRepresentationGettersRule(),
     );
     testRule(
       'ProperSuperCallsRule',
@@ -153,6 +158,7 @@ void main() {
       'prefer_non_const_constructors',
       'prefer_factory_constructor',
       'prefer_private_extension_type_field',
+      'avoid_renaming_representation_getters',
       'proper_super_calls',
       'avoid_unmarked_public_class',
       'prefer_final_class',

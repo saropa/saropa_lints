@@ -413,6 +413,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferExplicitParameterNamesRule.new,
   PreferPrefixedGlobalConstantsRule.new,
   PreferPrivateExtensionTypeFieldRule.new,
+  AvoidRenamingRepresentationGettersRule.new,
   PreferReturningShorthandsRule.new,
   RecordFieldsOrderingRule.new,
   PreferPatternDestructuringRule.new,
@@ -1371,6 +1372,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidMultipleAutofocusRule.new,
   AvoidShrinkWrapExpensiveRule.new,
   PreferItemExtentRule.new,
+  PreferCacheExtentRule.new,
   PreferPrototypeItemRule.new,
   RequireKeyForReorderableRule.new,
   RequireKeyForCollectionRule.new,
@@ -2181,6 +2183,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // Security rules
   RequireSecureStorageErrorHandlingRule.new,
   AvoidSecureStorageLargeDataRule.new,
+  PreferBiometricProtectionRule.new,
 
   // Navigation rules
   AvoidNavigatorContextIssueRule.new,

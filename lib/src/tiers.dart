@@ -2083,6 +2083,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_static_route_config', // WARNING - static route configs limit testability
   'avoid_firebase_realtime_in_build', // WARNING - Firebase listeners in build
   'avoid_secure_storage_large_data', // INFO - large data not suited for secure storage
+  'prefer_biometric_protection', // INFO - FlutterSecureStorage authenticationRequired
   'require_pop_result_type', // INFO - typed navigation results
   'avoid_nested_navigators_misuse', // WARNING - nested navigators need WillPopScope
   'require_deep_link_testing', // INFO - routes should support deep links
@@ -2389,6 +2390,7 @@ const Set<String> professionalOnlyRules = <String>{
   // 'prefer_positive_conditions_first' moved to stylisticRules (opinionated)
   'prefer_prefixed_global_constants',
   'prefer_private_extension_type_field',
+  'avoid_renaming_representation_getters', // INFO - extension type representation getter name
   // 'prefer_private_members_first' moved to stylisticRules (conflicting pair)
   // 'prefer_private_underscore_prefix' moved to stylisticRules (opinionated)
   'prefer_proxy_provider',
@@ -2594,6 +2596,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_sorted_imports', // alphabetical import sorting within groups
   // Performance micro-optimizations (moved from Professional)
   'prefer_item_extent', // scroll performance hint
+  'prefer_cache_extent', // scroll performance - tune off-screen cache
   'prefer_prototype_item', // consistent sizing optimization
   'require_add_automatic_keep_alives_off', // memory efficiency
   'prefer_http_connection_reuse', // connection reuse

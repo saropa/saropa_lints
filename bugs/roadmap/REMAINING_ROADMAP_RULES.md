@@ -29,6 +29,10 @@ These task rule names are already implemented (or covered by an existing rule):
 - **prefer_correct_throws** — implemented (documentation_rules.dart)
 - **prefer_layout_builder_for_constraints** — implemented (widget_layout_rules.dart)
 - **require_const_list_items** — implemented (collection_rules.dart)
+- **prefer_context_read_not_watch** → covered by **prefer_context_read_in_callbacks** (provider_rules.dart)
+- **prefer_cache_extent** — implemented (scroll_rules.dart)
+- **prefer_biometric_protection** — implemented (security_rules.dart)
+- **avoid_renaming_representation_getters** — implemented (class_constructor_rules.dart)
 - All Easy rules from Batch 1 in PLAN_100_RULES are implemented (see CHANGELOG and tiers).
 
 ## Hard (skip for “implement all” single-file batch)
@@ -61,23 +65,17 @@ Implement in this order: **Easy** first, then **Medium**, and within each group 
 
 | Rule name | Importance |
 |-----------|------------|
-| avoid_hardcoded_config_test | High |
-| avoid_misleading_documentation | High |
-| avoid_renaming_representation_getters | High |
 | prefer_auto_route_path_params_simple | High |
 | prefer_auto_route_typed_args | High |
-| prefer_biometric_protection | High |
 | prefer_bloc_extensions | High |
 | prefer_branch_io_or_firebase_links | High |
 | prefer_builder_pattern | High |
-| prefer_cache_extent | High |
 | prefer_cancellation_token_pattern | High |
 | prefer_class_destructuring | High |
 | prefer_closest_context | High |
 | prefer_compile_time_config | High |
 | prefer_conditional_logging | High |
 | prefer_connectivity_debounce | High |
-| prefer_context_read_not_watch | High |
 | prefer_correct_json_casts | High |
 | prefer_correct_topics | High |
 | prefer_dark_mode_colors | High |

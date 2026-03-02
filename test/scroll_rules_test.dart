@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/scroll_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 17 Scroll lint rules.
+/// Tests for 18 Scroll lint rules.
 ///
 /// Test fixtures: example_widgets/lib/scroll/*
 void main() {
@@ -69,6 +69,11 @@ void main() {
       () => PreferItemExtentRule(),
     );
     testRule(
+      'PreferCacheExtentRule',
+      'prefer_cache_extent',
+      () => PreferCacheExtentRule(),
+    );
+    testRule(
       'PreferPrototypeItemRule',
       'prefer_prototype_item',
       () => PreferPrototypeItemRule(),
@@ -116,6 +121,7 @@ void main() {
       'require_refresh_indicator_on_lists',
       'avoid_shrink_wrap_expensive',
       'prefer_item_extent',
+      'prefer_cache_extent',
       'prefer_prototype_item',
       'require_key_for_reorderable',
       'require_add_automatic_keep_alives_off',

@@ -5946,6 +5946,102 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
   }
 }
 
+/// Warns when FlutterSecureStorage is used without biometric protection.
+///
+/// Since: v4.13.0 | Rule version: v1
+///
+/// **Purpose for developers:** Sensitive data in [FlutterSecureStorage](https://pub.dev/packages/flutter_secure_storage)
+/// should require device unlock or biometrics so that reading/writing is protected
+/// when the device is locked. This rule flags any FlutterSecureStorage constructor
+/// call that does not pass [AndroidOptions](https://pub.dev/documentation/flutter_secure_storage/latest/android_options/AndroidOptions-class.html)
+/// or [IOSOptions](https://pub.dev/documentation/flutter_secure_storage/latest/ios_options/IOSOptions-class.html)
+/// with `authenticationRequired: true`. Detection is exact: we only check for the
+/// named args `aOptions`/`iOptions` and the named arg `authenticationRequired`
+/// set to `true` inside those option constructors. No string heuristics.
+///
+/// **BAD:**
+/// ```dart
+/// final storage = FlutterSecureStorage();
+/// // or
+/// final storage = FlutterSecureStorage(
+///   aOptions: AndroidOptions(encryptedSharedPreferences: true),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final storage = FlutterSecureStorage(
+///   aOptions: AndroidOptions(authenticationRequired: true),
+///   iOptions: IOSOptions(authenticationRequired: true),
+/// );
+/// ```
+class PreferBiometricProtectionRule extends SaropaLintRule {
+  PreferBiometricProtectionRule() : super(code: _code);
+
+  /// Sensitive data without biometric gate is a security gap.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  OwaspMapping get owasp => const OwaspMapping(
+    mobile: <OwaspMobile>{OwaspMobile.m2, OwaspMobile.m9},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
+
+  static const LintCode _code = LintCode(
+    'prefer_biometric_protection',
+    '[prefer_biometric_protection] FlutterSecureStorage should use '
+        'authenticationRequired in options so access requires device unlock or biometrics. {v1}',
+    correctionMessage:
+        'Add aOptions: AndroidOptions(authenticationRequired: true) and/or '
+        'iOptions: IOSOptions(authenticationRequired: true) to FlutterSecureStorage.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static bool _hasAuthenticationRequired(Expression optionsExpr) {
+    if (optionsExpr is! InstanceCreationExpression) return false;
+    for (final arg in optionsExpr.argumentList.arguments) {
+      if (arg is NamedExpression &&
+          arg.name.label.name == 'authenticationRequired') {
+        final expr = arg.expression;
+        if (expr is BooleanLiteral && expr.value) return true;
+      }
+    }
+    return false;
+  }
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'FlutterSecureStorage') return;
+
+      bool hasBiometric = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final name = arg.name.label.name;
+          if (name == 'aOptions' || name == 'iOptions') {
+            if (_hasAuthenticationRequired(arg.expression)) {
+              hasBiometric = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (!hasBiometric) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
 // =============================================================================
 // Clipboard Security Rules (from v4.1.7)
 // =============================================================================
