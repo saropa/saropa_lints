@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
-/// Tests for 9 roadmap-detail lint rules (banned_usage, prefer_csrf_protection,
+/// Tests for 9 roadmap-detail lint rules (banned_identifier_usage, prefer_csrf_protection,
 /// prefer_no_commented_code alias, prefer_semver_version, prefer_sqflite_encryption,
 /// require_conflict_resolution_strategy, require_connectivity_timeout,
 /// require_init_state_idempotent, require_input_validation).
@@ -21,7 +21,7 @@ void main() {
   const recommendedRules = <String>['prefer_semver_version'];
 
   const professionalRules = <String>[
-    'banned_usage',
+    'banned_identifier_usage',
     'prefer_csrf_protection',
     'prefer_sqflite_encryption',
     'require_conflict_resolution_strategy',
@@ -103,7 +103,7 @@ void main() {
       final content = File(
         'example/lib/roadmap_detail_9_rules_fixture.dart',
       ).readAsStringSync();
-      expect(content.contains('banned_usage'), isTrue);
+      expect(content.contains('banned_identifier_usage'), isTrue);
       expect(content.contains('require_connectivity_timeout'), isTrue);
       expect(content.contains('require_input_validation'), isTrue);
     });

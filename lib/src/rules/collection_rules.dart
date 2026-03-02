@@ -1029,11 +1029,14 @@ class PreferForeachRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    'prefer_foreach',
-    '[prefer_foreach] Prefer for-in loop over .forEach() for clarity and to allow break/continue/return.',
+    'prefer_for_in_over_foreach',
+    '[prefer_for_in_over_foreach] Prefer for-in loop over .forEach() for clarity and to allow break/continue/return.',
     correctionMessage: 'Replace with a for-in loop.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<String> get configAliases => const ['prefer_foreach'];
 
   @override
   void runWithReporter(

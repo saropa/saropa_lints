@@ -1,5 +1,5 @@
 // ignore_for_file: unused_element
-// Fixture for prefer_foreach: prefer for-in over .forEach().
+// Fixture for prefer_for_in_over_foreach: prefer for-in over .forEach().
 
 // LINT: forEach used
 void bad(List<int> items) {

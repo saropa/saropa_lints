@@ -22,7 +22,7 @@ Bloc enforces strict separation of concerns, but has subtle patterns that cause 
 | Public Bloc methods | Bypasses event pattern | `avoid_bloc_public_methods` |
 | BlocBuilder over-rebuild | Performance | `require_bloc_selector` |
 | BuildContext in Bloc | Lifecycle coupling | `avoid_bloc_context_dependency` |
-| Cubit instead of Bloc | Event traceability | `avoid_cubits` (opinionated) |
+| Cubit instead of Bloc | Event traceability | `avoid_cubit_usage` (opinionated; alias: avoid_cubits) |
 
 ## What saropa_lints Catches
 

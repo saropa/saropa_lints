@@ -911,7 +911,7 @@ saropa_lints:
     - avoid_bloc_in_bloc: false
     - prefer_sealed_events: false
     - prefer_cubit_for_simple: false
-    - avoid_cubits: false
+    - avoid_cubit_usage: false
     - require_bloc_observer: false
     - avoid_provider_of_in_build: false
     - avoid_get_find_in_build: false
@@ -1587,7 +1587,7 @@ saropa_lints:
     # --- Stylistic ---
     - avoid_escaping_inner_quotes: false                 # INFO - use opposite quote style (v6.0.8)
     - avoid_single_cascade_in_expression_statements: false # INFO - single cascade, use normal call (v6.0.8)
-    - avoid_cascades: false                              # INFO - discourage cascade (..) (roadmap)
+    - avoid_cascade_notation: false                       # INFO - discourage cascade (..) (roadmap)
     - avoid_function_literals_in_foreach_calls: false   # INFO - forEach with function literal (v6.0.8)
 
     # --- Recommended ---

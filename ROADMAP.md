@@ -3,16 +3,16 @@
      Heading regex: "# Roadmap: Aiming for N,NNN"
      Goal regex:    "Goal: NNN rules (NNN implemented, NNN remaining)"
      Goal is rounded up to the nearest 100. -->
-# Roadmap: Aiming for 2,200 Lint Rules
+# Roadmap: Aiming for 2,100 Lint Rules
 <!-- cspell:disable -->
 
-See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1735 implemented, 455 remaining).
+See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2100 rules (1964 implemented, 99 remaining).
 
 > **When implementing**: Remove from ROADMAP, add to CHANGELOG, register in `all_rules.dart` + `tiers.dart`. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 > **Planned rules**: Detailed task specs (examples, detection, false positives) are in [bugs/roadmap/](bugs/roadmap/) (one file per rule: `task_<rule_name>.md`). See [bugs/roadmap/README.md](bugs/roadmap/README.md) for the index.
 
-> **Deferred rules**: Cross-file analysis, heuristics, YAML parsing → see **Part 2: Deferred Rules & Technical Limitations** below.
+> **Deferred rules**: Rules we do not implement yet because they need cross-file analysis, YAML/config parsing, or heuristic detection with high false-positive risk → see **Part 2: Deferred Rules & Technical Limitations** below for why each group is deferred.
 
 ### Legend
 
@@ -35,6 +35,18 @@ See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (1735 i
 | `[TOO-COMPLEX]` | Pattern too abstract for reliable AST detection |
 | `[PUBSPEC]` | Requires pubspec.yaml analysis (not Dart AST) |
 
+### Stylistic rule pairs and overlaps
+
+Some rules intentionally conflict or overlap; the **init wizard** (`dart run saropa_lints:init --stylistic`) lets users choose which stylistic rules to enable. This is by design, not a bug.
+
+| Relationship | Rules | Notes |
+|--------------|--------|--------|
+| **Intentional pair** | `avoid_cubit_usage` vs `prefer_cubit_for_simple_state` | Opposite preferences: prefer Bloc (event traceability) vs prefer Cubit for simple state. Enable one via the wizard. |
+| **Narrow variant** | `prefer_expression_body_getters` vs `prefer_arrow_functions` | Getter-only vs all single-expression bodies. Can enable both (getters get the narrow rule; methods the broad one) or just one. |
+| **Other pairs** | e.g. `prefer_type_over_var` / `prefer_var_over_explicit_type` | Documented in rule DartDoc and in CHANGELOG; wizard shows both so users pick one. |
+
+When adding or reviewing rules, check CODE_INDEX and tiers for existing stylistic opposites; document pairs in the rule’s DartDoc and, if needed, in this table.
+
 ---
 
 ## Part 1: Technical Debt & Improvements
@@ -51,7 +63,7 @@ Details and design notes for each enhancement are in [bugs/discussion/](bugs/dis
 
 ## Part 2: Deferred Rules & Technical Limitations
 
-Rules and features in this section are **deferred** due to technical complexity, framework limitations, or cross-file analysis that is not yet supported.
+Rules and features in this section are **deferred**: we do not implement them yet because the current analyzer only supports single-file Dart AST analysis, and implementing these would either require unsupported infrastructure (YAML, cross-file graphs, IDE events), produce unreliable results (heuristic/pattern matching with high false-positive risk), or depend on runtime or build-time context we cannot detect. Each subsection below states **why** those items are deferred so contributors know what would need to change before implementing them.
 
 ### Table of Contents (Part 2)
 
@@ -63,9 +75,9 @@ Rules and features in this section are **deferred** due to technical complexity,
 
 ---
 
-### Deferred: Pubspec Rules (11 rules)
+### Deferred: Pubspec Rules (18 rules)
 
-> **Note**: saropa_lints currently only analyzes `.dart` files using the Dart AST. These pubspec rules require YAML parsing which is not yet supported.
+> **Why deferred:** saropa_lints only analyzes `.dart` files via the Dart AST. Pubspec rules require reading and parsing `pubspec.yaml` (and sometimes other YAML or external data). Until we have a YAML-capable analyzer or a separate CLI that runs on non-Dart files, these rules cannot be implemented without extending the plugin beyond its current scope.
 
 **Implementation Options**:
 1. A separate analyzer plugin that processes YAML files
@@ -90,12 +102,19 @@ Rules and features in this section are **deferred** due to technical complexity,
 | ⚠️📦 `avoid_deprecated_packages` | Essential | WARNING | Don't use deprecated packages. Detect known deprecated packages. |
 | 🚨📦 `require_null_safe_packages` | Essential | ERROR | All packages should be null-safe. Detect pre-null-safety dependencies. |
 | ℹ️📦 `prefer_first_party_packages` | Recommended | INFO | Prefer official Flutter/Dart packages. Detect unofficial alternatives. |
+| 📦 `add_resolution_workspace` | Professional | INFO | Monorepo: add resolution workspace for dependency management (requires workspace YAML). |
+| 📦 `pubspec_ordering` | Stylistic | INFO | Pubspec fields should follow recommended ordering. |
+| 📦 `newline_before_pubspec_entry` | Stylistic | INFO | Add blank lines between major pubspec sections. |
+| 📦 `dependencies_ordering` | Stylistic | INFO | Dependencies in pubspec should be sorted alphabetically. |
+| 📦 `prefer_pinned_version_syntax` | Stylistic | INFO | Pinned version syntax (e.g. `1.2.3`) may be preferred over caret in some workflows. |
+| 📦 `prefer_commenting_pubspec_ignores` | Professional | INFO | Comment pubspec ignore/dependency_override entries. |
+| 📦 `prefer_l10n_yaml_config` | Professional | INFO | Prefer l10n configuration via YAML (e.g. l10n.yaml). |
 
 ---
 
 ### Deferred: Cross-File Analysis Rules
 
-> **Note**: These rules require **cross-file dependency graph analysis** or access to **non-Dart configuration files** (manifest, plist, gitignore, etc.). The `avoid_circular_imports` rule has been implemented using the `ImportGraphCache` infrastructure.
+> **Why deferred:** The custom_lint pipeline runs per file; it does not have a guaranteed view of the whole project or of non-Dart assets. These rules require **cross-file dependency analysis** (e.g. provider/riverpod usage across files) or **reading non-Dart config** (AndroidManifest.xml, Info.plist, .gitignore, etc.). We defer them until cross-file and config-file support exists; `avoid_circular_imports` already uses `ImportGraphCache` for import-only cross-file analysis.
 
 #### Provider/State Management
 
@@ -105,6 +124,14 @@ Rules and features in this section are **deferred** due to technical complexity,
 | 🚨🐙 [`avoid_riverpod_circular_provider`](https://github.com/saropa/saropa_lints/issues/1) | Essential | ERROR | Requires tracking `ref.watch()` and `ref.read()` calls across multiple provider files. |
 | ℹ️🚫 `require_riverpod_test_override` | Professional | INFO | Test overrides may be in setup files separate from test files. |
 | ℹ️🚫 `require_go_router_deep_link_test` | Professional | INFO | Routes are defined in one file, tests in another. |
+
+#### Project-wide / coverage / barrel
+
+| Rule | Tier | Severity | Why Complex |
+|------|------|----------|-------------|
+| ℹ️🚫 `require_test_coverage_threshold` | Professional | INFO | Coverage is computed project-wide; single-file AST cannot enforce threshold. |
+| ℹ️🚫 `require_test_golden_threshold` | Professional | INFO | Golden file count and usage span multiple files. |
+| ℹ️🚫 `require_barrel_files` | Professional | INFO | Requires detecting multiple individual imports across files to suggest barrel exports. |
 
 #### Platform Configuration Rules
 
@@ -127,6 +154,8 @@ Rules and features in this section are **deferred** due to technical complexity,
 ---
 
 ### Deferred: Performance Architecture
+
+> **Why deferred:** Optimizations below depend on **IDE or framework capabilities we do not have**: keystroke/edit events, file-open events, or control over how/when rules are run. The plugin runs inside the Dart analysis server with no access to these hooks, so we defer these ideas until the custom_lint (or IDE) API supports them or we introduce a separate CLI path.
 
 The `custom_lint` plugin architecture runs inside the Dart analysis server process. This provides excellent IDE integration (real-time squiggles, quick fixes, hover info).
 
@@ -172,7 +201,7 @@ The "Lints" status bar item is controlled entirely by the [Dart-Code VSCode exte
 
 ### Deferred & Complex Rules (Consolidated)
 
-Rules below are deferred or marked as too complex for reliable AST detection. Listed for tracking only; do NOT implement until the underlying complexity is resolved.
+> **Why deferred:** The rules below would require analysis we cannot do reliably today (cross-file, config, or runtime context), or would rely on heuristics that cause too many false positives. We list them for tracking only; do **not** implement until the barrier in the table is addressed (e.g. cross-file support, config parsing, or a clear AST pattern that avoids heuristic matching).
 
 #### Why Rules Are Deferred
 
@@ -296,6 +325,8 @@ These rules from the saropa project analysis require heuristic detection, cross-
 
 #### Deferred: Package-Specific Rules from saropa (38 remaining)
 
+> **Why deferred:** These rules are the same as those in the "Deferred: Package-Specific Rules (saropa) — Heuristic/Logout/Check-Before-Use" table above. They are deferred because they need cross-file analysis, logout/control-flow detection, "check before use" patterns across methods, or heuristic criteria that would produce too many false positives with single-file AST only.
+>
 > Generated on 2026-01-10 by `analyze_pubspec.py`
 
 ##### Authentication

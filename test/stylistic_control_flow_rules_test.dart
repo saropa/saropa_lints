@@ -63,7 +63,7 @@ void main() {
 
     testRule(
       'AvoidCascadesRule',
-      'avoid_cascades',
+      'avoid_cascade_notation',
       () => AvoidCascadesRule(),
     );
 
@@ -98,6 +98,36 @@ void main() {
     );
 
     testRule(
+      'PreferThenCatchErrorRule',
+      'prefer_then_catcherror',
+      () => PreferThenCatchErrorRule(),
+    );
+
+    testRule(
+      'PreferFireAndForgetRule',
+      'prefer_fire_and_forget',
+      () => PreferFireAndForgetRule(),
+    );
+
+    testRule(
+      'PreferSeparateAssignmentsRule',
+      'prefer_separate_assignments',
+      () => PreferSeparateAssignmentsRule(),
+    );
+
+    testRule(
+      'PreferIfElseOverGuardsRule',
+      'prefer_if_else_over_guards',
+      () => PreferIfElseOverGuardsRule(),
+    );
+
+    testRule(
+      'PreferCascadeAssignmentsRule',
+      'prefer_cascade_assignments',
+      () => PreferCascadeAssignmentsRule(),
+    );
+
+    testRule(
       'PreferPositiveConditionsRule',
       'prefer_positive_conditions',
       () => PreferPositiveConditionsRule(),
@@ -113,12 +143,17 @@ void main() {
       'prefer_switch_statement',
       'prefer_cascade_over_chained',
       'prefer_chained_over_cascade',
-      'avoid_cascades',
+      'avoid_cascade_notation',
       'prefer_exhaustive_enums',
       'prefer_default_enum_case',
       'prefer_await_over_then',
       'prefer_then_over_await',
       'prefer_sync_over_async_where_possible',
+      'prefer_then_catcherror',
+      'prefer_fire_and_forget',
+      'prefer_separate_assignments',
+      'prefer_if_else_over_guards',
+      'prefer_cascade_assignments',
       'prefer_positive_conditions',
     ];
 

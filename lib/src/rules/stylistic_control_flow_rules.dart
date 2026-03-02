@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../saropa_lint_rule.dart';
 
@@ -26,6 +27,24 @@ bool _containsAwaitExpression(Expression expr) {
   }
 
   return false;
+}
+
+/// Returns true if [stmt] (or any descendant) contains an AwaitExpression.
+bool _statementContainsAwait(Statement stmt) {
+  bool found = false;
+  stmt.visitChildren(_AwaitFinder(() => found = true));
+  return found;
+}
+
+class _AwaitFinder extends RecursiveAstVisitor<void> {
+  _AwaitFinder(this._onFound);
+  final void Function() _onFound;
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    _onFound();
+    super.visitAwaitExpression(node);
+  }
 }
 
 // =============================================================================
@@ -667,12 +686,15 @@ class AvoidCascadesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    'avoid_cascades',
-    '[avoid_cascades] Cascade notation (..) can reduce clarity and maintainability. Use separate statements for each operation. {v1}',
+    'avoid_cascade_notation',
+    '[avoid_cascade_notation] Cascade notation (..) can reduce clarity and maintainability. Use separate statements for each operation. {v1}',
     correctionMessage:
         'Replace cascade (..) with separate method calls or property assignments.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  @override
+  List<String> get configAliases => const ['avoid_cascades'];
 
   @override
   void runWithReporter(
@@ -1070,6 +1092,291 @@ class PreferSyncOverAsyncWhereSimpleRule extends SaropaLintRule {
       // Check if return expression contains await
       if (!_containsAwaitExpression(stmt.expression!)) {
         reporter.atNode(body);
+      }
+    });
+  }
+}
+
+/// Warns when try/catch is used for async error handling instead of .then().catchError().
+///
+/// Stylistic: some teams prefer chained .then().catchError() for single-Future error
+/// handling so that errors are handled at the call site without try/catch.
+///
+/// **Bad:**
+/// ```dart
+/// try {
+///   final x = await fetchData();
+///   use(x);
+/// } catch (e, st) {
+///   log(e, st);
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// fetchData().then(use).catchError(log);
+/// ```
+class PreferThenCatchErrorRule extends SaropaLintRule {
+  PreferThenCatchErrorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_then_catcherror',
+    '[prefer_then_catcherror] Prefer .then().catchError() over try/catch for async error handling when handling a single Future.',
+    correctionMessage:
+        'Consider refactoring to use .then().catchError() on the Future.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addTryStatement((TryStatement node) {
+      if (!_statementContainsAwait(node.body)) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Suggests fire-and-forget (unawaited) when the Future result is not used.
+///
+/// Stylistic: awaiting a Future and ignoring the result is clearer as
+/// unawaited(future) or just calling without await so the intent is explicit.
+///
+/// **Bad:**
+/// ```dart
+/// void onTap() async {
+///   await logEvent();  // result unused
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// void onTap() {
+///   unawaited(logEvent());
+/// }
+/// ```
+class PreferFireAndForgetRule extends SaropaLintRule {
+  PreferFireAndForgetRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_fire_and_forget',
+    '[prefer_fire_and_forget] Await is used but the Future result is not used; consider fire-and-forget (unawaited) to make intent explicit.',
+    correctionMessage:
+        'Use unawaited() or remove await if the result is not needed.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addAwaitExpression((AwaitExpression node) {
+      final AstNode? parent = node.parent;
+      if (parent is! ExpressionStatement) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Suggests separate assignments over cascade for assignments.
+///
+/// Stylistic: some teams prefer separate statements over obj..a=1..b=2.
+///
+/// **Bad:**
+/// ```dart
+/// context..size = 1..debug = true;
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// context.size = 1;
+/// context.debug = true;
+/// ```
+class PreferSeparateAssignmentsRule extends SaropaLintRule {
+  PreferSeparateAssignmentsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_separate_assignments',
+    '[prefer_separate_assignments] Prefer separate assignment statements over cascade assignment.',
+    correctionMessage: 'Replace with separate assignment statements.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCascadeExpression((CascadeExpression node) {
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Prefer if-else over guard clauses for certain logic (opinionated).
+///
+/// Flags blocks that contain two or more consecutive guard-style if statements
+/// (if (cond) return;). Some teams prefer if-else for symmetry.
+///
+/// **Bad:**
+/// ```dart
+/// void f(int x) {
+///   if (x < 0) return;
+///   if (x > 10) return;
+///   print(x);
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// void f(int x) {
+///   if (x < 0) {
+///     return;
+///   } else if (x > 10) {
+///     return;
+///   } else {
+///     print(x);
+///   }
+/// }
+/// ```
+class PreferIfElseOverGuardsRule extends SaropaLintRule {
+  PreferIfElseOverGuardsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_if_else_over_guards',
+    '[prefer_if_else_over_guards] Consecutive guard clauses (if-return) could be expressed as if-else for symmetry.',
+    correctionMessage:
+        'Consider refactoring guard clauses into an if-else structure.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBlock((Block node) {
+      final statements = node.statements;
+      if (statements.length < 2) return;
+      for (int i = 0; i < statements.length - 1; i++) {
+        final a = statements[i];
+        final b = statements[i + 1];
+        if (a is IfStatement &&
+            b is IfStatement &&
+            _isGuardStyle(a) &&
+            _isGuardStyle(b)) {
+          reporter.atNode(a);
+          return;
+        }
+      }
+    });
+  }
+
+  static bool _isGuardStyle(IfStatement stmt) {
+    if (stmt.elseStatement != null) return false;
+    final then = stmt.thenStatement;
+    if (then is ReturnStatement) return true;
+    if (then is Block && then.statements.length == 1) {
+      return then.statements.single is ReturnStatement;
+    }
+    return false;
+  }
+}
+
+/// Prefer cascade (..) for consecutive assignments/calls to the same target.
+///
+/// Same intent as prefer_cascade_over_chained; alternative rule name for tier config.
+///
+/// **Bad:**
+/// ```dart
+/// list.add(1);
+/// list.add(2);
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// list..add(1)..add(2);
+/// ```
+class PreferCascadeAssignmentsRule extends SaropaLintRule {
+  PreferCascadeAssignmentsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_cascade_assignments',
+    '[prefer_cascade_assignments] Consecutive method calls on the same target; consider cascade notation (..).',
+    correctionMessage:
+        'Consider using cascade (..) for consecutive calls on the same object.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBlock((Block node) {
+      final statements = node.statements;
+      String? lastTarget;
+      int consecutiveCount = 0;
+      Statement? firstConsecutive;
+
+      for (final stmt in statements) {
+        if (stmt is ExpressionStatement) {
+          final expr = stmt.expression;
+          if (expr is MethodInvocation) {
+            final target = expr.target;
+            if (target is SimpleIdentifier) {
+              final targetName = target.name;
+              if (targetName == lastTarget) {
+                consecutiveCount++;
+                if (consecutiveCount == 2) {
+                  reporter.atNode(firstConsecutive!);
+                  return;
+                }
+              } else {
+                lastTarget = targetName;
+                consecutiveCount = 1;
+                firstConsecutive = stmt;
+              }
+              continue;
+            }
+          }
+        }
+        lastTarget = null;
+        consecutiveCount = 0;
+        firstConsecutive = null;
       }
     });
   }
