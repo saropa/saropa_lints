@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 16 roadmap-detail lint rules (prefer_final_locals, prefer_getters_before_setters, etc.).
+/// Tests for 15 roadmap-detail lint rules (prefer_final_locals, prefer_getters_before_setters, etc.).
 ///
 /// Verifies fixture exists and documents expected rule names and tiers.
 /// Registration and tier assignment are in lib/saropa_lints.dart and lib/src/tiers.dart.
@@ -19,7 +19,6 @@ void main() {
   const professionalRules = <String>[
     'prefer_getters_before_setters',
     'prefer_mixin_over_abstract',
-    'prefer_named_bool_params',
     'prefer_noun_class_names',
     'prefer_raw_strings',
     'prefer_record_over_tuple_class',
@@ -49,9 +48,9 @@ void main() {
       }
     });
 
-    test('all 16 rule names are documented', () {
-      expect(allNewRules.length, 16);
-      expect(allNewRules.toSet().length, 16);
+    test('all 15 rule names are documented', () {
+      expect(allNewRules.length, 15);
+      expect(allNewRules.toSet().length, 15);
     });
   });
 
