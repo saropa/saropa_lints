@@ -1,6 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages
 
 /// Base class for saropa_lints quick fixes in the native plugin system.
+/// Fixes are registered per-rule in [SaropaLintRule.fixGenerators]; the
+/// analysis server invokes them when the user applies a quick fix from the IDE.
 ///
 /// Extends [ResolvedCorrectionProducer] with saropa-specific defaults.
 /// Subclasses must override [fixKind] and [compute].
@@ -63,21 +65,34 @@ abstract class SaropaFixProducer extends ResolvedCorrectionProducer {
   ///
   /// Useful for inserting or wrapping code at the same indentation level.
   /// Only returns spaces and tabs — stops at the first non-whitespace char.
-  String getLineIndent(AstNode node) {
-    final lineInfo = unitResult.lineInfo;
-    final line = lineInfo.getLocation(node.offset).lineNumber - 1;
-    final lineStart = lineInfo.getOffsetOfLine(line);
-    final content = unitResult.content;
-    final indent = StringBuffer();
-    for (var i = lineStart; i < content.length; i++) {
-      final ch = content[i];
-      if (ch == ' ' || ch == '\t') {
-        indent.write(ch);
-      } else {
-        break;
+  /// Returns empty string if [node], lineInfo, or content is unavailable.
+  String getLineIndent(AstNode? node) {
+    if (node == null) return '';
+    try {
+      final lineInfo = unitResult.lineInfo;
+      final content = unitResult.content;
+      if (content.isEmpty) return '';
+
+      final location = lineInfo.getLocation(node.offset);
+      final line = location.lineNumber - 1;
+      if (line < 0) return '';
+
+      final lineStart = lineInfo.getOffsetOfLine(line);
+      if (lineStart < 0 || lineStart >= content.length) return '';
+
+      final indent = StringBuffer();
+      for (var i = lineStart; i < content.length; i++) {
+        final ch = content[i];
+        if (ch == ' ' || ch == '\t') {
+          indent.write(ch);
+        } else {
+          break;
+        }
       }
+      return indent.toString();
+    } catch (_) {
+      return '';
     }
-    return indent.toString();
   }
 }
 

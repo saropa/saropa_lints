@@ -24,14 +24,17 @@
 library;
 
 class BaselinePaths {
-  BaselinePaths(List<String> patterns) : _patterns = _compilePatterns(patterns);
+  BaselinePaths(List<String>? patterns)
+      : _patterns = _compilePatterns(patterns ?? const []);
 
   final List<_CompiledPattern> _patterns;
 
   /// Check if a file path matches any of the baseline patterns.
   ///
   /// [filePath] should be the full or relative path to the file.
-  bool matches(String filePath) {
+  /// Returns false if [filePath] is null or empty.
+  bool matches(String? filePath) {
+    if (filePath == null || filePath.isEmpty) return false;
     if (_patterns.isEmpty) return false;
 
     final normalized = _normalizePath(filePath);
@@ -46,8 +49,18 @@ class BaselinePaths {
   }
 
   /// Compile glob patterns into regex patterns for efficient matching.
+  /// Skips null/empty entries; invalid patterns are wrapped in try/catch per pattern.
   static List<_CompiledPattern> _compilePatterns(List<String> patterns) {
-    return patterns.map(_CompiledPattern.new).toList();
+    final result = <_CompiledPattern>[];
+    for (final p in patterns) {
+      if (p.trim().isEmpty) continue;
+      try {
+        result.add(_CompiledPattern(p));
+      } catch (_) {
+        // Skip malformed pattern
+      }
+    }
+    return result;
   }
 
   /// Normalize a file path for consistent matching.

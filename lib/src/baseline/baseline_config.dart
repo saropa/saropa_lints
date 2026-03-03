@@ -1,5 +1,8 @@
 /// Configuration for the baseline feature.
 ///
+/// Loaded by [config_loader] from analysis_options_custom.yaml / analysis_options;
+/// [BaselineManager] uses it to decide which violations to suppress (file/path/date).
+///
 /// Parses baseline configuration from `analysis_options.yaml`:
 /// ```yaml
 /// plugins:
@@ -39,34 +42,37 @@ class BaselineConfig {
 
     final map = yaml;
 
-    // Parse file path
-    final file = map['file'] as String?;
+    // Parse file path (defensive: trim and reject empty)
+    final fileRaw = map['file'];
+    final file = fileRaw is String && fileRaw.trim().isNotEmpty
+        ? fileRaw.trim()
+        : null;
 
     // Parse date
     final dateStr = map['date'] as String?;
     DateTime? date;
-    if (dateStr != null) {
-      date = DateTime.tryParse(dateStr);
+    if (dateStr != null && dateStr.trim().isNotEmpty) {
+      date = DateTime.tryParse(dateStr.trim());
     }
 
-    // Parse paths
+    // Parse paths (defensive: only non-empty strings)
     final pathsRaw = map['paths'];
     final paths = <String>[];
     if (pathsRaw is List) {
       for (final p in pathsRaw) {
-        if (p is String) {
-          paths.add(p);
+        if (p is String && p.trim().isNotEmpty) {
+          paths.add(p.trim());
         }
       }
     }
 
-    // Parse only_impacts
+    // Parse only_impacts (defensive: only non-empty strings)
     final impactsRaw = map['only_impacts'];
     final onlyImpacts = <String>[];
     if (impactsRaw is List) {
       for (final i in impactsRaw) {
-        if (i is String) {
-          onlyImpacts.add(i.toLowerCase());
+        if (i is String && i.trim().isNotEmpty) {
+          onlyImpacts.add(i.trim().toLowerCase());
         }
       }
     }
@@ -108,7 +114,9 @@ class BaselineConfig {
   /// Returns true if:
   /// - [onlyImpacts] is empty (baseline all), or
   /// - [impact] is in the [onlyImpacts] list
-  bool shouldBaselineImpact(String impact) {
+  /// Returns false if [impact] is null or empty.
+  bool shouldBaselineImpact(String? impact) {
+    if (impact == null || impact.isEmpty) return false;
     if (onlyImpacts.isEmpty) return true;
     return onlyImpacts.contains(impact.toLowerCase());
   }

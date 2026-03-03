@@ -107,8 +107,9 @@ class CommentPatterns {
   /// A prose guard runs first: if the content contains multiple common
   /// English function words (articles, prepositions, conjunctions), it is
   /// treated as natural language even if it starts with a keyword or type.
-  static bool isLikelyCode(String content) {
-    if (content.isEmpty) return false;
+  /// Returns false if [content] is null or empty.
+  static bool isLikelyCode(String? content) {
+    if (content == null || content.isEmpty) return false;
     if (_isLikelyProse(content)) return false;
     return codePattern.hasMatch(content);
   }
@@ -225,16 +226,18 @@ class CommentPatterns {
   /// Returns true if the comment contains special task markers (like TO-DO or FIX-ME).
   ///
   /// [content] should be the comment text with the "//" prefix removed and trimmed.
-  static bool isSpecialMarker(String content) {
-    if (content.isEmpty) return false;
+  /// Returns false if [content] is null or empty.
+  static bool isSpecialMarker(String? content) {
+    if (content == null || content.isEmpty) return false;
     return specialMarkerPattern.hasMatch(content);
   }
 
   /// Returns true if the comment content starts with a lowercase letter.
   ///
   /// [content] should be the comment text with the "//" prefix removed and trimmed.
-  static bool startsWithLowercase(String content) {
-    if (content.isEmpty) return false;
+  /// Returns false if [content] is null or empty.
+  static bool startsWithLowercase(String? content) {
+    if (content == null || content.isEmpty) return false;
     return _lowercaseStartPattern.hasMatch(content);
   }
 

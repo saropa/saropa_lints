@@ -47,12 +47,14 @@ class BaselineDate {
   /// [filePath] is the full path to the file.
   /// [line] is the 1-based line number.
   /// [projectRoot] is the git repository root (optional, auto-detected if null).
+  /// Returns false if [filePath] is null/empty or [line] < 1.
   Future<bool> isOlderThanBaseline(
-    String filePath,
+    String? filePath,
     int line, {
     String? projectRoot,
   }) async {
-    if (line <= 0) return false;
+    if (filePath == null || filePath.isEmpty) return false;
+    if (line < 1) return false;
 
     try {
       final lineDate = await _getLineDate(filePath, line, projectRoot);
@@ -97,26 +99,34 @@ class BaselineDate {
     int line,
     String? projectRoot,
   ) async {
-    final workDir = projectRoot ?? _findGitRoot(filePath);
-    if (workDir == null) return null;
+    if (filePath.isEmpty || line < 1) return null;
 
-    // Make path relative to git root
-    final relativePath = _makeRelative(filePath, workDir);
+    try {
+      final workDir = projectRoot ?? _findGitRoot(filePath);
+      if (workDir == null || workDir.isEmpty) return null;
 
-    final result = await Process.run(
-      _gitPath,
-      ['blame', '-L', '$line,$line', '--porcelain', relativePath],
-      workingDirectory: workDir,
-      runInShell: true,
-    );
+      // Make path relative to git root
+      final relativePath = _makeRelative(filePath, workDir);
+      if (relativePath.isEmpty) return null;
 
-    if (result.exitCode != 0) {
+      final result = await Process.run(
+        _gitPath,
+        ['blame', '-L', '$line,$line', '--porcelain', relativePath],
+        workingDirectory: workDir,
+        runInShell: true,
+      );
+
+      if (result.exitCode != 0) {
+        return null;
+      }
+
+      // Parse the porcelain output to find committer-time
+      final output = result.stdout?.toString() ?? '';
+      return _parseCommitterTime(output);
+    } catch (_) {
+      // Git unavailable or process error
       return null;
     }
-
-    // Parse the porcelain output to find committer-time
-    final output = result.stdout.toString();
-    return _parseCommitterTime(output);
   }
 
   /// Parse git blame porcelain output to extract committer timestamp.
@@ -185,25 +195,33 @@ class BaselineDate {
   ///
   /// This runs git blame once for the entire file and caches all line dates,
   /// which is faster than running blame line-by-line.
-  Future<void> preloadFile(String filePath, {String? projectRoot}) async {
-    final workDir = projectRoot ?? _findGitRoot(filePath);
-    if (workDir == null) return;
+  /// No-op if [filePath] is null or empty.
+  Future<void> preloadFile(String? filePath, {String? projectRoot}) async {
+    if (filePath == null || filePath.isEmpty) return;
 
-    final relativePath = _makeRelative(filePath, workDir);
+    try {
+      final workDir = projectRoot ?? _findGitRoot(filePath);
+      if (workDir == null || workDir.isEmpty) return;
 
-    final result = await Process.run(
-      _gitPath,
-      ['blame', '--porcelain', relativePath],
-      workingDirectory: workDir,
-      runInShell: true,
-    );
+      final relativePath = _makeRelative(filePath, workDir);
+      if (relativePath.isEmpty) return;
 
-    if (result.exitCode != 0) return;
+      final result = await Process.run(
+        _gitPath,
+        ['blame', '--porcelain', relativePath],
+        workingDirectory: workDir,
+        runInShell: true,
+      );
 
-    final output = result.stdout.toString();
-    final lineDates = _parseFullBlame(output);
+      if (result.exitCode != 0) return;
 
-    _cache[filePath] = _FileDateCache()..lineDates.addAll(lineDates);
+      final output = result.stdout?.toString() ?? '';
+      final lineDates = _parseFullBlame(output);
+
+      _cache[filePath] = _FileDateCache()..lineDates.addAll(lineDates);
+    } catch (_) {
+      // Git not available or file not in repo
+    }
   }
 
   /// Parse full git blame output to extract all line dates.

@@ -3,8 +3,12 @@
 /// Registry wrapper that provides the callback-based `addXxx((node) {...})`
 /// API that existing saropa_lints rules use.
 ///
-/// Internally, it stores callbacks in a [CompatVisitor] and registers that
-/// visitor with the native [RuleVisitorRegistry].
+/// **Flow:** Rule's [runWithReporter] receives a [SaropaContext]. It calls
+/// [addMethodInvocation] etc.; each call stores a callback in [CompatVisitor]
+/// and registers that visitor with the native [RuleVisitorRegistry]. When the
+/// analyzer walks the AST, it invokes the visitor, which dispatches to the
+/// stored callbacks. Per-file filtering (skip generated/test/pattern checks)
+/// is applied inside wrapped callbacks so expensive rules skip early.
 ///
 /// Old pattern: `context.registry.addMethodInvocation((node) { ... })`
 /// New pattern: `context.addMethodInvocation((node) { ... })`
@@ -62,8 +66,17 @@ class SaropaContext {
   ///
   /// Provides line/column lookup via `lineInfo.getLocation(offset)`.
   /// Only valid during AST visiting (not during registration).
+  /// Throws [StateError] if current unit is not yet available.
   // ignore: lines_longer_than_80_chars
-  LineInfo get lineInfo => _ruleContext.currentUnit!.unit.lineInfo;
+  LineInfo get lineInfo {
+    final unit = _ruleContext.currentUnit;
+    if (unit == null) {
+      throw StateError(
+        'SaropaContext.lineInfo is only valid during AST visiting',
+      );
+    }
+    return unit.unit.lineInfo;
+  }
 
   // ===========================================================================
   // Per-file filtering
@@ -148,6 +161,7 @@ class SaropaContext {
   /// Returns true if the file content fails any of the rule's
   /// content-based requirements (async, widgets, imports, etc.).
   static bool _failsContentRequirements(SaropaLintRule rule, String content) {
+    if (content.isEmpty) return false; // Defensive: empty content => don't fail
     if (rule.requiresAsync &&
         !content.contains('async') &&
         !content.contains('Future')) {
