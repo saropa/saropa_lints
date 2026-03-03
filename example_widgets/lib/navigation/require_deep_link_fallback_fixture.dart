@@ -101,7 +101,7 @@
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
 // Test fixture for: require_deep_link_fallback
-// Source: lib\src\rules\navigation_rules.dart
+// Source: lib/src/rules/ui/navigation_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
@@ -116,7 +116,7 @@ void _bad509_handleDeepLink(Uri uri) {
   Navigator.push(context, ProductPage(id: productId));
 }
 
-// GOOD: Should NOT trigger require_deep_link_fallback
+// GOOD: Should NOT trigger require_deep_link_fallback (null check + NotFound)
 void _good509_handleDeepLink(Uri uri) async {
   final productId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
   if (productId == null) {
@@ -129,4 +129,19 @@ void _good509_handleDeepLink(Uri uri) async {
     return;
   }
   Navigator.push(context, ProductPage(product: product));
+}
+
+// OK: Method name has "link" but body does NOT perform navigation — only
+// parses URI and returns; should NOT trigger.
+String exportLinkToClipboard(Uri uri) {
+  final path = uri.pathSegments.isNotEmpty ? uri.pathSegments.join('/') : '';
+  return path;
+}
+
+// OK: Fallback via "if (x != null)" guard before navigate; should NOT trigger.
+void _good509_handleRouteByUri(Uri uri) {
+  final id = uri.queryParameters['id'];
+  if (id != null) {
+    Navigator.push(context, ProductPage(id: id));
+  }
 }

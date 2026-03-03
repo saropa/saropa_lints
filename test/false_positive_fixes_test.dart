@@ -200,13 +200,24 @@ void main() {
         );
       });
 
-      test('should skip methods with no deep link signals in body', () {
-        // Expected behavior: These should NOT trigger
-        // - linkAccounts() - name has "link" but body has no Uri/Navigator
+      test('should skip methods with no navigation in body', () {
+        // Expected behavior: These should NOT trigger (name matches but no navigation)
+        // - linkAccounts() - name has "link" but body has no Navigator/GoRouter/.go/.push
         // - logRouteChange() - name has "route" but body has no navigation
+        // - exportLinkToClipboard(Uri uri) - see require_deep_link_fallback_fixture.dart
 
         expect(
-          'Methods without Uri/Navigator/GoRouter in body are skipped',
+          'Methods without Navigator/GoRouter/.go/.push in body are skipped',
+          isNotNull,
+        );
+      });
+
+      test('should skip handlers with != null guard before navigate', () {
+        // Expected behavior: Should NOT trigger when body has "if (x != null) { navigate }"
+        // - _good509_handleRouteByUri in require_deep_link_fallback_fixture.dart
+
+        expect(
+          'Guard clause "if (id != null)" before Navigator.push is recognized as fallback',
           isNotNull,
         );
       });

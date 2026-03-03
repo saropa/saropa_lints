@@ -16,6 +16,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
+- **`avoid_redirect_injection`:** No longer reports when the redirect-related argument is used in a block that indicates allowlist validation. The rule now skips when the enclosing block source contains the substrings `allowed` or `validated` (e.g. `_allowedExportDestinations`, `validatedDestination`), in addition to existing hints (`.host`, `.authority`, `allowlist`, `whitelist`, `trusted`). Fixes false positives where the value is metadata from a fixed set (e.g. `'clipboard'`, `'notes'`) rather than a redirect URL.
+
+- **`require_deep_link_fallback`:** Reduced false positives and clarified scope. (1) Only methods whose body contains a navigation call (e.g. `Navigator`, `GoRouter`, `.go(`, `.push(`, `.goNamed(`, `.pushNamed(`, `.pushReplacement`, `getInitialLink`, `getInitialUri`) are reported; methods that only parse URIs or build link text (e.g. export/share helpers) are no longer flagged. (2) Fallback detection now recognizes `if (x != null)` guard before navigate. (3) Rule DartDoc documents "When we report" / "When we don't report" and a developer note on pattern-based detection. Fixture and tests updated. See `bugs/history/false_positives/require_deep_link_fallback_resolved.md`.
+
 - **`avoid_unawaited_future`:** No longer reports when the expression statement is explicitly wrapped in `unawaited(...)`. The rule previously checked `node.parent` (the enclosing block) instead of `node.expression`, so the skip never applied. It now returns early when the statement's expression is a `MethodInvocation` with method name `unawaited`, matching the rule's own correction message and Dart's recommended fire-and-forget pattern.
 
 ### Maintenance
