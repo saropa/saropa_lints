@@ -133,7 +133,7 @@ saropa_lints:
     - avoid_unassigned_stream_subscriptions: false
     - require_stream_controller_dispose: false
     - avoid_future_then_in_async: false          # WARNING - use await instead (v2.3.10)
-    - avoid_unawaited_future: false              # ERROR - unawaited futures lose errors (v2.3.10)
+    - avoid_unawaited_future: false              # WARNING - unawaited futures lose errors; unawaited() allowed (v2.3.10)
     - prefer_future_wait: false                  # INFO - use Future.wait for independent awaits (v2.5.0)
     - avoid_stream_sync_events: false            # WARNING - stream event added before listeners attached (v4.2.0)
     - avoid_sequential_awaits: false             # INFO - use Future.wait for independent operations (v4.2.0)

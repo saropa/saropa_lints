@@ -2964,6 +2964,12 @@ class AvoidFutureThenInAsyncRule extends SaropaLintRule {
 ///
 /// Since: v2.3.10 | Updated: v4.13.0 | Rule version: v3
 ///
+/// **Implementation note for developers:** Expression statements whose
+/// expression is a call to `unawaited(...)` are never reported. The check
+/// uses `node.expression` (the statement's expression), not `node.parent`,
+/// so that `unawaited(someFuture());` is correctly recognized as intentional
+/// fire-and-forget regardless of static type resolution.
+///
 /// Alias: unawaited_future, missing_await, fire_and_forget
 ///
 /// Unawaited Futures lose their errors and can cause unexpected behavior.
@@ -3031,23 +3037,23 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
     context.addExpressionStatement((ExpressionStatement node) {
       final Expression expr = node.expression;
 
+      // Explicit unawaited() - recommended by Dart and by this rule's correction message
+      if (expr is MethodInvocation && expr.methodName.name == 'unawaited') {
+        return;
+      }
+
       // Check if this is a method invocation that returns a Future
       if (expr is MethodInvocation) {
         final DartType? returnType = expr.staticType;
         if (returnType != null) {
           final String typeName = returnType.getDisplayString();
           if (typeName.startsWith('Future<') || typeName == 'Future') {
-            // Skip if wrapped in unawaited()
-            final AstNode? parent = node.parent;
-            if (parent is! MethodInvocation ||
-                parent.methodName.name != 'unawaited') {
-              // Skip safe patterns: subscription.cancel() in dispose(),
-              // or chains ending with .catchError()/.ignore()
-              if (_isSafeFireAndForget(expr, node)) {
-                return;
-              }
-              reporter.atNode(expr);
+            // Skip safe patterns: subscription.cancel() in dispose(),
+            // or chains ending with .catchError()/.ignore()
+            if (_isSafeFireAndForget(expr, node)) {
+              return;
             }
+            reporter.atNode(expr);
           }
         }
       }
