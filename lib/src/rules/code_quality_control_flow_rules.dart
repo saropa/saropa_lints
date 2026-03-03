@@ -564,16 +564,18 @@ class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
   }
 }
 
-/// Warns when a BytesBuilder should be used for byte operations.
+/// Prefer switch expression over switch statement when all cases are simple
+/// return/assignment (value mapping).
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
-/// Example of **bad** code:
-/// ```dart
-/// final bytes = <int>[];
-/// bytes.addAll([1, 2, 3]);
-/// bytes.addAll([4, 5, 6]);
-/// ```
+/// **Exempt:** Does not flag switches where any case has multiple statements,
+/// control flow (if/for/while/try/do) inside a case, or non-exhaustive switches
+/// with code after the switch. See bugs/history/false_positives/
+/// prefer_switch_expression_false_positive_complex_case_logic.md.
+///
+/// **Bad:** Switch statement with only return/assignment per case.
+/// **Good:** Switch expression with same mapping.
 class PreferSwitchExpressionRule extends SaropaLintRule {
   PreferSwitchExpressionRule() : super(code: _code);
 

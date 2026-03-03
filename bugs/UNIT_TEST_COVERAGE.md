@@ -102,13 +102,13 @@ Integration tests in `test/fixture_lint_integration_test.dart`: run custom_lint 
 
 ### 6.0) Reproduce baseline (optional)
 
-- [ ] Run the publish coverage report and record: Fixtures `X/1964`, lowest fixture coverage list.
+- [x] Run the publish coverage report and record (2026-03-02): **Fixtures 1962/1990 (98.6%)**. Lowest coverage: async 49/52, hive 23/26, debug 10/12, riverpod 38/40, scroll 18/20, accessibility 40/41, architecture 9/10 (prefer_builder_pattern not implemented), code_quality_variables 23/24.
 
 ### 6.1) Fix metrics: code_quality_* categories
 
 Pick one approach (1A lower-risk; 1B higher churn).
 
-- [ ] **1A (recommended): update** `scripts/modules/_rule_metrics.py`
+- [x] **1A (recommended): update** `scripts/modules/_rule_metrics.py` — **Done.** `_fixture_category_alias` maps `code_quality_*` → `code_quality`; `_count_fixtures_for_category` looks in `example_core/lib/code_quality/` and counts by `rule_names` intersection (no overcount).
   - [ ] In `_count_fixtures_for_category(...)`: if `category.startswith('code_quality_')`, look in `example_core/lib/code_quality/`.
   - [ ] **Important:** Do not return `len(code_quality_dir/*_fixture.dart)` for every `code_quality_*` (would overcount 4×). Parse rule code names from the category’s rule file and count only fixtures whose basename matches those rule names (e.g. first string literal in each `LintCode(...)`; fixtures named `{rule_name}_fixture.dart`).
 
@@ -117,8 +117,8 @@ Pick one approach (1A lower-risk; 1B higher churn).
 
 ### 6.2) Fix metrics: don’t count commented-out rule classes
 
-- [ ] Update `_RULE_CLASS_RE` usage in `scripts/modules/_rule_metrics.py` so it doesn’t count `class ... extends ...` inside line comments (e.g. strip `//` lines before regex, or use `^(?!\s*//)\s*class ... extends ...` with `re.MULTILINE`; handle block comments if needed).
-- [ ] Re-run coverage and confirm Isar no longer shows 1 missing fixture.
+- [x] Update `_rule_metrics.py` (strip comment lines before regex). ~~Update `_RULE_CLASS_RE` usage~~ in `scripts/modules/_rule_metrics.py` so it doesn’t count `class ... extends ...` inside line comments Done: strip `//`/`///` lines before applying regex in `count_rules` and `_collect_category_rules`.
+- [x] Re-run coverage and confirm Isar no longer shows 1 missing fixture.
 
 ### 6.3) Add real missing fixture files
 
@@ -128,7 +128,7 @@ For each item: create `.../{rule_name}_fixture.dart` with at least a **BAD** exa
 
 | Category        | Rule(s) | Directory |
 |-----------------|--------|-----------|
-| architecture    | `prefer_builder_pattern` | `example_core/lib/architecture/` |
+| architecture    | ~~`prefer_builder_pattern`~~ | Rule not implemented (empty `runWithReporter`); stub fixture removed. Do not add fixture until rule is implemented. |
 | async           | `avoid_void_async` | `example_async/lib/async/` |
 | class_constructor | `prefer_final_fields_always` | `example_core/lib/class_constructor/` |
 | config          | `prefer_compile_time_config`, `prefer_flavor_configuration` | `example_async/lib/config/` |
@@ -152,15 +152,15 @@ For each item: create `.../{rule_name}_fixture.dart` with at least a **BAD** exa
 
 ### 6.4) Update test fixture lists and rule instantiation tests
 
-- [ ] `test/config_rules_test.dart`: add fixtures `prefer_compile_time_config`, `prefer_flavor_configuration`; add Rule Instantiation for `PreferCompileTimeConfigRule`, `PreferFlavorConfigurationRule`.
-- [ ] `test/auto_route_rules_test.dart`: add fixtures `prefer_auto_route_path_params_simple`, `prefer_auto_route_typed_args`; add Rule Instantiation for the two rules.
-- [ ] Update other `test/{category}_rules_test.dart` fixture lists for categories in §6.3 where applicable.
+- [x] `test/config_rules_test.dart`: fixtures and Rule Instantiation for `prefer_compile_time_config`, `prefer_flavor_configuration` already present.
+- [x] `test/auto_route_rules_test.dart`: fixtures and Rule Instantiation for `prefer_auto_route_path_params_simple`, `prefer_auto_route_typed_args` already present.
+- [x] Update other `test/{category}_rules_test.dart` fixture lists for categories in §6.3 where applicable. Audited: return, config, auto_route, stylistic, theming already include the §6.3 fixtures.
 
 ### 6.5) Verify
 
-- [ ] Re-run publish coverage and confirm **Fixtures = 100%**.
-- [ ] Run `dart test`.
-- [ ] Run `dart analyze --fatal-infos`.
+- [ ] Re-run publish coverage and confirm **Fixtures = 100%** (current 98.6%; remaining gaps = missing fixtures per §6.3 and categories above).
+- [ ] Run `dart test` (full suite; some pre-existing failures in other rules).
+- [x] Run `dart analyze --fatal-infos` — **passes** (2026-03-02; fixed duplicate `RequireAddAutomaticKeepAlivesOffRule`, async `.name`/`.lexeme`, test unused import).
 
 ---
 
