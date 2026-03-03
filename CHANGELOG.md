@@ -16,17 +16,89 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 
-- **Quick fix batches (QUICK_FIX_PLAN):** Batch 2 — `avoid_bloc_event_in_constructor` and `prefer_const_widgets` fixtures + quick-fix tests. Batch 3 — `prefer_capitalized_comment_start`, `prefer_const_declarations`, `prefer_final_locals` quick-fix tests; type fixtures with real BAD/GOOD. Batch 4 — `avoid_redundant_pragma_inline`, `avoid_unused_parameters`, `avoid_weak_cryptographic_algorithms` quick-fix tests; `avoid_weak_cryptographic_algorithms` now uses ReplaceWeakCryptoFix (replaces md5/sha1 with sha256). Batch 5 — `avoid_unnecessary_getter` fix (RemoveUnnecessaryGetterFix); `no_empty_block` real fix (AddNoEmptyBlockIgnoreFix). All batches: fixtures present, unit tests verify fixGenerators. See `bugs/QUICK_FIX_PLAN.md`.
+- **Quick fixes and tests:** `avoid_bloc_event_in_constructor` — fixtures and quick-fix tests (do not dispatch BLoC events in constructor). `prefer_const_widgets` — fixtures and quick-fix tests. `prefer_capitalized_comment_start`, `prefer_const_declarations`, `prefer_final_locals` — quick-fix tests and type fixtures with real BAD/GOOD. `avoid_redundant_pragma_inline`, `avoid_unused_parameters` — quick-fix tests. `avoid_weak_cryptographic_algorithms` — quick-fix tests and ReplaceWeakCryptoFix (replaces md5/sha1 with sha256). `avoid_unnecessary_getter` — RemoveUnnecessaryGetterFix. `no_empty_block` — AddNoEmptyBlockIgnoreFix (real fix). Fixtures and unit tests verify fixGenerators. See `bugs/QUICK_FIX_PLAN.md`.
 
 - **Defensive coding and robustness:** Parameter validation, null/empty handling, and error handling across core utilities and baseline/config. No behavioral change for valid inputs. Covers: `normalizePath`, `BloomFilter`, `ProjectContext` (findProjectRoot, getPackageName, getProjectInfo, hasDependency), config loader, baseline config/manager/file/paths/date, banned usage config, `SaropaContext`/`SaropaFixProducer`, common fix bases (insert/replace/delete), comment/ignore utils, and plugin registration in `main.dart`. New unit tests in `test/defensive_coding_test.dart` (50 cases) for null/empty and edge cases.
 
-- **Batch of 20 roadmap rules (Medium, High importance):** `prefer_semantics_sort`, `prefer_sliver_for_mixed_scroll`, `prefer_stale_while_revalidate`, `prefer_stream_transformer`, `prefer_streams_over_polling`, `prefer_using_for_temp_resources`, `prefer_webview_sandbox`, `prefer_whitelist_validation`, `require_addAutomaticKeepAlives_off`, `require_api_response_validation`, `require_api_version_handling`, `require_auto_route_deep_link_config`, `require_backup_exclusion`, `require_cancellable_operations`, `require_config_validation`, `require_connectivity_resume_check`, `require_content_type_validation`, `require_context_in_build_descendants`, `require_dispose_verification_tests`, `require_error_context_in_logs`. All INFO severity; professional tier.
-
-- **Batch of 20 roadmap rules (Medium, High importance):** `prefer_hive_compact_periodically`, `prefer_hive_compact`, `prefer_hive_web_aware`, `prefer_injectable_package`, `prefer_internet_connection_checker`, `prefer_json_codegen`, `prefer_late_lazy_initialization`, `prefer_log_levels`, `prefer_log_timestamp`, `prefer_lru_cache`, `prefer_named_routes_for_deep_links`, `prefer_notification_custom_sound`, `prefer_overlay_portal_layout_builder`, `prefer_permission_minimal_request`, `prefer_platform_widget_adaptive`, `prefer_readable_line_length`, `prefer_riverpod_code_gen`, `prefer_riverpod_keep_alive`, `prefer_root_detection`, `prefer_rxdart_for_complex_streams`. All INFO severity; registered in professional (18) or recommended (2) tier.
-
-- **Batch 3 roadmap rules (High importance):** `require_error_message_clarity`, `require_error_recovery`, `require_firebase_email_enumeration_protection`, `require_firebase_composite_index` (existing), `require_firebase_offline_persistence`, `require_focus_order`, `require_getit_dispose_registration`, `require_heading_hierarchy`, `require_performance_test`, `require_image_memory_cache_limit`, `require_interface_for_dependency`, `require_json_date_format_consistency`, `require_keychain_access`, `require_permission_lifecycle_observer`, `require_provider_update_should_notify`, `require_reduced_motion_support`, `require_rtl_support`, `require_sqflite_index_for_queries`, `require_stream_cancel_on_error`. All INFO severity; professional tier. (`require_https_only_test` was already implemented.)
-
-- **Batch 4 roadmap rules (High + Medium/Low):** `require_webview_user_agent`, `require_will_pop_scope`, `require_subscription_composite`, `use_closest_build_context`, `use_specific_deprecation`, `avoid_screenshot_in_ci`, `prefer_test_report`, `avoid_semantics_in_animation`, `prefer_announce_for_changes`, `prefer_show_hide`, `require_link_distinction`, `require_switch_control`, `prefer_deferred_imports`, `prefer_part_over_import`, `prefer_weak_references`, `prefer_zone_error_handler`, `require_multi_factor`, `prefer_isar_for_complex_queries`, `prefer_external_keyboard`, `prefer_outlined_icons`. All INFO severity; professional tier.
+- **New rules (INFO severity; professional or recommended tier):**
+  - `prefer_semantics_sort` — Suggests sortKey on Semantics for correct screen reader order in complex layouts.
+  - `prefer_sliver_for_mixed_scroll` — Suggests CustomScrollView with slivers when mixing scroll and non-scroll content.
+  - `prefer_stale_while_revalidate` — Suggests stale-while-revalidate for cached API data.
+  - `prefer_stream_transformer` — Suggests Stream.transform() for reusable stream pipelines.
+  - `prefer_streams_over_polling` — Prefer Stream over Timer.periodic for reactive updates.
+  - `prefer_using_for_temp_resources` — Use try-finally or ensure dispose for temporary files/resources.
+  - `prefer_webview_sandbox` — Restrict WebView file access and JavaScript when not needed.
+  - `prefer_whitelist_validation` — Prefer allowlist over blocklist for input validation.
+  - `require_add_automatic_keep_alives_off` — Set addAutomaticKeepAlives: false on long lists to improve memory efficiency.
+  - `require_api_response_validation` — Validate API response shape before use.
+  - `require_api_version_handling` — Include API version in URL or headers.
+  - `require_auto_route_deep_link_config` — Configure deep links for auto_route routes.
+  - `require_backup_exclusion` — Exclude sensitive data from Android backup.
+  - `require_cancellable_operations` — Support cancellation for long-running async operations.
+  - `require_config_validation` — Validate config (null, range) after loading.
+  - `require_connectivity_resume_check` — Re-check connectivity when app resumes.
+  - `require_content_type_validation` — Check Content-Type before parsing response body.
+  - `require_context_in_build_descendants` — Pass BuildContext or use Builder for descendants that need it.
+  - `require_dispose_verification_tests` — Add tests that verify dispose is called on controllers/subscriptions.
+  - `require_error_context_in_logs` — Include user/request id in error logs for debugging.
+  - `prefer_hive_compact_periodically` — Call box.compact() after Hive bulk deletes to reclaim disk space.
+  - `prefer_hive_compact` — Consider calling box.compact() periodically for large Hive boxes.
+  - `prefer_hive_web_aware` — Consider web platform when using Hive (e.g. IndexedDB).
+  - `prefer_injectable_package` — Prefer injectable package for code-generated GetIt DI.
+  - `prefer_internet_connection_checker` — Use connectivity_plus or package to check internet (not just connectivity).
+  - `prefer_json_codegen` — Prefer json_serializable/codegen for type-safe JSON.
+  - `prefer_late_lazy_initialization` — Prefer late or lazy initialization when appropriate.
+  - `prefer_log_levels` — Use log levels (debug, info, warning, error) consistently.
+  - `prefer_log_timestamp` — Include timestamps in log output.
+  - `prefer_lru_cache` — Prefer LRU cache for bounded caches.
+  - `prefer_named_routes_for_deep_links` — Use named routes for deep linking.
+  - `prefer_notification_custom_sound` — Prefer custom sound for local notifications when appropriate.
+  - `prefer_overlay_portal_layout_builder` — Use OverlayPortal with LayoutBuilder for overlay positioning.
+  - `prefer_permission_minimal_request` — Request only permissions needed at the time.
+  - `prefer_platform_widget_adaptive` — Use platform-adaptive widgets (e.g. Cupertino/Material).
+  - `prefer_readable_line_length` — Keep line length readable (e.g. wrap or break long lines).
+  - `prefer_riverpod_code_gen` — Prefer @riverpod and riverpod_generator for type-safe providers.
+  - `prefer_riverpod_keep_alive` — Use keepAlive for Riverpod providers that must outlive widget.
+  - `prefer_root_detection` — Consider root/jailbreak detection for sensitive apps.
+  - `prefer_rxdart_for_complex_streams` — Prefer rxdart for complex stream composition.
+  - `require_error_message_clarity` — Use clear, user-facing error messages.
+  - `require_error_recovery` — Provide recovery path (retry, fallback) when errors occur.
+  - `require_firebase_email_enumeration_protection` — Use same generic message for invalid email and wrong password.
+  - `require_firebase_offline_persistence` — Consider Firestore offline persistence (cacheSizeBytes).
+  - `require_focus_order` — Set focusOrder for keyboard and screen reader navigation.
+  - `require_getit_dispose_registration` — Call getIt.reset() in tearDown or on app shutdown.
+  - `require_heading_hierarchy` — Use semantic heading levels (headerLevel 1–6) for screen readers.
+  - `require_performance_test` — Consider performance tests for critical paths.
+  - `require_image_memory_cache_limit` — Set image cache max size to avoid OOM.
+  - `require_interface_for_dependency` — Depend on abstractions (interfaces), not concrete classes.
+  - `require_json_date_format_consistency` — Use consistent date format (e.g. ISO 8601) in JSON.
+  - `require_keychain_access` — Use Keychain (e.g. flutter_secure_storage) for sensitive data on iOS.
+  - `require_permission_lifecycle_observer` — Re-check permissions when app resumes.
+  - `require_provider_update_should_notify` — Call notifyListeners() when ChangeNotifier state changes.
+  - `require_reduced_motion_support` — Respect MediaQuery.reducedMotion for animations.
+  - `require_rtl_support` — Support RTL layouts for Arabic/Hebrew locales.
+  - `require_sqflite_index_for_queries` — Add indexes for frequently queried columns.
+  - `require_stream_cancel_on_error` — Cancel stream subscriptions on error to avoid leaks.
+  - `require_webview_user_agent` — Set custom user agent on WebView when needed.
+  - `require_will_pop_scope` — Use PopScope/WillPopScope to handle back button when needed.
+  - `require_subscription_composite` — Combine multiple stream subscriptions for single cancel.
+  - `use_closest_build_context` — Prefer closest BuildContext to avoid wrong scope.
+  - `use_specific_deprecation` — Prefer @Deprecated with replacement and expiry.
+  - `avoid_screenshot_in_ci` — Avoid screenshot tests in CI unless stable and fast.
+  - `prefer_test_report` — Prefer test reporters (e.g. JSON) for CI.
+  - `avoid_semantics_in_animation` — Avoid semantics that change during animation for screen readers.
+  - `prefer_announce_for_changes` — Announce live region changes for screen readers.
+  - `prefer_show_hide` — Prefer semantics show/hide for conditional content.
+  - `require_link_distinction` — Make links distinguishable (e.g. underline, role).
+  - `require_switch_control` — Support switch control / external input for key actions.
+  - `prefer_deferred_imports` — Use deferred imports for large optional libraries.
+  - `prefer_part_over_import` — Prefer part/part of for same-package splits.
+  - `prefer_weak_references` — Prefer WeakReference for caches to avoid retaining objects.
+  - `prefer_zone_error_handler` — Use runZonedGuarded for top-level errors.
+  - `require_multi_factor` — Consider MFA for sensitive auth flows.
+  - `prefer_isar_for_complex_queries` — Prefer Isar for complex local queries over raw SQL.
+  - `prefer_external_keyboard` — Support external keyboard navigation and shortcuts.
+  - `prefer_outlined_icons` — Prefer outlined icons for Material 3 style.
 
 ### Removed
 
@@ -57,6 +129,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - **No stub fixtures:** Policy and docs now prohibit stub test fixtures (files with `// expect_lint` and placeholder BAD/GOOD code when the rule does not run or report on that code). Fixtures may only be added when the rule is implemented and the fixture is validated. Updated: `bugs/UNIT_TEST_COVERAGE.md` (policy + §6.3), `CONTRIBUTING.md` (§8 and Testing checklist), `project guide` (Test step), `project skill doc` (fixture step).
 
 ### Fixed
+
+- **avoid_long_parameter_list false positive:** No longer reports on methods or functions named `copyWith` or on any declaration whose parameters are all optional (no required positional or required named). These patterns are self-documenting and do not match the rule's intent. See `bugs/history/avoid_long_parameter_list_copyWith_false_positive.md`.
 
 - **handle_throwing_invocations plugin crash:** On analyzer versions where `Element.metadata` is a wrapper (e.g. `MetadataImpl`) rather than an `Iterable`, the rule no longer crashes with "MetadataImpl is not a subtype of Iterable". `_hasThrowsAnnotation` now uses `readElementAnnotationsFromMetadata` from `lib/src/analyzer_metadata_compat_utils.dart`. Regression test: `test/handle_throwing_invocations_metadata_crash_test.dart`. See `bugs/history/rule_bugs/report_element_metadata_not_iterable_handle_throwing_invocations.md`.
 
