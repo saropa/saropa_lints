@@ -12,7 +12,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
-## [Unreleased]
+## [6.2.0]
+
+**Focus: Dog Food** — This release focuses on cleaning up all lint issues in our own project (eating our own dog food).
+
 
 ### Added
 
@@ -107,9 +110,19 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
   - `prefer_outlined_icons` — Prefer outlined icons for Material 3 style.
   - `prefer_js_interop_over_dart_js` — Prefer dart:js_interop (Dart 3.5) over deprecated dart:js / dart:js_util.
 
+### Changed
+
+- **Init wizard (stylistic walkthrough):** Replaced per-rule prompts (~193) with ruleset-based prompts (~13–14). One question per ruleset (e.g. Good methods, Ordering & sorting, Naming conventions) with label and description; warnings for noisy rulesets (Ordering, Naming, Formatting, Opinionated). Conflicting style choices gated behind a single “[y/N] Set these now?” prompt. “Other stylistic rules” covers any uncategorized stylistic rules and lists rule names when ≤25. `prefer_readable_line_length` added to Good methods ruleset. See `doc/guides/good_methods.md`.
+
 ### Removed
 
 - **Insert-TODO quick fixes (additional):** Removed `WeakCryptoTodoFix` (avoid_weak_cryptographic_algorithms) and `NoEmptyBlockTodoFix` (no_empty_block); replaced with real fixes per project policy (CONTRIBUTING.md, QUICK_FIX_PLAN.md).
+
+### Fixed
+
+- **avoid_high_cyclomatic_complexity and copyWith:** The rule no longer reports methods or functions named `copyWith`. These implement the standard Dart immutable-update pattern; their apparent complexity is mechanical (one null-coalescing branch per parameter), not logical. See `bugs/BUG_REPORT_copyWith_exclusion_full_spec.md`.
+
+- **Duplicate rules (positional boolean parameters):** `avoid_positional_boolean_parameters` and `prefer_named_bool_params` reported the same issue and produced two diagnostics per positional bool. Removed `prefer_named_bool_params` from the default tier so only `avoid_positional_boolean_parameters` runs by default. The rule implementation remains available for consumers who opt in. See `bugs/duplicate_rules_avoid_positional_boolean_parameters_prefer_named_bool_params.md`.
 
 ### Documentation
 
