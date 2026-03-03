@@ -25,7 +25,7 @@ void main() {
       late String ruleSource;
       setUp(() {
         ruleSource = File(
-          'lib/src/rules/testing_best_practices_rules.dart',
+          'lib/src/rules/testing/testing_best_practices_rules.dart',
         ).readAsStringSync();
       });
 

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/dependency_injection_rules.dart';
+import 'package:saropa_lints/src/rules/architecture/dependency_injection_rules.dart';
 
 /// Tests for 15 Dependency Injection lint rules.
 ///

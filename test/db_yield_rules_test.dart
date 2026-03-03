@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/db_yield_rules.dart';
+import 'package:saropa_lints/src/rules/resources/db_yield_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 3 Database Yield lint rules.

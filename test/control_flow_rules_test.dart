@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/control_flow_rules.dart';
+import 'package:saropa_lints/src/rules/flow/control_flow_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 31 Control Flow lint rules.

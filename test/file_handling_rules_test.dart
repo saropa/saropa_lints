@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/file_handling_rules.dart';
+import 'package:saropa_lints/src/rules/resources/file_handling_rules.dart';
 
 /// Tests for 15 File Handling lint rules.
 ///

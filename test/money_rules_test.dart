@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/money_rules.dart';
+import 'package:saropa_lints/src/rules/data/money_rules.dart';
 
 /// Tests for 2 Money/Currency lint rules.
 ///

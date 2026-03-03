@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/testing_best_practices_rules.dart';
+import 'package:saropa_lints/src/rules/testing/testing_best_practices_rules.dart';
 
 /// Tests for 35 Testing Best Practices lint rules.
 ///

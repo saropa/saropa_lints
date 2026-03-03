@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/ui_ux_rules.dart';
+import 'package:saropa_lints/src/rules/widget/ui_ux_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 20 Ui Ux lint rules.

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/disposal_rules.dart';
+import 'package:saropa_lints/src/rules/architecture/disposal_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 17 Disposal lint rules.

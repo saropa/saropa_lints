@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/complexity_rules.dart';
+import 'package:saropa_lints/src/rules/code_quality/complexity_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 14 Complexity lint rules.

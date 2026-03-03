@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/equality_rules.dart';
+import 'package:saropa_lints/src/rules/data/equality_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 7 Equality lint rules.

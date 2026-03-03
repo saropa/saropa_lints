@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/collection_rules.dart';
+import 'package:saropa_lints/src/rules/data/collection_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 26 Collection lint rules.

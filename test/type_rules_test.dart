@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/type_rules.dart';
+import 'package:saropa_lints/src/rules/data/type_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 18 Type lint rules.

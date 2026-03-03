@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/animation_rules.dart';
+import 'package:saropa_lints/src/rules/ui/animation_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 19 Animation lint rules.

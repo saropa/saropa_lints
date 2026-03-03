@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/stylistic_whitespace_constructor_rules.dart';
+import 'package:saropa_lints/src/rules/stylistic/stylistic_whitespace_constructor_rules.dart';
 
 /// Tests for 15 Stylistic Whitespace Constructor lint rules.
 ///

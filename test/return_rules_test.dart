@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/return_rules.dart';
+import 'package:saropa_lints/src/rules/flow/return_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 8 Return lint rules.

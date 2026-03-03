@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/debug_rules.dart';
+import 'package:saropa_lints/src/rules/testing/debug_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 9 Debug lint rules.

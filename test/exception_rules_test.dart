@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/exception_rules.dart';
+import 'package:saropa_lints/src/rules/flow/exception_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 5 Exception lint rules.

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/memory_management_rules.dart';
+import 'package:saropa_lints/src/rules/resources/memory_management_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 13 Memory Management lint rules.

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/crypto_rules.dart';
+import 'package:saropa_lints/src/rules/security/crypto_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 5 Cryptography lint rules.

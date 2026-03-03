@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/build_method_rules.dart';
+import 'package:saropa_lints/src/rules/widget/build_method_rules.dart';
 
 /// Tests for 11 Build Method lint rules.
 ///

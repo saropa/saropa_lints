@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/accessibility_rules.dart';
+import 'package:saropa_lints/src/rules/ui/accessibility_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 39 Accessibility lint rules.

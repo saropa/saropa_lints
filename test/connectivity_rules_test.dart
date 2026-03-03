@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/connectivity_rules.dart';
+import 'package:saropa_lints/src/rules/network/connectivity_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 3 Connectivity lint rules.

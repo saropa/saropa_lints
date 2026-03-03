@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/freezed_rules.dart';
+import 'package:saropa_lints/src/rules/codegen/freezed_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 10 Freezed lint rules.

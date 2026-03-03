@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/type_safety_rules.dart';
+import 'package:saropa_lints/src/rules/data/type_safety_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 17 Type Safety lint rules.

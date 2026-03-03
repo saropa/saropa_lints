@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/documentation_rules.dart';
+import 'package:saropa_lints/src/rules/core/documentation_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 9 Documentation lint rules.

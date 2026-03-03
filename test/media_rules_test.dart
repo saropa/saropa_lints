@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/media_rules.dart';
+import 'package:saropa_lints/src/rules/media/media_rules.dart';
 
 /// Tests for 3 Media lint rules.
 ///

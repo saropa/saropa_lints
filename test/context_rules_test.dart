@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/context_rules.dart';
+import 'package:saropa_lints/src/rules/core/context_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 6 Context lint rules.

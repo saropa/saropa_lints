@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/dialog_snackbar_rules.dart';
+import 'package:saropa_lints/src/rules/widget/dialog_snackbar_rules.dart';
 
 /// Tests for 6 Dialog & SnackBar lint rules.
 ///

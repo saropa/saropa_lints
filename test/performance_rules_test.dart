@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/performance_rules.dart';
+import 'package:saropa_lints/src/rules/core/performance_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 49 Performance lint rules.

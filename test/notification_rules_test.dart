@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/notification_rules.dart';
+import 'package:saropa_lints/src/rules/ui/notification_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 8 Notification lint rules.

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/architecture_rules.dart';
+import 'package:saropa_lints/src/rules/architecture/architecture_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 9 Architecture lint rules.
