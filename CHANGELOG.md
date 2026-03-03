@@ -12,35 +12,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
-## [Unreleased]
-
-### Fixed
-
-- **`prefer_platform_io_conditional`:** No longer reports in files that are the native branch of a conditional import (`if (dart.library.io)` or `if (dart.library.ffi)`). Such files are never loaded on web, so requiring a `kIsWeb` guard inside them was a false positive. Added `conditional_import_utils.dart` to detect native-only targets by scanning `lib/` for conditional import configurations; result cached per project. See `bugs/history/false_positives/false_positive_prefer_platform_io_conditional_conditional_import_resolved.md`.
-
-- **`avoid_redirect_injection`:** No longer reports when the redirect-related argument is used in a block that indicates allowlist validation. The rule now skips when the enclosing block source contains the substrings `allowed` or `validated` (e.g. `_allowedExportDestinations`, `validatedDestination`), in addition to existing hints (`.host`, `.authority`, `allowlist`, `whitelist`, `trusted`). Fixes false positives where the value is metadata from a fixed set (e.g. `'clipboard'`, `'notes'`) rather than a redirect URL.
-
-- **`require_deep_link_fallback`:** Reduced false positives and clarified scope. (1) Only methods whose body contains a navigation call (e.g. `Navigator`, `GoRouter`, `.go(`, `.push(`, `.goNamed(`, `.pushNamed(`, `.pushReplacement`, `getInitialLink`, `getInitialUri`) are reported; methods that only parse URIs or build link text (e.g. export/share helpers) are no longer flagged. (2) Fallback detection now recognizes `if (x != null)` guard before navigate. (3) Rule DartDoc documents "When we report" / "When we don't report" and a developer note on pattern-based detection. Fixture and tests updated. See `bugs/history/false_positives/require_deep_link_fallback_resolved.md`.
-
-- **`avoid_unawaited_future`:** No longer reports when the expression statement is explicitly wrapped in `unawaited(...)`. The rule previously checked `node.parent` (the enclosing block) instead of `node.expression`, so the skip never applied. It now returns early when the statement's expression is a `MethodInvocation` with method name `unawaited`, matching the rule's own correction message and Dart's recommended fire-and-forget pattern. Quick fix "Wrap in unawaited()" added.
-
-- **`avoid_uncaught_future_errors`:** Expression statements that are exactly `unawaited(...);` are never reported. The rule now returns immediately when the statement's expression is a `MethodInvocation` with method name `unawaited`, independent of type resolution or chaining, so all code paths guarantee no report on intentional fire-and-forget. DartDoc and tests updated. See `bugs/history/false_positives/false_positive_avoid_uncaught_future_errors_unawaited_wrapper.md`.
-
-### Maintenance
-
-- **Docs:** Retired `bugs/REMAINING_ROADMAP_RULES.md`. Moved 9 deferred (Hard) rules into ROADMAP.md Part 2 → “Deferred: Remaining Hard (cross-file/heuristics/YAML)” with Reason and Description.
-
-- **Rules layout:** Reorganized `lib/src/rules/` into subfolders to reduce root file count. Category rule files now live under `architecture/`, `code_quality/`, `codegen/`, `commerce/`, `config/`, `core/`, `data/`, `flow/`, `hardware/`, `media/`, `network/`, `resources/`, `security/`, `stylistic/`, `testing/`, `ui/`, and `widget/`. `packages/` and `platforms/` unchanged. Barrel export in `all_rules.dart` and `CODEBASE_INDEX.md` updated. No rule logic or tier changes.
-
----
-
 ## [6.2.0]
 
 **Focus: Dog Food** — This release focuses on cleaning up all lint issues in our own project (eating our own dog food).
-
-### Changed
-
-- **Ignore handling:** Removed quick fix that inserted `// ignore: no_empty_block` (project policy: no fixes that add `// ignore:`). `no_empty_block` now uses `IgnoreUtils.isIgnoredForFile` and `IgnoreUtils.hasIgnoreComment` to respect existing ignore comments. Added Cursor rule `.cursor/rules/prohibit-ignore-comments.mdc` and CLAUDE.md guidance to prohibit adding ignore-inserting fixes.
 
 ### Added
 
@@ -137,6 +111,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Changed
 
+- **Ignore handling:** Removed quick fix that inserted `// ignore: no_empty_block` (project policy: no fixes that add `// ignore:`). `no_empty_block` now uses `IgnoreUtils.isIgnoredForFile` and `IgnoreUtils.hasIgnoreComment` to respect existing ignore comments. Added Cursor rule `.cursor/rules/prohibit-ignore-comments.mdc` and CLAUDE.md guidance to prohibit adding ignore-inserting fixes.
+
 - **Init wizard (stylistic walkthrough):** Replaced per-rule prompts (~193) with ruleset-based prompts (~13–14). One question per ruleset (e.g. Good methods, Ordering & sorting, Naming conventions) with label and description; warnings for noisy rulesets (Ordering, Naming, Formatting, Opinionated). Conflicting style choices gated behind a single “[y/N] Set these now?” prompt. “Other stylistic rules” covers any uncategorized stylistic rules and lists rule names when ≤25. `prefer_readable_line_length` added to Good methods ruleset. See `doc/guides/good_methods.md`.
 
 ### Removed
@@ -145,9 +121,25 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
+- **`prefer_platform_io_conditional`:** No longer reports in files that are the native branch of a conditional import (`if (dart.library.io)` or `if (dart.library.ffi)`). Such files are never loaded on web, so requiring a `kIsWeb` guard inside them was a false positive. Added `conditional_import_utils.dart` to detect native-only targets by scanning `lib/` for conditional import configurations; result cached per project. See `bugs/history/false_positives/false_positive_prefer_platform_io_conditional_conditional_import_resolved.md`.
+
+- **`avoid_redirect_injection`:** No longer reports when the redirect-related argument is used in a block that indicates allowlist validation. The rule now skips when the enclosing block source contains the substrings `allowed` or `validated` (e.g. `_allowedExportDestinations`, `validatedDestination`), in addition to existing hints (`.host`, `.authority`, `allowlist`, `whitelist`, `trusted`). Fixes false positives where the value is metadata from a fixed set (e.g. `'clipboard'`, `'notes'`) rather than a redirect URL.
+
+- **`require_deep_link_fallback`:** Reduced false positives and clarified scope. (1) Only methods whose body contains a navigation call (e.g. `Navigator`, `GoRouter`, `.go(`, `.push(`, `.goNamed(`, `.pushNamed(`, `.pushReplacement`, `getInitialLink`, `getInitialUri`) are reported; methods that only parse URIs or build link text (e.g. export/share helpers) are no longer flagged. (2) Fallback detection now recognizes `if (x != null)` guard before navigate. (3) Rule DartDoc documents "When we report" / "When we don't report" and a developer note on pattern-based detection. Fixture and tests updated. See `bugs/history/false_positives/require_deep_link_fallback_resolved.md`.
+
+- **`avoid_unawaited_future`:** No longer reports when the expression statement is explicitly wrapped in `unawaited(...)`. The rule previously checked `node.parent` (the enclosing block) instead of `node.expression`, so the skip never applied. It now returns early when the statement's expression is a `MethodInvocation` with method name `unawaited`, matching the rule's own correction message and Dart's recommended fire-and-forget pattern. Quick fix "Wrap in unawaited()" added.
+
+- **`avoid_uncaught_future_errors`:** Expression statements that are exactly `unawaited(...);` are never reported. The rule now returns immediately when the statement's expression is a `MethodInvocation` with method name `unawaited`, independent of type resolution or chaining, so all code paths guarantee no report on intentional fire-and-forget. DartDoc and tests updated. See `bugs/history/false_positives/false_positive_avoid_uncaught_future_errors_unawaited_wrapper.md`.
+
+- **`require_database_close`:** No longer reports when the method body only references `openDatabase` (or similar) in string literals or name checks; only actual invocations (`openDatabase(`, `Database(`, `SqliteDatabase(`) are treated as opening a DB. Skips own rule files (`file_handling_rules.dart`, `sqflite_rules.dart`). See `bugs/history/false_positives/require_database_close_false_positive_string_literal_rule_files.md`.
+
 - **avoid_high_cyclomatic_complexity and copyWith:** The rule no longer reports methods or functions named `copyWith`. These implement the standard Dart immutable-update pattern; their apparent complexity is mechanical (one null-coalescing branch per parameter), not logical. See `bugs/BUG_REPORT_copyWith_exclusion_full_spec.md`.
 
 - **Duplicate rules (positional boolean parameters):** `avoid_positional_boolean_parameters` and `prefer_named_bool_params` reported the same issue and produced two diagnostics per positional bool. Removed `prefer_named_bool_params` from the default tier so only `avoid_positional_boolean_parameters` runs by default. The rule implementation remains available for consumers who opt in. See `bugs/duplicate_rules_avoid_positional_boolean_parameters_prefer_named_bool_params.md`.
+
+### Maintenance
+
+- **Rules layout:** Reorganized `lib/src/rules/` into subfolders to reduce root file count. Category rule files now live under `architecture/`, `code_quality/`, `codegen/`, `commerce/`, `config/`, `core/`, `data/`, `flow/`, `hardware/`, `media/`, `network/`, `resources/`, `security/`, `stylistic/`, `testing/`, `ui/`, and `widget/`. `packages/` and `platforms/` unchanged. Barrel export in `all_rules.dart` and `CODEBASE_INDEX.md` updated. No rule logic or tier changes.
 
 ### Documentation
 
