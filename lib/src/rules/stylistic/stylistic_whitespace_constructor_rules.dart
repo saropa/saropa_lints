@@ -1,0 +1,1246 @@
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
+
+import 'package:analyzer/dart/ast/ast.dart';
+
+import '../../saropa_lint_rule.dart';
+import '../../fixes/formatting/add_blank_line_after_declarations_fix.dart';
+import '../../fixes/formatting/add_blank_line_fix.dart';
+import '../../fixes/stylistic_widget/prefer_clip_r_superellipse_fix.dart';
+
+// ============================================================================
+// STYLISTIC WHITESPACE & CONSTRUCTOR/PARAMETER RULES
+// ============================================================================
+//
+// These rules are NOT included in any tier by default. They represent team
+// preferences for whitespace and constructor patterns.
+// ============================================================================
+
+// =============================================================================
+// WHITESPACE RULES
+// =============================================================================
+
+/// Warns when there IS a blank line before return (opposite rule).
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of no blank line:**
+/// - Compact code
+/// - Less vertical scrolling
+/// - Simpler style
+///
+/// **Cons (why some teams prefer blank line):**
+/// - Less visual separation
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// int calculate(int a, int b) {
+///   final sum = a + b;
+///
+///   return sum;
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// int calculate(int a, int b) {
+///   final sum = a + b;
+///   return sum;
+/// }
+/// ```
+///
+/// Alias: prefer_no_blank_line_before_return
+class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
+  PreferNoBlankLineBeforeReturnRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'final sum = a + b;\n\n  return sum;';
+
+  @override
+  String get exampleGood => 'final sum = a + b;\n  return sum;';
+
+  static const LintCode _code = LintCode(
+    'prefer_no_blank_line_before_return',
+    '[prefer_no_blank_line_before_return] A blank line before the return statement adds unnecessary vertical space that separates the return value from its context. Remove it to keep the function body compact. {v3}',
+    correctionMessage:
+        'Remove the blank line directly above the return statement to keep the function body compact and readable.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBlock((node) {
+      final statements = node.statements;
+      if (statements.length < 2) return;
+
+      final lastStmt = statements.last;
+      if (lastStmt is! ReturnStatement) return;
+
+      final secondLastStmt = statements[statements.length - 2];
+
+      final lastLine = context.lineInfo.getLocation(lastStmt.offset).lineNumber;
+      final prevLine = context.lineInfo
+          .getLocation(secondLastStmt.end)
+          .lineNumber;
+
+      // Flag if there's a blank line
+      if (lastLine - prevLine >= 2) {
+        reporter.atNode(lastStmt);
+      }
+    });
+  }
+}
+
+/// Warns when there is no blank line after variable declarations.
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of blank line after declarations:**
+/// - Visual grouping of declarations
+/// - Clear separation from logic
+///
+/// **Cons (why some teams don't require it):**
+/// - Extra whitespace
+/// - May be overkill for single declarations
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// void process() {
+///   final a = 1;
+///   final b = 2;
+///   print(a + b);
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// void process() {
+///   final a = 1;
+///   final b = 2;
+///
+///   print(a + b);
+/// }
+/// ```
+///
+/// Alias: prefer_blank_line_after_declarations
+///
+/// Alias: prefer_blank_line_after_declarations
+class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
+  PreferBlankLineAfterDeclarationsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'final x = 1;\nprint(x);';
+
+  @override
+  String get exampleGood => 'final x = 1;\n\nprint(x);';
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineAfterDeclarationsFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_blank_line_after_declarations',
+    '[prefer_blank_line_after_declarations] Variable declarations run directly into the logic that follows without a visual break. A blank line separates setup from behavior and improves scanability. {v3}',
+    correctionMessage:
+        'Insert a blank line after variable declarations to visually separate the setup block from the logic that follows.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBlock((node) {
+      final statements = node.statements;
+      if (statements.length < 2) return;
+
+      for (int i = 0; i < statements.length - 1; i++) {
+        final current = statements[i];
+        final next = statements[i + 1];
+
+        // Check if current is a variable declaration and next is not
+        if (current is VariableDeclarationStatement &&
+            next is! VariableDeclarationStatement) {
+          final currentLine = context.lineInfo
+              .getLocation(current.end)
+              .lineNumber;
+          final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
+
+          if (nextLine - currentLine < 2) {
+            reporter.atNode(current);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when there IS a blank line after declarations (opposite rule).
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of no blank line:**
+/// - Compact code
+/// - Declarations are close to usage
+///
+/// **Cons (why some teams prefer blank line):**
+/// - Less visual separation
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// void process() {
+///   final a = 1;
+///
+///   print(a);
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// void process() {
+///   final a = 1;
+///   print(a);
+/// }
+/// ```
+///
+/// Alias: prefer_compact_declarations
+class PreferCompactDeclarationsRule extends SaropaLintRule {
+  PreferCompactDeclarationsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'final x = 1;\n\nprint(x);';
+
+  @override
+  String get exampleGood => 'final x = 1;\nprint(x);';
+
+  static const LintCode _code = LintCode(
+    'prefer_compact_declarations',
+    '[prefer_compact_declarations] Unnecessary blank line after variable declarations pushes related logic further from the variables it uses, increasing the vertical distance readers must scan. {v3}',
+    correctionMessage:
+        'Remove the blank line after declarations to keep variable definitions close to the code that uses them.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBlock((node) {
+      final statements = node.statements;
+      if (statements.length < 2) return;
+
+      for (int i = 0; i < statements.length - 1; i++) {
+        final current = statements[i];
+        final next = statements[i + 1];
+
+        if (current is VariableDeclarationStatement &&
+            next is! VariableDeclarationStatement) {
+          final currentLine = context.lineInfo
+              .getLocation(current.end)
+              .lineNumber;
+          final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
+
+          if (nextLine - currentLine >= 2) {
+            reporter.atNode(current);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when there are no blank lines between class members.
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of blank lines between members:**
+/// - Clear separation of methods
+/// - Easier to navigate
+/// - More readable
+///
+/// **Cons (why some teams prefer compact):**
+/// - More vertical scrolling
+/// - Compact classes are easier to overview
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// class MyClass {
+///   void method1() {}
+///   void method2() {}
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class MyClass {
+///   void method1() {}
+///
+///   void method2() {}
+/// }
+/// ```
+class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
+  PreferBlankLinesBetweenMembersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'void a() {}\nvoid b() {}';
+
+  @override
+  String get exampleGood => 'void a() {}\n\nvoid b() {}';
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_blank_lines_between_members',
+    '[prefer_blank_lines_between_members] Class members are not separated by blank lines. Dense class bodies force readers to visually parse where one member ends and the next begins, slowing navigation. {v2}',
+    correctionMessage:
+        'Insert a blank line between each class member so fields, methods, and constructors are visually distinct.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((node) {
+      final members = node.members;
+      if (members.length < 2) return;
+
+      for (int i = 0; i < members.length - 1; i++) {
+        final current = members[i];
+        final next = members[i + 1];
+
+        // Skip field declarations - they can be grouped
+        if (current is FieldDeclaration && next is FieldDeclaration) continue;
+
+        final currentLine = context.lineInfo
+            .getLocation(current.end)
+            .lineNumber;
+        final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
+
+        if (nextLine - currentLine < 2) {
+          reporter.atNode(next);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when there ARE blank lines between members (opposite rule).
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of compact members:**
+/// - Less vertical scrolling
+/// - Easier to see whole class
+///
+/// **Cons (why some teams prefer blank lines):**
+/// - Harder to distinguish members
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// class MyClass {
+///   void method1() {}
+///
+///   void method2() {}
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class MyClass {
+///   void method1() {}
+///   void method2() {}
+/// }
+/// ```
+class PreferCompactClassMembersRule extends SaropaLintRule {
+  PreferCompactClassMembersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'void a() {}\n\nvoid b() {}';
+
+  @override
+  String get exampleGood => 'void a() {}\nvoid b() {}';
+
+  static const LintCode _code = LintCode(
+    'prefer_compact_class_members',
+    '[prefer_compact_class_members] Unnecessary blank lines between class members inflate the class body. Compact layout lets the full class definition fit on fewer lines for a quick overview. {v2}',
+    correctionMessage:
+        'Remove blank lines between class members so the full class definition fits on fewer lines for a quick overview.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((node) {
+      final members = node.members;
+      if (members.length < 2) return;
+
+      for (int i = 0; i < members.length - 1; i++) {
+        final current = members[i];
+        final next = members[i + 1];
+
+        final currentLine = context.lineInfo
+            .getLocation(current.end)
+            .lineNumber;
+        final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
+
+        if (nextLine - currentLine >= 2) {
+          reporter.atNode(next);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when there are blank lines at the start/end of blocks.
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of no blank lines inside blocks:**
+/// - Compact code
+/// - No wasted vertical space
+///
+/// **Cons (why some teams allow it):**
+/// - May want visual separation
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// void process() {
+///
+///   print('hello');
+///
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// void process() {
+///   print('hello');
+/// }
+/// ```
+class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
+  PreferNoBlankLineInsideBlocksRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
+  static const LintCode _code = LintCode(
+    'prefer_no_blank_line_inside_blocks',
+    '[prefer_no_blank_line_inside_blocks] Blank line at the start or end of a block body wastes vertical space and creates visual inconsistency with the surrounding indentation structure. {v2}',
+    correctionMessage:
+        'Remove the leading or trailing blank line inside the block body so the code stays compact and consistently indented.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBlock((node) {
+      if (node.statements.isEmpty) return;
+
+      // Check for blank line at start
+      final openBraceLine = context.lineInfo
+          .getLocation(node.leftBracket.offset)
+          .lineNumber;
+      final firstStmtLine = context.lineInfo
+          .getLocation(node.statements.first.offset)
+          .lineNumber;
+
+      if (firstStmtLine - openBraceLine > 1) {
+        reporter.atNode(node.statements.first, code);
+      }
+
+      // Check for blank line at end
+      final lastStmtLine = context.lineInfo
+          .getLocation(node.statements.last.end)
+          .lineNumber;
+      final closeBraceLine = context.lineInfo
+          .getLocation(node.rightBracket.offset)
+          .lineNumber;
+
+      if (closeBraceLine - lastStmtLine > 1) {
+        reporter.atNode(node.statements.last, code);
+      }
+    });
+  }
+}
+
+/// Warns when there are more than one consecutive blank lines.
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of single blank lines:**
+/// - Consistent spacing
+/// - No excessive whitespace
+///
+/// **Cons (why some teams allow multiple):**
+/// - May want stronger visual separation
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// void method1() {}
+///
+///
+/// void method2() {}
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// void method1() {}
+///
+/// void method2() {}
+/// ```
+class PreferSingleBlankLineMaxRule extends SaropaLintRule {
+  PreferSingleBlankLineMaxRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_single_blank_line_max',
+    '[prefer_single_blank_line_max] Multiple consecutive blank lines waste vertical space and create visual gaps that break reading flow. One blank line is sufficient to separate logical sections. {v2}',
+    correctionMessage:
+        'Collapse multiple consecutive blank lines into a single blank line to conserve vertical space in the file.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((node) {
+      final declarations = node.declarations;
+      if (declarations.length < 2) return;
+
+      for (int i = 0; i < declarations.length - 1; i++) {
+        final current = declarations[i];
+        final next = declarations[i + 1];
+
+        final currentLine = context.lineInfo
+            .getLocation(current.end)
+            .lineNumber;
+        final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
+
+        // More than 2 lines difference means 2+ blank lines
+        if (nextLine - currentLine > 2) {
+          reporter.atNode(next);
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// CONSTRUCTOR & PARAMETER RULES
+// =============================================================================
+
+/// Warns when Dart 3 super parameters could be used.
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of super parameters:**
+/// - Less boilerplate
+/// - Cleaner constructor signatures
+/// - Dart 3.0+ idiomatic
+///
+/// **Cons (why some teams prefer explicit):**
+/// - More explicit about super calls
+/// - Works in older Dart versions
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// class Child extends Parent {
+///   Child({required String name}) : super(name: name);
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class Child extends Parent {
+///   Child({required super.name});
+/// }
+/// ```
+class PreferSuperParametersRule extends SaropaLintRule {
+  PreferSuperParametersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'Foo(int x) : super(x: x)';
+
+  @override
+  String get exampleGood => 'Foo(super.x)';
+
+  static const LintCode _code = LintCode(
+    'prefer_super_parameters',
+    '[prefer_super_parameters] Constructor parameter is forwarded directly to super() instead of using Dart 3 super-parameter syntax. This adds unnecessary boilerplate and repetition; use super.paramName to shorten the signature. {v3}',
+    correctionMessage:
+        'Use Dart 3 super-parameter syntax (super.name) to forward constructor arguments without repeating the field name.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addConstructorDeclaration((node) {
+      // Check for super initializer
+      for (final initializer in node.initializers) {
+        if (initializer is SuperConstructorInvocation) {
+          // Check if any arguments just pass through a parameter
+          for (final arg in initializer.argumentList.arguments) {
+            if (arg is NamedExpression) {
+              final expr = arg.expression;
+              if (expr is SimpleIdentifier) {
+                // Check if this identifier matches a constructor parameter
+                for (final param in node.parameters.parameters) {
+                  final paramName = param.name?.lexeme;
+                  if (paramName == expr.name &&
+                      arg.name.label.name == paramName) {
+                    reporter.atNode(arg);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when initializing formals could be used.
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of initializing formals:**
+/// - Less boilerplate
+/// - Direct field initialization
+/// - Cleaner constructor
+///
+/// **Cons (why some teams prefer explicit):**
+/// - More explicit assignment
+/// - Can add validation logic
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// class User {
+///   final String name;
+///   User(String name) : this.name = name;
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class User {
+///   final String name;
+///   User(this.name);
+/// }
+/// ```
+class PreferInitializingFormalsRule extends SaropaLintRule {
+  PreferInitializingFormalsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'User(String name) : this.name = name;';
+
+  @override
+  String get exampleGood => 'User(this.name);';
+
+  /// Alias: prefer_initializing_formal
+  static const LintCode _code = LintCode(
+    'prefer_initializing_formals',
+    '[prefer_initializing_formals] Constructor assigns a parameter directly to a field via the initializer list. Use this.field syntax in the parameter list instead to reduce boilerplate and improve readability. {v3}',
+    correctionMessage:
+        'Use this.field syntax in the constructor parameter list to assign the value directly without an initializer body.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addConstructorDeclaration((node) {
+      for (final initializer in node.initializers) {
+        if (initializer is ConstructorFieldInitializer) {
+          final value = initializer.expression;
+          if (value is SimpleIdentifier) {
+            // Check if the value matches a parameter name
+            for (final param in node.parameters.parameters) {
+              final paramName = param.name?.lexeme;
+              if (paramName == value.name &&
+                  initializer.fieldName.name == paramName) {
+                reporter.atNode(initializer);
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when constructor body assignment could use initializing formals (opposite).
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of body assignment:**
+/// - Can add validation logic
+/// - More explicit
+/// - Flexible
+///
+/// **Cons (why some teams prefer initializing formals):**
+/// - More verbose
+/// - Field must not be final
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// class User {
+///   final String name;
+///   User(this.name);
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class User {
+///   final String name;
+///   User(String name) : this.name = name;
+/// }
+/// ```
+class PreferConstructorBodyAssignmentRule extends SaropaLintRule {
+  PreferConstructorBodyAssignmentRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_constructor_body_assignment',
+    '[prefer_constructor_body_assignment] Constructor uses this.field shorthand which prevents adding validation or transformation logic. Use an explicit initializer list or body assignment instead to keep the constructor flexible. {v2}',
+    correctionMessage:
+        'Assign fields inside the constructor body instead of using this.field to allow validation or transformation logic.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addConstructorDeclaration((node) {
+      for (final param in node.parameters.parameters) {
+        if (param is FieldFormalParameter) {
+          reporter.atNode(param);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when factory constructor could be used for validation.
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of factory for validation:**
+/// - Can return null or different instance
+/// - Clear that construction may fail
+/// - Can cache instances
+///
+/// **Cons (why some teams prefer regular constructor):**
+/// - Simpler API
+/// - Assertions work for debug validation
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// class Email {
+///   final String value;
+///   Email(this.value) {
+///     if (!value.contains('@')) throw ArgumentError('Invalid email');
+///   }
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class Email {
+///   final String value;
+///   Email._(this.value);
+///
+///   factory Email(String value) {
+///     if (!value.contains('@')) throw ArgumentError('Invalid email');
+///     return Email._(value);
+///   }
+/// }
+/// ```
+class PreferFactoryForValidationRule extends SaropaLintRule {
+  PreferFactoryForValidationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_factory_for_validation',
+    '[prefer_factory_for_validation] Use a factory constructor for validation logic instead of constructor assertions. This is an opinionated rule - not included in any tier by default. {v2}',
+    correctionMessage:
+        'A factory constructor can return null, a cached instance, or a subtype when validation fails, unlike assert.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addConstructorDeclaration((node) {
+      // Skip factory constructors
+      if (node.factoryKeyword != null) return;
+
+      final body = node.body;
+      if (body is! BlockFunctionBody) return;
+
+      // Check if body contains throw or if validation
+      for (final stmt in body.block.statements) {
+        if (stmt is IfStatement) {
+          final thenStmt = stmt.thenStatement;
+          Statement? inner = thenStmt;
+          if (inner is Block && inner.statements.isNotEmpty) {
+            inner = inner.statements.first;
+          }
+          if (inner is ExpressionStatement &&
+              inner.expression is ThrowExpression) {
+            reporter.atNode(node);
+            return;
+          }
+        } else if (stmt is ExpressionStatement &&
+            stmt.expression is ThrowExpression) {
+          reporter.atNode(node);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when constructor assertion could be used instead of factory (opposite).
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of constructor assertion:**
+/// - Simpler code
+/// - Removed in release mode
+/// - Standard Dart pattern
+///
+/// **Cons (why some teams prefer factory):**
+/// - Assertions only run in debug
+/// - Can't return null
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// class Positive {
+///   final int value;
+///   Positive._(this.value);
+///   factory Positive(int value) {
+///     if (value < 0) throw ArgumentError('Must be positive');
+///     return Positive._(value);
+///   }
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class Positive {
+///   final int value;
+///   Positive(this.value) : assert(value >= 0, 'Must be positive');
+/// }
+/// ```
+class PreferConstructorAssertionRule extends SaropaLintRule {
+  PreferConstructorAssertionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_constructor_assertion',
+    '[prefer_constructor_assertion] Use a constructor assertion instead of a factory for simple debug-only precondition checks. This is an opinionated rule - not included in any tier by default. {v2}',
+    correctionMessage:
+        'Constructor assertions run only in debug mode and keep the class constructor simple without a factory indirection.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addConstructorDeclaration((node) {
+      if (node.factoryKeyword == null) return;
+
+      final body = node.body;
+      if (body is! BlockFunctionBody) return;
+
+      // Check if body is just validation + return
+      final statements = body.block.statements;
+      if (statements.length != 2) return;
+
+      final first = statements.first;
+      final second = statements.last;
+
+      if (first is IfStatement && second is ReturnStatement) {
+        final thenStmt = first.thenStatement;
+        Statement? inner = thenStmt;
+        if (inner is Block && inner.statements.length == 1) {
+          inner = inner.statements.first;
+        }
+        if (inner is ExpressionStatement &&
+            inner.expression is ThrowExpression) {
+          reporter.atNode(node);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when required parameters come after optional parameters.
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of required before optional:**
+/// - Most important params first
+/// - Clearer API
+/// - Common convention
+///
+/// **Cons (why some teams prefer grouped by purpose):**
+/// - Grouping by functionality may be clearer
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// void create({String? prefix, required String name, int? suffix});
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// void create({required String name, String? prefix, int? suffix});
+/// ```
+class PreferRequiredBeforeOptionalRule extends SaropaLintRule {
+  PreferRequiredBeforeOptionalRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_required_before_optional',
+    '[prefer_required_before_optional] Required parameters appear after optional ones, forcing callers to scan past defaults to find mandatory arguments. Place required parameters first for a clearer API signature. {v2}',
+    correctionMessage:
+        'Move required parameters before optional ones so callers see mandatory arguments first in the signature.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addFormalParameterList((node) {
+      bool seenOptional = false;
+
+      for (final param in node.parameters) {
+        final isRequired = param.isRequired;
+        final isOptional = !isRequired;
+
+        if (isOptional) {
+          seenOptional = true;
+        } else if (seenOptional && isRequired) {
+          reporter.atNode(param);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when parameters should be grouped by purpose (opposite).
+///
+/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of grouping by purpose:**
+/// - Related params together
+/// - Clearer for complex APIs
+///
+/// **Cons (why some teams prefer required first):**
+/// - Required params may be scattered
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// void create({required String name, String? prefix, required int id});
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// // Grouped by purpose: identity first, formatting second
+/// void create({required String name, required int id, String? prefix});
+/// ```
+class PreferGroupedByPurposeRule extends SaropaLintRule {
+  PreferGroupedByPurposeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_grouped_by_purpose',
+    '[prefer_grouped_by_purpose] Parameters alternate frequently between required and optional, scattering related arguments. Group parameters by purpose instead so callers can understand each logical group at a glance. {v2}',
+    correctionMessage:
+        'Group constructor parameters by purpose (e.g., layout, style, callbacks) rather than required-vs-optional ordering.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // This is a heuristic rule - it's hard to detect "purpose" statically
+    // So we flag when required and optional alternate frequently
+    context.addFormalParameterList((node) {
+      if (node.parameters.length < 4) return;
+
+      int transitions = 0;
+      bool? lastWasRequired;
+
+      for (final param in node.parameters) {
+        final isRequired = param.isRequired;
+        if (lastWasRequired != null && lastWasRequired != isRequired) {
+          transitions++;
+        }
+        lastWasRequired = isRequired;
+      }
+
+      // If there are many transitions, suggest grouping differently
+      if (transitions >= 3) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+/// Warns when rethrow is not used to preserve stack trace.
+///
+/// Since: v4.9.0 | Updated: v4.13.0 | Rule version: v3
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// **Pros of rethrow:**
+/// - Preserves original stack trace
+/// - Cleaner syntax
+/// - Idiomatic Dart
+///
+/// **Cons (why some teams use throw e):**
+/// - Can modify exception before rethrowing
+/// - More explicit
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// try {
+///   doSomething();
+/// } catch (e) {
+///   log(e);
+///   throw e;
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// try {
+///   doSomething();
+/// } catch (e) {
+///   log(e);
+///   rethrow;
+/// }
+/// ```
+class PreferRethrowOverThrowERule extends SaropaLintRule {
+  PreferRethrowOverThrowERule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferClipRSuperellipseFix(context: context),
+  ];
+
+  /// Alias: prefer_rethrow_throw_e
+  static const LintCode _code = LintCode(
+    'prefer_rethrow_over_throw_e',
+    '[prefer_rethrow_over_throw_e] Using throw e resets the stack trace to the current frame, losing the original call site information. Use rethrow to preserve the full stack trace for easier debugging. {v3}',
+    correctionMessage:
+        'Replace throw e with rethrow to preserve the original stack trace instead of resetting it to the current frame.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCatchClause((node) {
+      final exceptionParam = node.exceptionParameter?.name;
+      if (exceptionParam == null) return;
+
+      final body = node.body;
+      for (final stmt in body.statements) {
+        if (stmt is ExpressionStatement) {
+          final expr = stmt.expression;
+          if (expr is ThrowExpression) {
+            final thrown = expr.expression;
+            if (thrown is SimpleIdentifier &&
+                thrown.name == exceptionParam.lexeme) {
+              reporter.atNode(expr);
+            }
+          }
+        }
+      }
+    });
+  }
+}

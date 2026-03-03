@@ -12,6 +12,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+- **Rules layout:** Reorganized `lib/src/rules/` into subfolders to reduce root file count. Category rule files now live under `architecture/`, `code_quality/`, `codegen/`, `commerce/`, `config/`, `core/`, `data/`, `flow/`, `hardware/`, `media/`, `network/`, `resources/`, `security/`, `stylistic/`, `testing/`, `ui/`, and `widget/`. `packages/` and `platforms/` unchanged. Barrel export in `all_rules.dart` and `CODEBASE_INDEX.md` updated. No rule logic or tier changes.
+
+---
+
 ## [6.2.0]
 
 **Focus: Dog Food** — This release focuses on cleaning up all lint issues in our own project (eating our own dog food).

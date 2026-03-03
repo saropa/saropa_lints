@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/stylistic_error_testing_rules.dart';
+import 'package:saropa_lints/src/rules/stylistic/stylistic_error_testing_rules.dart';
 
 /// Tests for 13 Stylistic Error Testing lint rules.
 ///

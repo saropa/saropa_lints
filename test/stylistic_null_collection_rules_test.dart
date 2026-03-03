@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/stylistic_null_collection_rules.dart';
+import 'package:saropa_lints/src/rules/stylistic/stylistic_null_collection_rules.dart';
 
 /// Tests for 14 Stylistic Null Collection lint rules.
 ///

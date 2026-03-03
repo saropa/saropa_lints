@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/forms_rules.dart';
+import 'package:saropa_lints/src/rules/widget/forms_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 26 Forms lint rules.

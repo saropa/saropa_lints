@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/class_constructor_rules.dart';
+import 'package:saropa_lints/src/rules/core/class_constructor_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 21 Class Constructor lint rules.

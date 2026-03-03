@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/theming_rules.dart';
+import 'package:saropa_lints/src/rules/widget/theming_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 4 Theming lint rules.

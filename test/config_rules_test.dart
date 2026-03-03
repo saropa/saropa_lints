@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/config_rules.dart';
+import 'package:saropa_lints/src/rules/config/config_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 7 Configuration lint rules.

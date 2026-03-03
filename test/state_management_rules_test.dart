@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/state_management_rules.dart';
+import 'package:saropa_lints/src/rules/core/state_management_rules.dart';
 
 /// Tests for 10 State Management lint rules.
 ///

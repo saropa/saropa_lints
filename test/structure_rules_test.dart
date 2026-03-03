@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/structure_rules.dart';
+import 'package:saropa_lints/src/rules/architecture/structure_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 45 Structure lint rules.

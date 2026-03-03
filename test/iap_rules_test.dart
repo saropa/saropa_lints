@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/iap_rules.dart';
+import 'package:saropa_lints/src/rules/commerce/iap_rules.dart';
 
 /// Tests for 5 In-App Purchase lint rules.
 ///

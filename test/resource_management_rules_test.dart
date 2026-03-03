@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/resource_management_rules.dart';
+import 'package:saropa_lints/src/rules/resources/resource_management_rules.dart';
 
 /// Tests for 14 Resource Management lint rules.
 ///

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart' show LintImpact;
-import 'package:saropa_lints/src/rules/formatting_rules.dart';
+import 'package:saropa_lints/src/rules/stylistic/formatting_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 10 Formatting lint rules.

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/platform_rules.dart';
+import 'package:saropa_lints/src/rules/config/platform_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 3 Platform lint rules.

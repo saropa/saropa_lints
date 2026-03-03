@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/json_datetime_rules.dart';
+import 'package:saropa_lints/src/rules/data/json_datetime_rules.dart';
 
 /// Tests for 13 Json Datetime lint rules.
 ///

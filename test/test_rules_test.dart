@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/test_rules.dart';
+import 'package:saropa_lints/src/rules/testing/test_rules.dart';
 
 /// Tests for 30 Test Rules lint rules.
 ///

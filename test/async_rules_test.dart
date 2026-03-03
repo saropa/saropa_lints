@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/async_rules.dart';
+import 'package:saropa_lints/src/rules/core/async_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 46 async lint rules.

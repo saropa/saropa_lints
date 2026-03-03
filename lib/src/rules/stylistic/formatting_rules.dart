@@ -1,0 +1,1123 @@
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use, todo
+
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/source/line_info.dart';
+
+import '../../saropa_lint_rule.dart';
+import '../../fixes/formatting/add_blank_line_fix.dart';
+import '../../fixes/formatting/add_blank_line_before_return_fix.dart';
+
+/// Warns when case clauses don't have newlines before them.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Alias: blank_line_before_case, newline_before_case, case_spacing
+///
+/// Newlines before case clauses improve readability.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// switch (x) {
+///   case 1: return 'one'; case 2: return 'two';
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// switch (x) {
+///   case 1:
+///     return 'one';
+///
+///   case 2:
+///     return 'two';
+/// }
+/// ```
+class NewlineBeforeCaseRule extends SaropaLintRule {
+  NewlineBeforeCaseRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_blank_line_before_case',
+    '[prefer_blank_line_before_case] Adding blank lines before case clauses is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
+    correctionMessage:
+        'Add blank line before this case. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addSwitchStatement((SwitchStatement node) {
+      final NodeList<SwitchMember> members = node.members;
+
+      for (int i = 1; i < members.length; i++) {
+        final SwitchMember current = members[i];
+        final SwitchMember previous = members[i - 1];
+
+        // Skip if previous is a fall-through (empty statements)
+        if (previous.statements.isEmpty) continue;
+
+        // Check if there's a blank line before current case
+        final root = node.root;
+        if (root is! CompilationUnit) continue;
+        final unit = root;
+        final int prevEndLine = unit.lineInfo
+            .getLocation(previous.end)
+            .lineNumber;
+        final int currStartLine = unit.lineInfo
+            .getLocation(current.offset)
+            .lineNumber;
+
+        if (currStartLine - prevEndLine < 2) {
+          // Use beginToken to handle SwitchCase, SwitchDefault, and SwitchPatternCase
+          reporter.atToken(current.beginToken, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when constructors don't have blank lines before them.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Alias: blank_line_before_constructor, constructor_spacing, newline_before_constructor
+///
+/// Blank lines before constructors improve readability.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class Foo {
+///   final int value;
+///   Foo(this.value); // No blank line
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class Foo {
+///   final int value;
+///
+///   Foo(this.value);
+/// }
+/// ```
+class NewlineBeforeConstructorRule extends SaropaLintRule {
+  NewlineBeforeConstructorRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_blank_line_before_constructor',
+    '[prefer_blank_line_before_constructor] Adding blank lines before constructors is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
+    correctionMessage:
+        'Add blank line to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      final root = node.root;
+      if (root is CompilationUnit) {
+        _checkMembers(node.members, root, reporter);
+      }
+    });
+  }
+
+  void _checkMembers(
+    NodeList<ClassMember> members,
+    CompilationUnit unit,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    for (int i = 1; i < members.length; i++) {
+      final ClassMember current = members[i];
+      final ClassMember previous = members[i - 1];
+
+      // Only check constructors
+      if (current is! ConstructorDeclaration) continue;
+
+      // Get line numbers
+      final int prevEndLine = unit.lineInfo
+          .getLocation(previous.end)
+          .lineNumber;
+      final int currStartLine = unit.lineInfo
+          .getLocation(current.offset)
+          .lineNumber;
+
+      // Should have at least one blank line
+      if (currStartLine - prevEndLine < 2) {
+        final Token? nameToken = current.name;
+        if (nameToken != null) {
+          reporter.atToken(nameToken);
+        } else {
+          reporter.atNode(current.returnType, code);
+        }
+      }
+    }
+  }
+}
+
+/// Warns when methods don't have blank lines before them.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Alias: blank_line_before_method, method_spacing, newline_before_method
+///
+/// Blank lines before methods improve readability.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class Foo {
+///   void foo() { }
+///   void bar() { } // No blank line
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class Foo {
+///   void foo() { }
+///
+///   void bar() { }
+/// }
+/// ```
+class NewlineBeforeMethodRule extends SaropaLintRule {
+  NewlineBeforeMethodRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_blank_line_before_method',
+    '[prefer_blank_line_before_method] Adding blank lines before methods is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v4}',
+    correctionMessage:
+        'Add blank line to improve readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      final root = node.root;
+      if (root is CompilationUnit) {
+        _checkMembers(node.members, root, reporter);
+      }
+    });
+
+    context.addMixinDeclaration((MixinDeclaration node) {
+      final root = node.root;
+      if (root is CompilationUnit) {
+        _checkMembers(node.members, root, reporter);
+      }
+    });
+
+    context.addEnumDeclaration((EnumDeclaration node) {
+      final root = node.root;
+      if (root is CompilationUnit) {
+        _checkMembers(node.members, root, reporter);
+      }
+    });
+  }
+
+  void _checkMembers(
+    NodeList<ClassMember> members,
+    CompilationUnit unit,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    for (int i = 1; i < members.length; i++) {
+      final ClassMember current = members[i];
+      final ClassMember previous = members[i - 1];
+
+      // Only check methods
+      if (current is! MethodDeclaration) continue;
+
+      // Get line numbers
+      final int prevEndLine = unit.lineInfo
+          .getLocation(previous.end)
+          .lineNumber;
+      final int currStartLine = unit.lineInfo
+          .getLocation(current.offset)
+          .lineNumber;
+
+      // Should have at least one blank line
+      if (currStartLine - prevEndLine < 2) {
+        reporter.atToken(current.name, code);
+      }
+    }
+  }
+}
+
+/// Warns when there's no blank line before a return statement.
+///
+/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v5
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Alias: blank_line_before_return, return_spacing, newline_before_return
+///
+/// Adding a blank line before return statements can improve readability
+/// by visually separating the return from the preceding logic.
+class NewlineBeforeReturnRule extends SaropaLintRule {
+  NewlineBeforeReturnRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeReturnFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_blank_line_before_return',
+    '[prefer_blank_line_before_return] Adding blank lines before return statements is a formatting preference with no impact on code behavior or performance. Enable via the stylistic tier. {v5}',
+    correctionMessage:
+        'Insert a blank line before return for readability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addReturnStatement((ReturnStatement node) {
+      final AstNode? parent = node.parent;
+      if (parent is! Block) return;
+
+      final List<Statement> statements = parent.statements;
+      final int index = statements.indexOf(node);
+
+      // Don't warn if it's the first or only statement
+      if (index <= 0) return;
+
+      // Check if previous statement ends on the line immediately before
+      final Statement previous = statements[index - 1];
+      final int prevEndLine = context.lineInfo
+          .getLocation(previous.end)
+          .lineNumber;
+      final int returnStartLine = context.lineInfo
+          .getLocation(node.offset)
+          .lineNumber;
+
+      if (returnStartLine - prevEndLine < 2) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+/// Warns when there is no blank line before an `else` or `else if` clause.
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+/// A blank line before `else` separates branches visually and improves
+/// readability (see [doc/guides/good_methods.md](../../../doc/guides/good_methods.md) §9).
+///
+/// **Implementation notes for developers:**
+/// - Uses [addIfStatement] only; no string or name heuristics.
+/// - Reports on [elseStatement] so [AddBlankLineBeforeFix] inserts at the
+///   start of the line containing the else clause.
+/// - Skips when there is no else (no false positive on `if (x) { }`).
+///
+/// **Bad:**
+/// ```dart
+/// if (x) {
+///   a();
+/// } else {
+///   b();
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// if (x) {
+///   a();
+/// }
+///
+/// else {
+///   b();
+/// }
+/// ```
+class NewlineBeforeElseRule extends SaropaLintRule {
+  NewlineBeforeElseRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_blank_line_before_else',
+    '[prefer_blank_line_before_else] Adding a blank line before else/else if '
+        'separates branches and improves readability. Enable via the stylistic tier. {v1}',
+    correctionMessage:
+        'Add a blank line before this else clause.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addIfStatement((IfStatement node) {
+      final Statement? elseStmt = node.elseStatement;
+      final Token? elseToken = node.elseKeyword;
+      if (elseStmt == null || elseToken == null) return;
+
+      final LineInfo lineInfo = context.lineInfo;
+      final int thenEndLine = lineInfo.getLocation(node.thenStatement.end).lineNumber;
+      final int elseStartLine = lineInfo.getLocation(elseToken.offset).lineNumber;
+      // At least one full blank line required (gap >= 2).
+      if (elseStartLine - thenEndLine < 2) {
+        reporter.atNode(elseStmt, code);
+      }
+    });
+  }
+}
+
+/// Warns when there is no blank line after a for or while loop before the next statement.
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+/// A blank line after a loop separates it from the following logic (see
+/// [doc/guides/good_methods.md](../../../doc/guides/good_methods.md) §9).
+///
+/// **Implementation notes for developers:**
+/// - Uses [addBlock] and iterates [Block.statements]; no recursion.
+/// - Only [ForStatement] and [WhileStatement] count as loops (for-in is
+///   [ForStatement] with [ForEachParts], so it is covered).
+/// - Reports on the *next* statement so [AddBlankLineBeforeFix] inserts
+///   a blank line before it (i.e. after the loop).
+/// - Blocks with fewer than two statements are skipped (no false positive).
+///
+/// **Bad:**
+/// ```dart
+/// for (final x in list) {
+///   process(x);
+/// }
+/// doNext();
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// for (final x in list) {
+///   process(x);
+/// }
+///
+/// doNext();
+/// ```
+class NewlineAfterLoopRule extends SaropaLintRule {
+  NewlineAfterLoopRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_blank_line_after_loop',
+    '[prefer_blank_line_after_loop] Adding a blank line after a for/while loop '
+        'separates the loop from the next statement and improves readability. Enable via the stylistic tier. {v1}',
+    correctionMessage:
+        'Add a blank line after the loop (before this statement).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBlock((Block node) {
+      final List<Statement> statements = node.statements;
+      if (statements.length < 2) return;
+
+      final LineInfo lineInfo = context.lineInfo;
+
+      for (int i = 0; i < statements.length - 1; i++) {
+        final Statement current = statements[i];
+        final Statement next = statements[i + 1];
+
+        final bool currentIsLoop = current is ForStatement || current is WhileStatement;
+        if (!currentIsLoop) continue;
+
+        final int loopEndLine = lineInfo.getLocation(current.end).lineNumber;
+        final int nextStartLine = lineInfo.getLocation(next.offset).lineNumber;
+        // At least one full blank line required (gap >= 2).
+        if (nextStartLine - loopEndLine < 2) {
+          reporter.atNode(next, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when multi-line constructs are missing trailing commas.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Alias: require_trailing_comma, add_trailing_comma, multiline_comma
+///
+/// Trailing commas make diffs cleaner and prevent formatting issues.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// final list = [
+///   'a',
+///   'b',
+///   'c'  // Missing trailing comma
+/// ];
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// final list = [
+///   'a',
+///   'b',
+///   'c',  // Has trailing comma
+/// ];
+/// ```
+class PreferTrailingCommaRule extends SaropaLintRule {
+  PreferTrailingCommaRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_trailing_comma',
+    '[prefer_trailing_comma] Adding trailing commas in multi-line constructs is a formatting preference that affects diff readability. No performance or correctness impact. Enable via the stylistic tier. {v4}',
+    correctionMessage:
+        'Add a trailing comma. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addArgumentList((ArgumentList node) {
+      _checkTrailingComma(node.arguments, node.rightParenthesis, reporter);
+    });
+
+    context.addListLiteral((ListLiteral node) {
+      _checkTrailingComma(node.elements, node.rightBracket, reporter);
+    });
+
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
+      _checkTrailingComma(node.elements, node.rightBracket, reporter);
+    });
+
+    context.addFormalParameterList((FormalParameterList node) {
+      _checkTrailingComma(node.parameters, node.rightParenthesis, reporter);
+    });
+  }
+
+  void _checkTrailingComma(
+    NodeList<AstNode> elements,
+    Token closingToken,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    if (elements.isEmpty) return;
+
+    final AstNode first = elements.first;
+    final AstNode last = elements.last;
+
+    // Check if multi-line by comparing offsets
+    final int closingOffset = closingToken.charOffset;
+    final int firstOffset = first.offset;
+    final int lastEnd = last.end;
+
+    // If construct spans multiple lines (approximate heuristic)
+    // Check if there's significant distance between first and closing
+    if (closingOffset > firstOffset + 50 && closingOffset > lastEnd + 5) {
+      // Check for trailing comma by looking at tokens
+      Token? token = last.endToken.next;
+      bool hasTrailingComma = false;
+
+      while (token != null && token != closingToken) {
+        if (token.lexeme == ',') {
+          hasTrailingComma = true;
+          break;
+        }
+        token = token.next;
+      }
+
+      if (!hasTrailingComma && elements.length >= 2) {
+        // Only report if it looks like a multi-line construct
+        reporter.atNode(last);
+      }
+    }
+  }
+}
+
+/// Warns when trailing commas are unnecessary.
+///
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Alias: remove_trailing_comma, single_element_comma, extra_comma
+///
+/// Single-element lists/parameters don't need trailing commas.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// final list = [
+///   'single item',
+/// ];
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// final list = ['single item'];
+/// // OR for multiple items:
+/// final list = [
+///   'item1',
+///   'item2',
+/// ];
+/// ```
+class UnnecessaryTrailingCommaRule extends SaropaLintRule {
+  UnnecessaryTrailingCommaRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'final list = [1, 2, 3,];';
+
+  @override
+  String get exampleGood => 'final list = [1, 2, 3];';
+
+  static const LintCode _code = LintCode(
+    'unnecessary_trailing_comma',
+    '[unnecessary_trailing_comma] Removing trailing commas in single-line constructs is a formatting preference. No impact on code behavior or performance. Enable via the stylistic tier. {v4}',
+    correctionMessage:
+        'Remove trailing comma or keep on single line. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addListLiteral((ListLiteral node) {
+      _checkTrailingComma(node.elements, node.rightBracket, reporter);
+    });
+
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
+      _checkTrailingComma(node.elements, node.rightBracket, reporter);
+    });
+  }
+
+  void _checkTrailingComma(
+    NodeList<CollectionElement> elements,
+    Token rightBracket,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    if (elements.length != 1) return;
+
+    // Check if there's a trailing comma
+    final CollectionElement element = elements.first;
+    final Token? nextToken = element.endToken.next;
+    if (nextToken != null && nextToken.type == TokenType.COMMA) {
+      // Single element with trailing comma
+      reporter.atToken(nextToken);
+    }
+  }
+}
+
+/// Warns when comments don't follow formatting conventions.
+///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v3
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Alias: comment_style, comment_capitalization, comment_punctuation
+///
+/// Comments should start with a capital letter and end with punctuation.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// // this is a comment
+/// // TODO fix this
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// // This is a comment.
+/// // TODO: Fix this.
+/// ```
+class FormatCommentFormattingRule extends SaropaLintRule {
+  FormatCommentFormattingRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'format_comment_style',
+    '[format_comment_style] Enforcing specific comment formatting conventions is a stylistic preference. Comment format has no impact on code behavior or performance. Enable via the stylistic tier. {v3}',
+    correctionMessage:
+        'Start with capital letter and end with punctuation. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  /// Annotation markers that have their own formatting conventions.
+  static final RegExp _annotationMarker = RegExp(
+    r'^(TODO|FIXME|FIX|NOTE|HACK|XXX|BUG|OPTIMIZE|WARNING|CHANGED|REVIEW|DEPRECATED|IMPORTANT|MARK)\b',
+    caseSensitive: false,
+  );
+
+  // Cached regex for performance - matches lowercase start
+  static final RegExp _lowercaseStart = RegExp(r'^[a-z]');
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Comments are not part of the AST, so we need to check tokens
+    context.addCompilationUnit((CompilationUnit node) {
+      Token? token = node.beginToken;
+      while (token != null && token != node.endToken) {
+        _checkPrecedingComments(token, reporter);
+        token = token.next;
+      }
+    });
+  }
+
+  void _checkPrecedingComments(Token token, SaropaDiagnosticReporter reporter) {
+    Token? comment = token.precedingComments;
+    while (comment != null) {
+      final String lexeme = comment.lexeme;
+
+      // Skip doc comments, they have their own rules
+      if (lexeme.startsWith('///') || lexeme.startsWith('/**')) {
+        comment = comment.next;
+        continue;
+      }
+
+      // Check single-line comments
+      if (lexeme.startsWith('//')) {
+        final String content = lexeme.substring(2).trim();
+
+        // Skip empty comments, special markers, and ignore directives
+        if (content.isEmpty ||
+            content.startsWith('ignore') ||
+            _annotationMarker.hasMatch(content)) {
+          comment = comment.next;
+          continue;
+        }
+
+        // Check if starts with lowercase (excluding URLs and code)
+        if (content.isNotEmpty &&
+            content[0].toLowerCase() == content[0] &&
+            _lowercaseStart.hasMatch(content) &&
+            !content.startsWith('http') &&
+            !content.contains('://')) {
+          reporter.atToken(comment);
+        }
+      }
+
+      comment = comment.next;
+    }
+  }
+}
+
+/// Warns when class members are not in the conventional order.
+///
+/// Since: v4.1.3 | Updated: v4.13.0 | Rule version: v4
+///
+/// Alias: sort_class_members, class_member_order, fields_before_methods,
+/// prefer_sorted_members
+///
+/// Members should be ordered: fields, constructors, methods.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class Foo {
+///   void doSomething() {}
+///   final int value;
+///   Foo(this.value);
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class Foo {
+///   final int value;
+///   Foo(this.value);
+///   void doSomething() {}
+/// }
+/// ```
+///
+/// Formerly: `enforce_member_ordering`
+class MemberOrderingFormattingRule extends SaropaLintRule {
+  MemberOrderingFormattingRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<String> get configAliases => const <String>[
+    'enforce_member_ordering',
+    'member_ordering',
+    'prefer_sorted_members',
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_member_ordering',
+    '[prefer_member_ordering] Class members are not in conventional order. Members must be ordered: fields, constructors, methods. {v4}',
+    correctionMessage:
+        'Reorder class members to follow the conventional layout: static fields, instance fields, constructors, then methods.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      int lastCategory = -1;
+
+      for (final ClassMember member in node.members) {
+        final int category = _getMemberCategory(member);
+
+        if (category < lastCategory) {
+          reporter.atNode(member);
+        }
+
+        if (category > lastCategory) {
+          lastCategory = category;
+        }
+      }
+    });
+  }
+
+  int _getMemberCategory(ClassMember member) {
+    if (member is FieldDeclaration) {
+      return member.isStatic ? 0 : 1;
+    } else if (member is ConstructorDeclaration) {
+      return 2;
+    } else if (member is MethodDeclaration) {
+      return member.isStatic ? 3 : 4;
+    }
+    return 5;
+  }
+}
+
+/// Warns when parameters are not in conventional order.
+///
+/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v3
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Alias: sort_parameters, parameter_order, required_before_optional
+///
+/// Parameters should be ordered: required positional, optional positional,
+/// then named parameters (required named before optional named).
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// void foo({String? name}, int count) {}
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// void foo(int count, {String? name}) {}
+/// ```
+class ParametersOrderingConventionRule extends SaropaLintRule {
+  ParametersOrderingConventionRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  /// Alias: parameters_ordering
+  @override
+  List<String> get configAliases => const <String>['parameters_ordering'];
+
+  static const LintCode _code = LintCode(
+    'enforce_parameters_ordering',
+    '[enforce_parameters_ordering] Ordering parameters in a specific sequence is a convention preference. Parameter order does not affect performance or compiled output. Enable via the stylistic tier. {v3}',
+    correctionMessage:
+        'Order: required positional, optional positional, named. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addFunctionDeclaration((FunctionDeclaration node) {
+      _checkParameters(node.functionExpression.parameters, reporter);
+    });
+
+    context.addMethodDeclaration((MethodDeclaration node) {
+      _checkParameters(node.parameters, reporter);
+    });
+  }
+
+  void _checkParameters(
+    FormalParameterList? params,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    if (params == null) return;
+
+    int lastCategory = -1;
+    for (final FormalParameter param in params.parameters) {
+      final int category = _getParamCategory(param);
+
+      if (category < lastCategory) {
+        reporter.atNode(param);
+      }
+
+      if (category > lastCategory) {
+        lastCategory = category;
+      }
+    }
+  }
+
+  int _getParamCategory(FormalParameter param) {
+    if (param.isRequiredPositional) return 0;
+    if (param.isOptionalPositional) return 1;
+    if (param.isRequiredNamed) return 2;
+    return 3; // Optional named
+  }
+}
+
+/// Warns when enum constants are not in alphabetical order.
+///
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Alias: sort_enum_constants, alphabetical_enum, enum_alphabetical_order
+///
+/// Keeping enum constants in alphabetical order improves readability
+/// and makes it easier to find specific values.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// enum Priority {
+///   high,
+///   critical,
+///   low,
+///   medium,
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// enum Priority {
+///   critical,
+///   high,
+///   low,
+///   medium,
+/// }
+/// ```
+class EnumConstantsOrderingRule extends SaropaLintRule {
+  EnumConstantsOrderingRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'enum_constants_ordering',
+    '[enum_constants_ordering] Ordering enum constants alphabetically is a stylistic preference. Enum constant order does not affect runtime behavior or performance. Enable via the stylistic tier. {v2}',
+    correctionMessage:
+        'Prefer ordering enum constants alphabetically. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addEnumDeclaration((EnumDeclaration node) {
+      final List<EnumConstantDeclaration> constants = node.constants.toList();
+      if (constants.length < 2) return;
+
+      // Check if already sorted
+      String? previousName;
+      for (final EnumConstantDeclaration constant in constants) {
+        final String currentName = constant.name.lexeme;
+        if (previousName != null &&
+            currentName.toLowerCase().compareTo(previousName.toLowerCase()) <
+                0) {
+          reporter.atNode(node);
+          return; // Only report once per enum
+        }
+        previousName = currentName;
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_readable_line_length
+// =============================================================================
+
+/// Suggests keeping lines under ~80 characters for readability.
+///
+/// Long lines are harder to read and review. Prefer wrapping or breaking.
+///
+/// **Bad:** Lines over 80 characters.
+///
+/// **Good:** Wrap at ~80 characters or use dart format line length.
+class PreferReadableLineLengthRule extends SaropaLintRule {
+  PreferReadableLineLengthRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_readable_line_length',
+    '[prefer_readable_line_length] Line exceeds 80 characters. '
+        'Consider wrapping for readability.',
+    correctionMessage:
+        'Break long lines at ~80 characters or configure dart format line length.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const int _maxLineLength = 80;
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit unit) {
+      final LineInfo lineInfo = context.lineInfo;
+      final String content = context.fileContent;
+      for (int i = 1; i <= lineInfo.lineCount; i++) {
+        final int lineStart = lineInfo.getOffsetOfLine(i);
+        final int lineEnd = i < lineInfo.lineCount
+            ? lineInfo.getOffsetOfLine(i + 1) - 1
+            : content.length;
+        final int length = lineEnd - lineStart;
+        if (length > _maxLineLength) {
+          reporter.atOffset(offset: lineStart, length: length.clamp(1, 81));
+          return;
+        }
+      }
+    });
+  }
+}

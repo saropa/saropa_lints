@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/navigation_rules.dart';
+import 'package:saropa_lints/src/rules/ui/navigation_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 36 Navigation lint rules.

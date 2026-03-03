@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/numeric_literal_rules.dart';
+import 'package:saropa_lints/src/rules/data/numeric_literal_rules.dart';
 
 /// Tests for 11 Numeric Literal lint rules.
 ///

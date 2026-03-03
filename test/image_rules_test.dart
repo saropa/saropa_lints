@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/image_rules.dart';
+import 'package:saropa_lints/src/rules/media/image_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 21 Image lint rules.

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/stylistic_control_flow_rules.dart';
+import 'package:saropa_lints/src/rules/stylistic/stylistic_control_flow_rules.dart';
 
 /// Tests for 14 Stylistic Control Flow lint rules.
 ///

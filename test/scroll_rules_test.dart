@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/scroll_rules.dart';
+import 'package:saropa_lints/src/rules/widget/scroll_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 18 Scroll lint rules.

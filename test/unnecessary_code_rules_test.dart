@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/unnecessary_code_rules.dart';
+import 'package:saropa_lints/src/rules/code_quality/unnecessary_code_rules.dart';
 
 /// Tests for 14 Unnecessary Code lint rules.
 ///

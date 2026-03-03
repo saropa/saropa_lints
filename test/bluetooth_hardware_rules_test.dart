@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/bluetooth_hardware_rules.dart';
+import 'package:saropa_lints/src/rules/hardware/bluetooth_hardware_rules.dart';
 
 /// Tests for 10 Bluetooth Hardware lint rules.
 ///

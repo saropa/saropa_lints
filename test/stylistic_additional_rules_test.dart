@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/stylistic_additional_rules.dart';
+import 'package:saropa_lints/src/rules/stylistic/stylistic_additional_rules.dart';
 
 /// Tests for 24 Stylistic Additional lint rules.
 ///
