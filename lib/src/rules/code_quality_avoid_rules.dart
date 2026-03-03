@@ -15,7 +15,7 @@ import '../fixes/code_quality/remove_inferrable_type_arguments_fix.dart';
 import '../fixes/code_quality/remove_redundant_pragma_inline_fix.dart';
 import '../fixes/code_quality/remove_unnecessary_override_fix.dart';
 import '../fixes/code_quality/remove_unnecessary_statement_fix.dart';
-import '../fixes/code_quality/weak_crypto_todo_fix.dart';
+import '../fixes/code_quality/replace_weak_crypto_fix.dart';
 import '../saropa_lint_rule.dart';
 
 class AvoidAdjacentStringsRule extends SaropaLintRule {
@@ -1153,7 +1153,7 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
-        WeakCryptoTodoFix(context: context),
+        ReplaceWeakCryptoFix(context: context),
   ];
 }
 
@@ -3292,22 +3292,24 @@ class AvoidDeprecatedUsageRule extends SaropaLintRule {
 
   static bool _isDeprecated(Element? element) {
     if (element == null) return false;
-    if (hasDeprecatedFlag(element)) return true;
+    try {
+      if (hasDeprecatedFlag(element)) return true;
 
-    for (final ann in readElementAnnotationsFromMetadata(
-      (element as dynamic).metadata,
-    )) {
-      if (ann.isDeprecated) return true;
-    }
-    if (element is ConstructorElement) {
-      final enclosing = element.enclosingElement;
-      if (hasDeprecatedFlag(enclosing)) return true;
-
-      for (final ann in readElementAnnotationsFromMetadata(
-        (enclosing as dynamic).metadata,
-      )) {
+      final meta = (element as dynamic).metadata;
+      for (final ann in readElementAnnotationsFromMetadata(meta)) {
         if (ann.isDeprecated) return true;
       }
+      if (element is ConstructorElement) {
+        final enclosing = element.enclosingElement;
+        if (hasDeprecatedFlag(enclosing)) return true;
+
+        final enclosingMeta = (enclosing as dynamic).metadata;
+        for (final ann in readElementAnnotationsFromMetadata(enclosingMeta)) {
+          if (ann.isDeprecated) return true;
+        }
+      }
+    } on Object {
+      return false;
     }
     return false;
   }
@@ -3340,10 +3342,14 @@ class AvoidDeprecatedUsageRule extends SaropaLintRule {
     if (_isGeneratedFile(path)) return;
 
     void checkElement(Element? element, AstNode node) {
-      if (element == null) return;
-      if (!_isDeprecated(element)) return;
-      if (_isSamePackage(element, path)) return;
-      reporter.atNode(node);
+      try {
+        if (element == null) return;
+        if (!_isDeprecated(element)) return;
+        if (_isSamePackage(element, path)) return;
+        reporter.atNode(node);
+      } on Object {
+        // Plugin must not crash on any element API throw (e.g. metadata).
+      }
     }
 
     // Support both analyzer APIs: .element (analyzer 9+) and .staticElement (older).
@@ -3352,11 +3358,11 @@ class AvoidDeprecatedUsageRule extends SaropaLintRule {
       try {
         final e = id.element;
         if (e is Element) return e;
-      } catch (_) {}
+      } on Object {}
       try {
         final s = id.staticElement;
         if (s is Element) return s;
-      } catch (_) {}
+      } on Object {}
       return null;
     }
 

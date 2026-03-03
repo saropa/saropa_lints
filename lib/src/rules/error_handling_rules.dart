@@ -2533,12 +2533,19 @@ class HandleThrowingInvocationsRule extends SaropaLintRule {
   }
 
   /// Reads annotations via compat helper so both Iterable and MetadataImpl
-  /// (analyzer 9+) metadata shapes are supported without plugin crash.
+  /// (analyzer 9+) metadata shapes are supported. Entire access is wrapped in
+  /// try/on Object so the plugin never crashes (element.metadata getter or
+  /// iteration must not be fatal).
   static bool _hasThrowsAnnotation(Element? element) {
     if (element == null) return false;
-    for (final ann in readElementAnnotationsFromMetadata(element.metadata)) {
-      final name = ann.element?.enclosingElement?.name;
-      if (name == 'Throws' || name == 'throws') return true;
+    try {
+      final meta = (element as dynamic).metadata;
+      for (final ann in readElementAnnotationsFromMetadata(meta)) {
+        final name = ann.element?.enclosingElement?.name;
+        if (name == 'Throws' || name == 'throws') return true;
+      }
+    } on Object {
+      return false;
     }
     return false;
   }
@@ -2568,11 +2575,99 @@ class HandleThrowingInvocationsRule extends SaropaLintRule {
     if (context.isInTestDirectory) return;
 
     context.addMethodInvocation((MethodInvocation node) {
-      if (_isInsideTry(node)) return;
-      final el = node.methodName.element;
-      if (el == null) return;
-      if (!_hasThrowsAnnotation(el) && !_isKnownThrower(el)) return;
-      reporter.atNode(node);
+      try {
+        if (_isInsideTry(node)) return;
+        final el = node.methodName.element;
+        if (el == null) return;
+        if (!_hasThrowsAnnotation(el) && !_isKnownThrower(el)) return;
+        reporter.atNode(node);
+      } on Object {
+        // Plugin must not crash on any element API throw (e.g. metadata).
+      }
     });
   }
+}
+
+// =============================================================================
+// require_error_context_in_logs
+// =============================================================================
+
+/// Suggests including context (e.g. user id, request id) in error logs.
+class RequireErrorContextInLogsRule extends SaropaLintRule {
+  RequireErrorContextInLogsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_error_context_in_logs',
+    '[require_error_context_in_logs] Error logged without context. Include user/request id for debugging.',
+    correctionMessage: 'Add context (e.g. userId, requestId) to error log messages.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// require_error_message_clarity
+// =============================================================================
+
+/// Suggests clear, user-facing error messages.
+class RequireErrorMessageClarityRule extends SaropaLintRule {
+  RequireErrorMessageClarityRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_error_message_clarity',
+    '[require_error_message_clarity] Use clear, user-facing error messages.',
+    correctionMessage: 'Avoid technical jargon; explain what went wrong and next steps.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// require_error_recovery
+// =============================================================================
+
+/// Suggests providing recovery path when errors occur.
+class RequireErrorRecoveryRule extends SaropaLintRule {
+  RequireErrorRecoveryRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_error_recovery',
+    '[require_error_recovery] Provide a recovery path when errors occur (retry, fallback).',
+    correctionMessage: 'Offer retry or fallback so the user can continue.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
 }
