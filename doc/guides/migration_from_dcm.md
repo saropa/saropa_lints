@@ -6,7 +6,7 @@ This guide helps you migrate from `dart_code_metrics` (DCM) to `saropa_lints`.
 
 | Feature | DCM | saropa_lints |
 |---------|-----|--------------|
-| **Rule count** | ~70 rules + metrics | 1450+ custom rules |
+| **Rule count** | ~70 rules + metrics | 2050+ custom rules |
 | **Focus** | Code metrics & complexity | Flutter-specific analysis |
 | **Configuration** | Extensive YAML options | 5 progressive tiers |
 | **Maintenance** | DCM Classic discontinued | Actively maintained |
@@ -27,7 +27,7 @@ DCM and saropa_lints take different approaches to performance:
 
 **DCM's approach**: DCM moved to a precompiled binary to solve performance issues with running many rules in the Dart Analysis Server. This makes CLI analysis fast but limits real-time IDE feedback.
 
-**saropa_lints' approach**: Uses the custom_lint plugin architecture for full IDE integration (squiggles, quick fixes, hover info). The tier system lets you control memory usage - start with `essential` (~256 rules) for lighter resource usage, scale up as needed.
+**saropa_lints' approach**: Uses the custom_lint plugin architecture for full IDE integration (squiggles, quick fixes, hover info). The tier system lets you control memory usage - start with `essential` (~300 rules) for lighter resource usage, scale up as needed.
 
 **Recommendation**: For large codebases concerned about IDE performance, start with `essential` or `recommended` tier. Use higher tiers in CI where memory isn't constrained.
 
@@ -120,10 +120,10 @@ DCM has granular metric thresholds. saropa_lints uses progressive tiers:
 
 | DCM Usage | saropa_lints Tier | Description |
 |-----------|-------------------|-------------|
-| Minimal rules | **Essential** (~256 rules) | Critical bugs, memory leaks, security |
-| Default config | **Recommended** (~573 rules) | Balanced coverage |
-| Strict metrics | **Professional** (~979 rules) | Enterprise-grade |
-| All rules enabled | **Comprehensive** (~1202 rules) | Quality obsessed |
+| Minimal rules | **Essential** (~300 rules) | Critical bugs, memory leaks, security |
+| Default config | **Recommended** (~900 rules) | Balanced coverage |
+| Strict metrics | **Professional** (~1600 rules) | Enterprise-grade |
+| All rules enabled | **Comprehensive** (~2050 rules) | Quality obsessed |
 | Maximum everything | **Pedantic** (1450+ rules) | Every single rule |
 
 **Start with `recommended`** - it provides broad coverage without overwhelming noise.

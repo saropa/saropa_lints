@@ -70,11 +70,11 @@ solid_lints has one configuration. saropa_lints offers progressive tiers:
 
 | solid_lints Usage | saropa_lints Tier               | Description                           |
 | ----------------- | ------------------------------- | ------------------------------------- |
-| Basic             | **Essential** (~256 rules)      | Critical bugs, memory leaks, security |
-| Full config       | **Recommended** (~573 rules)    | Balanced coverage                     |
-| + strict mode     | **Professional** (~979 rules)   | Enterprise-grade                      |
-| Maximum           | **Comprehensive** (~1202 rules) | Quality obsessed                      |
-| Everything        | **Pedantic** (1450+ rules)      | Every single rule                     |
+| Basic             | **Essential** (~300 rules)      | Critical bugs, memory leaks, security |
+| Full config       | **Recommended** (~900 rules)    | Balanced coverage                     |
+| + strict mode     | **Professional** (~1600 rules)   | Enterprise-grade                      |
+| Maximum           | **Comprehensive** (~2050 rules) | Quality obsessed                      |
+| Everything        | **Pedantic** (2050+ rules)      | Every single rule                     |
 
 **Start with `recommended`** - it provides similar coverage to solid_lints plus Flutter-specific rules.
 

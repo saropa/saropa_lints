@@ -10,10 +10,10 @@ Saropa Lints (v5+) runs as a **native Dart analyzer plugin**, integrated directl
 
 1. **Native integration** - Rules run inside the analyzer process, eliminating IPC overhead
 2. **Incremental analysis** - The analyzer only re-analyzes changed files
-3. **Lazy rule instantiation** - Only rules in the selected tier are created (not all 1700+)
+3. **Lazy rule instantiation** - Only rules in the selected tier are created (not all 2050+)
 4. **Compile-time constant tier sets** - No runtime set-building overhead
 
-With 1700+ rules, analysis can still be slow on large projects. The optimizations below help manage this.
+With 2050+ rules, analysis can still be slow on large projects. The optimizations below help manage this.
 
 ---
 
@@ -24,7 +24,7 @@ With 1700+ rules, analysis can still be slow on large projects. The optimization
 The single biggest performance improvement is using fewer rules. **Always generate your config with the CLI tool for reliable tier selection:**
 
 ```bash
-# Fast local development (~290 rules)
+# Fast local development (~300 rules)
 dart run saropa_lints:init --tier essential
 
 # Thorough CI checking (~1600 rules)
@@ -35,11 +35,11 @@ dart run saropa_lints:init --tier professional
 
 | Tier            | Rule Count | Relative Speed         |
 | --------------- | ---------- | ---------------------- |
-| `essential`     | ~290       | **Fastest** (baseline) |
-| `recommended`   | ~840       | ~2x slower             |
+| `essential`     | ~300       | **Fastest** (baseline) |
+| `recommended`   | ~900       | ~2x slower             |
 | `professional`  | ~1600      | ~3x slower             |
-| `comprehensive` | ~1710      | ~3.5x slower           |
-| `pedantic`      | ~1720      | **Slowest**            |
+| `comprehensive` | ~2050      | ~3.5x slower           |
+| `pedantic`      | ~2050      | **Slowest**            |
 
 ### 2. Exclude Generated Code
 
@@ -123,7 +123,7 @@ These optimizations are automatic - no configuration needed.
 const Set<String> essentialRules = <String>{
   'avoid_null_assertion',
   'avoid_debug_print',
-  // ... ~290 rules
+  // ... ~300 rules
 };
 ```
 
@@ -133,7 +133,7 @@ Higher tiers use `.union()` on these const sets. Since the base sets are immutab
 
 ### Lazy Rule Instantiation
 
-**Problem:** Instantiating all 1700+ rules consumes ~4GB of memory.
+**Problem:** Instantiating all 2050+ rules consumes ~4GB of memory.
 
 **Solution:** Rules are stored as factory functions and only instantiated when needed:
 
@@ -256,10 +256,10 @@ jobs:
 Use different tiers for local development vs CI:
 
 ```bash
-# Local: Fast feedback loop (~290 rules)
+# Local: Fast feedback loop (~300 rules)
 dart run saropa_lints:init --tier essential
 
-# CI: Thorough checking (~1710 rules)
+# CI: Thorough checking (~2050 rules)
 dart run saropa_lints:init --tier comprehensive -o analysis_options.ci.yaml
 ```
 

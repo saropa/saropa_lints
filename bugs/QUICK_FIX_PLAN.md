@@ -1,8 +1,8 @@
 # Quick Fix Plan: Analysis + Checklist
 
-**Goal:** Increase quick fix coverage from **119/2050 (5.8%)** by implementing fixes in priority order, with fixtures + tests, and validating via the audit script.
+**Goal:** Increase quick fix coverage from **129/2051 (6.3%)** by implementing fixes in priority order, with fixtures + tests, and validating via the audit script.
 
-**Current state:** 119 rules with fixes / 2050 total rules (5.8%). **1931 rules have no fix.**
+**Current state:** 129 rules with fixes / 2051 total rules (6.3%). **1922 rules have no fix.**
 
 ---
 
