@@ -122,3 +122,11 @@ void _good229() {
   final name = user.name;
   print('$name, $name');
 }
+
+// GOOD: Same initializer source but contains method invocation — must NOT trigger.
+// Each call yields a different value; rule excludes initializers that contain
+// MethodInvocation or FunctionExpressionInvocation.
+void _goodSameSourceWithInvocation() {
+  final a = DateTime.now();
+  final b = DateTime.now();
+}

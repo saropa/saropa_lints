@@ -2161,7 +2161,52 @@ class _DestructuredPropertyAccessChecker extends RecursiveAstVisitor<void> {
   }
 }
 
+/// Visitor that detects if an expression contains any method or function
+/// invocation. Used to avoid treating "same source" as "same value" when
+/// the expression can produce different values (e.g. Random().nextDouble()).
+///
+/// Does not call [super] after setting [hasInvocation] to avoid unnecessary
+/// descent; one invocation is enough to exclude the initializer.
+class _InvocationPresenceVisitor extends RecursiveAstVisitor<void> {
+  bool hasInvocation = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    hasInvocation = true;
+  }
+
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
+    hasInvocation = true;
+  }
+}
+
+/// Returns true if [expression] contains any MethodInvocation or
+/// FunctionExpressionInvocation. Such expressions may produce different
+/// values or have side effects, so they are not treated as duplicate-by-source.
+bool _expressionContainsInvocation(Expression expression) {
+  final visitor = _InvocationPresenceVisitor();
+  expression.visitChildren(visitor);
+  return visitor.hasInvocation;
+}
+
 /// Warns when a new variable is created that duplicates an existing one.
+///
+/// **For developers:** This rule detects redundant variable declarations
+/// within the same block by comparing initializer source code ([toSource]).
+/// It only considers initializers that are not literals and not simple
+/// identifiers. To avoid false positives, any initializer whose AST
+/// contains a [MethodInvocation] or [FunctionExpressionInvocation] is
+/// excluded from duplicate detection, because the same source can evaluate
+/// to different values (e.g. [Random.nextDouble], [DateTime.now]) or have
+/// side effects. Registry: [addBlock]; runs once per block; single pass over
+/// [Block.statements]; no recursion. Impact: medium (maintainability). Cost:
+/// low (block-scoped, one visitor per candidate initializer).
+///
+/// **Heuristic:** "Contains any invocation" is conservative: some pure
+/// getters may be excluded, and some calls that are effectively constant
+/// could still be flagged if we ever refine. See CONTRIBUTING.md § Avoiding
+/// False Positives.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
@@ -2177,8 +2222,20 @@ class _DestructuredPropertyAccessChecker extends RecursiveAstVisitor<void> {
 /// final name = user.name;
 /// print('$name, $name');
 /// ```
+///
+/// Same-source initializers that contain invocations are not reported:
+/// ```dart
+/// final x = 0.2 + rng.nextDouble() * 0.6;
+/// final y = 0.2 + rng.nextDouble() * 0.6;  // OK: different values per call
+/// ```
 class UseExistingVariableRule extends SaropaLintRule {
   UseExistingVariableRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     'use_existing_variable',
@@ -2206,6 +2263,10 @@ class UseExistingVariableRule extends SaropaLintRule {
             // Skip literals and simple values
             if (initializer is Literal) continue;
             if (initializer is SimpleIdentifier) continue;
+
+            // Skip initializers that contain invocations; same source can
+            // produce different values (e.g. rng.nextDouble(), DateTime.now()).
+            if (_expressionContainsInvocation(initializer)) continue;
 
             final String exprSource = initializer.toSource();
 
