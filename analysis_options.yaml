@@ -3,7 +3,11 @@
 # This file configures `dart analyze` for the saropa_lints package itself.
 # Consumer projects use `dart run saropa_lints:init` to generate their own.
 #
+# Plugin is loaded from this package (same name); no self-dependency.
+# Tiers: essential (fewest) | recommended | professional | comprehensive | pedantic (all ~2000, 20k+ issues).
 # cspell:disable
+
+include: package:saropa_lints/tiers/recommended.yaml
 
 analyzer:
   errors:
@@ -25,6 +29,7 @@ analyzer:
     - "example_platforms/**"
     - "example_style/**"
     - "example_widgets/**"
+    - "self_check/**"
 linter:
   rules:
     - curly_braces_in_flow_control_structures
