@@ -202,8 +202,9 @@ void handleError() {
 
 ## Notes & Issues
 
-1. **⚠️ MAY ALREADY EXIST** — Check `lib/src/rules/unnecessary_code_rules.dart` for existing `no_empty_block` implementation before doing anything. If it exists, delete the ROADMAP entry and close this task.
-2. **`onPressed: () {}`** is a VERY common Flutter pattern for "disable the button" — if we trigger on empty function expressions passed as arguments, the false positive rate will be extremely high. Consider NOT checking empty function expression arguments.
-3. **Empty test bodies** are common when TDD practitioners write the test structure first — be careful about triggering in test files.
-4. **Existing Dart lint**: Dart's built-in `empty_catches` lint already flags empty catch blocks. This rule would extend it to all block types. Verify we're not purely duplicating it.
-5. **The `_hasIntentComment` logic** needs careful token traversal — Flutter's token model has preceding comments accessible via `token.precedingComments`. The block's content tokens need checking properly.
+1. **Add-ignore quick fix removed (project policy):** The quick fix that inserted `// ignore: no_empty_block` was removed. Project policy prohibits quick fixes that add `// ignore:`; rules use `IgnoreUtils` to respect existing ignore comments. See `.cursor/rules/prohibit-ignore-comments.mdc` and `lib/src/ignore_fixes.dart`.
+2. **⚠️ MAY ALREADY EXIST** — Check `lib/src/rules/unnecessary_code_rules.dart` for existing `no_empty_block` implementation before doing anything. If it exists, delete the ROADMAP entry and close this task.
+3. **`onPressed: () {}`** is a VERY common Flutter pattern for "disable the button" — if we trigger on empty function expressions passed as arguments, the false positive rate will be extremely high. Consider NOT checking empty function expression arguments.
+4. **Empty test bodies** are common when TDD practitioners write the test structure first — be careful about triggering in test files.
+5. **Existing Dart lint**: Dart's built-in `empty_catches` lint already flags empty catch blocks. This rule would extend it to all block types. Verify we're not purely duplicating it.
+6. **The `_hasIntentComment` logic** needs careful token traversal — Flutter's token model has preceding comments accessible via `token.precedingComments`. The block's content tokens need checking properly.

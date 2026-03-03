@@ -3,14 +3,10 @@
 ///
 /// The framework registers `IgnoreDiagnosticOnLine`, `IgnoreDiagnosticInFile`,
 /// and `IgnoreDiagnosticInAnalysisOptionsFile` for ALL plugin diagnostics.
-/// These provide:
-/// - "Ignore 'X' for this line" — adds `// ignore: rule_name`
-/// - "Ignore 'X' for the whole file" — adds `// ignore_for_file: rule_name`
-/// - "Ignore 'X' in analysis_options.yaml"
+/// These provide "Ignore for this line" and "Ignore for the whole file".
+/// No custom fix implementation is needed.
 ///
-/// No custom implementation is needed in saropa_lints v5.
-///
-/// The old v4 classes (`AddIgnoreCommentFix`, `AddIgnoreForFileFix`,
-/// `WrapInTryCatchFix`) have been removed as they are superseded by the
-/// native implementation.
+/// **Prohibition:** Do not add quick fixes that insert
+/// `// ignore:` or `// ignore_for_file:` (e.g. "Add // ignore: rule_name").
+/// Use [IgnoreUtils] in rules when a rule must respect existing ignore comments.
 library;

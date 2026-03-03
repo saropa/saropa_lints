@@ -16,6 +16,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 **Focus: Dog Food** — This release focuses on cleaning up all lint issues in our own project (eating our own dog food).
 
+### Changed
+
+- **Ignore handling:** Removed quick fix that inserted `// ignore: no_empty_block` (project policy: no fixes that add `// ignore:`). `no_empty_block` now uses `IgnoreUtils.isIgnoredForFile` and `IgnoreUtils.hasIgnoreComment` to respect existing ignore comments. Added Cursor rule `.cursor/rules/prohibit-ignore-comments.mdc` and CLAUDE.md guidance to prohibit adding ignore-inserting fixes.
 
 ### Added
 

@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import '../ignore_utils.dart';
 import '../saropa_lint_rule.dart';
 import '../fixes/unnecessary_code/comment_out_empty_spread_fix.dart';
 import '../fixes/unnecessary_code/comment_out_unnecessary_constructor_fix.dart';
@@ -10,7 +11,6 @@ import '../fixes/unnecessary_code/invert_unnecessary_negation_fix.dart';
 import '../fixes/unnecessary_code/remove_extends_object_fix.dart';
 import '../fixes/unnecessary_code/use_is_empty_or_is_not_empty_fix.dart';
 import '../fixes/unnecessary_code/remove_unnecessary_call_fix.dart';
-import '../fixes/unnecessary_code/add_no_empty_block_ignore_fix.dart';
 import '../fixes/unnecessary_code/no_empty_string_prefer_is_empty_fix.dart';
 import '../fixes/unnecessary_code/remove_unnecessary_block_fix.dart';
 import '../fixes/unnecessary_code/remove_unnecessary_enum_argument_fix.dart';
@@ -613,16 +613,17 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
           // Check block body: get x { return _x; }
           if (body is BlockFunctionBody) {
             final NodeList<Statement> statements = body.block.statements;
-            if (statements.length == 1 && statements.first is ReturnStatement) {
-              final ReturnStatement returnStmt =
-                  statements.first as ReturnStatement;
-              final Expression? expr = returnStmt.expression;
-              if (expr is SimpleIdentifier) {
-                final String fieldName = expr.name;
-                if (finalPrivateFields.contains(fieldName)) {
-                  final String getterName = member.name.lexeme;
-                  if (fieldName == '_$getterName') {
-                    reporter.atNode(member);
+            if (statements.length == 1) {
+              final Statement firstStmt = statements.first;
+              if (firstStmt is ReturnStatement) {
+                final Expression? expr = firstStmt.expression;
+                if (expr is SimpleIdentifier) {
+                  final String fieldName = expr.name;
+                  if (finalPrivateFields.contains(fieldName)) {
+                    final String getterName = member.name.lexeme;
+                    if (fieldName == '_$getterName') {
+                      reporter.atNode(member);
+                    }
                   }
                 }
               }
@@ -684,8 +685,9 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
       bool isNotEmptyPattern = false;
       bool isEmptyPattern = false;
 
-      if (_isLengthAccess(node.leftOperand)) {
-        lengthAccess = node.leftOperand as PropertyAccess;
+      final Expression leftOp = node.leftOperand;
+      if (_isLengthAccess(leftOp) && leftOp is PropertyAccess) {
+        lengthAccess = leftOp;
         final Expression right = node.rightOperand;
         if (right is IntegerLiteral) {
           final int? value = right.value;
@@ -697,17 +699,20 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
             if (op == '<') isEmptyPattern = true;
           }
         }
-      } else if (_isLengthAccess(node.rightOperand)) {
-        lengthAccess = node.rightOperand as PropertyAccess;
-        final Expression left = node.leftOperand;
-        if (left is IntegerLiteral) {
-          final int? value = left.value;
-          if (value == 0) {
-            if (op == '<' || op == '!=') isNotEmptyPattern = true;
-            if (op == '==' || op == '>=') isEmptyPattern = true;
-          } else if (value == 1) {
-            if (op == '<=') isNotEmptyPattern = true;
-            if (op == '>') isEmptyPattern = true;
+      } else {
+        final Expression rightOp = node.rightOperand;
+        if (_isLengthAccess(rightOp) && rightOp is PropertyAccess) {
+          lengthAccess = rightOp;
+          final Expression left = node.leftOperand;
+          if (left is IntegerLiteral) {
+            final int? value = left.value;
+            if (value == 0) {
+              if (op == '<' || op == '!=') isNotEmptyPattern = true;
+              if (op == '==' || op == '>=') isEmptyPattern = true;
+            } else if (value == 1) {
+              if (op == '<=') isNotEmptyPattern = true;
+              if (op == '>') isEmptyPattern = true;
+            }
           }
         }
       }
@@ -949,65 +954,14 @@ class NoEmptyBlockRule extends SaropaLintRule {
           }
         }
 
-        // Check for ignore comment on the same line using source content
-        if (_hasIgnoreCommentOnLine(context, node)) {
-          return;
-        }
-
-        // Hyphenated ignore comments handled automatically by SaropaLintRule
+        // Respect file- and node-level ignore (IgnoreUtils).
+        if (IgnoreUtils.isIgnoredForFile(context.fileContent, _name)) return;
+        if (IgnoreUtils.hasIgnoreComment(node, _name)) return;
         reporter.atNode(node);
       }
     });
   }
 
-  @override
-  List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddNoEmptyBlockIgnoreFix(context: context),
-  ];
-
-  /// Checks if there's an ignore comment for this rule on the same line as the node.
-  bool _hasIgnoreCommentOnLine(SaropaContext context, AstNode node) {
-    try {
-      final String content = context.fileContent;
-      final List<String> lines = content.split('\n');
-
-      // Check the line where the block ends (the } character)
-      final int blockEndLine = context.lineInfo
-          .getLocation(node.end - 1)
-          .lineNumber;
-      if (blockEndLine > 0 && blockEndLine <= lines.length) {
-        final String line = lines[blockEndLine - 1];
-        if (line.contains('// ignore: $_name') ||
-            line.contains('// ignore: ${_name.replaceAll('_', '-')}')) {
-          return true;
-        }
-      }
-
-      // Also check the line where the containing statement ends
-      AstNode? statement = node.parent;
-      while (statement != null && statement is! ExpressionStatement) {
-        if (statement is FunctionBody) break;
-        statement = statement.parent;
-      }
-      if (statement is ExpressionStatement) {
-        final int stmtEndLine = context.lineInfo
-            .getLocation(statement.end - 1)
-            .lineNumber;
-        if (stmtEndLine > 0 && stmtEndLine <= lines.length) {
-          final String line = lines[stmtEndLine - 1];
-          if (line.contains('// ignore: $_name') ||
-              line.contains('// ignore: ${_name.replaceAll('_', '-')}')) {
-            return true;
-          }
-        }
-      }
-
-      return false;
-    } catch (_) {
-      return false;
-    }
-  }
 }
 
 /// Warns when an empty string literal is used.

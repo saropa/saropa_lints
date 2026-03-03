@@ -264,9 +264,10 @@ void main() {
 
   group('Unnecessary Code - General Rules', () {
     group('no_empty_block', () {
-      test('rule offers quick fix (add ignore comment)', () {
+      test('rule has no add-ignore fix (project policy)', () {
+        // AddNoEmptyBlockIgnoreFix was removed; project prohibits fixes that insert // ignore:.
         final rule = NoEmptyBlockRule();
-        expect(rule.fixGenerators, isNotEmpty);
+        expect(rule.fixGenerators, isEmpty);
       });
 
       test('no_empty_block SHOULD trigger', () {
