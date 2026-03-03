@@ -137,6 +137,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_blank_line_before_method', // Moved from professional (opinionated)
   'prefer_blank_line_before_return', // Moved from professional (opinionated)
   'prefer_trailing_comma', // Moved from professional (opinionated)
+  'prefer_readable_line_length', // Moved from professional (opinionated)
   'unnecessary_trailing_comma', // Moved from professional (opinionated)
   'double_literal_format', // Moved from professional (opinionated)
   'format_comment_style', // Moved from pedantic (opinionated)
@@ -1599,11 +1600,11 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_uuid_v4', // UUID v4 over v1 for privacy
   'require_https_only_test', // INFO - HTTP URLs in test files
   'avoid_hardcoded_config_test', // INFO - hardcoded config in test files
+  'prefer_js_interop_over_dart_js', // INFO - dart:js_interop over deprecated dart:js
   // Batch 3 High-importance (REMAINING_ROADMAP)
   'require_error_message_clarity',
   'require_error_recovery',
   'require_firebase_email_enumeration_protection',
-  'require_firebase_composite_index',
   'require_firebase_offline_persistence',
   'require_focus_order',
   'require_heading_hierarchy',

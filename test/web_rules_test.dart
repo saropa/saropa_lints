@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/platforms/web_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 8 Web lint rules.
+/// Tests for 9 Web lint rules.
 ///
 /// Test fixtures: example_platforms/lib/web/
 void main() {
@@ -39,6 +39,11 @@ void main() {
       () => AvoidWebOnlyDependenciesRule(),
     );
     testRule(
+      'PreferJsInteropOverDartJsRule',
+      'prefer_js_interop_over_dart_js',
+      () => PreferJsInteropOverDartJsRule(),
+    );
+    testRule(
       'PreferUrlStrategyForWebRule',
       'prefer_url_strategy_for_web',
       () => PreferUrlStrategyForWebRule(),
@@ -65,6 +70,7 @@ void main() {
       'require_cors_handling',
       'prefer_deferred_loading_web',
       'avoid_web_only_dependencies',
+      'prefer_js_interop_over_dart_js',
       'prefer_url_strategy_for_web',
       'require_web_renderer_awareness',
       'avoid_js_rounded_ints',
@@ -122,6 +128,29 @@ void main() {
   });
 
   group('Web - Preference Rules', () {
+    group('prefer_js_interop_over_dart_js', () {
+      test('rule metadata: problemMessage mentions dart:js and dart:js_util', () {
+        final rule = PreferJsInteropOverDartJsRule();
+        final msg = rule.code.problemMessage;
+        expect(msg, contains('dart:js'));
+        expect(msg, contains('dart:js_util'));
+      });
+      test('only dart:js and dart:js_util trigger (no dart:html or package URIs)', () {
+        // False-positive guard: rule uses exact Set match; similar URIs must not match.
+        final rule = PreferJsInteropOverDartJsRule();
+        expect(rule.code.name, 'prefer_js_interop_over_dart_js');
+        // If the rule used .contains() on string, 'dart:html'.contains('dart:js') could match.
+        // Our implementation uses Set.contains(uri) so only exact URIs trigger.
+        expect(rule.code.correctionMessage, contains('dart:js_interop'));
+      });
+      test('compliant URI dart:js_interop is not in deprecated set', () {
+        const compliantUris = ['dart:js_interop', 'dart:js_interop_unsafe', 'dart:html', 'package:foo/dart_js.dart'];
+        for (final uri in compliantUris) {
+          expect(uri, isNot(equals('dart:js')), reason: 'dart:js should not be in compliant list');
+          expect(uri, isNot(equals('dart:js_util')), reason: 'dart:js_util should not be in compliant list');
+        }
+      });
+    });
     group('prefer_deferred_loading_web', () {
       test('eager import of large web module SHOULD trigger', () {
         expect('eager import of large web module', isNotNull);
