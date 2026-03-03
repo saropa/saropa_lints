@@ -136,45 +136,45 @@ After integration, remove history references from CHANGELOG and delete or archiv
 
 ## Phase 2: issues (9 files)
 
-- [ ] bugs/history/issues/issue_020_require_pagination_for_large_lists.md
-- [ ] bugs/history/issues/issue_024_prefer_sliverfillremaining_for_empty_state.md
-- [ ] bugs/history/issues/issue_025_require_rtl_layout_support.md
-- [ ] bugs/history/issues/issue_026_require_stepper_state_management.md
-- [ ] bugs/history/issues/issue_029_require_pagination_for_large_lists.md
-- [ ] bugs/history/issues/issue_033_prefer_sliverfillremaining_for_empty_state.md
-- [ ] bugs/history/issues/issue_034_require_rtl_layout_support.md
-- [ ] bugs/history/issues/issue_035_require_stepper_state_management.md
-- [ ] bugs/history/issues/issue_038_avoid_infinite_scroll_duplicate_requests.md
+- [x] bugs/history/issues/issue_020_require_pagination_for_large_lists.md
+- [x] bugs/history/issues/issue_024_prefer_sliverfillremaining_for_empty_state.md
+- [x] bugs/history/issues/issue_025_require_rtl_layout_support.md
+- [x] bugs/history/issues/issue_026_require_stepper_state_management.md
+- [x] bugs/history/issues/issue_029_require_pagination_for_large_lists.md
+- [x] bugs/history/issues/issue_033_prefer_sliverfillremaining_for_empty_state.md
+- [x] bugs/history/issues/issue_034_require_rtl_layout_support.md
+- [x] bugs/history/issues/issue_035_require_stepper_state_management.md
+- [x] bugs/history/issues/issue_038_avoid_infinite_scroll_duplicate_requests.md
 
 ---
 
 ## Phase 2: migration (5 files)
 
-- [ ] bugs/history/migration/migration to native dart analyzer plugin.md
-- [ ] bugs/history/migration/migration-candidate-003-remove_deprecated_assetmanifest_json_file_in.md
-- [ ] bugs/history/migration/migration-candidate-007-deprecate_dropdownbuttonformfield_value_parameter_in_favor_o.md
-- [ ] bugs/history/migration/migration-candidate-008-clean_up_references_to_deprecated_onpop_method_in_docs_in.md
+- [x] bugs/history/migration/migration to native dart analyzer plugin.md
+- [x] bugs/history/migration/migration-candidate-003-remove_deprecated_assetmanifest_json_file_in.md
+- [x] bugs/history/migration/migration-candidate-007-deprecate_dropdownbuttonformfield_value_parameter_in_favor_o.md
+- [x] bugs/history/migration/migration-candidate-008-clean_up_references_to_deprecated_onpop_method_in_docs_in.md
 
 ---
 
 ## Phase 3: not_viable/drift (8 files)
 
-- [ ] bugs/history/not_viable/drift/not-viable-avoid_drift_client_default_for_timestamps.md
-- [ ] bugs/history/not_viable/drift/not-viable-avoid_drift_custom_constraint_without_not_null.md
-- [ ] bugs/history/not_viable/drift/not-viable-avoid_drift_downgrade.md
-- [ ] bugs/history/not_viable/drift/not-viable-avoid_drift_multiple_auto_increment.md
-- [ ] bugs/history/not_viable/drift/not-viable-prefer_drift_modular_generation.md
-- [ ] bugs/history/not_viable/drift/not-viable-require_drift_build_runner.md
-- [ ] bugs/history/not_viable/drift/not-viable-require_drift_table_column_trailing_parens.md
-- [ ] bugs/history/not_viable/drift/not-viable-require_drift_wal_mode.md
+- [x] bugs/history/not_viable/drift/not-viable-avoid_drift_client_default_for_timestamps.md
+- [x] bugs/history/not_viable/drift/not-viable-avoid_drift_custom_constraint_without_not_null.md
+- [x] bugs/history/not_viable/drift/not-viable-avoid_drift_downgrade.md
+- [x] bugs/history/not_viable/drift/not-viable-avoid_drift_multiple_auto_increment.md
+- [x] bugs/history/not_viable/drift/not-viable-prefer_drift_modular_generation.md
+- [x] bugs/history/not_viable/drift/not-viable-require_drift_build_runner.md
+- [x] bugs/history/not_viable/drift/not-viable-require_drift_table_column_trailing_parens.md
+- [x] bugs/history/not_viable/drift/not-viable-require_drift_wal_mode.md
 
 ---
 
 ## Phase 3: not_viable/framework_upgrade (134 files)
 
-- [ ] bugs/history/not_viable/framework_upgrade/migration-candidate-001-material_change_default_mouse_cursor_of_buttons_to_basic_arr.md
-- [ ] bugs/history/not_viable/framework_upgrade/migration-candidate-002-fix_drawer_child_docstring_to_say_listview_instead_of_sliver.md
-- [ ] bugs/history/not_viable/framework_upgrade/migration-candidate-004-introduce_a_getter_for_project_to_get_gradle_wrapper_propert.md
+- [x] bugs/history/not_viable/framework_upgrade/migration-candidate-001-material_change_default_mouse_cursor_of_buttons_to_basic_arr.md
+- [x] bugs/history/not_viable/framework_upgrade/migration-candidate-002-fix_drawer_child_docstring_to_say_listview_instead_of_sliver.md
+- [x] bugs/history/not_viable/framework_upgrade/migration-candidate-004-introduce_a_getter_for_project_to_get_gradle_wrapper_propert.md
 - [ ] bugs/history/not_viable/framework_upgrade/migration-candidate-005-update_gradleutils_dart_to_use_constant_instead_of_final_in.md
 - [ ] bugs/history/not_viable/framework_upgrade/migration-candidate-006-lastenginecommit_ps1_use_flutterroot_instead_of_gittoplevel_.md
 - [ ] bugs/history/not_viable/framework_upgrade/migration-candidate-009-android_gradle_use_lowercase_instead_of_tolowercase_in_prepa.md
