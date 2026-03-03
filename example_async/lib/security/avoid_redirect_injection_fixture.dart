@@ -89,7 +89,7 @@ void badSimplePush(String returnUrl) {
   push(returnUrl);
 }
 
-void push(String route) {}
+void push(String route, {String? exportDestination}) {}
 
 // BAD: Variable named with redirect term
 void badRedirectVariable() {
@@ -128,6 +128,18 @@ void goodRedirectWithAllowlist(String returnUrl) {
 }
 
 bool _isAllowlistedDomain(String url) => true;
+
+final _allowedExportDestinationsRedirect = {'clipboard', 'notes'};
+
+// GOOD: Allowlist-validated destination (metadata, not a redirect URL)
+// Value is one of a fixed set (e.g. 'clipboard', 'notes'), not user-controlled URL.
+void goodAllowlistValidatedDestination(String destination) {
+  final validatedDestination =
+      _allowedExportDestinationsRedirect.contains(destination)
+          ? destination
+          : null;
+  push('/', exportDestination: validatedDestination);
+}
 
 // GOOD: Static route (not from parameter)
 void goodStaticRoute() {

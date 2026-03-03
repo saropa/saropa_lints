@@ -2275,7 +2275,13 @@ class RequireUrlValidationRule extends SaropaLintRule {
 /// Open redirects can be used for phishing attacks. Always validate
 /// redirect URLs against an allowlist of trusted domains.
 ///
-/// **Quick fix available:** Adds a `// ignore:` comment for manual domain validation.
+/// **Developer note:** The rule skips reporting when the enclosing block source
+/// (lowercased) contains validation hints: `.host`, `.authority`, `allowlist`,
+/// `whitelist`, `trusted`, or the heuristic substrings `allowed` and `validated`
+/// (e.g. `_allowedExportDestinations`, `validatedDestination`). These are
+/// block-source heuristics to reduce false positives where the value is
+/// allowlist-validated metadata rather than a redirect URL. See CONTRIBUTING.md
+/// § Avoiding False Positives.
 ///
 /// **BAD:**
 /// ```dart
@@ -2412,7 +2418,7 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
           continue;
         }
 
-        // Skip if there's validation nearby
+        // Skip if there's validation nearby (domain allowlist or heuristic hints)
         AstNode? current = node.parent;
         Block? enclosingBlock;
 
@@ -2430,7 +2436,9 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
               blockSource.contains('.authority') ||
               blockSource.contains('allowlist') ||
               blockSource.contains('whitelist') ||
-              blockSource.contains('trusted')) {
+              blockSource.contains('trusted') ||
+              blockSource.contains('allowed') ||
+              blockSource.contains('validated')) {
             continue;
           }
         }
