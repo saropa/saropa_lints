@@ -3,6 +3,8 @@
 
 library;
 
+import 'dart:developer' as dev;
+
 /// CLI tool to generate analysis_options.yaml with explicit rule configuration.
 ///
 /// ## Purpose
@@ -108,7 +110,9 @@ String? _getSaropaLintsRootUri() {
     ).firstMatch(content);
 
     return match?.group(1);
-  } catch (_) {}
+  } catch (e, st) {
+    dev.log('Failed to read saropa_lints rootUri from package_config', error: e, stackTrace: st);
+  }
 
   return null;
 }
@@ -201,8 +205,8 @@ Map<String, bool> _detectProjectPackages() {
       '${detected.entries.where((e) => e.value).map((e) => e.key).join(', ')}'
       '${isFlutter ? ' (Flutter project)' : ' (pure Dart)'}${_Colors.reset}',
     );
-  } catch (_) {
-    // Can't read pubspec — fall back to all enabled
+  } catch (e, st) {
+    dev.log('Could not read project pubspec for package detection', error: e, stackTrace: st);
     return Map<String, bool>.of(tiers.defaultPackages);
   }
 
@@ -227,7 +231,9 @@ String _getPackageVersion() {
       multiLine: true,
     ).firstMatch(content);
     return match?.group(1)?.trim() ?? 'unknown';
-  } catch (_) {}
+  } catch (e, st) {
+    dev.log('Failed to read saropa_lints version from pubspec', error: e, stackTrace: st);
+  }
 
   return 'unknown';
 }
@@ -281,7 +287,8 @@ void _writeLogFile() {
     print(
       '${_Colors.bold}Log:${_Colors.reset} ${_Colors.cyan}$logPath${_Colors.reset}',
     );
-  } on Exception catch (e) {
+  } on Exception catch (e, st) {
+    dev.log('Could not write log file', error: e, stackTrace: st);
     print(
       '${_Colors.yellow}Warning: Could not write log file: $e${_Colors.reset}',
     );
@@ -365,8 +372,8 @@ Future<String?> _findNewestPluginReport(
         final name = reports.first.path.split('/').last.split('\\').last;
         return 'reports/$dateFolderName/$name';
       }
-    } catch (_) {
-      // Non-critical — fall through to retry or return null
+    } catch (e, st) {
+      dev.log('Non-critical: listing report files failed', error: e, stackTrace: st);
     }
     await Future<void>.delayed(const Duration(milliseconds: 200));
   }
@@ -744,8 +751,8 @@ void _tryEnableAnsiWindows() {
       ); // ENABLE_VIRTUAL_TERMINAL_PROCESSING
     }
     free(heap, 0, ptr);
-  } catch (_) {
-    // VTP unavailable - colors degrade gracefully to plain text
+  } catch (e, st) {
+    dev.log('VTP unavailable; colors degrade to plain text', error: e, stackTrace: st);
   }
 }
 
@@ -1099,6 +1106,8 @@ const Map<String, List<String>> _stylisticRuleCategories =
         'prefer_blank_line_before_case',
         'prefer_blank_line_before_constructor',
         'prefer_blank_line_before_method',
+        'prefer_blank_line_before_else',
+        'prefer_blank_line_after_loop',
         'prefer_trailing_comma',
         'double_literal_format',
         'format_comment_style',
@@ -1781,14 +1790,15 @@ Future<void> main(List<String> args) async {
       final outputName = cliArgs.outputPath.split('/').last.split('\\').last;
       final backupPath = '$outputDir/${_logTimestamp}_$outputName.bak';
       outputFile.copySync(backupPath);
-    } on Exception catch (_) {
-      // Backup failed - continue anyway
+    } on Exception catch (e, st) {
+      dev.log('Backup before overwrite failed', error: e, stackTrace: st);
     }
 
     try {
       outputFile.writeAsStringSync(newContent);
       _logTerminal('${_success('✓ Written to:')} ${cliArgs.outputPath}');
-    } on Exception catch (e) {
+    } on Exception catch (e, st) {
+      dev.log('Failed to write config file', error: e, stackTrace: st);
       _logTerminal(_error('✗ Failed to write file: $e'));
       exitCode = 2;
       return;

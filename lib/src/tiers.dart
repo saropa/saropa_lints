@@ -136,6 +136,8 @@ const Set<String> stylisticRules = <String>{
   'prefer_blank_line_before_constructor', // Moved from professional (opinionated)
   'prefer_blank_line_before_method', // Moved from professional (opinionated)
   'prefer_blank_line_before_return', // Moved from professional (opinionated)
+  'prefer_blank_line_before_else',
+  'prefer_blank_line_after_loop',
   'prefer_trailing_comma', // Moved from professional (opinionated)
   'prefer_readable_line_length', // Moved from professional (opinionated)
   'unnecessary_trailing_comma', // Moved from professional (opinionated)
