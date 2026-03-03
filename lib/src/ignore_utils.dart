@@ -66,7 +66,9 @@ class IgnoreUtils {
   /// Converts a rule name from underscore format to hyphen format.
   ///
   /// Example: `no_empty_block` -> `no-empty-block`
-  static String toHyphenated(String ruleName) => ruleName.replaceAll('_', '-');
+  /// Returns empty string if [ruleName] is null.
+  static String toHyphenated(String? ruleName) =>
+      ruleName?.replaceAll('_', '-') ?? '';
 
   /// Checks if a rule is suppressed at the file level via
   /// `// ignore_for_file:` directive.
@@ -78,11 +80,16 @@ class IgnoreUtils {
   /// This is intentionally a string-based search on file content rather
   /// than an AST walk, for performance — it runs once per rule per file
   /// before any AST callbacks are registered.
-  static bool isIgnoredForFile(String fileContent, String ruleName) {
+  /// Returns false if [fileContent] or [ruleName] is null or empty.
+  static bool isIgnoredForFile(String? fileContent, String? ruleName) {
+    if (fileContent == null || fileContent.isEmpty) return false;
+    if (ruleName == null || ruleName.isEmpty) return false;
+
     // Fast pre-check avoids regex compilation for the common case
     if (!fileContent.contains('ignore_for_file:')) return false;
 
     final hyphenatedName = toHyphenated(ruleName);
+    if (hyphenatedName.isEmpty) return false;
 
     // Match the rule name inside an ignore_for_file comment.
     // Uses \b word boundaries to avoid matching substrings

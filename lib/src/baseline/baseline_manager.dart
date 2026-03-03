@@ -106,12 +106,17 @@ class BaselineManager {
   ///
   /// **Note**: Date-based baseline requires [preloadDateBaseline] to be called first.
   /// If not preloaded, date-based checks are skipped.
+  /// Returns false if [filePath], [ruleName] are null/empty or [line] < 1.
   static bool isBaselined(
-    String filePath,
-    String ruleName,
+    String? filePath,
+    String? ruleName,
     int line, {
     String? impact,
   }) {
+    if (filePath == null || filePath.isEmpty) return false;
+    if (ruleName == null || ruleName.isEmpty) return false;
+    if (line < 1) return false;
+
     final config = _config;
     if (config == null || !config.isEnabled) {
       return false;
@@ -144,12 +149,17 @@ class BaselineManager {
   ///
   /// This version runs git blame if needed. Use for CLI tools or when
   /// async operations are acceptable.
+  /// Returns false if [filePath], [ruleName] are null/empty or [line] < 1.
   static Future<bool> isBaselinedAsync(
-    String filePath,
-    String ruleName,
+    String? filePath,
+    String? ruleName,
     int line, {
     String? impact,
   }) async {
+    if (filePath == null || filePath.isEmpty) return false;
+    if (ruleName == null || ruleName.isEmpty) return false;
+    if (line < 1) return false;
+
     final config = _config;
     if (config == null || !config.isEnabled) {
       return false;
@@ -182,25 +192,36 @@ class BaselineManager {
   ///
   /// Call this before analyzing a file to enable date-based baseline checks.
   /// This runs `git blame` once for the file and caches all line dates.
-  static Future<void> preloadDateBaseline(String filePath) async {
+  /// No-op if [filePath] is null or empty.
+  static Future<void> preloadDateBaseline(String? filePath) async {
+    if (filePath == null || filePath.isEmpty) return;
+
     final baselineDate = _baselineDate;
     if (baselineDate == null) return;
 
-    await baselineDate.preloadFile(filePath, projectRoot: _projectRoot);
+    try {
+      await baselineDate.preloadFile(filePath, projectRoot: _projectRoot);
+    } catch (_) {
+      return;
+    }
 
     // Also populate our sync cache
     final fileCache = _dateCache.putIfAbsent(filePath, () => {});
-    final file = File(filePath);
-    if (!file.existsSync()) return;
+    try {
+      final file = File(filePath);
+      if (!file.existsSync()) return;
 
-    final lines = file.readAsLinesSync();
-    for (var i = 1; i <= lines.length; i++) {
-      final isOld = await baselineDate.isOlderThanBaseline(
-        filePath,
-        i,
-        projectRoot: _projectRoot,
-      );
-      fileCache[i] = isOld;
+      final lines = file.readAsLinesSync();
+      for (var i = 1; i <= lines.length; i++) {
+        final isOld = await baselineDate.isOlderThanBaseline(
+          filePath,
+          i,
+          projectRoot: _projectRoot,
+        );
+        fileCache[i] = isOld;
+      }
+    } catch (_) {
+      // File read or blame failed; sync cache stays empty
     }
   }
 
@@ -294,15 +315,18 @@ class BaselineManager {
   }
 
   /// Find the project root by looking for pubspec.yaml.
-  static String? _findProjectRoot(String startPath) {
-    var dir = Directory(startPath);
-    while (dir.path != dir.parent.path) {
-      final pubspec = File('${dir.path}/pubspec.yaml');
-      if (pubspec.existsSync()) {
-        return dir.path;
+  static String? _findProjectRoot(String? startPath) {
+    if (startPath == null || startPath.isEmpty) return null;
+    try {
+      var dir = Directory(startPath);
+      while (dir.path != dir.parent.path) {
+        final pubspec = File('${dir.path}/pubspec.yaml');
+        if (pubspec.existsSync()) {
+          return dir.path;
+        }
+        dir = dir.parent;
       }
-      dir = dir.parent;
-    }
+    } catch (_) {}
     return null;
   }
 
@@ -326,6 +350,6 @@ class BaselineManager {
   static String? get projectRoot => _projectRoot;
 
   /// Find the project root (public accessor).
-  static String? findProjectRoot(String startPath) =>
+  static String? findProjectRoot(String? startPath) =>
       _findProjectRoot(startPath);
 }

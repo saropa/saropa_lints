@@ -1,5 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages
 
+/// Reusable quick-fix base: replace the violation node's source with new text.
+/// Used by fixes that rewrite an expression or statement (e.g. replace deprecated
+/// API with recommended one). Subclass and implement [computeReplacement].
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/source_range.dart';
 
@@ -30,11 +33,19 @@ abstract class ReplaceNodeFix extends SaropaFixProducer {
     if (target == null) return;
 
     final replacement = computeReplacement(target);
-    await builder.addDartFileEdit(file, (builder) {
-      builder.addSimpleReplacement(
-        SourceRange(target.offset, target.length),
-        replacement,
-      );
-    });
+
+    if (file.isEmpty) return;
+
+    final offset = target.offset;
+    final length = target.length;
+    if (offset < 0 || length < 0) return;
+
+    try {
+      await builder.addDartFileEdit(file, (b) {
+        b.addSimpleReplacement(SourceRange(offset, length), replacement);
+      });
+    } catch (_) {
+      // Builder or edit may fail; avoid propagating
+    }
   }
 }

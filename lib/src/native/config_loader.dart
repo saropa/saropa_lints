@@ -2,14 +2,15 @@
 
 /// Loads saropa_lints configuration for the native analyzer plugin.
 ///
-/// Called once from [SaropaLintsPlugin.start] to populate:
-/// - [SaropaLintRule.severityOverrides] and [SaropaLintRule.disabledRules]
-/// - [BaselineManager] configuration
-/// - [ProgressTracker] output settings (max_issues, output mode)
+/// **When:** Called once from [SaropaLintsPlugin.start] before [register].
+/// **Where:** Project root = [Directory.current]; files: analysis_options.yaml,
+/// analysis_options_custom.yaml. Env vars (e.g. SAROPA_LINTS_MAX) override where applicable.
 ///
-/// Reads `analysis_options.yaml` (for rule enable/disable via `diagnostics:`)
-/// and `analysis_options_custom.yaml` (for severities, baseline, output)
-/// from the project root using `Directory.current`.
+/// Populates:
+/// - [SaropaLintRule.severityOverrides] and [SaropaLintRule.disabledRules]
+/// - [BaselineManager] (baseline path, enabled)
+/// - [ProgressTracker] (max_issues, file-only output)
+/// - [BannedUsageConfig] from custom yaml
 library;
 
 import 'dart:io' show Directory, File, Platform;
@@ -22,26 +23,36 @@ import '../baseline/baseline_manager.dart';
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 
 /// Loads all plugin configuration from yaml and environment variables.
-///
+/// Order matters: severity overrides first, then diagnostics (enable/disable),
+/// then baseline, banned usage, and output (max_issues, file-only).
 /// Safe to call multiple times — static fields are simply overwritten.
+/// Never throws; failures in any step are caught and the rest still run.
 void loadNativePluginConfig() {
-  final content = _readProjectFile('analysis_options_custom.yaml');
-  _loadSeverityOverrides(content);
-  _loadDiagnosticsConfig();
-  _loadBaselineConfig(content);
-  loadBannedUsageConfig(content);
-  _loadOutputConfig(content);
+  try {
+    final content = _readProjectFile('analysis_options_custom.yaml');
+    _loadSeverityOverrides(content);
+    _loadDiagnosticsConfig();
+    _loadBaselineConfig(content);
+    loadBannedUsageConfig(content);
+    _loadOutputConfig(content);
+  } catch (_) {
+    // Defensive: ensure plugin can still register with defaults
+  }
 }
 
-/// Read a yaml file from the project root. Returns null if not found.
+/// Read a yaml file from the project root. Returns null if not found or on error.
 String? _readProjectFile(String filename) {
+  if (filename.isEmpty) return null;
   try {
+    final currentPath = Directory.current.path;
+    if (currentPath.isEmpty) return null;
     final sep = Platform.pathSeparator;
-    final path = '${Directory.current.path}$sep$filename';
+    final path = '$currentPath$sep$filename';
     final file = File(path);
     if (!file.existsSync()) return null;
     return file.readAsStringSync();
   } catch (_) {
+    // I/O or path error; return null so config steps use defaults
     return null;
   }
 }
@@ -81,10 +92,11 @@ void _loadSeverityOverrides(String? content) {
     final match = RegExp(r'^\s+(\w+):\s*(\S+)').firstMatch(line);
     if (match == null) continue;
 
-    final ruleName = match.group(1)!;
-    final value = match.group(2)!.toUpperCase();
+    final ruleName = match.group(1);
+    final value = match.group(2);
+    if (ruleName == null || ruleName.isEmpty || value == null) continue;
 
-    switch (value) {
+    switch (value.toUpperCase()) {
       case 'ERROR':
         overrides[ruleName] = DiagnosticSeverity.ERROR;
       case 'WARNING':

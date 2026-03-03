@@ -26,7 +26,8 @@ class BannedUsageEntry {
 
   /// Whole-word match: [name] equals [identifier] (e.g. `print` matches
   /// `print` but not `_print` or `println`).
-  bool matchesName(String name) => name == identifier;
+  /// Returns false if [name] is null.
+  bool matchesName(String? name) => name != null && name == identifier;
 }
 
 /// Configured bans. Set by [loadBannedUsageConfig] from config_loader.
@@ -44,7 +45,7 @@ List<BannedUsageEntry> bannedUsageEntries = [];
 /// ```
 void loadBannedUsageConfig(String? content) {
   bannedUsageEntries = [];
-  if (content == null || content.isEmpty) return;
+  if (content == null || content.trim().isEmpty) return;
 
   final sectionMatch = RegExp(
     r'^banned_usage:\s*$',

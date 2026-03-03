@@ -1,5 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages
 
+/// Reusable quick-fix base: insert text at the violation location.
+/// Used by many rule-specific fixes that only need to add a snippet (e.g. add
+/// a mounted check, add a const keyword). Subclass and implement [insertionText].
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../native/saropa_fix.dart';
@@ -30,9 +33,20 @@ abstract class InsertTextFix extends SaropaFixProducer {
     final target = findTargetNode(node);
     if (target == null) return;
 
+    final text = insertionText;
+    if (text.isEmpty) return; // Defensive: no insertion text
+
+    if (file.isEmpty) return;
+
     final offset = insertBefore ? target.offset : target.end;
-    await builder.addDartFileEdit(file, (builder) {
-      builder.addSimpleInsertion(offset, insertionText);
-    });
+    if (offset < 0) return;
+
+    try {
+      await builder.addDartFileEdit(file, (b) {
+        b.addSimpleInsertion(offset, text);
+      });
+    } catch (_) {
+      // Builder or edit may fail; avoid propagating
+    }
   }
 }

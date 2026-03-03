@@ -31,56 +31,79 @@ class BaselineFile {
 
   /// Loads a baseline file from the given path.
   ///
-  /// Returns null if the file doesn't exist or is invalid.
-  static BaselineFile? load(String path) {
-    final file = File(path);
-    if (!file.existsSync()) {
-      return null;
-    }
+  /// Returns null if the file doesn't exist, path is null/empty, or content is invalid.
+  static BaselineFile? load(String? path) {
+    if (path == null || path.trim().isEmpty) return null;
 
     try {
+      final file = File(path);
+      if (!file.existsSync()) {
+        return null;
+      }
+
       final content = file.readAsStringSync();
-      final json = jsonDecode(content) as Map<String, dynamic>;
-      return BaselineFile.fromJson(json);
-    } catch (e) {
+      if (content.isEmpty) return null;
+
+      final decoded = jsonDecode(content);
+      if (decoded is! Map<String, dynamic>) return null;
+
+      return BaselineFile.fromJson(decoded);
+    } catch (_) {
       // Invalid JSON or format - return null
       return null;
     }
   }
 
   /// Creates a [BaselineFile] from parsed JSON.
-  factory BaselineFile.fromJson(Map<String, dynamic> json) {
-    final version = json['version'] as int? ?? 1;
+  ///
+  /// Never throws; invalid or unknown-version data yields a safe default.
+  factory BaselineFile.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return BaselineFile(violations: {}, generated: DateTime.now());
+    }
+
+    final version = json['version'] is int ? json['version'] as int : 1;
     if (version > currentVersion) {
-      throw FormatException(
-        'Baseline file version $version is newer than supported version $currentVersion',
-      );
+      // Unknown version: return empty baseline instead of throwing
+      return BaselineFile(violations: {}, generated: DateTime.now());
     }
 
     final generatedStr = json['generated'] as String?;
-    final generated = generatedStr != null
-        ? DateTime.tryParse(generatedStr)
+    final generated = generatedStr != null && generatedStr.trim().isNotEmpty
+        ? (DateTime.tryParse(generatedStr) ?? DateTime.now())
         : DateTime.now();
 
-    final violationsRaw = json['violations'] as Map<String, dynamic>? ?? {};
+    final violationsRaw = json['violations'];
     final violations = <String, Map<String, List<int>>>{};
 
-    for (final entry in violationsRaw.entries) {
-      final filePath = entry.key;
-      final rulesRaw = entry.value as Map<String, dynamic>? ?? {};
-      final rules = <String, List<int>>{};
+    if (violationsRaw is Map<String, dynamic>) {
+      for (final entry in violationsRaw.entries) {
+        final filePath = entry.key.trim();
+        if (filePath.isEmpty) continue;
 
-      for (final ruleEntry in rulesRaw.entries) {
-        final ruleName = ruleEntry.key;
-        final linesRaw = ruleEntry.value as List<dynamic>? ?? [];
-        final lines = linesRaw.whereType<int>().toList();
-        if (lines.isNotEmpty) {
-          rules[ruleName] = lines;
+        final rulesRaw = entry.value;
+        if (rulesRaw is! Map<String, dynamic>) continue;
+
+        final rules = <String, List<int>>{};
+        for (final ruleEntry in rulesRaw.entries) {
+          final ruleName = ruleEntry.key.trim();
+          if (ruleName.isEmpty) continue;
+
+          final linesRaw = ruleEntry.value;
+          if (linesRaw is! List) continue;
+
+          final lines = linesRaw
+              .whereType<int>()
+              .where((l) => l >= 1)
+              .toList();
+          if (lines.isNotEmpty) {
+            rules[ruleName] = lines;
+          }
         }
-      }
 
-      if (rules.isNotEmpty) {
-        violations[filePath] = rules;
+        if (rules.isNotEmpty) {
+          violations[filePath] = rules;
+        }
       }
     }
 
@@ -97,16 +120,27 @@ class BaselineFile {
   }
 
   /// Saves this baseline to the given path.
-  void save(String path) {
-    final file = File(path);
-    final encoder = const JsonEncoder.withIndent('  ');
-    file.writeAsStringSync(encoder.convert(toJson()));
+  /// No-op if [path] is null or empty. Swallows IO errors (defensive).
+  void save(String? path) {
+    if (path == null || path.trim().isEmpty) return;
+    try {
+      final file = File(path);
+      final encoder = const JsonEncoder.withIndent('  ');
+      file.writeAsStringSync(encoder.convert(toJson()));
+    } catch (_) {
+      // Caller can check file system separately if needed
+    }
   }
 
   /// Checks if a specific violation is baselined.
   ///
   /// [filePath] should be normalized (forward slashes).
-  bool isBaselined(String filePath, String ruleName, int line) {
+  /// Returns false if [filePath], [ruleName] are null/empty or [line] < 1.
+  bool isBaselined(String? filePath, String? ruleName, int line) {
+    if (filePath == null || filePath.isEmpty) return false;
+    if (ruleName == null || ruleName.isEmpty) return false;
+    if (line < 1) return false;
+
     // Normalize the file path for lookup
     final normalized = _normalizePath(filePath);
 

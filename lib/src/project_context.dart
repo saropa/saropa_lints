@@ -1,5 +1,11 @@
 // ignore_for_file: always_specify_types
 
+/// Project-wide context and caches for saropa_lints rules.
+///
+/// **Purpose:** Avoid redundant I/O and parsing. Package detection, file type,
+/// and content filters are computed once per project/file and reused. Rules
+/// call [ProjectContext.of(context)] to get the singleton; all heavy data
+/// (pubspec deps, path normalization, bloom filters, etc.) lives here.
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
@@ -21,6 +27,8 @@ import 'dart:typed_data';
 /// Converts backslashes to forward slashes for cross-platform consistency.
 /// ALWAYS use this when storing or looking up file paths in maps/caches.
 ///
+/// Returns empty string for null or empty input (defensive fallback).
+///
 /// Example:
 /// ```dart
 /// // BAD - will fail on Windows:
@@ -29,7 +37,10 @@ import 'dart:typed_data';
 /// // GOOD - works everywhere:
 /// _cache[normalizePath(filePath)] = value;
 /// ```
-String normalizePath(String path) => path.replaceAll('\\', '/');
+String normalizePath(String? path) {
+  if (path == null || path.isEmpty) return '';
+  return path.replaceAll('\\', '/');
+}
 
 // =============================================================================
 // PROJECT CONTEXT CACHE (Performance Optimization)
@@ -67,7 +78,9 @@ class BloomFilter {
   ///
   /// Larger sizes reduce false positive rate but use more memory.
   /// Default of 8192 bits (1KB) gives ~1% false positive rate for 500 patterns.
-  BloomFilter([int bitSize = 8192]) : _bits = Uint8List((bitSize + 7) ~/ 8);
+  /// If [bitSize] is <= 0, uses 8192 as fallback.
+  BloomFilter([int bitSize = 8192])
+      : _bits = Uint8List(((bitSize > 0 ? bitSize : 8192) + 7) ~/ 8);
 
   final Uint8List _bits;
   int get _bitSize => _bits.length * 8;
@@ -76,7 +89,9 @@ class BloomFilter {
   static const int _numHashes = 3;
 
   /// Add a string to the filter.
-  void add(String value) {
+  /// No-op if [value] is null or empty.
+  void add(String? value) {
+    if (value == null || value.isEmpty) return;
     final hashes = _getHashes(value);
     for (final hash in hashes) {
       final index = hash % _bitSize;
@@ -87,7 +102,9 @@ class BloomFilter {
   /// Add all space-separated tokens from content.
   ///
   /// Also adds common substrings (3-10 char prefixes) for partial matching.
-  void addAllTokens(String content) {
+  /// No-op if [content] is null.
+  void addAllTokens(String? content) {
+    if (content == null) return;
     // Add word tokens
     final words = content.split(RegExp(r'[\s\.\(\)\{\}\[\];,<>]+'));
     for (final word in words) {
@@ -103,9 +120,10 @@ class BloomFilter {
 
   /// Check if the filter might contain a string.
   ///
-  /// Returns true if definitely NOT in the set.
-  /// Returns false if MAYBE in the set (could be false positive).
-  bool mightContain(String value) {
+  /// Returns false if [value] is null or empty (defensive: never "might contain").
+  /// Otherwise: false = definitely not in set; true = might be in set (possible false positive).
+  bool mightContain(String? value) {
+    if (value == null || value.isEmpty) return false;
     final hashes = _getHashes(value);
     for (final hash in hashes) {
       final index = hash % _bitSize;
@@ -301,9 +319,11 @@ class ProjectContext {
   ///
   /// Finds the project root (directory containing pubspec.yaml) and caches
   /// the parsed project information for subsequent calls.
-  static _ProjectInfo? getProjectInfo(String filePath) {
+  /// Returns null if [filePath] is null/empty or no project root is found.
+  static _ProjectInfo? getProjectInfo(String? filePath) {
+    if (filePath == null || filePath.isEmpty) return null;
     final projectRoot = findProjectRoot(filePath);
-    if (projectRoot == null) return null;
+    if (projectRoot == null || projectRoot.isEmpty) return null;
 
     return _projectCache.putIfAbsent(projectRoot, () {
       return _ProjectInfo._fromProjectRoot(projectRoot);
@@ -314,7 +334,9 @@ class ProjectContext {
   ///
   /// Returns the `name:` field from `pubspec.yaml`, or an empty string
   /// if not found. Result is cached.
-  static String getPackageName(String projectRoot) {
+  /// Returns empty string if [projectRoot] is null or empty.
+  static String getPackageName(String? projectRoot) {
+    if (projectRoot == null || projectRoot.isEmpty) return '';
     final info = _projectCache.putIfAbsent(projectRoot, () {
       return _ProjectInfo._fromProjectRoot(projectRoot);
     });
@@ -324,10 +346,13 @@ class ProjectContext {
   /// Find the project root directory (contains pubspec.yaml).
   ///
   /// Walks up the directory tree from [filePath] looking for pubspec.yaml.
-  /// Returns `null` if no project root is found.
-  static String? findProjectRoot(String filePath) {
+  /// Returns `null` if no project root is found or [filePath] is null/empty.
+  static String? findProjectRoot(String? filePath) {
+    if (filePath == null || filePath.isEmpty) return null;
     final normalized = normalizePath(filePath);
-    var dir = Directory(normalized).parent;
+    if (normalized.isEmpty) return null;
+    try {
+      var dir = Directory(normalized).parent;
 
     // Walk up the directory tree looking for pubspec.yaml
     while (dir.path.length > 1) {
@@ -340,10 +365,16 @@ class ProjectContext {
       dir = parent;
     }
     return null;
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Check if the project containing [filePath] has a specific dependency.
-  static bool hasDependency(String filePath, String packageName) {
+  /// Returns false if [filePath] or [packageName] is null/empty.
+  static bool hasDependency(String? filePath, String? packageName) {
+    if (filePath == null || filePath.isEmpty) return false;
+    if (packageName == null || packageName.isEmpty) return false;
     return getProjectInfo(filePath)?.hasDependency(packageName) ?? false;
   }
 

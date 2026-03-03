@@ -20,6 +20,10 @@ import 'package:analysis_server_plugin/registry.dart';
 import 'saropa_lints.dart';
 import 'src/native/config_loader.dart';
 
+// ---------------------------------------------------------------------------
+// Plugin discovery: analysis server loads this file and reads [plugin].
+// ---------------------------------------------------------------------------
+
 /// Top-level plugin instance discovered by the analysis server.
 final plugin = SaropaLintsPlugin();
 
@@ -32,25 +36,43 @@ class SaropaLintsPlugin extends Plugin {
   @override
   String get name => 'saropa_lints';
 
-  /// Loads plugin configuration before rules are registered.
+  /// Loads plugin configuration (severity overrides, disabled rules, etc.)
+  /// from analysis_options / SAROPA env vars before rules are registered.
   @override
   FutureOr<void> start() {
-    loadNativePluginConfig();
+    try {
+      loadNativePluginConfig();
+    } catch (_) {
+      // Defensive: plugin still registers with defaults
+    }
   }
 
+  /// Registers each rule and its quick-fix generators with the analysis server.
+  /// Disabled rules (from config) are skipped; all others get rule + fixes.
+  /// Invalid rules (null code or empty name) are skipped defensively.
   @override
   void register(PluginRegistry registry) {
-    final disabled = SaropaLintRule.disabledRules;
-    for (final rule in allSaropaRules) {
-      if (disabled != null && disabled.contains(rule.code.name)) {
-        continue;
-      }
+    try {
+      final rules = allSaropaRules;
+      if (rules.isEmpty) return;
 
-      registry.registerLintRule(rule);
+      final disabled = SaropaLintRule.disabledRules;
+      for (final rule in rules) {
+        final code = rule.code;
+        if (code.name.isEmpty) continue;
 
-      for (final generator in rule.fixGenerators) {
-        registry.registerFixForRule(rule.code, generator);
+        if (disabled != null && disabled.contains(code.name)) {
+          continue;
+        }
+
+        registry.registerLintRule(rule);
+
+        for (final generator in rule.fixGenerators) {
+          registry.registerFixForRule(code, generator);
+        }
       }
+    } catch (_) {
+      // Defensive: avoid bringing down the analysis server
     }
   }
 }
