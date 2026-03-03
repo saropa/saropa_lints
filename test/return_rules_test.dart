@@ -123,6 +123,12 @@ void main() {
         expect('implicit void return', isNotNull);
       });
     });
+    group('avoid_returning_null_for_void', () {
+      test('rule offers quick fix (replace return null with return)', () {
+        final rule = AvoidReturningNullForVoidRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+    });
   });
 
   group('Return - Preference Rules', () {

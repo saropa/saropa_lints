@@ -6,6 +6,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../fixes/collection/remove_duplicate_map_entry_fix.dart';
 import '../fixes/collection/replace_with_where_or_null_fix.dart';
 import '../fixes/collection/use_contains_key_fix.dart';
 import '../fixes/collection/use_last_fix.dart';
@@ -153,6 +154,12 @@ class AvoidDuplicateMapKeysRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveDuplicateMapEntryFix(context: context),
+  ];
 }
 
 /// Warns when .keys.contains() is used instead of .containsKey().

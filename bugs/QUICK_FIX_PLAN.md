@@ -1,8 +1,8 @@
 # Quick Fix Plan: Analysis + Checklist
 
-**Goal:** Increase quick fix coverage from **119/1962 (6.1%)** by implementing fixes in priority order, with fixtures + tests, and validating via the audit script.
+**Goal:** Increase quick fix coverage from **119/2050 (5.8%)** by implementing fixes in priority order, with fixtures + tests, and validating via the audit script.
 
-**Current state:** 119 rules with fixes / 1962 total rules (6.1%). **1843 rules have no fix.**
+**Current state:** 119 rules with fixes / 2050 total rules (5.8%). **1931 rules have no fix.**
 
 ---
 
@@ -255,11 +255,36 @@ Execution work follows **Part 2 (Checklist)** below.
 
 ### H. Batch 6 — Performance sync I/O (MEDIUM)
 
-- [ ] `performance_rules.dart`: `avoid_synchronous_file_io`
-  - [ ] Fix 1: replace sync method name with async equivalent
+- [x] `performance_rules.dart`: `avoid_synchronous_file_io`
+  - [x] Fix 1: replace sync method name with async equivalent (`ReplaceSyncFileIoFix`)
   - [ ] Fix 2 (optional): also add `await` when legal (multi-edit)
+  - [x] Fixture exists; test added in `performance_rules_test.dart`.
 
-**Exit criteria:** +1 or +2 fixes, fixtures/tests present, audit increases.
+**Exit criteria:** +1 or +2 fixes, fixtures/tests present, audit increases. **Done (+1 fix).**
+
+### H2. Batch 7 — Control flow, code quality, collection (EASY)
+
+- [x] `control_flow_rules.dart`: `avoid_constant_assert_conditions` — `RemoveConstantAssertFix` (delete assert statement).
+- [x] `control_flow_rules.dart`: `avoid_duplicate_switch_case_conditions` — `RemoveDuplicateSwitchCaseFix` (delete duplicate case).
+- [x] `control_flow_rules.dart`: `avoid_redundant_else` — `RemoveRedundantElseFix` (delete else clause).
+- [x] `code_quality_avoid_rules.dart`: `avoid_adjacent_strings` — `CombineAdjacentStringsFix` (replace with single string literal).
+- [x] `collection_rules.dart`: `avoid_duplicate_map_keys` — `RemoveDuplicateMapEntryFix` (delete duplicate map entry).
+
+**Exit criteria:** +5 fixes, fixtures/tests present, audit increases. **Done (+5 fixes).**
+
+### H3. Batch 8 — Control flow (more) + exception (EASY)
+
+- [x] `control_flow_rules.dart`: `avoid_unconditional_break` — `RemoveUnconditionalBreakFix` (delete break/continue statement).
+- [x] `control_flow_rules.dart`: `no_equal_then_else` — `ReplaceWithThenBranchFix` (replace if/ternary with then branch only).
+- [x] `exception_rules.dart`: `avoid_only_rethrow` — `RemoveTryCatchOnlyRethrowFix` (replace try-catch with try body only).
+
+**Exit criteria:** +3 fixes, tests present, audit increases. **Done (+3 fixes).**
+
+### H4. Batch 9 — Return (EASY)
+
+- [x] `return_rules.dart`: `avoid_returning_null_for_void` — `ReplaceReturnNullWithReturnFix` (replace "return null;" with "return;").
+
+**Batch 6+7+8+9 total:** +10 new quick fixes: avoid_synchronous_file_io, avoid_constant_assert_conditions, avoid_duplicate_switch_case_conditions, avoid_redundant_else, avoid_adjacent_strings, avoid_duplicate_map_keys, avoid_unconditional_break, no_equal_then_else, avoid_only_rethrow, avoid_returning_null_for_void. (Next batch can add 10 more to reach 20.)
 
 ### I. After Batch 6
 

@@ -85,6 +85,11 @@ void main() {
       });
     });
     group('avoid_only_rethrow', () {
+      test('rule offers quick fix (remove try-catch that only rethrows)', () {
+        final rule = AvoidOnlyRethrowRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('catch block that only rethrows SHOULD trigger', () {
         expect('catch block that only rethrows', isNotNull);
       });
