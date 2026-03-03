@@ -124,14 +124,14 @@ const int _deferThresholdMs = 50;
 /// pass. Run with SAROPA_LINTS_DEFERRED=true to run only the deferred rules.
 ///
 /// Set via environment variable: SAROPA_LINTS_DEFER=true
-final bool _deferSlowRules =
+final bool _isDeferSlowRules =
     const bool.fromEnvironment('SAROPA_LINTS_DEFER') ||
     const String.fromEnvironment('SAROPA_LINTS_DEFER') == 'true';
 
 /// Controls whether to run ONLY deferred (slow) rules.
 ///
 /// Set via environment variable: SAROPA_LINTS_DEFERRED=true
-final bool _runDeferredOnly =
+final bool _isRunDeferredOnly =
     const bool.fromEnvironment('SAROPA_LINTS_DEFERRED') ||
     const String.fromEnvironment('SAROPA_LINTS_DEFERRED') == 'true';
 
@@ -213,8 +213,8 @@ class ProgressTracker {
   static int _violationsFound = 0;
   static int _filesWithIssues = 0;
   static String? _lastFileWithIssue;
-  static bool _etaCalibrated = false;
-  static bool _discoveredFromFiles =
+  static bool _isEtaCalibrated = false;
+  static bool _isDiscoveredFromFiles =
       false; // True only if discoverFiles() found files
 
   // Severity tracking
@@ -244,20 +244,20 @@ class ProgressTracker {
 
   // Issue limit tracking
   static int _maxIssues = 500; // Default limit (0 = unlimited)
-  static bool _limitReached = false;
+  static bool _isLimitReached = false;
 
   // Abort tracking (triggered by .saropa_stop sentinel file)
-  static bool _abortRequested = false;
+  static bool _isAbortRequested = false;
 
   // Re-analysis detection: set when _clearFileData fires, indicating a
   // previously-completed file is being analyzed again (new build/session).
   static bool _hasReanalyzedFile = false;
 
   // Output mode: when true, all violations go to report file only
-  static bool _fileOnly = false;
+  static bool _isFileOnly = false;
 
   // Guard to ensure reportSummary() is called at most once per session
-  static bool _summaryReported = false;
+  static bool _isSummaryReported = false;
 
   // Total enabled rules (set from plugin entry point)
   static int _totalEnabledRules = 0;
@@ -282,10 +282,10 @@ class ProgressTracker {
   static int get maxIssues => _maxIssues;
 
   /// Returns true if issue limit has been reached.
-  static bool get isLimitReached => _limitReached;
+  static bool get isLimitReached => _isLimitReached;
 
   /// Returns true if abort was requested via `.saropa_stop` sentinel file.
-  static bool get isAbortRequested => _abortRequested;
+  static bool get isAbortRequested => _isAbortRequested;
 
   /// Returns true if a previously-completed file has been re-analyzed,
   /// indicating a new build/analysis session has started.
@@ -300,11 +300,11 @@ class ProgressTracker {
   /// not the Problems tab.
   ///
   /// Set via `SAROPA_LINTS_OUTPUT=file`. Default is `both`.
-  static bool get isFileOnly => _fileOnly;
+  static bool get isFileOnly => _isFileOnly;
 
   /// Set the output mode.
   static void setFileOnly({required bool fileOnly}) {
-    _fileOnly = fileOnly;
+    _isFileOnly = fileOnly;
   }
 
   /// Whether violations should be sent to the Problems tab delegate.
@@ -312,7 +312,7 @@ class ProgressTracker {
   /// False when file-only mode is active, issue limit is reached, or
   /// abort was requested.
   static bool get shouldReportToProblems =>
-      !_fileOnly && !_limitReached && !_abortRequested;
+      !_isFileOnly && !_isLimitReached && !_isAbortRequested;
 
   /// Interval between progress reports (in files or time).
   static const int _fileInterval = 10; // More frequent updates
@@ -321,7 +321,7 @@ class ProgressTracker {
   /// Set expected total file count (if known) for % calculation.
   static void setExpectedFileCount(int count) {
     _totalExpectedFiles = count;
-    _etaCalibrated = true;
+    _isEtaCalibrated = true;
   }
 
   /// Auto-discover dart files in a directory for ETA estimation.
@@ -347,11 +347,17 @@ class ProgressTracker {
       // (avoids false ETA when discovery fails or wrong directory)
       if (count >= 10) {
         _totalExpectedFiles = count;
-        _etaCalibrated = true;
-        _discoveredFromFiles = true;
+        _isEtaCalibrated = true;
+        _isDiscoveredFromFiles = true;
       }
       return count;
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        '_estimateTotalFiles failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       return 0;
     }
   }
@@ -372,9 +378,10 @@ class ProgressTracker {
     // Dedup: skip if this exact violation was already counted for this file.
     // Prevents inflated counts when the analyzer re-visits a file without
     // _clearFileData firing (consecutive re-analysis of the same file).
-    if (_currentFile != null && ruleName != null) {
+    final currentFile = _currentFile;
+    if (currentFile != null && ruleName != null) {
       final key = '$ruleName:$line';
-      final keys = _fileViolationKeys[_currentFile!] ??= {};
+      final keys = _fileViolationKeys[currentFile] ??= {};
       if (!keys.add(key)) return;
     }
 
@@ -396,8 +403,8 @@ class ProgressTracker {
     // checks this flag to stop pushing diagnostics to the Problems tab.
     final nonErrorCount = _warningCount + _infoCount;
     if (!isError && _maxIssues > 0 && nonErrorCount > _maxIssues) {
-      if (!_limitReached) {
-        _limitReached = true;
+      if (!_isLimitReached) {
+        _isLimitReached = true;
         stderr.writeln('');
         stderr.writeln(
           '[saropa_lints] $_maxIssues issues in Problems tab. '
@@ -415,16 +422,17 @@ class ProgressTracker {
 
   /// Track violation counts by file and by rule for report generation.
   static void _trackByFileAndRule(String? severity, String? ruleName) {
-    if (_currentFile != null) {
-      _issuesByFile[_currentFile!] = (_issuesByFile[_currentFile!] ?? 0) + 1;
-      if (_currentFile != _lastFileWithIssue) {
+    final currentFile = _currentFile;
+    if (currentFile != null) {
+      _issuesByFile[currentFile] = (_issuesByFile[currentFile] ?? 0) + 1;
+      if (currentFile != _lastFileWithIssue) {
         _filesWithIssues++;
-        _lastFileWithIssue = _currentFile;
+        _lastFileWithIssue = currentFile;
       }
 
       // Per-file severity breakdown (for accurate clearing on re-analysis)
       if (severity != null) {
-        final fileSev = _issuesByFileBySeverity[_currentFile!] ??= {};
+        final fileSev = _issuesByFileBySeverity[currentFile] ??= {};
         fileSev[severity] = (fileSev[severity] ?? 0) + 1;
       }
     }
@@ -436,8 +444,8 @@ class ProgressTracker {
       }
 
       // Per-file rule breakdown (for accurate clearing on re-analysis)
-      if (_currentFile != null) {
-        final fileRules = _issuesByFileByRule[_currentFile!] ??= {};
+      if (currentFile != null) {
+        final fileRules = _issuesByFileByRule[currentFile] ??= {};
         fileRules[ruleName] = (fileRules[ruleName] ?? 0) + 1;
       }
     }
@@ -453,7 +461,7 @@ class ProgressTracker {
 
     // On first file, discover project files for progress % and
     // initialize the analysis reporter for log generation.
-    if (!_discoveredFromFiles && _seenFiles.isEmpty) {
+    if (!_isDiscoveredFromFiles && _seenFiles.isEmpty) {
       final projectRoot = ProjectContext.findProjectRoot(path);
       if (projectRoot != null) {
         discoverFiles(projectRoot);
@@ -484,7 +492,8 @@ class ProgressTracker {
     final fileCount = _seenFiles.length;
 
     // Report progress at intervals (every N files or every N seconds)
-    final timeSinceLastReport = now.difference(_lastProgressTime!);
+    final lastProgress = _lastProgressTime ?? now;
+    final timeSinceLastReport = now.difference(lastProgress);
     final filesSinceLastReport = fileCount - _lastReportedCount;
 
     if (filesSinceLastReport >= _fileInterval ||
@@ -504,10 +513,10 @@ class ProgressTracker {
     // synchronously. `dart analyze` may exit before the debounce timer
     // fires, so this ensures the report file exists on disk.
     if (wasNew &&
-        !_summaryReported &&
+        !_isSummaryReported &&
         _totalExpectedFiles > 0 &&
         fileCount >= _totalExpectedFiles) {
-      _summaryReported = true;
+      _isSummaryReported = true;
       AnalysisReporter.writeNow();
       reportSummary();
     }
@@ -517,10 +526,12 @@ class ProgressTracker {
   /// check for abort sentinel, and recalibrate ETA.
   static void _handleNewFile(String path, DateTime now) {
     // Track long-running files (> 2 seconds) for summary report
-    if (_currentFile != null && _currentFileStart != null) {
-      final fileTime = now.difference(_currentFileStart!);
+    final currentFile = _currentFile;
+    final currentFileStart = _currentFileStart;
+    if (currentFile != null && currentFileStart != null) {
+      final fileTime = now.difference(currentFileStart);
       if (fileTime.inSeconds >= 2) {
-        _slowFiles[_currentFile!] = fileTime.inSeconds;
+        _slowFiles[currentFile] = fileTime.inSeconds;
       }
     }
 
@@ -536,7 +547,7 @@ class ProgressTracker {
     // (discovery undercounted). Triggering at 90% caused the progress bar to
     // go backwards when discovery overcounted (common when analysis_options
     // excludes files that discoverFiles counted).
-    if (_etaCalibrated && _seenFiles.length > _totalExpectedFiles) {
+    if (_isEtaCalibrated && _seenFiles.length > _totalExpectedFiles) {
       _totalExpectedFiles = (_seenFiles.length * 1.2).round();
     }
   }
@@ -555,7 +566,7 @@ class ProgressTracker {
 
     // Return rolling average for smoother ETA
     if (_rateSamples.isEmpty) return instantRate;
-    return _rateSamples.reduce((a, b) => a + b) / _rateSamples.length;
+    return _rateSamples.fold(0.0, (a, b) => a + b) / _rateSamples.length;
   }
 
   /// Format duration as human-readable string.
@@ -568,11 +579,15 @@ class ProgressTracker {
   }
 
   static void _reportProgress(int fileCount, DateTime now) {
-    final elapsed = now.difference(_startTime!);
+    if (_seenFiles.isEmpty) return;
+    final startTime = _startTime;
+    if (startTime == null) return;
+    final elapsed = now.difference(startTime);
     final filesPerSec = _calculateFilesPerSec(fileCount, elapsed);
 
     // Extract just the filename from the last seen file for context
-    final lastFile = _seenFiles.last;
+    final lastFile = _seenFiles.length > 0 ? _seenFiles.last : null;
+    if (lastFile == null) return;
     final displayName = lastFile.split('/').last.split('\\').last;
 
     // Aliases for cleaner code
@@ -587,11 +602,11 @@ class ProgressTracker {
     final clearLine = _ProgressColors.clearLine;
 
     // Issue count string shared by both progress line variants
-    final issuesDisplay = _limitReached
+    final issuesDisplay = _isLimitReached
         ? '$_maxIssues shown, $_violationsFound total'
         : '$_violationsFound';
 
-    if (_discoveredFromFiles && _totalExpectedFiles > 0) {
+    if (_isDiscoveredFromFiles && _totalExpectedFiles > 0) {
       final percent = (fileCount * 100 / _totalExpectedFiles)
           .clamp(0, 100)
           .round();
@@ -656,9 +671,10 @@ class ProgressTracker {
 
   /// Report final summary when analysis completes.
   static void reportSummary() {
-    if (!_progressEnabled || _startTime == null) return;
+    final startTime = _startTime;
+    if (!_progressEnabled || startTime == null) return;
 
-    final elapsed = DateTime.now().difference(_startTime!);
+    final elapsed = DateTime.now().difference(startTime);
     final fileCount = _seenFiles.length;
     final filesPerSec = _calculateFilesPerSec(fileCount, elapsed);
 
@@ -673,8 +689,8 @@ class ProgressTracker {
     final clearLine = _ProgressColors.clearLine;
 
     // Emit a final 100% progress bar to replace the stale in-progress line.
-    if (_discoveredFromFiles && fileCount > 0) {
-      final issuesDisplay = _limitReached
+    if (_isDiscoveredFromFiles && fileCount > 0) {
+      final issuesDisplay = _isLimitReached
           ? '$_maxIssues shown, $_violationsFound total'
           : '$_violationsFound';
       const barWidth = 20;
@@ -720,7 +736,7 @@ class ProgressTracker {
     );
 
     // Note if issue limit was reached (Problems tab capped, report has all)
-    if (_limitReached) {
+    if (_isLimitReached) {
       final report = AnalysisReporter.reportPath;
       buf.writeln();
       buf.writeln(
@@ -902,7 +918,7 @@ class ProgressTracker {
 
   /// Check for `.saropa_stop` sentinel file in the project root.
   ///
-  /// When found, sets [_abortRequested] so all subsequent rules return
+  /// When found, sets [_isAbortRequested] so all subsequent rules return
   /// early, writes a partial report immediately, and deletes the file.
   static void _checkAbortSentinel() {
     final root = AnalysisReporter.projectRoot;
@@ -912,7 +928,7 @@ class ProgressTracker {
       final sentinel = File('$root${Platform.pathSeparator}.saropa_stop');
       if (!sentinel.existsSync()) return;
 
-      _abortRequested = true;
+      _isAbortRequested = true;
       sentinel.deleteSync();
 
       stderr.writeln('');
@@ -974,10 +990,10 @@ class ProgressTracker {
     _filesWithIssues = _issuesByFile.keys.length;
 
     // Recalculate limit (may un-reach if enough were cleared)
-    if (_limitReached && _maxIssues > 0) {
+    if (_isLimitReached && _maxIssues > 0) {
       final nonErrorCount = _warningCount + _infoCount;
       if (nonErrorCount <= _maxIssues) {
-        _limitReached = false;
+        _isLimitReached = false;
       }
     }
 
@@ -996,8 +1012,8 @@ class ProgressTracker {
     _lastReportedCount = 0;
     _totalExpectedFiles = 0;
     _totalEnabledRules = 0;
-    _etaCalibrated = false;
-    _discoveredFromFiles = false;
+    _isEtaCalibrated = false;
+    _isDiscoveredFromFiles = false;
     _violationsFound = 0;
     _filesWithIssues = 0;
     _lastFileWithIssue = null;
@@ -1012,11 +1028,11 @@ class ProgressTracker {
     _fileViolationKeys.clear();
     _rateSamples.clear();
     _slowFiles.clear();
-    _limitReached = false;
-    _abortRequested = false;
+    _isLimitReached = false;
+    _isAbortRequested = false;
     _hasReanalyzedFile = false;
-    _summaryReported = false;
-    // Note: _maxIssues and _fileOnly are not reset - they're config, not state
+    _isSummaryReported = false;
+    // Note: _maxIssues and _isFileOnly are not reset - they're config, not state
   }
 }
 
@@ -1065,8 +1081,8 @@ class RuleTimingTracker {
   /// - This rule has exceeded the deferral threshold before
   /// - We're NOT in deferred-only mode
   static bool shouldDefer(String ruleName) {
-    if (!_deferSlowRules) return false;
-    if (_runDeferredOnly) return false; // We want to run slow rules now
+    if (!_isDeferSlowRules) return false;
+    if (_isRunDeferredOnly) return false; // We want to run slow rules now
     return _slowRules.contains(ruleName);
   }
 
@@ -1076,7 +1092,7 @@ class RuleTimingTracker {
   /// - Deferred-only mode is enabled (SAROPA_LINTS_DEFERRED=true)
   /// - This rule is NOT marked as slow (should have run in first pass)
   static bool shouldSkipInDeferredMode(String ruleName) {
-    if (!_runDeferredOnly) return false;
+    if (!_isRunDeferredOnly) return false;
     return !_slowRules.contains(ruleName);
   }
 
@@ -1259,8 +1275,11 @@ class ReportWriter {
       final io = await _getIoLibrary();
       if (io == null) return;
 
+      final reportsDir = _reportsDir;
+      if (reportsDir == null) return;
+
       // Create reports directory
-      await _createDirectory(io, _reportsDir!);
+      await _createDirectory(io, reportsDir);
 
       // Write timing report
       await _writeTimingReport(io);
@@ -1291,20 +1310,27 @@ class ReportWriter {
       return await Future.value(
         null,
       ); // Placeholder - actual impl needs dart:io
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        '_getIoLibrary failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       return null;
     }
   }
 
   // ignore: avoid_dynamic
-  static Future<void> _createDirectory(dynamic io, String path) async {
+  static Future<void> _createDirectory(dynamic io, String path) {
     // Placeholder - actual implementation needs dart:io
+    return Future.value();
   }
 
   // ignore: avoid_dynamic
-  static Future<void> _writeTimingReport(dynamic io) async {
+  static Future<void> _writeTimingReport(dynamic io) {
     final timings = RuleTimingTracker.sortedTimings;
-    if (timings.isEmpty) return;
+    if (timings.isEmpty) return Future.value();
 
     final buffer = StringBuffer();
     buffer.writeln('SAROPA LINTS TIMING REPORT');
@@ -1326,11 +1352,12 @@ class ReportWriter {
 
     // Would write to file here with dart:io
     stderr.writeln(buffer.toString());
+    return Future.value();
   }
 
   // ignore: avoid_dynamic
-  static Future<void> _writeSlowRulesReport(dynamic io) async {
-    if (_slowRuleLog.isEmpty) return;
+  static Future<void> _writeSlowRulesReport(dynamic io) {
+    if (_slowRuleLog.isEmpty) return Future.value();
 
     final buffer = StringBuffer();
     buffer.writeln('SAROPA LINTS SLOW RULES REPORT');
@@ -1346,11 +1373,12 @@ class ReportWriter {
     stderr.writeln(
       '[saropa_lints] Slow rules: ${_slowRuleLog.length} occurrences',
     );
+    return Future.value();
   }
 
   // ignore: avoid_dynamic
-  static Future<void> _writeSkippedFilesReport(dynamic io) async {
-    if (_skippedFiles.isEmpty) return;
+  static Future<void> _writeSkippedFilesReport(dynamic io) {
+    if (_skippedFiles.isEmpty) return Future.value();
 
     final buffer = StringBuffer();
     buffer.writeln('SAROPA LINTS SKIPPED FILES REPORT');
@@ -1363,10 +1391,11 @@ class ReportWriter {
     }
 
     stderr.writeln('[saropa_lints] Skipped files: ${_skippedFiles.length}');
+    return Future.value();
   }
 
   // ignore: avoid_dynamic
-  static Future<void> _writeImpactReport(dynamic io) async {
+  static Future<void> _writeImpactReport(dynamic io) {
     final buffer = StringBuffer();
     buffer.writeln('SAROPA LINTS IMPACT REPORT');
     buffer.writeln('Generated: ${DateTime.now().toIso8601String()}');
@@ -1385,12 +1414,14 @@ class ReportWriter {
     }
 
     stderr.writeln(buffer.toString());
+    return Future.value();
   }
 
   // ignore: avoid_dynamic
-  static Future<void> _writeSummaryReport(dynamic io) async {
-    final elapsed = _analysisStartTime != null
-        ? DateTime.now().difference(_analysisStartTime!)
+  static Future<void> _writeSummaryReport(dynamic io) {
+    final start = _analysisStartTime;
+    final elapsed = start != null
+        ? DateTime.now().difference(start)
         : Duration.zero;
 
     final buffer = StringBuffer();
@@ -1407,6 +1438,7 @@ class ReportWriter {
     buffer.writeln(ImpactTracker.summary);
 
     stderr.writeln(buffer.toString());
+    return Future.value();
   }
 
   /// Reset all tracked data.
@@ -1615,15 +1647,18 @@ class ImpactTracker {
     required String message,
     String? correction,
   }) {
-    _violations[impact]!.add(
-      ViolationRecord(
-        rule: rule,
-        file: file,
-        line: line,
-        message: message,
-        correction: correction,
-      ),
-    );
+    final set = _violations[impact];
+    if (set != null) {
+      set.add(
+        ViolationRecord(
+          rule: rule,
+          file: file,
+          line: line,
+          message: message,
+          correction: correction,
+        ),
+      );
+    }
   }
 
   /// Get all violations grouped by impact.
@@ -1633,11 +1668,12 @@ class ImpactTracker {
 
   /// Get count of violations by impact level.
   static Map<LintImpact, int> get counts => {
-    LintImpact.critical: _violations[LintImpact.critical]!.length,
-    LintImpact.high: _violations[LintImpact.high]!.length,
-    LintImpact.medium: _violations[LintImpact.medium]!.length,
-    LintImpact.low: _violations[LintImpact.low]!.length,
-    LintImpact.opinionated: _violations[LintImpact.opinionated]!.length,
+    LintImpact.critical: _violations[LintImpact.critical]?.length ?? 0,
+    LintImpact.high: _violations[LintImpact.high]?.length ?? 0,
+    LintImpact.medium: _violations[LintImpact.medium]?.length ?? 0,
+    LintImpact.low: _violations[LintImpact.low]?.length ?? 0,
+    LintImpact.opinionated:
+        _violations[LintImpact.opinionated]?.length ?? 0,
   };
 
   /// Get total violation count.
@@ -1645,7 +1681,10 @@ class ImpactTracker {
       _violations.values.fold(0, (sum, v) => sum + v.length);
 
   /// Returns true if there are any critical violations.
-  static bool get hasCritical => _violations[LintImpact.critical]!.isNotEmpty;
+  static bool get hasCritical {
+    final set = _violations[LintImpact.critical];
+    return set != null && set.isNotEmpty;
+  }
 
   /// Get a summary string suitable for display.
   ///
@@ -1668,19 +1707,19 @@ class ImpactTracker {
     buffer.writeln('Impact Summary');
     buffer.writeln('==============');
 
-    if (c[LintImpact.critical]! > 0) {
+    if ((c[LintImpact.critical] ?? 0) > 0) {
       buffer.writeln('CRITICAL: ${c[LintImpact.critical]} (fix immediately!)');
     }
-    if (c[LintImpact.high]! > 0) {
+    if ((c[LintImpact.high] ?? 0) > 0) {
       buffer.writeln('HIGH:     ${c[LintImpact.high]} (address soon)');
     }
-    if (c[LintImpact.medium]! > 0) {
+    if ((c[LintImpact.medium] ?? 0) > 0) {
       buffer.writeln('MEDIUM:   ${c[LintImpact.medium]} (tech debt)');
     }
-    if (c[LintImpact.low]! > 0) {
+    if ((c[LintImpact.low] ?? 0) > 0) {
       buffer.writeln('LOW:      ${c[LintImpact.low]} (style)');
     }
-    if (c[LintImpact.opinionated]! > 0) {
+    if ((c[LintImpact.opinionated] ?? 0) > 0) {
       buffer.writeln(
         'OPINIONATED: ${c[LintImpact.opinionated]} (team preference)',
       );
@@ -1697,7 +1736,7 @@ class ImpactTracker {
   static List<ViolationRecord> get sortedViolations {
     final result = <ViolationRecord>[];
     for (final impact in LintImpact.values) {
-      result.addAll(_violations[impact]!);
+      result.addAll(_violations[impact] ?? []);
     }
     return result;
   }
@@ -1757,7 +1796,7 @@ class ViolationRecord {
 /// Base class for Saropa lint rules with enhanced features:
 ///
 /// 1. **Hyphenated ignore comments**: Supports both `// ignore: no_empty_block`
-///    and `// ignore: no-empty-block` formats.
+///    and `// ignore: no-empty-block` formats (see [IgnoreUtils]).
 ///
 /// 2. **Context-aware suppression**: Automatically skip generated files,
 ///    test files, or example files by overriding the skip* getters.
@@ -2395,7 +2434,7 @@ abstract class SaropaLintRule extends AnalysisRule {
   // ============================================================
 
   // Track if we've initialized the project root for disk persistence
-  static bool _projectRootInitialized = false;
+  static bool _isProjectRootInitialized = false;
 
   // Track recent analysis for throttling: "path:contentHash" -> timestamp
   // Prevents duplicate analysis of identical content within short windows
@@ -2465,9 +2504,11 @@ abstract class SaropaLintRule extends AnalysisRule {
     if (_fileEditHistory.length > 100) {
       // Remove files not edited recently
       final oldCutoff = now.subtract(const Duration(seconds: 30));
-      _fileEditHistory.removeWhere(
-        (_, times) => times.isEmpty || times.last.isBefore(oldCutoff),
-      );
+      _fileEditHistory.removeWhere((_, times) {
+        if (times.isEmpty) return true;
+        final lastTime = times.elementAt(times.length - 1);
+        return lastTime.isBefore(oldCutoff);
+      });
     }
 
     // Rapid mode if 3+ edits in the window
@@ -2484,10 +2525,11 @@ abstract class SaropaLintRule extends AnalysisRule {
   // =========================================================================
   // Native Plugin Registration
   // =========================================================================
-  // In the native analyzer plugin system, registerNodeProcessors is called
-  // ONCE per rule (not per file). Per-file pre-filtering (file type checks,
-  // content pattern matching, incremental analysis, etc.) will be re-enabled
-  // in Phase 2 by wrapping callbacks with lazy per-file checks.
+  // The analyzer calls registerNodeProcessors once per rule at startup. We
+  // build a SaropaContext (callback registry + CompatVisitor) and a reporter,
+  // then runWithReporter() registers callbacks. Per-file filtering is applied
+  // inside those callbacks via SaropaContext._wrapCallback so expensive rules
+  // skip quickly when file type/patterns don't match.
   // =========================================================================
 
   @override
@@ -2495,7 +2537,6 @@ abstract class SaropaLintRule extends AnalysisRule {
     RuleVisitorRegistry registry,
     RuleContext ruleContext,
   ) {
-    // Check if rule is disabled
     if (isDisabled) return;
 
     final saropaContext = SaropaContext(registry, this, ruleContext);

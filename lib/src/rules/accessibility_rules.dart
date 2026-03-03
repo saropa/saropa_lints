@@ -635,11 +635,9 @@ class RequireSemanticsLabelRule extends SaropaLintRule {
           }
           if (_interactiveProperties.contains(name)) {
             // Check if the value is true
-            if (arg.expression is BooleanLiteral) {
-              final BooleanLiteral boolLit = arg.expression as BooleanLiteral;
-              if (boolLit.value) {
-                isInteractive = true;
-              }
+            final expr = arg.expression;
+            if (expr is BooleanLiteral && expr.value) {
+              isInteractive = true;
             }
           }
         }
@@ -828,9 +826,10 @@ class RequireLiveRegionRule extends SaropaLintRule {
       }
 
       if (variableName == null) return;
+      final String name = variableName;
 
       final bool suggestsDynamic = _dynamicIndicators.any(
-        (String indicator) => variableName!.contains(indicator),
+        (String indicator) => name.contains(indicator),
       );
 
       if (!suggestsDynamic) return;
@@ -848,9 +847,8 @@ class RequireLiveRegionRule extends SaropaLintRule {
             ) {
               if (arg is NamedExpression &&
                   arg.name.label.name == 'liveRegion') {
-                if (arg.expression is BooleanLiteral) {
-                  return (arg.expression as BooleanLiteral).value;
-                }
+                final expr = arg.expression;
+                if (expr is BooleanLiteral) return expr.value;
               }
               return false;
             });
@@ -958,9 +956,8 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
               Expression arg,
             ) {
               if (arg is NamedExpression && arg.name.label.name == 'header') {
-                if (arg.expression is BooleanLiteral) {
-                  return (arg.expression as BooleanLiteral).value;
-                }
+                final expr = arg.expression;
+                if (expr is BooleanLiteral) return expr.value;
               }
               return false;
             });
@@ -1049,10 +1046,10 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
       bool hasImageChild = false;
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'child') {
-          if (arg.expression is InstanceCreationExpression) {
-            final InstanceCreationExpression child =
-                arg.expression as InstanceCreationExpression;
-            final String? childName = child.constructorName.type.element?.name;
+          final childExpr = arg.expression;
+          if (childExpr is InstanceCreationExpression) {
+            final String? childName =
+                childExpr.constructorName.type.element?.name;
             if (childName == 'Image' ||
                 childName == 'Icon' ||
                 childName == 'SvgPicture') {
@@ -1240,9 +1237,9 @@ class RequireImageSemanticsRule extends SaropaLintRule {
             hasSemanticLabel = true;
           }
           if (name == 'excludeFromSemantics') {
-            if (arg.expression is BooleanLiteral) {
-              isExcludedFromSemantics =
-                  (arg.expression as BooleanLiteral).value;
+            final expr = arg.expression;
+            if (expr is BooleanLiteral) {
+              isExcludedFromSemantics = expr.value;
             }
           }
         }
@@ -1278,9 +1275,9 @@ class RequireImageSemanticsRule extends SaropaLintRule {
             hasSemanticLabel = true;
           }
           if (name == 'excludeFromSemantics') {
-            if (arg.expression is BooleanLiteral) {
-              isExcludedFromSemantics =
-                  (arg.expression as BooleanLiteral).value;
+            final expr = arg.expression;
+            if (expr is BooleanLiteral) {
+              isExcludedFromSemantics = expr.value;
             }
           }
         }
@@ -1382,9 +1379,8 @@ class AvoidHiddenInteractiveRule extends SaropaLintRule {
         for (final Expression arg in node.argumentList.arguments) {
           if (arg is NamedExpression &&
               arg.name.label.name == 'excludeSemantics') {
-            if (arg.expression is BooleanLiteral) {
-              hasExcludeSemantics = (arg.expression as BooleanLiteral).value;
-            }
+            final expr = arg.expression;
+            if (expr is BooleanLiteral) hasExcludeSemantics = expr.value;
           }
         }
 
@@ -1670,7 +1666,7 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
 
       // Check if widget name suggests visual/custom content
       final String className = node.name.lexeme;
-      final List<String> visualPatterns = <String>[
+      const List<String> visualPatterns = <String>[
         'Rating',
         'Chart',
         'Graph',
@@ -2025,7 +2021,7 @@ class RequireMinimumContrastRule extends SaropaLintRule {
             if (colorSource.contains(lightColor)) {
               // Check if there's an explicit dark background nearby
               if (!_hasDarkBackgroundContext(node)) {
-                // Honor // ignore: and // ignore_for_file: (and hyphenated names).
+                // Respect // ignore: and // ignore_for_file: (IgnoreUtils).
                 if (IgnoreUtils.isIgnoredForFile(
                   context.fileContent,
                   _code.name,
@@ -3037,11 +3033,8 @@ class RequireSemanticLabelIconsRule extends SaropaLintRule {
           for (final Expression arg in current.argumentList.arguments) {
             if (arg is NamedExpression &&
                 arg.name.label.name == 'excludeSemantics') {
-              if (arg.expression is BooleanLiteral) {
-                if ((arg.expression as BooleanLiteral).value) {
-                  return true;
-                }
-              }
+              final expr = arg.expression;
+              if (expr is BooleanLiteral && expr.value) return true;
             }
           }
         }
@@ -3145,8 +3138,9 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
           hasSemanticLabel = true;
         }
         if (name == 'excludeFromSemantics') {
-          if (arg.expression is BooleanLiteral) {
-            hasExcludeFromSemantics = (arg.expression as BooleanLiteral).value;
+          final expr = arg.expression;
+          if (expr is BooleanLiteral) {
+            hasExcludeFromSemantics = expr.value;
           }
         }
       }
