@@ -511,6 +511,32 @@ void main() {
         // Preferred pattern used correctly
         expect('prefer_correct_for_loop_increment passes', isNotNull);
       });
+
+      test('prefer_correct_for_loop_increment comment exemption', () {
+        // Non-standard increment with explanatory comment on same line or line
+        // above should NOT trigger (see fixture _good253CommentExemption).
+        expect('prefer_correct_for_loop_increment comment exemption', isNotNull);
+      });
+
+      test('prefer_correct_for_loop_increment unrelated comment still triggers',
+          () {
+        // Unrelated comment (e.g. "Fix later") on line above does NOT exempt;
+        // see fixture _bad253UnrelatedComment (expect_lint).
+        expect(
+          'prefer_correct_for_loop_increment unrelated comment still triggers',
+          isNotNull,
+        );
+      });
+
+      test('prefer_correct_for_loop_increment comment two lines above still triggers',
+          () {
+        // Comment exemption only applies to same line or immediately above;
+        // see fixture _bad253CommentTooFarAbove (expect_lint).
+        expect(
+          'prefer_correct_for_loop_increment comment two lines above still triggers',
+          isNotNull,
+        );
+      });
     });
 
     group('prefer_null_aware_elements', () {

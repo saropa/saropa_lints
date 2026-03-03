@@ -117,3 +117,27 @@ void _good253() {
   for (int i = 0; i < 10; i++) {} // Standard increment
   for (int i = 0; i < 10; i += 1) {} // Also acceptable
 }
+
+// GOOD: Comment exemption - non-standard increment with explanatory comment
+// should NOT trigger prefer_correct_for_loop_increment
+void _good253CommentExemption() {
+  // Step by 8 to draw wave points at fixed horizontal spacing.
+  for (var x = 0; x < 100; x += 8) {}
+  // Step by 4 for scan lines at fixed vertical spacing (intentional).
+  for (var y = 0; y < 50; y += 4) {}
+}
+
+// BAD: Unrelated comment (no exemption keywords) - SHOULD still trigger
+// expect_lint: prefer_correct_for_loop_increment
+void _bad253UnrelatedComment() {
+  // Fix later.
+  for (int i = 0; i < 10; i += 2) {}
+}
+
+// BAD: Comment two lines above is not "immediately above" - SHOULD still trigger
+// expect_lint: prefer_correct_for_loop_increment
+void _bad253CommentTooFarAbove() {
+  // Step by 2 for something.
+  // (blank conceptual line - comment not on adjacent line)
+  for (int i = 0; i < 10; i += 2) {}
+}

@@ -5,7 +5,9 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:analyzer/source/line_info.dart';
 
+import '../../fixes/collection/add_for_loop_increment_comment_fix.dart';
 import '../../fixes/collection/remove_duplicate_map_entry_fix.dart';
 import '../../fixes/collection/replace_with_where_or_null_fix.dart';
 import '../../fixes/collection/use_contains_key_fix.dart';
@@ -1841,7 +1843,8 @@ class PreferAddAllRule extends SaropaLintRule {
             final String? paramName = params.parameters.first.name?.lexeme;
             final NodeList<Expression> addArgs = expr.argumentList.arguments;
             final firstAddArg = addArgs.isNotEmpty ? addArgs.first : null;
-            if (firstAddArg is SimpleIdentifier && firstAddArg.name == paramName) {
+            if (firstAddArg is SimpleIdentifier &&
+                firstAddArg.name == paramName) {
               reporter.atNode(node);
             }
           }
@@ -2354,13 +2357,20 @@ class PreferSetForLookupRule extends SaropaLintRule {
   }
 }
 
-/// Warns when for loop uses non-standard increment patterns.
+/// Warns when a for loop uses a non-standard increment (e.g. `i += 2`, `i = i + 3`).
+///
+/// **Developer notes:**
+/// - Only [ForParts] (C-style) loops are checked; for-in and for-elements are ignored.
+/// - Exemption: if a comment on the same line as the `for` or the line immediately
+///   above contains one of (step, increment, spacing, stride, non-standard, intentional),
+///   the rule does not report. This aligns with the correction message and allows
+///   intentional patterns (e.g. drawing at fixed step sizes) without false positives.
+/// - Comment text is matched case-insensitively; heuristics avoid unrelated prose.
+/// - Performance: one [LineInfo] lookup and a bounded comment walk per for statement.
 ///
 /// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v2
 ///
 /// Alias: standard_for_increment, no_non_standard_increment
-///
-/// Standard for loop increments make code more readable and predictable.
 ///
 /// **BAD:**
 /// ```dart
@@ -2372,6 +2382,8 @@ class PreferSetForLookupRule extends SaropaLintRule {
 /// ```dart
 /// for (int i = 0; i < 10; i++) { } // Standard increment
 /// for (int i = 0; i < 10; i += 1) { } // Also acceptable
+/// // Step by 8 for fixed horizontal spacing (intentional).
+/// for (var x = 0; x < width; x += 8) { }
 /// ```
 class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
   PreferCorrectForLoopIncrementRule() : super(code: _code);
@@ -2391,6 +2403,12 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
   );
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddForLoopIncrementCommentFix(context: context),
+  ];
+
+  @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
@@ -2403,6 +2421,9 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
       final NodeList<Expression> updaters = parts.updaters;
       if (updaters.isEmpty) return;
 
+      final bool hasExemption =
+          _hasExplanatoryIncrementComment(node, context.lineInfo);
+
       for (final Expression updater in updaters) {
         // Check for compound assignment like i += 2
         if (updater is AssignmentExpression) {
@@ -2410,8 +2431,7 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
           if (op == '+=' || op == '-=') {
             final Expression right = updater.rightHandSide;
             if (right is IntegerLiteral && right.value != 1) {
-              // Non-standard increment (not by 1)
-              reporter.atNode(updater);
+              if (!hasExemption) reporter.atNode(updater);
             }
           }
         }
@@ -2424,7 +2444,7 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
                 right.operator.type == TokenType.MINUS) {
               final Expression rightOperand = right.rightOperand;
               if (rightOperand is IntegerLiteral && rightOperand.value != 1) {
-                reporter.atNode(updater);
+                if (!hasExemption) reporter.atNode(updater);
               }
             }
           }
@@ -2432,6 +2452,43 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
       }
     });
   }
+
+  /// True if the for statement has a comment on its line or the line above
+  /// that explains the non-standard increment (e.g. step, spacing, intentional).
+  static bool _hasExplanatoryIncrementComment(
+    ForStatement node,
+    LineInfo lineInfo,
+  ) {
+    final int forLine = lineInfo.getLocation(node.offset).lineNumber;
+    final List<String> commentTexts = [];
+
+    void collectRelevantComments(Token? token) {
+      Token? comment = token?.precedingComments;
+      while (comment != null) {
+        final int commentLine =
+            lineInfo.getLocation(comment.offset).lineNumber;
+        if (commentLine == forLine || commentLine == forLine - 1) {
+          commentTexts.add(comment.lexeme);
+        }
+        comment = comment.next;
+      }
+    }
+
+    collectRelevantComments(node.beginToken);
+    final Statement? body = node.body;
+    if (body is Block) {
+      collectRelevantComments(body.beginToken);
+    }
+    if (commentTexts.isEmpty) return false;
+
+    final String combined = commentTexts.join(' ').toLowerCase();
+    return _incrementExplanationPattern.hasMatch(combined);
+  }
+
+  static final RegExp _incrementExplanationPattern = RegExp(
+    r'\b(step|increment|spacing|stride|non-?standard|intentional)\b',
+    caseSensitive: false,
+  );
 }
 
 /// Warns when a for loop has impossible or unreachable bounds.
