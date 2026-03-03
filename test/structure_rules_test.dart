@@ -505,6 +505,52 @@ void main() {
         // Avoidance pattern not present
         expect('avoid_long_parameter_list passes', isNotNull);
       });
+
+      test('fixture has exactly 3 BAD cases (expect_lint) and GOOD exclusions', () {
+        final file = File('example_core/lib/structure/avoid_long_parameter_list_fixture.dart');
+        expect(file.existsSync(), isTrue);
+        final content = file.readAsStringSync();
+        final expectLintCount =
+            RegExp(r'// expect_lint: avoid_long_parameter_list').allMatches(content).length;
+        expect(expectLintCount, equals(3),
+            reason: 'Fixture must have exactly 3 BAD cases that trigger the rule');
+        expect(content, contains('copyWith'),
+            reason: 'Fixture must include copyWith (excluded, no lint)');
+        expect(content, contains('isValidDateParts'),
+            reason: 'Fixture must include all-optional-named example (excluded)');
+        expect(content, contains('_badManyPositional'),
+            reason: 'Fixture must include long required-positional BAD case');
+      });
+
+      test('excluded patterns (copyWith, all-optional) have no expect_lint on their declaration', () {
+        final file = File('example_core/lib/structure/avoid_long_parameter_list_fixture.dart');
+        final lines = file.readAsStringSync().split('\n');
+        int? copyWithLineIdx;
+        int? isValidDatePartsLineIdx;
+        for (var i = 0; i < lines.length; i++) {
+          if (lines[i].contains('copyWith({') && !lines[i].trim().startsWith('//')) {
+            copyWithLineIdx = i;
+          }
+          if (lines[i].contains('isValidDateParts({') && !lines[i].trim().startsWith('//')) {
+            isValidDatePartsLineIdx = i;
+          }
+        }
+        expect(copyWithLineIdx, isNotNull);
+        expect(isValidDatePartsLineIdx, isNotNull);
+        // Line immediately before declaration must not be expect_lint for this rule
+        expect(
+          copyWithLineIdx! > 0 &&
+              !lines[copyWithLineIdx - 1].contains('expect_lint: avoid_long_parameter_list'),
+          isTrue,
+          reason: 'copyWith must not have expect_lint (excluded by rule)',
+        );
+        expect(
+          isValidDatePartsLineIdx! > 0 &&
+              !lines[isValidDatePartsLineIdx - 1].contains('expect_lint: avoid_long_parameter_list'),
+          isTrue,
+          reason: 'isValidDateParts (all optional named) must not have expect_lint',
+        );
+      });
     });
 
     group('avoid_local_functions', () {

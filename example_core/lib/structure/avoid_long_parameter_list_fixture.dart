@@ -119,10 +119,13 @@ void _bad1049_process(int a, int b, int c, int d, int e, int f, int g) {}
 // expect_lint: avoid_long_parameter_list
 void _badWithDocComment(int a, int b, int c, int d, int e, int f) {}
 
+/// BAD: Many required positional parameters (no exception).
+// expect_lint: avoid_long_parameter_list
+void _badManyPositional(int a, int b, int c, int d, int e, int f) {}
+
 class _BadMethodExample {
   /// Returns true if all provided date/time components are within valid ranges.
-  /// This method intentionally has many named parameters.
-  // expect_lint: avoid_long_parameter_list
+  /// All optional named — excluded; no lint.
   static bool isValidDateParts({
     int? year,
     int? month,
@@ -132,6 +135,35 @@ class _BadMethodExample {
     int? second,
   }) {
     return true;
+  }
+}
+
+/// GOOD: copyWith with many optional named parameters is excluded.
+class _CopyWithExample {
+  const _CopyWithExample({this.a, this.b, this.c, this.d, this.e, this.f});
+  final int? a;
+  final int? b;
+  final int? c;
+  final int? d;
+  final int? e;
+  final int? f;
+
+  _CopyWithExample copyWith({
+    int? a,
+    int? b,
+    int? c,
+    int? d,
+    int? e,
+    int? f,
+  }) {
+    return _CopyWithExample(
+      a: a ?? this.a,
+      b: b ?? this.b,
+      c: c ?? this.c,
+      d: d ?? this.d,
+      e: e ?? this.e,
+      f: f ?? this.f,
+    );
   }
 }
 

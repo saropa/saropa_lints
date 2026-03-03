@@ -1078,7 +1078,18 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
   }
 }
 
-/// Warns when a function has too many parameters.
+/// Warns when a function has too many parameters (max 5).
+///
+/// **Excluded (no report):** Methods or functions named `copyWith`, and any
+/// declaration whose parameters are all optional (no required positional or
+/// required named). These patterns are self-documenting and do not match the
+/// rule's intent (avoid hard-to-call, combinatorial APIs).
+///
+/// **Implementation note for developers:** Reporting is gated by
+/// `_shouldSkipLongParameterList`: (1) name equals `copyWith`, or (2) every
+/// parameter is optional (no [isRequiredPositional] or [isRequiredNamed]).
+/// Uses [addFunctionDeclaration] and [addMethodDeclaration] only; no full AST
+/// traversal. No quick fix (refactor to config object is context-dependent).
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
 ///
@@ -1114,6 +1125,17 @@ class AvoidLongParameterListRule extends SaropaLintRule {
 
   static const int _maxParameters = 5;
 
+  /// Skip reporting for copyWith (standard Dart pattern) or when all parameters
+  /// are optional (no required positional/named), which does not match the
+  /// rule's intent (hard-to-call, too much work).
+  static bool _shouldSkipLongParameterList(String? name, FormalParameterList params) {
+    if (name == 'copyWith') return true;
+    for (final FormalParameter p in params.parameters) {
+      if (p.isRequiredPositional || p.isRequiredNamed) return false;
+    }
+    return true;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1122,16 +1144,16 @@ class AvoidLongParameterListRule extends SaropaLintRule {
     context.addFunctionDeclaration((FunctionDeclaration node) {
       final FunctionExpression function = node.functionExpression;
       final FormalParameterList? params = function.parameters;
-      if (params != null && params.parameters.length > _maxParameters) {
-        reporter.atNode(params);
-      }
+      if (params == null || params.parameters.length <= _maxParameters) return;
+      if (_shouldSkipLongParameterList(node.name.lexeme, params)) return;
+      reporter.atNode(params);
     });
 
     context.addMethodDeclaration((MethodDeclaration node) {
       final FormalParameterList? params = node.parameters;
-      if (params != null && params.parameters.length > _maxParameters) {
-        reporter.atNode(params);
-      }
+      if (params == null || params.parameters.length <= _maxParameters) return;
+      if (_shouldSkipLongParameterList(node.name.lexeme, params)) return;
+      reporter.atNode(params);
     });
   }
 }
