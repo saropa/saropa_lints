@@ -71,7 +71,9 @@ Rules and features in this section are **deferred**: we do not implement them ye
 - [Deferred: Cross-File Analysis Rules](#deferred-cross-file-analysis-rules)
 - [Deferred: Performance Architecture](#deferred-performance-architecture)
 - [Deferred & Complex Rules (Consolidated)](#deferred--complex-rules-consolidated)
+- [Deferred: Remaining Hard (cross-file/heuristics/YAML)](#deferred-remaining-hard-cross-fileheuristicsyaml)
 - [Deferred: Package-Specific Rules from saropa](#deferred-package-specific-rules-from-saropa-38-remaining)
+- [Rules reviewed and not viable (do not re-propose)](#rules-reviewed-and-not-viable-do-not-re-propose)
 
 ---
 
@@ -277,6 +279,22 @@ The "Lints" status bar item is controlled entirely by the [Dart-Code VSCode exte
 | `prefer_layer_separation` | CROSS-FILE | Architecture analysis is cross-file |
 | `require_missing_test_files` | CROSS-FILE | Test file existence check |
 
+#### Deferred: Remaining Hard (cross-file/heuristics/YAML)
+
+Implement only when cross-file, heuristics, or YAML support exists. Single-file AST analysis cannot implement these reliably.
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `avoid_importing_entrypoint_exports` | CROSS-FILE | Requires knowing which files re-export entry points. |
+| `handle_bloc_event_subclasses` | CROSS-FILE | Bloc event class hierarchy spans multiple files. |
+| `prefer_automatic_dispose` | CONTEXT / HEURISTIC | Automatic dispose detection needs lifecycle/context. |
+| `prefer_composition_over_inheritance` | TOO-COMPLEX | Pattern too abstract for reliable AST detection. |
+| `prefer_correct_screenshots` | CROSS-FILE | Screenshot references, tests, and assets span files. |
+| `prefer_inline_comments_sparingly` | HEURISTIC | "Sparingly" is subjective; threshold would be arbitrary. |
+| `prefer_intent_filter_export` | CROSS-FILE | Android intent-filter export requires manifest/usage analysis. |
+| `require_di_module_separation` | CROSS-FILE | DI module boundaries require cross-file analysis. |
+| `require_resource_tracker` | HEURISTIC / CROSS-FILE | Resource tracking is context-dependent across files. |
+
 #### Deferred: Package-Specific Rules (saropa) — Heuristic/Logout/Check-Before-Use
 
 These rules from the saropa project analysis require heuristic detection, cross-file analysis, or have vague detection criteria.
@@ -404,6 +422,24 @@ These rules from the saropa project analysis require heuristic detection, cross-
 | `require_cache_manager_clear_on_logout` | Recommended | flutter_cache_manager | Clear cache on logout |
 | `require_timezone_initialization` | Essential | timezone | Call initializeTimeZones() first |
 | `require_password_strength_threshold` | Recommended | zxcvbn | Enforce minimum score 3+ |
+
+---
+
+### Rules reviewed and not viable (do not re-propose)
+
+Reference list of proposed rules that were reviewed and **rejected**. Rationale is preserved so contributors do not re-propose them.
+
+#### Drift
+
+Proposed Drift-related lint rules that were reviewed and **not** implemented:
+
+| Proposed rule | Reason not viable |
+|---------------|-------------------|
+| `avoid_drift_client_default_for_timestamps` | `clientDefault(() => DateTime.now())` vs `withDefault(currentDateAndTime)` are both valid (Dart runtime clock vs SQL canonical). Design choice, not a bug. |
+| `avoid_drift_custom_constraint_without_not_null` | customConstraint() intentionally overrides NOT NULL; power users need exact SQL. Flagging would cause false positives. |
+| `require_drift_build_runner` | Lint analyzes source at rest; cannot detect stale/missing generated files. Build either succeeds or fails. |
+
+Other rejected ideas (redundant with compiler/library or trivial): schema downgrade, multiple autoIncrement, trailing column `()`, WAL mode, modular generation preference.
 
 ---
 
