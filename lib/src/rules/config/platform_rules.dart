@@ -2,9 +2,10 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 
-import '../../saropa_lint_rule.dart';
+import '../../conditional_import_utils.dart';
 import '../../fixes/platform/add_k_is_web_guard_fix.dart';
 import '../../fixes/platform/replace_platform_check_fix.dart';
+import '../../saropa_lint_rule.dart';
 
 // =============================================================================
 // Platform-Specific Rules (v4.1.6)
@@ -151,19 +152,24 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Files that are the native branch of a conditional import (dart.library.io
+    // or dart.library.ffi) are never loaded on web; no need to require kIsWeb.
+    if (isNativeOnlyConditionalImportTarget(context.filePath)) return;
+
     context.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (node.prefix.name != 'Platform') return;
 
       final String property = node.identifier.name;
       if (!property.startsWith('is')) return; // Platform.isAndroid, etc.
 
-      // Check if already guarded by kIsWeb
       if (!_isGuardedByKIsWeb(node)) {
         reporter.atNode(node);
       }
     });
   }
 
+  /// True if an ancestor IfStatement or ConditionalExpression's condition
+  /// source mentions kIsWeb (guard present).
   bool _isGuardedByKIsWeb(AstNode node) {
     AstNode? current = node.parent;
     while (current != null) {

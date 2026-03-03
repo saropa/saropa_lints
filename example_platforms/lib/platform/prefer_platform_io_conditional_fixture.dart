@@ -102,6 +102,10 @@
 // ignore_for_file: non_constant_default_value, not_a_type
 // Test fixture for: prefer_platform_io_conditional
 // Source: lib\src\rules\platform_rules.dart
+//
+// Note: Files that are only imported via conditional import (e.g. import 'stub.dart'
+// if (dart.library.io) 'native_impl.dart') are never loaded on web. The rule does not
+// report in those native-only files; no expect_lint needed there.
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
