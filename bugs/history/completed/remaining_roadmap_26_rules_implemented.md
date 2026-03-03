@@ -14,4 +14,4 @@ prefer_auto_route_path_params_simple, prefer_auto_route_typed_args, prefer_bloc_
 ## References
 
 - **CHANGELOG.md** — Unreleased “Added” entry for the 26 rules.
-- **bugs/roadmap/REMAINING_ROADMAP_RULES.md** — First 26 rules marked as implemented; table continues with prefer_hive_compact_periodically and below.
+- **REMAINING_ROADMAP_RULES.md** — Retired 2026-03-03. Hard rules moved to ROADMAP.md Part 2 (Deferred: Remaining Hard). See `bugs/history/remaining_roadmap_rules_doc_retired.md`.

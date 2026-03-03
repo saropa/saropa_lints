@@ -14,7 +14,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
-### Changed
+### Maintenance
+
+- **Docs:** Retired `bugs/REMAINING_ROADMAP_RULES.md`. Moved 9 deferred (Hard) rules into ROADMAP.md Part 2 → “Deferred: Remaining Hard (cross-file/heuristics/YAML)” with Reason and Description.
 
 - **Rules layout:** Reorganized `lib/src/rules/` into subfolders to reduce root file count. Category rule files now live under `architecture/`, `code_quality/`, `codegen/`, `commerce/`, `config/`, `core/`, `data/`, `flow/`, `hardware/`, `media/`, `network/`, `resources/`, `security/`, `stylistic/`, `testing/`, `ui/`, and `widget/`. `packages/` and `platforms/` unchanged. Barrel export in `all_rules.dart` and `CODEBASE_INDEX.md` updated. No rule logic or tier changes.
 
