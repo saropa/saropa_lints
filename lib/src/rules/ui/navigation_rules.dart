@@ -806,21 +806,30 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
 /// Deep links may reference content that doesn't exist or has been deleted.
 /// Always handle the case where the linked content is unavailable.
 ///
+/// **When we report:** A method is treated as a deep link handler only if
+/// (1) its name suggests deep link handling (e.g. contains "deeplink", "link",
+/// "uri", "route"), (2) the method body performs navigation (e.g. uses
+/// `Navigator`, `GoRouter`, `.go(`, `.push(`, `.goNamed(`, `.pushNamed(`,
+/// `.pushReplacement`, `getInitialLink`, `getInitialUri`), and (3) the body
+/// lacks fallback handling (null check, NotFound/404/error route, try-catch,
+/// or returning null from a redirect).
+///
+/// **When we don't report:** Methods that only parse URIs, return stored
+/// URIs, build link text, or export/share without navigating are not reported
+/// even if the name matches—the body must contain at least one navigation
+/// call. We also skip: Widget builders (return type Widget), utility getters
+/// (`is*`, `has*`, `check*`, `valid*`), state methods (`reset*`, `clear*`,
+/// `set*`), simple returns (`=> _uri`, `{ return _uri; }`), and bodies that
+/// already show fallback (e.g. `if (x == null) return`, `return null`,
+/// try-catch, NotFound, or `if (x != null)` guard before navigate).
+///
 /// **Quick fix available:** Wraps the handler body with try/catch for
 /// fallback handling.
 ///
-/// **Skipped patterns** (not deep link handlers):
-/// - Widget builders: methods returning Widget types (including
-///   `Future<Widget>`, `PreferredSizeWidget`, etc.)
-/// - Utility getters: `is*`, `has*`, `check*`, `valid*` prefixes
-/// - State methods: `reset*`, `clear*`, `set*` prefixes
-/// - Simple field returns: `=> _uri`, `=> prefix.uri`
-/// - Lazy-loading: `=> _uri ??= parseUri(url)`
-/// - URI conversions: `=> url.toUri()`, `=> url?.toUriSafe()`
-/// - Property access: `=> url?.uri`
-/// - Trivial blocks: `{ return _uri; }`, `{ _uri = value; }`
-/// - No deep link signals: body lacks `Uri`, `pathSegments`,
-///   `queryParameters`, `Navigator`, `GoRouter`, or navigation calls
+/// **Developer note:** Detection is pattern-based (method name + body source
+/// regex). Only methods whose body contains a navigation call are reported;
+/// URI-only helpers are skipped. Fallback is inferred from keywords (NotFound,
+/// try/catch, == null, != null, return null). Edge cases may need tuning.
 ///
 /// **BAD:**
 /// ```dart
@@ -869,10 +878,10 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
     RegExp(r'\buri\b'),
     RegExp(r'\broute\b'),
   ];
-  static final List<RegExp> _deepLinkSignalPatterns = [
-    RegExp(r'\bUri\b'),
-    RegExp(r'\bpathSegments\b'),
-    RegExp(r'\bqueryParameters\b'),
+  /// Only methods whose body contains at least one of these are considered
+  /// "navigate to deep link target" handlers. Parsing URIs or building link
+  /// text without navigation does not trigger the rule.
+  static final List<RegExp> _deepLinkNavigationPatterns = [
     RegExp(r'\bNavigator\b'),
     RegExp(r'\bGoRouter\b'),
     RegExp(r'\.go\s*\('),
@@ -890,6 +899,7 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
     RegExp(r'null\s*\)'),
     RegExp(r'\breturn\s+null\b'),
     RegExp(r'==\s*null'),
+    RegExp(r'!=\s*null'),
     RegExp(r'\bisEmpty\b'),
     RegExp(r'\btry\b'),
     RegExp(r'\bcatch\b'),
@@ -1029,7 +1039,10 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
         }
       }
 
-      if (!_deepLinkSignalPatterns.any((p) => p.hasMatch(bodySource))) {
+      // Only report when the method actually performs navigation; parsing
+      // URIs or building link text without Navigator/GoRouter/.go/.push
+      // is not reported.
+      if (!_deepLinkNavigationPatterns.any((p) => p.hasMatch(bodySource))) {
         return;
       }
       if (!_deepLinkFallbackPatterns.any((p) => p.hasMatch(bodySource))) {
