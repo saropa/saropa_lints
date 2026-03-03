@@ -2578,3 +2578,200 @@ class RequireSessionTimeoutRule extends SaropaLintRule {
 ///   );
 /// }
 /// ```
+
+// =============================================================================
+// prefer_root_detection
+// =============================================================================
+
+/// Suggests root/jailbreak detection when using sensitive APIs.
+///
+/// Rooted or jailbroken devices can bypass security. Consider detecting
+/// compromise and warning users or disabling sensitive features.
+///
+/// **Bad:** Secure storage or sensitive APIs without root check.
+///
+/// **Good:** Use root_checker or similar and gate sensitive features.
+class PreferRootDetectionRule extends SaropaLintRule {
+  PreferRootDetectionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_root_detection',
+    '[prefer_root_detection] Sensitive storage or APIs used. Consider '
+        'root/jailbreak detection and gating sensitive features on compromised devices.',
+    correctionMessage:
+        'Add root detection (e.g. root_checker) and warn or restrict on compromised devices.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final String content = context.fileContent;
+    if (RegExp(r'\broot\b.*\b(check|detect|detection)\b', caseSensitive: false)
+        .hasMatch(content)) {
+      return;
+    }
+    if (RegExp(r'SafetyNet|isRooted|isJailbroken').hasMatch(content)) {
+      return;
+    }
+
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String name = node.constructorName.type.name.lexeme;
+      if (name == 'FlutterSecureStorage' || name == 'FlutterSecureStorageImpl') {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_webview_sandbox
+// =============================================================================
+
+/// Suggests sandboxing WebView (e.g. disable file access) when not needed.
+class PreferWebviewSandboxRule extends SaropaLintRule {
+  PreferWebviewSandboxRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_webview_sandbox',
+    '[prefer_webview_sandbox] WebView without sandbox. Consider restricting file access and JavaScript when not needed.',
+    correctionMessage: 'Set allowFileAccess: false and restrict domains if possible.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String name = node.constructorName.type.name.lexeme;
+      if (name == 'WebView' || name == 'WebViewWidget') {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_whitelist_validation
+// =============================================================================
+
+/// Suggests whitelist (allowlist) validation over blacklist for input.
+class PreferWhitelistValidationRule extends SaropaLintRule {
+  PreferWhitelistValidationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_whitelist_validation',
+    '[prefer_whitelist_validation] Prefer allowlist over blocklist for input validation.',
+    correctionMessage: 'Validate against allowed values instead of disallowed.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// require_keychain_access
+// =============================================================================
+
+class RequireKeychainAccessRule extends SaropaLintRule {
+  RequireKeychainAccessRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_keychain_access',
+    '[require_keychain_access] On iOS, use Keychain for sensitive data (e.g. flutter_secure_storage).',
+    correctionMessage: 'Store tokens/credentials in Keychain via flutter_secure_storage.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// require_webview_user_agent
+// =============================================================================
+
+class RequireWebviewUserAgentRule extends SaropaLintRule {
+  RequireWebviewUserAgentRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_webview_user_agent',
+    '[require_webview_user_agent] Set a custom user agent on WebView when needed for compatibility.',
+    correctionMessage: 'Use userAgent or custom userAgentFrom to identify in-app browser.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// require_multi_factor
+// =============================================================================
+
+class RequireMultiFactorRule extends SaropaLintRule {
+  RequireMultiFactorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_multi_factor',
+    '[require_multi_factor] Consider MFA for sensitive auth flows.',
+    correctionMessage: 'Add second factor (OTP, biometric) for high-risk operations.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

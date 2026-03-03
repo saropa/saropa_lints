@@ -2570,4 +2570,31 @@ class RequireRtlLayoutSupportRule extends SaropaLintRule {
   }
 }
 
+// =============================================================================
+// require_rtl_support
+// =============================================================================
+
+class RequireRtlSupportRule extends SaropaLintRule {
+  RequireRtlSupportRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_rtl_support',
+    '[require_rtl_support] Support RTL layouts for Arabic/Hebrew locales.',
+    correctionMessage: 'Use Directionality, TextDirection, or directional widgets.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
 /// Quick fix for [RequireRtlLayoutSupportRule].

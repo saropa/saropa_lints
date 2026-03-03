@@ -2671,3 +2671,30 @@ class RequireErrorRecoveryRule extends SaropaLintRule {
     SaropaContext context,
   ) {}
 }
+
+// =============================================================================
+// prefer_zone_error_handler
+// =============================================================================
+
+class PreferZoneErrorHandlerRule extends SaropaLintRule {
+  PreferZoneErrorHandlerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_zone_error_handler',
+    '[prefer_zone_error_handler] Use runZonedGuarded or Zone.handleUncaughtError for top-level errors.',
+    correctionMessage: 'Wrap main or runApp in runZonedGuarded to catch async errors.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

@@ -1194,3 +1194,58 @@ class PreferClosestContextRule extends SaropaLintRule {
     SaropaContext context,
   ) {}
 }
+
+// =============================================================================
+// require_context_in_build_descendants
+// =============================================================================
+
+/// Suggests passing context to descendants that need it in build().
+class RequireContextInBuildDescendantsRule extends SaropaLintRule {
+  RequireContextInBuildDescendantsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_context_in_build_descendants',
+    '[require_context_in_build_descendants] Descendant may need BuildContext. Pass context or use Builder.',
+    correctionMessage: 'Use Builder or pass context to widgets that need it.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// use_closest_build_context
+// =============================================================================
+
+class UseClosestBuildContextRule extends SaropaLintRule {
+  UseClosestBuildContextRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'use_closest_build_context',
+    '[use_closest_build_context] Prefer the closest BuildContext to avoid inheriting from wrong scope.',
+    correctionMessage: 'Use context from the widget that actually provides the dependency.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

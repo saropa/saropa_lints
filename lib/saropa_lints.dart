@@ -2,6 +2,11 @@
 
 /// Custom lint rules for Saropa codebase.
 ///
+/// **Architecture:** This file is the main export and tier gateway. It exposes
+/// [allSaropaRules] (full list for tooling), [getRulesFromRegistry] (tier-filtered
+/// for analysis), and version/config helpers. Rule instances are created lazily
+/// from [_allRuleFactories] to keep memory low when only one tier is used.
+///
 /// ## Configuration
 ///
 /// Generate your configuration with the CLI tool:
@@ -98,6 +103,10 @@ export 'package:saropa_lints/src/project_context.dart'
 List<SaropaLintRule> get allSaropaRules =>
     _ruleFactories.values.map((f) => f()).toList();
 
+// ---------------------------------------------------------------------------
+// Version resolution: used by init script and reports to show package version.
+// ---------------------------------------------------------------------------
+
 /// Cached package version resolved from pubspec.yaml at runtime.
 String? _resolvedVersion;
 
@@ -105,6 +114,8 @@ String? _resolvedVersion;
 /// project's `.dart_tool/package_config.json`. Falls back to `'unknown'`.
 String get saropaLintsVersion => _resolvedVersion ??= _resolveVersion();
 
+/// Resolves package root from package_config.json then reads version from
+/// that path's pubspec.yaml. Handles file:// and relative rootUri.
 String _resolveVersion() {
   try {
     final configFile = File('.dart_tool/package_config.json');
@@ -141,6 +152,11 @@ String _resolveVersion() {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Rule registry: factories only. Instantiation happens in getRulesFromRegistry
+// when a tier is selected, so memory stays low (~500MB essential vs ~4GB all).
+// ---------------------------------------------------------------------------
+
 /// All rule factories (not instances).
 ///
 /// This list contains constructor references (`.new`), not instances.
@@ -153,6 +169,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidNullAssertionRule.new,
   AvoidDebugPrintRule.new,
   PreferConditionalLoggingRule.new,
+  PreferLogLevelsRule.new,
+  PreferLogTimestampRule.new,
   AvoidUnguardedDebugRule.new,
   PreferConstStringListRule.new,
   AvoidUnnecessaryContainersRule.new,
@@ -162,6 +180,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireInitStateIdempotentRule.new,
   AvoidStoringContextRule.new,
   PreferClosestContextRule.new,
+  RequireContextInBuildDescendantsRule.new,
   AvoidContextAcrossAsyncRule.new,
   AvoidContextAfterAwaitInStaticRule.new,
   AvoidContextInAsyncStaticRule.new,
@@ -218,6 +237,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   NoBooleanLiteralCompareRule.new,
   NoEmptyBlockRule.new,
   PreferLastRule.new,
+  PreferLateLazyInitializationRule.new,
   AvoidDoubleSlashImportsRule.new,
   AvoidNestedRecordsRule.new,
   PreferCommentingAnalyzerIgnoresRule.new,
@@ -234,6 +254,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   NoEqualThenElseRule.new,
   AvoidGlobalStateRule.new,
   PreferImmediateReturnRule.new,
+  PreferInjectablePackageRule.new,
   PreferIterableOfRule.new,
   AvoidExpandedAsSpacerRule.new,
   PreferFlexForComplexLayoutRule.new,
@@ -450,6 +471,9 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidUnnecessaryCompareToRule.new,
   AvoidFutureIgnoreRule.new,
   PreferCancellationTokenPatternRule.new,
+  PreferStreamTransformerRule.new,
+  PreferStreamsOverPollingRule.new,
+  RequireCancellableOperationsRule.new,
   AvoidFutureToStringRule.new,
   PreferCorrectCallbackFieldNameRule.new,
   AvoidNullableInterpolationRule.new,
@@ -668,6 +692,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Accessibility rules (NEW)
   AvoidIconButtonsWithoutTooltipRule.new,
+  PreferSemanticsSortRule.new,
   AvoidSmallTouchTargetsRule.new,
   RequireExcludeSemanticsJustificationRule.new,
   AvoidColorOnlyIndicatorsRule.new,
@@ -681,6 +706,9 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // Security rules (NEW)
   AvoidLoggingSensitiveDataRule.new,
   RequireSecureStorageRule.new,
+  PreferRootDetectionRule.new,
+  PreferWebviewSandboxRule.new,
+  PreferWhitelistValidationRule.new,
   AvoidHardcodedCredentialsRule.new,
   RequireInputSanitizationRule.new,
   RequireInputValidationRule.new,
@@ -732,6 +760,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // Error handling rules (NEW)
   AvoidSwallowingExceptionsRule.new,
   HandleThrowingInvocationsRule.new,
+  RequireErrorContextInLogsRule.new,
   AvoidLosingStackTraceRule.new,
   AvoidPrintErrorRule.new,
   // RequireFutureErrorHandlingRule merged into AvoidUncaughtFutureErrorsRule
@@ -790,6 +819,10 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // API & Network rules (NEW)
   RequireHttpStatusCheckRule.new,
+  PreferStaleWhileRevalidateRule.new,
+  RequireApiResponseValidationRule.new,
+  RequireApiVersionHandlingRule.new,
+  RequireContentTypeValidationRule.new,
   PreferBatchRequestsRule.new,
   RequireCompressionRule.new,
   RequireSslPinningSensitiveRule.new,
@@ -818,6 +851,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidCapturingThisInCallbacksRule.new,
   RequireCacheEvictionPolicyRule.new,
   PreferWeakReferencesForCacheRule.new,
+  PreferLruCacheRule.new,
   AvoidExpandoCircularReferencesRule.new,
   AvoidLargeIsolateCommunicationRule.new,
 
@@ -832,6 +866,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Resource Management rules (NEW)
   RequireFileCloseInFinallyRule.new,
+  PreferUsingForTempResourcesRule.new,
   RequireHiveDatabaseCloseRule.new,
   RequireHttpClientCloseRule.new,
   RequireNativeResourceCleanupRule.new,
@@ -1007,6 +1042,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferBlankLineAfterDeclarationsRule.new,
   PreferCompactDeclarationsRule.new,
   PreferBlankLinesBetweenMembersRule.new,
+  PreferReadableLineLengthRule.new,
   PreferCompactClassMembersRule.new,
   PreferNoBlankLineInsideBlocksRule.new,
   PreferSingleBlankLineMaxRule.new,
@@ -1175,6 +1211,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidAssigningNotifiersRule.new,
   AvoidNotifierConstructorsRule.new,
   PreferImmutableProviderArgumentsRule.new,
+  PreferRiverpodCodeGenRule.new,
+  PreferRiverpodKeepAliveRule.new,
 
   AvoidScrollListenerInBuildRule.new,
   PreferValueListenableBuilderRule.new,
@@ -1279,11 +1317,13 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferCupertinoForIosFeelRule.new,
   PreferUrlStrategyForWebRule.new,
   RequireWindowSizeConstraintsRule.new,
+  PreferOverlayPortalLayoutBuilderRule.new,
   PreferKeyboardShortcutsRule.new,
   // Notification rules
   RequireNotificationChannelAndroidRule.new,
   PreferLocalNotificationForImmediateRule.new,
   AvoidNotificationPayloadSensitiveRule.new,
+  PreferNotificationCustomSoundRule.new,
 
   // Widget rules
   AvoidNullableWidgetMethodsRule.new,
@@ -1385,6 +1425,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidShrinkWrapExpensiveRule.new,
   PreferItemExtentRule.new,
   PreferCacheExtentRule.new,
+  PreferSliverForMixedScrollRule.new,
+  RequireAddAutomaticKeepAlivesOffRule.new,
   PreferPrototypeItemRule.new,
   RequireKeyForReorderableRule.new,
   RequireKeyForCollectionRule.new,
@@ -1399,6 +1441,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // JSON and DateTime rules (NEW)
   RequireJsonDecodeTryCatchRule.new,
   PreferCorrectJsonCastsRule.new,
+  PreferJsonCodegenRule.new,
   AvoidDateTimeParseUnvalidatedRule.new,
   PreferTryParseForDynamicDataRule.new,
   AvoidDoubleForMoneyRule.new,
@@ -1645,7 +1688,10 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireHiveInitializationRule.new,
   RequireHiveTypeAdapterRule.new,
   RequireHiveBoxCloseRule.new,
+  PreferHiveCompactPeriodicallyRule.new,
+  PreferHiveCompactRule.new,
   PreferHiveEncryptionRule.new,
+  PreferHiveWebAwareRule.new,
   RequireHiveEncryptionKeySecureRule.new,
   AvoidHiveFieldIndexReuseRule.new,
 
@@ -1924,10 +1970,95 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidExceptionInConstructorRule.new,
   RequireCacheKeyDeterminismRule.new,
   RequirePermissionPermanentDenialHandlingRule.new,
+  RequireErrorMessageClarityRule.new,
+  RequireErrorRecoveryRule.new,
+
+  // Firebase rules
+  RequireFirebaseEmailEnumerationProtectionRule.new,
+  RequireFirebaseCompositeIndexRule.new,
+  RequireFirebaseOfflinePersistenceRule.new,
+
+  // Accessibility rules
+  RequireFocusOrderRule.new,
+  RequireHeadingHierarchyRule.new,
+  RequireReducedMotionSupportRule.new,
+
+  // GetIt rules
+  RequireGetitDisposeRegistrationRule.new,
+
+  // Test rules
+  RequirePerformanceTestRule.new,
+
+  // Image rules
+  RequireImageMemoryCacheLimitRule.new,
 
   // Dependency injection rules
   RequireGetItRegistrationOrderRule.new,
   RequireDefaultConfigRule.new,
+  RequireInterfaceForDependencyRule.new,
+
+  // JSON rules
+  RequireJsonDateFormatConsistencyRule.new,
+
+  // Security rules
+  RequireKeychainAccessRule.new,
+
+  // Permission rules
+  RequirePermissionLifecycleObserverRule.new,
+
+  // Provider rules
+  RequireProviderUpdateShouldNotifyRule.new,
+
+  // Internationalization rules
+  RequireRtlSupportRule.new,
+
+  // Sqflite rules
+  RequireSqfliteIndexForQueriesRule.new,
+
+  // Async rules
+  RequireStreamCancelOnErrorRule.new,
+  RequireSubscriptionCompositeRule.new,
+
+  // Security rules (batch 4)
+  RequireWebviewUserAgentRule.new,
+  RequireMultiFactorRule.new,
+
+  // Navigation rules
+  RequireWillPopScopeRule.new,
+
+  // Context rules
+  UseClosestBuildContextRule.new,
+
+  // Code quality avoid
+  UseSpecificDeprecationRule.new,
+
+  // Test rules (batch 4)
+  AvoidScreenshotInCiRule.new,
+  PreferTestReportRule.new,
+
+  // Accessibility (batch 4)
+  AvoidSemanticsInAnimationRule.new,
+  PreferAnnounceForChangesRule.new,
+  PreferShowHideRule.new,
+  RequireLinkDistinctionRule.new,
+  RequireSwitchControlRule.new,
+  PreferExternalKeyboardRule.new,
+
+  // Structure rules
+  PreferDeferredImportsRule.new,
+  PreferPartOverImportRule.new,
+
+  // Memory management
+  PreferWeakReferencesRule.new,
+
+  // Error handling
+  PreferZoneErrorHandlerRule.new,
+
+  // Isar rules
+  PreferIsarForComplexQueriesRule.new,
+
+  // UI/UX rules
+  PreferOutlinedIconsRule.new,
 
   // Widget rules
   AvoidBuilderIndexOutOfBoundsRule.new,
@@ -2230,6 +2361,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // Platform rules (platform_rules.dart)
   RequirePlatformCheckRule.new,
   PreferPlatformIoConditionalRule.new,
+  PreferPlatformWidgetAdaptiveRule.new,
   AvoidWebOnlyDependenciesRule.new,
   PreferFoundationPlatformCheckRule.new,
 
@@ -2243,6 +2375,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidHardcodedConfigRule.new,
   PreferCompileTimeConfigRule.new,
   PreferFlavorConfigurationRule.new,
+  RequireConfigValidationRule.new,
   AvoidHardcodedConfigTestRule.new,
   PreferSemverVersionRule.new,
   AvoidMixedEnvironmentsRule.new,
@@ -2299,6 +2432,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // Android rules (android_rules.dart)
   RequireAndroidPermissionRequestRule.new,
+  RequireBackupExclusionRule.new,
   AvoidAndroidTaskAffinityDefaultRule.new,
   RequireAndroid12SplashRule.new,
   PreferPendingIntentFlagsRule.new,
@@ -2323,6 +2457,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // Connectivity rules (connectivity_rules.dart)
   RequireConnectivityErrorHandlingRule.new,
   PreferConnectivityDebounceRule.new,
+  PreferInternetConnectionCheckerRule.new,
+  RequireConnectivityResumeCheckRule.new,
   RequireConnectivityTimeoutRule.new,
 
   // Geolocator rules (geolocator_rules.dart)
@@ -2501,6 +2637,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireNullSafeJsonAccessRule.new,
   RequirePermissionDeniedHandlingRule.new,
   RequirePermissionManifestAndroidRule.new,
+  PreferPermissionMinimalRequestRule.new,
   RequirePermissionPlistIosRule.new,
   RequirePermissionRationaleRule.new,
   RequirePermissionStatusCheckRule.new,
@@ -2575,9 +2712,11 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferInputFormattersRule.new,
   PreferGoRouterRedirectRule.new,
   PreferGoRouterBuilderRule.new,
+  PreferNamedRoutesForDeepLinksRule.new,
   RequireAutoRoutePageSuffixRule.new,
   PreferAutoRoutePathParamsSimpleRule.new,
   PreferAutoRouteTypedArgsRule.new,
+  RequireAutoRouteDeepLinkConfigRule.new,
   PreferBranchIoOrFirebaseLinksRule.new,
   PreferPermissionRequestInContextRule.new,
   AvoidSharedPrefsLargeDataRule.new,
@@ -2608,6 +2747,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidMisusedHooksRule.new,
   RequireRtlLayoutSupportRule.new,
   AvoidMisusedTestMatchersRule.new,
+  RequireDisposeVerificationTestsRule.new,
 
   // v5.1.0 - Migration rules (Flutter SDK deprecations)
   AvoidAssetManifestJsonRule.new,
@@ -2622,6 +2762,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidAccessingOtherClassesPrivateMembersRule.new,
   AvoidClosureCaptureLeaksRule.new,
   AvoidBehaviorSubjectLastValueRule.new,
+  PreferRxdartForComplexStreamsRule.new,
   AvoidCacheStampedeRule.new,
 
   // v5.1.0 - Batch 2
@@ -2717,6 +2858,8 @@ Map<String, SaropaLintRule Function()> _buildRuleFactoriesMap() {
 /// Only instantiates rules that are in the provided set.
 /// This is the key optimization - for essential tier (253 rules),
 /// only 253 rules are created instead of all 1600+.
+/// Builds rule instances only for the given [ruleNames] (e.g. tier set).
+/// Used by the native plugin so only enabled-tier rules are instantiated.
 List<SaropaLintRule> getRulesFromRegistry(Set<String> ruleNames) {
   final rules = <SaropaLintRule>[];
   for (final name in ruleNames) {

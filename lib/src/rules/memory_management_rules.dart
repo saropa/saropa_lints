@@ -1404,3 +1404,78 @@ class RequireExpandoCleanupRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_lru_cache
+// =============================================================================
+
+/// Suggests LRU cache for memory-bounded caches.
+///
+/// A Map used as a cache without eviction can grow unbounded. Use an
+/// LRU cache (e.g. collection package) for size-limited caches.
+///
+/// **Bad:** Map used as cache with put/get and no size limit.
+///
+/// **Good:** Use LruCache or similar with a maximum size.
+class PreferLruCacheRule extends SaropaLintRule {
+  PreferLruCacheRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_lru_cache',
+    '[prefer_lru_cache] Map used with put() without eviction. '
+        'Consider an LRU cache for memory-bounded caches.',
+    correctionMessage:
+        'Use an LRU cache (e.g. collection package) with a maximum size.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'put') return;
+      final Expression? target = node.realTarget;
+      if (target == null) return;
+      final String? typeStr = target.staticType?.getDisplayString();
+      if (typeStr == null || !typeStr.startsWith('Map')) return;
+      final String name = target.toSource();
+      if (!name.endsWith('Cache') && !name.endsWith('cache')) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+// =============================================================================
+// prefer_weak_references
+// =============================================================================
+
+class PreferWeakReferencesRule extends SaropaLintRule {
+  PreferWeakReferencesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_weak_references',
+    '[prefer_weak_references] Prefer WeakReference for caches to avoid retaining objects.',
+    correctionMessage: 'Use WeakReference or Expando where strong reference is not required.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

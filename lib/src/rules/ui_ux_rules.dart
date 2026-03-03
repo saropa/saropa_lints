@@ -1733,3 +1733,30 @@ class PreferMasterDetailForLargeRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_outlined_icons
+// =============================================================================
+
+class PreferOutlinedIconsRule extends SaropaLintRule {
+  PreferOutlinedIconsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_outlined_icons',
+    '[prefer_outlined_icons] Prefer outlined icons for consistency and clarity.',
+    correctionMessage: 'Use Icons.*_outlined where available for Material 3 style.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

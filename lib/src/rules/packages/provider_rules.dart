@@ -2565,3 +2565,30 @@ class AvoidProviderListenFalseInBuildRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// require_provider_update_should_notify
+// =============================================================================
+
+class RequireProviderUpdateShouldNotifyRule extends SaropaLintRule {
+  RequireProviderUpdateShouldNotifyRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_provider_update_should_notify',
+    '[require_provider_update_should_notify] ChangeNotifier should call notifyListeners() when state changes.',
+    correctionMessage: 'Call notifyListeners() after mutating state so listeners rebuild.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

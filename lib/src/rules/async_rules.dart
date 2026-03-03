@@ -4683,3 +4683,156 @@ class PreferCancellationTokenPatternRule extends SaropaLintRule {
     SaropaContext context,
   ) {}
 }
+
+// =============================================================================
+// prefer_stream_transformer
+// =============================================================================
+
+/// Suggests Stream.transform() for reusable stream pipelines.
+class PreferStreamTransformerRule extends SaropaLintRule {
+  PreferStreamTransformerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_stream_transformer',
+    '[prefer_stream_transformer] Consider Stream.transform() for reusable stream pipelines.',
+    correctionMessage: 'Use Stream.transform() with a custom StreamTransformer.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'map' && node.methodName.name != 'where') {
+        return;
+      }
+      final String? typeStr = node.realTarget?.staticType?.getDisplayString();
+      if (typeStr == null || !typeStr.startsWith('Stream')) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+// =============================================================================
+// prefer_streams_over_polling
+// =============================================================================
+
+/// Suggests Streams over Timer.periodic for reactive data.
+class PreferStreamsOverPollingRule extends SaropaLintRule {
+  PreferStreamsOverPollingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_streams_over_polling',
+    '[prefer_streams_over_polling] Timer.periodic used for polling. Consider a Stream instead.',
+    correctionMessage: 'Use a Stream (e.g. Stream.periodic or broadcast) for reactive updates.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (node.constructorName.type.name.lexeme != 'Timer') return;
+      if (node.constructorName.name?.name != 'periodic') return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+// =============================================================================
+// require_cancellable_operations
+// =============================================================================
+
+/// Suggests making long-running operations cancellable.
+class RequireCancellableOperationsRule extends SaropaLintRule {
+  RequireCancellableOperationsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_cancellable_operations',
+    '[require_cancellable_operations] Long-running async operation. Consider supporting cancellation.',
+    correctionMessage: 'Accept CancelToken or similar and check cancellation in loops.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// require_stream_cancel_on_error
+// =============================================================================
+
+class RequireStreamCancelOnErrorRule extends SaropaLintRule {
+  RequireStreamCancelOnErrorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_stream_cancel_on_error',
+    '[require_stream_cancel_on_error] Cancel stream subscriptions on error to avoid leaks.',
+    correctionMessage: 'Use takeUntil or handleError and cancel in cleanup.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// require_subscription_composite
+// =============================================================================
+
+class RequireSubscriptionCompositeRule extends SaropaLintRule {
+  RequireSubscriptionCompositeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_subscription_composite',
+    '[require_subscription_composite] Multiple stream subscriptions should be combined (e.g. Rx.combineLatest) for single cancel.',
+    correctionMessage: 'Use combineLatest/zip or a single subscription to simplify disposal.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

@@ -1925,3 +1925,30 @@ class AvoidCachedImageWebRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// require_image_memory_cache_limit
+// =============================================================================
+
+class RequireImageMemoryCacheLimitRule extends SaropaLintRule {
+  RequireImageMemoryCacheLimitRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_image_memory_cache_limit',
+    '[require_image_memory_cache_limit] Set PaintingBinding.instance.imageCache.maximumSize.',
+    correctionMessage: 'Limit image cache size to avoid OOM.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

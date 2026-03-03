@@ -321,3 +321,30 @@ class PreferSqfliteEncryptionRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// require_sqflite_index_for_queries
+// =============================================================================
+
+class RequireSqfliteIndexForQueriesRule extends SaropaLintRule {
+  RequireSqfliteIndexForQueriesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_sqflite_index_for_queries',
+    '[require_sqflite_index_for_queries] Add indexes for frequently queried columns.',
+    correctionMessage: 'Create INDEX in migrations for WHERE/ORDER BY columns.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

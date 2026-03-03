@@ -3614,3 +3614,57 @@ class PreferExtensionTypeForWrapperRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_deferred_imports
+// =============================================================================
+
+class PreferDeferredImportsRule extends SaropaLintRule {
+  PreferDeferredImportsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_deferred_imports',
+    '[prefer_deferred_imports] Use deferred imports for large optional libraries.',
+    correctionMessage: 'Use import \'package:foo/foo.dart\' deferred as foo; and await foo.loadLibrary().',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// prefer_part_over_import
+// =============================================================================
+
+class PreferPartOverImportRule extends SaropaLintRule {
+  PreferPartOverImportRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_part_over_import',
+    '[prefer_part_over_import] Prefer part/part of for same-package splits over import.',
+    correctionMessage: 'Use part \'bar.dart\'; in library and part of in part file when splitting same package.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

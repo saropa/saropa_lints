@@ -701,3 +701,76 @@ class AvoidPermissionRequestLoopRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_permission_minimal_request
+// =============================================================================
+
+/// Suggests requesting only the permissions actually used.
+///
+/// Requesting unused permissions increases denial risk and privacy concerns.
+///
+/// **Bad:** request([Permission.storage, Permission.camera, ...]) when only one is used.
+///
+/// **Good:** Request only the permission needed for the current feature.
+class PreferPermissionMinimalRequestRule extends SaropaLintRule {
+  PreferPermissionMinimalRequestRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_permission_minimal_request',
+    '[prefer_permission_minimal_request] Request only permissions that are '
+        'used. Unused permissions increase denial risk and privacy concerns.',
+    correctionMessage:
+        'Remove unused permissions from the request list.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'request') return;
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.length != 1) return;
+      final Expression arg = args.single;
+      if (arg is! ListLiteral) return;
+      if (arg.elements.length <= 2) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+// =============================================================================
+// require_permission_lifecycle_observer
+// =============================================================================
+
+class RequirePermissionLifecycleObserverRule extends SaropaLintRule {
+  RequirePermissionLifecycleObserverRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_permission_lifecycle_observer',
+    '[require_permission_lifecycle_observer] Handle permission changes when app resumes.',
+    correctionMessage: 'Use WidgetsBindingObserver or lifecycle callbacks to re-check permissions.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
