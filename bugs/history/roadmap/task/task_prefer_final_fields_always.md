@@ -36,7 +36,7 @@ This rule aims to improve code quality, security, or maintainability by enforcin
 ## Detection: True Positives
 
 - **Goal**: Reliably detect all real violations of the practice.
-- **Approach**: Prefer type/element checks and exact-match sets over substring or `toSource()` matching (see [bugs/history/false_positives/string_contains_false_positive_audit.md](../../history/false_positives/string_contains_false_positive_audit.md)).
+- **Approach**: Prefer type/element checks and exact-match sets over substring or `toSource()` matching.
 - **AST coverage**: Consider all AST shapes for the same pattern (e.g. both `MethodDeclaration` and `FunctionDeclaration`) so violations are not missed.
 - **Edge cases**: Document which constructs are in scope (e.g. test files, generated code, platform-specific code) and ensure detection is consistent.
 
@@ -70,3 +70,4 @@ This rule aims to improve code quality, security, or maintainability by enforcin
 ## Resolution
 
 - **Implemented** and assigned to **Stylistic** tier (moved from Professional for tier-integrity: all prefer_* opinionated rules live in stylisticRules). Rule code: `prefer_final_fields_always`.
+
