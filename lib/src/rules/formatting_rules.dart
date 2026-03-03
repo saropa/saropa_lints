@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/source/line_info.dart';
 
 import '../saropa_lint_rule.dart';
 import '../fixes/formatting/add_blank_line_fix.dart';
@@ -346,6 +347,165 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
 
       if (returnStartLine - prevEndLine < 2) {
         reporter.atNode(node);
+      }
+    });
+  }
+}
+
+/// Warns when there is no blank line before an `else` or `else if` clause.
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+/// A blank line before `else` separates branches visually and improves
+/// readability (see [doc/guides/good_methods.md](../../../doc/guides/good_methods.md) §9).
+///
+/// **Implementation notes for developers:**
+/// - Uses [addIfStatement] only; no string or name heuristics.
+/// - Reports on [elseStatement] so [AddBlankLineBeforeFix] inserts at the
+///   start of the line containing the else clause.
+/// - Skips when there is no else (no false positive on `if (x) { }`).
+///
+/// **Bad:**
+/// ```dart
+/// if (x) {
+///   a();
+/// } else {
+///   b();
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// if (x) {
+///   a();
+/// }
+///
+/// else {
+///   b();
+/// }
+/// ```
+class NewlineBeforeElseRule extends SaropaLintRule {
+  NewlineBeforeElseRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_blank_line_before_else',
+    '[prefer_blank_line_before_else] Adding a blank line before else/else if '
+        'separates branches and improves readability. Enable via the stylistic tier. {v1}',
+    correctionMessage:
+        'Add a blank line before this else clause.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addIfStatement((IfStatement node) {
+      final Statement? elseStmt = node.elseStatement;
+      final Token? elseToken = node.elseKeyword;
+      if (elseStmt == null || elseToken == null) return;
+
+      final LineInfo lineInfo = context.lineInfo;
+      final int thenEndLine = lineInfo.getLocation(node.thenStatement.end).lineNumber;
+      final int elseStartLine = lineInfo.getLocation(elseToken.offset).lineNumber;
+      // At least one full blank line required (gap >= 2).
+      if (elseStartLine - thenEndLine < 2) {
+        reporter.atNode(elseStmt, code);
+      }
+    });
+  }
+}
+
+/// Warns when there is no blank line after a for or while loop before the next statement.
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+/// A blank line after a loop separates it from the following logic (see
+/// [doc/guides/good_methods.md](../../../doc/guides/good_methods.md) §9).
+///
+/// **Implementation notes for developers:**
+/// - Uses [addBlock] and iterates [Block.statements]; no recursion.
+/// - Only [ForStatement] and [WhileStatement] count as loops (for-in is
+///   [ForStatement] with [ForEachParts], so it is covered).
+/// - Reports on the *next* statement so [AddBlankLineBeforeFix] inserts
+///   a blank line before it (i.e. after the loop).
+/// - Blocks with fewer than two statements are skipped (no false positive).
+///
+/// **Bad:**
+/// ```dart
+/// for (final x in list) {
+///   process(x);
+/// }
+/// doNext();
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// for (final x in list) {
+///   process(x);
+/// }
+///
+/// doNext();
+/// ```
+class NewlineAfterLoopRule extends SaropaLintRule {
+  NewlineAfterLoopRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_blank_line_after_loop',
+    '[prefer_blank_line_after_loop] Adding a blank line after a for/while loop '
+        'separates the loop from the next statement and improves readability. Enable via the stylistic tier. {v1}',
+    correctionMessage:
+        'Add a blank line after the loop (before this statement).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBlock((Block node) {
+      final List<Statement> statements = node.statements;
+      if (statements.length < 2) return;
+
+      final LineInfo lineInfo = context.lineInfo;
+
+      for (int i = 0; i < statements.length - 1; i++) {
+        final Statement current = statements[i];
+        final Statement next = statements[i + 1];
+
+        final bool currentIsLoop = current is ForStatement || current is WhileStatement;
+        if (!currentIsLoop) continue;
+
+        final int loopEndLine = lineInfo.getLocation(current.end).lineNumber;
+        final int nextStartLine = lineInfo.getLocation(next.offset).lineNumber;
+        // At least one full blank line required (gap >= 2).
+        if (nextStartLine - loopEndLine < 2) {
+          reporter.atNode(next, code);
+        }
       }
     });
   }
@@ -889,6 +1049,60 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
           return; // Only report once per enum
         }
         previousName = currentName;
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_readable_line_length
+// =============================================================================
+
+/// Suggests keeping lines under ~80 characters for readability.
+///
+/// Long lines are harder to read and review. Prefer wrapping or breaking.
+///
+/// **Bad:** Lines over 80 characters.
+///
+/// **Good:** Wrap at ~80 characters or use dart format line length.
+class PreferReadableLineLengthRule extends SaropaLintRule {
+  PreferReadableLineLengthRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_readable_line_length',
+    '[prefer_readable_line_length] Line exceeds 80 characters. '
+        'Consider wrapping for readability.',
+    correctionMessage:
+        'Break long lines at ~80 characters or configure dart format line length.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const int _maxLineLength = 80;
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit unit) {
+      final LineInfo lineInfo = context.lineInfo;
+      final String content = context.fileContent;
+      for (int i = 1; i <= lineInfo.lineCount; i++) {
+        final int lineStart = lineInfo.getOffsetOfLine(i);
+        final int lineEnd = i < lineInfo.lineCount
+            ? lineInfo.getOffsetOfLine(i + 1) - 1
+            : content.length;
+        final int length = lineEnd - lineStart;
+        if (length > _maxLineLength) {
+          reporter.atOffset(offset: lineStart, length: length.clamp(1, 81));
+          return;
+        }
       }
     });
   }

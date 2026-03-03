@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:test/test.dart';
-
+import 'package:saropa_lints/saropa_lints.dart' show LintImpact;
 import 'package:saropa_lints/src/rules/formatting_rules.dart';
+import 'package:test/test.dart';
 
 /// Tests for 10 Formatting lint rules.
 ///
@@ -41,6 +41,18 @@ void main() {
       'NewlineBeforeReturnRule',
       'prefer_blank_line_before_return',
       () => NewlineBeforeReturnRule(),
+    );
+
+    testRule(
+      'NewlineBeforeElseRule',
+      'prefer_blank_line_before_else',
+      () => NewlineBeforeElseRule(),
+    );
+
+    testRule(
+      'NewlineAfterLoopRule',
+      'prefer_blank_line_after_loop',
+      () => NewlineAfterLoopRule(),
     );
 
     testRule(
@@ -86,6 +98,8 @@ void main() {
       'prefer_blank_line_before_constructor',
       'prefer_blank_line_before_method',
       'prefer_blank_line_before_return',
+      'prefer_blank_line_before_else',
+      'prefer_blank_line_after_loop',
       'prefer_trailing_comma',
       'unnecessary_trailing_comma',
       'format_comment_style',
@@ -184,6 +198,99 @@ void main() {
       test('prefer_blank_line_before_return should NOT trigger', () {
         // Preferred pattern used correctly
         expect('prefer_blank_line_before_return passes', isNotNull);
+      });
+    });
+
+    group('prefer_blank_line_before_else', () {
+      test('is stylistic rule (opinionated impact)', () {
+        final rule = NewlineBeforeElseRule();
+        expect(rule.impact, LintImpact.opinionated);
+      });
+
+      test('rule offers quick fix (add blank line before else)', () {
+        final rule = NewlineBeforeElseRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
+      test('prefer_blank_line_before_else SHOULD trigger', () {
+        expect('prefer_blank_line_before_else detected', isNotNull);
+      });
+
+      test('prefer_blank_line_before_else should NOT trigger', () {
+        expect('prefer_blank_line_before_else passes', isNotNull);
+      });
+
+      test('fixture has bad example with expect_lint marker', () {
+        final content = File(
+          'example_core/lib/formatting/prefer_blank_line_before_else_fixture.dart',
+        ).readAsStringSync();
+        expect(
+          content,
+          contains('// expect_lint: prefer_blank_line_before_else'),
+        );
+        expect(content, contains('_bad'));
+      });
+
+      test('fixture has good example without violation', () {
+        final content = File(
+          'example_core/lib/formatting/prefer_blank_line_before_else_fixture.dart',
+        ).readAsStringSync();
+        expect(content, contains('_good'));
+      });
+
+      test('fixture has false-positive guard: if without else must not trigger', () {
+        final content = File(
+          'example_core/lib/formatting/prefer_blank_line_before_else_fixture.dart',
+        ).readAsStringSync();
+        expect(content, contains('_noElse'));
+        expect(content, contains('if (x)'));
+        // _noElse has no else clause; rule must not report there.
+      });
+    });
+
+    group('prefer_blank_line_after_loop', () {
+      test('is stylistic rule (opinionated impact)', () {
+        final rule = NewlineAfterLoopRule();
+        expect(rule.impact, LintImpact.opinionated);
+      });
+
+      test('rule offers quick fix (add blank line after loop)', () {
+        final rule = NewlineAfterLoopRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
+      test('prefer_blank_line_after_loop SHOULD trigger', () {
+        expect('prefer_blank_line_after_loop detected', isNotNull);
+      });
+
+      test('prefer_blank_line_after_loop should NOT trigger', () {
+        expect('prefer_blank_line_after_loop passes', isNotNull);
+      });
+
+      test('fixture has bad example with expect_lint marker', () {
+        final content = File(
+          'example_core/lib/formatting/prefer_blank_line_after_loop_fixture.dart',
+        ).readAsStringSync();
+        expect(
+          content,
+          contains('// expect_lint: prefer_blank_line_after_loop'),
+        );
+        expect(content, contains('_bad'));
+      });
+
+      test('fixture has good example without violation', () {
+        final content = File(
+          'example_core/lib/formatting/prefer_blank_line_after_loop_fixture.dart',
+        ).readAsStringSync();
+        expect(content, contains('_good'));
+      });
+
+      test('fixture has false-positive guard: block with only loop must not trigger', () {
+        final content = File(
+          'example_core/lib/formatting/prefer_blank_line_after_loop_fixture.dart',
+        ).readAsStringSync();
+        expect(content, contains('_onlyLoop'));
+        expect(content, contains('for (var i = 0'));
       });
     });
 

@@ -502,6 +502,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   BinaryExpressionOperandOrderRule.new,
   DoubleLiteralFormatRule.new,
   NewlineBeforeReturnRule.new,
+  NewlineBeforeElseRule.new,
+  NewlineAfterLoopRule.new,
   NoMagicNumberRule.new,
   PreferAsyncAwaitRule.new,
   PreferConditionalExpressionsRule.new,
