@@ -4,7 +4,10 @@
 /// init process. Individual lines are truncated but all items are shown.
 library;
 
+import 'dart:developer' as dev;
 import 'dart:io';
+
+import 'package:path/path.dart' as path;
 
 const int _maxLineLength = 78; // chars per bullet before "..."
 const String _changelogUrl = 'https://pub.dev/packages/saropa_lints/changelog';
@@ -33,7 +36,14 @@ List<String> formatWhatsNew({
   required AnsiColors colors,
 }) {
   try {
-    final file = File('$packageDir/CHANGELOG.md');
+    final dir = Directory(packageDir);
+    if (!dir.existsSync()) return const [];
+    final basePath = path.normalize(dir.resolveSymbolicLinksSync());
+    final changelogPath = path.join(basePath, 'CHANGELOG.md');
+    if (!path.isWithin(basePath, path.normalize(changelogPath))) {
+      return const [];
+    }
+    final file = File(changelogPath);
     if (!file.existsSync()) return const [];
 
     final content = file.readAsStringSync();
@@ -44,7 +54,8 @@ List<String> formatWhatsNew({
     if (categories.isEmpty) return const [];
 
     return _format(categories, section.isUnreleased ? null : version, colors);
-  } catch (_) {
+  } catch (e, st) {
+    dev.log('Failed to parse CHANGELOG for whats new', error: e, stackTrace: st);
     return const [];
   }
 }
@@ -99,14 +110,16 @@ List<_Cat> _parseCategories(String sectionText) {
       if (currentName != null && items.isNotEmpty) {
         categories.add(_Cat(currentName, items));
       }
-      currentName = catMatch.group(1)!.trim();
+      final group1 = catMatch.group(1);
+      currentName = group1 != null ? group1.trim() : null;
       items = [];
       continue;
     }
     if (currentName == null) continue;
 
     final bulletMatch = _bulletPattern.firstMatch(line.trim());
-    if (bulletMatch != null) items.add(bulletMatch.group(1)!);
+    final bullet = bulletMatch?.group(1);
+    if (bullet != null) items.add(bullet);
   }
 
   if (currentName != null && items.isNotEmpty) {

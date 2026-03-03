@@ -19,12 +19,14 @@
 ///   dart run saropa_lints --help
 library;
 
+import 'package:collection/collection.dart';
+
 import 'baseline.dart' as baseline_cmd;
 import 'impact_report.dart' as impact_cmd;
 import 'init.dart' as init_cmd;
 
 Future<void> main(List<String> args) async {
-  if (args.isNotEmpty && (args.first == '--help' || args.first == '-h')) {
+  if (args.firstOrNull == '--help' || args.firstOrNull == '-h') {
     _printUsage();
     return;
   }

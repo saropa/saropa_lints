@@ -73,15 +73,17 @@ Future<void> main(List<String> args) async {
   };
 
   for (final v in violations) {
-    if (v.impact != null) {
-      byImpact[v.impact!]!.add(v);
+    final impact = v.impact;
+    if (impact != null) {
+      final list = byImpact[impact];
+      if (list != null) list.add(v);
     }
   }
 
   // Print violations sorted by impact (critical first)
   var printed = false;
   for (final impact in LintImpact.values) {
-    final list = byImpact[impact]!;
+    final list = byImpact[impact] ?? [];
     if (list.isEmpty) continue;
 
     if (printed) print('');
@@ -99,11 +101,11 @@ Future<void> main(List<String> args) async {
   print('Impact Summary');
   print('==============');
 
-  final criticalCount = byImpact[LintImpact.critical]!.length;
-  final highCount = byImpact[LintImpact.high]!.length;
-  final mediumCount = byImpact[LintImpact.medium]!.length;
-  final lowCount = byImpact[LintImpact.low]!.length;
-  final opinionatedCount = byImpact[LintImpact.opinionated]!.length;
+  final criticalCount = (byImpact[LintImpact.critical] ?? []).length;
+  final highCount = (byImpact[LintImpact.high] ?? []).length;
+  final mediumCount = (byImpact[LintImpact.medium] ?? []).length;
+  final lowCount = (byImpact[LintImpact.low] ?? []).length;
+  final opinionatedCount = (byImpact[LintImpact.opinionated] ?? []).length;
 
   if (criticalCount > 0) {
     print('CRITICAL: $criticalCount (fix immediately!)');
