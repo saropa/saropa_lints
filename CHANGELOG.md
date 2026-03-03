@@ -22,6 +22,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`avoid_unawaited_future`:** No longer reports when the expression statement is explicitly wrapped in `unawaited(...)`. The rule previously checked `node.parent` (the enclosing block) instead of `node.expression`, so the skip never applied. It now returns early when the statement's expression is a `MethodInvocation` with method name `unawaited`, matching the rule's own correction message and Dart's recommended fire-and-forget pattern.
 
+- **`avoid_uncaught_future_errors`:** Expression statements that are exactly `unawaited(...);` are never reported. The rule now returns immediately when the statement's expression is a `MethodInvocation` with method name `unawaited`, independent of type resolution or chaining, so all code paths guarantee no report on intentional fire-and-forget. DartDoc and tests updated. See `bugs/history/false_positives/false_positive_avoid_uncaught_future_errors_unawaited_wrapper.md`.
+
 ### Maintenance
 
 - **Docs:** Retired `bugs/REMAINING_ROADMAP_RULES.md`. Moved 9 deferred (Hard) rules into ROADMAP.md Part 2 → “Deferred: Remaining Hard (cross-file/heuristics/YAML)” with Reason and Description.

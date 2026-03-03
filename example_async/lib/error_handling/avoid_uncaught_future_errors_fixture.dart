@@ -103,6 +103,8 @@
 // Test fixture for: avoid_uncaught_future_errors
 // Source: lib\src\rules\error_handling_rules.dart
 
+import 'dart:async';
+
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // NOTE: avoid_uncaught_future_errors fires on Future method calls
@@ -115,3 +117,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // GOOD:
 // void _good360() async { await fetchData(); }
 void _note360() {}
+
+Future<void> _fetchData() async {}
+
+/// GOOD: unawaited() explicitly acknowledges fire-and-forget; rule must NOT report.
+void unawaitedExample() {
+  unawaited(_fetchData());
+}
