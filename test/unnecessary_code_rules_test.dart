@@ -209,6 +209,11 @@ void main() {
     });
 
     group('avoid_unnecessary_getter', () {
+      test('rule offers quick fix (remove unnecessary getter)', () {
+        final rule = AvoidUnnecessaryGetterRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_unnecessary_getter SHOULD trigger', () {
         // Pattern that should be avoided: avoid unnecessary getter
         expect('avoid_unnecessary_getter detected', isNotNull);
@@ -259,6 +264,11 @@ void main() {
 
   group('Unnecessary Code - General Rules', () {
     group('no_empty_block', () {
+      test('rule offers quick fix (add ignore comment)', () {
+        final rule = NoEmptyBlockRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('no_empty_block SHOULD trigger', () {
         // Detected violation: no empty block
         expect('no_empty_block detected', isNotNull);

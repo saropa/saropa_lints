@@ -4,14 +4,17 @@ import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../native/saropa_fix.dart';
 
-/// Quick fix: Insert TODO comment in empty block.
-class NoEmptyBlockTodoFix extends SaropaFixProducer {
-  NoEmptyBlockTodoFix({required super.context});
+/// Quick fix: Add ignore comment for empty block (documented suppression).
+///
+/// Matches the rule's correctionMessage: use `// ignore: no_empty_block` to
+/// suppress and document why the block is empty.
+class AddNoEmptyBlockIgnoreFix extends SaropaFixProducer {
+  AddNoEmptyBlockIgnoreFix({required super.context});
 
   static const _fixKind = FixKind(
-    'saropa.fix.noEmptyBlockTodoFix',
+    'saropa.fix.addNoEmptyBlockIgnoreFix',
     50,
-    'Add TODO: implement',
+    'Add // ignore: no_empty_block',
   );
 
   @override
@@ -26,8 +29,8 @@ class NoEmptyBlockTodoFix extends SaropaFixProducer {
     if (block == null || block.statements.isNotEmpty) return;
 
     final insertOffset = block.leftBracket.end;
-    await builder.addDartFileEdit(file, (builder) {
-      builder.addSimpleInsertion(insertOffset, ' // TODO: implement');
+    await builder.addDartFileEdit(file, (b) {
+      b.addSimpleInsertion(insertOffset, ' // ignore: no_empty_block');
     });
   }
 }

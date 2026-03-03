@@ -3505,3 +3505,30 @@ class BannedUsageRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// use_specific_deprecation
+// =============================================================================
+
+class UseSpecificDeprecationRule extends SaropaLintRule {
+  UseSpecificDeprecationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'use_specific_deprecation',
+    '[use_specific_deprecation] Prefer @Deprecated with a specific replacement and expiry.',
+    correctionMessage: 'Add replacement and since/expiry to @Deprecated.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

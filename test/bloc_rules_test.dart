@@ -329,6 +329,11 @@ void main() {
 
   group('BLoC Constructor & Lifecycle Rules', () {
     group('avoid_bloc_event_in_constructor', () {
+      test('rule offers quick fix (remove add() statement)', () {
+        final rule = AvoidBlocEventInConstructorRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('add() call in Bloc constructor SHOULD trigger', () {
         // Events added in constructor fire before listeners attach
         expect('add() in constructor body detected', isNotNull);

@@ -805,6 +805,11 @@ void main() {
     });
 
     group('prefer_const_widgets', () {
+      test('rule offers quick fix (add const to widget)', () {
+        final rule = PreferConstWidgetsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('prefer_const_widgets SHOULD trigger', () {
         // Better alternative available: prefer const widgets
         expect('prefer_const_widgets detected', isNotNull);

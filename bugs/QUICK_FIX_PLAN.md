@@ -168,75 +168,90 @@ Execution work follows **Part 2 (Checklist)** below.
 
 ### C. Batch 1 — `structure_rules.dart` (EASY, deterministic)
 
-**File:** `lib/src/rules/structure_rules.dart` (51 rules, 0 fixes)
+**File:** `lib/src/rules/structure_rules.dart` (51 rules, 4 fixes)
 
-- [ ] `avoid_double_slash_imports`
-  - [ ] Fix: replace URI string literal value to remove `//`
-  - [ ] Implementation: ReplaceNodeFix/custom on `SimpleStringLiteral`
-- [ ] `avoid_duplicate_exports`
-  - [ ] Fix: delete duplicate `ExportDirective`
-  - [ ] Implementation: DeleteNodeFix (target the directive)
-- [ ] `avoid_duplicate_named_imports`
-  - [ ] Fix: delete duplicate `ImportDirective`
-  - [ ] Implementation: DeleteNodeFix (target the directive)
-- [ ] `prefer_trailing_underscore_for_unused`
-  - [ ] Fix: rename unused param `x` → `x_` (or `_x`, pick one consistent with rule)
-  - [ ] Implementation: replace the parameter name token / source range
+- [x] `avoid_double_slash_imports`
+  - [x] Fix: replace URI string literal value to remove `//`
+  - [x] Implementation: `RemoveDoubleSlashImportsFix` (ReplaceNodeFix on `SimpleStringLiteral`)
+- [x] `avoid_duplicate_exports`
+  - [x] Fix: delete duplicate `ExportDirective`
+  - [x] Implementation: `DeleteDuplicateExportFix` (DeleteNodeFix)
+- [x] `avoid_duplicate_named_imports`
+  - [x] Fix: delete duplicate `ImportDirective`
+  - [x] Implementation: `DeleteDuplicateImportFix` (DeleteNodeFix)
+- [x] `prefer_trailing_underscore_for_unused`
+  - [x] Fix: rename unused param `x` → `x_`
+  - [x] Implementation: `PreferTrailingUnderscoreForUnusedFix` (replace name token)
 
-**Exit criteria:** All 4 fixes have fixtures + tests and audit count increases by 4.
+**Exit criteria:** All 4 fixes have fixtures + tests and audit count increases by 4. **Done.**
 
 ### D. Batch 2 — `bloc_rules.dart` + `performance_rules.dart` (EASY)
 
-- [ ] `bloc_rules.dart`: `avoid_bloc_event_in_constructor`
-  - [ ] Fix: delete the statement containing `add(...)` in constructor
-  - [ ] Implementation: DeleteNodeFix; target `ExpressionStatement`
+- [x] `bloc_rules.dart`: `avoid_bloc_event_in_constructor`
+  - [x] Fix: delete the statement containing `add(...)` in constructor
+  - [x] Implementation: DeleteNodeFix; target `ExpressionStatement` (`RemoveBlocEventInConstructorFix`)
+  - [x] Fixture: `example_packages/lib/bloc/avoid_bloc_event_in_constructor_fixture.dart` (Bloc with add() in constructor)
+  - [x] Test: `bloc_rules_test.dart` — rule offers quick fix
 
-- [ ] `performance_rules.dart`: `prefer_const_widgets`
-  - [ ] Fix: add `const` to the instance creation expression when valid
-  - [ ] Implementation: ReplaceNodeFix/custom on `InstanceCreationExpression`
+- [x] `performance_rules.dart`: `prefer_const_widgets`
+  - [x] Fix: add `const` to the instance creation expression when valid
+  - [x] Implementation: `PreferConstWidgetsFix` on `InstanceCreationExpression`
+  - [x] Fixture: `example_async/lib/performance/prefer_const_widgets_fixture.dart`
+  - [x] Test: `performance_rules_test.dart` — rule offers quick fix
 
-**Exit criteria:** +2 fixes, fixtures/tests present, audit count increases by 2.
+**Exit criteria:** +2 fixes, fixtures/tests present, audit count increases by 2. **Done.**
 
 ### E. Batch 3 — naming + type (EASY, high impact)
 
-- [ ] `naming_style_rules.dart`: `prefer_capitalized_comment_start`
-  - [ ] Fix: reuse existing `CapitalizeCommentFix`
-  - [ ] Implementation: add `fixGenerators` returning `CapitalizeCommentFix`
+- [x] `naming_style_rules.dart`: `prefer_capitalized_comment_start`
+  - [x] Fix: reuse existing `CapitalizeCommentFix`
+  - [x] Implementation: `fixGenerators` already returns `CapitalizeCommentFix` (FormatCommentRule)
+  - [x] Fixture: `example_core/lib/naming_style/prefer_capitalized_comment_start_fixture.dart`
+  - [x] Test: `naming_style_rules_test.dart` — rule offers quick fix
 
-- [ ] `type_rules.dart`: `prefer_const_declarations`
-  - [ ] Fix: replace `final` with `const` for the declaration list
-  - [ ] Implementation: custom `SaropaFixProducer` that edits the keyword range
+- [x] `type_rules.dart`: `prefer_const_declarations`
+  - [x] Fix: replace `final` with `const` for the declaration list
+  - [x] Implementation: `PreferConstDeclarationsFix` (edits keyword range)
+  - [x] Fixture: `example_core/lib/type/prefer_const_declarations_fixture.dart` (BAD: final pi = 3.14159)
+  - [x] Test: `type_rules_test.dart` — rule offers quick fix
 
-- [ ] `type_rules.dart`: `prefer_final_locals`
-  - [ ] Fix: add `final` (or replace `var` with `final`) for local decl
-  - [ ] Implementation: custom `SaropaFixProducer` keyword insertion/replacement
+- [x] `type_rules.dart`: `prefer_final_locals`
+  - [x] Fix: add `final` (or replace `var` with `final`) for local decl
+  - [x] Implementation: `PreferFinalLocalsFix` (keyword insertion/replacement)
+  - [x] Fixture: `example_core/lib/type/prefer_final_locals_fixture.dart` (BAD: var count = 1)
+  - [x] Test: `type_rules_test.dart` — rule offers quick fix
 
-**Exit criteria:** +3 fixes, fixtures/tests present, audit count increases by 3.
+**Exit criteria:** +3 fixes, fixtures/tests present, audit count increases by 3. **Done.**
 
 ### F. Batch 4 — `code_quality_avoid_rules.dart` (EASY candidates)
 
 **File:** `lib/src/rules/code_quality_avoid_rules.dart` (44 rules, 0 fixes)
 
-- [ ] `avoid_redundant_pragma_inline`
-  - [ ] Fix: delete redundant pragma annotation
-  - [ ] Implementation: DeleteNodeFix/custom on annotation node
-- [ ] `avoid_unused_parameters`
-  - [ ] Fix: rename unused parameter to `_x` / `x_` (match convention)
-  - [ ] Implementation: replace name token range
-- [ ] `avoid_weak_cryptographic_algorithms`
-  - [ ] Decide fix behavior:
-    - [ ] Option A: replace algorithm call (only when API is known + safe)
-    - [ ] Option B: insert TODO/comment (always safe)
+- [x] `avoid_redundant_pragma_inline`
+  - [x] Fix: delete redundant pragma annotation
+  - [x] Implementation: `RemoveRedundantPragmaInlineFix` (DeleteNodeFix on Annotation)
+  - [x] Fixture: `example_core/lib/code_quality/avoid_redundant_pragma_inline_fixture.dart`
+  - [x] Test: `code_quality_rules_test.dart` — rule offers quick fix
+- [x] `avoid_unused_parameters`
+  - [x] Fix: prefix unused parameter with underscore
+  - [x] Implementation: `PrefixUnusedParameterFix` (replace name token)
+  - [x] Fixture: `example_core/lib/code_quality/avoid_unused_parameters_fixture.dart`
+  - [x] Test: `code_quality_rules_test.dart` — rule offers quick fix
+- [x] `avoid_weak_cryptographic_algorithms`
+  - [x] Fix: replace weak algorithm identifier with `sha256` (Option A; Option B TODO fix removed)
+  - [x] Implementation: `ReplaceWeakCryptoFix` (replaces md5/sha1/MD5/SHA1 → sha256); removed `WeakCryptoTodoFix`
+  - [x] Fixture: `example_core/lib/code_quality/avoid_weak_cryptographic_algorithms_fixture.dart`
+  - [x] Test: `code_quality_rules_test.dart` — rule offers quick fix
 
-**Exit criteria:** +2 to +3 fixes, fixtures/tests present, audit increases accordingly.
+**Exit criteria:** +2 to +3 fixes, fixtures/tests present, audit increases accordingly. **Done.**
 
 ### G. Batch 5 — `unnecessary_code_rules.dart` (fill remaining gaps)
 
-- [ ] Scan the 7 rules without fixes and classify:
-  - [ ] deterministic local delete/replace → implement
-  - [ ] ambiguous → TODO/comment fix only
+- [x] Scanned rules; 1 had no fix, 1 had prohibited TODO fix.
+- [x] `avoid_unnecessary_getter`: added `RemoveUnnecessaryGetterFix` (DeleteNodeFix on getter MethodDeclaration). Fixture exists; test added in `unnecessary_code_rules_test.dart`.
+- [x] `no_empty_block`: replaced `NoEmptyBlockTodoFix` with `AddNoEmptyBlockIgnoreFix` (inserts `// ignore: no_empty_block` per rule’s correctionMessage). Deleted `no_empty_block_todo_fix.dart`. Test added.
 
-**Exit criteria:** +N fixes with tests, audit increases.
+**Exit criteria:** +N fixes with tests, audit increases. **Done (+2 fixes).**
 
 ### H. Batch 6 — Performance sync I/O (MEDIUM)
 
