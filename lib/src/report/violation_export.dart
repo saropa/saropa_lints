@@ -1,8 +1,10 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert' show JsonEncoder;
-import 'dart:io' show Directory, File, Platform, stderr;
+import 'dart:developer' as developer;
+import 'dart:io' show Directory, File, stderr;
 
+import 'package:path/path.dart' as path;
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
@@ -223,13 +225,16 @@ class ViolationExporter {
   /// delete the target first. If any step fails, fall back to a
   /// direct write.
   static void _writeAtomic(String projectRoot, String content) {
-    final sep = Platform.pathSeparator;
-    final dir = Directory('$projectRoot${sep}reports$sep$_dirName');
+    final base = path.normalize(projectRoot);
+    final dirPath = path.join(base, 'reports', _dirName);
+    if (!path.isWithin(base, dirPath)) return;
+
+    final dir = Directory(dirPath);
     if (!dir.existsSync()) {
       dir.createSync(recursive: true);
     }
 
-    final targetPath = '${dir.path}$sep$_fileName';
+    final targetPath = path.join(dir.path, _fileName);
     final tmpPath = '$targetPath.tmp';
     final tmpFile = File(tmpPath);
     final targetFile = File(targetPath);
@@ -245,18 +250,36 @@ class ViolationExporter {
 
       // Rename temp to target
       tmpFile.renameSync(targetPath);
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        'ViolationExporter.write atomic rename failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // Fallback: direct write if atomic strategy fails
       try {
         targetFile.writeAsStringSync(content);
-      } catch (e) {
-        stderr.writeln('[saropa_lints] Could not write violation export: $e');
+      } catch (e2, st2) {
+        developer.log(
+          'ViolationExporter.write fallback write failed',
+          name: 'saropa_lints',
+          error: e2,
+          stackTrace: st2,
+        );
+        stderr.writeln('[saropa_lints] Could not write violation export: $e2');
       }
 
       // Clean up temp file if it still exists
       try {
         if (tmpFile.existsSync()) tmpFile.deleteSync();
-      } catch (_) {
+      } catch (e2, st2) {
+        developer.log(
+          'ViolationExporter.write temp cleanup failed',
+          name: 'saropa_lints',
+          error: e2,
+          stackTrace: st2,
+        );
         // Cleanup failure is non-critical.
       }
     }

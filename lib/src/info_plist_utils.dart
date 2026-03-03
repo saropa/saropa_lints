@@ -1,5 +1,6 @@
 // ignore_for_file: always_specify_types
 
+import 'dart:developer' as developer;
 import 'dart:io';
 
 /// Utilities for checking iOS Info.plist permission keys.
@@ -51,7 +52,13 @@ class InfoPlistChecker {
       if (file.existsSync()) {
         content = file.readAsStringSync();
       }
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        'Info.plist read failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // File doesn't exist or can't be read - that's OK
     }
 
@@ -84,7 +91,13 @@ class InfoPlistChecker {
         if (File(pubspecPath).existsSync()) {
           return current;
         }
-      } catch (_) {
+      } catch (e, st) {
+        developer.log(
+          'InfoPlistChecker _findProjectRoot file check failed',
+          name: 'saropa_lints',
+          error: e,
+          stackTrace: st,
+        );
         // Continue searching
       }
     }

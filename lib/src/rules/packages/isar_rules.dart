@@ -1714,6 +1714,9 @@ class AvoidCachedIsarStreamRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  static final _isarPattern = RegExp(r'\bisar\b');
+  static final _watchPattern = RegExp(r'\bwatch\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1724,8 +1727,7 @@ class AvoidCachedIsarStreamRule extends SaropaLintRule {
       final Expression? init = node.initializer;
       if (init == null) return;
       final String source = init.toSource().toLowerCase();
-      if (RegExp(r'\bisar\b').hasMatch(source) &&
-          RegExp(r'\bwatch\b').hasMatch(source)) {
+      if (_isarPattern.hasMatch(source) && _watchPattern.hasMatch(source)) {
         reporter.atNode(node);
       }
     });
@@ -1736,8 +1738,7 @@ class AvoidCachedIsarStreamRule extends SaropaLintRule {
         final Expression? init = variable.initializer;
         if (init == null) continue;
         final String source = init.toSource().toLowerCase();
-        if (RegExp(r'\bisar\b').hasMatch(source) &&
-            RegExp(r'\bwatch\b').hasMatch(source)) {
+        if (_isarPattern.hasMatch(source) && _watchPattern.hasMatch(source)) {
           reporter.atNode(variable);
         }
       }

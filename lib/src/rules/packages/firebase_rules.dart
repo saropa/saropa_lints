@@ -169,7 +169,7 @@ class _DatabaseInBuildVisitor extends RecursiveAstVisitor<void> {
   final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
-  bool _inFutureOrStreamBuilder = false;
+  bool _isInFutureOrStreamBuilder = false;
 
   static const Set<String> _databasePatterns = <String>{
     'collection',
@@ -187,9 +187,9 @@ class _DatabaseInBuildVisitor extends RecursiveAstVisitor<void> {
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     final String? name = node.constructorName.type.element?.name;
     if (name == 'FutureBuilder' || name == 'StreamBuilder') {
-      _inFutureOrStreamBuilder = true;
+      _isInFutureOrStreamBuilder = true;
       super.visitInstanceCreationExpression(node);
-      _inFutureOrStreamBuilder = false;
+      _isInFutureOrStreamBuilder = false;
       return;
     }
     super.visitInstanceCreationExpression(node);
@@ -197,7 +197,7 @@ class _DatabaseInBuildVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (!_inFutureOrStreamBuilder) {
+    if (!_isInFutureOrStreamBuilder) {
       super.visitMethodInvocation(node);
       return;
     }
@@ -1004,6 +1004,10 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  static final RegExp _docParen = RegExp(r'\.doc\s*\(');
+  static final RegExp _documentReference = RegExp(r'\bDocumentReference\b');
+  static final RegExp _firestoreWord = RegExp(r'\bFirestore\b');
+
   static const LintCode _code = LintCode(
     'prefer_firestore_batch_write',
     '[prefer_firestore_batch_write] Individual writes increase latency and billing costs. Multiple individual write operations are slower and more expensive than batch writes. Use WriteBatch for multiple related operations. {v3}',
@@ -1033,9 +1037,9 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
                   methodName == 'delete') {
                 // Check if it's a Firestore operation (word-boundary regex)
                 final String source = awaited.toSource();
-                if (RegExp(r'\.doc\s*\(').hasMatch(source) ||
-                    RegExp(r'\bDocumentReference\b').hasMatch(source) ||
-                    RegExp(r'\bFirestore\b').hasMatch(source)) {
+                if (_docParen.hasMatch(source) ||
+                    _documentReference.hasMatch(source) ||
+                    _firestoreWord.hasMatch(source)) {
                   firestoreWriteCount++;
                   firstWrite ??= awaited;
                 }
@@ -2721,9 +2725,8 @@ class RequireFirebaseReauthenticationRule extends SaropaLintRule {
       );
       node.body.visitChildren(visitor);
       // Use earliest reauth offset in source order (visitor order is DFS, not source).
-      final int? firstReauthOffset = visitor.reauthOffsets.isEmpty
-          ? null
-          : visitor.reauthOffsets.reduce((int a, int b) => a < b ? a : b);
+      final int? firstReauthOffset = visitor.reauthOffsets.fold<int?>(
+          null, (int? a, int b) => a == null ? b : (a < b ? a : b));
       for (final MethodInvocation call in visitor.sensitiveCalls) {
         if (firstReauthOffset == null || call.offset < firstReauthOffset) {
           reporter.atNode(call, _code);
@@ -2793,6 +2796,8 @@ class RequireFirebaseTokenRefreshRule extends SaropaLintRule {
     'user',
   };
 
+  static final RegExp _idTokenChanges = RegExp(r'\bidTokenChanges\b');
+
   static const LintCode _code = LintCode(
     'require_firebase_token_refresh',
     '[require_firebase_token_refresh] getIdToken() result may be stored without token refresh. Use idTokenChanges().listen() or getIdToken(true). {v1}',
@@ -2838,8 +2843,7 @@ class RequireFirebaseTokenRefreshRule extends SaropaLintRule {
       if (current is MethodInvocation) {
         if (current.methodName.name == 'listen') {
           final Expression? t = current.target;
-          if (t != null &&
-              RegExp(r'\bidTokenChanges\b').hasMatch(t.toSource())) {
+          if (t != null && _idTokenChanges.hasMatch(t.toSource())) {
             return true;
           }
         }

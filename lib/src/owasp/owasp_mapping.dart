@@ -21,7 +21,7 @@ Map<OwaspMobile, List<String>> getMobileCoverage(
 
   for (final MapEntry<String, OwaspMapping> entry in ruleMappings.entries) {
     for (final OwaspMobile category in entry.value.mobile) {
-      coverage[category]!.add(entry.key);
+      (coverage[category] ??= <String>[]).add(entry.key);
     }
   }
 
@@ -43,7 +43,7 @@ Map<OwaspWeb, List<String>> getWebCoverage(
 
   for (final MapEntry<String, OwaspMapping> entry in ruleMappings.entries) {
     for (final OwaspWeb category in entry.value.web) {
-      coverage[category]!.add(entry.key);
+      (coverage[category] ??= <String>[]).add(entry.key);
     }
   }
 
@@ -93,7 +93,7 @@ String generateComplianceReport(Map<String, OwaspMapping> ruleMappings) {
     ruleMappings,
   );
   for (final OwaspMobile category in OwaspMobile.values) {
-    final List<String> rules = mobileCoverage[category]!;
+    final List<String> rules = mobileCoverage[category] ?? <String>[];
     final String ruleList = rules.isEmpty
         ? '_No coverage_'
         : rules.take(3).join(', ');
@@ -113,7 +113,7 @@ String generateComplianceReport(Map<String, OwaspMapping> ruleMappings) {
 
   final Map<OwaspWeb, List<String>> webCoverage = getWebCoverage(ruleMappings);
   for (final OwaspWeb category in OwaspWeb.values) {
-    final List<String> rules = webCoverage[category]!;
+    final List<String> rules = webCoverage[category] ?? <String>[];
     final String ruleList = rules.isEmpty
         ? '_No coverage_'
         : rules.take(3).join(', ');

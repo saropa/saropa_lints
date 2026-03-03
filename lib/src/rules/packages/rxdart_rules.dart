@@ -121,3 +121,54 @@ class AvoidBehaviorSubjectLastValueRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// prefer_rxdart_for_complex_streams
+// =============================================================================
+
+/// Suggests RxDart for complex stream transformations.
+///
+/// RxDart provides operators (combineLatest, switchMap, etc.) that simplify
+/// complex stream logic compared to raw Dart Stream.
+///
+/// **Bad:** Long chain of stream.map().where().asyncMap() without rxdart.
+///
+/// **Good:** Use rxdart operators for complex transformations.
+class PreferRxdartForComplexStreamsRule extends SaropaLintRule {
+  PreferRxdartForComplexStreamsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_rxdart_for_complex_streams',
+    '[prefer_rxdart_for_complex_streams] Complex stream transformation. '
+        'Consider rxdart package for combineLatest, switchMap, and other operators.',
+    correctionMessage:
+        'Add rxdart for stream operators when logic gets complex.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final String content = context.fileContent;
+    if (RegExp(r'\brxdart\b').hasMatch(content)) return;
+    if (RegExp(r'\bRx\b').hasMatch(content)) return;
+
+    context.addMethodInvocation((MethodInvocation node) {
+      final String name = node.methodName.name;
+      if (name != 'map' && name != 'where' && name != 'asyncMap') return;
+      final Expression? target = node.realTarget;
+      if (target == null) return;
+      final String? typeStr = target.staticType?.getDisplayString();
+      if (typeStr == null || !typeStr.startsWith('Stream')) return;
+      reporter.atNode(node);
+    });
+  }
+}

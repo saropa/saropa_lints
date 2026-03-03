@@ -13,6 +13,7 @@
 library;
 
 import 'dart:async' show FutureOr;
+import 'dart:developer' as developer;
 
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
@@ -42,7 +43,13 @@ class SaropaLintsPlugin extends Plugin {
   FutureOr<void> start() {
     try {
       loadNativePluginConfig();
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        'loadNativePluginConfig failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // Defensive: plugin still registers with defaults
     }
   }
@@ -71,7 +78,13 @@ class SaropaLintsPlugin extends Plugin {
           registry.registerFixForRule(code, generator);
         }
       }
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        'register(PluginRegistry) failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // Defensive: avoid bringing down the analysis server
     }
   }

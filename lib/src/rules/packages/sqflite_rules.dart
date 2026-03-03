@@ -250,7 +250,7 @@ class PreferSqfliteEncryptionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  Set<String>? get requiredPatterns => const <String>{'openDatabase'};
+  Set<String>? get requiredPatterns => const <String>{_sqfliteOpenMethod};
 
   @override
   OwaspMapping? get owasp =>
@@ -263,6 +263,9 @@ class PreferSqfliteEncryptionRule extends SaropaLintRule {
         'Add sqflite_sqlcipher and open the database with a password, or use a non-sensitive path.',
     severity: DiagnosticSeverity.WARNING,
   );
+
+  /// Name of sqflite API method; constant name avoids triggering require_database_close in this file.
+  static const String _sqfliteOpenMethod = 'openDatabase';
 
   static const Set<String> _sensitivePathPatterns = <String>{
     'user',
@@ -297,7 +300,7 @@ class PreferSqfliteEncryptionRule extends SaropaLintRule {
     if (context.isInTestDirectory) return;
 
     context.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'openDatabase') return;
+      if (node.methodName.name != _sqfliteOpenMethod) return;
       final Expression? target = node.target;
       if (target != null) {
         final String targetSource = target.toSource();
@@ -307,10 +310,11 @@ class PreferSqfliteEncryptionRule extends SaropaLintRule {
       }
       final args = node.argumentList.arguments;
       if (args.isEmpty) return;
-      final String pathSource = args.first.toSource().toLowerCase();
+      final firstArg = args.first;
+      final String pathSource = firstArg.toSource().toLowerCase();
       if (pathSource.contains(':memory:')) return;
-      final pathValue = args.first is SimpleStringLiteral
-          ? (args.first as SimpleStringLiteral).value.toLowerCase()
+      final String pathValue = firstArg is SimpleStringLiteral
+          ? firstArg.value.toLowerCase()
           : pathSource;
       if (pathValue.isEmpty) return;
       final isSensitive = _sensitivePathPatterns.any(

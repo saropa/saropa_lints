@@ -367,7 +367,7 @@ class RequireQrContentValidationRule extends SaropaLintRule {
 
   /// Find the position of URL validation in the source.
   int _findValidationPosition(String source) {
-    final List<String> patterns = <String>[
+    const List<String> patterns = [
       'Uri.tryParse',
       'isValidUrl',
       'validateUrl',

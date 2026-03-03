@@ -59,13 +59,20 @@ class BatchData {
   /// Deserialize from JSON string. Returns null if invalid.
   static BatchData? fromJsonString(String source) {
     try {
-      final map = json.decode(source) as Map<String, dynamic>;
+      final decoded = json.decode(source);
+      if (decoded is! Map<String, dynamic>) return null;
+      final map = decoded;
       if (map['v'] != _formatVersion) return null;
 
+      final s = map['s'];
+      final i = map['i'];
+      final u = map['u'];
+      if (s is! String || i is! String || u is! String) return null;
+
       return BatchData(
-        sessionId: map['s'] as String,
-        isolateId: map['i'] as String,
-        updatedAt: DateTime.parse(map['u'] as String),
+        sessionId: s,
+        isolateId: i,
+        updatedAt: DateTime.parse(u),
         config: _configFromJson(map['cfg']),
         analyzedFiles: _stringList(map['af']),
         issuesByFile: _intMap(map['ibf']),
@@ -74,7 +81,9 @@ class BatchData {
         severityCounts: _severityCountsFromJson(map['sc']),
         violations: _violationsFromJson(map['vl']),
       );
-    } catch (_) {
+    } on FormatException {
+      return null;
+    } on TypeError {
       return null;
     }
   }
@@ -104,11 +113,14 @@ Map<String, Object> _severityCountsToJson(SeverityCounts sc) => {
 };
 
 SeverityCounts _severityCountsFromJson(dynamic raw) {
-  final m = raw as Map<String, dynamic>? ?? {};
+  final m = raw is Map<String, dynamic> ? raw : <String, dynamic>{};
+  final e = m['e'];
+  final w = m['w'];
+  final i = m['i'];
   return SeverityCounts(
-    error: m['e'] as int? ?? 0,
-    warning: m['w'] as int? ?? 0,
-    info: m['i'] as int? ?? 0,
+    error: e is int ? e : 0,
+    warning: w is int ? w : 0,
+    info: i is int ? i : 0,
   );
 }
 
@@ -140,19 +152,30 @@ Map<LintImpact, List<ViolationRecord>> _violationsFromJson(dynamic raw) {
   if (raw is! Map<String, dynamic>) return result;
 
   for (final impact in LintImpact.values) {
-    final list = raw[impact.name] as List<dynamic>?;
+    final listRaw = raw[impact.name];
+    final list = listRaw is List<dynamic> ? listRaw : null;
     if (list == null || list.isEmpty) continue;
 
     result[impact] = list
         .cast<Map<String, dynamic>>()
         .map(
-          (m) => ViolationRecord(
-            rule: m['r'] as String,
-            file: m['f'] as String,
-            line: m['l'] as int,
-            message: m['m'] as String,
-            correction: m['c2'] as String?,
-          ),
+          (m) {
+            final r = m['r'];
+            final f = m['f'];
+            final l = m['l'];
+            final msg = m['m'];
+            final c2 = m['c2'];
+            if (r is! String || f is! String || l is! int || msg is! String) {
+              throw FormatException('Invalid violation record', m.toString());
+            }
+            return ViolationRecord(
+              rule: r,
+              file: f,
+              line: l,
+              message: msg,
+              correction: c2 is String ? c2 : null,
+            );
+          },
         )
         .toList();
   }
@@ -176,30 +199,37 @@ Map<String, Object> _configToJson(ReportConfig c) => <String, Object>{
 
 ReportConfig? _configFromJson(dynamic raw) {
   if (raw is! Map<String, dynamic>) return null;
+  final v = raw['version'];
+  final t = raw['tier'];
+  final rc = raw['ruleCount'];
+  final mi = raw['maxIssues'];
+  final out = raw['output'];
   return ReportConfig(
-    version: raw['version'] as String? ?? 'unknown',
-    effectiveTier: raw['tier'] as String? ?? 'unknown',
-    enabledRuleCount: raw['ruleCount'] as int? ?? 0,
+    version: v is String ? v : 'unknown',
+    effectiveTier: t is String ? t : 'unknown',
+    enabledRuleCount: rc is int ? rc : 0,
     enabledRuleNames: _stringList(raw['rules']),
     enabledPlatforms: _stringList(raw['ePlatforms']),
     disabledPlatforms: _stringList(raw['dPlatforms']),
     enabledPackages: _stringList(raw['ePackages']),
     disabledPackages: _stringList(raw['dPackages']),
     userExclusions: _stringList(raw['exclusions']),
-    maxIssues: raw['maxIssues'] as int? ?? 0,
-    outputMode: raw['output'] as String? ?? 'both',
+    maxIssues: mi is int ? mi : 0,
+    outputMode: out is String ? out : 'both',
   );
 }
 
-List<String> _stringList(dynamic raw) =>
-    (raw as List<dynamic>?)?.cast<String>() ?? [];
+List<String> _stringList(dynamic raw) {
+  if (raw is! List<dynamic>) return [];
+  return raw.cast<String>();
+}
 
 Map<String, int> _intMap(dynamic raw) {
   if (raw is! Map<String, dynamic>) return {};
-  return raw.map((k, v) => MapEntry(k, v as int));
+  return raw.map((k, v) => MapEntry(k, v is int ? v : 0));
 }
 
 Map<String, String> _stringMap(dynamic raw) {
   if (raw is! Map<String, dynamic>) return {};
-  return raw.map((k, v) => MapEntry(k, v as String));
+  return raw.map((k, v) => MapEntry(k, v is String ? v : ''));
 }

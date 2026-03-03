@@ -1844,7 +1844,13 @@ abstract class SaropaLintRule extends AnalysisRule {
 
   @override
   DiagnosticCode get diagnosticCode {
-    final override = severityOverrides?[code.name];
+    DiagnosticSeverity? override = severityOverrides?[code.name];
+    if (override == null && severityOverrides != null) {
+      for (final alias in configAliases) {
+        override = severityOverrides![alias];
+        if (override != null) break;
+      }
+    }
     if (override == null) return _lintCode;
     return _overriddenCode ??= LintCode(
       _lintCode.name,
@@ -2423,11 +2429,36 @@ abstract class SaropaLintRule extends AnalysisRule {
   static Set<String>? disabledRules;
 
   /// Check if this rule is disabled via configuration.
-  bool get isDisabled => disabledRules?.contains(code.name) ?? false;
+  ///
+  /// Returns true if [disabledRules] contains this rule's [code.name] or any
+  /// [configAliases], so config using an alias (e.g. `require_riverpod_lint_package: false`)
+  /// correctly disables the rule.
+  bool get isDisabled {
+    final d = disabledRules;
+    if (d == null) return false;
+    if (d.contains(code.name)) return true;
+    for (final alias in configAliases) {
+      if (d.contains(alias)) return true;
+    }
+    return false;
+  }
 
   /// Get the effective severity for this rule, considering overrides.
-  DiagnosticSeverity? get effectiveSeverity =>
-      severityOverrides?[code.name] ?? code.severity;
+  ///
+  /// Checks [severityOverrides] for [code.name] first, then each [configAliases],
+  /// so config using an alias is applied.
+  DiagnosticSeverity? get effectiveSeverity {
+    final o = severityOverrides;
+    if (o != null) {
+      final byName = o[code.name];
+      if (byName != null) return byName;
+      for (final alias in configAliases) {
+        final byAlias = o[alias];
+        if (byAlias != null) return byAlias;
+      }
+    }
+    return code.severity;
+  }
 
   // ============================================================
   // Core Implementation

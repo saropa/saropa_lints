@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, Platform, stderr;
 import 'dart:math' show Random;
 
@@ -58,8 +59,8 @@ class AnalysisReporter {
   static String? _sessionId;
   static String? _isolateId;
   static Timer? _debounceTimer;
-  static bool _pathsLogged = false;
-  static bool _reportWritten = false;
+  static bool _hasPathsLogged = false;
+  static bool _hasReportWritten = false;
   static ReportConfig? _config;
   static Map<String, OwaspMapping>? _owaspLookup;
 
@@ -98,7 +99,7 @@ class AnalysisReporter {
   static void initialize(String projectRoot) {
     if (_projectRoot != null) return;
     _projectRoot = projectRoot;
-    _pathsLogged = false;
+    _hasPathsLogged = false;
     _sessionId = ReportConsolidator.initSession(projectRoot);
     _isolateId = _generateIsolateId();
   }
@@ -130,7 +131,7 @@ class AnalysisReporter {
     // analyzer is now re-visiting files it already processed. This is
     // safe from false positives because late-arriving straggler files are
     // new (wasNew=true) and never set the re-analysis flag.
-    if (_reportWritten && ProgressTracker.hasReanalyzedFile) {
+    if (_hasReportWritten && ProgressTracker.hasReanalyzedFile) {
       _startNewSession();
     }
 
@@ -148,13 +149,14 @@ class AnalysisReporter {
     ImpactTracker.reset();
     ImportGraphTracker.reset();
     ProgressTracker.clearReanalysisFlag();
-    if (_projectRoot != null) {
-      ReportConsolidator.cleanupSession(_projectRoot!);
-      _sessionId = ReportConsolidator.initSession(_projectRoot!);
+    final root = _projectRoot;
+    if (root != null) {
+      ReportConsolidator.cleanupSession(root);
+      _sessionId = ReportConsolidator.initSession(root);
     }
     _isolateId = _generateIsolateId();
-    _pathsLogged = false;
-    _reportWritten = false;
+    _hasPathsLogged = false;
+    _hasReportWritten = false;
   }
 
   /// The project root directory, or null if not initialized.
@@ -178,11 +180,13 @@ class AnalysisReporter {
 
   /// Full path to the report file, or null if not initialized.
   static String? get reportPath {
-    if (_projectRoot == null || _sessionId == null) return null;
+    final root = _projectRoot;
+    final sid = _sessionId;
+    if (root == null || sid == null) return null;
     final sep = Platform.pathSeparator;
-    final df = dateFolder(_sessionId!);
-    return '$_projectRoot${sep}reports$sep$df$sep'
-        '${ReportConsolidator.reportFilename(_sessionId!)}';
+    final df = dateFolder(sid);
+    return '$root${sep}reports$sep$df$sep'
+        '${ReportConsolidator.reportFilename(sid)}';
   }
 
   /// Write the consolidated report file.
@@ -191,12 +195,14 @@ class AnalysisReporter {
   /// this isolate's batch data, then reads ALL batches from the
   /// session and merges them into one report file.
   static void _writeReport() {
-    if (_projectRoot == null || _sessionId == null) return;
+    final projectRoot = _projectRoot;
+    final sessionId = _sessionId;
+    if (projectRoot == null || sessionId == null) return;
 
     try {
       final sep = Platform.pathSeparator;
-      final df = dateFolder(_sessionId!);
-      final reportsDir = Directory('$_projectRoot${sep}reports$sep$df');
+      final df = dateFolder(sessionId);
+      final reportsDir = Directory('$projectRoot${sep}reports$sep$df');
       if (!reportsDir.existsSync()) {
         reportsDir.createSync(recursive: true);
       }
@@ -206,29 +212,30 @@ class AnalysisReporter {
 
       // 2. Consolidate all batches into one report
       final consolidated = ReportConsolidator.consolidate(
-        _projectRoot!,
-        _sessionId!,
+        projectRoot,
+        sessionId,
       );
       if (consolidated == null) return;
 
       // 3. Write the consolidated report
-      final path = reportPath!;
+      final path = reportPath;
+      if (path == null) return;
       _writeCombinedReport(path, consolidated);
 
       // 4. Write structured JSON export for Log Capture integration
       ViolationExporter.write(
-        projectRoot: _projectRoot!,
-        sessionId: _sessionId!,
+        projectRoot: projectRoot,
+        sessionId: sessionId,
         data: consolidated,
         owaspLookup: _owaspLookup ?? const <String, OwaspMapping>{},
       );
 
-      _reportWritten = true;
+      _hasReportWritten = true;
       _cleanOldReports();
 
       // Log file path only on the first write to avoid spamming stderr.
-      if (!_pathsLogged) {
-        _pathsLogged = true;
+      if (!_hasPathsLogged) {
+        _hasPathsLogged = true;
         stderr.writeln('');
         stderr.writeln('[saropa_lints] Report: $path');
       }
@@ -239,11 +246,13 @@ class AnalysisReporter {
 
   /// Write this isolate's data as a batch file for cross-isolate merging.
   static void _writeBatchFile() {
-    if (_projectRoot == null || _sessionId == null) return;
+    final projectRoot = _projectRoot;
+    final sessionId = _sessionId;
+    if (projectRoot == null || sessionId == null) return;
 
     final trackerData = ProgressTracker.reportData;
     final batch = BatchData(
-      sessionId: _sessionId!,
+      sessionId: sessionId,
       isolateId: _isolateId ?? 'unknown',
       updatedAt: DateTime.now(),
       config: _config,
@@ -259,7 +268,7 @@ class AnalysisReporter {
       violations: ImpactTracker.violations,
     );
 
-    ReportConsolidator.writeBatch(_projectRoot!, batch);
+    ReportConsolidator.writeBatch(projectRoot, batch);
   }
 
   /// Write the consolidated report (summary + full violation list).
@@ -399,7 +408,13 @@ class AnalysisReporter {
       }
       buf.writeln('${'─' * 70}');
       buf.writeln();
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        '_writeCustomYamlSubsection read failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // Silently skip if file can't be read
     }
   }
@@ -747,8 +762,9 @@ class AnalysisReporter {
 
   /// Convert an absolute path to a relative path from project root.
   static String _relativePath(String filePath) {
-    if (_projectRoot == null) return filePath;
-    return toRelativePath(filePath, _projectRoot!);
+    final root = _projectRoot;
+    if (root == null) return filePath;
+    return toRelativePath(filePath, root);
   }
 
   /// Move old report files to `.trash/`, keeping only the
@@ -789,7 +805,13 @@ class AnalysisReporter {
         final name = old.path.split(sep).last;
         old.renameSync('${trashDir.path}$sep$name');
       }
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        '_rotateReports cleanup failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // Cleanup failure is non-critical — silently ignore.
     }
   }
@@ -804,8 +826,8 @@ class AnalysisReporter {
     _projectRoot = null;
     _sessionId = null;
     _isolateId = null;
-    _pathsLogged = false;
-    _reportWritten = false;
+    _hasPathsLogged = false;
+    _hasReportWritten = false;
     _config = null;
     _owaspLookup = null;
     ImportGraphTracker.reset();

@@ -1558,7 +1558,6 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_setters_without_getters',
   'prefer_getters_before_setters',
   'prefer_mixin_over_abstract',
-  'prefer_named_bool_params',
   'prefer_noun_class_names',
   'prefer_raw_strings',
   'prefer_record_over_tuple_class',

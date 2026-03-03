@@ -26,11 +26,22 @@ List<Violation> parseViolations(String output) {
   );
 
   for (final match in pattern.allMatches(output)) {
-    final file = match.group(1)!;
-    final line = int.tryParse(match.group(2)!) ?? 0;
-    final column = int.tryParse(match.group(3)!) ?? 0;
-    final message = match.group(4)!;
-    final rule = match.group(5)!;
+    final g1 = match.group(1);
+    final g2 = match.group(2);
+    final g3 = match.group(3);
+    final g4 = match.group(4);
+    final g5 = match.group(5);
+    if (g1 == null || g2 == null || g3 == null || g4 == null || g5 == null) {
+      throw FormatException(
+        'Violation line did not match expected format (5 groups)',
+        output,
+      );
+    }
+    final file = g1;
+    final line = int.tryParse(g2) ?? 0;
+    final column = int.tryParse(g3) ?? 0;
+    final message = g4;
+    final rule = g5;
 
     // Look up impact for this rule
     final impact = _ruleImpacts[rule] ?? LintImpact.medium;

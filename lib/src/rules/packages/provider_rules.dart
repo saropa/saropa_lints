@@ -248,8 +248,9 @@ class _ProviderOfVisitor extends RecursiveAstVisitor<void> {
     bool hasListenFalse = false;
     for (final Expression arg in node.argumentList.arguments) {
       if (arg is NamedExpression && arg.name.label.name == 'listen') {
-        if (arg.expression is BooleanLiteral) {
-          hasListenFalse = !(arg.expression as BooleanLiteral).value;
+        final Expression expr = arg.expression;
+        if (expr is BooleanLiteral) {
+          hasListenFalse = !expr.value;
         }
       }
     }
@@ -1649,6 +1650,9 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
   PreferContextReadInCallbacksRule() : super(code: _code);
 
   @override
+  List<String> get configAliases => const <String>['prefer_context_read_not_watch'];
+
+  @override
   LintImpact get impact => LintImpact.medium;
 
   @override
@@ -1791,7 +1795,7 @@ class PreferProxyProviderRule extends SaropaLintRule {
               _ProxyProviderAccessVisitor();
           createExpr.visitChildren(visitor);
 
-          if (visitor.accessesProviders) {
+          if (visitor.hasProviderAccess) {
             reporter.atNode(node.constructorName, code);
           }
         }
@@ -1802,7 +1806,7 @@ class PreferProxyProviderRule extends SaropaLintRule {
 
 /// Visitor that checks if code accesses other providers via context.read/watch.
 class _ProxyProviderAccessVisitor extends RecursiveAstVisitor<void> {
-  bool accessesProviders = false;
+  bool hasProviderAccess = false;
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
@@ -1814,7 +1818,7 @@ class _ProxyProviderAccessVisitor extends RecursiveAstVisitor<void> {
       if (target != null) {
         // Match exact 'context' identifier
         if (target is SimpleIdentifier && target.name == 'context') {
-          accessesProviders = true;
+          hasProviderAccess = true;
         }
       }
     }
@@ -1823,7 +1827,7 @@ class _ProxyProviderAccessVisitor extends RecursiveAstVisitor<void> {
     if (methodName == 'of') {
       final Expression? target = node.target;
       if (target is SimpleIdentifier && target.name == 'Provider') {
-        accessesProviders = true;
+        hasProviderAccess = true;
       }
     }
 
@@ -1939,7 +1943,7 @@ class RequireUpdateCallbackRule extends SaropaLintRule {
     final List<FormalParameter> paramList = params.parameters.toList();
     if (paramList.isEmpty) return;
 
-    final FormalParameter lastParam = paramList.last;
+    final FormalParameter lastParam = paramList[paramList.length - 1];
     final String lastParamName = lastParam.name?.lexeme ?? '';
 
     // Check if the previous parameter is unused (named _ or starts with _)
@@ -2021,6 +2025,9 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static final RegExp _selectCallRegex = RegExp(r'\.select\s*\(');
+  static final RegExp _singlePropertyPattern = RegExp(
+    r'ref\.watch\([^)]+\)\.(\w+)[^.\w]',
+  );
 
   static const LintCode _code = LintCode(
     'prefer_selector_over_consumer',
@@ -2050,12 +2057,8 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
             // Check for patterns like ref.watch(provider).property or
             // ref.watch(provider).field
             // This suggests the Consumer is only using one property
-            final RegExp singlePropertyPattern = RegExp(
-              r'ref\.watch\([^)]+\)\.(\w+)[^.\w]',
-            );
-
-            final Iterable<RegExpMatch> matches = singlePropertyPattern
-                .allMatches(bodySource);
+            final Iterable<RegExpMatch> matches =
+                _singlePropertyPattern.allMatches(bodySource);
 
             // If we only see one property being accessed from the watched
             // provider, suggest using Selector
@@ -2543,12 +2546,12 @@ class AvoidProviderListenFalseInBuildRule extends SaropaLintRule {
       // Check for listen: false named argument
       bool hasListenFalse = false;
       for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'listen' &&
-            arg.expression is BooleanLiteral &&
-            (arg.expression as BooleanLiteral).value == false) {
-          hasListenFalse = true;
-          break;
+        if (arg is NamedExpression && arg.name.label.name == 'listen') {
+          final Expression expr = arg.expression;
+          if (expr is BooleanLiteral && expr.value == false) {
+            hasListenFalse = true;
+            break;
+          }
         }
       }
       if (!hasListenFalse) return;

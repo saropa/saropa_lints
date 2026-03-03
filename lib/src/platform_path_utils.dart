@@ -55,7 +55,7 @@ bool _callerHasPlatformPathApi(AstNode node) {
 
   final _CallerChecker checker = _CallerChecker(methodName);
   searchScope.visitChildren(checker);
-  return checker.found;
+  return checker.isFound;
 }
 
 /// Returns the enclosing method/function name if it starts with `_`.
@@ -97,25 +97,25 @@ class _CallerChecker extends RecursiveAstVisitor<void> {
   _CallerChecker(this._targetName);
 
   final String _targetName;
-  bool found = false;
+  bool isFound = false;
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (found) return;
+    if (isFound) return;
     if (node.methodName.name == _targetName) {
       _checkCallerBody(node);
     }
-    if (!found) super.visitMethodInvocation(node);
+    if (!isFound) super.visitMethodInvocation(node);
   }
 
   @override
   void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
-    if (found) return;
+    if (isFound) return;
     final Expression fn = node.function;
     if (fn is SimpleIdentifier && fn.name == _targetName) {
       _checkCallerBody(node);
     }
-    if (!found) super.visitFunctionExpressionInvocation(node);
+    if (!isFound) super.visitFunctionExpressionInvocation(node);
   }
 
   void _checkCallerBody(AstNode callSite) {
@@ -124,7 +124,7 @@ class _CallerChecker extends RecursiveAstVisitor<void> {
     if (callerBody == null) return;
 
     if (bodyContainsPlatformPathApi(callerBody.toSource())) {
-      found = true;
+      isFound = true;
     }
   }
 }

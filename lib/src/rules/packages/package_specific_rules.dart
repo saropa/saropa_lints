@@ -578,13 +578,12 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
               ).hasMatch(disposeMethod.body.toSource()));
 
       if (!hasCleanup && RegExp(r'\.listen\s*\(').hasMatch(classSource)) {
-        // Find the field declaration to report on
+        final keyboardControllerPattern =
+            RegExp(r'\bKeyboardVisibilityController\b');
         for (final ClassMember member in node.members) {
           if (member is FieldDeclaration) {
             final String fieldSource = member.toSource();
-            if (RegExp(
-              r'\bKeyboardVisibilityController\b',
-            ).hasMatch(fieldSource)) {
+            if (keyboardControllerPattern.hasMatch(fieldSource)) {
               reporter.atNode(member);
               return;
             }
@@ -667,11 +666,12 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
 
       // Find SpeechToText fields
       final List<String> speechFieldNames = <String>[];
+      final speechToTextPattern = RegExp(r'\bSpeechToText\b');
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null &&
-              RegExp(r'\bSpeechToText\b').hasMatch(typeName)) {
+              speechToTextPattern.hasMatch(typeName)) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
               speechFieldNames.add(variable.name.lexeme);
@@ -802,8 +802,12 @@ class AvoidAppLinksSensitiveParamsRule extends SaropaLintRule {
       final String source = node.toSource();
       if (!RegExp(r'://').hasMatch(source)) return;
 
-      for (final String param in _sensitiveParams) {
-        if (RegExp(RegExp.escape(param) + r'=').hasMatch(source)) {
+      final paramPatterns = [
+        for (final param in _sensitiveParams)
+          RegExp(RegExp.escape(param) + r'='),
+      ];
+      for (var i = 0; i < paramPatterns.length; i++) {
+        if (paramPatterns[i].hasMatch(source)) {
           reporter.atNode(node);
           return;
         }
@@ -853,9 +857,9 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_envied_obfuscation',
-    '[require_envied_obfuscation] Envied environment variable generated without obfuscation stores secrets as plaintext string constants in the compiled binary. Attackers can extract API keys, database URLs, and authentication tokens using basic reverse engineering tools, enabling unauthorized access to your backend services and third-party APIs. {v2}',
+    '[require_envied_obfuscation] Envied environment variable generated without obfuscation stores secrets as plain text string constants in the compiled binary. Attackers can extract API keys, database URLs, and authentication tokens using basic reverse engineering tools, enabling unauthorized access to your backend services and third-party APIs. {v2}',
     correctionMessage:
-        'Add obfuscate: true to the @Envied annotation or individual @EnviedField annotations to encode secrets at compile time and prevent plaintext extraction.',
+        'Add obfuscate: true to the @Envied annotation or individual @EnviedField annotations to encode secrets at compile time and prevent plain text extraction.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -1708,14 +1712,14 @@ class AvoidImagePickerQuickSuccessionRule extends SaropaLintRule {
 
       if (!isImagePicker) return;
 
-      // Check if there's a guard (boolean check) in the enclosing function
+      final guardPattern = RegExp(
+        r'\b(picking|loading|isLoading|isPicking|_picking|_isPicking)\b',
+      );
       AstNode? current = node.parent;
       while (current != null) {
         if (current is IfStatement) {
           final String condition = current.expression.toSource();
-          if (RegExp(
-            r'\b(picking|loading|isLoading|isPicking|_picking|_isPicking)\b',
-          ).hasMatch(condition)) {
+          if (guardPattern.hasMatch(condition)) {
             return; // Has a guard, OK
           }
         }

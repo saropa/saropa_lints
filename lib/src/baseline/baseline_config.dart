@@ -1,6 +1,6 @@
 /// Configuration for the baseline feature.
 ///
-/// Loaded by [config_loader] from analysis_options_custom.yaml / analysis_options;
+/// Loaded by `config_loader` from analysis_options_custom.yaml / analysis_options;
 /// [BaselineManager] uses it to decide which violations to suppress (file/path/date).
 ///
 /// Parses baseline configuration from `analysis_options.yaml`:

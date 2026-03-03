@@ -909,8 +909,9 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
             if (metadata.name.name == 'HiveField') {
               final int? index = _extractHiveFieldIndex(metadata);
               if (index != null) {
-                fieldIndices.putIfAbsent(index, () => <Annotation>[]);
-                fieldIndices[index]!.add(metadata);
+                final list =
+                    fieldIndices.putIfAbsent(index, () => <Annotation>[]);
+                list.add(metadata);
               }
             }
           }
@@ -1710,7 +1711,7 @@ class RequireHiveMigrationStrategyRule extends SaropaLintRule {
       }
 
       // Check if indices don't start at 0 (suggests early fields removed)
-      if (indices.isNotEmpty && indices.first > 0) {
+      if (indices.isNotEmpty && indices[0] > 0) {
         reporter.atNode(node);
       }
     });
@@ -2181,5 +2182,200 @@ class AvoidHiveLargeSingleEntryRule extends SaropaLintRule {
       'List<num>',
     ];
     return primitives.contains(typeStr);
+  }
+}
+
+// =============================================================================
+// prefer_hive_compact_periodically
+// =============================================================================
+
+/// Suggests calling box.compact() after bulk deletes to reclaim space.
+///
+/// Hive files grow without compaction. Calling deleteAll() or clear() without
+/// a subsequent compact() leaves dead space on disk.
+///
+/// **Bad:**
+/// ```dart
+/// await box.deleteAll(box.keys);
+/// // no compact
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// await box.deleteAll(box.keys);
+/// await box.compact();
+/// ```
+class PreferHiveCompactPeriodicallyRule extends SaropaLintRule {
+  PreferHiveCompactPeriodicallyRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'hive'};
+
+  static const LintCode _code = LintCode(
+    'prefer_hive_compact_periodically',
+    '[prefer_hive_compact_periodically] Hive box bulk delete (deleteAll/clear) '
+        'without compact(). Call box.compact() after bulk deletes to reclaim disk space.',
+    correctionMessage:
+        'Call box.compact() after bulk deletes to reclaim space.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'deleteAll' && methodName != 'clear') return;
+      if (!_isHiveBoxTarget(node.realTarget)) return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+// =============================================================================
+// prefer_hive_compact
+// =============================================================================
+
+/// Suggests periodic compaction for Hive boxes that are written to.
+///
+/// Large or long-lived boxes should be compacted periodically to avoid
+/// unbounded file growth. This rule reports when a file uses box write/delete
+/// operations but never calls compact() in that file.
+///
+/// **Bad:** Box put/delete in file, no compact() in file.
+///
+/// **Good:** Box used with periodic compact() or small/short-lived usage.
+class PreferHiveCompactRule extends SaropaLintRule {
+  PreferHiveCompactRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'hive'};
+
+  static const LintCode _code = LintCode(
+    'prefer_hive_compact',
+    '[prefer_hive_compact] Hive box write/delete usage in this file without '
+        'compact(). Consider calling box.compact() periodically for large boxes.',
+    correctionMessage:
+        'Call box.compact() periodically or after bulk operations.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit unit) {
+      bool hasCompact = false;
+      MethodInvocation? firstWrite;
+      unit.visitChildren(_HiveCompactVisitor(
+        onCompact: () => hasCompact = true,
+        onWrite: (MethodInvocation node) => firstWrite ??= node,
+      ));
+      if (firstWrite != null && !hasCompact) reporter.atNode(firstWrite!);
+    });
+  }
+}
+
+class _HiveCompactVisitor extends RecursiveAstVisitor<void> {
+  _HiveCompactVisitor({required this.onCompact, required this.onWrite});
+
+  final void Function() onCompact;
+  final void Function(MethodInvocation node) onWrite;
+
+  static const Set<String> _writeMethods = <String>{
+    'put',
+    'delete',
+    'deleteAll',
+    'clear',
+    'add',
+    'addAll',
+  };
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String name = node.methodName.name;
+    if (name == 'compact') {
+      if (_isHiveBoxTarget(node.realTarget)) onCompact();
+    } else if (_writeMethods.contains(name) &&
+        _isHiveBoxTarget(node.realTarget)) {
+      onWrite(node);
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  bool _isHiveBoxTarget(Expression? target) {
+    if (target == null) return false;
+    final String src = target.toSource().toLowerCase();
+    return _boxTargetPattern.hasMatch(src);
+  }
+}
+
+// =============================================================================
+// prefer_hive_web_aware
+// =============================================================================
+
+/// Suggests web-aware Hive initialization when targeting web.
+///
+/// Hive on web has different behavior (e.g. path handling). Code that opens
+/// Hive boxes should consider kIsWeb or platform checks when the app targets web.
+///
+/// **Bad:** Hive.openBox/openLazyBox in file with no web check (in web-targeting app).
+///
+/// **Good:** Hive.init with path or kIsWeb check; or non-web-only app.
+class PreferHiveWebAwareRule extends SaropaLintRule {
+  PreferHiveWebAwareRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'hive'};
+
+  static const LintCode _code = LintCode(
+    'prefer_hive_web_aware',
+    '[prefer_hive_web_aware] Hive usage without web consideration. '
+        'Hive on web has different behavior; consider kIsWeb or path handling.',
+    correctionMessage:
+        'Use Hive.init with a path or check kIsWeb when targeting web.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final String content = context.fileContent;
+    final bool hasWebCheck = RegExp(r'\bkIsWeb\b').hasMatch(content);
+    if (hasWebCheck) return;
+
+    context.addMethodInvocation((MethodInvocation node) {
+      final String name = node.methodName.name;
+      if (!name.startsWith('openBox') && !name.startsWith('openLazyBox')) {
+        return;
+      }
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier && target.name == 'Hive') {
+        reporter.atNode(node);
+      }
+    });
   }
 }

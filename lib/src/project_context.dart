@@ -1,4 +1,4 @@
-// ignore_for_file: always_specify_types
+// ignore_for_file: always_specify_types, avoid_catching_generic_exception
 
 /// Project-wide context and caches for saropa_lints rules.
 ///
@@ -6,9 +6,13 @@
 /// and content filters are computed once per project/file and reused. Rules
 /// call [ProjectContext.of(context)] to get the singleton; all heavy data
 /// (pubspec deps, path normalization, bloom filters, etc.) lives here.
+import 'dart:async';
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
+
+import 'package:path/path.dart' as p;
 
 // =============================================================================
 // PATH UTILITIES
@@ -197,7 +201,7 @@ class GitAwarePriority {
   /// Initialize with project root.
   static void initialize(String projectRoot) {
     _projectRoot = projectRoot;
-    refresh();
+    unawaited(refresh());
   }
 
   /// Refresh the list of modified files from git.
@@ -226,7 +230,9 @@ class GitAwarePriority {
       _modifiedFiles.clear();
       _stagedFiles.clear();
 
-      final output = result.stdout as String;
+      final stdoutRaw = result.stdout;
+      if (stdoutRaw is! String) return;
+      final output = stdoutRaw;
       // Porcelain format with -z: XY<space>path<null>
       final entries = output.split('\x00');
       for (final entry in entries) {
@@ -253,8 +259,22 @@ class GitAwarePriority {
       }
 
       _lastRefresh = now;
-    } catch (_) {
-      // Git not available or other error - silently ignore
+    } on ProcessException catch (e, st) {
+      developer.log(
+        'git status refresh failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
+      // Git not available or other error - ignore
+    } on IOException catch (e, st) {
+      developer.log(
+        'git status refresh failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
+      // Git not available or other error - ignore
     }
   }
 
@@ -365,7 +385,7 @@ class ProjectContext {
       dir = parent;
     }
     return null;
-    } catch (_) {
+    } on OSError {
       return null;
     }
   }
@@ -429,7 +449,13 @@ class _ProjectInfo {
         dependencies: deps,
         packageName: packageName,
       );
-    } catch (_) {
+    } on FormatException {
+      return _ProjectInfo._(
+        isFlutterProject: false,
+        dependencies: {},
+        packageName: '',
+      );
+    } on IOException {
       return _ProjectInfo._(
         isFlutterProject: false,
         dependencies: {},
@@ -573,9 +599,8 @@ class FileTypeDetector {
     final normalizedPath = normalizePath(filePath);
 
     // Check cache first
-    if (_cache.containsKey(normalizedPath)) {
-      return _cache[normalizedPath]!;
-    }
+    final cached = _cache[normalizedPath];
+    if (cached != null) return cached;
 
     final types = <FileType>{};
 
@@ -904,7 +929,7 @@ class FileMetricsCache {
     final lines = content.split('\n');
     lineCount = lines.length;
 
-    // Simple pattern matching for quick estimates
+    final functionPattern = RegExp(r'^\s*\w+\s+\w+\s*\(');
     for (final line in lines) {
       final trimmed = line.trimLeft();
       if (trimmed.startsWith('import ')) importCount++;
@@ -912,8 +937,7 @@ class FileMetricsCache {
           trimmed.startsWith('abstract class ')) {
         classCount++;
       }
-      if (trimmed.contains(' Function') ||
-          RegExp(r'^\s*\w+\s+\w+\s*\(').hasMatch(line)) {
+      if (trimmed.contains(' Function') || functionPattern.hasMatch(line)) {
         functionCount++;
       }
     }
@@ -988,8 +1012,8 @@ class SmartContentFilter {
     int minimumLines = 0,
     int maximumLines = 0,
     Set<String>? requiredKeywords,
-    bool requiresAsync = false,
-    bool requiresWidgets = false,
+    bool isAsyncRequired = false,
+    bool isWidgetsRequired = false,
   }) {
     final metrics = FileMetricsCache.get(filePath, content);
 
@@ -1000,10 +1024,10 @@ class SmartContentFilter {
     if (maximumLines > 0 && metrics.lineCount > maximumLines) return false;
 
     // Check async requirement
-    if (requiresAsync && !metrics.hasAsyncCode) return false;
+    if (isAsyncRequired && !metrics.hasAsyncCode) return false;
 
     // Check widget requirement
-    if (requiresWidgets && !metrics.hasWidgets) return false;
+    if (isWidgetsRequired && !metrics.hasWidgets) return false;
 
     // Check required patterns (any must match)
     if (requiredPatterns != null && requiredPatterns.isNotEmpty) {
@@ -1235,8 +1259,22 @@ class IncrementalAnalysisTracker {
 
       _isDirty = false;
       _changesSinceLastSave = 0;
-    } catch (_) {
-      // Silently ignore load errors - cache is optional
+    } on FormatException catch (e, st) {
+      developer.log(
+        'loadFromDisk cache parse failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
+      // Invalid cache file - ignore
+    } on IOException catch (e, st) {
+      developer.log(
+        'loadFromDisk cache read failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
+      // Cannot read cache - ignore
     }
   }
 
@@ -1279,8 +1317,14 @@ class IncrementalAnalysisTracker {
 
       _isDirty = false;
       _changesSinceLastSave = 0;
-    } catch (_) {
-      // Silently ignore save errors - cache is optional
+    } on IOException catch (e, st) {
+      developer.log(
+        'saveToDisk cache write failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
+      // Cannot write cache - ignore
     }
   }
 
@@ -1295,7 +1339,7 @@ class IncrementalAnalysisTracker {
       // For simplicity, we'll use a basic approach
       // In production, you'd want proper JSON parsing
       return _simpleJsonParse(trimmed);
-    } catch (_) {
+    } on FormatException {
       return null;
     }
   }
@@ -1311,23 +1355,25 @@ class IncrementalAnalysisTracker {
 
       // Match "key": value patterns
       final versionMatch = RegExp(r'"version":\s*(\d+)').firstMatch(json);
-      if (versionMatch != null) {
-        result['version'] = int.parse(versionMatch.group(1)!);
+      final versionGroup = versionMatch?.group(1);
+      if (versionGroup != null) {
+        result['version'] = int.parse(versionGroup);
       }
 
       final configHashMatch = RegExp(
         r'"configHash":\s*(-?\d+)',
       ).firstMatch(json);
-      if (configHashMatch != null) {
-        result['configHash'] = int.parse(configHashMatch.group(1)!);
+      final configHashGroup = configHashMatch?.group(1);
+      if (configHashGroup != null) {
+        result['configHash'] = int.parse(configHashGroup);
       }
 
       // Parse files section - this is complex, so we'll use a regex approach
       final filesMatch = RegExp(
         r'"files":\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}',
       ).firstMatch(json);
-      if (filesMatch != null) {
-        final filesContent = filesMatch.group(1)!;
+      final filesContent = filesMatch?.group(1);
+      if (filesContent != null) {
         final files = <String, dynamic>{};
 
         // Match each file entry: "path": {"hash": N, "rules": [...]}
@@ -1335,16 +1381,23 @@ class IncrementalAnalysisTracker {
           r'"([^"]+)":\s*\{\s*"hash":\s*(-?\d+),\s*"rules":\s*\[([^\]]*)\]\s*\}',
         );
 
+        final rulePattern = RegExp(r'"([^"]+)"');
         for (final match in filePattern.allMatches(filesContent)) {
-          final path = match.group(1)!;
-          final hash = int.parse(match.group(2)!);
-          final rulesStr = match.group(3)!;
+          final pathPart = match.group(1);
+          final hashGroup = match.group(2);
+          final rulesStrPart = match.group(3);
+          if (pathPart == null || hashGroup == null || rulesStrPart == null) {
+            continue;
+          }
+          final path = pathPart;
+          final hash = int.parse(hashGroup);
+          final rulesStr = rulesStrPart;
 
           // Parse rules array
           final rules = <String>[];
-          final rulePattern = RegExp(r'"([^"]+)"');
           for (final ruleMatch in rulePattern.allMatches(rulesStr)) {
-            rules.add(ruleMatch.group(1)!);
+            final g = ruleMatch.group(1);
+            if (g != null) rules.add(g);
           }
 
           files[path] = <String, dynamic>{'hash': hash, 'rules': rules};
@@ -1354,7 +1407,7 @@ class IncrementalAnalysisTracker {
       }
 
       return result;
-    } catch (_) {
+    } on FormatException {
       return null;
     }
   }
@@ -2147,29 +2200,57 @@ class ParallelAnalysisResult {
 
   /// Create from a map (for isolate communication).
   factory ParallelAnalysisResult.fromMap(Map<String, dynamic> map) {
+    final fp = map['filePath'];
+    final ch = map['contentHash'];
+    final lc = map['lineCount'];
+    final cc = map['characterCount'];
+    final ic = map['importCount'];
+    final clc = map['classCount'];
+    final fc = map['functionCount'];
+    final ha = map['hasAsyncCode'];
+    final hw = map['hasWidgets'];
+    final hf = map['hasFlutterImport'];
+    final hb = map['hasBlocImport'];
+    final hp = map['hasProviderImport'];
+    final hr = map['hasRiverpodImport'];
+    final fpr = map['fingerprint'];
+    final ft = map['fileTypes'];
+    final mp = map['matchingPatterns'];
+    if (fp is! String ||
+        ch is! int ||
+        lc is! int ||
+        cc is! int ||
+        ic is! int ||
+        clc is! int ||
+        fc is! int ||
+        ha is! bool ||
+        hw is! bool ||
+        fpr is! int ||
+        ft is! List ||
+        mp is! List) {
+      throw ArgumentError('Invalid ParallelAnalysisResult map');
+    }
     return ParallelAnalysisResult(
-      filePath: map['filePath'] as String,
-      contentHash: map['contentHash'] as int,
+      filePath: fp,
+      contentHash: ch,
       metrics: FileMetrics(
-        lineCount: map['lineCount'] as int,
-        characterCount: map['characterCount'] as int,
-        importCount: map['importCount'] as int,
-        classCount: map['classCount'] as int,
-        functionCount: map['functionCount'] as int,
-        hasAsyncCode: map['hasAsyncCode'] as bool,
-        hasWidgets: map['hasWidgets'] as bool,
-        hasFlutterImport: map['hasFlutterImport'] as bool? ?? false,
-        hasBlocImport: map['hasBlocImport'] as bool? ?? false,
-        hasProviderImport: map['hasProviderImport'] as bool? ?? false,
-        hasRiverpodImport: map['hasRiverpodImport'] as bool? ?? false,
+        lineCount: lc,
+        characterCount: cc,
+        importCount: ic,
+        classCount: clc,
+        functionCount: fc,
+        hasAsyncCode: ha,
+        hasWidgets: hw,
+        hasFlutterImport: hf is bool ? hf : false,
+        hasBlocImport: hb is bool ? hb : false,
+        hasProviderImport: hp is bool ? hp : false,
+        hasRiverpodImport: hr is bool ? hr : false,
       ),
-      fingerprint: map['fingerprint'] as int,
-      fileTypes: (map['fileTypes'] as List<dynamic>)
-          .map((e) => FileType.values[e as int])
+      fingerprint: fpr,
+      fileTypes: ft
+          .map<FileType>((e) => FileType.values[e is int ? e : 0])
           .toSet(),
-      matchingPatterns: (map['matchingPatterns'] as List<dynamic>)
-          .cast<String>()
-          .toSet(),
+      matchingPatterns: mp.cast<String>().toSet(),
     );
   }
 
@@ -2216,7 +2297,7 @@ class ParallelAnalyzer {
 
   // Number of worker isolates (based on CPU cores)
   static int _workerCount = 0;
-  static bool _initialized = false;
+  static bool _isInitialized = false;
   static bool _useIsolates = true;
 
   // Cache of pre-computed results (shared across isolates via main isolate)
@@ -2233,13 +2314,14 @@ class ParallelAnalyzer {
   static Future<void> initialize({
     int? workerCount,
     bool useIsolates = true,
-  }) async {
-    if (_initialized) return;
+  }) {
+    if (_isInitialized) return Future.value();
 
     // Determine worker count (default: CPU cores - 1, min 1, max 8)
     _workerCount = workerCount ?? _getDefaultWorkerCount();
     _useIsolates = useIsolates;
-    _initialized = true;
+    _isInitialized = true;
+    return Future.value();
   }
 
   static int _getDefaultWorkerCount() {
@@ -2252,11 +2334,11 @@ class ParallelAnalyzer {
   ///
   /// Returns analysis results for each file. Results are cached automatically.
   /// Uses Isolate.run() for true parallel execution when available.
-  static Future<List<ParallelAnalysisResult>> analyzeFiles({
+  static Future<List<ParallelAnalysisResult>> analyzeFiles({ // ignore: avoid_redundant_async
     required List<String> filePaths,
     required Set<String> patterns,
   }) async {
-    if (!_initialized || _workerCount <= 1) {
+    if (!_isInitialized || _workerCount <= 1) {
       // Fallback to synchronous processing
       return _analyzeFilesSync(filePaths, patterns);
     }
@@ -2327,10 +2409,15 @@ class ParallelAnalyzer {
       }
 
       return results;
-    } catch (e) {
-      // Isolate failed - fall back to sync processing
+    } on IsolateSpawnException catch (e, st) {
+      developer.log(
+        'isolate/spawn failed, falling back to sync',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       _syncTasksRun++;
-      return _processBatch(filePaths, patterns.toSet());
+      return await _processBatch(filePaths, patterns.toSet());
     }
   }
 
@@ -2352,8 +2439,22 @@ class ParallelAnalyzer {
         final content = file.readAsStringSync();
         final result = analyzeFileContent(path, content, patterns);
         results.add(result);
-      } catch (_) {
+      } on IOException catch (e, st) {
+        developer.log(
+          '_analyzeFilesInIsolate file read failed',
+          name: 'saropa_lints',
+          error: e,
+          stackTrace: st,
+        );
         // Skip files that can't be read
+      } on FormatException catch (e, st) {
+        developer.log(
+          '_analyzeFilesInIsolate parse failed',
+          name: 'saropa_lints',
+          error: e,
+          stackTrace: st,
+        );
+        // Skip files that can't be parsed
       }
     }
 
@@ -2383,8 +2484,22 @@ class ParallelAnalyzer {
         _applyCacheResult(result);
 
         results.add(result);
-      } catch (_) {
+      } on IOException catch (e, st) {
+        developer.log(
+          '_processBatch file read failed',
+          name: 'saropa_lints',
+          error: e,
+          stackTrace: st,
+        );
         // Skip files that can't be read
+      } on FormatException catch (e, st) {
+        developer.log(
+          '_processBatch parse failed',
+          name: 'saropa_lints',
+          error: e,
+          stackTrace: st,
+        );
+        // Skip files that can't be parsed
       }
     }
 
@@ -2416,8 +2531,22 @@ class ParallelAnalyzer {
         _applyCacheResult(result);
 
         results.add(result);
-      } catch (_) {
+      } on IOException catch (e, st) {
+        developer.log(
+          '_analyzeFilesSync file read failed',
+          name: 'saropa_lints',
+          error: e,
+          stackTrace: st,
+        );
         // Skip files that can't be read
+      } on FormatException catch (e, st) {
+        developer.log(
+          '_analyzeFilesSync parse failed',
+          name: 'saropa_lints',
+          error: e,
+          stackTrace: st,
+        );
+        // Skip files that can't be parsed
       }
     }
 
@@ -2462,6 +2591,8 @@ class ParallelAnalyzer {
     );
   }
 
+  static final RegExp _functionLikeLine = RegExp(r'^\s*\w+\s+\w+\s*\(');
+
   /// Compute file metrics (same logic as FileMetricsCache).
   static FileMetrics _computeMetrics(String content) {
     var lineCount = 1;
@@ -2480,7 +2611,7 @@ class ParallelAnalyzer {
         classCount++;
       }
       if (trimmed.contains(' Function') ||
-          RegExp(r'^\s*\w+\s+\w+\s*\(').hasMatch(line)) {
+          _functionLikeLine.hasMatch(line)) {
         functionCount++;
       }
     }
@@ -2615,7 +2746,7 @@ class ParallelAnalyzer {
   /// Get statistics about parallel analysis.
   static Map<String, dynamic> getStats() {
     return {
-      'initialized': _initialized,
+      'initialized': _isInitialized,
       'workerCount': _workerCount,
       'useIsolates': _useIsolates,
       'cachedFiles': _resultCache.length,
@@ -2641,8 +2772,8 @@ class BatchableRuleInfo {
     required this.cost,
     required this.requiredPatterns,
     required this.applicableFileTypes,
-    required this.requiresAsync,
-    required this.requiresWidgets,
+    required this.isAsyncRequired,
+    required this.isWidgetsRequired,
     this.dependencies = const {},
   });
 
@@ -2650,8 +2781,8 @@ class BatchableRuleInfo {
   final RuleCost cost;
   final Set<String>? requiredPatterns;
   final Set<FileType>? applicableFileTypes;
-  final bool requiresAsync;
-  final bool requiresWidgets;
+  final bool isAsyncRequired;
+  final bool isWidgetsRequired;
   final Set<String> dependencies;
 
   /// Check if this rule should run on a file based on pre-analysis.
@@ -2664,12 +2795,12 @@ class BatchableRuleInfo {
     }
 
     // Check async requirement
-    if (requiresAsync && !analysis.metrics.hasAsyncCode) {
+    if (isAsyncRequired && !analysis.metrics.hasAsyncCode) {
       return false;
     }
 
     // Check widget requirement
-    if (requiresWidgets && !analysis.metrics.hasWidgets) {
+    if (isWidgetsRequired && !analysis.metrics.hasWidgets) {
       return false;
     }
 
@@ -3107,14 +3238,16 @@ class DiffBasedAnalysis {
 
     // Sort by start line
     final sorted = [...ranges]..sort((a, b) => a.start.compareTo(b.start));
+    final firstSorted = sorted.firstOrNull;
+    if (firstSorted == null) return [];
 
-    final merged = <LineRange>[sorted.first];
+    final merged = <LineRange>[firstSorted];
     for (var i = 1; i < sorted.length; i++) {
       final current = sorted[i];
-      final last = merged.last;
+      final last = merged.lastOrNull;
+      if (last == null) continue;
 
       if (current.start <= last.end + 1) {
-        // Overlapping or adjacent - merge
         merged[merged.length - 1] = last.merge(current);
       } else {
         merged.add(current);
@@ -3243,40 +3376,47 @@ class ImportGraphCache {
   static String? _projectRoot;
 
   /// Build import graph from a project directory.
-  static Future<void> buildFromDirectory(String projectRoot) async {
-    if (_isBuilt && _projectRoot == projectRoot) return;
+  static Future<void> buildFromDirectory(String projectRoot) {
+    if (_isBuilt && _projectRoot == projectRoot) return Future.value();
 
     _graph.clear();
     _projectRoot = projectRoot;
 
-    // Find all Dart files
-    final libDir = Directory('$projectRoot/lib');
+    // Find all Dart files (projectRoot is configured project root, not user input)
+    final libDir = Directory(p.join(projectRoot, 'lib'));
     if (!libDir.existsSync()) {
       _isBuilt = true;
-      return;
+      return Future.value();
     }
 
-    await _scanDirectory(libDir);
+    _scanDirectory(libDir);
     _buildReverseGraph();
     _isBuilt = true;
+    return Future.value();
   }
 
   /// Scan a directory for Dart files and parse their imports.
-  static Future<void> _scanDirectory(Directory dir) async {
+  static void _scanDirectory(Directory dir) {
     try {
       final entities = dir.listSync(recursive: true);
       for (final entity in entities) {
         if (entity is File && entity.path.endsWith('.dart')) {
-          await _parseImports(entity.path);
+          _parseImports(entity.path);
         }
       }
-    } catch (_) {
+    } on OSError catch (e, st) {
+      developer.log(
+        'import graph scan failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // Ignore errors during scanning
     }
   }
 
   /// Parse imports from a single file.
-  static Future<void> _parseImports(String filePath) async {
+  static void _parseImports(String filePath) {
     try {
       final file = File(filePath);
       if (!file.existsSync()) return;
@@ -3303,33 +3443,33 @@ class ImportGraphCache {
       }
 
       _graph[filePath] = node;
-    } catch (_) {
+    } on IOException catch (e, st) {
+      developer.log(
+        '_parseImports read failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
+      // Ignore read errors
+    } on FormatException catch (e, st) {
+      developer.log(
+        '_parseImports parse failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // Ignore parse errors
     }
   }
 
   /// Resolve a relative import to absolute path.
   static String _resolveImport(String import, String fromFile) {
-    // Package imports stay as-is
     if (import.startsWith('package:') || import.startsWith('dart:')) {
       return import;
     }
-
-    // Resolve relative imports
     final fromDir = File(fromFile).parent.path;
-    final resolved = '$fromDir/$import'.replaceAll('\\', '/');
-
-    // Normalize path (remove . and ..)
-    final parts = resolved.split('/');
-    final normalized = <String>[];
-    for (final part in parts) {
-      if (part == '..') {
-        if (normalized.isNotEmpty) normalized.removeLast();
-      } else if (part != '.' && part.isNotEmpty) {
-        normalized.add(part);
-      }
-    }
-    return normalized.join('/');
+    final resolved = p.normalize(p.join(fromDir, import));
+    return resolved.replaceAll('\\', '/');
   }
 
   /// Build reverse graph (importedBy relationships).
@@ -3390,8 +3530,9 @@ class ImportGraphCache {
     Set<String> visited,
     List<List<String>> cycles,
   ) {
+    final pathFirst = path.firstOrNull;
     for (final imp in node.imports) {
-      if (imp == path.first) {
+      if (pathFirst != null && imp == pathFirst) {
         // Found a cycle back to start
         cycles.add([...path, imp]);
         continue;
@@ -3526,7 +3667,10 @@ class SourceLocationCache {
       computeLineStarts(filePath, content);
     }
 
-    final starts = _lineStarts[filePath]!;
+    final starts = _lineStarts[filePath];
+    if (starts == null || starts.isEmpty) {
+      return SourceLocation(1, 1);
+    }
 
     // Binary search for the line containing this offset
     var low = 0;
@@ -3564,8 +3708,8 @@ class SourceLocationCache {
       computeLineStarts(filePath, content);
     }
 
-    final starts = _lineStarts[filePath]!;
-    if (line < 1 || line > starts.length) return null;
+    final starts = _lineStarts[filePath];
+    if (starts == null || line < 1 || line > starts.length) return null;
 
     final lineStart = starts[line - 1];
     return lineStart + column - 1;
@@ -3578,8 +3722,8 @@ class SourceLocationCache {
       computeLineStarts(filePath, content);
     }
 
-    final starts = _lineStarts[filePath]!;
-    if (line < 1 || line > starts.length) return null;
+    final starts = _lineStarts[filePath];
+    if (starts == null || line < 1 || line > starts.length) return null;
 
     final start = starts[line - 1];
     final end = line < starts.length ? starts[line] - 1 : content.length;
@@ -3851,8 +3995,9 @@ class CompilationUnitCache {
     String content,
   ) {
     final hash = content.hashCode;
-    if (_contentHashes[filePath] == hash && _cache.containsKey(filePath)) {
-      return _cache[filePath]!;
+    final cached = _cache[filePath];
+    if (_contentHashes[filePath] == hash && cached != null) {
+      return cached;
     }
 
     // Create new data
@@ -4604,7 +4749,7 @@ class HotPathProfiler {
   HotPathProfiler._();
 
   // Whether profiling is enabled
-  static bool _enabled = false;
+  static bool _isEnabled = false;
 
   // Map of name -> list of durations
   static final Map<String, List<Duration>> _measurements = {};
@@ -4618,16 +4763,16 @@ class HotPathProfiler {
 
   /// Enable profiling.
   static void enable() {
-    _enabled = true;
+    _isEnabled = true;
   }
 
   /// Disable profiling.
   static void disable() {
-    _enabled = false;
+    _isEnabled = false;
   }
 
   /// Check if profiling is enabled.
-  static bool get isEnabled => _enabled;
+  static bool get isEnabled => _isEnabled;
 
   /// Configure slow threshold.
   static void setSlowThreshold(Duration threshold) {
@@ -4639,7 +4784,7 @@ class HotPathProfiler {
   /// Returns a Stopwatch that should be passed to [endProfile].
   static Stopwatch startProfile(String name) {
     final stopwatch = Stopwatch();
-    if (_enabled) {
+    if (_isEnabled) {
       stopwatch.start();
     }
     return stopwatch;
@@ -4651,7 +4796,7 @@ class HotPathProfiler {
     Stopwatch stopwatch, {
     Map<String, dynamic>? metadata,
   }) {
-    if (!_enabled) return;
+    if (!_isEnabled) return;
 
     stopwatch.stop();
     final duration = stopwatch.elapsed;
@@ -4680,7 +4825,7 @@ class HotPathProfiler {
     Duration duration, {
     Map<String, dynamic>? metadata,
   }) {
-    if (!_enabled) return;
+    if (!_isEnabled) return;
 
     _measurements.putIfAbsent(name, () => []).add(duration);
 
@@ -4769,7 +4914,7 @@ class HotPathProfiler {
     final slowest = getSlowest(5);
 
     return {
-      'enabled': _enabled,
+      'enabled': _isEnabled,
       'operationsTracked': _measurements.length,
       'totalMeasurements': totalMeasurements,
       'recentEntries': _recentEntries.length,
@@ -4931,10 +5076,10 @@ class LruCache<K, V> {
   }
 
   void _evictLru() {
-    if (_tail == null) return;
-
-    _map.remove(_tail!.key);
-    _removeNode(_tail!);
+    final t = _tail;
+    if (t == null) return;
+    _map.remove(t.key);
+    _removeNode(t);
   }
 }
 
@@ -5094,7 +5239,8 @@ class MemoryPressureHandler {
       estimatedBytes += s.length * 2; // UTF-16
     }
 
-    return estimatedBytes ~/ (1024 * 1024);
+    const bytesPerMb = 1 << 20; // 1024 * 1024
+    return estimatedBytes ~/ bytesPerMb;
   }
 
   /// Get statistics.

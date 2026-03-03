@@ -1,5 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 
+import 'dart:developer' as developer;
+
 /// Reusable quick-fix base: replace the violation node's source with new text.
 /// Used by fixes that rewrite an expression or statement (e.g. replace deprecated
 /// API with recommended one). Subclass and implement [computeReplacement].
@@ -44,7 +46,13 @@ abstract class ReplaceNodeFix extends SaropaFixProducer {
       await builder.addDartFileEdit(file, (b) {
         b.addSimpleReplacement(SourceRange(offset, length), replacement);
       });
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        'ReplaceNodeFix addDartFileEdit failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // Builder or edit may fail; avoid propagating
     }
   }

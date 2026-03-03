@@ -1,7 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/source/source_range.dart';
 
 import '../../native/saropa_fix.dart';
@@ -29,7 +28,8 @@ class PreferConstDeclarationsFix extends SaropaFixProducer {
         : node.thisOrAncestorOfType<VariableDeclarationList>();
     if (list == null || list.keyword?.lexeme != 'final') return;
 
-    final Token keyword = list.keyword!;
+    final keyword = list.keyword;
+    if (keyword == null) return;
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(
         SourceRange(keyword.offset, keyword.length),

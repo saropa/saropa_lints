@@ -85,7 +85,7 @@ class SaropaContext {
   /// Cache: last file path checked and its skip result.
   /// Avoids re-evaluating for every node in the same file.
   String? _lastCheckedPath;
-  bool _lastSkipResult = false;
+  bool _wasLastFileSkipped = false;
 
   /// Wraps a callback with per-file filtering based on rule metadata.
   ///
@@ -110,15 +110,16 @@ class SaropaContext {
   bool _shouldSkipCurrentFile() {
     final path = filePath;
     if (path.isEmpty) return false;
-    if (path == _lastCheckedPath) return _lastSkipResult;
+    if (path == _lastCheckedPath) return _wasLastFileSkipped;
     _lastCheckedPath = path;
     ProgressTracker.recordFile(path);
 
-    final rule = _saropaRule!;
+    final rule = _saropaRule;
+    if (rule == null) return false;
 
     // 1. Path-based filtering (generated, test, example, fixture).
     if (rule.shouldSkipFile(path)) {
-      return _lastSkipResult = true;
+      return _wasLastFileSkipped = true;
     }
 
     // Read file content once for all content-based checks.
@@ -129,7 +130,7 @@ class SaropaContext {
     if (applicable != null) {
       final fileTypes = FileTypeDetector.detect(path, content);
       if (!applicable.any(fileTypes.contains)) {
-        return _lastSkipResult = true;
+        return _wasLastFileSkipped = true;
       }
     }
 
@@ -138,24 +139,24 @@ class SaropaContext {
     if (patterns != null &&
         patterns.isNotEmpty &&
         !patterns.any(content.contains)) {
-      return _lastSkipResult = true;
+      return _wasLastFileSkipped = true;
     }
 
     // 4. Content-based requirements (imports, keywords).
     if (_failsContentRequirements(rule, content)) {
-      return _lastSkipResult = true;
+      return _wasLastFileSkipped = true;
     }
 
     // 5. Line count checks.
     final lineCount = _ruleContext.currentUnit?.unit.lineInfo.lineCount ?? 0;
     if (rule.minimumLineCount > 0 && lineCount < rule.minimumLineCount) {
-      return _lastSkipResult = true;
+      return _wasLastFileSkipped = true;
     }
     if (rule.maximumLineCount > 0 && lineCount > rule.maximumLineCount) {
-      return _lastSkipResult = true;
+      return _wasLastFileSkipped = true;
     }
 
-    return _lastSkipResult = false;
+    return _wasLastFileSkipped = false;
   }
 
   /// Returns true if the file content fails any of the rule's

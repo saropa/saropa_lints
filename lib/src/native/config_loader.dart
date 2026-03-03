@@ -13,6 +13,7 @@
 /// - [BannedUsageConfig] from custom yaml
 library;
 
+import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, Platform;
 
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
@@ -35,7 +36,13 @@ void loadNativePluginConfig() {
     _loadBaselineConfig(content);
     loadBannedUsageConfig(content);
     _loadOutputConfig(content);
-  } catch (_) {
+  } catch (e, st) {
+    developer.log(
+      'loadNativePluginConfig failed',
+      name: 'saropa_lints',
+      error: e,
+      stackTrace: st,
+    );
     // Defensive: ensure plugin can still register with defaults
   }
 }
@@ -51,7 +58,13 @@ String? _readProjectFile(String filename) {
     final file = File(path);
     if (!file.existsSync()) return null;
     return file.readAsStringSync();
-  } catch (_) {
+  } catch (e, st) {
+    developer.log(
+      '_readProjectFile failed',
+      name: 'saropa_lints',
+      error: e,
+      stackTrace: st,
+    );
     // I/O or path error; return null so config steps use defaults
     return null;
   }
@@ -147,8 +160,9 @@ void _loadDiagnosticsConfig() {
     final match = RegExp(r'^\s+([\w_]+):\s*(true|false)').firstMatch(line);
     if (match == null) continue;
 
-    if (match.group(2) == 'false') {
-      disabled.add(match.group(1)!);
+    final ruleName = match.group(1);
+    if (match.group(2) == 'false' && ruleName != null && ruleName.isNotEmpty) {
+      disabled.add(ruleName);
     }
   }
 
@@ -195,14 +209,17 @@ Map<String, Object> _parseBaselineSection(String content, int offset) {
 
     // List item: "    - value"
     final listMatch = RegExp(r'^\s+-\s+"?([^"]+)"?$').firstMatch(line);
-    if (listMatch != null && currentList != null) {
-      currentList.add(listMatch.group(1)!);
+    final listItem = listMatch?.group(1);
+    if (listMatch != null && currentList != null && listItem != null) {
+      currentList.add(listItem);
       continue;
     }
 
     // Key-value: "  key: value" or "  key:"
     final kvMatch = RegExp(r'^\s+(\w+):\s*(.*)$').firstMatch(line);
-    if (kvMatch == null) continue;
+    final key = kvMatch?.group(1);
+    final value = (kvMatch?.group(2) ?? '').trim();
+    if (kvMatch == null || key == null || key.isEmpty) continue;
 
     // Flush previous list
     if (currentList != null && currentListKey != null) {
@@ -210,9 +227,6 @@ Map<String, Object> _parseBaselineSection(String content, int offset) {
       currentList = null;
       currentListKey = null;
     }
-
-    final key = kvMatch.group(1)!;
-    final value = kvMatch.group(2)!.trim();
 
     if (value.isEmpty) {
       // Start of a list section
@@ -256,7 +270,13 @@ void _loadOutputConfig(String? content) {
       }
       outputFromEnv = true;
     }
-  } catch (_) {
+  } catch (e, st) {
+    developer.log(
+      '_loadOutputConfig env read failed',
+      name: 'saropa_lints',
+      error: e,
+      stackTrace: st,
+    );
     // Platform.environment may throw on some platforms
   }
 
@@ -268,8 +288,9 @@ void _loadOutputConfig(String? content) {
       r'^max_issues:\s*(\d+)',
       multiLine: true,
     ).firstMatch(content);
-    if (match != null) {
-      final value = int.tryParse(match.group(1)!);
+    final group1 = match?.group(1);
+    if (match != null && group1 != null) {
+      final value = int.tryParse(group1);
       if (value != null) ProgressTracker.setMaxIssues(value);
     }
   }
@@ -279,7 +300,10 @@ void _loadOutputConfig(String? content) {
       r'^output:\s*(\w+)',
       multiLine: true,
     ).firstMatch(content);
-    if (match != null && match.group(1)!.toLowerCase() == 'file') {
+    final outputGroup = match?.group(1);
+    if (match != null &&
+        outputGroup != null &&
+        outputGroup.toLowerCase() == 'file') {
       ProgressTracker.setFileOnly(fileOnly: true);
     }
   }

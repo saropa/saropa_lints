@@ -28,13 +28,20 @@ class CapitalizeCommentFix extends SaropaFixProducer {
     final match = RegExp(r'^(///?)\s*(\S)').firstMatch(source);
     if (match == null) return;
 
-    final prefix = source.substring(0, match.start + match.group(1)!.length);
+    final prefixGroup = match.group(1);
+    final fullMatch = match.group(0);
+    final firstCharGroup = match.group(2);
+    if (prefixGroup == null || fullMatch == null || firstCharGroup == null) {
+      return;
+    }
+
+    final prefix = source.substring(0, match.start + prefixGroup.length);
     final spacing = source.substring(
-      match.start + match.group(1)!.length,
-      match.start + match.group(0)!.length - 1,
+      match.start + prefixGroup.length,
+      match.start + fullMatch.length - 1,
     );
-    final firstChar = match.group(2)!;
-    final rest = source.substring(match.start + match.group(0)!.length);
+    final firstChar = firstCharGroup;
+    final rest = source.substring(match.start + fullMatch.length);
     final capitalized = '$prefix$spacing${firstChar.toUpperCase()}$rest';
     if (capitalized == source) return;
 

@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'baseline_config.dart';
@@ -201,7 +202,13 @@ class BaselineManager {
 
     try {
       await baselineDate.preloadFile(filePath, projectRoot: _projectRoot);
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        'baseline preloadFile failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       return;
     }
 
@@ -220,7 +227,13 @@ class BaselineManager {
         );
         fileCache[i] = isOld;
       }
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        'baseline date cache read failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // File read or blame failed; sync cache stays empty
     }
   }
@@ -269,7 +282,7 @@ class BaselineManager {
     final baselineDate = _baselineDate;
     if (baselineDate == null) return false;
 
-    return baselineDate.isOlderThanBaseline(
+    return await baselineDate.isOlderThanBaseline(
       filePath,
       line,
       projectRoot: _projectRoot,
@@ -326,7 +339,14 @@ class BaselineManager {
         }
         dir = dir.parent;
       }
-    } catch (_) {}
+    } catch (e, st) {
+      developer.log(
+        '_findProjectRoot failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
+    }
     return null;
   }
 

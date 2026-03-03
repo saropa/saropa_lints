@@ -42,6 +42,7 @@ class UseIsEmptyOrIsNotEmptyFix extends SaropaFixProducer {
       lengthAccess = left.prefix;
     }
     if (lengthAccess == null) return;
+    final lengthAccessExpr = lengthAccess;
 
     // Determine isEmpty or isNotEmpty based on operator
     final String property;
@@ -62,7 +63,7 @@ class UseIsEmptyOrIsNotEmptyFix extends SaropaFixProducer {
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(
         SourceRange(target.offset, target.length),
-        '${lengthAccess!.toSource()}.$property',
+        '${lengthAccessExpr.toSource()}.$property',
       );
     });
   }
