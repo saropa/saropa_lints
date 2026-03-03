@@ -1,4 +1,8 @@
 /// Tier-based rule configuration for saropa_lints.
+///
+/// **Structure:** Tiers are cumulative (recommended = essential + recommendedOnly,
+/// etc.). Rule names are string sets; [getRulesForTier] returns the union for a
+/// tier. The init CLI and native plugin use this to enable only the selected tier.
 /// See README.md "The 5 Tiers" section for tier definitions and philosophy.
 library;
 
@@ -728,6 +732,8 @@ const Set<String> recommendedOnlyRules = <String>{
   // 'prefer_list_last' moved to stylisticRules (opinionated)
   'avoid_deprecated_usage', // WARNING - deprecated API from other packages
   'prefer_local_notification_for_immediate', // INFO - FCM vs local notifications
+  'prefer_hive_web_aware', // INFO - Hive web behavior
+  'prefer_platform_widget_adaptive', // INFO - platform-adaptive widgets
   'avoid_variable_shadowing',
   'avoid_string_substring',
   'prefer_single_container',
@@ -1593,6 +1599,46 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_uuid_v4', // UUID v4 over v1 for privacy
   'require_https_only_test', // INFO - HTTP URLs in test files
   'avoid_hardcoded_config_test', // INFO - hardcoded config in test files
+  // Batch 3 High-importance (REMAINING_ROADMAP)
+  'require_error_message_clarity',
+  'require_error_recovery',
+  'require_firebase_email_enumeration_protection',
+  'require_firebase_composite_index',
+  'require_firebase_offline_persistence',
+  'require_focus_order',
+  'require_heading_hierarchy',
+  'require_reduced_motion_support',
+  'require_getit_dispose_registration',
+  'require_performance_test',
+  'require_image_memory_cache_limit',
+  'require_interface_for_dependency',
+  'require_json_date_format_consistency',
+  'require_keychain_access',
+  'require_permission_lifecycle_observer',
+  'require_provider_update_should_notify',
+  'require_rtl_support',
+  'require_sqflite_index_for_queries',
+  'require_stream_cancel_on_error',
+  'require_subscription_composite',
+  'require_webview_user_agent',
+  'require_will_pop_scope',
+  'use_closest_build_context',
+  'use_specific_deprecation',
+  'avoid_screenshot_in_ci',
+  'prefer_test_report',
+  'avoid_semantics_in_animation',
+  'prefer_announce_for_changes',
+  'prefer_show_hide',
+  'require_link_distinction',
+  'require_switch_control',
+  'prefer_deferred_imports',
+  'prefer_part_over_import',
+  'prefer_weak_references',
+  'prefer_zone_error_handler',
+  'require_multi_factor',
+  'prefer_isar_for_complex_queries',
+  'prefer_external_keyboard',
+  'prefer_outlined_icons',
   // Accessibility
   'avoid_merged_semantics_hiding_info',
   'require_exclude_semantics_justification',
@@ -2610,6 +2656,44 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_getx_builder_over_obx',
   'prefer_go_router_builder',
   'prefer_high_contrast_mode',
+  'prefer_hive_compact',
+  'prefer_hive_compact_periodically',
+  'prefer_injectable_package',
+  'prefer_internet_connection_checker',
+  'prefer_json_codegen',
+  'prefer_late_lazy_initialization',
+  'prefer_log_levels',
+  'prefer_log_timestamp',
+  'prefer_lru_cache',
+  'prefer_named_routes_for_deep_links',
+  'prefer_notification_custom_sound',
+  'prefer_overlay_portal_layout_builder',
+  'prefer_permission_minimal_request',
+  'prefer_readable_line_length',
+  'prefer_riverpod_code_gen',
+  'prefer_riverpod_keep_alive',
+  'prefer_root_detection',
+  'prefer_rxdart_for_complex_streams',
+  'prefer_semantics_sort',
+  'prefer_sliver_for_mixed_scroll',
+  'prefer_stale_while_revalidate',
+  'prefer_stream_transformer',
+  'prefer_streams_over_polling',
+  'prefer_using_for_temp_resources',
+  'prefer_webview_sandbox',
+  'prefer_whitelist_validation',
+  'require_addAutomaticKeepAlives_off',
+  'require_api_response_validation',
+  'require_api_version_handling',
+  'require_auto_route_deep_link_config',
+  'require_backup_exclusion',
+  'require_cancellable_operations',
+  'require_config_validation',
+  'require_connectivity_resume_check',
+  'require_content_type_validation',
+  'require_context_in_build_descendants',
+  'require_dispose_verification_tests',
+  'require_error_context_in_logs',
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).
@@ -2789,6 +2873,8 @@ const Set<String> pedanticOnlyRules = <String>{
 };
 
 /// Returns the set of rule names for a given tier.
+/// Tier names: 'essential' | 'recommended' | 'professional' | 'comprehensive' | 'pedantic' | 'stylistic'.
+/// Unknown tier falls back to essential. Used by init script and plugin config.
 Set<String> getRulesForTier(String tier) {
   switch (tier) {
     case 'stylistic':

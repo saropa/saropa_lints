@@ -4126,3 +4126,292 @@ class AvoidColorOnlyMeaningRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// prefer_semantics_sort
+// =============================================================================
+
+/// Suggests sortKey on Semantics for complex layouts so screen reader order is correct.
+///
+/// Default semantics order may not match visual layout. Use sortKey to control order.
+///
+/// **Bad:** Semantics in complex layout without sortKey.
+///
+/// **Good:** Semantics(sortKey: OrdinalSortKey(...)) when order matters.
+class PreferSemanticsSortRule extends SaropaLintRule {
+  PreferSemanticsSortRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_semantics_sort',
+    '[prefer_semantics_sort] Complex layout may need Semantics sortKey for '
+        'correct screen reader navigation order.',
+    correctionMessage:
+        'Add sortKey (e.g. OrdinalSortKey) to Semantics when order matters.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (node.constructorName.type.name.lexeme != 'Semantics') return;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'sortKey') {
+          return;
+        }
+      }
+      reporter.atNode(node);
+    });
+  }
+}
+
+// =============================================================================
+// require_focus_order
+// =============================================================================
+
+class RequireFocusOrderRule extends SaropaLintRule {
+  RequireFocusOrderRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_focus_order',
+    '[require_focus_order] Consider focusOrder for keyboard and screen reader navigation.',
+    correctionMessage: 'Set focusOrder on FocusNode or use FocusTraversalOrder.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// require_heading_hierarchy
+// =============================================================================
+
+class RequireHeadingHierarchyRule extends SaropaLintRule {
+  RequireHeadingHierarchyRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_heading_hierarchy',
+    '[require_heading_hierarchy] Use semantic heading levels for screen readers.',
+    correctionMessage: 'Set header: true and headerLevel (1–6) on Semantics.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// require_reduced_motion_support
+// =============================================================================
+
+class RequireReducedMotionSupportRule extends SaropaLintRule {
+  RequireReducedMotionSupportRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_reduced_motion_support',
+    '[require_reduced_motion_support] Respect MediaQuery.reducedMotion.',
+    correctionMessage: 'Check reducedMotion and shorten or disable animations when set.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// avoid_semantics_in_animation
+// =============================================================================
+
+class AvoidSemanticsInAnimationRule extends SaropaLintRule {
+  AvoidSemanticsInAnimationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_semantics_in_animation',
+    '[avoid_semantics_in_animation] Avoid semantics that change during animation; can confuse screen readers.',
+    correctionMessage: 'Exclude semantics from animated subtree or announce after animation.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// prefer_announce_for_changes
+// =============================================================================
+
+class PreferAnnounceForChangesRule extends SaropaLintRule {
+  PreferAnnounceForChangesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_announce_for_changes',
+    '[prefer_announce_for_changes] Announce live region changes for screen readers.',
+    correctionMessage: 'Use Semantics(liveRegion: true) or SemanticsService.announce.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// prefer_show_hide
+// =============================================================================
+
+class PreferShowHideRule extends SaropaLintRule {
+  PreferShowHideRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_show_hide',
+    '[prefer_show_hide] Prefer semantics show/hide for conditional content for screen readers.',
+    correctionMessage: 'Use Semantics(visible: false) or ExcludeSemantics when hiding.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// require_link_distinction
+// =============================================================================
+
+class RequireLinkDistinctionRule extends SaropaLintRule {
+  RequireLinkDistinctionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_link_distinction',
+    '[require_link_distinction] Links should be distinguishable (e.g. underline, role).',
+    correctionMessage: 'Use link role and visible link styling for accessibility.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// require_switch_control
+// =============================================================================
+
+class RequireSwitchControlRule extends SaropaLintRule {
+  RequireSwitchControlRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_switch_control',
+    '[require_switch_control] Support switch control / external input for key actions.',
+    correctionMessage: 'Ensure focus order and activation work with switch control.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// prefer_external_keyboard
+// =============================================================================
+
+class PreferExternalKeyboardRule extends SaropaLintRule {
+  PreferExternalKeyboardRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_external_keyboard',
+    '[prefer_external_keyboard] Support external keyboard navigation and shortcuts.',
+    correctionMessage: 'Use Shortcuts and Focus widgets for keyboard users.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

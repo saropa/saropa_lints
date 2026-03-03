@@ -1317,3 +1317,102 @@ class PreferCorrectJsonCastsRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_json_codegen
+// =============================================================================
+
+/// Suggests json_serializable or freezed for JSON serialization.
+///
+/// Hand-written fromJson/toJson is error-prone. Use code generation.
+///
+/// **Bad:** Class with manual fromJson factory and toJson method.
+///
+/// **Good:** @JsonSerializable() or @freezed with generated serialization.
+class PreferJsonCodegenRule extends SaropaLintRule {
+  PreferJsonCodegenRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_json_codegen',
+    '[prefer_json_codegen] Manual fromJson/toJson is error-prone. '
+        'Use json_serializable or freezed for code-generated serialization.',
+    correctionMessage:
+        'Add @JsonSerializable() or use @freezed and run build_runner.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      bool hasManualFromJson = false;
+      bool hasManualToJson = false;
+      bool hasCodegen = false;
+
+      for (final annotation in node.metadata) {
+        final String name = annotation.name.name;
+        if (name == 'JsonSerializable' || name == 'freezed' || name == 'Freezed') {
+          hasCodegen = true;
+          break;
+        }
+      }
+      if (hasCodegen) return;
+
+      for (final ClassMember member in node.members) {
+        if (member is ConstructorDeclaration &&
+            member.factoryKeyword != null &&
+            member.name?.lexeme == 'fromJson') {
+          final String body = member.body.toSource();
+          if (!RegExp(r'_\$').hasMatch(body) &&
+              (RegExp(r"json\s*\['").hasMatch(body) ||
+                  RegExp(r'json\s*\["').hasMatch(body))) {
+            hasManualFromJson = true;
+          }
+        }
+        if (member is MethodDeclaration && member.name.lexeme == 'toJson') {
+          final String body = member.body.toSource();
+          if (!RegExp(r'_\$').hasMatch(body)) hasManualToJson = true;
+        }
+      }
+
+      if (hasManualFromJson && hasManualToJson) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_json_date_format_consistency
+// =============================================================================
+
+class RequireJsonDateFormatConsistencyRule extends SaropaLintRule {
+  RequireJsonDateFormatConsistencyRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_json_date_format_consistency',
+    '[require_json_date_format_consistency] Use consistent date format (ISO 8601) in JSON.',
+    correctionMessage: 'Serialize/parse dates with a single format (e.g. toIso8601String).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

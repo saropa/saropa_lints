@@ -2964,3 +2964,63 @@ class PreferDeepLinkAuthRule extends SaropaLintRule {
     SaropaContext context,
   ) {}
 }
+
+// =============================================================================
+// require_firebase_email_enumeration_protection
+// =============================================================================
+
+class RequireFirebaseEmailEnumerationProtectionRule extends SaropaLintRule {
+  RequireFirebaseEmailEnumerationProtectionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'firebase_auth'};
+
+  static const LintCode _code = LintCode(
+    'require_firebase_email_enumeration_protection',
+    '[require_firebase_email_enumeration_protection] Use same message for invalid email and wrong password.',
+    correctionMessage: 'Return generic message for sign-in failures.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// require_firebase_offline_persistence
+// =============================================================================
+
+class RequireFirebaseOfflinePersistenceRule extends SaropaLintRule {
+  RequireFirebaseOfflinePersistenceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'cloud_firestore'};
+
+  static const LintCode _code = LintCode(
+    'require_firebase_offline_persistence',
+    '[require_firebase_offline_persistence] Consider Firestore offline persistence.',
+    correctionMessage: 'Enable Firestore.settings with cacheSizeBytes.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

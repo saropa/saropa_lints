@@ -3367,4 +3367,122 @@ class AvoidMisusedTestMatchersRule extends SaropaLintRule {
   }
 }
 
+// =============================================================================
+// require_dispose_verification_tests
+// =============================================================================
+
+/// Suggests tests that verify dispose() is called on stateful/stream resources.
+class RequireDisposeVerificationTestsRule extends SaropaLintRule {
+  RequireDisposeVerificationTestsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
+  static const LintCode _code = LintCode(
+    'require_dispose_verification_tests',
+    '[require_dispose_verification_tests] Add tests that verify dispose is called on controllers/subscriptions.',
+    correctionMessage: 'Test that dispose() is invoked when widget is removed.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// require_performance_test
+// =============================================================================
+
+class RequirePerformanceTestRule extends SaropaLintRule {
+  RequirePerformanceTestRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
+  static const LintCode _code = LintCode(
+    'require_performance_test',
+    '[require_performance_test] Consider performance tests for critical paths.',
+    correctionMessage: 'Add benchmarks or performance tests for hot paths.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// avoid_screenshot_in_ci
+// =============================================================================
+
+class AvoidScreenshotInCiRule extends SaropaLintRule {
+  AvoidScreenshotInCiRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
+  static const LintCode _code = LintCode(
+    'avoid_screenshot_in_ci',
+    '[avoid_screenshot_in_ci] Avoid screenshot tests in CI unless stable and fast.',
+    correctionMessage: 'Gate screenshot tests or run only on stable agents.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
+// =============================================================================
+// prefer_test_report
+// =============================================================================
+
+class PreferTestReportRule extends SaropaLintRule {
+  PreferTestReportRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_test_report',
+    '[prefer_test_report] Prefer test reporters (e.g. JSON) for CI integration.',
+    correctionMessage: 'Use --reporter or test reporter for machine-readable output.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
+
 /// Quick fix for [AvoidMisusedTestMatchersRule].

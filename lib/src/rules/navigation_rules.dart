@@ -3519,3 +3519,73 @@ class RequireAutoRoutePageSuffixRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_named_routes_for_deep_links
+// =============================================================================
+
+/// Suggests named routes for deep linking.
+///
+/// Anonymous route construction (e.g. MaterialPageRoute(builder: ...)) cannot
+/// be deep-linked. Use named routes so links open the correct screen.
+///
+/// **Bad:** Navigator.push(context, MaterialPageRoute(...)).
+///
+/// **Good:** Named routes or go_router path-based navigation.
+class PreferNamedRoutesForDeepLinksRule extends SaropaLintRule {
+  PreferNamedRoutesForDeepLinksRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_named_routes_for_deep_links',
+    '[prefer_named_routes_for_deep_links] Anonymous route construction '
+        'prevents deep linking. Use named routes or path-based routing.',
+    correctionMessage:
+        'Define named routes or use go_router/auto_route for deep link support.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String name = node.constructorName.type.name.lexeme;
+      if (name != 'MaterialPageRoute' && name != 'CupertinoPageRoute') return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+// =============================================================================
+// require_will_pop_scope
+// =============================================================================
+
+class RequireWillPopScopeRule extends SaropaLintRule {
+  RequireWillPopScopeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_will_pop_scope',
+    '[require_will_pop_scope] Use WillPopScope/PopScope to handle back button when needed.',
+    correctionMessage: 'Wrap with PopScope (or WillPopScope) to confirm or intercept back.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

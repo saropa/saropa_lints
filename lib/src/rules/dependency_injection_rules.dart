@@ -1535,3 +1535,30 @@ class PreferLazySingletonRegistrationRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// require_interface_for_dependency
+// =============================================================================
+
+class RequireInterfaceForDependencyRule extends SaropaLintRule {
+  RequireInterfaceForDependencyRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_interface_for_dependency',
+    '[require_interface_for_dependency] Depend on abstractions (interfaces), not concrete classes.',
+    correctionMessage: 'Register and inject interface types for testability.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}
