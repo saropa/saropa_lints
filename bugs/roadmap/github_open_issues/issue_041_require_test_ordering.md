@@ -120,7 +120,7 @@ group('User flow', () {
 - [integration_test package](https://pub.dev/packages/integration_test) — API and test lifecycle.
 - [Test isolation best practices](https://docs.flutter.dev/testing#test-isolation) — avoid shared state.
 - [Dart custom_lint](https://pub.dev/packages/custom_lint) — plugin API.
-- [Project: string_contains false positive audit](../../history/false_positives/string_contains_false_positive_audit.md) — avoid substring matching on names.
+- **Project**: Avoid substring matching on names; prefer type/element checks and exact-match sets.
 
 ## Quality & Performance
 
@@ -133,3 +133,4 @@ group('User flow', () {
 
 - Overlap: Check [CODE_INDEX.md](../../CODE_INDEX.md) for existing test-lifecycle or integration-test rules.
 - Checklist: exact-match or type checks for test APIs; do not use `path.contains('integration')` alone; consider all AST shapes for setUp/setUpAll.
+

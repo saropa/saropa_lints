@@ -20,10 +20,10 @@ Existing subfolders:
 
 ## Summary (this reorganization)
 
-- **false_positives/** — +9 files (rule-specific FP notes and FP reduction review).
-- **rule_bugs/** — 22 files (severity/tier/docs/regression, analyzer/report fixes, yield quickfix).
-- **issues/** — 9 files (issue_020–038).
-- **migration/** — 4 files (native analyzer plugin plan + 3 migration-candidate notes).
+- **false_positives/** — 2 files (remaining FP notes; 82 integrated files removed).
+- **rule_bugs/** — 2 files (remaining rule-bug notes; 22 integrated files removed).
+- **issues/** — (integrated issue docs removed.)
+- **migration/** — (integrated migration docs removed.)
 - **plans/** — 7 files (drift, file structure, roadmap native, versioning, test coverage, tier/severity).
 - **todos/** — 4 files (missing iOS/platform rules).
 - **releases/** — 2 files (v4.12.2 config, CI analyzer fixes).
