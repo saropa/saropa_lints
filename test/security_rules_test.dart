@@ -519,6 +519,32 @@ void main() {
       test('redirect URL without domain validation SHOULD trigger', () {
         expect('open redirect detected', isNotNull);
       });
+
+      test('fixture has exactly 3 BAD cases with expect_lint (unvalidated redirect should trigger)', () {
+        final file = File('example_async/lib/security/avoid_redirect_injection_fixture.dart');
+        expect(file.existsSync(), isTrue);
+        final content = file.readAsStringSync();
+        final count = RegExp(r'// expect_lint: avoid_redirect_injection')
+            .allMatches(content)
+            .length;
+        expect(count, equals(3),
+            reason: 'Three BAD examples (redirect from param, simple push, redirect variable) must have expect_lint');
+      });
+
+      test('allowlist-validated destination (allowed/validated in block) should NOT trigger', () {
+        final file = File('example_async/lib/security/avoid_redirect_injection_fixture.dart');
+        expect(file.existsSync(), isTrue);
+        final content = file.readAsStringSync();
+        expect(content.contains('goodAllowlistValidatedDestination'), isTrue);
+        expect(content.contains('validatedDestination'), isTrue);
+        expect(content.contains('_allowedExportDestinationsRedirect'), isTrue);
+        final goodSection = content.substring(content.indexOf('goodAllowlistValidatedDestination'));
+        expect(
+          goodSection.contains('expect_lint: avoid_redirect_injection'),
+          isFalse,
+          reason: 'Allowlist-validated destination is a GOOD example; no lint expected',
+        );
+      });
     });
 
     group('avoid_unsafe_deserialization', () {
