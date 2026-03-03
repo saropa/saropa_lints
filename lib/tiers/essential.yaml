@@ -1,4 +1,4 @@
-# Saropa Lints - Essential Tier (~50 rules)
+# Saropa Lints - Essential Tier (~300 rules)
 #
 # Critical rules that prevent crashes, data loss, and security holes.
 # Every project should use this tier at minimum.

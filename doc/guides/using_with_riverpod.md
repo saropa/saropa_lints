@@ -7,7 +7,7 @@ This guide explains how saropa_lints enhances your Riverpod development with spe
 | Aspect | riverpod_lint | saropa_lints |
 |--------|--------------|--------------|
 | **Focus** | Riverpod-specific syntax | Cross-cutting concerns |
-| **Rule count** | ~20 rules | 1450+ rules (9+ Riverpod-specific) |
+| **Rule count** | ~20 rules | 2050+ rules (9+ Riverpod-specific) |
 | **Catches** | Provider syntax issues | Memory leaks, lifecycle bugs, architecture |
 
 **Key insight**: These packages are *complementary*. Use both for comprehensive coverage.

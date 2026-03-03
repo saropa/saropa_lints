@@ -32,6 +32,10 @@ Available tiers: `essential` (1), `recommended` (2), `professional` (3),
 - **Architecture** - Layer violations, god classes
 - **Testing** - Best practices, flaky test detection
 
+## Guides
+
+- [Migration from v4 to v5](guides/migration_v4_to_v5.md) — custom_lint to native analyzer plugin
+
 ## Links
 
 - [GitHub Repository](https://github.com/saropa/saropa_lints)

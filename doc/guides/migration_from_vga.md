@@ -6,7 +6,7 @@ This guide helps you migrate from `very_good_analysis` to Saropa Lints.
 
 | Feature | very_good_analysis | Saropa Lints |
 |---------|-------------------|--------------|
-| **Rule count** | 174 standard rules | 1450+ custom rules |
+| **Rule count** | 174 standard rules | 2050+ custom rules |
 | **Rule types** | Dart linter rules | Deep custom analysis |
 | **Configuration** | Single file | 5 progressive tiers + optional stylistic rules |
 | **Specialization** | General best practices | Flutter-specific (accessibility, state management, security) |
@@ -89,10 +89,10 @@ VGA has one configuration. Saropa Lints has five tiers to match your team's need
 
 | VGA Equivalent | Saropa Lints Tier | Description |
 |----------------|-------------------|-------------|
-| Basic usage | **Essential** (~256 rules) | Critical bugs, memory leaks, security |
-| Full VGA | **Recommended** (~573 rules) | Similar coverage + Flutter-specific |
-| Stricter | **Professional** (~979 rules) | Enterprise-grade |
-| Maximum | **Comprehensive** (~1202 rules) | Quality obsessed |
+| Basic usage | **Essential** (~300 rules) | Critical bugs, memory leaks, security |
+| Full VGA | **Recommended** (~900 rules) | Similar coverage + Flutter-specific |
+| Stricter | **Professional** (~1600 rules) | Enterprise-grade |
+| Maximum | **Comprehensive** (~2050 rules) | Quality obsessed |
 | Everything | **Pedantic** (1450+ rules) | Every single rule |
 
 **Start with `recommended`** - it's the closest to VGA's philosophy.
