@@ -190,7 +190,7 @@ Future<void> main(List<String> args) async {
 
   // Update analysis_options.yaml
   if (!skipConfig) {
-    final updated = await _updateAnalysisOptions(outputPath);
+    final updated = _updateAnalysisOptions(outputPath);
     if (updated) {
       print('Updated analysis_options.yaml with baseline configuration');
     }
@@ -204,7 +204,7 @@ Future<void> main(List<String> args) async {
 }
 
 /// Update analysis_options.yaml to include baseline configuration.
-Future<bool> _updateAnalysisOptions(String baselinePath) async {
+bool _updateAnalysisOptions(String baselinePath) {
   final file = File('analysis_options.yaml');
 
   if (!file.existsSync()) {
@@ -231,16 +231,16 @@ Future<bool> _updateAnalysisOptions(String baselinePath) async {
 
   final match = saropaPattern.firstMatch(content);
   if (match != null) {
-    // Add baseline config after tier
-    final indent = _detectIndent(content, match.start);
-    final baselineConfig =
-        '\n$indent  baseline:\n$indent    file: "$baselinePath"';
-    content = content.replaceFirst(
-      match.group(0)!,
-      '${match.group(0)}$baselineConfig',
-    );
-    file.writeAsStringSync(content);
-    return true;
+    final group0 = match.group(0);
+    if (group0 != null) {
+      // Add baseline config after tier
+      final indent = _detectIndent(content, match.start);
+      final baselineConfig =
+          '\n$indent  baseline:\n$indent    file: "$baselinePath"';
+      content = content.replaceFirst(group0, '$group0$baselineConfig');
+      file.writeAsStringSync(content);
+      return true;
+    }
   }
 
   print('Note: Could not find saropa_lints section in analysis_options.yaml');
