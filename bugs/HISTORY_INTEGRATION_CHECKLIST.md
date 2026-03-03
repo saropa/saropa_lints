@@ -35,102 +35,102 @@ After integration, remove history references from CHANGELOG and delete or archiv
 - [x] bugs/history/false_positives/avoid_nested_assignments_false_positive_arrow_function_body.md
 - [x] bugs/history/false_positives/avoid_nested_assignments_for_loop_false_positive.md
 - [x] bugs/history/false_positives/avoid_non_ascii_symbols_false_positive_unicode_library.md
-- [ ] bugs/history/false_positives/avoid_path_traversal_false_positive_private_helper_method.md
-- [ ] bugs/history/false_positives/avoid_positioned_outside_stack_false_positive.md
-- [ ] bugs/history/false_positives/avoid_positioned_outside_stack_false_positives.md
-- [ ] bugs/history/false_positives/avoid_ref_in_build_body_false_positive_callbacks_inside_build.md
-- [ ] bugs/history/false_positives/avoid_ref_watch_outside_build_false_positive_riverpod_provider_bodies.md
-- [ ] bugs/history/false_positives/avoid_similar_names_false_positives_short_names_and_time_units.md
-- [ ] bugs/history/false_positives/avoid_single_child_column_row_if_element_false_positive.md
-- [ ] bugs/history/false_positives/avoid_static_state_false_positive_cached_regex_constants.md
-- [ ] bugs/history/false_positives/avoid_stream_subscription_in_field_false_positive_listen_as_argument_to_collection_add.md
-- [ ] bugs/history/false_positives/avoid_string_concatenation_l10n_false_positive_numeric_only_interpolation.md
-- [ ] bugs/history/false_positives/avoid_unbounded_listview_false_positive_in_overlay_callbacks.md
-- [ ] bugs/history/false_positives/avoid_unmarked_public_class_false_positive_static_utility_classes.md
-- [ ] bugs/history/false_positives/avoid_unnecessary_nullable_return_type_false_positive_conditional_null_branches.md
-- [ ] bugs/history/false_positives/avoid_unnecessary_nullable_return_type_false_positive_expression_bodies.md
-- [ ] bugs/history/false_positives/avoid_unnecessary_nullable_return_type_false_positive_map_operator.md
-- [ ] bugs/history/false_positives/avoid_unnecessary_nullable_return_type_false_positive_nullable_delegation.md
-- [ ] bugs/history/false_positives/avoid_unnecessary_setstate_false_positive_closure_callbacks.md
-- [ ] bugs/history/false_positives/avoid_unnecessary_to_list_false_positive_required_by_return_type.md
-- [ ] bugs/history/false_positives/avoid_unused_assignment_false_positive_conditional_reassignment.md
-- [ ] bugs/history/false_positives/avoid_unused_assignment_false_positive_definite_assignment_if_else.md
-- [ ] bugs/history/false_positives/avoid_unused_assignment_false_positive_loop_reassignment.md
-- [ ] bugs/history/false_positives/avoid_url_launcher_simulator_tests_false_positive_no_launcher_usage.md
-- [ ] bugs/history/false_positives/avoid_variable_shadowing_false_positive_non_overlapping_loop_scopes.md
-- [ ] bugs/history/false_positives/check_mounted_after_async_false_positive_guard_clause.md
-- [ ] bugs/history/false_positives/check_mounted_after_async_false_positives.md
-- [ ] bugs/history/false_positives/comment_and_type_arg_false_positives.md
-- [ ] bugs/history/false_positives/discussion_062_false_positive_reduction_review.md
-- [ ] bugs/history/false_positives/false_positives_kykto.md
-- [ ] bugs/history/false_positives/function_always_returns_null_false_positive_async_generator_method.md
-- [ ] bugs/history/false_positives/function_always_returns_null_false_positive_async_generator.md
-- [ ] bugs/history/false_positives/multiple_false_positives_in_utility_library_context.md
-- [ ] bugs/history/false_positives/no_empty_string_false_positive_standard_dart_idiom.md
-- [ ] bugs/history/false_positives/no_equal_conditions_false_positive_if_case_pattern_matching.md
-- [ ] bugs/history/false_positives/no_magic_number_false_positive_named_default_parameters.md
-- [ ] bugs/history/false_positives/prefer_cached_getter_false_positive_extension_getters.md
-- [ ] bugs/history/false_positives/prefer_compute_for_heavy_work_false_positive_pure_dart_library.md
-- [ ] bugs/history/false_positives/prefer_const_widgets_in_lists_false_positive.md
-- [ ] bugs/history/false_positives/prefer_digit_separators_false_positive_small_numbers_and_code_points.md
-- [ ] bugs/history/false_positives/prefer_edgeinsets_symmetric_false_positive.md
-- [ ] bugs/history/false_positives/prefer_implicit_boolean_comparison_false_positive.md
-- [ ] bugs/history/false_positives/prefer_keep_alive_false_positive_naive_tab_string_match.md
-- [ ] bugs/history/false_positives/prefer_list_first_false_positive_sibling_index_access.md
-- [ ] bugs/history/false_positives/prefer_match_file_name_false_positive_matching_class_name.md
-- [ ] bugs/history/false_positives/prefer_named_boolean_parameters_false_positive_lambda_parameters.md
-- [ ] bugs/history/false_positives/prefer_no_commented_out_code_false_positive_prose_comments.md
-- [ ] bugs/history/false_positives/prefer_prefixed_global_constants_false_positive_dart_convention.md
-- [ ] bugs/history/false_positives/prefer_secure_random_false_positive_non_security_shuffling.md
-- [ ] bugs/history/false_positives/prefer_setup_teardown_false_positive_expect_as_setup.md
-- [ ] bugs/history/false_positives/prefer_static_method_false_positive_extension_methods.md
-- [ ] bugs/history/false_positives/prefer_stream_distinct_false_positives.md
-- [ ] bugs/history/false_positives/prefer_switch_expression_false_positive_complex_case_logic.md
-- [ ] bugs/history/false_positives/prefer_trailing_comma_always_false_positive_callback_arguments.md
-- [ ] bugs/history/false_positives/prefer_unique_test_names_false_positive_ignores_group_scoping.md
-- [ ] bugs/history/false_positives/prefer_wheretype_over_where_is_false_positive_negated_type_check.md
-- [ ] bugs/history/false_positives/require_currency_code_with_amount_false_positive_non_monetary_totals.md
-- [ ] bugs/history/false_positives/require_dispose_pattern_false_positive_borrowed_references.md
-- [ ] bugs/history/false_positives/require_envied_obfuscation_false_positive_class_level_annotation.md
-- [ ] bugs/history/false_positives/require_error_case_tests_false_positive_defensive_source.md
-- [ ] bugs/history/false_positives/require_file_path_sanitization_false_positive_private_helper_method.md
-- [ ] bugs/history/false_positives/require_hero_tag_uniqueness_false_positive_cross_route_pairs.md
-- [ ] bugs/history/false_positives/require_https_only_test_false_positive_url_utility_tests.md
-- [ ] bugs/history/false_positives/require_intl_currency_format_false_positive_dollar_interpolation.md
-- [ ] bugs/history/false_positives/require_ios_callkit_false_positive_substring_match.md
-- [ ] bugs/history/false_positives/require_ios_callkit_false_positive_whole_word_agora.md
-- [ ] bugs/history/false_positives/require_list_preallocate_false_positive_unknowable_size.md
-- [ ] bugs/history/false_positives/require_location_timeout_false_positive_permission_checks.md
-- [ ] bugs/history/false_positives/require_number_format_locale_false_positive_device_locale.md
-- [ ] bugs/history/false_positives/string_contains_false_positive_audit.md
+- [x] bugs/history/false_positives/avoid_path_traversal_false_positive_private_helper_method.md
+- [x] bugs/history/false_positives/avoid_positioned_outside_stack_false_positive.md
+- [x] bugs/history/false_positives/avoid_positioned_outside_stack_false_positives.md
+- [x] bugs/history/false_positives/avoid_ref_in_build_body_false_positive_callbacks_inside_build.md
+- [x] bugs/history/false_positives/avoid_ref_watch_outside_build_false_positive_riverpod_provider_bodies.md
+- [x] bugs/history/false_positives/avoid_similar_names_false_positives_short_names_and_time_units.md
+- [x] bugs/history/false_positives/avoid_single_child_column_row_if_element_false_positive.md
+- [x] bugs/history/false_positives/avoid_static_state_false_positive_cached_regex_constants.md
+- [x] bugs/history/false_positives/avoid_stream_subscription_in_field_false_positive_listen_as_argument_to_collection_add.md
+- [x] bugs/history/false_positives/avoid_string_concatenation_l10n_false_positive_numeric_only_interpolation.md
+- [x] bugs/history/false_positives/avoid_unbounded_listview_false_positive_in_overlay_callbacks.md
+- [x] bugs/history/false_positives/avoid_unmarked_public_class_false_positive_static_utility_classes.md
+- [x] bugs/history/false_positives/avoid_unnecessary_nullable_return_type_false_positive_conditional_null_branches.md
+- [x] bugs/history/false_positives/avoid_unnecessary_nullable_return_type_false_positive_expression_bodies.md
+- [x] bugs/history/false_positives/avoid_unnecessary_nullable_return_type_false_positive_map_operator.md
+- [x] bugs/history/false_positives/avoid_unnecessary_nullable_return_type_false_positive_nullable_delegation.md
+- [x] bugs/history/false_positives/avoid_unnecessary_setstate_false_positive_closure_callbacks.md
+- [x] bugs/history/false_positives/avoid_unnecessary_to_list_false_positive_required_by_return_type.md
+- [x] bugs/history/false_positives/avoid_unused_assignment_false_positive_conditional_reassignment.md
+- [x] bugs/history/false_positives/avoid_unused_assignment_false_positive_definite_assignment_if_else.md
+- [x] bugs/history/false_positives/avoid_unused_assignment_false_positive_loop_reassignment.md
+- [x] bugs/history/false_positives/avoid_url_launcher_simulator_tests_false_positive_no_launcher_usage.md
+- [x] bugs/history/false_positives/avoid_variable_shadowing_false_positive_non_overlapping_loop_scopes.md
+- [x] bugs/history/false_positives/check_mounted_after_async_false_positive_guard_clause.md
+- [x] bugs/history/false_positives/check_mounted_after_async_false_positives.md
+- [x] bugs/history/false_positives/comment_and_type_arg_false_positives.md
+- [x] bugs/history/false_positives/discussion_062_false_positive_reduction_review.md
+- [x] bugs/history/false_positives/false_positives_kykto.md
+- [x] bugs/history/false_positives/function_always_returns_null_false_positive_async_generator_method.md
+- [x] bugs/history/false_positives/function_always_returns_null_false_positive_async_generator.md
+- [x] bugs/history/false_positives/multiple_false_positives_in_utility_library_context.md
+- [x] bugs/history/false_positives/no_empty_string_false_positive_standard_dart_idiom.md
+- [x] bugs/history/false_positives/no_equal_conditions_false_positive_if_case_pattern_matching.md
+- [x] bugs/history/false_positives/no_magic_number_false_positive_named_default_parameters.md
+- [x] bugs/history/false_positives/prefer_cached_getter_false_positive_extension_getters.md
+- [x] bugs/history/false_positives/prefer_compute_for_heavy_work_false_positive_pure_dart_library.md
+- [x] bugs/history/false_positives/prefer_const_widgets_in_lists_false_positive.md
+- [x] bugs/history/false_positives/prefer_digit_separators_false_positive_small_numbers_and_code_points.md
+- [x] bugs/history/false_positives/prefer_edgeinsets_symmetric_false_positive.md
+- [x] bugs/history/false_positives/prefer_implicit_boolean_comparison_false_positive.md
+- [x] bugs/history/false_positives/prefer_keep_alive_false_positive_naive_tab_string_match.md
+- [x] bugs/history/false_positives/prefer_list_first_false_positive_sibling_index_access.md
+- [x] bugs/history/false_positives/prefer_match_file_name_false_positive_matching_class_name.md
+- [x] bugs/history/false_positives/prefer_named_boolean_parameters_false_positive_lambda_parameters.md
+- [x] bugs/history/false_positives/prefer_no_commented_out_code_false_positive_prose_comments.md
+- [x] bugs/history/false_positives/prefer_prefixed_global_constants_false_positive_dart_convention.md
+- [x] bugs/history/false_positives/prefer_secure_random_false_positive_non_security_shuffling.md
+- [x] bugs/history/false_positives/prefer_setup_teardown_false_positive_expect_as_setup.md
+- [x] bugs/history/false_positives/prefer_static_method_false_positive_extension_methods.md
+- [x] bugs/history/false_positives/prefer_stream_distinct_false_positives.md
+- [x] bugs/history/false_positives/prefer_switch_expression_false_positive_complex_case_logic.md
+- [x] bugs/history/false_positives/prefer_trailing_comma_always_false_positive_callback_arguments.md
+- [x] bugs/history/false_positives/prefer_unique_test_names_false_positive_ignores_group_scoping.md
+- [x] bugs/history/false_positives/prefer_wheretype_over_where_is_false_positive_negated_type_check.md
+- [x] bugs/history/false_positives/require_currency_code_with_amount_false_positive_non_monetary_totals.md
+- [x] bugs/history/false_positives/require_dispose_pattern_false_positive_borrowed_references.md
+- [x] bugs/history/false_positives/require_envied_obfuscation_false_positive_class_level_annotation.md
+- [x] bugs/history/false_positives/require_error_case_tests_false_positive_defensive_source.md
+- [x] bugs/history/false_positives/require_file_path_sanitization_false_positive_private_helper_method.md
+- [x] bugs/history/false_positives/require_hero_tag_uniqueness_false_positive_cross_route_pairs.md
+- [x] bugs/history/false_positives/require_https_only_test_false_positive_url_utility_tests.md
+- [x] bugs/history/false_positives/require_intl_currency_format_false_positive_dollar_interpolation.md
+- [x] bugs/history/false_positives/require_ios_callkit_false_positive_substring_match.md
+- [x] bugs/history/false_positives/require_ios_callkit_false_positive_whole_word_agora.md
+- [x] bugs/history/false_positives/require_list_preallocate_false_positive_unknowable_size.md
+- [x] bugs/history/false_positives/require_location_timeout_false_positive_permission_checks.md
+- [x] bugs/history/false_positives/require_number_format_locale_false_positive_device_locale.md
+- [x] bugs/history/false_positives/string_contains_false_positive_audit.md
 
 ---
 
 ## Phase 1: rule_bugs (22 files)
 
-- [ ] bugs/history/rule_bugs/avoid_empty_setstate severity.md
-- [ ] bugs/history/rule_bugs/avoid_empty_setstate_wrong_tier.md
-- [ ] bugs/history/rule_bugs/avoid_expanded_outside_flex_documentation.md
-- [ ] bugs/history/rule_bugs/avoid_large_list_copy_overly_generic_detection.md
-- [ ] bugs/history/rule_bugs/avoid_long_parameter_list_ignore_not_respected.md
-- [ ] bugs/history/rule_bugs/conflicting_rules_prefer_static_class_vs_prefer_abstract_final_static_class.md
-- [ ] bugs/history/rule_bugs/dartdoc_references_nonexistent_parameter.md
-- [ ] bugs/history/rule_bugs/detect_unsorted_imports.md
-- [ ] bugs/history/rule_bugs/duplicate_rules_async_without_await.md
-- [ ] bugs/history/rule_bugs/function_always_returns_null_generator_guard_ineffective.md
-- [ ] bugs/history/rule_bugs/no_magic_number_string_in_tests_severity_miscalibration.md
-- [ ] bugs/history/rule_bugs/prefer_catch_over_on_reverse_rule.md
-- [ ] bugs/history/rule_bugs/prefer_expanded_at_call_site.md
-- [ ] bugs/history/rule_bugs/prefer_static_class_regression_on_abstract_final_class.md
-- [ ] bugs/history/rule_bugs/quick_fixes_not_appearing_in_vscode.md
-- [ ] bugs/history/rule_bugs/report_avoid_deprecated_usage_analyzer_api_crash.md
-- [ ] bugs/history/rule_bugs/report_avoid_deprecated_usage_metadataimpl_not_iterable_crash.md
-- [ ] bugs/history/rule_bugs/report_duplicate_paths_deduplication.md
-- [ ] bugs/history/rule_bugs/report_session_management.md
-- [ ] bugs/history/rule_bugs/require_minimum_contrast_ignore_suppression.md
-- [ ] bugs/history/rule_bugs/require_yield_between_db_awaits_read_vs_write.md
-- [ ] bugs/history/rule_bugs/violation_deduplication.md
-- [ ] bugs/history/rule_bugs/yield description and quickfix.md
+- [x] bugs/history/rule_bugs/avoid_empty_setstate severity.md
+- [x] bugs/history/rule_bugs/avoid_empty_setstate_wrong_tier.md
+- [x] bugs/history/rule_bugs/avoid_expanded_outside_flex_documentation.md
+- [x] bugs/history/rule_bugs/avoid_large_list_copy_overly_generic_detection.md
+- [x] bugs/history/rule_bugs/avoid_long_parameter_list_ignore_not_respected.md
+- [x] bugs/history/rule_bugs/conflicting_rules_prefer_static_class_vs_prefer_abstract_final_static_class.md
+- [x] bugs/history/rule_bugs/dartdoc_references_nonexistent_parameter.md
+- [x] bugs/history/rule_bugs/detect_unsorted_imports.md
+- [x] bugs/history/rule_bugs/duplicate_rules_async_without_await.md
+- [x] bugs/history/rule_bugs/function_always_returns_null_generator_guard_ineffective.md
+- [x] bugs/history/rule_bugs/no_magic_number_string_in_tests_severity_miscalibration.md
+- [x] bugs/history/rule_bugs/prefer_catch_over_on_reverse_rule.md
+- [x] bugs/history/rule_bugs/prefer_expanded_at_call_site.md
+- [x] bugs/history/rule_bugs/prefer_static_class_regression_on_abstract_final_class.md
+- [x] bugs/history/rule_bugs/quick_fixes_not_appearing_in_vscode.md
+- [x] bugs/history/rule_bugs/report_avoid_deprecated_usage_analyzer_api_crash.md
+- [x] bugs/history/rule_bugs/report_avoid_deprecated_usage_metadataimpl_not_iterable_crash.md
+- [x] bugs/history/rule_bugs/report_duplicate_paths_deduplication.md
+- [x] bugs/history/rule_bugs/report_session_management.md
+- [x] bugs/history/rule_bugs/require_minimum_contrast_ignore_suppression.md
+- [x] bugs/history/rule_bugs/require_yield_between_db_awaits_read_vs_write.md
+- [x] bugs/history/rule_bugs/violation_deduplication.md
+- [x] bugs/history/rule_bugs/yield description and quickfix.md
 
 ---
 
