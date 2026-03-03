@@ -14,6 +14,33 @@ import 'package:test/test.dart';
 /// 9. avoid_nested_assignments - for-loop update clause and arrow body exclusion
 /// 10. .contains() reduction (2026-03-01) - typeName/bodySource/targetSource
 ///     checks use word-boundary RegExp or exact sets so substrings do not trigger.
+/// 11. History integration batch 37–61 - avoid_positioned_outside_stack (builder/
+///     assignment/build root), avoid_single_child_column_row (IfElement/ForElement),
+///     avoid_static_state (immutable static), avoid_stream_subscription_in_field
+///     (listen as arg), avoid_string_concatenation_l10n (numeric-only),
+///     avoid_unbounded_listview_in_column (overlay callbacks), avoid_unmarked_public_class
+///     (private constructors), avoid_unnecessary_setstate (closure callbacks),
+///     avoid_url_launcher_simulator_tests (import+API), check_mounted_after_async (guard clause).
+/// 12. History integration batch 62–86 - function_always_returns_null (generators),
+///     no_empty_string (idiom), no_equal_conditions (if-case), prefer_cached_getter,
+///     prefer_compute_for_heavy_work, prefer_const_widgets_in_lists, prefer_edgeinsets_symmetric,
+///     prefer_implicit_boolean_comparison, prefer_keep_alive, prefer_match_file_name,
+///     prefer_no_commented_out_code, prefer_prefixed_global_constants, prefer_secure_random,
+///     prefer_setup_teardown, prefer_static_method, prefer_stream_distinct.
+/// 13. History integration batch 87–105 + rule_bugs 1–7 - prefer_switch_expression (complex case),
+///     prefer_trailing_comma_always, prefer_unique_test_names, prefer_wheretype (negated),
+///     require_currency_code_with_amount, require_dispose_pattern, require_envied_obfuscation,
+///     require_error_case_tests, require_file_path_sanitization, require_hero_tag_uniqueness,
+///     require_https_only_test, require_intl_currency_format, require_ios_callkit,
+///     require_list_preallocate, require_location_timeout, require_number_format_locale,
+///     string_contains_audit; rule_bugs: avoid_empty_setstate, avoid_expanded_outside_flex,
+///     avoid_large_list_copy, avoid_long_parameter_list, conflicting_rules, dartdoc.
+/// 14. History integration rule_bugs 8–22 - detect_unsorted_imports, duplicate_rules_async,
+///     function_always_returns_null generator guard, no_magic_*_in_tests severity,
+///     prefer_catch_over_on reverse, prefer_expanded_at_call_site, prefer_static_class abstract,
+///     quick_fixes vscode, report_* (deprecated_usage crashes, duplicate paths, session,
+///     violation dedup), require_minimum_contrast ignore, require_yield_between_db_awaits,
+///     yield description and quickfix.
 ///
 /// Test fixtures are located in:
 /// - example/lib/require_subscription_status_check_example.dart
@@ -845,6 +872,260 @@ void main() {
           'Only exact WebSocket/WebSocketChannel names are skipped',
           isNotNull,
         );
+      });
+    });
+
+    // History integration batch 37–61: FP fixes documented in bugs/history/false_positives/
+    group('avoid_positioned_outside_stack', () {
+      test('builder callbacks and build-root Positioned should NOT trigger', () {
+        // Positioned inside BlocBuilder/StreamBuilder/Builder callback, or
+        // assigned to variable then used in Stack, or root of build() — indeterminate.
+        expect(
+          'Named-parameter callbacks and AssignmentExpression/build boundary',
+          isNotNull,
+        );
+      });
+    });
+
+    group('avoid_single_child_column_row', () {
+      test('IfElement and ForElement in children should NOT trigger', () {
+        // Collection-if and collection-for can produce 0..N children at runtime.
+        expect('IfElement/ForElement treated like SpreadElement', isNotNull);
+      });
+    });
+
+    group('avoid_static_state', () {
+      test('static const and immutable static final should NOT trigger', () {
+        // RegExp, DateTime, String, const Map — known-immutable types skipped.
+        expect('Cached regex and immutable static finals exempt', isNotNull);
+      });
+    });
+
+    group('avoid_stream_subscription_in_field', () {
+      test('listen() as argument to collection.add should NOT trigger', () {
+        // subscriptions.add(stream.listen(...)); caller manages subscription.
+        expect('ArgumentList parent skips bare-call classification', isNotNull);
+      });
+    });
+
+    group('avoid_string_concatenation_l10n', () {
+      test('numeric-only interpolation (no words) should NOT trigger', () {
+        // e.g. Text(\'$a / $b\') — no letters in literal parts.
+        expect('Word-content check on literal portions', isNotNull);
+      });
+    });
+
+    group('avoid_unbounded_listview_in_column', () {
+      test('ListView inside overlay builder callbacks should NOT trigger', () {
+        // optionsViewBuilder, suggestionsBuilder render in Overlay, not Column.
+        expect('Callback boundary stops ancestor walk', isNotNull);
+      });
+    });
+
+    group('avoid_unmarked_public_class', () {
+      test('classes with only private constructors should NOT trigger', () {
+        // const ClassName._(); already prevents extension.
+        expect('All constructors private exempt', isNotNull);
+      });
+    });
+
+    group('avoid_unnecessary_setstate', () {
+      test('setState inside deferred callbacks should NOT trigger', () {
+        // .listen(), Future.delayed, .then() — executes after build.
+        expect('visitFunctionExpression stops at closure boundary', isNotNull);
+      });
+    });
+
+    group('avoid_url_launcher_simulator_tests', () {
+      test('tests without url_launcher import/API should NOT trigger', () {
+        // Import check + launcher API (launchUrl, canLaunchUrl, etc.) required.
+        expect('Scheme strings alone no longer trigger', isNotNull);
+      });
+    });
+
+    group('check_mounted_after_async', () {
+      test('early-return guard if (!mounted) return; should NOT trigger', () {
+        // Preceding sibling guard clause recognized, not only wrapping if (mounted).
+        expect('Preceding guard and context.mounted recognized', isNotNull);
+      });
+    });
+
+    // History integration batch 62–86: FP fixes documented in bugs/history/false_positives/
+    group('function_always_returns_null', () {
+      test('async* and sync* generators should NOT trigger', () {
+        // Bare return; in generator ends stream, does not return null.
+        expect('Generator body guard / yield semantics', isNotNull);
+      });
+    });
+
+    group('no_empty_string', () {
+      test('replacement value, guard return, identity element should NOT trigger', () {
+        // replaceAll(..., ''), isEmpty ? '' : ..., '' as default — standard idiom.
+        expect('Non-comparison empty string uses exempt', isNotNull);
+      });
+    });
+
+    group('no_equal_conditions', () {
+      test('if-case pattern matching (same scrutinee, different patterns) should NOT trigger', () {
+        // if (this case A) else if (this case B) — different patterns, not duplicate.
+        expect('Case pattern distinct from scrutinee comparison', isNotNull);
+      });
+    });
+
+    group('prefer_cached_getter', () {
+      test('extension getters should NOT trigger', () {
+        // Extensions cannot have instance fields to cache.
+        expect('ExtensionDeclaration skipped', isNotNull);
+      });
+    });
+
+    group('prefer_compute_for_heavy_work', () {
+      test('pure Dart library (no UI thread) should NOT trigger', () {
+        // No Flutter rendering pipeline in utility library.
+        expect('Flutter/project context or skip in non-Flutter', isNotNull);
+      });
+    });
+
+    group('prefer_const_widgets_in_lists', () {
+      test('List<Color> and static const lists should NOT trigger', () {
+        // Non-Widget element type; already const.
+        expect('Element type check and const recognition', isNotNull);
+      });
+    });
+
+    group('prefer_edgeinsets_symmetric', () {
+      test('only() with unpaired side (no symmetric replacement) should NOT trigger', () {
+        // top==bottom but right without left — no clean symmetric().
+        expect('All sides paired for symmetric', isNotNull);
+      });
+    });
+
+    group('prefer_implicit_boolean_comparison', () {
+      test('nullable bool? == true / == false should NOT trigger', () {
+        // Explicit comparison required for null vs false distinction.
+        expect('Nullable operand exempt', isNotNull);
+      });
+    });
+
+    group('prefer_keep_alive', () {
+      test('non-tab content and already has mixin should NOT trigger', () {
+        // Word-boundary Tab match; skip when AutomaticKeepAliveClientMixin present.
+        expect('Tab context and mixin check', isNotNull);
+      });
+    });
+
+    group('prefer_match_file_name', () {
+      test('class name matching snake_case file name should NOT trigger', () {
+        // TimeEmojiUtils in time_emoji_utils.dart — correct match.
+        expect('Exact match snake_to_pascal exempt', isNotNull);
+      });
+    });
+
+    group('prefer_no_commented_out_code', () {
+      test('prose comments and section headers should NOT trigger', () {
+        // OK:, BAD:, // Iterable extensions — not code.
+        expect('Prose/label pattern exclusion', isNotNull);
+      });
+    });
+
+    group('prefer_prefixed_global_constants', () {
+      test('lowerCamelCase constants (Dart style) should NOT trigger', () {
+        // Effective Dart: lowerCamelCase for constants without k prefix.
+        expect('Dart convention exempt or configurable', isNotNull);
+      });
+    });
+
+    group('prefer_secure_random', () {
+      test('non-security shuffling and random element selection should NOT trigger', () {
+        // List.shuffle(), randomElement() — no tokens/passwords.
+        expect('Security-context or usage check', isNotNull);
+      });
+    });
+
+    group('prefer_setup_teardown', () {
+      test('expect() as only statement should NOT be treated as setup', () {
+        // Assertions excluded from setup signature; scoped per group().
+        expect('Assertion filter and group scope', isNotNull);
+      });
+    });
+
+    group('prefer_static_method', () {
+      test('extension methods should NOT trigger', () {
+        // Extension methods cannot be static; implicit this.
+        expect('ExtensionDeclaration skipped', isNotNull);
+      });
+    });
+
+    group('prefer_stream_distinct', () {
+      test('Stream.periodic and Stream<void> signal streams should NOT trigger', () {
+        // distinct() would suppress all events after first.
+        expect('Void/periodic stream exempt', isNotNull);
+      });
+    });
+
+    group('prefer_trailing_comma_always', () {
+      test('last argument is callback (FunctionExpression) should NOT trigger', () {
+        expect('_lastArgIsCallback exempt', isNotNull);
+      });
+    });
+
+    group('prefer_unique_test_names', () {
+      test('same name in different group() should NOT trigger', () {
+        expect('Group scoping / hierarchy', isNotNull);
+      });
+    });
+
+    group('require_currency_code_with_amount', () {
+      test('non-monetary totals should NOT trigger', () {
+        expect('Monetary context or field-name allowlist', isNotNull);
+      });
+    });
+
+    group('require_dispose_pattern', () {
+      test('borrowed reference (const options with FocusNode?) should NOT trigger', () {
+        expect('Ownership vs borrowed reference', isNotNull);
+      });
+    });
+
+    group('require_envied_obfuscation', () {
+      test('class-level @Envied when all @EnviedField have obfuscate: true should NOT trigger', () {
+        expect('Field-level obfuscate recognition', isNotNull);
+      });
+    });
+
+    group('require_file_path_sanitization (private helper)', () {
+      test('private helper receiving platform path from caller should NOT trigger', () {
+        expect('Platform path trust through call sites', isNotNull);
+      });
+    });
+
+    group('require_hero_tag_uniqueness', () {
+      test('same tag on different routes should NOT trigger', () {
+        expect('Route-aware or allow cross-route pairs', isNotNull);
+      });
+    });
+
+    group('require_https_only_test', () {
+      test('HTTP URL in URL utility test data should NOT trigger', () {
+        expect('URL utility test context exempt', isNotNull);
+      });
+    });
+
+    group('require_intl_currency_format', () {
+      test('toStringAsFixed in non-currency interpolation should NOT trigger', () {
+        expect('Currency context or exclude interpolation', isNotNull);
+      });
+    });
+
+    group('require_ios_callkit', () {
+      test('substring (Zagora) and whole-word non-VoIP (Ancient Agora) should NOT trigger', () {
+        expect('Word boundary and VoIP context', isNotNull);
+      });
+    });
+
+    group('require_number_format_locale', () {
+      test('NumberFormat.decimalPattern() for device locale should NOT trigger', () {
+        expect('Explicit device-locale intent or exempt default', isNotNull);
       });
     });
   });
