@@ -6,6 +6,11 @@ import 'package:analyzer/dart/ast/token.dart';
 import '../saropa_lint_rule.dart';
 import '../fixes/control_flow/comment_out_unnecessary_continue_fix.dart';
 import '../fixes/control_flow/invert_operator_fix.dart';
+import '../fixes/control_flow/remove_constant_assert_fix.dart';
+import '../fixes/control_flow/remove_duplicate_switch_case_fix.dart';
+import '../fixes/control_flow/remove_redundant_else_fix.dart';
+import '../fixes/control_flow/remove_unconditional_break_fix.dart';
+import '../fixes/control_flow/replace_with_then_branch_fix.dart';
 import '../fixes/control_flow/simplify_boolean_literal_fix.dart';
 import '../fixes/control_flow/use_positive_form_fix.dart';
 
@@ -309,6 +314,12 @@ class AvoidConstantAssertConditionsRule extends SaropaLintRule {
     });
   }
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveConstantAssertFix(context: context),
+  ];
+
   bool _areSameLiteral(Expression left, Expression right) {
     if (left is IntegerLiteral && right is IntegerLiteral) {
       return left.value == right.value;
@@ -537,6 +548,12 @@ class AvoidDuplicateSwitchCaseConditionsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveDuplicateSwitchCaseFix(context: context),
+  ];
 }
 
 /// Warns when an if statement has too many branches.
@@ -1133,6 +1150,12 @@ class AvoidRedundantElseRule extends SaropaLintRule {
 
     return false;
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveRedundantElseFix(context: context),
+  ];
 }
 
 /// Warns when break or continue is unconditionally executed.
@@ -1217,6 +1240,12 @@ class AvoidUnconditionalBreakRule extends SaropaLintRule {
       reporter.atNode(firstStatement);
     }
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnconditionalBreakFix(context: context),
+  ];
 }
 
 /// Warns when a condition is always true or always false.
@@ -1566,6 +1595,12 @@ class NoEqualThenElseRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithThenBranchFix(context: context),
+  ];
 }
 
 /// Warns when an if-else could be simplified to a conditional expression.

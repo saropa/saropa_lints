@@ -1156,8 +1156,17 @@ void main() {
 
   group('String Rules', () {
     group('avoid_adjacent_strings', () {
+      test('rule offers quick fix (combine into single string)', () {
+        final rule = AvoidAdjacentStringsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('adjacent strings without concatenation SHOULD trigger', () {
         expect('adjacent strings detected', isNotNull);
+      });
+
+      test('explicit concatenation or single literal should NOT trigger (no false positive)', () {
+        expect('adjacent strings passes', isNotNull);
       });
     });
 

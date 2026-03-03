@@ -5,6 +5,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../fixes/exception/remove_try_catch_only_rethrow_fix.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when exception classes have non-final fields.
@@ -117,6 +118,12 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveTryCatchOnlyRethrowFix(context: context),
+  ];
 }
 
 /// Warns when throw is used inside a catch block, which loses the stack trace.

@@ -258,6 +258,11 @@ void main() {
     });
 
     group('avoid_constant_assert_conditions', () {
+      test('rule offers quick fix (remove constant assert)', () {
+        final rule = AvoidConstantAssertConditionsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_constant_assert_conditions SHOULD trigger', () {
         // Pattern that should be avoided: avoid constant assert conditions
         expect('avoid_constant_assert_conditions detected', isNotNull);
@@ -282,6 +287,11 @@ void main() {
     });
 
     group('avoid_duplicate_switch_case_conditions', () {
+      test('rule offers quick fix (remove duplicate case)', () {
+        final rule = AvoidDuplicateSwitchCaseConditionsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_duplicate_switch_case_conditions SHOULD trigger', () {
         // Pattern that should be avoided: avoid duplicate switch case conditions
         expect('avoid_duplicate_switch_case_conditions detected', isNotNull);
@@ -390,6 +400,11 @@ void main() {
     });
 
     group('avoid_redundant_else', () {
+      test('rule offers quick fix (remove redundant else)', () {
+        final rule = AvoidRedundantElseRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_redundant_else SHOULD trigger', () {
         // Pattern that should be avoided: avoid redundant else
         expect('avoid_redundant_else detected', isNotNull);
@@ -402,6 +417,11 @@ void main() {
     });
 
     group('avoid_unconditional_break', () {
+      test('rule offers quick fix (remove unconditional break/continue)', () {
+        final rule = AvoidUnconditionalBreakRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_unconditional_break SHOULD trigger', () {
         // Pattern that should be avoided: avoid unconditional break
         expect('avoid_unconditional_break detected', isNotNull);
@@ -555,6 +575,11 @@ void main() {
     });
 
     group('no_equal_then_else', () {
+      test('rule offers quick fix (replace with then branch only)', () {
+        final rule = NoEqualThenElseRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('no_equal_then_else SHOULD trigger', () {
         // Detected violation: no equal then else
         expect('no_equal_then_else detected', isNotNull);

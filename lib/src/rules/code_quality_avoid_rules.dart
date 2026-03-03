@@ -9,6 +9,7 @@ import 'package:analyzer/dart/element/type.dart';
 import '../analyzer_metadata_compat_utils.dart';
 import '../banned_usage_config.dart' as banned_usage_config;
 import '../fixes/code_quality/avoid_substring_todo_fix.dart';
+import '../fixes/code_quality/combine_adjacent_strings_fix.dart';
 import '../fixes/code_quality/delete_unknown_pragma_fix.dart';
 import '../fixes/code_quality/prefix_unused_parameter_fix.dart';
 import '../fixes/code_quality/remove_inferrable_type_arguments_fix.dart';
@@ -45,6 +46,12 @@ class AvoidAdjacentStringsRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        CombineAdjacentStringsFix(context: context),
+  ];
 }
 
 /// Warns when accessing enum values by index (`EnumName.values[i]`).

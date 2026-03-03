@@ -7,6 +7,7 @@ import 'package:analyzer/dart/element/type.dart';
 import '../saropa_lint_rule.dart';
 import '../fixes/return/remove_unnecessary_return_fix.dart';
 import '../fixes/return/inline_immediate_return_fix.dart';
+import '../fixes/return/replace_return_null_with_return_fix.dart';
 
 /// Resolves the declared return type from a [FunctionBody]'s parent.
 DartType? getReturnTypeFromBody(FunctionBody body) {
@@ -485,6 +486,12 @@ class AvoidReturningNullForVoidRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceReturnNullWithReturnFix(context: context),
+  ];
 }
 
 /// Warns when returning `null` from a non-async `Future` function.

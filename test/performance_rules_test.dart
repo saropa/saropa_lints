@@ -463,6 +463,11 @@ void main() {
     });
 
     group('avoid_synchronous_file_io', () {
+      test('rule offers quick fix (use async file operation)', () {
+        final rule = AvoidSynchronousFileIoRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_synchronous_file_io SHOULD trigger', () {
         // Pattern that should be avoided: avoid synchronous file io
         expect('avoid_synchronous_file_io detected', isNotNull);

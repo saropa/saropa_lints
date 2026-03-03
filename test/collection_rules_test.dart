@@ -222,6 +222,11 @@ void main() {
     });
 
     group('avoid_duplicate_map_keys', () {
+      test('rule offers quick fix (remove duplicate entry)', () {
+        final rule = AvoidDuplicateMapKeysRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_duplicate_map_keys SHOULD trigger', () {
         // Pattern that should be avoided: avoid duplicate map keys
         expect('avoid_duplicate_map_keys detected', isNotNull);

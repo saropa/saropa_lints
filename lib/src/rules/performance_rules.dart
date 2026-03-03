@@ -13,6 +13,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../async_context_utils.dart';
 import '../fixes/performance/prefer_const_widgets_fix.dart';
+import '../fixes/performance/replace_sync_file_io_fix.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when AnimatedList or AnimatedGrid items don't have keys.
@@ -317,6 +318,12 @@ class AvoidSynchronousFileIoRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceSyncFileIoFix(context: context),
+  ];
 }
 
 /// Warns when compute() should be used for heavy work.
