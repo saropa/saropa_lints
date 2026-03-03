@@ -11,6 +11,7 @@ import '../../fixes/async/avoid_redundant_async_fix.dart';
 import '../../fixes/async/change_to_future_void_function_fix.dart';
 import '../../fixes/async/replace_async_callback_with_future_void_function_fix.dart';
 import '../../fixes/async/add_to_utc_fix.dart';
+import '../../fixes/async/wrap_in_unawaited_fix.dart';
 
 /// Warns when calling .ignore() on a Future.
 ///
@@ -2968,7 +2969,11 @@ class AvoidFutureThenInAsyncRule extends SaropaLintRule {
 /// expression is a call to `unawaited(...)` are never reported. The check
 /// uses `node.expression` (the statement's expression), not `node.parent`,
 /// so that `unawaited(someFuture());` is correctly recognized as intentional
-/// fire-and-forget regardless of static type resolution.
+/// fire-and-forget regardless of static type resolution. When we don't
+/// report: (1) the expression is `unawaited(...)`, (2) safe fire-and-forget
+/// patterns (subscription.cancel() in dispose, .catchError()/.ignore(), etc.).
+///
+/// **Quick fix available:** Wrap in unawaited().
 ///
 /// Alias: unawaited_future, missing_await, fire_and_forget
 ///
@@ -3020,6 +3025,12 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            WrapInUnawaitedFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_unawaited_future',

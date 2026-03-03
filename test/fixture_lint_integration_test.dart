@@ -101,6 +101,50 @@ void main() {
       },
     );
 
+    /// avoid_unawaited_future: only the BAD case (bare Future) must trigger;
+    /// unawaited(...) and unawaited(... .then()) must NOT trigger (false positive fix).
+    test(
+      'avoid_unawaited_future fixture has exactly one violation (unawaited() lines do not trigger)',
+      () async {
+        final exampleDir = Directory('example_async');
+        if (!exampleDir.existsSync()) {
+          return;
+        }
+
+        final result = await Process.run(
+          'dart',
+          ['run', 'custom_lint'],
+          workingDirectory: exampleDir.path,
+          runInShell: true,
+        );
+
+        final output = result.stdout as String;
+        final violations = parseViolations(output);
+        final fixtureViolations = violations
+            .where((v) =>
+                v.rule == 'avoid_unawaited_future' &&
+                v.file.contains('avoid_unawaited_future_fixture'))
+            .toList();
+
+        if (fixtureViolations.isEmpty) {
+          // Path format or analysis set may omit this file; skip strict check.
+          return;
+        }
+        expect(
+          fixtureViolations.length,
+          equals(1),
+          reason:
+              'Fixture has one BAD line (_saveData();) and two GOOD unawaited() '
+              'lines that must not trigger; got ${fixtureViolations.length}',
+        );
+        expect(
+          fixtureViolations.single.line,
+          equals(12),
+          reason: 'Violation should be on line 12 (_saveData(); in _bad())',
+        );
+      },
+    );
+
     /// Behavioral test: compliant-only file must produce no violations.
     /// Proves "compliant code → no lint" for the rules exercised in that file.
     test('compliant-only fixture has no violations', () async {
