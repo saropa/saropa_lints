@@ -30,9 +30,16 @@ from scripts.modules._utils import (
 )
 
 _RULE_CLASS_RE = re.compile(
-    r"^(?!\s*//)\s*class \w+ extends (?:SaropaLintRule|DartLintRule)",
+    r"^\s*class \w+ extends (?:SaropaLintRule|DartLintRule)",
     re.MULTILINE,
 )
+
+
+def _strip_line_comments(content: str) -> str:
+    """Remove lines that are only line comments (// or ///) so rule class regex does not count commented-out classes."""
+    lines = content.splitlines()
+    kept = [line for line in lines if not line.strip().startswith(("//", "///"))]
+    return "\n".join(kept)
 
 # First string literal argument in LintCode(...) is the rule code name.
 _LINT_NAME_RE = re.compile(
@@ -52,6 +59,7 @@ def count_rules(project_dir: Path) -> int:
         if dart_file.name == "all_rules.dart":
             continue
         content = dart_file.read_text(encoding="utf-8")
+        content = _strip_line_comments(content)
         count += len(_RULE_CLASS_RE.findall(content))
     return count
 
@@ -100,6 +108,7 @@ def _collect_category_rules(rules_dir: Path) -> list[_CategoryInfo]:
             continue
         category = dart_file.stem.replace("_rules", "")
         content = dart_file.read_text(encoding="utf-8")
+        content = _strip_line_comments(content)
         rule_count = len(_RULE_CLASS_RE.findall(content))
         names = _LINT_NAME_RE.findall(content)
         # Dedupe preserving order (some rules define multiple codes).
