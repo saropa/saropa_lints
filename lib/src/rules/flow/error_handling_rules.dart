@@ -715,6 +715,14 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
 ///
 /// Both explicitly acknowledge that you're intentionally ignoring the Future.
 ///
+/// Expression statements that are exactly a call to `unawaited(...)` are
+/// **never** reported, as they explicitly acknowledge fire-and-forget.
+///
+/// **Developer note:** The rule skips by checking the statement's expression
+/// for a top-level `MethodInvocation` with method name `unawaited` before any
+/// type resolution or chain walking, so `unawaited(...);` is never reported
+/// in all analyzer/code paths.
+///
 /// ## Exceptions (not flagged)
 /// - Futures with `.catchError()` chained
 /// - Futures with `.then(onError: ...)` callback
@@ -800,6 +808,12 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
 
     context.addExpressionStatement((ExpressionStatement node) {
       final Expression expression = node.expression;
+
+      // Expression statements that are exactly unawaited(...) are never reported.
+      if (expression is MethodInvocation &&
+          expression.methodName.name == 'unawaited') {
+        return;
+      }
 
       // Only check for fire-and-forget Future calls (unawaited futures)
       // We do NOT flag awaited futures because await propagates errors to the

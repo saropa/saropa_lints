@@ -296,6 +296,95 @@ void main() {
       test('Future with catchError should NOT trigger', () {
         expect('handled future passes', isNotNull);
       });
+
+      test('unawaited(futureCall()) must NOT trigger (explicit fire-and-forget)',
+          () async {
+        final repoRoot = Directory.current;
+        expect(
+          File(
+            '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
+          ).existsSync(),
+          isTrue,
+          reason: 'Run tests from the saropa_lints repo root.',
+        );
+
+        final tempDir = await Directory.systemTemp.createTemp(
+          'saropa_lints_uncaught_future_',
+        );
+        addTearDown(() async {
+          if (tempDir.existsSync()) {
+            await tempDir.delete(recursive: true);
+          }
+        });
+
+        final repoPathForYaml = repoRoot.path.replaceAll('\\', '/');
+
+        await Directory(
+          '${tempDir.path}${Platform.pathSeparator}lib',
+        ).create(recursive: true);
+
+        await File(
+          '${tempDir.path}${Platform.pathSeparator}pubspec.yaml',
+        ).writeAsString('''
+name: tmp_saropa_lints_consumer
+publish_to: none
+
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+
+dev_dependencies:
+  saropa_lints:
+    path: "$repoPathForYaml"
+''');
+
+        await File(
+          '${tempDir.path}${Platform.pathSeparator}analysis_options.yaml',
+        ).writeAsString('''
+plugins:
+  saropa_lints:
+    diagnostics:
+      avoid_uncaught_future_errors: true
+''');
+
+        await File(
+          '${tempDir.path}${Platform.pathSeparator}lib${Platform.pathSeparator}main.dart',
+        ).writeAsString('''
+import 'dart:async';
+
+Future<void> _futureCall() async {}
+
+void main() {
+  unawaited(_futureCall());
+}
+''');
+
+        final pubGet = await Process.run(
+          'dart',
+          ['pub', 'get'],
+          workingDirectory: tempDir.path,
+          runInShell: true,
+        );
+        expect(
+          pubGet.exitCode,
+          0,
+          reason: 'dart pub get failed:\n${pubGet.stdout}\n${pubGet.stderr}',
+        );
+
+        final analyze = await Process.run(
+          'dart',
+          ['analyze', 'lib/main.dart'],
+          workingDirectory: tempDir.path,
+          runInShell: true,
+        );
+
+        final combined = '${analyze.stdout}\n${analyze.stderr}';
+        expect(
+          combined,
+          isNot(contains('avoid_uncaught_future_errors')),
+          reason:
+              'unawaited(futureCall()) must never be reported:\n$combined',
+        );
+      }, timeout: const Timeout(Duration(minutes: 2)));
     });
 
     group('avoid_print_error', () {
