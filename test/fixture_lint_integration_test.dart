@@ -84,6 +84,7 @@ void main() {
           'avoid_async_in_build',
           'require_stream_subscription_cancel',
           'avoid_future_then_in_async',
+          'avoid_unawaited_future',
           'avoid_context_across_async',
           'prefer_secure_random_for_crypto',
           'require_completer_error_handling',

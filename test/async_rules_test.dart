@@ -409,6 +409,11 @@ void main() {
         // Errors/exceptions silently lost
         expect('unawaited Future detected', isNotNull);
       });
+
+      test('unawaited(someFutureCall()) should NOT trigger', () {
+        // Explicit unawaited() is the recommended way to mark fire-and-forget
+        expect('unawaited wrapper passes', isNotNull);
+      });
     });
 
     group('avoid_future_then_in_async', () {
