@@ -16,6 +16,12 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 **Focus: Dog Food** — This release focuses on cleaning up all lint issues in our own project (eating our own dog food).
 
+### Fixed
+
+- **use_existing_variable** — No longer reports a duplicate when two variables share the same initializer **source** but the initializer contains a method or function invocation (e.g. `Random().nextDouble()`, `DateTime.now()`). Same source was incorrectly treated as same value; such expressions can produce different values at runtime. Initializers whose AST contains any `MethodInvocation` or `FunctionExpressionInvocation` are now excluded from duplicate detection. See `bugs/history/false_positives/use_existing_variable_tosource_false_positive_resolved.md`.
+
+- **prefer_correct_for_loop_increment comment exemption** — The rule’s correction message allowed “add a comment explaining why a non-standard increment step is necessary,” but the implementation did not check for comments. The rule now exempts a for loop when a comment on the same line or the line immediately above contains one of: step, increment, spacing, stride, non-standard, intentional (case-insensitive). Unrelated comments or comments two lines above do not exempt. Quick fix: “Add comment explaining non-standard increment” inserts a placeholder comment above the loop. See `bugs/history/false_positives/prefer_correct_for_loop_increment_comment_exemption_resolved.md`.
+
 ### Added
 
 - **New stylistic rules (blank-line formatting):** `prefer_blank_line_before_else` — require a blank line before `else` / `else if` clauses. `prefer_blank_line_after_loop` — require a blank line after a for/while loop before the next statement. Both are INFO severity, stylistic tier, with quick fix (Add blank line). See [doc/guides/good_methods.md](doc/guides/good_methods.md).

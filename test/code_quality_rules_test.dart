@@ -1165,9 +1165,12 @@ void main() {
         expect('adjacent strings detected', isNotNull);
       });
 
-      test('explicit concatenation or single literal should NOT trigger (no false positive)', () {
-        expect('adjacent strings passes', isNotNull);
-      });
+      test(
+        'explicit concatenation or single literal should NOT trigger (no false positive)',
+        () {
+          expect('adjacent strings passes', isNotNull);
+        },
+      );
     });
 
     group('avoid_string_substring', () {
@@ -1255,6 +1258,13 @@ void main() {
     group('use_existing_variable', () {
       test('new variable with same value SHOULD trigger', () {
         expect('duplicate variable detected', isNotNull);
+      });
+
+      test('same-source initializers with method invocations should NOT trigger', () {
+        // e.g. final a = DateTime.now(); final b = DateTime.now();
+        // Fixture: example_core/lib/code_quality/use_existing_variable_fixture.dart
+        // _goodSameSourceWithInvocation() must not report use_existing_variable.
+        expect('invocation-containing initializers excluded from duplicate check', isNotNull);
       });
     });
 

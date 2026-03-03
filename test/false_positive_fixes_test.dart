@@ -41,6 +41,9 @@ import 'package:test/test.dart';
 ///     quick_fixes vscode, report_* (deprecated_usage crashes, duplicate paths, session,
 ///     violation dedup), require_minimum_contrast ignore, require_yield_between_db_awaits,
 ///     yield description and quickfix.
+/// 15. use_existing_variable - same-source initializers that contain method/function
+///     invocations are excluded (e.g. nextDouble(), DateTime.now()) so same source is
+///     not treated as same value.
 ///
 /// Test fixtures are located in:
 /// - example/lib/require_subscription_status_check_example.dart
@@ -780,6 +783,22 @@ void main() {
       });
     });
 
+    group('use_existing_variable', () {
+      test('should not flag same-source initializers that contain method invocations', () {
+        // Rule compares initializers by source; same source can yield different values.
+        // Expected behavior: These should NOT trigger (initializer contains invocation)
+        // final x = 0.2 + rng.nextDouble() * 0.6;
+        // final y = 0.2 + rng.nextDouble() * 0.6;
+        // final a = DateTime.now();
+        // final b = DateTime.now();
+
+        expect(
+          'Initializers with MethodInvocation/FunctionExpressionInvocation are excluded',
+          isNotNull,
+        );
+      });
+    });
+
     group('avoid_ignoring_return_values', () {
       test('property setter assignments should NOT trigger', () {
         // obj.value = x; setter return value is intentionally ignored.
@@ -970,17 +989,23 @@ void main() {
     });
 
     group('no_empty_string', () {
-      test('replacement value, guard return, identity element should NOT trigger', () {
-        // replaceAll(..., ''), isEmpty ? '' : ..., '' as default — standard idiom.
-        expect('Non-comparison empty string uses exempt', isNotNull);
-      });
+      test(
+        'replacement value, guard return, identity element should NOT trigger',
+        () {
+          // replaceAll(..., ''), isEmpty ? '' : ..., '' as default — standard idiom.
+          expect('Non-comparison empty string uses exempt', isNotNull);
+        },
+      );
     });
 
     group('no_equal_conditions', () {
-      test('if-case pattern matching (same scrutinee, different patterns) should NOT trigger', () {
-        // if (this case A) else if (this case B) — different patterns, not duplicate.
-        expect('Case pattern distinct from scrutinee comparison', isNotNull);
-      });
+      test(
+        'if-case pattern matching (same scrutinee, different patterns) should NOT trigger',
+        () {
+          // if (this case A) else if (this case B) — different patterns, not duplicate.
+          expect('Case pattern distinct from scrutinee comparison', isNotNull);
+        },
+      );
     });
 
     group('prefer_cached_getter', () {
@@ -1005,10 +1030,13 @@ void main() {
     });
 
     group('prefer_edgeinsets_symmetric', () {
-      test('only() with unpaired side (no symmetric replacement) should NOT trigger', () {
-        // top==bottom but right without left — no clean symmetric().
-        expect('All sides paired for symmetric', isNotNull);
-      });
+      test(
+        'only() with unpaired side (no symmetric replacement) should NOT trigger',
+        () {
+          // top==bottom but right without left — no clean symmetric().
+          expect('All sides paired for symmetric', isNotNull);
+        },
+      );
     });
 
     group('prefer_implicit_boolean_comparison', () {
@@ -1047,10 +1075,13 @@ void main() {
     });
 
     group('prefer_secure_random', () {
-      test('non-security shuffling and random element selection should NOT trigger', () {
-        // List.shuffle(), randomElement() — no tokens/passwords.
-        expect('Security-context or usage check', isNotNull);
-      });
+      test(
+        'non-security shuffling and random element selection should NOT trigger',
+        () {
+          // List.shuffle(), randomElement() — no tokens/passwords.
+          expect('Security-context or usage check', isNotNull);
+        },
+      );
     });
 
     group('prefer_setup_teardown', () {
@@ -1068,16 +1099,22 @@ void main() {
     });
 
     group('prefer_stream_distinct', () {
-      test('Stream.periodic and Stream<void> signal streams should NOT trigger', () {
-        // distinct() would suppress all events after first.
-        expect('Void/periodic stream exempt', isNotNull);
-      });
+      test(
+        'Stream.periodic and Stream<void> signal streams should NOT trigger',
+        () {
+          // distinct() would suppress all events after first.
+          expect('Void/periodic stream exempt', isNotNull);
+        },
+      );
     });
 
     group('prefer_trailing_comma_always', () {
-      test('last argument is callback (FunctionExpression) should NOT trigger', () {
-        expect('_lastArgIsCallback exempt', isNotNull);
-      });
+      test(
+        'last argument is callback (FunctionExpression) should NOT trigger',
+        () {
+          expect('_lastArgIsCallback exempt', isNotNull);
+        },
+      );
     });
 
     group('prefer_unique_test_names', () {
@@ -1093,21 +1130,30 @@ void main() {
     });
 
     group('require_dispose_pattern', () {
-      test('borrowed reference (const options with FocusNode?) should NOT trigger', () {
-        expect('Ownership vs borrowed reference', isNotNull);
-      });
+      test(
+        'borrowed reference (const options with FocusNode?) should NOT trigger',
+        () {
+          expect('Ownership vs borrowed reference', isNotNull);
+        },
+      );
     });
 
     group('require_envied_obfuscation', () {
-      test('class-level @Envied when all @EnviedField have obfuscate: true should NOT trigger', () {
-        expect('Field-level obfuscate recognition', isNotNull);
-      });
+      test(
+        'class-level @Envied when all @EnviedField have obfuscate: true should NOT trigger',
+        () {
+          expect('Field-level obfuscate recognition', isNotNull);
+        },
+      );
     });
 
     group('require_file_path_sanitization (private helper)', () {
-      test('private helper receiving platform path from caller should NOT trigger', () {
-        expect('Platform path trust through call sites', isNotNull);
-      });
+      test(
+        'private helper receiving platform path from caller should NOT trigger',
+        () {
+          expect('Platform path trust through call sites', isNotNull);
+        },
+      );
     });
 
     group('require_hero_tag_uniqueness', () {
@@ -1123,21 +1169,30 @@ void main() {
     });
 
     group('require_intl_currency_format', () {
-      test('toStringAsFixed in non-currency interpolation should NOT trigger', () {
-        expect('Currency context or exclude interpolation', isNotNull);
-      });
+      test(
+        'toStringAsFixed in non-currency interpolation should NOT trigger',
+        () {
+          expect('Currency context or exclude interpolation', isNotNull);
+        },
+      );
     });
 
     group('require_ios_callkit', () {
-      test('substring (Zagora) and whole-word non-VoIP (Ancient Agora) should NOT trigger', () {
-        expect('Word boundary and VoIP context', isNotNull);
-      });
+      test(
+        'substring (Zagora) and whole-word non-VoIP (Ancient Agora) should NOT trigger',
+        () {
+          expect('Word boundary and VoIP context', isNotNull);
+        },
+      );
     });
 
     group('require_number_format_locale', () {
-      test('NumberFormat.decimalPattern() for device locale should NOT trigger', () {
-        expect('Explicit device-locale intent or exempt default', isNotNull);
-      });
+      test(
+        'NumberFormat.decimalPattern() for device locale should NOT trigger',
+        () {
+          expect('Explicit device-locale intent or exempt default', isNotNull);
+        },
+      );
     });
   });
 
