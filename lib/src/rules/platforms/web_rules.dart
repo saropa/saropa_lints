@@ -366,6 +366,71 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
   }
 }
 
+// =============================================================================
+// prefer_js_interop_over_dart_js
+// =============================================================================
+
+/// Prefer stable `dart:js_interop` (Dart 3.5+) over deprecated `dart:js` / `dart:js_util`.
+///
+/// **For developers:** This rule reports any import whose URI is exactly
+/// `dart:js` or `dart:js_util`. Detection uses an exact [Set] match on
+/// [ImportDirective.uri], so there are no heuristics and no false positives
+/// from similar-looking URIs (e.g. `package:foo/dart_js.dart` or strings
+/// containing "dart:js"). One callback per file via [addImportDirective];
+/// no recursion and no full AST traversal. Impact is [LintImpact.medium]:
+/// migrating off deprecated APIs is a maintainability concern, not a crash.
+///
+/// Since: v4.x | Rule version: v1
+///
+/// **Bad:**
+/// ```dart
+/// import 'dart:js';
+/// import 'dart:js_util';
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// import 'dart:js_interop';
+/// import 'dart:js_interop_unsafe';
+/// ```
+class PreferJsInteropOverDartJsRule extends SaropaLintRule {
+  PreferJsInteropOverDartJsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_js_interop_over_dart_js',
+    '[prefer_js_interop_over_dart_js] Use stable dart:js_interop (Dart 3.5) instead of deprecated dart:js or dart:js_util. {v1}',
+    correctionMessage:
+        'Replace with import \'dart:js_interop\' and migrate to @JS() and extension types. See https://dart.dev/interop/js-interop.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  /// Exact URIs only; no substring matching to avoid false positives.
+  static const Set<String> _deprecatedJsUris = {
+    'dart:js',
+    'dart:js_util',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addImportDirective((ImportDirective node) {
+      final String? uri = node.uri.stringValue;
+      if (uri == null) return;
+      if (_deprecatedJsUris.contains(uri)) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
 // cspell:ignore myapp
 // =============================================================================
 // prefer_url_strategy_for_web

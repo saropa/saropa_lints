@@ -2363,6 +2363,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferPlatformIoConditionalRule.new,
   PreferPlatformWidgetAdaptiveRule.new,
   AvoidWebOnlyDependenciesRule.new,
+  PreferJsInteropOverDartJsRule.new,
   PreferFoundationPlatformCheckRule.new,
 
   // JSON/API rules (json_datetime_rules.dart)
@@ -2836,7 +2837,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 // =============================================================================
 // Built once on first access. Creates temporary instances to get rule names,
 // then discards them. Only the factory references are kept in memory.
-// This allows tier filtering without keeping all 1600+ rules in memory.
+// This allows tier filtering without keeping all 2050+ rules in memory.
 
 /// Lazy name→factory map, built once on first access.
 late final Map<String, SaropaLintRule Function()> _ruleFactories =
@@ -2857,7 +2858,7 @@ Map<String, SaropaLintRule Function()> _buildRuleFactoriesMap() {
 ///
 /// Only instantiates rules that are in the provided set.
 /// This is the key optimization - for essential tier (253 rules),
-/// only 253 rules are created instead of all 1600+.
+/// only 253 rules are created instead of all 2050+.
 /// Builds rule instances only for the given [ruleNames] (e.g. tier set).
 /// Used by the native plugin so only enabled-tier rules are instantiated.
 List<SaropaLintRule> getRulesFromRegistry(Set<String> ruleNames) {

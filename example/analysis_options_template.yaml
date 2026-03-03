@@ -80,11 +80,11 @@ analyzer:
 
 saropa_lints:
   # Choose one tier (required):
-  #   - essential      : ~340 rules (critical only)
-  #   - recommended    : ~850 rules (default) ← START HERE
-  #   - professional   : ~1590 rules (strict)
-  #   - comprehensive  : ~1640 rules (very strict)
-  #   - pedantic       : ~1650 rules (everything)
+  #   - essential      : ~300 rules (critical only)
+  #   - recommended    : ~900 rules (default) ← START HERE
+  #   - professional   : ~1600 rules (strict)
+  #   - comprehensive  : ~2050 rules (very strict)
+  #   - pedantic       : ~2050 rules (everything)
   tier: recommended
 
   # cspell:ignore shouldrepaint itemextent
@@ -1375,6 +1375,7 @@ saropa_lints:
     - prefer_lazy_loading_images: false            # WARNING - large images should be lazy loaded (v4.2.0)
     - require_json_schema_validation: false        # INFO - validate JSON against schema (v4.2.0)
     - prefer_json_serializable: false              # INFO - prefer json_serializable over manual parsing (v4.2.0)
+    - prefer_js_interop_over_dart_js: false        # INFO - prefer dart:js_interop over deprecated dart:js/dart:js_util
     - prefer_regex_validation: false               # INFO - use regex for input validation patterns (v4.2.0)
     - prefer_typed_prefs_wrapper: false            # INFO - wrap SharedPreferences with typed accessor (v4.2.0)
     - prefer_freezed_for_data_classes: false       # INFO - Freezed for immutable data classes (v4.2.0)
