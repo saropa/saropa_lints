@@ -1363,9 +1363,12 @@ class AvoidEquatableNestedEqualityRule extends SaropaLintRule {
         if (expr is ListLiteral) propsList = expr;
       } else if (body is BlockFunctionBody) {
         for (final Statement stmt in body.block.statements) {
-          if (stmt is ReturnStatement && stmt.expression is ListLiteral) {
-            propsList = stmt.expression as ListLiteral;
-            break;
+          if (stmt is ReturnStatement) {
+            final expr = stmt.expression;
+            if (expr is ListLiteral) {
+              propsList = expr;
+              break;
+            }
           }
         }
       }

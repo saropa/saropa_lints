@@ -362,19 +362,19 @@ class UseRefReadSynchronouslyRule extends SaropaLintRule {
 class _RefReadAfterAwaitVisitor extends RecursiveAstVisitor<void> {
   final SaropaDiagnosticReporter reporter;
   final LintCode code;
-  bool foundAwait = false;
+  bool hasFoundAwait = false;
 
   _RefReadAfterAwaitVisitor(this.reporter, this.code);
 
   @override
   void visitAwaitExpression(AwaitExpression node) {
-    foundAwait = true;
+    hasFoundAwait = true;
     super.visitAwaitExpression(node);
   }
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (foundAwait &&
+    if (hasFoundAwait &&
         node.methodName.name == 'read' &&
         node.target != null &&
         node.target.toString() == 'ref') {
@@ -447,20 +447,20 @@ class UseRefAndStateSynchronouslyRule extends SaropaLintRule {
 class _RefAfterAwaitVisitor extends RecursiveAstVisitor<void> {
   final SaropaDiagnosticReporter reporter;
   final LintCode code;
-  bool foundAwait = false;
+  bool hasFoundAwait = false;
 
   _RefAfterAwaitVisitor(this.reporter, this.code);
 
   @override
   void visitAwaitExpression(AwaitExpression node) {
-    foundAwait = true;
+    hasFoundAwait = true;
     super.visitAwaitExpression(node);
   }
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     // Only flag 'ref' - 'state' is too common a variable name
-    if (foundAwait && node.name == 'ref') {
+    if (hasFoundAwait && node.name == 'ref') {
       reporter.atNode(node);
     }
     super.visitSimpleIdentifier(node);
@@ -1027,7 +1027,8 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
       // Check for direct .value access on AsyncValue
       if (node.propertyName.name != 'value') return;
 
-      final Expression target = node.target!;
+      final Expression? target = node.target;
+      if (target == null) return;
       final String targetSource = target.toSource().toLowerCase();
 
       if (_refWatchReadRegex.any((re) => re.hasMatch(targetSource))) {
@@ -1642,6 +1643,8 @@ class RequireAutoDisposeRule extends SaropaLintRule {
     'ChangeNotifierProvider',
   };
 
+  static final RegExp _autoDisposeInTypeName = RegExp(r'\bAutoDispose\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1679,7 +1682,7 @@ class RequireAutoDisposeRule extends SaropaLintRule {
           if (_providerTypes.contains(typeName)) {
             // Check if it uses autoDispose constructor
             if (constructorName != 'autoDispose' &&
-                !RegExp(r'\bAutoDispose\b').hasMatch(typeName)) {
+                !_autoDisposeInTypeName.hasMatch(typeName)) {
               reporter.atNode(variable);
             }
           }
@@ -2355,7 +2358,7 @@ class AvoidCircularProviderDepsRule extends SaropaLintRule {
         final _ProviderDepVisitor depVisitor = _ProviderDepVisitor();
         initializer.visitChildren(depVisitor);
 
-        providerDeps[providerName]!.addAll(depVisitor.dependencies);
+        providerDeps[providerName]?.addAll(depVisitor.dependencies);
       }
     });
 
@@ -2559,6 +2562,9 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _notifierStatePattern =
+      RegExp(r'\.notifier\.state\b');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2585,10 +2591,15 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
     // Count .notifier.state mutations
     context.addAssignmentExpression((AssignmentExpression node) {
       final String source = node.leftHandSide.toSource();
-      if (!RegExp(r'\.notifier\.state\b').hasMatch(source)) return;
-      for (final String name in stateProviderMutations.keys) {
-        if (RegExp(r'\b' + RegExp.escape(name) + r'\b').hasMatch(source)) {
-          stateProviderMutations[name] = stateProviderMutations[name]! + 1;
+      if (!_notifierStatePattern.hasMatch(source)) return;
+      final Map<String, RegExp> nameRegExps = <String, RegExp>{
+        for (final String n in stateProviderMutations.keys)
+          n: RegExp(r'\b' + RegExp.escape(n) + r'\b'),
+      };
+      for (final MapEntry<String, RegExp> e in nameRegExps.entries) {
+        if (e.value.hasMatch(source)) {
+          stateProviderMutations[e.key] =
+              (stateProviderMutations[e.key] ?? 0) + 1;
         }
       }
     });
@@ -2644,6 +2655,9 @@ class RequireRiverpodLintRule extends SaropaLintRule {
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
+
+  @override
+  List<String> get configAliases => const <String>['require_riverpod_lint_package'];
 
   static const LintCode _code = LintCode(
     'require_riverpod_lint',
@@ -3217,8 +3231,9 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
   ) {
     // Check for GlobalKey<NavigatorState> in providers
     context.addVariableDeclaration((VariableDeclaration node) {
-      final String? typeName = node.parent is VariableDeclarationList
-          ? (node.parent as VariableDeclarationList).type?.toSource()
+      final AstNode? parent = node.parent;
+      final String? typeName = parent is VariableDeclarationList
+          ? parent.type?.toSource()
           : null;
 
       if (typeName == null) return;
@@ -3368,6 +3383,136 @@ class AvoidRiverpodForNetworkOnlyRule extends SaropaLintRule {
             reporter.atNode(variable);
           }
         }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_riverpod_code_gen
+// =============================================================================
+
+/// Suggests @riverpod annotation for type-safe providers.
+///
+/// Hand-written Provider declarations are error-prone. Use riverpod_generator
+/// with @riverpod for type-safe, generated providers.
+///
+/// **Bad:** final myProvider = Provider((ref) => ...);
+///
+/// **Good:** @riverpod MyType myProvider(MyProviderRef ref) => ...
+class PreferRiverpodCodeGenRule extends SaropaLintRule {
+  PreferRiverpodCodeGenRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
+  static const LintCode _code = LintCode(
+    'prefer_riverpod_code_gen',
+    '[prefer_riverpod_code_gen] Hand-written provider declaration. '
+        'Consider @riverpod and riverpod_generator for type-safe providers.',
+    correctionMessage:
+        'Use @riverpod annotation and run build_runner for generated providers.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _providerSuffixes = <String>{
+    'Provider',
+    'FutureProvider',
+    'StreamProvider',
+    'StateNotifierProvider',
+    'NotifierProvider',
+    'AsyncNotifierProvider',
+  };
+
+  static final List<RegExp> _providerSuffixRegexes = [
+    for (final String s in _providerSuffixes) RegExp('$s\\s*\\('),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final String content = context.fileContent;
+    if (RegExp(r'@riverpod\b').hasMatch(content)) return;
+    if (RegExp(r'@Riverpod\b').hasMatch(content)) return;
+
+    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+      for (final VariableDeclaration variable in node.variables.variables) {
+        final Expression? init = variable.initializer;
+        if (init == null) continue;
+        final String initSrc = init.toSource();
+        for (final RegExp re in _providerSuffixRegexes) {
+          if (re.hasMatch(initSrc)) {
+            reporter.atNode(variable);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_riverpod_keep_alive
+// =============================================================================
+
+/// Suggests ref.keepAlive() for long-lived provider state.
+///
+/// Auto-dispose providers are disposed when no longer listened to. For state
+/// that should outlive listeners (e.g. auth state), use ref.keepAlive().
+///
+/// **Bad:** Provider that should persist but relies on auto-dispose.
+///
+/// **Good:** ref.keepAlive() in provider build when state must persist.
+class PreferRiverpodKeepAliveRule extends SaropaLintRule {
+  PreferRiverpodKeepAliveRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
+  static const LintCode _code = LintCode(
+    'prefer_riverpod_keep_alive',
+    '[prefer_riverpod_keep_alive] Consider ref.keepAlive() for providers '
+        'whose state should outlive their listeners.',
+    correctionMessage:
+        'Call ref.keepAlive() inside the provider build when state must persist.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static final RegExp _asyncNotifierProvider = RegExp(r'AsyncNotifierProvider\s*<');
+  static final RegExp _notifierProvider = RegExp(r'NotifierProvider\s*<');
+  static final RegExp _refKeepAlive = RegExp(r'ref\.keepAlive\b');
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+      for (final VariableDeclaration variable in node.variables.variables) {
+        final Expression? init = variable.initializer;
+        if (init == null) continue;
+        final String initSrc = init.toSource();
+        if (!_asyncNotifierProvider.hasMatch(initSrc) &&
+            !_notifierProvider.hasMatch(initSrc)) {
+          continue;
+        }
+        if (_refKeepAlive.hasMatch(initSrc)) continue;
+        reporter.atNode(variable);
+        return;
       }
     });
   }

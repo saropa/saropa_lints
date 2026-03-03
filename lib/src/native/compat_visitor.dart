@@ -3,6 +3,12 @@
 /// Visitor bridge that converts callback-based rule registration to the
 /// native analyzer's visitor-based pattern.
 ///
+/// **Why:** Saropa rules use a callback API (`addXxx((node) => ...)`). The
+/// native analyzer expects a visitor (visitXxx(node)). [CompatVisitor] holds
+/// one optional callback per AST node type; each visitXxx() invokes the
+/// corresponding callback if set. [SaropaContext] sets these callbacks
+/// and registers this visitor with [RuleVisitorRegistry].
+///
 /// Rules register callbacks via `context.addMethodInvocation((node) {...})`.
 /// This visitor stores those callbacks and dispatches to them when the
 /// analyzer walks the AST.

@@ -34,8 +34,8 @@ class AddImportGroupCommentsFix extends SaropaFixProducer {
 
     // Bail out if there are comments between imports that would be lost.
     final content = unitResult.content;
-    final blockStart = imports.first.offset;
-    final blockEnd = imports.last.end;
+    final blockStart = imports[0].offset;
+    final blockEnd = imports[imports.length - 1].end;
     if (_hasNonGroupComments(content, imports, blockStart, blockEnd)) {
       return;
     }
@@ -93,9 +93,11 @@ class AddImportGroupCommentsFix extends SaropaFixProducer {
     ]) {
       final group = groups[groupId];
       if (group == null || group.isEmpty) continue;
+      final header = ImportGroup.headers[groupId];
+      if (header == null) continue;
       if (!firstGroup) buffer.write('\n\n');
       firstGroup = false;
-      buffer.write(ImportGroup.headers[groupId]!);
+      buffer.write(header);
       for (final imp in group) {
         buffer.write('\n');
         buffer.write(imp.toSource());

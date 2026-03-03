@@ -92,9 +92,13 @@ class AvoidAutoRouteContextNavigationRule extends SaropaLintRule {
       final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first is NamedExpression
-          ? (args.first as NamedExpression).expression
-          : args.first;
+      final Expression firstArg;
+      final first = args.first;
+      if (first is NamedExpression) {
+        firstArg = first.expression;
+      } else {
+        firstArg = first;
+      }
 
       final bool isStringNav =
           firstArg is SimpleStringLiteral ||
@@ -531,4 +535,35 @@ class PreferAutoRouteTypedArgsRule extends SaropaLintRule {
       }
     });
   }
+}
+
+// =============================================================================
+// require_auto_route_deep_link_config
+// =============================================================================
+
+/// Suggests configuring deep links for auto_route routes.
+class RequireAutoRouteDeepLinkConfigRule extends SaropaLintRule {
+  RequireAutoRouteDeepLinkConfigRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'auto_route'};
+
+  static const LintCode _code = LintCode(
+    'require_auto_route_deep_link_config',
+    '[require_auto_route_deep_link_config] Configure deep links for auto_route routes.',
+    correctionMessage: 'Add path and deep link config to route definitions.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
 }

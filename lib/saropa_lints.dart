@@ -32,6 +32,7 @@
 /// ```
 library;
 
+import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, Platform, stderr;
 
 import 'package:saropa_lints/src/baseline/baseline_config.dart';
@@ -147,7 +148,13 @@ String _resolveVersion() {
       multiLine: true,
     ).firstMatch(pubspec.readAsStringSync());
     return versionMatch?.group(1)?.trim() ?? 'unknown';
-  } catch (_) {
+  } catch (e, st) {
+    developer.log(
+      'readVersionFromPubspec failed',
+      name: 'saropa_lints',
+      error: e,
+      stackTrace: st,
+    );
     return 'unknown';
   }
 }
@@ -2986,9 +2993,11 @@ void _parseYamlSection({
 
     final entryMatch = RegExp(r'^\s+(\w+):\s*(true|false)').firstMatch(line);
     if (entryMatch != null) {
-      final name = entryMatch.group(1)!;
-      final enabled = entryMatch.group(2) == 'true';
-      onEntry(name, enabled);
+      final name = entryMatch.group(1);
+      if (name != null) {
+        final enabled = entryMatch.group(2) == 'true';
+        onEntry(name, enabled);
+      }
     }
   }
 }
@@ -3078,7 +3087,13 @@ void _loadAnalysisConfig() {
       }
       outputFromEnv = true;
     }
-  } catch (_) {
+  } catch (e, st) {
+    developer.log(
+      'loadFromEnv output config failed',
+      name: 'saropa_lints',
+      error: e,
+      stackTrace: st,
+    );
     // Platform.environment may throw on some platforms
   }
 
@@ -3098,8 +3113,11 @@ void _loadAnalysisConfig() {
         multiLine: true,
       ).firstMatch(content);
       if (match != null) {
-        final value = int.tryParse(match.group(1)!);
-        if (value != null) ProgressTracker.setMaxIssues(value);
+        final group1 = match.group(1);
+        if (group1 != null) {
+          final value = int.tryParse(group1);
+          if (value != null) ProgressTracker.setMaxIssues(value);
+        }
       }
     }
 
@@ -3109,7 +3127,8 @@ void _loadAnalysisConfig() {
         r'^output:\s*(\w+)',
         multiLine: true,
       ).firstMatch(content);
-      if (match != null && match.group(1)!.toLowerCase() == 'file') {
+      final outputGroup = match?.group(1);
+      if (match != null && outputGroup != null && outputGroup.toLowerCase() == 'file') {
         ProgressTracker.setFileOnly(fileOnly: true);
       }
     }

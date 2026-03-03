@@ -83,7 +83,8 @@ void loadBannedUsageConfig(String? content) {
     }
     final reasonMatch = reasonPattern.firstMatch(line);
     if (reasonMatch != null && currentId != null) {
-      currentReason = reasonMatch.group(1)!.trim();
+      final group1 = reasonMatch.group(1);
+      if (group1 != null) currentReason = group1.trim();
     }
   }
   if (currentId != null && currentReason != null) {

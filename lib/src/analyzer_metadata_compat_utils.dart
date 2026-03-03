@@ -20,7 +20,8 @@ List<ElementAnnotation> readElementAnnotationsFromMetadata(Object? metadata) {
     if (metadata == null) return const <ElementAnnotation>[];
 
     // 1) Prefer .annotations via dynamic (no dependency on Metadata type).
-    final anns = (metadata as dynamic).annotations;
+    final dynamic m = metadata;
+    final anns = m.annotations;
     if (anns != null) {
       if (anns is Iterable<ElementAnnotation>) return anns.toList();
       if (anns is Iterable) return anns.whereType<ElementAnnotation>().toList();
@@ -40,17 +41,22 @@ List<ElementAnnotation> readElementAnnotationsFromMetadata(Object? metadata) {
 
 bool hasDeprecatedFlag(Object? element) {
   if (element == null) return false;
+  final dynamic e = element;
   try {
-    final v = (element as dynamic).hasDeprecated;
+    final v = e.hasDeprecated;
     if (v is bool) return v;
-  } on Object {
-    // Defensive: ignore any throw, return false.
+  } on NoSuchMethodError {
+    return false;
+  } on TypeError {
+    return false;
   }
   try {
-    final v = (element as dynamic).isDeprecated;
+    final v = e.isDeprecated;
     if (v is bool) return v;
-  } on Object {
-    // Defensive: ignore any throw, return false.
+  } on NoSuchMethodError {
+    return false;
+  } on TypeError {
+    return false;
   }
   return false;
 }

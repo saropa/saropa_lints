@@ -45,7 +45,7 @@ class ImportGraphTracker {
   /// Layer weights.
   static final Map<String, double> _layerWeights = {};
 
-  static bool _computed = false;
+  static bool _isComputed = false;
   static String? _projectRoot;
   static String? _packageName;
 
@@ -105,8 +105,8 @@ class ImportGraphTracker {
   ///
   /// Idempotent — subsequent calls are no-ops until [reset].
   static void compute() {
-    if (_computed) return;
-    _computed = true;
+    if (_isComputed) return;
+    _isComputed = true;
 
     _resolveAllImports();
     _buildReverseGraph();
@@ -169,7 +169,7 @@ class ImportGraphTracker {
     _importanceScores.clear();
     _layers.clear();
     _layerWeights.clear();
-    _computed = false;
+    _isComputed = false;
     // Keep _projectRoot and _packageName — they're config, not state.
   }
 
@@ -326,11 +326,12 @@ class ImportGraphTracker {
 
   /// Convert an absolute path to relative (from project root).
   static String _toRelative(String filePath) {
-    if (_projectRoot == null) return filePath;
-    final root = _projectRoot!.replaceAll('\\', '/');
+    final root = _projectRoot;
+    if (root == null) return filePath;
+    final rootPath = root.replaceAll('\\', '/');
     final file = filePath.replaceAll('\\', '/');
-    if (file.startsWith('$root/')) {
-      return file.substring(root.length + 1);
+    if (file.startsWith('$rootPath/')) {
+      return file.substring(rootPath.length + 1);
     }
     return filePath;
   }

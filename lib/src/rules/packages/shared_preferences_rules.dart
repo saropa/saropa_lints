@@ -92,7 +92,7 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
         final String keySource = keyArg.toSource().toLowerCase();
 
         // Flag keys that suggest storing collections
-        final List<String> largeDataPatterns = <String>[
+        final List<String> largeDataPatterns = const <String>[
           'users',
           'items',
           'products',

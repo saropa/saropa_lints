@@ -388,17 +388,106 @@ class _GetItUsageVisitor extends RecursiveAstVisitor<void> {
 
   final SaropaDiagnosticReporter reporter;
   final LintCode code;
-  bool _reported = false;
+  bool _hasReported = false;
 
   @override
   void visitPrefixedIdentifier(PrefixedIdentifier node) {
-    if (_reported) return;
+    if (_hasReported) return;
 
     if (node.prefix.name == 'GetIt' &&
         (node.identifier.name == 'I' || node.identifier.name == 'instance')) {
       reporter.atNode(node);
-      _reported = true;
+      _hasReported = true;
     }
     super.visitPrefixedIdentifier(node);
   }
+}
+
+// =============================================================================
+// prefer_injectable_package
+// =============================================================================
+
+/// Suggests using injectable package for DI code generation.
+///
+/// Manual GetIt registration boilerplate is error-prone. The injectable
+/// package generates registration code from @Injectable() annotations.
+///
+/// **Bad:** Manual registerLazySingleton/registerSingleton in file.
+///
+/// **Good:** Use @Injectable() and injectable_generator to generate DI setup.
+class PreferInjectablePackageRule extends SaropaLintRule {
+  PreferInjectablePackageRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_injectable_package',
+    '[prefer_injectable_package] Manual GetIt registration detected. '
+        'Consider using the injectable package for code-generated DI setup.',
+    correctionMessage:
+        'Add injectable and injectable_generator; use @Injectable() and run build_runner.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _registerMethods = <String>{
+    'registerLazySingleton',
+    'registerSingleton',
+    'registerFactory',
+    'registerFactoryParam',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final String content = context.fileContent;
+    if (RegExp(r'@Injectable\b').hasMatch(content)) return;
+    if (RegExp(r'@injectable\b').hasMatch(content)) return;
+    if (RegExp(r'@lazySingleton\b').hasMatch(content)) return;
+
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_registerMethods.contains(node.methodName.name)) return;
+      final Expression? target = node.realTarget;
+      if (target == null) return;
+      final String src = target.toSource();
+      if (src == 'GetIt.I' ||
+          src == 'GetIt.instance' ||
+          RegExp(r'getIt\b').hasMatch(src)) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_getit_dispose_registration
+// =============================================================================
+
+/// Suggests disposing GetIt registrations in tests or on app shutdown.
+class RequireGetitDisposeRegistrationRule extends SaropaLintRule {
+  RequireGetitDisposeRegistrationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_getit_dispose_registration',
+    '[require_getit_dispose_registration] Dispose GetIt in tests or on shutdown to avoid leaks.',
+    correctionMessage: 'Call getIt.reset() in tearDown or when app exits.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
 }

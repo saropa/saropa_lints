@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 
 /// Date-based baseline for ignoring violations in code older than a specified date.
@@ -61,7 +62,13 @@ class BaselineDate {
       if (lineDate == null) return false;
 
       return lineDate.isBefore(baselineDate);
-    } catch (e) {
+    } catch (e, st) {
+      developer.log(
+        'isOlderThanBaseline failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // If git blame fails (not a git repo, file not tracked, etc.), don't suppress
       return false;
     }
@@ -123,7 +130,13 @@ class BaselineDate {
       // Parse the porcelain output to find committer-time
       final output = result.stdout?.toString() ?? '';
       return _parseCommitterTime(output);
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        '_runGitBlame failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // Git unavailable or process error
       return null;
     }
@@ -219,7 +232,13 @@ class BaselineDate {
       final lineDates = _parseFullBlame(output);
 
       _cache[filePath] = _FileDateCache()..lineDates.addAll(lineDates);
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        'preloadFile git blame failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // Git not available or file not in repo
     }
   }

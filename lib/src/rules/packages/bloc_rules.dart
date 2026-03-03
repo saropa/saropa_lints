@@ -174,6 +174,8 @@ class RequireBlocCloseRule extends SaropaLintRule {
       // Find Bloc/Cubit fields that are CREATED locally (have initializers)
       // Fields without initializers are typically injected and managed elsewhere
       final List<String> blocNames = <String>[];
+      final blocGenericPattern = RegExp(r'\bBloc\s*<');
+      final cubitGenericPattern = RegExp(r'\bCubit\s*<');
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
@@ -186,8 +188,8 @@ class RequireBlocCloseRule extends SaropaLintRule {
                 typeName != null &&
                 (typeName.endsWith('Bloc') ||
                     typeName.endsWith('Cubit') ||
-                    RegExp(r'\bBloc\s*<').hasMatch(typeName) ||
-                    RegExp(r'\bCubit\s*<').hasMatch(typeName));
+                    blocGenericPattern.hasMatch(typeName) ||
+                    cubitGenericPattern.hasMatch(typeName));
             if (isBlocOrCubitType) {
               blocNames.add(variable.name.lexeme);
               continue;
@@ -825,10 +827,11 @@ class _BlocProviderOfVisitor extends RecursiveAstVisitor<void> {
         final ArgumentList args = node.argumentList;
         bool hasListenFalse = false;
         for (final Expression arg in args.arguments) {
+          final expr = arg is NamedExpression ? arg.expression : null;
           if (arg is NamedExpression &&
               arg.name.label.name == 'listen' &&
-              arg.expression is BooleanLiteral &&
-              !(arg.expression as BooleanLiteral).value) {
+              expr is BooleanLiteral &&
+              !expr.value) {
             hasListenFalse = true;
           }
         }
@@ -982,8 +985,11 @@ class RequireErrorStateRule extends SaropaLintRule {
             break;
           }
         }
-        if (!hasErrorState && stateClasses.containsKey(baseName)) {
-          reporter.atNode(stateClasses[baseName]!, code);
+        if (!hasErrorState) {
+          final stateClass = stateClasses[baseName];
+          if (stateClass != null) {
+            reporter.atNode(stateClass, code);
+          }
         }
       }
     });
@@ -1746,13 +1752,13 @@ class CheckIsNotClosedAfterAsyncGapRule extends SaropaLintRule {
 }
 
 class _EmitAfterAwaitVisitor extends RecursiveAstVisitor<void> {
-  bool _foundAwait = false;
-  bool _insideClosedCheck = false;
+  bool _hasFoundAwait = false;
+  bool _isInsideClosedCheck = false;
   final List<MethodInvocation> emitCallsAfterAwait = <MethodInvocation>[];
 
   @override
   void visitAwaitExpression(AwaitExpression node) {
-    _foundAwait = true;
+    _hasFoundAwait = true;
     super.visitAwaitExpression(node);
   }
 
@@ -1761,9 +1767,9 @@ class _EmitAfterAwaitVisitor extends RecursiveAstVisitor<void> {
     // Check for if (!isClosed) or if (isClosed) return patterns
     final Expression condition = node.expression;
     if (_isClosedCheck(condition)) {
-      _insideClosedCheck = true;
+      _isInsideClosedCheck = true;
       node.thenStatement.accept(this);
-      _insideClosedCheck = false;
+      _isInsideClosedCheck = false;
       node.elseStatement?.accept(this);
     } else {
       super.visitIfStatement(node);
@@ -1784,7 +1790,7 @@ class _EmitAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'emit' && _foundAwait && !_insideClosedCheck) {
+    if (node.methodName.name == 'emit' && _hasFoundAwait && !_isInsideClosedCheck) {
       emitCallsAfterAwait.add(node);
     }
     super.visitMethodInvocation(node);
@@ -1879,14 +1885,13 @@ class AvoidDuplicateBlocEventHandlersRule extends SaropaLintRule {
         if (typeArgs == null || typeArgs.arguments.isEmpty) continue;
 
         final String eventType = typeArgs.arguments.first.toSource();
-        eventHandlers.putIfAbsent(eventType, () => <MethodInvocation>[]);
-        eventHandlers[eventType]!.add(onCall);
+        eventHandlers.putIfAbsent(eventType, () => <MethodInvocation>[]).add(onCall);
       }
 
       // Report duplicates
       for (final String eventType in eventHandlers.keys) {
-        final List<MethodInvocation> handlers = eventHandlers[eventType]!;
-        if (handlers.length > 1) {
+        final List<MethodInvocation>? handlers = eventHandlers[eventType];
+        if (handlers != null && handlers.length > 1) {
           // Report all but the first one
           for (int i = 1; i < handlers.length; i++) {
             reporter.atNode(handlers[i], code);
@@ -2776,13 +2781,13 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
       if (enclosingMethod == null) return;
 
       // Check if method is async
-      if (enclosingMethod.body is! BlockFunctionBody) return;
-      final body = enclosingMethod.body as BlockFunctionBody;
+      final body = enclosingMethod.body;
+      if (body is! BlockFunctionBody) return;
       if (body.keyword?.lexeme != 'async') return;
 
       // Check if emit is after an await expression
-      final methodSource = enclosingMethod.body.toSource();
-      final emitOffset = node.offset - enclosingMethod.body.offset;
+      final methodSource = body.toSource();
+      final emitOffset = node.offset - body.offset;
 
       // Simple heuristic: check if there's an await before this emit
       final beforeEmit = methodSource.substring(
@@ -3020,8 +3025,8 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
       // Check if async method
-      if (node.body is! BlockFunctionBody) return;
-      final body = node.body as BlockFunctionBody;
+      final body = node.body;
+      if (body is! BlockFunctionBody) return;
       if (body.keyword?.lexeme != 'async') return;
 
       // Check if in Bloc class
@@ -3207,6 +3212,11 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
     'StreamSubscription',
   };
 
+  static final Map<String, RegExp> _disposableTypeRegex = {
+    for (final String t in _disposableTypes)
+      t: RegExp(r'\b' + RegExp.escape(t) + r'\b'),
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3229,9 +3239,8 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null) {
             for (final String disposableType in _disposableTypes) {
-              if (RegExp(
-                r'\b' + RegExp.escape(disposableType) + r'\b',
-              ).hasMatch(typeName)) {
+              final regex = _disposableTypeRegex[disposableType];
+              if (regex != null && regex.hasMatch(typeName)) {
                 for (final VariableDeclaration variable
                     in member.fields.variables) {
                   disposableFields.add(variable.name.lexeme);
@@ -3348,6 +3357,8 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
+  static final RegExp _onEventPattern = RegExp(r'on<(\w+)>');
+
   static const LintCode _code = LintCode(
     'prefer_cubit_for_simple_state',
     '[prefer_cubit_for_simple_state] Bloc with single event type. Use Cubit for simpler code. Bloc is designed for complex state management with multiple events. When a Bloc only has one event type, a Cubit is simpler and more direct. {v3}',
@@ -3378,14 +3389,15 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
           final String bodySource = member.body.toSource();
 
           // Find all on<EventType> patterns
-          final RegExp onEventPattern = RegExp(r'on<(\w+)>');
-          final Iterable<RegExpMatch> matches = onEventPattern.allMatches(
-            bodySource,
-          );
+          final Iterable<RegExpMatch> matches =
+              _onEventPattern.allMatches(bodySource);
 
           for (final RegExpMatch match in matches) {
-            eventHandlerCount++;
-            eventTypes.add(match.group(1)!);
+            final group1 = match.group(1);
+            if (group1 != null) {
+              eventHandlerCount++;
+              eventTypes.add(group1);
+            }
           }
         }
       }
@@ -4355,7 +4367,10 @@ class AvoidReturningValueFromCubitMethodsRule extends SaropaLintRule {
 
     if (hasEmit) {
       // Method both emits and returns a value - warn
-      reporter.atNode(method.returnType!, code);
+      final returnType = method.returnType;
+      if (returnType != null) {
+        reporter.atNode(returnType, code);
+      }
     }
   }
 }
@@ -4750,8 +4765,7 @@ class AvoidOverengineeredBlocStatesRule extends SaropaLintRule {
       if (extendsClause != null) {
         final String superclass = extendsClause.superclass.toSource();
         if (superclass.endsWith('State')) {
-          stateHierarchy.putIfAbsent(superclass, () => <ClassDeclaration>[]);
-          stateHierarchy[superclass]!.add(node);
+          stateHierarchy.putIfAbsent(superclass, () => <ClassDeclaration>[]).add(node);
         }
       }
     });

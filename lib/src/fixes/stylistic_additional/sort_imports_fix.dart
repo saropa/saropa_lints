@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/source_range.dart';
+import 'package:collection/collection.dart';
 
 import '../../import_utils.dart';
 import '../../native/saropa_fix.dart';
@@ -34,8 +35,9 @@ class SortImportsFix extends SaropaFixProducer {
 
     // Bail out if there are comments between imports that would be lost.
     final content = unitResult.content;
-    final blockStart = imports.first.offset;
-    final blockEnd = imports.last.end;
+    final blockStart = imports.firstOrNull?.offset;
+    final blockEnd = imports.lastOrNull?.end;
+    if (blockStart == null || blockEnd == null) return;
     if (_hasNonImportComments(content, imports, blockStart, blockEnd)) {
       return;
     }

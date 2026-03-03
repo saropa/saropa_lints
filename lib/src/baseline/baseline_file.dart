@@ -48,8 +48,9 @@ class BaselineFile {
       if (decoded is! Map<String, dynamic>) return null;
 
       return BaselineFile.fromJson(decoded);
-    } catch (_) {
-      // Invalid JSON or format - return null
+    } on FormatException {
+      return null;
+    } on IOException {
       return null;
     }
   }
@@ -62,13 +63,15 @@ class BaselineFile {
       return BaselineFile(violations: {}, generated: DateTime.now());
     }
 
-    final version = json['version'] is int ? json['version'] as int : 1;
+    final v = json['version'];
+    final version = v is int ? v : 1;
     if (version > currentVersion) {
       // Unknown version: return empty baseline instead of throwing
       return BaselineFile(violations: {}, generated: DateTime.now());
     }
 
-    final generatedStr = json['generated'] as String?;
+    final g = json['generated'];
+    final generatedStr = g is String ? g : null;
     final generated = generatedStr != null && generatedStr.trim().isNotEmpty
         ? (DateTime.tryParse(generatedStr) ?? DateTime.now())
         : DateTime.now();
@@ -127,8 +130,9 @@ class BaselineFile {
       final file = File(path);
       final encoder = const JsonEncoder.withIndent('  ');
       file.writeAsStringSync(encoder.convert(toJson()));
-    } catch (_) {
-      // Caller can check file system separately if needed
+    } on IOException catch (e) {
+      // Best-effort write; log and continue so caller is not forced to handle
+      print('Baseline save failed: $e');
     }
   }
 

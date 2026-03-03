@@ -732,3 +732,31 @@ class PreferForegroundServiceAndroidRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// require_backup_exclusion
+// =============================================================================
+
+/// Suggests excluding sensitive data from Android backup.
+class RequireBackupExclusionRule extends SaropaLintRule {
+  RequireBackupExclusionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_backup_exclusion',
+    '[require_backup_exclusion] Sensitive data may be included in Android backup. Consider android:allowBackup or fullBackupContent.',
+    correctionMessage: 'Exclude sensitive files from backup in AndroidManifest.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {}
+}

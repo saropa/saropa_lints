@@ -1,7 +1,9 @@
 // ignore_for_file: avoid_print
 
+import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, Platform, stderr;
 
+import 'package:path/path.dart' as path;
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
 import 'package:saropa_lints/src/report/batch_data.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
@@ -84,7 +86,13 @@ class ReportConsolidator {
       try {
         final content = sessionFile.readAsStringSync().trim();
         if (content.isNotEmpty) return content;
-      } catch (_) {
+      } catch (e, st) {
+        developer.log(
+          'initSession read session file failed',
+          name: 'saropa_lints',
+          error: e,
+          stackTrace: st,
+        );
         // Fall through to create new session
       }
     }
@@ -148,7 +156,13 @@ class ReportConsolidator {
       if (batchDir.existsSync()) {
         batchDir.deleteSync(recursive: true);
       }
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        'cleanupSession failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // Cleanup failure is non-critical.
     }
   }
@@ -156,8 +170,11 @@ class ReportConsolidator {
   /// Delete batch files and session markers older than [_sessionTimeout].
   static void _cleanupStaleSessions(String reportsDir) {
     try {
-      final sep = Platform.pathSeparator;
-      final sessionFile = File('$reportsDir$sep$_sessionFileName');
+      final base = path.normalize(reportsDir);
+      final sessionPath = path.join(base, _sessionFileName);
+      if (!path.isWithin(base, sessionPath)) return;
+
+      final sessionFile = File(sessionPath);
       if (!sessionFile.existsSync()) return;
 
       final age = DateTime.now().difference(sessionFile.lastModifiedSync());
@@ -165,11 +182,20 @@ class ReportConsolidator {
 
       // Session is stale — remove it and all batch files.
       sessionFile.deleteSync();
-      final batchDir = Directory('$reportsDir$sep$_batchDirName');
+      final batchDirPath = path.join(base, _batchDirName);
+      if (!path.isWithin(base, batchDirPath)) return;
+
+      final batchDir = Directory(batchDirPath);
       if (batchDir.existsSync()) {
         batchDir.deleteSync(recursive: true);
       }
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        '_cleanupStaleSessions failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // Cleanup failure is non-critical.
     }
   }
@@ -221,11 +247,23 @@ class ReportConsolidator {
           final content = entity.readAsStringSync();
           final batch = BatchData.fromJsonString(content);
           if (batch != null) batches.add(batch);
-        } catch (_) {
+        } catch (e, st) {
+          developer.log(
+            '_readAllBatches batch file read failed',
+            name: 'saropa_lints',
+            error: e,
+            stackTrace: st,
+          );
           // Skip corrupted or locked files.
         }
       }
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        '_readAllBatches list directory failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // If the directory can't be listed, return what we have.
     }
     return batches;

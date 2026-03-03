@@ -100,13 +100,14 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
 
       // Find Worker fields
       final List<String> workerFields = <String>[];
+      final workerListRegex = RegExp(r'\bList\s*<\s*Worker\s*>');
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null &&
               (typeName == 'Worker' ||
                   typeName == 'Worker?' ||
-                  RegExp(r'\bList\s*<\s*Worker\s*>').hasMatch(typeName))) {
+                  workerListRegex.hasMatch(typeName))) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
               workerFields.add(variable.name.lexeme);
@@ -780,12 +781,12 @@ class RequireGetxLazyPutRule extends SaropaLintRule {
 
   bool _isInGlobalContext(AstNode node) {
     AstNode? current = node.parent;
+    final initSetupRegex = RegExp(r'\b(init|setup|configure)\b');
     while (current != null) {
       if (current is FunctionDeclaration) {
         // Check if it's main() or setup-like function
         final String name = current.name.lexeme;
-        if (name == 'main' ||
-            RegExp(r'\b(init|setup|configure)\b').hasMatch(name)) {
+        if (name == 'main' || initSetupRegex.hasMatch(name)) {
           return true;
         }
       }
@@ -975,19 +976,15 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
 
       bool hasDisposable = false;
       bool hasOnClose = false;
+      final disposableTypesRegex = RegExp(
+        r'\b(' + _disposableTypes.map(RegExp.escape).join(r'|') + r')\b',
+      );
 
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName != null) {
-            for (final String disposable in _disposableTypes) {
-              if (RegExp(
-                r'\b' + RegExp.escape(disposable) + r'\b',
-              ).hasMatch(typeName)) {
-                hasDisposable = true;
-                break;
-              }
-            }
+          if (typeName != null && disposableTypesRegex.hasMatch(typeName)) {
+            hasDisposable = true;
           }
         }
 
@@ -1626,7 +1623,8 @@ class PreferGetxBuilderRule extends SaropaLintRule {
       if (node.propertyName.name != 'value') return;
 
       // Check if target ends with .obs pattern (word-boundary to avoid FPs)
-      final Expression target = node.target!;
+      final target = node.target;
+      if (target == null) return;
       final String targetSource = target.toSource();
       if (!RegExp(r'\.obs\b').hasMatch(targetSource) &&
           !RegExp(r'\bRx\b').hasMatch(targetSource) &&

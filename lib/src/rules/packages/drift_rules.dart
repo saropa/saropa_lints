@@ -1275,10 +1275,10 @@ class PreferDriftIsolateSharingRule extends SaropaLintRule {
       // Extract the file path argument source
       final pathArg = args.first.toSource();
 
-      if (dbPaths.containsKey(pathArg)) {
+      final existing = dbPaths[pathArg];
+      if (existing != null) {
         // Second instance with same path — flag both
-        final first = dbPaths[pathArg]!;
-        reporter.atNode(first);
+        reporter.atNode(existing);
         reporter.atNode(node);
       } else {
         dbPaths[pathArg] = node;
@@ -1457,14 +1457,13 @@ class RequireDriftSchemaVersionBumpRule extends SaropaLintRule {
 
       // Check @DriftDatabase annotation for table count
       int tableCount = 0;
+      final tablesListRegex = RegExp(r'tables:\s*\[([^\]]*)\]');
       for (final annotation in node.metadata) {
         final name = annotation.name.name;
         if (name == 'DriftDatabase') {
           final source = annotation.toSource();
           // Count commas in tables list as heuristic for table count
-          final tablesMatch = RegExp(
-            r'tables:\s*\[([^\]]*)\]',
-          ).firstMatch(source);
+          final tablesMatch = tablesListRegex.firstMatch(source);
           if (tablesMatch != null) {
             final tablesContent = tablesMatch.group(1) ?? '';
             tableCount = tablesContent.split(',').length;
@@ -1475,12 +1474,13 @@ class RequireDriftSchemaVersionBumpRule extends SaropaLintRule {
       if (tableCount < 3) return; // Only flag with 3+ tables
 
       // Find schemaVersion getter
+      final schemaVersionOneRegex = RegExp(r'=>\s*1\s*;');
       for (final member in node.members) {
         if (member is MethodDeclaration &&
             member.name.lexeme == 'schemaVersion' &&
             member.isGetter) {
           final bodySource = member.body.toSource();
-          if (RegExp(r'=>\s*1\s*;').hasMatch(bodySource)) {
+          if (schemaVersionOneRegex.hasMatch(bodySource)) {
             reporter.atNode(member);
           }
           return;
@@ -2127,11 +2127,12 @@ class RequireDriftReadTableOrNullRule extends SaropaLintRule {
       if (!fileImportsPackage(node, PackageImports.drift)) return;
 
       // Check if the enclosing method/function body contains leftOuterJoin
+      final leftOuterJoinRegex = RegExp(r'\bleftOuterJoin\b');
       AstNode? current = node.parent;
       while (current != null) {
         if (current is MethodDeclaration || current is FunctionExpression) {
           final bodySource = current.toSource();
-          if (RegExp(r'\bleftOuterJoin\b').hasMatch(bodySource)) {
+          if (leftOuterJoinRegex.hasMatch(bodySource)) {
             reporter.atNode(node.methodName);
           }
           return;
@@ -2271,11 +2272,12 @@ class AvoidDriftValidateSchemaProductionRule extends SaropaLintRule {
       if (node.methodName.name != 'validateDatabaseSchema') return;
 
       // Check if inside a kDebugMode guard
+      final debugModeRegex = RegExp(r'\b(kDebugMode|kReleaseMode)\b');
       AstNode? current = node.parent;
       while (current != null) {
         if (current is IfStatement) {
           final condSource = current.expression.toSource();
-          if (RegExp(r'\b(kDebugMode|kReleaseMode)\b').hasMatch(condSource)) {
+          if (debugModeRegex.hasMatch(condSource)) {
             return; // Properly guarded
           }
         }
@@ -2716,12 +2718,13 @@ class RequireDriftOnUpgradeHandlerRule extends SaropaLintRule {
 
       // Find schemaVersion getter
       int schemaVersion = 0;
+      final schemaVersionMatchRegex = RegExp(r'=>\s*(\d+)\s*;');
       for (final member in node.members) {
         if (member is MethodDeclaration &&
             member.name.lexeme == 'schemaVersion' &&
             member.isGetter) {
           final bodySource = member.body.toSource();
-          final match = RegExp(r'=>\s*(\d+)\s*;').firstMatch(bodySource);
+          final match = schemaVersionMatchRegex.firstMatch(bodySource);
           if (match != null) {
             schemaVersion = int.tryParse(match.group(1) ?? '') ?? 0;
           }
@@ -2733,8 +2736,9 @@ class RequireDriftOnUpgradeHandlerRule extends SaropaLintRule {
 
       // Check if any member source mentions onUpgrade (cheaper than full
       // class toSource() — only stringifies individual members)
+      final onUpgradeRegex = RegExp(r'\bonUpgrade\b');
       for (final member in node.members) {
-        if (RegExp(r'\bonUpgrade\b').hasMatch(member.toSource())) return;
+        if (onUpgradeRegex.hasMatch(member.toSource())) return;
       }
 
       reporter.atNode(node);

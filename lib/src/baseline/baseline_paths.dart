@@ -23,6 +23,8 @@
 /// ```
 library;
 
+import 'dart:developer' as developer;
+
 class BaselinePaths {
   BaselinePaths(List<String>? patterns)
       : _patterns = _compilePatterns(patterns ?? const []);
@@ -56,7 +58,13 @@ class BaselinePaths {
       if (p.trim().isEmpty) continue;
       try {
         result.add(_CompiledPattern(p));
-      } catch (_) {
+      } catch (e, st) {
+        developer.log(
+          '_compilePatterns: skip malformed pattern',
+          name: 'saropa_lints',
+          error: e,
+          stackTrace: st,
+        );
         // Skip malformed pattern
       }
     }

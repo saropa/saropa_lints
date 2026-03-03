@@ -1,5 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 
+import 'dart:developer' as developer;
+
 /// Reusable quick-fix base: delete the violation node (or an ancestor via [findTargetNode]).
 /// Used by fixes that remove dead code, redundant statements, or deprecated usages.
 import 'package:analyzer/dart/ast/ast.dart';
@@ -38,7 +40,13 @@ abstract class DeleteNodeFix extends SaropaFixProducer {
       await builder.addDartFileEdit(file, (b) {
         b.addDeletion(SourceRange(offset, length));
       });
-    } catch (_) {
+    } catch (e, st) {
+      developer.log(
+        'DeleteNodeFix addDartFileEdit failed',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
       // Builder or edit may fail; avoid propagating
     }
   }
