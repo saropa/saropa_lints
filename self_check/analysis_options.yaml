@@ -1,0 +1,9 @@
+# Run the full saropa_lints rule set (pedantic) on the saropa_lints package.
+# Usage: from repo root: dart pub get --directory self_check && dart analyze self_check
+include: package:saropa_lints/tiers/pedantic.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.gen.dart"
