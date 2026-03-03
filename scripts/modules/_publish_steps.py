@@ -11,8 +11,14 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
+import re
 import subprocess
+import sys
+import threading
+import time
+from datetime import datetime
 from pathlib import Path
+from typing import NamedTuple
 
 from scripts.modules._utils import (
     Color,
@@ -38,6 +44,63 @@ from scripts.modules._pubdev_lint import (
 from scripts.modules._version_changelog import (
     validate_changelog_version,
 )
+
+
+class _AnalysisCounts(NamedTuple):
+    """Parsed error/warning/info counts from dart analyze output."""
+
+    errors: int
+    warnings: int
+    infos: int
+
+    @property
+    def total(self) -> int:
+        return self.errors + self.warnings + self.infos
+
+
+def _parse_analysis_counts(output: str) -> _AnalysisCounts:
+    """Extract error/warning/info counts from dart analyze output.
+
+    Matches both diagnostic lines (  error - ...) and plugin summary
+    (Errors:   N, Warnings: N, Info:     N).
+    """
+    errors = warnings = infos = 0
+    for line in output.splitlines():
+        stripped = line.strip()
+        # Diagnostic line: "error - path:line:col - ..." or "warning - ...", "info - ..."
+        if re.match(r"^(error|warning|info)\s+-\s+", stripped, re.IGNORECASE):
+            kind = stripped.split("-", 1)[0].strip().lower()
+            if kind == "error":
+                errors += 1
+            elif kind == "warning":
+                warnings += 1
+            else:
+                infos += 1
+            continue
+        # Plugin summary block: "Errors:   5", "Warnings: 12", "Info:     100"
+        m = re.search(r"Errors:\s*(\d+)", stripped, re.IGNORECASE)
+        if m:
+            errors = int(m.group(1))
+        m = re.search(r"Warnings:\s*(\d+)", stripped, re.IGNORECASE)
+        if m:
+            warnings = int(m.group(1))
+        m = re.search(r"Info:\s*(\d+)", stripped, re.IGNORECASE)
+        if m:
+            infos = int(m.group(1))
+    return _AnalysisCounts(errors=errors, warnings=warnings, infos=infos)
+
+
+def _spinner_while(running: threading.Event, message: str = "Working") -> None:
+    """Print a spinning indicator until running is cleared (daemon thread)."""
+    chars = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+    idx = 0
+    while running.is_set():
+        sys.stdout.write(f"\r  {chars[idx % len(chars)]} {message}...   ")
+        sys.stdout.flush()
+        idx += 1
+        time.sleep(0.08)
+    sys.stdout.write("\r" + " " * (len(message) + 12) + "\r")
+    sys.stdout.flush()
 
 
 def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
@@ -468,7 +531,7 @@ def run_format(project_dir: Path) -> bool:
 
 
 def run_analysis(project_dir: Path) -> bool:
-    """Step 7: Run static analysis."""
+    """Step 7: Run static analysis with log file and colorful summary."""
     print_header("STEP 7: RUNNING STATIC ANALYSIS")
 
     print_info("Checking for pub.dev lint issues...")
@@ -505,13 +568,82 @@ def run_analysis(project_dir: Path) -> bool:
     else:
         print_success("No pub.dev lint issues found")
 
-    result = run_command(
-        ["dart", "analyze", "--fatal-infos"],
-        project_dir,
-        "Analyzing code (matching CI: dart analyze --fatal-infos)",
-        summarize=True,
+    # Log file: date-prefixed, in reports/
+    reports_dir = project_dir / "reports"
+    reports_dir.mkdir(exist_ok=True)
+    now = datetime.now()
+    date_prefix = now.strftime("%Y%m%d")
+    time_suffix = now.strftime("%H%M%S")
+    log_name = f"{date_prefix}_analysis_violations_{time_suffix}.log"
+    log_path = reports_dir / log_name
+
+    print_info(f"Running dart analyze (output → reports/{log_name})")
+    use_shell = get_shell_mode()
+
+    # Spinner while analyzer runs
+    running = threading.Event()
+    running.set()
+    spinner = threading.Thread(
+        target=_spinner_while,
+        args=(running, "Analyzing"),
+        daemon=True,
     )
-    return result.returncode == 0
+    spinner.start()
+
+    try:
+        result = subprocess.run(
+            ["dart", "analyze", "--fatal-infos"],
+            cwd=project_dir,
+            capture_output=True,
+            text=True,
+            shell=use_shell,
+        )
+    finally:
+        running.clear()
+        spinner.join(timeout=0.5)
+
+    combined = (result.stdout or "") + (result.stderr or "")
+    log_path.write_text(combined, encoding="utf-8", errors="replace")
+
+    counts = _parse_analysis_counts(combined)
+
+    # Colorful summary
+    print()
+    print_colored("  ─── Analysis report ───", Color.CYAN)
+    if counts.total == 0:
+        print_success("No issues found.")
+    else:
+        if counts.errors > 0:
+            print_colored(
+                f"  ● Errors:   {counts.errors}",
+                Color.RED,
+            )
+        if counts.warnings > 0:
+            print_colored(
+                f"  ● Warnings: {counts.warnings}",
+                Color.YELLOW,
+            )
+        if counts.infos > 0:
+            print_colored(
+                f"  ● Info:     {counts.infos}",
+                Color.CYAN,
+            )
+        print_colored(
+            f"  ● Total:    {counts.total}",
+            Color.BOLD,
+        )
+    print_colored(f"  Full log: {log_path}", Color.DIM)
+    print()
+
+    if result.returncode != 0:
+        print_error(
+            f"Analysis failed (exit code {result.returncode}). "
+            f"CI uses dart analyze --fatal-infos; fix issues and re-run."
+        )
+        return False
+
+    print_success("Static analysis completed (no fatal issues)")
+    return True
 
 
 def validate_changelog(
