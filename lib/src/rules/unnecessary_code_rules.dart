@@ -10,11 +10,12 @@ import '../fixes/unnecessary_code/invert_unnecessary_negation_fix.dart';
 import '../fixes/unnecessary_code/remove_extends_object_fix.dart';
 import '../fixes/unnecessary_code/use_is_empty_or_is_not_empty_fix.dart';
 import '../fixes/unnecessary_code/remove_unnecessary_call_fix.dart';
-import '../fixes/unnecessary_code/no_empty_block_todo_fix.dart';
+import '../fixes/unnecessary_code/add_no_empty_block_ignore_fix.dart';
 import '../fixes/unnecessary_code/no_empty_string_prefer_is_empty_fix.dart';
 import '../fixes/unnecessary_code/remove_unnecessary_block_fix.dart';
 import '../fixes/unnecessary_code/remove_unnecessary_enum_argument_fix.dart';
 import '../fixes/unnecessary_code/remove_unnecessary_enum_prefix_fix.dart';
+import '../fixes/unnecessary_code/remove_unnecessary_getter_fix.dart';
 import '../fixes/unnecessary_code/remove_unnecessary_super_fix.dart';
 import '../fixes/unnecessary_code/replace_null_aware_spread_fix.dart';
 
@@ -631,6 +632,12 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryGetterFix(context: context),
+  ];
 }
 
 /// Warns when length > 0 or length != 0 can be replaced with isNotEmpty.
@@ -956,7 +963,7 @@ class NoEmptyBlockRule extends SaropaLintRule {
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
-        NoEmptyBlockTodoFix(context: context),
+        AddNoEmptyBlockIgnoreFix(context: context),
   ];
 
   /// Checks if there's an ignore comment for this rule on the same line as the node.

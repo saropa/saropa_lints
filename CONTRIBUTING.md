@@ -306,7 +306,9 @@ All rules should have quick fixes when feasible:
    - **Debug/intentional code**: Comment out to preserve developer history
    - **Wrap/add required code**: Add missing parameters, wrap with widgets, etc.
 
-#### HACK Comment Fixes Are Discouraged
+#### HACK and TODO Comment Fixes Are Prohibited
+
+**Do NOT add quick fixes that only insert a `// TODO: ...` or `// HACK: ...` comment at the violation.** They add no value over the lint itself and clutter the fix list. Only implement fixes that make a real code change (replace/delete/insert that resolves or meaningfully addresses the violation).
 
 **Do NOT use `// HACK:` comment fixes as a shortcut.** These provide no real value:
 

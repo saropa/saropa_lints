@@ -16,7 +16,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 
-- **Quick fix batches (QUICK_FIX_PLAN):** Batch 2 — `avoid_bloc_event_in_constructor` and `prefer_const_widgets` fixtures + quick-fix tests. Batch 3 — `prefer_capitalized_comment_start`, `prefer_const_declarations`, `prefer_final_locals` quick-fix tests; type fixtures with real BAD/GOOD. Batch 4 — `avoid_redundant_pragma_inline`, `avoid_unused_parameters`, `avoid_weak_cryptographic_algorithms` quick-fix tests. Batch 5 — `avoid_unnecessary_getter` fix (RemoveUnnecessaryGetterFix); `no_empty_block` real fix (AddNoEmptyBlockIgnoreFix). All batches: fixtures present, unit tests verify fixGenerators. See `bugs/QUICK_FIX_PLAN.md`.
+- **Quick fix batches (QUICK_FIX_PLAN):** Batch 2 — `avoid_bloc_event_in_constructor` and `prefer_const_widgets` fixtures + quick-fix tests. Batch 3 — `prefer_capitalized_comment_start`, `prefer_const_declarations`, `prefer_final_locals` quick-fix tests; type fixtures with real BAD/GOOD. Batch 4 — `avoid_redundant_pragma_inline`, `avoid_unused_parameters`, `avoid_weak_cryptographic_algorithms` quick-fix tests; `avoid_weak_cryptographic_algorithms` now uses ReplaceWeakCryptoFix (replaces md5/sha1 with sha256). Batch 5 — `avoid_unnecessary_getter` fix (RemoveUnnecessaryGetterFix); `no_empty_block` real fix (AddNoEmptyBlockIgnoreFix). All batches: fixtures present, unit tests verify fixGenerators. See `bugs/QUICK_FIX_PLAN.md`.
 
 - **Defensive coding and robustness:** Parameter validation, null/empty handling, and error handling across core utilities and baseline/config. No behavioral change for valid inputs. Covers: `normalizePath`, `BloomFilter`, `ProjectContext` (findProjectRoot, getPackageName, getProjectInfo, hasDependency), config loader, baseline config/manager/file/paths/date, banned usage config, `SaropaContext`/`SaropaFixProducer`, common fix bases (insert/replace/delete), comment/ignore utils, and plugin registration in `main.dart`. New unit tests in `test/defensive_coding_test.dart` (50 cases) for null/empty and edge cases.
 
@@ -27,6 +27,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - **Batch 3 roadmap rules (High importance):** `require_error_message_clarity`, `require_error_recovery`, `require_firebase_email_enumeration_protection`, `require_firebase_composite_index` (existing), `require_firebase_offline_persistence`, `require_focus_order`, `require_getit_dispose_registration`, `require_heading_hierarchy`, `require_performance_test`, `require_image_memory_cache_limit`, `require_interface_for_dependency`, `require_json_date_format_consistency`, `require_keychain_access`, `require_permission_lifecycle_observer`, `require_provider_update_should_notify`, `require_reduced_motion_support`, `require_rtl_support`, `require_sqflite_index_for_queries`, `require_stream_cancel_on_error`. All INFO severity; professional tier. (`require_https_only_test` was already implemented.)
 
 - **Batch 4 roadmap rules (High + Medium/Low):** `require_webview_user_agent`, `require_will_pop_scope`, `require_subscription_composite`, `use_closest_build_context`, `use_specific_deprecation`, `avoid_screenshot_in_ci`, `prefer_test_report`, `avoid_semantics_in_animation`, `prefer_announce_for_changes`, `prefer_show_hide`, `require_link_distinction`, `require_switch_control`, `prefer_deferred_imports`, `prefer_part_over_import`, `prefer_weak_references`, `prefer_zone_error_handler`, `require_multi_factor`, `prefer_isar_for_complex_queries`, `prefer_external_keyboard`, `prefer_outlined_icons`. All INFO severity; professional tier.
+
+### Removed
+
+- **Insert-TODO quick fixes (additional):** Removed `WeakCryptoTodoFix` (avoid_weak_cryptographic_algorithms) and `NoEmptyBlockTodoFix` (no_empty_block); replaced with real fixes per project policy (CONTRIBUTING.md, QUICK_FIX_PLAN.md).
 
 ### Documentation
 

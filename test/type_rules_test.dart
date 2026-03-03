@@ -355,5 +355,19 @@ void main() {
         expect('prefer_type_over_var passes', isNotNull);
       });
     });
+
+    group('prefer_final_locals', () {
+      test('rule offers quick fix (add final to local)', () {
+        final rule = PreferFinalLocalsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+    });
+
+    group('prefer_const_declarations', () {
+      test('rule offers quick fix (use const instead of final)', () {
+        final rule = PreferConstDeclarationsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+    });
   });
 }

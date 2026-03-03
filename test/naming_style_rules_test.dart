@@ -247,6 +247,11 @@ void main() {
     });
 
     group('prefer_capitalized_comment_start', () {
+      test('rule offers quick fix (capitalize first letter)', () {
+        final rule = FormatCommentRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('prefer_capitalized_comment_start SHOULD trigger', () {
         // Better alternative available: prefer capitalized comment start
         expect('prefer_capitalized_comment_start detected', isNotNull);

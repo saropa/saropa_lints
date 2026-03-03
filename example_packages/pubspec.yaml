@@ -8,6 +8,7 @@ environment:
 dependencies:
   saropa_lints_example:
     path: ../example
+  bloc: ^8.1.0
   crypto: ^3.0.0
 
 dev_dependencies:

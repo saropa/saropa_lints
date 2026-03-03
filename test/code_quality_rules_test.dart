@@ -891,6 +891,11 @@ void main() {
 
   group('Dead Code & Unused Rules', () {
     group('avoid_unused_parameters', () {
+      test('rule offers quick fix (prefix parameter with underscore)', () {
+        final rule = AvoidUnusedParametersRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('declared but unreferenced parameter SHOULD trigger', () {
         expect('unused parameter detected', isNotNull);
       });
@@ -1311,6 +1316,11 @@ void main() {
 
   group('Annotation & Pragma Rules', () {
     group('avoid_redundant_pragma_inline', () {
+      test('rule offers quick fix (remove redundant pragma)', () {
+        final rule = AvoidRedundantPragmaInlineRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('pragma inline on trivial method SHOULD trigger', () {
         expect('redundant pragma detected', isNotNull);
       });
@@ -1391,6 +1401,11 @@ void main() {
     });
 
     group('avoid_weak_cryptographic_algorithms', () {
+      test('rule offers quick fix (replace with sha256)', () {
+        final rule = AvoidWeakCryptographicAlgorithmsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('MD5 or SHA-1 usage SHOULD trigger', () {
         expect('weak crypto detected', isNotNull);
       });
