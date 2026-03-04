@@ -2,22 +2,43 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+/// Resolves the saropa_lints repo root by walking up from [start] until
+/// a directory containing pubspec.yaml with name "saropa_lints" is found.
+Directory _findRepoRoot([Directory? start]) {
+  var dir = start ?? Directory.current;
+  while (true) {
+    final pubspec = File('${dir.path}${Platform.pathSeparator}pubspec.yaml');
+    if (pubspec.existsSync()) {
+      final content = pubspec.readAsStringSync();
+      if (content.contains('name: saropa_lints') ||
+          content.contains('name: saropa_lints\n')) {
+        return dir;
+      }
+    }
+    final parent = dir.parent;
+    if (parent.path == dir.path) break;
+    dir = parent;
+  }
+  return Directory.current;
+}
+
 /// Regression test for handle_throwing_invocations rule.
 ///
 /// Ensures the rule does not crash the analyzer plugin when reading
 /// element metadata (MetadataImpl vs Iterable across analyzer versions).
-/// See: bugs/history/rule_bugs/report_element_metadata_not_iterable_handle_throwing_invocations.md
+/// Includes non-thrower and try/catch cases to guard against false positives.
 void main() {
   test(
     'handle_throwing_invocations does not crash analyzer plugin (MetadataImpl)',
     () async {
-      final repoRoot = Directory.current;
+      final repoRoot = _findRepoRoot();
+      final pubspecFile =
+          File('${repoRoot.path}${Platform.pathSeparator}pubspec.yaml');
       expect(
-        File(
-          '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
-        ).existsSync(),
+        pubspecFile.existsSync(),
         isTrue,
-        reason: 'Run tests from the saropa_lints repo root.',
+        reason: 'Run tests from the saropa_lints repo (or a subdir). '
+            'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
       );
 
       final tempDir = await Directory.systemTemp.createTemp(
@@ -109,13 +130,14 @@ void main() {
   test(
     'handle_throwing_invocations does not report when inside try/catch',
     () async {
-      final repoRoot = Directory.current;
+      final repoRoot = _findRepoRoot();
+      final pubspecFile =
+          File('${repoRoot.path}${Platform.pathSeparator}pubspec.yaml');
       expect(
-        File(
-          '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
-        ).existsSync(),
+        pubspecFile.existsSync(),
         isTrue,
-        reason: 'Run tests from the saropa_lints repo root.',
+        reason: 'Run tests from the saropa_lints repo (or a subdir). '
+            'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
       );
 
       final tempDir = await Directory.systemTemp.createTemp(
@@ -199,13 +221,14 @@ void main() {
   test(
     'handle_throwing_invocations does not report on non-thrower (no false positive)',
     () async {
-      final repoRoot = Directory.current;
+      final repoRoot = _findRepoRoot();
+      final pubspecFile =
+          File('${repoRoot.path}${Platform.pathSeparator}pubspec.yaml');
       expect(
-        File(
-          '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
-        ).existsSync(),
+        pubspecFile.existsSync(),
         isTrue,
-        reason: 'Run tests from the saropa_lints repo root.',
+        reason: 'Run tests from the saropa_lints repo (or a subdir). '
+            'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
       );
 
       final tempDir = await Directory.systemTemp.createTemp(
