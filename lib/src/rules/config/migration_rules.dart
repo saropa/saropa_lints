@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/source_range.dart';
 
+import '../../fixes/config/replace_asset_manifest_json_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 // =============================================================================
@@ -82,6 +83,12 @@ class AvoidAssetManifestJsonRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceAssetManifestJsonFix(context: context),
+  ];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

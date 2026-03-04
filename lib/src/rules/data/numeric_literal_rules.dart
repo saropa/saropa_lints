@@ -5,6 +5,12 @@ import 'package:analyzer/dart/ast/ast.dart';
 import '../../literal_context_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/numeric_literal/add_digit_separators_fix.dart';
+import '../../fixes/numeric_literal/prefer_addition_subtraction_assignments_fix.dart';
+import '../../fixes/numeric_literal/double_literal_format_fix.dart';
+import '../../fixes/numeric_literal/normalize_digit_separators_fix.dart';
+import '../../fixes/numeric_literal/prefer_compound_assignment_operators_fix.dart';
+import '../../fixes/numeric_literal/remove_digit_separators_fix.dart';
+import '../../fixes/numeric_literal/remove_unnecessary_digit_separators_fix.dart';
 
 /// Warns when digit separators are not grouped consistently.
 ///
@@ -97,6 +103,12 @@ class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        NormalizeDigitSeparatorsFix(context: context),
+  ];
 }
 
 /// Warns when digit separators are used unnecessarily.
@@ -165,6 +177,12 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryDigitSeparatorsFix(context: context),
+  ];
 }
 
 /// Warns when double literals don't follow a consistent format.
@@ -210,6 +228,12 @@ class DoubleLiteralFormatRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        DoubleLiteralFormatFix(context: context),
+  ];
 }
 
 /// Warns when magic numbers are used instead of named constants.
@@ -455,6 +479,12 @@ class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferAdditionSubtractionAssignmentsFix(context: context),
+  ];
 }
 
 /// Warns when binary operators can be simplified to compound assignment.
@@ -521,6 +551,12 @@ class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferCompoundAssignmentOperatorsFix(context: context),
+  ];
 }
 
 /// Warns when large numbers don't use digit separators.
@@ -685,6 +721,12 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveDigitSeparatorsFix(context: context),
+  ];
 }
 
 /// Warns when magic numbers are used in test files.

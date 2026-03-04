@@ -5,7 +5,9 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../fixes/exception/remove_leading_underscore_from_exception_class_fix.dart';
 import '../../fixes/exception/remove_try_catch_only_rethrow_fix.dart';
+import '../../fixes/exception/replace_throw_with_rethrow_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Warns when exception classes have non-final fields.
@@ -180,6 +182,12 @@ class AvoidThrowInCatchBlockRule extends SaropaLintRule {
       node.body.visitChildren(_ThrowVisitor(reporter, code));
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceThrowWithRethrowFix(context: context),
+  ];
 }
 
 class _ThrowVisitor extends RecursiveAstVisitor<void> {
@@ -322,4 +330,10 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveLeadingUnderscoreFromExceptionClassFix(context: context),
+  ];
 }

@@ -2156,6 +2156,93 @@ class PreferConstConstructorsInImmutablesRule extends SaropaLintRule {
   }
 }
 
+/// Prefer declaring constructors as const when the class has only final fields.
+///
+/// Since: (roadmap task_prefer_const_constructor_declarations)
+///
+/// When all instance fields are final and the class has a generative
+/// constructor, adding `const` enables const instances and compile-time
+/// evaluation. This rule applies to plain classes; @immutable and Widget
+/// subclasses are covered by [PreferConstConstructorsInImmutablesRule].
+///
+/// **Bad:**
+/// ```dart
+/// class Config {
+///   final String url;
+///   Config(this.url);
+/// }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// class Config {
+///   final String url;
+///   const Config(this.url);
+/// }
+/// ```
+class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
+  PreferConstConstructorDeclarationsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'prefer_const_constructor_declarations',
+    '[prefer_const_constructor_declarations] Constructor could be const. '
+        'Class has only final fields; add const to the constructor declaration.',
+    correctionMessage:
+        'Add the const keyword to the constructor. Ensure all initializers are const-capable.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      if (_isImmutableOrWidget(node)) return;
+
+      bool allFinal = true;
+      ConstructorDeclaration? nonConstGenConstructor;
+
+      for (final ClassMember m in node.members) {
+        if (m is FieldDeclaration && !m.isStatic) {
+          if (!m.fields.isFinal || m.fields.isLate) allFinal = false;
+        } else if (m is ConstructorDeclaration) {
+          if (m.factoryKeyword == null) {
+            if (m.constKeyword == null) {
+              nonConstGenConstructor = m;
+            }
+          }
+        }
+      }
+
+      if (!allFinal || nonConstGenConstructor == null) return;
+      reporter.atNode(nonConstGenConstructor);
+    });
+  }
+
+  static bool _isImmutableOrWidget(ClassDeclaration node) {
+    for (final Annotation a in node.metadata) {
+      if (a.name.name == 'immutable') return true;
+    }
+    final ExtendsClause? ext = node.extendsClause;
+    if (ext != null) {
+      final String sup = ext.superclass.name.lexeme;
+      if (sup == 'StatelessWidget' ||
+          sup == 'StatefulWidget' ||
+          sup == 'Widget') {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
 /// Warns when a class field is never reassigned and could be final.
 ///
 /// Since: v6.0.8 | Rule version: v1

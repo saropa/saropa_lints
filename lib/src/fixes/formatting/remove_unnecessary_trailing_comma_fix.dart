@@ -29,10 +29,20 @@ class RemoveUnnecessaryTrailingCommaFix extends SaropaFixProducer {
     final listLit = node.thisOrAncestorOfType<ListLiteral>();
     final setMap = node.thisOrAncestorOfType<SetOrMapLiteral>();
     if (listLit != null) {
-      return _removeFromLiteral(listLit, listLit.elements, listLit.rightBracket, builder);
+      return _removeFromLiteral(
+        listLit,
+        listLit.elements,
+        listLit.rightBracket,
+        builder,
+      );
     }
     if (setMap != null) {
-      return _removeFromLiteral(setMap, setMap.elements, setMap.rightBracket, builder);
+      return _removeFromLiteral(
+        setMap,
+        setMap.elements,
+        setMap.rightBracket,
+        builder,
+      );
     }
     return Future.value();
   }

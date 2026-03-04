@@ -40,6 +40,11 @@ class AddDigitSeparatorsFix extends SaropaFixProducer {
     });
   }
 
+  /// Exposed for [NormalizeDigitSeparatorsFix]; normalizes digit separator grouping.
+  static String addSeparatorsForNormalize(String literal) {
+    return _addSeparators(literal);
+  }
+
   static String _addSeparators(String literal) {
     if (literal.startsWith('0x') || literal.startsWith('0X')) {
       final hex = literal.substring(2).replaceAll('_', '');

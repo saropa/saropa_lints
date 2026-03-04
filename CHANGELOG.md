@@ -28,19 +28,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 
-- **Roadmap rules (bugs/roadmap/README.md):**
   - `prefer_geolocation_coarse_location` — Now fully implemented (was stub). Warns when `Geolocator.getCurrentPosition` or `getPositionStream` use `LocationAccuracy.best` or `.high`; suggests `.low` or `.balanced` for battery and privacy. Config alias: `prefer_geolocator_coarse_location`.
   - `prefer_const_constructor_declarations` — Prefer declaring constructors as `const` when the class has only final fields (plain classes; @immutable and Widget subclasses remain covered by `prefer_const_constructors_in_immutables`). INFO, comprehensive tier.
-
-- **History integration (checklist batches):** Integrated 51 `bugs/history` files; each is covered by unit tests, code comments, and/or changelogs/ROADMAP as below.
-  - **11 not_viable/roadmap:** Rationale for each rule in ROADMAP.md § Rules reviewed and not viable → Roadmap (AST/infra/heuristic barriers). No code/tests (rules not implemented by design).
-  - **7 plans:** drift_support_plan, file_structure, framework_feature_upgrade_suggestions, ROADMAP_NATIVE_PLUGIN, rule_versioning_plan, task_test_coverage_improvement_plan, TIER_AND_SEVERITY_ANALYSIS — content in ROADMAP/CHANGELOG/tiers/UNIT_TEST_COVERAGE/LINKS (this changelog entry; ROADMAP; UNIT_TEST_COVERAGE.md; LINKS.md).
-  - **2 releases:** v4.12.2_abort_rerun_config, ci_analyzer_fixes_2026 — covered by existing CHANGELOG release notes and this entry.
-  - **5 roadmap/summary:** README, nine_rules_implemented_2026, roadmap_detail_12, SUMMARY_18, SUMMARY — rule lists covered by ROADMAP and CHANGELOG (implemented rules already in code/tests/changelog).
-  - **25 roadmap/task (plain):** task_avoid_cascades through task_prefer_class_destructuring — implemented rules covered by existing rule code, unit tests, and CHANGELOG; planned rules covered by ROADMAP. Checklist since removed.
-  - **50 roadmap/task (plain):** task_prefer_closest_context through task_require_firebase_token_refresh — integrated and removed; planned rules in ROADMAP, implemented rules in code/tests/CHANGELOG. Section removed from checklist (total 137; checklist since removed).
-  - **50 roadmap/task_info:** task_ℹ️_avoid_bool_in_widget_constructors through task_ℹ️_require_public_api_documentation — integrated and removed; INFO-severity task specs; planned rules in ROADMAP, implemented in code/tests/CHANGELOG. Section removed from checklist (total 87).
-  - **Remaining 87 bugs/history files (Phase 2):** All reviewed and integrated without losing any useful information. 6 task_octopus (🐙), 7 task_star (⭐), 62 task_warning (⚠️), 4 todos, 5 misc (tooling, user_reports, completed, README). Content was in integration archives (since removed). Files deleted.
 
 ---
 

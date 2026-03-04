@@ -1414,14 +1414,13 @@ void main() {
 
     group('avoid_stateful_widget_in_list', () {
       test('StatefulWidget in ListView.builder SHOULD trigger', () {
-        // Loses State when scrolled
-        expect('StatefulWidget in list detected', isNotNull);
+        expect(AvoidStatefulWidgetInListRule().code.name, 'avoid_stateful_widget_in_list');
       });
     });
 
     group('avoid_fitted_box_for_text', () {
       test('FittedBox around Text SHOULD trigger', () {
-        expect('FittedBox for text detected', isNotNull);
+        expect(AvoidFittedBoxForTextRule().code.name, 'avoid_fitted_box_for_text');
       });
     });
   });

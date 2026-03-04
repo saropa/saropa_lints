@@ -9,6 +9,9 @@ import 'package:analyzer/dart/element/type.dart';
 
 import '../../fixes/type/prefer_const_declarations_fix.dart';
 import '../../fixes/type/prefer_final_locals_fix.dart';
+import '../../fixes/type/remove_null_assertion_fix.dart';
+import '../../fixes/type/replace_unnecessary_type_assertion_fix.dart';
+import '../../fixes/type/remove_unnecessary_type_cast_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Warns when casting to an extension type.
@@ -637,6 +640,12 @@ class AvoidNullAssertionRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveNullAssertionFix(context: context),
+  ];
 
   /// Checks if the null assertion is safe because it follows a ??= assignment.
   ///
@@ -1615,6 +1624,12 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceUnnecessaryTypeAssertionFix(context: context),
+  ];
 }
 
 /// Warns when a type cast (as) is unnecessary.
@@ -1679,6 +1694,12 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryTypeCastFix(context: context),
+  ];
 }
 
 /// Warns when an 'is' type check can never be true.

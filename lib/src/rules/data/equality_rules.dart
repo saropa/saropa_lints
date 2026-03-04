@@ -7,6 +7,7 @@ import '../../saropa_lint_rule.dart';
 import '../../fixes/equality/remove_self_assignment_fix.dart';
 import '../../fixes/equality/use_date_time_difference_fix.dart';
 import '../../fixes/equality/use_direct_equality_fix.dart';
+import '../../fixes/equality/replace_self_compare_with_constant_fix.dart';
 import '../../fixes/equality/use_not_equals_fix.dart';
 
 /// Warns when comparing an expression to itself (x == x).
@@ -62,6 +63,12 @@ class AvoidEqualExpressionsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceSelfCompareWithConstantFix(context: context),
+  ];
 }
 
 /// Warns when negation is used in equality checks.
@@ -244,6 +251,12 @@ class AvoidSelfCompareRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceSelfCompareWithConstantFix(context: context),
+  ];
 }
 
 /// Warns when compareTo is used for equality instead of ==.

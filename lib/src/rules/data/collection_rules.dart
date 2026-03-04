@@ -17,6 +17,7 @@ import '../../fixes/collection/use_last_fix.dart';
 import '../../fixes/collection/use_where_or_null_fix.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/collection/use_contains_fix.dart';
+import '../../fixes/collection/replace_unnecessary_collection_wrapper_fix.dart';
 import '../../fixes/collection/use_first_fix.dart';
 
 /// Warns when comparing collections using == operator.
@@ -293,6 +294,12 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceUnnecessaryCollectionWrapperFix(context: context),
+  ];
 }
 
 /// Warns when using .first or .last on potentially empty collections.
