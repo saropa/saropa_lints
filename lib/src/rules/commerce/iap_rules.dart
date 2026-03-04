@@ -219,7 +219,9 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
   };
 
   static final List<RegExp> _premiumIndicatorPatterns = _premiumIndicators
-      .map((s) => RegExp(r'\b' + RegExp.escape(s) + r'\b', caseSensitive: false))
+      .map(
+        (s) => RegExp(r'\b' + RegExp.escape(s) + r'\b', caseSensitive: false),
+      )
       .toList();
 
   static final List<RegExp> _statusCheckPatterns = <RegExp>[

@@ -1130,7 +1130,10 @@ class AvoidLongParameterListRule extends SaropaLintRule {
   /// Skip reporting for copyWith (standard Dart pattern) or when all parameters
   /// are optional (no required positional/named), which does not match the
   /// rule's intent (hard-to-call, too much work).
-  static bool _shouldSkipLongParameterList(String? name, FormalParameterList params) {
+  static bool _shouldSkipLongParameterList(
+    String? name,
+    FormalParameterList params,
+  ) {
     if (name == 'copyWith') return true;
     for (final FormalParameter p in params.parameters) {
       if (p.isRequiredPositional || p.isRequiredNamed) return false;
@@ -3663,7 +3666,8 @@ class PreferDeferredImportsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_deferred_imports',
     '[prefer_deferred_imports] Use deferred imports for large optional libraries.',
-    correctionMessage: 'Use import \'package:foo/foo.dart\' deferred as foo; and await foo.loadLibrary().',
+    correctionMessage:
+        'Use import \'package:foo/foo.dart\' deferred as foo; and await foo.loadLibrary().',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -3690,7 +3694,8 @@ class PreferPartOverImportRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_part_over_import',
     '[prefer_part_over_import] Prefer part/part of for same-package splits over import.',
-    correctionMessage: 'Use part \'bar.dart\'; in library and part of in part file when splitting same package.',
+    correctionMessage:
+        'Use part \'bar.dart\'; in library and part of in part file when splitting same package.',
     severity: DiagnosticSeverity.INFO,
   );
 

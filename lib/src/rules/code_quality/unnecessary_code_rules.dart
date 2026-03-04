@@ -961,7 +961,6 @@ class NoEmptyBlockRule extends SaropaLintRule {
       }
     });
   }
-
 }
 
 /// Warns when an empty string literal is used.

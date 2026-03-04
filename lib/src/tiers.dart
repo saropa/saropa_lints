@@ -72,6 +72,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_optional_named_params',
   'prefer_optional_positional_params',
   'prefer_positional_bool_params',
+  'prefer_named_bool_params', // Opt-in; overlaps avoid_positional_boolean_parameters
   'prefer_if_else_over_guards',
   'prefer_cascade_assignments',
   'prefer_factory_constructor',
@@ -2671,7 +2672,6 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_notification_custom_sound',
   'prefer_overlay_portal_layout_builder',
   'prefer_permission_minimal_request',
-  'prefer_readable_line_length',
   'prefer_riverpod_code_gen',
   'prefer_riverpod_keep_alive',
   'prefer_root_detection',
@@ -2684,7 +2684,6 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_using_for_temp_resources',
   'prefer_webview_sandbox',
   'prefer_whitelist_validation',
-  'require_addAutomaticKeepAlives_off',
   'require_api_response_validation',
   'require_api_version_handling',
   'require_auto_route_deep_link_config',

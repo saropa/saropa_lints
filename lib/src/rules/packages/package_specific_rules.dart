@@ -578,8 +578,9 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
               ).hasMatch(disposeMethod.body.toSource()));
 
       if (!hasCleanup && RegExp(r'\.listen\s*\(').hasMatch(classSource)) {
-        final keyboardControllerPattern =
-            RegExp(r'\bKeyboardVisibilityController\b');
+        final keyboardControllerPattern = RegExp(
+          r'\bKeyboardVisibilityController\b',
+        );
         for (final ClassMember member in node.members) {
           if (member is FieldDeclaration) {
             final String fieldSource = member.toSource();
@@ -670,8 +671,7 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName != null &&
-              speechToTextPattern.hasMatch(typeName)) {
+          if (typeName != null && speechToTextPattern.hasMatch(typeName)) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
               speechFieldNames.add(variable.name.lexeme);

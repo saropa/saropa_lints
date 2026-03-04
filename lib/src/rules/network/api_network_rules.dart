@@ -811,8 +811,9 @@ class PreferStreamingResponseRule extends SaropaLintRule {
     RegExp(r'\bFile\s*\('),
     RegExp(r'\bsavePath\b'),
   ];
-  static final RegExp _responseTypeStreamPattern =
-      RegExp(r'\bResponseType\.stream\b');
+  static final RegExp _responseTypeStreamPattern = RegExp(
+    r'\bResponseType\.stream\b',
+  );
 
   @override
   void runWithReporter(
@@ -3747,7 +3748,8 @@ class PreferStaleWhileRevalidateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_stale_while_revalidate',
     '[prefer_stale_while_revalidate] Consider stale-while-revalidate for cached API data.',
-    correctionMessage: 'Serve cached data immediately and refresh in background.',
+    correctionMessage:
+        'Serve cached data immediately and refresh in background.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -3775,7 +3777,8 @@ class RequireApiResponseValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_api_response_validation',
     '[require_api_response_validation] API response used without validation. Validate shape before use.',
-    correctionMessage: 'Check response fields or use json_serializable with fromJson.',
+    correctionMessage:
+        'Check response fields or use json_serializable with fromJson.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -3808,7 +3811,8 @@ class RequireApiVersionHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_api_version_handling',
     '[require_api_version_handling] Consider API version in URL or headers.',
-    correctionMessage: 'Include version in path or Accept header for API compatibility.',
+    correctionMessage:
+        'Include version in path or Accept header for API compatibility.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -3836,7 +3840,8 @@ class RequireContentTypeValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_content_type_validation',
     '[require_content_type_validation] Response body parsed without Content-Type check.',
-    correctionMessage: 'Check response.headers Content-Type before parsing body.',
+    correctionMessage:
+        'Check response.headers Content-Type before parsing body.',
     severity: DiagnosticSeverity.INFO,
   );
 

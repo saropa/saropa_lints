@@ -4183,7 +4183,8 @@ class RequireFocusOrderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_focus_order',
     '[require_focus_order] Consider focusOrder for keyboard and screen reader navigation.',
-    correctionMessage: 'Set focusOrder on FocusNode or use FocusTraversalOrder.',
+    correctionMessage:
+        'Set focusOrder on FocusNode or use FocusTraversalOrder.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -4237,7 +4238,8 @@ class RequireReducedMotionSupportRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_reduced_motion_support',
     '[require_reduced_motion_support] Respect MediaQuery.reducedMotion.',
-    correctionMessage: 'Check reducedMotion and shorten or disable animations when set.',
+    correctionMessage:
+        'Check reducedMotion and shorten or disable animations when set.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -4264,7 +4266,8 @@ class AvoidSemanticsInAnimationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_semantics_in_animation',
     '[avoid_semantics_in_animation] Avoid semantics that change during animation; can confuse screen readers.',
-    correctionMessage: 'Exclude semantics from animated subtree or announce after animation.',
+    correctionMessage:
+        'Exclude semantics from animated subtree or announce after animation.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -4291,7 +4294,8 @@ class PreferAnnounceForChangesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_announce_for_changes',
     '[prefer_announce_for_changes] Announce live region changes for screen readers.',
-    correctionMessage: 'Use Semantics(liveRegion: true) or SemanticsService.announce.',
+    correctionMessage:
+        'Use Semantics(liveRegion: true) or SemanticsService.announce.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -4318,7 +4322,8 @@ class PreferShowHideRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_show_hide',
     '[prefer_show_hide] Prefer semantics show/hide for conditional content for screen readers.',
-    correctionMessage: 'Use Semantics(visible: false) or ExcludeSemantics when hiding.',
+    correctionMessage:
+        'Use Semantics(visible: false) or ExcludeSemantics when hiding.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -4345,7 +4350,8 @@ class RequireLinkDistinctionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_link_distinction',
     '[require_link_distinction] Links should be distinguishable (e.g. underline, role).',
-    correctionMessage: 'Use link role and visible link styling for accessibility.',
+    correctionMessage:
+        'Use link role and visible link styling for accessibility.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -4372,7 +4378,8 @@ class RequireSwitchControlRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_switch_control',
     '[require_switch_control] Support switch control / external input for key actions.',
-    correctionMessage: 'Ensure focus order and activation work with switch control.',
+    correctionMessage:
+        'Ensure focus order and activation work with switch control.',
     severity: DiagnosticSeverity.INFO,
   );
 

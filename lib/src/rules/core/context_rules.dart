@@ -487,7 +487,8 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
 
         // Get BuildContext parameter names
         final contextParamNames = <String>[];
-        for (final param in node.parameters?.parameters ?? <FormalParameter>[]) {
+        for (final param
+            in node.parameters?.parameters ?? <FormalParameter>[]) {
           final name = getBuildContextParamName(param);
           if (name != null) contextParamNames.add(name);
         }
@@ -1237,7 +1238,8 @@ class UseClosestBuildContextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'use_closest_build_context',
     '[use_closest_build_context] Prefer the closest BuildContext to avoid inheriting from wrong scope.',
-    correctionMessage: 'Use context from the widget that actually provides the dependency.',
+    correctionMessage:
+        'Use context from the widget that actually provides the dependency.',
     severity: DiagnosticSeverity.INFO,
   );
 

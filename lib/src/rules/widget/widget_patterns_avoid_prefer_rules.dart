@@ -142,7 +142,12 @@ class AvoidMissingImageAltRule extends SaropaLintRule {
 
       // Check for Image.asset, Image.network, etc.
       final String methodName = node.methodName.name;
-      if (const <String>['asset', 'network', 'file', 'memory'].contains(methodName)) {
+      if (const <String>[
+        'asset',
+        'network',
+        'file',
+        'memory',
+      ].contains(methodName)) {
         _checkForSemanticLabelInMethod(node, reporter);
       }
     });
@@ -3459,8 +3464,9 @@ class AvoidDoubleTapSubmitRule extends SaropaLintRule {
       // Check if this looks like a submit button
       if (childText == null) return;
       final text = childText;
-      bool isSubmitButton =
-          _submitKeywords.any((String keyword) => text.contains(keyword));
+      bool isSubmitButton = _submitKeywords.any(
+        (String keyword) => text.contains(keyword),
+      );
       if (!isSubmitButton) return;
 
       // Check if onPressed has any conditional logic

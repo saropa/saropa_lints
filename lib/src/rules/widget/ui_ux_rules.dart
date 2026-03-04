@@ -942,8 +942,7 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         final source = current.toSource().toLowerCase();
-        if (isEmptyRegex.hasMatch(source) ||
-            isNotEmptyRegex.hasMatch(source)) {
+        if (isEmptyRegex.hasMatch(source) || isNotEmptyRegex.hasMatch(source)) {
           return; // Has empty check
         }
         if (current is ConditionalExpression ||
@@ -1750,7 +1749,8 @@ class PreferOutlinedIconsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_outlined_icons',
     '[prefer_outlined_icons] Prefer outlined icons for consistency and clarity.',
-    correctionMessage: 'Use Icons.*_outlined where available for Material 3 style.',
+    correctionMessage:
+        'Use Icons.*_outlined where available for Material 3 style.',
     severity: DiagnosticSeverity.INFO,
   );
 

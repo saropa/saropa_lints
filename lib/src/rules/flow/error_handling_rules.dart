@@ -14,6 +14,7 @@ import 'package:analyzer/dart/element/element.dart';
 
 import '../../analyzer_metadata_compat_utils.dart';
 import '../../saropa_lint_rule.dart';
+import '../../fixes/error_handling/add_rethrow_in_catch_fix.dart';
 import '../../fixes/error_handling/change_exception_to_object_fix.dart';
 
 /// Warns when catch block swallows exception without logging.
@@ -94,6 +95,12 @@ class AvoidSwallowingExceptionsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddRethrowInCatchFix(context: context),
+  ];
 }
 
 class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
@@ -1227,11 +1234,9 @@ class _UiErrorDisplayVisitor extends RecursiveAstVisitor<void> {
         if (expr is SimpleIdentifier && expr.name == exceptionName) {
           return true;
         }
-        if (expr is MethodInvocation &&
-            expr.methodName.name == 'toString') {
+        if (expr is MethodInvocation && expr.methodName.name == 'toString') {
           final target = expr.target;
-          if (target is SimpleIdentifier &&
-              target.name == exceptionName) {
+          if (target is SimpleIdentifier && target.name == exceptionName) {
             return true;
           }
         }
@@ -2630,7 +2635,8 @@ class RequireErrorContextInLogsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_error_context_in_logs',
     '[require_error_context_in_logs] Error logged without context. Include user/request id for debugging.',
-    correctionMessage: 'Add context (e.g. userId, requestId) to error log messages.',
+    correctionMessage:
+        'Add context (e.g. userId, requestId) to error log messages.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -2658,7 +2664,8 @@ class RequireErrorMessageClarityRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_error_message_clarity',
     '[require_error_message_clarity] Use clear, user-facing error messages.',
-    correctionMessage: 'Avoid technical jargon; explain what went wrong and next steps.',
+    correctionMessage:
+        'Avoid technical jargon; explain what went wrong and next steps.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -2713,7 +2720,8 @@ class PreferZoneErrorHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_zone_error_handler',
     '[prefer_zone_error_handler] Use runZonedGuarded or Zone.handleUncaughtError for top-level errors.',
-    correctionMessage: 'Wrap main or runApp in runZonedGuarded to catch async errors.',
+    correctionMessage:
+        'Wrap main or runApp in runZonedGuarded to catch async errors.',
     severity: DiagnosticSeverity.INFO,
   );
 

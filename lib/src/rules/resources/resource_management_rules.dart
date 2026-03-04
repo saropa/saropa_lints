@@ -174,21 +174,30 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Skip known false-positive files that reference 'openDatabase' only in
-    // string literals (e.g. methodName != 'openDatabase') not as invocations.
-    final String path = context.filePath.replaceAll(r'\', '/');
-    final bool isOwnRuleFile = path.contains('file_handling_rules.dart') ||
+    // Skip when analyzing this package's own rule files (avoids self-trigger on
+    // openDatabase in string literals/regex). Path format can differ by SDK/OS.
+    final String path = context.filePath.replaceAll(r'\', '/').toLowerCase();
+    final bool isOwnRuleFile =
+        path.contains('src/rules/') ||
+        path.contains('resource_management_rules.dart') ||
+        path.contains('file_handling_rules.dart') ||
         path.contains('sqflite_rules.dart');
 
     context.addMethodDeclaration((MethodDeclaration node) {
-      if (isOwnRuleFile) return;
-
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
+
+      if (isOwnRuleFile) return;
 
       // Require an actual invocation (e.g. openDatabase(...)), not just the name
       // in a string (e.g. methodName != 'openDatabase' in rule code).
       if (!_dbOpenInvocationOnly.hasMatch(bodySource)) {
+        return;
+      }
+
+      // Skip when body only references the name (e.g. methodName != 'openDatabase').
+      if (bodySource.indexOf("'openDatabase'") >= 0 &&
+          bodySource.indexOf('methodName') >= 0) {
         return;
       }
 

@@ -750,7 +750,8 @@ class RequireBackupExclusionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_backup_exclusion',
     '[require_backup_exclusion] Sensitive data may be included in Android backup. Consider android:allowBackup or fullBackupContent.',
-    correctionMessage: 'Exclude sensitive files from backup in AndroidManifest.',
+    correctionMessage:
+        'Exclude sensitive files from backup in AndroidManifest.',
     severity: DiagnosticSeverity.INFO,
   );
 

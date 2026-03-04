@@ -1650,7 +1650,9 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
   PreferContextReadInCallbacksRule() : super(code: _code);
 
   @override
-  List<String> get configAliases => const <String>['prefer_context_read_not_watch'];
+  List<String> get configAliases => const <String>[
+    'prefer_context_read_not_watch',
+  ];
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2057,8 +2059,8 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
             // Check for patterns like ref.watch(provider).property or
             // ref.watch(provider).field
             // This suggests the Consumer is only using one property
-            final Iterable<RegExpMatch> matches =
-                _singlePropertyPattern.allMatches(bodySource);
+            final Iterable<RegExpMatch> matches = _singlePropertyPattern
+                .allMatches(bodySource);
 
             // If we only see one property being accessed from the watched
             // provider, suggest using Selector
@@ -2585,7 +2587,8 @@ class RequireProviderUpdateShouldNotifyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_provider_update_should_notify',
     '[require_provider_update_should_notify] ChangeNotifier should call notifyListeners() when state changes.',
-    correctionMessage: 'Call notifyListeners() after mutating state so listeners rebuild.',
+    correctionMessage:
+        'Call notifyListeners() after mutating state so listeners rebuild.',
     severity: DiagnosticSeverity.INFO,
   );
 

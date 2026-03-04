@@ -336,7 +336,10 @@ List<String> _findOwnedFieldsOfType(ClassDeclaration node, String typeName) {
       for (final String fieldName in fieldOwnership.keys) {
         if (fieldOwnership[fieldName] != true) {
           if (_initStateAssignsFieldOfType(
-              initStateBody, fieldName, typeName)) {
+            initStateBody,
+            fieldName,
+            typeName,
+          )) {
             fieldOwnership[fieldName] = true;
           }
         }
@@ -356,7 +359,10 @@ List<String> _findOwnedFieldsOfType(ClassDeclaration node, String typeName) {
 /// `fieldName = typeName(` or `fieldName = typeName.` (with optional
 /// whitespace), using string matching to avoid RegExp in loops.
 bool _initStateAssignsFieldOfType(
-    String body, String fieldName, String typeName) {
+  String body,
+  String fieldName,
+  String typeName,
+) {
   int idx = 0;
   while (true) {
     idx = body.indexOf(fieldName, idx);
@@ -372,7 +378,8 @@ bool _initStateAssignsFieldOfType(
       if ((code >= 0x61 && code <= 0x7A) || // a-z
           (code >= 0x41 && code <= 0x5A) || // A-Z
           (code >= 0x30 && code <= 0x39) || // 0-9
-          code == 0x5F) { // _
+          code == 0x5F) {
+        // _
         idx = after;
         continue;
       }
@@ -400,8 +407,7 @@ bool _initStateAssignsFieldOfType(
       continue;
     }
     final next = i + typeName.length;
-    if (next < body.length &&
-        (body[next] == '(' || body[next] == '.')) {
+    if (next < body.length && (body[next] == '(' || body[next] == '.')) {
       return true;
     }
     idx = after;
@@ -1159,8 +1165,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
     final RegExpMatch? forInMatch = forInPattern.firstMatch(disposeSource);
     if (forInMatch != null) {
       final String? loopVar = forInMatch.group(1);
-      if (loopVar != null &&
-          disposeSource.contains('$loopVar.cancel()')) {
+      if (loopVar != null && disposeSource.contains('$loopVar.cancel()')) {
         return true;
       }
     }
@@ -1173,8 +1178,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
     final RegExpMatch? forEachMatch = forEachPattern.firstMatch(disposeSource);
     if (forEachMatch != null) {
       final String? param = forEachMatch.group(1);
-      if (param != null &&
-          disposeSource.contains('$param.cancel()')) {
+      if (param != null && disposeSource.contains('$param.cancel()')) {
         return true;
       }
     }

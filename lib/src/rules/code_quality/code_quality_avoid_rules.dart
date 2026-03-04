@@ -14,6 +14,9 @@ import '../../fixes/code_quality/avoid_substring_todo_fix.dart';
 import '../../fixes/code_quality/combine_adjacent_strings_fix.dart';
 import '../../fixes/code_quality/delete_unknown_pragma_fix.dart';
 import '../../fixes/code_quality/prefix_unused_parameter_fix.dart';
+import '../../fixes/code_quality/remove_always_null_argument_fix.dart';
+import '../../fixes/code_quality/remove_late_keyword_fix.dart';
+import '../../fixes/code_quality/replace_object_with_dynamic_fix.dart';
 import '../../fixes/code_quality/remove_inferrable_type_arguments_fix.dart';
 import '../../fixes/code_quality/remove_redundant_pragma_inline_fix.dart';
 import '../../fixes/code_quality/remove_unnecessary_override_fix.dart';
@@ -255,6 +258,12 @@ class AvoidLateKeywordRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveLateKeywordFix(context: context),
+  ];
 }
 
 /// Warns when a getter is called without parentheses in print/debugPrint.
@@ -1282,6 +1291,12 @@ class NoObjectDeclarationRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceObjectWithDynamicFix(context: context),
+  ];
 }
 
 /// Warns when only one inlining annotation is used.
@@ -1346,6 +1361,12 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveAlwaysNullArgumentFix(context: context),
+  ];
 }
 
 /// Warns when an instance method assigns to a static field.
@@ -3015,7 +3036,9 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
             // Check for { return true; }
             else if (body is BlockFunctionBody) {
               final List<Statement> statements = body.block.statements;
-              final Statement? single = statements.length == 1 ? statements.first : null;
+              final Statement? single = statements.length == 1
+                  ? statements.first
+                  : null;
               if (single is ReturnStatement) {
                 final Expression? returnExpr = single.expression;
                 if (returnExpr is BooleanLiteral && returnExpr.value) {

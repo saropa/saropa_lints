@@ -28,6 +28,6 @@ class RemoveUnconditionalBreakFix extends DeleteNodeFix {
     return node is BreakStatement || node is ContinueStatement
         ? node
         : node.thisOrAncestorOfType<BreakStatement>() ??
-            node.thisOrAncestorOfType<ContinueStatement>();
+              node.thisOrAncestorOfType<ContinueStatement>();
   }
 }

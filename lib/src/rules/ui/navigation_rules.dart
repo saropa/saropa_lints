@@ -878,6 +878,7 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
     RegExp(r'\buri\b'),
     RegExp(r'\broute\b'),
   ];
+
   /// Only methods whose body contains at least one of these are considered
   /// "navigate to deep link target" handlers. Parsing URIs or building link
   /// text without navigation does not trigger the rule.
@@ -3595,7 +3596,8 @@ class RequireWillPopScopeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_will_pop_scope',
     '[require_will_pop_scope] Use WillPopScope/PopScope to handle back button when needed.',
-    correctionMessage: 'Wrap with PopScope (or WillPopScope) to confirm or intercept back.',
+    correctionMessage:
+        'Wrap with PopScope (or WillPopScope) to confirm or intercept back.',
     severity: DiagnosticSeverity.INFO,
   );
 

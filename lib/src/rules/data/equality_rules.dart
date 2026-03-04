@@ -4,6 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../fixes/equality/remove_self_assignment_fix.dart';
 import '../../fixes/equality/use_date_time_difference_fix.dart';
 import '../../fixes/equality/use_direct_equality_fix.dart';
 import '../../fixes/equality/use_not_equals_fix.dart';
@@ -160,6 +161,12 @@ class AvoidSelfAssignmentRule extends SaropaLintRule {
         'Remove the self-assignment entirely, or replace the right-hand side with the intended source value.',
     severity: DiagnosticSeverity.WARNING,
   );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveSelfAssignmentFix(context: context),
+  ];
 
   @override
   void runWithReporter(

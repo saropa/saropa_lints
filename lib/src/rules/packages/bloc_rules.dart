@@ -1790,7 +1790,9 @@ class _EmitAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'emit' && _hasFoundAwait && !_isInsideClosedCheck) {
+    if (node.methodName.name == 'emit' &&
+        _hasFoundAwait &&
+        !_isInsideClosedCheck) {
       emitCallsAfterAwait.add(node);
     }
     super.visitMethodInvocation(node);
@@ -1885,7 +1887,9 @@ class AvoidDuplicateBlocEventHandlersRule extends SaropaLintRule {
         if (typeArgs == null || typeArgs.arguments.isEmpty) continue;
 
         final String eventType = typeArgs.arguments.first.toSource();
-        eventHandlers.putIfAbsent(eventType, () => <MethodInvocation>[]).add(onCall);
+        eventHandlers
+            .putIfAbsent(eventType, () => <MethodInvocation>[])
+            .add(onCall);
       }
 
       // Report duplicates
@@ -3389,8 +3393,9 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
           final String bodySource = member.body.toSource();
 
           // Find all on<EventType> patterns
-          final Iterable<RegExpMatch> matches =
-              _onEventPattern.allMatches(bodySource);
+          final Iterable<RegExpMatch> matches = _onEventPattern.allMatches(
+            bodySource,
+          );
 
           for (final RegExpMatch match in matches) {
             final group1 = match.group(1);
@@ -4765,7 +4770,9 @@ class AvoidOverengineeredBlocStatesRule extends SaropaLintRule {
       if (extendsClause != null) {
         final String superclass = extendsClause.superclass.toSource();
         if (superclass.endsWith('State')) {
-          stateHierarchy.putIfAbsent(superclass, () => <ClassDeclaration>[]).add(node);
+          stateHierarchy
+              .putIfAbsent(superclass, () => <ClassDeclaration>[])
+              .add(node);
         }
       }
     });

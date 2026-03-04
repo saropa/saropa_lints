@@ -7,7 +7,9 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/line_info.dart';
 
+import '../../fixes/collection/add_const_to_list_item_fix.dart';
 import '../../fixes/collection/add_for_loop_increment_comment_fix.dart';
+import '../../fixes/collection/remove_duplicate_collection_element_fix.dart';
 import '../../fixes/collection/remove_duplicate_map_entry_fix.dart';
 import '../../fixes/collection/replace_with_where_or_null_fix.dart';
 import '../../fixes/collection/use_contains_key_fix.dart';
@@ -1936,6 +1938,12 @@ class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
   );
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveDuplicateCollectionElementFix(context: context),
+  ];
+
+  @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
@@ -2003,6 +2011,12 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
         'Remove the duplicate string element or verify the values are intentionally repeated. In Sets, duplicates are silently discarded.',
     severity: DiagnosticSeverity.WARNING,
   );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveDuplicateCollectionElementFix(context: context),
+  ];
 
   @override
   void runWithReporter(
@@ -2073,6 +2087,12 @@ class AvoidDuplicateObjectElementsRule extends SaropaLintRule {
   );
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveDuplicateCollectionElementFix(context: context),
+  ];
+
+  @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
@@ -2139,6 +2159,12 @@ class RequireConstListItemsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddConstToListItemFix(context: context),
+  ];
 }
 
 /// Prefer asMap().entries for indexed iteration over manual index.
@@ -2421,8 +2447,10 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
       final NodeList<Expression> updaters = parts.updaters;
       if (updaters.isEmpty) return;
 
-      final bool hasExemption =
-          _hasExplanatoryIncrementComment(node, context.lineInfo);
+      final bool hasExemption = _hasExplanatoryIncrementComment(
+        node,
+        context.lineInfo,
+      );
 
       for (final Expression updater in updaters) {
         // Check for compound assignment like i += 2
@@ -2465,8 +2493,7 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
     void collectRelevantComments(Token? token) {
       Token? comment = token?.precedingComments;
       while (comment != null) {
-        final int commentLine =
-            lineInfo.getLocation(comment.offset).lineNumber;
+        final int commentLine = lineInfo.getLocation(comment.offset).lineNumber;
         if (commentLine == forLine || commentLine == forLine - 1) {
           commentTexts.add(comment.lexeme);
         }

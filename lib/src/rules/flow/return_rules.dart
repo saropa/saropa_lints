@@ -5,9 +5,14 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
-import '../../fixes/return/remove_unnecessary_return_fix.dart';
+import '../../fixes/return/convert_to_expression_body_fix.dart';
 import '../../fixes/return/inline_immediate_return_fix.dart';
+import '../../fixes/return/remove_return_void_fix.dart';
+import '../../fixes/return/remove_unnecessary_return_fix.dart';
 import '../../fixes/return/replace_return_null_with_return_fix.dart';
+import '../../fixes/return/replace_return_null_with_future_value_fix.dart';
+import '../../fixes/return/replace_return_this_with_return_fix.dart';
+import '../../fixes/return/split_return_cascade_fix.dart';
 
 /// Resolves the declared return type from a [FunctionBody]'s parent.
 DartType? getReturnTypeFromBody(FunctionBody body) {
@@ -68,6 +73,12 @@ class AvoidReturningCascadesRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        SplitReturnCascadeFix(context: context),
+  ];
 }
 
 /// Avoid returning this from methods; prefer explicit return types.
@@ -117,6 +128,12 @@ class AvoidReturningThisRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceReturnThisWithReturnFix(context: context),
+  ];
 }
 
 /// Warns when a function explicitly returns `void`.
@@ -181,6 +198,12 @@ class AvoidReturningVoidRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveReturnVoidFix(context: context),
+  ];
 }
 
 /// Warns on unnecessary return statement at end of void function.
@@ -418,6 +441,12 @@ class PreferReturningShorthandsRule extends SaropaLintRule {
       reporter.atToken(nameToken);
     }
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ConvertToExpressionBodyFix(context: context),
+  ];
 }
 
 /// Warns when returning `null` from a function with `void` return type.
@@ -563,4 +592,10 @@ class AvoidReturningNullForFutureRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceReturnNullWithFutureValueFix(context: context),
+  ];
 }

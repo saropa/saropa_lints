@@ -1515,8 +1515,7 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
       for (final String fieldName in tickerFields) {
         final re = stopRegexByField[fieldName];
         if (re == null) continue;
-        final bool isStopped =
-            disposeBody != null && re.hasMatch(disposeBody);
+        final bool isStopped = disposeBody != null && re.hasMatch(disposeBody);
 
         if (!isStopped) {
           for (final ClassMember member in node.members) {

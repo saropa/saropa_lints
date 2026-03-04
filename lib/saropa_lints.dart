@@ -3128,7 +3128,9 @@ void _loadAnalysisConfig() {
         multiLine: true,
       ).firstMatch(content);
       final outputGroup = match?.group(1);
-      if (match != null && outputGroup != null && outputGroup.toLowerCase() == 'file') {
+      if (match != null &&
+          outputGroup != null &&
+          outputGroup.toLowerCase() == 'file') {
         ProgressTracker.setFileOnly(fileOnly: true);
       }
     }

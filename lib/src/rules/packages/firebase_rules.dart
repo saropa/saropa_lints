@@ -2726,7 +2726,9 @@ class RequireFirebaseReauthenticationRule extends SaropaLintRule {
       node.body.visitChildren(visitor);
       // Use earliest reauth offset in source order (visitor order is DFS, not source).
       final int? firstReauthOffset = visitor.reauthOffsets.fold<int?>(
-          null, (int? a, int b) => a == null ? b : (a < b ? a : b));
+        null,
+        (int? a, int b) => a == null ? b : (a < b ? a : b),
+      );
       for (final MethodInvocation call in visitor.sensitiveCalls) {
         if (firstReauthOffset == null || call.offset < firstReauthOffset) {
           reporter.atNode(call, _code);

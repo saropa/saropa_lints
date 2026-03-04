@@ -1466,7 +1466,8 @@ class PreferWeakReferencesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_weak_references',
     '[prefer_weak_references] Prefer WeakReference for caches to avoid retaining objects.',
-    correctionMessage: 'Use WeakReference or Expando where strong reference is not required.',
+    correctionMessage:
+        'Use WeakReference or Expando where strong reference is not required.',
     severity: DiagnosticSeverity.INFO,
   );
 
