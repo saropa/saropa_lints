@@ -26,6 +26,22 @@ Standard contacts apps store data; Saropa helps you use it. It is an "Intelligen
 
 ---
 
+### Kykto
+**Writing solves problems.**
+
+Kykto is built on the idea that simply writing a kyk down is often all the organizing you need. Getting a task out of your head and onto a screen is the plan in itself. Every item you enter stays for exactly 24 hours. During that day, you can send it to your calendar, text it to someone, or just let it sit. If you don't take action, Kykto clears it away automatically — so you always wake up to a fresh, manageable screen.
+
+* **Smart Features:**
+    * **Zero-friction capture:** One tap to add a kyk. No folders, no tags, no dates.
+    * **24-hour decay:** Every kyk moves to the vault after 24 hours. Fresh start, every day.
+    * **Export tray:** Route kyks to calendar, messages, email, or clipboard.
+    * **Snooze:** Long-press to grant one extra 24-hour cycle. Max 3 active.
+* **Platform:** Android, iOS, Windows, macOS, Linux (mobile and desktop)
+* **Package:** saropa_kykto (Flutter)
+* **Link:** [kykto.com](https://kykto.com)
+
+---
+
 ## 🛠️ Developer Ecosystem
 *Production-hardened tools for VS Code, Dart, and Flutter.*
 

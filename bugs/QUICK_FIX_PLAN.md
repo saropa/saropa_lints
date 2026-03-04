@@ -1,8 +1,8 @@
 # Quick Fix Plan: Analysis + Checklist
 
-**Goal:** Increase quick fix coverage from **129/2051 (6.3%)** by implementing fixes in priority order, with fixtures + tests, and validating via the audit script.
+**Goal:** Increase quick fix coverage by implementing fixes in priority order, with fixtures + tests, and validating via the audit script.
 
-**Current state:** 129 rules with fixes / 2051 total rules (6.3%). **1922 rules have no fix.**
+**Current state:** Run `python scripts/list_rules_without_fixes.py` for an up-to-date list. Batches 12+ (conversation batches 4–8) added 28+ quick fixes; 50+ rules now have at least one fix from this effort.
 
 ---
 

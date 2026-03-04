@@ -2,6 +2,8 @@
 
 This folder contains one detailed task report per planned rule from [ROADMAP.md](../../ROADMAP.md). Each report covers examples, detection vs. false positives, external references, and quality/performance notes.
 
+**Review (2026-03):** The task index below lists 170+ planned rules. Most are already implemented (often under the same or a similar name in `lib/src/tiers.dart`), or are **Hard**/deferred (cross-file, heuristic, or YAML). Implementable single-file AST rules from the index that were still missing have been added (e.g. `prefer_geolocator_coarse_location` alias and full implementation of `prefer_geolocation_coarse_location`, and `prefer_const_constructor_declarations`). When adding more rules, prefer High-importance and Easy/Medium-ease; skip Hard/deferred unless the barrier is removed.
+
 **Placeholders**: Task files no longer use "TODO: Replace with concrete example"; they include a **Detection approach** line and instruct implementers to add concrete bad/good examples (or mark "Needs design") before implementing. Rules that require pubspec/YAML or cross-file analysis are listed in ROADMAP.md Part 2 (Deferred) and do not have task files here.
 
 **Implemented check:** Task filenames are checked against `lib/src/tiers.dart`. During **publish** (Step 1), any task file whose rule is already in tiers is removed automatically. No need to run a separate script; the logic lives in `scripts/modules/_roadmap_implemented.py`.
