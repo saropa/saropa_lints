@@ -13,6 +13,8 @@ analyzer:
   errors:
     todo: ignore
   exclude:
+    # require_database_close false-positive (rule's runWithReporter contains openDatabase regex)
+    - "lib/src/rules/resources/resource_management_rules.dart"
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     - "**/*.gr.dart"
