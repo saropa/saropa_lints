@@ -32,7 +32,10 @@ import 'package:path/path.dart' as p;
 import 'project_context.dart';
 
 /// Condition names that mean "native only" (file is not loaded on web).
-const Set<String> _nativeOnlyConditionNames = {'dart.library.io', 'dart.library.ffi'};
+const Set<String> _nativeOnlyConditionNames = {
+  'dart.library.io',
+  'dart.library.ffi',
+};
 
 /// Cache: project root -> set of normalized file paths that are the native
 /// branch of a conditional import. Built lazily per project.
@@ -70,7 +73,12 @@ Set<String> _buildNativeOnlyTargets(String projectRoot) {
       _collectNativeOnlyTargetsFromFile(entity.path, projectRoot, result);
     }
   } on OSError catch (e, st) {
-    developer.log('listSync failed for native-only targets', name: 'saropa_lints', error: e, stackTrace: st);
+    developer.log(
+      'listSync failed for native-only targets',
+      name: 'saropa_lints',
+      error: e,
+      stackTrace: st,
+    );
   }
   return result;
 }
@@ -87,7 +95,12 @@ void _collectNativeOnlyTargetsFromFile(
   try {
     content = file.readAsStringSync();
   } on IOException catch (e, st) {
-    developer.log('read failed for native-only scan', name: 'saropa_lints', error: e, stackTrace: st);
+    developer.log(
+      'read failed for native-only scan',
+      name: 'saropa_lints',
+      error: e,
+      stackTrace: st,
+    );
     return;
   }
 
@@ -110,7 +123,12 @@ void _collectNativeOnlyTargetsFromFile(
       final uri = uriLiteral.stringValue;
       if (uri == null || uri.isEmpty) continue;
 
-      final resolved = _resolveUri(uri, importingFilePath, projectRoot, packageName);
+      final resolved = _resolveUri(
+        uri,
+        importingFilePath,
+        projectRoot,
+        packageName,
+      );
       if (resolved != null) {
         out.add(normalizePath(resolved));
       }

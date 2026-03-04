@@ -6,6 +6,8 @@
 /// and content filters are computed once per project/file and reused. Rules
 /// call [ProjectContext.of(context)] to get the singleton; all heavy data
 /// (pubspec deps, path normalization, bloom filters, etc.) lives here.
+library;
+
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
@@ -84,7 +86,7 @@ class BloomFilter {
   /// Default of 8192 bits (1KB) gives ~1% false positive rate for 500 patterns.
   /// If [bitSize] is <= 0, uses 8192 as fallback.
   BloomFilter([int bitSize = 8192])
-      : _bits = Uint8List(((bitSize > 0 ? bitSize : 8192) + 7) ~/ 8);
+    : _bits = Uint8List(((bitSize > 0 ? bitSize : 8192) + 7) ~/ 8);
 
   final Uint8List _bits;
   int get _bitSize => _bits.length * 8;
@@ -374,17 +376,17 @@ class ProjectContext {
     try {
       var dir = Directory(normalized).parent;
 
-    // Walk up the directory tree looking for pubspec.yaml
-    while (dir.path.length > 1) {
-      final pubspec = File('${dir.path}/pubspec.yaml');
-      if (pubspec.existsSync()) {
-        return dir.path;
+      // Walk up the directory tree looking for pubspec.yaml
+      while (dir.path.length > 1) {
+        final pubspec = File('${dir.path}/pubspec.yaml');
+        if (pubspec.existsSync()) {
+          return dir.path;
+        }
+        final parent = dir.parent;
+        if (parent.path == dir.path) break;
+        dir = parent;
       }
-      final parent = dir.parent;
-      if (parent.path == dir.path) break;
-      dir = parent;
-    }
-    return null;
+      return null;
     } on OSError {
       return null;
     }
@@ -2311,10 +2313,7 @@ class ParallelAnalyzer {
   ///
   /// Call this once at startup. Creates worker isolates based on CPU cores.
   /// If isolates aren't available (e.g., web), falls back to sync processing.
-  static Future<void> initialize({
-    int? workerCount,
-    bool useIsolates = true,
-  }) {
+  static Future<void> initialize({int? workerCount, bool useIsolates = true}) {
     if (_isInitialized) return Future.value();
 
     // Determine worker count (default: CPU cores - 1, min 1, max 8)
@@ -2334,7 +2333,8 @@ class ParallelAnalyzer {
   ///
   /// Returns analysis results for each file. Results are cached automatically.
   /// Uses Isolate.run() for true parallel execution when available.
-  static Future<List<ParallelAnalysisResult>> analyzeFiles({ // ignore: avoid_redundant_async
+  static Future<List<ParallelAnalysisResult>> analyzeFiles({
+    // ignore: avoid_redundant_async
     required List<String> filePaths,
     required Set<String> patterns,
   }) async {
@@ -2610,8 +2610,7 @@ class ParallelAnalyzer {
           trimmed.startsWith('abstract class ')) {
         classCount++;
       }
-      if (trimmed.contains(' Function') ||
-          _functionLikeLine.hasMatch(line)) {
+      if (trimmed.contains(' Function') || _functionLikeLine.hasMatch(line)) {
         functionCount++;
       }
     }

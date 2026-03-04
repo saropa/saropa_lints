@@ -95,10 +95,7 @@ class BaselineFile {
           final linesRaw = ruleEntry.value;
           if (linesRaw is! List) continue;
 
-          final lines = linesRaw
-              .whereType<int>()
-              .where((l) => l >= 1)
-              .toList();
+          final lines = linesRaw.whereType<int>().where((l) => l >= 1).toList();
           if (lines.isNotEmpty) {
             rules[ruleName] = lines;
           }

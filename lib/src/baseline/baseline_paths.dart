@@ -27,7 +27,7 @@ import 'dart:developer' as developer;
 
 class BaselinePaths {
   BaselinePaths(List<String>? patterns)
-      : _patterns = _compilePatterns(patterns ?? const []);
+    : _patterns = _compilePatterns(patterns ?? const []);
 
   final List<_CompiledPattern> _patterns;
 
