@@ -466,6 +466,17 @@ void main() {
       'avoid_fixed_size_in_scaffold_body',
       () => AvoidFixedSizeInScaffoldBodyRule(),
     );
+
+    testRule(
+      'PreferFlexForComplexLayoutRule',
+      'prefer_flex_for_complex_layout',
+      () => PreferFlexForComplexLayoutRule(),
+    );
+    testRule(
+      'PreferFindChildIndexCallbackRule',
+      'prefer_find_child_index_callback',
+      () => PreferFindChildIndexCallbackRule(),
+    );
   });
 
   group('Widget Layout Rules - Fixture Verification', () {

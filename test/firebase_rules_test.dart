@@ -167,6 +167,21 @@ void main() {
       'require_firebase_token_refresh',
       () => RequireFirebaseTokenRefreshRule(),
     );
+    testRule(
+      'PreferFirebaseTransactionForCountersRule',
+      'prefer_firebase_transaction_for_counters',
+      () => PreferFirebaseTransactionForCountersRule(),
+    );
+    testRule(
+      'PreferCorrectTopicsRule',
+      'prefer_correct_topics',
+      () => PreferCorrectTopicsRule(),
+    );
+    testRule(
+      'PreferDeepLinkAuthRule',
+      'prefer_deep_link_auth',
+      () => PreferDeepLinkAuthRule(),
+    );
   });
   group('Firebase Rules - Fixture Verification', () {
     test('avoid_firebase_user_data_in_auth fixture exists', () {

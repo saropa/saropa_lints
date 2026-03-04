@@ -39,6 +39,11 @@ void main() {
       () => PreferComputeForHeavyWorkRule(),
     );
     testRule(
+      'PreferDiskCacheForPersistenceRule',
+      'prefer_disk_cache_for_persistence',
+      () => PreferDiskCacheForPersistenceRule(),
+    );
+    testRule(
       'AvoidObjectCreationInHotLoopsRule',
       'avoid_object_creation_in_hot_loops',
       () => AvoidObjectCreationInHotLoopsRule(),

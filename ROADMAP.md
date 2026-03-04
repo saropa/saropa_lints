@@ -441,6 +441,24 @@ Proposed Drift-related lint rules that were reviewed and **not** implemented:
 
 Other rejected ideas (redundant with compiler/library or trivial): schema downgrade, multiple autoIncrement, trailing column `()`, WAL mode, modular generation preference.
 
+#### Roadmap (AST/infra/heuristic barriers)
+
+Proposed rules from roadmap task review that were **not** implemented due to infrastructure, detection, or false-positive barriers:
+
+| Proposed rule | Reason not viable |
+|---------------|-------------------|
+| `avoid_any_version` | Requires YAML parsing of `pubspec.yaml`; custom_lint only processes `.dart`. Same blocker as all pubspec rules. |
+| `avoid_banned_api` | Configurable layer-boundary rule requires per-project config parsing from `analysis_options.yaml` not yet supported; high maintenance and overlap with `banned_usage`. |
+| `avoid_connectivity_ui_decisions` | False positive rate too high; cannot distinguish full-screen block from small offline indicator (identical AST: StreamBuilder → if on ConnectivityResult → return widget). |
+| `avoid_dependency_overrides` | Requires reading `pubspec.yaml`; custom_lint has no API for non-Dart files. Infrastructure blocker. |
+| `avoid_firestore_admin_role_overuse` | Cannot distinguish security enforcement (bad) from UI personalization (fine); `claims['admin']` for UI gating looks identical in both cases. |
+| `avoid_large_assets_on_web` | Lint cannot read file sizes from disk; asset paths are strings; analyzer does not resolve to filesystem. Build-time/CI concern. |
+| `avoid_large_object_in_state` | Static analysis cannot measure runtime size; e.g. `Uint8List` could be 16 bytes or 5MB. DevTools memory profiler is the right tool. |
+| `avoid_pagination_refetch_all` | Detection surface too narrow; real apps use BLoC/Riverpod/PagingController, not for-loops; near-zero real-world detections. |
+| `avoid_repeated_widget_creation` | Determining “identical widgets with all-const args” requires deep expression analysis; trivial case rare, complex case unreliable. |
+| `avoid_suspicious_global_reference` | Allowlist would not converge (Theme.of, Navigator.of, MediaQuery, GetIt, singletons, etc.); estimated 90%+ false positive rate. |
+| `avoid_unbounded_collections` | List.add() used everywhere; linter cannot determine if a list "should" have a bound (domain-level decision). Phase 1 would flag virtually every stateful list. |
+
 ---
 
 ## Part 3: Cross-File Analysis CLI Tool Roadmap
