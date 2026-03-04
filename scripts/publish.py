@@ -331,7 +331,9 @@ def _print_success_banner(
 def _prompt_publish_mode() -> str:
     """Ask user what to do when run as main script."""
     print_header("PUBLISH OPTIONS")
-    print("  1) Full publish (audit → tests → version → publish → release)")
+    print(
+        "  1) Full publish (audit → format → analysis → tests → version → release)"
+    )
     print("  2) Audit only (tier integrity, DX checks; no publish)")
     print("  3) Fix doc comments (angle brackets, refs; then exit)")
     try:
@@ -467,20 +469,22 @@ def main(
                     exit_with_error(_AUDIT_FAILED_MSG, ExitCode.AUDIT_FAILED)
 
             if audit_only:  # Stop after audit, don't publish
-                print_success("Audit complete.")
+                print_success("Audit-only run complete (no format/analysis/tests).")
                 succeeded = True
                 return ExitCode.SUCCESS.value
 
-            # Gate: user must confirm before starting the publish workflow
-            print()
-            response = (
-                input("  Audit passed. Continue to publish? [Y/n] ")
-                .strip()
-                .lower()
-            )
-            if response.startswith("n"):  # User declined to continue
-                print_warning("Publish canceled by user.")
-                return ExitCode.USER_CANCELED.value
+            # Gate: user must confirm before format/analysis/tests (commented out)
+            # print()
+            # response = (
+            #     input(
+            #         "  Audit step done. Continue to format, analysis, and tests? [Y/n] "
+            #     )
+            #     .strip()
+            #     .lower()
+            # )
+            # if response.startswith("n"):  # User declined to continue
+            #     print_warning("Publish canceled by user.")
+            #     return ExitCode.USER_CANCELED.value
         elif audit_only:
             return ExitCode.USER_CANCELED.value
 
@@ -504,21 +508,23 @@ def main(
                     ExitCode.WORKING_TREE_FAILED,
                 )
 
-        with timer.step("Tests"):  # Step 5: dart test
-            if not run_tests(project_dir):  # Test failure
-                exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
-
-        with timer.step("Format"):  # Step 6: dart format
+        # Format and analyze before tests: fail fast on analysis without
+        # running 7k+ tests (which can fill temp and fail with disk space errors).
+        with timer.step("Format"):  # Step 5: dart format
             if not run_format(project_dir):  # Format error
                 exit_with_error(
                     "Formatting failed.", ExitCode.VALIDATION_FAILED,
                 )
 
-        with timer.step("Analysis"):  # Step 7: dart analyze --fatal-infos
+        with timer.step("Analysis"):  # Step 6: dart analyze --fatal-infos
             if not run_analysis(project_dir):  # Analysis error
                 exit_with_error(
                     "Analysis failed.", ExitCode.ANALYSIS_FAILED,
                 )
+
+        with timer.step("Tests"):  # Step 7: dart test
+            if not run_tests(project_dir):  # Test failure
+                exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
 
         # --- Step 8: Version prompt (interactive, not timed) ---
         print_header("VERSION")
