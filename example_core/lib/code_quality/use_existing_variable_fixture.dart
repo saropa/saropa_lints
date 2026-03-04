@@ -103,6 +103,8 @@
 // Test fixture for: use_existing_variable
 // Source: lib\src\rules\code_quality_rules.dart
 
+import 'dart:math';
+
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final name = 'example';
@@ -129,4 +131,19 @@ void _good229() {
 void _goodSameSourceWithInvocation() {
   final a = DateTime.now();
   final b = DateTime.now();
+}
+
+// GOOD: Same initializer source but uses Random/RNG — must NOT trigger.
+// Each call yields a different value; rule excludes initializers that use
+// any type named Random/RNG/RandomNumberGenerator or RNG-like receiver names.
+void _goodSameSourceWithRandom() {
+  final rng = Random(42);
+  final x = 0.2 + rng.nextDouble() * 0.6;
+  final y = 0.2 + rng.nextDouble() * 0.6;
+}
+
+// GOOD: Random().nextInt(10) x2 — must NOT trigger (explicit Random check).
+void _goodSameSourceWithRandomInt() {
+  final a = Random().nextInt(10);
+  final b = Random().nextInt(10);
 }
