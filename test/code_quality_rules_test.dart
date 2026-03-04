@@ -777,6 +777,11 @@ void main() {
 
   group('Type Safety Rules', () {
     group('no_object_declaration', () {
+      test('rule offers quick fix (replace Object with dynamic)', () {
+        final rule = NoObjectDeclarationRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('member declared with type Object SHOULD trigger', () {
         expect('Object type detected', isNotNull);
       });
@@ -826,6 +831,11 @@ void main() {
     });
 
     group('avoid_always_null_parameters', () {
+      test('rule offers quick fix (remove null argument)', () {
+        final rule = AvoidAlwaysNullParametersRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('parameter explicitly passed null everywhere SHOULD trigger', () {
         expect('always-null param detected', isNotNull);
       });
@@ -846,6 +856,11 @@ void main() {
 
   group('Late Keyword Rules', () {
     group('avoid_late_keyword', () {
+      test('rule offers quick fix (remove late keyword)', () {
+        final rule = AvoidLateKeywordRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('late field SHOULD trigger', () {
         // Defers initialization checking to runtime
         expect('late keyword detected', isNotNull);
@@ -1260,12 +1275,18 @@ void main() {
         expect('duplicate variable detected', isNotNull);
       });
 
-      test('same-source initializers with method invocations should NOT trigger', () {
-        // e.g. final a = DateTime.now(); final b = DateTime.now();
-        // Fixture: example_core/lib/code_quality/use_existing_variable_fixture.dart
-        // _goodSameSourceWithInvocation() must not report use_existing_variable.
-        expect('invocation-containing initializers excluded from duplicate check', isNotNull);
-      });
+      test(
+        'same-source initializers with method invocations should NOT trigger',
+        () {
+          // e.g. final a = DateTime.now(); final b = DateTime.now();
+          // Fixture: example_core/lib/code_quality/use_existing_variable_fixture.dart
+          // _goodSameSourceWithInvocation() must not report use_existing_variable.
+          expect(
+            'invocation-containing initializers excluded from duplicate check',
+            isNotNull,
+          );
+        },
+      );
     });
 
     group('use_existing_destructuring', () {

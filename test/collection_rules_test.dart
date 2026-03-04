@@ -333,6 +333,11 @@ void main() {
     });
 
     group('avoid_duplicate_number_elements', () {
+      test('rule offers quick fix (remove duplicate element)', () {
+        final rule = AvoidDuplicateNumberElementsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_duplicate_number_elements SHOULD trigger', () {
         // Pattern that should be avoided: avoid duplicate number elements
         expect('avoid_duplicate_number_elements detected', isNotNull);
@@ -345,6 +350,11 @@ void main() {
     });
 
     group('avoid_duplicate_string_elements', () {
+      test('rule offers quick fix (remove duplicate element)', () {
+        final rule = AvoidDuplicateStringElementsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_duplicate_string_elements SHOULD trigger', () {
         // Pattern that should be avoided: avoid duplicate string elements
         expect('avoid_duplicate_string_elements detected', isNotNull);
@@ -357,6 +367,11 @@ void main() {
     });
 
     group('avoid_duplicate_object_elements', () {
+      test('rule offers quick fix (remove duplicate element)', () {
+        final rule = AvoidDuplicateObjectElementsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_duplicate_object_elements SHOULD trigger', () {
         // Pattern that should be avoided: avoid duplicate object elements
         expect('avoid_duplicate_object_elements detected', isNotNull);
@@ -365,6 +380,13 @@ void main() {
       test('avoid_duplicate_object_elements should NOT trigger', () {
         // Avoidance pattern not present
         expect('avoid_duplicate_object_elements passes', isNotNull);
+      });
+    });
+
+    group('require_const_list_items', () {
+      test('rule offers quick fix (add const to list item)', () {
+        final rule = RequireConstListItemsRule();
+        expect(rule.fixGenerators, isNotEmpty);
       });
     });
 
@@ -515,28 +537,35 @@ void main() {
       test('prefer_correct_for_loop_increment comment exemption', () {
         // Non-standard increment with explanatory comment on same line or line
         // above should NOT trigger (see fixture _good253CommentExemption).
-        expect('prefer_correct_for_loop_increment comment exemption', isNotNull);
-      });
-
-      test('prefer_correct_for_loop_increment unrelated comment still triggers',
-          () {
-        // Unrelated comment (e.g. "Fix later") on line above does NOT exempt;
-        // see fixture _bad253UnrelatedComment (expect_lint).
         expect(
-          'prefer_correct_for_loop_increment unrelated comment still triggers',
+          'prefer_correct_for_loop_increment comment exemption',
           isNotNull,
         );
       });
 
-      test('prefer_correct_for_loop_increment comment two lines above still triggers',
-          () {
-        // Comment exemption only applies to same line or immediately above;
-        // see fixture _bad253CommentTooFarAbove (expect_lint).
-        expect(
-          'prefer_correct_for_loop_increment comment two lines above still triggers',
-          isNotNull,
-        );
-      });
+      test(
+        'prefer_correct_for_loop_increment unrelated comment still triggers',
+        () {
+          // Unrelated comment (e.g. "Fix later") on line above does NOT exempt;
+          // see fixture _bad253UnrelatedComment (expect_lint).
+          expect(
+            'prefer_correct_for_loop_increment unrelated comment still triggers',
+            isNotNull,
+          );
+        },
+      );
+
+      test(
+        'prefer_correct_for_loop_increment comment two lines above still triggers',
+        () {
+          // Comment exemption only applies to same line or immediately above;
+          // see fixture _bad253CommentTooFarAbove (expect_lint).
+          expect(
+            'prefer_correct_for_loop_increment comment two lines above still triggers',
+            isNotNull,
+          );
+        },
+      );
     });
 
     group('prefer_null_aware_elements', () {

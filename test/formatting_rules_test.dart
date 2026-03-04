@@ -238,14 +238,17 @@ void main() {
         expect(content, contains('_good'));
       });
 
-      test('fixture has false-positive guard: if without else must not trigger', () {
-        final content = File(
-          'example_core/lib/formatting/prefer_blank_line_before_else_fixture.dart',
-        ).readAsStringSync();
-        expect(content, contains('_noElse'));
-        expect(content, contains('if (x)'));
-        // _noElse has no else clause; rule must not report there.
-      });
+      test(
+        'fixture has false-positive guard: if without else must not trigger',
+        () {
+          final content = File(
+            'example_core/lib/formatting/prefer_blank_line_before_else_fixture.dart',
+          ).readAsStringSync();
+          expect(content, contains('_noElse'));
+          expect(content, contains('if (x)'));
+          // _noElse has no else clause; rule must not report there.
+        },
+      );
     });
 
     group('prefer_blank_line_after_loop', () {
@@ -285,16 +288,24 @@ void main() {
         expect(content, contains('_good'));
       });
 
-      test('fixture has false-positive guard: block with only loop must not trigger', () {
-        final content = File(
-          'example_core/lib/formatting/prefer_blank_line_after_loop_fixture.dart',
-        ).readAsStringSync();
-        expect(content, contains('_onlyLoop'));
-        expect(content, contains('for (var i = 0'));
-      });
+      test(
+        'fixture has false-positive guard: block with only loop must not trigger',
+        () {
+          final content = File(
+            'example_core/lib/formatting/prefer_blank_line_after_loop_fixture.dart',
+          ).readAsStringSync();
+          expect(content, contains('_onlyLoop'));
+          expect(content, contains('for (var i = 0'));
+        },
+      );
     });
 
     group('prefer_trailing_comma', () {
+      test('rule offers quick fix (add trailing comma)', () {
+        final rule = PreferTrailingCommaRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('prefer_trailing_comma SHOULD trigger', () {
         // Better alternative available: prefer trailing comma
         expect('prefer_trailing_comma detected', isNotNull);
@@ -337,6 +348,11 @@ void main() {
 
   group('Formatting - General Rules', () {
     group('unnecessary_trailing_comma', () {
+      test('rule offers quick fix (remove unnecessary trailing comma)', () {
+        final rule = UnnecessaryTrailingCommaRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('unnecessary_trailing_comma SHOULD trigger', () {
         // Detected violation: unnecessary trailing comma
         expect('unnecessary_trailing_comma detected', isNotNull);
