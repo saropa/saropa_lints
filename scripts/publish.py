@@ -25,7 +25,7 @@ Workflow:
     Post:    Bump version for next cycle (pubspec + [Unreleased])
 
 Run from project root: python scripts/publish.py. Prompts: full publish /
-audit only / fix doc comments. No flags. Other logic is in scripts/modules/
+audit only / fix doc comments / publish without audit. No flags. Other logic is in scripts/modules/
 (audit, DX improver, retrigger CI); run standalone with e.g.
 python -m scripts.modules._improve_dx_messages if needed. Historical scripts
 (version_rules, release-note scrapers, lint candidates) are in
@@ -336,6 +336,7 @@ def _prompt_publish_mode() -> str:
     )
     print("  2) Audit only (tier integrity, DX checks; no publish)")
     print("  3) Fix doc comments (angle brackets, refs; then exit)")
+    print("  4) Publish without audit (skip audit; format → analysis → tests → release)")
     try:
         raw = input("  Choice [1]: ").strip() or "1"
         n = int(raw)
@@ -343,6 +344,8 @@ def _prompt_publish_mode() -> str:
             return "audit_only"
         if n == 3:
             return "fix_docs"
+        if n == 4:
+            return "full_skip_audit"
     except (ValueError, EOFError, KeyboardInterrupt):
         pass
     return "full"
@@ -352,7 +355,7 @@ def main(
     mode: str = "full",
     output_level: OutputLevel | None = None,
 ) -> int:
-    """Main entry point. mode: 'full' | 'audit_only' | 'fix_docs'."""
+    """Main entry point. mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit'."""
     enable_ansi_support()
     set_output_level(output_level or _parse_output_level())
 
@@ -427,7 +430,7 @@ def main(
 
     # --- Timed workflow ---
     audit_only = mode == "audit_only"
-    skip_audit = False  # Always run audit unless mode is audit_only (then we stop after)
+    skip_audit = mode == "full_skip_audit"
     timer = StepTimer()
     exit_code = ExitCode.SUCCESS.value
     version = pubspec_version
@@ -487,6 +490,9 @@ def main(
             #     return ExitCode.USER_CANCELED.value
         elif audit_only:
             return ExitCode.USER_CANCELED.value
+
+        if skip_audit:
+            print_warning("Audit skipped (publish without audit).")
 
         # --- Steps 2-7: Pre-publish analysis workflow ---
         with timer.step("Prerequisites"):  # Step 2: flutter, git, gh

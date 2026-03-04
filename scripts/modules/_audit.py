@@ -102,6 +102,7 @@ class AuditResult:
     rules_missing_prefix: list[str] = field(default_factory=list)
     tier_integrity_passed: bool = True
     contains_audit_over_baseline: bool = False
+    analysis_passed: bool = True
 
     @property
     def has_blocking_issues(self) -> bool:
@@ -112,6 +113,7 @@ class AuditResult:
         - Duplicate class names, rule names, or aliases exist
         - Rules missing ``[rule_name]`` prefix in problemMessage
         - Any rule file exceeds .contains() baseline (CI would fail)
+        - dart analyze --fatal-infos failed (run during audit)
         """
         return bool(
             not self.tier_integrity_passed
@@ -120,6 +122,7 @@ class AuditResult:
             or self.duplicate_report.get("aliases")
             or self.rules_missing_prefix
             or self.contains_audit_over_baseline
+            or not self.analysis_passed
         )
 
 
