@@ -16,7 +16,12 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 
-- **History integration (checklist batches):** Integrated 51 `bugs/history` files: 11 not_viable/roadmap (rationale in ROADMAP § Rules reviewed and not viable), 7 plans, 2 releases, 5 roadmap/summary, 25 roadmap/task (plain). LINKS.md and UNIT_TEST_COVERAGE.md updated; checklist progress in `bugs/HISTORY_INTEGRATION_CHECKLIST.md`.
+- **History integration (checklist batches):** Integrated 51 `bugs/history` files; each is covered by unit tests, code comments, and/or changelogs/ROADMAP as below.
+  - **11 not_viable/roadmap:** Rationale for each rule in ROADMAP.md § Rules reviewed and not viable → Roadmap (AST/infra/heuristic barriers). No code/tests (rules not implemented by design).
+  - **7 plans:** drift_support_plan, file_structure, framework_feature_upgrade_suggestions, ROADMAP_NATIVE_PLUGIN, rule_versioning_plan, task_test_coverage_improvement_plan, TIER_AND_SEVERITY_ANALYSIS — content in ROADMAP/CHANGELOG/tiers/UNIT_TEST_COVERAGE/LINKS (this changelog entry; ROADMAP; UNIT_TEST_COVERAGE.md; LINKS.md).
+  - **2 releases:** v4.12.2_abort_rerun_config, ci_analyzer_fixes_2026 — covered by existing CHANGELOG release notes and this entry.
+  - **5 roadmap/summary:** README, nine_rules_implemented_2026, roadmap_detail_12, SUMMARY_18, SUMMARY — rule lists covered by ROADMAP and CHANGELOG (implemented rules already in code/tests/changelog).
+  - **25 roadmap/task (plain):** task_avoid_cascades through task_prefer_class_destructuring — implemented rules covered by existing rule code, unit tests, and CHANGELOG; planned rules covered by ROADMAP. Checklist progress in `bugs/HISTORY_INTEGRATION_CHECKLIST.md`.
 
 ---
 
