@@ -20,4 +20,4 @@ The following issue files had a corresponding task in `bugs/roadmap/`; that task
 
 **Issues with merged roadmap content:** 22, 23, 31, 32, 37, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54.
 
-**No roadmap task in bugs/roadmap/** (content only in this folder): prefer_avatar_loading_placeholder (27, 36), require_snackbar_duration_consideration (39), or the cross-file / “too complex” issues (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12). Issues 76 and 92 are bug reports (require_field_dispose cascade, max_issues config), not rule requests. Issue 21, 30 (avoid_pagination_refetch_all) has a task in `bugs/history/not_viable/roadmap/` only.
+**No roadmap task in bugs/roadmap/** (content only in this folder): prefer_avatar_loading_placeholder (27, 36), require_snackbar_duration_consideration (39), or the cross-file / “too complex” issues (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12). Issues 76 and 92 are bug reports (require_field_dispose cascade, max_issues config), not rule requests. Issue 21, 30 (avoid_pagination_refetch_all) is documented as not viable in ROADMAP.md § Rules reviewed and not viable.

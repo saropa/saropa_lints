@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/widget/theming_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 4 Theming lint rules.
+/// Tests for 6 Theming lint rules.
 ///
 /// Test fixtures: example_widgets/lib/theming/*
 void main() {
@@ -36,6 +36,20 @@ void main() {
       final rule = RequireSemanticColorsRule();
       expect(rule.code.name, 'require_semantic_colors');
       expect(rule.code.problemMessage, contains('[require_semantic_colors]'));
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PreferDarkModeColorsRule', () {
+      final rule = PreferDarkModeColorsRule();
+      expect(rule.code.name, 'prefer_dark_mode_colors');
+      expect(rule.code.problemMessage, contains('[prefer_dark_mode_colors]'));
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PreferHighContrastModeRule', () {
+      final rule = PreferHighContrastModeRule();
+      expect(rule.code.name, 'prefer_high_contrast_mode');
+      expect(rule.code.problemMessage, contains('[prefer_high_contrast_mode]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

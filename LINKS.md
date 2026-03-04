@@ -11,6 +11,7 @@
 ## Documentation
 
 - [ROADMAP.md](ROADMAP.md) — Planned rules and implementation priorities; [Part 2](ROADMAP.md#part-2-deferred-rules--technical-limitations) covers deferred rules (cross-file, heuristic, technical limitations)
+- [MIGRATION_V5.md](MIGRATION_V5.md) — v4 (custom_lint) → v5 (native analyzer plugin) upgrade; the full migration plan was previously in `bugs/history/plans/ROADMAP_NATIVE_PLUGIN.md`
 
 ## Custom Lint Development
 

@@ -132,6 +132,12 @@ void main() {
       'prefer_pattern_destructuring',
       () => PreferPatternDestructuringRule(),
     );
+
+    testRule(
+      'PreferClassDestructuringRule',
+      'prefer_class_destructuring',
+      () => PreferClassDestructuringRule(),
+    );
   });
 
   group('Record Pattern Rules - Fixture Verification', () {

@@ -36,6 +36,12 @@ void main() {
       'avoid_continuous_location_updates',
       () => AvoidContinuousLocationUpdatesRule(),
     );
+
+    testRule(
+      'PreferGeolocationCoarseLocationRule',
+      'prefer_geolocation_coarse_location',
+      () => PreferGeolocationCoarseLocationRule(),
+    );
   });
 
   group('Geolocator Rules - Fixture Verification', () {
