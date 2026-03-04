@@ -8,6 +8,7 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/line_info.dart';
 
+import '../../fixes/code_quality/remove_unused_assignment_fix.dart';
 import '../../saropa_lint_rule.dart';
 import '../../type_annotation_utils.dart';
 
@@ -863,6 +864,12 @@ class AvoidUnusedAssignmentRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnusedAssignmentFix(context: context),
+  ];
 
   /// Returns true if [node] is inside a loop body (while, do, for).
   static bool _isInsideLoop(AstNode node) {
@@ -2190,23 +2197,125 @@ bool _expressionContainsInvocation(Expression expression) {
   return visitor.hasInvocation;
 }
 
+/// Well-known RNG method names (dart:math Random and common variants).
+/// Used to exclude same-source initializers that produce different values per call.
+const Set<String> _rngMethodNames = <String>{
+  'nextDouble',
+  'nextInt',
+  'nextBool',
+  'next',
+};
+
+/// Common variable names used for Random (or RNG) instances.
+/// Heuristic: receiver with one of these names calling an RNG method is excluded.
+const Set<String> _rngReceiverNames = <String>{
+  'rng',
+  'random',
+  'rand',
+  'rnd',
+};
+
+/// Type names that indicate an RNG (any library), so projects can have their
+/// own Random/RNG classes or re-exports without being treated as duplicates.
+const Set<String> _rngTypeNames = <String>{
+  'Random',
+  'RNG',
+  'RandomNumberGenerator',
+};
+
+/// Returns true if [type] looks like an RNG type: any [InterfaceType] whose
+/// name is [Random], [RNG], or [RandomNumberGenerator] from any library.
+/// Covers dart:math [Random] and project-specific overloads or custom RNG types.
+bool _isRngLikeType(DartType? type) {
+  if (type is! InterfaceType) return false;
+  final String? name = type.element.name;
+  return name != null && _rngTypeNames.contains(name);
+}
+
+/// Visitor that detects if an expression uses Random (or RNG-like) APIs.
+/// Used to exclude such initializers from duplicate detection: same source
+/// (e.g. `rng.nextDouble()`) evaluates to different values each time.
+/// See: bugs/use_existing_variable_false_positive_random_rng.md
+class _RandomPresenceVisitor extends RecursiveAstVisitor<void> {
+  bool hasRandomOrRngUsage = false;
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final DartType? type = node.constructorName.type.type ?? node.staticType;
+    if (_isRngLikeType(type)) {
+      hasRandomOrRngUsage = true;
+      return;
+    }
+    super.visitInstanceCreationExpression(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (!_rngMethodNames.contains(methodName)) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+    final Expression? target = node.target;
+    if (target != null) {
+      final DartType? receiverType = target.staticType;
+      if (_isRngLikeType(receiverType)) {
+        hasRandomOrRngUsage = true;
+        return;
+      }
+      if (target is SimpleIdentifier &&
+          _rngReceiverNames.contains(target.name)) {
+        hasRandomOrRngUsage = true;
+        return;
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Returns true if [expression] uses Random or RNG-like APIs: any type named
+/// [Random], [RNG], or [RandomNumberGenerator] (from any library), or a
+/// variable named like an RNG (rng, random, rand, rnd) calling nextDouble/
+/// nextInt/nextBool/next. Such initializers are excluded from duplicate
+/// detection because each evaluation yields a different value.
+bool _expressionUsesRandomOrRng(Expression expression) {
+  final visitor = _RandomPresenceVisitor();
+  expression.visitChildren(visitor);
+  return visitor.hasRandomOrRngUsage;
+}
+
 /// Warns when a new variable is created that duplicates an existing one.
 ///
-/// **For developers:** This rule detects redundant variable declarations
-/// within the same block by comparing initializer source code ([toSource]).
-/// It only considers initializers that are not literals and not simple
-/// identifiers. To avoid false positives, any initializer whose AST
-/// contains a [MethodInvocation] or [FunctionExpressionInvocation] is
-/// excluded from duplicate detection, because the same source can evaluate
-/// to different values (e.g. [Random.nextDouble], [DateTime.now]) or have
-/// side effects. Registry: [addBlock]; runs once per block; single pass over
-/// [Block.statements]; no recursion. Impact: medium (maintainability). Cost:
-/// low (block-scoped, one visitor per candidate initializer).
+/// **For developers:**
+///
+/// **Detection:** Redundant variable declarations within the same block are
+/// detected by comparing initializer source code ([toSource]). Only
+/// initializers that are not literals and not simple identifiers are
+/// considered. Registry: [addBlock]; runs once per block; single pass over
+/// [Block.statements]; no recursion.
+///
+/// **Exclusions (false positive avoidance):** The following are excluded from
+/// duplicate detection so that same-source initializers are not reported when
+/// they can evaluate to different values or have side effects:
+///
+/// 1. **Any invocation:** Initializers whose AST contains a [MethodInvocation]
+///    or [FunctionExpressionInvocation] (e.g. [DateTime.now], getters with side
+///    effects). Same source can evaluate to different values per call.
+///
+/// 2. **Random / RNG usage:** Initializers that use Random or RNG-like APIs:
+///    - Any type named [Random], [RNG], or [RandomNumberGenerator] from any
+///      library (dart:math [Random] or project overloads/custom RNG types).
+///    - Instance methods [nextDouble], [nextInt], [nextBool], [next] on such
+///      a type, or on a variable with a common RNG-like name (rng, random,
+///      rand, rnd). Each call yields a different value.
+///    See: bugs/history/false_positives/use_existing_variable_false_positive_random_rng_resolved.md.
+///
+/// **Impact:** medium (maintainability). **Cost:** low (block-scoped, one
+/// visitor per candidate initializer).
 ///
 /// **Heuristic:** "Contains any invocation" is conservative: some pure
-/// getters may be excluded, and some calls that are effectively constant
-/// could still be flagged if we ever refine. See CONTRIBUTING.md § Avoiding
-/// False Positives.
+/// getters may be excluded. RNG type names are a heuristic; see
+/// CONTRIBUTING.md § Avoiding False Positives.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
 ///
@@ -2227,6 +2336,12 @@ bool _expressionContainsInvocation(Expression expression) {
 /// ```dart
 /// final x = 0.2 + rng.nextDouble() * 0.6;
 /// final y = 0.2 + rng.nextDouble() * 0.6;  // OK: different values per call
+/// ```
+///
+/// Same-source initializers that use Random or RNG are also not reported:
+/// ```dart
+/// final a = Random().nextInt(10);
+/// final b = Random().nextInt(10);  // OK: each call yields a different value
 /// ```
 class UseExistingVariableRule extends SaropaLintRule {
   UseExistingVariableRule() : super(code: _code);
@@ -2267,6 +2382,10 @@ class UseExistingVariableRule extends SaropaLintRule {
             // Skip initializers that contain invocations; same source can
             // produce different values (e.g. rng.nextDouble(), DateTime.now()).
             if (_expressionContainsInvocation(initializer)) continue;
+
+            // Skip initializers that use Random or RNG: each call yields a
+            // different value (e.g. rng.nextDouble(), Random().nextInt(10)).
+            if (_expressionUsesRandomOrRng(initializer)) continue;
 
             final String exprSource = initializer.toSource();
 

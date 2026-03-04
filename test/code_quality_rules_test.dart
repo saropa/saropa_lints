@@ -1287,6 +1287,92 @@ void main() {
           );
         },
       );
+
+      test(
+        'same-source initializers that use Random or RNG should NOT trigger',
+        () {
+          // e.g. final x = 0.2 + rng.nextDouble() * 0.6; final y = 0.2 + rng.nextDouble() * 0.6;
+          // Fixture: _goodSameSourceWithRandom(), _goodSameSourceWithRandomInt().
+          // Rule explicitly excludes initializers using any type Random/RNG/RandomNumberGenerator or RNG-like receiver names.
+          expect(
+            'Random/RNG initializers excluded from duplicate check',
+            isNotNull,
+          );
+        },
+      );
+
+      test(
+        'use_existing_variable does NOT report on same-source Random initializers (integration)',
+        () async {
+          // Before fix: same-source rng.nextDouble() x2 was reported as duplicate.
+          // After fix: must not report. Run analyzer on a temp package with that pattern.
+          final repoRoot = Directory.current;
+          expect(
+            File('${repoRoot.path}${Platform.pathSeparator}pubspec.yaml')
+                .existsSync(),
+            isTrue,
+            reason: 'Run tests from repo root.',
+          );
+          final tempDir =
+              await Directory.systemTemp.createTemp('saropa_use_existing_');
+          addTearDown(() async {
+            if (tempDir.existsSync()) await tempDir.delete(recursive: true);
+          });
+          final repoPath = repoRoot.path.replaceAll('\\', '/');
+          await Directory('${tempDir.path}${Platform.pathSeparator}lib')
+              .create(recursive: true);
+          await File('${tempDir.path}${Platform.pathSeparator}pubspec.yaml')
+              .writeAsString('''
+name: tmp_use_existing_test
+publish_to: none
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+dev_dependencies:
+  saropa_lints:
+    path: "$repoPath"
+''');
+          await File(
+            '${tempDir.path}${Platform.pathSeparator}analysis_options.yaml',
+          ).writeAsString('''
+plugins:
+  saropa_lints:
+    diagnostics:
+      use_existing_variable: true
+''');
+          await File(
+            '${tempDir.path}${Platform.pathSeparator}lib${Platform.pathSeparator}main.dart',
+          ).writeAsString('''
+import 'dart:math';
+void main() {
+  final rng = Random(42);
+  final x = 0.2 + rng.nextDouble() * 0.6;
+  final y = 0.2 + rng.nextDouble() * 0.6;
+}
+''');
+          final pubGet = await Process.run(
+            'dart',
+            ['pub', 'get'],
+            workingDirectory: tempDir.path,
+            runInShell: true,
+          );
+          expect(pubGet.exitCode, 0, reason: 'pub get failed');
+          final analyze = await Process.run(
+            'dart',
+            ['analyze', 'lib/main.dart'],
+            workingDirectory: tempDir.path,
+            runInShell: true,
+          );
+          final combined = '${analyze.stdout}\n${analyze.stderr}';
+          // Must not report use_existing_variable on main.dart for the Random snippet (false positive fix).
+          expect(
+            combined.contains('use_existing_variable') &&
+                combined.contains('main.dart'),
+            isFalse,
+            reason:
+                'use_existing_variable should NOT trigger on same-source Random initializers. Output:\n$combined',
+          );
+        },
+      );
     });
 
     group('use_existing_destructuring', () {
