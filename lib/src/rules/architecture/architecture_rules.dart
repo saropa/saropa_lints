@@ -832,9 +832,9 @@ class AvoidCircularImportsRule extends SaropaLintRule {
 
     // Fire-and-forget: build graph in background (once per session).
     unawaited(
-      ImportGraphCache.buildFromDirectory(projectRoot).catchError(
-        (Object _, StackTrace __) {},
-      ),
+      ImportGraphCache.buildFromDirectory(
+        projectRoot,
+      ).catchError((Object _, StackTrace __) {}),
     );
   }
 

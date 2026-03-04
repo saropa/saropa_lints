@@ -5,8 +5,10 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/source/line_info.dart';
 
 import '../../saropa_lint_rule.dart';
-import '../../fixes/formatting/add_blank_line_fix.dart';
 import '../../fixes/formatting/add_blank_line_before_return_fix.dart';
+import '../../fixes/formatting/add_blank_line_fix.dart';
+import '../../fixes/formatting/add_trailing_comma_fix.dart';
+import '../../fixes/formatting/remove_unnecessary_trailing_comma_fix.dart';
 
 /// Warns when case clauses don't have newlines before them.
 ///
@@ -416,8 +418,7 @@ class NewlineBeforeElseRule extends SaropaLintRule {
     'prefer_blank_line_before_else',
     '[prefer_blank_line_before_else] Adding a blank line before else/else if '
         'separates branches and improves readability. Enable via the stylistic tier. {v1}',
-    correctionMessage:
-        'Add a blank line before this else clause.',
+    correctionMessage: 'Add a blank line before this else clause.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -432,8 +433,12 @@ class NewlineBeforeElseRule extends SaropaLintRule {
       if (elseStmt == null || elseToken == null) return;
 
       final LineInfo lineInfo = context.lineInfo;
-      final int thenEndLine = lineInfo.getLocation(node.thenStatement.end).lineNumber;
-      final int elseStartLine = lineInfo.getLocation(elseToken.offset).lineNumber;
+      final int thenEndLine = lineInfo
+          .getLocation(node.thenStatement.end)
+          .lineNumber;
+      final int elseStartLine = lineInfo
+          .getLocation(elseToken.offset)
+          .lineNumber;
       // At least one full blank line required (gap >= 2).
       if (elseStartLine - thenEndLine < 2) {
         reporter.atNode(elseStmt, code);
@@ -511,7 +516,8 @@ class NewlineAfterLoopRule extends SaropaLintRule {
         final Statement current = statements[i];
         final Statement next = statements[i + 1];
 
-        final bool currentIsLoop = current is ForStatement || current is WhileStatement;
+        final bool currentIsLoop =
+            current is ForStatement || current is WhileStatement;
         if (!currentIsLoop) continue;
 
         final int loopEndLine = lineInfo.getLocation(current.end).lineNumber;
@@ -630,6 +636,12 @@ class PreferTrailingCommaRule extends SaropaLintRule {
       }
     }
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddTrailingCommaFix(context: context),
+  ];
 }
 
 /// Warns when trailing commas are unnecessary.
@@ -713,6 +725,12 @@ class UnnecessaryTrailingCommaRule extends SaropaLintRule {
       reporter.atToken(nextToken);
     }
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryTrailingCommaFix(context: context),
+  ];
 }
 
 /// Warns when comments don't follow formatting conventions.

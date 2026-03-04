@@ -487,10 +487,12 @@ class RequireErrorMessageContextRule extends SaropaLintRule {
   };
 
   static final List<RegExp> _genericMessagePatterns = _genericMessages
-      .map((s) => RegExp(
-            "return ['\"]${RegExp.escape(s)}['\"];?",
-            caseSensitive: false,
-          ))
+      .map(
+        (s) => RegExp(
+          "return ['\"]${RegExp.escape(s)}['\"];?",
+          caseSensitive: false,
+        ),
+      )
       .toList();
 
   @override

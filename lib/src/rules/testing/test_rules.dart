@@ -3481,7 +3481,8 @@ class PreferTestReportRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_test_report',
     '[prefer_test_report] Prefer test reporters (e.g. JSON) for CI integration.',
-    correctionMessage: 'Use --reporter or test reporter for machine-readable output.',
+    correctionMessage:
+        'Use --reporter or test reporter for machine-readable output.',
     severity: DiagnosticSeverity.INFO,
   );
 

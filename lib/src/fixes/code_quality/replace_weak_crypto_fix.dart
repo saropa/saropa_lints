@@ -34,10 +34,7 @@ class ReplaceWeakCryptoFix extends SaropaFixProducer {
     if (id == null || !_weak.contains(id.name)) return;
 
     await builder.addDartFileEdit(file, (b) {
-      b.addSimpleReplacement(
-        SourceRange(id.offset, id.length),
-        'sha256',
-      );
+      b.addSimpleReplacement(SourceRange(id.offset, id.length), 'sha256');
     });
   }
 }

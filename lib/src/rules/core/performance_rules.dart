@@ -4608,8 +4608,7 @@ class AvoidCacheStampedeRule extends SaropaLintRule {
     for (final Statement stmt in block.statements) {
       final String source = stmt.toSource();
 
-      if (containsKeyRegex.hasMatch(source) ||
-          notNullRegex.hasMatch(source)) {
+      if (containsKeyRegex.hasMatch(source) || notNullRegex.hasMatch(source)) {
         sawContainsKey = true;
       }
       if (sawContainsKey && awaitRegex.hasMatch(source)) {

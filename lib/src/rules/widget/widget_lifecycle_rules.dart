@@ -24,9 +24,7 @@ bool _isNameDisposedInBody(String disposeBody, String name) {
     '${RegExp.escape(name)}\\s*[?.]+'
     '\\s*dispose(Safe)?\\s*\\(',
   );
-  final iterationRe = RegExp(
-    'in\\s+${RegExp.escape(name)}(\\.values)?\\)',
-  );
+  final iterationRe = RegExp('in\\s+${RegExp.escape(name)}(\\.values)?\\)');
   return directRe.hasMatch(disposeBody) ||
       (iterationRe.hasMatch(disposeBody) &&
           _disposeCallPattern.hasMatch(disposeBody));
@@ -1462,8 +1460,9 @@ class RequireDisposeRule extends SaropaLintRule {
       '$name?.${method}Safe(',
       '$name..${method}Safe(',
     ];
-    final List<RegExp> compiledPatterns =
-        patterns.map((p) => RegExp(RegExp.escape(p))).toList();
+    final List<RegExp> compiledPatterns = patterns
+        .map((p) => RegExp(RegExp.escape(p)))
+        .toList();
 
     for (final RegExp re in compiledPatterns) {
       if (re.hasMatch(disposeBody)) {
@@ -1705,8 +1704,9 @@ class RequireTimerCancellationRule extends SaropaLintRule {
       '$name?.cancelSafe(',
       '$name..cancelSafe(',
     ];
-    final List<RegExp> compiledPatterns =
-        patterns.map((p) => RegExp(RegExp.escape(p))).toList();
+    final List<RegExp> compiledPatterns = patterns
+        .map((p) => RegExp(RegExp.escape(p)))
+        .toList();
 
     for (final RegExp re in compiledPatterns) {
       if (re.hasMatch(disposeBody)) {
@@ -3437,8 +3437,8 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
 
       // Check if each controller is disposed
       for (final String name in controllerNames) {
-        final bool isDisposed = disposeBody != null &&
-            _isNameDisposedInBody(disposeBody, name);
+        final bool isDisposed =
+            disposeBody != null && _isNameDisposedInBody(disposeBody, name);
 
         if (!isDisposed) {
           // Find and report the field declaration
@@ -3564,8 +3564,8 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
 
       // Check if each node is disposed
       for (final String name in nodeNames) {
-        final bool isDisposed = disposeBody != null &&
-            _isNameDisposedInBody(disposeBody, name);
+        final bool isDisposed =
+            disposeBody != null && _isNameDisposedInBody(disposeBody, name);
 
         if (!isDisposed) {
           // Find and report the field declaration

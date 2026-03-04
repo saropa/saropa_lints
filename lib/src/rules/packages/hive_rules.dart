@@ -909,8 +909,10 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
             if (metadata.name.name == 'HiveField') {
               final int? index = _extractHiveFieldIndex(metadata);
               if (index != null) {
-                final list =
-                    fieldIndices.putIfAbsent(index, () => <Annotation>[]);
+                final list = fieldIndices.putIfAbsent(
+                  index,
+                  () => <Annotation>[],
+                );
                 list.add(metadata);
               }
             }
@@ -2282,10 +2284,12 @@ class PreferHiveCompactRule extends SaropaLintRule {
     context.addCompilationUnit((CompilationUnit unit) {
       bool hasCompact = false;
       MethodInvocation? firstWrite;
-      unit.visitChildren(_HiveCompactVisitor(
-        onCompact: () => hasCompact = true,
-        onWrite: (MethodInvocation node) => firstWrite ??= node,
-      ));
+      unit.visitChildren(
+        _HiveCompactVisitor(
+          onCompact: () => hasCompact = true,
+          onWrite: (MethodInvocation node) => firstWrite ??= node,
+        ),
+      );
       if (firstWrite != null && !hasCompact) reporter.atNode(firstWrite!);
     });
   }

@@ -4196,8 +4196,9 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
       final Set<String> itemCountBoundLists = _getItemCountBoundLists(node);
 
       // One combined RegExp per check type (avoid_regex_in_loop).
-      final String listNameAlternation =
-          accessedLists.map(RegExp.escape).join('|');
+      final String listNameAlternation = accessedLists
+          .map(RegExp.escape)
+          .join('|');
       if (listNameAlternation.isEmpty) return;
       final RegExp combinedLengthPattern = RegExp(
         r'\b(' + listNameAlternation + r')\.length\b',
@@ -4205,8 +4206,7 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
       final RegExp combinedEmptyPattern = RegExp(
         r'\b(' + listNameAlternation + r')\.(?:isEmpty|isNotEmpty)\b',
       );
-      final bool hasComparisonOp =
-          _comparisonOpPattern.hasMatch(bodySource);
+      final bool hasComparisonOp = _comparisonOpPattern.hasMatch(bodySource);
       final Set<String> listsWithLengthCheck = combinedLengthPattern
           .allMatches(bodySource)
           .map((m) => m.group(1))
@@ -4252,8 +4252,9 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
       if (arg is NamedExpression && arg.name.label.name == 'itemCount') {
         final String countSource = arg.expression.toSource();
         // Match: list.length, widget.list.length, _list.length
-        final RegExpMatch? match =
-            _itemCountLengthPattern.firstMatch(countSource);
+        final RegExpMatch? match = _itemCountLengthPattern.firstMatch(
+          countSource,
+        );
         final String? group1 = match?.group(1);
         if (group1 != null) {
           return <String>{_extractListName(group1)};

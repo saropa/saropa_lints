@@ -1762,7 +1762,8 @@ class PreferIsarForComplexQueriesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_isar_for_complex_queries',
     '[prefer_isar_for_complex_queries] Prefer Isar for complex local queries over raw SQL.',
-    correctionMessage: 'Use Isar filter/link queries for type-safe complex queries.',
+    correctionMessage:
+        'Use Isar filter/link queries for type-safe complex queries.',
     severity: DiagnosticSeverity.INFO,
   );
 

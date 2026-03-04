@@ -7,7 +7,7 @@ import '../../native/saropa_fix.dart';
 
 /// Quick fix: Wrap the unawaited Future expression in `unawaited(...)`.
 ///
-/// Applies to [avoid_unawaited_future] violations. Replaces the whole
+/// Applies to `avoid_unawaited_future` violations. Replaces the whole
 /// expression statement with `unawaited(expression);` so errors are
 /// explicitly acknowledged as fire-and-forget. Caller must have
 /// `dart:async` imported for `unawaited`.

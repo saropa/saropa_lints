@@ -211,8 +211,9 @@ bool _isFutureDelayedZero(MethodInvocation node) {
   final List<Expression> args = node.argumentList.arguments;
   if (args.isEmpty) return false;
   final arg0 = args[0];
-  final Expression durationArg =
-      args.length == 2 && arg0 is NamedExpression ? arg0.expression : arg0;
+  final Expression durationArg = args.length == 2 && arg0 is NamedExpression
+      ? arg0.expression
+      : arg0;
   if (durationArg is PropertyAccess) {
     return durationArg.propertyName.name == 'zero';
   }

@@ -398,7 +398,8 @@ class RequireConnectivityResumeCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_connectivity_resume_check',
     '[require_connectivity_resume_check] Re-check connectivity when app resumes. Android 8+ stops background updates.',
-    correctionMessage: 'Listen to WidgetsBindingObserver and re-check connectivity on resume.',
+    correctionMessage:
+        'Listen to WidgetsBindingObserver and re-check connectivity on resume.',
     severity: DiagnosticSeverity.INFO,
   );
 

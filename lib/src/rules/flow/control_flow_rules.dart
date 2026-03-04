@@ -7,7 +7,10 @@ import '../../saropa_lint_rule.dart';
 import '../../fixes/control_flow/comment_out_unnecessary_continue_fix.dart';
 import '../../fixes/control_flow/invert_operator_fix.dart';
 import '../../fixes/control_flow/remove_constant_assert_fix.dart';
+import '../../fixes/control_flow/remove_double_negation_fix.dart';
+import '../../fixes/control_flow/replace_assignment_with_comparison_fix.dart';
 import '../../fixes/control_flow/remove_duplicate_switch_case_fix.dart';
+import '../../fixes/control_flow/simplify_de_morgan_fix.dart';
 import '../../fixes/control_flow/remove_redundant_else_fix.dart';
 import '../../fixes/control_flow/remove_unconditional_break_fix.dart';
 import '../../fixes/control_flow/replace_with_then_branch_fix.dart';
@@ -83,6 +86,12 @@ class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
       _checkCondition(node.condition, reporter);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceAssignmentWithComparisonFix(context: context),
+  ];
 
   void _checkCondition(
     Expression condition,
@@ -1126,7 +1135,8 @@ class AvoidRedundantElseRule extends SaropaLintRule {
 
       // Check if then branch ends with return/throw/break/continue
       final elseKeyword = node.elseKeyword;
-      if (elseKeyword != null && _endsWithAbruptCompletion(node.thenStatement)) {
+      if (elseKeyword != null &&
+          _endsWithAbruptCompletion(node.thenStatement)) {
         reporter.atToken(elseKeyword, code);
       }
     });
@@ -2093,6 +2103,14 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveDoubleNegationFix(context: context),
+    ({required CorrectionProducerContext context}) =>
+        SimplifyDeMorganFix(context: context),
+  ];
 
   /// Check if an expression is simple enough that negating it is readable.
   /// We want to avoid suggesting De Morgan's for complex nested expressions.

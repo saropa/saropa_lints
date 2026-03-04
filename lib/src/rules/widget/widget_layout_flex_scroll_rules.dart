@@ -192,24 +192,23 @@ class AvoidShrinkWrapInListsRule extends SaropaLintRule {
 
       // Check for shrinkWrap: true
       for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'shrinkWrap') {
+        if (arg is NamedExpression && arg.name.label.name == 'shrinkWrap') {
           final expr = arg.expression;
           if (expr is BooleanLiteral && expr.value) {
-          // Check if inside another scrollable
-          AstNode? parent = node.parent;
-          while (parent != null) {
-            if (parent is InstanceCreationExpression) {
-              final String? parentConstructor =
-                  parent.constructorName.type.element?.name;
-              if (parentConstructor != null &&
-                  _scrollableWidgets.contains(parentConstructor)) {
-                reporter.atNode(arg);
-                return;
+            // Check if inside another scrollable
+            AstNode? parent = node.parent;
+            while (parent != null) {
+              if (parent is InstanceCreationExpression) {
+                final String? parentConstructor =
+                    parent.constructorName.type.element?.name;
+                if (parentConstructor != null &&
+                    _scrollableWidgets.contains(parentConstructor)) {
+                  reporter.atNode(arg);
+                  return;
+                }
               }
+              parent = parent.parent;
             }
-            parent = parent.parent;
-          }
           }
         }
       }

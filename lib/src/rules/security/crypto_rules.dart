@@ -478,8 +478,9 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
     // Check for const IV
     context.addVariableDeclaration((VariableDeclaration node) {
       final p = node.parent;
-      final VariableDeclarationList? parent =
-          p is VariableDeclarationList ? p : null;
+      final VariableDeclarationList? parent = p is VariableDeclarationList
+          ? p
+          : null;
       if (parent == null) return;
 
       final bool isConst = parent.isConst;

@@ -1360,7 +1360,9 @@ class PreferJsonCodegenRule extends SaropaLintRule {
 
       for (final annotation in node.metadata) {
         final String name = annotation.name.name;
-        if (name == 'JsonSerializable' || name == 'freezed' || name == 'Freezed') {
+        if (name == 'JsonSerializable' ||
+            name == 'freezed' ||
+            name == 'Freezed') {
           hasCodegen = true;
           break;
         }
@@ -1407,7 +1409,8 @@ class RequireJsonDateFormatConsistencyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_json_date_format_consistency',
     '[require_json_date_format_consistency] Use consistent date format (ISO 8601) in JSON.',
-    correctionMessage: 'Serialize/parse dates with a single format (e.g. toIso8601String).',
+    correctionMessage:
+        'Serialize/parse dates with a single format (e.g. toIso8601String).',
     severity: DiagnosticSeverity.INFO,
   );
 

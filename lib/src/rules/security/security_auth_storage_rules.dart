@@ -2614,8 +2614,10 @@ class PreferRootDetectionRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     final String content = context.fileContent;
-    if (RegExp(r'\broot\b.*\b(check|detect|detection)\b', caseSensitive: false)
-        .hasMatch(content)) {
+    if (RegExp(
+      r'\broot\b.*\b(check|detect|detection)\b',
+      caseSensitive: false,
+    ).hasMatch(content)) {
       return;
     }
     if (RegExp(r'SafetyNet|isRooted|isJailbroken').hasMatch(content)) {
@@ -2624,7 +2626,8 @@ class PreferRootDetectionRule extends SaropaLintRule {
 
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String name = node.constructorName.type.name.lexeme;
-      if (name == 'FlutterSecureStorage' || name == 'FlutterSecureStorageImpl') {
+      if (name == 'FlutterSecureStorage' ||
+          name == 'FlutterSecureStorageImpl') {
         reporter.atNode(node);
       }
     });
@@ -2648,7 +2651,8 @@ class PreferWebviewSandboxRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_webview_sandbox',
     '[prefer_webview_sandbox] WebView without sandbox. Consider restricting file access and JavaScript when not needed.',
-    correctionMessage: 'Set allowFileAccess: false and restrict domains if possible.',
+    correctionMessage:
+        'Set allowFileAccess: false and restrict domains if possible.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -2710,7 +2714,8 @@ class RequireKeychainAccessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_keychain_access',
     '[require_keychain_access] On iOS, use Keychain for sensitive data (e.g. flutter_secure_storage).',
-    correctionMessage: 'Store tokens/credentials in Keychain via flutter_secure_storage.',
+    correctionMessage:
+        'Store tokens/credentials in Keychain via flutter_secure_storage.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -2737,7 +2742,8 @@ class RequireWebviewUserAgentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_webview_user_agent',
     '[require_webview_user_agent] Set a custom user agent on WebView when needed for compatibility.',
-    correctionMessage: 'Use userAgent or custom userAgentFrom to identify in-app browser.',
+    correctionMessage:
+        'Use userAgent or custom userAgentFrom to identify in-app browser.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -2764,7 +2770,8 @@ class RequireMultiFactorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_multi_factor',
     '[require_multi_factor] Consider MFA for sensitive auth flows.',
-    correctionMessage: 'Add second factor (OTP, biometric) for high-risk operations.',
+    correctionMessage:
+        'Add second factor (OTP, biometric) for high-risk operations.',
     severity: DiagnosticSeverity.INFO,
   );
 

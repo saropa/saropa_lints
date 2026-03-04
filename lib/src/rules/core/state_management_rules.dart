@@ -688,7 +688,9 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'setState' && _hasSeenAwait && !_hasMountedCheck) {
+    if (node.methodName.name == 'setState' &&
+        _hasSeenAwait &&
+        !_hasMountedCheck) {
       // Double-check with ancestor mounted check
       if (!_hasAncestorMountedCheck(node)) {
         reporter.atNode(node);

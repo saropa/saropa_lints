@@ -1143,7 +1143,14 @@ class PreferLogLevelsRule extends SaropaLintRule {
   );
 
   static const Set<String> _levels = <String>{
-    'debug', 'info', 'warning', 'severe', 'fine', 'finer', 'finest', 'shout',
+    'debug',
+    'info',
+    'warning',
+    'severe',
+    'fine',
+    'finer',
+    'finest',
+    'shout',
   };
 
   @override
@@ -1154,9 +1161,11 @@ class PreferLogLevelsRule extends SaropaLintRule {
     context.addCompilationUnit((CompilationUnit unit) {
       final Set<String> usedLevels = <String>{};
       MethodInvocation? firstLog;
-      unit.visitChildren(_LogLevelVisitor(usedLevels, (MethodInvocation n) {
-        firstLog ??= n;
-      }));
+      unit.visitChildren(
+        _LogLevelVisitor(usedLevels, (MethodInvocation n) {
+          firstLog ??= n;
+        }),
+      );
       if (usedLevels.length <= 1 && firstLog != null) {
         reporter.atNode(firstLog!);
       }
@@ -1214,7 +1223,14 @@ class PreferLogTimestampRule extends SaropaLintRule {
   );
 
   static const Set<String> _logMethods = <String>{
-    'info', 'warning', 'severe', 'debug', 'fine', 'finer', 'finest', 'shout',
+    'info',
+    'warning',
+    'severe',
+    'debug',
+    'fine',
+    'finer',
+    'finest',
+    'shout',
   };
 
   @override

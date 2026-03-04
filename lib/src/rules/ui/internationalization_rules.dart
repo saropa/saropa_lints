@@ -2586,7 +2586,8 @@ class RequireRtlSupportRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_rtl_support',
     '[require_rtl_support] Support RTL layouts for Arabic/Hebrew locales.',
-    correctionMessage: 'Use Directionality, TextDirection, or directional widgets.',
+    correctionMessage:
+        'Use Directionality, TextDirection, or directional widgets.',
     severity: DiagnosticSeverity.INFO,
   );
 

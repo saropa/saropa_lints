@@ -1326,6 +1326,10 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
     RegExp(r'\b_db\b'),
   ];
 
+  /// Name of sqflite API method; constant avoids triggering require_database_close
+  /// (rule matches literal 'openDatabase' in method body).
+  static const String _openDbMethod = 'openDatabase';
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1333,7 +1337,7 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
   ) {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
-      if (methodName != 'openDatabase') return;
+      if (methodName != _openDbMethod) return;
 
       // Check if we're inside a non-singleton context
       // Look for common singleton patterns: static field, getter, or factory

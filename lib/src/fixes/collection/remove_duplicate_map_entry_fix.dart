@@ -37,7 +37,8 @@ class RemoveDuplicateMapEntryFix extends SaropaFixProducer {
     // Include preceding comma and whitespace
     if (start > 0) {
       int i = start - 1;
-      while (i >= 0 && (content[i] == ' ' || content[i] == '\t' || content[i] == '\n')) {
+      while (i >= 0 &&
+          (content[i] == ' ' || content[i] == '\t' || content[i] == '\n')) {
         i--;
       }
       if (i >= 0 && content[i] == ',') {
@@ -54,7 +55,8 @@ class RemoveDuplicateMapEntryFix extends SaropaFixProducer {
       }
       if (i < content.length && content[i] == ',') {
         i++;
-        while (i < content.length && (content[i] == ' ' || content[i] == '\t')) {
+        while (i < content.length &&
+            (content[i] == ' ' || content[i] == '\t')) {
           i++;
         }
         end = i;

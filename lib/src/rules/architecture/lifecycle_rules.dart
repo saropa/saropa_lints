@@ -435,9 +435,10 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
     final String bodySource = body.toSource();
     final fieldList = lateFields.toList();
     final assignmentPatterns = fieldList
-        .map((fieldName) => RegExp(
-              '(?:^|[^\\w])(?:this\\.)?$fieldName\\s*=\\s*[^=]',
-            ))
+        .map(
+          (fieldName) =>
+              RegExp('(?:^|[^\\w])(?:this\\.)?$fieldName\\s*=\\s*[^=]'),
+        )
         .toList();
 
     for (var i = 0; i < fieldList.length; i++) {

@@ -1877,7 +1877,10 @@ class TagNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  List<String> get configAliases => const <String>['tag_name', 'prefer_kebab_tag'];
+  List<String> get configAliases => const <String>[
+    'tag_name',
+    'prefer_kebab_tag',
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_kebab_tag_name',

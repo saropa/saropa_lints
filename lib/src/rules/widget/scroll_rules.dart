@@ -848,8 +848,9 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
     'SingleChildScrollView',
   };
 
-  static final RegExp _neverScrollablePhysicsPattern =
-      RegExp(r'neverscrollablescrollphysics');
+  static final RegExp _neverScrollablePhysicsPattern = RegExp(
+    r'neverscrollablescrollphysics',
+  );
 
   @override
   void runWithReporter(

@@ -11,6 +11,7 @@ import '../../fixes/async/avoid_redundant_async_fix.dart';
 import '../../fixes/async/change_to_future_void_function_fix.dart';
 import '../../fixes/async/replace_async_callback_with_future_void_function_fix.dart';
 import '../../fixes/async/add_to_utc_fix.dart';
+import '../../fixes/async/wrap_future_ignore_in_unawaited_fix.dart';
 import '../../fixes/async/wrap_in_unawaited_fix.dart';
 
 /// Warns when calling .ignore() on a Future.
@@ -60,6 +61,12 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        WrapFutureIgnoreInUnawaitedFix(context: context),
+  ];
 }
 
 /// Warns when calling toString() or using string interpolation on a Future.
@@ -3028,9 +3035,9 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            WrapInUnawaitedFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        WrapInUnawaitedFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_unawaited_future',
@@ -3761,7 +3768,9 @@ class _MountedCheckVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'setState' && _didSeeAwait && !_hasMountedCheck) {
+    if (node.methodName.name == 'setState' &&
+        _didSeeAwait &&
+        !_hasMountedCheck) {
       if (!_hasAncestorMountedCheck(node)) {
         reporter.atNode(node);
       }
@@ -4465,7 +4474,9 @@ class AvoidSequentialAwaitsRule extends SaropaLintRule {
           assignedVars.add(parent.name.lexeme);
           break;
         }
-        final left = parent is AssignmentExpression ? parent.leftHandSide : null;
+        final left = parent is AssignmentExpression
+            ? parent.leftHandSide
+            : null;
         if (left is SimpleIdentifier) {
           assignedVars.add(left.name);
           break;
@@ -4716,7 +4727,8 @@ class PreferStreamTransformerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_stream_transformer',
     '[prefer_stream_transformer] Consider Stream.transform() for reusable stream pipelines.',
-    correctionMessage: 'Use Stream.transform() with a custom StreamTransformer.',
+    correctionMessage:
+        'Use Stream.transform() with a custom StreamTransformer.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -4753,7 +4765,8 @@ class PreferStreamsOverPollingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_streams_over_polling',
     '[prefer_streams_over_polling] Timer.periodic used for polling. Consider a Stream instead.',
-    correctionMessage: 'Use a Stream (e.g. Stream.periodic or broadcast) for reactive updates.',
+    correctionMessage:
+        'Use a Stream (e.g. Stream.periodic or broadcast) for reactive updates.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -4787,7 +4800,8 @@ class RequireCancellableOperationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_cancellable_operations',
     '[require_cancellable_operations] Long-running async operation. Consider supporting cancellation.',
-    correctionMessage: 'Accept CancelToken or similar and check cancellation in loops.',
+    correctionMessage:
+        'Accept CancelToken or similar and check cancellation in loops.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -4841,7 +4855,8 @@ class RequireSubscriptionCompositeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_subscription_composite',
     '[require_subscription_composite] Multiple stream subscriptions should be combined (e.g. Rx.combineLatest) for single cancel.',
-    correctionMessage: 'Use combineLatest/zip or a single subscription to simplify disposal.',
+    correctionMessage:
+        'Use combineLatest/zip or a single subscription to simplify disposal.',
     severity: DiagnosticSeverity.INFO,
   );
 

@@ -2562,8 +2562,7 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  static final RegExp _notifierStatePattern =
-      RegExp(r'\.notifier\.state\b');
+  static final RegExp _notifierStatePattern = RegExp(r'\.notifier\.state\b');
 
   @override
   void runWithReporter(
@@ -2657,7 +2656,9 @@ class RequireRiverpodLintRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   @override
-  List<String> get configAliases => const <String>['require_riverpod_lint_package'];
+  List<String> get configAliases => const <String>[
+    'require_riverpod_lint_package',
+  ];
 
   static const LintCode _code = LintCode(
     'require_riverpod_lint',
@@ -3492,7 +3493,9 @@ class PreferRiverpodKeepAliveRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  static final RegExp _asyncNotifierProvider = RegExp(r'AsyncNotifierProvider\s*<');
+  static final RegExp _asyncNotifierProvider = RegExp(
+    r'AsyncNotifierProvider\s*<',
+  );
   static final RegExp _notifierProvider = RegExp(r'NotifierProvider\s*<');
   static final RegExp _refKeepAlive = RegExp(r'ref\.keepAlive\b');
 

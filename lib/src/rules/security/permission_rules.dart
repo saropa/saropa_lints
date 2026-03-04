@@ -726,8 +726,7 @@ class PreferPermissionMinimalRequestRule extends SaropaLintRule {
     'prefer_permission_minimal_request',
     '[prefer_permission_minimal_request] Request only permissions that are '
         'used. Unused permissions increase denial risk and privacy concerns.',
-    correctionMessage:
-        'Remove unused permissions from the request list.',
+    correctionMessage: 'Remove unused permissions from the request list.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -764,7 +763,8 @@ class RequirePermissionLifecycleObserverRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_permission_lifecycle_observer',
     '[require_permission_lifecycle_observer] Handle permission changes when app resumes.',
-    correctionMessage: 'Use WidgetsBindingObserver or lifecycle callbacks to re-check permissions.',
+    correctionMessage:
+        'Use WidgetsBindingObserver or lifecycle callbacks to re-check permissions.',
     severity: DiagnosticSeverity.INFO,
   );
 

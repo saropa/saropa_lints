@@ -707,7 +707,9 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
   ];
 
   @override
-  List<String> get configAliases => const <String>['prefer_const_constructor_declarations'];
+  List<String> get configAliases => const <String>[
+    'prefer_const_constructor_declarations',
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_declaring_const_constructor',

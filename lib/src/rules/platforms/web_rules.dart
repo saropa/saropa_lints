@@ -411,10 +411,7 @@ class PreferJsInteropOverDartJsRule extends SaropaLintRule {
   );
 
   /// Exact URIs only; no substring matching to avoid false positives.
-  static const Set<String> _deprecatedJsUris = {
-    'dart:js',
-    'dart:js_util',
-  };
+  static const Set<String> _deprecatedJsUris = {'dart:js', 'dart:js_util'};
 
   @override
   void runWithReporter(

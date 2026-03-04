@@ -6,6 +6,8 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../fixes/complexity/replace_bitwise_with_logical_fix.dart';
+import '../../fixes/complexity/wrap_if_null_in_parens_fix.dart';
+import '../../fixes/complexity/wrap_if_null_expression_in_parens_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Warns when bitwise operators are used with boolean operands.
@@ -129,6 +131,12 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        WrapIfNullInParensFix(context: context),
+  ];
 }
 
 /// Warns when arithmetic expressions are too complex.
@@ -878,6 +886,12 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        WrapIfNullExpressionInParensFix(context: context),
+  ];
 }
 
 /// Warns when code blocks are nested more than 5 levels deep.
