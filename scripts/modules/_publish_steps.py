@@ -225,9 +225,15 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
 
     # --- Run dart analyze as part of audit (fail fast; same as Step 6) ---
     if not audit_result.has_blocking_issues and not spelling_hits:
-        print_header("STEP 1 (cont.): DART ANALYZE")
-        if not run_analysis(project_dir):
+        analysis_result = run_analysis_with_prompt(
+            project_dir,
+            step_header="STEP 1 (cont.): DART ANALYZE",
+            do_doc_check=False,
+        )
+        if analysis_result == "abort":
             audit_result.analysis_passed = False
+        elif analysis_result == "ignore":
+            audit_result.analysis_passed = True  # Don't block; user chose to continue
 
     # --- Blocking issues gate ---
     if audit_result.has_blocking_issues or spelling_hits:
@@ -496,7 +502,22 @@ def run_tests(project_dir: Path) -> bool:
             env=env,
         )
         if result.returncode != 0:
-            return False
+            response = (
+                input("  Tests failed. Retry? [y/N]: ").strip().lower()
+                or "n"
+            )
+            if response in ("y", "yes"):
+                result = run_command(
+                    ["dart", "test"],
+                    project_dir,
+                    "Running unit tests (retry)",
+                    summarize=True,
+                    env=env,
+                )
+                if result.returncode != 0:
+                    return False
+            else:
+                return False
     else:
         print_warning("No test directory found, skipping unit tests")
 
@@ -595,41 +616,8 @@ def run_format(project_dir: Path) -> bool:
     return True
 
 
-def run_analysis(project_dir: Path) -> bool:
-    """Step 6: Run static analysis with log file and colorful summary."""
-    print_header("STEP 6: RUNNING STATIC ANALYSIS")
-
-    # Doc-comment check first (no success message — success = dart analyze passes)
-    print_info("Checking for pub.dev doc issues...")
-    pubdev_issues = check_pubdev_lint_issues(project_dir)
-    if pubdev_issues:
-        print_warning(f"Found {len(pubdev_issues)} pub.dev lint issue(s):")
-        for issue in pubdev_issues:
-            print_colored(f"      {issue}", Color.YELLOW)
-
-        print_info("Auto-fixing doc comment issues...")
-        fixed_brackets = fix_doc_angle_brackets(project_dir)
-        fixed_refs = fix_doc_references(project_dir)
-        total_fixed = fixed_brackets + fixed_refs
-
-        if total_fixed:
-            print_info(
-                f"Auto-fixed {total_fixed} issue(s) "
-                f"({fixed_brackets} angle bracket(s), "
-                f"{fixed_refs} doc reference(s))."
-            )
-
-        remaining = check_pubdev_lint_issues(project_dir)
-        if remaining:
-            print_error(
-                f"{len(remaining)} unfixable pub.dev lint issue(s) remain:"
-            )
-            for issue in remaining:
-                print_colored(f"      {issue}", Color.YELLOW)
-            return False
-
-    # Run dart analyze — only success is when this passes
-    # Log file: date-prefixed, in reports/
+def _run_dart_analyze_core(project_dir: Path) -> bool:
+    """Run dart analyze --fatal-infos, write log, print report. Returns True iff exit 0."""
     reports_dir = project_dir / "reports"
     reports_dir.mkdir(exist_ok=True)
     now = datetime.now()
@@ -641,7 +629,6 @@ def run_analysis(project_dir: Path) -> bool:
     print_info(f"Running dart analyze (output → reports/{log_name})")
     use_shell = get_shell_mode()
 
-    # Spinner while analyzer runs
     running = threading.Event()
     running.set()
     spinner = threading.Thread(
@@ -656,7 +643,8 @@ def run_analysis(project_dir: Path) -> bool:
             ["dart", "analyze", "--fatal-infos"],
             cwd=project_dir,
             capture_output=True,
-            text=True,
+            encoding="utf-8",
+            errors="replace",
             shell=use_shell,
         )
     finally:
@@ -668,7 +656,6 @@ def run_analysis(project_dir: Path) -> bool:
 
     counts = _parse_analysis_counts(combined)
 
-    # Colorful summary
     print()
     print_colored("  ─── Analysis report ───", Color.CYAN)
     if counts.total == 0:
@@ -700,16 +687,91 @@ def run_analysis(project_dir: Path) -> bool:
     if result.returncode != 0:
         print_error(
             f"dart analyze failed (exit code {result.returncode}). "
-            f"Fix the issues in the log above and re-run publish."
+            f"See report above."
         )
-        print_colored(
-            f"  Log: {log_path}",
-            Color.DIM,
-        )
+        print_colored(f"  Log: {log_path}", Color.DIM)
         return False
 
     print_success("dart analyze passed (no errors, warnings, or infos)")
     return True
+
+
+def _prompt_analysis_failure() -> str:
+    """Ask user what to do after analysis failed. Returns 'ignore' | 'retry' | 'abort'."""
+    print_warning("dart analyze failed. Choose an action:")
+    print_colored("  [I]gnore and continue (issues may be non-blocking)", Color.CYAN)
+    print_colored("  [R]etry (re-run dart analyze)", Color.CYAN)
+    print_colored("  [A]bort (stop publish)", Color.CYAN)
+    try:
+        raw = input("  Choice [i/r/a]: ").strip().lower() or "a"
+        if raw.startswith("i"):
+            return "ignore"
+        if raw.startswith("r"):
+            return "retry"
+        if raw.startswith("a"):
+            return "abort"
+    except (EOFError, KeyboardInterrupt):
+        return "abort"
+    return "abort"
+
+
+def run_analysis_with_prompt(
+    project_dir: Path,
+    step_header: str | None,
+    do_doc_check: bool,
+) -> str:
+    """Run dart analyze; on failure prompt Ignore/Retry/Abort. Returns 'ok' | 'ignore' | 'abort'."""
+    if step_header:
+        print_header(step_header)
+
+    if do_doc_check:
+        print_info("Checking for pub.dev doc issues...")
+        pubdev_issues = check_pubdev_lint_issues(project_dir)
+        if pubdev_issues:
+            print_warning(f"Found {len(pubdev_issues)} pub.dev lint issue(s):")
+            for issue in pubdev_issues:
+                print_colored(f"      {issue}", Color.YELLOW)
+            print_info("Auto-fixing doc comment issues...")
+            fixed_brackets = fix_doc_angle_brackets(project_dir)
+            fixed_refs = fix_doc_references(project_dir)
+            total_fixed = fixed_brackets + fixed_refs
+            if total_fixed:
+                print_info(
+                    f"Auto-fixed {total_fixed} issue(s) "
+                    f"({fixed_brackets} angle bracket(s), "
+                    f"{fixed_refs} doc reference(s))."
+                )
+            remaining = check_pubdev_lint_issues(project_dir)
+            if remaining:
+                print_error(
+                    f"{len(remaining)} unfixable pub.dev lint issue(s) remain:"
+                )
+                for issue in remaining:
+                    print_colored(f"      {issue}", Color.YELLOW)
+                return "abort"
+
+    while True:
+        if _run_dart_analyze_core(project_dir):
+            return "ok"
+        choice = _prompt_analysis_failure()
+        if choice == "abort":
+            return "abort"
+        if choice == "ignore":
+            return "ignore"
+        if choice == "retry":
+            print_info("Re-running dart analyze...")
+            continue
+    return "abort"
+
+
+def run_analysis(project_dir: Path) -> bool:
+    """Step 6: Run static analysis with log and prompt on failure. Returns True to continue."""
+    result = run_analysis_with_prompt(
+        project_dir,
+        step_header="STEP 6: RUNNING STATIC ANALYSIS",
+        do_doc_check=True,
+    )
+    return result in ("ok", "ignore")
 
 
 def validate_changelog(

@@ -551,21 +551,40 @@ def main(
             )
 
         with timer.step("Version sync"):  # Align pubspec, CHANGELOG, tag
-            if version != pubspec_version:  # User chose a different version
-                set_version_in_pubspec(pubspec_path, version)
-                print_success(f"Updated pubspec.yaml to {version}")
+            version_to_sync = version
+            while True:
+                if version_to_sync != pubspec_version:
+                    set_version_in_pubspec(pubspec_path, version_to_sync)
+                    print_success(f"Updated pubspec.yaml to {version_to_sync}")
 
-            # Rename [Unreleased] to this version in CHANGELOG
-            try:
-                if rename_unreleased_to_version(changelog_path, version):
-                    print_success(
-                        f"Renamed [Unreleased] to [{version}] "
-                        f"in CHANGELOG.md"
+                # Rename [Unreleased] to this version in CHANGELOG
+                try:
+                    if rename_unreleased_to_version(
+                        changelog_path, version_to_sync
+                    ):
+                        print_success(
+                            f"Renamed [Unreleased] to [{version_to_sync}] "
+                            f"in CHANGELOG.md"
+                        )
+                    break
+                except ValueError as exc:
+                    # CHANGELOG has both [Unreleased] and [version] — suggest
+                    # next patch and ask which version to publish
+                    suggested = increment_version(version_to_sync)
+                    print_warning(str(exc))
+                    print_colored(
+                        f"  Suggested version: {suggested} "
+                        f"(press Enter or edit)",
+                        Color.CYAN,
                     )
-            except ValueError as exc:  # Malformed CHANGELOG
-                exit_with_error(
-                    str(exc), ExitCode.CHANGELOG_FAILED,
-                )
+                    version_to_sync = _prompt_version(suggested)
+                    if not re.match(rf"^{_VERSION_RE}$", version_to_sync):
+                        print_warning(
+                            f"Invalid version format '{version_to_sync}'. "
+                            f"Use X.Y.Z or X.Y.Z-pre.N"
+                        )
+                        continue
+            version = version_to_sync
 
             # Validate pubspec and CHANGELOG versions match
             changelog_version = get_latest_changelog_version(

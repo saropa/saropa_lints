@@ -1,9 +1,15 @@
 # Analyzer 10 upgrade review
 
+**Last updated:** 2025-03; API and dependency versions verified against pub.dev and analyzer 10.0.0 docs.
+
 **Current:** analyzer ^9.0.0, analysis_server_plugin ^0.3.4, analyzer_plugin ^0.13.11  
 **Target:** analyzer ^10.0.0, analysis_server_plugin ^0.3.10+ (supports analyzer 10), analyzer_plugin ^0.14.0
 
 **Release:** This upgrade is **breaking** for consumers (SDK/analyzer constraints and plugin behavior). Ship as **saropa_lints v7** (major version bump from current v6.x).
+
+**Why analyzer 10 not 11?** Analyzer 11.x exists; this review targets **10.x** so the migration is bounded to the body/namePart and isSynthetic changes. A later upgrade to 11.x can be done separately (plugin APIs may have additional breaking changes there).
+
+**SDK:** Analyzer 10.x requires Dart SDK 3.9+. This project already uses `sdk: ">=3.10.0 <4.0.0"`, so no SDK constraint change is needed.
 
 ---
 
@@ -39,13 +45,14 @@ In analyzer 10 these nodes use a **body** and (where applicable) **namePart**:
 | Old (deprecated)                                        | New (analyzer 10)                                  |
 | ------------------------------------------------------- | -------------------------------------------------- |
 | `node.members`                                          | `(node.body as BlockClassBody).members`                                |
-| `node.leftBracket` / `node.rightBracket`                | `node.body.leftBracket` / `node.body.rightBracket` |
+| `node.leftBracket` / `node.rightBracket` (ClassDeclaration) | `(node.body as BlockClassBody).leftBracket` / `.rightBracket` |
+| **Enum only:** brackets                                 | `node.body.leftBracket` / `node.body.rightBracket` (EnumBody) |
 | `node.name`                                             | `node.namePart.typeName`                           |
 | `node.typeParameters`                                   | `node.namePart.typeParameters`                     |
 | **Enum only:** `node.constants`                         | `node.body.constants`                              |
 | **ExtensionType only:** `node.primaryConstructor`, etc. | See analyzer 10 docs for `body` / name parts       |
 
-**API note (analyzer 10.0.0):** `ClassDeclaration.body` is type **ClassBody** (sealed); the implementer **BlockClassBody** has `.members`, `.leftBracket`, `.rightBracket`. For normal class declarations the body is a `BlockClassBody`, so use `(node.body as BlockClassBody).members` (and brackets) unless the shared API exposes them on `ClassBody`. **ClassNamePart** (returned by `namePart`) has **`.typeName`** → **Token**, not `.name`; use `node.namePart.typeName` for `.lexeme` and `reporter.atToken(node.namePart.typeName, ...)`.
+**API note (analyzer 10.x):** **ClassDeclaration:** `body` is **ClassBody** (sealed); the implementer **BlockClassBody** has `.members`, `.leftBracket`, `.rightBracket`. Use `(node.body as BlockClassBody).members` and brackets. **EnumDeclaration:** `body` is **EnumBody** (has `.constants`, `.members`, `.leftBracket`, `.rightBracket` directly)—use `node.body.constants`, `node.body.members`, no cast. **ClassNamePart** (returned by `namePart` on both): **`.typeName`** → **Token** (not `.name`); use `node.namePart.typeName` for `.lexeme` and `reporter.atToken(node.namePart.typeName, ...)`. See: [ClassDeclaration](https://pub.dev/documentation/analyzer/10.0.0/dart_ast_ast/ClassDeclaration-class.html), [ClassNamePart](https://pub.dev/documentation/analyzer/10.0.0/dart_ast_ast/ClassNamePart-class.html), [BlockClassBody](https://pub.dev/documentation/analyzer/10.0.0/dart_ast_ast/BlockClassBody-class.html), [EnumBody](https://pub.dev/documentation/analyzer/10.0.0/dart_ast_ast/EnumBody-class.html).
 
 **Note:** `ListLiteral`, `SetOrMapLiteral`, `Block`, `FormalParameterList`, etc. are **not** affected; only ClassDeclaration, EnumDeclaration, ExtensionDeclaration, ExtensionTypeDeclaration.
 
@@ -187,7 +194,7 @@ Use this as a runbook. Complete in order; run analyze + test after each phase.
 - [ ] **1.1** In `pubspec.yaml`, bump **package version** to `7.0.0` (breaking release).
 - [ ] **1.2** In `pubspec.yaml`, set `analyzer: ^10.2.0` (find latest).
 - [ ] **1.3** In `pubspec.yaml`, set `analysis_server_plugin: ^0.3.11` (find latest).
-- [ ] **1.4** In `pubspec.yaml`, set `analyzer_plugin: ^0.14.4` (find latest`).
+- [ ] **1.4** In `pubspec.yaml`, set `analyzer_plugin: ^0.14.4` (or latest 0.14.x; check pub.dev).
 - [ ] **1.5** Run `dart pub get`. Resolve any version conflicts (adjust upper bounds if needed).
 - [ ] **1.6** Run `dart analyze --fatal-infos`. Note all new errors and deprecations (do not fix yet—just list them).
 
@@ -209,13 +216,15 @@ Only change code where the **receiver** is statically a `ClassDeclaration` (e.g.
 - [ ] **3.4** Run `dart analyze --fatal-infos` and fix any type/API issues (e.g. add `BlockClassBody` import from `package:analyzer/dart/ast/ast.dart` if needed).
 - [ ] **3.5** Run `dart test` and fix any test failures in rule tests.
 
+**Note:** `namePart.typeName` is a **Token** in analyzer 10 (see API note §2.2). Use it for `.lexeme` and `atToken` as with the old `node.name`.
+
 **Files to touch (ClassDeclaration):** See section 4 list; prioritize `class_constructor_rules.dart`, `structure_rules.dart`, `stylistic_rules.dart`, `formatting_rules.dart`, `stylistic_whitespace_constructor_rules.dart`, then all other rule files that use `addClassDeclaration` and access `.members`/`.name`/`.typeParameters`.
 
 ### Phase 4: EnumDeclaration migration
 
 - [ ] **4.1** In every `addEnumDeclaration` callback, replace:
   - `node.constants` → `node.body.constants`
-  - `node.members` → `(node.body as BlockClassBody).members`
+  - `node.members` → `node.body.members` (EnumBody has .members directly; do not use BlockClassBody)
   - `node.name` → `node.namePart.typeName` (Token; same as ClassDeclaration)
   - `node.typeParameters` → `node.namePart.typeParameters`
 - [ ] **4.2** Run `dart analyze --fatal-infos` and `dart test` for enum-related rules.
@@ -261,7 +270,7 @@ Only the **four declaration kinds** (ClassDeclaration, EnumDeclaration, Extensio
 
 ### 9.2 namePart.typeName (not .name)
 
-In analyzer 9, `ClassDeclaration.name` is a **Token**. In analyzer 10, `node.namePart.typeName` might be a **Token** or an **Identifier**. If it’s an `Identifier`, it may still have something like `.name` (the simple identifier) or `.lexeme`. Check the analyzer 10 API; every `node.name.lexeme` / `reporter.atToken(node.name, ...)` may need a one-line adjustment if the type differs (e.g. `node.namePart.typeName.lexeme` or `node.namePart.typeName.name`).
+In analyzer 9, `ClassDeclaration.name` is a **Token**. In analyzer 10, `node.namePart.typeName` is a **Token** (verified in analyzer 10 API). If it’s an `Identifier`, it may still have something like `.name` (the simple identifier) or `.lexeme`. Check the analyzer 10 API; every `node.name.lexeme` / `reporter.atToken(node.name, ...)` may need a one-line adjustment if the type differs (e.g. `node.namePart.typeName.lexeme` or `node.namePart.typeName.name`).
 
 ### 9.3 Parent–child relationship changes
 
@@ -297,9 +306,19 @@ The **test** directory does not (from the earlier grep) use `.members` on class 
 | Gotcha                                      | Impact      | Mitigation                                                                                                                                           |
 | ------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Blind replace breaks SwitchStatement, etc.  | High        | Only replace in addClassDeclaration / addEnumDeclaration / addExtensionDeclaration / addExtensionTypeDeclaration (or where type is one of the four). |
-| namePart.name type difference               | Medium      | Check API; adjust .lexeme / atToken call sites.                                                                                                      |
+| namePart: use .typeName (Token), not .name  | Medium      | Use `namePart.typeName` for .lexeme and atToken; no .name on ClassNamePart.                                                                           |
 | Parent–child change                         | Medium      | Audit .parent and visitor logic; use body when needed.                                                                                               |
 | Fatal infos                                 | High        | Fix all deprecations before CI can pass.                                                                                                             |
 | Plugin API breaks                           | Medium–High | Read plugin changelogs; fix registration and fix/assist APIs.                                                                                        |
 | ExtensionTypeDeclaration extra deprecations | Low–Medium  | Use full analyzer 10 migration guide for extension types.                                                                                            |
 | Test/expectation churn                      | Low         | Run tests; update expectations or fixtures if needed.                                                                                                |
+
+---
+
+## 10. References
+
+- [analyzer package](https://pub.dev/packages/analyzer) — pub.dev (check latest 10.x; 10.2.0 as of review).
+- [analyzer changelog](https://pub.dev/packages/analyzer/changelog) — breaking changes and deprecations.
+- [analysis_server_plugin](https://pub.dev/packages/analysis_server_plugin) — 0.3.10+ for analyzer 10.
+- [analyzer_plugin](https://pub.dev/packages/analyzer_plugin) — 0.14.x for analyzer 10.
+- API docs (analyzer 10.0.0): ClassDeclaration, ClassNamePart, BlockClassBody, EnumBody — linked in the API note under §2.2.
