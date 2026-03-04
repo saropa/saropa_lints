@@ -2,6 +2,27 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+/// Deletes [dir] with retries. On Windows, child processes (e.g. dart analyze)
+/// can hold handles so deletion fails with errno 32; we retry then give up
+/// without failing the test (cleanup is best-effort).
+Future<void> deleteTempDirWithRetry(Directory dir) async {
+  if (!dir.existsSync()) return;
+  const maxAttempts = 8;
+  const delay = Duration(milliseconds: 300);
+  for (var i = 0; i < maxAttempts; i++) {
+    try {
+      await dir.delete(recursive: true);
+      return;
+    } on FileSystemException catch (_) {
+      if (i < maxAttempts - 1) {
+        await Future<void>.delayed(delay);
+        continue;
+      }
+      // Best-effort cleanup: do not fail the test if delete still fails.
+    }
+  }
+}
+
 /// Regression test for the avoid_deprecated_usage rule.
 ///
 /// Ensures the rule does not crash the analyzer plugin when walking metadata.
@@ -22,11 +43,7 @@ void main() {
       final tempDir = await Directory.systemTemp.createTemp(
         'saropa_lints_avoid_deprecated_usage_',
       );
-      addTearDown(() async {
-        if (tempDir.existsSync()) {
-          await tempDir.delete(recursive: true);
-        }
-      });
+      addTearDown(() => deleteTempDirWithRetry(tempDir));
 
       final repoPathForYaml = repoRoot.path.replaceAll('\\', '/');
 
