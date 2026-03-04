@@ -784,19 +784,22 @@ void main() {
     });
 
     group('use_existing_variable', () {
-      test('should not flag same-source initializers that contain method invocations', () {
-        // Rule compares initializers by source; same source can yield different values.
-        // Expected behavior: These should NOT trigger (initializer contains invocation)
-        // final x = 0.2 + rng.nextDouble() * 0.6;
-        // final y = 0.2 + rng.nextDouble() * 0.6;
-        // final a = DateTime.now();
-        // final b = DateTime.now();
+      test(
+        'should not flag same-source initializers that contain method invocations',
+        () {
+          // Rule compares initializers by source; same source can yield different values.
+          // Expected behavior: These should NOT trigger (initializer contains invocation)
+          // final x = 0.2 + rng.nextDouble() * 0.6;
+          // final y = 0.2 + rng.nextDouble() * 0.6;
+          // final a = DateTime.now();
+          // final b = DateTime.now();
 
-        expect(
-          'Initializers with MethodInvocation/FunctionExpressionInvocation are excluded',
-          isNotNull,
-        );
-      });
+          expect(
+            'Initializers with MethodInvocation/FunctionExpressionInvocation are excluded',
+            isNotNull,
+          );
+        },
+      );
     });
 
     group('avoid_ignoring_return_values', () {

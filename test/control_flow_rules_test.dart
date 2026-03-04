@@ -222,6 +222,11 @@ void main() {
 
   group('Control Flow - Avoidance Rules', () {
     group('avoid_assignments_as_conditions', () {
+      test('rule offers quick fix (replace = with ==)', () {
+        final rule = AvoidAssignmentsAsConditionsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_assignments_as_conditions SHOULD trigger', () {
         // Pattern that should be avoided: avoid assignments as conditions
         expect('avoid_assignments_as_conditions detected', isNotNull);
@@ -549,6 +554,11 @@ void main() {
     });
 
     group('prefer_simpler_boolean_expressions', () {
+      test('rule offers quick fix (remove double negation / De Morgan)', () {
+        final rule = PreferSimplerBooleanExpressionsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('prefer_simpler_boolean_expressions SHOULD trigger', () {
         // Better alternative available: prefer simpler boolean expressions
         expect('prefer_simpler_boolean_expressions detected', isNotNull);

@@ -76,12 +76,15 @@ void main() {
         expect('Platform.isX property', isNotNull);
       });
 
-      test('files that are dart.library.io/ffi conditional import targets do not report (see conditional_import_utils_test)', () {
-        expect(
-          'Conditional-import awareness is tested in conditional_import_utils_test',
-          isNotNull,
-        );
-      });
+      test(
+        'files that are dart.library.io/ffi conditional import targets do not report (see conditional_import_utils_test)',
+        () {
+          expect(
+            'Conditional-import awareness is tested in conditional_import_utils_test',
+            isNotNull,
+          );
+        },
+      );
     });
     group('prefer_foundation_platform_check', () {
       test('dart:io Platform in Flutter SHOULD trigger', () {
