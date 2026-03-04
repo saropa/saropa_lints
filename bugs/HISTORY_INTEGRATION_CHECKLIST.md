@@ -7,82 +7,87 @@
 
 **First 10 reviewed (false_positives):** All 10 had fixes already in rule implementations and CHANGELOG_ARCHIVE. Integrated: rule DartDoc exemptions, CHANGELOG [Unreleased] bullet, and FP test groups for avoid_barrel_files and avoid_duplicate_number_elements. History files kept (not deleted) for detail.
 
+**Phase 3 (not_viable/roadmap) first 10:** Rationale from each file integrated into ROADMAP.md § "Rules reviewed and not viable" → "Roadmap (AST/infra/heuristic barriers)" table. History files deleted.
+
+**Next 20 (Phase 3 last + Phase 2 plans/releases/summary/task):** (1) avoid_unbounded_collections → ROADMAP not-viable table, file deleted. (2) Plans: drift_support_plan, file_structure, framework_feature_upgrade_suggestions, ROADMAP_NATIVE_PLUGIN, rule_versioning_plan, task_test_coverage_improvement_plan, TIER_AND_SEVERITY_ANALYSIS — content already in ROADMAP/CHANGELOG/tiers/UNIT_TEST_COVERAGE; LINKS.md and UNIT_TEST_COVERAGE.md updated; files deleted. (3) Releases: v4.12.2 and ci_analyzer_fixes already in CHANGELOG; files deleted. (4) Roadmap README + 4 summary files: historical; deleted. (5) First 5 roadmap/task (plain): task specs redundant with ROADMAP; deleted.
+
+**Next 20 (roadmap/task plain):** task_avoid_referencing_subclasses through task_prefer_class_destructuring — specs redundant with ROADMAP; files deleted.
 
 <!-- cspell:disable -->
 ---
 
 ## Phase 3: not_viable/roadmap (11 files)
 
-- [ ] bugs/history/not_viable/roadmap/task_??_avoid_any_version.md
-- [ ] bugs/history/not_viable/roadmap/task_??_avoid_banned_api.md
-- [ ] bugs/history/not_viable/roadmap/task_??_avoid_connectivity_ui_decisions.md
-- [ ] bugs/history/not_viable/roadmap/task_??_avoid_dependency_overrides.md
-- [ ] bugs/history/not_viable/roadmap/task_??_avoid_firestore_admin_role_overuse.md
-- [ ] bugs/history/not_viable/roadmap/task_??_avoid_large_assets_on_web.md
-- [ ] bugs/history/not_viable/roadmap/task_??_avoid_large_object_in_state.md
-- [ ] bugs/history/not_viable/roadmap/task_??_avoid_pagination_refetch_all.md
-- [ ] bugs/history/not_viable/roadmap/task_??_avoid_repeated_widget_creation.md
-- [ ] bugs/history/not_viable/roadmap/task_??_avoid_suspicious_global_reference.md
-- [ ] bugs/history/not_viable/roadmap/task_??_avoid_unbounded_collections.md
+- [x] bugs/history/not_viable/roadmap/task_??_avoid_any_version.md
+- [x] bugs/history/not_viable/roadmap/task_??_avoid_banned_api.md
+- [x] bugs/history/not_viable/roadmap/task_??_avoid_connectivity_ui_decisions.md
+- [x] bugs/history/not_viable/roadmap/task_??_avoid_dependency_overrides.md
+- [x] bugs/history/not_viable/roadmap/task_??_avoid_firestore_admin_role_overuse.md
+- [x] bugs/history/not_viable/roadmap/task_??_avoid_large_assets_on_web.md
+- [x] bugs/history/not_viable/roadmap/task_??_avoid_large_object_in_state.md
+- [x] bugs/history/not_viable/roadmap/task_??_avoid_pagination_refetch_all.md
+- [x] bugs/history/not_viable/roadmap/task_??_avoid_repeated_widget_creation.md
+- [x] bugs/history/not_viable/roadmap/task_??_avoid_suspicious_global_reference.md
+- [x] bugs/history/not_viable/roadmap/task_??_avoid_unbounded_collections.md
 
 ---
 
 ## Phase 2: plans (7 files)
 
-- [ ] bugs/history/plans/drift_support_plan.md
-- [ ] bugs/history/plans/file_structure.md
-- [ ] bugs/history/plans/framework_feature_upgrade_suggestions.md
-- [ ] bugs/history/plans/ROADMAP_NATIVE_PLUGIN.md
-- [ ] bugs/history/plans/rule_versioning_plan.md
-- [ ] bugs/history/plans/task_test_coverage_improvement_plan.md
-- [ ] bugs/history/plans/TIER_AND_SEVERITY_ANALYSIS.md
+- [x] bugs/history/plans/drift_support_plan.md
+- [x] bugs/history/plans/file_structure.md
+- [x] bugs/history/plans/framework_feature_upgrade_suggestions.md
+- [x] bugs/history/plans/ROADMAP_NATIVE_PLUGIN.md
+- [x] bugs/history/plans/rule_versioning_plan.md
+- [x] bugs/history/plans/task_test_coverage_improvement_plan.md
+- [x] bugs/history/plans/TIER_AND_SEVERITY_ANALYSIS.md
 
 ---
 
 ## Phase 2: releases (2 files)
 
-- [ ] bugs/history/releases/2026-02-07_v4.12.2_abort_rerun_config.md
-- [ ] bugs/history/releases/ci_analyzer_fixes_2026.md
+- [x] bugs/history/releases/2026-02-07_v4.12.2_abort_rerun_config.md
+- [x] bugs/history/releases/ci_analyzer_fixes_2026.md
 
 ---
 
 ## Phase 2: roadmap/summary (5 files)
 
-- [ ] bugs/history/roadmap/README.md
-- [ ] bugs/history/roadmap/summary/nine_rules_implemented_2026.md
-- [ ] bugs/history/roadmap/summary/roadmap_detail_12_rules_implemented.md
-- [ ] bugs/history/roadmap/summary/SUMMARY_18_roadmap_detail_rules_implemented.md
-- [ ] bugs/history/roadmap/summary/SUMMARY.md
+- [x] bugs/history/roadmap/README.md
+- [x] bugs/history/roadmap/summary/nine_rules_implemented_2026.md
+- [x] bugs/history/roadmap/summary/roadmap_detail_12_rules_implemented.md
+- [x] bugs/history/roadmap/summary/SUMMARY_18_roadmap_detail_rules_implemented.md
+- [x] bugs/history/roadmap/summary/SUMMARY.md
 
 ---
 
 ## Phase 2: roadmap/task (plain) (75 files)
 
-- [ ] bugs/history/roadmap/task/task_avoid_cascades.md
-- [ ] bugs/history/roadmap/task/task_avoid_cubits.md
-- [ ] bugs/history/roadmap/task/task_avoid_expensive_log_string_construction.md
-- [ ] bugs/history/roadmap/task/task_avoid_explicit_type_declaration.md
-- [ ] bugs/history/roadmap/task/task_avoid_freezed_invalid_annotation_target.md
-- [ ] bugs/history/roadmap/task/task_avoid_referencing_subclasses.md
-- [ ] bugs/history/roadmap/task/task_avoid_renaming_representation_getters.md
-- [ ] bugs/history/roadmap/task/task_avoid_returning_this.md
-- [ ] bugs/history/roadmap/task/task_avoid_riverpod_string_provider_name.md
-- [ ] bugs/history/roadmap/task/task_avoid_test_on_real_device.md
-- [ ] bugs/history/roadmap/task/task_avoid_unnecessary_null_aware_elements.md
-- [ ] bugs/history/roadmap/task/task_format_test_name.md
-- [ ] bugs/history/roadmap/task/task_prefer_asmap_over_indexed_iteration.md
-- [ ] bugs/history/roadmap/task/task_prefer_auto_route_path_params_simple.md
-- [ ] bugs/history/roadmap/task/task_prefer_auto_route_typed_args.md
-- [ ] bugs/history/roadmap/task/task_prefer_base_prefix.md
-- [ ] bugs/history/roadmap/task/task_prefer_biometric_protection.md
-- [ ] bugs/history/roadmap/task/task_prefer_bloc_extensions.md
-- [ ] bugs/history/roadmap/task/task_prefer_block_body_setters.md
-- [ ] bugs/history/roadmap/task/task_prefer_branch_io_or_firebase_links.md
-- [ ] bugs/history/roadmap/task/task_prefer_builder_pattern.md
-- [ ] bugs/history/roadmap/task/task_prefer_cache_extent.md
-- [ ] bugs/history/roadmap/task/task_prefer_cancellation_token_pattern.md
-- [ ] bugs/history/roadmap/task/task_prefer_cascade_assignments.md
-- [ ] bugs/history/roadmap/task/task_prefer_class_destructuring.md
+- [x] bugs/history/roadmap/task/task_avoid_cascades.md
+- [x] bugs/history/roadmap/task/task_avoid_cubits.md
+- [x] bugs/history/roadmap/task/task_avoid_expensive_log_string_construction.md
+- [x] bugs/history/roadmap/task/task_avoid_explicit_type_declaration.md
+- [x] bugs/history/roadmap/task/task_avoid_freezed_invalid_annotation_target.md
+- [x] bugs/history/roadmap/task/task_avoid_referencing_subclasses.md
+- [x] bugs/history/roadmap/task/task_avoid_renaming_representation_getters.md
+- [x] bugs/history/roadmap/task/task_avoid_returning_this.md
+- [x] bugs/history/roadmap/task/task_avoid_riverpod_string_provider_name.md
+- [x] bugs/history/roadmap/task/task_avoid_test_on_real_device.md
+- [x] bugs/history/roadmap/task/task_avoid_unnecessary_null_aware_elements.md
+- [x] bugs/history/roadmap/task/task_format_test_name.md
+- [x] bugs/history/roadmap/task/task_prefer_asmap_over_indexed_iteration.md
+- [x] bugs/history/roadmap/task/task_prefer_auto_route_path_params_simple.md
+- [x] bugs/history/roadmap/task/task_prefer_auto_route_typed_args.md
+- [x] bugs/history/roadmap/task/task_prefer_base_prefix.md
+- [x] bugs/history/roadmap/task/task_prefer_biometric_protection.md
+- [x] bugs/history/roadmap/task/task_prefer_bloc_extensions.md
+- [x] bugs/history/roadmap/task/task_prefer_block_body_setters.md
+- [x] bugs/history/roadmap/task/task_prefer_branch_io_or_firebase_links.md
+- [x] bugs/history/roadmap/task/task_prefer_builder_pattern.md
+- [x] bugs/history/roadmap/task/task_prefer_cache_extent.md
+- [x] bugs/history/roadmap/task/task_prefer_cancellation_token_pattern.md
+- [x] bugs/history/roadmap/task/task_prefer_cascade_assignments.md
+- [x] bugs/history/roadmap/task/task_prefer_class_destructuring.md
 - [ ] bugs/history/roadmap/task/task_prefer_closest_context.md
 - [ ] bugs/history/roadmap/task/task_prefer_compile_time_config.md
 - [ ] bugs/history/roadmap/task/task_prefer_conditional_logging.md
