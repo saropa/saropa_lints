@@ -12,6 +12,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **History integration (checklist batches):** Integrated 51 `bugs/history` files: 11 not_viable/roadmap (rationale in ROADMAP § Rules reviewed and not viable), 7 plans, 2 releases, 5 roadmap/summary, 25 roadmap/task (plain). LINKS.md and UNIT_TEST_COVERAGE.md updated; checklist progress in `bugs/HISTORY_INTEGRATION_CHECKLIST.md`.
+
+---
+
 ## [6.2.0]
 
 **Focus: Dog Food** — This release focuses on cleaning up all lint issues in our own project (eating our own dog food).
