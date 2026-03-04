@@ -11,6 +11,7 @@ import '../../fixes/control_flow/remove_double_negation_fix.dart';
 import '../../fixes/control_flow/replace_assignment_with_comparison_fix.dart';
 import '../../fixes/control_flow/remove_duplicate_switch_case_fix.dart';
 import '../../fixes/control_flow/simplify_de_morgan_fix.dart';
+import '../../fixes/control_flow/prefer_returning_conditionals_fix.dart';
 import '../../fixes/control_flow/remove_redundant_else_fix.dart';
 import '../../fixes/control_flow/remove_unconditional_break_fix.dart';
 import '../../fixes/control_flow/replace_with_then_branch_fix.dart';
@@ -1830,6 +1831,12 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferReturningConditionalsFix(context: context),
+  ];
 
   bool _returnsBoolLiteral(Statement stmt, bool value) {
     if (stmt is ReturnStatement) {

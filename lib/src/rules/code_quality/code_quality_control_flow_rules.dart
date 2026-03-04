@@ -7,6 +7,11 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 
+import '../../fixes/code_quality/replace_constant_condition_fix.dart';
+import '../../fixes/control_flow/remove_duplicate_switch_case_fix.dart';
+import '../../fixes/control_flow/flatten_redundant_nested_condition_fix.dart';
+import '../../fixes/control_flow/remove_duplicate_pattern_case_fix.dart';
+import '../../fixes/control_flow/remove_wildcard_or_default_case_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 class AvoidComplexLoopConditionsRule extends SaropaLintRule {
@@ -131,6 +136,12 @@ class AvoidConstantConditionsRule extends SaropaLintRule {
     });
   }
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceConstantConditionFix(context: context),
+  ];
+
   bool _isConstant(Expression expr) {
     return expr is IntegerLiteral ||
         expr is DoubleLiteral ||
@@ -188,6 +199,12 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
     });
   }
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveWildcardOrDefaultCaseFix(context: context),
+  ];
+
   bool _looksLikeEnumType(String typeName) {
     if (typeName.isEmpty) return false;
     final String clean = typeName.replaceAll('?', '');
@@ -244,6 +261,12 @@ class NoEqualNestedConditionsRule extends SaropaLintRule {
       );
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        FlattenRedundantNestedConditionFix(context: context),
+  ];
 }
 
 class _NestedConditionChecker extends RecursiveAstVisitor<void> {
@@ -320,6 +343,12 @@ class NoEqualSwitchCaseRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveDuplicateSwitchCaseFix(context: context),
+  ];
 }
 
 /// Warns when isEmpty/isNotEmpty is used after where().
@@ -384,6 +413,12 @@ class AvoidDuplicatePatternsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveDuplicatePatternCaseFix(context: context),
+  ];
 }
 
 /// Warns when an extension type contains another extension type.
@@ -449,6 +484,12 @@ class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveWildcardOrDefaultCaseFix(context: context),
+  ];
 }
 
 /// Warns when switch on sealed types uses default or wildcard, defeating exhaustiveness.
@@ -511,6 +552,12 @@ class RequireExhaustiveSealedSwitchRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveWildcardOrDefaultCaseFix(context: context),
+  ];
 }
 
 /// Warns when switch expression cases have identical expressions.
@@ -563,6 +610,12 @@ class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveDuplicateSwitchCaseFix(context: context),
+  ];
 }
 
 /// Prefer switch expression over switch statement when all cases are simple

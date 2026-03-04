@@ -12,6 +12,7 @@ import '../../fixes/async/change_to_future_void_function_fix.dart';
 import '../../fixes/async/replace_async_callback_with_future_void_function_fix.dart';
 import '../../fixes/async/add_to_utc_fix.dart';
 import '../../fixes/async/wrap_future_ignore_in_unawaited_fix.dart';
+import '../../fixes/async/remove_redundant_await_fix.dart';
 import '../../fixes/async/wrap_in_unawaited_fix.dart';
 
 /// Warns when calling .ignore() on a Future.
@@ -4677,6 +4678,12 @@ class AvoidRedundantAwaitRule extends SaropaLintRule {
       reporter.atNode(node);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveRedundantAwaitFix(context: context),
+  ];
 }
 
 // =============================================================================

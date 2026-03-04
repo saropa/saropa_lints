@@ -12,6 +12,11 @@ import '../../analyzer_metadata_compat_utils.dart';
 import '../../banned_usage_config.dart' as banned_usage_config;
 import '../../fixes/code_quality/avoid_substring_todo_fix.dart';
 import '../../fixes/code_quality/combine_adjacent_strings_fix.dart';
+import '../../fixes/code_quality/add_set_or_map_type_argument_fix.dart';
+import '../../fixes/code_quality/delete_duplicate_initializer_fix.dart';
+import '../../fixes/code_quality/remove_default_value_argument_fix.dart';
+import '../../fixes/code_quality/delete_static_field_assignment_fix.dart';
+import '../../fixes/code_quality/remove_empty_build_when_fix.dart';
 import '../../fixes/code_quality/delete_unknown_pragma_fix.dart';
 import '../../fixes/code_quality/prefix_unused_parameter_fix.dart';
 import '../../fixes/code_quality/remove_always_null_argument_fix.dart';
@@ -426,6 +431,12 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddSetOrMapTypeArgumentFix(context: context),
+  ];
 }
 
 /// Warns when an object is passed as an argument to its own method.
@@ -1420,6 +1431,12 @@ class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
     });
   }
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        DeleteStaticFieldAssignmentFix(context: context),
+  ];
+
   void _checkMethodBody(
     FunctionBody body,
     Set<String> staticFields,
@@ -2189,6 +2206,12 @@ class AvoidDuplicateInitializersRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        DeleteDuplicateInitializerFix(context: context),
+  ];
 }
 
 /// Warns when an override just calls super without additional logic.
@@ -2619,6 +2642,12 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
       }
     }
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveDefaultValueArgumentFix(context: context),
+  ];
 
   bool _isEmptyCollectionLiteral(Expression expr) {
     // Check for empty list literal
@@ -3051,6 +3080,12 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveEmptyBuildWhenFix(context: context),
+  ];
 }
 
 /// Suggests using 'use' prefix for custom hooks.

@@ -7,8 +7,16 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import '../../saropa_lint_rule.dart';
+import '../../fixes/code_quality/prefer_dot_shorthand_fix.dart';
 import '../../fixes/code_quality/prefer_returning_conditional_expressions_fix.dart';
+import '../../fixes/code_quality/add_use_prefix_fix.dart';
+import '../../fixes/code_quality/replace_conditional_spread_with_null_aware_fix.dart';
+import '../../fixes/code_quality/replace_expect_contains_is_true_with_contains_fix.dart';
+import '../../fixes/code_quality/replace_expect_length_equals_zero_with_is_empty_fix.dart';
+import '../../fixes/code_quality/replace_first_where_with_by_name_fix.dart';
+import '../../fixes/code_quality/replace_where_is_empty_with_any_fix.dart';
 import '../../fixes/code_quality/simplify_boolean_comparison_fix.dart';
+import '../../fixes/code_quality/simplify_redundant_null_aware_spread_fix.dart';
 
 class PreferBothInliningAnnotationsRule extends SaropaLintRule {
   PreferBothInliningAnnotationsRule() : super(code: _code);
@@ -205,6 +213,12 @@ class PreferEnumsByNameRule extends SaropaLintRule {
     });
   }
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceFirstWhereWithByNameFix(context: context),
+  ];
+
   bool _isNameAccess(Expression expr) {
     if (expr is PrefixedIdentifier) {
       return expr.identifier.name == 'name';
@@ -342,6 +356,14 @@ class PreferNullAwareSpreadRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        SimplifyRedundantNullAwareSpreadFix(context: context),
+    ({required CorrectionProducerContext context}) =>
+        ReplaceConditionalSpreadWithNullAwareFix(context: context),
+  ];
 }
 
 /// Warns when @visibleForTesting should be used on members.
@@ -492,6 +514,12 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWhereIsEmptyWithAnyFix(context: context),
+  ];
 }
 
 /// Warns when index-based for loop can be replaced with for-in.
@@ -1206,6 +1234,14 @@ class PreferTestMatchersRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceExpectLengthEqualsZeroWithIsEmptyFix(context: context),
+    ({required CorrectionProducerContext context}) =>
+        ReplaceExpectContainsIsTrueWithContainsFix(context: context),
+  ];
 }
 
 /// Warns when `FutureOr<T>` could be unwrapped for cleaner handling.
@@ -1620,6 +1656,12 @@ class PreferUsePrefixRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddUsePrefixFix(context: context),
+  ];
 }
 
 class _HookCallVisitor extends RecursiveAstVisitor<void> {
@@ -1733,6 +1775,12 @@ class PreferDotShorthandRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferDotShorthandFix(context: context),
+  ];
 }
 
 // =============================================================================

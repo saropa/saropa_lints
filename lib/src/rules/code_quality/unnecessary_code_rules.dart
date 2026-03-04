@@ -16,6 +16,7 @@ import '../../fixes/unnecessary_code/remove_unnecessary_block_fix.dart';
 import '../../fixes/unnecessary_code/remove_unnecessary_enum_argument_fix.dart';
 import '../../fixes/unnecessary_code/remove_unnecessary_enum_prefix_fix.dart';
 import '../../fixes/unnecessary_code/remove_unnecessary_getter_fix.dart';
+import '../../fixes/unnecessary_code/no_empty_block_fix.dart';
 import '../../fixes/unnecessary_code/remove_unnecessary_super_fix.dart';
 import '../../fixes/unnecessary_code/replace_null_aware_spread_fix.dart';
 
@@ -961,6 +962,12 @@ class NoEmptyBlockRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        NoEmptyBlockFix(context: context),
+  ];
 }
 
 /// Warns when an empty string literal is used.

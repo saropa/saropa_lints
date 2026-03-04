@@ -496,6 +496,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferFactoryConstructorRule.new,
   PreferAssertsInInitializerListsRule.new,
   PreferConstConstructorsInImmutablesRule.new,
+  PreferConstConstructorDeclarationsRule.new,
   PreferFinalFieldsRule.new,
   PreferFinalFieldsAlwaysRule.new,
   AvoidUnnecessaryIfRule.new,

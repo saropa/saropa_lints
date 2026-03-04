@@ -23,9 +23,18 @@ class AvoidRedundantAsyncFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final target = node is FunctionBody
+    FunctionBody? target = node is FunctionBody
         ? node
         : node.thisOrAncestorOfType<FunctionBody>();
+    if (target == null) {
+      final method = node.thisOrAncestorOfType<MethodDeclaration>();
+      if (method != null) {
+        target = method.body;
+      } else {
+        final func = node.thisOrAncestorOfType<FunctionDeclaration>();
+        if (func != null) target = func.functionExpression.body;
+      }
+    }
     if (target == null) return;
 
     // Delete only the 'async' keyword, not the entire body

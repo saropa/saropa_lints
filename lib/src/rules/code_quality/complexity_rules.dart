@@ -5,8 +5,10 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../fixes/complexity/remove_duplicate_cascade_section_fix.dart';
 import '../../fixes/complexity/replace_bitwise_with_logical_fix.dart';
 import '../../fixes/complexity/wrap_if_null_in_parens_fix.dart';
+import '../../fixes/complexity/swap_binary_operand_order_fix.dart';
 import '../../fixes/complexity/wrap_if_null_expression_in_parens_fix.dart';
 import '../../saropa_lint_rule.dart';
 
@@ -364,6 +366,12 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveDuplicateCascadeSectionFix(context: context),
+  ];
 }
 
 /// Warns when an expression has excessive complexity.
@@ -735,6 +743,12 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        SwapBinaryOperandOrderFix(context: context),
+  ];
 }
 
 /// Warns when an expression is repeated and could be extracted to a variable.

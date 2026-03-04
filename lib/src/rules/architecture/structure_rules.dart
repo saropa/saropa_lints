@@ -10,8 +10,13 @@ import 'package:analyzer/source/line_info.dart';
 import '../../fixes/structure/delete_duplicate_export_fix.dart';
 import '../../fixes/structure/delete_duplicate_import_fix.dart';
 import '../../fixes/structure/delete_duplicate_mixin_fix.dart';
+import '../../fixes/async/avoid_redundant_async_fix.dart';
+import '../../fixes/structure/delete_throw_in_finally_fix.dart';
 import '../../fixes/structure/prefer_trailing_underscore_for_unused_fix.dart';
 import '../../fixes/structure/remove_double_slash_imports_fix.dart';
+import '../../fixes/structure/remove_unnecessary_nullable_return_type_fix.dart';
+import '../../fixes/structure/remove_unnecessary_reassignment_fix.dart';
+import '../../fixes/return/inline_immediate_return_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Warns when a file only contains export statements (barrel file).
@@ -1674,6 +1679,12 @@ class AvoidUnnecessaryLocalVariableRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        InlineImmediateReturnFix(context: context),
+  ];
 }
 
 /// Warns when a variable is assigned the same value it already has.
@@ -1734,6 +1745,12 @@ class AvoidUnnecessaryReassignmentRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryReassignmentFix(context: context),
+  ];
 }
 
 /// Warns when an instance method doesn't use `this` and could be static.
@@ -2267,6 +2284,12 @@ class AvoidUnnecessaryFuturesRule extends SaropaLintRule {
     });
   }
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AvoidRedundantAsyncFix(context: context),
+  ];
+
   bool _containsAwaitExpression(FunctionBody body) {
     bool found = false;
     body.visitChildren(_AwaitExpressionFinder(() => found = true));
@@ -2344,6 +2367,12 @@ class AvoidThrowInFinallyRule extends SaropaLintRule {
       );
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        DeleteThrowInFinallyFix(context: context),
+  ];
 }
 
 class _ThrowFinder extends RecursiveAstVisitor<void> {
@@ -2415,6 +2444,12 @@ class AvoidUnnecessaryNullableReturnTypeRule extends SaropaLintRule {
       reporter.atNode(returnType);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryNullableReturnTypeFix(context: context),
+  ];
 
   bool _canReturnNull(FunctionBody body) {
     if (body is ExpressionFunctionBody) {

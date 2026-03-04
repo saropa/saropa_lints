@@ -302,21 +302,40 @@ class AvoidContinuousLocationUpdatesRule extends SaropaLintRule {
 }
 
 // =============================================================================
-// prefer_geolocation_coarse_location
+// prefer_geolocation_coarse_location / prefer_geolocator_coarse_location
 // =============================================================================
 
 /// Prefer coarse location when high accuracy is not needed (battery and privacy).
+///
+/// Warns when [Geolocator.getCurrentPosition] or [Geolocator.getPositionStream]
+/// is used with [LocationAccuracy.best] or [LocationAccuracy.high] without
+/// a clear need. Use [LocationAccuracy.low] or [LocationAccuracy.medium]
+/// when fine location is not required.
+///
+/// **BAD:**
+/// ```dart
+/// final pos = await Geolocator.getCurrentPosition(
+///   locationSettings: LocationSettings(accuracy: LocationAccuracy.best),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final pos = await Geolocator.getCurrentPosition(
+///   locationSettings: LocationSettings(accuracy: LocationAccuracy.low),
+/// );
+/// ```
 class PreferGeolocationCoarseLocationRule extends SaropaLintRule {
   PreferGeolocationCoarseLocationRule() : super(code: _code);
+
+  @override
+  List<String> get configAliases => const <String>['prefer_geolocator_coarse_location'];
 
   @override
   LintImpact get impact => LintImpact.medium;
 
   @override
   RuleCost get cost => RuleCost.low;
-
-  @override
-  Set<String>? get requiredPatterns => const <String>{'geolocator'};
 
   static const LintCode _code = LintCode(
     'prefer_geolocation_coarse_location',
@@ -328,9 +347,34 @@ class PreferGeolocationCoarseLocationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  static final RegExp _bestOrHighAccuracy = RegExp(
+    r'LocationAccuracy\.(?:best|high)\b',
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
-  ) {}
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'getCurrentPosition' && methodName != 'getPositionStream') {
+        return;
+      }
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Geolocator') return;
+
+      final String argsSource = node.argumentList.toSource();
+      if (!_bestOrHighAccuracy.hasMatch(argsSource)) return;
+
+      reporter.atNode(node);
+    });
+
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (node.constructorName.type.name.lexeme != 'LocationSettings') return;
+      final String source = node.argumentList.toSource();
+      if (!_bestOrHighAccuracy.hasMatch(source)) return;
+      reporter.atNode(node);
+    });
+  }
 }
