@@ -4,7 +4,7 @@
 **Scope:** All lint rules in `lib/src/rules/` and all rule-related tests in `test/`.  
 **Goal:** Publish “Test Coverage” report shows **Fixtures = 100%**.
 
-This document merges the former **UNIT_TEST_COVERAGE_REVIEW.md** (current status) and **FULL_TEST_COVERAGE_PLAN.md** (checklist). Ground truth analysis (if present): `reports/missing_fixtures_analysis.md`.
+This document merges the former **UNIT_TEST_COVERAGE_REVIEW.md** (current status) and **FULL_TEST_COVERAGE_PLAN.md** (checklist). Phases 1–3 of the test-coverage improvement plan (high/medium/small categories) are complete — 95/95 categories with test files. Ground truth analysis (if present): `reports/missing_fixtures_analysis.md`.
 
 ---
 
@@ -173,4 +173,4 @@ For each item: create `.../{rule_name}_fixture.dart` with at least a **BAD** exa
 | Real behavioral tests (linter on code) | **In progress** |
 | Publish report Fixtures = 100% | **Checklist above** |
 
-Completed fixture and rule-instantiation work is summarized in `bugs/history/unit_test_coverage_fixtures_and_instantiation_completed.md` (if present).
+Completed fixture and rule-instantiation work is summarized in `bugs/history/unit_test_coverage_fixtures_and_instantiation_completed.md` (if present). Batch 2026-03-03: 10 new Rule Instantiation tests, 42 new rules in integration expected list — see `bugs/history/unit_test_coverage_batch_2026-03-03.md`.
