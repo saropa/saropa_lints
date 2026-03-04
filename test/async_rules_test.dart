@@ -317,6 +317,11 @@ void main() {
 
   group('Future Handling Rules', () {
     group('avoid_future_ignore', () {
+      test('rule offers quick fix (replace with unawaited)', () {
+        final rule = AvoidFutureIgnoreRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('Future.ignore() call SHOULD trigger', () {
         // Discards all errors and exceptions silently
         expect('Future.ignore() detected', isNotNull);

@@ -107,6 +107,11 @@ void main() {
       });
     });
     group('avoid_self_assignment', () {
+      test('rule offers quick fix (remove self-assignment statement)', () {
+        final rule = AvoidSelfAssignmentRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('x = x assignment SHOULD trigger', () {
         expect('x = x assignment', isNotNull);
       });

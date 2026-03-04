@@ -129,25 +129,44 @@ void main() {
 
   group('Web - Preference Rules', () {
     group('prefer_js_interop_over_dart_js', () {
-      test('rule metadata: problemMessage mentions dart:js and dart:js_util', () {
-        final rule = PreferJsInteropOverDartJsRule();
-        final msg = rule.code.problemMessage;
-        expect(msg, contains('dart:js'));
-        expect(msg, contains('dart:js_util'));
-      });
-      test('only dart:js and dart:js_util trigger (no dart:html or package URIs)', () {
-        // False-positive guard: rule uses exact Set match; similar URIs must not match.
-        final rule = PreferJsInteropOverDartJsRule();
-        expect(rule.code.name, 'prefer_js_interop_over_dart_js');
-        // If the rule used .contains() on string, 'dart:html'.contains('dart:js') could match.
-        // Our implementation uses Set.contains(uri) so only exact URIs trigger.
-        expect(rule.code.correctionMessage, contains('dart:js_interop'));
-      });
+      test(
+        'rule metadata: problemMessage mentions dart:js and dart:js_util',
+        () {
+          final rule = PreferJsInteropOverDartJsRule();
+          final msg = rule.code.problemMessage;
+          expect(msg, contains('dart:js'));
+          expect(msg, contains('dart:js_util'));
+        },
+      );
+      test(
+        'only dart:js and dart:js_util trigger (no dart:html or package URIs)',
+        () {
+          // False-positive guard: rule uses exact Set match; similar URIs must not match.
+          final rule = PreferJsInteropOverDartJsRule();
+          expect(rule.code.name, 'prefer_js_interop_over_dart_js');
+          // If the rule used .contains() on string, 'dart:html'.contains('dart:js') could match.
+          // Our implementation uses Set.contains(uri) so only exact URIs trigger.
+          expect(rule.code.correctionMessage, contains('dart:js_interop'));
+        },
+      );
       test('compliant URI dart:js_interop is not in deprecated set', () {
-        const compliantUris = ['dart:js_interop', 'dart:js_interop_unsafe', 'dart:html', 'package:foo/dart_js.dart'];
+        const compliantUris = [
+          'dart:js_interop',
+          'dart:js_interop_unsafe',
+          'dart:html',
+          'package:foo/dart_js.dart',
+        ];
         for (final uri in compliantUris) {
-          expect(uri, isNot(equals('dart:js')), reason: 'dart:js should not be in compliant list');
-          expect(uri, isNot(equals('dart:js_util')), reason: 'dart:js_util should not be in compliant list');
+          expect(
+            uri,
+            isNot(equals('dart:js')),
+            reason: 'dart:js should not be in compliant list',
+          );
+          expect(
+            uri,
+            isNot(equals('dart:js_util')),
+            reason: 'dart:js_util should not be in compliant list',
+          );
         }
       });
     });

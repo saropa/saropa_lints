@@ -127,9 +127,9 @@ void main() {
     test('security_rules and disposal_rules have zero dangerous .contains()', () {
       final rulesDir = Directory(p.join('lib', 'src', 'rules'));
       final files = [
-        'security_auth_storage_rules.dart',
-        'security_network_input_rules.dart',
-        'disposal_rules.dart',
+        p.join('security', 'security_auth_storage_rules.dart'),
+        p.join('security', 'security_network_input_rules.dart'),
+        p.join('architecture', 'disposal_rules.dart'),
       ];
       for (final name in files) {
         final file = File(p.join(rulesDir.path, name));

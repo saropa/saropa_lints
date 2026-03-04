@@ -50,22 +50,28 @@ void main() {
       },
     );
 
-    test('readElementAnnotationsFromMetadata uses .annotations when present (MetadataImpl-like)', () {
-      // Object is not Iterable; only .annotations is available (like MetadataImpl).
-      final wrapper = _MetadataImplLike(<ElementAnnotation>[]);
-      final result = readElementAnnotationsFromMetadata(wrapper);
-      expect(result, isEmpty);
-    });
+    test(
+      'readElementAnnotationsFromMetadata uses .annotations when present (MetadataImpl-like)',
+      () {
+        // Object is not Iterable; only .annotations is available (like MetadataImpl).
+        final wrapper = _MetadataImplLike(<ElementAnnotation>[]);
+        final result = readElementAnnotationsFromMetadata(wrapper);
+        expect(result, isEmpty);
+      },
+    );
 
-    test('readElementAnnotationsFromMetadata never throws when .annotations throws (fatal-crash prevention)', () {
-      // Simulates hostile or broken host object: .annotations getter throws.
-      final hostile = _ThrowingAnnotations();
-      expect(
-        () => readElementAnnotationsFromMetadata(hostile),
-        returnsNormally,
-      );
-      expect(readElementAnnotationsFromMetadata(hostile), isEmpty);
-    });
+    test(
+      'readElementAnnotationsFromMetadata never throws when .annotations throws (fatal-crash prevention)',
+      () {
+        // Simulates hostile or broken host object: .annotations getter throws.
+        final hostile = _ThrowingAnnotations();
+        expect(
+          () => readElementAnnotationsFromMetadata(hostile),
+          returnsNormally,
+        );
+        expect(readElementAnnotationsFromMetadata(hostile), isEmpty);
+      },
+    );
 
     test('hasDeprecatedFlag reads hasDeprecated/isDeprecated when present', () {
       expect(

@@ -133,7 +133,13 @@ void main() {
       expect(b.isBaselined('lib/foo.dart', null, 1), isFalse);
     });
     test('isBaselined with line < 1 returns false', () {
-      final b = BaselineFile(violations: {'lib/foo.dart': {'r': [1]}});
+      final b = BaselineFile(
+        violations: {
+          'lib/foo.dart': {
+            'r': [1],
+          },
+        },
+      );
       expect(b.isBaselined('lib/foo.dart', 'r', 0), isFalse);
       expect(b.isBaselined('lib/foo.dart', 'r', -1), isFalse);
     });
@@ -218,17 +224,11 @@ void main() {
 
   group('BannedUsageEntry', () {
     test('matchesName(null) returns false', () {
-      const e = BannedUsageEntry(
-        identifier: 'print',
-        reason: 'Use Logger',
-      );
+      const e = BannedUsageEntry(identifier: 'print', reason: 'Use Logger');
       expect(e.matchesName(null), isFalse);
     });
     test('matchesName("print") returns true', () {
-      const e = BannedUsageEntry(
-        identifier: 'print',
-        reason: 'Use Logger',
-      );
+      const e = BannedUsageEntry(identifier: 'print', reason: 'Use Logger');
       expect(e.matchesName('print'), isTrue);
     });
   });
