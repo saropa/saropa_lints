@@ -1414,13 +1414,19 @@ void main() {
 
     group('avoid_stateful_widget_in_list', () {
       test('StatefulWidget in ListView.builder SHOULD trigger', () {
-        expect(AvoidStatefulWidgetInListRule().code.name, 'avoid_stateful_widget_in_list');
+        expect(
+          AvoidStatefulWidgetInListRule().code.name,
+          'avoid_stateful_widget_in_list',
+        );
       });
     });
 
     group('avoid_fitted_box_for_text', () {
       test('FittedBox around Text SHOULD trigger', () {
-        expect(AvoidFittedBoxForTextRule().code.name, 'avoid_fitted_box_for_text');
+        expect(
+          AvoidFittedBoxForTextRule().code.name,
+          'avoid_fitted_box_for_text',
+        );
       });
     });
   });

@@ -1133,10 +1133,13 @@ void main() {
     });
 
     group('prefer_any_or_every', () {
-      test('rule offers quick fix (use .any() instead of .where().isEmpty)', () {
-        final rule = PreferAnyOrEveryRule();
-        expect(rule.fixGenerators, isNotEmpty);
-      });
+      test(
+        'rule offers quick fix (use .any() instead of .where().isEmpty)',
+        () {
+          final rule = PreferAnyOrEveryRule();
+          expect(rule.fixGenerators, isNotEmpty);
+        },
+      );
 
       test('where().isEmpty SHOULD trigger', () {
         expect('where-isEmpty detected', isNotNull);
@@ -1172,10 +1175,13 @@ void main() {
     });
 
     group('prefer_enums_by_name', () {
-      test('rule offers quick fix (use .byName() instead of .firstWhere())', () {
-        final rule = PreferEnumsByNameRule();
-        expect(rule.fixGenerators, isNotEmpty);
-      });
+      test(
+        'rule offers quick fix (use .byName() instead of .firstWhere())',
+        () {
+          final rule = PreferEnumsByNameRule();
+          expect(rule.fixGenerators, isNotEmpty);
+        },
+      );
 
       test('firstWhere for enum lookup SHOULD trigger', () {
         expect('firstWhere enum detected', isNotNull);
@@ -1334,18 +1340,15 @@ void main() {
         },
       );
 
-      test(
-        'same-source initializers that use Random or RNG should NOT trigger',
-        () {
-          // e.g. final x = 0.2 + rng.nextDouble() * 0.6; final y = 0.2 + rng.nextDouble() * 0.6;
-          // Fixture: _goodSameSourceWithRandom(), _goodSameSourceWithRandomInt().
-          // Rule explicitly excludes initializers using any type Random/RNG/RandomNumberGenerator or RNG-like receiver names.
-          expect(
-            'Random/RNG initializers excluded from duplicate check',
-            isNotNull,
-          );
-        },
-      );
+      test('same-source initializers that use Random or RNG should NOT trigger', () {
+        // e.g. final x = 0.2 + rng.nextDouble() * 0.6; final y = 0.2 + rng.nextDouble() * 0.6;
+        // Fixture: _goodSameSourceWithRandom(), _goodSameSourceWithRandomInt().
+        // Rule explicitly excludes initializers using any type Random/RNG/RandomNumberGenerator or RNG-like receiver names.
+        expect(
+          'Random/RNG initializers excluded from duplicate check',
+          isNotNull,
+        );
+      });
 
       test(
         'use_existing_variable does NOT report on same-source Random initializers (integration)',
@@ -1354,21 +1357,25 @@ void main() {
           // After fix: must not report. Run analyzer on a temp package with that pattern.
           final repoRoot = Directory.current;
           expect(
-            File('${repoRoot.path}${Platform.pathSeparator}pubspec.yaml')
-                .existsSync(),
+            File(
+              '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
+            ).existsSync(),
             isTrue,
             reason: 'Run tests from repo root.',
           );
-          final tempDir =
-              await Directory.systemTemp.createTemp('saropa_use_existing_');
+          final tempDir = await Directory.systemTemp.createTemp(
+            'saropa_use_existing_',
+          );
           addTearDown(() async {
             if (tempDir.existsSync()) await tempDir.delete(recursive: true);
           });
           final repoPath = repoRoot.path.replaceAll('\\', '/');
-          await Directory('${tempDir.path}${Platform.pathSeparator}lib')
-              .create(recursive: true);
-          await File('${tempDir.path}${Platform.pathSeparator}pubspec.yaml')
-              .writeAsString('''
+          await Directory(
+            '${tempDir.path}${Platform.pathSeparator}lib',
+          ).create(recursive: true);
+          await File(
+            '${tempDir.path}${Platform.pathSeparator}pubspec.yaml',
+          ).writeAsString('''
 name: tmp_use_existing_test
 publish_to: none
 environment:
