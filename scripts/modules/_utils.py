@@ -345,6 +345,7 @@ def run_command(
     capture_output: bool = False,
     allow_failure: bool = False,
     summarize: bool = False,
+    env: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess:
     """Run a shell command and handle errors.
 
@@ -358,6 +359,7 @@ def run_command(
             On success: prints the last meaningful line.
             On failure: prints the last 10 lines of output.
             Full output is shown in --verbose mode on failure.
+        env: Optional environment for the process. If None, inherits current env.
 
     Returns:
         The CompletedProcess result.
@@ -377,6 +379,7 @@ def run_command(
         capture_output=should_capture,
         text=True,
         shell=use_shell,
+        env=env,
     )
 
     if result.returncode != 0 and not allow_failure:

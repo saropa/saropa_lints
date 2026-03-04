@@ -11,6 +11,7 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
@@ -88,6 +89,34 @@ def _parse_analysis_counts(output: str) -> _AnalysisCounts:
         if m:
             infos = int(m.group(1))
     return _AnalysisCounts(errors=errors, warnings=warnings, infos=infos)
+
+
+# Limit how many diagnostic lines we print to console (rest are in log)
+_MAX_ANALYSIS_REPORT_LINES = 30
+
+
+def _print_analysis_diagnostics(combined: str) -> None:
+    """Print diagnostic lines (error/warning/info) from dart analyze output."""
+    lines = []
+    for line in combined.splitlines():
+        stripped = line.strip()
+        if re.match(r"^(error|warning|info)\s+-\s+", stripped, re.IGNORECASE):
+            lines.append(stripped)
+    if not lines:
+        return
+    print_colored("  Issues:", Color.BOLD)
+    for line in lines[:_MAX_ANALYSIS_REPORT_LINES]:
+        if line.lower().startswith("error"):
+            print_colored(f"    {line}", Color.RED)
+        elif line.lower().startswith("warning"):
+            print_colored(f"    {line}", Color.YELLOW)
+        else:
+            print_colored(f"    {line}", Color.CYAN)
+    if len(lines) > _MAX_ANALYSIS_REPORT_LINES:
+        print_colored(
+            f"    ... and {len(lines) - _MAX_ANALYSIS_REPORT_LINES} more (see log)",
+            Color.DIM,
+        )
 
 
 def _spinner_while(running: threading.Event, message: str = "Working") -> None:
@@ -198,6 +227,22 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
     if audit_result.has_blocking_issues or spelling_hits:
         if audit_result.has_blocking_issues:
             print_error("Blocking audit issues found.")
+            # Report which categories are blocking so users know what to fix
+            blocking_reasons: list[str] = []
+            if not audit_result.tier_integrity_passed:
+                blocking_reasons.append("Tier integrity (orphans, phantoms, "
+                    "multi-tier, or other tier checks — see ✗ above)")
+            dup = audit_result.duplicate_report
+            if dup.get("class_names") or dup.get("rule_names") or dup.get("aliases"):
+                blocking_reasons.append("Duplicate class names, rule names, or aliases")
+            if audit_result.rules_missing_prefix:
+                blocking_reasons.append(
+                    f"Rules missing [rule_name] prefix ({len(audit_result.rules_missing_prefix)} rule(s))"
+                )
+            if getattr(audit_result, "contains_audit_over_baseline", False):
+                blocking_reasons.append(".contains() counts over baseline (CI would fail)")
+            for reason in blocking_reasons:
+                print_error(f"  • {reason}")
         if spelling_hits:
             print_spelling_report(
                 spelling_hits, project_dir, show_header=False,
@@ -205,7 +250,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
         return False, audit_result
 
     print()
-    print_success("All pre-publish audit checks passed.")
+    print_success("Pre-publish audit step complete.")
     return True, None
 
 
@@ -411,24 +456,34 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
 
 
 def run_tests(project_dir: Path) -> bool:
-    """Step 5: Run unit tests.
+    """Step 7: Run unit tests.
 
+    Uses a temp dir under the project so the test runner does not fill
+    the system temp drive (e.g. C:) when the project is on another drive.
     Note: full integration tests (dart analyze in example/) are skipped
     during publish because 1700+ rules x 1500+ fixture files takes too long.
     Run manually when needed:
         cd example && dart analyze
     """
-    print_header("STEP 5: RUNNING TESTS")
+    print_header("STEP 7: RUNNING TESTS")
 
     clear_flutter_lock()
 
     test_dir = project_dir / "test"
     if test_dir.exists():
+        # Use project-local temp so dart test kernel files don't fill system
+        # temp (e.g. C:\Users\...\AppData\Local\Temp) when project is on D:
+        test_tmp = project_dir / ".dart_test_tmp"
+        test_tmp.mkdir(exist_ok=True)
+        env = os.environ.copy()
+        env["TMP"] = str(test_tmp)
+        env["TEMP"] = str(test_tmp)
         result = run_command(
             ["dart", "test"],
             project_dir,
             "Running unit tests",
             summarize=True,
+            env=env,
         )
         if result.returncode != 0:
             return False
@@ -459,8 +514,8 @@ def _collect_format_paths(project_dir: Path) -> list[str]:
 
 
 def run_format(project_dir: Path) -> bool:
-    """Step 6: Run dart format."""
-    print_header("STEP 6: FORMATTING CODE")
+    """Step 5: Run dart format."""
+    print_header("STEP 5: FORMATTING CODE")
 
     use_shell = get_shell_mode()
 
@@ -531,30 +586,29 @@ def run_format(project_dir: Path) -> bool:
 
 
 def run_analysis(project_dir: Path) -> bool:
-    """Step 7: Run static analysis with log file and colorful summary."""
-    print_header("STEP 7: RUNNING STATIC ANALYSIS")
+    """Step 6: Run static analysis with log file and colorful summary."""
+    print_header("STEP 6: RUNNING STATIC ANALYSIS")
 
-    print_info("Checking for pub.dev lint issues...")
+    # Doc-comment check first (no success message — success = dart analyze passes)
+    print_info("Checking for pub.dev doc issues...")
     pubdev_issues = check_pubdev_lint_issues(project_dir)
     if pubdev_issues:
         print_warning(f"Found {len(pubdev_issues)} pub.dev lint issue(s):")
         for issue in pubdev_issues:
             print_colored(f"      {issue}", Color.YELLOW)
 
-        # Auto-fix doc comment issues
         print_info("Auto-fixing doc comment issues...")
         fixed_brackets = fix_doc_angle_brackets(project_dir)
         fixed_refs = fix_doc_references(project_dir)
         total_fixed = fixed_brackets + fixed_refs
 
         if total_fixed:
-            print_success(
+            print_info(
                 f"Auto-fixed {total_fixed} issue(s) "
                 f"({fixed_brackets} angle bracket(s), "
                 f"{fixed_refs} doc reference(s))."
             )
 
-        # Re-check for remaining issues
         remaining = check_pubdev_lint_issues(project_dir)
         if remaining:
             print_error(
@@ -564,10 +618,7 @@ def run_analysis(project_dir: Path) -> bool:
                 print_colored(f"      {issue}", Color.YELLOW)
             return False
 
-        print_success("All pub.dev lint issues resolved")
-    else:
-        print_success("No pub.dev lint issues found")
-
+    # Run dart analyze — only success is when this passes
     # Log file: date-prefixed, in reports/
     reports_dir = project_dir / "reports"
     reports_dir.mkdir(exist_ok=True)
@@ -632,17 +683,22 @@ def run_analysis(project_dir: Path) -> bool:
             f"  ● Total:    {counts.total}",
             Color.BOLD,
         )
+        _print_analysis_diagnostics(combined)
     print_colored(f"  Full log: {log_path}", Color.DIM)
     print()
 
     if result.returncode != 0:
         print_error(
-            f"Analysis failed (exit code {result.returncode}). "
-            f"CI uses dart analyze --fatal-infos; fix issues and re-run."
+            f"dart analyze failed (exit code {result.returncode}). "
+            f"Fix the issues in the log above and re-run publish."
+        )
+        print_colored(
+            f"  Log: {log_path}",
+            Color.DIM,
         )
         return False
 
-    print_success("Static analysis completed (no fatal issues)")
+    print_success("dart analyze passed (no errors, warnings, or infos)")
     return True
 
 
