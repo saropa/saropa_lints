@@ -801,17 +801,14 @@ void main() {
         },
       );
 
-      test(
-        'should not flag same-source initializers that use Random or RNG',
-        () {
-          // Rule explicitly excludes Random/RNG: same source yields different values per call.
-          // Fixture: _goodSameSourceWithRandom(), _goodSameSourceWithRandomInt().
-          expect(
-            'Initializers using Random or RNG-like APIs are excluded',
-            isNotNull,
-          );
-        },
-      );
+      test('should not flag same-source initializers that use Random or RNG', () {
+        // Rule explicitly excludes Random/RNG: same source yields different values per call.
+        // Fixture: _goodSameSourceWithRandom(), _goodSameSourceWithRandomInt().
+        expect(
+          'Initializers using Random or RNG-like APIs are excluded',
+          isNotNull,
+        );
+      });
     });
 
     group('avoid_ignoring_return_values', () {

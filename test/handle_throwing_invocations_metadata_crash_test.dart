@@ -32,12 +32,14 @@ void main() {
     'handle_throwing_invocations does not crash analyzer plugin (MetadataImpl)',
     () async {
       final repoRoot = _findRepoRoot();
-      final pubspecFile =
-          File('${repoRoot.path}${Platform.pathSeparator}pubspec.yaml');
+      final pubspecFile = File(
+        '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
+      );
       expect(
         pubspecFile.existsSync(),
         isTrue,
-        reason: 'Run tests from the saropa_lints repo (or a subdir). '
+        reason:
+            'Run tests from the saropa_lints repo (or a subdir). '
             'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
       );
 
@@ -131,12 +133,14 @@ void main() {
     'handle_throwing_invocations does not report when inside try/catch',
     () async {
       final repoRoot = _findRepoRoot();
-      final pubspecFile =
-          File('${repoRoot.path}${Platform.pathSeparator}pubspec.yaml');
+      final pubspecFile = File(
+        '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
+      );
       expect(
         pubspecFile.existsSync(),
         isTrue,
-        reason: 'Run tests from the saropa_lints repo (or a subdir). '
+        reason:
+            'Run tests from the saropa_lints repo (or a subdir). '
             'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
       );
 
@@ -222,12 +226,14 @@ void main() {
     'handle_throwing_invocations does not report on non-thrower (no false positive)',
     () async {
       final repoRoot = _findRepoRoot();
-      final pubspecFile =
-          File('${repoRoot.path}${Platform.pathSeparator}pubspec.yaml');
+      final pubspecFile = File(
+        '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
+      );
       expect(
         pubspecFile.existsSync(),
         isTrue,
-        reason: 'Run tests from the saropa_lints repo (or a subdir). '
+        reason:
+            'Run tests from the saropa_lints repo (or a subdir). '
             'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
       );
 
