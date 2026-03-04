@@ -97,6 +97,11 @@ void main() {
 
   group('Return - Avoidance Rules', () {
     group('avoid_returning_cascades', () {
+      test('rule offers quick fix (split cascade from return)', () {
+        final rule = AvoidReturningCascadesRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('returning cascade expression SHOULD trigger', () {
         expect('returning cascade expression', isNotNull);
       });
@@ -106,6 +111,11 @@ void main() {
       });
     });
     group('avoid_returning_void', () {
+      test('rule offers quick fix (remove return from void expression)', () {
+        final rule = AvoidReturningVoidRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('explicit return of void expression SHOULD trigger', () {
         expect('explicit return of void expression', isNotNull);
       });
@@ -123,9 +133,21 @@ void main() {
         expect('implicit void return', isNotNull);
       });
     });
+    group('avoid_returning_this', () {
+      test('rule offers quick fix (replace return this with return)', () {
+        final rule = AvoidReturningThisRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+    });
     group('avoid_returning_null_for_void', () {
       test('rule offers quick fix (replace return null with return)', () {
         final rule = AvoidReturningNullForVoidRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+    });
+    group('avoid_returning_null_for_future', () {
+      test('rule offers quick fix (replace with Future.value(null))', () {
+        final rule = AvoidReturningNullForFutureRule();
         expect(rule.fixGenerators, isNotEmpty);
       });
     });
@@ -142,6 +164,11 @@ void main() {
       });
     });
     group('prefer_returning_shorthands', () {
+      test('rule offers quick fix (convert to expression body)', () {
+        final rule = PreferReturningShorthandsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('single-expression body with return SHOULD trigger', () {
         expect('single-expression body with return', isNotNull);
       });

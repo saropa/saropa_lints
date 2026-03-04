@@ -284,7 +284,38 @@ Execution work follows **Part 2 (Checklist)** below.
 
 - [x] `return_rules.dart`: `avoid_returning_null_for_void` — `ReplaceReturnNullWithReturnFix` (replace "return null;" with "return;").
 
-**Batch 6+7+8+9 total:** +10 new quick fixes: avoid_synchronous_file_io, avoid_constant_assert_conditions, avoid_duplicate_switch_case_conditions, avoid_redundant_else, avoid_adjacent_strings, avoid_duplicate_map_keys, avoid_unconditional_break, no_equal_then_else, avoid_only_rethrow, avoid_returning_null_for_void. (Next batch can add 10 more to reach 20.)
+**Batch 6+7+8+9 total:** +10 new quick fixes: avoid_synchronous_file_io, avoid_constant_assert_conditions, avoid_duplicate_switch_case_conditions, avoid_redundant_else, avoid_adjacent_strings, avoid_duplicate_map_keys, avoid_unconditional_break, no_equal_then_else, avoid_only_rethrow, avoid_returning_null_for_void.
+
+### H5. Batch 10 — Control flow, equality, return, error handling, async (EASY)
+
+- [x] `control_flow_rules.dart`: `avoid_assignments_as_conditions` — `ReplaceAssignmentWithComparisonFix` (replace `=` with `==` in condition).
+- [x] `equality_rules.dart`: `avoid_self_assignment` — `RemoveSelfAssignmentFix` (delete the self-assignment statement).
+- [x] `return_rules.dart`: `avoid_returning_cascades` — `SplitReturnCascadeFix` (split "return x..y..z;" into "x..y..z; return x;").
+- [x] `return_rules.dart`: `avoid_returning_void` — `RemoveReturnVoidFix` (replace "return voidCall();" with "voidCall();").
+- [x] `return_rules.dart`: `avoid_returning_this` — `ReplaceReturnThisWithReturnFix` (replace "return this;" with "return;").
+- [x] `error_handling_rules.dart`: `avoid_swallowing_exceptions` — `AddRethrowInCatchFix` (insert "rethrow;" in empty/unused catch block).
+- [x] `async_rules.dart`: `avoid_future_ignore` — `WrapFutureIgnoreInUnawaitedFix` (replace future.ignore() with unawaited(future)).
+- [x] `control_flow_rules.dart`: `prefer_simpler_boolean_expressions` — `RemoveDoubleNegationFix` (!!x → x) and `SimplifyDeMorganFix` (!(a&&b) → !a||!b, !(a||b) → !a&&!b).
+
+**Exit criteria:** +10 fixes (9 rules; one rule has 2 fix generators), fixtures/tests present, audit increases. **Done (+10 fixes).**
+
+### H6. Batch 11 — Collection, formatting, code quality, return, complexity (EASY)
+
+- [x] `collection_rules.dart`: `avoid_duplicate_number_elements` — `RemoveDuplicateCollectionElementFix` (delete duplicate list/set element).
+- [x] `collection_rules.dart`: `avoid_duplicate_string_elements` — `RemoveDuplicateCollectionElementFix`.
+- [x] `collection_rules.dart`: `avoid_duplicate_object_elements` — `RemoveDuplicateCollectionElementFix`.
+- [x] `collection_rules.dart`: `require_const_list_items` — `AddConstToListItemFix` (add const to list item).
+- [x] `formatting_rules.dart`: `unnecessary_trailing_comma` — `RemoveUnnecessaryTrailingCommaFix`.
+- [x] `formatting_rules.dart`: `prefer_trailing_comma` — `AddTrailingCommaFix`.
+- [x] `code_quality_avoid_rules.dart`: `avoid_always_null_parameters` — `RemoveAlwaysNullArgumentFix` (remove null argument).
+- [x] `code_quality_avoid_rules.dart`: `avoid_late_keyword` — `RemoveLateKeywordFix`.
+- [x] `code_quality_avoid_rules.dart`: `no_object_declaration` — `ReplaceObjectWithDynamicFix`.
+- [x] `return_rules.dart`: `avoid_returning_null_for_future` — `ReplaceReturnNullWithFutureValueFix`.
+- [x] `return_rules.dart`: `prefer_returning_shorthands` — `ConvertToExpressionBodyFix`.
+- [x] `complexity_rules.dart`: `avoid_cascade_after_if_null` — `WrapIfNullInParensFix`.
+- [x] `complexity_rules.dart`: `prefer_parentheses_with_if_null` — `WrapIfNullExpressionInParensFix`.
+
+**Exit criteria:** +13 fixes, tests in collection/formatting/code_quality/return/complexity test files, audit increases. **Done (+13 fixes).**
 
 ### I. After Batch 6
 

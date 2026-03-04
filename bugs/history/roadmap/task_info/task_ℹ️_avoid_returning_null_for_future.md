@@ -173,6 +173,7 @@ The quick fix builder should:
 3. For Fix 2: Insert `async` before the function body's opening brace.
 
 ## Notes & Issues
+- **Quick fix implemented (Batch 11):** `ReplaceReturnNullWithFutureValueFix` — replaces `return null;` with `return Future.value(null);`. See QUICK_FIX_PLAN.md H6.
 - Dart version: This rule applies to null-safe code (Dart 2.12+). For pre-null-safety code, `Future<String>` could always be null and this pattern was valid.
 - The `isDartAsyncFuture` property on `DartType` is the canonical way to check for `dart:async Future`. Use it instead of checking `type.element?.name == 'Future'`.
 - The rule should check the effective language version of the file being analyzed and skip files with `@dart<2.12`.

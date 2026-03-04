@@ -174,6 +174,11 @@ void main() {
     });
 
     group('avoid_cascade_after_if_null', () {
+      test('rule offers quick fix (wrap ?? in parentheses)', () {
+        final rule = AvoidCascadeAfterIfNullRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_cascade_after_if_null SHOULD trigger', () {
         // Pattern that should be avoided: avoid cascade after if null
         expect('avoid_cascade_after_if_null detected', isNotNull);
@@ -298,6 +303,11 @@ void main() {
     });
 
     group('prefer_parentheses_with_if_null', () {
+      test('rule offers quick fix (wrap ?? expression in parentheses)', () {
+        final rule = PreferParenthesesWithIfNullRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('prefer_parentheses_with_if_null SHOULD trigger', () {
         // Better alternative available: prefer parentheses with if null
         expect('prefer_parentheses_with_if_null detected', isNotNull);
