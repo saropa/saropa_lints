@@ -223,6 +223,12 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
         extra_checks=spelling_check,
     )
 
+    # --- Run dart analyze as part of audit (fail fast; same as Step 6) ---
+    if not audit_result.has_blocking_issues and not spelling_hits:
+        print_header("STEP 1 (cont.): DART ANALYZE")
+        if not run_analysis(project_dir):
+            audit_result.analysis_passed = False
+
     # --- Blocking issues gate ---
     if audit_result.has_blocking_issues or spelling_hits:
         if audit_result.has_blocking_issues:
@@ -241,6 +247,10 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
                 )
             if getattr(audit_result, "contains_audit_over_baseline", False):
                 blocking_reasons.append(".contains() counts over baseline (CI would fail)")
+            if not audit_result.analysis_passed:
+                blocking_reasons.append(
+                    "dart analyze failed (--fatal-infos); fix issues in report above"
+                )
             for reason in blocking_reasons:
                 print_error(f"  • {reason}")
         if spelling_hits:
