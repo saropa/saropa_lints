@@ -26,12 +26,13 @@ class RemoveDuplicateCascadeSectionFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final Expression? section =
-        node is Expression ? node : node.thisOrAncestorOfType<Expression>();
+    final Expression? section = node is Expression
+        ? node
+        : node.thisOrAncestorOfType<Expression>();
     if (section == null) return;
 
-    final CascadeExpression? cascade =
-        section.thisOrAncestorOfType<CascadeExpression>();
+    final CascadeExpression? cascade = section
+        .thisOrAncestorOfType<CascadeExpression>();
     if (cascade == null) return;
 
     final content = unitResult.content;

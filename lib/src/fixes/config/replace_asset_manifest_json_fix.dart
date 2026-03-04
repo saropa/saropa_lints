@@ -31,8 +31,9 @@ class ReplaceAssetManifestJsonFix extends SaropaFixProducer {
         : node.thisOrAncestorOfType<SimpleStringLiteral>();
     if (literal == null || literal.value != 'AssetManifest.json') return;
 
-    final String replacement =
-        literal.isSingleQuoted ? "'AssetManifest.bin'" : '"AssetManifest.bin"';
+    final String replacement = literal.isSingleQuoted
+        ? "'AssetManifest.bin'"
+        : '"AssetManifest.bin"';
 
     await builder.addDartFileEdit(file, (b) {
       b.addSimpleReplacement(

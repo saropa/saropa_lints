@@ -26,8 +26,9 @@ class AddSetOrMapTypeArgumentFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final SetOrMapLiteral? literal =
-        node is SetOrMapLiteral ? node : node.thisOrAncestorOfType<SetOrMapLiteral>();
+    final SetOrMapLiteral? literal = node is SetOrMapLiteral
+        ? node
+        : node.thisOrAncestorOfType<SetOrMapLiteral>();
     if (literal == null || literal.elements.isNotEmpty) return;
 
     final type = literal.staticType;

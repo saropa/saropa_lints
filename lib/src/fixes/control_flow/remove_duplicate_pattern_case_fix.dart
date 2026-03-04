@@ -36,7 +36,11 @@ class RemoveDuplicatePatternCaseFix extends SaropaFixProducer {
 
     if (start > 0) {
       int i = start - 1;
-      while (i >= 0 && (content[i] == ' ' || content[i] == '\t' || content[i] == '\n' || content[i] == '\r')) {
+      while (i >= 0 &&
+          (content[i] == ' ' ||
+              content[i] == '\t' ||
+              content[i] == '\n' ||
+              content[i] == '\r')) {
         i--;
       }
       if (i >= 0 && content[i] == ',') {

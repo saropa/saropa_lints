@@ -36,10 +36,7 @@ class RemoveLeadingUnderscoreFromExceptionClassFix extends SaropaFixProducer {
     final newName = name.substring(1);
     final token = classDecl.name;
     await builder.addDartFileEdit(file, (b) {
-      b.addSimpleReplacement(
-        SourceRange(token.offset, token.length),
-        newName,
-      );
+      b.addSimpleReplacement(SourceRange(token.offset, token.length), newName);
     });
   }
 }

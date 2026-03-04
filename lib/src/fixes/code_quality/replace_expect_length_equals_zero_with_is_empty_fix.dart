@@ -36,15 +36,14 @@ class ReplaceExpectLengthEqualsZeroWithIsEmptyFix extends SaropaFixProducer {
     final Expression actual = args[0];
     final Expression matcher = args[1];
 
-    if (actual is! PropertyAccess ||
-        actual.propertyName.name != 'length') {
+    if (actual is! PropertyAccess || actual.propertyName.name != 'length') {
       return;
     }
-    if (matcher is! MethodInvocation ||
-        matcher.methodName.name != 'equals') {
+    if (matcher is! MethodInvocation || matcher.methodName.name != 'equals') {
       return;
     }
-    final List<Expression> matcherArgs = matcher.argumentList.arguments.toList();
+    final List<Expression> matcherArgs = matcher.argumentList.arguments
+        .toList();
     if (matcherArgs.isEmpty) return;
     final Expression matcherArg = matcherArgs[0];
     if (matcherArg is! IntegerLiteral || matcherArg.value != 0) return;

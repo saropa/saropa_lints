@@ -33,10 +33,7 @@ class NoEmptyBlockFix extends SaropaFixProducer {
     const insertText = ' // no-op';
 
     await builder.addDartFileEdit(file, (b) {
-      b.addSimpleReplacement(
-        SourceRange(insertOffset, 0),
-        insertText,
-      );
+      b.addSimpleReplacement(SourceRange(insertOffset, 0), insertText);
     });
   }
 }
