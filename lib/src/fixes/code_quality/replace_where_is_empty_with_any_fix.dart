@@ -34,7 +34,9 @@ class ReplaceWhereIsEmptyWithAnyFix extends SaropaFixProducer {
     if (propertyName != 'isEmpty' && propertyName != 'isNotEmpty') return;
 
     final Expression? target = access.target;
-    if (target is! MethodInvocation || target.methodName.name != 'where') return;
+    if (target is! MethodInvocation || target.methodName.name != 'where') {
+      return;
+    }
 
     final Expression? whereReceiver = target.target;
     if (whereReceiver == null) return;
@@ -44,10 +46,9 @@ class ReplaceWhereIsEmptyWithAnyFix extends SaropaFixProducer {
         .map((e) => e.toSource())
         .join(', ');
     final bool useNegation = propertyName == 'isEmpty';
-    final String replacement =
-        useNegation
-            ? '!$receiverSrc.any($argsSrc)'
-            : '$receiverSrc.any($argsSrc)';
+    final String replacement = useNegation
+        ? '!$receiverSrc.any($argsSrc)'
+        : '$receiverSrc.any($argsSrc)';
 
     final int start = target.offset;
     final int end = access.end;

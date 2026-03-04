@@ -24,8 +24,12 @@ class ReplaceRedundantNullCheckFix extends ReplaceNodeFix {
   String computeReplacement(AstNode node) {
     if (node is! BinaryExpression) return node.toSource();
     final op = node.operator.lexeme;
-    if (op == '==') return 'false'; // x == null is always false when x is non-nullable
-    if (op == '!=') return 'true'; // x != null is always true when x is non-nullable
+    if (op == '==') {
+      return 'false'; // x == null is always false when x is non-nullable
+    }
+    if (op == '!=') {
+      return 'true'; // x != null is always true when x is non-nullable
+    }
     return node.toSource();
   }
 }

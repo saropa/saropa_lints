@@ -42,8 +42,7 @@ class ReplaceExpectContainsIsTrueWithContainsFix extends SaropaFixProducer {
     final Expression actual = args[0];
     final Expression matcher = args[1];
 
-    if (actual is! MethodInvocation ||
-        actual.methodName.name != 'contains') {
+    if (actual is! MethodInvocation || actual.methodName.name != 'contains') {
       return;
     }
     if (matcher is! SimpleIdentifier ||
@@ -58,7 +57,8 @@ class ReplaceExpectContainsIsTrueWithContainsFix extends SaropaFixProducer {
 
     final Expression? containsTarget = actual.target;
     if (containsTarget == null) return;
-    final List<Expression> containsArgs = actual.argumentList.arguments.toList();
+    final List<Expression> containsArgs = actual.argumentList.arguments
+        .toList();
     if (containsArgs.isEmpty) return;
     final Expression firstArg = containsArgs[0];
 
