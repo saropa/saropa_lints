@@ -72,8 +72,8 @@ const Set<String> stylisticRules = <String>{
   'prefer_optional_named_params',
   'prefer_optional_positional_params',
   'prefer_positional_bool_params',
-  // prefer_named_bool_params removed from stylistic tier to avoid duplicate diagnostics
-  // with avoid_positional_boolean_parameters (professional tier). Enable explicitly if desired.
+  // prefer_named_bool_params in pedanticOnlyRules to avoid duplicate diagnostics
+  // with avoid_positional_boolean_parameters (professional). Enable explicitly via pedantic tier.
   'prefer_if_else_over_guards',
   'prefer_cascade_assignments',
   'prefer_factory_constructor',
@@ -2871,6 +2871,8 @@ const Set<String> pedanticOnlyRules = <String>{
   // Very strict patterns
   'avoid_returning_widgets', // no widget helper methods
   'avoid_nullable_widget_methods', // no nullable widget returns
+  // Bool params: in pedantic only to avoid duplicate diagnostics with avoid_positional_boolean_parameters (professional)
+  'prefer_named_bool_params',
   // Test pedantry
   'avoid_duplicate_test_assertions', // no repeated assertions
 };

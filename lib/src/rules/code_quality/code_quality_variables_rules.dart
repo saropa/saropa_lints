@@ -2208,12 +2208,7 @@ const Set<String> _rngMethodNames = <String>{
 
 /// Common variable names used for Random (or RNG) instances.
 /// Heuristic: receiver with one of these names calling an RNG method is excluded.
-const Set<String> _rngReceiverNames = <String>{
-  'rng',
-  'random',
-  'rand',
-  'rnd',
-};
+const Set<String> _rngReceiverNames = <String>{'rng', 'random', 'rand', 'rnd'};
 
 /// Type names that indicate an RNG (any library), so projects can have their
 /// own Random/RNG classes or re-exports without being treated as duplicates.

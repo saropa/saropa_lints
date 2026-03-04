@@ -329,7 +329,9 @@ class PreferGeolocationCoarseLocationRule extends SaropaLintRule {
   PreferGeolocationCoarseLocationRule() : super(code: _code);
 
   @override
-  List<String> get configAliases => const <String>['prefer_geolocator_coarse_location'];
+  List<String> get configAliases => const <String>[
+    'prefer_geolocator_coarse_location',
+  ];
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -358,7 +360,8 @@ class PreferGeolocationCoarseLocationRule extends SaropaLintRule {
   ) {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
-      if (methodName != 'getCurrentPosition' && methodName != 'getPositionStream') {
+      if (methodName != 'getCurrentPosition' &&
+          methodName != 'getPositionStream') {
         return;
       }
       final Expression? target = node.target;
