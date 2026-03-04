@@ -658,6 +658,11 @@ void main() {
     });
 
     group('avoid_throw_in_finally', () {
+      test('rule offers quick fix (delete throw in finally)', () {
+        final rule = AvoidThrowInFinallyRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_throw_in_finally SHOULD trigger', () {
         // Pattern that should be avoided: avoid throw in finally
         expect('avoid_throw_in_finally detected', isNotNull);

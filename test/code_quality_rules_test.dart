@@ -1055,6 +1055,11 @@ void main() {
 
   group('Switch & Pattern Matching Rules', () {
     group('avoid_wildcard_cases_with_enums', () {
+      test('rule offers quick fix (remove wildcard or default case)', () {
+        final rule = AvoidWildcardCasesWithEnumsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('wildcard case on enum switch SHOULD trigger', () {
         expect('enum wildcard detected', isNotNull);
       });
@@ -1103,6 +1108,11 @@ void main() {
     });
 
     group('avoid_duplicate_patterns', () {
+      test('rule offers quick fix (remove duplicate pattern case)', () {
+        final rule = AvoidDuplicatePatternsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('same pattern repeated SHOULD trigger', () {
         expect('duplicate pattern detected', isNotNull);
       });
@@ -1123,6 +1133,11 @@ void main() {
     });
 
     group('prefer_any_or_every', () {
+      test('rule offers quick fix (use .any() instead of .where().isEmpty)', () {
+        final rule = PreferAnyOrEveryRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('where().isEmpty SHOULD trigger', () {
         expect('where-isEmpty detected', isNotNull);
       });
@@ -1157,8 +1172,34 @@ void main() {
     });
 
     group('prefer_enums_by_name', () {
+      test('rule offers quick fix (use .byName() instead of .firstWhere())', () {
+        final rule = PreferEnumsByNameRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('firstWhere for enum lookup SHOULD trigger', () {
         expect('firstWhere enum detected', isNotNull);
+      });
+    });
+
+    group('prefer_test_matchers', () {
+      test('rule offers quick fix (expect length/equals(0) -> isEmpty)', () {
+        final rule = PreferTestMatchersRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+    });
+
+    group('prefer_use_prefix', () {
+      test('rule offers quick fix (add use prefix to hook name)', () {
+        final rule = PreferUsePrefixRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+    });
+
+    group('avoid_passing_default_values', () {
+      test('rule offers quick fix (remove default value argument)', () {
+        final rule = AvoidPassingDefaultValuesRule();
+        expect(rule.fixGenerators, isNotEmpty);
       });
     });
 
@@ -1245,6 +1286,11 @@ void main() {
     });
 
     group('no_equal_nested_conditions', () {
+      test('rule offers quick fix (flatten redundant nested condition)', () {
+        final rule = NoEqualNestedConditionsRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('inner condition identical to outer SHOULD trigger', () {
         expect('equal nested condition detected', isNotNull);
       });

@@ -215,6 +215,11 @@ void main() {
     });
 
     group('avoid_duplicate_cascades', () {
+      test('rule offers quick fix (remove duplicate cascade section)', () {
+        final rule = AvoidDuplicateCascadesRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
       test('avoid_duplicate_cascades SHOULD trigger', () {
         // Pattern that should be avoided: avoid duplicate cascades
         expect('avoid_duplicate_cascades detected', isNotNull);
