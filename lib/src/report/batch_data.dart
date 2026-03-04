@@ -156,28 +156,23 @@ Map<LintImpact, List<ViolationRecord>> _violationsFromJson(dynamic raw) {
     final list = listRaw is List<dynamic> ? listRaw : null;
     if (list == null || list.isEmpty) continue;
 
-    result[impact] = list
-        .cast<Map<String, dynamic>>()
-        .map(
-          (m) {
-            final r = m['r'];
-            final f = m['f'];
-            final l = m['l'];
-            final msg = m['m'];
-            final c2 = m['c2'];
-            if (r is! String || f is! String || l is! int || msg is! String) {
-              throw FormatException('Invalid violation record', m.toString());
-            }
-            return ViolationRecord(
-              rule: r,
-              file: f,
-              line: l,
-              message: msg,
-              correction: c2 is String ? c2 : null,
-            );
-          },
-        )
-        .toList();
+    result[impact] = list.cast<Map<String, dynamic>>().map((m) {
+      final r = m['r'];
+      final f = m['f'];
+      final l = m['l'];
+      final msg = m['m'];
+      final c2 = m['c2'];
+      if (r is! String || f is! String || l is! int || msg is! String) {
+        throw FormatException('Invalid violation record', m.toString());
+      }
+      return ViolationRecord(
+        rule: r,
+        file: f,
+        line: l,
+        message: msg,
+        correction: c2 is String ? c2 : null,
+      );
+    }).toList();
   }
 
   return result;

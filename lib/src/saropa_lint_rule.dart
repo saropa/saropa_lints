@@ -1672,8 +1672,7 @@ class ImpactTracker {
     LintImpact.high: _violations[LintImpact.high]?.length ?? 0,
     LintImpact.medium: _violations[LintImpact.medium]?.length ?? 0,
     LintImpact.low: _violations[LintImpact.low]?.length ?? 0,
-    LintImpact.opinionated:
-        _violations[LintImpact.opinionated]?.length ?? 0,
+    LintImpact.opinionated: _violations[LintImpact.opinionated]?.length ?? 0,
   };
 
   /// Get total violation count.
