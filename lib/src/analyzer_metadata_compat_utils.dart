@@ -6,6 +6,15 @@ import 'package:analyzer/dart/element/element.dart';
 
 /// Compatibility helpers for analyzer API shape changes.
 ///
+/// **Element.metadata (analyzer 9+):** In analyzer 9+, [Element.metadata] returns
+/// [Metadata] (runtime `MetadataImpl`), not `Iterable`. Iterating it directly
+/// causes "MetadataImpl is not a subtype of Iterable". Annotations must be read
+/// via [Metadata.annotations] or through [readElementAnnotationsFromMetadata].
+/// In this repo only two call sites read Element metadata: HandleThrowingInvocationsRule
+/// (_hasThrowsAnnotation) and AvoidDeprecatedUsageRule (_isDeprecated); both use
+/// this helper. AST `node.metadata` / `member.metadata` (AnnotatedNode) remains
+/// iterable and is unchanged.
+///
 /// **Plugin safety (fatal-crash prevention):** All functions are defensive.
 /// - Never throw. Use `on Object` to catch both Exception and Error.
 /// - Never return live references to host analyzer objects that might throw

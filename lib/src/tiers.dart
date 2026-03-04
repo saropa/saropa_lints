@@ -72,7 +72,8 @@ const Set<String> stylisticRules = <String>{
   'prefer_optional_named_params',
   'prefer_optional_positional_params',
   'prefer_positional_bool_params',
-  'prefer_named_bool_params', // Opt-in; overlaps avoid_positional_boolean_parameters
+  // prefer_named_bool_params removed from stylistic tier to avoid duplicate diagnostics
+  // with avoid_positional_boolean_parameters (professional tier). Enable explicitly if desired.
   'prefer_if_else_over_guards',
   'prefer_cascade_assignments',
   'prefer_factory_constructor',
@@ -1569,6 +1570,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_adjective_bool_getters',
   'prefer_asserts_in_initializer_lists',
   'prefer_const_constructors_in_immutables',
+  'prefer_const_constructor_declarations',
   'prefer_constructors_first',
   'prefer_extension_methods',
   'prefer_extension_over_utility_class',
