@@ -600,3 +600,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ## [5.0.3] and Earlier
 
 For details on the initial release and versions 0.1.0 through 5.0.3, please refer to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md).
+
+---
+## [6.2.2]
+
+### Changed
+- Version bump
+

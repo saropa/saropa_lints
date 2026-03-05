@@ -472,13 +472,33 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
 
 
 def _dart_test_env(project_dir: Path) -> dict[str, str]:
-    """Return env with TMP/TEMP set to project-local .dart_test_tmp so test kernel files don't fill system temp."""
-    test_tmp = project_dir / ".dart_test_tmp"
-    test_tmp.mkdir(exist_ok=True)
+    """Return env with TMP/TEMP set to project-local build/test_tmp so test kernel files don't fill system temp.
+
+    Uses build/test_tmp (not .dart_test_tmp) to avoid Windows PathAccessException when tests that create
+    temp dirs via Directory.systemTemp run: the dart test runner also uses .dart_test_tmp and can hold
+    handles during cleanup, causing "file is being used by another process" on teardown.
+    """
+    test_tmp = project_dir / "build" / "test_tmp"
+    test_tmp.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
     env["TMP"] = str(test_tmp)
     env["TEMP"] = str(test_tmp)
     return env
+
+
+def _log_shows_windows_file_lock(log_path: Path) -> bool:
+    """True if the log indicates a transient Windows file-lock (PathAccessException / errno 32)."""
+    if not log_path.exists():
+        return False
+    try:
+        text = log_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return False
+    return (
+        "PathAccessException" in text
+        or "being used by another process" in text
+        or "errno = 32" in text
+    )
 
 
 def _run_chain_stack_traces_and_check(
@@ -486,46 +506,79 @@ def _run_chain_stack_traces_and_check(
 ) -> bool:
     """Run dart test --chain-stack-traces, pipe output to a log file, then check for error lines.
 
-    Used in Step 6 (after dart analyze) to surface test failures early with full stack traces,
-    and in Step 7 when plain 'dart test' fails. Writes to reports/YYYYMMDD/YYYYMMDD_HHMMSS_chain_stack_traces.log.
+    Used in Step 7 when plain 'dart test' fails. Writes to reports/YYYYMMDD/YYYYMMDD_HHMMSS_chain_stack_traces.log.
     Shows a spinner while the subprocess runs. Calls _check_log_for_errors to print failure lines (cap 50).
+    On Windows, retries once if the log shows a transient PathAccessException (file in use in .dart_test_tmp).
 
     Returns:
         True iff the test process exited with code 0. False if non-zero exit or if subprocess/open raised.
     """
-    now = datetime.now()
-    date_str = now.strftime("%Y%m%d")
-    time_str = now.strftime("%H%M%S")
-    reports_dir = project_dir / "reports" / date_str
-    reports_dir.mkdir(parents=True, exist_ok=True)
-    log_name = f"{date_str}_{time_str}_chain_stack_traces.log"
-    log_path = reports_dir / log_name
-    print_info(f"Running dart test --chain-stack-traces (output → reports/{date_str}/{log_name})")
     use_shell = get_shell_mode()
-    running = threading.Event()
-    running.set()
-    spinner = threading.Thread(
-        target=_spinner_while,
-        args=(running, "Tests"),
-        daemon=True,
-    )
-    spinner.start()
-    result = None
-    try:
-        with open(log_path, "w", encoding="utf-8") as out:
-            result = subprocess.run(
-                ["dart", "test", "--chain-stack-traces"],
-                cwd=project_dir,
-                stdout=out,
-                stderr=subprocess.STDOUT,
-                env=env,
-                shell=use_shell,
+    max_attempts = 2
+    last_result = None
+    last_log_path = None
+    last_date_str = None
+    last_log_name = None
+
+    for attempt in range(max_attempts):
+        now = datetime.now()
+        date_str = now.strftime("%Y%m%d")
+        time_str = now.strftime("%H%M%S")
+        reports_dir = project_dir / "reports" / date_str
+        reports_dir.mkdir(parents=True, exist_ok=True)
+        log_name = f"{date_str}_{time_str}_chain_stack_traces.log"
+        log_path = reports_dir / log_name
+        if attempt > 0:
+            print_info(
+                f"Retrying dart test --chain-stack-traces (output → reports/{date_str}/{log_name})"
             )
-    finally:
-        running.clear()
-        spinner.join(timeout=0.5)
-    _check_log_for_errors(log_path, date_str, log_name)
-    return result.returncode == 0 if result is not None else False
+        else:
+            print_info(
+                f"Running dart test --chain-stack-traces (output → reports/{date_str}/{log_name})"
+            )
+        running = threading.Event()
+        running.set()
+        spinner = threading.Thread(
+            target=_spinner_while,
+            args=(running, "Tests"),
+            daemon=True,
+        )
+        spinner.start()
+        result = None
+        try:
+            with open(log_path, "w", encoding="utf-8") as out:
+                result = subprocess.run(
+                    ["dart", "test", "--chain-stack-traces"],
+                    cwd=project_dir,
+                    stdout=out,
+                    stderr=subprocess.STDOUT,
+                    env=env,
+                    shell=use_shell,
+                )
+        finally:
+            running.clear()
+            spinner.join(timeout=0.5)
+        last_result = result
+        last_log_path = log_path
+        last_date_str = date_str
+        last_log_name = log_name
+
+        if result is not None and result.returncode == 0:
+            return True
+        # Retry once on Windows when log shows transient file lock in .dart_test_tmp
+        if attempt == 0 and _log_shows_windows_file_lock(log_path):
+            print_warning(
+                "Transient Windows file lock detected (.dart_test_tmp). Retrying tests once..."
+            )
+            continue
+        break
+
+    _check_log_for_errors(last_log_path, last_date_str, last_log_name)
+    return (
+        last_result.returncode == 0
+        if last_result is not None
+        else False
+    )
 
 
 def _check_log_for_errors(log_path: Path, date_str: str, log_name: str) -> None:
@@ -845,22 +898,17 @@ def run_analysis_with_prompt(
 
 
 def run_analysis(project_dir: Path) -> bool:
-    """Step 6: Run static analysis and tests with chain-stack-traces; log and prompt on failure. Returns True to continue."""
+    """Step 6: Run static analysis only (dart analyze + doc check). Returns True to continue.
+
+    Tests run in Step 7; keeping analysis and tests separate ensures we report
+    'Analysis failed' vs 'Tests failed' correctly (e.g. Windows file-lock in .dart_test_tmp).
+    """
     result = run_analysis_with_prompt(
         project_dir,
         step_header="STEP 6: RUNNING STATIC ANALYSIS",
         do_doc_check=True,
     )
-    if result not in ("ok", "ignore"):
-        return False
-    # Run tests with full traces during analysis so we surface test failures early (no need to wait for Step 7).
-    test_dir = project_dir / "test"
-    if test_dir.exists():
-        env = _dart_test_env(project_dir)
-        if not _run_chain_stack_traces_and_check(project_dir, env):
-            print_error("dart test --chain-stack-traces failed. See report above.")
-            return False
-    return True
+    return result in ("ok", "ignore")
 
 
 def validate_changelog(
