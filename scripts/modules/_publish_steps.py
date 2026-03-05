@@ -471,6 +471,93 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
     return True
 
 
+def _dart_test_env(project_dir: Path) -> dict[str, str]:
+    """Return env with TMP/TEMP set to project-local .dart_test_tmp so test kernel files don't fill system temp."""
+    test_tmp = project_dir / ".dart_test_tmp"
+    test_tmp.mkdir(exist_ok=True)
+    env = os.environ.copy()
+    env["TMP"] = str(test_tmp)
+    env["TEMP"] = str(test_tmp)
+    return env
+
+
+def _run_chain_stack_traces_and_check(
+    project_dir: Path, env: dict[str, str] | None
+) -> bool:
+    """Run dart test --chain-stack-traces, pipe to file, open and check for errors. Returns True iff tests passed."""
+    now = datetime.now()
+    date_str = now.strftime("%Y%m%d")
+    time_str = now.strftime("%H%M%S")
+    reports_dir = project_dir / "reports" / date_str
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    log_name = f"{date_str}_{time_str}_chain_stack_traces.log"
+    log_path = reports_dir / log_name
+    print_info(f"Running dart test --chain-stack-traces (output → reports/{date_str}/{log_name})")
+    use_shell = get_shell_mode()
+    running = threading.Event()
+    running.set()
+    spinner = threading.Thread(
+        target=_spinner_while,
+        args=(running, "Tests"),
+        daemon=True,
+    )
+    spinner.start()
+    result = None
+    try:
+        with open(log_path, "w", encoding="utf-8") as out:
+            result = subprocess.run(
+                ["dart", "test", "--chain-stack-traces"],
+                cwd=project_dir,
+                stdout=out,
+                stderr=subprocess.STDOUT,
+                env=env,
+                shell=use_shell,
+            )
+    finally:
+        running.clear()
+        spinner.join(timeout=0.5)
+    _check_log_for_errors(log_path, date_str, log_name)
+    return result.returncode == 0 if result is not None else False
+
+
+def _check_log_for_errors(log_path: Path, date_str: str, log_name: str) -> None:
+    """Open the chain-stack-traces log and print lines that indicate failures (cap 50 lines)."""
+    if not log_path.exists():
+        return
+    try:
+        text = log_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        print_warning(f"Could not read {log_path}")
+        return
+    lines = text.splitlines()
+    error_markers = (
+        "FAILED",
+        "Some tests failed",
+        "Error:",
+        "Exception",
+        "Expected:",
+        "Actual:",
+        "which was",
+        "Bad state",
+    )
+    found = []
+    for i, line in enumerate(lines):
+        for marker in error_markers:
+            if marker in line:
+                found.append((i + 1, line.strip()))
+                break
+    if found:
+        print_error(f"Failures in reports/{date_str}/{log_name}:")
+        for line_no, content in found[:50]:
+            print_colored(f"  {line_no}: {content}", Color.RED)
+        if len(found) > 50:
+            print_colored(f"  ... and {len(found) - 50} more (see full log)", Color.RED)
+    else:
+        print_info(
+            f"Output saved to reports/{date_str}/{log_name} — no obvious error lines found; check file for full output."
+        )
+
+
 def run_tests(project_dir: Path) -> bool:
     """Step 7: Run unit tests.
 
@@ -502,22 +589,8 @@ def run_tests(project_dir: Path) -> bool:
             env=env,
         )
         if result.returncode != 0:
-            response = (
-                input("  Tests failed. Retry? [y/N]: ").strip().lower()
-                or "n"
-            )
-            if response in ("y", "yes"):
-                result = run_command(
-                    ["dart", "test"],
-                    project_dir,
-                    "Running unit tests (retry)",
-                    summarize=True,
-                    env=env,
-                )
-                if result.returncode != 0:
-                    return False
-            else:
-                return False
+            _run_chain_stack_traces_and_check(project_dir, env)
+            return False
     else:
         print_warning("No test directory found, skipping unit tests")
 
@@ -765,13 +838,22 @@ def run_analysis_with_prompt(
 
 
 def run_analysis(project_dir: Path) -> bool:
-    """Step 6: Run static analysis with log and prompt on failure. Returns True to continue."""
+    """Step 6: Run static analysis and tests with chain-stack-traces; log and prompt on failure. Returns True to continue."""
     result = run_analysis_with_prompt(
         project_dir,
         step_header="STEP 6: RUNNING STATIC ANALYSIS",
         do_doc_check=True,
     )
-    return result in ("ok", "ignore")
+    if result not in ("ok", "ignore"):
+        return False
+    # Run tests with full traces during analysis so we surface test failures early (no need to wait for Step 7).
+    test_dir = project_dir / "test"
+    if test_dir.exists():
+        env = _dart_test_env(project_dir)
+        if not _run_chain_stack_traces_and_check(project_dir, env):
+            print_error("dart test --chain-stack-traces failed. See report above.")
+            return False
+    return True
 
 
 def validate_changelog(
