@@ -18,6 +18,7 @@ import json
 import subprocess
 import sys
 import time
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 # Allow running as __main__ from scripts/modules/ (project root on path)
@@ -108,6 +109,52 @@ def _get_failed_runs(limit: int) -> list[dict]:
     return [r for r in runs if r.get("conclusion") == "failure"]
 
 
+def _current_branch() -> str | None:
+    """Return current git branch name, or None if not in a repo or detached."""
+    r = subprocess.run(
+        ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+        cwd=get_project_dir(),
+        capture_output=True,
+        text=True,
+        shell=get_shell_mode(),
+    )
+    if r.returncode != 0 or not r.stdout.strip():
+        return None
+    branch = r.stdout.strip()
+    return branch if branch != "HEAD" else None
+
+
+def _parse_created_at(created_at: str | None) -> datetime | None:
+    """Parse gh run createdAt (ISO 8601). Returns None on parse failure."""
+    if not created_at:
+        return None
+    try:
+        s = created_at.replace("Z", "+00:00")
+        return datetime.fromisoformat(s)
+    except (ValueError, TypeError):
+        return None
+
+
+def _filter_recent_same_branch(
+    runs: list[dict],
+    branch: str | None,
+    max_age_minutes: int,
+) -> list[dict]:
+    """Keep only runs for the given branch that were created within max_age_minutes."""
+    if not runs:
+        return []
+    cutoff = datetime.now(timezone.utc) - timedelta(minutes=max_age_minutes)
+    out: list[dict] = []
+    for r in runs:
+        if branch is not None and r.get("headBranch") != branch:
+            continue
+        created = _parse_created_at(r.get("createdAt"))
+        if created is not None and created < cutoff:
+            continue
+        out.append(r)
+    return out
+
+
 def get_failed_runs_safe(limit: int = 10) -> tuple[bool, list[dict]]:
     """Fetch recent failed workflow runs without exiting. For use by publish.
 
@@ -137,10 +184,26 @@ def get_failed_runs_safe(limit: int = 10) -> tuple[bool, list[dict]]:
     return True, failed
 
 
+# When used from publish: only prompt for failures on current branch from last N minutes.
+OFFER_RETRIGGER_MAX_AGE_MINUTES = 60
+
+
 def offer_retrigger_ci(limit: int = 10) -> None:
-    """If there are failed runs, display them and prompt to re-run / watch. Used by publish."""
+    """If there are failed runs (current branch, last hour), display them and prompt to re-run / watch.
+
+    Used by publish. Only shows failures for the current git branch that were created in the last
+    OFFER_RETRIGGER_MAX_AGE_MINUTES, so old or other-branch failures do not trigger the prompt.
+    """
     ok, failed_runs = get_failed_runs_safe(limit)
     if not ok or not failed_runs:
+        return
+    branch = _current_branch()
+    failed_runs = _filter_recent_same_branch(
+        failed_runs,
+        branch,
+        OFFER_RETRIGGER_MAX_AGE_MINUTES,
+    )
+    if not failed_runs:
         return
     print_warning(f"Found {len(failed_runs)} failed CI run(s):")
     print()
