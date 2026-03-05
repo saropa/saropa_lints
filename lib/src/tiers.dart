@@ -145,6 +145,7 @@ const Set<String> stylisticRules = <String>{
   'unnecessary_trailing_comma', // Moved from professional (opinionated)
   'double_literal_format', // Moved from professional (opinionated)
   'format_comment_style', // Moved from pedantic (opinionated)
+  'require_ignore_comment_spacing', // ignore: and ignore_for_file: need space after colon
   // === Comments & Documentation ===
   'prefer_todo_format',
   'prefer_fixme_format',
@@ -1111,6 +1112,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_empty_results_state',
   'require_search_loading_indicator',
   'require_pagination_loading_state',
+  'require_pagination_error_recovery',
 
   // Part 6 - Lifecycle Rules (Recommended)
   'avoid_work_in_paused_state',
@@ -2168,6 +2170,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_always_null_parameters',
   'avoid_autoplay_audio',
   'avoid_barrel_files',
+  'avoid_importing_entrypoint_exports',
   'avoid_border_all',
   'avoid_calling_of_in_build',
   'avoid_collapsible_if',

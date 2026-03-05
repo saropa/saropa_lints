@@ -657,6 +657,7 @@ saropa_lints:
     - avoid_double_slash_imports: false
     - avoid_duplicate_exports: false
     - avoid_duplicate_named_imports: false
+    - avoid_importing_entrypoint_exports: false
     - max_imports: false
     - prefer_named_imports: false
 
@@ -1128,6 +1129,7 @@ saropa_lints:
     # UI Components
     - require_svg_error_handler: false
     - require_google_fonts_fallback: false
+    - require_pagination_error_recovery: false  # INFO - paginated list without retry/error in scope (v6.2.1)
     - prefer_uuid_v4: false
     # Isar
     - avoid_cached_isar_stream: false           # PROFESSIONAL - New in 4.1.3: Prevents caching Isar query streams (runtime crash risk)

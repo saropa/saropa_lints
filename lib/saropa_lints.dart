@@ -364,6 +364,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidUnnecessaryGestureDetectorRule.new,
   PreferWidgetPrivateMembersRule.new,
   AvoidBarrelFilesRule.new,
+  AvoidImportingEntrypointExportsRule.new,
   PreferConstructorsFirstRule.new,
   PreferFactoryBeforeNamedRule.new,
   PreferOverridesLastRule.new,
@@ -887,6 +888,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // New formatting rules
   AvoidDigitSeparatorsRule.new,
   FormatCommentFormattingRule.new,
+  RequireIgnoreCommentSpacingRule.new,
   MemberOrderingFormattingRule.new,
   ParametersOrderingConventionRule.new,
 
@@ -1775,6 +1777,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireSearchLoadingIndicatorRule.new,
   RequireSearchDebounceRule.new,
   RequirePaginationLoadingStateRule.new,
+  RequirePaginationErrorRecoveryRule.new,
 
   // Part 6 - Lifecycle rules
   AvoidWorkInPausedStateRule.new,
