@@ -307,7 +307,7 @@ Stylistic rules are orthogonal to correctness. Your code can be perfectly correc
 
 ### Configuration template
 
-See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 2053+ rules organized by category, tier membership, and examples.
+See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 2054+ rules organized by category, tier membership, and examples.
 
 ### Using a tier
 
