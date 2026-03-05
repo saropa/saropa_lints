@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/architecture/structure_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 45 Structure lint rules.
+/// Tests for 46 Structure lint rules.
 ///
 /// Test fixtures: example_core/lib/structure/*
 void main() {
@@ -22,6 +22,11 @@ void main() {
       'AvoidBarrelFilesRule',
       'avoid_barrel_files',
       () => AvoidBarrelFilesRule(),
+    );
+    testRule(
+      'AvoidImportingEntrypointExportsRule',
+      'avoid_importing_entrypoint_exports',
+      () => AvoidImportingEntrypointExportsRule(),
     );
     testRule(
       'AvoidDoubleSlashImportsRule',
@@ -273,6 +278,7 @@ void main() {
   group('Structure Rules - Fixture Verification', () {
     final fixtures = [
       'avoid_barrel_files',
+      'avoid_importing_entrypoint_exports',
       'avoid_double_slash_imports',
       'avoid_duplicate_exports',
       'avoid_duplicate_mixins',
@@ -343,6 +349,32 @@ void main() {
       test('avoid_barrel_files should NOT trigger', () {
         // Avoidance pattern not present
         expect('avoid_barrel_files passes', isNotNull);
+      });
+    });
+
+    group('avoid_importing_entrypoint_exports', () {
+      test('bad fixture imports a file that re-exports main.dart', () {
+        final barrel = File('example_core/lib/structure/entrypoint_barrel.dart');
+        expect(barrel.existsSync(), isTrue);
+        final content = barrel.readAsStringSync();
+        expect(content, contains("export '../main.dart'"));
+      });
+
+      test('good fixture imports a file that does not re-export main.dart', () {
+        final goodFixture = File(
+          'example_core/lib/structure/avoid_importing_entrypoint_exports_good_fixture.dart',
+        );
+        expect(goodFixture.existsSync(), isTrue);
+        expect(goodFixture.readAsStringSync(), contains("import 'avoid_barrel_files_fixture.dart'"));
+        final target = File('example_core/lib/structure/avoid_barrel_files_fixture.dart');
+        expect(target.existsSync(), isTrue);
+        final targetContent = target.readAsStringSync();
+        final exportMainPattern = RegExp(r'''export\s+['"][^'"]*main\.dart['"]''');
+        expect(
+          exportMainPattern.hasMatch(targetContent),
+          isFalse,
+          reason: 'Compliant fixture must import a file that does not re-export main.dart',
+        );
       });
     });
 

@@ -1,11 +1,14 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
+import 'dart:io' show File, IOException;
+
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/line_info.dart';
+import 'package:path/path.dart' as p;
 
 import '../../fixes/structure/delete_duplicate_export_fix.dart';
 import '../../fixes/structure/delete_duplicate_import_fix.dart';
@@ -3739,4 +3742,139 @@ class PreferPartOverImportRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {}
+}
+
+/// Warns when importing from a file that re-exports the entry point.
+///
+/// Since: v0.1.4 | Rule version: v1
+///
+/// **For developers:** This rule flags [ImportDirective] nodes when the
+/// imported URI resolves to a Dart file that contains an `export` directive
+/// whose target URI ends with `main.dart`. Entry point here means the
+/// conventional app bootstrap file; re-exporting it from a barrel pulls the
+/// bootstrap into the dependency graph. Detection is single-file plus
+/// one level of file read: we resolve the import URI to a path (using
+/// [ProjectContext.findProjectRoot] and package/relative resolution), then
+/// read that file and match `export '...'` / `export "..."` with a regex;
+/// if any exported URI ends with `main.dart` we report. We skip `dart:` URIs
+/// and the current file when it is itself `main.dart`. No heuristic name
+/// matching: we use exact `endsWith('main.dart')` and the export regex.
+/// Performance: one file read per same-package or relative import; cost is
+/// [RuleCost.medium]. No quick fix: fixing requires choosing which specific
+/// module or the entry point to import, which is not safe to automate.
+///
+/// Importing from a barrel or bootstrap file that re-exports `main.dart`
+/// pulls the entry point into the dependency graph and can cause unintended
+/// side effects, tighter coupling, and harder-to-reason-about startup.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// // lib/barrel.dart: export 'main.dart';
+/// // lib/feature/foo.dart:
+/// import '../barrel.dart';  // barrel re-exports main.dart
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// import '../models/user.dart';
+/// import '../main.dart';  // Direct entry-point import is not flagged
+/// ```
+class AvoidImportingEntrypointExportsRule extends SaropaLintRule {
+  AvoidImportingEntrypointExportsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    'avoid_importing_entrypoint_exports',
+    '[avoid_importing_entrypoint_exports] This import resolves to a file that '
+        're-exports the entry point (e.g. main.dart). Importing from such files '
+        'pulls the app bootstrap into the dependency graph and can cause '
+        'unintended coupling and side effects. {v1}',
+    correctionMessage:
+        'Import specific modules or the entry point directly instead of '
+        'importing from a file that re-exports the entry point.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  /// Matches export '...' or export "..."; capture group 1 is the URI.
+  static final RegExp _exportUriPattern =
+      RegExp(r'''export\s+['"]([^'"]+)['"]''');
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final String filePath = context.filePath;
+    final String normalizedPath = filePath.replaceAll('\\', '/');
+
+    if (_isEntryPointFile(normalizedPath)) return;
+
+    final String? projectRoot = ProjectContext.findProjectRoot(filePath);
+    final String packageName =
+        projectRoot != null ? ProjectContext.getPackageName(projectRoot) : '';
+
+    context.addImportDirective((ImportDirective node) {
+      final String? uri = node.uri.stringValue;
+      if (uri == null || uri.isEmpty) return;
+      if (uri.startsWith('dart:')) return;
+
+      final String? resolvedPath = _resolveImportUri(
+        uri,
+        filePath,
+        projectRoot,
+        packageName,
+      );
+      if (resolvedPath == null) return;
+
+      if (!_fileReExportsEntryPoint(resolvedPath)) return;
+
+      reporter.atNode(node);
+    });
+  }
+
+  bool _isEntryPointFile(String normalizedPath) {
+    return normalizedPath.endsWith('main.dart');
+  }
+
+  String? _resolveImportUri(
+    String uri,
+    String fromFilePath,
+    String? projectRoot,
+    String packageName,
+  ) {
+    if (uri.startsWith('package:')) {
+      if (packageName.isEmpty || projectRoot == null) return null;
+      final String prefix = 'package:$packageName/';
+      if (!uri.startsWith(prefix)) return null;
+      final String relative = uri.substring(prefix.length);
+      final String resolved =
+          p.normalize(p.join(projectRoot, 'lib', relative));
+      return resolved.replaceAll('\\', '/');
+    }
+    final String fromDir = p.dirname(fromFilePath);
+    final String resolved = p.normalize(p.join(fromDir, uri));
+    return resolved.replaceAll('\\', '/');
+  }
+
+  bool _fileReExportsEntryPoint(String path) {
+    try {
+      final File file = File(path);
+      if (!file.existsSync()) return false;
+      final String content = file.readAsStringSync();
+      for (final Match m in _exportUriPattern.allMatches(content)) {
+        final String exportedUri = m.group(1) ?? '';
+        if (exportedUri.endsWith('main.dart')) return true;
+      }
+      return false;
+    } on IOException {
+      return false;
+    }
+  }
 }
