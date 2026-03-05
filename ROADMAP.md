@@ -285,7 +285,6 @@ Implement only when cross-file, heuristics, or YAML support exists. Single-file 
 
 | Rule | Reason | Description |
 |------|--------|-------------|
-| `avoid_importing_entrypoint_exports` | CROSS-FILE | Requires knowing which files re-export entry points. |
 | `handle_bloc_event_subclasses` | CROSS-FILE | Bloc event class hierarchy spans multiple files. |
 | `prefer_automatic_dispose` | CONTEXT / HEURISTIC | Automatic dispose detection needs lifecycle/context. |
 | `prefer_composition_over_inheritance` | TOO-COMPLEX | Pattern too abstract for reliable AST detection. |

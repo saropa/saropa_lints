@@ -33,7 +33,6 @@ This folder contains one detailed task report per planned rule from [ROADMAP.md]
 | task_avoid_explicit_type_declaration.md | Easy | Low |
 | task_avoid_freezed_invalid_annotation_target.md | Medium | High |
 | task_avoid_hardcoded_config_test.md | Medium | High |
-| task_avoid_importing_entrypoint_exports.md | Hard | High |
 | task_avoid_misleading_documentation.md | Medium | High |
 | task_avoid_referencing_subclasses.md | Medium | High |
 | task_avoid_renaming_representation_getters.md | Medium | High |
@@ -44,13 +43,11 @@ This folder contains one detailed task report per planned rule from [ROADMAP.md]
 | task_avoid_unnecessary_null_aware_elements.md | Medium | High |
 | task_fold.md | Easy | Low |
 | task_format_test_name.md | Easy | Low |
-| task_handle_bloc_event_subclasses.md | Hard | High |
 | task_pattern_fields_ordering.md | Medium | Low |
 | task_prefer_announce_for_changes.md | Medium | Medium |
 | task_prefer_asmap_over_indexed_iteration.md | Medium | High |
 | task_prefer_auto_route_path_params_simple.md | Medium | High |
 | task_prefer_auto_route_typed_args.md | Medium | High |
-| task_prefer_automatic_dispose.md | Hard | High |
 | task_prefer_base_prefix.md | Easy | Medium |
 | task_prefer_biometric_protection.md | Medium | High |
 | task_prefer_bloc_extensions.md | Medium | High |
@@ -62,7 +59,6 @@ This folder contains one detailed task report per planned rule from [ROADMAP.md]
 | task_prefer_class_destructuring.md | Medium | High |
 | task_prefer_closest_context.md | Medium | High |
 | task_prefer_compile_time_config.md | Medium | High |
-| task_prefer_composition_over_inheritance.md | Hard | High |
 | task_prefer_conditional_logging.md | Medium | High |
 | task_prefer_connectivity_debounce.md | Medium | High |
 | task_prefer_const_constructor_declarations.md | Easy | Low |
@@ -70,7 +66,6 @@ This folder contains one detailed task report per planned rule from [ROADMAP.md]
 | task_prefer_constructors_over_static_methods.md | Easy | Low |
 | task_prefer_context_read_not_watch.md | Medium | High |
 | task_prefer_correct_json_casts.md | Medium | High |
-| task_prefer_correct_screenshots.md | Hard | High |
 | task_prefer_correct_throws.md | Medium | High |
 | task_prefer_correct_topics.md | Medium | High |
 | task_prefer_dark_mode_colors.md | Medium | High |
@@ -105,9 +100,7 @@ This folder contains one detailed task report per planned rule from [ROADMAP.md]
 | task_prefer_import_group_comments.md | Easy | Low |
 | task_prefer_import_over_part.md | Medium | High |
 | task_prefer_injectable_package.md | Medium | High |
-| task_prefer_inline_comments_sparingly.md | Hard | Medium |
 | task_prefer_inline_function_types.md | Easy | Medium |
-| task_prefer_intent_filter_export.md | Hard | High |
 | task_prefer_internet_connection_checker.md | Medium | High |
 | task_prefer_isar_for_complex_queries.md | Medium | Medium |
 | task_prefer_js_interop_over_dart_js.md | Medium | High |
@@ -167,7 +160,6 @@ This folder contains one detailed task report per planned rule from [ROADMAP.md]
 | task_require_const_list_items.md | Medium | High |
 | task_require_content_type_validation.md | Medium | High |
 | task_require_context_in_build_descendants.md | Medium | High |
-| task_require_di_module_separation.md | Hard | High |
 | task_require_dispose_verification_tests.md | Medium | High |
 | task_require_error_context_in_logs.md | Medium | High |
 | task_require_error_handling_graceful.md | Medium | High |
@@ -193,7 +185,6 @@ This folder contains one detailed task report per planned rule from [ROADMAP.md]
 | task_require_permission_lifecycle_observer.md | Medium | High |
 | task_require_provider_update_should_notify.md | Medium | High |
 | task_require_reduced_motion_support.md | Medium | High |
-| task_require_resource_tracker.md | Hard | Medium |
 | task_require_return_documentation.md | Medium | High |
 | task_require_riverpod_lint_package.md | Easy | High |
 | task_require_rtl_support.md | Medium | High |
