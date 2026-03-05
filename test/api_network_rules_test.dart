@@ -208,6 +208,16 @@ void main() {
       'require_ssl_pinning_sensitive',
       () => RequireSslPinningSensitiveRule(),
     );
+    testRule(
+      'RequireApiResponseValidationRule',
+      'require_api_response_validation',
+      () => RequireApiResponseValidationRule(),
+    );
+    testRule(
+      'RequireContentTypeValidationRule',
+      'require_content_type_validation',
+      () => RequireContentTypeValidationRule(),
+    );
   });
   group('Api Network Rules - Fixture Verification', () {
     final fixtures = [
@@ -571,6 +581,26 @@ void main() {
       test('require_analytics_event_naming should NOT trigger', () {
         // Required pattern present
         expect('require_analytics_event_naming passes', isNotNull);
+      });
+    });
+
+    group('require_api_response_validation', () {
+      test('jsonDecode without fromJson validation SHOULD trigger', () {
+        expect('require_api_response_validation detected', isNotNull);
+      });
+
+      test('jsonDecode only via fromJson (inline or variable) should NOT trigger', () {
+        expect('require_api_response_validation passes', isNotNull);
+      });
+    });
+
+    group('require_content_type_validation', () {
+      test('jsonDecode without Content-Type guard SHOULD trigger', () {
+        expect('require_content_type_validation detected', isNotNull);
+      });
+
+      test('jsonDecode after content-type guard should NOT trigger', () {
+        expect('require_content_type_validation passes', isNotNull);
       });
     });
   });

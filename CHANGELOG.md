@@ -44,6 +44,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **prefer_safe_area_consumer** — No longer reports when `SafeArea(top: false, ...)` is used inside a Scaffold body. That pattern only applies bottom (and optionally left/right) insets, so there is no redundant top inset with the AppBar. See bugs/history/bug_prefer_safe_area_consumer_safe_area_top_false.md.
 
+- **prefer_named_routes_for_deep_links** — No longer reports when `MaterialPageRoute` or `CupertinoPageRoute` use `settings: RouteSettings(name: ...)` with a non-empty name (literal or variable). Supports path-style names and `onGenerateRoute`-based deep linking. Still reports when there is no `settings`, when `RouteSettings` has no `name`, or when `name` is an empty string literal. Resolves bug_prefer_named_routes_for_deep_links_material_page_route_named.
+
+- **prefer_webview_sandbox** — No longer reports when the controller passed to `WebViewWidget` (or `WebView`) is configured in the same file with `setNavigationDelegate(...)` and/or `setAllowFileAccess(false)` (e.g. in initState). Controller matching is by expression root (e.g. `_controller`, `controller`). Resolves bug_prefer_webview_sandbox_controller_configuration.
+
 ---
 
 ## [6.2.1]

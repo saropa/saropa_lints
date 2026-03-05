@@ -3764,7 +3764,132 @@ class PreferStaleWhileRevalidateRule extends SaropaLintRule {
 // require_api_response_validation
 // =============================================================================
 
+/// Returns the innermost [Block] that contains [node], or null.
+Block? _blockContaining(AstNode node) {
+  AstNode? current = node.parent;
+  while (current != null) {
+    if (current is Block) return current;
+    current = current.parent;
+  }
+  return null;
+}
+
+/// Returns the outermost [Block] that contains [node], or null.
+Block? _outermostBlockContaining(AstNode node) {
+  Block? block = _blockContaining(node);
+  while (block != null) {
+    final parent = block.parent;
+    if (parent is! Block) break;
+    block = parent;
+  }
+  return block;
+}
+
+/// Returns the [Statement] that is a direct child of [block] and contains [node].
+Statement? _directChildStatementOf(Block block, AstNode node) {
+  AstNode? current = node;
+  while (current != null && current.parent != block) {
+    current = current.parent;
+  }
+  return current is Statement ? current : null;
+}
+
+/// Returns the [Statement] that is a direct child of a [Block] and contains [node].
+Statement? _statementInBlockContaining(AstNode node) {
+  AstNode? current = node;
+  while (current != null) {
+    final parent = current.parent;
+    if (parent is Block && current is Statement) return current;
+    current = parent;
+  }
+  return null;
+}
+
+/// True when [node] (a jsonDecode call) is the direct argument to a fromJson call.
+bool _isDirectArgumentToFromJson(MethodInvocation node) {
+  final parent = node.parent;
+  if (parent is ArgumentList) {
+    final grandparent = parent.parent;
+    if (grandparent is MethodInvocation &&
+        grandparent.methodName.name == 'fromJson' &&
+        parent.arguments.length == 1 &&
+        parent.arguments.single == node) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/// Variable name if [node] is the RHS of an assignment to a variable; null otherwise.
+String? _assignedVariableName(MethodInvocation node) {
+  final parent = node.parent;
+  if (parent is VariableDeclaration && parent.initializer == node) {
+    return parent.name.lexeme;
+  }
+  if (parent is AssignmentExpression && parent.rightHandSide == node) {
+    final left = parent.leftHandSide;
+    if (left is SimpleIdentifier) return left.name;
+  }
+  return null;
+}
+
+void _collectIdentifiers(AstNode node, String name, List<SimpleIdentifier> out) {
+  if (node is SimpleIdentifier && node.name == name) {
+    out.add(node);
+  }
+  for (final c in node.childEntities) {
+    if (c is AstNode) _collectIdentifiers(c, name, out);
+  }
+}
+
+/// True when the only use of variable [name] in [block] (after [stmt]) is as the single argument to a fromJson call.
+bool _variableOnlyPassedToFromJson(Block block, String name, Statement stmt) {
+  final stmtIndex = block.statements.indexOf(stmt);
+  if (stmtIndex < 0) return false;
+  final afterStmt = block.statements.sublist(stmtIndex);
+  final identifiers = <SimpleIdentifier>[];
+  for (final s in afterStmt) {
+    _collectIdentifiers(s, name, identifiers);
+  }
+  for (final id in identifiers) {
+    if (id.parent is VariableDeclaration) continue;
+    if (!_isArgumentToFromJson(id)) return false;
+  }
+  return true;
+}
+
+bool _isArgumentToFromJson(SimpleIdentifier identifier) {
+  final parent = identifier.parent;
+  if (parent is ArgumentList &&
+      parent.arguments.length == 1 &&
+      parent.arguments.single == identifier) {
+    final grandparent = parent.parent;
+    if (grandparent is MethodInvocation &&
+        grandparent.methodName.name == 'fromJson') {
+      return true;
+    }
+  }
+  return false;
+}
+
 /// Suggests validating API response shape before use.
+///
+/// Reports on [jsonDecode] when the decoded value may be used without validation (e.g. direct field access).
+/// Does **not** report when:
+/// - The [jsonDecode] call is the direct single argument to a [fromJson] call (e.g. `MyType.fromJson(jsonDecode(body))`), or
+/// - The decoded value is assigned to a variable and that variable is only ever passed as the single argument to a [fromJson] call.
+///
+/// **BAD:**
+/// ```dart
+/// final data = jsonDecode(response.body);
+/// print(data['key']); // Unvalidated use
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final data = MyModel.fromJson(jsonDecode(response.body));
+/// // or: final decoded = jsonDecode(response.body); ... MyModel.fromJson(decoded);
+/// ```
 class RequireApiResponseValidationRule extends SaropaLintRule {
   RequireApiResponseValidationRule() : super(code: _code);
 
@@ -3789,6 +3914,17 @@ class RequireApiResponseValidationRule extends SaropaLintRule {
   ) {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'jsonDecode') return;
+      if (_isDirectArgumentToFromJson(node)) return;
+      final varName = _assignedVariableName(node);
+      if (varName != null) {
+        final block = _blockContaining(node);
+        final stmt = _statementInBlockContaining(node);
+        if (block != null &&
+            stmt != null &&
+            _variableOnlyPassedToFromJson(block, varName, stmt)) {
+          return;
+        }
+      }
       reporter.atNode(node);
     });
   }
@@ -3827,7 +3963,58 @@ class RequireApiVersionHandlingRule extends SaropaLintRule {
 // require_content_type_validation
 // =============================================================================
 
+/// True when [stmt] is an IfStatement that returns when Content-Type is not application/json (guard before decode).
+///
+/// Uses a guarded heuristic on condition source (contentType/mimeType + application/json) per CONTRIBUTING.md.
+bool _isContentTypeGuardStatement(Statement stmt) {
+  if (stmt is! IfStatement) return false;
+  final condition = stmt.expression.toSource();
+  final hasContentType = condition.contains('contentType') ||
+      condition.contains('mimeType') ||
+      condition.contains('content_type');
+  final hasJson = condition.contains('application/json');
+  if (!hasContentType || !hasJson) return false;
+  return stmt.thenStatement is ReturnStatement;
+}
+
+/// True when a dominating content-type check exists before the jsonDecode at [node].
+bool _hasContentTypeGuardBeforeJsonDecode(AstNode node) {
+  Block? block = _outermostBlockContaining(node);
+  while (block != null) {
+    final stmt = _directChildStatementOf(block, node);
+    if (stmt != null) {
+      final stmtIndex = block.statements.indexOf(stmt);
+      if (stmtIndex > 0) {
+        for (var i = 0; i < stmtIndex; i++) {
+          if (_isContentTypeGuardStatement(block.statements[i])) return true;
+        }
+      }
+    }
+    final parent = block.parent;
+    if (parent is! Block) break;
+    block = parent;
+  }
+  return false;
+}
+
 /// Suggests validating Content-Type before parsing response.
+///
+/// Reports on [jsonDecode] when there is no dominating content-type guard (e.g. early return when not `application/json`).
+/// Does **not** report when a preceding [IfStatement] in the same or outer block checks contentType/mimeType and
+/// `application/json`, and returns before the decode (guarded heuristic on condition source; see CONTRIBUTING.md).
+///
+/// **BAD:**
+/// ```dart
+/// final data = jsonDecode(response.body); // No Content-Type check
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (request.headers.contentType?.mimeType != 'application/json') {
+///   return (error: 'Content-Type must be application/json');
+/// }
+/// final data = jsonDecode(body);
+/// ```
 class RequireContentTypeValidationRule extends SaropaLintRule {
   RequireContentTypeValidationRule() : super(code: _code);
 
@@ -3852,6 +4039,7 @@ class RequireContentTypeValidationRule extends SaropaLintRule {
   ) {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'jsonDecode') return;
+      if (_hasContentTypeGuardBeforeJsonDecode(node)) return;
       reporter.atNode(node);
     });
   }

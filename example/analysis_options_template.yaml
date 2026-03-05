@@ -750,6 +750,8 @@ saropa_lints:
     - require_connectivity_check: false
     - require_offline_indicator: false
     - require_api_error_mapping: false
+    - require_api_response_validation: false   # INFO - validate shape / fromJson (v6.2.0)
+    - require_content_type_validation: false  # INFO - check Content-Type before parse (v6.2.0)
     - avoid_token_in_url: false
     - avoid_generic_key_in_url: false
     - prefer_http_connection_reuse: false
@@ -1116,6 +1118,7 @@ saropa_lints:
     # WebView
     - require_webview_ssl_error_handling: false
     - avoid_webview_file_access: false
+    - prefer_webview_sandbox: false
     # WorkManager
     - require_workmanager_constraints: false
     - require_workmanager_result_return: false

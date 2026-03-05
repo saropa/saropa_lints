@@ -353,6 +353,7 @@ void main() {
       'prefer_secure_random',
       'prefer_typed_data',
       'prefer_webview_javascript_disabled',
+      'prefer_webview_sandbox',
       'require_auth_check',
       'require_biometric_fallback',
       'require_certificate_pinning',
