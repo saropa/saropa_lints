@@ -1769,25 +1769,40 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
   }
 }
 
-/// Future rule: prefer-safe-area-consumer
+/// Prefer letting Scaffold consume safe area instead of wrapping body in SafeArea.
+///
+/// **prefer_safe_area_consumer** — Warns when [SafeArea] is used as the direct
+/// body of a [Scaffold]. Scaffold already insets its body below the AppBar and
+/// above the BottomNavigationBar, so a full SafeArea often doubles the top inset
+/// and wastes vertical space.
+///
+/// **Exception:** Does not report when SafeArea has an explicit `top: false`.
+/// In that case only bottom (and optionally left/right) insets are applied,
+/// e.g. for the home indicator; there is no redundant top inset.
 ///
 /// Since: v1.1.19 | Updated: v4.13.0 | Rule version: v4
 ///
-/// Warns when SafeArea is used without considering when it's unnecessary.
-///
-/// Example of **bad** code:
+/// **Bad:**
 /// ```dart
 /// Scaffold(
-///   body: SafeArea(  // Scaffold already handles safe area
+///   body: SafeArea(
 ///     child: ListView(...),
 ///   ),
 /// )
 /// ```
 ///
-/// Example of **good** code:
+/// **Good:**
 /// ```dart
 /// Scaffold(
-///   body: ListView(...),  // Scaffold handles safe area via appBar, bottomNavigationBar
+///   body: ListView(...),
+/// )
+/// ```
+///
+/// **Good (bottom-only inset):**
+/// ```dart
+/// Scaffold(
+///   appBar: AppBar(...),
+///   body: SafeArea(top: false, child: WebView(...)),
 /// )
 /// ```
 class PreferSafeAreaConsumerRule extends SaropaLintRule {
@@ -1826,12 +1841,27 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
             final bodyExpr = arg.expression;
             if (bodyExpr is InstanceCreationExpression &&
                 bodyExpr.constructorName.type.name.lexeme == 'SafeArea') {
+              // SafeArea(top: false) only applies bottom/left/right insets;
+              // no redundant top inset with AppBar, so do not report.
+              if (_safeAreaHasTopFalse(bodyExpr)) continue;
               reporter.atNode(bodyExpr.constructorName, code);
             }
           }
         }
       }
     });
+  }
+
+  /// True when this SafeArea has an explicit `top: false` (no redundant top
+  /// inset with Scaffold appBar).
+  static bool _safeAreaHasTopFalse(InstanceCreationExpression safeArea) {
+    for (final Expression arg in safeArea.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'top') {
+        final expr = arg.expression;
+        return expr is BooleanLiteral && !expr.value;
+      }
+    }
+    return false;
   }
 }
 
