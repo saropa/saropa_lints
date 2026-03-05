@@ -143,7 +143,6 @@ This folder contains one detailed task report per planned rule from [ROADMAP.md]
 | task_prefer_then_catcherror.md | Easy | Low |
 | task_prefer_using_for_temp_resources.md | Medium | High |
 | task_prefer_weak_references.md | Medium | Medium |
-| task_prefer_webview_sandbox.md | Medium | High |
 | task_prefer_whitelist_validation.md | Medium | High |
 | task_prefer_zone_error_handler.md | Medium | Medium |
 | task_record_fields_ordering.md | Medium | Low |

@@ -2679,6 +2679,16 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
 // NEW ROADMAP STAR RULES - Navigation Rules
 // =============================================================================
 
+/// Returns the expression passed as the [settings] named argument, if any.
+Expression? _getSettingsArgument(InstanceCreationExpression node) {
+  for (final Expression arg in node.argumentList.arguments) {
+    if (arg is NamedExpression && arg.name.label.name == 'settings') {
+      return arg.expression;
+    }
+  }
+  return null;
+}
+
 /// Warns when RouteSettings.name is not provided for analytics tracking.
 ///
 /// Since: v4.1.4 | Updated: v4.13.0 | Rule version: v2
@@ -2736,21 +2746,7 @@ class PreferRouteSettingsNameRule extends SaropaLintRule {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_routeTypes.contains(typeName)) return;
-
-      // Check for settings parameter
-      final ArgumentList args = node.argumentList;
-      bool hasSettings = false;
-
-      for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'settings') {
-          hasSettings = true;
-          break;
-        }
-      }
-
-      if (!hasSettings) {
-        reporter.atNode(node);
-      }
+      if (_getSettingsArgument(node) == null) reporter.atNode(node);
     });
   }
 }
@@ -3541,14 +3537,29 @@ class RequireAutoRoutePageSuffixRule extends SaropaLintRule {
 // prefer_named_routes_for_deep_links
 // =============================================================================
 
-/// Suggests named routes for deep linking.
+/// Suggests named routes so that deep links can open the correct screen.
 ///
-/// Anonymous route construction (e.g. MaterialPageRoute(builder: ...)) cannot
-/// be deep-linked. Use named routes so links open the correct screen.
+/// **When this rule reports:** It reports on [MaterialPageRoute] and
+/// [CupertinoPageRoute] constructions that do **not** supply a named route
+/// suitable for deep linking — i.e. when there is no `settings:
+/// RouteSettings(name: ...)` with a non-empty name.
 ///
-/// **Bad:** Navigator.push(context, MaterialPageRoute(...)).
+/// **When this rule does not report:** It does **not** report when the route
+/// has `settings: RouteSettings(name: pathOrName)` where:
+/// - `pathOrName` is a non-empty string literal (e.g. `'/details'`), or
+/// - `pathOrName` is any other expression (e.g. a variable like `routeName`),
+///   since the value cannot be known at analysis time and may be path-style.
+/// Apps that use `onGenerateRoute` and match on `RouteSettings.name` (e.g.
+/// `settings.name?.startsWith(basePath)`) support deep linking with such
+/// routes; the rule treats them as named and suppresses the diagnostic.
 ///
-/// **Good:** Named routes or go_router path-based navigation.
+/// **Edge case:** `RouteSettings(name: '')` is still reported (empty name
+/// cannot be used for deep linking).
+///
+/// **Bad:** `Navigator.push(context, MaterialPageRoute(builder: (_) => Page()));`
+///
+/// **Good:** Named routes; or `MaterialPageRoute(settings: RouteSettings(name:
+/// '/path'), builder: ...)`; or go_router/auto_route path-based navigation.
 class PreferNamedRoutesForDeepLinksRule extends SaropaLintRule {
   PreferNamedRoutesForDeepLinksRule() : super(code: _code);
 
@@ -3575,8 +3586,31 @@ class PreferNamedRoutesForDeepLinksRule extends SaropaLintRule {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String name = node.constructorName.type.name.lexeme;
       if (name != 'MaterialPageRoute' && name != 'CupertinoPageRoute') return;
+      if (_hasNamedRouteSettings(node)) return;
       reporter.atNode(node);
     });
+  }
+
+  /// True if this route has `settings: RouteSettings(name: ...)` with a
+  /// non-empty name (or a name that is not a compile-time empty string).
+  static bool _hasNamedRouteSettings(InstanceCreationExpression node) {
+    final Expression? settingsExpr = _getSettingsArgument(node);
+    if (settingsExpr is! InstanceCreationExpression) return false;
+    if (settingsExpr.constructorName.type.name.lexeme != 'RouteSettings') {
+      return false;
+    }
+    for (final Expression settingsArg in settingsExpr.argumentList.arguments) {
+      if (settingsArg is! NamedExpression ||
+          settingsArg.name.label.name != 'name') {
+        continue;
+      }
+      final Expression nameExpr = settingsArg.expression;
+      if (nameExpr is SimpleStringLiteral) {
+        return nameExpr.value.isNotEmpty;
+      }
+      return true;
+    }
+    return false;
   }
 }
 

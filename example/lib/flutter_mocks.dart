@@ -1526,6 +1526,25 @@ class WebView extends Widget {
   });
 }
 
+/// Mock for prefer_webview_sandbox fixture (controller-based WebView API).
+class WebViewWidget extends Widget {
+  const WebViewWidget({super.key, required dynamic controller});
+}
+
+class WebViewController {
+  WebViewController();
+  void setNavigationDelegate(dynamic delegate) {}
+  dynamic get platform => null;
+}
+
+class NavigationDelegate {
+  const NavigationDelegate({dynamic onNavigationRequest});
+}
+
+class AndroidWebViewController {
+  void setAllowFileAccess(bool value) {}
+}
+
 class InAppWebView extends Widget {
   const InAppWebView({super.key, dynamic initialUrlRequest});
 }

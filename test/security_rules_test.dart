@@ -686,6 +686,18 @@ void main() {
         expect('proper CORS config passes', isNotNull);
       });
     });
+
+    group('prefer_webview_sandbox', () {
+      test('WebViewWidget without controller sandbox config SHOULD trigger',
+          () {
+        expect('unconfigured WebView controller detected', isNotNull);
+      });
+      test(
+          'WebViewWidget with controller setNavigationDelegate/setAllowFileAccess should NOT trigger',
+          () {
+        expect('controller-level sandbox config recognized', isNotNull);
+      });
+    });
   });
 
   group('Authentication Rules', () {

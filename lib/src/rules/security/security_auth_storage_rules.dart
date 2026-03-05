@@ -9,6 +9,7 @@ library;
 // cspell:ignore encryptedbox changepassword getexternalstoragedirectory
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -2641,6 +2642,21 @@ class PreferRootDetectionRule extends SaropaLintRule {
 // =============================================================================
 
 /// Suggests sandboxing WebView (e.g. disable file access) when not needed.
+///
+/// **Developer notes:**
+/// - Reports at [WebView] or [WebViewWidget] instance creation when no sandbox
+///   configuration is detected for the controller passed as the `controller`
+///   argument.
+/// - **Controller-level configuration** satisfies the rule when detectable in
+///   the same file: [WebViewController.setNavigationDelegate] (or equivalent)
+///   and/or [AndroidWebViewController.setAllowFileAccess](false) on the same
+///   controller instance (e.g. in initState). Matching is by the controller
+///   expression "root" (e.g. `_controller`, `controller`) so same-file setup
+///   in the same widget is recognized.
+/// - Uses [requiredPatterns] so the rule only runs in files that mention
+///   WebView/WebViewWidget, avoiding unnecessary AST visits in other files.
+/// - Does not trace controllers across files or through factories; only
+///   same-file configuration is considered.
 class PreferWebviewSandboxRule extends SaropaLintRule {
   PreferWebviewSandboxRule() : super(code: _code);
 
@@ -2649,6 +2665,10 @@ class PreferWebviewSandboxRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns =>
+      const <String>{'WebView', 'WebViewWidget'};
 
   static const LintCode _code = LintCode(
     'prefer_webview_sandbox',
@@ -2663,12 +2683,104 @@ class PreferWebviewSandboxRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    final Set<String> configuredControllerRoots = <String>{};
+
+    context.addCompilationUnit((CompilationUnit unit) {
+      unit.visitChildren(_WebViewSandboxConfigVisitor(configuredControllerRoots));
+    });
+
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String name = node.constructorName.type.name.lexeme;
-      if (name == 'WebView' || name == 'WebViewWidget') {
-        reporter.atNode(node);
+      if (name != 'WebView' && name != 'WebViewWidget') return;
+
+      final String? controllerRoot = _controllerRootFromCreation(node);
+      if (controllerRoot != null &&
+          configuredControllerRoots.contains(controllerRoot)) {
+        return;
       }
+      reporter.atNode(node);
     });
+  }
+
+  /// Returns the source of the controller argument (root identifier/chain), or
+  /// null if there is no named `controller` argument.
+  static String? _controllerRootFromCreation(InstanceCreationExpression node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression &&
+          arg.name.label.name == 'controller') {
+        return _controllerRootFromExpression(arg.expression);
+      }
+    }
+    return null;
+  }
+
+  /// Normalizes an expression to a comparable "root" (strip !, ??, etc.).
+  static String _controllerRootFromExpression(Expression expr) {
+    if (expr is PostfixExpression) {
+      return _controllerRootFromExpression(expr.operand);
+    }
+    if (expr is PrefixExpression) {
+      return _controllerRootFromExpression(expr.operand);
+    }
+    return expr.toSource();
+  }
+}
+
+/// AST visitor that collects controller expression roots which have
+/// setNavigationDelegate or setAllowFileAccess(false) in this compilation unit.
+class _WebViewSandboxConfigVisitor extends RecursiveAstVisitor<void> {
+  _WebViewSandboxConfigVisitor(this._roots);
+
+  final Set<String> _roots;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String name = node.methodName.name;
+
+    if (name == 'setNavigationDelegate') {
+      final Expression? receiver = _receiver(node);
+      if (receiver != null) {
+        _roots.add(PreferWebviewSandboxRule._controllerRootFromExpression(
+            receiver));
+      }
+    } else if (name == 'setAllowFileAccess') {
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isNotEmpty &&
+          args.arguments.first.toSource() == 'false') {
+        final Expression? receiver = _receiver(node);
+        if (receiver != null) {
+          _roots.add(
+              _controllerRootFromAllowFileAccessReceiver(receiver));
+        }
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  /// Receiver of the invocation; for cascades (e.g. c..setX()), the cascade target.
+  static Expression? _receiver(MethodInvocation node) {
+    final Expression? target = node.target;
+    if (target != null) return target;
+    final AstNode? parent = node.parent;
+    if (parent is CascadeExpression) {
+      return parent.target;
+    }
+    return null;
+  }
+
+  /// For setAllowFileAccess(false), receiver is often
+  /// (controller.platform as AndroidWebViewController) or controller.platform;
+  /// we record the controller root (the part before .platform).
+  static String _controllerRootFromAllowFileAccessReceiver(Expression receiver) {
+    Expression? current = receiver;
+    if (current is AsExpression) {
+      current = current.expression;
+    }
+    if (current is PropertyAccess &&
+        current.propertyName.name == 'platform') {
+      current = current.target;
+    }
+    return PreferWebviewSandboxRule._controllerRootFromExpression(current!);
   }
 }
 
