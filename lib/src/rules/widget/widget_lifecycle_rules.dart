@@ -522,6 +522,8 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if extends State
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -530,7 +532,7 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
       if (superclassName != 'State') return;
 
       // Check constructors for bodies
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is ConstructorDeclaration) {
           final FunctionBody body = member.body;
           if (body is BlockFunctionBody && body.block.statements.isNotEmpty) {
@@ -587,6 +589,8 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if extends StatelessWidget
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -595,7 +599,7 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
       if (superclassName != 'StatelessWidget') return;
 
       // Check for initialized fields
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             if (variable.initializer != null) {
@@ -678,8 +682,9 @@ class AvoidUnnecessarySetStateRule extends SaropaLintRule {
       if (!_lifecycleMethods.contains(methodName)) return;
 
       // Check if in a State class
-      final AstNode? parent = node.parent;
-      if (parent is! ClassDeclaration) return;
+      final ClassDeclaration? parent = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (parent == null) return;
 
       final ExtendsClause? extendsClause = parent.extendsClause;
       if (extendsClause == null) return;
@@ -1895,7 +1900,9 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
     ClassDeclaration classNode,
     String fieldName,
   ) {
-    for (final ClassMember member in classNode.members) {
+    final body = classNode.body;
+    if (body is! BlockClassBody) return false;
+    for (final ClassMember member in body.members) {
       if (member is FieldDeclaration) {
         for (final VariableDeclaration variable in member.fields.variables) {
           if (variable.name.lexeme == fieldName) {
@@ -2641,7 +2648,7 @@ class PreferWidgetStateMixinRule extends SaropaLintRule {
       }
 
       if (stateFields >= 2) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
       }
     });
   }

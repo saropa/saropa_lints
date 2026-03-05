@@ -86,6 +86,8 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if class extends GetxController or GetxService
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -101,7 +103,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
       // Find Worker fields
       final List<String> workerFields = <String>[];
       final workerListRegex = RegExp(r'\bList\s*<\s*Worker\s*>');
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null &&
@@ -120,7 +122,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
 
       // Find onClose method and check for dispose calls
       MethodDeclaration? onCloseMethod;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'onClose') {
           onCloseMethod = member;
           break;
@@ -134,7 +136,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
             isFieldCleanedUp(fieldName, 'dispose', onCloseMethod.body);
 
         if (!isDisposed) {
-          for (final ClassMember member in node.members) {
+          for (final ClassMember member in body.members) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
@@ -973,6 +975,8 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
           superName != 'FullLifeCycleController') {
         return;
       }
+      final body = node.body;
+      if (body is! BlockClassBody) return;
 
       bool hasDisposable = false;
       bool hasOnClose = false;
@@ -980,7 +984,7 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
         r'\b(' + _disposableTypes.map(RegExp.escape).join(r'|') + r')\b',
       );
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null && disposableTypesRegex.hasMatch(typeName)) {
@@ -996,7 +1000,7 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
       }
 
       if (hasDisposable && !hasOnClose) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
       }
     });
   }
@@ -1503,6 +1507,8 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if class extends GetxController
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1512,7 +1518,7 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
 
       // Find Worker fields
       final List<String> workerFields = <String>[];
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toString();
           if (typeName == 'Worker' || typeName == 'Worker?') {
@@ -1530,7 +1536,7 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
       bool hasOnClose = false;
       final Set<String> disposedFields = <String>{};
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'onClose') {
           hasOnClose = true;
           // Check for dispose calls

@@ -515,6 +515,7 @@ void _runPreflightChecks({required String version}) {
 
   _checkPubspecDependency();
   _checkDartSdkVersion();
+  _checkV7SdkIfNeeded(version);
   _auditExistingConfig(version);
 
   _logTerminal('');
@@ -552,26 +553,29 @@ void _checkPubspecDependency() {
   }
 }
 
+/// Parses Dart SDK version from [Platform.version] (e.g. "3.10.0 (stable) ...").
+/// Returns (major, minor) or null if unparseable.
+(int major, int minor)? _parseDartSdkVersion() {
+  final match = RegExp(r'^(\d+)\.(\d+)').firstMatch(Platform.version);
+  if (match == null) return null;
+  final g1 = match.group(1);
+  final g2 = match.group(2);
+  if (g1 == null || g2 == null) return null;
+  return (int.parse(g1), int.parse(g2));
+}
+
 /// Check that the Dart SDK version supports the plugin system (>= 3.6).
 void _checkDartSdkVersion() {
-  final versionStr = Platform.version; // e.g. "3.10.0 (stable) ..."
-  final match = RegExp(r'^(\d+)\.(\d+)').firstMatch(versionStr);
-
-  if (match == null) {
+  final parsed = _parseDartSdkVersion();
+  if (parsed == null) {
     _logCheck(
       'Dart SDK version',
       pass: false,
-      detail: 'could not parse: $versionStr',
+      detail: 'could not parse: ${Platform.version}',
     );
     return;
   }
-
-  final g1 = match.group(1);
-  final g2 = match.group(2);
-  if (g1 == null || g2 == null) return;
-  final major = int.parse(g1);
-  final minor = int.parse(g2);
-
+  final (major, minor) = parsed;
   if (major > 3 || (major == 3 && minor >= 6)) {
     _logCheck('Dart SDK $major.$minor (plugin support OK)', pass: true);
   } else {
@@ -579,6 +583,27 @@ void _checkDartSdkVersion() {
       'Dart SDK version',
       pass: false,
       detail: '$major.$minor detected — native plugins require Dart >= 3.6',
+    );
+  }
+}
+
+/// If saropa_lints is v7+, ensure Dart SDK is 3.9+ (analyzer 10 requirement).
+void _checkV7SdkIfNeeded(String packageVersion) {
+  if (!packageVersion.startsWith('7.')) return;
+
+  final parsed = _parseDartSdkVersion();
+  if (parsed == null) return;
+  final (major, minor) = parsed;
+
+  if (major > 3 || (major == 3 && minor >= 9)) {
+    _logCheck('Dart SDK $major.$minor (v7 / analyzer 10 OK)', pass: true);
+  } else {
+    _logCheck(
+      'Dart SDK for v7',
+      pass: false,
+      detail:
+          '$major.$minor detected — saropa_lints v7 requires Dart SDK 3.9+ '
+          '(analyzer 10). Use saropa_lints 6.2.2 for older SDK.',
     );
   }
 }
@@ -1804,6 +1829,8 @@ Future<void> main(List<String> args) async {
   // Track whether v4 migration occurred (used for ignore comment tip)
   bool v4Detected = false;
   Map<String, bool> v4MigratedRules = <String, bool>{};
+  // Count rule names normalized from v6 (mixed-case) to v7 (lowerCaseName)
+  final List<int> v7NormalizedCount = [0];
 
   if (outputFile.existsSync()) {
     existingContent = outputFile.readAsStringSync();
@@ -1836,16 +1863,32 @@ Future<void> main(List<String> args) async {
     }
 
     if (!cliArgs.isReset) {
-      userCustomizations = _extractUserCustomizations(
+      final result = _extractUserCustomizations(
         existingContent,
         allRules,
+        v7NormalizedCount,
       );
+      userCustomizations = result.customizations;
+
+      if (v7NormalizedCount[0] > 0) {
+        _logTerminal(
+          '${_Colors.yellow}--- V7 MIGRATION ---${_Colors.reset}',
+        );
+        _logTerminal(
+          '${_Colors.yellow}Normalized ${v7NormalizedCount[0]} rule name(s) '
+          'to lowerCaseName (v7 config format).${_Colors.reset}',
+        );
+        _logTerminal(
+          '${_Colors.dim}  Update any // ignore: comments to use '
+          'lowercase rule names (e.g. prefer_debugprint).${_Colors.reset}',
+        );
+        _logTerminal('');
+      }
 
       // Warn if manual edits in tier sections were recovered
-      final tierEdits = _detectManualTierEdits(existingContent, allRules);
-      if (tierEdits.isNotEmpty) {
+      if (result.tierEdits.isNotEmpty) {
         _logTerminal(
-          '${_Colors.yellow}⚠ Recovered ${tierEdits.length} manually '
+          '${_Colors.yellow}⚠ Recovered ${result.tierEdits.length} manually '
           'edited rule(s) from tier sections${_Colors.reset}',
         );
         _logTerminal(
@@ -2209,11 +2252,19 @@ final RegExp _userCustomizationsSectionPattern = RegExp(
 ///
 /// Parameters:
 /// - [yamlContent] - The existing YAML file content
-/// - [allRules] - All known saropa_lints rules
-Map<String, bool> _extractUserCustomizations(
+/// - [allRules] - All known saropa_lints rules (v7 lowerCaseName)
+/// - [v7NormalizedCount] - If non-null, incremented when a rule name is
+///   normalized from mixed-case (v6) to lowerCaseName (v7)
+///
+/// Returns a record with [customizations] and [tierEdits] so the caller
+/// can show the "Recovered N manually edited rule(s)" message without
+/// scanning tier sections again.
+({Map<String, bool> customizations, Map<String, bool> tierEdits})
+    _extractUserCustomizations(
   String yamlContent,
-  Set<String> allRules,
-) {
+  Set<String> allRules, [
+  List<int>? v7NormalizedCount,
+]) {
   final Map<String, bool> customizations = <String, bool>{};
 
   // Find USER CUSTOMIZATIONS section
@@ -2223,7 +2274,7 @@ Map<String, bool> _extractUserCustomizations(
   if (customizationsMatch == null) {
     // No customizations section - file wasn't generated by this tool
     // or user hasn't made any customizations
-    return customizations;
+    return (customizations: customizations, tierEdits: <String, bool>{});
   }
 
   // Find the content after USER CUSTOMIZATIONS header
@@ -2240,23 +2291,32 @@ Map<String, bool> _extractUserCustomizations(
       ? afterHeader.substring(0, nextSection.start)
       : afterHeader;
 
-  // Extract rules from the customizations section only
+  // Extract rules from the customizations section only.
+  // Normalize to v7 lowerCaseName so v6 config (mixed-case) is preserved.
   for (final Match match in _ruleEntryPattern.allMatches(
     customizationsSection,
   )) {
-    final ruleName = match.group(1);
-    if (ruleName == null) continue;
+    final rawName = match.group(1);
+    if (rawName == null) continue;
+    final String ruleName = _normalizeRuleNameV7(rawName);
     final bool currentEnabled = match.group(2) == 'true';
 
     // Skip rules that aren't in our rule set (might be from other plugins)
     if (!allRules.contains(ruleName)) continue;
+    if (v7NormalizedCount != null && rawName != ruleName) {
+      v7NormalizedCount[0] = v7NormalizedCount[0] + 1;
+    }
     customizations[ruleName] = currentEnabled;
   }
 
   // Detect manual edits in tier sections: the ENABLED section should only
   // contain true entries and DISABLED should only contain false. Any rule
   // with the opposite value was manually edited and should be preserved.
-  final manualEdits = _detectManualTierEdits(yamlContent, allRules);
+  final manualEdits = _detectManualTierEdits(
+    yamlContent,
+    allRules,
+    v7NormalizedCount,
+  );
   for (final entry in manualEdits.entries) {
     // Existing USER CUSTOMIZATIONS take precedence
     if (!customizations.containsKey(entry.key)) {
@@ -2264,7 +2324,7 @@ Map<String, bool> _extractUserCustomizations(
     }
   }
 
-  return customizations;
+  return (customizations: customizations, tierEdits: manualEdits);
 }
 
 /// Detect rules manually edited in ENABLED/DISABLED tier sections.
@@ -2273,8 +2333,9 @@ Map<String, bool> _extractUserCustomizations(
 /// sections. Any opposite value was changed by the user after generation.
 Map<String, bool> _detectManualTierEdits(
   String yamlContent,
-  Set<String> allRules,
-) {
+  Set<String> allRules, [
+  List<int>? v7NormalizedCount,
+]) {
   final Map<String, bool> edits = <String, bool>{};
 
   // ENABLED section: false entries are manual disables
@@ -2284,6 +2345,7 @@ Map<String, bool> _detectManualTierEdits(
     sectionHeader: 'ENABLED RULES',
     expectedValue: true,
     edits: edits,
+    v7NormalizedCount: v7NormalizedCount,
   );
 
   // DISABLED section: true entries are manual enables
@@ -2293,18 +2355,21 @@ Map<String, bool> _detectManualTierEdits(
     sectionHeader: 'DISABLED RULES',
     expectedValue: false,
     edits: edits,
+    v7NormalizedCount: v7NormalizedCount,
   );
 
   return edits;
 }
 
 /// Scan a tier section for rules whose value differs from [expectedValue].
+/// Normalizes rule names to v7 lowerCaseName when reading.
 void _collectOppositeEntries(
   String yamlContent,
   Set<String> allRules, {
   required String sectionHeader,
   required bool expectedValue,
   required Map<String, bool> edits,
+  List<int>? v7NormalizedCount,
 }) {
   final headerMatch = RegExp(sectionHeader).firstMatch(yamlContent);
 
@@ -2322,16 +2387,30 @@ void _collectOppositeEntries(
       : afterHeader;
 
   for (final match in _ruleEntryPattern.allMatches(section)) {
-    final ruleName = match.group(1);
-    if (ruleName == null) continue;
+    final rawName = match.group(1);
+    if (rawName == null) continue;
+    final String ruleName = _normalizeRuleNameV7(rawName);
     final value = match.group(2) == 'true';
 
     if (!allRules.contains(ruleName)) continue;
+    if (v7NormalizedCount != null && rawName != ruleName) {
+      v7NormalizedCount[0] = v7NormalizedCount[0] + 1;
+    }
     if (value != expectedValue) {
       edits[ruleName] = value;
     }
   }
 }
+
+// ---------------------------------------------------------------------------
+// V6 → V7 (lowerCaseName) migration
+// ---------------------------------------------------------------------------
+
+/// Normalizes a rule name from config to v7 lowerCaseName format.
+///
+/// v7 uses the analyzer's lowerCaseName (e.g. prefer_debugprint). Config or
+/// v6-generated files may have mixed-case names (e.g. prefer_debugPrint).
+String _normalizeRuleNameV7(String name) => name.toLowerCase();
 
 // ---------------------------------------------------------------------------
 // V4 (custom_lint) auto-migration
@@ -2364,8 +2443,9 @@ Map<String, bool> _extractV4Rules(String yamlContent, Set<String> allRules) {
       : afterSection;
 
   for (final Match match in _v4RuleEntryPattern.allMatches(sectionContent)) {
-    final ruleName = match.group(1);
-    if (ruleName == null) continue;
+    final rawName = match.group(1);
+    if (rawName == null) continue;
+    final String ruleName = _normalizeRuleNameV7(rawName);
     final bool enabled = match.group(2) == 'true';
 
     if (allRules.contains(ruleName)) {

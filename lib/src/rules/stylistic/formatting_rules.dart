@@ -157,9 +157,11 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       final root = node.root;
       if (root is CompilationUnit) {
-        _checkMembers(node.members, root, reporter);
+        _checkMembers(body.members, root, reporter);
       }
     });
   }
@@ -255,23 +257,25 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       final root = node.root;
       if (root is CompilationUnit) {
-        _checkMembers(node.members, root, reporter);
+        _checkMembers(body.members, root, reporter);
       }
     });
 
     context.addMixinDeclaration((MixinDeclaration node) {
       final root = node.root;
       if (root is CompilationUnit) {
-        _checkMembers(node.members, root, reporter);
+        _checkMembers(node.body.members, root, reporter);
       }
     });
 
     context.addEnumDeclaration((EnumDeclaration node) {
       final root = node.root;
       if (root is CompilationUnit) {
-        _checkMembers(node.members, root, reporter);
+        _checkMembers(node.body.members, root, reporter);
       }
     });
   }
@@ -989,9 +993,11 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       int lastCategory = -1;
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         final int category = _getMemberCategory(member);
 
         if (category < lastCategory) {
@@ -1159,7 +1165,8 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addEnumDeclaration((EnumDeclaration node) {
-      final List<EnumConstantDeclaration> constants = node.constants.toList();
+      final List<EnumConstantDeclaration> constants = node.body.constants
+          .toList();
       if (constants.length < 2) return;
 
       // Check if already sorted

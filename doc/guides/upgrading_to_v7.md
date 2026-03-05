@@ -37,5 +37,8 @@ This release is built and tested against analyzer 10.x. We do not support analyz
 ## After upgrading
 
 1. Run `dart pub get`.
-2. Run `dart analyze` and fix any new issues (e.g. rule renames in config).
-3. Update `// ignore:` comments that reference rule names to use lowerCaseName.
+2. Run **`dart run saropa_lints:init`** (or `dart run saropa_lints init`) to migrate existing config:
+   - Rule names in your `analysis_options.yaml` (USER CUSTOMIZATIONS and tier sections) are normalized to lowerCaseName. Init reports how many were updated.
+   - Pre-flight checks warn if Dart SDK &lt; 3.9 when using v7.
+3. Run `dart analyze` and fix any new issues (e.g. rule renames in config).
+4. Update `// ignore:` comments that reference rule names to use lowerCaseName (e.g. `prefer_debugprint`).

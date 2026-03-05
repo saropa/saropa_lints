@@ -335,7 +335,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String name = node.name.lexeme;
+      final String name = node.namePart.typeName.lexeme;
 
       // Skip private classes
       if (name.startsWith('_')) return;
@@ -369,7 +369,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
               !name.endsWith('Builder')) {
             // Allow any name for widgets, but warn if very generic
             if (name.length < 4) {
-              reporter.atToken(node.name, code);
+              reporter.atToken(node.namePart.typeName, code);
             }
           }
         }
@@ -377,7 +377,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
         // State classes should end with State
         if (superName == 'State') {
           if (!name.endsWith('State') && !name.startsWith('_')) {
-            reporter.atToken(node.name, code);
+            reporter.atToken(node.namePart.typeName, code);
           }
         }
       }
@@ -428,9 +428,11 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Collect private field names
       final Set<String> privateFields = <String>{};
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final String name = variable.name.lexeme;
@@ -442,7 +444,7 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
       }
 
       // Check getters
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration && member.isGetter) {
           final String getterName = member.name.lexeme;
 
@@ -1995,9 +1997,9 @@ class PreferBasePrefixRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword == null) return;
-      final String name = node.name.lexeme;
+      final String name = node.namePart.typeName.lexeme;
       if (name.endsWith('Base')) return;
-      reporter.atToken(node.name, code);
+      reporter.atToken(node.namePart.typeName, code);
     });
   }
 }
@@ -2088,9 +2090,9 @@ class PreferIPrefixInterfacesRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword == null) return;
-      final String name = node.name.lexeme;
+      final String name = node.namePart.typeName.lexeme;
       if (name.startsWith('I') && name.length > 1) return;
-      reporter.atToken(node.name, code);
+      reporter.atToken(node.namePart.typeName, code);
     });
   }
 }
@@ -2119,11 +2121,11 @@ class PreferNoIPrefixInterfacesRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword == null) return;
-      final String name = node.name.lexeme;
+      final String name = node.namePart.typeName.lexeme;
       if (!name.startsWith('I') || name.length < 2) return;
       final String second = name[1];
       if (second != second.toUpperCase() && second != '_') return;
-      reporter.atToken(node.name, code);
+      reporter.atToken(node.namePart.typeName, code);
     });
   }
 }
@@ -2154,9 +2156,9 @@ class PreferImplSuffixRule extends SaropaLintRule {
       final clause = node.implementsClause;
       if (clause == null) return;
       if (clause.interfaces.isEmpty) return;
-      final String name = node.name.lexeme;
+      final String name = node.namePart.typeName.lexeme;
       if (name.endsWith('Impl')) return;
-      reporter.atToken(node.name, code);
+      reporter.atToken(node.namePart.typeName, code);
     });
   }
 }
@@ -2741,13 +2743,13 @@ class PreferNounClassNamesRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword != null) return;
-      final name = node.name.lexeme;
+      final name = node.namePart.typeName.lexeme;
       if (name.endsWith('ing') && !_ingAllowlist.contains(name)) {
-        reporter.atToken(node.name);
+        reporter.atToken(node.namePart.typeName);
         return;
       }
       if ((name.endsWith('able') || name.endsWith('ible'))) {
-        reporter.atToken(node.name);
+        reporter.atToken(node.namePart.typeName);
       }
     });
   }

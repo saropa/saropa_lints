@@ -127,6 +127,8 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if extends InheritedWidget
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -140,7 +142,7 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
 
       // Check for updateShouldNotify method
       bool hasUpdateShouldNotify = false;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration &&
             member.name.lexeme == 'updateShouldNotify') {
           hasUpdateShouldNotify = true;

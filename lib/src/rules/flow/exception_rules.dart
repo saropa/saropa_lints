@@ -51,8 +51,10 @@ class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
         return;
       }
 
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check all field declarations
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           if (member.isStatic) continue;
           if (member.fields.isFinal || member.fields.isConst) continue;

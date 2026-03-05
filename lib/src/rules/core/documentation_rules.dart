@@ -835,8 +835,10 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
 
   Set<String> _extractClassFieldNames(ClassDeclaration? classDecl) {
     if (classDecl == null) return const <String>{};
+    final body = classDecl.body;
+    if (body is! BlockClassBody) return const <String>{};
     final Set<String> names = <String>{};
-    for (final ClassMember member in classDecl.members) {
+    for (final ClassMember member in body.members) {
       if (member is FieldDeclaration) {
         for (final VariableDeclaration variable in member.fields.variables) {
           names.add(variable.name.lexeme);

@@ -95,6 +95,8 @@ class ExtendEquatableRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if class extends Equatable
       if (_extendsEquatable(node)) return;
 
@@ -103,7 +105,7 @@ class ExtendEquatableRule extends SaropaLintRule {
 
       // Check if class overrides operator ==
       bool hasEqualsOverride = false;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration &&
             member.name.lexeme == '==' &&
             member.isOperator) {
@@ -199,12 +201,14 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final classBody = node.body;
+      if (classBody is! BlockClassBody) return;
       // Check if class extends Equatable or mixes in EquatableMixin
       if (!isEquatable(node)) return;
 
       // Collect all instance fields
       final Set<String> instanceFields = <String>{};
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in classBody.members) {
         if (member is FieldDeclaration && !member.isStatic) {
           for (final VariableDeclaration variable in member.fields.variables) {
             instanceFields.add(variable.name.lexeme);
@@ -216,7 +220,7 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
 
       // Find props getter
       MethodDeclaration? propsGetter;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in classBody.members) {
         if (member is MethodDeclaration &&
             member.name.lexeme == 'props' &&
             member.isGetter) {
@@ -419,12 +423,14 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if class extends Equatable or mixes in EquatableMixin
       if (!isEquatable(node)) return;
 
       // Check if class already overrides stringify
       bool hasStringifyOverride = false;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration &&
             member.name.lexeme == 'stringify' &&
             member.isGetter) {
@@ -574,6 +580,8 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if class extends Equatable or mixes in EquatableMixin
       if (!isEquatable(node)) return;
 
@@ -585,11 +593,13 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
   }
 
   bool _isSimpleDataClass(ClassDeclaration node) {
+    final body = node.body;
+    if (body is! BlockClassBody) return false;
     // Count fields
     int fieldCount = 0;
     bool hasOnlyFinalFields = true;
 
-    for (final ClassMember member in node.members) {
+    for (final ClassMember member in body.members) {
       if (member is FieldDeclaration) {
         if (member.isStatic) continue;
 
@@ -614,7 +624,7 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
 
     // Check for methods other than props, stringify, and constructors
     bool hasComplexMethods = false;
-    for (final ClassMember member in node.members) {
+    for (final ClassMember member in body.members) {
       if (member is MethodDeclaration) {
         final String methodName = member.name.lexeme;
         // Allow props, stringify, toString, hashCode, == (inherited from Equatable)
@@ -692,11 +702,13 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if class extends Equatable or mixes in EquatableMixin
       if (!isEquatable(node)) return;
 
       // Find non-final instance fields
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration && !member.isStatic) {
           // Check if fields are final
           if (!member.fields.isFinal && !member.fields.isConst) {
@@ -770,12 +782,14 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if class extends Equatable or mixes in EquatableMixin
       if (!isEquatable(node)) return;
 
       // Check if class has copyWith method
       bool hasCopyWith = false;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'copyWith') {
           hasCopyWith = true;
           break;
@@ -944,6 +958,8 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if extends Equatable
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -953,7 +969,7 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
 
       // Find collection fields
       final Set<String> collectionFields = <String>{};
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration field in member.fields.variables) {
             final String? typeSource = member.fields.type?.toSource();
@@ -974,7 +990,7 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
       if (collectionFields.isEmpty) return;
 
       // Find props getter
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration &&
             member.name.lexeme == 'props' &&
             member.isGetter) {
@@ -1048,6 +1064,8 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if extends Equatable
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1057,7 +1075,7 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
 
       // Find DateTime fields
       final Set<String> dateTimeFields = <String>{};
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           final String? typeSource = member.fields.type?.toSource();
           if (typeSource != null &&
@@ -1075,7 +1093,7 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
       if (dateTimeFields.isEmpty) return;
 
       // Find props getter
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration &&
             member.name.lexeme == 'props' &&
             member.isGetter) {
@@ -1155,6 +1173,8 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
       r'|\.(toList|toSet|toMap)\s*\(\)',
     );
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if it's a state/model class (extends Equatable or has immutable intent)
       final ExtendsClause? extendsClause = node.extendsClause;
       bool isImmutableClass = false;
@@ -1179,7 +1199,7 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
       if (!isImmutableClass) return;
 
       // Find collection fields
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration && member.fields.isFinal) {
           final String? typeSource = member.fields.type?.toSource();
           if (typeSource != null &&
@@ -1189,7 +1209,7 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
             // Check if constructor makes it unmodifiable
             bool madeUnmodifiable = false;
 
-            for (final ClassMember constructor in node.members) {
+            for (final ClassMember constructor in body.members) {
               if (constructor is ConstructorDeclaration) {
                 final String? initSource = constructor.initializers
                     .map((e) => e.toSource())
@@ -1263,6 +1283,8 @@ class RequireEquatablePropsOverrideRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if extends Equatable
       final extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1270,7 +1292,7 @@ class RequireEquatablePropsOverrideRule extends SaropaLintRule {
 
       // Check for props getter
       bool hasProps = false;
-      for (final member in node.members) {
+      for (final member in body.members) {
         if (member is MethodDeclaration &&
             member.isGetter &&
             member.name.lexeme == 'props') {
