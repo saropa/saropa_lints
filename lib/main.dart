@@ -66,9 +66,9 @@ class SaropaLintsPlugin extends Plugin {
       final disabled = SaropaLintRule.disabledRules;
       for (final rule in rules) {
         final code = rule.code;
-        if (code.name.isEmpty) continue;
+        if (code.lowerCaseName.isEmpty) continue;
 
-        if (disabled != null && disabled.contains(code.name)) {
+        if (disabled != null && disabled.contains(code.lowerCaseName)) {
           continue;
         }
 

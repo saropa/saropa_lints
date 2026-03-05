@@ -12,6 +12,29 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [7.0.0]
+
+**Breaking: Analyzer 10 upgrade** — This release upgrades to the analyzer 10.x API. See [Upgrading to v7](doc/guides/upgrading_to_v7.md) for migration steps.
+
+### Requirements
+
+- **Dart SDK:** 3.9 or later.
+- **Analyzer:** 10.x only. **saropa_lints 6.2.2** is the last release compatible with analyzer &lt; v10.
+
+### Breaking changes
+
+- **Dependencies:** Requires `analyzer: ^10.0.0`, `analysis_server_plugin: ^0.3.10`, and `analyzer_plugin: ^0.14.0`. Dropped support for analyzer 9.x.
+- **Config keyed by lowerCaseName:** Rule identifiers and config keys (severity overrides, disabled rules, etc.) now use the analyzer's **lowerCaseName**. Use `prefer_debugprint` instead of `prefer_debugPrint`. Update `analysis_options.yaml` and any `// ignore:` comments that reference rule names.
+- **AST API:** Migrated to `body` and `namePart` where applicable (e.g. `(node.body as BlockClassBody).members`, `node.namePart.typeName`) in lifecycle_rules and the exception fix; remaining rule files can be migrated incrementally.
+
+### Changed
+
+- **Version:** 6.2.2 → 7.0.0 (major).
+- **DiagnosticCode / LintCode:** All internal and test use of `code.name` replaced with `code.lowerCaseName`.
+- **Tests:** Expect `rule.code.lowerCaseName` (e.g. `prefer_debugprint`) where rule identity is asserted.
+
+---
+
 ## [6.2.1]
 
 ### Changed

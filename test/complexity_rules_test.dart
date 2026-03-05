@@ -10,7 +10,7 @@ void main() {
   group('Complexity Rules - Rule Instantiation', () {
     test('AvoidBitwiseOperatorsWithBooleansRule', () {
       final rule = AvoidBitwiseOperatorsWithBooleansRule();
-      expect(rule.code.name, 'avoid_bitwise_operators_with_booleans');
+      expect(rule.code.lowerCaseName, 'avoid_bitwise_operators_with_booleans');
       expect(
         rule.code.problemMessage,
         contains('[avoid_bitwise_operators_with_booleans]'),
@@ -20,7 +20,7 @@ void main() {
     });
     test('AvoidCascadeAfterIfNullRule', () {
       final rule = AvoidCascadeAfterIfNullRule();
-      expect(rule.code.name, 'avoid_cascade_after_if_null');
+      expect(rule.code.lowerCaseName, 'avoid_cascade_after_if_null');
       expect(
         rule.code.problemMessage,
         contains('[avoid_cascade_after_if_null]'),
@@ -30,7 +30,7 @@ void main() {
     });
     test('AvoidComplexArithmeticExpressionsRule', () {
       final rule = AvoidComplexArithmeticExpressionsRule();
-      expect(rule.code.name, 'avoid_complex_arithmetic_expressions');
+      expect(rule.code.lowerCaseName, 'avoid_complex_arithmetic_expressions');
       expect(
         rule.code.problemMessage,
         contains('[avoid_complex_arithmetic_expressions]'),
@@ -40,21 +40,21 @@ void main() {
     });
     test('AvoidComplexConditionsRule', () {
       final rule = AvoidComplexConditionsRule();
-      expect(rule.code.name, 'avoid_complex_conditions');
+      expect(rule.code.lowerCaseName, 'avoid_complex_conditions');
       expect(rule.code.problemMessage, contains('[avoid_complex_conditions]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidDuplicateCascadesRule', () {
       final rule = AvoidDuplicateCascadesRule();
-      expect(rule.code.name, 'avoid_duplicate_cascades');
+      expect(rule.code.lowerCaseName, 'avoid_duplicate_cascades');
       expect(rule.code.problemMessage, contains('[avoid_duplicate_cascades]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidExcessiveExpressionsRule', () {
       final rule = AvoidExcessiveExpressionsRule();
-      expect(rule.code.name, 'avoid_excessive_expressions');
+      expect(rule.code.lowerCaseName, 'avoid_excessive_expressions');
       expect(
         rule.code.problemMessage,
         contains('[avoid_excessive_expressions]'),
@@ -64,7 +64,7 @@ void main() {
     });
     test('AvoidImmediatelyInvokedFunctionsRule', () {
       final rule = AvoidImmediatelyInvokedFunctionsRule();
-      expect(rule.code.name, 'avoid_immediately_invoked_functions');
+      expect(rule.code.lowerCaseName, 'avoid_immediately_invoked_functions');
       expect(
         rule.code.problemMessage,
         contains('[avoid_immediately_invoked_functions]'),
@@ -74,21 +74,21 @@ void main() {
     });
     test('AvoidNestedShorthandsRule', () {
       final rule = AvoidNestedShorthandsRule();
-      expect(rule.code.name, 'avoid_nested_shorthands');
+      expect(rule.code.lowerCaseName, 'avoid_nested_shorthands');
       expect(rule.code.problemMessage, contains('[avoid_nested_shorthands]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidMultiAssignmentRule', () {
       final rule = AvoidMultiAssignmentRule();
-      expect(rule.code.name, 'avoid_multi_assignment');
+      expect(rule.code.lowerCaseName, 'avoid_multi_assignment');
       expect(rule.code.problemMessage, contains('[avoid_multi_assignment]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('BinaryExpressionOperandOrderRule', () {
       final rule = BinaryExpressionOperandOrderRule();
-      expect(rule.code.name, 'binary_expression_operand_order');
+      expect(rule.code.lowerCaseName, 'binary_expression_operand_order');
       expect(
         rule.code.problemMessage,
         contains('[binary_expression_operand_order]'),
@@ -98,14 +98,14 @@ void main() {
     });
     test('PreferMovingToVariableRule', () {
       final rule = PreferMovingToVariableRule();
-      expect(rule.code.name, 'prefer_moving_to_variable');
+      expect(rule.code.lowerCaseName, 'prefer_moving_to_variable');
       expect(rule.code.problemMessage, contains('[prefer_moving_to_variable]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('PreferParenthesesWithIfNullRule', () {
       final rule = PreferParenthesesWithIfNullRule();
-      expect(rule.code.name, 'prefer_parentheses_with_if_null');
+      expect(rule.code.lowerCaseName, 'prefer_parentheses_with_if_null');
       expect(
         rule.code.problemMessage,
         contains('[prefer_parentheses_with_if_null]'),
@@ -115,14 +115,14 @@ void main() {
     });
     test('AvoidDeepNestingRule', () {
       final rule = AvoidDeepNestingRule();
-      expect(rule.code.name, 'avoid_deep_nesting');
+      expect(rule.code.lowerCaseName, 'avoid_deep_nesting');
       expect(rule.code.problemMessage, contains('[avoid_deep_nesting]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidHighCyclomaticComplexityRule', () {
       final rule = AvoidHighCyclomaticComplexityRule();
-      expect(rule.code.name, 'avoid_high_cyclomatic_complexity');
+      expect(rule.code.lowerCaseName, 'avoid_high_cyclomatic_complexity');
       expect(
         rule.code.problemMessage,
         contains('[avoid_high_cyclomatic_complexity]'),

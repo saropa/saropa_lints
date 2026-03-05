@@ -35,7 +35,7 @@ void main() {
 
   group('Roadmap detail 9 rules - registration', () {
     test('all 8 new rules are registered in allSaropaRules', () {
-      final names = allSaropaRules.map((r) => r.code.name).toSet();
+      final names = allSaropaRules.map((r) => r.code.lowerCaseName).toSet();
       for (final name in allNewRules) {
         expect(
           names.contains(name),
@@ -49,7 +49,9 @@ void main() {
       'prefer_no_commented_code is alias of prefer_no_commented_out_code',
       () {
         final list = allSaropaRules
-            .where((r) => r.code.name == 'prefer_no_commented_out_code')
+            .where(
+              (r) => r.code.lowerCaseName == 'prefer_no_commented_out_code',
+            )
             .toList();
         expect(list.isNotEmpty, isTrue);
         expect(

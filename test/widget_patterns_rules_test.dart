@@ -17,7 +17,7 @@ void main() {
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
         final rule = create();
-        expect(rule.code.name, codeName);
+        expect(rule.code.lowerCaseName, codeName);
         expect(rule.code.problemMessage, contains('[$codeName]'));
         expect(rule.code.problemMessage.length, greaterThan(50));
         expect(rule.code.correctionMessage, isNotNull);
@@ -1415,7 +1415,7 @@ void main() {
     group('avoid_stateful_widget_in_list', () {
       test('StatefulWidget in ListView.builder SHOULD trigger', () {
         expect(
-          AvoidStatefulWidgetInListRule().code.name,
+          AvoidStatefulWidgetInListRule().code.lowerCaseName,
           'avoid_stateful_widget_in_list',
         );
       });
@@ -1424,7 +1424,7 @@ void main() {
     group('avoid_fitted_box_for_text', () {
       test('FittedBox around Text SHOULD trigger', () {
         expect(
-          AvoidFittedBoxForTextRule().code.name,
+          AvoidFittedBoxForTextRule().code.lowerCaseName,
           'avoid_fitted_box_for_text',
         );
       });

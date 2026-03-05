@@ -185,22 +185,22 @@ Use this as a runbook. Complete in order; run analyze + test after each phase.
 
 ### Phase 0: Prep
 
-- [ ] **0.1** Create a branch for the upgrade (e.g. `upgrade/analyzer-10`).
-- [ ] **0.2** Run `dart analyze --fatal-infos` and `dart test` and confirm both pass (baseline).
+- [x] **0.1** Create a branch for the upgrade (e.g. `upgrade/analyzer-10`).
+- [x] **0.2** Run `dart analyze --fatal-infos` and `dart test` and confirm both pass (baseline).
 - [ ] **0.3** (Optional) Grep and list every file that contains `addClassDeclaration`, `addEnumDeclaration`, `addExtensionDeclaration`, `addExtensionTypeDeclaration` so you have a scoped file list.
 
 ### Phase 1: Dependencies
 
-- [ ] **1.1** In `pubspec.yaml`, bump **package version** to `7.0.0` (breaking release).
-- [ ] **1.2** In `pubspec.yaml`, set `analyzer: ^10.2.0` (find latest).
-- [ ] **1.3** In `pubspec.yaml`, set `analysis_server_plugin: ^0.3.11` (find latest).
-- [ ] **1.4** In `pubspec.yaml`, set `analyzer_plugin: ^0.14.4` (or latest 0.14.x; check pub.dev).
-- [ ] **1.5** Run `dart pub get`. Resolve any version conflicts (adjust upper bounds if needed).
-- [ ] **1.6** Run `dart analyze --fatal-infos`. Note all new errors and deprecations (do not fix yet—just list them).
+- [x] **1.1** In `pubspec.yaml`, bump **package version** to `7.0.0` (breaking release).
+- [x] **1.2** In `pubspec.yaml`, set `analyzer: ^10.0.0` (or ^10.2.0).
+- [x] **1.3** In `pubspec.yaml`, set `analysis_server_plugin: ^0.3.10` (0.3.11 requires analyzer 11).
+- [x] **1.4** In `pubspec.yaml`, set `analyzer_plugin: ^0.14.0` (e.g. 0.14.4).
+- [x] **1.5** Run `dart pub get`. Resolve any version conflicts (adjust upper bounds if needed).
+- [x] **1.6** Run `dart analyze --fatal-infos`. Note all new errors and deprecations (do not fix yet—just list them).
 
 ### Phase 2: Plugin API (if any)
 
-- [ ] **2.1** If analyze or build fails due to `analysis_server_plugin` or `analyzer_plugin` API changes, read their changelogs and fix imports/call sites. Repeat until `dart analyze` runs (even if analyzer AST deprecations remain).
+- [x] **2.1** If analyze or build fails due to `analysis_server_plugin` or `analyzer_plugin` API changes, read their changelogs and fix imports/call sites. Repeat until `dart analyze` runs (even if analyzer AST deprecations remain). *No plugin API changes required.*
 
 ### Phase 3: ClassDeclaration migration
 
@@ -251,7 +251,7 @@ Only change code where the **receiver** is statically a `ClassDeclaration` (e.g.
 - [ ] **7.1** Search the repo for remaining direct use of `.members`, `.name`, `.typeParameters`, `.constants` on the four declaration types (only in `lib/` and `test/`). Replace any stragglers with `body`/`namePart`.
 - [ ] **7.2** Run `dart analyze --fatal-infos` (must pass with zero infos).
 - [ ] **7.3** Run `dart test` (all tests pass).
-- [ ] **7.4** Update **CHANGELOG.md** with a `## 7.0.0` entry and a **Breaking changes** note (analyzer 10, SDK/analyzer constraints, v7 release).
+- [x] **7.4** Update **CHANGELOG.md** with a `## 7.0.0` entry and a **Breaking changes** note (analyzer 10, SDK/analyzer constraints, v7 release).
 - [ ] **7.5** Run `dart format` and commit with a clear message (e.g. `chore: upgrade to analyzer 10, migrate to body/namePart API (v7 breaking)`).
 
 ---

@@ -1833,7 +1833,7 @@ class ViolationRecord {
 abstract class SaropaLintRule extends AnalysisRule {
   SaropaLintRule({required LintCode code})
     : _lintCode = code,
-      super(name: code.name, description: code.problemMessage);
+      super(name: code.lowerCaseName, description: code.problemMessage);
 
   final LintCode _lintCode;
 
@@ -1845,7 +1845,7 @@ abstract class SaropaLintRule extends AnalysisRule {
 
   @override
   DiagnosticCode get diagnosticCode {
-    DiagnosticSeverity? override = severityOverrides?[code.name];
+    DiagnosticSeverity? override = severityOverrides?[code.lowerCaseName];
     if (override == null && severityOverrides != null) {
       for (final alias in configAliases) {
         override = severityOverrides![alias];
@@ -1854,7 +1854,7 @@ abstract class SaropaLintRule extends AnalysisRule {
     }
     if (override == null) return _lintCode;
     return _overriddenCode ??= LintCode(
-      _lintCode.name,
+      _lintCode.lowerCaseName,
       _lintCode.problemMessage,
       correctionMessage: _lintCode.correctionMessage,
       severity: override,
@@ -1883,7 +1883,7 @@ abstract class SaropaLintRule extends AnalysisRule {
   /// Alternate config keys that can be used to reference this rule.
   ///
   /// Override to provide aliases that users can use in `analysis_options.yaml`
-  /// instead of the canonical rule name (`code.name`).
+  /// instead of the canonical rule name (`code.lowerCaseName`).
   ///
   /// This is useful when:
   /// - Rule name has a prefix like `enforce_` or `require_` that users omit
@@ -2402,12 +2402,12 @@ abstract class SaropaLintRule extends AnalysisRule {
   /// Returns the documentation URL for this rule.
   ///
   /// Format: `https://pub.dev/packages/saropa_lints#rule_name`
-  String get documentationUrl => '$documentationBaseUrl#${code.name}';
+  String get documentationUrl => '$documentationBaseUrl#${code.lowerCaseName}';
 
   /// Returns the rule name in hyphenated format for display.
   ///
   /// Example: `no_empty_block` → `no-empty-block`
-  String get hyphenatedName => code.name.replaceAll('_', '-');
+  String get hyphenatedName => code.lowerCaseName.replaceAll('_', '-');
 
   // ============================================================
   // Severity Override Support (#5)
@@ -2431,13 +2431,13 @@ abstract class SaropaLintRule extends AnalysisRule {
 
   /// Check if this rule is disabled via configuration.
   ///
-  /// Returns true if [disabledRules] contains this rule's [code.name] or any
+  /// Returns true if [disabledRules] contains this rule's [code.lowerCaseName] or any
   /// [configAliases], so config using an alias (e.g. `require_riverpod_lint_package: false`)
   /// correctly disables the rule.
   bool get isDisabled {
     final d = disabledRules;
     if (d == null) return false;
-    if (d.contains(code.name)) return true;
+    if (d.contains(code.lowerCaseName)) return true;
     for (final alias in configAliases) {
       if (d.contains(alias)) return true;
     }
@@ -2446,12 +2446,12 @@ abstract class SaropaLintRule extends AnalysisRule {
 
   /// Get the effective severity for this rule, considering overrides.
   ///
-  /// Checks [severityOverrides] for [code.name] first, then each [configAliases],
+  /// Checks [severityOverrides] for [code.lowerCaseName] first, then each [configAliases],
   /// so config using an alias is applied.
   DiagnosticSeverity? get effectiveSeverity {
     final o = severityOverrides;
     if (o != null) {
-      final byName = o[code.name];
+      final byName = o[code.lowerCaseName];
       if (byName != null) return byName;
       for (final alias in configAliases) {
         final byAlias = o[alias];
@@ -2551,7 +2551,7 @@ abstract class SaropaLintRule extends AnalysisRule {
   ///
   /// Essential-tier rules run even during rapid editing.
   bool _isEssentialTierRule() {
-    return essentialRules.contains(code.name);
+    return essentialRules.contains(code.lowerCaseName);
   }
 
   // =========================================================================
@@ -2574,7 +2574,7 @@ abstract class SaropaLintRule extends AnalysisRule {
     final saropaContext = SaropaContext(registry, this, ruleContext);
     final reporter = SaropaDiagnosticReporter(
       this,
-      code.name,
+      code.lowerCaseName,
       impact: impact,
       lintCode: _lintCode,
       ruleContext: ruleContext,
