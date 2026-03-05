@@ -1524,6 +1524,15 @@ class RequireSocketCloseRule extends SaropaLintRule {
 /// Debounce timers used for search or input delay must be canceled
 /// to prevent callbacks firing after widget disposal.
 ///
+/// **Implementation:** Restricted to classes extending [State]. Collects
+/// all [Timer]/[Timer?] field names, then for each field checks every
+/// [dispose] method in the class (not only the first) so that classes
+/// with mixins (e.g. `State<Foo> with WidgetsBindingObserver`) are
+/// handled correctly. Cleanup is detected via [isFieldCleanedUp] on the
+/// method body and [isFieldCleanedUpInSource] on the full method source,
+/// so patterns like `_debounce?.cancel()` are found even when body
+/// serialization differs.
+///
 /// **BAD:**
 /// ```dart
 /// class _SearchState extends State<Search> {
@@ -1558,6 +1567,10 @@ class RequireSocketCloseRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
+///
+/// **Suppression:** Use `// ignore: require_debouncer_cancel` (space after colon).
+/// If the line-above form is not honored, use a trailing comment on the same line:
+/// `Timer? _debounce; // ignore: require_debouncer_cancel`
 class RequireDebouncerCancelRule extends SaropaLintRule {
   RequireDebouncerCancelRule() : super(code: _code);
 
@@ -1600,26 +1613,29 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
 
       if (timerFields.isEmpty) return;
 
-      // Check dispose method for cancel calls
-      FunctionBody? disposeMethodBody;
+      // Collect all dispose methods (class may have mixins; check every dispose)
+      final List<MethodDeclaration> disposeMethods = <MethodDeclaration>[];
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeMethodBody = member.body;
-          break;
+          disposeMethods.add(member);
         }
       }
 
       for (final String field in timerFields) {
-        final bool isCanceled =
-            disposeMethodBody != null &&
-            isFieldCleanedUp(field, 'cancel', disposeMethodBody);
+        final bool isCanceled = disposeMethods.any((MethodDeclaration m) =>
+            isFieldCleanedUp(field, 'cancel', m.body) ||
+            isFieldCleanedUpInSource(field, 'cancel', m.toSource()));
         if (!isCanceled) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
+              final fieldDeclaration = member;
               for (final VariableDeclaration variable
-                  in member.fields.variables) {
+                  in fieldDeclaration.fields.variables) {
                 if (variable.name.lexeme == field) {
-                  reporter.atNode(variable);
+                  // Report at the field so the diagnostic is associated with
+                  // the declaration whose preceding comment can be // ignore:
+                  reporter.atNode(fieldDeclaration);
+                  break;
                 }
               }
             }

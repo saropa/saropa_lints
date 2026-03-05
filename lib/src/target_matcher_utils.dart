@@ -60,11 +60,26 @@ bool isExactTarget(Expression target, Set<String> targets) {
 /// }
 /// ```
 bool isFieldCleanedUp(String fieldName, String methodName, FunctionBody body) {
-  final source = body.toSource();
-  final pattern = RegExp(
-    '${RegExp.escape(fieldName)}\\s*[?.]\\s*$methodName\\s*\\(',
+  return _fieldCleanedUpPattern(fieldName, methodName).hasMatch(body.toSource());
+}
+
+/// Pattern for [fieldName].[methodName]( or [fieldName]?.[methodName](.
+RegExp _fieldCleanedUpPattern(String fieldName, String methodName) {
+  return RegExp(
+    '${RegExp.escape(fieldName)}\\s*(\\.|\\?\\.)\\s*${RegExp.escape(methodName)}\\s*\\(',
   );
-  return pattern.hasMatch(source);
+}
+
+/// Same as [isFieldCleanedUp] but checks arbitrary [source] (e.g. full method).
+///
+/// Use when [body].toSource() may omit the call (e.g. mixin/override layout).
+/// Callers can pass [MethodDeclaration].toSource() as fallback.
+bool isFieldCleanedUpInSource(
+  String fieldName,
+  String methodName,
+  String source,
+) {
+  return _fieldCleanedUpPattern(fieldName, methodName).hasMatch(source);
 }
 
 /// Walks up the AST from [node] to check if a chained method call with

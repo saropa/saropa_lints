@@ -16,11 +16,27 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Added
 
+- **require_pagination_error_recovery** — Recommended tier, INFO. Warns when a paginated list (ListView.builder/GridView.builder with loadMore/fetchMore/nextPage) has no visible error recovery in the enclosing scope (retry, onError, catch, hasError, isError, errorBuilder). Failed page loads need a retry option so users can recover. Resolves GitHub #22, #31.
+
+### Fixed
+
+- **require_field_dispose** — Now recognizes cascade notation for disposal (e.g. `_controller..removeListener(_fn)..dispose()`). Previously only matched `_controller.dispose()` on a single line. Resolves GitHub #76.
+
+- **max_issues setting** — `analysis_options_custom.yaml` is now loaded from the project root when it is first known (from the first analyzed file), so `max_issues` and `output` take effect even when the plugin runs with cwd in a temporary directory. Resolves GitHub #92.
+
+### Added (continued)
+
+- **avoid_importing_entrypoint_exports** — Professional tier, INFO. Warns when a file imports from another file that re-exports the entry point (e.g. `main.dart`). Implemented by resolving import URIs to paths and checking the imported file for `export '...main.dart'`. Reduces unintended coupling to the app bootstrap.
+
+- **require_ignore_comment_spacing** — Stylistic tier, INFO. Warns when `// ignore:` or `// ignore_for_file:` has no space after the colon (e.g. `// ignore:rule_name`). The analyzer expects a space so the directive can suppress the lint. Quick fix: add a space after the colon.
+
 - **Quick fixes (Batches 12+):** Added 28+ quick fixes across 28 rules. No new lint rules or tier changes. Fixes include: `avoid_assigning_to_static_field` (DeleteStaticFieldAssignmentFix), `avoid_wildcard_cases_with_enums` / `avoid_wildcard_cases_with_sealed_classes` / `require_exhaustive_sealed_switch` (RemoveWildcardOrDefaultCaseFix), `avoid_duplicate_initializers` (DeleteDuplicateInitializerFix), `avoid_duplicate_patterns` (RemoveDuplicatePatternCaseFix), `avoid_throw_in_finally` (DeleteThrowInFinallyFix), `avoid_duplicate_cascades` (RemoveDuplicateCascadeSectionFix), `avoid_empty_build_when` (RemoveEmptyBuildWhenFix), `avoid_unnecessary_futures` (AvoidRedundantAsyncFix), `avoid_misused_set_literals` (AddSetOrMapTypeArgumentFix), `no_equal_nested_conditions` (FlattenRedundantNestedConditionFix), `avoid_unused_assignment` (RemoveUnusedAssignmentFix), `prefer_any_or_every` (ReplaceWhereIsEmptyWithAnyFix), `avoid_asset_manifest_json` (ReplaceAssetManifestJsonFix), `prefer_null_aware_spread` (SimplifyRedundantNullAwareSpreadFix, ReplaceConditionalSpreadWithNullAwareFix), `prefer_use_prefix` (AddUsePrefixFix), `avoid_passing_default_values` (RemoveDefaultValueArgumentFix), `prefer_enums_by_name` (ReplaceFirstWhereWithByNameFix), `prefer_test_matchers` (ReplaceExpectLengthEqualsZeroWithIsEmptyFix, ReplaceExpectContainsIsTrueWithContainsFix). `AvoidRedundantAsyncFix` now resolves body from function name token for `avoid_unnecessary_futures`. Fixed `replace_expect_contains_is_true_with_contains_fix` to avoid `dart:collection` (use `isEmpty`/`first`). See `bugs/QUICK_FIX_PLAN.md`.
 
 - **Quick-fix presence tests:** Unit tests that assert `fixGenerators` is not empty for `prefer_any_or_every`, `prefer_enums_by_name`, `prefer_test_matchers`, `prefer_use_prefix`, `avoid_passing_default_values`, `avoid_wildcard_cases_with_enums`, `avoid_duplicate_patterns`, `no_equal_nested_conditions` (code_quality_rules_test), `avoid_duplicate_cascades` (complexity_rules_test), and `avoid_throw_in_finally` (structure_rules_test).
 
 ### Fixed
+
+- **require_debouncer_cancel** — False positive when a `State` subclass (e.g. with `WidgetsBindingObserver` mixin) already had `_debounce?.cancel()` in `dispose()`. The rule now checks every `dispose` method in the class (not only the first) and uses both body source and full method source for cleanup detection, so cancel-in-dispose is reliably found. Added `isFieldCleanedUpInSource` in `target_matcher_utils.dart` and a regression fixture + tests. See `bugs/history/issue_require_debouncer_cancel_false_positive_when_cancel_in_dispose.md`.
 
 - **Duplicate diagnostics (positional bool):** `prefer_named_bool_params` was removed from the stylistic tier so it is no longer enabled by default alongside `avoid_positional_boolean_parameters` (professional tier). Both rules report the same issue (positional boolean parameters) with the same fix (use a named parameter). Enabling both produced two diagnostics per parameter. Use `avoid_positional_boolean_parameters` from the professional tier, or enable `prefer_named_bool_params` explicitly if desired.
 
