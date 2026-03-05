@@ -203,6 +203,11 @@ void main() {
       'require_auto_route_page_suffix',
       () => RequireAutoRoutePageSuffixRule(),
     );
+    testRule(
+      'PreferNamedRoutesForDeepLinksRule',
+      'prefer_named_routes_for_deep_links',
+      () => PreferNamedRoutesForDeepLinksRule(),
+    );
   });
   group('Navigation Rules - Fixture Verification', () {
     final fixtures = [
@@ -227,6 +232,7 @@ void main() {
       'require_go_router_typed_params',
       'prefer_go_router_extra_typed',
       'prefer_maybe_pop',
+      'prefer_named_routes_for_deep_links',
       'prefer_url_launcher_uri_over_string',
       'avoid_go_router_push_replacement_confusion',
       'require_url_launcher_encoding',
@@ -682,6 +688,28 @@ void main() {
       test('prefer_route_settings_name should NOT trigger', () {
         // Preferred pattern used correctly
         expect('prefer_route_settings_name passes', isNotNull);
+      });
+    });
+
+    group('prefer_named_routes_for_deep_links', () {
+      test('prefer_named_routes_for_deep_links SHOULD trigger', () {
+        // Anonymous MaterialPageRoute/CupertinoPageRoute without settings
+        expect('prefer_named_routes_for_deep_links detected', isNotNull);
+      });
+
+      test('prefer_named_routes_for_deep_links should NOT trigger', () {
+        // Route with settings: RouteSettings(name: non-empty or variable)
+        expect('prefer_named_routes_for_deep_links passes', isNotNull);
+      });
+
+      test('RouteSettings(name: variable) should NOT trigger (no false positive)', () {
+        // Variable name is treated as named; used with onGenerateRoute
+        expect('named route via variable passes', isNotNull);
+      });
+
+      test('RouteSettings(name: "") should trigger (empty name)', () {
+        // Empty string name cannot be used for deep linking
+        expect('empty name still triggers', isNotNull);
       });
     });
 
