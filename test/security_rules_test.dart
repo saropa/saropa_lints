@@ -223,6 +223,11 @@ void main() {
       () => RequireWebViewErrorHandlingRule(),
     );
     testRule(
+      'PreferWebviewSandboxRule',
+      'prefer_webview_sandbox',
+      () => PreferWebviewSandboxRule(),
+    );
+    testRule(
       'AvoidApiKeyInCodeRule',
       'avoid_api_key_in_code',
       () => AvoidApiKeyInCodeRule(),
@@ -752,6 +757,44 @@ void main() {
       test('sensitive screen allows screenshots SHOULD trigger', () {
         expect('screenshot-enabled sensitive screen detected', isNotNull);
       });
+
+      test(
+        'fixture has exactly one BAD (expect_lint) so rule triggers once',
+        () {
+          final path =
+              'example_async/lib/security/avoid_screenshot_sensitive_fixture.dart';
+          final file = File(path);
+          expect(file.existsSync(), isTrue, reason: 'Fixture must exist');
+          final content = file.readAsStringSync();
+          final count = RegExp(
+            r'// expect_lint: avoid_screenshot_sensitive',
+          ).allMatches(content).length;
+          expect(
+            count,
+            1,
+            reason: 'Exactly one BAD class (PaymentScreen) should have expect_lint',
+          );
+        },
+      );
+
+      test(
+        'fixture GOOD classes (debug/viewer, fromsettings) must NOT trigger',
+        () {
+          final path =
+              'example_async/lib/security/avoid_screenshot_sensitive_fixture.dart';
+          final content = File(path).readAsStringSync();
+          expect(
+            content.contains('_DriftViewerWebViewScreen'),
+            isTrue,
+            reason: 'Viewer screen is debug/tooling; must not trigger',
+          );
+          expect(
+            content.contains('_WebViewScreenFromSettings'),
+            isTrue,
+            reason: 'WebView from settings is navigation context; must not trigger',
+          );
+        },
+      );
     });
 
     group('prefer_data_masking', () {
