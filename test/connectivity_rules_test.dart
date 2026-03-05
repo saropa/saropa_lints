@@ -10,7 +10,7 @@ void main() {
   group('Connectivity Rules - Rule Instantiation', () {
     test('RequireConnectivityErrorHandlingRule', () {
       final rule = RequireConnectivityErrorHandlingRule();
-      expect(rule.code.name, 'require_connectivity_error_handling');
+      expect(rule.code.lowerCaseName, 'require_connectivity_error_handling');
       expect(
         rule.code.problemMessage,
         contains('[require_connectivity_error_handling]'),
@@ -20,7 +20,7 @@ void main() {
     });
     test('AvoidConnectivityEqualsInternetRule', () {
       final rule = AvoidConnectivityEqualsInternetRule();
-      expect(rule.code.name, 'avoid_connectivity_equals_internet');
+      expect(rule.code.lowerCaseName, 'avoid_connectivity_equals_internet');
       expect(
         rule.code.problemMessage,
         contains('[avoid_connectivity_equals_internet]'),
@@ -30,7 +30,7 @@ void main() {
     });
     test('RequireConnectivityTimeoutRule', () {
       final rule = RequireConnectivityTimeoutRule();
-      expect(rule.code.name, 'require_connectivity_timeout');
+      expect(rule.code.lowerCaseName, 'require_connectivity_timeout');
       expect(
         rule.code.problemMessage,
         contains('[require_connectivity_timeout]'),

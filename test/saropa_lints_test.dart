@@ -34,7 +34,7 @@ void main() {
 
     setUpAll(() {
       pluginRuleNames = allSaropaRules
-          .map((SaropaLintRule rule) => rule.code.name)
+          .map((SaropaLintRule rule) => rule.code.lowerCaseName)
           .toSet();
       tierRuleNames = getAllDefinedRules();
     });
@@ -99,7 +99,7 @@ void main() {
 
     test('every plugin rule is in exactly one tier set', () {
       final Set<String> pluginRuleNames = allSaropaRules
-          .map((SaropaLintRule rule) => rule.code.name)
+          .map((SaropaLintRule rule) => rule.code.lowerCaseName)
           .toSet();
 
       final Set<String> allTierRuleNames = <String>{};
@@ -150,7 +150,7 @@ void main() {
       for (final SaropaLintRule rule in allSaropaRules) {
         if (rule.impact != LintImpact.opinionated) continue;
 
-        final String name = rule.code.name;
+        final String name = rule.code.lowerCaseName;
         // All prefer_* opinionated rules are stylistic, no exceptions.
         // Non-prefer opinionated rules (avoid_*, require_*) are case-by-case.
         if (!name.startsWith('prefer_')) continue;
@@ -179,7 +179,7 @@ void main() {
 
     setUpAll(() {
       pluginRuleNames = allSaropaRules
-          .map((SaropaLintRule rule) => rule.code.name)
+          .map((SaropaLintRule rule) => rule.code.lowerCaseName)
           .toSet();
       pkgSets = packageRuleSets;
     });
@@ -301,7 +301,7 @@ void main() {
     test('all widget-only stylistic rules are in flutterStylisticRules', () {
       final widgetOnlyRules = <String>{};
       for (final rule in allSaropaRules) {
-        final name = rule.code.name;
+        final name = rule.code.lowerCaseName;
         if (!stylisticRules.contains(name)) continue;
         final fileTypes = rule.applicableFileTypes;
         if (fileTypes != null && fileTypes.length == 1) {
@@ -334,8 +334,8 @@ void main() {
       for (final rule in allSaropaRules) {
         final hasBad = rule.exampleBad != null;
         final hasGood = rule.exampleGood != null;
-        if (hasBad && !hasGood) badOnly.add(rule.code.name);
-        if (hasGood && !hasBad) goodOnly.add(rule.code.name);
+        if (hasBad && !hasGood) badOnly.add(rule.code.lowerCaseName);
+        if (hasGood && !hasBad) goodOnly.add(rule.code.lowerCaseName);
       }
 
       expect(
@@ -360,7 +360,7 @@ void main() {
       final empty = <String>[];
 
       for (final rule in allSaropaRules) {
-        final name = rule.code.name;
+        final name = rule.code.lowerCaseName;
         if (rule.exampleBad != null && rule.exampleBad!.trim().isEmpty) {
           empty.add('$name.exampleBad');
         }
@@ -382,7 +382,7 @@ void main() {
       for (final rule in allSaropaRules) {
         if (rule.exampleBad == null || rule.exampleGood == null) continue;
         if (rule.exampleBad == rule.exampleGood) {
-          identical.add(rule.code.name);
+          identical.add(rule.code.lowerCaseName);
         }
       }
 
@@ -400,7 +400,7 @@ void main() {
       // exampleGood and vice versa. Verify a few known pairs.
       final ruleMap = <String, SaropaLintRule>{};
       for (final rule in allSaropaRules) {
-        ruleMap[rule.code.name] = rule;
+        ruleMap[rule.code.lowerCaseName] = rule;
       }
 
       void checkPair(String ruleA, String ruleB) {

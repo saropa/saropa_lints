@@ -10,7 +10,7 @@ void main() {
   group('Cryptography Rules - Rule Instantiation', () {
     test('AvoidHardcodedEncryptionKeysRule', () {
       final rule = AvoidHardcodedEncryptionKeysRule();
-      expect(rule.code.name, 'avoid_hardcoded_encryption_keys');
+      expect(rule.code.lowerCaseName, 'avoid_hardcoded_encryption_keys');
       expect(
         rule.code.problemMessage,
         contains('[avoid_hardcoded_encryption_keys]'),
@@ -20,7 +20,7 @@ void main() {
     });
     test('PreferSecureRandomForCryptoRule', () {
       final rule = PreferSecureRandomForCryptoRule();
-      expect(rule.code.name, 'prefer_secure_random_for_crypto');
+      expect(rule.code.lowerCaseName, 'prefer_secure_random_for_crypto');
       expect(
         rule.code.problemMessage,
         contains('[prefer_secure_random_for_crypto]'),
@@ -30,7 +30,7 @@ void main() {
     });
     test('AvoidDeprecatedCryptoAlgorithmsRule', () {
       final rule = AvoidDeprecatedCryptoAlgorithmsRule();
-      expect(rule.code.name, 'avoid_deprecated_crypto_algorithms');
+      expect(rule.code.lowerCaseName, 'avoid_deprecated_crypto_algorithms');
       expect(
         rule.code.problemMessage,
         contains('[avoid_deprecated_crypto_algorithms]'),
@@ -40,7 +40,7 @@ void main() {
     });
     test('RequireUniqueIvPerEncryptionRule', () {
       final rule = RequireUniqueIvPerEncryptionRule();
-      expect(rule.code.name, 'require_unique_iv_per_encryption');
+      expect(rule.code.lowerCaseName, 'require_unique_iv_per_encryption');
       expect(
         rule.code.problemMessage,
         contains('[require_unique_iv_per_encryption]'),
@@ -50,7 +50,7 @@ void main() {
     });
     test('RequireSecureKeyGenerationRule', () {
       final rule = RequireSecureKeyGenerationRule();
-      expect(rule.code.name, 'require_secure_key_generation');
+      expect(rule.code.lowerCaseName, 'require_secure_key_generation');
       expect(
         rule.code.problemMessage,
         contains('[require_secure_key_generation]'),

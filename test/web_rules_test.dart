@@ -11,7 +11,7 @@ void main() {
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
         final rule = create();
-        expect(rule.code.name, codeName);
+        expect(rule.code.lowerCaseName, codeName);
         expect(rule.code.problemMessage, contains('[$codeName]'));
         expect(rule.code.problemMessage.length, greaterThan(50));
         expect(rule.code.correctionMessage, isNotNull);
@@ -143,7 +143,7 @@ void main() {
         () {
           // False-positive guard: rule uses exact Set match; similar URIs must not match.
           final rule = PreferJsInteropOverDartJsRule();
-          expect(rule.code.name, 'prefer_js_interop_over_dart_js');
+          expect(rule.code.lowerCaseName, 'prefer_js_interop_over_dart_js');
           // If the rule used .contains() on string, 'dart:html'.contains('dart:js') could match.
           // Our implementation uses Set.contains(uri) so only exact URIs trigger.
           expect(rule.code.correctionMessage, contains('dart:js_interop'));

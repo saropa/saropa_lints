@@ -10,42 +10,42 @@ void main() {
   group('Return Rules - Rule Instantiation', () {
     test('AvoidReturningCascadesRule', () {
       final rule = AvoidReturningCascadesRule();
-      expect(rule.code.name, 'avoid_returning_cascades');
+      expect(rule.code.lowerCaseName, 'avoid_returning_cascades');
       expect(rule.code.problemMessage, contains('[avoid_returning_cascades]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidReturningThisRule', () {
       final rule = AvoidReturningThisRule();
-      expect(rule.code.name, 'avoid_returning_this');
+      expect(rule.code.lowerCaseName, 'avoid_returning_this');
       expect(rule.code.problemMessage, contains('[avoid_returning_this]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidReturningVoidRule', () {
       final rule = AvoidReturningVoidRule();
-      expect(rule.code.name, 'avoid_returning_void');
+      expect(rule.code.lowerCaseName, 'avoid_returning_void');
       expect(rule.code.problemMessage, contains('[avoid_returning_void]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidUnnecessaryReturnRule', () {
       final rule = AvoidUnnecessaryReturnRule();
-      expect(rule.code.name, 'avoid_unnecessary_return');
+      expect(rule.code.lowerCaseName, 'avoid_unnecessary_return');
       expect(rule.code.problemMessage, contains('[avoid_unnecessary_return]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('PreferImmediateReturnRule', () {
       final rule = PreferImmediateReturnRule();
-      expect(rule.code.name, 'prefer_immediate_return');
+      expect(rule.code.lowerCaseName, 'prefer_immediate_return');
       expect(rule.code.problemMessage, contains('[prefer_immediate_return]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('PreferReturningShorthandsRule', () {
       final rule = PreferReturningShorthandsRule();
-      expect(rule.code.name, 'prefer_returning_shorthands');
+      expect(rule.code.lowerCaseName, 'prefer_returning_shorthands');
       expect(
         rule.code.problemMessage,
         contains('[prefer_returning_shorthands]'),
@@ -55,7 +55,7 @@ void main() {
     });
     test('AvoidReturningNullForVoidRule', () {
       final rule = AvoidReturningNullForVoidRule();
-      expect(rule.code.name, 'avoid_returning_null_for_void');
+      expect(rule.code.lowerCaseName, 'avoid_returning_null_for_void');
       expect(
         rule.code.problemMessage,
         contains('[avoid_returning_null_for_void]'),
@@ -65,7 +65,7 @@ void main() {
     });
     test('AvoidReturningNullForFutureRule', () {
       final rule = AvoidReturningNullForFutureRule();
-      expect(rule.code.name, 'avoid_returning_null_for_future');
+      expect(rule.code.lowerCaseName, 'avoid_returning_null_for_future');
       expect(
         rule.code.problemMessage,
         contains('[avoid_returning_null_for_future]'),

@@ -30,11 +30,11 @@ class RemoveLeadingUnderscoreFromExceptionClassFix extends SaropaFixProducer {
         : node.thisOrAncestorOfType<ClassDeclaration>();
     if (classDecl == null) return;
 
-    final name = classDecl.name.lexeme;
+    final name = classDecl.namePart.typeName.lexeme;
     if (!name.startsWith('_')) return;
 
     final newName = name.substring(1);
-    final token = classDecl.name;
+    final token = classDecl.namePart.typeName;
     await builder.addDartFileEdit(file, (b) {
       b.addSimpleReplacement(SourceRange(token.offset, token.length), newName);
     });

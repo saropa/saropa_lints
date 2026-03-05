@@ -10,7 +10,7 @@ void main() {
   group('Exception Rules - Rule Instantiation', () {
     test('AvoidNonFinalExceptionClassFieldsRule', () {
       final rule = AvoidNonFinalExceptionClassFieldsRule();
-      expect(rule.code.name, 'avoid_non_final_exception_class_fields');
+      expect(rule.code.lowerCaseName, 'avoid_non_final_exception_class_fields');
       expect(
         rule.code.problemMessage,
         contains('[avoid_non_final_exception_class_fields]'),
@@ -20,14 +20,14 @@ void main() {
     });
     test('AvoidOnlyRethrowRule', () {
       final rule = AvoidOnlyRethrowRule();
-      expect(rule.code.name, 'avoid_only_rethrow');
+      expect(rule.code.lowerCaseName, 'avoid_only_rethrow');
       expect(rule.code.problemMessage, contains('[avoid_only_rethrow]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidThrowInCatchBlockRule', () {
       final rule = AvoidThrowInCatchBlockRule();
-      expect(rule.code.name, 'avoid_throw_in_catch_block');
+      expect(rule.code.lowerCaseName, 'avoid_throw_in_catch_block');
       expect(
         rule.code.problemMessage,
         contains('[avoid_throw_in_catch_block]'),
@@ -37,7 +37,7 @@ void main() {
     });
     test('AvoidThrowObjectsWithoutToStringRule', () {
       final rule = AvoidThrowObjectsWithoutToStringRule();
-      expect(rule.code.name, 'avoid_throw_objects_without_tostring');
+      expect(rule.code.lowerCaseName, 'avoid_throw_objects_without_tostring');
       expect(
         rule.code.problemMessage,
         contains('[avoid_throw_objects_without_tostring]'),
@@ -47,7 +47,7 @@ void main() {
     });
     test('PreferPublicExceptionClassesRule', () {
       final rule = PreferPublicExceptionClassesRule();
-      expect(rule.code.name, 'prefer_public_exception_classes');
+      expect(rule.code.lowerCaseName, 'prefer_public_exception_classes');
       expect(
         rule.code.problemMessage,
         contains('[prefer_public_exception_classes]'),

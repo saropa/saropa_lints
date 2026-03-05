@@ -10,7 +10,7 @@ void main() {
   group('Lifecycle Rules - Rule Instantiation', () {
     test('AvoidWorkInPausedStateRule', () {
       final rule = AvoidWorkInPausedStateRule();
-      expect(rule.code.name, 'avoid_work_in_paused_state');
+      expect(rule.code.lowerCaseName, 'avoid_work_in_paused_state');
       expect(
         rule.code.problemMessage,
         contains('[avoid_work_in_paused_state]'),
@@ -20,7 +20,7 @@ void main() {
     });
     test('RequireResumeStateRefreshRule', () {
       final rule = RequireResumeStateRefreshRule();
-      expect(rule.code.name, 'require_resume_state_refresh');
+      expect(rule.code.lowerCaseName, 'require_resume_state_refresh');
       expect(
         rule.code.problemMessage,
         contains('[require_resume_state_refresh]'),
@@ -30,7 +30,7 @@ void main() {
     });
     test('RequireDidUpdateWidgetCheckRule', () {
       final rule = RequireDidUpdateWidgetCheckRule();
-      expect(rule.code.name, 'require_did_update_widget_check');
+      expect(rule.code.lowerCaseName, 'require_did_update_widget_check');
       expect(
         rule.code.problemMessage,
         contains('[require_did_update_widget_check]'),
@@ -40,7 +40,10 @@ void main() {
     });
     test('RequireLateInitializationInInitStateRule', () {
       final rule = RequireLateInitializationInInitStateRule();
-      expect(rule.code.name, 'require_late_initialization_in_init_state');
+      expect(
+        rule.code.lowerCaseName,
+        'require_late_initialization_in_init_state',
+      );
       expect(
         rule.code.problemMessage,
         contains('[require_late_initialization_in_init_state]'),
@@ -50,7 +53,7 @@ void main() {
     });
     test('RequireAppLifecycleHandlingRule', () {
       final rule = RequireAppLifecycleHandlingRule();
-      expect(rule.code.name, 'require_app_lifecycle_handling');
+      expect(rule.code.lowerCaseName, 'require_app_lifecycle_handling');
       expect(
         rule.code.problemMessage,
         contains('[require_app_lifecycle_handling]'),
@@ -60,7 +63,7 @@ void main() {
     });
     test('RequireConflictResolutionStrategyRule', () {
       final rule = RequireConflictResolutionStrategyRule();
-      expect(rule.code.name, 'require_conflict_resolution_strategy');
+      expect(rule.code.lowerCaseName, 'require_conflict_resolution_strategy');
       expect(
         rule.code.problemMessage,
         contains('[require_conflict_resolution_strategy]'),

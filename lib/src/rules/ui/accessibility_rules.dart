@@ -2024,11 +2024,12 @@ class RequireMinimumContrastRule extends SaropaLintRule {
                 // Respect // ignore: and // ignore_for_file: (IgnoreUtils).
                 if (IgnoreUtils.isIgnoredForFile(
                   context.fileContent,
-                  _code.name,
+                  _code.lowerCaseName,
                 )) {
                   return;
                 }
-                if (IgnoreUtils.hasIgnoreComment(arg, _code.name)) return;
+                if (IgnoreUtils.hasIgnoreComment(arg, _code.lowerCaseName))
+                  return;
                 reporter.atNode(arg);
               }
               return;

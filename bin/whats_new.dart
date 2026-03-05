@@ -55,7 +55,11 @@ List<String> formatWhatsNew({
 
     return _format(categories, section.isUnreleased ? null : version, colors);
   } catch (e, st) {
-    dev.log('Failed to parse CHANGELOG for whats new', error: e, stackTrace: st);
+    dev.log(
+      'Failed to parse CHANGELOG for whats new',
+      error: e,
+      stackTrace: st,
+    );
     return const [];
   }
 }
