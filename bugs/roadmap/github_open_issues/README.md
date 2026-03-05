@@ -1,6 +1,8 @@
 # GitHub open issues (bug reports)
 
-Each file in this folder is a local copy of an **open** GitHub issue for [saropa/saropa_lints](https://github.com/saropa/saropa_lints). When an issue corresponds to a rule that is already implemented, the file is moved to [bugs/history/](../history/) with a **Resolved in:** line and the GitHub issue is closed with the version number.
+Each file in this folder is a local copy of an **open** GitHub issue for [saropa/saropa_lints](https://github.com/saropa/saropa_lints). When an issue corresponds to a rule that is already implemented (or is deferred/not viable), the file is moved to [bugs/history/](../history/) with a **Resolved in:** line and the GitHub issue is closed with the version number when applicable.
+
+**Status (2026-03):** All issues that were tracked here (1–12, 21–54, 76, 92) have been resolved and moved to `bugs/history/`; the corresponding GitHub issues have been closed. This folder currently has no issue files. To track new open issues, refresh from GitHub (see below).
 
 - **Naming:** `issue_NNN_slug_from_title.md` = GitHub issue #NNN plus a short slug from the issue title.
 - **Content:** Title, GitHub URL, opened date, and full issue body (Detail).
