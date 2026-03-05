@@ -3803,8 +3803,9 @@ class AvoidImportingEntrypointExportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   /// Matches export '...' or export "..."; capture group 1 is the URI.
-  static final RegExp _exportUriPattern =
-      RegExp(r'''export\s+['"]([^'"]+)['"]''');
+  static final RegExp _exportUriPattern = RegExp(
+    r'''export\s+['"]([^'"]+)['"]''',
+  );
 
   @override
   void runWithReporter(
@@ -3817,8 +3818,9 @@ class AvoidImportingEntrypointExportsRule extends SaropaLintRule {
     if (_isEntryPointFile(normalizedPath)) return;
 
     final String? projectRoot = ProjectContext.findProjectRoot(filePath);
-    final String packageName =
-        projectRoot != null ? ProjectContext.getPackageName(projectRoot) : '';
+    final String packageName = projectRoot != null
+        ? ProjectContext.getPackageName(projectRoot)
+        : '';
 
     context.addImportDirective((ImportDirective node) {
       final String? uri = node.uri.stringValue;
@@ -3854,8 +3856,7 @@ class AvoidImportingEntrypointExportsRule extends SaropaLintRule {
       final String prefix = 'package:$packageName/';
       if (!uri.startsWith(prefix)) return null;
       final String relative = uri.substring(prefix.length);
-      final String resolved =
-          p.normalize(p.join(projectRoot, 'lib', relative));
+      final String resolved = p.normalize(p.join(projectRoot, 'lib', relative));
       return resolved.replaceAll('\\', '/');
     }
     final String fromDir = p.dirname(fromFilePath);

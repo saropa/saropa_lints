@@ -1,7 +1,7 @@
 # Package identity
 name: saropa_lints
 description: >-
-  2051 custom lint rules with 131 quick fixes for Flutter and Dart.
+  2052 custom lint rules with 131 quick fixes for Flutter and Dart.
   Static analysis for security, accessibility, and performance.
 version: 6.2.1
 license: MIT
@@ -40,6 +40,9 @@ dependencies:
 
   # https://pub.dev/packages/analyzer_plugin/changelog
   analyzer_plugin: ^0.13.11 # ChangeBuilder and FixKind for quick fixes
+
+  # https://pub.dev/packages/collection/changelog
+  collection: ^1.18.0 # Used by bin/saropa_lints.dart, sort_imports_fix, code_quality_control_flow_rules
 
   # https://pub.dev/packages/json2yaml/changelog
   json2yaml: ^3.0.1 # YAML serialization for CLI tool

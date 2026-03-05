@@ -58,44 +58,74 @@ void main() {
     hasFix('AvoidStringSubstringRule', () => AvoidSubstringRule());
     hasFix('AvoidUnknownPragmaRule', () => AvoidUnknownPragmaRule());
     hasFix('AvoidUnusedParametersRule', () => AvoidUnusedParametersRule());
-    hasFix('AvoidWeakCryptographicAlgorithmsRule',
-        () => AvoidWeakCryptographicAlgorithmsRule());
+    hasFix(
+      'AvoidWeakCryptographicAlgorithmsRule',
+      () => AvoidWeakCryptographicAlgorithmsRule(),
+    );
     hasFix('NoObjectDeclarationRule', () => NoObjectDeclarationRule());
-    hasFix('AvoidPassingDefaultValuesRule', () => AvoidPassingDefaultValuesRule());
-    hasFix('AvoidRedundantPragmaInlineRule',
-        () => AvoidRedundantPragmaInlineRule());
-    hasFix('AvoidAlwaysNullParametersRule',
-        () => AvoidAlwaysNullParametersRule());
-    hasFix('AvoidAssigningToStaticFieldRule',
-        () => AvoidAssigningToStaticFieldRule());
-    hasFix('AvoidDuplicateInitializersRule',
-        () => AvoidDuplicateInitializersRule());
-    hasFix('AvoidUnnecessaryOverridesRule', () => AvoidUnnecessaryOverridesRule());
-    hasFix('AvoidUnnecessaryStatementsRule',
-        () => AvoidUnnecessaryStatementsRule());
+    hasFix(
+      'AvoidPassingDefaultValuesRule',
+      () => AvoidPassingDefaultValuesRule(),
+    );
+    hasFix(
+      'AvoidRedundantPragmaInlineRule',
+      () => AvoidRedundantPragmaInlineRule(),
+    );
+    hasFix(
+      'AvoidAlwaysNullParametersRule',
+      () => AvoidAlwaysNullParametersRule(),
+    );
+    hasFix(
+      'AvoidAssigningToStaticFieldRule',
+      () => AvoidAssigningToStaticFieldRule(),
+    );
+    hasFix(
+      'AvoidDuplicateInitializersRule',
+      () => AvoidDuplicateInitializersRule(),
+    );
+    hasFix(
+      'AvoidUnnecessaryOverridesRule',
+      () => AvoidUnnecessaryOverridesRule(),
+    );
+    hasFix(
+      'AvoidUnnecessaryStatementsRule',
+      () => AvoidUnnecessaryStatementsRule(),
+    );
     hasFix('AvoidEmptyBuildWhenRule', () => AvoidEmptyBuildWhenRule());
     hasFix('AvoidUnnecessaryFuturesRule', () => AvoidUnnecessaryFuturesRule());
-    hasFix('AvoidUnnecessaryNullableReturnTypeRule',
-        () => AvoidUnnecessaryNullableReturnTypeRule());
+    hasFix(
+      'AvoidUnnecessaryNullableReturnTypeRule',
+      () => AvoidUnnecessaryNullableReturnTypeRule(),
+    );
     hasFix('AvoidThrowInCatchBlockRule', () => AvoidThrowInCatchBlockRule());
-    hasFix('PreferPublicExceptionClassesRule',
-        () => PreferPublicExceptionClassesRule());
+    hasFix(
+      'PreferPublicExceptionClassesRule',
+      () => PreferPublicExceptionClassesRule(),
+    );
 
     // Code quality - control flow (6)
     hasFix('NoEqualNestedConditionsRule', () => NoEqualNestedConditionsRule());
     hasFix('NoEqualSwitchCaseRule', () => NoEqualSwitchCaseRule());
     hasFix('AvoidDuplicatePatternsRule', () => AvoidDuplicatePatternsRule());
-    hasFix('NoEqualSwitchExpressionCasesRule',
-        () => NoEqualSwitchExpressionCasesRule());
-    hasFix('RequireExhaustiveSealedSwitchRule',
-        () => RequireExhaustiveSealedSwitchRule());
-    hasFix('AvoidWildcardCasesWithEnumsRule',
-        () => AvoidWildcardCasesWithEnumsRule());
+    hasFix(
+      'NoEqualSwitchExpressionCasesRule',
+      () => NoEqualSwitchExpressionCasesRule(),
+    );
+    hasFix(
+      'RequireExhaustiveSealedSwitchRule',
+      () => RequireExhaustiveSealedSwitchRule(),
+    );
+    hasFix(
+      'AvoidWildcardCasesWithEnumsRule',
+      () => AvoidWildcardCasesWithEnumsRule(),
+    );
 
     // Code quality - prefer (8)
     hasFix('PreferDotShorthandRule', () => PreferDotShorthandRule());
-    hasFix('PreferReturningConditionalExpressionsRule',
-        () => PreferReturningConditionalExpressionsRule());
+    hasFix(
+      'PreferReturningConditionalExpressionsRule',
+      () => PreferReturningConditionalExpressionsRule(),
+    );
     hasFix('PreferUsePrefixRule', () => PreferUsePrefixRule());
     hasFix('PreferNullAwareSpreadRule', () => PreferNullAwareSpreadRule());
     hasFix('PreferAnyOrEveryRule', () => PreferAnyOrEveryRule());
@@ -104,21 +134,36 @@ void main() {
     hasFix('NoBooleanLiteralCompareRule', () => NoBooleanLiteralCompareRule());
 
     // Control flow (12)
-    hasFix('AvoidAssignmentsAsConditionsRule',
-        () => AvoidAssignmentsAsConditionsRule());
-    hasFix('AvoidConstantAssertConditionsRule',
-        () => AvoidConstantAssertConditionsRule());
-    hasFix('AvoidDuplicateSwitchCaseConditionsRule',
-        () => AvoidDuplicateSwitchCaseConditionsRule());
+    hasFix(
+      'AvoidAssignmentsAsConditionsRule',
+      () => AvoidAssignmentsAsConditionsRule(),
+    );
+    hasFix(
+      'AvoidConstantAssertConditionsRule',
+      () => AvoidConstantAssertConditionsRule(),
+    );
+    hasFix(
+      'AvoidDuplicateSwitchCaseConditionsRule',
+      () => AvoidDuplicateSwitchCaseConditionsRule(),
+    );
     hasFix('AvoidRedundantElseRule', () => AvoidRedundantElseRule());
     hasFix('AvoidUnconditionalBreakRule', () => AvoidUnconditionalBreakRule());
-    hasFix('AvoidUnnecessaryContinueRule', () => AvoidUnnecessaryContinueRule());
-    hasFix('PreferSimplerBooleanExpressionsRule',
-        () => PreferSimplerBooleanExpressionsRule());
-    hasFix('AvoidConditionsWithBooleanLiteralsRule',
-        () => AvoidConditionsWithBooleanLiteralsRule());
-    hasFix('AvoidInvertedBooleanChecksRule',
-        () => AvoidInvertedBooleanChecksRule());
+    hasFix(
+      'AvoidUnnecessaryContinueRule',
+      () => AvoidUnnecessaryContinueRule(),
+    );
+    hasFix(
+      'PreferSimplerBooleanExpressionsRule',
+      () => PreferSimplerBooleanExpressionsRule(),
+    );
+    hasFix(
+      'AvoidConditionsWithBooleanLiteralsRule',
+      () => AvoidConditionsWithBooleanLiteralsRule(),
+    );
+    hasFix(
+      'AvoidInvertedBooleanChecksRule',
+      () => AvoidInvertedBooleanChecksRule(),
+    );
     hasFix('AvoidNegatedConditionsRule', () => AvoidNegatedConditionsRule());
     hasFix('NoEqualThenElseRule', () => NoEqualThenElseRule());
     hasFix('AvoidConstantConditionsRule', () => AvoidConstantConditionsRule());
@@ -129,32 +174,48 @@ void main() {
     hasFix('AvoidReturningVoidRule', () => AvoidReturningVoidRule());
     hasFix('AvoidUnnecessaryReturnRule', () => AvoidUnnecessaryReturnRule());
     hasFix('PreferImmediateReturnRule', () => PreferImmediateReturnRule());
-    hasFix('PreferReturningShorthandsRule',
-        () => PreferReturningShorthandsRule());
-    hasFix('AvoidReturningNullForVoidRule',
-        () => AvoidReturningNullForVoidRule());
-    hasFix('AvoidReturningNullForFutureRule',
-        () => AvoidReturningNullForFutureRule());
+    hasFix(
+      'PreferReturningShorthandsRule',
+      () => PreferReturningShorthandsRule(),
+    );
+    hasFix(
+      'AvoidReturningNullForVoidRule',
+      () => AvoidReturningNullForVoidRule(),
+    );
+    hasFix(
+      'AvoidReturningNullForFutureRule',
+      () => AvoidReturningNullForFutureRule(),
+    );
 
     // Collection (14)
     hasFix('AvoidDuplicateMapKeysRule', () => AvoidDuplicateMapKeysRule());
     hasFix('PreferContainsRule', () => PreferContainsRule());
     hasFix('PreferFirstRule', () => PreferFirstRule());
-    hasFix('AvoidDuplicateNumberElementsRule',
-        () => AvoidDuplicateNumberElementsRule());
-    hasFix('AvoidDuplicateStringElementsRule',
-        () => AvoidDuplicateStringElementsRule());
-    hasFix('AvoidDuplicateObjectElementsRule',
-        () => AvoidDuplicateObjectElementsRule());
+    hasFix(
+      'AvoidDuplicateNumberElementsRule',
+      () => AvoidDuplicateNumberElementsRule(),
+    );
+    hasFix(
+      'AvoidDuplicateStringElementsRule',
+      () => AvoidDuplicateStringElementsRule(),
+    );
+    hasFix(
+      'AvoidDuplicateObjectElementsRule',
+      () => AvoidDuplicateObjectElementsRule(),
+    );
     hasFix('RequireConstListItemsRule', () => RequireConstListItemsRule());
     hasFix('AvoidMapKeysContainsRule', () => AvoidMapKeysContainsRule());
     hasFix('PreferLastRule', () => PreferLastRule());
     hasFix('PreferWhereOrNullRule', () => PreferWhereOrNullRule());
     hasFix('AvoidUnsafeWhereMethodsRule', () => AvoidUnsafeWhereMethodsRule());
-    hasFix('AvoidUnnecessaryCollectionsRule',
-        () => AvoidUnnecessaryCollectionsRule());
-    hasFix('PreferCorrectForLoopIncrementRule',
-        () => PreferCorrectForLoopIncrementRule());
+    hasFix(
+      'AvoidUnnecessaryCollectionsRule',
+      () => AvoidUnnecessaryCollectionsRule(),
+    );
+    hasFix(
+      'PreferCorrectForLoopIncrementRule',
+      () => PreferCorrectForLoopIncrementRule(),
+    );
 
     // Async (2)
     hasFix('AvoidFutureIgnoreRule', () => AvoidFutureIgnoreRule());
@@ -163,23 +224,33 @@ void main() {
     // Structure (10)
     hasFix('AvoidThrowInFinallyRule', () => AvoidThrowInFinallyRule());
     hasFix('AvoidDoubleSlashImportsRule', () => AvoidDoubleSlashImportsRule());
-    hasFix('AvoidDuplicateNamedImportsRule',
-        () => AvoidDuplicateNamedImportsRule());
+    hasFix(
+      'AvoidDuplicateNamedImportsRule',
+      () => AvoidDuplicateNamedImportsRule(),
+    );
     hasFix('AvoidDuplicateExportsRule', () => AvoidDuplicateExportsRule());
     hasFix('AvoidDuplicateMixinsRule', () => AvoidDuplicateMixinsRule());
-    hasFix('AvoidUnnecessaryLocalVariableRule',
-        () => AvoidUnnecessaryLocalVariableRule());
-    hasFix('AvoidUnnecessaryReassignmentRule',
-        () => AvoidUnnecessaryReassignmentRule());
-    hasFix('PreferTrailingUnderscoreForUnusedRule',
-        () => PreferTrailingUnderscoreForUnusedRule());
+    hasFix(
+      'AvoidUnnecessaryLocalVariableRule',
+      () => AvoidUnnecessaryLocalVariableRule(),
+    );
+    hasFix(
+      'AvoidUnnecessaryReassignmentRule',
+      () => AvoidUnnecessaryReassignmentRule(),
+    );
+    hasFix(
+      'PreferTrailingUnderscoreForUnusedRule',
+      () => PreferTrailingUnderscoreForUnusedRule(),
+    );
 
     // Formatting (4)
     hasFix('NewlineBeforeElseRule', () => NewlineBeforeElseRule());
     hasFix('NewlineAfterLoopRule', () => NewlineAfterLoopRule());
     hasFix('PreferTrailingCommaRule', () => PreferTrailingCommaRule());
-    hasFix('UnnecessaryTrailingCommaRule',
-        () => UnnecessaryTrailingCommaRule());
+    hasFix(
+      'UnnecessaryTrailingCommaRule',
+      () => UnnecessaryTrailingCommaRule(),
+    );
 
     // Equality (1)
     hasFix('AvoidSelfAssignmentRule', () => AvoidSelfAssignmentRule());
@@ -188,8 +259,10 @@ void main() {
     hasFix('AvoidOnlyRethrowRule', () => AvoidOnlyRethrowRule());
 
     // Complexity (3)
-    hasFix('PreferParenthesesWithIfNullRule',
-        () => PreferParenthesesWithIfNullRule());
+    hasFix(
+      'PreferParenthesesWithIfNullRule',
+      () => PreferParenthesesWithIfNullRule(),
+    );
     hasFix('AvoidDuplicateCascadesRule', () => AvoidDuplicateCascadesRule());
     hasFix('AvoidCascadeAfterIfNullRule', () => AvoidCascadeAfterIfNullRule());
 
@@ -204,18 +277,24 @@ void main() {
     // Stylistic (stylistic_rules + stylistic_additional) (7)
     hasFix('PreferSingleQuotesRule', () => PreferSingleQuotesRule());
     hasFix('PreferDoubleQuotesRule', () => PreferDoubleQuotesRule());
-    hasFix('PreferSentenceCaseCommentsRule',
-        () => PreferSentenceCaseCommentsRule());
-    hasFix('PreferStraightApostropheRule',
-        () => PreferStraightApostropheRule());
+    hasFix(
+      'PreferSentenceCaseCommentsRule',
+      () => PreferSentenceCaseCommentsRule(),
+    );
+    hasFix(
+      'PreferStraightApostropheRule',
+      () => PreferStraightApostropheRule(),
+    );
     hasFix('PreferCurlyApostropheRule', () => PreferCurlyApostropheRule());
     hasFix('ArgumentsOrderingRule', () => ArgumentsOrderingRule());
 
     // Numeric literal (3)
     hasFix('PreferDigitSeparatorsRule', () => PreferDigitSeparatorsRule());
     hasFix('DoubleLiteralFormatRule', () => DoubleLiteralFormatRule());
-    hasFix('AvoidUnnecessaryDigitSeparatorsRule',
-        () => AvoidUnnecessaryDigitSeparatorsRule());
+    hasFix(
+      'AvoidUnnecessaryDigitSeparatorsRule',
+      () => AvoidUnnecessaryDigitSeparatorsRule(),
+    );
 
     // Code quality variables (1)
     hasFix('AvoidUnusedAssignmentRule', () => AvoidUnusedAssignmentRule());

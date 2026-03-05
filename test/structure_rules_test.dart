@@ -354,7 +354,9 @@ void main() {
 
     group('avoid_importing_entrypoint_exports', () {
       test('bad fixture imports a file that re-exports main.dart', () {
-        final barrel = File('example_core/lib/structure/entrypoint_barrel.dart');
+        final barrel = File(
+          'example_core/lib/structure/entrypoint_barrel.dart',
+        );
         expect(barrel.existsSync(), isTrue);
         final content = barrel.readAsStringSync();
         expect(content, contains("export '../main.dart'"));
@@ -365,15 +367,23 @@ void main() {
           'example_core/lib/structure/avoid_importing_entrypoint_exports_good_fixture.dart',
         );
         expect(goodFixture.existsSync(), isTrue);
-        expect(goodFixture.readAsStringSync(), contains("import 'avoid_barrel_files_fixture.dart'"));
-        final target = File('example_core/lib/structure/avoid_barrel_files_fixture.dart');
+        expect(
+          goodFixture.readAsStringSync(),
+          contains("import 'avoid_barrel_files_fixture.dart'"),
+        );
+        final target = File(
+          'example_core/lib/structure/avoid_barrel_files_fixture.dart',
+        );
         expect(target.existsSync(), isTrue);
         final targetContent = target.readAsStringSync();
-        final exportMainPattern = RegExp(r'''export\s+['"][^'"]*main\.dart['"]''');
+        final exportMainPattern = RegExp(
+          r'''export\s+['"][^'"]*main\.dart['"]''',
+        );
         expect(
           exportMainPattern.hasMatch(targetContent),
           isFalse,
-          reason: 'Compliant fixture must import a file that does not re-export main.dart',
+          reason:
+              'Compliant fixture must import a file that does not re-export main.dart',
         );
       });
     });

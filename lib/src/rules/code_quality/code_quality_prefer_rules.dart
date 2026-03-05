@@ -14,6 +14,8 @@ import '../../fixes/code_quality/replace_conditional_spread_with_null_aware_fix.
 import '../../fixes/code_quality/replace_expect_contains_is_true_with_contains_fix.dart';
 import '../../fixes/code_quality/replace_expect_length_equals_zero_with_is_empty_fix.dart';
 import '../../fixes/code_quality/replace_first_where_with_by_name_fix.dart';
+import '../../fixes/code_quality/add_missing_inlining_pragma_fix.dart';
+import '../../fixes/code_quality/prefer_dedicated_media_query_method_fix.dart';
 import '../../fixes/code_quality/replace_where_is_empty_with_any_fix.dart';
 import '../../fixes/code_quality/simplify_boolean_comparison_fix.dart';
 import '../../fixes/code_quality/simplify_redundant_null_aware_spread_fix.dart';
@@ -69,6 +71,12 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
       checkAnnotations(node.metadata, node.name);
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddMissingInliningPragmaFix(context: context),
+  ];
 }
 
 /// Warns when using `MediaQuery.of(context).size` instead of dedicated methods.
@@ -143,6 +151,12 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferDedicatedMediaQueryMethodFix(context: context),
+  ];
 }
 
 /// Warns when enum values are found using firstWhere instead of byName.

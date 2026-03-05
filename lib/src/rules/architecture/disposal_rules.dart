@@ -1622,9 +1622,11 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
       }
 
       for (final String field in timerFields) {
-        final bool isCanceled = disposeMethods.any((MethodDeclaration m) =>
-            isFieldCleanedUp(field, 'cancel', m.body) ||
-            isFieldCleanedUpInSource(field, 'cancel', m.toSource()));
+        final bool isCanceled = disposeMethods.any(
+          (MethodDeclaration m) =>
+              isFieldCleanedUp(field, 'cancel', m.body) ||
+              isFieldCleanedUpInSource(field, 'cancel', m.toSource()),
+        );
         if (!isCanceled) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {

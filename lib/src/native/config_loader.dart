@@ -48,13 +48,14 @@ void loadNativePluginConfig() {
 }
 
 /// Read a yaml file from the project root. Returns null if not found or on error.
-String? _readProjectFile(String filename) {
+/// Uses [Directory.current] when no [projectRoot] is given (e.g. at plugin start).
+String? _readProjectFile(String filename, [String? projectRoot]) {
   if (filename.isEmpty) return null;
   try {
-    final currentPath = Directory.current.path;
-    if (currentPath.isEmpty) return null;
+    final basePath = projectRoot ?? Directory.current.path;
+    if (basePath.isEmpty) return null;
     final sep = Platform.pathSeparator;
-    final path = '$currentPath$sep$filename';
+    final path = '$basePath$sep$filename';
     final file = File(path);
     if (!file.existsSync()) return null;
     return file.readAsStringSync();
@@ -67,6 +68,27 @@ String? _readProjectFile(String filename) {
     );
     // I/O or path error; return null so config steps use defaults
     return null;
+  }
+}
+
+/// Load max_issues and output from analysis_options_custom.yaml in [projectRoot].
+/// Call this when the project root is first known (e.g. from first analyzed file),
+/// so config is found even when the plugin runs with cwd in a temp directory.
+/// Safe to call multiple times; env vars still take precedence over file.
+void loadOutputConfigFromProjectRoot(String projectRoot) {
+  try {
+    final content = _readProjectFile(
+      'analysis_options_custom.yaml',
+      projectRoot,
+    );
+    if (content != null) _loadOutputConfig(content);
+  } catch (e, st) {
+    developer.log(
+      'loadOutputConfigFromProjectRoot failed',
+      name: 'saropa_lints',
+      error: e,
+      stackTrace: st,
+    );
   }
 }
 

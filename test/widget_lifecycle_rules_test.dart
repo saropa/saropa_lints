@@ -487,9 +487,17 @@ void main() {
       });
 
       test('require_field_dispose should NOT trigger', () {
-        // Required pattern present
+        // Required pattern present (direct dispose)
         expect('require_field_dispose passes', isNotNull);
       });
+
+      test(
+        'require_field_dispose should NOT trigger when dispose uses cascade (#76)',
+        () {
+          // Regression: _field..removeListener(_fn)..dispose() must be recognized.
+          expect('require_field_dispose cascade recognized', isNotNull);
+        },
+      );
     });
 
     group('require_timer_cancellation', () {

@@ -94,6 +94,11 @@ void main() {
       () => RequirePaginationLoadingStateRule(),
     );
     testRule(
+      'RequirePaginationErrorRecoveryRule',
+      'require_pagination_error_recovery',
+      () => RequirePaginationErrorRecoveryRule(),
+    );
+    testRule(
       'RequireWebViewProgressIndicatorRule',
       'require_webview_progress_indicator',
       () => RequireWebViewProgressIndicatorRule(),
@@ -136,6 +141,7 @@ void main() {
       'require_search_loading_indicator',
       'require_search_debounce',
       'require_pagination_loading_state',
+      'require_pagination_error_recovery',
       'require_webview_progress_indicator',
       'avoid_loading_flash',
       'prefer_avatar_loading_placeholder',
@@ -278,6 +284,26 @@ void main() {
       test('require_pagination_loading_state should NOT trigger', () {
         // Required pattern present
         expect('require_pagination_loading_state passes', isNotNull);
+      });
+    });
+
+    group('require_pagination_error_recovery', () {
+      test('require_pagination_error_recovery SHOULD trigger', () {
+        // Pagination (loadMore/fetchMore) in itemBuilder without retry/onError/catch in scope
+        expect('require_pagination_error_recovery detected', isNotNull);
+      });
+
+      test('require_pagination_error_recovery should NOT trigger', () {
+        // Error recovery (retry, hasError, errorBuilder, etc.) present in enclosing scope
+        expect('require_pagination_error_recovery passes', isNotNull);
+      });
+
+      test('require_pagination_error_recovery false positive guard', () {
+        // ListView.builder without loadMore/fetchMore must not trigger
+        expect(
+          'require_pagination_error_recovery no pagination no trigger',
+          isNotNull,
+        );
       });
     });
 
