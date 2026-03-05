@@ -42,7 +42,7 @@ class RequireIgnoreCommentSpacingFix extends SaropaFixProducer {
     });
   }
 
-  /// Finds the offset (after the colon) in content[start:end] for ignore directives.
+  /// Finds the offset (after the colon) in content`start:end` for ignore directives.
   static int? _colonOffsetInSlice(String content, int start, int end) {
     if (start >= end || start < 0) return null;
     final slice = content.substring(start, end);

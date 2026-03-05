@@ -2,6 +2,20 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+/// Deletes [dir] recursively. On Windows retries once after a short delay if deletion fails
+/// (e.g. "file is being used by another process"), to avoid flaky test teardown.
+Future<void> _deleteTempDir(Directory dir) async {
+  if (!dir.existsSync()) return;
+  try {
+    await dir.delete(recursive: true);
+  } catch (_) {
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+    try {
+      await dir.delete(recursive: true);
+    } catch (_) {}
+  }
+}
+
 /// Resolves the saropa_lints repo root by walking up from [start] until
 /// a directory containing pubspec.yaml with name "saropa_lints" is found.
 Directory _findRepoRoot([Directory? start]) {
@@ -46,11 +60,7 @@ void main() {
       final tempDir = await Directory.systemTemp.createTemp(
         'saropa_lints_handle_throwing_',
       );
-      addTearDown(() async {
-        if (tempDir.existsSync()) {
-          await tempDir.delete(recursive: true);
-        }
-      });
+      addTearDown(() => _deleteTempDir(tempDir));
 
       final repoPathForYaml = repoRoot.path.replaceAll('\\', '/');
 
@@ -147,11 +157,7 @@ void main() {
       final tempDir = await Directory.systemTemp.createTemp(
         'saropa_lints_handle_throwing_try_',
       );
-      addTearDown(() async {
-        if (tempDir.existsSync()) {
-          await tempDir.delete(recursive: true);
-        }
-      });
+      addTearDown(() => _deleteTempDir(tempDir));
 
       final repoPathForYaml = repoRoot.path.replaceAll('\\', '/');
 
@@ -240,11 +246,7 @@ void main() {
       final tempDir = await Directory.systemTemp.createTemp(
         'saropa_lints_handle_throwing_fp_',
       );
-      addTearDown(() async {
-        if (tempDir.existsSync()) {
-          await tempDir.delete(recursive: true);
-        }
-      });
+      addTearDown(() => _deleteTempDir(tempDir));
 
       final repoPathForYaml = repoRoot.path.replaceAll('\\', '/');
 
