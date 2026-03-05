@@ -35,6 +35,7 @@ Available tiers: `essential` (1), `recommended` (2), `professional` (3),
 ## Guides
 
 - [Migration from v4 to v5](guides/migration_v4_to_v5.md) — custom_lint to native analyzer plugin
+- [Upgrading to v7](guides/upgrading_to_v7.md) — analyzer 10, lowerCaseName config, and breaking changes
 
 ## Links
 
