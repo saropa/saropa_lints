@@ -175,7 +175,7 @@ These can be done on the **current** codebase (analyzer 9) without breaking anyt
 
 ### 7.5 Optional: capture “what to fix” without fixing
 
-- [ ] **(Optional)** On a throwaway branch: bump only the three dependencies (and package version to 7.0.0), run `dart pub get` and `dart analyze --fatal-infos` 2>&1. Save the full analyzer output to a file (e.g. `bugs/analyzer_10_first_run.txt`). Use it as the concrete list of errors/deprecations to fix; no code changes beyond pubspec yet.
+- [x] **(Optional)** On a throwaway branch: bump only the three dependencies (and package version to 7.0.0), run `dart pub get` and `dart analyze --fatal-infos` 2>&1. Save the full analyzer output to a file (e.g. `bugs/analyzer_10_first_run.txt`). Use it as the concrete list of errors/deprecations to fix; no code changes beyond pubspec yet. *Done: branch `throwaway/analyzer_10_first_run`, output in `bugs/analyzer_10_first_run.txt` (388 issues, mostly deprecated_member_use for `.name` → lowerCaseName).*
 
 ---
 
