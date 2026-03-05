@@ -74,6 +74,12 @@ void main() {
     );
 
     testRule(
+      'RequireIgnoreCommentSpacingRule',
+      'require_ignore_comment_spacing',
+      () => RequireIgnoreCommentSpacingRule(),
+    );
+
+    testRule(
       'MemberOrderingFormattingRule',
       'prefer_member_ordering',
       () => MemberOrderingFormattingRule(),
@@ -103,6 +109,7 @@ void main() {
       'prefer_trailing_comma',
       'unnecessary_trailing_comma',
       'format_comment_style',
+      'require_ignore_comment_spacing',
       'prefer_member_ordering',
       'enforce_parameters_ordering',
       'enum_constants_ordering',
@@ -123,6 +130,7 @@ void main() {
       'lib/src/fixes/formatting/add_blank_line_fix.dart',
       'lib/src/fixes/formatting/add_blank_line_after_declarations_fix.dart',
       'lib/src/fixes/formatting/add_blank_line_before_return_fix.dart',
+      'lib/src/fixes/formatting/require_ignore_comment_spacing_fix.dart',
     ];
 
     for (final fixFile in fixFiles) {
@@ -374,6 +382,39 @@ void main() {
         // Compliant code passes
         expect('format_comment_style passes', isNotNull);
       });
+    });
+
+    group('require_ignore_comment_spacing', () {
+      test('require_ignore_comment_spacing SHOULD trigger', () {
+        expect('require_ignore_comment_spacing detected', isNotNull);
+      });
+
+      test('require_ignore_comment_spacing should NOT trigger', () {
+        expect('require_ignore_comment_spacing passes', isNotNull);
+      });
+
+      test('fixture has bad example with expect_lint marker', () {
+        final content = File(
+          'example_core/lib/formatting/require_ignore_comment_spacing_fixture.dart',
+        ).readAsStringSync();
+        expect(
+          content,
+          contains('// expect_lint: require_ignore_comment_spacing'),
+        );
+        expect(content, contains('// ignore:require_debouncer_cancel'));
+        expect(content, contains('// ignore_for_file:avoid_print'));
+      });
+
+      test(
+        'fixture has good examples (space after colon) that must not trigger',
+        () {
+          final content = File(
+            'example_core/lib/formatting/require_ignore_comment_spacing_fixture.dart',
+          ).readAsStringSync();
+          expect(content, contains('// ignore: require_debouncer_cancel'));
+          expect(content, contains('// ignore_for_file: avoid_print'));
+        },
+      );
     });
 
     group('enforce_parameters_ordering', () {

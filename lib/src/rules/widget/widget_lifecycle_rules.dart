@@ -1446,26 +1446,28 @@ class RequireDisposeRule extends SaropaLintRule {
     );
   }
 
-  /// Check if a field is properly disposed in the dispose body
+  /// Returns true if [disposeBody] shows this field being disposed (direct, ?., or cascade).
+  /// Normalizes whitespace so cascade across lines matches (e.g. "_x\n  ..dispose()").
   bool _isFieldDisposed(_DisposableField field, String disposeBody) {
-    final String name = field.name;
-    final String method = field.disposeMethod;
+    final String name = RegExp.escape(field.name);
+    final String method = RegExp.escape(field.disposeMethod);
 
-    // Common disposal patterns (compiled once, not inside loop)
-    final List<String> patterns = <String>[
-      '$name.$method(',
-      '$name?.$method(',
-      '$name..$method(',
-      '$name.${method}Safe(',
-      '$name?.${method}Safe(',
-      '$name..${method}Safe(',
+    final String normalized = disposeBody.replaceAll(RegExp(r'\s+'), ' ');
+
+    // Common disposal patterns: direct call, optional chain, cascade (allowing whitespace)
+    final List<RegExp> patterns = <RegExp>[
+      RegExp('$name\\.$method\\('),
+      RegExp('$name\\?\\.$method\\('),
+      RegExp('$name\\.\\.$method\\('),
+      RegExp('$name\\.${method}Safe\\('),
+      RegExp('$name\\?\\.${method}Safe\\('),
+      RegExp('$name\\.\\.${method}Safe\\('),
+      // Cascade with optional whitespace (e.g. "_x\n  ..dispose()" or "_x ..dispose()")
+      RegExp('$name\\s+\\.\\.\\s*$method\\s*\\('),
     ];
-    final List<RegExp> compiledPatterns = patterns
-        .map((p) => RegExp(RegExp.escape(p)))
-        .toList();
 
-    for (final RegExp re in compiledPatterns) {
-      if (re.hasMatch(disposeBody)) {
+    for (final RegExp re in patterns) {
+      if (re.hasMatch(normalized)) {
         return true;
       }
     }

@@ -11,6 +11,7 @@ import '../../fixes/collection/add_const_to_list_item_fix.dart';
 import '../../fixes/collection/add_for_loop_increment_comment_fix.dart';
 import '../../fixes/collection/remove_duplicate_collection_element_fix.dart';
 import '../../fixes/collection/remove_duplicate_map_entry_fix.dart';
+import '../../fixes/collection/replace_from_with_of_fix.dart';
 import '../../fixes/collection/replace_with_where_or_null_fix.dart';
 import '../../fixes/collection/use_contains_key_fix.dart';
 import '../../fixes/collection/use_last_fix.dart';
@@ -1688,6 +1689,12 @@ class PreferIterableOfRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceFromWithOfFix(context: context),
+  ];
 }
 
 /// Warns when `list[length-1]` is used instead of `list.last`.

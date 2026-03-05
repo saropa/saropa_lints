@@ -17,5 +17,6 @@ Rule reported `require_debouncer_cancel` on a `Timer? _debounce` field even when
 
 ## References
 
+- Consolidated report: [bug-report-require_debouncer_cancel.md](bug-report-require_debouncer_cancel.md)
 - Rule: `lib/src/rules/architecture/disposal_rules.dart` — `RequireDebouncerCancelRule`
 - Helper: `lib/src/target_matcher_utils.dart` — `isFieldCleanedUp`, `isFieldCleanedUpInSource`

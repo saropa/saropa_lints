@@ -1159,6 +1159,7 @@ class RequireSearchDebounceRule extends SaropaLintRule {
     );
   }
 
+  // cspell:ignore restartabletimer
   /// Debounce-related type names (lowercased for comparison).
   static const Set<String> _debounceTypeNames = <String>{
     'timer',
@@ -1300,6 +1301,133 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
         reporter.atNode(node.constructorName, code);
       }
     });
+  }
+}
+
+/// Warns when a paginated list has no error recovery (retry/error state).
+///
+/// Since: v6.2.1 | Rule version: v1
+///
+/// Failed page loads need a retry option so users can recover. This rule
+/// detects ListView/GridView builder pagination (loadMore/fetchMore/nextPage/
+/// loadNext) and warns when the enclosing method/function body has no
+/// obvious error-handling pattern (retry, onError, catch, hasError, isError,
+/// errorBuilder). Scope is the nearest MethodDeclaration, FunctionDeclaration,
+/// or ConstructorDeclaration body, or the whole file if none found.
+///
+/// **Heuristic:** Detection is scope-based and keyword-based; error handling
+/// in a separate helper or mixin may not be seen. Severity is INFO to limit
+/// false-positive impact. See CONTRIBUTING.md § Avoiding False Positives.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: items.length + 1,
+///   itemBuilder: (ctx, i) {
+///     if (i == items.length) return CircularProgressIndicator();
+///     if (i == items.length - 1) loadMore(); // no retry on failure
+///     return ItemTile(items[i]);
+///   },
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: items.length + (hasError ? 1 : 0) + 1,
+///   itemBuilder: (ctx, i) {
+///     if (hasError && i == items.length) return RetryButton(onPressed: loadMore);
+///     if (i == items.length) return CircularProgressIndicator();
+///     if (i == items.length - 1) loadMore();
+///     return ItemTile(items[i]);
+///   },
+/// );
+/// ```
+class RequirePaginationErrorRecoveryRule extends SaropaLintRule {
+  RequirePaginationErrorRecoveryRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    'require_pagination_error_recovery',
+    '[require_pagination_error_recovery] Paginated list has no visible error recovery. Failed page loads need a retry option so users can recover. {v1}',
+    correctionMessage:
+        'Add error state handling and a retry option (e.g. errorBuilder, retry button, or catch/onError) for failed page loads.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static final RegExp _errorRecoveryPattern = RegExp(
+    r'\b(retry|onError|catch|hasError|isError|errorBuilder)\b',
+    caseSensitive: false,
+  );
+
+  static final RegExp _paginationTriggerPattern = RegExp(
+    r'\b(loadmore|fetchmore|nextpage|loadnext)\b',
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'ListView' && typeName != 'GridView') {
+        return;
+      }
+
+      final constructorName = node.constructorName.name?.name ?? '';
+      if (constructorName != 'builder' && constructorName != 'separated') {
+        return;
+      }
+
+      final itemBuilderArg = node.argumentList.arguments
+          .whereType<NamedExpression>()
+          .where((arg) => arg.name.label.name == 'itemBuilder')
+          .firstOrNull;
+      if (itemBuilderArg == null) {
+        return;
+      }
+
+      final builderSource = itemBuilderArg.expression.toSource().toLowerCase();
+      if (!_paginationTriggerPattern.hasMatch(builderSource)) {
+        return;
+      }
+
+      final scopeSource = _scopeSource(node);
+      if (_errorRecoveryPattern.hasMatch(scopeSource)) {
+        return;
+      }
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+
+  String _scopeSource(InstanceCreationExpression node) {
+    AstNode? current = node;
+    while (current != null) {
+      if (current is MethodDeclaration) {
+        final body = current.body;
+        if (body is BlockFunctionBody) return body.block.toSource();
+      }
+      if (current is FunctionDeclaration) {
+        final body = current.functionExpression.body;
+        if (body is BlockFunctionBody) return body.block.toSource();
+      }
+      if (current is ConstructorDeclaration) {
+        final body = current.body;
+        if (body is BlockFunctionBody) return body.block.toSource();
+      }
+      current = current.parent;
+    }
+    return node.root.toSource();
   }
 }
 

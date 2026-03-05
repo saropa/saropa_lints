@@ -25,6 +25,17 @@ jobs:
         run: dart pub get
       - name: Analyze
         run: dart analyze --fatal-infos
+      - name: Dry run (pub.dev validation)
+        # Catches missing direct dependencies and other pub.dev rules; exit 65 = warnings, 66+ = errors
+        run: |
+          code=0
+          dart pub publish --dry-run || code=$?
+          if [ $code -eq 65 ]; then
+            echo "::warning::Dry run has warnings (exit 65). Review output above."
+          elif [ $code -ne 0 ]; then
+            echo "::error::Dry run failed with exit code $code (e.g. missing dependency in pubspec.yaml)"
+            exit 1
+          fi
       - name: Format
         # Only format lib/ and test/; example_* use experimental features and are excluded from analyze
         run: dart format lib test

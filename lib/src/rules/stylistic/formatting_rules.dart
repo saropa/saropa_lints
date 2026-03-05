@@ -9,6 +9,7 @@ import '../../fixes/formatting/add_blank_line_before_return_fix.dart';
 import '../../fixes/formatting/add_blank_line_fix.dart';
 import '../../fixes/formatting/add_trailing_comma_fix.dart';
 import '../../fixes/formatting/remove_unnecessary_trailing_comma_fix.dart';
+import '../../fixes/formatting/require_ignore_comment_spacing_fix.dart';
 
 /// Warns when case clauses don't have newlines before them.
 ///
@@ -831,6 +832,97 @@ class FormatCommentFormattingRule extends SaropaLintRule {
         }
       }
 
+      comment = comment.next;
+    }
+  }
+}
+
+/// Warns when `// ignore:` or `// ignore_for_file:` has no space after the colon.
+///
+/// The Dart analyzer expects a space after the colon (e.g. `// ignore: rule_name`).
+/// Without it, the directive may not suppress the lint. This rule detects the
+/// missing space and offers a quick fix to insert it.
+///
+/// **Tier:** Stylistic (opt-in). **Impact:** Opinionated. **Cost:** Trivial
+/// (single token walk). **Since:** v6.2.1.
+///
+/// **Detection:** Only reports when the comment content (after `//`) starts with
+/// `ignore:` or `ignore_for_file:` and the character immediately after that
+/// prefix is not space or tab. Does not report when the directive is already
+/// correctly formatted or when the comment is merely describing ignore syntax.
+///
+/// **BAD:**
+/// ```dart
+/// // ignore:require_debouncer_cancel
+/// // ignore_for_file:avoid_print
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // ignore: require_debouncer_cancel
+/// // ignore_for_file: avoid_print
+/// ```
+class RequireIgnoreCommentSpacingRule extends SaropaLintRule {
+  RequireIgnoreCommentSpacingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.trivial;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RequireIgnoreCommentSpacingFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'require_ignore_comment_spacing',
+    '[require_ignore_comment_spacing] Put a space after the colon in '
+        '// ignore: and // ignore_for_file: so the analyzer can apply the directive.',
+    correctionMessage: 'Add a space after the colon.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const List<String> _ignorePrefixes = <String>[
+    'ignore:',
+    'ignore_for_file:',
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit node) {
+      Token? token = node.beginToken;
+      while (token != null && token != node.endToken) {
+        _checkPrecedingComments(token, reporter);
+        token = token.next;
+      }
+    });
+  }
+
+  void _checkPrecedingComments(Token token, SaropaDiagnosticReporter reporter) {
+    Token? comment = token.precedingComments;
+    while (comment != null) {
+      final String lexeme = comment.lexeme;
+      if (lexeme.startsWith('//')) {
+        final String content = lexeme.substring(2).trimLeft();
+        for (final prefix in _ignorePrefixes) {
+          if (content.startsWith(prefix)) {
+            final afterColon = prefix.length;
+            if (afterColon < content.length) {
+              final next = content[afterColon];
+              if (next != ' ' && next != '\t') {
+                reporter.atToken(comment);
+              }
+            }
+            break;
+          }
+        }
+      }
       comment = comment.next;
     }
   }

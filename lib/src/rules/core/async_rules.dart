@@ -12,7 +12,10 @@ import '../../fixes/async/change_to_future_void_function_fix.dart';
 import '../../fixes/async/replace_async_callback_with_future_void_function_fix.dart';
 import '../../fixes/async/add_to_utc_fix.dart';
 import '../../fixes/async/wrap_future_ignore_in_unawaited_fix.dart';
+import '../../fixes/async/add_return_await_fix.dart';
 import '../../fixes/async/remove_redundant_await_fix.dart';
+import '../../fixes/async/replace_future_tostring_with_await_fix.dart';
+import '../../fixes/async/replace_void_with_future_void_fix.dart';
 import '../../fixes/async/wrap_in_unawaited_fix.dart';
 
 /// Warns when calling .ignore() on a Future.
@@ -126,6 +129,12 @@ class AvoidFutureToStringRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceFutureToStringWithAwaitFix(context: context),
+  ];
 }
 
 /// Warns when `Future<Future<T>>` is used (nested futures).
@@ -947,6 +956,12 @@ class PreferReturnAwaitRule extends SaropaLintRule {
     }
     return null;
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddReturnAwaitFix(context: context),
+  ];
 }
 
 /// Warns when `VoidCallback` is used for a callback that likely performs
@@ -4612,6 +4627,12 @@ class AvoidVoidAsyncRule extends SaropaLintRule {
 
     reporter.atToken(nameToken);
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceVoidWithFutureVoidFix(context: context),
+  ];
 }
 
 /// Warns when `await` is used on a non-Future expression.

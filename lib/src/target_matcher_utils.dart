@@ -60,7 +60,10 @@ bool isExactTarget(Expression target, Set<String> targets) {
 /// }
 /// ```
 bool isFieldCleanedUp(String fieldName, String methodName, FunctionBody body) {
-  return _fieldCleanedUpPattern(fieldName, methodName).hasMatch(body.toSource());
+  return _fieldCleanedUpPattern(
+    fieldName,
+    methodName,
+  ).hasMatch(body.toSource());
 }
 
 /// Pattern for [fieldName].[methodName]( or [fieldName]?.[methodName](.
