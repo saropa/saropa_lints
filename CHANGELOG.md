@@ -36,6 +36,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
+- **require_api_response_validation** — No longer reports when the result of `jsonDecode` is only used as the argument to a `fromJson` call (inline `Type.fromJson(jsonDecode(...))` or variable only passed to `fromJson`). Resolves bug_require_api_response_validation_require_content_type_validation_flow.
+
+- **require_content_type_validation** — No longer reports when a dominating content-type guard exists before `jsonDecode` in the same or outer block (e.g. early return when `contentType?.mimeType != 'application/json'`). Resolves bug_require_api_response_validation_require_content_type_validation_flow.
+
 - **avoid_screenshot_sensitive** — No longer reports on debug/tooling screens: class names containing `debug`, `viewer`, `webview`, `devtool`, or `tooling` are excluded. When the only matched keyword is `settings`, classes whose name contains `fromsettings` (e.g. `_WebViewScreenFromSettings`) are excluded as navigation context. Resolves bug_avoid_screenshot_sensitive_debug_only_screens (debug-only DB viewer, saropa_drift_viewer).
 
 - **prefer_safe_area_consumer** — No longer reports when `SafeArea(top: false, ...)` is used inside a Scaffold body. That pattern only applies bottom (and optionally left/right) insets, so there is no redundant top inset with the AppBar. See bugs/history/bug_prefer_safe_area_consumer_safe_area_top_false.md.

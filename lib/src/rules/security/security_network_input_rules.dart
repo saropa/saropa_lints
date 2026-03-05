@@ -1786,10 +1786,22 @@ class PreferDataMaskingRule extends SaropaLintRule {
 
 /// Warns when sensitive screens don't disable screenshots.
 ///
+/// **Scope (developers):** This rule uses name-based heuristics to infer
+/// "sensitive" screens: class names containing both a sensitive keyword
+/// (payment, login, auth, settings, account, profile, etc.) and a screen
+/// suffix (screen, page, view, widget). Screens that use FLAG_SECURE
+/// (or similar) in source are excluded. To reduce false positives,
+/// class names containing debug/tooling markers (debug, viewer, webview,
+/// devtool, tooling) are never reported; and when the only match is "settings",
+/// names containing "fromsettings" (e.g. WebViewScreenFromSettings) are
+/// excluded as navigation context, not settings UI. See
+/// bugs/history/bug_avoid_screenshot_sensitive_debug_only_screens.md.
+///
 /// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Financial and authentication screens should disable screenshots using
-/// platform APIs to prevent sensitive data exposure.
+/// platform APIs to prevent sensitive data exposure. Debug and tooling
+/// screens (e.g. debug-only viewers, dev WebViews) are out of scope.
 ///
 /// **BAD:**
 /// ```dart
@@ -1860,6 +1872,15 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
     'profile',
   };
 
+  /// Class names containing these are treated as debug/tooling, not sensitive.
+  static const Set<String> _debugToolingNames = {
+    'debug',
+    'viewer',
+    'webview',
+    'devtool',
+    'tooling',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1868,17 +1889,29 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
-      // Check if this looks like a sensitive screen
+      // Skip debug/tooling screens (e.g. debug DB viewer, WebView from settings).
+      for (final String tool in _debugToolingNames) {
+        if (className.contains(tool)) return;
+      }
+
+      // Check if this looks like a sensitive screen (financial/auth).
       bool isSensitive = false;
       for (final String pattern in _sensitiveScreenNames) {
-        if (className.contains(pattern) &&
-            (className.contains('screen') ||
-                className.contains('page') ||
-                className.contains('view') ||
-                className.contains('widget'))) {
-          isSensitive = true;
-          break;
+        if (!className.contains(pattern)) {
+          continue;
         }
+        if (!(className.contains('screen') ||
+            className.contains('page') ||
+            className.contains('view') ||
+            className.contains('widget'))) {
+          continue;
+        }
+        // "settings" in "fromsettings" is navigation context, not settings UI.
+        if (pattern == 'settings' && className.contains('fromsettings')) {
+          continue;
+        }
+        isSensitive = true;
+        break;
       }
 
       if (!isSensitive) return;

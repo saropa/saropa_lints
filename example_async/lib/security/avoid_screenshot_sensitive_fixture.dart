@@ -116,7 +116,7 @@ class _bad1012_PaymentScreen extends StatelessWidget {
   }
 }
 
-// GOOD: Should NOT trigger avoid_screenshot_sensitive
+// GOOD: Should NOT trigger avoid_screenshot_sensitive (has FLAG_SECURE)
 class _good1012_PaymentScreen extends StatefulWidget {
   @override
   void initState() {
@@ -129,4 +129,18 @@ class _good1012_PaymentScreen extends StatefulWidget {
     FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
     super.dispose();
   }
+}
+
+// OK: Debug/tooling (viewer in name) — should NOT trigger
+class _DriftViewerWebViewScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Scaffold(body: const SizedBox());
+}
+
+// OK: WebView from settings (navigation context) — should NOT trigger
+class _WebViewScreenFromSettings extends StatelessWidget {
+  const _WebViewScreenFromSettings({required this.uri});
+  final Uri uri;
+  @override
+  Widget build(BuildContext context) => Scaffold(body: const SizedBox());
 }

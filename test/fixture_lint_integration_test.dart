@@ -129,6 +129,7 @@ void main() {
           'avoid_scroll_listener_in_build',
           'avoid_widget_creation_in_loop',
           'require_item_extent_for_large_lists',
+          'avoid_screenshot_sensitive',
         ];
 
         final expectedSet = expectedFromFixtures.toSet();

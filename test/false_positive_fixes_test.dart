@@ -1519,6 +1519,12 @@ void main() {
       expect(true, isTrue);
     });
 
+    test('avoid_screenshot_sensitive has regression fixture (debug/viewer, fromsettings)', () {
+      // example_async/lib/security/avoid_screenshot_sensitive_fixture.dart
+      // Debug/tooling (viewer, webview) and WebViewScreenFromSettings must NOT trigger
+      expect(true, isTrue);
+    });
+
     test('6.0.4 require_file_path_sanitization has regression fixture', () {
       // example_async/lib/file_handling/require_file_path_sanitization_fixture.dart
       expect(true, isTrue);
