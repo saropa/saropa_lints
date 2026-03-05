@@ -484,7 +484,15 @@ def _dart_test_env(project_dir: Path) -> dict[str, str]:
 def _run_chain_stack_traces_and_check(
     project_dir: Path, env: dict[str, str] | None
 ) -> bool:
-    """Run dart test --chain-stack-traces, pipe to file, open and check for errors. Returns True iff tests passed."""
+    """Run dart test --chain-stack-traces, pipe output to a log file, then check for error lines.
+
+    Used in Step 6 (after dart analyze) to surface test failures early with full stack traces,
+    and in Step 7 when plain 'dart test' fails. Writes to reports/YYYYMMDD/YYYYMMDD_HHMMSS_chain_stack_traces.log.
+    Shows a spinner while the subprocess runs. Calls _check_log_for_errors to print failure lines (cap 50).
+
+    Returns:
+        True iff the test process exited with code 0. False if non-zero exit or if subprocess/open raised.
+    """
     now = datetime.now()
     date_str = now.strftime("%Y%m%d")
     time_str = now.strftime("%H%M%S")
@@ -521,7 +529,12 @@ def _run_chain_stack_traces_and_check(
 
 
 def _check_log_for_errors(log_path: Path, date_str: str, log_name: str) -> None:
-    """Open the chain-stack-traces log and print lines that indicate failures (cap 50 lines)."""
+    """Open the chain-stack-traces log and print lines that indicate failures.
+
+    Scans for markers: FAILED, Some tests failed, Error:, Exception, Expected:, Actual:, which was, Bad state.
+    Prints up to 50 matching lines with line numbers in red; if more, prints a truncation message.
+    If no matches, prints an info line directing the user to the full log file.
+    """
     if not log_path.exists():
         return
     try:
@@ -574,13 +587,7 @@ def run_tests(project_dir: Path) -> bool:
 
     test_dir = project_dir / "test"
     if test_dir.exists():
-        # Use project-local temp so dart test kernel files don't fill system
-        # temp (e.g. C:\Users\...\AppData\Local\Temp) when project is on D:
-        test_tmp = project_dir / ".dart_test_tmp"
-        test_tmp.mkdir(exist_ok=True)
-        env = os.environ.copy()
-        env["TMP"] = str(test_tmp)
-        env["TEMP"] = str(test_tmp)
+        env = _dart_test_env(project_dir)
         result = run_command(
             ["dart", "test"],
             project_dir,
