@@ -126,3 +126,14 @@ void _good1388() {
         ListView(), // Scaffold handles safe area via appBar, bottomNavigationBar
   );
 }
+
+// GOOD: SafeArea(top: false) only applies bottom insets; no redundant top.
+void _goodSafeAreaTopFalse() {
+  Scaffold(
+    appBar: AppBar(title: Text('Title')),
+    body: SafeArea(
+      top: false,
+      child: Center(child: Text('Content')),
+    ),
+  );
+}
