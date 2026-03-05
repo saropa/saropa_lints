@@ -329,6 +329,37 @@ void main() {
         // Required pattern present
         expect('require_debouncer_cancel passes', isNotNull);
       });
+
+      test('fixture has exactly one BAD (expect_lint) so rule triggers once', () {
+        final path = 'example_async/lib/disposal/require_debouncer_cancel_fixture.dart';
+        final file = File(path);
+        expect(file.existsSync(), isTrue, reason: 'Fixture must exist');
+        final content = file.readAsStringSync();
+        final count = RegExp(r'// expect_lint: require_debouncer_cancel')
+            .allMatches(content)
+            .length;
+        expect(count, 1, reason: 'Exactly one BAD class should have expect_lint');
+      });
+
+      test('fixture GOOD classes (no trigger): simple dispose and State-with-mixin', () {
+        final path = 'example_async/lib/disposal/require_debouncer_cancel_fixture.dart';
+        final content = File(path).readAsStringSync();
+        expect(
+          content.contains('_good332__SearchState'),
+          isTrue,
+          reason: 'Simple GOOD with _debounce?.cancel() in dispose must not trigger',
+        );
+        expect(
+          content.contains('_goodDebouncerWithMixinState'),
+          isTrue,
+          reason: 'Regression: State with WidgetsBindingObserver + cancel in dispose must NOT trigger',
+        );
+        expect(
+          content.contains('_debounce?.cancel()'),
+          isTrue,
+          reason: 'GOOD cases must cancel debounce in dispose',
+        );
+      });
     });
 
     group('require_interval_timer_cancel', () {

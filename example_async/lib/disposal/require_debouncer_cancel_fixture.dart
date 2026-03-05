@@ -136,3 +136,38 @@ class _good332__SearchState extends State<Search> {
     super.dispose();
   }
 }
+
+// GOOD: Regression for State with mixin — dispose() has _debounce?.cancel();
+// must NOT trigger require_debouncer_cancel (bug: false positive when using mixin)
+class _goodDebouncerWithMixinState extends State<Search> with WidgetsBindingObserver {
+  Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _debounce = null;
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      _debounce?.cancel();
+      _debounce = null;
+    }
+  }
+
+  void onSearchChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 200), () {
+      if (mounted) setState(() {});
+    });
+  }
+}
