@@ -262,17 +262,22 @@ def _find_workflow_run(
 ) -> str | None:
     """Poll GitHub Actions until the publish workflow run appears.
 
-    GitHub may take several seconds to queue the workflow after a
-    tag push. Retries every 30 seconds for up to 10 minutes.
+    The publish workflow is triggered by a tag push (e.g. v6.2.2). Tag-triggered
+    runs are not always associated with headBranch in the API, so we list by
+    workflow only and accept the most recent run created since we started
+    polling (within a short window). Retries every 30 seconds for up to 10 minutes.
 
     Returns the run's database ID as a string, or None.
     """
     import json
     import time
+    from datetime import datetime, timezone
 
     use_shell = get_shell_mode()
     max_wait = 600
     interval = 30
+    # Only accept runs created after we started (minus a small buffer for clock skew).
+    started_at = datetime.now(timezone.utc).timestamp() - 120
 
     for elapsed in range(0, max_wait + 1, interval):
         if elapsed > 0:
@@ -288,9 +293,8 @@ def _find_workflow_run(
             [
                 "gh", "run", "list",
                 "--workflow=publish.yml",
-                f"--branch={tag_name}",
-                "--limit=1",
-                "--json=databaseId,status,conclusion",
+                "--limit=5",
+                "--json=databaseId,status,conclusion,createdAt,headBranch",
             ],
             cwd=project_dir,
             capture_output=True,
@@ -305,8 +309,20 @@ def _find_workflow_run(
         except json.JSONDecodeError:
             continue
 
-        if runs:
-            return str(runs[0]["databaseId"])
+        for run in runs:
+            # Prefer run that matches our tag (headBranch can be tag for tag pushes).
+            if run.get("headBranch") == tag_name:
+                return str(run["databaseId"])
+            # Otherwise accept if created after we (roughly) started waiting.
+            created_at = run.get("createdAt") or ""
+            try:
+                created_ts = datetime.fromisoformat(
+                    created_at.replace("Z", "+00:00")
+                ).timestamp()
+                if created_ts >= started_at:
+                    return str(run["databaseId"])
+            except (ValueError, TypeError):
+                pass
 
     return None
 
