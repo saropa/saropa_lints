@@ -36,9 +36,11 @@ class AvoidLateFinalReassignmentRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration classNode) {
+      final body = classNode.body;
+      if (body is! BlockClassBody) return;
       // Collect late final field names
       final Set<String> lateFinalFields = <String>{};
-      for (final ClassMember member in classNode.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           if (member.fields.isLate && member.fields.isFinal) {
             for (final VariableDeclaration field in member.fields.variables) {
@@ -53,7 +55,7 @@ class AvoidLateFinalReassignmentRule extends SaropaLintRule {
       if (lateFinalFields.isEmpty) return;
 
       // Track assignments per method
-      for (final ClassMember member in classNode.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration) {
           final Map<String, int> assignments = <String, int>{};
           member.body.visitChildren(
@@ -1236,11 +1238,13 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       final Set<String> assignedFields = <String>{};
       final Map<String, Token> nullableFields = <String, Token>{};
 
       // Collect nullable fields without initializers
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final DartType? type = variable.declaredFragment?.element.type;
@@ -1255,7 +1259,7 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
       }
 
       // Check constructors for assignments
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is ConstructorDeclaration) {
           for (final ConstructorInitializer init in member.initializers) {
             if (init is ConstructorFieldInitializer) {
@@ -1271,7 +1275,7 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
       }
 
       // Check method bodies for assignments
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration) {
           member.body.visitChildren(_FieldAssignmentVisitor(assignedFields));
         }
@@ -1349,11 +1353,13 @@ class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       final Set<String> assignedFields = <String>{};
       final Map<String, Token> lateFields = <String, Token>{};
 
       // Collect late fields without initializers
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration && member.fields.isLate) {
           for (final VariableDeclaration variable in member.fields.variables) {
             if (variable.initializer == null) {
@@ -1366,7 +1372,7 @@ class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
       if (lateFields.isEmpty) return;
 
       // Check constructors and methods for assignments
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is ConstructorDeclaration) {
           for (final ConstructorInitializer init in member.initializers) {
             if (init is ConstructorFieldInitializer) {
@@ -1425,11 +1431,13 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       final Map<String, FieldDeclaration> lateFields =
           <String, FieldDeclaration>{};
 
       // Collect late fields
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration && member.fields.isLate) {
           for (final VariableDeclaration variable in member.fields.variables) {
             lateFields[variable.name.lexeme] = member;
@@ -1444,7 +1452,7 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
         int constructorCount = 0;
         int assignmentCount = 0;
 
-        for (final ClassMember member in node.members) {
+        for (final ClassMember member in body.members) {
           if (member is ConstructorDeclaration) {
             constructorCount++;
             bool assigned = false;
@@ -1522,12 +1530,14 @@ class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       final Map<String, Token> nullableFields = <String, Token>{};
       final Set<String> assignedNullFields = <String>{};
       final Set<String> constructorInitializedFields = <String>{};
 
       // Collect nullable fields
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final DartType? type = variable.declaredFragment?.element.type;
@@ -1548,7 +1558,7 @@ class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
       if (nullableFields.isEmpty) return;
 
       // Check constructors
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is ConstructorDeclaration) {
           for (final FormalParameter param in member.parameters.parameters) {
             if (param is FieldFormalParameter) {
@@ -1567,7 +1577,7 @@ class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
       }
 
       // Check methods for null assignments
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration) {
           member.body.visitChildren(_NullAssignmentChecker(assignedNullFields));
         }
@@ -1758,12 +1768,14 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration classNode) {
+      final body = classNode.body;
+      if (body is! BlockClassBody) return;
       // Get parent class
       final ExtendsClause? extendsClause = classNode.extendsClause;
       if (extendsClause == null) return;
 
       // Check each method in the class
-      for (final ClassMember member in classNode.members) {
+      for (final ClassMember member in body.members) {
         if (member is! MethodDeclaration) continue;
 
         // Check if it's an override
@@ -2456,10 +2468,12 @@ class PreferLateFinalRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Find late non-final fields
       final List<_LateFinalFieldInfo> lateFields = <_LateFinalFieldInfo>[];
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           final VariableDeclarationList fields = member.fields;
           if (fields.lateKeyword != null && !fields.isFinal) {
@@ -2493,7 +2507,7 @@ class PreferLateFinalRule extends SaropaLintRule {
           <String, Set<String>>{};
 
       // Visit all methods to count assignments
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration) {
           final _LateFinalAssignmentCounterVisitor visitor =
               _LateFinalAssignmentCounterVisitor(assignmentCounts);
@@ -2557,7 +2571,9 @@ class PreferLateFinalRule extends SaropaLintRule {
     final _LateFinalMethodCallCounterVisitor callVisitor =
         _LateFinalMethodCallCounterVisitor(methodCallCounts);
 
-    for (final ClassMember member in node.members) {
+    final classBody = node.body;
+    if (classBody is! BlockClassBody) return;
+    for (final ClassMember member in classBody.members) {
       if (member is MethodDeclaration) {
         member.body.visitChildren(callVisitor);
       }

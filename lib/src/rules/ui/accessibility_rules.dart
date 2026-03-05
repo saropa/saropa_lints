@@ -1665,7 +1665,7 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
       }
 
       // Check if widget name suggests visual/custom content
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
       const List<String> visualPatterns = <String>[
         'Rating',
         'Chart',
@@ -1693,7 +1693,7 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
       // Check if build method has Semantics
       final String classSource = node.toSource();
       if (!classSource.contains('Semantics')) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
       }
     });
   }
@@ -2028,8 +2028,9 @@ class RequireMinimumContrastRule extends SaropaLintRule {
                 )) {
                   return;
                 }
-                if (IgnoreUtils.hasIgnoreComment(arg, _code.lowerCaseName))
+                if (IgnoreUtils.hasIgnoreComment(arg, _code.lowerCaseName)) {
                   return;
+                }
                 reporter.atNode(arg);
               }
               return;

@@ -866,15 +866,18 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
           result.add(declaration.name.lexeme);
         }
       } else if (declaration is ClassDeclaration) {
-        for (final ClassMember member in declaration.members) {
-          if (member is MethodDeclaration) {
-            if (_bodyHasTryCatch(member.body)) {
-              result.add(member.name.lexeme);
+        final body = declaration.body;
+        if (body is BlockClassBody) {
+          for (final ClassMember member in body.members) {
+            if (member is MethodDeclaration) {
+              if (_bodyHasTryCatch(member.body)) {
+                result.add(member.name.lexeme);
+              }
             }
           }
         }
       } else if (declaration is MixinDeclaration) {
-        for (final ClassMember member in declaration.members) {
+        for (final ClassMember member in declaration.body.members) {
           if (member is MethodDeclaration) {
             if (_bodyHasTryCatch(member.body)) {
               result.add(member.name.lexeme);
@@ -882,7 +885,7 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
           }
         }
       } else if (declaration is ExtensionDeclaration) {
-        for (final ClassMember member in declaration.members) {
+        for (final ClassMember member in declaration.body.members) {
           if (member is MethodDeclaration) {
             if (_bodyHasTryCatch(member.body)) {
               result.add(member.name.lexeme);

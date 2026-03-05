@@ -2,6 +2,12 @@
 
 **Last updated:** 2025-03; API and dependency versions verified against pub.dev and analyzer 10.0.0 docs.
 
+**Status:** Upgrade complete. All phases (0–7) and init v6→v7 migration are done; `dart analyze --fatal-infos` and `dart test` pass.
+
+**Phase 3–5 (body/namePart) migration:** Done. All `addClassDeclaration` / `addEnumDeclaration` / `addExtensionDeclaration` / `addExtensionTypeDeclaration` / `addMixinDeclaration` callbacks and helpers that used `node.members`, `node.name`, or `node.constants` now use `body` (e.g. `(node.body as BlockClassBody).members`) and, where applicable, `node.namePart.typeName` (ClassDeclaration, EnumDeclaration). MixinDeclaration and ExtensionTypeDeclaration still use `node.name` (no `namePart` in current API). `dart analyze --fatal-infos` and `dart test` pass.
+
+**Init v6→v7:** Done. `bin/init.dart` normalizes rule names to lowerCaseName when reading existing config (USER CUSTOMIZATIONS and tier sections), reports how many were updated, and warns if Dart SDK &lt; 3.9 when using v7. See `doc/guides/upgrading_to_v7.md`.
+
 **Current:** analyzer ^9.0.0, analysis_server_plugin ^0.3.4, analyzer_plugin ^0.13.11  
 **Target:** analyzer ^10.0.0, analysis_server_plugin ^0.3.10+ (supports analyzer 10), analyzer_plugin ^0.14.0
 
@@ -206,15 +212,15 @@ Use this as a runbook. Complete in order; run analyze + test after each phase.
 
 Only change code where the **receiver** is statically a `ClassDeclaration` (e.g. inside `addClassDeclaration((ClassDeclaration node) { ... })`). Do **not** replace `.members` / `.name` on `SwitchStatement`, `MethodDeclaration`, or other node types.
 
-- [ ] **3.1** In each file that uses `addClassDeclaration`, replace:
+- [x] **3.1** In each file that uses `addClassDeclaration`, replace:
   - `node.members` → `(node.body as BlockClassBody).members`
   - `node.name` → `node.namePart.typeName` (if `namePart.name` is a `Token`, keep `.lexeme` / `.offset` etc.; if it’s an `Identifier`, use its getter per API)
   - `node.typeParameters` → `node.namePart.typeParameters`
   - `node.leftBracket` / `node.rightBracket` → `(node.body as BlockClassBody).leftBracket` / `.rightBracket`
-- [ ] **3.2** In the same files, replace any `classDecl.members` / `classNode.members` / `cls.members` when the variable is a `ClassDeclaration` with `(classDecl.body as BlockClassBody).members`; same for `.name` → `.namePart.typeName`, `.typeParameters` → `.namePart.typeParameters`.
-- [ ] **3.3** Replace `reporter.atToken(node.name, ...)` (and similar) with `reporter.atToken(node.namePart.typeName, ...)` where `node` is `ClassDeclaration`.
-- [ ] **3.4** Run `dart analyze --fatal-infos` and fix any type/API issues (e.g. add `BlockClassBody` import from `package:analyzer/dart/ast/ast.dart` if needed).
-- [ ] **3.5** Run `dart test` and fix any test failures in rule tests.
+- [x] **3.2** In the same files, replace any `classDecl.members` / `classNode.members` / `cls.members` when the variable is a `ClassDeclaration` with `(classDecl.body as BlockClassBody).members`; same for `.name` → `.namePart.typeName`, `.typeParameters` → `.namePart.typeParameters`.
+- [x] **3.3** Replace `reporter.atToken(node.name, ...)` (and similar) with `reporter.atToken(node.namePart.typeName, ...)` where `node` is `ClassDeclaration`.
+- [x] **3.4** Run `dart analyze --fatal-infos` and fix any type/API issues (e.g. add `BlockClassBody` import from `package:analyzer/dart/ast/ast.dart` if needed).
+- [x] **3.5** Run `dart test` and fix any test failures in rule tests.
 
 **Note:** `namePart.typeName` is a **Token** in analyzer 10 (see API note §2.2). Use it for `.lexeme` and `atToken` as with the old `node.name`.
 
@@ -222,37 +228,37 @@ Only change code where the **receiver** is statically a `ClassDeclaration` (e.g.
 
 ### Phase 4: EnumDeclaration migration
 
-- [ ] **4.1** In every `addEnumDeclaration` callback, replace:
+- [x] **4.1** In every `addEnumDeclaration` callback, replace:
   - `node.constants` → `node.body.constants`
   - `node.members` → `node.body.members` (EnumBody has .members directly; do not use BlockClassBody)
   - `node.name` → `node.namePart.typeName` (Token; same as ClassDeclaration)
   - `node.typeParameters` → `node.namePart.typeParameters`
-- [ ] **4.2** Run `dart analyze --fatal-infos` and `dart test` for enum-related rules.
+- [x] **4.2** Run `dart analyze --fatal-infos` and `dart test` for enum-related rules.
 
 **Files to touch (EnumDeclaration):** `lib/src/rules/stylistic/formatting_rules.dart` (and any other file with `addEnumDeclaration`).
 
 ### Phase 5: ExtensionDeclaration and ExtensionTypeDeclaration migration
 
-- [ ] **5.1** In every `addExtensionDeclaration` callback, replace `node.members`, `node.name`, `node.typeParameters`, and any bracket access with `node.body.*` and `node.namePart.*` per analyzer 10 API.
-- [ ] **5.2** In every `addExtensionTypeDeclaration` callback, replace deprecated members with `body` / `namePart` (and any ExtensionType-specific replacements from the changelog, e.g. `primaryConstructor`).
-- [ ] **5.3** Run `dart analyze --fatal-infos` and `dart test`.
+- [x] **5.1** In every `addExtensionDeclaration` callback, replace `node.members`, `node.name`, `node.typeParameters`, and any bracket access with `node.body.*` and `node.namePart.*` per analyzer 10 API.
+- [x] **5.2** In every `addExtensionTypeDeclaration` callback, replace deprecated members with `body` / `namePart` (and any ExtensionType-specific replacements from the changelog, e.g. `primaryConstructor`). MixinDeclaration/ExtensionTypeDeclaration still use `node.name` where API has no namePart.
+- [x] **5.3** Run `dart analyze --fatal-infos` and `dart test`.
 
 **Files to touch:** `lib/src/rules/core/class_constructor_rules.dart`, `lib/src/rules/data/type_rules.dart`, `lib/src/rules/data/type_safety_rules.dart`, `lib/src/rules/architecture/structure_rules.dart`, `lib/src/rules/core/naming_style_rules.dart`, `lib/src/rules/code_quality/code_quality_avoid_rules.dart`, and any other file using `addExtensionDeclaration` / `addExtensionTypeDeclaration`.
 
 ### Phase 6: isSynthetic and parent–child
 
-- [ ] **6.1** Fix `SimpleStringLiteral.isSynthetic` in `lib/src/rules/stylistic/stylistic_rules.dart`: check analyzer 10 docs/changelog for the replacement (or remove the check if the API changed).
-- [ ] **6.2** Fix `ConstructorDeclaration.factoryKeyword?.isSynthetic` in `lib/src/rules/core/class_constructor_rules.dart`: use the recommended replacement (e.g. token or element API).
-- [ ] **6.3** Search for `.parent is ClassDeclaration` (and Enum/Extension/ExtensionType) and any logic that assumes `member.parent == classDecl`. Update to account for `member.parent == classDecl.body` if necessary.
-- [ ] **6.4** Run `dart analyze --fatal-infos` and `dart test`.
+- [x] **6.1** Fix `SimpleStringLiteral.isSynthetic` in `lib/src/rules/stylistic/stylistic_rules.dart`: replaced with `node.length == 0` (synthetic nodes have length 0 per API).
+- [x] **6.2** Fix `ConstructorDeclaration.factoryKeyword?.isSynthetic` in `lib/src/rules/core/class_constructor_rules.dart`: replaced with `(m.factoryKeyword == null || m.factoryKeyword!.length == 0)`.
+- [x] **6.3** Replaced `node.parent is ExtensionDeclaration/ExtensionTypeDeclaration` with `node.thisOrAncestorOfType<ExtensionDeclaration>() != null` in structure_rules and performance_rules; `parent is ClassDeclaration` with `thisOrAncestorOfType<ClassDeclaration>()` in widget_lifecycle_rules.
+- [x] **6.4** Run `dart analyze --fatal-infos` and `dart test`.
 
 ### Phase 7: Cleanup and verification
 
-- [ ] **7.1** Search the repo for remaining direct use of `.members`, `.name`, `.typeParameters`, `.constants` on the four declaration types (only in `lib/` and `test/`). Replace any stragglers with `body`/`namePart`.
-- [ ] **7.2** Run `dart analyze --fatal-infos` (must pass with zero infos).
-- [ ] **7.3** Run `dart test` (all tests pass).
+- [x] **7.1** Replaced remaining `.members`/`.name` in documentation_rules, code_quality_prefer_rules, state_management_rules, widget_lifecycle_rules, naming_style_rules, widget_patterns_avoid_prefer_rules; and `reporter.atToken(node.name)` → `node.namePart.typeName` where node is ClassDeclaration in naming_style_rules, code_quality_avoid_rules, performance_rules, animation_rules, widget_patterns_ux_rules, accessibility_rules, widget_lifecycle_rules.
+- [x] **7.2** Run `dart analyze --fatal-infos` (must pass with zero infos).
+- [x] **7.3** Run `dart test` (all tests pass).
 - [x] **7.4** Update **CHANGELOG.md** with a `## 7.0.0` entry and a **Breaking changes** note (analyzer 10, SDK/analyzer constraints, v7 release).
-- [ ] **7.5** Run `dart format` and commit with a clear message (e.g. `chore: upgrade to analyzer 10, migrate to body/namePart API (v7 breaking)`).
+- [x] **7.5** Run `dart format`. Commit with: `chore: analyzer 10 phase 6–7 (isSynthetic, parent–child, final cleanup)`.
 
 ---
 

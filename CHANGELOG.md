@@ -25,7 +25,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **Dependencies:** Requires `analyzer: ^10.0.0`, `analysis_server_plugin: ^0.3.10`, and `analyzer_plugin: ^0.14.0`. Dropped support for analyzer 9.x.
 - **Config keyed by lowerCaseName:** Rule identifiers and config keys (severity overrides, disabled rules, etc.) now use the analyzer's **lowerCaseName**. Use `prefer_debugprint` instead of `prefer_debugPrint`. Update `analysis_options.yaml` and any `// ignore:` comments that reference rule names.
-- **AST API:** Migrated to `body` and `namePart` where applicable (e.g. `(node.body as BlockClassBody).members`, `node.namePart.typeName`) in lifecycle_rules and the exception fix; remaining rule files can be migrated incrementally.
+- **AST API:** All rule files migrated to analyzer 10 `body` and `namePart` API (e.g. `(node.body as BlockClassBody).members`, `node.namePart.typeName`).
+- **Init:** Running `dart run saropa_lints:init` on an existing v6 config normalizes rule names to lowerCaseName and reports how many were updated; pre-flight warns if Dart SDK &lt; 3.9 when using v7.
 
 ### Changed
 

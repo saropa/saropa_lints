@@ -1232,8 +1232,10 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
       final String? superclassName = extendsClause.superclass.element?.name;
       if (superclassName != 'StatelessWidget') return;
 
+      final classBody = node.body;
+      if (classBody is! BlockClassBody) return;
       // Check if it has only the build method (no fields, no other methods)
-      final List<ClassMember> members = node.members.toList();
+      final List<ClassMember> members = classBody.members.toList();
 
       bool hasFields = false;
       bool hasOtherMethods = false;
@@ -1278,7 +1280,7 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
       final int lineCount = endLine - startLine + 1;
 
       if (lineCount <= _maxBuildLines) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
       }
     });
   }
@@ -4023,7 +4025,7 @@ class PreferRawStringsRule extends SaropaLintRule {
   ) {
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (node.isRaw) return;
-      if (node.isSynthetic) return;
+      if (node.length == 0) return; // skip synthetic (error-recovery) nodes
       final lexeme = node.literal.lexeme;
       if (!lexeme.contains(r'\\')) return;
       if (RegExp(r'\\[nrtbfv0xu]').hasMatch(lexeme)) return;

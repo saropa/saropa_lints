@@ -262,6 +262,8 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if extends State<T>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -274,7 +276,7 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
 
       // Find AnimationController fields with initializers
       final List<String> controllerNames = <String>[];
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final Expression? initializer = variable.initializer;
@@ -307,7 +309,7 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
 
       // Find dispose method body for isFieldCleanedUp checks
       FunctionBody? disposeMethodBody;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeMethodBody = member.body;
           break;
@@ -321,7 +323,7 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
             isFieldCleanedUp(name, 'dispose', disposeMethodBody);
 
         if (!isDisposed) {
-          for (final ClassMember member in node.members) {
+          for (final ClassMember member in body.members) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
@@ -1468,6 +1470,8 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check if extends State<T>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1480,7 +1484,7 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
 
       // Find Ticker fields
       final List<String> tickerFields = <String>[];
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null &&
@@ -1497,7 +1501,7 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
 
       // Find dispose method and check for stop calls
       String? disposeBody;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeBody = member.body.toSource();
           break;
@@ -1518,7 +1522,7 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
         final bool isStopped = disposeBody != null && re.hasMatch(disposeBody);
 
         if (!isStopped) {
-          for (final ClassMember member in node.members) {
+          for (final ClassMember member in body.members) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
@@ -1973,6 +1977,8 @@ class AvoidMultipleAnimationControllersRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Only check State subclasses
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -1981,7 +1987,7 @@ class AvoidMultipleAnimationControllersRule extends SaropaLintRule {
 
       int controllerCount = 0;
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is! FieldDeclaration) continue;
         final TypeAnnotation? type = member.fields.type;
 
@@ -2004,7 +2010,7 @@ class AvoidMultipleAnimationControllersRule extends SaropaLintRule {
       }
 
       if (controllerCount >= _threshold) {
-        reporter.atToken(node.name);
+        reporter.atToken(node.namePart.typeName);
       }
     });
   }

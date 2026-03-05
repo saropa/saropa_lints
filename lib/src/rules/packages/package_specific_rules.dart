@@ -561,9 +561,11 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
         return;
       }
 
+      final body = node.body;
+      if (body is! BlockClassBody) return;
       // Check for proper cleanup patterns in dispose
       MethodDeclaration? disposeMethod;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeMethod = member;
           break;
@@ -581,7 +583,7 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
         final keyboardControllerPattern = RegExp(
           r'\bKeyboardVisibilityController\b',
         );
-        for (final ClassMember member in node.members) {
+        for (final ClassMember member in body.members) {
           if (member is FieldDeclaration) {
             final String fieldSource = member.toSource();
             if (keyboardControllerPattern.hasMatch(fieldSource)) {
@@ -664,11 +666,13 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
 
       final String superName = extendsClause.superclass.name.lexeme;
       if (superName != 'State') return;
+      final body = node.body;
+      if (body is! BlockClassBody) return;
 
       // Find SpeechToText fields
       final List<String> speechFieldNames = <String>[];
       final speechToTextPattern = RegExp(r'\bSpeechToText\b');
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null && speechToTextPattern.hasMatch(typeName)) {
@@ -684,7 +688,7 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
 
       // Find dispose method
       MethodDeclaration? disposeMethod;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeMethod = member;
           break;
@@ -699,7 +703,7 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
                 isFieldCleanedUp(name, 'cancel', disposeMethod.body));
 
         if (!isStopped) {
-          for (final ClassMember member in node.members) {
+          for (final ClassMember member in body.members) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
@@ -907,9 +911,11 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
   /// Returns true if every @EnviedField in the class explicitly
   /// specifies an `obfuscate` argument (true or false).
   static bool _allFieldsHandleObfuscation(ClassDeclaration classDecl) {
+    final classBody = classDecl.body;
+    if (classBody is! BlockClassBody) return true;
     bool hasAnyField = false;
 
-    for (final ClassMember member in classDecl.members) {
+    for (final ClassMember member in classBody.members) {
       if (member is! FieldDeclaration) continue;
 
       for (final Annotation annotation in member.metadata) {
