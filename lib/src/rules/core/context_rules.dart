@@ -947,9 +947,8 @@ class AvoidContextInAsyncStaticRule extends SaropaLintRule {
     context.addMethodDeclaration((node) {
       // Only check async static methods
       if (!node.isStatic) return;
-      if (node.body is! BlockFunctionBody) return;
-
       final body = node.body;
+      if (body is! BlockFunctionBody) return;
       if (!body.isAsynchronous) return;
 
       // Check parameters for BuildContext
@@ -1038,10 +1037,9 @@ class AvoidContextInStaticMethodsRule extends SaropaLintRule {
     context.addMethodDeclaration((node) {
       // Only check static methods
       if (!node.isStatic) return;
-
+      final body = node.body;
       // Skip async methods - handled by more specific rules
-      if (node.body is BlockFunctionBody) {
-        final body = node.body;
+      if (body is BlockFunctionBody) {
         if (body.isAsynchronous) return;
       }
 
