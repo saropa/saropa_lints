@@ -2667,8 +2667,10 @@ class PreferWebviewSandboxRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'WebView', 'WebViewWidget'};
+  Set<String>? get requiredPatterns => const <String>{
+    'WebView',
+    'WebViewWidget',
+  };
 
   static const LintCode _code = LintCode(
     'prefer_webview_sandbox',
@@ -2686,7 +2688,9 @@ class PreferWebviewSandboxRule extends SaropaLintRule {
     final Set<String> configuredControllerRoots = <String>{};
 
     context.addCompilationUnit((CompilationUnit unit) {
-      unit.visitChildren(_WebViewSandboxConfigVisitor(configuredControllerRoots));
+      unit.visitChildren(
+        _WebViewSandboxConfigVisitor(configuredControllerRoots),
+      );
     });
 
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
@@ -2706,8 +2710,7 @@ class PreferWebviewSandboxRule extends SaropaLintRule {
   /// null if there is no named `controller` argument.
   static String? _controllerRootFromCreation(InstanceCreationExpression node) {
     for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression &&
-          arg.name.label.name == 'controller') {
+      if (arg is NamedExpression && arg.name.label.name == 'controller') {
         return _controllerRootFromExpression(arg.expression);
       }
     }
@@ -2740,8 +2743,9 @@ class _WebViewSandboxConfigVisitor extends RecursiveAstVisitor<void> {
     if (name == 'setNavigationDelegate') {
       final Expression? receiver = _receiver(node);
       if (receiver != null) {
-        _roots.add(PreferWebviewSandboxRule._controllerRootFromExpression(
-            receiver));
+        _roots.add(
+          PreferWebviewSandboxRule._controllerRootFromExpression(receiver),
+        );
       }
     } else if (name == 'setAllowFileAccess') {
       final ArgumentList args = node.argumentList;
@@ -2749,8 +2753,7 @@ class _WebViewSandboxConfigVisitor extends RecursiveAstVisitor<void> {
           args.arguments.first.toSource() == 'false') {
         final Expression? receiver = _receiver(node);
         if (receiver != null) {
-          _roots.add(
-              _controllerRootFromAllowFileAccessReceiver(receiver));
+          _roots.add(_controllerRootFromAllowFileAccessReceiver(receiver));
         }
       }
     }
@@ -2771,13 +2774,14 @@ class _WebViewSandboxConfigVisitor extends RecursiveAstVisitor<void> {
   /// For setAllowFileAccess(false), receiver is often
   /// (controller.platform as AndroidWebViewController) or controller.platform;
   /// we record the controller root (the part before .platform).
-  static String _controllerRootFromAllowFileAccessReceiver(Expression receiver) {
+  static String _controllerRootFromAllowFileAccessReceiver(
+    Expression receiver,
+  ) {
     Expression current = receiver;
     if (current is AsExpression) {
       current = current.expression;
     }
-    if (current is PropertyAccess &&
-        current.propertyName.name == 'platform') {
+    if (current is PropertyAccess && current.propertyName.name == 'platform') {
       // PropertyAccess.target is nullable; only assign when present.
       final target = current.target;
       if (target != null) {

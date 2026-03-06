@@ -1855,7 +1855,8 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
   /// True when this Scaffold has appBar or bottomNavigationBar (so body
   /// is already inset and SafeArea is redundant).
   static bool _scaffoldHasAppBarOrBottomNav(
-      InstanceCreationExpression scaffold) {
+    InstanceCreationExpression scaffold,
+  ) {
     for (final Expression arg in scaffold.argumentList.arguments) {
       if (arg is NamedExpression) {
         final name = arg.name.label.name;

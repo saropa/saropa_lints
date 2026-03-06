@@ -1002,7 +1002,8 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
         if (returnTypeSource != repTypeSource) continue;
         renamingGetters.add(m);
       }
-      final bool skipAll = representationIsPrivate && renamingGetters.length == 1;
+      final bool skipAll =
+          representationIsPrivate && renamingGetters.length == 1;
       for (final MethodDeclaration m in renamingGetters) {
         if (skipAll) continue;
         reporter.atToken(m.name, code);
@@ -2277,8 +2278,9 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
   /// True if any parameter is a function type (const constructor impossible).
   static bool _constructorHasFunctionTypeParam(ConstructorDeclaration node) {
     for (final FormalParameter p in node.parameters.parameters) {
-      final FormalParameter param =
-          p is DefaultFormalParameter ? p.parameter : p;
+      final FormalParameter param = p is DefaultFormalParameter
+          ? p.parameter
+          : p;
       TypeAnnotation? type;
       if (param is SimpleFormalParameter) {
         type = param.type;
@@ -2297,12 +2299,13 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
     final InterfaceElement? superInterface =
         ext.superclass.type?.element as InterfaceElement?;
     if (superInterface == null) return false;
-    return !superInterface.constructors.any((ConstructorElement c) => c.isConst);
+    return !superInterface.constructors.any(
+      (ConstructorElement c) => c.isConst,
+    );
   }
 
   /// True when any field or super initializer uses a non-const expression.
-  static bool _constructorHasNonConstInitializers(
-      ConstructorDeclaration node) {
+  static bool _constructorHasNonConstInitializers(ConstructorDeclaration node) {
     final NodeList<ConstructorInitializer> inits = node.initializers;
     if (inits.isEmpty) return false;
     for (final ConstructorInitializer init in inits) {

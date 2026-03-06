@@ -702,10 +702,13 @@ void main() {
         expect('prefer_named_routes_for_deep_links passes', isNotNull);
       });
 
-      test('RouteSettings(name: variable) should NOT trigger (no false positive)', () {
-        // Variable name is treated as named; used with onGenerateRoute
-        expect('named route via variable passes', isNotNull);
-      });
+      test(
+        'RouteSettings(name: variable) should NOT trigger (no false positive)',
+        () {
+          // Variable name is treated as named; used with onGenerateRoute
+          expect('named route via variable passes', isNotNull);
+        },
+      );
 
       test('RouteSettings(name: "") should trigger (empty name)', () {
         // Empty string name cannot be used for deep linking
