@@ -12,6 +12,8 @@ include: package:saropa_lints/tiers/recommended.yaml
 analyzer:
   errors:
     todo: ignore
+    # Analyzer 9 marks ClassDeclaration.body as experimental; ignore for analyzer-9 compatibility (8.0.x).
+    experimental_member_use: ignore
   exclude:
     # require_database_close false-positive (rule's runWithReporter contains openDatabase regex)
     - "lib/src/rules/resources/resource_management_rules.dart"

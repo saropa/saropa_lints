@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/rules/packages/sqflite_rules.dart';
 import 'package:test/test.dart';
 
@@ -11,7 +10,7 @@ void main() {
   group('Sqflite Rules - Rule Instantiation', () {
     test('AvoidSqfliteTypeMismatchRule', () {
       final rule = AvoidSqfliteTypeMismatchRule();
-      expect(rule.code.lowerCaseName, 'avoid_sqflite_type_mismatch');
+      expect(rule.code.name.toLowerCase(), 'avoid_sqflite_type_mismatch');
       expect(
         rule.code.problemMessage,
         contains('[avoid_sqflite_type_mismatch]'),
@@ -21,7 +20,7 @@ void main() {
     });
     test('PreferSqfliteEncryptionRule', () {
       final rule = PreferSqfliteEncryptionRule();
-      expect(rule.code.lowerCaseName, 'prefer_sqflite_encryption');
+      expect(rule.code.name.toLowerCase(), 'prefer_sqflite_encryption');
       expect(rule.code.problemMessage, contains('[prefer_sqflite_encryption]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);

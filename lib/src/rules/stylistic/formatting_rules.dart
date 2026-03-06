@@ -157,11 +157,9 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       final root = node.root;
       if (root is CompilationUnit) {
-        _checkMembers(body.members, root, reporter);
+        _checkMembers(node.members, root, reporter);
       }
     });
   }
@@ -257,25 +255,23 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       final root = node.root;
       if (root is CompilationUnit) {
-        _checkMembers(body.members, root, reporter);
+        _checkMembers(node.members, root, reporter);
       }
     });
 
     context.addMixinDeclaration((MixinDeclaration node) {
       final root = node.root;
       if (root is CompilationUnit) {
-        _checkMembers(node.body.members, root, reporter);
+        _checkMembers(node.members, root, reporter);
       }
     });
 
     context.addEnumDeclaration((EnumDeclaration node) {
       final root = node.root;
       if (root is CompilationUnit) {
-        _checkMembers(node.body.members, root, reporter);
+        _checkMembers(node.members, root, reporter);
       }
     });
   }
@@ -993,11 +989,9 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       int lastCategory = -1;
 
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         final int category = _getMemberCategory(member);
 
         if (category < lastCategory) {

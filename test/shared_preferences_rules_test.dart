@@ -1,8 +1,7 @@
 import 'dart:io';
 
-import 'package:test/test.dart';
-
 import 'package:saropa_lints/src/rules/packages/shared_preferences_rules.dart';
+import 'package:test/test.dart';
 
 /// Tests for 12 Shared Preferences lint rules.
 ///
@@ -12,7 +11,7 @@ void main() {
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
         final rule = create();
-        expect(rule.code.lowerCaseName, codeName);
+        expect(rule.code.name.toLowerCase(), codeName);
         expect(rule.code.problemMessage, contains('[$codeName]'));
         expect(rule.code.problemMessage.length, greaterThan(50));
         expect(rule.code.correctionMessage, isNotNull);

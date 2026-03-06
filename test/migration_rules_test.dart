@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/rules/config/migration_rules.dart';
 import 'package:test/test.dart';
 
@@ -23,7 +22,7 @@ void main() {
   group('Migration Rules - Rule Instantiation', () {
     test('AvoidAssetManifestJsonRule instantiates correctly', () {
       final rule = AvoidAssetManifestJsonRule();
-      expect(rule.code.lowerCaseName, 'avoid_asset_manifest_json');
+      expect(rule.code.name.toLowerCase(), 'avoid_asset_manifest_json');
       expect(rule.code.problemMessage, contains('[avoid_asset_manifest_json]'));
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
@@ -31,7 +30,7 @@ void main() {
 
     test('PreferDropdownInitialValueRule instantiates correctly', () {
       final rule = PreferDropdownInitialValueRule();
-      expect(rule.code.lowerCaseName, 'prefer_dropdown_initial_value');
+      expect(rule.code.name.toLowerCase(), 'prefer_dropdown_initial_value');
       expect(
         rule.code.problemMessage,
         contains('[prefer_dropdown_initial_value]'),
@@ -42,7 +41,7 @@ void main() {
 
     test('PreferOnPopWithResultRule instantiates correctly', () {
       final rule = PreferOnPopWithResultRule();
-      expect(rule.code.lowerCaseName, 'prefer_on_pop_with_result');
+      expect(rule.code.name.toLowerCase(), 'prefer_on_pop_with_result');
       expect(rule.code.problemMessage, contains('[prefer_on_pop_with_result]'));
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);

@@ -942,7 +942,6 @@ class PreferMapEntriesIterationRule extends SaropaLintRule {
       final mapName = mapTarget.toString();
 
       // Check if the loop body accesses map[key]
-      final body = node.body;
       bool hasMapLookup = false;
 
       void checkNode(AstNode astNode) {
@@ -959,6 +958,7 @@ class PreferMapEntriesIterationRule extends SaropaLintRule {
         }
       }
 
+      final body = node.body;
       checkNode(body);
 
       if (hasMapLookup) {

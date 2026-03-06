@@ -47,15 +47,18 @@ Kykto is built on the idea that simply writing a kyk down is often all the organ
 
 ### Dart & Flutter Packages
 
-| Package | Description |
-| :--- | :--- |
-| **[saropa_lints](https://pub.dev/packages/saropa_lints)** | **1700+ Custom Rules.** Catch memory leaks, security vulnerabilities (mapped to OWASP Top 10), and runtime crashes that standard linters miss. Includes AI-ready diagnostics for faster repairs. |
-| **[saropa_dart_utils](https://pub.dev/packages/saropa_dart_utils)** | **The "Swiss Army" Library.** Stop writing boilerplate. Access 280+ production-hardened extension methods for Strings, Dates, and Lists extracted from real-world apps. |
+| Package                                                                 | Description                                                                                                                                                                                                                                            |
+| :---------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **[saropa_lints](https://pub.dev/packages/saropa_lints)**               | **1700+ Custom Rules.** Catch memory leaks, security vulnerabilities (mapped to OWASP Top 10), and runtime crashes that standard linters miss. Includes AI-ready diagnostics for faster repairs.                                                       |
+| **[saropa_dart_utils](https://pub.dev/packages/saropa_dart_utils)**     | **The "Swiss Army" Library.** Stop writing boilerplate. Access 280+ production-hardened extension methods for Strings, Dates, and Lists extracted from real-world apps.                                                                                |
+| **[saropa_drift_viewer](https://pub.dev/packages/saropa_drift_viewer)** | **Debug-only SQLite/Drift inspector.** Exposes your database as JSON and a minimal web UI: table list, pagination, schema, CSV export, read-only SQL runner, snapshot/diff, and optional auth. Use from any Flutter/Dart app with Drift or raw SQLite. |
 
 ### VS Code Extensions
 
 * **[Saropa Log Capture](https://marketplace.visualstudio.com/items?itemName=Saropa.saropa-log-capture)**
     * *The Debugger's Safety Net:* Automatically saves all Debug Console output to persistent log files. No setup required—just hit F5 and your logs are safe.
+* **[Saropa Drift Viewer](https://marketplace.visualstudio.com/items?itemName=Saropa.drift-viewer)**
+    * *SQLite/Drift at a glance:* Run a task to open the Drift Viewer in your browser and inspect tables, run read-only SQL, export schema or data, and compare snapshots—without leaving the editor.
 * **[Saropa Claude Guard](https://marketplace.visualstudio.com/items?itemName=Saropa.saropa-claude-guard)**
     * *AI Governance:* Tracks Claude API costs in real-time by tailing local logs. Enforce daily/monthly budgets and monitor spend directly from the status bar.
 
@@ -63,12 +66,12 @@ Kykto is built on the idea that simply writing a kyk down is often all the organ
 
 ## 🌐 Connect With Us
 
-| Channel | Focus |
-| :--- | :--- |
-| **[GitHub](https://github.com/saropa)** | Open source projects, issue tracking, and technical discussions. |
-| **[Medium](https://medium.com/@saropa-contacts)** | Articles on the "Architecture of Connection," social values, and resilient tech. |
-| **[Bluesky](https://bsky.app/profile/saropa.com)** | Real-time updates and community news. |
-| **[LinkedIn](https://www.linkedin.com/company/saropa-pty-ltd)** | Corporate milestones and professional networking. |
+| Channel                                                         | Focus                                                                            |
+| :-------------------------------------------------------------- | :------------------------------------------------------------------------------- |
+| **[GitHub](https://github.com/saropa)**                         | Open source projects, issue tracking, and technical discussions.                 |
+| **[Medium](https://medium.com/@saropa-contacts)**               | Articles on the "Architecture of Connection," social values, and resilient tech. |
+| **[Bluesky](https://bsky.app/profile/saropa.com)**              | Real-time updates and community news.                                            |
+| **[LinkedIn](https://www.linkedin.com/company/saropa-pty-ltd)** | Corporate milestones and professional networking.                                |
 
 ---
 

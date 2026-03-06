@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/rules/architecture/disposal_rules.dart';
 import 'package:test/test.dart';
 
@@ -11,7 +10,7 @@ void main() {
   group('Disposal Rules - Rule Instantiation', () {
     test('RequireMediaPlayerDisposeRule', () {
       final rule = RequireMediaPlayerDisposeRule();
-      expect(rule.code.lowerCaseName, 'require_media_player_dispose');
+      expect(rule.code.name.toLowerCase(), 'require_media_player_dispose');
       expect(
         rule.code.problemMessage,
         contains('[require_media_player_dispose]'),
@@ -21,7 +20,7 @@ void main() {
     });
     test('RequireTabControllerDisposeRule', () {
       final rule = RequireTabControllerDisposeRule();
-      expect(rule.code.lowerCaseName, 'require_tab_controller_dispose');
+      expect(rule.code.name.toLowerCase(), 'require_tab_controller_dispose');
       expect(
         rule.code.problemMessage,
         contains('[require_tab_controller_dispose]'),
@@ -32,7 +31,7 @@ void main() {
     test('RequireTextEditingControllerDisposeRule', () {
       final rule = RequireTextEditingControllerDisposeRule();
       expect(
-        rule.code.lowerCaseName,
+        rule.code.name.toLowerCase(),
         'require_text_editing_controller_dispose',
       );
       expect(
@@ -44,7 +43,7 @@ void main() {
     });
     test('RequirePageControllerDisposeRule', () {
       final rule = RequirePageControllerDisposeRule();
-      expect(rule.code.lowerCaseName, 'require_page_controller_dispose');
+      expect(rule.code.name.toLowerCase(), 'require_page_controller_dispose');
       expect(
         rule.code.problemMessage,
         contains('[require_page_controller_dispose]'),
@@ -54,7 +53,7 @@ void main() {
     });
     test('RequireLifecycleObserverRule', () {
       final rule = RequireLifecycleObserverRule();
-      expect(rule.code.lowerCaseName, 'require_lifecycle_observer');
+      expect(rule.code.name.toLowerCase(), 'require_lifecycle_observer');
       expect(
         rule.code.problemMessage,
         contains('[require_lifecycle_observer]'),
@@ -64,7 +63,7 @@ void main() {
     });
     test('AvoidWebsocketMemoryLeakRule', () {
       final rule = AvoidWebsocketMemoryLeakRule();
-      expect(rule.code.lowerCaseName, 'avoid_websocket_memory_leak');
+      expect(rule.code.name.toLowerCase(), 'avoid_websocket_memory_leak');
       expect(
         rule.code.problemMessage,
         contains('[avoid_websocket_memory_leak]'),
@@ -75,7 +74,7 @@ void main() {
     test('RequireVideoPlayerControllerDisposeRule', () {
       final rule = RequireVideoPlayerControllerDisposeRule();
       expect(
-        rule.code.lowerCaseName,
+        rule.code.name.toLowerCase(),
         'require_video_player_controller_dispose',
       );
       expect(
@@ -87,7 +86,7 @@ void main() {
     });
     test('RequireStreamSubscriptionCancelRule', () {
       final rule = RequireStreamSubscriptionCancelRule();
-      expect(rule.code.lowerCaseName, 'require_stream_subscription_cancel');
+      expect(rule.code.name.toLowerCase(), 'require_stream_subscription_cancel');
       expect(
         rule.code.problemMessage,
         contains('[require_stream_subscription_cancel]'),
@@ -97,7 +96,7 @@ void main() {
     });
     test('RequireChangeNotifierDisposeRule', () {
       final rule = RequireChangeNotifierDisposeRule();
-      expect(rule.code.lowerCaseName, 'require_change_notifier_dispose');
+      expect(rule.code.name.toLowerCase(), 'require_change_notifier_dispose');
       expect(
         rule.code.problemMessage,
         contains('[require_change_notifier_dispose]'),
@@ -107,7 +106,7 @@ void main() {
     });
     test('RequireReceivePortCloseRule', () {
       final rule = RequireReceivePortCloseRule();
-      expect(rule.code.lowerCaseName, 'require_receive_port_close');
+      expect(rule.code.name.toLowerCase(), 'require_receive_port_close');
       expect(
         rule.code.problemMessage,
         contains('[require_receive_port_close]'),
@@ -117,21 +116,21 @@ void main() {
     });
     test('RequireSocketCloseRule', () {
       final rule = RequireSocketCloseRule();
-      expect(rule.code.lowerCaseName, 'require_socket_close');
+      expect(rule.code.name.toLowerCase(), 'require_socket_close');
       expect(rule.code.problemMessage, contains('[require_socket_close]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireDebouncerCancelRule', () {
       final rule = RequireDebouncerCancelRule();
-      expect(rule.code.lowerCaseName, 'require_debouncer_cancel');
+      expect(rule.code.name.toLowerCase(), 'require_debouncer_cancel');
       expect(rule.code.problemMessage, contains('[require_debouncer_cancel]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireIntervalTimerCancelRule', () {
       final rule = RequireIntervalTimerCancelRule();
-      expect(rule.code.lowerCaseName, 'require_interval_timer_cancel');
+      expect(rule.code.name.toLowerCase(), 'require_interval_timer_cancel');
       expect(
         rule.code.problemMessage,
         contains('[require_interval_timer_cancel]'),
@@ -141,14 +140,14 @@ void main() {
     });
     test('RequireFileHandleCloseRule', () {
       final rule = RequireFileHandleCloseRule();
-      expect(rule.code.lowerCaseName, 'require_file_handle_close');
+      expect(rule.code.name.toLowerCase(), 'require_file_handle_close');
       expect(rule.code.problemMessage, contains('[require_file_handle_close]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireDisposeImplementationRule', () {
       final rule = RequireDisposeImplementationRule();
-      expect(rule.code.lowerCaseName, 'require_dispose_implementation');
+      expect(rule.code.name.toLowerCase(), 'require_dispose_implementation');
       expect(
         rule.code.problemMessage,
         contains('[require_dispose_implementation]'),
@@ -158,7 +157,7 @@ void main() {
     });
     test('PreferDisposeBeforeNewInstanceRule', () {
       final rule = PreferDisposeBeforeNewInstanceRule();
-      expect(rule.code.lowerCaseName, 'prefer_dispose_before_new_instance');
+      expect(rule.code.name.toLowerCase(), 'prefer_dispose_before_new_instance');
       expect(
         rule.code.problemMessage,
         contains('[prefer_dispose_before_new_instance]'),
@@ -168,7 +167,7 @@ void main() {
     });
     test('DisposeClassFieldsRule', () {
       final rule = DisposeClassFieldsRule();
-      expect(rule.code.lowerCaseName, 'dispose_class_fields');
+      expect(rule.code.name.toLowerCase(), 'dispose_class_fields');
       expect(rule.code.problemMessage, contains('[dispose_class_fields]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);

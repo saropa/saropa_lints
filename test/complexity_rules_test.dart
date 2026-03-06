@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/rules/code_quality/complexity_rules.dart';
 import 'package:test/test.dart';
 
@@ -11,7 +10,7 @@ void main() {
   group('Complexity Rules - Rule Instantiation', () {
     test('AvoidBitwiseOperatorsWithBooleansRule', () {
       final rule = AvoidBitwiseOperatorsWithBooleansRule();
-      expect(rule.code.lowerCaseName, 'avoid_bitwise_operators_with_booleans');
+      expect(rule.code.name.toLowerCase(), 'avoid_bitwise_operators_with_booleans');
       expect(
         rule.code.problemMessage,
         contains('[avoid_bitwise_operators_with_booleans]'),
@@ -21,7 +20,7 @@ void main() {
     });
     test('AvoidCascadeAfterIfNullRule', () {
       final rule = AvoidCascadeAfterIfNullRule();
-      expect(rule.code.lowerCaseName, 'avoid_cascade_after_if_null');
+      expect(rule.code.name.toLowerCase(), 'avoid_cascade_after_if_null');
       expect(
         rule.code.problemMessage,
         contains('[avoid_cascade_after_if_null]'),
@@ -31,7 +30,7 @@ void main() {
     });
     test('AvoidComplexArithmeticExpressionsRule', () {
       final rule = AvoidComplexArithmeticExpressionsRule();
-      expect(rule.code.lowerCaseName, 'avoid_complex_arithmetic_expressions');
+      expect(rule.code.name.toLowerCase(), 'avoid_complex_arithmetic_expressions');
       expect(
         rule.code.problemMessage,
         contains('[avoid_complex_arithmetic_expressions]'),
@@ -41,21 +40,21 @@ void main() {
     });
     test('AvoidComplexConditionsRule', () {
       final rule = AvoidComplexConditionsRule();
-      expect(rule.code.lowerCaseName, 'avoid_complex_conditions');
+      expect(rule.code.name.toLowerCase(), 'avoid_complex_conditions');
       expect(rule.code.problemMessage, contains('[avoid_complex_conditions]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidDuplicateCascadesRule', () {
       final rule = AvoidDuplicateCascadesRule();
-      expect(rule.code.lowerCaseName, 'avoid_duplicate_cascades');
+      expect(rule.code.name.toLowerCase(), 'avoid_duplicate_cascades');
       expect(rule.code.problemMessage, contains('[avoid_duplicate_cascades]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidExcessiveExpressionsRule', () {
       final rule = AvoidExcessiveExpressionsRule();
-      expect(rule.code.lowerCaseName, 'avoid_excessive_expressions');
+      expect(rule.code.name.toLowerCase(), 'avoid_excessive_expressions');
       expect(
         rule.code.problemMessage,
         contains('[avoid_excessive_expressions]'),
@@ -65,7 +64,7 @@ void main() {
     });
     test('AvoidImmediatelyInvokedFunctionsRule', () {
       final rule = AvoidImmediatelyInvokedFunctionsRule();
-      expect(rule.code.lowerCaseName, 'avoid_immediately_invoked_functions');
+      expect(rule.code.name.toLowerCase(), 'avoid_immediately_invoked_functions');
       expect(
         rule.code.problemMessage,
         contains('[avoid_immediately_invoked_functions]'),
@@ -75,21 +74,21 @@ void main() {
     });
     test('AvoidNestedShorthandsRule', () {
       final rule = AvoidNestedShorthandsRule();
-      expect(rule.code.lowerCaseName, 'avoid_nested_shorthands');
+      expect(rule.code.name.toLowerCase(), 'avoid_nested_shorthands');
       expect(rule.code.problemMessage, contains('[avoid_nested_shorthands]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidMultiAssignmentRule', () {
       final rule = AvoidMultiAssignmentRule();
-      expect(rule.code.lowerCaseName, 'avoid_multi_assignment');
+      expect(rule.code.name.toLowerCase(), 'avoid_multi_assignment');
       expect(rule.code.problemMessage, contains('[avoid_multi_assignment]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('BinaryExpressionOperandOrderRule', () {
       final rule = BinaryExpressionOperandOrderRule();
-      expect(rule.code.lowerCaseName, 'binary_expression_operand_order');
+      expect(rule.code.name.toLowerCase(), 'binary_expression_operand_order');
       expect(
         rule.code.problemMessage,
         contains('[binary_expression_operand_order]'),
@@ -99,14 +98,14 @@ void main() {
     });
     test('PreferMovingToVariableRule', () {
       final rule = PreferMovingToVariableRule();
-      expect(rule.code.lowerCaseName, 'prefer_moving_to_variable');
+      expect(rule.code.name.toLowerCase(), 'prefer_moving_to_variable');
       expect(rule.code.problemMessage, contains('[prefer_moving_to_variable]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('PreferParenthesesWithIfNullRule', () {
       final rule = PreferParenthesesWithIfNullRule();
-      expect(rule.code.lowerCaseName, 'prefer_parentheses_with_if_null');
+      expect(rule.code.name.toLowerCase(), 'prefer_parentheses_with_if_null');
       expect(
         rule.code.problemMessage,
         contains('[prefer_parentheses_with_if_null]'),
@@ -116,14 +115,14 @@ void main() {
     });
     test('AvoidDeepNestingRule', () {
       final rule = AvoidDeepNestingRule();
-      expect(rule.code.lowerCaseName, 'avoid_deep_nesting');
+      expect(rule.code.name.toLowerCase(), 'avoid_deep_nesting');
       expect(rule.code.problemMessage, contains('[avoid_deep_nesting]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidHighCyclomaticComplexityRule', () {
       final rule = AvoidHighCyclomaticComplexityRule();
-      expect(rule.code.lowerCaseName, 'avoid_high_cyclomatic_complexity');
+      expect(rule.code.name.toLowerCase(), 'avoid_high_cyclomatic_complexity');
       expect(
         rule.code.problemMessage,
         contains('[avoid_high_cyclomatic_complexity]'),

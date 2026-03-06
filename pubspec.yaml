@@ -3,7 +3,7 @@ name: saropa_lints
 description: >-
   2052 custom lint rules with 131 quick fixes for Flutter and Dart.
   Static analysis for security, accessibility, and performance.
-version: 7.0.4
+version: 8.0.0
 license: MIT
 
 # Project links for pub.dev
@@ -26,20 +26,16 @@ executables:
   baseline: baseline
   impact_report: impact_report
 
-# Dart SDK version constraint
+# Dart SDK and Flutter version constraints (Flutter 3.27 = first with Dart 3.6)
 environment:
-  sdk: ">=3.10.0 <4.0.0"
+  sdk: ">=3.6.0 <4.0.0"
+  flutter: ">=3.27.0"
 
-# Runtime dependencies for lint rule implementation
+# Runtime dependencies for lint rule implementation (analyzer 9 for Flutter compatibility)
 dependencies:
-  # https://pub.dev/packages/analysis_server_plugin/changelog
-  analysis_server_plugin: ^0.3.10 # Native Dart analyzer plugin framework (0.3.11 requires analyzer 11)
-
-  # https://pub.dev/packages/analyzer/changelog
-  analyzer: ^10.0.0 # Dart AST, types, and diagnostic APIs
-
-  # https://pub.dev/packages/analyzer_plugin/changelog
-  analyzer_plugin: ^0.14.0 # ChangeBuilder and FixKind for quick fixes
+  analysis_server_plugin: ^0.3.4
+  analyzer: ^9.0.0
+  analyzer_plugin: ^0.13.0
 
   # https://pub.dev/packages/collection/changelog
   collection: ^1.18.0 # Used by bin/saropa_lints.dart, sort_imports_fix, code_quality_control_flow_rules

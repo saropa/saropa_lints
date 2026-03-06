@@ -685,11 +685,9 @@ class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       bool seenMethod = false;
 
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (member is MethodDeclaration) {
           seenMethod = true;
         } else if (member is FieldDeclaration && seenMethod) {
@@ -742,11 +740,9 @@ class PreferMethodsBeforeFieldsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       bool seenField = false;
 
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (member is FieldDeclaration) {
           seenField = true;
         } else if (member is MethodDeclaration && seenField) {
@@ -813,11 +809,9 @@ class PreferStaticMembersFirstRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       bool seenInstanceMember = false;
 
-      for (final member in body.members) {
+      for (final member in node.members) {
         final isStatic = _isStaticMember(member);
 
         if (!isStatic) {
@@ -878,11 +872,9 @@ class PreferInstanceMembersFirstRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       bool seenStaticMember = false;
 
-      for (final member in body.members) {
+      for (final member in node.members) {
         final isStatic = _isStaticMember(member);
 
         if (isStatic) {
@@ -943,11 +935,9 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       bool seenPrivateMember = false;
 
-      for (final member in body.members) {
+      for (final member in node.members) {
         final isPrivate = _isPrivateMember(member);
 
         if (isPrivate) {
@@ -1008,11 +998,9 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       bool seenPublicMember = false;
 
-      for (final member in body.members) {
+      for (final member in node.members) {
         final isPrivate = _isPrivateMember(member);
 
         if (!isPrivate) {
@@ -1543,11 +1531,9 @@ class PreferExplicitThisRule extends SaropaLintRule {
       final parent = node.parent;
       if (parent is! ClassDeclaration) return;
 
-      final parentBody = parent.body;
-      if (parentBody is! BlockClassBody) return;
       // Get all field names in the class
       final fieldNames = <String>{};
-      for (final member in parentBody.members) {
+      for (final member in parent.members) {
         if (member is FieldDeclaration) {
           for (final variable in member.fields.variables) {
             fieldNames.add(variable.name.lexeme);

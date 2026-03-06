@@ -251,8 +251,6 @@ class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       // Check if class extends HookWidget
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -265,7 +263,7 @@ class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
 
       // Find build method
       MethodDeclaration? buildMethod;
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
           buildMethod = member;
           break;

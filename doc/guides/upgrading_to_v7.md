@@ -1,11 +1,17 @@
 # Upgrading to saropa_lints v7
 
+> **7.x was retracted.** It required analyzer 10 and did not work in Flutter projects (Flutter SDK pins meta 1.17.0). Use **saropa_lints 8.0.0** for Flutter and Dart projects; 8.0.0 includes the same rules and fixes as 7.x while staying on analyzer 9. This guide is for reference only (it describes the retracted 7.x line).
+
 v7 upgrades to the **analyzer 10** API. It is a breaking release for dependency constraints and config key format.
 
 ## Requirements
 
 - **Dart SDK:** 3.9 or later.
 - **Analyzer:** 10.x only. If your project must stay on analyzer 9.x, use **saropa_lints 6.2.2** (the last release compatible with analyzer &lt; v10).
+
+### Why v7 isn’t available in Flutter projects yet
+
+Analyzer 10 (and therefore saropa_lints 7.x) requires **meta ^1.18.0**. The Flutter SDK pins **meta** to **1.17.0** in its own `pubspec.yaml`, so any Flutter app or package is constrained to that version and the dependency solver will not select analyzer 10+. This is a Flutter SDK constraint, not a limitation of analyzer 10. For Flutter projects, stay on **saropa_lints 6.2.2** until the Flutter SDK bumps its meta constraint to 1.18+.
 
 ## Breaking changes
 

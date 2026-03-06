@@ -2193,14 +2193,12 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       // Find StreamController fields, tracking if they are exact types or
       // wrappers. Record format: (variable, isExactStreamControllerType)
       final List<(VariableDeclaration, bool)> controllers =
           <(VariableDeclaration, bool)>[];
 
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeStr = member.fields.type?.toSource();
           if (typeStr != null &&
@@ -2226,7 +2224,7 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
       final closePattern = RegExp(r'\.close\s*\(');
       final disposePattern = RegExp(r'\.dispose\s*\(');
 
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (member is MethodDeclaration) {
           final methodName = member.name.lexeme;
           if (methodName == 'dispose' || methodName == 'close') {

@@ -184,8 +184,6 @@ class RequireFreezedArrowSyntaxRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       // Check for @freezed annotation
       bool hasFreezed = false;
       for (final annotation in node.metadata) {
@@ -198,7 +196,7 @@ class RequireFreezedArrowSyntaxRule extends SaropaLintRule {
       if (!hasFreezed) return;
 
       // Check fromJson factory
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (member is ConstructorDeclaration &&
             member.factoryKeyword != null &&
             member.name?.lexeme == 'fromJson') {
@@ -261,8 +259,6 @@ class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       // Check for @freezed annotation
       bool hasFreezed = false;
       for (final annotation in node.metadata) {
@@ -276,7 +272,7 @@ class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
 
       // Check for private constructor (ClassName._)
       bool hasPrivateConstructor = false;
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (member is ConstructorDeclaration) {
           final ctorName = member.name?.lexeme ?? '';
           if (ctorName == '_') {
@@ -288,7 +284,7 @@ class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
 
       // Only warn if class has custom methods that need the private ctor
       bool hasCustomMethods = false;
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (member is MethodDeclaration &&
             member.name.lexeme != 'toString' &&
             member.name.lexeme != 'toJson') {
@@ -383,10 +379,8 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
   }
 
   bool _hasNestedObjects(ClassDeclaration node) {
-    final body = node.body;
-    if (body is! BlockClassBody) return false;
     // Check factory constructors for complex type parameters
-    for (final ClassMember member in body.members) {
+    for (final ClassMember member in node.members) {
       if (member is ConstructorDeclaration && member.factoryKeyword != null) {
         for (final FormalParameter param in member.parameters.parameters) {
           if (_isComplexType(param)) {
@@ -525,13 +519,11 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       // Check if class has @freezed annotation
       if (!_hasFreezedAnnotation(node)) return;
 
       // Check factory constructors for nullable parameters without @Default
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is ConstructorDeclaration && member.factoryKeyword != null) {
           for (final FormalParameter param in member.parameters.parameters) {
             if (_isNullableWithoutDefault(param)) {
@@ -648,8 +640,6 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       // Check for @freezed annotation
       bool hasFreezed = false;
       for (final Annotation annotation in node.metadata) {
@@ -663,7 +653,7 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
 
       // Check for fromJson factory
       bool hasFromJson = false;
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is ConstructorDeclaration) {
           final String? name = member.name?.lexeme;
           if (name == 'fromJson') {
@@ -675,7 +665,7 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
       if (!hasFromJson) return;
 
       // Check factory constructors for types needing converters
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is ConstructorDeclaration && member.factoryKeyword != null) {
           final FormalParameterList? params = member.parameters;
           if (params == null) continue;
@@ -940,8 +930,6 @@ class PreferFreezedForDataClassesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       // Check if already using freezed/equatable
       for (final annotation in node.metadata) {
         final name = annotation.name.name;
@@ -966,7 +954,7 @@ class PreferFreezedForDataClassesRule extends SaropaLintRule {
       bool hasEqualsOverride = false;
       bool hasHashCodeOverride = false;
 
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           if (member.fields.isFinal) {
             finalFieldCount += member.fields.variables.length;
@@ -1051,8 +1039,6 @@ class AvoidFreezedAnyMapIssueRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       bool hasFreezed = false;
       bool hasAnyMap = false;
 
@@ -1074,7 +1060,7 @@ class AvoidFreezedAnyMapIssueRule extends SaropaLintRule {
 
       // Check for fromJson factory
       bool hasFromJson = false;
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is ConstructorDeclaration &&
             member.factoryKeyword != null &&
             member.name?.lexeme == 'fromJson') {

@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/packages/drift_rules.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
+import 'package:saropa_lints/src/rules/packages/drift_rules.dart';
 import 'package:test/test.dart';
 
 /// Tests for 31 Drift database lint rules.
@@ -12,7 +12,7 @@ void main() {
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
         final rule = create();
-        expect(rule.code.lowerCaseName, codeName);
+        expect(rule.code.name.toLowerCase(), codeName);
         expect(rule.code.problemMessage, contains('[$codeName]'));
         expect(rule.code.problemMessage.length, greaterThan(50));
         expect(rule.code.correctionMessage, isNotNull);

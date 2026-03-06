@@ -687,9 +687,7 @@ class RequireTokenRefreshRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
-      final String className = node.namePart.typeName.lexeme.toLowerCase();
+      final String className = node.name.lexeme.toLowerCase();
 
       // Check if class is auth-related (whole-word to avoid Oauth, SessionId, etc.)
       if (!_containsWord(className, 'auth') &&
@@ -703,7 +701,7 @@ class RequireTokenRefreshRule extends SaropaLintRule {
       bool hasRefreshMethod = false;
       bool hasExpiryCheck = false;
 
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String fieldSource = member.toSource().toLowerCase();
           if (fieldSource.contains('accesstoken') ||
@@ -732,10 +730,10 @@ class RequireTokenRefreshRule extends SaropaLintRule {
 
       // If has access token but no refresh logic, warn
       if (hasAccessToken && !hasRefreshToken && !hasRefreshMethod) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.name, code);
       }
       if (hasAccessToken && !hasExpiryCheck) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.name, code);
       }
     });
   }

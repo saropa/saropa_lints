@@ -1232,10 +1232,8 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
       final String? superclassName = extendsClause.superclass.element?.name;
       if (superclassName != 'StatelessWidget') return;
 
-      final classBody = node.body;
-      if (classBody is! BlockClassBody) return;
       // Check if it has only the build method (no fields, no other methods)
-      final List<ClassMember> members = classBody.members.toList();
+      final List<ClassMember> members = node.members.toList();
 
       bool hasFields = false;
       bool hasOtherMethods = false;
@@ -1280,7 +1278,7 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
       final int lineCount = endLine - startLine + 1;
 
       if (lineCount <= _maxBuildLines) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.name, code);
       }
     });
   }

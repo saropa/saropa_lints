@@ -500,8 +500,8 @@ class AvoidNotEncodableInToJsonRule extends SaropaLintRule {
         return;
       }
 
-      // Check the body for non-encodable values
       final body = node.body;
+      // Check the body for non-encodable values
       if (body is BlockFunctionBody) {
         _checkBlockForNonEncodable(body.block, reporter);
       } else if (body is ExpressionFunctionBody) {
