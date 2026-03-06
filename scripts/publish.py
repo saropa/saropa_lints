@@ -159,7 +159,7 @@ if not check_modules_exist():
     sys.exit(1)
 
 # Import publish workflow modules (all required files verified above)
-# Colours, exit codes, output level, project dir, and logo from shared utils
+# Colors, exit codes, output level, project dir, and logo from shared utils
 from scripts.modules._utils import (
     Color,
     ExitCode,
@@ -466,6 +466,7 @@ def main(
             # Timed step: run tier integrity, duplicates, DX checks; retry if prefix fix applied
             with timer.step("Pre-publish audit"):
                 print_header("STEP 1: AUDIT")
+                # audit_ok: True if all checks passed; audit_result: details for auto-fix or error
                 audit_ok, audit_result = run_pre_publish_audits(project_dir)
                 while not audit_ok and audit_result:
                     rules_dir = project_dir / "lib" / "src" / "rules"
@@ -532,8 +533,9 @@ def main(
 
         # Timed step: ensure working tree clean or user confirms uncommitted changes
         with timer.step("Working tree"):
+            # ok: True if clean or user chose to continue with changes
             ok, _ = check_working_tree(project_dir)
-            if not ok:  # User declined to include uncommitted changes
+            if not ok:
                 exit_with_error("Aborted.", ExitCode.USER_CANCELED)
 
         # Timed step: ensure local branch is in sync with remote
@@ -585,6 +587,7 @@ def main(
         # Timed step: write version to pubspec, rename [Unreleased] in CHANGELOG, reconcile versions
         with timer.step("Version sync"):
             # Align pubspec and CHANGELOG: update pubspec if needed, then rename [Unreleased] → [version]
+            # version_to_sync: may be re-prompted if CHANGELOG has duplicate version sections
             version_to_sync = version
             while True:
                 if version_to_sync != pubspec_version:
@@ -617,9 +620,11 @@ def main(
                             f"Use X.Y.Z or X.Y.Z-pre.N"
                         )
                         continue
+            # Use synced version for rest of workflow
             version = version_to_sync
 
             # Ensure pubspec and CHANGELOG agree (reconcile or add section if needed)
+            # changelog_version: latest version heading found in CHANGELOG
             changelog_version = get_latest_changelog_version(
                 changelog_path,
             )

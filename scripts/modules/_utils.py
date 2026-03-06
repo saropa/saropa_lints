@@ -388,10 +388,10 @@ def run_command(
         print_error(f"{description} failed (exit code {result.returncode})")
         return result
 
-    if summarize and result.stdout:
-        _print_summary_line(result.stdout)
-
-    print_success(f"{description} completed")
+    if result.returncode == 0:
+        if summarize and result.stdout:
+            _print_summary_line(result.stdout)
+        print_success(f"{description} completed")
     return result
 
 
