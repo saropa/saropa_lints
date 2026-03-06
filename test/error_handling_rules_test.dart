@@ -323,8 +323,18 @@ void main() {
             'saropa_lints_uncaught_future_',
           );
           addTearDown(() async {
-            if (tempDir.existsSync()) {
-              await tempDir.delete(recursive: true);
+            for (var attempt = 0; attempt < 3; attempt++) {
+              try {
+                if (tempDir.existsSync()) {
+                  await tempDir.delete(recursive: true);
+                }
+                return;
+              } on FileSystemException {
+                // Windows: process may still hold a lock; wait and retry.
+                await Future<void>.delayed(
+                  Duration(milliseconds: 500 * (attempt + 1)),
+                );
+              }
             }
           });
 
