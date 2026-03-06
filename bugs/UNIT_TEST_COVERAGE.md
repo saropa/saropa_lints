@@ -1,6 +1,6 @@
 # Unit Test Coverage: Status and Plan to 100%
 
-**Last updated:** 2026-03-03  
+**Last updated:** 2026-03-06  
 **Scope:** All lint rules in `lib/src/rules/` and all rule-related tests in `test/`.  
 **Goal:** Publish “Test Coverage” report shows **Fixtures = 100%**.
 
@@ -15,9 +15,9 @@ Only the following is still open. Everything else in this doc is either done or 
 **File:** `scripts/modules/_rule_metrics.py`  
 **Function:** `_count_fixtures_for_category(example_dirs, category, *, rule_names=None)` (starts ~line 190).
 
-**Current behaviour:** The function uses `_fixture_category_alias(category)` so that `code_quality_avoid`, `code_quality_control_flow`, `code_quality_prefer`, `code_quality_variables` all map to `fixture_category = "code_quality"`. It then looks for a directory `lib_dir / suffix` with `suffix` in `["code_quality", "code_qualitys"]` in **any** of `example_dirs`. If found, it lists `*_fixture.dart` and, when `rule_names` is provided, returns `len(basenames.intersection(rule_names))`. The call site in `display_test_coverage` (line ~339) already passes `rule_names=cat.rule_names` from `_collect_category_rules`. So in theory each code_quality_* category should get a count equal to how many of **that file’s** rule names have a matching fixture in the shared dir.
+**Current behavior:** The function uses `_fixture_category_alias(category)` so that `code_quality_avoid`, `code_quality_control_flow`, `code_quality_prefer`, `code_quality_variables` all map to `fixture_category = "code_quality"`. It then looks for a directory `lib_dir / suffix` with `suffix` in `["code_quality", "code_qualitys"]` in **any** of `example_dirs`. If found, it lists `*_fixture.dart` and, when `rule_names` is provided, returns `len(basenames.intersection(rule_names))`. The call site in `display_test_coverage` (line ~339) already passes `rule_names=cat.rule_names` from `_collect_category_rules`. So in theory each code_quality_* category should get a count equal to how many of **that file’s** rule names have a matching fixture in the shared dir.
 
-**Why the report can still show 0 for code_quality_*:** The directory that actually contains the 104 fixtures is **only** `example_core/lib/code_quality/`. If the loop over `example_dirs` and `suffix` hits another example package first (e.g. `example/lib/code_quality` if it exists) and that path exists but has no fixtures or different layout, the count can be wrong or 0. So the fix must **explicitly** resolve code_quality to `example_core`’s lib dir.
+**Why the report can still show 0 for code_quality_*:** The directory that actually contains the fixtures is **only** `example_core/lib/code_quality/`. If the loop over `example_dirs` and `suffix` hits another example package first (e.g. `example/lib/code_quality` if it exists) and that path exists but has no fixtures or different layout, the count can be wrong or 0. So the fix must **explicitly** resolve code_quality to `example_core`’s lib dir.
 
 **Concrete change:** At the start of `_count_fixtures_for_category`, add a branch:
 
@@ -29,7 +29,7 @@ Only the following is still open. Everything else in this doc is either done or 
 
 **Rule names source:** `rule_names` come from `_collect_category_rules`, which reads each `lib/src/rules/**/*_rules.dart` and extracts the first string literal from each `LintCode(...)` via `_LINT_NAME_RE`. So code_quality_avoid_rules.dart → one set of names, code_quality_control_flow_rules.dart → another, etc. No change needed there.
 
-**Categories affected:** `code_quality_avoid`, `code_quality_control_flow`, `code_quality_prefer`, `code_quality_variables`. Rule files: `lib/src/rules/code_quality/code_quality_avoid_rules.dart` (and same path with `_control_flow`, `_prefer`, `_variables`). Fixture dir: `example_core/lib/code_quality/` (104 `*_fixture.dart` files).
+**Categories affected:** `code_quality_avoid`, `code_quality_control_flow`, `code_quality_prefer`, `code_quality_variables`. Rule files: `lib/src/rules/code_quality/code_quality_avoid_rules.dart` (and same path with `_control_flow`, `_prefer`, `_variables`). Fixture dir: `example_core/lib/code_quality/` (108 `*_fixture.dart` files as of 2026-03-06).
 
 ### 2. Isar metric (already done)
 
@@ -37,7 +37,9 @@ Comment stripping in `_rule_metrics.py` (`_strip_line_comments` before `_RULE_CL
 
 ### 3. Real missing fixtures (check §6.3 table)
 
-For each row in the **§6.3** table, the “Directory” column is the exact directory; the fixture file must be `{Directory}/{rule_name}_fixture.dart`. Rules can have multiple rule names (e.g. config has two). **Check that each of these files exists** (no stubs):
+As of 2026-03-06, all fixtures listed in the table below have been verified to exist. The table is kept as a reference for fixture paths. Any remaining gap to 100% is from the code_quality metric bug (§1) or other rules; run `python scripts/publish.py` to see current Fixtures count.
+
+For each row in the **§6.3** table, the “Directory” column is the exact directory; the fixture file must be `{Directory}/{rule_name}_fixture.dart`. Rules can have multiple rule names (e.g. config has two). **When adding new rules:** ensure the fixture exists (no stubs):
 
 | Rule name(s) | Full fixture path(s) |
 |--------------|----------------------|
@@ -66,7 +68,7 @@ If a file is missing: add it (one BAD example with `// expect_lint: rule_name` t
 
 ### 4. Verify
 
-- Run: `python scripts/publish.py` (or the same command your CI uses). In the “Test Coverage” section, confirm **Fixtures** line shows 100% (or 1990/1990).
+- Run: `python scripts/publish.py` (or the same command your CI uses). In the “Test Coverage” section, confirm **Fixtures** line shows 100% (or 2047/2047).
 - Run: `dart test`. Fix any failing tests.
 
 ### 5. Behavioral tests (optional)
@@ -92,9 +94,9 @@ Counting stub files as “fixtures” is not allowed.
 | Item | Status | Notes |
 |------|--------|--------|
 | Fixtures (one per rule in reviewed categories) | **Done for 27 categories** | Those 27 have 0 missing. Other rules still need fixtures — see §6.3. |
-| Rule instantiation tests (one per rule, metadata assertions) | **Done for 99 categories** | All category test files have a Rule Instantiation group. See §3. |
+| Rule instantiation tests (one per rule, metadata assertions) | **Done for 108 categories** | All category test files have a Rule Instantiation group. See §3. |
 | Real behavioral tests (linter on code, assert lint present/absent) | **In progress** | Violating→lint and compliant→no lint in `fixture_lint_integration_test.dart`. See §5. |
-| Publish report “Fixtures” metric | **&lt;100%** | ~98.3% due to metrics bugs and a few real gaps. See §4 and §6. |
+| Publish report “Fixtures” metric | **&lt;100%** | ~96.3% (1971/2047) due to metrics bugs and any remaining gaps. See §4 and §6. |
 
 ---
 
@@ -113,7 +115,7 @@ All 27 categories below have **0 rules without a dedicated fixture**. Other cate
 | performance           | 49         | 49            | 0       |
 | widget_patterns       | 104        | 104           | 0       |
 | api_network           | 38         | 38            | 0       |
-| code_quality          | 105        | 104+          | 0       |
+| code_quality          | 105        | 108           | 0       |
 | collection            | 25         | 25            | 0       |
 | complexity            | 14         | 14            | 0       |
 | firebase              | 29         | 29            | 0       |
@@ -134,9 +136,9 @@ All 27 categories below have **0 rules without a dedicated fixture**. Other cate
 
 ---
 
-## 3. Rule instantiation tests — Done for 99 categories
+## 3. Rule instantiation tests — Done for 108 categories
 
-All 99 category test files have a “Rule Instantiation” group (one test per rule: instantiate, assert `code.name`, `problemMessage` contains `[code_name]`, length &gt; 50, `correctionMessage` non-null).
+All 108 category test files have a “Rule Instantiation” group (one test per rule: instantiate, assert `code.name`, `problemMessage` contains `[code_name]`, length &gt; 50, `correctionMessage` non-null).
 
 **Publish script:** Rule-instantiation status is derived in `scripts/modules/_rule_metrics.py` (`_compute_rule_instantiation_stats`): it scans each `test/{category}_rules_test.dart` for the string `Rule Instantiation`. The “Test Coverage” report shows a “Rule inst.” line. This document is for human reference only; the script does not read it.
 
@@ -144,11 +146,11 @@ All 99 category test files have a “Rule Instantiation” group (one test per r
 
 ## 4. Why the publish report shows Fixtures &lt; 100%
 
-- **A. code_quality:** Four categories (`code_quality_avoid`, `code_quality_control_flow`, `code_quality_prefer`, `code_quality_variables`) in `lib/src/rules/code_quality/*.dart` share one fixture dir: `example_core/lib/code_quality/` (104 `*_fixture.dart` files). `_count_fixtures_for_category` in `scripts/modules/_rule_metrics.py` must, for each of these categories, count only fixtures whose basename is in that category’s `rule_names`, and must resolve the fixture dir to `example_core` (see **Remaining work §1**). Until that fix is in place, the report undercounts and shows &lt;100%.
+- **A. code_quality:** Four categories (`code_quality_avoid`, `code_quality_control_flow`, `code_quality_prefer`, `code_quality_variables`) in `lib/src/rules/code_quality/*.dart` share one fixture dir: `example_core/lib/code_quality/` (108 `*_fixture.dart` files). `_count_fixtures_for_category` in `scripts/modules/_rule_metrics.py` must, for each of these categories, count only fixtures whose basename is in that category’s `rule_names`, and must resolve the fixture dir to `example_core` (see **Remaining work §1**). Until that fix is in place, the report undercounts and shows &lt;100%.
 
 - **B. isar:** Fixed. `_strip_line_comments` in `_rule_metrics.py` is applied before `_RULE_CLASS_RE` in `count_rules` and `_collect_category_rules`, so the commented-out class in `lib/src/rules/packages/isar_rules.dart` is not counted.
 
-- **C. Real missing fixtures:** Any rule in the §6.3 table that still has no `{rule_name}_fixture.dart` in the stated directory contributes to the gap. See **Remaining work §3** for the exact paths to check.
+- **C. Real missing fixtures:** The §6.3 table (verified 2026-03-06) lists fixture paths that now exist. Any remaining gap is from other rules or the code_quality metric; run the publish script to see current counts.
 
 ---
 
@@ -164,7 +166,7 @@ Integration tests in `test/fixture_lint_integration_test.dart`: run custom_lint 
 
 ### 6.0) Baseline
 
-- [x] Run the publish coverage report and record (2026-03-02): **Fixtures 1962/1990 (98.6%)**.
+- [x] Run the publish coverage report and record (2026-03-06): **Fixtures 1971/2047 (96.3%)**. Target: 2047/2047 (100%).
 
 ### 6.1) Fix metrics: code_quality_* categories — **NOT DONE**
 
@@ -208,7 +210,7 @@ Integration tests in `test/fixture_lint_integration_test.dart`: run custom_lint 
 
 ### 6.5) Verify — **NOT DONE**
 
-- [ ] After §6.1 (and any §6.3 gaps): run `python scripts/publish.py` and in the Test Coverage block confirm **Fixtures** shows 100% (e.g. 1990/1990).
+- [ ] After §6.1 (and any §6.3 gaps): run `python scripts/publish.py` and in the Test Coverage block confirm **Fixtures** shows 100% (e.g. 2047/2047).
 - [ ] Run `dart test` from repo root; fix any failing tests.
 
 ---
@@ -218,9 +220,9 @@ Integration tests in `test/fixture_lint_integration_test.dart`: run custom_lint 
 | Need | Status |
 |------|--------|
 | Fixtures (per-rule in 27 reviewed categories) | **Done** |
-| Rule instantiation tests (99 categories) | **Done** |
+| Rule instantiation tests (108 categories) | **Done** |
 | Real behavioral tests (linter on code) | **In progress** (optional: add more rules to integration test) |
-| Publish report Fixtures = 100% | **Not done** — see **Remaining work** at top |
+| Publish report Fixtures = 100% | **Not done** (1971/2047; see **Remaining work** at top) |
 
 For completed batch details: `bugs/history/unit_test_coverage_fixtures_and_instantiation_completed.md`, `bugs/history/unit_test_coverage_batch_2026-03-03.md`.
 
@@ -228,7 +230,7 @@ For completed batch details: `bugs/history/unit_test_coverage_fixtures_and_insta
 
 ## 8. Full checklist: all remaining unit tests
 
-This section lists **every** remaining unit test to add. Each item = add that rule code to `expectedFromFixtures` in `test/fixture_lint_integration_test.dart` (around line 75), then run `dart test test/fixture_lint_integration_test.dart` to confirm. Rules are grouped by fixture directory under `example_async/lib/`. **57 rules are already in the list**; the checkboxes below are for the rest.
+This section lists **every** remaining unit test to add. Each item = add that rule code to `expectedFromFixtures` in `test/fixture_lint_integration_test.dart` (around line 75), then run `dart test test/fixture_lint_integration_test.dart` to confirm. Rules are grouped by fixture directory under `example_async/lib/`. **56 rules are already in the list**; the checkboxes below are for the rest.
 
 ### Other remaining work (metric + verify)
 

@@ -94,6 +94,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] avoid_classes_with_only_static_members
   - [ ] avoid_global_state
   - [ ] avoid_hardcoded_colors
+  - [ ] avoid_importing_entrypoint_exports
   - [ ] avoid_local_functions
   - [ ] avoid_long_functions
   - [ ] avoid_long_length_files
@@ -102,11 +103,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] avoid_medium_length_files
   - [ ] avoid_medium_length_test_files
   - [ ] avoid_setters_without_getters
-  - [ ] avoid_throw_in_finally
-  - [ ] avoid_unnecessary_futures
-  - [ ] avoid_unnecessary_local_variable
-  - [ ] avoid_unnecessary_nullable_return_type
-  - [ ] avoid_unnecessary_reassignment
   - [ ] avoid_unused_generics
   - [ ] avoid_very_long_length_files
   - [ ] avoid_very_long_length_test_files
@@ -141,16 +137,13 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 
 #### code_quality_avoid_rules.dart
   - [ ] avoid_accessing_collections_by_constant_index
-  - [ ] avoid_assigning_to_static_field
   - [ ] avoid_async_call_in_sync_function
   - [ ] avoid_contradictory_expressions
   - [ ] avoid_default_tostring
   - [ ] avoid_deprecated_usage
   - [ ] avoid_duplicate_constant_values
-  - [ ] avoid_duplicate_initializers
   - [ ] avoid_duplicate_string_literals
   - [ ] avoid_duplicate_string_literals_pair
-  - [ ] avoid_empty_build_when
   - [ ] avoid_enum_values_by_index
   - [ ] avoid_expensive_log_string_construction
   - [ ] avoid_identical_exception_handling_blocks
@@ -159,9 +152,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] avoid_missed_calls
   - [ ] avoid_missing_completer_stack_trace
   - [ ] avoid_missing_interpolation
-  - [ ] avoid_misused_set_literals
   - [ ] avoid_nested_extension_types
-  - [ ] avoid_passing_default_values
   - [ ] avoid_passing_self_as_argument
   - [ ] avoid_positional_boolean_parameters
   - [ ] avoid_recursive_calls
@@ -176,32 +167,18 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 
 #### code_quality_control_flow_rules.dart
   - [ ] avoid_complex_loop_conditions
-  - [ ] avoid_constant_conditions
-  - [ ] avoid_duplicate_patterns
-  - [ ] avoid_wildcard_cases_with_enums
-  - [ ] avoid_wildcard_cases_with_sealed_classes
-  - [ ] no_equal_nested_conditions
-  - [ ] no_equal_switch_case
-  - [ ] no_equal_switch_expression_cases
   - [ ] prefer_specific_cases_first
   - [ ] prefer_switch_expression
   - [ ] prefer_switch_with_enums
   - [ ] prefer_switch_with_sealed_classes
-  - [ ] require_exhaustive_sealed_switch
 
 #### code_quality_prefer_rules.dart
   - [ ] pass_correct_accepted_type
   - [ ] pass_optional_argument
-  - [ ] prefer_any_or_every
-  - [ ] prefer_both_inlining_annotations
   - [ ] prefer_bytes_builder
-  - [ ] prefer_dedicated_media_query_method
-  - [ ] prefer_dot_shorthand
-  - [ ] prefer_enums_by_name
   - [ ] prefer_extracting_function_callbacks
   - [ ] prefer_for_in
   - [ ] prefer_named_bool_params
-  - [ ] prefer_null_aware_spread
   - [ ] prefer_overriding_parent_equality
   - [ ] prefer_pushing_conditional_expressions
   - [ ] prefer_redirecting_superclass_constructor
@@ -209,10 +186,8 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] prefer_shorthands_with_enums
   - [ ] prefer_shorthands_with_static_fields
   - [ ] prefer_single_declaration_per_file
-  - [ ] prefer_test_matchers
   - [ ] prefer_typedefs_for_callbacks
   - [ ] prefer_unwrapping_future_or
-  - [ ] prefer_use_prefix
   - [ ] prefer_visible_for_testing_on_members
 
 #### code_quality_variables_rules.dart
@@ -229,7 +204,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] avoid_unnecessary_nullable_parameters
   - [ ] avoid_unnecessary_patterns
   - [ ] avoid_unused_after_null_check
-  - [ ] avoid_unused_assignment
   - [ ] avoid_unused_instances
   - [ ] function_always_returns_null
   - [ ] function_always_returns_same_value
@@ -245,17 +219,12 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] avoid_complex_arithmetic_expressions
   - [ ] avoid_complex_conditions
   - [ ] avoid_deep_nesting
-  - [ ] avoid_duplicate_cascades
   - [ ] avoid_excessive_expressions
   - [ ] avoid_high_cyclomatic_complexity
   - [ ] avoid_immediately_invoked_functions
   - [ ] avoid_multi_assignment
   - [ ] avoid_nested_shorthands
-  - [ ] binary_expression_operand_order
   - [ ] prefer_moving_to_variable
-
-#### unnecessary_code_rules.dart
-  - [ ] no_empty_block
 
 #### freezed_rules.dart
   - [ ] avoid_freezed_any_map_issue
@@ -288,9 +257,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] require_config_validation
   - [ ] require_feature_flag_type_safety
 
-#### migration_rules.dart
-  - [ ] avoid_asset_manifest_json
-
 #### platform_rules.dart
   - [ ] prefer_platform_widget_adaptive
   - [ ] require_platform_check
@@ -300,12 +266,10 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] avoid_dialog_context_after_async
   - [ ] avoid_future_in_build
   - [ ] avoid_future_then_in_async
-  - [ ] avoid_future_tostring
   - [ ] avoid_multiple_stream_listeners
   - [ ] avoid_nested_futures
   - [ ] avoid_nested_streams_and_futures
   - [ ] avoid_passing_async_when_sync_expected
-  - [ ] avoid_redundant_await
   - [ ] avoid_sequential_awaits
   - [ ] avoid_stream_in_build
   - [ ] avoid_stream_subscription_in_field
@@ -313,7 +277,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] avoid_stream_tostring
   - [ ] avoid_sync_on_every_change
   - [ ] avoid_unassigned_stream_subscriptions
-  - [ ] avoid_void_async
   - [ ] check_mounted_after_async
   - [ ] prefer_assigning_await_expressions
   - [ ] prefer_async_await
@@ -324,7 +287,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] prefer_correct_future_return_type
   - [ ] prefer_correct_stream_return_type
   - [ ] prefer_future_wait
-  - [ ] prefer_return_await
   - [ ] prefer_specifying_future_value_type
   - [ ] prefer_stream_distinct
   - [ ] prefer_stream_transformer
@@ -359,6 +321,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] avoid_variable_shadowing
   - [ ] prefer_asserts_in_initializer_lists
   - [ ] prefer_base_class
+  - [ ] prefer_const_constructor_declarations
   - [ ] prefer_const_constructors_in_immutables
   - [ ] prefer_factory_constructor
   - [ ] prefer_final_fields
@@ -492,7 +455,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 #### collection_rules.dart
   - [ ] avoid_collection_equality_checks
   - [ ] avoid_function_literals_in_foreach_calls
-  - [ ] avoid_unnecessary_collections
   - [ ] avoid_unreachable_for_loop
   - [ ] avoid_unsafe_collection_methods
   - [ ] avoid_unsafe_reduce
@@ -504,15 +466,12 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] prefer_for_in_over_foreach
   - [ ] prefer_foreach_over_map_entries
   - [ ] prefer_inlined_adds
-  - [ ] prefer_iterable_of
   - [ ] prefer_iterable_operations
   - [ ] prefer_null_aware_elements
   - [ ] prefer_set_for_lookup
   - [ ] require_key_for_collection
 
 #### equality_rules.dart
-  - [ ] avoid_equal_expressions
-  - [ ] avoid_self_compare
   - [ ] no_equal_arguments
 
 #### json_datetime_rules.dart
@@ -534,16 +493,10 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] require_currency_code_with_amount
 
 #### numeric_literal_rules.dart
-  - [ ] avoid_digit_separators
-  - [ ] avoid_inconsistent_digit_separators
-  - [ ] avoid_unnecessary_digit_separators
-  - [ ] double_literal_format
   - [ ] no_magic_number
   - [ ] no_magic_number_in_tests
   - [ ] no_magic_string
   - [ ] no_magic_string_in_tests
-  - [ ] prefer_addition_subtraction_assignments
-  - [ ] prefer_compound_assignment_operators
 
 #### record_pattern_rules.dart
   - [ ] avoid_bottom_type_in_patterns
@@ -571,14 +524,11 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] avoid_collection_methods_with_unrelated_types
   - [ ] avoid_dynamic_type
   - [ ] avoid_implicitly_nullable_extension_types
-  - [ ] avoid_null_assertion
   - [ ] avoid_nullable_interpolation
   - [ ] avoid_nullable_parameters_with_default_values
   - [ ] avoid_nullable_tostring
   - [ ] avoid_private_typedef_functions
   - [ ] avoid_shadowing_type_parameters
-  - [ ] avoid_unnecessary_type_assertions
-  - [ ] avoid_unnecessary_type_casts
   - [ ] avoid_unrelated_type_assertions
   - [ ] prefer_correct_type_name
   - [ ] prefer_explicit_function_type
@@ -590,7 +540,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] avoid_dynamic_json_access
   - [ ] avoid_dynamic_json_chains
   - [ ] avoid_non_null_assertion
-  - [ ] avoid_redundant_null_check
   - [ ] avoid_type_casts
   - [ ] avoid_unrelated_type_casts
   - [ ] avoid_unsafe_cast
@@ -624,7 +573,6 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] prefer_no_continue_statement
   - [ ] prefer_null_aware_method_calls
   - [ ] prefer_returning_condition
-  - [ ] prefer_returning_conditionals
   - [ ] prefer_when_guard_over_if
 
 #### error_handling_rules.dart
@@ -655,9 +603,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 
 #### exception_rules.dart
   - [ ] avoid_non_final_exception_class_fields
-  - [ ] avoid_throw_in_catch_block
   - [ ] avoid_throw_objects_without_tostring
-  - [ ] prefer_public_exception_classes
 
 #### bluetooth_hardware_rules.dart
   - [ ] avoid_bluetooth_scan_without_timeout
@@ -1893,6 +1839,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] require_empty_results_state
   - [ ] require_graphql_operation_names
   - [ ] require_number_formatting_locale
+  - [ ] require_pagination_error_recovery
   - [ ] require_pagination_loading_state
   - [ ] require_responsive_breakpoints
   - [ ] require_search_debounce
@@ -2111,6 +2058,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
   - [ ] prefer_semantic_widget_names
   - [ ] prefer_system_theme_default
   - [ ] prefer_text_theme
+
 
 ### 2. How quick fixes work in this repo
 
