@@ -71,7 +71,7 @@ import time
 import webbrowser
 from pathlib import Path
 
-# Allow running as `python scripts/publish.py` from project root
+# Allow running as `python scripts/publish.py` from project root (add parent to path)
 _scripts_parent = str(Path(__file__).resolve().parent.parent)
 if _scripts_parent not in sys.path:
     sys.path.insert(0, _scripts_parent)
@@ -79,7 +79,7 @@ if _scripts_parent not in sys.path:
 
 SCRIPT_VERSION = "4.0"
 
-# Message when pre-publish audit fails and no auto-fix applies (tier/duplicates/spelling).
+# Shown when audit fails with no auto-fix (e.g. tier integrity or duplicate rule names)
 _AUDIT_FAILED_MSG = (
     "Pre-publish audit failed. Fix the blocking issue(s) "
     "marked with ✗ above and re-run."
@@ -90,6 +90,7 @@ _AUDIT_FAILED_MSG = (
 # MODULE CHECK (runs before any module imports)
 # =============================================================================
 
+# Modules under scripts/modules/ that must exist before any of them are imported
 _REQUIRED_MODULES = [
     "modules/__init__.py",
     "modules/_utils.py",
@@ -113,7 +114,7 @@ def check_modules_exist() -> bool:
     """Verify all required module files exist before importing.
 
     This runs BEFORE any module imports so the user gets a clear
-    error message instead of a Python ImportError traceback.1
+    error message instead of a Python ImportError traceback.
 
     Uses ASCII-only output since enable_ansi_support() hasn't run yet.
 
@@ -132,10 +133,10 @@ def check_modules_exist() -> bool:
 
     for module_rel in _REQUIRED_MODULES:
         module_path = scripts_dir / module_rel
-        if not module_path.exists():  # Module file not found on disk
+        if not module_path.exists():
             missing.append(module_rel)
 
-    if missing:  # At least one required module is missing
+    if missing:
         for m in missing:
             print(f"  [MISSING] Module MISSING: {m}")
         print()
@@ -155,7 +156,7 @@ def check_modules_exist() -> bool:
 if not check_modules_exist():
     sys.exit(1)
 
-
+# Import publish workflow modules (all required files verified above)
 from scripts.modules._utils import (
     Color,
     ExitCode,
@@ -228,8 +229,9 @@ from scripts.modules._version_changelog import (
 
 
 def _parse_output_level() -> OutputLevel:
-    """Default output level (verbose). No CLI flags."""
+    """Return default output level (verbose). No CLI flags."""
     return OutputLevel.VERBOSE
+
 
 # cspell:ignore kbhit getwch
 def _prompt_version(default: str, timeout: int = 30) -> str:
@@ -239,45 +241,46 @@ def _prompt_version(default: str, timeout: int = 30) -> str:
     On Unix it is shown in brackets; press Enter to accept.
     Returns the default after *timeout* seconds of inactivity.
     """
-    if sys.platform == "win32":  # Windows: editable pre-filled prompt
+    if sys.platform == "win32":
+        # Windows: editable pre-filled prompt (no readline with prefill on Windows)
         import msvcrt
 
         sys.stdout.write(f"  Version to publish: {default}")
         sys.stdout.flush()
         buffer = list(default)
         start = time.time()
-        while time.time() - start < timeout:  # Poll for keystrokes
-            if msvcrt.kbhit():  # Key available
+        while time.time() - start < timeout:
+            if msvcrt.kbhit():
                 ch = msvcrt.getwch()
-                if ch in ("\r", "\n"):  # Enter pressed — submit
+                if ch in ("\r", "\n"):
                     print()
                     return "".join(buffer).strip() or default
-                if ch == "\x08":  # Backspace — delete last char
+                if ch == "\x08":  # Backspace
                     if buffer:
                         buffer.pop()
                         sys.stdout.write("\b \b")
                         sys.stdout.flush()
-                elif ch == "\x03":  # Ctrl+C — abort
+                elif ch == "\x03":  # Ctrl+C
                     raise KeyboardInterrupt
-                elif ch.isprintable():  # Normal character — append
+                elif ch.isprintable():
                     buffer.append(ch)
                     sys.stdout.write(ch)
                     sys.stdout.flush()
             time.sleep(0.05)
         print()
-        return "".join(buffer).strip() or default  # Timeout — use buffer
+        return "".join(buffer).strip() or default
 
-    # Unix: simple readline with select-based timeout
+    # Unix: readline with select-based timeout; [default] shown in brackets
     import select
 
     sys.stdout.write(f"  Version to publish [{default}]: ")
     sys.stdout.flush()
     ready, _, _ = select.select([sys.stdin], [], [], timeout)
-    if ready:  # User typed something before timeout
+    if ready:
         user_input = sys.stdin.readline().strip()
         return user_input if user_input else default
     print()
-    return default  # Timeout — use default version
+    return default
 
 
 # =============================================================================
@@ -289,7 +292,7 @@ def _prompt_version(default: str, timeout: int = 30) -> str:
 def _print_success_banner(
     package_name: str, version: str, repo_path: str,
 ) -> None:
-    """Print final success status with links."""
+    """Print final success banner with pub.dev, CI, release URLs and pubspec snippet."""
     print_colored(
         f"  \u2713 PUBLISHED {package_name} v{version}",
         Color.GREEN,
@@ -329,7 +332,7 @@ def _print_success_banner(
 
 
 def _prompt_publish_mode() -> str:
-    """Ask user what to do when run as main script."""
+    """Ask user for run mode: full publish, audit only, fix docs, or publish without audit."""
     print_header("PUBLISH OPTIONS")
     print(
         "  1) Full publish (audit → format → analysis → tests → version → release)"
@@ -355,13 +358,13 @@ def main(
     mode: str = "full",
     output_level: OutputLevel | None = None,
 ) -> int:
-    """Main entry point. mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit'."""
+    """Run publish workflow. Returns exit code (0 = success). mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit'."""
     enable_ansi_support()
     set_output_level(output_level or _parse_output_level())
 
     show_saropa_logo()
 
-    # --- Find project ---
+    # --- Resolve project paths and validate presence of pubspec/CHANGELOG ---
     project_dir = get_project_dir()
     pubspec_path = project_dir / "pubspec.yaml"
     changelog_path = project_dir / "CHANGELOG.md"
@@ -402,7 +405,7 @@ def main(
             print_warning("No auto-fixable issues found.")
         return ExitCode.SUCCESS.value
 
-    # --- Package info (basic, version-independent) ---
+    # --- Show package info (name, current version, branch, rule/category counts) ---
     package_name = get_package_name(pubspec_path)
     pubspec_version = get_version_from_pubspec(pubspec_path)
     branch = get_current_branch(project_dir)
@@ -428,7 +431,7 @@ def main(
     if todo_log:
         print_info(f"TODO log: {todo_log.relative_to(project_dir)}")
 
-    # --- Timed workflow ---
+    # --- Timed workflow: audit (optional), then prerequisites → format → analysis → tests ---
     audit_only = mode == "audit_only"
     skip_audit = mode == "full_skip_audit"
     timer = StepTimer()
@@ -438,8 +441,8 @@ def main(
     succeeded = False
 
     try:
-        # --- Step 1: Pre-publish audits (unless --skip-audit) ---
-        if not skip_audit:  # Normal path: run full audit
+        # --- Step 1: Pre-publish audits (tier integrity, duplicates, DX; skip if full_skip_audit) ---
+        if not skip_audit:
             with timer.step("Pre-publish audit"):
                 print_header("STEP 1: AUDIT")
                 audit_ok, audit_result = run_pre_publish_audits(project_dir)
@@ -463,7 +466,7 @@ def main(
                             if audit_ok:
                                 break
                             continue
-                    # No fixable issue: exit (cause is in audit output above)
+                    # No auto-fix (e.g. tier/duplicate error): show message and exit
                     exit_with_error(
                         _AUDIT_FAILED_MSG,
                         ExitCode.AUDIT_FAILED,
@@ -532,16 +535,15 @@ def main(
             if not run_tests(project_dir):  # Test failure
                 exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
 
-        # --- Step 8: Version prompt (interactive, not timed) ---
+        # --- Step 8: Version prompt (interactive; suggest next patch if current tag exists) ---
         print_header("VERSION")
         if tag_exists_on_remote(project_dir, f"v{pubspec_version}"):
-            # Current version already published — suggest next patch
             default_version = increment_version(pubspec_version)
         else:
-            # Current version not yet published — offer it as default
             default_version = pubspec_version
 
-        while True:  # Loop until valid version format entered
+        while True:
+            # Accept only semver (X.Y.Z or X.Y.Z-pre.N)
             version = _prompt_version(default_version)
             if re.match(rf"^{_VERSION_RE}$", version):  # Valid semver
                 break
@@ -550,15 +552,16 @@ def main(
                 f"Use X.Y.Z or X.Y.Z-pre.N"
             )
 
-        with timer.step("Version sync"):  # Align pubspec, CHANGELOG, tag
+        with timer.step("Version sync"):
+            # Align pubspec and CHANGELOG: update pubspec if needed, then rename [Unreleased] → [version]
             version_to_sync = version
             while True:
                 if version_to_sync != pubspec_version:
                     set_version_in_pubspec(pubspec_path, version_to_sync)
                     print_success(f"Updated pubspec.yaml to {version_to_sync}")
 
-                # Rename [Unreleased] to this version in CHANGELOG
                 try:
+                    # Rename [Unreleased] to [version_to_sync] in CHANGELOG
                     if rename_unreleased_to_version(
                         changelog_path, version_to_sync
                     ):
@@ -568,8 +571,7 @@ def main(
                         )
                     break
                 except ValueError as exc:
-                    # CHANGELOG has both [Unreleased] and [version] — suggest
-                    # next patch and ask which version to publish
+                    # CHANGELOG already has both [Unreleased] and [version]: prompt for which version to use
                     suggested = increment_version(version_to_sync)
                     print_warning(str(exc))
                     print_colored(
@@ -586,7 +588,7 @@ def main(
                         continue
             version = version_to_sync
 
-            # Validate pubspec and CHANGELOG versions match
+            # Ensure pubspec and CHANGELOG agree (reconcile or add section if needed)
             changelog_version = get_latest_changelog_version(
                 changelog_path,
             )
@@ -595,11 +597,9 @@ def main(
                     "Could not extract version from CHANGELOG.md",
                     ExitCode.CHANGELOG_FAILED,
                 )
-            if version != changelog_version:  # Version mismatch
-                if parse_version(version) < parse_version(
-                    changelog_version,
-                ):
-                    # Pubspec behind CHANGELOG — auto-update pubspec
+            if version != changelog_version:
+                if parse_version(version) < parse_version(changelog_version):
+                    # Pubspec behind CHANGELOG: update pubspec to match
                     print_warning(
                         f"pubspec version ({version}) is behind "
                         f"CHANGELOG ({changelog_version}). "
@@ -613,7 +613,7 @@ def main(
                         f"Updated pubspec.yaml to {version}"
                     )
                 else:
-                    # Pubspec ahead of CHANGELOG — offer to add section
+                    # Pubspec ahead of CHANGELOG: offer to add [version] section
                     print_warning(
                         f"pubspec version ({version}) is ahead "
                         f"of CHANGELOG ({changelog_version})."
@@ -655,11 +655,11 @@ def main(
         print_colored(f"      Tag:        v{version}", Color.CYAN)
         print()
 
-        # --- Steps 9-11: Version-dependent validation ---
-        with timer.step("Badge sync"):  # Step 9: update README badges
+        # --- Steps 9-11: Badge sync, CHANGELOG validation, doc generation, dry-run ---
+        with timer.step("Badge sync"):
             sync_readme_badges(project_dir, version, rule_count)
 
-        with timer.step("CHANGELOG validation"):  # Step 10: extract notes
+        with timer.step("CHANGELOG validation"):
             ok, release_notes = validate_changelog(
                 project_dir, version,
             )
@@ -668,19 +668,19 @@ def main(
                     "CHANGELOG failed", ExitCode.CHANGELOG_FAILED,
                 )
 
-        with timer.step("Docs"):  # Step 11: dart doc
+        with timer.step("Docs"):
             if not generate_docs(project_dir):  # Doc generation error
                 exit_with_error(
                     "Docs failed", ExitCode.VALIDATION_FAILED,
                 )
 
-        with timer.step("Pre-publish validation"):  # dart pub publish --dry-run
+        with timer.step("Pre-publish validation"):
             if not pre_publish_validation(project_dir):  # Would fail on pub.dev
                 exit_with_error(
                     "Validation failed", ExitCode.VALIDATION_FAILED,
                 )
 
-        # --- Final CI gate: re-check after version bump changed files ---
+        # --- Re-run analysis after version bump so we don't tag a broken build ---
         with timer.step("Final CI gate"):
             print_header("FINAL CI GATE")
             print_info(
@@ -695,8 +695,8 @@ def main(
                 )
             print_success("CI gate passed \u2014 safe to create tag")
 
-        # --- Commit, tag, publish, release ---
-        with timer.step("Git commit & push"):  # Stage and push all changes
+        # --- Commit and push versioned files, then tag, publish to pub.dev, create GitHub release ---
+        with timer.step("Git commit & push"):
             if not git_commit_and_push(
                 project_dir, version, branch,
             ):
@@ -704,13 +704,13 @@ def main(
                     "Git operations failed", ExitCode.GIT_FAILED,
                 )
 
-        # --- Check for failed CI and offer to re-trigger ---
+        # --- Optionally re-trigger CI if workflow failed (e.g. flaky check) ---
         with timer.step("CI status"):
             from scripts.modules._retrigger_ci import offer_retrigger_ci
 
             offer_retrigger_ci(limit=10)
 
-        with timer.step("Git tag"):  # Create vX.Y.Z tag
+        with timer.step("Git tag"):
             if not create_git_tag(project_dir, version):
                 exit_with_error(
                     "Git tag failed", ExitCode.GIT_FAILED,
@@ -722,7 +722,7 @@ def main(
                     "Publish failed", ExitCode.PUBLISH_FAILED,
                 )
 
-        with timer.step("GitHub release"):  # Create GH release with notes
+        with timer.step("GitHub release"):
             gh_success, gh_error = create_github_release(
                 project_dir, version, release_notes,
             )
@@ -734,15 +734,13 @@ def main(
 
         succeeded = True
 
-        # --- Post-publish: bump version for next dev cycle ---
+        # --- Bump pubspec and add [Unreleased] in CHANGELOG for next cycle; commit if possible ---
         try:
             with timer.step("Version bump"):
                 next_version = increment_version(version)
                 set_version_in_pubspec(pubspec_path, next_version)
                 add_unreleased_section(changelog_path)
-                if post_publish_commit(
-                    project_dir, next_version, branch,
-                ):  # Commit succeeded
+                if post_publish_commit(project_dir, next_version, branch):
                     print_success(
                         f"Bumped to {next_version} with "
                         f"[Unreleased] section"
@@ -752,7 +750,7 @@ def main(
                         f"Version bump to {next_version} "
                         f"not committed \u2014 commit manually"
                     )
-        except Exception as exc:  # Version bump is best-effort
+        except Exception as exc:
             print_warning(f"Post-publish version bump failed: {exc}")
 
         # --- Post-publish: open pub.dev page (convenience) ---
@@ -766,11 +764,11 @@ def main(
     except SystemExit as exc:  # Caught from exit_with_error() calls
         exit_code = exc.code if isinstance(exc.code, int) else 1
 
-    finally:  # Always show timing summary, even on failure
+    finally:
         timer.print_summary()
 
-    # Final status banner (always the last output)
-    if succeeded:  # Publish completed successfully
+    if succeeded:
+        # Show success banner with package/release links and pubspec snippet
         repo_path = extract_repo_path(remote_url)
         _print_success_banner(package_name, version, repo_path)
 
@@ -778,4 +776,5 @@ def main(
 
 
 if __name__ == "__main__":
+    # Interactive: prompt for mode (full / audit only / fix docs / full_skip_audit) then run
     sys.exit(main(mode=_prompt_publish_mode()))

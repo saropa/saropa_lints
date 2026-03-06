@@ -372,10 +372,11 @@ def display_test_coverage(project_dir: Path) -> None:
     print_colored("  ▶ Test Coverage", Color.WHITE)
     print()
 
-    # Fixture overall bar
+    # Fixture overall bar (labels padded to 25 chars so bars align)
+    label_w = 25
     bar = _make_bar(total_fixtures, total_rules)
     print_colored(
-        f"    Fixtures     {bar}    "
+        f"    {'Fixtures':<{label_w}s} {bar}    "
         f"{total_fixtures:>5d}/{total_rules:>5d}   "
         f"({fixture_pct:6.1f}%)   {fixture_status}",
         fixture_color,
@@ -384,7 +385,7 @@ def display_test_coverage(project_dir: Path) -> None:
     # Unit test overall bar
     bar = _make_bar(unit_tested, unit_total_cats)
     print_colored(
-        f"    Unit tests   {bar}    "
+        f"    {'Unit tests':<{label_w}s} {bar}    "
         f"{unit_tested:>5d}/{unit_total_cats:>5d}   "
         f"({unit_pct:6.1f}%)   {unit_status}",
         unit_color,
@@ -394,7 +395,7 @@ def display_test_coverage(project_dir: Path) -> None:
     if ri_total > 0:
         bar = _make_bar(ri_count, ri_total)
         print_colored(
-            f"    Rule inst.  {bar}    "
+            f"    {'Rule inst.':<{label_w}s} {bar}    "
             f"{ri_count:>5d}/{ri_total:>5d}   "
             f"({ri_pct:6.1f}%)   {ri_status}",
             ri_color,
