@@ -108,22 +108,31 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 dynamic body;
 dynamic child;
 
-// BAD: Should trigger prefer_safe_area_consumer
+// BAD: Scaffold has appBar; SafeArea in body is redundant (should trigger).
 // expect_lint: prefer_safe_area_consumer
 void _bad1388() {
   Scaffold(
+    appBar: AppBar(title: Text('Title')),
     body: SafeArea(
-      // Scaffold already handles safe area
       child: ListView(),
     ),
   );
 }
 
-// GOOD: Should NOT trigger prefer_safe_area_consumer
+// GOOD: No appBar/bottomNavBar; SafeArea is appropriate (must NOT trigger).
+void _goodNoAppBar() {
+  Scaffold(
+    body: SafeArea(
+      child: Center(child: Text('Full-screen, no app bar')),
+    ),
+  );
+}
+
+// GOOD: Body is not SafeArea (no trigger).
 void _good1388() {
   Scaffold(
-    body:
-        ListView(), // Scaffold handles safe area via appBar, bottomNavigationBar
+    appBar: AppBar(title: Text('Title')),
+    body: ListView(),
   );
 }
 

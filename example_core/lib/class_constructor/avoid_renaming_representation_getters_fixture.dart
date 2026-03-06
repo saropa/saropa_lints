@@ -6,10 +6,15 @@
 /// under a different name (renames the representation getter).
 /// GOOD: No such getter, or getter name matches representation field.
 
-// LINT: avoid_renaming_representation_getters — getter "value" renames representation "_id"
-extension type BadUserId(int _id) {
-  int get value => _id;
+// LINT: avoid_renaming_representation_getters — getter "value" renames representation "id"
+extension type BadUserId(int id) {
+  int get value => id;
 }
 
 // OK: No extra getter; representation name used directly
 extension type GoodUserId(int id) {}
+
+// OK: Private representation + exactly one public getter (allowed; no conflict with prefer_private_extension_type_field)
+extension type GoodPrivateSingleGetter(String _sql) {
+  String get sql => _sql;
+}

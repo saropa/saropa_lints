@@ -1772,13 +1772,15 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
 /// Prefer letting Scaffold consume safe area instead of wrapping body in SafeArea.
 ///
 /// **prefer_safe_area_consumer** — Warns when [SafeArea] is used as the direct
-/// body of a [Scaffold]. Scaffold already insets its body below the AppBar and
-/// above the BottomNavigationBar, so a full SafeArea often doubles the top inset
-/// and wastes vertical space.
+/// body of a [Scaffold] that already has an [AppBar] or [BottomNavigationBar].
+/// In that case Scaffold insets the body below the AppBar and above the bottom
+/// bar, so a full SafeArea doubles the top/bottom inset and wastes vertical space.
 ///
-/// **Exception:** Does not report when SafeArea has an explicit `top: false`.
-/// In that case only bottom (and optionally left/right) insets are applied,
-/// e.g. for the home indicator; there is no redundant top inset.
+/// **Exceptions:** Does not report when:
+/// - The Scaffold has no `appBar` and no `bottomNavigationBar` (body extends
+///   under system UI; SafeArea is appropriate).
+/// - SafeArea has an explicit `top: false` (only bottom/left/right insets;
+///   no redundant top inset with AppBar).
 ///
 /// Since: v1.1.19 | Updated: v4.13.0 | Rule version: v4
 ///

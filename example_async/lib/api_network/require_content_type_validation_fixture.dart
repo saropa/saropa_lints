@@ -16,10 +16,19 @@ void badNoContentTypeCheck() {
   return;
 }
 
-// GOOD: Content-Type guard before decode — should NOT trigger
+// GOOD: Content-Type guard before decode (return) — should NOT trigger
 void goodWithContentTypeGuard() {
   if (request.headers.contentType?.mimeType != 'application/json') {
     return;
+  }
+  final data = jsonDecode(body);
+  return;
+}
+
+// GOOD: Content-Type guard throws (validation helper pattern) — should NOT trigger
+void goodWithContentTypeGuardThrows() {
+  if (request.headers.contentType?.mimeType != 'application/json') {
+    throw FormatException('Unexpected Content-Type');
   }
   final data = jsonDecode(body);
   return;
