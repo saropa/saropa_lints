@@ -585,6 +585,12 @@ def _run_chain_stack_traces_and_check(
         last_date_str = date_str
         last_log_name = log_name
 
+        if result is not None and result.returncode != 0 and log_path.exists():
+            try:
+                with open(log_path, "a", encoding="utf-8") as ap:
+                    ap.write(f"\n[Tests failed — exit code {result.returncode}.]\n")
+            except OSError:
+                pass
         if result is not None and result.returncode == 0:
             return True
         # Retry once on Windows when log shows transient file lock in .dart_test_tmp
@@ -601,6 +607,79 @@ def _run_chain_stack_traces_and_check(
         if last_result is not None
         else False
     )
+
+
+_TEST_FAILURE_MARKERS = (
+    " -1: ",  # dart test: "00:09 +7332 -1: test\foo_test.dart: test name"
+    "FAILED",
+    "Some tests failed",
+    "failed",
+    "Error:",
+    "Exception",
+    "Expected:",
+    "Actual:",
+    "which was",
+    "Bad state",
+)
+
+
+def _extract_failure_excerpt(log_path: Path, max_lines: int = 10) -> list[tuple[int, str]]:
+    """Read log file and return up to max_lines (line_no, content) that match failure markers."""
+    if not log_path.exists():
+        return []
+    try:
+        text = log_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return []
+    lines = text.splitlines()
+    found = []
+    for i, line in enumerate(lines):
+        for marker in _TEST_FAILURE_MARKERS:
+            if marker in line:
+                found.append((i + 1, line.strip()))
+                break
+    return found[:max_lines]
+
+
+def _run_dart_test_to_file(
+    project_dir: Path,
+    env: dict[str, str] | None,
+    log_path: Path,
+) -> int:
+    """Run dart test with stdout/stderr piped only to log_path. Returns exit code.
+
+    On non-zero exit, appends a line to the log so the file explicitly records that tests failed.
+    """
+    use_shell = get_shell_mode()
+    with open(log_path, "w", encoding="utf-8", errors="replace") as out:
+        result = subprocess.run(
+            ["dart", "test"],
+            cwd=project_dir,
+            stdout=out,
+            stderr=subprocess.STDOUT,
+            env=env,
+            shell=use_shell,
+        )
+    if result.returncode != 0:
+        with open(log_path, "a", encoding="utf-8") as ap:
+            ap.write(f"\n[Tests failed — exit code {result.returncode}.]\n")
+    return result.returncode
+
+
+def _prompt_test_failure() -> str:
+    """Ask user what to do after tests failed. Returns 'continue' | 'abort'."""
+    print_warning("Tests failed. Choose an action:")
+    print_colored("  [C]ontinue anyway (proceed with publish)", Color.CYAN)
+    print_colored("  [A]bort (stop publish)", Color.CYAN)
+    try:
+        raw = input("  Choice [c/a]: ").strip().lower() or "a"
+        if raw.startswith("c"):
+            return "continue"
+        if raw.startswith("a"):
+            return "abort"
+    except (EOFError, KeyboardInterrupt):
+        return "abort"
+    return "abort"
 
 
 def _check_log_for_errors(log_path: Path, date_str: str, log_name: str) -> None:
@@ -621,6 +700,7 @@ def _check_log_for_errors(log_path: Path, date_str: str, log_name: str) -> None:
     error_markers = (
         "FAILED",
         "Some tests failed",
+        "failed",
         "Error:",
         "Exception",
         "Expected:",
@@ -649,34 +729,63 @@ def _check_log_for_errors(log_path: Path, date_str: str, log_name: str) -> None:
 def run_tests(project_dir: Path) -> bool:
     """Step 7: Run unit tests.
 
+    All test output is written to a log file only (no test output on terminal).
+    On failure, shows log path and a short excerpt, then prompts Continue or Abort.
     Uses a temp dir under the project so the test runner does not fill
-    the system temp drive (e.g. C:) when the project is on another drive.
-    Note: full integration tests (dart analyze in example/) are skipped
-    during publish because 1700+ rules x 1500+ fixture files takes too long.
-    Run manually when needed:
-        cd example && dart analyze
+    the system temp drive. Full integration tests (dart analyze in example/)
+    are skipped during publish; run manually: cd example && dart analyze
     """
     print_header("STEP 7: RUNNING TESTS")
 
     clear_flutter_lock()
 
     test_dir = project_dir / "test"
-    if test_dir.exists():
-        env = _dart_test_env(project_dir)
-        result = run_command(
-            ["dart", "test"],
-            project_dir,
-            "Running unit tests",
-            summarize=True,
-            env=env,
-        )
-        if result.returncode != 0:
-            _run_chain_stack_traces_and_check(project_dir, env)
-            return False
-    else:
+    if not test_dir.exists():
         print_warning("No test directory found, skipping unit tests")
+        return True
 
-    return True
+    env = _dart_test_env(project_dir)
+    now = datetime.now()
+    date_str = now.strftime("%Y%m%d")
+    time_str = now.strftime("%H%M%S")
+    reports_dir = project_dir / "reports" / date_str
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    log_name = f"{date_str}_{time_str}_dart_test.log"
+    log_path = reports_dir / log_name
+
+    print_info(f"Running unit tests (output → reports/{date_str}/{log_name})")
+    returncode = _run_dart_test_to_file(project_dir, env, log_path)
+    if returncode == 0:
+        print_success("Tests passed.")
+        return True
+
+    print_warning("Retrying tests once...")
+    retry_name = f"{date_str}_{time_str}_dart_test_retry.log"
+    retry_path = reports_dir / retry_name
+    retry_code = _run_dart_test_to_file(project_dir, env, retry_path)
+    if retry_code == 0:
+        print_success("Tests passed on retry.")
+        return True
+
+    # Both runs failed: show log path and short excerpt, then prompt
+    print_error("Tests failed. Full output in log file (no test output was printed to this terminal).")
+    print_colored(f"  Log: reports/{date_str}/{retry_name}", Color.CYAN)
+    excerpt = _extract_failure_excerpt(retry_path, max_lines=10)
+    if excerpt:
+        print_colored("  Excerpt:", Color.RED)
+        for line_no, content in excerpt:
+            print_colored(f"    {line_no}: {content}", Color.RED)
+    else:
+        print_info("  (No failure markers found in log; open the log file to see output.)")
+
+    choice = _prompt_test_failure()
+    if choice == "continue":
+        print_info("Continuing despite test failure.")
+        return True
+    # Abort: run chain-stack-traces so a detailed log exists, then return False
+    print_info("Writing detailed trace to log (output → reports/.../chain_stack_traces.log)")
+    _run_chain_stack_traces_and_check(project_dir, env)
+    return False
 
 
 # Paths passed to ``dart format``. Must match CI (.github/workflows/ci.yml) and
