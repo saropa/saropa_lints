@@ -11,6 +11,7 @@ Workflow:
     Step 2:  Check prerequisites (flutter, git, gh)
     Step 3:  Validate working tree
     Step 4:  Check remote sync
+    Step 4.5: Commit and push .github/workflows/publish.yml if changed (no manual git)
     Step 5:  Run tests
     Step 6:  Format code
     Step 7:  Run static analysis
@@ -182,6 +183,7 @@ from scripts.modules._utils import (
 from scripts.modules._git_ops import (
     create_git_tag,
     create_github_release,
+    ensure_publish_workflow_committed,
     extract_repo_path,
     get_current_branch,
     get_remote_url,
@@ -551,6 +553,14 @@ def main(
                 exit_with_error(
                     "Remote sync failed",
                     ExitCode.WORKING_TREE_FAILED,
+                )
+
+        # Timed step: commit and push publish workflow if changed (so tag sees it; no manual git)
+        with timer.step("Publish workflow"):
+            if not ensure_publish_workflow_committed(project_dir, branch):
+                exit_with_error(
+                    "Failed to commit/push .github/workflows/publish.yml",
+                    ExitCode.GIT_FAILED,
                 )
 
         # Format and analyze before tests: fail fast on analysis without

@@ -13,12 +13,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Use stable channel so the SDK is always available (no exact-version lookup failures).
+      # Pubspec allows sdk: ">=3.6.0 <4.0.0", so any current stable is valid.
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.10.8'
+          sdk: stable
+
+      - name: Verify Dart SDK
+        run: dart --version
 
       - name: Install dependencies
-        run: dart pub get
+        run: |
+          for i in 1 2; do
+            dart pub get && break
+            if [ $i -eq 2 ]; then echo "::error::dart pub get failed twice"; exit 1; fi
+            echo "::warning::dart pub get failed, retrying in 10s..."
+            sleep 10
+          done
 
       - name: Analyze
         run: dart analyze --fatal-infos
