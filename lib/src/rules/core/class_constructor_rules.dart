@@ -931,7 +931,7 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
 /// **Exception:** When the representation is private (name starts with `_`),
 /// exactly one public getter that exposes it under a different name is allowed
 /// (e.g. `String get sql => _sql`). This avoids conflict with
-/// [prefer_private_extension_type_field], which requires a private representation.
+/// `prefer_private_extension_type_field`, which requires a private representation.
 ///
 /// **BAD:**
 /// ```dart
