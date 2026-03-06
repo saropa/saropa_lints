@@ -11,6 +11,8 @@ import 'package:analyzer/dart/ast/ast.dart';
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
 
+// cspell:disable
+
 // =============================================================================
 // HTTP Rules
 // =============================================================================
@@ -3872,8 +3874,9 @@ bool _variableValidatedByTypeCheck(Block block, String name, Statement stmt) {
     if (s is IfStatement) {
       final conditionSrc = s.expression.toSource();
       if (!conditionSrc.contains(name)) continue;
-      if (!conditionSrc.contains('Map') && !conditionSrc.contains('List'))
+      if (!conditionSrc.contains('Map') && !conditionSrc.contains('List')) {
         continue;
+      }
       if (!_thenReturnsOrThrows(s.thenStatement)) continue;
       return true;
     }
