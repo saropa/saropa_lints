@@ -3833,7 +3833,11 @@ String? _assignedVariableName(MethodInvocation node) {
   return null;
 }
 
-void _collectIdentifiers(AstNode node, String name, List<SimpleIdentifier> out) {
+void _collectIdentifiers(
+  AstNode node,
+  String name,
+  List<SimpleIdentifier> out,
+) {
   if (node is SimpleIdentifier && node.name == name) {
     out.add(node);
   }
@@ -3868,7 +3872,8 @@ bool _variableValidatedByTypeCheck(Block block, String name, Statement stmt) {
     if (s is IfStatement) {
       final conditionSrc = s.expression.toSource();
       if (!conditionSrc.contains(name)) continue;
-      if (!conditionSrc.contains('Map') && !conditionSrc.contains('List')) continue;
+      if (!conditionSrc.contains('Map') && !conditionSrc.contains('List'))
+        continue;
       if (!_thenReturnsOrThrows(s.thenStatement)) continue;
       return true;
     }
@@ -4003,7 +4008,8 @@ bool _thenReturnsOrThrows(Statement thenStatement) {
 bool _isContentTypeGuardStatement(Statement stmt) {
   if (stmt is! IfStatement) return false;
   final condition = stmt.expression.toSource();
-  final hasContentType = condition.contains('contentType') ||
+  final hasContentType =
+      condition.contains('contentType') ||
       condition.contains('mimeType') ||
       condition.contains('content_type');
   final hasJson = condition.contains('application/json');

@@ -1280,13 +1280,20 @@ void main() {
         );
         expect(file.existsSync(), isTrue);
         final content = file.readAsStringSync();
-        final expectLintCount =
-            RegExp(r'// expect_lint: prefer_safe_area_consumer').allMatches(content).length;
-        expect(expectLintCount, 1, reason: 'Exactly one BAD case should have expect_lint');
+        final expectLintCount = RegExp(
+          r'// expect_lint: prefer_safe_area_consumer',
+        ).allMatches(content).length;
         expect(
-          content.contains('top: false') && content.contains('_goodSafeAreaTopFalse'),
+          expectLintCount,
+          1,
+          reason: 'Exactly one BAD case should have expect_lint',
+        );
+        expect(
+          content.contains('top: false') &&
+              content.contains('_goodSafeAreaTopFalse'),
           isTrue,
-          reason: 'Fixture must include GOOD case SafeArea(top: false) to prevent regression',
+          reason:
+              'Fixture must include GOOD case SafeArea(top: false) to prevent regression',
         );
       });
     });

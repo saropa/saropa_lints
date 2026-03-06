@@ -403,8 +403,24 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
         shell=use_shell,
     )
     if result.returncode != 0:
-        print_warning("Could not fetch from remote. Proceeding anyway.")
-        return True
+        if result.stderr:
+            print_colored(result.stderr.strip(), Color.RED)
+        if result.stdout and result.stdout.strip():
+            print_colored(result.stdout.strip(), Color.RED)
+        print_info("Trying 'git fetch origin' (all refs)...")
+        fallback = subprocess.run(
+            ["git", "fetch", "origin"],
+            cwd=project_dir,
+            capture_output=True,
+            text=True,
+            shell=use_shell,
+        )
+        if fallback.returncode != 0:
+            print_warning("Could not fetch from remote. Proceeding anyway.")
+            if fallback.stderr:
+                print_colored(fallback.stderr.strip(), Color.RED)
+            return True
+        print_success("Fetched from remote.")
 
     # Check if behind
     result = subprocess.run(

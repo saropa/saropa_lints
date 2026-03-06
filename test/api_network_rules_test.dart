@@ -589,9 +589,12 @@ void main() {
         expect('require_api_response_validation detected', isNotNull);
       });
 
-      test('jsonDecode only via fromJson (inline or variable) should NOT trigger', () {
-        expect('require_api_response_validation passes', isNotNull);
-      });
+      test(
+        'jsonDecode only via fromJson (inline or variable) should NOT trigger',
+        () {
+          expect('require_api_response_validation passes', isNotNull);
+        },
+      );
     });
 
     group('require_content_type_validation', () {
