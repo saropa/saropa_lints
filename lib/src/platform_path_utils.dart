@@ -60,15 +60,15 @@ bool _callerHasPlatformPathApi(AstNode node) {
 
 /// Returns the enclosing method/function name if it starts with `_`.
 String? _getEnclosingPrivateName(AstNode node) {
-  final MethodDeclaration? method = node
-      .thisOrAncestorOfType<MethodDeclaration>();
+  final MethodDeclaration? method =
+      node.thisOrAncestorOfType<MethodDeclaration>();
   if (method != null) {
     final String name = method.name.lexeme;
     return name.startsWith('_') ? name : null;
   }
 
-  final FunctionDeclaration? func = node
-      .thisOrAncestorOfType<FunctionDeclaration>();
+  final FunctionDeclaration? func =
+      node.thisOrAncestorOfType<FunctionDeclaration>();
   if (func != null) {
     final String name = func.name.lexeme;
     return name.startsWith('_') ? name : null;
@@ -82,8 +82,8 @@ String? _getEnclosingPrivateName(AstNode node) {
 /// For class methods, returns the [ClassDeclaration]. For top-level
 /// functions, returns the [CompilationUnit].
 AstNode? _getCallSiteSearchScope(AstNode node) {
-  final ClassDeclaration? classDecl = node
-      .thisOrAncestorOfType<ClassDeclaration>();
+  final ClassDeclaration? classDecl =
+      node.thisOrAncestorOfType<ClassDeclaration>();
   if (classDecl != null) return classDecl;
 
   return node.root is CompilationUnit ? node.root : null;
@@ -119,8 +119,8 @@ class _CallerChecker extends RecursiveAstVisitor<void> {
   }
 
   void _checkCallerBody(AstNode callSite) {
-    final FunctionBody? callerBody = callSite
-        .thisOrAncestorOfType<FunctionBody>();
+    final FunctionBody? callerBody =
+        callSite.thisOrAncestorOfType<FunctionBody>();
     if (callerBody == null) return;
 
     if (bodyContainsPlatformPathApi(callerBody.toSource())) {

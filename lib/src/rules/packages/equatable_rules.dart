@@ -1191,9 +1191,8 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
 
             for (final ClassMember constructor in node.members) {
               if (constructor is ConstructorDeclaration) {
-                final String? initSource = constructor.initializers
-                    .map((e) => e.toSource())
-                    .join();
+                final String? initSource =
+                    constructor.initializers.map((e) => e.toSource()).join();
                 if (initSource != null &&
                     unmodifiablePattern.hasMatch(initSource)) {
                   madeUnmodifiable = true;
@@ -1348,8 +1347,8 @@ class AvoidEquatableNestedEqualityRule extends SaropaLintRule {
       if (!node.isGetter || node.name.lexeme != 'props') return;
 
       // Must be inside an Equatable class
-      final ClassDeclaration? cls = node
-          .thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? cls =
+          node.thisOrAncestorOfType<ClassDeclaration>();
       if (cls == null) return;
 
       if (!isEquatable(cls)) return;

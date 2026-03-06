@@ -34,8 +34,8 @@ import 'compat_visitor.dart';
 /// which dispatches to the stored callback.
 class SaropaContext {
   SaropaContext(this._registry, this._rule, this._ruleContext)
-    : _visitor = CompatVisitor(),
-      _saropaRule = _rule is SaropaLintRule ? _rule : null;
+      : _visitor = CompatVisitor(),
+        _saropaRule = _rule is SaropaLintRule ? _rule : null;
 
   final RuleVisitorRegistry _registry;
   final AbstractAnalysisRule _rule;

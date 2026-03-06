@@ -360,8 +360,7 @@ class AvoidGodClassRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           // Skip static const/final fields — they are compile-time or
           // lazy constants, not instance state indicating a god class.
-          final bool isStaticConstant =
-              member.isStatic &&
+          final bool isStaticConstant = member.isStatic &&
               (member.fields.isConst || member.fields.isFinal);
           if (!isStaticConstant) {
             fieldCount += member.fields.variables.length;
@@ -440,8 +439,7 @@ class AvoidUiInDomainLayerRule extends SaropaLintRule {
     // Check if file is in domain layer (heuristic based on path)
     final String path = context.filePath;
 
-    final bool isDomainLayer =
-        path.contains('/domain/') ||
+    final bool isDomainLayer = path.contains('/domain/') ||
         path.contains('/models/') ||
         path.contains('/entities/');
 

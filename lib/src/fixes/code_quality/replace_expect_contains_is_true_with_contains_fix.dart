@@ -57,8 +57,8 @@ class ReplaceExpectContainsIsTrueWithContainsFix extends SaropaFixProducer {
 
     final Expression? containsTarget = actual.target;
     if (containsTarget == null) return;
-    final List<Expression> containsArgs = actual.argumentList.arguments
-        .toList();
+    final List<Expression> containsArgs =
+        actual.argumentList.arguments.toList();
     if (containsArgs.isEmpty) return;
     final Expression firstArg = containsArgs[0];
 

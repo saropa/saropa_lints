@@ -118,9 +118,8 @@ class RequireTestAssertionsRule extends SaropaLintRule {
       if (args.arguments.length < 2) return;
 
       // Get the test body (second argument, usually a function)
-      final Expression? bodyArg = args.arguments.length >= 2
-          ? args.arguments[1]
-          : null;
+      final Expression? bodyArg =
+          args.arguments.length >= 2 ? args.arguments[1] : null;
 
       if (bodyArg == null) return;
 
@@ -299,9 +298,8 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
     'dio.put(',
     'dio.delete(',
   };
-  static final List<RegExp> _networkPatternRegexps = _networkPatterns
-      .map((p) => RegExp('\\b${RegExp.escape(p)}'))
-      .toList();
+  static final List<RegExp> _networkPatternRegexps =
+      _networkPatterns.map((p) => RegExp('\\b${RegExp.escape(p)}')).toList();
   static final List<RegExp> _mockSkipPatterns = [
     RegExp(r'\bMock\b'),
     RegExp(r'\bmock\b'),
@@ -328,9 +326,8 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression? bodyArg = args.arguments.length >= 2
-          ? args.arguments[1]
-          : null;
+      final Expression? bodyArg =
+          args.arguments.length >= 2 ? args.arguments[1] : null;
 
       if (bodyArg == null) return;
 
@@ -500,8 +497,7 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Count tests
-      final int testCount =
-          'test('.allMatches(bodySource).length +
+      final int testCount = 'test('.allMatches(bodySource).length +
           'testWidgets('.allMatches(bodySource).length;
 
       // If multiple tests, check for setUp (word-boundary to avoid FP)
@@ -593,9 +589,8 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression? bodyArg = args.arguments.length >= 2
-          ? args.arguments[1]
-          : null;
+      final Expression? bodyArg =
+          args.arguments.length >= 2 ? args.arguments[1] : null;
 
       if (bodyArg == null) return;
 
@@ -1210,14 +1205,11 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
       final String bodySource = bodyArg.toSource();
 
       // Check for AAA comments (case-insensitive)
-      final bool hasArrange =
-          bodySource.toLowerCase().contains('// arrange') ||
+      final bool hasArrange = bodySource.toLowerCase().contains('// arrange') ||
           bodySource.toLowerCase().contains('//arrange');
-      final bool hasAct =
-          bodySource.toLowerCase().contains('// act') ||
+      final bool hasAct = bodySource.toLowerCase().contains('// act') ||
           bodySource.toLowerCase().contains('//act');
-      final bool hasAssert =
-          bodySource.toLowerCase().contains('// assert') ||
+      final bool hasAssert = bodySource.toLowerCase().contains('// assert') ||
           bodySource.toLowerCase().contains('//assert');
 
       // Only warn for longer tests that would benefit from structure
@@ -1610,9 +1602,9 @@ class PreferTestWrapperRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        WrapWithMaterialAppFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            WrapWithMaterialAppFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -2116,12 +2108,10 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
 
   /// Regex to detect seeded Random (any numeric seed is acceptable)
   static final RegExp _seededRandomPattern = RegExp(r'Random\(\s*\d');
-  static final List<RegExp> _safePatternRegexps = _safePatterns
-      .map((s) => RegExp('\\b${RegExp.escape(s)}'))
-      .toList();
-  static final List<RegExp> _flakyPatternRegexps = _flakyPatterns
-      .map((p) => RegExp('\\b${RegExp.escape(p)}'))
-      .toList();
+  static final List<RegExp> _safePatternRegexps =
+      _safePatterns.map((s) => RegExp('\\b${RegExp.escape(s)}')).toList();
+  static final List<RegExp> _flakyPatternRegexps =
+      _flakyPatterns.map((p) => RegExp('\\b${RegExp.escape(p)}')).toList();
 
   @override
   void runWithReporter(
@@ -2130,8 +2120,7 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
   ) {
     // Only check test files (handle both Unix / and Windows \ paths)
     final String path = context.filePath;
-    final bool isTestFile =
-        path.contains('_test.dart') ||
+    final bool isTestFile = path.contains('_test.dart') ||
         path.contains('/test/') ||
         path.contains(r'\test\');
     if (!isTestFile) return;
@@ -3232,11 +3221,9 @@ class PreferBlocTestPackageRule extends SaropaLintRule {
       final source = node.toSource();
 
       // Check for Bloc testing patterns without blocTest (word-boundary regex)
-      final hasAddOrEmit =
-          RegExp(r'\.add\s*\(').hasMatch(source) ||
+      final hasAddOrEmit = RegExp(r'\.add\s*\(').hasMatch(source) ||
           RegExp(r'\.emit\s*\(').hasMatch(source);
-      final hasBlocOrCubit =
-          RegExp(r'\bBloc\b').hasMatch(source) ||
+      final hasBlocOrCubit = RegExp(r'\bBloc\b').hasMatch(source) ||
           RegExp(r'\bCubit\b').hasMatch(source);
       final hasBlocTest = RegExp(r'\bblocTest\b').hasMatch(source);
       if (hasAddOrEmit && hasBlocOrCubit && !hasBlocTest) {
@@ -3315,11 +3302,9 @@ class PreferMockVerifyRule extends SaropaLintRule {
 
       // Check for when() setup without verify() (word-boundary regex)
       final hasWhen = RegExp(r'\bwhen\s*\(').hasMatch(source);
-      final hasThen =
-          RegExp(r'\.thenReturn\s*\(').hasMatch(source) ||
+      final hasThen = RegExp(r'\.thenReturn\s*\(').hasMatch(source) ||
           RegExp(r'\.thenAnswer\s*\(').hasMatch(source);
-      final hasVerify =
-          RegExp(r'\bverify\s*\(').hasMatch(source) ||
+      final hasVerify = RegExp(r'\bverify\s*\(').hasMatch(source) ||
           RegExp(r'\bverifyNever\s*\(').hasMatch(source) ||
           RegExp(r'\bverifyInOrder\s*\(').hasMatch(source);
       if (hasWhen && hasThen && !hasVerify) {
@@ -3635,8 +3620,7 @@ class RequireTestDocumentationRule extends SaropaLintRule {
 
       if (lineCount > _complexTestThreshold) {
         // Check for comments (regex to avoid FP on string literals)
-        final bool hasComments =
-            RegExp(r'//').hasMatch(bodySource) ||
+        final bool hasComments = RegExp(r'//').hasMatch(bodySource) ||
             RegExp(r'/\*').hasMatch(bodySource) ||
             RegExp(r'///').hasMatch(bodySource);
 

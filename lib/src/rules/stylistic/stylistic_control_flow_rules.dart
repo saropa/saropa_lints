@@ -1468,8 +1468,7 @@ class PreferPositiveConditionsRule extends SaropaLintRule {
     'prefer_positive_conditions',
     '[prefer_positive_conditions] Prefer a positive condition with '
         'the branches swapped for readability. {v3}',
-    correctionMessage:
-        'Invert the condition to its positive form and swap the '
+    correctionMessage: 'Invert the condition to its positive form and swap the '
         'then/else branches.',
     severity: DiagnosticSeverity.INFO,
   );

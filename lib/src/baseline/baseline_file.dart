@@ -18,7 +18,7 @@ import 'dart:io';
 /// ```
 class BaselineFile {
   BaselineFile({required this.violations, DateTime? generated})
-    : generated = generated ?? DateTime.now();
+      : generated = generated ?? DateTime.now();
 
   /// Current baseline file format version.
   static const int currentVersion = 1;
@@ -218,8 +218,7 @@ class BaselineFile {
   }
 
   @override
-  String toString() =>
-      'BaselineFile('
+  String toString() => 'BaselineFile('
       'violations: $totalViolations in $fileCount files, '
       'generated: $generated)';
 }

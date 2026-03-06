@@ -94,9 +94,8 @@ String generateComplianceReport(Map<String, OwaspMapping> ruleMappings) {
   );
   for (final OwaspMobile category in OwaspMobile.values) {
     final List<String> rules = mobileCoverage[category] ?? <String>[];
-    final String ruleList = rules.isEmpty
-        ? '_No coverage_'
-        : rules.take(3).join(', ');
+    final String ruleList =
+        rules.isEmpty ? '_No coverage_' : rules.take(3).join(', ');
     final String suffix = rules.length > 3 ? '...' : '';
     buffer.writeln(
       '| ${category.id}: ${category.name} | $ruleList$suffix | ${rules.length} |',
@@ -114,9 +113,8 @@ String generateComplianceReport(Map<String, OwaspMapping> ruleMappings) {
   final Map<OwaspWeb, List<String>> webCoverage = getWebCoverage(ruleMappings);
   for (final OwaspWeb category in OwaspWeb.values) {
     final List<String> rules = webCoverage[category] ?? <String>[];
-    final String ruleList = rules.isEmpty
-        ? '_No coverage_'
-        : rules.take(3).join(', ');
+    final String ruleList =
+        rules.isEmpty ? '_No coverage_' : rules.take(3).join(', ');
     final String suffix = rules.length > 3 ? '...' : '';
     buffer.writeln(
       '| ${category.id}: ${category.name} | $ruleList$suffix | ${rules.length} |',
@@ -134,12 +132,10 @@ String generateComplianceReport(Map<String, OwaspMapping> ruleMappings) {
     0,
     (int sum, List<String> rules) => sum + rules.length,
   );
-  final int mobileCovered = mobileCoverage.values
-      .where((List<String> r) => r.isNotEmpty)
-      .length;
-  final int webCovered = webCoverage.values
-      .where((List<String> r) => r.isNotEmpty)
-      .length;
+  final int mobileCovered =
+      mobileCoverage.values.where((List<String> r) => r.isNotEmpty).length;
+  final int webCovered =
+      webCoverage.values.where((List<String> r) => r.isNotEmpty).length;
 
   buffer.writeln('## Summary');
   buffer.writeln();

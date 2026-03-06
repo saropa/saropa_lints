@@ -1021,8 +1021,7 @@ class RequireExifHandlingRule extends SaropaLintRule {
           ? node.argumentList.arguments.first.toSource().toLowerCase()
           : '';
 
-      final isCameraRelated =
-          argSource.contains('photo') ||
+      final isCameraRelated = argSource.contains('photo') ||
           argSource.contains('camera') ||
           argSource.contains('image') ||
           argSource.contains('picture');
@@ -1243,8 +1242,7 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
 
       // Report ImageStreams without removeListener in dispose
       for (final String fieldName in imageStreamFields) {
-        final bool hasRemoveListener =
-            disposeMethod != null &&
+        final bool hasRemoveListener = disposeMethod != null &&
             isFieldCleanedUp(fieldName, 'removeListener', disposeMethod.body);
 
         if (!hasRemoveListener) {

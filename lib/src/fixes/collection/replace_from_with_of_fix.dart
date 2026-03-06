@@ -27,8 +27,8 @@ class ReplaceFromWithOfFix extends SaropaFixProducer {
 
     final InstanceCreationExpression? creation =
         node is InstanceCreationExpression
-        ? node
-        : node.thisOrAncestorOfType<InstanceCreationExpression>();
+            ? node
+            : node.thisOrAncestorOfType<InstanceCreationExpression>();
     if (creation == null) return;
 
     final SimpleIdentifier? id = creation.constructorName.name;

@@ -241,9 +241,8 @@ void main() {
       );
 
       final exported = readExport()['violations'] as List<dynamic>;
-      final owasp =
-          (exported.first as Map<String, dynamic>)['owasp']
-              as Map<String, dynamic>;
+      final owasp = (exported.first as Map<String, dynamic>)['owasp']
+          as Map<String, dynamic>;
 
       final mobile = (owasp['mobile'] as List<dynamic>).cast<String>();
       final web = (owasp['web'] as List<dynamic>).cast<String>();
@@ -268,9 +267,8 @@ void main() {
       );
 
       final exported = readExport()['violations'] as List<dynamic>;
-      final owasp =
-          (exported.first as Map<String, dynamic>)['owasp']
-              as Map<String, dynamic>;
+      final owasp = (exported.first as Map<String, dynamic>)['owasp']
+          as Map<String, dynamic>;
 
       expect(owasp['mobile'], isEmpty);
       expect(owasp['web'], isEmpty);
@@ -440,8 +438,8 @@ void main() {
       );
 
       final configSection = readExport()['config'] as Map<String, dynamic>;
-      final names = (configSection['enabledRuleNames'] as List<dynamic>)
-          .cast<String>();
+      final names =
+          (configSection['enabledRuleNames'] as List<dynamic>).cast<String>();
       expect(names, ['rule_a', 'rule_b', 'rule_c']);
     });
 
@@ -468,12 +466,12 @@ void main() {
       );
 
       final configSection = readExport()['config'] as Map<String, dynamic>;
-      final disabled = (configSection['disabledPackages'] as List<dynamic>)
-          .cast<String>();
+      final disabled =
+          (configSection['disabledPackages'] as List<dynamic>).cast<String>();
       expect(disabled, ['isar', 'hive']);
 
-      final exclusions = (configSection['userExclusions'] as List<dynamic>)
-          .cast<String>();
+      final exclusions =
+          (configSection['userExclusions'] as List<dynamic>).cast<String>();
       expect(exclusions, ['no_magic_numbers', 'prefer_const']);
     });
 

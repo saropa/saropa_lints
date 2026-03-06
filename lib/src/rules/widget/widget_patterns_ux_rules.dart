@@ -759,9 +759,9 @@ class PreferVoidCallbackRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceWithVoidCallbackFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceWithVoidCallbackFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};

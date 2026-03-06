@@ -422,8 +422,7 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
     'avoid_ios_in_app_browser_for_auth',
     '[avoid_ios_in_app_browser_for_auth] OAuth URL detected in WebView. Google and Apple block OAuth via '
         'in-app WebView for security reasons. {v2}',
-    correctionMessage:
-        'Use flutter_appauth or url_launcher for OAuth. '
+    correctionMessage: 'Use flutter_appauth or url_launcher for OAuth. '
         'ASWebAuthenticationSession is required on iOS.',
     severity: DiagnosticSeverity.ERROR,
   );
@@ -551,8 +550,7 @@ class RequireIosAppReviewPromptTimingRule extends SaropaLintRule {
     'require_ios_app_review_prompt_timing',
     '[require_ios_app_review_prompt_timing] App review request detected in initialization context. '
         'Do not request reviews on first launch or during startup. {v2}',
-    correctionMessage:
-        'Move review request after meaningful user engagement. '
+    correctionMessage: 'Move review request after meaningful user engagement. '
         'Apple rejects apps that prompt too early.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -849,8 +847,7 @@ class RequireIosReceiptValidationRule extends SaropaLintRule {
   ) {
     // Check if file has validation logic
     final String fileSource = context.fileContent;
-    final bool hasValidation =
-        fileSource.contains('validateReceipt') ||
+    final bool hasValidation = fileSource.contains('validateReceipt') ||
         fileSource.contains('verifyPurchase') ||
         fileSource.contains('/verify') ||
         fileSource.contains('receipt_validation');
@@ -1280,8 +1277,7 @@ class RequireIosSceneDelegateAwarenessRule extends SaropaLintRule {
     'require_ios_scene_delegate_awareness',
     '[require_ios_scene_delegate_awareness] App lifecycle handling detected. On iOS 13+, consider using '
         'scene-based lifecycle for multi-window support. {v2}',
-    correctionMessage:
-        'Use WidgetsBindingObserver.didChangeAppLifecycleState '
+    correctionMessage: 'Use WidgetsBindingObserver.didChangeAppLifecycleState '
         'which handles both app and scene lifecycle.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1530,8 +1526,7 @@ class RequireIosDeploymentTargetConsistencyRule extends SaropaLintRule {
     'require_ios_deployment_target_consistency',
     '[require_ios_deployment_target_consistency] API requiring iOS 15+ detected. Ensure minimum deployment target '
         'matches or add version guards. {v2}',
-    correctionMessage:
-        'Check iOS version before using newer APIs or increase '
+    correctionMessage: 'Check iOS version before using newer APIs or increase '
         'minimum deployment target.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -1881,8 +1876,7 @@ class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
     'avoid_ios_misleading_push_notifications',
     '[avoid_ios_misleading_push_notifications] Marketing notification pattern detected. Push notifications must '
         'be relevant to user interests to comply with Apple guidelines. {v2}',
-    correctionMessage:
-        'Ensure notifications are personalized and relevant. '
+    correctionMessage: 'Ensure notifications are personalized and relevant. '
         'Avoid generic marketing messages.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -2519,8 +2513,7 @@ class RequirePurchaseRestorationRule extends SaropaLintRule {
     'require_purchase_restoration',
     '[require_purchase_restoration] In-app purchase detected without restore functionality. '
         'App Store requires "Restore Purchases" for non-consumables. {v2}',
-    correctionMessage:
-        'Add a "Restore Purchases" button that calls '
+    correctionMessage: 'Add a "Restore Purchases" button that calls '
         'InAppPurchase.instance.restorePurchases().',
     severity: DiagnosticSeverity.ERROR,
   );
@@ -2704,8 +2697,7 @@ class RequireSyncErrorRecoveryRule extends SaropaLintRule {
     'require_sync_error_recovery',
     '[require_sync_error_recovery] Sync operation without error recovery detected. '
         'Failed syncs should retry and notify user of unrecoverable errors. {v2}',
-    correctionMessage:
-        'Implement exponential backoff retry and notify user of '
+    correctionMessage: 'Implement exponential backoff retry and notify user of '
         'persistent failures.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -2750,8 +2742,7 @@ class RequireSyncErrorRecoveryRule extends SaropaLintRule {
         if (current is TryStatement) {
           inTryCatch = true;
           final String catchSource = current.toSource();
-          hasRetry =
-              catchSource.contains('retry') ||
+          hasRetry = catchSource.contains('retry') ||
               catchSource.contains('attempt') ||
               catchSource.contains('backoff') ||
               catchSource.contains('Retry');
@@ -3342,8 +3333,7 @@ class RequireIosDataProtectionRule extends SaropaLintRule {
     'require_ios_data_protection',
     '[require_ios_data_protection] Sensitive file storage detected. Consider using iOS Data Protection '
         'to encrypt files when device is locked. {v2}',
-    correctionMessage:
-        'Set appropriate FileProtectionType for sensitive data. '
+    correctionMessage: 'Set appropriate FileProtectionType for sensitive data. '
         'Use "complete" protection for highly sensitive files.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -3444,8 +3434,7 @@ class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
     'avoid_ios_battery_drain_patterns',
     '[avoid_ios_battery_drain_patterns] Pattern detected that may cause excessive battery drain. '
         'iOS shows high battery usage in Settings. {v2}',
-    correctionMessage:
-        'Use push notifications instead of polling. '
+    correctionMessage: 'Use push notifications instead of polling. '
         'Reduce location accuracy and frequency.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -3463,9 +3452,8 @@ class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
         final Expression? target = node.target;
         if (target != null && target.toSource() == 'Timer') {
           // Check duration
-          final List<Expression> args = node.argumentList.arguments
-              .whereType<Expression>()
-              .toList();
+          final List<Expression> args =
+              node.argumentList.arguments.whereType<Expression>().toList();
           if (args.isNotEmpty) {
             final String durationSource = args.first.toSource();
             // Very short intervals are battery-draining
@@ -3686,8 +3674,7 @@ class RequireIosVersionCheckRule extends SaropaLintRule {
     'require_ios_version_check',
     '[require_ios_version_check] iOS version-specific feature detected without version check. '
         'Crashes may occur on older iOS versions. {v2}',
-    correctionMessage:
-        'Check iOS version before using newer APIs. '
+    correctionMessage: 'Check iOS version before using newer APIs. '
         'Use device_info_plus to get iOS version.',
     severity: DiagnosticSeverity.WARNING,
   );

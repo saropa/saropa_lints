@@ -3149,15 +3149,15 @@ const Set<String> _desktopPlatformRules = <String>{
 /// Each platform's effective rules include the platform-specific set plus
 /// any shared sets (Apple, desktop) that apply.
 Map<String, Set<String>> get platformRuleSets => {
-  'ios': iosPlatformRules.union(_applePlatformRules),
-  'android': androidPlatformRules,
-  'macos': macosPlatformRules
-      .union(_applePlatformRules)
-      .union(_desktopPlatformRules),
-  'web': webPlatformRules,
-  'windows': windowsPlatformRules.union(_desktopPlatformRules),
-  'linux': linuxPlatformRules.union(_desktopPlatformRules),
-};
+      'ios': iosPlatformRules.union(_applePlatformRules),
+      'android': androidPlatformRules,
+      'macos': macosPlatformRules
+          .union(_applePlatformRules)
+          .union(_desktopPlatformRules),
+      'web': webPlatformRules,
+      'windows': windowsPlatformRules.union(_desktopPlatformRules),
+      'linux': linuxPlatformRules.union(_desktopPlatformRules),
+    };
 
 /// All supported platform names.
 const List<String> allPlatforms = <String>[
@@ -3193,17 +3193,13 @@ const Map<String, bool> defaultPlatforms = <String, bool>{
 ///
 /// Rules not in any platform set are never affected.
 Set<String> getRulesDisabledByPlatforms(Map<String, bool> platforms) {
-  final disabledPlatforms = platforms.entries
-      .where((e) => !e.value)
-      .map((e) => e.key)
-      .toSet();
+  final disabledPlatforms =
+      platforms.entries.where((e) => !e.value).map((e) => e.key).toSet();
 
   if (disabledPlatforms.isEmpty) return const <String>{};
 
-  final enabledPlatforms = platforms.entries
-      .where((e) => e.value)
-      .map((e) => e.key)
-      .toSet();
+  final enabledPlatforms =
+      platforms.entries.where((e) => e.value).map((e) => e.key).toSet();
 
   final Set<String> rulesToDisable = <String>{};
   final sets = platformRuleSets;
@@ -3709,29 +3705,29 @@ const Set<String> flamePackageRules = <String>{
 /// any shared sets (database) that apply. A rule is disabled only when
 /// ALL packages that contain it are disabled.
 Map<String, Set<String>> get packageRuleSets => {
-  'bloc': blocPackageRules,
-  'provider': providerPackageRules,
-  'riverpod': riverpodPackageRules,
-  'getx': getxPackageRules,
-  'flutter_hooks': flutterHooksPackageRules,
-  'equatable': equatablePackageRules,
-  'freezed': freezedPackageRules,
-  'firebase': firebasePackageRules.union(_databaseSharedRules),
-  'isar': isarPackageRules.union(_databaseSharedRules),
-  'hive': hivePackageRules.union(_databaseSharedRules),
-  'shared_preferences': sharedPreferencesPackageRules,
-  'sqflite': sqflitePackageRules.union(_databaseSharedRules),
-  'drift': driftPackageRules.union(_databaseSharedRules),
-  'dio': dioPackageRules,
-  'graphql': graphqlPackageRules,
-  'supabase': supabasePackageRules,
-  'get_it': getItPackageRules,
-  'workmanager': workmanagerPackageRules,
-  'url_launcher': urlLauncherPackageRules,
-  'geolocator': geolocatorPackageRules,
-  'qr_scanner': qrScannerPackageRules,
-  'flame': flamePackageRules,
-};
+      'bloc': blocPackageRules,
+      'provider': providerPackageRules,
+      'riverpod': riverpodPackageRules,
+      'getx': getxPackageRules,
+      'flutter_hooks': flutterHooksPackageRules,
+      'equatable': equatablePackageRules,
+      'freezed': freezedPackageRules,
+      'firebase': firebasePackageRules.union(_databaseSharedRules),
+      'isar': isarPackageRules.union(_databaseSharedRules),
+      'hive': hivePackageRules.union(_databaseSharedRules),
+      'shared_preferences': sharedPreferencesPackageRules,
+      'sqflite': sqflitePackageRules.union(_databaseSharedRules),
+      'drift': driftPackageRules.union(_databaseSharedRules),
+      'dio': dioPackageRules,
+      'graphql': graphqlPackageRules,
+      'supabase': supabasePackageRules,
+      'get_it': getItPackageRules,
+      'workmanager': workmanagerPackageRules,
+      'url_launcher': urlLauncherPackageRules,
+      'geolocator': geolocatorPackageRules,
+      'qr_scanner': qrScannerPackageRules,
+      'flame': flamePackageRules,
+    };
 
 /// All supported package names.
 const List<String> allPackages = <String>[
@@ -3799,17 +3795,13 @@ const Map<String, bool> defaultPackages = <String, bool>{
 ///
 /// Rules not in any package set are never affected.
 Set<String> getRulesDisabledByPackages(Map<String, bool> packages) {
-  final disabledPackages = packages.entries
-      .where((e) => !e.value)
-      .map((e) => e.key)
-      .toSet();
+  final disabledPackages =
+      packages.entries.where((e) => !e.value).map((e) => e.key).toSet();
 
   if (disabledPackages.isEmpty) return const <String>{};
 
-  final enabledPackages = packages.entries
-      .where((e) => e.value)
-      .map((e) => e.key)
-      .toSet();
+  final enabledPackages =
+      packages.entries.where((e) => e.value).map((e) => e.key).toSet();
 
   final Set<String> rulesToDisable = <String>{};
   final sets = packageRuleSets;

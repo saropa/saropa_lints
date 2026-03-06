@@ -2090,9 +2090,8 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
     });
   }
 
-  static final List<RegExp> _firebaseClassPatterns = _firebaseClasses
-      .map((c) => RegExp('\\b${RegExp.escape(c)}\\b'))
-      .toList();
+  static final List<RegExp> _firebaseClassPatterns =
+      _firebaseClasses.map((c) => RegExp('\\b${RegExp.escape(c)}\\b')).toList();
 
   bool _isFirebaseCall(MethodInvocation node) {
     final Expression? target = node.target;
@@ -2431,8 +2430,7 @@ class RequireFirebaseCompositeIndexRule extends SaropaLintRule {
         'uses orderByChild with filtering but may lack a .indexOn rule. '
         'Without the index the SDK downloads all data and sorts client-side, '
         'causing severe performance degradation on large datasets. {v1}',
-    correctionMessage:
-        'Add a .indexOn rule for the ordered child key in your '
+    correctionMessage: 'Add a .indexOn rule for the ordered child key in your '
         'database.rules.json or Firebase Console security rules.',
     severity: DiagnosticSeverity.ERROR,
   );
@@ -2625,8 +2623,7 @@ class RequireFirebaseAppCheckProductionRule extends SaropaLintRule {
         'client can call your Cloud Functions and access Firestore or RTDB '
         'using the public API key. Add '
         'FirebaseAppCheck.instance.activate() after initialization. {v1}',
-    correctionMessage:
-        'Add FirebaseAppCheck.instance.activate() after '
+    correctionMessage: 'Add FirebaseAppCheck.instance.activate() after '
         'Firebase.initializeApp().',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -2682,12 +2679,12 @@ class RequireFirebaseReauthenticationRule extends SaropaLintRule {
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-    'reauthenticate',
-    'delete',
-    'updateEmail',
-    'updatePassword',
-    'user',
-  };
+        'reauthenticate',
+        'delete',
+        'updateEmail',
+        'updatePassword',
+        'user',
+      };
 
   static const LintCode _code = LintCode(
     'require_firebase_reauthentication',
@@ -2793,10 +2790,10 @@ class RequireFirebaseTokenRefreshRule extends SaropaLintRule {
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-    'getIdToken',
-    'idTokenChanges',
-    'user',
-  };
+        'getIdToken',
+        'idTokenChanges',
+        'user',
+      };
 
   static final RegExp _idTokenChanges = RegExp(r'\bidTokenChanges\b');
 

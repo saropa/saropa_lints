@@ -425,15 +425,14 @@ class PreferCatchOverOnRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        _PreferCatchOverOnFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            _PreferCatchOverOnFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_catch_over_on',
     '[prefer_catch_over_on] "on Object catch" is equivalent to a bare "catch" — both catch everything with the same static type for the exception variable. The redundant "on Object" clause adds visual noise without changing behavior. Remove it to clarify that this is an unfiltered catch-all handler. {v4}',
-    correctionMessage:
-        'Remove the redundant "on Object" clause. '
+    correctionMessage: 'Remove the redundant "on Object" clause. '
         'A bare "catch (e)" has identical behavior and clearer intent.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -473,9 +472,8 @@ class _PreferCatchOverOnFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final catchClause = node is CatchClause
-        ? node
-        : node.thisOrAncestorOfType<CatchClause>();
+    final catchClause =
+        node is CatchClause ? node : node.thisOrAncestorOfType<CatchClause>();
     if (catchClause == null) return;
 
     final exceptionType = catchClause.exceptionType;
@@ -592,8 +590,7 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
       final source = context.fileContent;
       final bodySource = source.substring(body.offset, body.end);
 
-      final hasStructure =
-          RegExp(r'// Arrange').hasMatch(bodySource) ||
+      final hasStructure = RegExp(r'// Arrange').hasMatch(bodySource) ||
           RegExp(r'// Act').hasMatch(bodySource) ||
           RegExp(r'// Assert').hasMatch(bodySource) ||
           RegExp(r'// Given').hasMatch(bodySource) ||
@@ -689,8 +686,7 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
       final source = context.fileContent;
       final bodySource = source.substring(body.offset, body.end);
 
-      final hasStructure =
-          RegExp(r'// Arrange').hasMatch(bodySource) ||
+      final hasStructure = RegExp(r'// Arrange').hasMatch(bodySource) ||
           RegExp(r'// Act').hasMatch(bodySource) ||
           RegExp(r'// Assert').hasMatch(bodySource) ||
           RegExp(r'// Given').hasMatch(bodySource) ||

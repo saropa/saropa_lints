@@ -48,8 +48,7 @@ void main() {
           expect(
             ruleSource.contains("'$keyword'"),
             isTrue,
-            reason:
-                'Original keyword "$keyword" should still be '
+            reason: 'Original keyword "$keyword" should still be '
                 'in _errorCaseKeywords',
           );
         }
@@ -66,8 +65,7 @@ void main() {
           expect(
             ruleSource.contains("'$keyword'"),
             isTrue,
-            reason:
-                'Defensive keyword "$keyword" should be '
+            reason: 'Defensive keyword "$keyword" should be '
                 'in _errorCaseKeywords',
           );
         }
@@ -79,8 +77,7 @@ void main() {
           expect(
             ruleSource.contains("'$keyword'"),
             isTrue,
-            reason:
-                'Lifecycle keyword "$keyword" should be '
+            reason: 'Lifecycle keyword "$keyword" should be '
                 'in _errorCaseKeywords',
           );
         }
@@ -98,8 +95,7 @@ void main() {
           expect(
             ruleSource.contains("'$keyword'"),
             isTrue,
-            reason:
-                'Failure keyword "$keyword" should be '
+            reason: 'Failure keyword "$keyword" should be '
                 'in _errorCaseKeywords',
           );
         }
@@ -118,8 +114,7 @@ void main() {
           expect(
             ruleSource.contains("'$keyword'"),
             isTrue,
-            reason:
-                'Boundary keyword "$keyword" should be '
+            reason: 'Boundary keyword "$keyword" should be '
                 'in _errorCaseKeywords',
           );
         }
@@ -129,8 +124,7 @@ void main() {
         expect(
           ruleSource.contains('_errorCaseKeywords.any(firstArg.contains)'),
           isTrue,
-          reason:
-              'Should use _errorCaseKeywords.any() instead of '
+          reason: 'Should use _errorCaseKeywords.any() instead of '
               'chained if/contains',
         );
       });
@@ -165,8 +159,7 @@ void main() {
         expect(
           fixtureSource.contains('_good1213_safely'),
           isTrue,
-          reason:
-              'Fixture should have a GOOD case for defensive '
+          reason: 'Fixture should have a GOOD case for defensive '
               '"safely" keyword',
         );
       });

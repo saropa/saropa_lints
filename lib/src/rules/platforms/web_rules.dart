@@ -656,8 +656,7 @@ class AvoidJsRoundedIntsRule extends SaropaLintRule {
       final int? value = node.value;
       if (value == null) return;
       final AstNode? parent = node.parent;
-      final int effectiveValue =
-          (parent is PrefixExpression &&
+      final int effectiveValue = (parent is PrefixExpression &&
               parent.operator.type == TokenType.MINUS)
           ? -value
           : value;
@@ -713,19 +712,19 @@ class PreferCsrfProtectionRule extends SaropaLintRule {
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-    'Cookie',
-    'cookie',
-    '.post(',
-    '.put(',
-    '.delete(',
-    '.patch(',
-  };
+        'Cookie',
+        'cookie',
+        '.post(',
+        '.put(',
+        '.delete(',
+        '.patch(',
+      };
 
   @override
   OwaspMapping? get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m3},
-    web: <OwaspWeb>{OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m3},
+        web: <OwaspWeb>{OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'prefer_csrf_protection',

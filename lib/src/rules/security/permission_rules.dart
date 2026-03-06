@@ -455,8 +455,7 @@ class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
         'Using these deprecated APIs prevents migration to null-safe versions '
         'and causes compile errors when updating the package. The modern API '
         'uses Permission.camera.status and Permission.camera.request() instead. {v2}',
-    correctionMessage:
-        'Migrate to the null-safe permission_handler API: use '
+    correctionMessage: 'Migrate to the null-safe permission_handler API: use '
         'Permission.camera.status instead of '
         'PermissionHandler().checkPermissionStatus(PermissionGroup.camera).',
     severity: DiagnosticSeverity.ERROR,
@@ -589,8 +588,7 @@ class PreferPermissionRequestInContextRule extends SaropaLintRule {
       final String? targetSource = node.target?.toSource();
       if (targetSource == null) return;
 
-      final bool isPermission =
-          targetSource == 'Permission' ||
+      final bool isPermission = targetSource == 'Permission' ||
           targetSource.startsWith('Permission.');
       if (!isPermission) return;
 
@@ -664,8 +662,7 @@ class AvoidPermissionRequestLoopRule extends SaropaLintRule {
         'making the loop both annoying and futile. Request once, check the '
         'result, and direct users to app settings via openAppSettings() if '
         'the permission is permanently denied. {v1}',
-    correctionMessage:
-        'Remove the loop and request the permission once. '
+    correctionMessage: 'Remove the loop and request the permission once. '
         'If denied, call openAppSettings() to let the user enable it '
         'manually.',
     severity: DiagnosticSeverity.WARNING,

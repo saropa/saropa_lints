@@ -1008,9 +1008,8 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
   /// Handles both positional and named arguments.
   bool _lastArgIsCallback(NodeList<Expression> arguments) {
     final Expression lastArg = arguments.last;
-    final Expression expr = lastArg is NamedExpression
-        ? lastArg.expression
-        : lastArg;
+    final Expression expr =
+        lastArg is NamedExpression ? lastArg.expression : lastArg;
     return expr is FunctionExpression;
   }
 
@@ -1618,9 +1617,9 @@ class PreferSingleQuotesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ConvertToSingleQuotesFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ConvertToSingleQuotesFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_single_quotes',
@@ -1892,9 +1891,9 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        CapitalizeCommentFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            CapitalizeCommentFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_sentence_case_comments',
@@ -2294,9 +2293,9 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ConvertToScreamingCaseFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ConvertToScreamingCaseFix(context: context),
+      ];
 }
 
 /// Warns when boolean variables/parameters don't use descriptive prefixes.
@@ -2782,9 +2781,8 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
 
       if (!_snakeCasePattern.hasMatch(baseName)) {
         // Report at the library directive if present, otherwise at the first token
-        final LibraryDirective? library = unit.directives
-            .whereType<LibraryDirective>()
-            .firstOrNull;
+        final LibraryDirective? library =
+            unit.directives.whereType<LibraryDirective>().firstOrNull;
         if (library != null) {
           reporter.atNode(library);
         } else {
@@ -2911,9 +2909,9 @@ class AvoidSmallTextRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        IncreaseFontSizeFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            IncreaseFontSizeFix(context: context),
+      ];
 }
 
 /// Warns when regular comments (`//`) are used instead of doc comments (`///`)
@@ -3166,9 +3164,9 @@ class PreferStraightApostropheRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceCurlyApostropheFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceCurlyApostropheFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_straight_apostrophe',
@@ -3494,9 +3492,9 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceStraightWithCurlyFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceStraightWithCurlyFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_curly_apostrophe',
@@ -3606,15 +3604,15 @@ class ArgumentsOrderingRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        SortArgumentsFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            SortArgumentsFix(context: context),
+      ];
 
   @override
   List<String> get configAliases => const <String>[
-    'enforce_arguments_ordering',
-    'arguments_ordering',
-  ];
+        'enforce_arguments_ordering',
+        'arguments_ordering',
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_arguments_ordering',
@@ -3723,15 +3721,15 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        DeleteCommentedCodeFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            DeleteCommentedCodeFix(context: context),
+      ];
 
   @override
   List<String> get configAliases => const <String>[
-    'avoid_commented_out_code',
-    'prefer_no_commented_code',
-  ];
+        'avoid_commented_out_code',
+        'prefer_no_commented_code',
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_no_commented_out_code',
@@ -3975,12 +3973,10 @@ class PreferInterpolationToComposeRule extends SaropaLintRule {
       if (node.staticType?.isDartCoreString != true) return;
       final left = node.leftOperand;
       final right = node.rightOperand;
-      final leftLiteral =
-          left is SimpleStringLiteral ||
+      final leftLiteral = left is SimpleStringLiteral ||
           left is StringInterpolation ||
           left is AdjacentStrings;
-      final rightLiteral =
-          right is SimpleStringLiteral ||
+      final rightLiteral = right is SimpleStringLiteral ||
           right is StringInterpolation ||
           right is AdjacentStrings;
       if (!leftLiteral && !rightLiteral) return;

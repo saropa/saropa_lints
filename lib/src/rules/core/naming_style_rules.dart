@@ -238,9 +238,8 @@ class FormatCommentRule extends SaropaLintRule {
 
         while (commentToken != null) {
           final String lexeme = commentToken.lexeme;
-          final int currentLine = lineInfo
-              .getLocation(commentToken.offset)
-              .lineNumber;
+          final int currentLine =
+              lineInfo.getLocation(commentToken.offset).lineNumber;
 
           // Only check single-line comments (not doc comments)
           if (lexeme.startsWith('//') && !lexeme.startsWith('///')) {
@@ -289,9 +288,9 @@ class FormatCommentRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        CapitalizeCommentFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            CapitalizeCommentFix(context: context),
+      ];
 }
 
 /// Warns when class names don't match expected patterns.
@@ -734,9 +733,8 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
       for (final VariableDeclaration variable in node.fields.variables) {
         final String name = variable.name.lexeme;
         // Strip leading underscore for checking
-        final String checkName = name.startsWith('_')
-            ? name.substring(1)
-            : name;
+        final String checkName =
+            name.startsWith('_') ? name.substring(1) : name;
 
         if (!_hasValidBooleanName(checkName)) {
           reporter.atNode(variable);
@@ -752,9 +750,8 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
 
       for (final VariableDeclaration variable in node.variables.variables) {
         final String name = variable.name.lexeme;
-        final String checkName = name.startsWith('_')
-            ? name.substring(1)
-            : name;
+        final String checkName =
+            name.startsWith('_') ? name.substring(1) : name;
 
         if (!_hasValidBooleanName(checkName)) {
           reporter.atNode(variable);
@@ -939,9 +936,8 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
       for (final VariableDeclaration variable in node.variables.variables) {
         final String name = variable.name.lexeme;
         // Strip leading underscore for checking
-        final String checkName = name.startsWith('_')
-            ? name.substring(1)
-            : name;
+        final String checkName =
+            name.startsWith('_') ? name.substring(1) : name;
 
         if (!_hasValidBooleanName(checkName)) {
           reporter.atNode(variable);
@@ -1175,9 +1171,8 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
     if (typeAnnotation is! NamedType) return;
     if (typeAnnotation.name.lexeme != 'bool') return;
 
-    final String checkName = paramName.startsWith('_')
-        ? paramName.substring(1)
-        : paramName;
+    final String checkName =
+        paramName.startsWith('_') ? paramName.substring(1) : paramName;
 
     if (!_hasValidBooleanName(checkName)) {
       reporter.atToken(nameToken);
@@ -1256,8 +1251,7 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
 
       // Check if this is a callback type (Function or VoidCallback or similar)
       final String typeStr = typeAnnotation.toSource();
-      final bool isCallback =
-          typeStr.contains('Function') ||
+      final bool isCallback = typeStr.contains('Function') ||
           typeStr.contains('Callback') ||
           typeStr.contains('ValueChanged') ||
           typeStr.contains('ValueGetter') ||
@@ -1301,8 +1295,7 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
         if (typeAnnotation == null || paramName == null) continue;
 
         final String typeStr = typeAnnotation.toSource();
-        final bool isCallback =
-            typeStr.contains('Function') ||
+        final bool isCallback = typeStr.contains('Function') ||
             typeStr.contains('Callback') ||
             typeStr.contains('ValueChanged') ||
             typeStr.contains('ValueGetter') ||
@@ -1743,10 +1736,8 @@ class PreferMatchFileNameRule extends SaropaLintRule {
   ) {
     context.addCompilationUnit((CompilationUnit node) {
       final String filePath = context.filePath;
-      final String fileName = filePath
-          .split(_pathSeparator)
-          .last
-          .replaceAll('.dart', '');
+      final String fileName =
+          filePath.split(_pathSeparator).last.replaceAll('.dart', '');
       final String expectedClassName = _snakeToPascal(fileName);
 
       // Only check the first public class
@@ -1878,9 +1869,9 @@ class TagNameRule extends SaropaLintRule {
 
   @override
   List<String> get configAliases => const <String>[
-    'tag_name',
-    'prefer_kebab_tag',
-  ];
+        'tag_name',
+        'prefer_kebab_tag',
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_kebab_tag_name',

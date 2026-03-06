@@ -264,8 +264,7 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
 
       // Check if channels are unsubscribed
       for (final String name in channelNames) {
-        final bool isUnsubscribed =
-            disposeBody != null &&
+        final bool isUnsubscribed = disposeBody != null &&
             (unsubscribeRegex(name).hasMatch(disposeBody) ||
                 removeChannelRegex.hasMatch(disposeBody));
 

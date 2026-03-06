@@ -107,10 +107,10 @@ class SeverityCounts {
 // ─────────────────────────────────────────────────────────────────────────────
 
 Map<String, Object> _severityCountsToJson(SeverityCounts sc) => {
-  'e': sc.error,
-  'w': sc.warning,
-  'i': sc.info,
-};
+      'e': sc.error,
+      'w': sc.warning,
+      'i': sc.info,
+    };
 
 SeverityCounts _severityCountsFromJson(dynamic raw) {
   final m = raw is Map<String, dynamic> ? raw : <String, dynamic>{};
@@ -179,18 +179,18 @@ Map<LintImpact, List<ViolationRecord>> _violationsFromJson(dynamic raw) {
 }
 
 Map<String, Object> _configToJson(ReportConfig c) => <String, Object>{
-  'version': c.version,
-  'tier': c.effectiveTier,
-  'ruleCount': c.enabledRuleCount,
-  'rules': c.enabledRuleNames,
-  'ePlatforms': c.enabledPlatforms,
-  'dPlatforms': c.disabledPlatforms,
-  'ePackages': c.enabledPackages,
-  'dPackages': c.disabledPackages,
-  'exclusions': c.userExclusions,
-  'maxIssues': c.maxIssues,
-  'output': c.outputMode,
-};
+      'version': c.version,
+      'tier': c.effectiveTier,
+      'ruleCount': c.enabledRuleCount,
+      'rules': c.enabledRuleNames,
+      'ePlatforms': c.enabledPlatforms,
+      'dPlatforms': c.disabledPlatforms,
+      'ePackages': c.enabledPackages,
+      'dPackages': c.disabledPackages,
+      'exclusions': c.userExclusions,
+      'maxIssues': c.maxIssues,
+      'output': c.outputMode,
+    };
 
 ReportConfig? _configFromJson(dynamic raw) {
   if (raw is! Map<String, dynamic>) return null;

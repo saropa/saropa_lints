@@ -163,9 +163,9 @@ class AvoidDuplicateMapKeysRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RemoveDuplicateMapEntryFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RemoveDuplicateMapEntryFix(context: context),
+      ];
 }
 
 /// Warns when .keys.contains() is used instead of .containsKey().
@@ -222,9 +222,9 @@ class AvoidMapKeysContainsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        UseContainsKeyFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            UseContainsKeyFix(context: context),
+      ];
 }
 
 /// Warns when unnecessary collection wrappers are used.
@@ -298,9 +298,9 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceUnnecessaryCollectionWrapperFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceUnnecessaryCollectionWrapperFix(context: context),
+      ];
 }
 
 /// Warns when using .first or .last on potentially empty collections.
@@ -773,8 +773,8 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
     if (expr is! SimpleIdentifier) return false;
 
     // Walk up to the enclosing FunctionExpression (the callback lambda)
-    final FunctionExpression? callback = expr
-        .thisOrAncestorOfType<FunctionExpression>();
+    final FunctionExpression? callback =
+        expr.thisOrAncestorOfType<FunctionExpression>();
     if (callback == null) return false;
 
     // Check if the callback is the value of a known named argument
@@ -1263,9 +1263,9 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        UseWhereOrNullFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            UseWhereOrNullFix(context: context),
+      ];
 }
 
 /// Suggests using *OrNull methods instead of *Where with orElse callback.
@@ -1355,9 +1355,9 @@ class PreferWhereOrNullRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceWithWhereOrNullFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceWithWhereOrNullFix(context: context),
+      ];
 }
 
 /// Warns when map literal keys are not in alphabetical order.
@@ -1457,9 +1457,9 @@ class PreferContainsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        UseContainsFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            UseContainsFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_list_contains',
@@ -1525,9 +1525,9 @@ class PreferFirstRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        UseFirstFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            UseFirstFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_list_first',
@@ -1692,9 +1692,9 @@ class PreferIterableOfRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceFromWithOfFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceFromWithOfFix(context: context),
+      ];
 }
 
 /// Warns when `list[length-1]` is used instead of `list.last`.
@@ -1795,9 +1795,9 @@ class PreferLastRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        UseLastFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            UseLastFix(context: context),
+      ];
 }
 
 /// Warns when forEach with add is used instead of addAll.
@@ -1953,9 +1953,9 @@ class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RemoveDuplicateCollectionElementFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RemoveDuplicateCollectionElementFix(context: context),
+      ];
 
   @override
   void runWithReporter(
@@ -2028,9 +2028,9 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RemoveDuplicateCollectionElementFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RemoveDuplicateCollectionElementFix(context: context),
+      ];
 
   @override
   void runWithReporter(
@@ -2102,9 +2102,9 @@ class AvoidDuplicateObjectElementsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RemoveDuplicateCollectionElementFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RemoveDuplicateCollectionElementFix(context: context),
+      ];
 
   @override
   void runWithReporter(
@@ -2176,9 +2176,9 @@ class RequireConstListItemsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddConstToListItemFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddConstToListItemFix(context: context),
+      ];
 }
 
 /// Prefer asMap().entries for indexed iteration over manual index.
@@ -2444,9 +2444,9 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddForLoopIncrementCommentFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddForLoopIncrementCommentFix(context: context),
+      ];
 
   @override
   void runWithReporter(

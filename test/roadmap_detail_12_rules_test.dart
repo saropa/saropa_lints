@@ -31,7 +31,8 @@ void main() {
 
   group('Roadmap detail 12 rules - registration', () {
     test('all 12 rules are registered in allSaropaRules', () {
-      final names = allSaropaRules.map((r) => r.code.name.toLowerCase()).toSet();
+      final names =
+          allSaropaRules.map((r) => r.code.name.toLowerCase()).toSet();
       for (final name in allNewRules) {
         expect(
           names.contains(name),

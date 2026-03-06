@@ -382,8 +382,7 @@ class RequireAwaitInDriftTransactionRule extends SaropaLintRule {
         'the callback returns — unawaited futures execute outside the '
         'transaction boundary, losing atomicity and causing data '
         'inconsistency. {v1}',
-    correctionMessage:
-        'Add await before database operations inside '
+    correctionMessage: 'Add await before database operations inside '
         'transaction callbacks.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -515,8 +514,7 @@ class RequireDriftForeignKeyPragmaRule extends SaropaLintRule {
         'PRAGMA foreign_keys = ON in beforeOpen callback. SQLite does NOT '
         'enforce foreign keys by default — all foreign key constraints in '
         'table definitions are silently ignored without this pragma. {v1}',
-    correctionMessage:
-        'Add a MigrationStrategy with beforeOpen callback '
+    correctionMessage: 'Add a MigrationStrategy with beforeOpen callback '
         'that runs: await customStatement(\'PRAGMA foreign_keys = ON\');',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -588,8 +586,7 @@ class AvoidDriftRawSqlInterpolationRule extends SaropaLintRule {
         'concatenation detected in Drift raw SQL method. This creates a SQL '
         'injection vulnerability (OWASP A03:2021-Injection). Attackers can '
         'execute arbitrary SQL including data exfiltration and deletion. {v1}',
-    correctionMessage:
-        'Use parameterized queries with the variables '
+    correctionMessage: 'Use parameterized queries with the variables '
         'parameter: customSelect(\'SELECT * FROM t WHERE id = ?\', '
         'variables: [Variable.withInt(id)])',
     severity: DiagnosticSeverity.ERROR,
@@ -670,8 +667,7 @@ class PreferDriftBatchOperationsRule extends SaropaLintRule {
         'call detected inside a loop. This is dramatically slower than using '
         'batch((b) { b.insertAll(...); }). Batches prepare SQL once and '
         'reuse it, providing 10-100x speedup for large datasets. {v1}',
-    correctionMessage:
-        'Use batch operations: await batch((b) { '
+    correctionMessage: 'Use batch operations: await batch((b) { '
         'b.insertAll(table, companions); });',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -778,8 +774,7 @@ class RequireDriftStreamCancelRule extends SaropaLintRule {
         'subscriptions cause memory leaks and re-execute the query on every '
         'table change, wasting CPU and memory. Always store and cancel '
         'subscriptions. {v1}',
-    correctionMessage:
-        'Store the subscription in a field and call '
+    correctionMessage: 'Store the subscription in a field and call '
         '.cancel() on it in dispose().',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -868,8 +863,7 @@ class AvoidDriftDatabaseOnMainIsolateRule extends SaropaLintRule {
         'mobile this causes UI jank and dropped frames. Use '
         'NativeDatabase.createInBackground() or driftDatabase() from '
         'drift_flutter for automatic platform handling. {v1}',
-    correctionMessage:
-        'Use NativeDatabase.createInBackground(file) or '
+    correctionMessage: 'Use NativeDatabase.createInBackground(file) or '
         'driftDatabase(name: \'app\') from the drift_flutter package.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1024,8 +1018,7 @@ class AvoidDriftGetSingleWithoutUniqueRule extends SaropaLintRule {
         'the query returns zero or more than one row. Without filtering to '
         'a unique row, this will crash at runtime when the table has != 1 '
         'row. {v1}',
-    correctionMessage:
-        'Add a where() clause filtering by primary key or '
+    correctionMessage: 'Add a where() clause filtering by primary key or '
         'unique column, or use getSingleOrNull() / get() instead.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1099,8 +1092,7 @@ class PreferDriftUseColumnsFalseRule extends SaropaLintRule {
         'aggregation, setting useColumns: false avoids reading unnecessary '
         'columns and improves query performance. Consider whether joined '
         'table columns are actually needed. {v1}',
-    correctionMessage:
-        'Add useColumns: false to join calls where joined '
+    correctionMessage: 'Add useColumns: false to join calls where joined '
         'table columns are not needed in the result.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1178,8 +1170,7 @@ class AvoidDriftLazyDatabaseRule extends SaropaLintRule {
         'isolates — stream queries may not update when data changes across '
         'isolates. Use DatabaseConnection.delayed() instead, which properly '
         'integrates with the stream system. {v1}',
-    correctionMessage:
-        'Replace LazyDatabase with '
+    correctionMessage: 'Replace LazyDatabase with '
         'DatabaseConnection.delayed(Future(() async { ... })).',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1250,8 +1241,7 @@ class PreferDriftIsolateSharingRule extends SaropaLintRule {
         'Streams only update when changes go through the same instance. '
         'Use a singleton pattern, drift_flutter shareAcrossIsolates, or '
         'DriftIsolate for proper multi-isolate support. {v1}',
-    correctionMessage:
-        'Use a singleton pattern or drift_flutter with '
+    correctionMessage: 'Use a singleton pattern or drift_flutter with '
         'shareAcrossIsolates: true.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1339,8 +1329,7 @@ class AvoidDriftQueryInMigrationRule extends SaropaLintRule {
         'schema, but during migration the database is on the OLD schema. '
         'This causes runtime crashes. Use raw SQL via customStatement() '
         'or migrator methods instead. {v1}',
-    correctionMessage:
-        'Replace select/update/delete/into calls with '
+    correctionMessage: 'Replace select/update/delete/into calls with '
         'customStatement() or migrator.addColumn() in migration callbacks.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -1436,8 +1425,7 @@ class RequireDriftSchemaVersionBumpRule extends SaropaLintRule {
         'since initial release without bumping the version, onUpgrade will '
         'not trigger, causing runtime crashes from schema mismatches. '
         'Consider bumping schemaVersion after schema changes. {v1}',
-    correctionMessage:
-        'Bump schemaVersion when you add, remove, or modify '
+    correctionMessage: 'Bump schemaVersion when you add, remove, or modify '
         'tables or columns. Add migration logic in onUpgrade.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1535,8 +1523,7 @@ class AvoidDriftForeignKeyInMigrationRule extends SaropaLintRule {
         'transactions, and SQLite PRAGMAs cannot be changed inside '
         'transactions — this silently fails. Set the pragma in the '
         'beforeOpen callback instead. {v1}',
-    correctionMessage:
-        'Move the PRAGMA foreign_keys statement to the '
+    correctionMessage: 'Move the PRAGMA foreign_keys statement to the '
         'beforeOpen callback of MigrationStrategy.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1617,8 +1604,7 @@ class RequireDriftReadsFromRule extends SaropaLintRule {
         'tables the query reads from and the stream can never be '
         'invalidated — it returns the initial result and never updates, '
         'even when the underlying data changes. {v1}',
-    correctionMessage:
-        'Add the readsFrom parameter: '
+    correctionMessage: 'Add the readsFrom parameter: '
         'customSelect(sql, readsFrom: {tableName}).watch()',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1690,8 +1676,7 @@ class AvoidDriftUnsafeWebStorageRule extends SaropaLintRule {
         'multiple browser tabs — data races can occur when multiple tabs '
         'write simultaneously. Use driftDatabase() from drift_flutter which '
         'selects the safest available strategy automatically. {v1}',
-    correctionMessage:
-        'Use driftDatabase(name: \'app\') from drift_flutter '
+    correctionMessage: 'Use driftDatabase(name: \'app\') from drift_flutter '
         'for automatic multi-tab safe storage selection.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1768,8 +1753,7 @@ class AvoidDriftCloseStreamsInTestsRule extends SaropaLintRule {
         'debouncing timers persist after test completion, causing flaky '
         'test failures with "Timer still pending" errors. Wrap in '
         'DatabaseConnection with closeStreamsSynchronously: true. {v1}',
-    correctionMessage:
-        'Wrap in DatabaseConnection: '
+    correctionMessage: 'Wrap in DatabaseConnection: '
         'DatabaseConnection(NativeDatabase.memory(), '
         'closeStreamsSynchronously: true)',
     severity: DiagnosticSeverity.INFO,
@@ -1864,8 +1848,7 @@ class AvoidDriftNullableConverterMismatchRule extends SaropaLintRule {
         'cannot be applied to non-nullable columns since Drift v2 and is '
         'almost always wrong. Use NullAwareTypeConverter for nullable '
         'handling, or make only the needed type parameter nullable. {v1}',
-    correctionMessage:
-        'Use TypeConverter<Foo, int> for non-nullable '
+    correctionMessage: 'Use TypeConverter<Foo, int> for non-nullable '
         'columns, or NullAwareTypeConverter for nullable column support.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1952,8 +1935,7 @@ class AvoidDriftValueNullVsAbsentRule extends SaropaLintRule {
         'non-nullable columns. If you meant "leave this column unchanged", '
         'use Value.absent() instead. Review whether null or absent is '
         'the correct intent for this column. {v1}',
-    correctionMessage:
-        'Use Value.absent() to leave the column unchanged, '
+    correctionMessage: 'Use Value.absent() to leave the column unchanged, '
         'or ensure the column is nullable before using Value(null).',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -2033,8 +2015,7 @@ class RequireDriftEqualsValueRule extends SaropaLintRule {
         '.equals() expects the raw SQL type — using a Dart enum generates '
         'a query that silently never matches. Use .equalsValue() instead, '
         'which applies the TypeConverter automatically. {v1}',
-    correctionMessage:
-        'Replace .equals(EnumType.value) with '
+    correctionMessage: 'Replace .equals(EnumType.value) with '
         '.equalsValue(EnumType.value) to apply the TypeConverter.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -2109,8 +2090,7 @@ class RequireDriftReadTableOrNullRule extends SaropaLintRule {
         'table — readTable() throws ArgumentError when the row is null. '
         'Use readTableOrNull() instead to safely handle missing joined '
         'rows. {v1}',
-    correctionMessage:
-        'Replace readTable(joinedTable) with '
+    correctionMessage: 'Replace readTable(joinedTable) with '
         'readTableOrNull(joinedTable) after left outer joins.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -2188,8 +2168,7 @@ class RequireDriftCreateAllInOnCreateRule extends SaropaLintRule {
         'tables are never created on first launch, causing "no such table" '
         'runtime errors. This only affects new installations, making it '
         'easy to miss during development. {v1}',
-    correctionMessage:
-        'Add await m.createAll() in the onCreate callback '
+    correctionMessage: 'Add await m.createAll() in the onCreate callback '
         'to create all tables on first launch.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -2336,8 +2315,7 @@ class AvoidDriftReplaceWithoutAllColumnsRule extends SaropaLintRule {
         'columns, replace() replaces the ENTIRE row — unspecified columns '
         'revert to defaults or null. This frequently causes silent data '
         'loss. Use write() to update only the specified columns. {v1}',
-    correctionMessage:
-        'Use .write(companion) instead of .replace(companion) '
+    correctionMessage: 'Use .write(companion) instead of .replace(companion) '
         'to only update the columns you specify.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -2408,8 +2386,7 @@ class AvoidDriftMissingUpdatesParamRule extends SaropaLintRule {
         'track which tables were modified — stream queries watching those '
         'tables will NOT update and return stale data silently. Always '
         'specify the updates parameter for proper stream invalidation. {v1}',
-    correctionMessage:
-        'Add the updates parameter: '
+    correctionMessage: 'Add the updates parameter: '
         'customUpdate(sql, variables: [...], updates: {tableName})',
     severity: DiagnosticSeverity.INFO,
   );
@@ -2494,8 +2471,7 @@ class AvoidIsarImportWithDriftRule extends SaropaLintRule {
         'both databases active doubles memory usage, complicates resource '
         'management, and risks reading stale data from the old database. '
         'Complete the migration to Drift and remove Isar imports. {v1}',
-    correctionMessage:
-        'Complete migration to Drift and remove all '
+    correctionMessage: 'Complete migration to Drift and remove all '
         'Isar imports. If this is migration code, consider isolating it '
         'in a dedicated migration file.',
     severity: DiagnosticSeverity.WARNING,
@@ -2577,8 +2553,7 @@ class PreferDriftForeignKeyDeclarationRule extends SaropaLintRule {
         '.references() declaration. Without it, Drift cannot enforce '
         'referential integrity or generate join helpers. This is common '
         'when migrating from Isar, where IsarLink handled relations. {v1}',
-    correctionMessage:
-        'Add .references(OtherTable, #id) to declare the '
+    correctionMessage: 'Add .references(OtherTable, #id) to declare the '
         'foreign key relationship for this column.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -2696,8 +2671,7 @@ class RequireDriftOnUpgradeHandlerRule extends SaropaLintRule {
         'Users upgrading from an earlier version will get the old schema '
         'with new code, causing "no such column" or "no such table" '
         'runtime crashes. Add an onUpgrade handler. {v1}',
-    correctionMessage:
-        'Add an onUpgrade callback to MigrationStrategy '
+    correctionMessage: 'Add an onUpgrade callback to MigrationStrategy '
         'that handles migration from each previous schema version.',
     severity: DiagnosticSeverity.WARNING,
   );

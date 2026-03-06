@@ -166,8 +166,7 @@ class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_explicit_pattern_field_name',
     '[avoid_explicit_pattern_field_name] Explicit pattern field name matches variable name. Explicit field names are used in pattern matching when they match the variable name. This pattern matching usage can cause unexpected behavior or miss important type information. {v3}',
-    correctionMessage:
-        'Use shorthand syntax: `:fieldName` instead of '
+    correctionMessage: 'Use shorthand syntax: `:fieldName` instead of '
         '`fieldName: fieldName`. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -195,9 +194,9 @@ class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        UseShorthandPatternFieldFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            UseShorthandPatternFieldFix(context: context),
+      ];
 }
 
 /// Warns when extension is defined on a Record type.

@@ -187,9 +187,9 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        PreferDoubleQuotesFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            PreferDoubleQuotesFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_double_quotes',
@@ -423,8 +423,8 @@ class PreferFlatImportsRule extends SaropaLintRule {
   ) {
     context.addCompilationUnit((node) {
       final imports = node.directives.whereType<ImportDirective>().toList(
-        growable: false,
-      );
+            growable: false,
+          );
       if (imports.length < 2) return;
 
       final lineInfo = context.lineInfo;
@@ -435,9 +435,8 @@ class PreferFlatImportsRule extends SaropaLintRule {
 
         // Get line numbers for previous and current imports
         final prevEndLine = lineInfo.getLocation(prevImport.end).lineNumber;
-        final currStartLine = lineInfo
-            .getLocation(currImport.offset)
-            .lineNumber;
+        final currStartLine =
+            lineInfo.getLocation(currImport.offset).lineNumber;
 
         // If there's more than one line gap (blank line), report
         if (currStartLine - prevEndLine > 1) {
@@ -483,9 +482,9 @@ class PreferSortedImportsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        SortImportsFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            SortImportsFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_sorted_imports',
@@ -494,8 +493,7 @@ class PreferSortedImportsRule extends SaropaLintRule {
         'locate specific dependencies and increase the likelihood of merge '
         'conflicts when multiple developers add imports to the same file. '
         '{v1}',
-    correctionMessage:
-        'Sort imports alphabetically within each group '
+    correctionMessage: 'Sort imports alphabetically within each group '
         '(dart:, package:, relative) for easier scanning.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -507,8 +505,8 @@ class PreferSortedImportsRule extends SaropaLintRule {
   ) {
     context.addCompilationUnit((CompilationUnit node) {
       final imports = node.directives.whereType<ImportDirective>().toList(
-        growable: false,
-      );
+            growable: false,
+          );
       if (imports.length < 2) return;
 
       String? lastUri;
@@ -571,9 +569,9 @@ class PreferImportGroupCommentsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddImportGroupCommentsFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddImportGroupCommentsFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_import_group_comments',
@@ -595,8 +593,8 @@ class PreferImportGroupCommentsRule extends SaropaLintRule {
   ) {
     context.addCompilationUnit((CompilationUnit node) {
       final imports = node.directives.whereType<ImportDirective>().toList(
-        growable: false,
-      );
+            growable: false,
+          );
       if (imports.isEmpty) return;
 
       final content = context.fileContent;
@@ -1123,9 +1121,9 @@ class PreferObjectOverDynamicRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        PreferObjectOverDynamicFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            PreferObjectOverDynamicFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_object_over_dynamic',
@@ -1190,9 +1188,9 @@ class PreferDynamicOverObjectRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceAssertWithExpectFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceAssertWithExpectFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_dynamic_over_object',

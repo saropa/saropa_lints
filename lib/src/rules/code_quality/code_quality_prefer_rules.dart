@@ -74,9 +74,9 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddMissingInliningPragmaFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddMissingInliningPragmaFix(context: context),
+      ];
 }
 
 /// Warns when using `MediaQuery.of(context).size` instead of dedicated methods.
@@ -154,9 +154,9 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        PreferDedicatedMediaQueryMethodFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            PreferDedicatedMediaQueryMethodFix(context: context),
+      ];
 }
 
 /// Warns when enum values are found using firstWhere instead of byName.
@@ -215,8 +215,7 @@ class PreferEnumsByNameRule extends SaropaLintRule {
           // Check for pattern: e.name == 'something' or 'something' == e.name
           if (expr is BinaryExpression &&
               expr.operator.type == TokenType.EQ_EQ) {
-            final bool isNameComparison =
-                _isNameAccess(expr.leftOperand) ||
+            final bool isNameComparison = _isNameAccess(expr.leftOperand) ||
                 _isNameAccess(expr.rightOperand);
             if (isNameComparison) {
               reporter.atNode(node);
@@ -229,9 +228,9 @@ class PreferEnumsByNameRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceFirstWhereWithByNameFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceFirstWhereWithByNameFix(context: context),
+      ];
 
   bool _isNameAccess(Expression expr) {
     if (expr is PrefixedIdentifier) {
@@ -373,11 +372,11 @@ class PreferNullAwareSpreadRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        SimplifyRedundantNullAwareSpreadFix(context: context),
-    ({required CorrectionProducerContext context}) =>
-        ReplaceConditionalSpreadWithNullAwareFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            SimplifyRedundantNullAwareSpreadFix(context: context),
+        ({required CorrectionProducerContext context}) =>
+            ReplaceConditionalSpreadWithNullAwareFix(context: context),
+      ];
 }
 
 /// Warns when @visibleForTesting should be used on members.
@@ -531,9 +530,9 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceWhereIsEmptyWithAnyFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceWhereIsEmptyWithAnyFix(context: context),
+      ];
 }
 
 /// Warns when index-based for loop can be replaced with for-in.
@@ -725,10 +724,10 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
 
           if (thenTarget == elseTarget) {
             // Check if only one argument differs
-            final List<Expression> thenArgs = thenExpr.argumentList.arguments
-                .toList();
-            final List<Expression> elseArgs = elseExpr.argumentList.arguments
-                .toList();
+            final List<Expression> thenArgs =
+                thenExpr.argumentList.arguments.toList();
+            final List<Expression> elseArgs =
+                elseExpr.argumentList.arguments.toList();
 
             if (thenArgs.length == elseArgs.length && thenArgs.length >= 2) {
               int diffCount = 0;
@@ -979,9 +978,8 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
               final String expectedTypeName = firstArg.type.toSource();
 
               // Get actual parameter type
-              final TypeAnnotation? paramType = node is SimpleFormalParameter
-                  ? node.type
-                  : null;
+              final TypeAnnotation? paramType =
+                  node is SimpleFormalParameter ? node.type : null;
 
               if (paramType != null) {
                 final String actualTypeName = paramType.toSource();
@@ -1138,8 +1136,8 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
   /// See also: `_isUtilityNamespaceFile` in `structure_rules.dart` which
   /// performs the same check (kept separate to avoid cross-file imports).
   static bool _allClassesAreStaticNamespaces(CompilationUnit unit) {
-    final Iterable<ClassDeclaration> classes = unit.declarations
-        .whereType<ClassDeclaration>();
+    final Iterable<ClassDeclaration> classes =
+        unit.declarations.whereType<ClassDeclaration>();
     if (classes.isEmpty) return false;
 
     for (final ClassDeclaration cls in classes) {
@@ -1215,8 +1213,8 @@ class PreferTestMatchersRule extends SaropaLintRule {
       if (actual is PropertyAccess && actual.propertyName.name == 'length') {
         if (matcher is MethodInvocation &&
             matcher.methodName.name == 'equals') {
-          final List<Expression> matcherArgs = matcher.argumentList.arguments
-              .toList();
+          final List<Expression> matcherArgs =
+              matcher.argumentList.arguments.toList();
           if (matcherArgs.isNotEmpty) {
             final Expression matcherArg = matcherArgs[0];
             if (matcherArg is IntegerLiteral && matcherArg.value == 0) {
@@ -1251,11 +1249,11 @@ class PreferTestMatchersRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceExpectLengthEqualsZeroWithIsEmptyFix(context: context),
-    ({required CorrectionProducerContext context}) =>
-        ReplaceExpectContainsIsTrueWithContainsFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceExpectLengthEqualsZeroWithIsEmptyFix(context: context),
+        ({required CorrectionProducerContext context}) =>
+            ReplaceExpectContainsIsTrueWithContainsFix(context: context),
+      ];
 }
 
 /// Warns when `FutureOr<T>` could be unwrapped for cleaner handling.
@@ -1420,9 +1418,8 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
         if (method.name == '==' && !method.isAbstract) {
           // Check if it's from Object or a custom implementation
           final enclosing = (method as Element).enclosingElement;
-          final String? enclosingName = enclosing is InterfaceElement
-              ? enclosing.name
-              : null;
+          final String? enclosingName =
+              enclosing is InterfaceElement ? enclosing.name : null;
           if (enclosingName != null && enclosingName != 'Object') {
             parentHasCustomEquals = true;
             break;
@@ -1673,9 +1670,9 @@ class PreferUsePrefixRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddUsePrefixFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddUsePrefixFix(context: context),
+      ];
 }
 
 class _HookCallVisitor extends RecursiveAstVisitor<void> {
@@ -1792,9 +1789,9 @@ class PreferDotShorthandRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        PreferDotShorthandFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            PreferDotShorthandFix(context: context),
+      ];
 }
 
 // =============================================================================
@@ -1886,9 +1883,9 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        SimplifyBooleanComparisonFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            SimplifyBooleanComparisonFix(context: context),
+      ];
 }
 
 /// Quick fix: Simplifies boolean literal comparisons.
@@ -1935,9 +1932,9 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        PreferReturningConditionalExpressionsFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            PreferReturningConditionalExpressionsFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_returning_conditional_expressions',

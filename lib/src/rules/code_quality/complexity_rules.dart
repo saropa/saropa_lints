@@ -76,9 +76,9 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceBitwiseWithLogicalFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceBitwiseWithLogicalFix(context: context),
+      ];
 }
 
 /// Warns when cascade is used after if-null operator without parentheses.
@@ -136,9 +136,9 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        WrapIfNullInParensFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            WrapIfNullInParensFix(context: context),
+      ];
 }
 
 /// Warns when arithmetic expressions are too complex.
@@ -369,9 +369,9 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RemoveDuplicateCascadeSectionFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RemoveDuplicateCascadeSectionFix(context: context),
+      ];
 }
 
 /// Warns when an expression has excessive complexity.
@@ -746,9 +746,9 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        SwapBinaryOperandOrderFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            SwapBinaryOperandOrderFix(context: context),
+      ];
 }
 
 /// Warns when an expression is repeated and could be extracted to a variable.
@@ -903,9 +903,9 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        WrapIfNullExpressionInParensFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            WrapIfNullExpressionInParensFix(context: context),
+      ];
 }
 
 /// Warns when code blocks are nested more than 5 levels deep.

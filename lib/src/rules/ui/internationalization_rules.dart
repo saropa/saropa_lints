@@ -291,9 +291,9 @@ class RequireDirectionalWidgetsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RequireDirectionalWidgetsFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RequireDirectionalWidgetsFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1821,9 +1821,8 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
       if (!countComparisonPattern.hasMatch(bodySource)) return;
 
       // Must have multiple return statements with strings (different plurals)
-      final int returnCount = _returnStringPattern
-          .allMatches(bodySource)
-          .length;
+      final int returnCount =
+          _returnStringPattern.allMatches(bodySource).length;
 
       // Need at least 2 different string returns (singular/plural)
       if (returnCount < 2) return;
@@ -1988,8 +1987,7 @@ class AvoidStringConcatenationForL10nRule extends SaropaLintRule {
       if (node.operator.lexeme != '+') return;
 
       // Check if either side is a string literal
-      final bool hasStringLiteral =
-          node.leftOperand is SimpleStringLiteral ||
+      final bool hasStringLiteral = node.leftOperand is SimpleStringLiteral ||
           node.rightOperand is SimpleStringLiteral;
 
       if (!hasStringLiteral) return;
@@ -2519,8 +2517,7 @@ class RequireRtlLayoutSupportRule extends SaropaLintRule {
         '500 million users worldwide. Use directional equivalents (start/end) '
         'that automatically adapt to the text direction, ensuring your layout '
         'works correctly in both LTR and RTL contexts. {v1}',
-    correctionMessage:
-        'Replace left/right with start/end equivalents: '
+    correctionMessage: 'Replace left/right with start/end equivalents: '
         'EdgeInsetsDirectional instead of EdgeInsets, '
         'TextAlign.start instead of TextAlign.left, '
         'AlignmentDirectional.centerStart instead of Alignment.centerLeft.',

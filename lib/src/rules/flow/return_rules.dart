@@ -76,9 +76,9 @@ class AvoidReturningCascadesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        SplitReturnCascadeFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            SplitReturnCascadeFix(context: context),
+      ];
 }
 
 /// Avoid returning this from methods; prefer explicit return types.
@@ -131,9 +131,9 @@ class AvoidReturningThisRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceReturnThisWithReturnFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceReturnThisWithReturnFix(context: context),
+      ];
 }
 
 /// Warns when a function explicitly returns `void`.
@@ -201,9 +201,9 @@ class AvoidReturningVoidRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RemoveReturnVoidFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RemoveReturnVoidFix(context: context),
+      ];
 }
 
 /// Warns on unnecessary return statement at end of void function.
@@ -240,9 +240,9 @@ class AvoidUnnecessaryReturnRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RemoveUnnecessaryReturnFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RemoveUnnecessaryReturnFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_return',
@@ -323,9 +323,9 @@ class PreferImmediateReturnRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        InlineImmediateReturnFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            InlineImmediateReturnFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_immediate_return',
@@ -444,9 +444,9 @@ class PreferReturningShorthandsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ConvertToExpressionBodyFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ConvertToExpressionBodyFix(context: context),
+      ];
 }
 
 /// Warns when returning `null` from a function with `void` return type.
@@ -518,9 +518,9 @@ class AvoidReturningNullForVoidRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceReturnNullWithReturnFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceReturnNullWithReturnFix(context: context),
+      ];
 }
 
 /// Warns when returning `null` from a non-async `Future` function.
@@ -595,7 +595,7 @@ class AvoidReturningNullForFutureRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceReturnNullWithFutureValueFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceReturnNullWithFutureValueFix(context: context),
+      ];
 }

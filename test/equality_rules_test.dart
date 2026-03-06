@@ -17,7 +17,8 @@ void main() {
     });
     test('AvoidNegationsInEqualityChecksRule', () {
       final rule = AvoidNegationsInEqualityChecksRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_negations_in_equality_checks');
+      expect(
+          rule.code.name.toLowerCase(), 'avoid_negations_in_equality_checks');
       expect(
         rule.code.problemMessage,
         contains('[avoid_negations_in_equality_checks]'),

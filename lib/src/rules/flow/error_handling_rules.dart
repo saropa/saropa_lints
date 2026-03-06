@@ -99,9 +99,9 @@ class AvoidSwallowingExceptionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddRethrowInCatchFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddRethrowInCatchFix(context: context),
+      ];
 }
 
 class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
@@ -877,8 +877,7 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
       } else if (declaration is MixinDeclaration) {
         // childEntities is Iterable<SyntacticEntity>, not Iterable<AstNode>.
         for (final SyntacticEntity child in declaration.body.childEntities) {
-          if (child is MethodDeclaration &&
-              _bodyHasTryCatch(child.body)) {
+          if (child is MethodDeclaration && _bodyHasTryCatch(child.body)) {
             result.add(child.name.lexeme);
           }
         }
@@ -887,8 +886,7 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
         if (body != null) {
           // childEntities is Iterable<SyntacticEntity>, not Iterable<AstNode>.
           for (final SyntacticEntity child in body.childEntities) {
-            if (child is MethodDeclaration &&
-                _bodyHasTryCatch(child.body)) {
+            if (child is MethodDeclaration && _bodyHasTryCatch(child.body)) {
               result.add(child.name.lexeme);
             }
           }
@@ -1253,8 +1251,7 @@ class _UiErrorDisplayVisitor extends RecursiveAstVisitor<void> {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
-        final String? name =
-            current.constructorName.type.element?.name ??
+        final String? name = current.constructorName.type.element?.name ??
             current.constructorName.type.name.lexeme;
         if (uiWidgets.contains(name)) return true;
       }
@@ -1421,9 +1418,9 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ChangeExceptionToObjectFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ChangeExceptionToObjectFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_catch_exception_alone',

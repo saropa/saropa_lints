@@ -511,10 +511,8 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
         // Count commas + 1 for number of items
         final String tabsContent = tabBarMatch.group(1) ?? '';
         if (tabsContent.trim().isNotEmpty) {
-          tabBarTabCount = tabsContent
-              .split(',')
-              .where((s) => s.trim().isNotEmpty)
-              .length;
+          tabBarTabCount =
+              tabsContent.split(',').where((s) => s.trim().isNotEmpty).length;
         } else {
           tabBarTabCount = 0;
         }
@@ -1265,8 +1263,8 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
 
   @override
   List<String> get configAliases => const <String>[
-    'require_addAutomaticKeepAlives_off',
-  ];
+        'require_addAutomaticKeepAlives_off',
+      ];
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -1377,9 +1375,9 @@ class PreferSliverFillRemainingForEmptyRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceSliverToBoxAdapterFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceSliverToBoxAdapterFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_sliverfillremaining_for_empty',
@@ -1605,8 +1603,7 @@ class PreferInfiniteScrollPreloadRule extends SaropaLintRule {
         'so data arrives before the user reaches the end. This creates a '
         'seamless experience without visible pauses. Use '
         'position.pixels >= position.maxScrollExtent * 0.8 as threshold. {v1}',
-    correctionMessage:
-        'Trigger loading at 70-80%% scroll extent (e.g., '
+    correctionMessage: 'Trigger loading at 70-80%% scroll extent (e.g., '
         'position.pixels >= position.maxScrollExtent * 0.8) instead of '
         'waiting for the exact bottom.',
     severity: DiagnosticSeverity.INFO,

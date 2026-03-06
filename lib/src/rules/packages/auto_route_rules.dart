@@ -100,8 +100,7 @@ class AvoidAutoRouteContextNavigationRule extends SaropaLintRule {
         firstArg = first;
       }
 
-      final bool isStringNav =
-          firstArg is SimpleStringLiteral ||
+      final bool isStringNav = firstArg is SimpleStringLiteral ||
           firstArg is StringInterpolation ||
           firstArg is AdjacentStrings;
 

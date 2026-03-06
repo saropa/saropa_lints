@@ -36,7 +36,8 @@ void main() {
   group('Auto Route Rules - Rule Instantiation', () {
     test('AvoidAutoRouteContextNavigationRule instantiates correctly', () {
       final rule = AvoidAutoRouteContextNavigationRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_auto_route_context_navigation');
+      expect(
+          rule.code.name.toLowerCase(), 'avoid_auto_route_context_navigation');
       expect(
         rule.code.problemMessage,
         contains('[avoid_auto_route_context_navigation]'),
@@ -47,7 +48,8 @@ void main() {
 
     test('AvoidAutoRouteKeepHistoryMisuseRule instantiates correctly', () {
       final rule = AvoidAutoRouteKeepHistoryMisuseRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_auto_route_keep_history_misuse');
+      expect(
+          rule.code.name.toLowerCase(), 'avoid_auto_route_keep_history_misuse');
       expect(
         rule.code.problemMessage,
         contains('[avoid_auto_route_keep_history_misuse]'),
@@ -80,7 +82,8 @@ void main() {
 
     test('PreferAutoRoutePathParamsSimpleRule instantiates correctly', () {
       final rule = PreferAutoRoutePathParamsSimpleRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_auto_route_path_params_simple');
+      expect(
+          rule.code.name.toLowerCase(), 'prefer_auto_route_path_params_simple');
       expect(
         rule.code.problemMessage,
         contains('[prefer_auto_route_path_params_simple]'),

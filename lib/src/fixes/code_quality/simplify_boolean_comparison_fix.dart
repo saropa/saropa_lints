@@ -51,9 +51,8 @@ class SimplifyBooleanComparisonFix extends SaropaFixProducer {
     // x == false → !x
     // x != true  → !x
     // x != false → x
-    final bool needsNegation = isEquals
-        ? !boolLiteral.value
-        : boolLiteral.value;
+    final bool needsNegation =
+        isEquals ? !boolLiteral.value : boolLiteral.value;
     final source = otherExpr.toSource();
     final replacement = needsNegation ? '!$source' : source;
 

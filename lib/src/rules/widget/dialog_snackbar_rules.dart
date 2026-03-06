@@ -354,9 +354,9 @@ class PreferAdaptiveDialogRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        UseAdaptiveDialogFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            UseAdaptiveDialogFix(context: context),
+      ];
 
   static final RegExp _platformIsRegex = RegExp(r'\bplatform\.is\b');
   static final RegExp _defaultTargetPlatformRegex = RegExp(

@@ -240,13 +240,13 @@ class RequireConnectivityTimeoutRule extends SaropaLintRule {
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-    '.get(',
-    '.post(',
-    '.put(',
-    '.delete(',
-    '.patch(',
-    '.head(',
-  };
+        '.get(',
+        '.post(',
+        '.put(',
+        '.delete(',
+        '.patch(',
+        '.head(',
+      };
 
   static const LintCode _code = LintCode(
     'require_connectivity_timeout',

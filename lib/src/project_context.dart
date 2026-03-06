@@ -86,7 +86,7 @@ class BloomFilter {
   /// Default of 8192 bits (1KB) gives ~1% false positive rate for 500 patterns.
   /// If [bitSize] is <= 0, uses 8192 as fallback.
   BloomFilter([int bitSize = 8192])
-    : _bits = Uint8List(((bitSize > 0 ? bitSize : 8192) + 7) ~/ 8);
+      : _bits = Uint8List(((bitSize > 0 ? bitSize : 8192) + 7) ~/ 8);
 
   final Uint8List _bits;
   int get _bitSize => _bits.length * 8;
@@ -221,11 +221,14 @@ class GitAwarePriority {
 
     try {
       // Get modified and staged files
-      final result = await Process.run('git', [
-        'status',
-        '--porcelain',
-        '-z',
-      ], workingDirectory: root);
+      final result = await Process.run(
+          'git',
+          [
+            'status',
+            '--porcelain',
+            '-z',
+          ],
+          workingDirectory: root);
 
       if (result.exitCode != 0) return;
 
@@ -426,8 +429,7 @@ class _ProjectInfo {
 
     try {
       final content = pubspecFile.readAsStringSync();
-      final isFlutter =
-          content.contains('flutter:') ||
+      final isFlutter = content.contains('flutter:') ||
           content.contains('flutter_test:') ||
           content.contains('sdk: flutter');
 
@@ -946,12 +948,10 @@ class FileMetricsCache {
 
     // Package import detection (single pass through content)
     final hasFlutterImport = content.contains('package:flutter/');
-    final hasBlocImport =
-        content.contains('package:bloc/') ||
+    final hasBlocImport = content.contains('package:bloc/') ||
         content.contains('package:flutter_bloc/');
     final hasProviderImport = content.contains('package:provider/');
-    final hasRiverpodImport =
-        content.contains('package:riverpod/') ||
+    final hasRiverpodImport = content.contains('package:riverpod/') ||
         content.contains('package:flutter_riverpod/') ||
         content.contains('package:hooks_riverpod/');
 
@@ -1546,10 +1546,10 @@ class RulePriorityQueue {
   /// Sort rules by priority (lowest priority number runs first).
   static List<T> sortByPriority<T>(List<T> rules, String Function(T) getName) {
     return [...rules]..sort((a, b) {
-      final pa = _rulePriority[getName(a)] ?? 200;
-      final pb = _rulePriority[getName(b)] ?? 200;
-      return pa.compareTo(pb);
-    });
+        final pa = _rulePriority[getName(a)] ?? 200;
+        final pb = _rulePriority[getName(b)] ?? 200;
+        return pa.compareTo(pb);
+      });
   }
 
   /// Get priority for a rule (lower = runs first).
@@ -1924,12 +1924,12 @@ class ContentFingerprint {
     final sizeBucket = lineCount < 50
         ? 0
         : lineCount < 200
-        ? 1
-        : lineCount < 500
-        ? 2
-        : lineCount < 1000
-        ? 3
-        : 4;
+            ? 1
+            : lineCount < 500
+                ? 2
+                : lineCount < 1000
+                    ? 3
+                    : 4;
 
     return Object.hash(
       importCount.clamp(0, 20), // Cap at 20 imports
@@ -2249,9 +2249,8 @@ class ParallelAnalysisResult {
         hasRiverpodImport: hr is bool ? hr : false,
       ),
       fingerprint: fpr,
-      fileTypes: ft
-          .map<FileType>((e) => FileType.values[e is int ? e : 0])
-          .toSet(),
+      fileTypes:
+          ft.map<FileType>((e) => FileType.values[e is int ? e : 0]).toSet(),
       matchingPatterns: mp.cast<String>().toSet(),
     );
   }
@@ -2617,12 +2616,10 @@ class ParallelAnalyzer {
 
     // Package import detection
     final hasFlutterImport = content.contains('package:flutter/');
-    final hasBlocImport =
-        content.contains('package:bloc/') ||
+    final hasBlocImport = content.contains('package:bloc/') ||
         content.contains('package:flutter_bloc/');
     final hasProviderImport = content.contains('package:provider/');
-    final hasRiverpodImport =
-        content.contains('package:riverpod/') ||
+    final hasRiverpodImport = content.contains('package:riverpod/') ||
         content.contains('package:flutter_riverpod/') ||
         content.contains('package:hooks_riverpod/');
 
@@ -2646,12 +2643,12 @@ class ParallelAnalyzer {
     final sizeBucket = metrics.lineCount < 50
         ? 0
         : metrics.lineCount < 200
-        ? 1
-        : metrics.lineCount < 500
-        ? 2
-        : metrics.lineCount < 1000
-        ? 3
-        : 4;
+            ? 1
+            : metrics.lineCount < 500
+                ? 2
+                : metrics.lineCount < 1000
+                    ? 3
+                    : 4;
 
     return Object.hash(
       metrics.importCount.clamp(0, 20),
@@ -4013,8 +4010,7 @@ class CompilationUnitCache {
   /// Quick content analysis to populate basic data.
   static void _analyzeContent(String content, CompilationUnitDerivedData data) {
     // Check for widgets
-    data.hasWidgets =
-        content.contains('extends StatelessWidget') ||
+    data.hasWidgets = content.contains('extends StatelessWidget') ||
         content.contains('extends StatefulWidget') ||
         content.contains('extends State<');
 
@@ -4023,8 +4019,7 @@ class CompilationUnitCache {
         content.contains('async') || content.contains('Future<');
 
     // Check for tests
-    data.hasTests =
-        content.contains('@Test') ||
+    data.hasTests = content.contains('@Test') ||
         content.contains('void main()') && content.contains('test(');
 
     // Check for main function
@@ -4918,9 +4913,8 @@ class HotPathProfiler {
       'totalMeasurements': totalMeasurements,
       'recentEntries': _recentEntries.length,
       'slowOperationCount': slowOperations.length,
-      'slowestOperations': slowest
-          .map((e) => '${e.key}: ${e.value.inMilliseconds}ms')
-          .toList(),
+      'slowestOperations':
+          slowest.map((e) => '${e.key}: ${e.value.inMilliseconds}ms').toList(),
     };
   }
 }

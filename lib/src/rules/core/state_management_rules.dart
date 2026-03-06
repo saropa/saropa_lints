@@ -212,7 +212,7 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
               // Wrapper: IsarStreamController, MyStreamController<T>, etc.
               final bool isDirectStreamController =
                   typeStr == 'StreamController' ||
-                  typeStr.startsWith('StreamController<');
+                      typeStr.startsWith('StreamController<');
               controllers.add(
                 _ControllerField(variable, !isDirectStreamController),
               );
@@ -611,9 +611,9 @@ class RequireMountedCheckRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddMountedCheckFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddMountedCheckFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'require_mounted_check',
@@ -633,8 +633,8 @@ class RequireMountedCheckRule extends SaropaLintRule {
       if (!node.body.isAsynchronous) return;
 
       // Check if in a State class
-      final ClassDeclaration? classDecl = node
-          .thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl =
+          node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;

@@ -545,8 +545,8 @@ class AvoidTestOnRealDeviceRule extends SaropaLintRule {
       final Expression firstArg = args.arguments.first;
       if (firstArg is! StringLiteral) return;
 
-      final String testName = (firstArg.stringValue ?? firstArg.toSource())
-          .toLowerCase();
+      final String testName =
+          (firstArg.stringValue ?? firstArg.toSource()).toLowerCase();
       for (final String phrase in _phrases) {
         if (testName.contains(phrase)) {
           reporter.atNode(firstArg);
@@ -617,9 +617,9 @@ class PreferExpectLaterRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceExpectWithExpectLaterFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceExpectWithExpectLaterFix(context: context),
+      ];
 }
 
 /// Warns when test files don't follow proper structure.
@@ -1756,8 +1756,7 @@ class RequireEdgeCaseTestsRule extends SaropaLintRule {
       final String source = unit.toSource();
 
       // Count test cases
-      final int testCount =
-          _testPattern.allMatches(source).length +
+      final int testCount = _testPattern.allMatches(source).length +
           _testWidgetsPattern.allMatches(source).length;
 
       if (testCount < 3) return; // Not enough tests to analyze
@@ -1982,8 +1981,7 @@ class AvoidTestImplementationDetailsRule extends SaropaLintRule {
       final String bodySource = callback.body.toSource();
 
       // Count verify calls vs expect calls
-      final int verifyCount =
-          'verify('.allMatches(bodySource).length +
+      final int verifyCount = 'verify('.allMatches(bodySource).length +
           'verifyNever('.allMatches(bodySource).length +
           'verifyInOrder('.allMatches(bodySource).length;
       final int expectCount = 'expect('.allMatches(bodySource).length;
@@ -2812,9 +2810,8 @@ class RequireAnimationTestsRule extends SaropaLintRule {
     'ScaleTransition',
     'Hero',
   };
-  static final List<RegExp> _animatedWidgetPatterns = _animatedWidgets
-      .map((w) => RegExp('\\b${RegExp.escape(w)}\\b'))
-      .toList();
+  static final List<RegExp> _animatedWidgetPatterns =
+      _animatedWidgets.map((w) => RegExp('\\b${RegExp.escape(w)}\\b')).toList();
   static final List<RegExp> _durationPumpPatterns = [
     RegExp(r'\bpumpAndSettle\b'),
     RegExp(r'\bpump\s*\(\s*const\s+Duration'),
@@ -3016,8 +3013,7 @@ class RequireMockHttpClientRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      final bool isHttpTarget =
-          targetSource == 'http' ||
+      final bool isHttpTarget = targetSource == 'http' ||
           targetSource.startsWith('http.') ||
           targetSource == 'client' ||
           RegExp(r'\bClient\b').hasMatch(targetSource);
@@ -3316,8 +3312,7 @@ class AvoidMisusedTestMatchersRule extends SaropaLintRule {
         'isNull, hasLength, equals, and isA provide clearer assertion '
         'semantics and significantly better diagnostic output when tests '
         'fail, making debugging faster. {v1}',
-    correctionMessage:
-        'Replace literal matchers with proper test matchers: '
+    correctionMessage: 'Replace literal matchers with proper test matchers: '
         'expect(x, true) => expect(x, isTrue), '
         'expect(x, false) => expect(x, isFalse), '
         'expect(x, null) => expect(x, isNull), '

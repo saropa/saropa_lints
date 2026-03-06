@@ -370,8 +370,7 @@ class RequireSemanticColorsRule extends SaropaLintRule {
       if (parent is! VariableDeclarationList) return;
 
       final String? typeStr = parent.type?.toSource();
-      final bool isColorType =
-          typeStr != null &&
+      final bool isColorType = typeStr != null &&
           (typeStr == 'Color' ||
               typeStr == 'Color?' ||
               typeStr == 'MaterialColor' ||
@@ -379,8 +378,7 @@ class RequireSemanticColorsRule extends SaropaLintRule {
 
       // Also check initializer for Color constructor
       final Expression? initializer = node.initializer;
-      final bool hasColorInit =
-          initializer != null &&
+      final bool hasColorInit = initializer != null &&
           (initializer.toSource().startsWith('Color(') ||
               initializer.toSource().startsWith('const Color(') ||
               initializer.toSource().startsWith('Colors.'));

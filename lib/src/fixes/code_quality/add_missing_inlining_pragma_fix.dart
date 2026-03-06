@@ -24,8 +24,7 @@ class AddMissingInliningPragmaFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final Declaration? decl =
-        node.thisOrAncestorOfType<MethodDeclaration>() ??
+    final Declaration? decl = node.thisOrAncestorOfType<MethodDeclaration>() ??
         node.thisOrAncestorOfType<FunctionDeclaration>();
     if (decl == null) return;
 
@@ -51,13 +50,12 @@ class AddMissingInliningPragmaFix extends SaropaFixProducer {
     final String pragma = hasVm && !hasDart2js
         ? "@pragma('dart2js:tryInline')"
         : !hasVm && hasDart2js
-        ? "@pragma('vm:prefer-inline')"
-        : '';
+            ? "@pragma('vm:prefer-inline')"
+            : '';
     if (pragma.isEmpty) return;
 
-    final int insertOffset = metadata.isNotEmpty
-        ? metadata.last.end
-        : decl.offset;
+    final int insertOffset =
+        metadata.isNotEmpty ? metadata.last.end : decl.offset;
     final String prefix = metadata.isNotEmpty ? '\n  ' : '';
     await builder.addDartFileEdit(file, (b) {
       b.addSimpleInsertion(insertOffset, '$prefix$pragma\n  ');
