@@ -880,17 +880,33 @@ def run_format(project_dir: Path) -> bool:
     return True
 
 
+def _strip_progress_lines(text: str) -> str:
+    """Remove dart analyze progress bar lines (░█▓▒ blocks) from output."""
+    _PROGRESS_CHARS = frozenset("░▒▓█")
+    result = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        # Skip progress bar lines: start with block chars and contain │
+        if stripped and stripped[0] in _PROGRESS_CHARS and "│" in stripped:
+            continue
+        # Skip blank/whitespace-only lines that precede/follow progress bars
+        if not stripped and len(line) > 40:
+            continue
+        result.append(line)
+    return "\n".join(result)
+
+
 def _run_dart_analyze_core(project_dir: Path) -> bool:
     """Run dart analyze --fatal-infos, write log, print report. Returns True iff exit 0."""
-    reports_dir = project_dir / "reports"
-    reports_dir.mkdir(exist_ok=True)
     now = datetime.now()
     date_prefix = now.strftime("%Y%m%d")
     time_suffix = now.strftime("%H%M%S")
+    reports_dir = project_dir / "reports" / date_prefix
+    reports_dir.mkdir(parents=True, exist_ok=True)
     log_name = f"{date_prefix}_analysis_violations_{time_suffix}.log"
     log_path = reports_dir / log_name
 
-    print_info(f"Running dart analyze (output → reports/{log_name})")
+    print_info(f"Running dart analyze (output → reports/{date_prefix}/{log_name})")
     use_shell = get_shell_mode()
 
     running = threading.Event()
@@ -915,7 +931,8 @@ def _run_dart_analyze_core(project_dir: Path) -> bool:
         running.clear()
         spinner.join(timeout=0.5)
 
-    combined = (result.stdout or "") + (result.stderr or "")
+    raw_combined = (result.stdout or "") + (result.stderr or "")
+    combined = _strip_progress_lines(raw_combined)
     log_path.write_text(combined, encoding="utf-8", errors="replace")
 
     counts = _parse_analysis_counts(combined)
