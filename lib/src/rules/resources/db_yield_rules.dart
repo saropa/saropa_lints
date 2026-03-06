@@ -211,9 +211,8 @@ bool _isFutureDelayedZero(MethodInvocation node) {
   final List<Expression> args = node.argumentList.arguments;
   if (args.isEmpty) return false;
   final arg0 = args[0];
-  final Expression durationArg = args.length == 2 && arg0 is NamedExpression
-      ? arg0.expression
-      : arg0;
+  final Expression durationArg =
+      args.length == 2 && arg0 is NamedExpression ? arg0.expression : arg0;
   if (durationArg is PropertyAccess) {
     return durationArg.propertyName.name == 'zero';
   }
@@ -494,8 +493,7 @@ class AvoidReturnAwaitDbRule extends SaropaLintRule {
     'avoid_return_await_db',
     '[avoid_return_await_db] Returning directly from a database/IO '
         'write skips yieldToUI(). {v3}',
-    correctionMessage:
-        'Save the result to a variable, call '
+    correctionMessage: 'Save the result to a variable, call '
         '`await DelayUtils.yieldToUI();`, then return the variable.',
     severity: DiagnosticSeverity.WARNING,
   );

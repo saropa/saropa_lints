@@ -90,8 +90,7 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    final String typeName =
-        node.constructorName.type.element?.name ??
+    final String typeName = node.constructorName.type.element?.name ??
         node.constructorName.type.name.lexeme;
 
     if (gradientTypes.contains(typeName)) {

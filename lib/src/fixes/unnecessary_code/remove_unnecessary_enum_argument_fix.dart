@@ -23,9 +23,8 @@ class RemoveUnnecessaryEnumArgumentFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final arg = node is Expression
-        ? node
-        : node.thisOrAncestorOfType<Expression>();
+    final arg =
+        node is Expression ? node : node.thisOrAncestorOfType<Expression>();
     if (arg == null) return;
 
     final args = arg.parent;

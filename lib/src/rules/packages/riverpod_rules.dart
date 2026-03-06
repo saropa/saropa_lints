@@ -521,9 +521,9 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        CommentOutNotifierAssignmentFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            CommentOutNotifierAssignmentFix(context: context),
+      ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -1883,8 +1883,8 @@ class AvoidRefInDisposeRule extends SaropaLintRule {
       if (node.name.lexeme != 'dispose') return;
 
       // Check if this is in a ConsumerState class
-      final ClassDeclaration? classDecl = node
-          .thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl =
+          node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -1983,13 +1983,12 @@ class RequireProviderScopeRule extends SaropaLintRule {
       );
 
       // Also check the whole file for Riverpod patterns
-      final CompilationUnit? unit = node
-          .thisOrAncestorOfType<CompilationUnit>();
+      final CompilationUnit? unit =
+          node.thisOrAncestorOfType<CompilationUnit>();
       if (unit == null) return;
 
       final String fileSource = unit.toSource();
-      final bool fileUsesRiverpod =
-          fileSource.contains('ConsumerWidget') ||
+      final bool fileUsesRiverpod = fileSource.contains('ConsumerWidget') ||
           fileSource.contains('ConsumerStatefulWidget') ||
           fileSource.contains('ProviderScope') ||
           fileSource.contains('flutter_riverpod');
@@ -2241,9 +2240,9 @@ class PreferRefWatchOverReadRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceReadWithWatchFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceReadWithWatchFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_ref_watch_over_read',
@@ -2657,8 +2656,8 @@ class RequireRiverpodLintRule extends SaropaLintRule {
 
   @override
   List<String> get configAliases => const <String>[
-    'require_riverpod_lint_package',
-  ];
+        'require_riverpod_lint_package',
+      ];
 
   static const LintCode _code = LintCode(
     'require_riverpod_lint',
@@ -3151,8 +3150,7 @@ class RequireFlutterRiverpodNotRiverpodRule extends SaropaLintRule {
     'require_flutter_riverpod_not_riverpod',
     '[require_flutter_riverpod_not_riverpod] Flutter apps should use '
         'flutter_riverpod, not riverpod package directly. {v2}',
-    correctionMessage:
-        'Replace "package:riverpod/riverpod.dart" with '
+    correctionMessage: 'Replace "package:riverpod/riverpod.dart" with '
         '"package:flutter_riverpod/flutter_riverpod.dart".',
     severity: DiagnosticSeverity.ERROR,
   );
@@ -3233,9 +3231,8 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
     // Check for GlobalKey<NavigatorState> in providers
     context.addVariableDeclaration((VariableDeclaration node) {
       final AstNode? parent = node.parent;
-      final String? typeName = parent is VariableDeclarationList
-          ? parent.type?.toSource()
-          : null;
+      final String? typeName =
+          parent is VariableDeclarationList ? parent.type?.toSource() : null;
 
       if (typeName == null) return;
 

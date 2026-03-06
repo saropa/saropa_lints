@@ -51,9 +51,8 @@ class PreferDedicatedMediaQueryMethodFix extends SaropaFixProducer {
     final Expression? receiver = target.target;
     if (receiver == null) return;
 
-    final String contextArg = target.argumentList.arguments
-        .map((e) => e.toSource())
-        .join(', ');
+    final String contextArg =
+        target.argumentList.arguments.map((e) => e.toSource()).join(', ');
     final String replacement =
         '${receiver.toSource()}.$methodName($contextArg)';
 

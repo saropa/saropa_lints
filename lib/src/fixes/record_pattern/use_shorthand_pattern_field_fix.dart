@@ -23,9 +23,8 @@ class UseShorthandPatternFieldFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final field = node is PatternField
-        ? node
-        : node.thisOrAncestorOfType<PatternField>();
+    final field =
+        node is PatternField ? node : node.thisOrAncestorOfType<PatternField>();
     if (field == null) return;
 
     final fieldName = field.name?.name?.lexeme;

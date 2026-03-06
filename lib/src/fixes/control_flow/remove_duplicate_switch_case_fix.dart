@@ -29,8 +29,7 @@ class RemoveDuplicateSwitchCaseFix extends SaropaFixProducer {
     if (node == null) return;
 
     // Reported on expression (SwitchCase) or pattern (SwitchExpressionCase).
-    final AstNode? toDelete =
-        node.thisOrAncestorOfType<SwitchCase>() ??
+    final AstNode? toDelete = node.thisOrAncestorOfType<SwitchCase>() ??
         node.thisOrAncestorOfType<SwitchExpressionCase>();
     if (toDelete == null) return;
 
@@ -58,8 +57,8 @@ class RemoveDuplicateSwitchCaseFix extends SaropaFixProducer {
       }
       if (i < content.length && content[i] == ',') {
         i++;
-        while (i < content.length &&
-            (content[i] == ' ' || content[i] == '\t')) {
+        while (
+            i < content.length && (content[i] == ' ' || content[i] == '\t')) {
           i++;
         }
         end = i;

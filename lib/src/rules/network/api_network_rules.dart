@@ -601,8 +601,7 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
 
       // cspell:ignore httpclient
       // Check if this is an HTTP-related call using exact target patterns
-      final bool isHttpCall =
-          targetSource == 'http' ||
+      final bool isHttpCall = targetSource == 'http' ||
           targetSource == 'dio' ||
           targetSource == 'client' ||
           targetSource.endsWith('.http') ||
@@ -1309,7 +1308,7 @@ class PreferPaginationRule extends SaropaLintRule {
       final String paramsSource = node.parameters?.toSource() ?? '';
       final bool hasPagination =
           _paginationParamPatterns.any((p) => p.hasMatch(bodySource)) ||
-          _paginationParamPatterns.any((p) => p.hasMatch(paramsSource));
+              _paginationParamPatterns.any((p) => p.hasMatch(paramsSource));
 
       if (!hasPagination) {
         reporter.atNode(node);
@@ -2649,9 +2648,8 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
       final params = node.parameters;
       if (params == null) return;
 
-      final paramNames = params.parameters
-          .map((p) => p.name?.lexeme ?? '')
-          .toList();
+      final paramNames =
+          params.parameters.map((p) => p.name?.lexeme ?? '').toList();
       if (!paramNames.contains('oldVersion') &&
           !paramNames.contains('old') &&
           !paramNames.any((p) => p.toLowerCase().contains('version'))) {
@@ -3150,8 +3148,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
       }
 
       for (final String fieldName in sseFields) {
-        final bool isClosed =
-            disposeBody != null &&
+        final bool isClosed = disposeBody != null &&
             (_sseFieldClosePattern(disposeBody, fieldName, 'close') ||
                 _sseFieldClosePattern(disposeBody, fieldName, 'dispose') ||
                 _sseFieldClosePattern(disposeBody, fieldName, 'cancel'));
@@ -3406,8 +3403,7 @@ class RequireAnalyticsEventNamingRule extends SaropaLintRule {
         'dashboards, breaks funnel queries, and makes cross-platform '
         'analysis unreliable. Most analytics platforms recommend or '
         'require snake_case for event names. {v1}',
-    correctionMessage:
-        'Rename the event to snake_case (e.g., "user_signed_up" '
+    correctionMessage: 'Rename the event to snake_case (e.g., "user_signed_up" '
         'instead of "UserSignedUp" or "user-signed-up").',
     severity: DiagnosticSeverity.INFO,
   );
@@ -4011,8 +4007,7 @@ bool _thenReturnsOrThrows(Statement thenStatement) {
 bool _isContentTypeGuardStatement(Statement stmt) {
   if (stmt is! IfStatement) return false;
   final condition = stmt.expression.toSource();
-  final hasContentType =
-      condition.contains('contentType') ||
+  final hasContentType = condition.contains('contentType') ||
       condition.contains('mimeType') ||
       condition.contains('content_type');
   final hasJson = condition.contains('application/json');

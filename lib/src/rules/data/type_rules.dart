@@ -643,9 +643,9 @@ class AvoidNullAssertionRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RemoveNullAssertionFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RemoveNullAssertionFix(context: context),
+      ];
 
   /// Checks if the null assertion is safe because it follows a ??= assignment.
   ///
@@ -1627,9 +1627,9 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceUnnecessaryTypeAssertionFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceUnnecessaryTypeAssertionFix(context: context),
+      ];
 }
 
 /// Warns when a type cast (as) is unnecessary.
@@ -1697,9 +1697,9 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RemoveUnnecessaryTypeCastFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RemoveUnnecessaryTypeCastFix(context: context),
+      ];
 }
 
 /// Warns when an 'is' type check can never be true.
@@ -2139,8 +2139,8 @@ class AvoidShadowingTypeParametersRule extends SaropaLintRule {
       if (methodTypeParams == null) return;
 
       // Find enclosing class
-      final ClassDeclaration? enclosingClass = node
-          .thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? enclosingClass =
+          node.thisOrAncestorOfType<ClassDeclaration>();
       if (enclosingClass == null) return;
 
       final TypeParameterList? classTypeParams = enclosingClass.typeParameters;
@@ -2269,9 +2269,9 @@ class PreferFinalLocalsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        PreferFinalLocalsFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            PreferFinalLocalsFix(context: context),
+      ];
 
   bool _assignsToName(Statement stmt, String name) {
     if (stmt is ExpressionStatement) {
@@ -2381,9 +2381,9 @@ class PreferConstDeclarationsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        PreferConstDeclarationsFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            PreferConstDeclarationsFix(context: context),
+      ];
 
   static bool _isConstExpression(Expression e) {
     if (e is NullLiteral ||

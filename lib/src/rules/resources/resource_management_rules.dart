@@ -87,8 +87,7 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      bool hasFileOpen =
-          _fileOpenMethodPattern.hasMatch(bodySource) ||
+      bool hasFileOpen = _fileOpenMethodPattern.hasMatch(bodySource) ||
           (_genericOpenPattern.hasMatch(bodySource) &&
               _fileIndicatorPatterns.any((re) => re.hasMatch(bodySource)));
 
@@ -177,8 +176,7 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
     // Skip when analyzing this package's own rule files (avoids self-trigger on
     // openDatabase in string literals/regex). Path format can differ by SDK/OS.
     final String path = context.filePath.replaceAll(r'\', '/').toLowerCase();
-    final bool isOwnRuleFile =
-        path.contains('src/rules/') ||
+    final bool isOwnRuleFile = path.contains('src/rules/') ||
         path.contains('resource_management_rules.dart') ||
         path.contains('file_handling_rules.dart') ||
         path.contains('sqflite_rules.dart');
@@ -1183,8 +1181,8 @@ class PreferImagePickerMultiSelectionRule extends SaropaLintRule {
 
       // Check if inside a loop
       final ForStatement? forLoop = node.thisOrAncestorOfType<ForStatement>();
-      final WhileStatement? whileLoop = node
-          .thisOrAncestorOfType<WhileStatement>();
+      final WhileStatement? whileLoop =
+          node.thisOrAncestorOfType<WhileStatement>();
       final DoStatement? doLoop = node.thisOrAncestorOfType<DoStatement>();
       final ForElement? forElement = node.thisOrAncestorOfType<ForElement>();
 

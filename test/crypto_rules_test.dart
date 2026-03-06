@@ -30,7 +30,8 @@ void main() {
     });
     test('AvoidDeprecatedCryptoAlgorithmsRule', () {
       final rule = AvoidDeprecatedCryptoAlgorithmsRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_deprecated_crypto_algorithms');
+      expect(
+          rule.code.name.toLowerCase(), 'avoid_deprecated_crypto_algorithms');
       expect(
         rule.code.problemMessage,
         contains('[avoid_deprecated_crypto_algorithms]'),

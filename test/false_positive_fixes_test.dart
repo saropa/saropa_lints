@@ -801,7 +801,8 @@ void main() {
         },
       );
 
-      test('should not flag same-source initializers that use Random or RNG', () {
+      test('should not flag same-source initializers that use Random or RNG',
+          () {
         // Rule explicitly excludes Random/RNG: same source yields different values per call.
         // Fixture: _goodSameSourceWithRandom(), _goodSameSourceWithRandomInt().
         expect(
@@ -919,7 +920,8 @@ void main() {
 
     // History integration batch 37–61: FP fixes documented in bugs/history/false_positives/
     group('avoid_positioned_outside_stack', () {
-      test('builder callbacks and build-root Positioned should NOT trigger', () {
+      test('builder callbacks and build-root Positioned should NOT trigger',
+          () {
         // Positioned inside BlocBuilder/StreamBuilder/Builder callback, or
         // assigned to variable then used in Stack, or root of build() — indeterminate.
         expect(

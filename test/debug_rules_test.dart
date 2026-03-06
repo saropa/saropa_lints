@@ -31,7 +31,8 @@ void main() {
     });
     test('PreferCommentingAnalyzerIgnoresRule', () {
       final rule = PreferCommentingAnalyzerIgnoresRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_commenting_analyzer_ignores');
+      expect(
+          rule.code.name.toLowerCase(), 'prefer_commenting_analyzer_ignores');
       expect(
         rule.code.problemMessage,
         contains('[prefer_commenting_analyzer_ignores]'),

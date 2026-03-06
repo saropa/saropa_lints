@@ -546,15 +546,13 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
       final String onPressedSource = onPressedExpr.toSource();
 
       // Check if the callback is async
-      bool isAsync =
-          onPressedSource.contains('async') ||
+      bool isAsync = onPressedSource.contains('async') ||
           onPressedSource.contains('await');
 
       if (!isAsync) return;
 
       // Check if there's loading state handling
-      bool hasLoadingState =
-          onPressedSource.contains('isLoading') ||
+      bool hasLoadingState = onPressedSource.contains('isLoading') ||
           onPressedSource.contains('_loading') ||
           onPressedSource.contains('loading') ||
           onPressedSource.contains('isSubmitting') ||
@@ -564,9 +562,9 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
       String childSource = childExpr?.toSource() ?? '';
       bool hasLoadingIndicator =
           childSource.contains('CircularProgressIndicator') ||
-          childSource.contains('Loading') ||
-          childSource.contains('isLoading') ||
-          childSource.contains('?');
+              childSource.contains('Loading') ||
+              childSource.contains('isLoading') ||
+              childSource.contains('?');
 
       if (!hasLoadingState && !hasLoadingIndicator) {
         reporter.atNode(node.constructorName, code);
@@ -1401,8 +1399,7 @@ class RequireWindowSizeConstraintsRule extends SaropaLintRule {
 
       // Check if has runApp but no window size setup
       if (mainSource.contains('runApp')) {
-        final bool hasWindowSetup =
-            mainSource.contains('setMinimumSize') ||
+        final bool hasWindowSetup = mainSource.contains('setMinimumSize') ||
             mainSource.contains('setWindowMinSize') ||
             mainSource.contains('windowManager') ||
             mainSource.contains('window_size') ||

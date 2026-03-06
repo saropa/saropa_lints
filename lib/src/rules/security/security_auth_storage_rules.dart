@@ -26,9 +26,9 @@ class RequireSecureStorageRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m9},
-    web: <OwaspWeb>{OwaspWeb.a02},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m9},
+        web: <OwaspWeb>{OwaspWeb.a02},
+      );
 
   static const LintCode _code = LintCode(
     'require_secure_storage',
@@ -61,9 +61,8 @@ class RequireSecureStorageRule extends SaropaLintRule {
     RegExp(r'\bpref\b'),
     RegExp(r'\bshared\b'),
   ];
-  static final List<RegExp> _sensitiveKeyPatterns = _sensitiveKeys
-      .map((s) => RegExp('\\b${RegExp.escape(s)}\\b'))
-      .toList();
+  static final List<RegExp> _sensitiveKeyPatterns =
+      _sensitiveKeys.map((s) => RegExp('\\b${RegExp.escape(s)}\\b')).toList();
 
   @override
   void runWithReporter(
@@ -129,9 +128,9 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m1},
-    web: <OwaspWeb>{OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m1},
+        web: <OwaspWeb>{OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_hardcoded_credentials',
@@ -239,9 +238,9 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m8},
-    web: <OwaspWeb>{OwaspWeb.a04},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m8},
+        web: <OwaspWeb>{OwaspWeb.a04},
+      );
 
   static const LintCode _code = LintCode(
     'require_biometric_fallback',
@@ -324,9 +323,9 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m1},
-    web: <OwaspWeb>{OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m1},
+        web: <OwaspWeb>{OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_storing_passwords',
@@ -409,9 +408,9 @@ class RequireAuthCheckRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m3},
-    web: <OwaspWeb>{OwaspWeb.a01, OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m3},
+        web: <OwaspWeb>{OwaspWeb.a01, OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'require_auth_check',
@@ -655,9 +654,9 @@ class RequireTokenRefreshRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m3},
-    web: <OwaspWeb>{OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m3},
+        web: <OwaspWeb>{OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'require_token_refresh',
@@ -775,9 +774,9 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m3},
-    web: <OwaspWeb>{OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m3},
+        web: <OwaspWeb>{OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_jwt_decode_client',
@@ -839,8 +838,8 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
     });
 
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name.lexeme
-          .toLowerCase();
+      final String typeName =
+          node.constructorName.type.name.lexeme.toLowerCase();
       if (_jwtTypePatterns.any((p) => p.hasMatch(typeName))) {
         reporter.atNode(node.constructorName, code);
       }
@@ -886,9 +885,9 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m3},
-    web: <OwaspWeb>{OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m3},
+        web: <OwaspWeb>{OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'require_logout_cleanup',
@@ -979,9 +978,9 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m1},
-    web: <OwaspWeb>{OwaspWeb.a03, OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m1},
+        web: <OwaspWeb>{OwaspWeb.a03, OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_auth_in_query_params',
@@ -1090,9 +1089,9 @@ class RequireDataEncryptionRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m9, OwaspMobile.m10},
-    web: <OwaspWeb>{OwaspWeb.a02},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m9, OwaspMobile.m10},
+        web: <OwaspWeb>{OwaspWeb.a02},
+      );
 
   static const LintCode _code = LintCode(
     'require_data_encryption',
@@ -1198,9 +1197,9 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m1, OwaspMobile.m9},
-    web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m1, OwaspMobile.m9},
+        web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'require_secure_password_field',
@@ -1309,9 +1308,9 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m3, OwaspMobile.m9},
-    web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m3, OwaspMobile.m9},
+        web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'require_secure_storage_for_auth',
@@ -1357,8 +1356,7 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
       final String targetType = target.staticType?.toString() ?? '';
       final String targetSource = target.toSource().toLowerCase();
 
-      final bool isPrefs =
-          targetType.contains('SharedPreferences') ||
+      final bool isPrefs = targetType.contains('SharedPreferences') ||
           _prefTargetSourcePatterns.any((p) => p.hasMatch(targetSource));
 
       if (!isPrefs) return;
@@ -1412,9 +1410,9 @@ class PreferLocalAuthRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m3},
-    web: <OwaspWeb>{OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m3},
+        web: <OwaspWeb>{OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'prefer_local_auth',
@@ -1505,9 +1503,9 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m3, OwaspMobile.m9},
-    web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m3, OwaspMobile.m9},
+        web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'require_secure_storage_auth_data',
@@ -1632,9 +1630,9 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m9},
-    web: <OwaspWeb>{OwaspWeb.a02},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m9},
+        web: <OwaspWeb>{OwaspWeb.a02},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_storing_sensitive_unencrypted',
@@ -1976,9 +1974,9 @@ class PreferBiometricProtectionRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m2, OwaspMobile.m9},
-    web: <OwaspWeb>{OwaspWeb.a02},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m2, OwaspMobile.m9},
+        web: <OwaspWeb>{OwaspWeb.a02},
+      );
 
   static const LintCode _code = LintCode(
     'prefer_biometric_protection',
@@ -2666,9 +2664,9 @@ class PreferWebviewSandboxRule extends SaropaLintRule {
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-    'WebView',
-    'WebViewWidget',
-  };
+        'WebView',
+        'WebViewWidget',
+      };
 
   static const LintCode _code = LintCode(
     'prefer_webview_sandbox',

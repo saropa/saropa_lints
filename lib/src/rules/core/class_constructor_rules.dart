@@ -502,8 +502,7 @@ class _ShadowingChecker extends RecursiveAstVisitor<void> {
     // For blocks that are direct children of if/else/switch/try,
     // variables declared inside should not leak to siblings.
     final AstNode? parent = node.parent;
-    final bool isScopedBlock =
-        parent is IfStatement ||
+    final bool isScopedBlock = parent is IfStatement ||
         parent is SwitchCase ||
         parent is SwitchDefault ||
         parent is TryStatement ||
@@ -579,16 +578,15 @@ class PreferConstStringListRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        PreferConstStringListFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            PreferConstStringListFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_const_string_list',
     '[prefer_const_string_list] This <String>[...] list contains only string literals '
         'and could be const. {v3}',
-    correctionMessage:
-        'Add const before the list literal or use a const '
+    correctionMessage: 'Add const before the list literal or use a const '
         'variable declaration.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -703,14 +701,14 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        PreferDeclaringConstConstructorFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            PreferDeclaringConstConstructorFix(context: context),
+      ];
 
   @override
   List<String> get configAliases => const <String>[
-    'prefer_const_constructor_declarations',
-  ];
+        'prefer_const_constructor_declarations',
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_declaring_const_constructor',
@@ -989,10 +987,8 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
         if (m.name.lexeme == repFieldName) continue;
         final TypeAnnotation? returnType = m.returnType;
         if (returnType == null) continue;
-        final String returnTypeSource = returnType
-            .toSource()
-            .replaceAll(RegExp(r'\s+'), ' ')
-            .trim();
+        final String returnTypeSource =
+            returnType.toSource().replaceAll(RegExp(r'\s+'), ' ').trim();
         if (returnTypeSource != repTypeSource) continue;
         renamingGetters.add(m);
       }
@@ -1184,9 +1180,8 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
 
       // Skip classes with only private constructors — they already prevent
       // external instantiation and extension, making a modifier redundant.
-      final List<ConstructorDeclaration> constructors = node.members
-          .whereType<ConstructorDeclaration>()
-          .toList();
+      final List<ConstructorDeclaration> constructors =
+          node.members.whereType<ConstructorDeclaration>().toList();
       if (constructors.isNotEmpty &&
           constructors.every(
             (ConstructorDeclaration c) =>
@@ -1228,9 +1223,9 @@ class PreferFinalClassRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        PreferFinalClassFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            PreferFinalClassFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_final_class',
@@ -1703,9 +1698,8 @@ class AvoidUnusedConstructorParametersRule extends SaropaLintRule {
         if (param is SuperFormalParameter) continue;
 
         // Get the actual parameter (unwrap DefaultFormalParameter)
-        final FormalParameter actual = param is DefaultFormalParameter
-            ? param.parameter
-            : param;
+        final FormalParameter actual =
+            param is DefaultFormalParameter ? param.parameter : param;
         if (actual is FieldFormalParameter) continue;
         if (actual is SuperFormalParameter) continue;
 
@@ -2034,9 +2028,8 @@ class PreferAssertsInInitializerListsRule extends SaropaLintRule {
   static Set<String> _constructorParamNames(ConstructorDeclaration node) {
     final Set<String> names = <String>{};
     for (final FormalParameter p in node.parameters.parameters) {
-      final FormalParameter inner = p is DefaultFormalParameter
-          ? p.parameter
-          : p;
+      final FormalParameter inner =
+          p is DefaultFormalParameter ? p.parameter : p;
       if (inner is FieldFormalParameter && inner.name.lexeme.isNotEmpty) {
         names.add(inner.name.lexeme);
       } else if (inner is SimpleFormalParameter) {
@@ -2254,9 +2247,8 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
   /// True if any parameter is a function type (const constructor impossible).
   static bool _constructorHasFunctionTypeParam(ConstructorDeclaration node) {
     for (final FormalParameter p in node.parameters.parameters) {
-      final FormalParameter param = p is DefaultFormalParameter
-          ? p.parameter
-          : p;
+      final FormalParameter param =
+          p is DefaultFormalParameter ? p.parameter : p;
       TypeAnnotation? type;
       if (param is SimpleFormalParameter) {
         type = param.type;

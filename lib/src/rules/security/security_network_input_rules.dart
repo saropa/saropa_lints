@@ -29,9 +29,9 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m6},
-    web: <OwaspWeb>{OwaspWeb.a09},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m6},
+        web: <OwaspWeb>{OwaspWeb.a09},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_logging_sensitive_data',
@@ -80,9 +80,8 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
     'unauthenticated', // Error state, not a credential
   ];
 
-  static final List<RegExp> _safePatternRegExps = _safePatternList
-      .map((p) => RegExp(RegExp.escape(p)))
-      .toList();
+  static final List<RegExp> _safePatternRegExps =
+      _safePatternList.map((p) => RegExp(RegExp.escape(p))).toList();
 
   static const Set<String> _loggingFunctions = <String>{
     'print',
@@ -194,9 +193,9 @@ class RequireInputSanitizationRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m4},
-    web: <OwaspWeb>{OwaspWeb.a03},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m4},
+        web: <OwaspWeb>{OwaspWeb.a03},
+      );
 
   static const LintCode _code = LintCode(
     'require_input_sanitization',
@@ -289,9 +288,9 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m8},
-    web: <OwaspWeb>{OwaspWeb.a05, OwaspWeb.a06},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m8},
+        web: <OwaspWeb>{OwaspWeb.a05, OwaspWeb.a06},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_webview_javascript_enabled',
@@ -373,9 +372,9 @@ class AvoidEvalLikePatternsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m4, OwaspMobile.m7},
-    web: <OwaspWeb>{OwaspWeb.a03},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m4, OwaspMobile.m7},
+        web: <OwaspWeb>{OwaspWeb.a03},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_eval_like_patterns',
@@ -701,14 +700,14 @@ class AvoidHardcodedSigningConfigRule extends SaropaLintRule {
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-    'keystore',
-    'jks',
-    'signing',
-    'storePassword',
-    'keyPassword',
-    'keyAlias',
-    'key.properties',
-  };
+        'keystore',
+        'jks',
+        'signing',
+        'storePassword',
+        'keyPassword',
+        'keyAlias',
+        'key.properties',
+      };
 
   static const LintCode _code = LintCode(
     'avoid_hardcoded_signing_config',
@@ -819,9 +818,9 @@ class RequireCertificatePinningRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m5},
-    web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a05},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m5},
+        web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a05},
+      );
 
   static const LintCode _code = LintCode(
     'require_certificate_pinning',
@@ -892,9 +891,9 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m1},
-    web: <OwaspWeb>{OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m1},
+        web: <OwaspWeb>{OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_token_in_url',
@@ -966,9 +965,9 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m6},
-    web: <OwaspWeb>{OwaspWeb.a04},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m6},
+        web: <OwaspWeb>{OwaspWeb.a04},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_clipboard_sensitive',
@@ -1051,9 +1050,9 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m4},
-    web: <OwaspWeb>{OwaspWeb.a03},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m4},
+        web: <OwaspWeb>{OwaspWeb.a03},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_dynamic_sql',
@@ -1194,9 +1193,9 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m1},
-    web: <OwaspWeb>{OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m1},
+        web: <OwaspWeb>{OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_generic_key_in_url',
@@ -1266,15 +1265,15 @@ class PreferSecureRandomRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        UseSecureRandomFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            UseSecureRandomFix(context: context),
+      ];
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m10},
-    web: <OwaspWeb>{OwaspWeb.a02},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m10},
+        web: <OwaspWeb>{OwaspWeb.a02},
+      );
 
   static const LintCode _code = LintCode(
     'prefer_secure_random',
@@ -1576,9 +1575,9 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m4, OwaspMobile.m8},
-    web: <OwaspWeb>{OwaspWeb.a01, OwaspWeb.a03},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m4, OwaspMobile.m8},
+        web: <OwaspWeb>{OwaspWeb.a01, OwaspWeb.a03},
+      );
 
   static const LintCode _code = LintCode(
     'require_deep_link_validation',
@@ -1722,9 +1721,9 @@ class PreferDataMaskingRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m6},
-    web: <OwaspWeb>{OwaspWeb.a04},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m6},
+        web: <OwaspWeb>{OwaspWeb.a04},
+      );
 
   static const LintCode _code = LintCode(
     'prefer_data_masking',
@@ -1839,9 +1838,9 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m6},
-    web: <OwaspWeb>{OwaspWeb.a04},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m6},
+        web: <OwaspWeb>{OwaspWeb.a04},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_screenshot_sensitive',
@@ -1967,9 +1966,9 @@ class AvoidPathTraversalRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m4},
-    web: <OwaspWeb>{OwaspWeb.a01, OwaspWeb.a03},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m4},
+        web: <OwaspWeb>{OwaspWeb.a01, OwaspWeb.a03},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_path_traversal',
@@ -2041,14 +2040,14 @@ class AvoidPathTraversalRule extends SaropaLintRule {
 
   /// Gets the parameters of the enclosing function or method.
   FormalParameterList? _getFunctionParameters(AstNode node) {
-    final FunctionDeclaration? funcDecl = node
-        .thisOrAncestorOfType<FunctionDeclaration>();
+    final FunctionDeclaration? funcDecl =
+        node.thisOrAncestorOfType<FunctionDeclaration>();
     if (funcDecl != null) {
       return funcDecl.functionExpression.parameters;
     }
 
-    final MethodDeclaration? methodDecl = node
-        .thisOrAncestorOfType<MethodDeclaration>();
+    final MethodDeclaration? methodDecl =
+        node.thisOrAncestorOfType<MethodDeclaration>();
     if (methodDecl != null) {
       return methodDecl.parameters;
     }
@@ -2118,9 +2117,9 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m4},
-    web: <OwaspWeb>{OwaspWeb.a03},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m4},
+        web: <OwaspWeb>{OwaspWeb.a03},
+      );
 
   static const LintCode _code = LintCode(
     'prefer_html_escape',
@@ -2231,9 +2230,9 @@ class RequireUrlValidationRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m4},
-    web: <OwaspWeb>{OwaspWeb.a03, OwaspWeb.a10},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m4},
+        web: <OwaspWeb>{OwaspWeb.a03, OwaspWeb.a10},
+      );
 
   static const LintCode _code = LintCode(
     'require_url_validation',
@@ -2344,9 +2343,9 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m4},
-    web: <OwaspWeb>{OwaspWeb.a01},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m4},
+        web: <OwaspWeb>{OwaspWeb.a01},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_redirect_injection',
@@ -2392,9 +2391,8 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
       // Check arguments for redirect-related variable names
       for (final arg in node.argumentList.arguments) {
         // Get the actual expression (unwrap NamedExpression if needed)
-        final Expression actualArg = arg is NamedExpression
-            ? arg.expression
-            : arg;
+        final Expression actualArg =
+            arg is NamedExpression ? arg.expression : arg;
 
         // Skip property access on typed objects (e.g., item.destination)
         // Even though item.destination has type String, the source is a typed
@@ -2411,8 +2409,7 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
           final typeName = argType.getDisplayString();
 
           // Skip custom object types (start with uppercase, not String/Uri/dynamic)
-          final isCustomType =
-              typeName.isNotEmpty &&
+          final isCustomType = typeName.isNotEmpty &&
               typeName[0].toUpperCase() == typeName[0] &&
               !typeName.startsWith('String') &&
               !typeName.startsWith('Uri') &&
@@ -2425,8 +2422,7 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
           }
 
           // Also skip obvious non-URL primitive types
-          final isUrlType =
-              typeName == 'String' ||
+          final isUrlType = typeName == 'String' ||
               typeName == 'String?' ||
               typeName == 'Uri' ||
               typeName == 'Uri?' ||
@@ -2518,9 +2514,9 @@ class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m9},
-    web: <OwaspWeb>{OwaspWeb.a01},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m9},
+        web: <OwaspWeb>{OwaspWeb.a01},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_external_storage_sensitive',
@@ -2642,9 +2638,9 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m8},
-    web: <OwaspWeb>{OwaspWeb.a05, OwaspWeb.a06},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m8},
+        web: <OwaspWeb>{OwaspWeb.a05, OwaspWeb.a06},
+      );
 
   static const LintCode _code = LintCode(
     'prefer_webview_javascript_disabled',
@@ -2749,9 +2745,9 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m8},
-    web: <OwaspWeb>{OwaspWeb.a05},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m8},
+        web: <OwaspWeb>{OwaspWeb.a05},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_webview_insecure_content',
@@ -2865,9 +2861,9 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m8},
-    web: <OwaspWeb>{OwaspWeb.a05},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m8},
+        web: <OwaspWeb>{OwaspWeb.a05},
+      );
 
   static const LintCode _code = LintCode(
     'require_webview_error_handling',
@@ -2964,9 +2960,9 @@ class AvoidApiKeyInCodeRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m1},
-    web: <OwaspWeb>{OwaspWeb.a07},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m1},
+        web: <OwaspWeb>{OwaspWeb.a07},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_api_key_in_code',
@@ -3087,9 +3083,9 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m5},
-    web: <OwaspWeb>{OwaspWeb.a05},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m5},
+        web: <OwaspWeb>{OwaspWeb.a05},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_ignoring_ssl_errors',
@@ -3225,15 +3221,15 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceWithHttpsFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceWithHttpsFix(context: context),
+      ];
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m5},
-    web: <OwaspWeb>{OwaspWeb.a05},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m5},
+        web: <OwaspWeb>{OwaspWeb.a05},
+      );
 
   static const LintCode _code = LintCode(
     'require_https_only',
@@ -3459,9 +3455,9 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m4},
-    web: <OwaspWeb>{OwaspWeb.a08},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m4},
+        web: <OwaspWeb>{OwaspWeb.a08},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_unsafe_deserialization',
@@ -3526,8 +3522,7 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
 
       // cspell:disable
       // Check for pattern matching or type checking
-      final bool hasTypeCheck =
-          blockSource.contains('case {') ||
+      final bool hasTypeCheck = blockSource.contains('case {') ||
           blockSource.contains('is map') ||
           blockSource.contains('is list') ||
           blockSource.contains('.fromjson') ||
@@ -3575,8 +3570,7 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
 
       // cspell:ignore fromjson frommap
       // Check for type validation
-      final bool hasTypeCheck =
-          blockSource.contains('case {') ||
+      final bool hasTypeCheck = blockSource.contains('case {') ||
           blockSource.contains('is map') ||
           blockSource.contains('is list') ||
           blockSource.contains('.fromjson') ||
@@ -3646,9 +3640,9 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m4},
-    web: <OwaspWeb>{OwaspWeb.a10},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m4},
+        web: <OwaspWeb>{OwaspWeb.a10},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_user_controlled_urls',
@@ -3749,8 +3743,7 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
 
           // cspell:ignore allowedhost trusteddom
           // Check for URL validation patterns
-          final bool hasValidation =
-              blockSource.contains('.scheme') ||
+          final bool hasValidation = blockSource.contains('.scheme') ||
               blockSource.contains('.host') ||
               blockSource.contains('allowlist') ||
               blockSource.contains('whitelist') ||
@@ -3800,11 +3793,9 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
               }
 
               if (enclosingBlock != null) {
-                final String blockSource = enclosingBlock
-                    .toSource()
-                    .toLowerCase();
-                final bool hasValidation =
-                    blockSource.contains('.scheme') ||
+                final String blockSource =
+                    enclosingBlock.toSource().toLowerCase();
+                final bool hasValidation = blockSource.contains('.scheme') ||
                     blockSource.contains('.host') ||
                     blockSource.contains('allowlist') ||
                     blockSource.contains('whitelist');
@@ -3877,9 +3868,9 @@ class RequireCatchLoggingRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m8},
-    web: <OwaspWeb>{OwaspWeb.a09},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m8},
+        web: <OwaspWeb>{OwaspWeb.a09},
+      );
 
   static const LintCode _code = LintCode(
     'require_catch_logging',
@@ -3997,7 +3988,7 @@ class RequireCatchLoggingRule extends SaropaLintRule {
       final String lowerSource = source.toLowerCase();
       final bool isOnlyBasicMethods =
           lowerSource.contains('$exceptionName.tostring()'.toLowerCase()) ||
-          lowerSource.contains('$exceptionName.message'.toLowerCase());
+              lowerSource.contains('$exceptionName.message'.toLowerCase());
 
       if (!isOnlyBasicMethods) {
         return false; // Passed to a method, consider it handled
@@ -4201,9 +4192,9 @@ class AvoidWebViewCorsIssuesRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-    mobile: <OwaspMobile>{OwaspMobile.m8},
-    web: <OwaspWeb>{OwaspWeb.a05},
-  );
+        mobile: <OwaspMobile>{OwaspMobile.m8},
+        web: <OwaspWeb>{OwaspWeb.a05},
+      );
 
   static const LintCode _code = LintCode(
     'avoid_webview_cors_issues',
@@ -4287,11 +4278,11 @@ class RequireInputValidationRule extends SaropaLintRule {
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-    '.text',
-    '.post(',
-    '.put(',
-    '.patch(',
-  };
+        '.text',
+        '.post(',
+        '.put(',
+        '.patch(',
+      };
 
   @override
   OwaspMapping? get owasp =>

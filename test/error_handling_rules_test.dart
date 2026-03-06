@@ -155,7 +155,8 @@ void main() {
     });
     test('RequireNotificationActionHandlingRule', () {
       final rule = RequireNotificationActionHandlingRule();
-      expect(rule.code.name.toLowerCase(), 'require_notification_action_handling');
+      expect(
+          rule.code.name.toLowerCase(), 'require_notification_action_handling');
       expect(
         rule.code.problemMessage,
         contains('[require_notification_action_handling]'),
@@ -179,7 +180,8 @@ void main() {
     });
     test('RequireAppStartupErrorHandlingRule', () {
       final rule = RequireAppStartupErrorHandlingRule();
-      expect(rule.code.name.toLowerCase(), 'require_app_startup_error_handling');
+      expect(
+          rule.code.name.toLowerCase(), 'require_app_startup_error_handling');
       expect(
         rule.code.problemMessage,
         contains('[require_app_startup_error_handling]'),
@@ -556,7 +558,8 @@ void main() {
         expect('startup error handling passes', isNotNull);
       });
 
-      test('main() without crash reporting dependency should NOT trigger '
+      test(
+          'main() without crash reporting dependency should NOT trigger '
           '(regression)', () {
         // Apps without firebase_crashlytics/sentry_flutter/etc. should
         // not be forced to add runZonedGuarded with no reporting target

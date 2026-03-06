@@ -130,8 +130,7 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
 
       // Check if controllers are disposed
       for (final String name in controllerNames) {
-        final bool isDisposed =
-            disposeMethodBody != null &&
+        final bool isDisposed = disposeMethodBody != null &&
             isFieldCleanedUp(name, 'dispose', disposeMethodBody);
 
         if (!isDisposed) {
@@ -259,8 +258,7 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
 
       // Check if controllers are disposed
       for (final String name in controllerNames) {
-        final bool isDisposed =
-            disposeMethodBody != null &&
+        final bool isDisposed = disposeMethodBody != null &&
             isFieldCleanedUp(name, 'dispose', disposeMethodBody);
 
         if (!isDisposed) {
@@ -728,7 +726,7 @@ class RequireLifecycleObserverRule extends SaropaLintRule {
       final String classSource = enclosingClass.toSource();
       final bool hasLifecycleObserver =
           classSource.contains('WidgetsBindingObserver') &&
-          classSource.contains('didChangeAppLifecycleState');
+              classSource.contains('didChangeAppLifecycleState');
 
       if (!hasLifecycleObserver) {
         reporter.atNode(node.methodName, code);
@@ -1382,8 +1380,7 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
       }
 
       for (final String field in portFields) {
-        final bool isClosed =
-            disposeMethodBody != null &&
+        final bool isClosed = disposeMethodBody != null &&
             isFieldCleanedUp(field, 'close', disposeMethodBody);
         if (!isClosed) {
           for (final ClassMember member in node.members) {
@@ -1494,8 +1491,7 @@ class RequireSocketCloseRule extends SaropaLintRule {
       }
 
       for (final String field in socketFields) {
-        final bool isClosed =
-            disposeMethodBody != null &&
+        final bool isClosed = disposeMethodBody != null &&
             (isFieldCleanedUp(field, 'close', disposeMethodBody) ||
                 isFieldCleanedUp(field, 'destroy', disposeMethodBody));
         if (!isClosed) {
@@ -1771,8 +1767,7 @@ class RequireIntervalTimerCancelRule extends SaropaLintRule {
         }
       }
 
-      final bool isCanceled =
-          disposeMethodBody != null &&
+      final bool isCanceled = disposeMethodBody != null &&
           isFieldCleanedUp(fieldName, 'cancel', disposeMethodBody);
 
       if (!isCanceled) {
@@ -1872,8 +1867,7 @@ class RequireFileHandleCloseRule extends SaropaLintRule {
       }
 
       for (final String field in fileFields) {
-        final bool isClosed =
-            disposeMethodBody != null &&
+        final bool isClosed = disposeMethodBody != null &&
             (isFieldCleanedUp(field, 'close', disposeMethodBody) ||
                 isFieldCleanedUp(field, 'closeSync', disposeMethodBody));
         if (!isClosed) {

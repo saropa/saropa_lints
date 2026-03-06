@@ -52,9 +52,9 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddBlankLineBeforeFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddBlankLineBeforeFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_case',
@@ -83,12 +83,10 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
         final root = node.root;
         if (root is! CompilationUnit) continue;
         final unit = root;
-        final int prevEndLine = unit.lineInfo
-            .getLocation(previous.end)
-            .lineNumber;
-        final int currStartLine = unit.lineInfo
-            .getLocation(current.offset)
-            .lineNumber;
+        final int prevEndLine =
+            unit.lineInfo.getLocation(previous.end).lineNumber;
+        final int currStartLine =
+            unit.lineInfo.getLocation(current.offset).lineNumber;
 
         if (currStartLine - prevEndLine < 2) {
           // Use beginToken to handle SwitchCase, SwitchDefault, and SwitchPatternCase
@@ -139,9 +137,9 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddBlankLineBeforeFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddBlankLineBeforeFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_constructor',
@@ -177,12 +175,10 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
       if (current is! ConstructorDeclaration) continue;
 
       // Get line numbers
-      final int prevEndLine = unit.lineInfo
-          .getLocation(previous.end)
-          .lineNumber;
-      final int currStartLine = unit.lineInfo
-          .getLocation(current.offset)
-          .lineNumber;
+      final int prevEndLine =
+          unit.lineInfo.getLocation(previous.end).lineNumber;
+      final int currStartLine =
+          unit.lineInfo.getLocation(current.offset).lineNumber;
 
       // Should have at least one blank line
       if (currStartLine - prevEndLine < 2) {
@@ -237,9 +233,9 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddBlankLineBeforeFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddBlankLineBeforeFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_method',
@@ -289,12 +285,10 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
       if (current is! MethodDeclaration) continue;
 
       // Get line numbers
-      final int prevEndLine = unit.lineInfo
-          .getLocation(previous.end)
-          .lineNumber;
-      final int currStartLine = unit.lineInfo
-          .getLocation(current.offset)
-          .lineNumber;
+      final int prevEndLine =
+          unit.lineInfo.getLocation(previous.end).lineNumber;
+      final int currStartLine =
+          unit.lineInfo.getLocation(current.offset).lineNumber;
 
       // Should have at least one blank line
       if (currStartLine - prevEndLine < 2) {
@@ -326,9 +320,9 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddBlankLineBeforeReturnFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddBlankLineBeforeReturnFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_return',
@@ -355,12 +349,10 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
 
       // Check if previous statement ends on the line immediately before
       final Statement previous = statements[index - 1];
-      final int prevEndLine = context.lineInfo
-          .getLocation(previous.end)
-          .lineNumber;
-      final int returnStartLine = context.lineInfo
-          .getLocation(node.offset)
-          .lineNumber;
+      final int prevEndLine =
+          context.lineInfo.getLocation(previous.end).lineNumber;
+      final int returnStartLine =
+          context.lineInfo.getLocation(node.offset).lineNumber;
 
       if (returnStartLine - prevEndLine < 2) {
         reporter.atNode(node);
@@ -411,9 +403,9 @@ class NewlineBeforeElseRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddBlankLineBeforeFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddBlankLineBeforeFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_else',
@@ -434,12 +426,10 @@ class NewlineBeforeElseRule extends SaropaLintRule {
       if (elseStmt == null || elseToken == null) return;
 
       final LineInfo lineInfo = context.lineInfo;
-      final int thenEndLine = lineInfo
-          .getLocation(node.thenStatement.end)
-          .lineNumber;
-      final int elseStartLine = lineInfo
-          .getLocation(elseToken.offset)
-          .lineNumber;
+      final int thenEndLine =
+          lineInfo.getLocation(node.thenStatement.end).lineNumber;
+      final int elseStartLine =
+          lineInfo.getLocation(elseToken.offset).lineNumber;
       // At least one full blank line required (gap >= 2).
       if (elseStartLine - thenEndLine < 2) {
         reporter.atNode(elseStmt, code);
@@ -489,9 +479,9 @@ class NewlineAfterLoopRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddBlankLineBeforeFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddBlankLineBeforeFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_after_loop',
@@ -640,9 +630,9 @@ class PreferTrailingCommaRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddTrailingCommaFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddTrailingCommaFix(context: context),
+      ];
 }
 
 /// Warns when trailing commas are unnecessary.
@@ -729,9 +719,9 @@ class UnnecessaryTrailingCommaRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RemoveUnnecessaryTrailingCommaFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RemoveUnnecessaryTrailingCommaFix(context: context),
+      ];
 }
 
 /// Warns when comments don't follow formatting conventions.
@@ -873,9 +863,9 @@ class RequireIgnoreCommentSpacingRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RequireIgnoreCommentSpacingFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RequireIgnoreCommentSpacingFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'require_ignore_comment_spacing',
@@ -970,10 +960,10 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
 
   @override
   List<String> get configAliases => const <String>[
-    'enforce_member_ordering',
-    'member_ordering',
-    'prefer_sorted_members',
-  ];
+        'enforce_member_ordering',
+        'member_ordering',
+        'prefer_sorted_members',
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_member_ordering',
@@ -1159,8 +1149,8 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addEnumDeclaration((EnumDeclaration node) {
-      final List<EnumConstantDeclaration> constants = node.body.constants
-          .toList();
+      final List<EnumConstantDeclaration> constants =
+          node.body.constants.toList();
       if (constants.length < 2) return;
 
       // Check if already sorted

@@ -10,7 +10,8 @@ import 'package:test/test.dart';
 /// parseViolations correctly parses custom_lint output. Run from repo root.
 void main() {
   group('Fixture lint integration', () {
-    test('custom_lint on example_async produces parseable violations', () async {
+    test('custom_lint on example_async produces parseable violations',
+        () async {
       final exampleDir = Directory('example_async');
       if (!exampleDir.existsSync()) {
         return; // Skip when example_async not present (e.g. in some CI)

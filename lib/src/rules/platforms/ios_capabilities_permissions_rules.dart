@@ -489,9 +489,8 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
 
       final String methodName = node.methodName.name;
       final Expression? target = node.target;
-      final String fullCall = target != null
-          ? '${target.toSource()}.$methodName'
-          : methodName;
+      final String fullCall =
+          target != null ? '${target.toSource()}.$methodName' : methodName;
 
       for (final String pattern in _trackingPatterns) {
         if (fullCall.contains(pattern)) {
@@ -883,7 +882,7 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
     final String fileSource = context.fileContent;
     final bool hasPermissionRequest =
         fileSource.contains('requestPermissions') ||
-        fileSource.contains('IOSFlutterLocalNotificationsPlugin');
+            fileSource.contains('IOSFlutterLocalNotificationsPlugin');
 
     if (hasPermissionRequest) {
       return;
@@ -1077,8 +1076,7 @@ class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
   ) {
     // Check if file has authorization call
     final String fileSource = context.fileContent;
-    final bool hasAuthCheck =
-        fileSource.contains('requestAuthorization') ||
+    final bool hasAuthCheck = fileSource.contains('requestAuthorization') ||
         fileSource.contains('hasAuthorization') ||
         fileSource.contains('isAuthorized');
 
@@ -1410,8 +1408,7 @@ class RequireIosAppClipSizeLimitRule extends SaropaLintRule {
     'require_ios_app_clip_size_limit',
     '[require_ios_app_clip_size_limit] App Clip detected. Ensure App Clip bundle stays under 10 MB. '
         'Large dependencies can exceed this limit. {v2}',
-    correctionMessage:
-        'Minimize dependencies and assets in App Clip target. '
+    correctionMessage: 'Minimize dependencies and assets in App Clip target. '
         'Consider lazy loading heavy features.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1701,10 +1698,14 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
   /// Brand names (Agora, Twilio, Vonage, WebRTC) removed because
   /// they have non-VoIP meanings and cause false positives.
   /// VoIP SDK usage is detected via import directives instead.
-  static final List<RegExp> _voipStringRegexes =
-      ['voip', 'incoming_call', 'outgoing_call', 'call_state']
-          .map((p) => RegExp('\\b${RegExp.escape(p)}\\b', caseSensitive: false))
-          .toList();
+  static final List<RegExp> _voipStringRegexes = [
+    'voip',
+    'incoming_call',
+    'outgoing_call',
+    'call_state'
+  ]
+      .map((p) => RegExp('\\b${RegExp.escape(p)}\\b', caseSensitive: false))
+      .toList();
 
   /// Known VoIP/telephony package URIs detected via import directives.
   static const List<String> _voipPackages = <String>[
@@ -1797,8 +1798,7 @@ class RequireIosCarplaySetupRule extends SaropaLintRule {
     'require_ios_carplay_setup',
     '[require_ios_carplay_setup] CarPlay-related code detected. CarPlay requires Apple approval '
         'and specific entitlements. {v2}',
-    correctionMessage:
-        'Apply for CarPlay entitlement at developer.apple.com. '
+    correctionMessage: 'Apply for CarPlay entitlement at developer.apple.com. '
         'Implement CPTemplateApplicationSceneDelegate.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1856,8 +1856,7 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
     'require_ios_live_activities_setup',
     '[require_ios_live_activities_setup] Live Activity usage detected. Ensure ActivityKit capability '
         'and Widget Extension are configured. {v2}',
-    correctionMessage:
-        'Add Widget Extension with ActivityConfiguration. '
+    correctionMessage: 'Add Widget Extension with ActivityConfiguration. '
         'Enable Push Notifications for remote updates.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -2209,8 +2208,7 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
     'require_ios_accessibility_large_text',
     '[require_ios_accessibility_large_text] Hardcoded font size may not respect iOS Dynamic Type. '
         'Use theme text styles for accessibility. {v2}',
-    correctionMessage:
-        'Use Theme.of(context).textTheme styles or apply '
+    correctionMessage: 'Use Theme.of(context).textTheme styles or apply '
         'MediaQuery.textScaleFactorOf(context).',
     severity: DiagnosticSeverity.INFO,
   );
@@ -2417,8 +2415,8 @@ class RequireIosVoiceoverGestureCompatibilityRule extends SaropaLintRule {
       // Check for drag gestures
       final bool hasDragGesture =
           node.getNamedParameterValue('onHorizontalDragEnd') != null ||
-          node.getNamedParameterValue('onVerticalDragEnd') != null ||
-          node.getNamedParameterValue('onPanEnd') != null;
+              node.getNamedParameterValue('onVerticalDragEnd') != null ||
+              node.getNamedParameterValue('onPanEnd') != null;
 
       if (!hasDragGesture) {
         return;

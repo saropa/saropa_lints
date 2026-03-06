@@ -867,9 +867,9 @@ class AvoidUnusedAssignmentRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RemoveUnusedAssignmentFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RemoveUnusedAssignmentFix(context: context),
+      ];
 
   /// Returns true if [node] is inside a loop body (while, do, for).
   static bool _isInsideLoop(AstNode node) {
@@ -1874,9 +1874,8 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
           for (final VariableDeclaration variable
               in statement.variables.variables) {
             final String name = variable.name.lexeme;
-            declarationLines[name] = context.lineInfo
-                .getLocation(variable.offset)
-                .lineNumber;
+            declarationLines[name] =
+                context.lineInfo.getLocation(variable.offset).lineNumber;
             declarations[name] = variable;
           }
         }

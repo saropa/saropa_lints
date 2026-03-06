@@ -92,20 +92,20 @@ class RequireGeolocatorBatteryAwarenessRule extends SaropaLintRule {
       final String nodeSource = node.toSource();
 
       // Check for problematic patterns (word-boundary / literal)
-      bool hasBestAccuracy =
-          RegExp(r'LocationAccuracy\.best\b').hasMatch(nodeSource) ||
+      bool hasBestAccuracy = RegExp(r'LocationAccuracy\.best\b')
+              .hasMatch(nodeSource) ||
           RegExp(r'LocationAccuracy\.bestForNavigation').hasMatch(nodeSource);
       bool hasZeroDistanceFilter = RegExp(
         r'distanceFilter:\s*0',
       ).hasMatch(nodeSource);
       bool hasNoIntervalDuration =
           !RegExp(r'\bintervalDuration\b').hasMatch(nodeSource) &&
-          !RegExp(r'\btimeLimit\b').hasMatch(nodeSource);
+              !RegExp(r'\btimeLimit\b').hasMatch(nodeSource);
 
       // Check for platform-specific optimized settings
       bool hasPlatformSettings =
           RegExp(r'\bAndroidSettings\b').hasMatch(nodeSource) ||
-          RegExp(r'\bAppleSettings\b').hasMatch(nodeSource);
+              RegExp(r'\bAppleSettings\b').hasMatch(nodeSource);
 
       // Flag if using best accuracy without platform optimization
       if (hasBestAccuracy && !hasPlatformSettings) {
@@ -129,8 +129,8 @@ class RequireGeolocatorBatteryAwarenessRule extends SaropaLintRule {
       final String nodeSource = node.toSource();
 
       // Check for problematic patterns
-      bool hasBestAccuracy =
-          RegExp(r'LocationAccuracy\.best\b').hasMatch(nodeSource) ||
+      bool hasBestAccuracy = RegExp(r'LocationAccuracy\.best\b')
+              .hasMatch(nodeSource) ||
           RegExp(r'LocationAccuracy\.bestForNavigation').hasMatch(nodeSource);
       bool hasZeroDistanceFilter = RegExp(
         r'distanceFilter:\s*0',
@@ -330,8 +330,8 @@ class PreferGeolocationCoarseLocationRule extends SaropaLintRule {
 
   @override
   List<String> get configAliases => const <String>[
-    'prefer_geolocator_coarse_location',
-  ];
+        'prefer_geolocator_coarse_location',
+      ];
 
   @override
   LintImpact get impact => LintImpact.medium;

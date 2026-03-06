@@ -2047,8 +2047,7 @@ class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
     '[avoid_scrollable_in_intrinsic] Scrollable widget inside '
         'IntrinsicHeight/IntrinsicWidth causes a geometry loop crash. '
         'Scrollables have no natural size. {v2}',
-    correctionMessage:
-        'Use SizedBox with explicit dimensions instead of '
+    correctionMessage: 'Use SizedBox with explicit dimensions instead of '
         'IntrinsicHeight/IntrinsicWidth around scrollable widgets.',
     severity: DiagnosticSeverity.ERROR,
   );

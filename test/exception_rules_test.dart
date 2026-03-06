@@ -10,7 +10,8 @@ void main() {
   group('Exception Rules - Rule Instantiation', () {
     test('AvoidNonFinalExceptionClassFieldsRule', () {
       final rule = AvoidNonFinalExceptionClassFieldsRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_non_final_exception_class_fields');
+      expect(rule.code.name.toLowerCase(),
+          'avoid_non_final_exception_class_fields');
       expect(
         rule.code.problemMessage,
         contains('[avoid_non_final_exception_class_fields]'),
@@ -37,7 +38,8 @@ void main() {
     });
     test('AvoidThrowObjectsWithoutToStringRule', () {
       final rule = AvoidThrowObjectsWithoutToStringRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_throw_objects_without_tostring');
+      expect(
+          rule.code.name.toLowerCase(), 'avoid_throw_objects_without_tostring');
       expect(
         rule.code.problemMessage,
         contains('[avoid_throw_objects_without_tostring]'),

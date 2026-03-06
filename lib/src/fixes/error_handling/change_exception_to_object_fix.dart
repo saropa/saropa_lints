@@ -23,9 +23,8 @@ class ChangeExceptionToObjectFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final target = node is CatchClause
-        ? node
-        : node.thisOrAncestorOfType<CatchClause>();
+    final target =
+        node is CatchClause ? node : node.thisOrAncestorOfType<CatchClause>();
     if (target == null) return;
 
     // Replace "on Exception" with "on Object" in the catch clause

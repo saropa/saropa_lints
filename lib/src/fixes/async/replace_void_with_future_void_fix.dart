@@ -27,7 +27,7 @@ class ReplaceVoidWithFutureVoidFix extends SaropaFixProducer {
 
     final TypeAnnotation? returnType =
         node.thisOrAncestorOfType<MethodDeclaration>()?.returnType ??
-        node.thisOrAncestorOfType<FunctionDeclaration>()?.returnType;
+            node.thisOrAncestorOfType<FunctionDeclaration>()?.returnType;
     if (returnType == null) return;
 
     final String src = returnType.toSource().trim();

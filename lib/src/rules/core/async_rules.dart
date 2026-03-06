@@ -68,9 +68,9 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        WrapFutureIgnoreInUnawaitedFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            WrapFutureIgnoreInUnawaitedFix(context: context),
+      ];
 }
 
 /// Warns when calling toString() or using string interpolation on a Future.
@@ -132,9 +132,9 @@ class AvoidFutureToStringRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceFutureToStringWithAwaitFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceFutureToStringWithAwaitFix(context: context),
+      ];
 }
 
 /// Warns when `Future<Future<T>>` is used (nested futures).
@@ -361,9 +361,9 @@ class AvoidRedundantAsyncRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AvoidRedundantAsyncFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AvoidRedundantAsyncFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_redundant_async',
@@ -959,9 +959,9 @@ class PreferReturnAwaitRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddReturnAwaitFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddReturnAwaitFix(context: context),
+      ];
 }
 
 /// Warns when `VoidCallback` is used for a callback that likely performs
@@ -1053,9 +1053,9 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ChangeToFutureVoidFunctionFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ChangeToFutureVoidFunctionFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_async_callback',
@@ -1224,9 +1224,9 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceAsyncCallbackWithFutureVoidFunctionFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceAsyncCallbackWithFutureVoidFunctionFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'prefer_future_void_function_over_async_callback',
@@ -1840,9 +1840,9 @@ class PreferUtcForStorageRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        AddToUtcFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            AddToUtcFix(context: context),
+      ];
 
   // No applicableFileTypes override: DateTime storage patterns appear in models,
   // services, repositories, widgets, and utilities. Early-exit guards on method
@@ -2204,8 +2204,7 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
           if (typeStr != null &&
               (typeStr.startsWith('StreamController') ||
                   typeStr.startsWith('StreamController?'))) {
-            final bool isExactType =
-                typeStr == 'StreamController' ||
+            final bool isExactType = typeStr == 'StreamController' ||
                 typeStr.startsWith('StreamController<') ||
                 typeStr.startsWith('StreamController?');
             for (final variable in member.fields.variables) {
@@ -3051,9 +3050,9 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        WrapInUnawaitedFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            WrapInUnawaitedFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_unawaited_future',
@@ -4490,9 +4489,8 @@ class AvoidSequentialAwaitsRule extends SaropaLintRule {
           assignedVars.add(parent.name.lexeme);
           break;
         }
-        final left = parent is AssignmentExpression
-            ? parent.leftHandSide
-            : null;
+        final left =
+            parent is AssignmentExpression ? parent.leftHandSide : null;
         if (left is SimpleIdentifier) {
           assignedVars.add(left.name);
           break;
@@ -4630,9 +4628,9 @@ class AvoidVoidAsyncRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ReplaceVoidWithFutureVoidFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            ReplaceVoidWithFutureVoidFix(context: context),
+      ];
 }
 
 /// Warns when `await` is used on a non-Future expression.
@@ -4702,9 +4700,9 @@ class AvoidRedundantAwaitRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        RemoveRedundantAwaitFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            RemoveRedundantAwaitFix(context: context),
+      ];
 }
 
 // =============================================================================

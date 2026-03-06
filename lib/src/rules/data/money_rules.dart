@@ -252,11 +252,9 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
           final String fieldName = variable.name.lexeme.toLowerCase();
 
           final TypeAnnotation? type = member.fields.type;
-          final String typeStr = type != null
-              ? type.toSource().toLowerCase()
-              : '';
-          final bool isNumeric =
-              typeStr.contains('double') ||
+          final String typeStr =
+              type != null ? type.toSource().toLowerCase() : '';
+          final bool isNumeric = typeStr.contains('double') ||
               typeStr.contains('int') ||
               typeStr.contains('num') ||
               typeStr.contains('decimal');

@@ -52,8 +52,7 @@ void main() {
       expect(
         pubspecFile.existsSync(),
         isTrue,
-        reason:
-            'Run tests from the saropa_lints repo (or a subdir). '
+        reason: 'Run tests from the saropa_lints repo (or a subdir). '
             'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
       );
 
@@ -149,8 +148,7 @@ void main() {
       expect(
         pubspecFile.existsSync(),
         isTrue,
-        reason:
-            'Run tests from the saropa_lints repo (or a subdir). '
+        reason: 'Run tests from the saropa_lints repo (or a subdir). '
             'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
       );
 
@@ -238,8 +236,7 @@ void main() {
       expect(
         pubspecFile.existsSync(),
         isTrue,
-        reason:
-            'Run tests from the saropa_lints repo (or a subdir). '
+        reason: 'Run tests from the saropa_lints repo (or a subdir). '
             'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
       );
 

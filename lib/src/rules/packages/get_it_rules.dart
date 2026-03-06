@@ -166,17 +166,16 @@ class RequireGetItRegistrationOrderRule extends SaropaLintRule {
       // First pass: collect all registrations and their dependencies
       body.accept(
         _GetItRegistrationVisitor(
-          onRegistration:
-              (
-                MethodInvocation node,
-                String? registeredType,
-                Set<String> dependencies,
-              ) {
-                registrations.add((node, dependencies));
-                if (registeredType != null) {
-                  registeredTypes.add(registeredType);
-                }
-              },
+          onRegistration: (
+            MethodInvocation node,
+            String? registeredType,
+            Set<String> dependencies,
+          ) {
+            registrations.add((node, dependencies));
+            if (registeredType != null) {
+              registeredTypes.add(registeredType);
+            }
+          },
         ),
       );
 
@@ -368,8 +367,7 @@ class RequireGetItResetInTestsRule extends SaropaLintRule {
         return;
       }
 
-      final bool hasReset =
-          RegExp(r'\.reset\s*\(\s*\)').hasMatch(source) ||
+      final bool hasReset = RegExp(r'\.reset\s*\(\s*\)').hasMatch(source) ||
           RegExp(r'\.resetLazySingleton\b').hasMatch(source) ||
           RegExp(r'GetIt\.I\.reset\b').hasMatch(source) ||
           RegExp(r'getIt\.reset\b').hasMatch(source);

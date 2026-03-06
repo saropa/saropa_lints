@@ -274,8 +274,8 @@ class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
       }
 
       // Look for comments in the compilation unit
-      final CompilationUnit? unit = node
-          .thisOrAncestorOfType<CompilationUnit>();
+      final CompilationUnit? unit =
+          node.thisOrAncestorOfType<CompilationUnit>();
       if (unit == null) {
         reporter.atNode(node.constructorName, code);
         return;
@@ -372,16 +372,15 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'color') {
           if (arg.expression is ConditionalExpression) {
             // Check if Container only has color (simple status indicator)
-            final bool hasOnlyColorAndChild = node.argumentList.arguments
-                .whereType<NamedExpression>()
-                .every(
-                  (NamedExpression na) =>
-                      na.name.label.name == 'color' ||
-                      na.name.label.name == 'child' ||
-                      na.name.label.name == 'key' ||
-                      na.name.label.name == 'width' ||
-                      na.name.label.name == 'height',
-                );
+            final bool hasOnlyColorAndChild =
+                node.argumentList.arguments.whereType<NamedExpression>().every(
+                      (NamedExpression na) =>
+                          na.name.label.name == 'color' ||
+                          na.name.label.name == 'child' ||
+                          na.name.label.name == 'key' ||
+                          na.name.label.name == 'width' ||
+                          na.name.label.name == 'height',
+                    );
 
             if (hasOnlyColorAndChild) {
               reporter.atNode(arg);
@@ -1907,7 +1906,7 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
             .any((re) => re.hasMatch(nodeSource));
         final bool hasDecorationAndError =
             _nonColorIndicatorPatterns[5].hasMatch(nodeSource) &&
-            _nonColorIndicatorPatterns[6].hasMatch(nodeSource);
+                _nonColorIndicatorPatterns[6].hasMatch(nodeSource);
         if (hasIconOrText || hasDecorationAndError) {
           hasNonColorIndicator = true;
           break;
@@ -2706,9 +2705,9 @@ class AvoidFlashingContentRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        IncreaseAnimationDurationFix(context: context),
-  ];
+        ({required CorrectionProducerContext context}) =>
+            IncreaseAnimationDurationFix(context: context),
+      ];
 
   static const LintCode _code = LintCode(
     'avoid_flashing_content',
@@ -3239,8 +3238,7 @@ class AvoidAutoPlayMediaRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check if this is a media-related widget (by type name or constructor name)
-      final bool isMediaWidget =
-          _mediaWidgets.contains(constructorName) ||
+      final bool isMediaWidget = _mediaWidgets.contains(constructorName) ||
           _mediaWidgets.contains(typeName) ||
           typeName.toLowerCase().contains('video') ||
           typeName.toLowerCase().contains('audio') ||
@@ -3336,8 +3334,7 @@ class PreferLargeTouchTargetsRule extends SaropaLintRule {
     'prefer_large_touch_targets',
     '[prefer_large_touch_targets] Touch target is smaller than 48px. '
         'This makes it difficult for users with motor impairments. {v2}',
-    correctionMessage:
-        'Increase the touch target size to at least 48x48 '
+    correctionMessage: 'Increase the touch target size to at least 48x48 '
         'logical pixels, or wrap in a larger touchable area.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -3672,8 +3669,7 @@ class RequireDragAlternativesRule extends SaropaLintRule {
       final parentSource = node.parent?.toSource() ?? '';
 
       // Look for button alternatives in nearby code
-      final hasButtonAlternative =
-          parentSource.contains('IconButton') ||
+      final hasButtonAlternative = parentSource.contains('IconButton') ||
           parentSource.contains('ElevatedButton') ||
           parentSource.contains('TextButton') ||
           parentSource.contains('PopupMenuButton') ||

@@ -144,8 +144,10 @@ def check_modules_exist() -> bool:
         print("  Ensure the following files exist:")
         for m in missing:
             print(f"    scripts/{m}")
+        # At least one required module missing; caller will exit with code 1
         return False
 
+    # All required modules present; safe to import
     return True
 
 
@@ -157,6 +159,7 @@ if not check_modules_exist():
     sys.exit(1)
 
 # Import publish workflow modules (all required files verified above)
+# Colours, exit codes, output level, project dir, and logo from shared utils
 from scripts.modules._utils import (
     Color,
     ExitCode,
@@ -172,6 +175,7 @@ from scripts.modules._utils import (
     set_output_level,
     show_saropa_logo,
 )
+# Git tag, GitHub release, commit/push, remote URL, and tag-exists check
 from scripts.modules._git_ops import (
     create_git_tag,
     create_github_release,
@@ -183,11 +187,13 @@ from scripts.modules._git_ops import (
     publish_to_pubdev_step,
     tag_exists_on_remote,
 )
+# Pub.dev doc-comment lint: issue check and auto-fix for angle brackets and refs
 from scripts.modules._pubdev_lint import (
     check_pubdev_lint_issues,
     fix_doc_angle_brackets,
     fix_doc_references,
 )
+# Prerequisites, working tree, remote sync, format, analysis, tests, audit, docs, validation
 from scripts.modules._publish_steps import (
     check_prerequisites,
     check_remote_sync,
@@ -200,6 +206,7 @@ from scripts.modules._publish_steps import (
     run_tests,
     validate_changelog,
 )
+# Rule/category counts, roadmap summary, test coverage display, README badge sync
 from scripts.modules._rule_metrics import (
     count_categories,
     count_rules,
@@ -207,7 +214,9 @@ from scripts.modules._rule_metrics import (
     display_test_coverage,
     sync_readme_badges,
 )
+# Step timing and summary display
 from scripts.modules._timing import StepTimer
+# Version regex, pubspec/changelog read/write, version parse/increment, display
 from scripts.modules._version_changelog import (
     _VERSION_RE,
     add_unreleased_section,
@@ -230,6 +239,7 @@ from scripts.modules._version_changelog import (
 
 def _parse_output_level() -> OutputLevel:
     """Return default output level (verbose). No CLI flags."""
+    # Script has no CLI flags; always verbose
     return OutputLevel.VERBOSE
 
 
@@ -254,6 +264,7 @@ def _prompt_version(default: str, timeout: int = 30) -> str:
                 ch = msvcrt.getwch()
                 if ch in ("\r", "\n"):
                     print()
+                    # Enter: submit current buffer or default
                     return "".join(buffer).strip() or default
                 if ch == "\x08":  # Backspace
                     if buffer:
@@ -268,6 +279,7 @@ def _prompt_version(default: str, timeout: int = 30) -> str:
                     sys.stdout.flush()
             time.sleep(0.05)
         print()
+        # Timeout: submit current buffer or default
         return "".join(buffer).strip() or default
 
     # Unix: readline with select-based timeout; [default] shown in brackets
@@ -278,8 +290,10 @@ def _prompt_version(default: str, timeout: int = 30) -> str:
     ready, _, _ = select.select([sys.stdin], [], [], timeout)
     if ready:
         user_input = sys.stdin.readline().strip()
+        # User entered something; use it or default
         return user_input if user_input else default
     print()
+    # Timeout: use default version
     return default
 
 
@@ -351,6 +365,7 @@ def _prompt_publish_mode() -> str:
             return "full_skip_audit"
     except (ValueError, EOFError, KeyboardInterrupt):
         pass
+    # Default or invalid input: full publish
     return "full"
 
 
@@ -370,13 +385,14 @@ def main(
     changelog_path = project_dir / "CHANGELOG.md"
     bugs_dir = project_dir / "bugs"
 
-    if not pubspec_path.exists():  # Can't publish without a pubspec
+    # Abort if pubspec or CHANGELOG missing (required for publish)
+    if not pubspec_path.exists():
         exit_with_error(
             f"pubspec.yaml not found at {pubspec_path}",
             ExitCode.PREREQUISITES_FAILED,
         )
 
-    if not changelog_path.exists():  # CHANGELOG is mandatory for releases
+    if not changelog_path.exists():
         exit_with_error(
             f"CHANGELOG.md not found at {changelog_path}",
             ExitCode.PREREQUISITES_FAILED,
@@ -386,8 +402,9 @@ def main(
     if mode == "fix_docs":
         print_header("FIX DOC COMMENT ISSUES")
         issues = check_pubdev_lint_issues(project_dir)
-        if not issues:  # Clean — nothing to fix
+        if not issues:
             print_success("No doc comment issues found.")
+            # fix_docs mode: nothing to fix, exit success
             return ExitCode.SUCCESS.value
         print_info(f"Found {len(issues)} issue(s):")
         for issue in issues:
@@ -401,11 +418,13 @@ def main(
                 f"({fixed_brackets} angle bracket(s), "
                 f"{fixed_refs} doc reference(s))."
             )
-        else:  # Issues exist but none are auto-fixable
+        else:
             print_warning("No auto-fixable issues found.")
+        # fix_docs mode: done (fixed or not), exit success
         return ExitCode.SUCCESS.value
 
     # --- Show package info (name, current version, branch, rule/category counts) ---
+    # Fields used for banner, version prompt, and release
     package_name = get_package_name(pubspec_path)
     pubspec_version = get_version_from_pubspec(pubspec_path)
     branch = get_current_branch(project_dir)
@@ -432,6 +451,7 @@ def main(
         print_info(f"TODO log: {todo_log.relative_to(project_dir)}")
 
     # --- Timed workflow: audit (optional), then prerequisites → format → analysis → tests ---
+    # Fields: mode flags, timer, exit code, version/release_notes (set later), success flag
     audit_only = mode == "audit_only"
     skip_audit = mode == "full_skip_audit"
     timer = StepTimer()
@@ -443,6 +463,7 @@ def main(
     try:
         # --- Step 1: Pre-publish audits (tier integrity, duplicates, DX; skip if full_skip_audit) ---
         if not skip_audit:
+            # Timed step: run tier integrity, duplicates, DX checks; retry if prefix fix applied
             with timer.step("Pre-publish audit"):
                 print_header("STEP 1: AUDIT")
                 audit_ok, audit_result = run_pre_publish_audits(project_dir)
@@ -452,6 +473,7 @@ def main(
                         audit_result, "rules_missing_prefix", None
                     )
                     if missing_prefix:
+                        # Lazy import: fix missing [rule_name] prefix in rule problem messages
                         from scripts.modules._audit_checks import fix_missing_prefix
 
                         n = fix_missing_prefix(rules_dir)
@@ -474,9 +496,10 @@ def main(
                 if not audit_ok:
                     exit_with_error(_AUDIT_FAILED_MSG, ExitCode.AUDIT_FAILED)
 
-            if audit_only:  # Stop after audit, don't publish
+            if audit_only:
                 print_success("Audit-only run complete (no format/analysis/tests).")
                 succeeded = True
+                # Audit-only: stop here, do not run format/analysis/tests
                 return ExitCode.SUCCESS.value
 
             # Gate: user must confirm before format/analysis/tests (commented out)
@@ -492,25 +515,29 @@ def main(
             #     print_warning("Publish canceled by user.")
             #     return ExitCode.USER_CANCELED.value
         elif audit_only:
+            # audit_only but skip_audit was true (invalid combination)
             return ExitCode.USER_CANCELED.value
 
         if skip_audit:
             print_warning("Audit skipped (publish without audit).")
 
         # --- Steps 2-7: Pre-publish analysis workflow ---
-        with timer.step("Prerequisites"):  # Step 2: flutter, git, gh
+        # Timed step: ensure flutter, git, gh are available
+        with timer.step("Prerequisites"):
             if not check_prerequisites():  # Missing required tool
                 exit_with_error(
                     "Prerequisites failed",
                     ExitCode.PREREQUISITES_FAILED,
                 )
 
-        with timer.step("Working tree"):  # Step 3: uncommitted changes
+        # Timed step: ensure working tree clean or user confirms uncommitted changes
+        with timer.step("Working tree"):
             ok, _ = check_working_tree(project_dir)
             if not ok:  # User declined to include uncommitted changes
                 exit_with_error("Aborted.", ExitCode.USER_CANCELED)
 
-        with timer.step("Remote sync"):  # Step 4: local/remote in sync
+        # Timed step: ensure local branch is in sync with remote
+        with timer.step("Remote sync"):
             if not check_remote_sync(project_dir, branch):  # Sync failed
                 exit_with_error(
                     "Remote sync failed",
@@ -519,19 +546,22 @@ def main(
 
         # Format and analyze before tests: fail fast on analysis without
         # running 7k+ tests (which can fill temp and fail with disk space errors).
-        with timer.step("Format"):  # Step 5: dart format
+        # Timed step: run dart format on project
+        with timer.step("Format"):
             if not run_format(project_dir):  # Format error
                 exit_with_error(
                     "Formatting failed.", ExitCode.VALIDATION_FAILED,
                 )
 
-        with timer.step("Analysis"):  # Step 6: dart analyze --fatal-infos
+        # Timed step: run dart analyze --fatal-infos
+        with timer.step("Analysis"):
             if not run_analysis(project_dir):  # Analysis error
                 exit_with_error(
                     "Analysis failed.", ExitCode.ANALYSIS_FAILED,
                 )
 
-        with timer.step("Tests"):  # Step 7: dart test
+        # Timed step: run dart test
+        with timer.step("Tests"):
             if not run_tests(project_dir):  # Test failure
                 exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
 
@@ -552,6 +582,7 @@ def main(
                 f"Use X.Y.Z or X.Y.Z-pre.N"
             )
 
+        # Timed step: write version to pubspec, rename [Unreleased] in CHANGELOG, reconcile versions
         with timer.step("Version sync"):
             # Align pubspec and CHANGELOG: update pubspec if needed, then rename [Unreleased] → [version]
             version_to_sync = version
@@ -656,24 +687,29 @@ def main(
         print()
 
         # --- Steps 9-11: Badge sync, CHANGELOG validation, doc generation, dry-run ---
+        # Timed step: update README badges with version and rule count
         with timer.step("Badge sync"):
             sync_readme_badges(project_dir, version, rule_count)
 
+        # Timed step: ensure CHANGELOG has entry for this version and extract release notes
         with timer.step("CHANGELOG validation"):
+            # ok: version present and valid; release_notes: body for GitHub release
             ok, release_notes = validate_changelog(
                 project_dir, version,
             )
-            if not ok:  # Version missing or empty in CHANGELOG
+            if not ok:
                 exit_with_error(
-                    "CHANGELOG failed", ExitCode.CHANGELOG_FAILED,
+                    "CHANGELOG failed",                     ExitCode.CHANGELOG_FAILED,
                 )
 
+        # Timed step: generate API docs (dart doc)
         with timer.step("Docs"):
             if not generate_docs(project_dir):  # Doc generation error
                 exit_with_error(
-                    "Docs failed", ExitCode.VALIDATION_FAILED,
+                    "Docs failed",                     ExitCode.VALIDATION_FAILED,
                 )
 
+        # Timed step: dart pub publish --dry-run to catch pub.dev issues
         with timer.step("Pre-publish validation"):
             if not pre_publish_validation(project_dir):  # Would fail on pub.dev
                 exit_with_error(
@@ -681,6 +717,7 @@ def main(
                 )
 
         # --- Re-run analysis after version bump so we don't tag a broken build ---
+        # Timed step: re-run analysis after version changes; abort if it fails
         with timer.step("Final CI gate"):
             print_header("FINAL CI GATE")
             print_info(
@@ -696,6 +733,7 @@ def main(
             print_success("CI gate passed \u2014 safe to create tag")
 
         # --- Commit and push versioned files, then tag, publish to pub.dev, create GitHub release ---
+        # Timed step: stage all changes, commit, push to remote
         with timer.step("Git commit & push"):
             if not git_commit_and_push(
                 project_dir, version, branch,
@@ -705,37 +743,45 @@ def main(
                 )
 
         # --- Optionally re-trigger CI if workflow failed (e.g. flaky check) ---
+        # Timed step: optionally re-run failed GitHub Actions workflow
         with timer.step("CI status"):
+            # Lazy import: prompt to re-run failed GitHub Actions workflow
             from scripts.modules._retrigger_ci import offer_retrigger_ci
 
             offer_retrigger_ci(limit=10)
 
+        # Timed step: create git tag vX.Y.Z
         with timer.step("Git tag"):
             if not create_git_tag(project_dir, version):
                 exit_with_error(
-                    "Git tag failed", ExitCode.GIT_FAILED,
+                    "Git tag failed",                     ExitCode.GIT_FAILED,
                 )
 
-        with timer.step("Publish"):  # dart pub publish to pub.dev
+        # Timed step: publish package to pub.dev (dart pub publish)
+        with timer.step("Publish"):
             if not publish_to_pubdev_step(project_dir, version):
                 exit_with_error(
-                    "Publish failed", ExitCode.PUBLISH_FAILED,
+                    "Publish failed",                     ExitCode.PUBLISH_FAILED,
                 )
 
+        # Timed step: create GitHub release with notes from CHANGELOG
         with timer.step("GitHub release"):
+            # gh_success: True if release created; gh_error: message on failure
             gh_success, gh_error = create_github_release(
                 project_dir, version, release_notes,
             )
-            if not gh_success:  # GH CLI or auth failure
+            if not gh_success:
                 exit_with_error(
                     f"GitHub release failed: {gh_error}",
                     ExitCode.GITHUB_RELEASE_FAILED,
                 )
 
+        # Mark success so final banner is printed and exit code stays 0
         succeeded = True
 
         # --- Bump pubspec and add [Unreleased] in CHANGELOG for next cycle; commit if possible ---
         try:
+            # Timed step: bump pubspec to next version, add [Unreleased], commit
             with timer.step("Version bump"):
                 next_version = increment_version(version)
                 set_version_in_pubspec(pubspec_path, next_version)
@@ -761,10 +807,12 @@ def main(
         except Exception:
             pass  # Browser open is non-critical
 
-    except SystemExit as exc:  # Caught from exit_with_error() calls
+    except SystemExit as exc:
+        # Capture exit code from exit_with_error() or sys.exit() for final return
         exit_code = exc.code if isinstance(exc.code, int) else 1
 
     finally:
+        # Always print step timing summary
         timer.print_summary()
 
     if succeeded:
@@ -772,6 +820,7 @@ def main(
         repo_path = extract_repo_path(remote_url)
         _print_success_banner(package_name, version, repo_path)
 
+    # Return 0 on success, or the exit code set by exit_with_error()
     return exit_code
 
 

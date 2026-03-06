@@ -63,7 +63,8 @@ void main() {
     });
     test('RequireConflictResolutionStrategyRule', () {
       final rule = RequireConflictResolutionStrategyRule();
-      expect(rule.code.name.toLowerCase(), 'require_conflict_resolution_strategy');
+      expect(
+          rule.code.name.toLowerCase(), 'require_conflict_resolution_strategy');
       expect(
         rule.code.problemMessage,
         contains('[require_conflict_resolution_strategy]'),

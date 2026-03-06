@@ -86,7 +86,8 @@ void main() {
     });
     test('RequireStreamSubscriptionCancelRule', () {
       final rule = RequireStreamSubscriptionCancelRule();
-      expect(rule.code.name.toLowerCase(), 'require_stream_subscription_cancel');
+      expect(
+          rule.code.name.toLowerCase(), 'require_stream_subscription_cancel');
       expect(
         rule.code.problemMessage,
         contains('[require_stream_subscription_cancel]'),
@@ -157,7 +158,8 @@ void main() {
     });
     test('PreferDisposeBeforeNewInstanceRule', () {
       final rule = PreferDisposeBeforeNewInstanceRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_dispose_before_new_instance');
+      expect(
+          rule.code.name.toLowerCase(), 'prefer_dispose_before_new_instance');
       expect(
         rule.code.problemMessage,
         contains('[prefer_dispose_before_new_instance]'),
