@@ -106,7 +106,7 @@ void _collectNativeOnlyTargetsFromFile(
 
   final parseResult = parseString(content: content, path: importingFilePath);
   final unit = parseResult.unit;
-  if (!parseResult.errors.isEmpty) return;
+  if (parseResult.errors.isNotEmpty) return;
 
   final packageName = ProjectContext.getPackageName(projectRoot);
 
