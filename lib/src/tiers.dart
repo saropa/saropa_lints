@@ -722,7 +722,7 @@ const Set<String> essentialRules = <String>{
 /// Recommended tier rules - Essential + common mistakes, performance basics.
 /// Catches bugs that don't immediately crash but cause poor UX, sluggish performance.
 const Set<String> recommendedOnlyRules = <String>{
-  // Moved from Essential (tier reclassification - no orphans; see bugs/TIER_AND_SEVERITY_ANALYSIS.md)
+  // Moved from Essential (tier reclassification - no orphans)
   'prefer_semver_version', // pubspec version major.minor.patch - tooling correctness
   'prefer_correct_package_name', // library/package naming - tooling/build
   'require_macos_notarization_ready', // macOS distribution reminder (INFO)

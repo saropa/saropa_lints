@@ -1835,14 +1835,12 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'Scaffold') {
-        // Check body argument
+        if (!_scaffoldHasAppBarOrBottomNav(node)) return;
         for (final Expression arg in node.argumentList.arguments) {
           if (arg is NamedExpression && arg.name.label.name == 'body') {
             final bodyExpr = arg.expression;
             if (bodyExpr is InstanceCreationExpression &&
                 bodyExpr.constructorName.type.name.lexeme == 'SafeArea') {
-              // SafeArea(top: false) only applies bottom/left/right insets;
-              // no redundant top inset with AppBar, so do not report.
               if (_safeAreaHasTopFalse(bodyExpr)) continue;
               reporter.atNode(bodyExpr.constructorName, code);
             }
@@ -1850,6 +1848,21 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// True when this Scaffold has appBar or bottomNavigationBar (so body
+  /// is already inset and SafeArea is redundant).
+  static bool _scaffoldHasAppBarOrBottomNav(
+      InstanceCreationExpression scaffold) {
+    for (final Expression arg in scaffold.argumentList.arguments) {
+      if (arg is NamedExpression) {
+        final name = arg.name.label.name;
+        if (name == 'appBar' || name == 'bottomNavigationBar') {
+          if (arg.expression is! NullLiteral) return true;
+        }
+      }
+    }
+    return false;
   }
 
   /// True when this SafeArea has an explicit `top: false` (no redundant top

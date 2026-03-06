@@ -2242,7 +2242,6 @@ bool _isRngLikeType(DartType? type) {
 /// Visitor that detects if an expression uses Random (or RNG-like) APIs.
 /// Used to exclude such initializers from duplicate detection: same source
 /// (e.g. `rng.nextDouble()`) evaluates to different values each time.
-/// See: bugs/use_existing_variable_false_positive_random_rng.md
 class _RandomPresenceVisitor extends RecursiveAstVisitor<void> {
   bool hasRandomOrRngUsage = false;
 
@@ -2315,7 +2314,6 @@ bool _expressionUsesRandomOrRng(Expression expression) {
 ///    - Instance methods [nextDouble], [nextInt], [nextBool], [next] on such
 ///      a type, or on a variable with a common RNG-like name (rng, random,
 ///      rand, rnd). Each call yields a different value.
-///    See: bugs/history/false_positives/use_existing_variable_false_positive_random_rng_resolved.md.
 ///
 /// **Impact:** medium (maintainability). **Cost:** low (block-scoped, one
 /// visitor per candidate initializer).

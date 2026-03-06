@@ -1,5 +1,7 @@
 # Analyzer 10 upgrade review
 
+**Archived:** Upgrade complete (2025-03). Kept in `bugs/history/` for reference (e.g. future analyzer 11 upgrade). Active docs: `doc/guides/upgrading_to_v7.md`, CHANGELOG 7.0.0.
+
 **Last updated:** 2025-03; API and dependency versions verified against pub.dev and analyzer 10.0.0 docs.
 
 **Status:** Upgrade complete. All phases (0–7) and init v6→v7 migration are done; `dart analyze --fatal-infos` and `dart test` pass.
@@ -84,7 +86,7 @@ Recommendation: **A** (direct migration to analyzer 10) to avoid long‑term com
 
 - **Element.isSynthetic** and related **isSynthetic** on element types are deprecated in favor of **isOriginXyz** (e.g. `isOriginDeclaration`, `isOriginImplicitDefault`).
 - This project uses **isSynthetic** in two places:
-  1. **`lib/src/rules/stylistic/stylistic_rules.dart`** (around line 4026): `SimpleStringLiteral.isSynthetic` — AST node, not Element. Need to confirm in analyzer 10 whether this is deprecated and what the replacement is (e.g. another AST property or “synthetic” string detection).
+  1. **`lib/src/rules/stylistic/stylistic_rules.dart`** (around line 4026): `SimpleStringLiteral.isSynthetic` — AST node, not Element. Need to confirm in analyzer 10 whether this is deprecated and what the replacement is (e.g. another AST property or "synthetic" string detection).
   2. **`lib/src/rules/core/class_constructor_rules.dart`** (around line 1760): `m.factoryKeyword?.isSynthetic` on `ConstructorDeclaration` — this is likely a token/AST property. Check analyzer 10 docs/changelog for Token or FactoryKeyword; replace with the recommended API if deprecated.
 
 **Action:** After upgrading, run the analyzer and tests; fix any deprecation or errors at these two call sites based on the actual analyzer 10 API (and changelog for AST/token `isSynthetic`).
@@ -93,7 +95,7 @@ Recommendation: **A** (direct migration to analyzer 10) to avoid long‑term com
 
 ## 3. Parent–child relationship changes
 
-Analyzer 10 changelog: *“Code relying on specific parent-child relationships for deprecated nodes in ClassDeclaration, EnumDeclaration, ExtensionDeclaration, and ExtensionTypeDeclaration may break.”*
+Analyzer 10 changelog: *"Code relying on specific parent-child relationships for deprecated nodes in ClassDeclaration, EnumDeclaration, ExtensionDeclaration, and ExtensionTypeDeclaration may break."*
 
 - If any code assumes the **parent** of `node.members[i]` or similar is exactly `node`, that may no longer hold; the parent may now be `node.body`. Update any such logic to use `(node.body as BlockClassBody).members` and treat the parent as the body node where relevant.
 - Search for `.parent is ClassDeclaration` (or Enum/Extension/ExtensionType) near uses of members/name/constants and ensure the new structure (body/namePart) is taken into account.
@@ -168,18 +170,18 @@ These can be done on the **current** codebase (analyzer 9) without breaking anyt
   - `addClassDeclaration` and any of `.members`, `.name`, `.typeParameters` on the callback parameter
   - `addEnumDeclaration` and any of `.constants`, `.members`, `.name`
   - `addExtensionDeclaration` / `addExtensionTypeDeclaration` and any deprecated property access
-  Paste the file paths (and optionally line counts) into the doc or a checklist file. Use this as the authoritative “files to touch” list for Phases 3–5.
+  Paste the file paths (and optionally line counts) into the doc or a checklist file. Use this as the authoritative "files to touch" list for Phases 3–5.
 - [ ] **List every parent/traversal use:** Grep for `.parent is ClassDeclaration`, `.parent is EnumDeclaration`, `.parent is ExtensionDeclaration`, `.parent is ExtensionTypeDeclaration`, and any `node.parent ==` where the node could be a class member. Document file:line so Phase 6.3 is a simple checklist.
 
 ### 7.3 Look up analyzer 10 API once
 
-- [x] **Resolve exact types for body/namePart (done):** Before touching code, check analyzer 10 API docs (e.g. pub.dev documentation for analyzer 10): types of `ClassDeclaration.body`, `ClassDeclaration.namePart`, and whether `namePart.name` is `Token` or `Identifier` (and how to get `.lexeme` / use with `atToken`). Add a 2–3 line “API note” in this doc (e.g. under section 2.2) so the migration doesn’t guess.
+- [x] **Resolve exact types for body/namePart (done):** Before touching code, check analyzer 10 API docs (e.g. pub.dev documentation for analyzer 10): types of `ClassDeclaration.body`, `ClassDeclaration.namePart`, and whether `namePart.name` is `Token` or `Identifier` (and how to get `.lexeme` / use with `atToken`). Add a 2–3 line "API note" in this doc (e.g. under section 2.2) so the migration doesn't guess.
 
 ### 7.4 Optional: introduce a thin accessor layer (strategy B prep)
 
-- [ ] **(Optional)** If you prefer a single switch point: add a small file (e.g. `lib/src/ast_compat.dart`) that **today** exposes helpers like `classMembers(ClassDeclaration n) => n.members`, `classNameToken(ClassDeclaration n) => n.name`, and use them in a few rule files as a trial. Once the pattern works, migrate the rest of the class/enum/extension call sites to use these helpers. When upgrading to analyzer 10, only the helper implementations change to `(n.body as BlockClassBody).members` and `n.namePart.typeName`. This is more prep work but confines the “breaking” edit to one place. Skip if you choose direct migration (strategy A).
+- [ ] **(Optional)** If you prefer a single switch point: add a small file (e.g. `lib/src/ast_compat.dart`) that **today** exposes helpers like `classMembers(ClassDeclaration n) => n.members`, `classNameToken(ClassDeclaration n) => n.name`, and use them in a few rule files as a trial. Once the pattern works, migrate the rest of the class/enum/extension call sites to use these helpers. When upgrading to analyzer 10, only the helper implementations change to `(n.body as BlockClassBody).members` and `n.namePart.typeName`. This is more prep work but confines the "breaking" edit to one place. Skip if you choose direct migration (strategy A).
 
-### 7.5 Optional: capture “what to fix” without fixing
+### 7.5 Optional: capture "what to fix" without fixing
 
 - [x] **(Optional)** On a throwaway branch: bump only the three dependencies (and package version to 7.0.0), run `dart pub get` and `dart analyze --fatal-infos` 2>&1. Save the full analyzer output to a file (e.g. `bugs/analyzer_10_first_run.txt`). Use it as the concrete list of errors/deprecations to fix; no code changes beyond pubspec yet. *Done: branch `throwaway/analyzer_10_first_run`, output in `bugs/analyzer_10_first_run.txt` (388 issues, mostly deprecated_member_use for `.name` → lowerCaseName).*
 
@@ -214,7 +216,7 @@ Only change code where the **receiver** is statically a `ClassDeclaration` (e.g.
 
 - [x] **3.1** In each file that uses `addClassDeclaration`, replace:
   - `node.members` → `(node.body as BlockClassBody).members`
-  - `node.name` → `node.namePart.typeName` (if `namePart.name` is a `Token`, keep `.lexeme` / `.offset` etc.; if it’s an `Identifier`, use its getter per API)
+  - `node.name` → `node.namePart.typeName` (if `namePart.name` is a `Token`, keep `.lexeme` / `.offset` etc.; if it's an `Identifier`, use its getter per API)
   - `node.typeParameters` → `node.namePart.typeParameters`
   - `node.leftBracket` / `node.rightBracket` → `(node.body as BlockClassBody).leftBracket` / `.rightBracket`
 - [x] **3.2** In the same files, replace any `classDecl.members` / `classNode.members` / `cls.members` when the variable is a `ClassDeclaration` with `(classDecl.body as BlockClassBody).members`; same for `.name` → `.namePart.typeName`, `.typeParameters` → `.namePart.typeParameters`.
@@ -262,7 +264,7 @@ Only change code where the **receiver** is statically a `ClassDeclaration` (e.g.
 
 ---
 
-## 9. Gotchas (why it’s not “just a find-replace”)
+## 9. Gotchas (why it's not "just a find-replace")
 
 ### 9.1 No blind search-replace
 
@@ -276,25 +278,25 @@ Only the **four declaration kinds** (ClassDeclaration, EnumDeclaration, Extensio
 
 ### 9.2 namePart.typeName (not .name)
 
-In analyzer 9, `ClassDeclaration.name` is a **Token**. In analyzer 10, `node.namePart.typeName` is a **Token** (verified in analyzer 10 API). If it’s an `Identifier`, it may still have something like `.name` (the simple identifier) or `.lexeme`. Check the analyzer 10 API; every `node.name.lexeme` / `reporter.atToken(node.name, ...)` may need a one-line adjustment if the type differs (e.g. `node.namePart.typeName.lexeme` or `node.namePart.typeName.name`).
+In analyzer 9, `ClassDeclaration.name` is a **Token**. In analyzer 10, `node.namePart.typeName` is a **Token** (verified in analyzer 10 API). If it's an `Identifier`, it may still have something like `.name` (the simple identifier) or `.lexeme`. Check the analyzer 10 API; every `node.name.lexeme` / `reporter.atToken(node.name, ...)` may need a one-line adjustment if the type differs (e.g. `node.namePart.typeName.lexeme` or `node.namePart.typeName.name`).
 
 ### 9.3 Parent–child relationship changes
 
 The changelog says **parent–child relationships** for the deprecated nodes have changed. So:
 
 - **member.parent** might now be the **body** node, not the class/enum/extension declaration. Any code that does `node.parent is ClassDeclaration` or `member.parent == classDecl` may break or need to consider `member.parent == classDecl.body` and then `classDecl.body.parent == classDecl`.
-- Visitor or traversal logic that assumes “parent of a class member is the class” will need to account for the intermediate **body** node.
+- Visitor or traversal logic that assumes "parent of a class member is the class" will need to account for the intermediate **body** node.
 
-### 9.4 Fatal infos = no “fix later”
+### 9.4 Fatal infos = no "fix later"
 
 This project runs **`dart analyze --fatal-infos`**. So:
 
 - Any **deprecation** reported as an info will **fail** analyze and CI.
-- You cannot “upgrade first and fix deprecations later.” All deprecated usages must be fixed in the same upgrade (or in a single follow-up commit that’s part of the same change set).
+- You cannot "upgrade first and fix deprecations later." All deprecated usages must be fixed in the same upgrade (or in a single follow-up commit that's part of the same change set).
 
 ### 9.5 analyzer_plugin and analysis_server_plugin may break too
 
-“Easy” refers mainly to the **analyzer** AST (body/namePart). The **analyzer_plugin** (0.13 → 0.14) and **analysis_server_plugin** (0.3.4 → 0.3.10+) upgrades can have their own breaking changes (renamed methods, different callback signatures, different types). If after `dart pub get` you see errors in `lib/src/native/` or in code that uses `ChangeBuilder`, `FixKind`, or the plugin registration APIs, you’ll need to read those packages’ changelogs and adapt. That can add non-trivial work.
+"Easy" refers mainly to the **analyzer** AST (body/namePart). The **analyzer_plugin** (0.13 → 0.14) and **analysis_server_plugin** (0.3.4 → 0.3.10+) upgrades can have their own breaking changes (renamed methods, different callback signatures, different types). If after `dart pub get` you see errors in `lib/src/native/` or in code that uses `ChangeBuilder`, `FixKind`, or the plugin registration APIs, you'll need to read those packages' changelogs and adapt. That can add non-trivial work.
 
 ### 9.6 ExtensionTypeDeclaration has more deprecated surface
 
@@ -305,7 +307,7 @@ ExtensionTypeDeclaration deprecates not only `members`, `name`, `typeParameters`
 The **test** directory does not (from the earlier grep) use `.members` on class nodes directly, but:
 
 - **Rule tests** that assert on diagnostics or quick fixes might behave differently if the AST shape changes (e.g. different offsets or ranges).
-- **Fixtures** in `example/` or `example_*/` are analyzed by the plugin; if the analyzer’s parsing or AST changes slightly, you might see new or different diagnostics. Run the full test suite and fix any failures; a few might need expectation updates.
+- **Fixtures** in `example/` or `example_*/` are analyzed by the plugin; if the analyzer's parsing or AST changes slightly, you might see new or different diagnostics. Run the full test suite and fix any failures; a few might need expectation updates.
 
 ### 9.8 Summary table
 

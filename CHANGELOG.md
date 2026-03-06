@@ -50,7 +50,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **avoid_screenshot_sensitive** — No longer reports on debug/tooling screens: class names containing `debug`, `viewer`, `webview`, `devtool`, or `tooling` are excluded. When the only matched keyword is `settings`, classes whose name contains `fromsettings` (e.g. `_WebViewScreenFromSettings`) are excluded as navigation context. Resolves bug_avoid_screenshot_sensitive_debug_only_screens (debug-only DB viewer, saropa_drift_viewer).
 
-- **prefer_safe_area_consumer** — No longer reports when `SafeArea(top: false, ...)` is used inside a Scaffold body. That pattern only applies bottom (and optionally left/right) insets, so there is no redundant top inset with the AppBar. See bugs/history/bug_prefer_safe_area_consumer_safe_area_top_false.md.
+- **prefer_safe_area_consumer** — No longer reports when `SafeArea(top: false, ...)` is used inside a Scaffold body. That pattern only applies bottom (and optionally left/right) insets, so there is no redundant top inset with the AppBar.
 
 - **prefer_named_routes_for_deep_links** — No longer reports when `MaterialPageRoute` or `CupertinoPageRoute` use `settings: RouteSettings(name: ...)` with a non-empty name (literal or variable). Supports path-style names and `onGenerateRoute`-based deep linking. Still reports when there is no `settings`, when `RouteSettings` has no `name`, or when `name` is an empty string literal. Resolves bug_prefer_named_routes_for_deep_links_material_page_route_named.
 

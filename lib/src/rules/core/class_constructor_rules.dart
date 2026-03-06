@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/class_constructor/prefer_const_string_list_fix.dart';
@@ -973,15 +974,17 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
           .replaceAll(RegExp(r'\s+'), ' ')
           .trim();
 
+      // When representation is private, allow exactly one public getter that
+      // exposes it under a different name (e.g. String get sql => _sql).
+      final bool representationIsPrivate = repFieldName.startsWith('_');
+      int renamingGetterCount = 0;
       for (final ClassMember m in body.members) {
         if (m is! MethodDeclaration) continue;
-        // Getters have no parameters
         if (m.parameters != null && m.parameters!.parameters.isNotEmpty) {
           continue;
         }
         final String getterName = m.name.lexeme;
         if (getterName == repFieldName) continue;
-
         final TypeAnnotation? returnType = m.returnType;
         if (returnType == null) continue;
         final String returnTypeSource = returnType
@@ -989,7 +992,23 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
             .replaceAll(RegExp(r'\s+'), ' ')
             .trim();
         if (returnTypeSource != repTypeSource) continue;
-
+        renamingGetterCount++;
+      }
+      for (final ClassMember m in body.members) {
+        if (m is! MethodDeclaration) continue;
+        if (m.parameters != null && m.parameters!.parameters.isNotEmpty) {
+          continue;
+        }
+        final String getterName = m.name.lexeme;
+        if (getterName == repFieldName) continue;
+        final TypeAnnotation? returnType = m.returnType;
+        if (returnType == null) continue;
+        final String returnTypeSource = returnType
+            .toSource()
+            .replaceAll(RegExp(r'\s+'), ' ')
+            .trim();
+        if (returnTypeSource != repTypeSource) continue;
+        if (representationIsPrivate && renamingGetterCount == 1) continue;
         reporter.atToken(m.name, code);
       }
     });
@@ -2246,8 +2265,62 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
       }
 
       if (!allFinal || nonConstGenConstructor == null) return;
+      if (_constructorHasFunctionTypeParam(nonConstGenConstructor)) return;
+      if (_superclassLacksConstConstructor(node)) return;
+      if (_constructorHasNonConstInitializers(nonConstGenConstructor)) return;
       reporter.atNode(nonConstGenConstructor);
     });
+  }
+
+  static bool _constructorHasFunctionTypeParam(ConstructorDeclaration node) {
+    for (final FormalParameter p in node.parameters.parameters) {
+      final FormalParameter param =
+          p is DefaultFormalParameter ? p.parameter : p;
+      TypeAnnotation? type;
+      if (param is SimpleFormalParameter) {
+        type = param.type;
+      } else if (param is FieldFormalParameter) {
+        type = param.type;
+      }
+      if (type is GenericFunctionType) return true;
+    }
+    return false;
+  }
+
+  static bool _superclassLacksConstConstructor(ClassDeclaration node) {
+    final ExtendsClause? ext = node.extendsClause;
+    if (ext == null) return false;
+    final InterfaceElement? superInterface =
+        ext.superclass.type?.element as InterfaceElement?;
+    if (superInterface == null) return false;
+    return !superInterface.constructors.any((ConstructorElement c) => c.isConst);
+  }
+
+  static bool _constructorHasNonConstInitializers(
+      ConstructorDeclaration node) {
+    final NodeList<ConstructorInitializer> inits = node.initializers;
+    if (inits.isEmpty) return false;
+    for (final ConstructorInitializer init in inits) {
+      if (init is ConstructorFieldInitializer) {
+        if (_expressionIsNonConst(init.expression)) return true;
+      } else if (init is SuperConstructorInvocation) {
+        for (final Expression arg in init.argumentList.arguments) {
+          if (_expressionIsNonConst(arg)) return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  static bool _expressionIsNonConst(Expression expr) {
+    if (expr is MethodInvocation) return true;
+    if (expr is InstanceCreationExpression) return true;
+    if (expr is BinaryExpression) return true;
+    if (expr is ConditionalExpression) return true;
+    if (expr is PrefixExpression) return true;
+    if (expr is PostfixExpression) return true;
+    if (expr is AwaitExpression) return true;
+    return false;
   }
 
   static bool _isImmutableOrWidget(ClassDeclaration node) {
