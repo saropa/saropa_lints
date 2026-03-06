@@ -625,8 +625,7 @@ class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
 ///
 /// **Exempt:** Does not flag switches where any case has multiple statements,
 /// control flow (if/for/while/try/do) inside a case, or non-exhaustive switches
-/// with code after the switch. See bugs/history/false_positives/
-/// prefer_switch_expression_false_positive_complex_case_logic.md.
+/// with code after the switch.
 ///
 /// **Bad:** Switch statement with only return/assignment per case.
 /// **Good:** Switch expression with same mapping.

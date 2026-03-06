@@ -3858,6 +3858,23 @@ bool _variableOnlyPassedToFromJson(Block block, String name, Statement stmt) {
   return true;
 }
 
+/// True when [name] is validated by a type check after [stmt] (e.g. if (x is! Map && x is! List) throw).
+bool _variableValidatedByTypeCheck(Block block, String name, Statement stmt) {
+  final stmtIndex = block.statements.indexOf(stmt);
+  if (stmtIndex < 0) return false;
+  final afterStmt = block.statements.sublist(stmtIndex + 1);
+  for (final s in afterStmt) {
+    if (s is IfStatement) {
+      final conditionSrc = s.expression.toSource();
+      if (!conditionSrc.contains(name)) continue;
+      if (!conditionSrc.contains('Map') && !conditionSrc.contains('List')) continue;
+      if (!_thenReturnsOrThrows(s.thenStatement)) continue;
+      return true;
+    }
+  }
+  return false;
+}
+
 bool _isArgumentToFromJson(SimpleIdentifier identifier) {
   final parent = identifier.parent;
   if (parent is ArgumentList &&
@@ -3919,10 +3936,9 @@ class RequireApiResponseValidationRule extends SaropaLintRule {
       if (varName != null) {
         final block = _blockContaining(node);
         final stmt = _statementInBlockContaining(node);
-        if (block != null &&
-            stmt != null &&
-            _variableOnlyPassedToFromJson(block, varName, stmt)) {
-          return;
+        if (block != null && stmt != null) {
+          if (_variableOnlyPassedToFromJson(block, varName, stmt)) return;
+          if (_variableValidatedByTypeCheck(block, varName, stmt)) return;
         }
       }
       reporter.atNode(node);
@@ -3963,7 +3979,23 @@ class RequireApiVersionHandlingRule extends SaropaLintRule {
 // require_content_type_validation
 // =============================================================================
 
-/// True when [stmt] is an IfStatement that returns when Content-Type is not application/json (guard before decode).
+/// True when the then-branch returns or throws (guard before decode).
+bool _thenReturnsOrThrows(Statement thenStatement) {
+  if (thenStatement is ReturnStatement) return true;
+  if (thenStatement is ExpressionStatement &&
+      thenStatement.expression is ThrowExpression) {
+    return true;
+  }
+  if (thenStatement is Block && thenStatement.statements.length == 1) {
+    final only = thenStatement.statements.single;
+    if (only is ExpressionStatement && only.expression is ThrowExpression) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/// True when [stmt] is an IfStatement that returns or throws when Content-Type is not application/json (guard before decode).
 ///
 /// Uses a guarded heuristic on condition source (contentType/mimeType + application/json) per CONTRIBUTING.md.
 bool _isContentTypeGuardStatement(Statement stmt) {
@@ -3974,7 +4006,20 @@ bool _isContentTypeGuardStatement(Statement stmt) {
       condition.contains('content_type');
   final hasJson = condition.contains('application/json');
   if (!hasContentType || !hasJson) return false;
-  return stmt.thenStatement is ReturnStatement;
+  return _thenReturnsOrThrows(stmt.thenStatement);
+}
+
+bool _hasContentTypeGuardInStatement(Statement s) {
+  if (_isContentTypeGuardStatement(s)) return true;
+  if (s is IfStatement) {
+    final then = s.thenStatement;
+    if (then is Block) {
+      for (final child in then.statements) {
+        if (_hasContentTypeGuardInStatement(child)) return true;
+      }
+    }
+  }
+  return false;
 }
 
 /// True when a dominating content-type check exists before the jsonDecode at [node].
@@ -3986,7 +4031,7 @@ bool _hasContentTypeGuardBeforeJsonDecode(AstNode node) {
       final stmtIndex = block.statements.indexOf(stmt);
       if (stmtIndex > 0) {
         for (var i = 0; i < stmtIndex; i++) {
-          if (_isContentTypeGuardStatement(block.statements[i])) return true;
+          if (_hasContentTypeGuardInStatement(block.statements[i])) return true;
         }
       }
     }

@@ -1794,8 +1794,7 @@ class PreferDataMaskingRule extends SaropaLintRule {
 /// class names containing debug/tooling markers (debug, viewer, devtool,
 /// tooling) are never reported; and when the only match is "settings",
 /// names containing "fromsettings" (e.g. WebViewScreenFromSettings) are
-/// excluded as navigation context, not settings UI. See
-/// bugs/history/bug_avoid_screenshot_sensitive_debug_only_screens.md.
+/// excluded as navigation context, not settings UI.
 ///
 /// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v5
 ///
