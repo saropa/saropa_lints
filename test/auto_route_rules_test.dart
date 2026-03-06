@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/rules/packages/auto_route_rules.dart';
 import 'package:test/test.dart';
 

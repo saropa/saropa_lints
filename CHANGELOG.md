@@ -12,7 +12,35 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
-## [7.0.1]
+## [8.0.0]
+
+**Recommended upgrade from 6.2.x.** This release delivers all fixes and improvements that were in 7.0.0 and 7.0.1 while remaining compatible with **analyzer 9** and the current **Flutter framework**.
+
+### Why v8 and not v7?
+
+- **v7.0.0 and v7.0.1 were retracted.** Those releases upgraded to the analyzer 10.x API. The **Flutter framework does not yet support analyzer 10** (Flutter's own dependency tree pins analyzer 9). Publishing with `analyzer: ^10.0.0` made saropa_lints incompatible with Flutter projects, so 7.x was retracted from pub.dev.
+- **v8.0.0** keeps the same rule set and all behavioral fixes from 7.x but stays on **analyzer 9.x**, so Flutter and Dart-only projects can upgrade without waiting for Flutter to adopt analyzer 10.
+
+### Requirements
+
+- **Dart SDK:** 3.6 or later (unchanged from 6.x).
+- **Analyzer:** 9.x. Uses `analyzer: ^9.0.0`, `analysis_server_plugin: ^0.3.4`, `analyzer_plugin: ^0.13.0`.
+
+### What's in 8.0.0 (from 7.x)
+
+- All **Fixed** and **Changed** items from [7.0.1](#701) and [7.0.0](#700) (rule fixes, quick fixes, internal use of `lowerCaseName` where needed on analyzer 9, AST adjusted for analyzer 9 `ClassDeclaration.members` and mixin/extension bodies).
+- No analyzer 10–only APIs: no `namePart`, no `BlockClassBody`, no dependency on analyzer 10.
+
+### Upgrade
+
+- From **6.2.x**: bump to `saropa_lints: ^8.0.0` and run `dart pub get`. No config or SDK change required if you are already on Dart 3.6+ and analyzer 9.
+- If you had temporarily tried **7.x** before it was retracted: switch to **8.0.0** and keep your existing `analysis_options.yaml`; 8.0.0 does not require the analyzer 10 / lowerCaseName config migration that 7.x required.
+
+---
+
+## [7.0.1] *(retracted)*
+
+*Retracted: required analyzer 10; Flutter does not yet support analyzer 10. Use [8.0.0](#800) instead.*
 
 In this release we’re preparing bug fixes and small rule refinements.
 
@@ -32,27 +60,29 @@ In this release we’re preparing bug fixes and small rule refinements.
 
 ---
 
-## [7.0.0]
+## [7.0.0] *(retracted)*
+
+*Retracted: required analyzer 10; Flutter framework does not yet support analyzer 10. Use [8.0.0](#800) instead.*
 
 In this release we move to the analyzer 10.x API and Dart SDK 3.9+. Rule names now use lowerCaseName—see the migration guide for updating your config.
 
-**Breaking: Analyzer 10 upgrade** — This release upgrades to the analyzer 10.x API. See [Upgrading to v7](doc/guides/upgrading_to_v7.md) for migration steps.
+**Breaking: Analyzer 10 upgrade** — This release upgraded to the analyzer 10.x API. See [Upgrading to v7](doc/guides/upgrading_to_v7.md) for migration steps. **This version was retracted** because Flutter does not yet support analyzer 10.
 
-### Requirements
+### Requirements *(retracted release)*
 
 - **Dart SDK:** 3.9 or later.
-- **Analyzer:** 10.x only. **saropa_lints 6.2.2** is the last release compatible with analyzer &lt; v10.
+- **Analyzer:** 10.x only. **saropa_lints 6.2.2** was the last release compatible with analyzer &lt; v10 before retraction; **8.0.0** is the current release for analyzer 9.
 
-### Breaking changes
+### Breaking changes *(retracted release)*
 
-- **Dependencies:** Requires `analyzer: ^10.0.0`, `analysis_server_plugin: ^0.3.10`, and `analyzer_plugin: ^0.14.0`. Dropped support for analyzer 9.x.
-- **Config keyed by lowerCaseName:** Rule identifiers and config keys (severity overrides, disabled rules, etc.) now use the analyzer's **lowerCaseName**. Use `prefer_debugprint` instead of `prefer_debugPrint`. Update `analysis_options.yaml` and any `// ignore:` comments that reference rule names.
-- **AST API:** All rule files migrated to analyzer 10 `body` and `namePart` API (e.g. `(node.body as BlockClassBody).members`, `node.namePart.typeName`).
-- **Init:** Running `dart run saropa_lints:init` on an existing v6 config normalizes rule names to lowerCaseName and reports how many were updated; pre-flight warns if Dart SDK &lt; 3.9 when using v7.
+- **Dependencies:** Required `analyzer: ^10.0.0`, `analysis_server_plugin: ^0.3.10`, and `analyzer_plugin: ^0.14.0`. Dropped support for analyzer 9.x.
+- **Config keyed by lowerCaseName:** Rule identifiers and config keys would use the analyzer's **lowerCaseName**. Use `prefer_debugprint` instead of `prefer_debugPrint`. Update `analysis_options.yaml` and any `// ignore:` comments that reference rule names.
+- **AST API:** All rule files were migrated to analyzer 10 `body` and `namePart` API (e.g. `(node.body as BlockClassBody).members`, `node.namePart.typeName`).
+- **Init:** Running `dart run saropa_lints:init` on an existing v6 config would normalize rule names to lowerCaseName; pre-flight warned if Dart SDK &lt; 3.9 when using v7.
 
-### Changed
+### Changed *(retracted release)*
 
-- **Version:** 6.2.2 → 7.0.0 (major).
+- **Version:** 6.2.2 → 7.0.0 (major). Release was later retracted.
 - **DiagnosticCode / LintCode:** All internal and test use of `code.name` replaced with `code.lowerCaseName`.
 - **Tests:** Expect `rule.code.lowerCaseName` (e.g. `prefer_debugprint`) where rule identity is asserted.
 
@@ -693,6 +723,13 @@ For details on the initial release and versions 0.1.0 through 5.0.3, please refe
 
 ---
 ## [Unreleased]
+
+### Fixed
+- **Tests and init:** Resolve undefined getter `lowerCaseName` on `LintCode` by importing `saropa_lint_rule.dart` (which defines the `LintCodeLowerCase` extension) in test files and `bin/init.dart`.
+
+### Notice
+
+**8.0.0** is the current Flutter-compatible release (analyzer 9). The **7.x line was retracted** (it required analyzer 10, which Flutter does not yet support). Use **saropa_lints ^8.0.0** for new projects and upgrades.
 
 ---
 ## [7.0.3]

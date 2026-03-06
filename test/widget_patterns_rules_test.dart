@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_avoid_prefer_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_require_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_ux_rules.dart';

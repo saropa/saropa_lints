@@ -91,6 +91,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart'
     show RuleTier, SaropaLintRule, allSaropaRules;
+import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/report/analysis_reporter.dart'
     show AnalysisReporter;
 import 'package:saropa_lints/src/tiers.dart' as tiers;
@@ -153,8 +154,7 @@ Map<String, bool> _detectProjectPackages() {
     final content = pubspecFile.readAsStringSync();
 
     // Detect Flutter
-    final isFlutter =
-        content.contains('flutter:') ||
+    final isFlutter = content.contains('flutter:') ||
         content.contains('flutter_test:') ||
         content.contains('sdk: flutter');
 
@@ -371,14 +371,13 @@ Future<String?> _findNewestPluginReport(
         continue;
       }
 
-      final reports =
-          dir
-              .listSync()
-              .whereType<File>()
-              .where((f) => f.path.endsWith('_saropa_lint_report.log'))
-              .toList()
-            // Filenames start with YYYYMMDD_HHMMSS so lexicographic = newest first
-            ..sort((a, b) => b.path.compareTo(a.path));
+      final reports = dir
+          .listSync()
+          .whereType<File>()
+          .where((f) => f.path.endsWith('_saropa_lint_report.log'))
+          .toList()
+        // Filenames start with YYYYMMDD_HHMMSS so lexicographic = newest first
+        ..sort((a, b) => b.path.compareTo(a.path));
 
       if (reports.isNotEmpty) {
         final name = reports.first.path.split('/').last.split('\\').last;
@@ -546,8 +545,7 @@ void _checkPubspecDependency() {
     _logCheck(
       'pubspec.yaml',
       pass: false,
-      detail:
-          'saropa_lints not found in dependencies — '
+      detail: 'saropa_lints not found in dependencies — '
           'add it to dev_dependencies',
     );
   }
@@ -588,6 +586,7 @@ void _checkDartSdkVersion() {
 }
 
 /// If saropa_lints is v7+, ensure Dart SDK is 3.9+ (analyzer 10 requirement).
+/// v7 was retracted; v8.0.0 uses analyzer 9 and skips this check.
 void _checkV7SdkIfNeeded(String packageVersion) {
   if (!packageVersion.startsWith('7.')) return;
 
@@ -601,9 +600,8 @@ void _checkV7SdkIfNeeded(String packageVersion) {
     _logCheck(
       'Dart SDK for v7',
       pass: false,
-      detail:
-          '$major.$minor detected — saropa_lints v7 requires Dart SDK 3.9+ '
-          '(analyzer 10). Use saropa_lints 6.2.2 for older SDK.',
+      detail: '$major.$minor detected — saropa_lints v7 requires Dart SDK 3.9+ '
+          '(analyzer 10). v7 was retracted; use saropa_lints 8.0.0 for Flutter.',
     );
   }
 }
@@ -624,8 +622,7 @@ void _auditExistingConfig(String currentVersion) {
     _logCheck(
       'Existing config',
       pass: false,
-      detail:
-          'contains custom_lint: section — '
+      detail: 'contains custom_lint: section — '
           'saropa_lints v5 uses native plugins, not custom_lint',
     );
   }
@@ -636,8 +633,7 @@ void _auditExistingConfig(String currentVersion) {
     _logCheck(
       'Existing config',
       pass: false,
-      detail:
-          'plugins section missing version: key — '
+      detail: 'plugins section missing version: key — '
           'the analyzer will silently ignore the plugin',
     );
   }
@@ -656,8 +652,7 @@ void _auditExistingConfig(String currentVersion) {
       _logCheck(
         'Existing config',
         pass: false,
-        detail:
-            'version $existing may be stale (current: $currentVersion) '
+        detail: 'version $existing may be stale (current: $currentVersion) '
             '— re-run "dart run saropa_lints" to update',
       );
     }
@@ -757,32 +752,24 @@ void _tryEnableAnsiWindows() {
   if (!Platform.isWindows) return;
   try {
     final k = DynamicLibrary.open('kernel32.dll');
-    final getStdHandle = k
-        .lookupFunction<IntPtr Function(Int32), int Function(int)>(
-          'GetStdHandle',
-        );
-    final getMode = k
-        .lookupFunction<
-          Int32 Function(IntPtr, Pointer<Uint32>),
-          int Function(int, Pointer<Uint32>)
-        >('GetConsoleMode');
+    final getStdHandle =
+        k.lookupFunction<IntPtr Function(Int32), int Function(int)>(
+      'GetStdHandle',
+    );
+    final getMode = k.lookupFunction<Int32 Function(IntPtr, Pointer<Uint32>),
+        int Function(int, Pointer<Uint32>)>('GetConsoleMode');
     final setMode = k
         .lookupFunction<Int32 Function(IntPtr, Uint32), int Function(int, int)>(
-          'SetConsoleMode',
-        );
+      'SetConsoleMode',
+    );
     final getHeap = k.lookupFunction<IntPtr Function(), int Function()>(
       'GetProcessHeap',
     );
-    final alloc = k
-        .lookupFunction<
-          Pointer<Void> Function(IntPtr, Uint32, IntPtr),
-          Pointer<Void> Function(int, int, int)
-        >('HeapAlloc');
-    final free = k
-        .lookupFunction<
-          Int32 Function(IntPtr, Uint32, Pointer<Void>),
-          int Function(int, int, Pointer<Void>)
-        >('HeapFree');
+    final alloc = k.lookupFunction<
+        Pointer<Void> Function(IntPtr, Uint32, IntPtr),
+        Pointer<Void> Function(int, int, int)>('HeapAlloc');
+    final free = k.lookupFunction<Int32 Function(IntPtr, Uint32, Pointer<Void>),
+        int Function(int, int, Pointer<Void>)>('HeapFree');
 
     final handle = getStdHandle(-11); // STD_OUTPUT_HANDLE
     final heap = getHeap();
@@ -1079,295 +1066,295 @@ const Map<String, String> tierDescriptions = <String, String>{
 /// pick-one UI in the walkthrough; all others are reviewed rule-by-rule.
 const Map<String, List<String>> _stylisticRuleCategories =
     <String, List<String>>{
-      // ── Non-conflicting categories ──────────────────────────────────────
-      'Debug/Test utility': <String>['prefer_fail_test_case'],
-      'Ordering & Sorting': <String>[
-        'prefer_member_ordering',
-        'prefer_arguments_ordering',
-        'prefer_sorted_parameters',
-        'prefer_sorted_pattern_fields',
-        'prefer_sorted_record_fields',
-        'binary_expression_operand_order',
-        'enforce_parameters_ordering',
-        'enum_constants_ordering',
-        'map_keys_ordering',
-      ],
-      'Naming conventions': <String>[
-        'prefer_no_getter_prefix',
-        'prefer_kebab_tag_name',
-        'prefer_capitalized_comment_start',
-        'prefer_snake_case_files',
-        'prefer_camel_case_method_names',
-        'prefer_exception_suffix',
-        'prefer_error_suffix',
-        'prefer_trailing_underscore_for_unused',
-        'prefer_sliver_prefix',
-        'prefer_correct_callback_field_name',
-        'prefer_correct_handler_name',
-        'prefer_correct_setter_parameter_name',
-        'prefer_bloc_event_suffix',
-        'prefer_bloc_state_suffix',
-        'prefer_use_prefix',
-      ],
-      'Boolean naming': <String>[
-        'prefer_boolean_prefixes',
-        'prefer_descriptive_bool_names',
-        'prefer_boolean_prefixes_for_params',
-        'prefer_boolean_prefixes_for_locals',
-      ],
-      'Code style preferences': <String>[
-        'prefer_no_continue_statement',
-        'prefer_wildcard_for_unused_param',
-        'prefer_rethrow_over_throw_e',
-        'prefer_list_first',
-        'prefer_list_last',
-        'no_boolean_literal_compare',
-        'prefer_returning_conditional_expressions',
-        'prefer_duration_constants',
-        'prefer_immediate_return',
-        'prefer_for_in',
-        'prefer_conditional_expressions',
-        'prefer_returning_condition',
-        'prefer_returning_conditionals',
-        'prefer_returning_shorthands',
-        'prefer_pushing_conditional_expressions',
-        'prefer_getter_over_method',
-      ],
-      'Function & Parameter style': <String>[
-        'prefer_arrow_functions',
-        'prefer_all_named_parameters',
-        'prefer_inline_callbacks',
-        'avoid_parameter_reassignment',
-      ],
-      'Widget style': <String>[
-        'avoid_shrink_wrap_in_scroll',
-        'prefer_one_widget_per_file',
-        'prefer_widget_methods_over_classes',
-        'prefer_borderradius_circular',
-        'avoid_small_text',
-        'prefer_sized_box_square',
-        'prefer_center_over_align',
-        'prefer_spacing_over_sizedbox',
-      ],
-      'Class & Record style': <String>[
-        'prefer_class_over_record_return',
-        'prefer_private_underscore_prefix',
-        'prefer_explicit_this',
-      ],
-      'Formatting': <String>[
-        'prefer_blank_line_before_case',
-        'prefer_blank_line_before_constructor',
-        'prefer_blank_line_before_method',
-        'prefer_blank_line_before_else',
-        'prefer_blank_line_after_loop',
-        'prefer_trailing_comma',
-        'double_literal_format',
-        'format_comment_style',
-      ],
-      'Comments & Documentation': <String>[
-        'prefer_todo_format',
-        'prefer_fixme_format',
-        'prefer_sentence_case_comments',
-        'prefer_period_after_doc',
-        'prefer_doc_comments_over_regular',
-        'prefer_no_commented_out_code',
-      ],
-      'Testing style': <String>['prefer_expect_over_assert_in_tests'],
+  // ── Non-conflicting categories ──────────────────────────────────────
+  'Debug/Test utility': <String>['prefer_fail_test_case'],
+  'Ordering & Sorting': <String>[
+    'prefer_member_ordering',
+    'prefer_arguments_ordering',
+    'prefer_sorted_parameters',
+    'prefer_sorted_pattern_fields',
+    'prefer_sorted_record_fields',
+    'binary_expression_operand_order',
+    'enforce_parameters_ordering',
+    'enum_constants_ordering',
+    'map_keys_ordering',
+  ],
+  'Naming conventions': <String>[
+    'prefer_no_getter_prefix',
+    'prefer_kebab_tag_name',
+    'prefer_capitalized_comment_start',
+    'prefer_snake_case_files',
+    'prefer_camel_case_method_names',
+    'prefer_exception_suffix',
+    'prefer_error_suffix',
+    'prefer_trailing_underscore_for_unused',
+    'prefer_sliver_prefix',
+    'prefer_correct_callback_field_name',
+    'prefer_correct_handler_name',
+    'prefer_correct_setter_parameter_name',
+    'prefer_bloc_event_suffix',
+    'prefer_bloc_state_suffix',
+    'prefer_use_prefix',
+  ],
+  'Boolean naming': <String>[
+    'prefer_boolean_prefixes',
+    'prefer_descriptive_bool_names',
+    'prefer_boolean_prefixes_for_params',
+    'prefer_boolean_prefixes_for_locals',
+  ],
+  'Code style preferences': <String>[
+    'prefer_no_continue_statement',
+    'prefer_wildcard_for_unused_param',
+    'prefer_rethrow_over_throw_e',
+    'prefer_list_first',
+    'prefer_list_last',
+    'no_boolean_literal_compare',
+    'prefer_returning_conditional_expressions',
+    'prefer_duration_constants',
+    'prefer_immediate_return',
+    'prefer_for_in',
+    'prefer_conditional_expressions',
+    'prefer_returning_condition',
+    'prefer_returning_conditionals',
+    'prefer_returning_shorthands',
+    'prefer_pushing_conditional_expressions',
+    'prefer_getter_over_method',
+  ],
+  'Function & Parameter style': <String>[
+    'prefer_arrow_functions',
+    'prefer_all_named_parameters',
+    'prefer_inline_callbacks',
+    'avoid_parameter_reassignment',
+  ],
+  'Widget style': <String>[
+    'avoid_shrink_wrap_in_scroll',
+    'prefer_one_widget_per_file',
+    'prefer_widget_methods_over_classes',
+    'prefer_borderradius_circular',
+    'avoid_small_text',
+    'prefer_sized_box_square',
+    'prefer_center_over_align',
+    'prefer_spacing_over_sizedbox',
+  ],
+  'Class & Record style': <String>[
+    'prefer_class_over_record_return',
+    'prefer_private_underscore_prefix',
+    'prefer_explicit_this',
+  ],
+  'Formatting': <String>[
+    'prefer_blank_line_before_case',
+    'prefer_blank_line_before_constructor',
+    'prefer_blank_line_before_method',
+    'prefer_blank_line_before_else',
+    'prefer_blank_line_after_loop',
+    'prefer_trailing_comma',
+    'double_literal_format',
+    'format_comment_style',
+  ],
+  'Comments & Documentation': <String>[
+    'prefer_todo_format',
+    'prefer_fixme_format',
+    'prefer_sentence_case_comments',
+    'prefer_period_after_doc',
+    'prefer_doc_comments_over_regular',
+    'prefer_no_commented_out_code',
+  ],
+  'Testing style': <String>['prefer_expect_over_assert_in_tests'],
 
-      // ── Conflicting categories (pick one) ───────────────────────────────
+  // ── Conflicting categories (pick one) ───────────────────────────────
 
-      // Type & variable style
-      'Type argument style (conflicting - choose one)': <String>[
-        'prefer_inferred_type_arguments',
-        'prefer_explicit_type_arguments',
-      ],
-      'Variable type style (conflicting - choose one)': <String>[
-        'prefer_type_over_var',
-        'prefer_var_over_explicit_type',
-      ],
-      'Dynamic vs Object (conflicting - choose one)': <String>[
-        'prefer_dynamic_over_object',
-        'prefer_object_over_dynamic',
-      ],
+  // Type & variable style
+  'Type argument style (conflicting - choose one)': <String>[
+    'prefer_inferred_type_arguments',
+    'prefer_explicit_type_arguments',
+  ],
+  'Variable type style (conflicting - choose one)': <String>[
+    'prefer_type_over_var',
+    'prefer_var_over_explicit_type',
+  ],
+  'Dynamic vs Object (conflicting - choose one)': <String>[
+    'prefer_dynamic_over_object',
+    'prefer_object_over_dynamic',
+  ],
 
-      // Imports & strings
-      'Import style (conflicting - choose one)': <String>[
-        'prefer_absolute_imports',
-        'prefer_flat_imports',
-        'prefer_grouped_imports',
-        'prefer_named_imports',
-        'prefer_relative_imports',
-      ],
-      'Quote style (conflicting - choose one)': <String>[
-        'prefer_double_quotes',
-        'prefer_single_quotes',
-      ],
-      'Apostrophe style (conflicting - choose one)': <String>[
-        'prefer_doc_curly_apostrophe',
-        'prefer_doc_straight_apostrophe',
-        'prefer_straight_apostrophe',
-      ],
-      'String building (conflicting - choose one)': <String>[
-        'prefer_interpolation_over_concatenation',
-        'prefer_concatenation_over_interpolation',
-      ],
+  // Imports & strings
+  'Import style (conflicting - choose one)': <String>[
+    'prefer_absolute_imports',
+    'prefer_flat_imports',
+    'prefer_grouped_imports',
+    'prefer_named_imports',
+    'prefer_relative_imports',
+  ],
+  'Quote style (conflicting - choose one)': <String>[
+    'prefer_double_quotes',
+    'prefer_single_quotes',
+  ],
+  'Apostrophe style (conflicting - choose one)': <String>[
+    'prefer_doc_curly_apostrophe',
+    'prefer_doc_straight_apostrophe',
+    'prefer_straight_apostrophe',
+  ],
+  'String building (conflicting - choose one)': <String>[
+    'prefer_interpolation_over_concatenation',
+    'prefer_concatenation_over_interpolation',
+  ],
 
-      // Control flow & error handling
-      'Exit strategy (conflicting - choose one)': <String>[
-        'prefer_early_return',
-        'prefer_single_exit_point',
-      ],
-      'Boolean comparison (conflicting - choose one)': <String>[
-        'prefer_implicit_boolean_comparison',
-        'prefer_explicit_boolean_comparison',
-      ],
-      'Error handling (conflicting - choose one)': <String>[
-        'prefer_catch_over_on',
-        'prefer_on_over_catch',
-      ],
-      'Exception specificity (conflicting - choose one)': <String>[
-        'prefer_specific_exceptions',
-        'prefer_generic_exception',
-      ],
+  // Control flow & error handling
+  'Exit strategy (conflicting - choose one)': <String>[
+    'prefer_early_return',
+    'prefer_single_exit_point',
+  ],
+  'Boolean comparison (conflicting - choose one)': <String>[
+    'prefer_implicit_boolean_comparison',
+    'prefer_explicit_boolean_comparison',
+  ],
+  'Error handling (conflicting - choose one)': <String>[
+    'prefer_catch_over_on',
+    'prefer_on_over_catch',
+  ],
+  'Exception specificity (conflicting - choose one)': <String>[
+    'prefer_specific_exceptions',
+    'prefer_generic_exception',
+  ],
 
-      // Async & chaining
-      'Async style (conflicting - choose one)': <String>[
-        'prefer_await_over_then',
-        'prefer_then_over_await',
-      ],
-      'Method chaining (conflicting - choose one)': <String>[
-        'prefer_cascade_over_chained',
-        'prefer_chained_over_cascade',
-      ],
+  // Async & chaining
+  'Async style (conflicting - choose one)': <String>[
+    'prefer_await_over_then',
+    'prefer_then_over_await',
+  ],
+  'Method chaining (conflicting - choose one)': <String>[
+    'prefer_cascade_over_chained',
+    'prefer_chained_over_cascade',
+  ],
 
-      // Collections & null handling
-      'Spread vs addAll (conflicting - choose one)': <String>[
-        'prefer_spread_over_addall',
-        'prefer_addall_over_spread',
-      ],
-      'Collection conditionals (conflicting - choose one)': <String>[
-        'prefer_collection_if_over_ternary',
-        'prefer_ternary_over_collection_if',
-      ],
-      'Null ternary (conflicting - choose one)': <String>[
-        'prefer_if_null_over_ternary',
-        'prefer_ternary_over_if_null',
-      ],
-      'Null assignment (conflicting - choose one)': <String>[
-        'prefer_null_aware_assignment',
-        'prefer_explicit_null_assignment',
-      ],
-      'Nullable vs late (conflicting - choose one)': <String>[
-        'prefer_nullable_over_late',
-        'prefer_late_over_nullable',
-      ],
+  // Collections & null handling
+  'Spread vs addAll (conflicting - choose one)': <String>[
+    'prefer_spread_over_addall',
+    'prefer_addall_over_spread',
+  ],
+  'Collection conditionals (conflicting - choose one)': <String>[
+    'prefer_collection_if_over_ternary',
+    'prefer_ternary_over_collection_if',
+  ],
+  'Null ternary (conflicting - choose one)': <String>[
+    'prefer_if_null_over_ternary',
+    'prefer_ternary_over_if_null',
+  ],
+  'Null assignment (conflicting - choose one)': <String>[
+    'prefer_null_aware_assignment',
+    'prefer_explicit_null_assignment',
+  ],
+  'Nullable vs late (conflicting - choose one)': <String>[
+    'prefer_nullable_over_late',
+    'prefer_late_over_nullable',
+  ],
 
-      // Ordering & naming
-      'Member ordering (conflicting - choose one)': <String>[
-        'prefer_static_members_first',
-        'prefer_instance_members_first',
-        'prefer_public_members_first',
-        'prefer_private_members_first',
-      ],
-      'Field/method order (conflicting - choose one)': <String>[
-        'prefer_fields_before_methods',
-        'prefer_methods_before_fields',
-      ],
-      'Constant case (conflicting - choose one)': <String>[
-        'prefer_lower_camel_case_constants',
-        'prefer_screaming_case_constants',
-      ],
+  // Ordering & naming
+  'Member ordering (conflicting - choose one)': <String>[
+    'prefer_static_members_first',
+    'prefer_instance_members_first',
+    'prefer_public_members_first',
+    'prefer_private_members_first',
+  ],
+  'Field/method order (conflicting - choose one)': <String>[
+    'prefer_fields_before_methods',
+    'prefer_methods_before_fields',
+  ],
+  'Constant case (conflicting - choose one)': <String>[
+    'prefer_lower_camel_case_constants',
+    'prefer_screaming_case_constants',
+  ],
 
-      // Formatting & spacing
-      'Trailing comma (conflicting - choose one)': <String>[
-        'prefer_trailing_comma_always',
-        'unnecessary_trailing_comma',
-      ],
-      'Blank line before return (conflicting - choose one)': <String>[
-        'prefer_blank_line_before_return',
-        'prefer_no_blank_line_before_return',
-      ],
-      'Declaration spacing (conflicting - choose one)': <String>[
-        'prefer_blank_line_after_declarations',
-        'prefer_compact_declarations',
-      ],
-      'Member spacing (conflicting - choose one)': <String>[
-        'prefer_blank_lines_between_members',
-        'prefer_compact_class_members',
-      ],
+  // Formatting & spacing
+  'Trailing comma (conflicting - choose one)': <String>[
+    'prefer_trailing_comma_always',
+    'unnecessary_trailing_comma',
+  ],
+  'Blank line before return (conflicting - choose one)': <String>[
+    'prefer_blank_line_before_return',
+    'prefer_no_blank_line_before_return',
+  ],
+  'Declaration spacing (conflicting - choose one)': <String>[
+    'prefer_blank_line_after_declarations',
+    'prefer_compact_declarations',
+  ],
+  'Member spacing (conflicting - choose one)': <String>[
+    'prefer_blank_lines_between_members',
+    'prefer_compact_class_members',
+  ],
 
-      // Widget conflicts
-      'Container vs SizedBox (conflicting - choose one)': <String>[
-        'prefer_sizedbox_over_container',
-        'prefer_container_over_sizedbox',
-      ],
-      'Expanded vs Flexible (conflicting - choose one)': <String>[
-        'prefer_expanded_over_flexible',
-        'prefer_flexible_over_expanded',
-      ],
-      'EdgeInsets style (conflicting - choose one)': <String>[
-        'prefer_edgeinsets_symmetric',
-        'prefer_edgeinsets_only',
-      ],
-      'RichText widget (conflicting - choose one)': <String>[
-        'prefer_text_rich_over_richtext',
-        'prefer_richtext_over_text_rich',
-      ],
-      'Theme colors (conflicting - choose one)': <String>[
-        'prefer_material_theme_colors',
-        'prefer_explicit_colors',
-      ],
+  // Widget conflicts
+  'Container vs SizedBox (conflicting - choose one)': <String>[
+    'prefer_sizedbox_over_container',
+    'prefer_container_over_sizedbox',
+  ],
+  'Expanded vs Flexible (conflicting - choose one)': <String>[
+    'prefer_expanded_over_flexible',
+    'prefer_flexible_over_expanded',
+  ],
+  'EdgeInsets style (conflicting - choose one)': <String>[
+    'prefer_edgeinsets_symmetric',
+    'prefer_edgeinsets_only',
+  ],
+  'RichText widget (conflicting - choose one)': <String>[
+    'prefer_text_rich_over_richtext',
+    'prefer_richtext_over_text_rich',
+  ],
+  'Theme colors (conflicting - choose one)': <String>[
+    'prefer_material_theme_colors',
+    'prefer_explicit_colors',
+  ],
 
-      // Testing conflicts
-      'Test naming (conflicting - choose one)': <String>[
-        'prefer_test_name_should_when',
-        'prefer_test_name_descriptive',
-      ],
-      'Test comments (conflicting - choose one)': <String>[
-        'prefer_given_when_then_comments',
-        'prefer_self_documenting_tests',
-      ],
-      'Test expectations (conflicting - choose one)': <String>[
-        'prefer_single_expectation_per_test',
-        'prefer_grouped_expectations',
-      ],
+  // Testing conflicts
+  'Test naming (conflicting - choose one)': <String>[
+    'prefer_test_name_should_when',
+    'prefer_test_name_descriptive',
+  ],
+  'Test comments (conflicting - choose one)': <String>[
+    'prefer_given_when_then_comments',
+    'prefer_self_documenting_tests',
+  ],
+  'Test expectations (conflicting - choose one)': <String>[
+    'prefer_single_expectation_per_test',
+    'prefer_grouped_expectations',
+  ],
 
-      // ── Remaining opinionated rules (no conflicts) ─────────────────────
-      'Opinionated rules': <String>[
-        'prefer_clip_r_superellipse',
-        'prefer_clip_r_superellipse_clipper',
-        'prefer_concise_variable_names',
-        'prefer_constructor_assertion',
-        'prefer_constructor_body_assignment',
-        'prefer_curly_apostrophe',
-        'prefer_default_enum_case',
-        'prefer_descriptive_bool_names_strict',
-        'prefer_descriptive_variable_names',
-        'prefer_dot_shorthand',
-        'prefer_exhaustive_enums',
-        'prefer_explicit_types',
-        'prefer_factory_for_validation',
-        'prefer_fake_over_mock',
-        'prefer_future_void_function_over_async_callback',
-        'prefer_grouped_by_purpose',
-        'prefer_guard_clauses',
-        'prefer_initializing_formals',
-        'prefer_keys_with_lookup',
-        'prefer_map_entries_iteration',
-        'prefer_mutable_collections',
-        'prefer_no_blank_line_inside_blocks',
-        'prefer_positive_conditions',
-        'prefer_positive_conditions_first',
-        'prefer_record_over_equatable',
-        'prefer_required_before_optional',
-        'prefer_single_blank_line_max',
-        'prefer_super_parameters',
-        'prefer_switch_statement',
-        'prefer_sync_over_async_where_possible',
-        'prefer_test_data_builder',
-        'prefer_wheretype_over_where_is',
-      ],
-    };
+  // ── Remaining opinionated rules (no conflicts) ─────────────────────
+  'Opinionated rules': <String>[
+    'prefer_clip_r_superellipse',
+    'prefer_clip_r_superellipse_clipper',
+    'prefer_concise_variable_names',
+    'prefer_constructor_assertion',
+    'prefer_constructor_body_assignment',
+    'prefer_curly_apostrophe',
+    'prefer_default_enum_case',
+    'prefer_descriptive_bool_names_strict',
+    'prefer_descriptive_variable_names',
+    'prefer_dot_shorthand',
+    'prefer_exhaustive_enums',
+    'prefer_explicit_types',
+    'prefer_factory_for_validation',
+    'prefer_fake_over_mock',
+    'prefer_future_void_function_over_async_callback',
+    'prefer_grouped_by_purpose',
+    'prefer_guard_clauses',
+    'prefer_initializing_formals',
+    'prefer_keys_with_lookup',
+    'prefer_map_entries_iteration',
+    'prefer_mutable_collections',
+    'prefer_no_blank_line_inside_blocks',
+    'prefer_positive_conditions',
+    'prefer_positive_conditions_first',
+    'prefer_record_over_equatable',
+    'prefer_required_before_optional',
+    'prefer_single_blank_line_max',
+    'prefer_super_parameters',
+    'prefer_switch_statement',
+    'prefer_sync_over_async_where_possible',
+    'prefer_test_data_builder',
+    'prefer_wheretype_over_where_is',
+  ],
+};
 
 /// Rule names for the "Good methods" major group (doc/guides/good_methods.md).
 /// Excludes any rule that conflicts with another in the same group.
@@ -1487,8 +1474,7 @@ List<_StylisticRuleset> _getStylisticRulesets() {
     _StylisticRuleset(
       id: _StylisticRulesetId.functionAndParameterStyle,
       label: 'Functions & parameters',
-      description:
-          'Arrow functions when concise, all-named parameters, inline '
+      description: 'Arrow functions when concise, all-named parameters, inline '
           'callbacks, and no parameter reassignment. Affects how you define '
           'and call functions and how you pass callbacks.',
       rules: catRules('Function & Parameter style'),
@@ -1870,6 +1856,7 @@ Future<void> main(List<String> args) async {
       );
       userCustomizations = result.customizations;
 
+      // cspell:ignore prefer_debugprint
       if (v7NormalizedCount[0] > 0) {
         _logTerminal(
           '${_Colors.yellow}--- V7 MIGRATION ---${_Colors.reset}',
@@ -1975,9 +1962,8 @@ Future<void> main(List<String> args) async {
   // Compact summary
   _logTerminal('');
   final totalRules = finalEnabled.length + finalDisabled.length;
-  final disabledPct = totalRules > 0
-      ? (finalDisabled.length * 100 ~/ totalRules)
-      : 0;
+  final disabledPct =
+      totalRules > 0 ? (finalDisabled.length * 100 ~/ totalRules) : 0;
   _logTerminal(
     '${_Colors.bold}Rules:${_Colors.reset} ${_success('${finalEnabled.length} enabled')} / ${_error('${finalDisabled.length} disabled')} ${_Colors.dim}($disabledPct%)${_Colors.reset}',
   );
@@ -2183,19 +2169,20 @@ Future<void> main(List<String> args) async {
 
       // Stream output to terminal. The plugin's AnalysisReporter writes
       // the structured results to a separate *_saropa_lint_report.log.
-      final process = await Process.start('dart', [
-        'analyze',
-      ], runInShell: true);
+      final process = await Process.start(
+          'dart',
+          [
+            'analyze',
+          ],
+          runInShell: true);
 
       // Use UTF-8 decoder (not SystemEncoding) because Dart processes
       // always write UTF-8, and SystemEncoding on Windows uses the
       // console code page which corrupts Unicode progress bar characters.
-      final stdoutDone = process.stdout
-          .transform(utf8.decoder)
-          .forEach(stdout.write);
-      final stderrDone = process.stderr
-          .transform(utf8.decoder)
-          .forEach(stderr.write);
+      final stdoutDone =
+          process.stdout.transform(utf8.decoder).forEach(stdout.write);
+      final stderrDone =
+          process.stderr.transform(utf8.decoder).forEach(stderr.write);
 
       // Wait for exit code AND stream drain together so the separator
       // line doesn't appear before trailing analyzer output.
@@ -2268,8 +2255,8 @@ final RegExp _userCustomizationsSectionPattern = RegExp(
   final Map<String, bool> customizations = <String, bool>{};
 
   // Find USER CUSTOMIZATIONS section
-  final Match? customizationsMatch = _userCustomizationsSectionPattern
-      .firstMatch(yamlContent);
+  final Match? customizationsMatch =
+      _userCustomizationsSectionPattern.firstMatch(yamlContent);
 
   if (customizationsMatch == null) {
     // No customizations section - file wasn't generated by this tool
@@ -2468,9 +2455,8 @@ String _removeCustomLintSection(String content) {
   final String before = content.substring(0, sectionMatch.start);
   final String afterStart = content.substring(sectionMatch.end);
   final Match? nextTopLevel = _topLevelKeyPattern.firstMatch(afterStart);
-  final String after = nextTopLevel != null
-      ? afterStart.substring(nextTopLevel.start)
-      : '';
+  final String after =
+      nextTopLevel != null ? afterStart.substring(nextTopLevel.start) : '';
 
   return '${before.trimRight()}\n\n$after'.trimRight() + '\n';
 }
@@ -2573,9 +2559,8 @@ String? _removeDevDep(String content, String packageName) {
   // Remove only within the dev_dependencies section
   final String cleanedSection = devSection.replaceAll(depLine, '');
   final String before = content.substring(0, devMatch.end);
-  final String after = nextSection != null
-      ? afterDevDeps.substring(nextSection.start)
-      : '';
+  final String after =
+      nextSection != null ? afterDevDeps.substring(nextSection.start) : '';
 
   return '$before$cleanedSection$after';
 }
@@ -2700,8 +2685,7 @@ void _createCustomOverridesFile(File file) {
   final stylisticSection = _buildStylisticSection();
   final packageSection = _buildPackageSection();
 
-  final content =
-      '''
+  final content = '''
 # ╔═══════════════════════════════════════════════════════════════════════════╗
 # ║                    SAROPA LINTS CUSTOM CONFIG                             ║
 # ║                                                                           ║
@@ -2899,8 +2883,7 @@ platforms:
 
   if (maxIssuesMatch != null) {
     final insertPos = maxIssuesMatch.end;
-    newContent =
-        content.substring(0, insertPos) +
+    newContent = content.substring(0, insertPos) +
         '\n' +
         settingBlock +
         content.substring(insertPos);
@@ -2908,8 +2891,7 @@ platforms:
     final headerEndMatch = RegExp(r'╚[═]+╝\n*').firstMatch(content);
     if (headerEndMatch != null) {
       final insertPos = headerEndMatch.end;
-      newContent =
-          content.substring(0, insertPos) +
+      newContent = content.substring(0, insertPos) +
           '\n' +
           settingBlock +
           content.substring(insertPos);
@@ -2940,8 +2922,7 @@ void _ensurePackagesSetting(File file) {
       .map((p) => '  $p: ${tiers.defaultPackages[p]}')
       .join('\n');
 
-  final settingBlock =
-      '''
+  final settingBlock = '''
 # ─────────────────────────────────────────────────────────────────────────────
 # PACKAGE SETTINGS
 # ─────────────────────────────────────────────────────────────────────────────
@@ -2969,8 +2950,7 @@ $packageEntries
 
   if (platformsEndMatch != null) {
     final insertPos = platformsEndMatch.end;
-    newContent =
-        content.substring(0, insertPos) +
+    newContent = content.substring(0, insertPos) +
         '\n' +
         settingBlock +
         content.substring(insertPos);
@@ -2979,8 +2959,7 @@ $packageEntries
     final maxIssuesMatch = RegExp(r'max_issues:\s*\d+\n*').firstMatch(content);
     if (maxIssuesMatch != null) {
       final insertPos = maxIssuesMatch.end;
-      newContent =
-          content.substring(0, insertPos) +
+      newContent = content.substring(0, insertPos) +
           '\n' +
           settingBlock +
           content.substring(insertPos);
@@ -3104,12 +3083,11 @@ String _buildStylisticSection({
   }
 
   // Add any uncategorized stylistic rules (safety net for new rules)
-  final uncategorized =
-      tiers.stylisticRules
-          .difference(categorizedRules)
-          .difference(skipRules)
-          .toList()
-        ..sort();
+  final uncategorized = tiers.stylisticRules
+      .difference(categorizedRules)
+      .difference(skipRules)
+      .toList()
+    ..sort();
 
   if (uncategorized.isNotEmpty) {
     buffer.writeln('# --- Other stylistic rules ---');
@@ -3148,8 +3126,8 @@ void _ensureStylisticRulesSection(File file) {
   // Find stylistic rules in the RULE OVERRIDES section (to skip them)
   final overrideValues = _extractOverrideSectionValues(content);
   var skipRules = overrideValues.keys.toSet().intersection(
-    tiers.stylisticRules,
-  );
+        tiers.stylisticRules,
+      );
 
   // Check if STYLISTIC RULES section exists
   final sectionMatch = _stylisticSectionHeader.firstMatch(content);
@@ -3186,8 +3164,7 @@ void _ensureStylisticRulesSection(File file) {
   final sectionStart = _findStylisticSectionStart(content);
   final sectionEnd = _findStylisticSectionEnd(content, sectionStart);
 
-  final newContent =
-      content.substring(0, sectionStart) +
+  final newContent = content.substring(0, sectionStart) +
       newSection +
       content.substring(sectionEnd);
 
@@ -3212,8 +3189,7 @@ void _insertNewStylisticSection(
   String newContent;
 
   if (overridesHeaderMatch != null) {
-    newContent =
-        content.substring(0, overridesHeaderMatch.start) +
+    newContent = content.substring(0, overridesHeaderMatch.start) +
         insertContent +
         content.substring(overridesHeaderMatch.start);
   } else {
@@ -3234,12 +3210,16 @@ void _logRemovedStylisticRules(String content) {
 
   if (removedRules.isEmpty) return;
 
-  final enabledRemoved =
-      removedRules.entries.where((e) => e.value).map((e) => e.key).toList()
-        ..sort();
-  final disabledRemoved =
-      removedRules.entries.where((e) => !e.value).map((e) => e.key).toList()
-        ..sort();
+  final enabledRemoved = removedRules.entries
+      .where((e) => e.value)
+      .map((e) => e.key)
+      .toList()
+    ..sort();
+  final disabledRemoved = removedRules.entries
+      .where((e) => !e.value)
+      .map((e) => e.key)
+      .toList()
+    ..sort();
 
   if (enabledRemoved.isNotEmpty) {
     _logTerminal(
@@ -3677,10 +3657,8 @@ String _generatePluginsYaml({
   }
 
   // Show package status
-  final disabledPackages = packageSettings.entries
-      .where((e) => !e.value)
-      .map((e) => e.key)
-      .toList();
+  final disabledPackages =
+      packageSettings.entries.where((e) => !e.value).map((e) => e.key).toList();
 
   if (disabledPackages.isNotEmpty) {
     buffer.writeln('    # Disabled packages: ${disabledPackages.join(', ')}');
@@ -3937,9 +3915,8 @@ String _replacePluginsSection(String existingContent, String newPlugins) {
   // Find next top-level section (line starting with a word followed by colon, no indentation)
   final Match? nextSection = _topLevelKeyPattern.firstMatch(afterPluginsStart);
 
-  final String afterPlugins = nextSection != null
-      ? afterPluginsStart.substring(nextSection.start)
-      : '';
+  final String afterPlugins =
+      nextSection != null ? afterPluginsStart.substring(nextSection.start) : '';
 
   return '$beforePlugins$newPlugins\n$afterPlugins';
 }
@@ -4144,9 +4121,8 @@ _WalkthroughResult _runStylisticWalkthrough({
 
   // Get existing values and reviewed markers
   final existingValues = _extractStylisticSectionValues(content);
-  var reviewedRules = resetStylistic
-      ? <String>{}
-      : _extractReviewedRules(content);
+  var reviewedRules =
+      resetStylistic ? <String>{} : _extractReviewedRules(content);
 
   // If --reset-stylistic, strip markers from the file first
   if (resetStylistic && content.contains('[reviewed]')) {
@@ -4198,20 +4174,18 @@ _WalkthroughResult _runStylisticWalkthrough({
     '── Stylistic Rules Walkthrough ──${_Colors.reset}',
   );
   // Use global counts so progress (e.g. 51/143) persists on resume, not 1/N.
-  final int totalAllRules = tiers.stylisticRules
-      .difference(irrelevantRules)
-      .length;
+  final int totalAllRules =
+      tiers.stylisticRules.difference(irrelevantRules).length;
   final int alreadyReviewed = totalAllRules - rulesToReview.length;
-  final int irrelevantCount = irrelevantRules
-      .intersection(tiers.stylisticRules)
-      .length;
+  final int irrelevantCount =
+      irrelevantRules.intersection(tiers.stylisticRules).length;
   _logTerminal(
     alreadyReviewed > 0
         ? '${_Colors.dim}${rulesToReview.length} rules remaining '
-              '($alreadyReviewed already reviewed, $irrelevantCount '
-              'skipped as irrelevant to project)${_Colors.reset}'
+            '($alreadyReviewed already reviewed, $irrelevantCount '
+            'skipped as irrelevant to project)${_Colors.reset}'
         : '${_Colors.dim}${rulesToReview.length} rules to review '
-              '($irrelevantCount skipped as irrelevant to project)${_Colors.reset}',
+            '($irrelevantCount skipped as irrelevant to project)${_Colors.reset}',
   );
   _logTerminal('');
   _logTerminal(
@@ -4280,9 +4254,8 @@ _WalkthroughResult _runStylisticWalkthrough({
         .expand((e) => e.value.where((r) => rulesToReview.contains(r)))
         .toSet();
     final alreadyDecided = Set<String>.from(decisions.keys);
-    final conflictingUnreviewed = conflictingToReview
-        .difference(alreadyDecided)
-        .toList();
+    final conflictingUnreviewed =
+        conflictingToReview.difference(alreadyDecided).toList();
 
     if (conflictingUnreviewed.isNotEmpty) {
       final doConflicting = _walkthroughConflictingGate(
@@ -4297,9 +4270,8 @@ _WalkthroughResult _runStylisticWalkthrough({
         int ruleOffset = alreadyReviewed + decisions.length;
 
         for (final entry in conflictingEntries) {
-          final categoryRules = entry.value
-              .where((r) => rulesToReview.contains(r))
-              .toList();
+          final categoryRules =
+              entry.value.where((r) => rulesToReview.contains(r)).toList();
           if (categoryRules.isEmpty) continue;
 
           categoryIndex++;
@@ -4338,9 +4310,10 @@ _WalkthroughResult _runStylisticWalkthrough({
     for (final rules in _stylisticRuleCategories.values) {
       categorizedRuleNames.addAll(rules);
     }
-    final remaining =
-        rulesToReview.difference(Set<String>.from(decisions.keys)).toList()
-          ..sort();
+    final remaining = rulesToReview
+        .difference(Set<String>.from(decisions.keys))
+        .toList()
+      ..sort();
     if (remaining.isNotEmpty) {
       final result = _walkthroughRemainingBulk(
         rules: remaining,
@@ -4778,9 +4751,8 @@ void _writeStylisticDecisions(File customFile, Map<String, bool> decisions) {
           .replaceFirst(RegExp(r'\[reviewed\]\s*'), '')
           .trim();
 
-      final newComment = descPart.isNotEmpty
-          ? '  # [reviewed] $descPart'
-          : '  # [reviewed]';
+      final newComment =
+          descPart.isNotEmpty ? '  # [reviewed] $descPart' : '  # [reviewed]';
 
       // Offset match positions back to full-content coordinates
       content = content.replaceRange(
@@ -4820,9 +4792,8 @@ String _promptForTier() {
     final String desc = tierDescriptions[name] ?? '';
     final String label = _tierColor(name.padRight(13));
     final String countStr = '${_Colors.dim}(~$count rules)${_Colors.reset}';
-    final String isDefault = name == defaultTier
-        ? ' ${_Colors.cyan}(default)${_Colors.reset}'
-        : '';
+    final String isDefault =
+        name == defaultTier ? ' ${_Colors.cyan}(default)${_Colors.reset}' : '';
     _logTerminal('  $id. $label $countStr  $desc$isDefault');
   }
 

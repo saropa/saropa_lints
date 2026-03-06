@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/rules/resources/memory_management_rules.dart';
 import 'package:test/test.dart';
 
