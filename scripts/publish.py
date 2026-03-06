@@ -88,6 +88,7 @@ _AUDIT_FAILED_MSG = (
 
 # =============================================================================
 # MODULE CHECK (runs before any module imports)
+
 # =============================================================================
 
 # Modules under scripts/modules/ that must exist before any of them are imported
@@ -159,6 +160,7 @@ if not check_modules_exist():
     sys.exit(1)
 
 # Import publish workflow modules (all required files verified above)
+
 # Colors, exit codes, output level, project dir, and logo from shared utils
 from scripts.modules._utils import (
     Color,
@@ -175,6 +177,7 @@ from scripts.modules._utils import (
     set_output_level,
     show_saropa_logo,
 )
+
 # Git tag, GitHub release, commit/push, remote URL, and tag-exists check
 from scripts.modules._git_ops import (
     create_git_tag,
@@ -187,12 +190,14 @@ from scripts.modules._git_ops import (
     publish_to_pubdev_step,
     tag_exists_on_remote,
 )
+
 # Pub.dev doc-comment lint: issue check and auto-fix for angle brackets and refs
 from scripts.modules._pubdev_lint import (
     check_pubdev_lint_issues,
     fix_doc_angle_brackets,
     fix_doc_references,
 )
+
 # Prerequisites, working tree, remote sync, format, analysis, tests, audit, docs, validation
 from scripts.modules._publish_steps import (
     check_prerequisites,
@@ -206,6 +211,7 @@ from scripts.modules._publish_steps import (
     run_tests,
     validate_changelog,
 )
+
 # Rule/category counts, roadmap summary, test coverage display, README badge sync
 from scripts.modules._rule_metrics import (
     count_categories,
@@ -214,6 +220,7 @@ from scripts.modules._rule_metrics import (
     display_test_coverage,
     sync_readme_badges,
 )
+
 # Step timing and summary display
 from scripts.modules._timing import StepTimer
 # Version regex, pubspec/changelog read/write, version parse/increment, display
@@ -676,13 +683,25 @@ def main(
                         f"CHANGELOG.md"
                     )
 
-            # Fail fast if version already published
+            # If version already published, auto-bump pubspec and add release note to CHANGELOG
             tag_name = f"v{version}"
             if tag_exists_on_remote(project_dir, tag_name):
-                exit_with_error(
+                next_version = increment_version(version)
+                print_warning(
                     f"Tag {tag_name} already exists on remote. "
-                    f"Version {version} has already been published.",
-                    ExitCode.GIT_FAILED,
+                    f"Version {version} has already been published."
+                )
+                print_info(
+                    f"Bumping to {next_version} and adding CHANGELOG section."
+                )
+                set_version_in_pubspec(pubspec_path, next_version)
+                add_version_section(
+                    changelog_path, next_version, "Release version",
+                )
+                version = next_version
+                print_success(
+                    f"Updated pubspec.yaml to {version} and added "
+                    f"[{version}] to CHANGELOG.md (Release version)."
                 )
 
         print_colored(
