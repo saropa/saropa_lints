@@ -9,6 +9,7 @@ library;
 import 'dart:developer' as developer;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 
@@ -866,29 +867,29 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
           result.add(declaration.name.lexeme);
         }
       } else if (declaration is ClassDeclaration) {
-        final body = declaration.body;
-        if (body is BlockClassBody) {
-          for (final ClassMember member in body.members) {
-            if (member is MethodDeclaration) {
-              if (_bodyHasTryCatch(member.body)) {
-                result.add(member.name.lexeme);
-              }
+        for (final ClassMember member in declaration.members) {
+          if (member is MethodDeclaration) {
+            if (_bodyHasTryCatch(member.body)) {
+              result.add(member.name.lexeme);
             }
           }
         }
       } else if (declaration is MixinDeclaration) {
-        for (final ClassMember member in declaration.body.members) {
-          if (member is MethodDeclaration) {
-            if (_bodyHasTryCatch(member.body)) {
-              result.add(member.name.lexeme);
-            }
+        // childEntities is Iterable<SyntacticEntity>, not Iterable<AstNode>.
+        for (final SyntacticEntity child in declaration.body.childEntities) {
+          if (child is MethodDeclaration &&
+              _bodyHasTryCatch(child.body)) {
+            result.add(child.name.lexeme);
           }
         }
       } else if (declaration is ExtensionDeclaration) {
-        for (final ClassMember member in declaration.body.members) {
-          if (member is MethodDeclaration) {
-            if (_bodyHasTryCatch(member.body)) {
-              result.add(member.name.lexeme);
+        final body = declaration.body;
+        if (body != null) {
+          // childEntities is Iterable<SyntacticEntity>, not Iterable<AstNode>.
+          for (final SyntacticEntity child in body.childEntities) {
+            if (child is MethodDeclaration &&
+                _bodyHasTryCatch(child.body)) {
+              result.add(child.name.lexeme);
             }
           }
         }
