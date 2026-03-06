@@ -75,6 +75,64 @@ def tag_exists_on_remote(project_dir: Path, tag_name: str) -> bool:
     return bool(result.stdout.strip())
 
 
+# Path to the workflow file we ensure is committed before release (so the tag sees it).
+_PUBLISH_WORKFLOW_PATH = ".github/workflows/publish.yml"
+
+
+def ensure_publish_workflow_committed(
+    project_dir: Path, branch: str
+) -> bool:
+    """Commit and push the publish workflow file if it has uncommitted changes.
+
+    Ensures the workflow used by GitHub Actions on tag push is on the remote
+    so the script never leaves you to run git add/commit/push manually.
+
+    Returns:
+        True if nothing to do or commit+push succeeded; False if push failed.
+    """
+    use_shell = get_shell_mode()
+    workflow_path = project_dir / _PUBLISH_WORKFLOW_PATH
+    if not workflow_path.exists():
+        return True
+
+    result = subprocess.run(
+        ["git", "status", "--porcelain", "--", _PUBLISH_WORKFLOW_PATH],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    if result.returncode != 0 or not result.stdout.strip():
+        return True
+
+    print_info(
+        f"Uncommitted changes in {_PUBLISH_WORKFLOW_PATH}; "
+        "committing and pushing..."
+    )
+    if (
+        run_command(
+            ["git", "add", _PUBLISH_WORKFLOW_PATH],
+            project_dir,
+            "Staging publish workflow",
+        ).returncode
+        != 0
+    ):
+        return False
+    if (
+        run_command(
+            ["git", "commit", "-m", "chore: update publish workflow"],
+            project_dir,
+            "Committing publish workflow",
+        ).returncode
+        != 0
+    ):
+        return False
+    if not _push_with_retry(project_dir, branch):
+        return False
+    print_success(f"Pushed {_PUBLISH_WORKFLOW_PATH} to origin/{branch}.")
+    return True
+
+
 def git_commit_and_push(
     project_dir: Path, version: str, branch: str
 ) -> bool:
