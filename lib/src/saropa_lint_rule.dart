@@ -588,7 +588,7 @@ class ProgressTracker {
     final filesPerSec = _calculateFilesPerSec(fileCount, elapsed);
 
     // Extract just the filename from the last seen file for context
-    final lastFile = _seenFiles.length > 0 ? _seenFiles.last : null;
+    final lastFile = _seenFiles.isNotEmpty ? _seenFiles.last : null;
     if (lastFile == null) return;
     final displayName = lastFile.split('/').last.split('\\').last;
 
