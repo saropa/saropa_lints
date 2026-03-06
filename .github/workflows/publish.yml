@@ -24,9 +24,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          for i in 1 2; do
-            dart pub get && break
-            if [ $i -eq 2 ]; then echo "::error::dart pub get failed twice"; exit 1; fi
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt/3: dart pub get"
+            if dart pub get; then
+              echo "dart pub get succeeded"
+              exit 0
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "::error::dart pub get failed after 3 attempts"
+              exit 1
+            fi
             echo "::warning::dart pub get failed, retrying in 10s..."
             sleep 10
           done
