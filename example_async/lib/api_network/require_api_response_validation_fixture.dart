@@ -29,6 +29,17 @@ void goodVariableOnlyToFromJson() {
   return;
 }
 
+// GOOD: type check (Map/List) then throw (validation helper) — should NOT trigger
+void goodTypeCheckThenThrow() {
+  final decoded = jsonDecode(body);
+  if (decoded != null &&
+      decoded is! Map<String, dynamic> &&
+      decoded is! List<dynamic>) {
+    throw FormatException('Expected JSON object or array');
+  }
+  return;
+}
+
 class _Model {
   _Model(this.x);
   final String x;

@@ -3859,6 +3859,7 @@ bool _variableOnlyPassedToFromJson(Block block, String name, Statement stmt) {
 }
 
 /// True when [name] is validated by a type check after [stmt] (e.g. if (x is! Map && x is! List) throw).
+/// Heuristic: condition source contains variable name and Map/List, and then-branch returns or throws.
 bool _variableValidatedByTypeCheck(Block block, String name, Statement stmt) {
   final stmtIndex = block.statements.indexOf(stmt);
   if (stmtIndex < 0) return false;
@@ -3894,7 +3895,8 @@ bool _isArgumentToFromJson(SimpleIdentifier identifier) {
 /// Reports on [jsonDecode] when the decoded value may be used without validation (e.g. direct field access).
 /// Does **not** report when:
 /// - The [jsonDecode] call is the direct single argument to a [fromJson] call (e.g. `MyType.fromJson(jsonDecode(body))`), or
-/// - The decoded value is assigned to a variable and that variable is only ever passed as the single argument to a [fromJson] call.
+/// - The decoded value is assigned to a variable and that variable is only ever passed as the single argument to a [fromJson] call, or
+/// - The decoded value is assigned to a variable and a subsequent [IfStatement] in the same block validates it (e.g. type check for Map/List) and returns or throws on failure (validation-helper pattern).
 ///
 /// **BAD:**
 /// ```dart
@@ -3906,6 +3908,7 @@ bool _isArgumentToFromJson(SimpleIdentifier identifier) {
 /// ```dart
 /// final data = MyModel.fromJson(jsonDecode(response.body));
 /// // or: final decoded = jsonDecode(response.body); ... MyModel.fromJson(decoded);
+/// // or: decodeAndValidateJson(body) that checks Map/List and throws.
 /// ```
 class RequireApiResponseValidationRule extends SaropaLintRule {
   RequireApiResponseValidationRule() : super(code: _code);
@@ -3979,7 +3982,7 @@ class RequireApiVersionHandlingRule extends SaropaLintRule {
 // require_content_type_validation
 // =============================================================================
 
-/// True when the then-branch returns or throws (guard before decode).
+/// True when the then-branch returns or throws (content-type guard before decode).
 bool _thenReturnsOrThrows(Statement thenStatement) {
   if (thenStatement is ReturnStatement) return true;
   if (thenStatement is ExpressionStatement &&
@@ -3995,8 +3998,7 @@ bool _thenReturnsOrThrows(Statement thenStatement) {
   return false;
 }
 
-/// True when [stmt] is an IfStatement that returns or throws when Content-Type is not application/json (guard before decode).
-///
+/// True when [stmt] is an IfStatement that returns or throws when Content-Type is not application/json.
 /// Uses a guarded heuristic on condition source (contentType/mimeType + application/json) per CONTRIBUTING.md.
 bool _isContentTypeGuardStatement(Statement stmt) {
   if (stmt is! IfStatement) return false;
@@ -4009,6 +4011,7 @@ bool _isContentTypeGuardStatement(Statement stmt) {
   return _thenReturnsOrThrows(stmt.thenStatement);
 }
 
+/// Recurses into if-then blocks to find nested content-type guards (e.g. if (headers != null) { if (!json) throw }).
 bool _hasContentTypeGuardInStatement(Statement s) {
   if (_isContentTypeGuardStatement(s)) return true;
   if (s is IfStatement) {
@@ -4044,9 +4047,10 @@ bool _hasContentTypeGuardBeforeJsonDecode(AstNode node) {
 
 /// Suggests validating Content-Type before parsing response.
 ///
-/// Reports on [jsonDecode] when there is no dominating content-type guard (e.g. early return when not `application/json`).
-/// Does **not** report when a preceding [IfStatement] in the same or outer block checks contentType/mimeType and
-/// `application/json`, and returns before the decode (guarded heuristic on condition source; see CONTRIBUTING.md).
+/// Reports on [jsonDecode] when there is no dominating content-type guard before the call.
+/// Does **not** report when a preceding [IfStatement] in the same or outer (including nested) block
+/// checks contentType/mimeType and `application/json`, and returns or throws before the decode.
+/// Guard detection accepts both return and throw in the then-branch (guarded heuristic on condition source; see CONTRIBUTING.md).
 ///
 /// **BAD:**
 /// ```dart
@@ -4059,6 +4063,14 @@ bool _hasContentTypeGuardBeforeJsonDecode(AstNode node) {
 ///   return (error: 'Content-Type must be application/json');
 /// }
 /// final data = jsonDecode(body);
+/// ```
+///
+/// **GOOD (throw in helper):**
+/// ```dart
+/// if (responseHeaders != null && !contentType.toLowerCase().contains('application/json')) {
+///   throw FormatException('Unexpected Content-Type');
+/// }
+/// final decoded = jsonDecode(source);
 /// ```
 class RequireContentTypeValidationRule extends SaropaLintRule {
   RequireContentTypeValidationRule() : super(code: _code);

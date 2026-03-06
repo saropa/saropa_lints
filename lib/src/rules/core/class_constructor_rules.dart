@@ -928,10 +928,15 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
 /// source to representation type source; no string heuristics. Methods with
 /// parameters are ignored (only parameterless getters are considered).
 ///
+/// **Exception:** When the representation is private (name starts with `_`),
+/// exactly one public getter that exposes it under a different name is allowed
+/// (e.g. `String get sql => _sql`). This avoids conflict with
+/// [prefer_private_extension_type_field], which requires a private representation.
+///
 /// **BAD:**
 /// ```dart
 /// extension type UserId(int _id) {
-///   int get value => _id;  // Renames representation getter
+///   int get value => _id;  // Renames representation getter (and second getter would also trigger)
 /// }
 /// ```
 ///
@@ -939,6 +944,13 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
 /// ```dart
 /// extension type UserId(int id) {
 ///   // Use representation name directly
+/// }
+/// ```
+///
+/// **GOOD (private repr + single public getter):**
+/// ```dart
+/// extension type _SqlRequestBody(String _sql) {
+///   String get sql => _sql;
 /// }
 /// ```
 class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
@@ -973,18 +985,14 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
           .toSource()
           .replaceAll(RegExp(r'\s+'), ' ')
           .trim();
-
-      // When representation is private, allow exactly one public getter that
-      // exposes it under a different name (e.g. String get sql => _sql).
       final bool representationIsPrivate = repFieldName.startsWith('_');
-      int renamingGetterCount = 0;
+      final List<MethodDeclaration> renamingGetters = [];
       for (final ClassMember m in body.members) {
         if (m is! MethodDeclaration) continue;
         if (m.parameters != null && m.parameters!.parameters.isNotEmpty) {
           continue;
         }
-        final String getterName = m.name.lexeme;
-        if (getterName == repFieldName) continue;
+        if (m.name.lexeme == repFieldName) continue;
         final TypeAnnotation? returnType = m.returnType;
         if (returnType == null) continue;
         final String returnTypeSource = returnType
@@ -992,23 +1000,11 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
             .replaceAll(RegExp(r'\s+'), ' ')
             .trim();
         if (returnTypeSource != repTypeSource) continue;
-        renamingGetterCount++;
+        renamingGetters.add(m);
       }
-      for (final ClassMember m in body.members) {
-        if (m is! MethodDeclaration) continue;
-        if (m.parameters != null && m.parameters!.parameters.isNotEmpty) {
-          continue;
-        }
-        final String getterName = m.name.lexeme;
-        if (getterName == repFieldName) continue;
-        final TypeAnnotation? returnType = m.returnType;
-        if (returnType == null) continue;
-        final String returnTypeSource = returnType
-            .toSource()
-            .replaceAll(RegExp(r'\s+'), ' ')
-            .trim();
-        if (returnTypeSource != repTypeSource) continue;
-        if (representationIsPrivate && renamingGetterCount == 1) continue;
+      final bool skipAll = representationIsPrivate && renamingGetters.length == 1;
+      for (final MethodDeclaration m in renamingGetters) {
+        if (skipAll) continue;
         reporter.atToken(m.name, code);
       }
     });
@@ -2206,6 +2202,12 @@ class PreferConstConstructorsInImmutablesRule extends SaropaLintRule {
 /// evaluation. This rule applies to plain classes; @immutable and Widget
 /// subclasses are covered by [PreferConstConstructorsInImmutablesRule].
 ///
+/// **Skips reporting when:**
+/// - Any constructor parameter has a function type (callbacks cannot be const).
+/// - The class extends a superclass that has no const constructor (e.g. ChangeNotifier).
+/// - The constructor initializer list or super arguments use non-const expressions
+///   (method calls, non-const constructor calls, binary/conditional expressions).
+///
 /// **Bad:**
 /// ```dart
 /// class Config {
@@ -2272,6 +2274,7 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
     });
   }
 
+  /// True if any parameter is a function type (const constructor impossible).
   static bool _constructorHasFunctionTypeParam(ConstructorDeclaration node) {
     for (final FormalParameter p in node.parameters.parameters) {
       final FormalParameter param =
@@ -2287,6 +2290,7 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
     return false;
   }
 
+  /// True when the class extends a type with no const constructor (e.g. ChangeNotifier).
   static bool _superclassLacksConstConstructor(ClassDeclaration node) {
     final ExtendsClause? ext = node.extendsClause;
     if (ext == null) return false;
@@ -2296,6 +2300,7 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
     return !superInterface.constructors.any((ConstructorElement c) => c.isConst);
   }
 
+  /// True when any field or super initializer uses a non-const expression.
   static bool _constructorHasNonConstInitializers(
       ConstructorDeclaration node) {
     final NodeList<ConstructorInitializer> inits = node.initializers;
@@ -2312,6 +2317,7 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
     return false;
   }
 
+  /// Conservative: true for any expression that is not obviously const-capable.
   static bool _expressionIsNonConst(Expression expr) {
     if (expr is MethodInvocation) return true;
     if (expr is InstanceCreationExpression) return true;

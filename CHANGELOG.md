@@ -16,6 +16,16 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
+- **avoid_renaming_representation_getters** — No longer reports when the representation is private and there is exactly one public getter that exposes it under a different name (e.g. `String get sql => _sql`). Resolves conflict with prefer_private_extension_type_field. See bugs/history/bug_extension_type_avoid_renaming_vs_prefer_private_conflict.md.
+
+- **prefer_const_constructor_declarations** — No longer suggests const when: (1) any constructor parameter has a function type (callbacks cannot be const); (2) the class extends a superclass with no const constructor (e.g. ChangeNotifier); (3) the constructor initializer list or super arguments use non-const expressions (method calls, non-const constructor calls, binary/conditional). Resolves bug_prefer_const_constructor_declarations_callback_field, bug_prefer_const_constructor_declarations_change_notifier, bug_prefer_const_constructor_declarations_non_const_initializers.
+
+- **prefer_safe_area_consumer** — No longer reports when the Scaffold has no `appBar` and no `bottomNavigationBar`. In that case the body extends under system UI and SafeArea is appropriate. Resolves bug_prefer_safe_area_consumer_scaffold_without_appbar.
+
+- **require_api_response_validation** — No longer reports when the decoded value is validated by a subsequent type check (e.g. `if (decoded is! Map && decoded is! List) throw`) in the same block (validation-helper pattern). Resolves bug_require_api_response_validation_require_content_type_in_validator_impl.
+
+- **require_content_type_validation** — No longer reports when a dominating content-type guard returns or throws (not only return) before `jsonDecode`, and when the guard is nested inside an outer if block. Resolves bug_require_api_response_validation_require_content_type_in_validator_impl.
+
 - **prefer_webview_sandbox** — Internal: removed null assertion in controller root helper; handle nullable `PropertyAccess.target` to satisfy avoid_null_assertion.
 
 ---
