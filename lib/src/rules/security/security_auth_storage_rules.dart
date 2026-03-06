@@ -2772,15 +2772,19 @@ class _WebViewSandboxConfigVisitor extends RecursiveAstVisitor<void> {
   /// (controller.platform as AndroidWebViewController) or controller.platform;
   /// we record the controller root (the part before .platform).
   static String _controllerRootFromAllowFileAccessReceiver(Expression receiver) {
-    Expression? current = receiver;
+    Expression current = receiver;
     if (current is AsExpression) {
       current = current.expression;
     }
     if (current is PropertyAccess &&
         current.propertyName.name == 'platform') {
-      current = current.target;
+      // PropertyAccess.target is nullable; only assign when present.
+      final target = current.target;
+      if (target != null) {
+        current = target;
+      }
     }
-    return PreferWebviewSandboxRule._controllerRootFromExpression(current!);
+    return PreferWebviewSandboxRule._controllerRootFromExpression(current);
   }
 }
 

@@ -12,6 +12,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **prefer_webview_sandbox** — Internal: removed null assertion in controller root helper; handle nullable `PropertyAccess.target` to satisfy avoid_null_assertion.
+
+---
+
 ## [7.0.0]
 
 **Breaking: Analyzer 10 upgrade** — This release upgrades to the analyzer 10.x API. See [Upgrading to v7](doc/guides/upgrading_to_v7.md) for migration steps.
