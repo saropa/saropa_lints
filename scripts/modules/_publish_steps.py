@@ -403,11 +403,17 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
         shell=use_shell,
     )
     if result.returncode != 0:
-        if result.stderr:
-            print_colored(result.stderr.strip(), Color.RED)
-        if result.stdout and result.stdout.strip():
-            print_colored(result.stdout.strip(), Color.RED)
-        print_info("Trying 'git fetch origin' (all refs)...")
+        stderr_text = (result.stderr or "").strip()
+        if "couldn't find remote ref" in stderr_text:
+            print_info(
+                f"Branch {branch} not on remote yet. Trying 'git fetch origin'..."
+            )
+        else:
+            if stderr_text:
+                print_colored(stderr_text, Color.RED)
+            if result.stdout and result.stdout.strip():
+                print_colored(result.stdout.strip(), Color.RED)
+            print_info("Trying 'git fetch origin' (all refs)...")
         fallback = subprocess.run(
             ["git", "fetch", "origin"],
             cwd=project_dir,

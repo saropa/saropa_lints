@@ -12,7 +12,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
-## [Unreleased]
+## [7.0.1]
+
+In this release we’re preparing bug fixes and small rule refinements.
 
 ### Fixed
 
@@ -31,6 +33,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 
 ## [7.0.0]
+
+In this release we move to the analyzer 10.x API and Dart SDK 3.9+. Rule names now use lowerCaseName—see the migration guide for updating your config.
 
 **Breaking: Analyzer 10 upgrade** — This release upgrades to the analyzer 10.x API. See [Upgrading to v7](doc/guides/upgrading_to_v7.md) for migration steps.
 
@@ -69,6 +73,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 
 ## [6.2.1]
+
+In this release we fix a few rules (use_existing_variable, require_debouncer_cancel, duplicate bool-param diagnostics), add rules for pagination error recovery and ignore-comment spacing, and ship 28+ new quick fixes. The publish script now runs tests in step 6 and loads analysis_options from the project root.
 
 ### Changed
 
@@ -111,7 +117,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [6.2.0]
 
-**Focus: Dog Food** — This release focuses on cleaning up all lint issues in our own project (eating our own dog food).
+We focus on eating our own dog food: new rules for API validation, accessibility, performance, Hive, Riverpod, and more; more quick fixes; and a reorg of rules into subfolders while cleaning up this project’s own lint issues.
+
+**Focus** — We clean up all lint issues in this project so we run the same rules we ship.
 
 ### Fixed
 
@@ -260,6 +268,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [6.1.2]
 
+In this release we remove 18 quick fixes that only inserted a TODO (project policy). We also add history docs for false positives, a no-stub-fixtures policy, and fixes for avoid_long_parameter_list and plugin crashes (handle_throwing_invocations, CI).
+
 ### Removed
 
 - **Insert-TODO quick fixes:** Removed 18 quick fixes that only inserted a `// TODO: ...` comment at the violation (no real code change). They added no value over the lint. Prohibition documented in `bugs/QUICK_FIX_PLAN.md` and `CLAUDE.md`. Rules affected: `avoid_adjacent_strings`, `avoid_late_keyword`, `no_object_declaration`, `avoid_deprecated_usage`, `avoid_duplicate_initializers`, `avoid_duplicate_constant_values`, `avoid_referencing_discarded_variables`, `avoid_duplicate_string_literals_pair`, `avoid_expensive_log_string_construction`, `avoid_missing_interpolation`, `avoid_ignoring_return_values`, `avoid_positional_boolean_parameters`, `avoid_default_to_string`, `avoid_misused_set_literals`, `avoid_global_state`, `avoid_unnecessary_nullable_return_type`, `avoid_unnecessary_local_variable`, `avoid_unused_generics`.
@@ -282,6 +292,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [6.1.1]
 
+In this release we reach full fixture coverage: 54 new fixture files so every rule has a dedicated fixture. We also fix avoid_deprecated_usage and no_empty_block metrics, and the analyzer metadata crash (MetadataImpl).
+
 ### Added
 
 - **Fixture coverage 100%:** Added 54 missing fixture files so the publish script Test Coverage report reaches 1963/1963 (100%) fixture coverage. Categories: stylistic (7), widget_patterns (3), firebase (3), code_quality (4), async (3), widget_layout (2), theming (2), navigation (2), getx (2), config (2), bloc (2), auto_route (2), and one each for state_management, security, riverpod, return, record_pattern, performance, lifecycle, json_datetime, image, geolocator, freezed, forms, error_handling, equatable, disposal, debug, context, connectivity, class_constructor, architecture. All new fixtures are verified in their category test files (Fixture Verification). No new rules; existing rules now have dedicated fixture files for coverage reporting.
@@ -295,6 +307,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 
 ## [6.1.0]
+
+In this release we add many new stylistic and professional rules (cascade, fold vs reduce, Riverpod/Bloc, naming, structure), split rule files for maintainability, and fix the publish script and report path handling.
 
 ### Added
 
@@ -370,6 +384,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [6.0.10]
 
+In this release we fix the analyzer 9 crash in avoid_deprecated_usage and clean up duplicated or malformed lint message text in 11 rule files.
+
 ### Fixed
 
 - **avoid_deprecated_usage (analyzer 9):** Fixed plugin crash (`NoSuchMethodError: SimpleIdentifierImpl has no getter 'staticElement'`) when running under analyzer 9.x. Rule now uses a compatibility helper that supports both `.element` (analyzer 9+) and `.staticElement` (older). See `bugs/history/report_avoid_deprecated_usage_analyzer_api_crash.md`.
@@ -378,6 +394,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 
 ## [6.0.9]
+
+In this release we focus on cutting false positives: substring checks are replaced with word-boundary regex and type checks in 121+ places. We also reclassify some tiers and severities, add full rule-instantiation tests, and tidy the roadmap and CHANGELOG.
 
 ### Fixed
 
@@ -429,6 +447,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 
 ## [6.0.7]
+
+In this release we add 55 new lint rules (deprecation, security, structure, Firebase, pagination, and more), remove four rules that were never implemented, and fix require_yield_after_db_write, verify_documented_parameters_exist, and style.
 
 ### Fixed
 
@@ -510,6 +530,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [6.0.6]
 
+In this release we add 15 new rules (widget bools, static-only classes, type checks, naming, structure) and improve the init wizard (stylistic walkthrough, progress, clearer boolean examples). require_minimum_contrast now respects ignore comments.
+
 ### Added
 
 - 15 new lint rules:
@@ -541,12 +563,16 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [6.0.5]
 
+In this release we fix path traversal and file sanitization so they no longer flag trusted platform paths (e.g. getApplicationDocumentsDirectory) when passed to private helpers.
+
 ### Fixed
 
 - `avoid_path_traversal` — false positive when trusted platform path (e.g., `getApplicationDocumentsDirectory`) is passed to a private helper method; now traces trust through call sites of private methods
 - `require_file_path_sanitization` — same false positive as `avoid_path_traversal`; shared inter-procedural platform path trust check
 
 ## [6.0.4]
+
+In this release we fix false positives in several rules: path traversal, Riverpod ref/watch, SQL PRAGMA, unsafe collection/reduce guards, require_app_startup_error_handling, require_search_debounce, and require_minimum_contrast.
 
 ### Fixed
 
@@ -566,6 +592,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [6.0.3]
 
+In this release we fix the Drift test rule (avoid_drift_close_streams_in_tests) so it runs in test files, and remove dead code from avoid_drift_update_without_where.
+
 ### Fixed
 
 - `avoid_drift_close_streams_in_tests` — rule never fired because `testRelevance` was not overridden; the framework skipped test files before the rule could run. Now correctly set to `TestRelevance.testOnly`
@@ -574,6 +602,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 
 ## [6.0.2]
+
+In this release we widen the analysis_server_plugin and analyzer_plugin version ranges to reduce conflicts for consumers, and fix the CI publish workflow so it no longer fails on analyzer warnings.
 
 ### Changed
 
@@ -586,6 +616,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 
 ## [6.0.1]
+
+In this release we add 10 new Drift rules (Value semantics, equalsValue, readTableOrNull, onCreate, schema validation, replace/write, Isar import, foreign keys, onUpgrade) and fix several Drift rule false positives.
 
 ### Added
 
@@ -611,6 +643,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 
 ## [6.0.0]
+
+In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (SQLite) rules for data safety, migrations, and performance. Drift is now a supported package in package filtering.
 
 ### Breaking
 
@@ -659,6 +693,8 @@ For details on the initial release and versions 0.1.0 through 5.0.3, please refe
 
 ---
 ## [6.2.2]
+
+This is a version bump for compatibility—the last release that supports analyzer &lt; v10 before 7.0.0.
 
 ### Changed
 - Version bump

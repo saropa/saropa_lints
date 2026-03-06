@@ -113,7 +113,7 @@ def check_modules_exist() -> bool:
     """Verify all required module files exist before importing.
 
     This runs BEFORE any module imports so the user gets a clear
-    error message instead of a Python ImportError traceback.
+    error message instead of a Python ImportError traceback.1
 
     Uses ASCII-only output since enable_ansi_support() hasn't run yet.
 

@@ -8,6 +8,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 
 ## [5.0.3]
 
+**In this release we add security and platform rules and improve ignore handling and the init walkthrough.**
+
 ### Added
 
 - `avoid_string_env_parsing`: warns when `fromEnvironment()` is called without `defaultValue` (Recommended)
@@ -43,6 +45,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 
 ## [5.0.2]
 
+**We cut down false positives and improve messages; the CLI now uses dart analyze.**
+
 ### Fixed
 
 - `prefer_list_first`: suppress false positives when the same collection is accessed with sibling indices (`list[0]` alongside `list[1]`), on assignment targets (`list[0] = value`), on String subscripts (`string[0]`), and on Map access (`map[0]`)
@@ -73,6 +77,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 
 ## [5.0.1]
 
+**We add quick fixes for formatting rules, new fixtures, and reduce false positives.**
+
 ### Added
 
 - Quick fixes for 5 blank-line formatting rules: `prefer_blank_line_before_case`, `prefer_blank_line_before_constructor`, `prefer_blank_line_before_method`, `prefer_blank_line_after_declarations`, `prefer_blank_lines_between_members`
@@ -101,6 +107,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 ---
 
 ## [5.0.0-beta.15]
+
+**We add rules for caching, auto_route, and complexity, and fix several false positives.**
 
 ### Added
 
@@ -144,6 +152,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 
 ## [5.0.0-beta.14]
 
+**We reduce false positives on variable shadowing, setState, switch expressions, and related rules.**
+
 ### Fixed
 
 - `avoid_variable_shadowing`: false positive on sequential for/while/do loops reusing the same variable name — loop variables are scoped to their body and don't shadow each other
@@ -161,6 +171,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 ---
 
 ## [5.0.0-beta.13]
+
+**We fix more false positives, merge prefer_sorted_members into prefer_member_ordering, and improve the publish and init flow.**
 
 ### Fixed
 
@@ -193,6 +205,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 ---
 
 ## [5.0.0-beta.12]
+
+**We add an interactive stylistic rule walkthrough and new import/Flutter migration rules.**
 
 ### Added
 
@@ -241,6 +255,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 
 ## [5.0.0-beta.11]
 
+**The CLI now defaults to init; we fix the publish script and format paths.**
+
 ### Changed
 
 - CLI defaults to `init` command when run without arguments (`dart run saropa_lints` now equivalent to `dart run saropa_lints init`)
@@ -251,6 +267,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 ---
 
 ## [5.0.0-beta.10]
+
+**We fix init and the progress bar and move report files into date-based folders.**
 
 ### Fixed
 
@@ -276,6 +294,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 ---
 
 ## [5.0.0-beta.9]
+
+**We fix a critical bug so the plugin loads correctly (missing version key) and fix analysis server output.**
 
 ### Fixed
 
@@ -304,6 +324,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 
 ## [5.0.0-beta.8]
 
+**Version bump only.**
+
 ### Changed
 
 - Version bump
@@ -311,6 +333,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 ---
 
 ## [5.0.0-beta.7]
+
+**We add a rule-by-rule report in init, date-based report paths, and a tier selection prompt.**
 
 ### Added
 
@@ -330,6 +354,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 ---
 
 ## [5.0.0-beta.6]
+
+**We add quick fixes, move report and cache output under reports/, and fill fixture placeholders.**
 
 ### Added
 
@@ -353,6 +379,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 ---
 
 ## [5.0.0-beta.5]
+
+**We add auto-migration from v4, make the plugin respect config, and ship 108 quick fixes.**
 
 ### Added
 
@@ -386,6 +414,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 
 ## [5.0.0-beta.4]
 
+**We fix publish dry-run and CI checks.**
+
 ### Fixed
 
 - Untrack `.github/copilot-instructions.md` — was gitignored but tracked, causing `dart pub publish --dry-run` to exit 65 (warning)
@@ -396,6 +426,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 
 ## [5.0.0-beta.3]
 
+**We add the analyzer as an explicit dependency and fix the publish workflow.**
+
 ### Fixed
 
 - Add `analyzer` as explicit dependency — `dart pub publish` rejected transitive-only imports, causing silent publish failure
@@ -404,6 +436,8 @@ Archived releases 0.1.0 through 5.0.3. See [CHANGELOG.md](https://github.com/sar
 ---
 
 ## [5.0.0-beta.2]
+
+**We update the publish script for the v5 LintCode format and pre-release versions.**
 
 ### Fixed
 
@@ -465,6 +499,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.15.1]
 
+**We add accessibility, RTL, and test matcher rules, plus Flutter hooks and animation rules.**
+
 ### Added
 
 - **`avoid_color_only_meaning`** (Essential, WARNING): Warns when color is the sole visual indicator to convey meaning or state, violating WCAG 1.4.1. Checks multiple widget types (Container, Card, Material, etc.) and verifies a companion Icon/Text exists
@@ -476,6 +512,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.15.0]
 
+**We add rules for return values, optimistic updates, image caching, and session timeout.**
+
 ### Added
 
 - **`avoid_ignoring_return_values`** (Recommended, INFO): Warns when a function's return value is discarded, which can silently hide bugs where an important result (Future, boolean, parsed value) is lost
@@ -486,6 +524,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.14.5]
+
+**We reduce false positives and add rules for semantics, permissions, and navigation.**
 
 ### Fixed
 
@@ -525,6 +565,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.14.4]
 
+**We add a quick fix for require_number_format_locale and fix several false positives.**
+
 ### Added
 
 - **`require_number_format_locale` quick fix**: New "Use device locale (Intl.defaultLocale)" quick fix inserts `Intl.defaultLocale` as the locale argument, letting developers explicitly acknowledge intentional device-locale formatting without `// ignore` comments
@@ -540,6 +582,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.14.3]
 
+**We fix the WebSocket rule, add fixture ignores, and disable two tests for now.**
+
 ### Fixed
 
 - **`require_websocket_reconnection` false positive** (v4): Rule no longer fires on `WebSocket` and `WebSocketChannel` class definitions themselves; only classes that use WebSocket connections are checked
@@ -552,6 +596,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.14.2]
+
+**We add a US English spelling check in publish, split the example into sub-packages, and fix fixtures and false positives.**
 
 ### Added
 
@@ -582,6 +628,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.14.1]
 
+**We add unit test coverage for 10 rule categories, JSON violation export, and a new Firebase index rule.**
+
 ### Changed
 
 - **Roadmap summary bars inverted**: Bars now show completion (0 remaining = full green bar) instead of remaining count, making progress more intuitive
@@ -600,6 +648,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.14.0]
+
+**We add six Essential rules (package name, GetX, permission_handler, disposed widgets, key generation, Hive web).**
 
 ### Added
 
@@ -635,6 +685,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.13.0]
 
+**We refine empty setState behavior, fix many false positives, and improve reports and audits.**
+
 ### Changed
 
 - **`avoid_empty_setstate` no longer flags mounted-guarded calls**: Empty `setState(() {})` inside a `mounted` guard (`if (mounted)`, ternary, or early-return pattern) is now suppressed. This is an intentional Flutter idiom for triggering rebuilds after async gaps or external state mutations. This rule flags a valid Flutter idiom (`if (mounted) setState(() {})` after async gaps). It is a style preference, not a bug or correctness issue, so it belongs in the comprehensive tier for quality-focused teams. Impact reduced from medium to low.
@@ -668,12 +720,16 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.12.3]
 
+**Init now updates existing configs and adds the output setting when max_issues is present.**
+
 ### Fixed
 
 - **Init migrates existing configs**: Running `dart run saropa_lints:init` on projects that already have `max_issues` now adds the missing `output` setting instead of skipping the file.
 
 ---
 ## [4.12.2]
+
+**We cap the Problems tab at 500, use a single report file, and add file-only mode and graceful abort.**
 
 ### Changed
 
@@ -700,6 +756,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.12.1]
 
+**The analysis report now includes all violations; we add parser regression tests.**
+
 ### Fixed
 
 - **Analysis report captures all violations**: The debounce timer's write-once guard caused reports to contain only the first batch of violations when analysis gaps exceeded 3 seconds. Reports now overwrite on each debounce cycle so the final output reflects the complete analysis.
@@ -712,6 +770,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.12.0]
+
+**We add ten lint rules (context, DateTime, GetX, provider, Hive, navigation, semantics).**
 
 ### Added
 
@@ -730,6 +790,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.11.1]
 
+**We improve the prefer_using_list_view messages and guidance.**
+
 - **Improved `prefer_using_list_view` Rule:**
   - Upgraded `problemMessage` to clearly define the performance pitfalls of eager-loading `Column` widgets inside scroll views.
   - Rewrote `correctionMessage` into a detailed technical guide. It now explicitly recommends `ListView.separated` as the direct replacement for layouts requiring specific spacing, provides guidance on handling `Flex` constraints, and explains the mechanics of lazy loading.
@@ -737,11 +799,15 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.11.0]
 
+**We centralize violation-parsing logic (PR #84).**
+
 ### Changed
 - Centralized the duplicated violation-parsing logic from the `baseline` and `impact_report` tools. This resolves a structural issue highlighted by the regex fix in PR #84 and makes future updates more robust. (Thanks [@icealive](https://github.com/icealive!))
 
 ---
 ## [4.10.2]
+
+**We add README screenshots and rename the Insanity tier to Pedantic.**
 
 ### Readme
 - **Screenshots** added to several sections in [README.md](./README.md).
@@ -753,6 +819,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.10.1]
 
+**We add the verify_documented_parameters_exist rule and list documentation rules in ROADMAP.**
+
 ### Added
 
 - **New rule `verify_documented_parameters_exist`** (Professional, WARNING): Detects when dartdoc `[paramName]` references parameters that do not exist in the function signature. Complements the existing `require_parameter_documentation` rule which checks the inverse direction. Handles edge cases: uppercase type references, single-letter generics, dotted enum/field references, class field names, `this.` and `super.` constructor parameters.
@@ -760,6 +828,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.10.0]
+
+**We remove a duplicate rule, register Windows/Linux rules, improve DX messages, and fix Expanded/Spacer handling.**
 
 ### Fixed
 
@@ -797,6 +867,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.9.20]
 
+**We add ten platform rules (Linux and Windows) and reduce false positives.**
+
 ### Added
 
 - **Linux platform rules (5 new rules)**: `avoid_sudo_shell_commands` (ERROR — detects Process.run with sudo/pkexec, OWASP M1), `avoid_hardcoded_unix_paths` (WARNING — detects `/home/`, `/tmp/`, `/etc/` literals), `avoid_x11_only_assumptions` (WARNING — detects X11-only tools and DISPLAY access without Wayland check), `prefer_xdg_directory_convention` (INFO — detects manual `~/.config/` path construction), `require_linux_font_fallback` (INFO — detects non-Linux fonts without fontFamilyFallback, quick fix adds fallback fonts)
@@ -813,6 +885,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.9.19]
 
+**We fix false positives for didUpdateWidget, const widgets in lists, and builder callbacks.**
+
 ### Fixed
 
 - **`require_did_update_widget_check` reduced false positives**: Rule now recognizes function-based comparisons (`listEquals`, `setEquals`, `mapEquals`, `identical`, `DeepCollectionEquality().equals`) as valid property-change checks. Previously the regex only matched `oldWidget` adjacent to `!=`/`==` operators, so standard Flutter collection comparisons were falsely flagged.
@@ -822,6 +896,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.9.18]
 
+**We correct empty setState severity and improve the yield-between-db-awaits message and fix.**
+
 ### Fixed
 
 - **`avoid_empty_setstate` reduced severity and corrected message**: Changed severity from WARNING to INFO — an empty `setState(() {})` still triggers a rebuild, so the previous message ("has no effect") was factually incorrect. Reworded to acknowledge that state is often modified before the call (e.g. after an async gap with a `mounted` check). This is a valid Flutter pattern, not a bug.
@@ -829,6 +905,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.9.17]
+
+**We fix Positioned/ListView false positives and update the publish script and README.**
 
 ### Fixed
 
@@ -849,6 +927,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.9.16]
+
+**We add database yield rules, reorganize package rules into a stylistic tier, and fix DX and false positives.**
 
 ### Added
 
@@ -893,12 +973,16 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.9.145]
 
+**We rewrite require_ios_lifecycle_handling and rename it to require_app_lifecycle_handling.**
+
 ### Fixed
 
 - **`require_ios_lifecycle_handling` rewritten and renamed to `require_app_lifecycle_handling`**: The rule used file-level string matching, causing false positives when unrelated classes in the same file contained lifecycle keywords. Rewritten with per-class AST detection via `addClassDeclaration` — each `State` subclass is independently checked for `WidgetsBindingObserver` mixin, `didChangeAppLifecycleState` method, and `AppLifecycleListener` fields. Also added one-shot `Timer()` constructor detection with word-boundary regex to avoid false positives from types like `MyTimer`. Renamed to `require_app_lifecycle_handling` (backward-compatible alias preserved) and moved from `ios_rules.dart` to `lifecycle_rules.dart` since the rule is platform-agnostic.
 
 ---
 ## [4.9.14]
+
+**We add nine layout crash detection rules (TableCell, Positioned, Spacer, scrollable, baseline, ListView, TextField, etc.).**
 
 ### Added
 
@@ -920,12 +1004,16 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.9.13]
 
+**We fix a check_mounted_after_async false positive for await showDialog().**
+
 ### Fixed
 
 - **`check_mounted_after_async` false positive on `await showDialog()`**: The rule flagged `await showDialog(...)` (and `showModalBottomSheet`, `showSnackBar`) as needing a mounted check even when no prior await existed. The `_hasAwaitBefore()` helper searched for `'await '` in the source text before the `MethodInvocation` offset, but when the call was itself the awaited expression (`await showDialog(...)`), its own `await` keyword appeared in that substring. Now uses the parent `AwaitExpression`'s offset when the target is directly awaited, so only genuinely preceding awaits are detected.
 
 ---
 ## [4.9.12]
+
+**We fix false positives for late nullability and nested assignments and improve the DX audit and stylistic messages.**
 
 ### Fixed
 
@@ -947,6 +1035,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.9.11]
+
+**We fix false positives (require_auth_check, no_equal_conditions, unsafe cast, nullify_after_dispose) and add ClipRSuperellipse rules.**
 
 ### Fixed
 
@@ -984,12 +1074,16 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.9.10]
 
+**We fix a prefer_late_final false positive when helper methods are called from multiple sites.**
+
 ### Fixed
 
 - **`prefer_late_final` false positive on helper methods called from multiple sites**: The rule counted assignment AST nodes rather than effective runtime assignments. A late field assigned in a helper method (e.g., `_fetchData()`) that was called from multiple sites (e.g., `initState()` and `didUpdateWidget()`) was incorrectly flagged as single-assignment. Now tracks which methods assign to which fields and counts call sites — if an assigning method is called from N > 1 sites, the field is treated as reassigned.
 
 ---
 ## [4.9.9]
+
+**We fix false positives for the push notification and dispose_pattern rules.**
 
 ### Fixed
 
@@ -999,6 +1093,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.9.8]
+
+**We fix false positives for avoid_unguarded_debug, dispose_before_new_instance, unused_instances, nullify_after_dispose, and change_notifier.**
 
 - **`avoid_unguarded_debug` no longer flags `debug()` calls**: The rule previously flagged every bare `debug()` call without a guard or `level:` parameter. The project's `debug()` function is production-safe logging infrastructure with its own level filtering and Crashlytics routing — it does not need external guards. The rule now only flags `debugPrint()`, which bypasses all filtering and writes directly to the console. Also added recognition of `debug*`/`_debug*` method names as implicit guards for `debugPrint()` calls inside debug helper methods.
 
@@ -1012,6 +1108,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.9.7]
+
+**We add quick fixes for 8 rules, a shared WrapInTryCatchFix, and improve DX messages for code_quality and control_flow.**
 
 ### Added
 
@@ -1027,6 +1125,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.9.5]
+
+**We add platform configuration, new rules (avoid_ignore_trailing_comment, prefer_positive_conditions, missing_use_result), quick fixes, and make ignore_for_file respected.**
 
 ### Added
 
@@ -1077,6 +1177,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.9.4]
 
+**We tighten Isar migration safety (require_isar_nullable_field) and read the plugin version from pubspec.**
+
 ### Changed
 
     Strict Isar migration safety: Replaced require_isar_non_nullable_migration with require_isar_nullable_field. The previous rule allowed non-nullable fields if they had default values, but Isar bypasses constructors/initializers during hydration, leading to crashes on legacy data. The new rule mandates that all fields in @collection classes (except Id) must be nullable (String?) to strictly prevent TypeError during version upgrades.
@@ -1087,6 +1189,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.9.3]
+
+**We improve progress bar terminal compatibility and version detection when run from other projects.**
 
 ### Fixed
 
@@ -1099,6 +1203,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.9.2]
 
+**Init now detects the version dynamically and emits full problem messages in the generated config.**
+
 ### Added
 
 - **Dynamic version detection in init**: The `init` command now reads the version from `pubspec.yaml` at runtime instead of using a hardcoded constant. Also displays the package source (local path vs pub.dev) to help diagnose version mismatches.
@@ -1109,6 +1215,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.9.1]
+
+**We add an in-place progress bar with colors and a max_issues setting for large codebases.**
 
 ### Added
 
@@ -1127,6 +1235,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.9.0]
 
+**We add automatic ignore quick fixes for all rules, 26 more quick fixes, and improve DX messages.**
+
 ### Added
 
 - **Automatic ignore quick fixes for all rules**: Every rule extending `SaropaLintRule` now automatically provides two quick fixes: "Ignore 'rule_name' for this line" (inserts `// ignore: rule_name` above the violation with matching indentation) and "Ignore 'rule_name' for this file" (inserts `// ignore_for_file: rule_name` after header comments). This enables one-click suppression for any lint violation. Rules can disable this via `includeIgnoreFixes => false` for critical security rules. New `customFixes` getter allows rules to provide specific fixes while retaining ignore fixes. Insertion logic respects existing ignore_for_file comments (groups them together) and copyright/license headers (inserts after, not before).
@@ -1141,6 +1251,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.8.8]
 
+**We add quick fixes for 9 rules (i18n, stylistic, Hive, logging), split widget rules into 3 files, and update DX and README.**
+
 ### Added
 
 - **Quick fixes for 9 rules**: Added automated quick fix support for frequently triggered rules to enable one-click corrections. Internationalization: `require_directional_widgets` (converts `EdgeInsets.only(left: x)` → `EdgeInsetsDirectional.only(start: x)` for RTL support), `prefer_intl_name` (adds `name` parameter to `Intl.message()`), `prefer_providing_intl_description` (adds `desc` parameter with TODO), `prefer_providing_intl_examples` (adds `examples` parameter). Stylistic: `prefer_double_quotes` (converts single quotes to double quotes), `prefer_object_over_dynamic` (replaces `dynamic` → `Object?`), `prefer_dynamic_over_object` (replaces `Object?` → `dynamic`). Hive: `prefer_hive_lazy_box` (converts `Hive.openBox()` → `Hive.openLazyBox()` for large collections). Logging: `prefer_logger_over_print` (replaces `print()` → `log()` from dart:developer). All fixes include comprehensive documentation and preserve code formatting.
@@ -1154,6 +1266,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.8.7]
 
+**We fix context/mounted false positives and make trailing ignore comments work for all rules.**
+
 ### Fixed
 
 - **`avoid_context_across_async` and `avoid_context_after_await_in_static` false positives on mounted ternary guards**: Fixed two issues where safe mounted guard patterns were incorrectly flagged: (1) Ternary guards in catch blocks (`context.mounted ? context : null`) were not detected due to premature AST traversal termination at statement boundaries. (2) Nullable-safe mounted checks (`context?.mounted ?? false ? context : null`) were not recognized. Both patterns now correctly suppress violations.
@@ -1161,6 +1275,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.8.6]
+
+**We add a TestRelevance enum, make rules skip test files by default, and fix DX and false positives.**
 
 ### Added
 
@@ -1186,6 +1302,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.8.5]
 
+**We introduce TestRelevance and default skip for test files, improve DX messages, and fix disposal and Isar false positives.**
+
 ### Added
 
 - **`TestRelevance` enum**: New three-value enum (`never`, `always`, `testOnly`) for granular control over whether lint rules run on test files. Rules can now declare their test file relationship explicitly instead of using a boolean flag.
@@ -1210,6 +1328,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.8.4]
 
+**We add test coverage and file health reports, improve DX messages for 58 rules, and fix doc references and the publish script.**
+
 ### Added
 
 - **Test coverage top offenders report**: The publish workflow's test coverage summary now lists the 10 worst categories ranked by untested rule count, color-coded by severity.
@@ -1233,6 +1353,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - **`doc/flutter_widget_rules_full_table.md`**: Obsolete split-plan document that was no longer referenced.
 
 ## [4.8.3]
+
+**We add OWASP rules (M2, M7), restore 141 orphan rules, and improve DX message quality.**
 
 ### Added
 
@@ -1328,6 +1450,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.7.6]
 
+**We fix require_ios_permission_description with method-level ImagePicker detection (gallery vs camera).**
+
 ### Fixed
 
 - **`require_ios_permission_description` false positive on ImagePicker constructor**: Fixed false positives where the rule required both `NSPhotoLibraryUsageDescription` AND `NSCameraUsageDescription` when only `ImagePicker()` was instantiated, before any method was called. The rule now uses smart method-level detection:
@@ -1338,6 +1462,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.7.5]
+
+**We make mid-chain ignore comments work: // ignore: now applies when placed before the method name in chained calls.**
 
 ### Added
 
@@ -1355,6 +1481,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.7.4]
+
+**We add quick fixes for cache growth, flashing content, and stream controller, and fix several false positives.**
 
 ### Added
 
@@ -1378,6 +1506,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.7.3]
 
+**We add an interactive analysis prompt after init and fix progress tracking.**
+
 ### Added
 
 - **Interactive analysis prompt**: After init completes, prompts user "🔍 Run analysis now? [y/N]" to optionally run `dart run custom_lint` immediately.
@@ -1390,6 +1520,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.7.2]
+
+**We add a custom overrides file (analysis_options_custom.yaml), timestamped backups, and init script fixes.**
 
 ### Added
 
@@ -1407,6 +1539,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.7.0]
+
+**We make rule tiers a single source of truth, improve init output, and add progress tracking with ETA.**
 
 ### Added
 
@@ -1433,6 +1567,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ---
 ## [4.6.2]
+
+**We add a require_build_context_scope alias, slow-rule deferral, report generation, and move quote rules to stylistic.**
 
 ### Removed
 
@@ -1476,6 +1612,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.6.1]
 
+**We add getAllDefinedRules() and move import style rules to the stylistic tier.**
+
 ### Added
 
 - **`getAllDefinedRules()` function**: New public function in `tiers.dart` returns the complete set of all rule names across all tiers (including stylistic). Used by both the CLI tool and unit tests to eliminate code duplication.
@@ -1511,6 +1649,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ## [4.6.0]
 
+**We add the CLI init tool and tier presets and update the documentation.**
+
 ### Added
 
 - **New CLI tool: `saropa_lints:init`** - Generates `analysis_options.yaml` with explicit rule configuration, bypassing custom_lint's unreliable plugin config mechanism:
@@ -1536,6 +1676,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 
 ## [4.5.7]
+
+**We improve the CLI, fix trailing ignore and deep_link_fallback, and read the plugin version from pubspec.**
 
 ### Changed
 
@@ -1576,6 +1718,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 ## [4.5.6]
 
+**We upgrade DX messages for many rules and make require_field_dispose and require_stream_controller_close smarter.**
+
 ### Changed
 - **Major upgrade to developer-facing lint rule messages:**
   - All `problemMessage` and `correctionMessage` fields for the following rules were rewritten to be context-rich, actionable, and consequence-focused, referencing best practices and real-world risks. This includes the latest upgrades for:
@@ -1596,6 +1740,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 
 ## [4.5.5]
+
+**We upgrade DX messages for async/dio/API rules, update PERFORMANCE.md, fix camera permission, and add release announcements.**
 
 ### Changed
 - **Major upgrade to developer-facing lint rule messages:**
@@ -1629,6 +1775,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.5.4]
 
+**We upgrade all remaining lint messages (unnecessary_code, ui_ux, type_safety) and fix the CLI YAML handling.**
+
 ### Changed
 
 - **All remaining lint rule messages upgraded:**
@@ -1650,12 +1798,16 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ---
 ## [4.5.3]
 
+**We add json2yaml/yaml to main dependencies for the bin/ CLI and fix publishing.**
+
 ### Fixed
 
 - Moved `json2yaml` and added `yaml` to main dependencies in pubspec.yaml to satisfy pub.dev requirements for CLI tools in `bin/`.
   This fixes publishing errors and allows versions above 4.5.0 to be published to pub.dev.
 
 ## [4.5.2]
+
+**We improve lint messages (debug, disposal, security, etc.) and add stylistic type-argument rules.**
 
 ### Changed
 
@@ -1682,6 +1834,8 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
   - This change makes it easier to opt into either style preference via the `--stylistic` flag or tier selection, but users should only enable one of the two in their configuration to avoid conflicts.
 
 ## [4.5.1]
+
+**We add CLI --no-pager and better YAML handling, rename file length rules, and align custom_lint versions.**
 
 ### Package Dependancies
 
@@ -1723,6 +1877,8 @@ Production file length rules now skip test files automatically.
 Production file length rules (such as `prefer_small_length_files`, `avoid_medium_length_files`, etc.) now automatically exclude test files from their checks. This prevents false positives on large test files and means you no longer need to manually disable these rules for test files in your configuration. Only production (non-test) Dart files are checked for file length limits by these rules.
 
 ## [4.5.0]
+
+**We add the init CLI (bin/init.dart), tier selection, and an explicit rule list in analysis_options.**
 
 ### Added
 
@@ -1767,6 +1923,8 @@ dart run saropa_lints:init --help
 
 ## [4.4.0]
 
+**We split duplicate collection elements into 3 rules (number, string, object) and fix variable shadowing.**
+
 ### Added
 
 **Split duplicate collection element detection into 3 separate rules** - The original `avoid_duplicate_collection_elements` rule has been replaced with three type-specific rules that can be suppressed independently:
@@ -1786,6 +1944,8 @@ All three rules include quick fixes to remove duplicate elements.
 **`avoid_variable_shadowing` false positives on sibling closures** - The rule was incorrectly flagging variables with the same name in sibling closures (like separate `test()` callbacks within a `group()`) as shadowing. These are independent scopes, not nested scopes, so they don't actually shadow each other. The rule now properly tracks scope boundaries.
 
 ## [4.3.0]
+
+**We add test-specific magic literal rules and make production rules skip test files.**
 
 ### Added
 
@@ -1819,6 +1979,8 @@ This prevents false positives on legitimate regex patterns like `RegExp(r'0+$')`
 This eliminates false positives while maintaining detection of actual commented-out code.
 
 ## [4.2.3]
+
+**We add progress reporting and apostrophe stylistic rules and fix several false positives.**
 
 ### Added
 
@@ -1867,6 +2029,8 @@ If you had `avoid_sensitive_data_in_logs` in your config, it will continue to wo
 
 ## [4.2.2]
 
+**We fix critical throttle key and rapid-edit mode bugs so rules are no longer silently skipped.**
+
 ### Fixed
 
 **Critical bug fixes for rule execution** - Two bugs were causing rules to be silently skipped, resulting in "No issues found" or far fewer issues than expected:
@@ -1878,6 +2042,8 @@ If you had `avoid_sensitive_data_in_logs` in your config, it will continue to wo
 **Impact**: These bugs affected all users on all platforms. Windows users were additionally affected by path normalization issues fixed in earlier commits.
 
 ## [4.2.1]
+
+**We rename a rule (avoid_parameter_reassignment), reorganize files, and fix the backup rules heuristic.**
 
 ### Changed
 
@@ -1896,6 +2062,8 @@ If you had `avoid_sensitive_data_in_logs` in your config, it will continue to wo
 
 ---
 ## [4.2.0]
+
+**We add config aliases, 41 rules (Android, IAP, URL launcher, permissions, etc.), and a DX message quality pass.**
 
 ### Added
 
@@ -2132,6 +2300,8 @@ Added aliases for:
 
 ## [4.1.9]
 
+**We rebalance tiers so Essential is strictly crash/security/memory-leak rules.**
+
 ### Changed
 
 **Tier rebalancing** - Redistributed rules across tiers to match tier philosophy:
@@ -2147,6 +2317,8 @@ Added aliases for:
 **Documentation**: Updated README tier table with detailed purpose, target user, and examples for each tier.
 
 ## [4.1.8]
+
+**We add 25 rules (state, performance, security, caching, testing, widgets, websocket, currency, DI).**
 
 ### Added
 
@@ -2214,6 +2386,8 @@ Added aliases for:
 
 ## [4.1.7]
 
+**We fix critical Windows issues (cache key and path normalization) and add a normalizePath() utility.**
+
 ### Fixed
 
 **Critical Windows compatibility bugs** that caused rules to not fire on Windows:
@@ -2235,6 +2409,8 @@ Added aliases for:
 ---
 
 ## [4.1.6]
+
+**We add 14 rules (logging, platform, JSON/API, config, lifecycle).**
 
 ### Added
 
@@ -2276,6 +2452,8 @@ Added aliases for:
 - **Professional tier:** 3 rules for code quality
 
 ## [4.1.5]
+
+**We add 24 rules (DI, accessibility, widgets, state, Firebase, security, navigation, i18n, async).**
 
 ### Added
 
@@ -2338,6 +2516,8 @@ Added aliases for:
 - **Professional tier:** 11 rules for stricter architecture/quality standards
 
 ## [4.1.4]
+
+**We add 25 rules (Bloc, GetX, Hive, SharedPreferences, streams, async, lifecycle, navigation, i18n, disposal).**
 
 ### Added
 
@@ -2409,6 +2589,8 @@ Added aliases for:
 
 ## [4.1.3]
 
+**We migrate rule names to a three-word convention (e.g. prefer_list_first, enforce_member_ordering).**
+
 - Migrated all single/double-word lint rules to three-word convention for clarity and discoverability. Notable migrations include:
   - `arguments_ordering` → `enforce_arguments_ordering`
   - `capitalize_comment` → `capitalize_comment_start`
@@ -2448,11 +2630,15 @@ Added aliases for:
 
 ## [4.1.2]
 
+**We remove a stray changelog entry from the README.**
+
 ### Fixed
 
 - Removed a stray change log entry from the readme
 
 ## [4.1.1]
+
+**We add avoid_cached_isar_stream, assign tiers for 6 rules, and tidy tier set maintenance.**
 
 ### Added
 
@@ -2494,6 +2680,8 @@ This ensures all implemented rules are available through tiered configuration an
 - Materially improve the message quality for all Critical rules
 
 ## [4.1.0]
+
+**We rebalance tiers, leave 81 stylistic rules intentionally untiered, and update rule counts and the tier table.**
 
 ### Tier Assignment Audit
 
@@ -2557,6 +2745,8 @@ Stylistic/opinionated rules remain untiered for team-specific configuration:
 
 ## [4.0.1]
 
+**We activate five testing rules and improve DX messages for 7 critical rules.**
+
 ### Testing Best Practices Rules
 
 Activated 5 previously unregistered testing best practices rules:
@@ -2596,6 +2786,8 @@ Improved problem messages for 7 critical-impact rules to provide specific conseq
 ---
 
 ## [4.0.0]
+
+**We add OWASP Mobile/Web mapping, a baseline feature for brownfield projects, and new OWASP gap rules.**
 
 ### OWASP Compliance Mapping
 
@@ -2721,6 +2913,8 @@ Five new rules to fill gaps in OWASP coverage:
 
 ## [3.4.0]
 
+**We add performance infrastructure: caches, rule grouping, parallel analysis, and memory optimization.**
+
 ### Performance Optimizations
 
 Added comprehensive performance infrastructure to support 1400+ lint rules efficiently.
@@ -2786,6 +2980,8 @@ Added comprehensive performance infrastructure to support 1400+ lint rules effic
 
 ## [3.3.1]
 
+**Quick fix policy: HACK-comment fixes discouraged; ROADMAP quick-fix plan; audit_rules.py enhancements.**
+
 ### Quick Fix Policy Update
 
 Updated contribution guidelines and roadmap with a plan to achieve 90% quick fix coverage.
@@ -2816,6 +3012,8 @@ Safety checklist: no deleting code, no behavior changes, works in edge cases.
 ---
 
 ## [3.3.0]
+
+**Audit script v2.0: OWASP stats, tier distribution, orphan detection, DX audit.**
 
 ### Audit Script v2.0
 
@@ -2851,6 +3049,8 @@ python scripts/audit_rules.py --no-dx      # Skip DX audit
 ---
 
 ## [3.1.2]
+
+**We add tiered file length rules and performance work: PatternIndex, incremental analysis, and related optimizations.**
 
 ### New Rules
 
@@ -2992,6 +3192,8 @@ All rules can be disabled per-file with `// ignore_for_file: rule_name`.
 
 ## [3.1.1]
 
+**We add bool naming rule variants and fix registration and false positives (boolean compare, iOS permissions, context, doc apostrophe).**
+
 ### New Rules
 
 - **prefer_descriptive_bool_names_strict**: Strict version of bool naming rule for insanity tier. Requires traditional prefixes (`is`, `has`, `can`, `should`). Does not allow action verbs.
@@ -3014,6 +3216,8 @@ All rules can be disabled per-file with `// ignore_for_file: rule_name`.
 
 ## [3.1.0]
 
+**We prefix every rule’s problemMessage with [rule_name] and fix context and Intl/isolate handling.**
+
 ### Enhancements
 
 - **Rule name prefix in messages**: All 1536 rules now prefix `problemMessage` with `[rule_name]` for visibility in VS Code's Problems panel.
@@ -3028,6 +3232,8 @@ All rules can be disabled per-file with `// ignore_for_file: rule_name`.
 ---
 
 ## [3.0.2]
+
+**We fix async context and unawaited-future handling and improve PreferExplicitTypes and file naming.**
 
 ### Bug Fixes
 
@@ -3057,6 +3263,8 @@ All rules can be disabled per-file with `// ignore_for_file: rule_name`.
 
 ## [3.0.1]
 
+**We add requiredPatterns, minimumLineCount, and FileContentCache and document future optimizations in ROADMAP.**
+
 ### Performance Optimizations
 
 #### Content Pre-filtering
@@ -3084,6 +3292,8 @@ All rules can be disabled per-file with `// ignore_for_file: rule_name`.
 ---
 
 ## [3.0.0]
+
+**We focus on performance: tier caching, rule filtering, file-type filtering, ProjectContext, and RuleCost.**
 
 ### Performance Optimizations
 
@@ -3156,6 +3366,8 @@ None. All changes are backwards-compatible performance improvements.
 ---
 
 ## [2.7.0]
+
+**We add 92 stylistic/opinionated rules (widget, null/collection, control flow, whitespace, testing, and more).**
 
 ### Added
 
@@ -3281,6 +3493,8 @@ None. All changes are backwards-compatible performance improvements.
 
 ## [2.6.0]
 
+**We add 23 rules (Riverpod, GetX, Dio, GoRouter, SQLite, Freezed, Geolocator, etc.).**
+
 ### Added
 
 #### New Lint Rules (23 rules from ROADMAP_NEXT)
@@ -3359,6 +3573,8 @@ None. All changes are backwards-compatible performance improvements.
 
 ## [2.5.0]
 
+**We add 17 rules, fix context/async and iOS permission handling, and introduce shared async_context_utils.**
+
 ### Changed
 
 - **`avoid_context_across_async`**: Improved detection logic using proper AST type checking instead of string matching. Now correctly reports context usage in else-branch of `if (mounted)` blocks. Added quick fix to insert `if (!mounted) return;` guard.
@@ -3428,17 +3644,23 @@ None. All changes are backwards-compatible performance improvements.
 
 ## [2.4.2]
 
+**We fix minor doc header escaping in ios_rules.**
+
 ### Changed
 
 - Minor doc header escaping in ios_rules.dart
 
 ## [2.4.1]
 
+**We fix minor doc header escaping for Provider.of<T>(context).**
+
 ### Changed
 
 - Minor doc header escaping of `Provider.of<T>(context)`
 
 ## [2.4.0]
+
+**We add 104 Apple platform rules (iOS and macOS): core, App Store, security, integration, device/hardware, and data.**
 
 ### Added
 
@@ -3625,6 +3847,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [2.3.11]
 
+**We improve error handling and other rules and update the changelog and docs.**
+
 ### Changed
 
 - **`audit_rules.py`**: Now counts and displays the number of quick fixes (DartFix classes) in the statistics output
@@ -3690,6 +3914,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`avoid_builder_index_out_of_bounds`**: Warns when itemBuilder accesses list without bounds check. Index may be out of bounds if list changes. (WARNING)
 
 ## [2.3.10]
+
+**We add rules and fixes and update the roadmap and tooling.**
 
 ### Added
 
@@ -3762,6 +3988,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [2.3.9]
 
+**We add rules and improvements.**
+
 ### Added
 
 #### Internationalization Rules (4 rules)
@@ -3792,6 +4020,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [2.3.8]
 
+**We fix bugs and false positives.**
+
 ### Fixed
 
 - **`require_sse_subscription_cancel`**: Fixed false positives for field names like `addressesFuture` or `hasSearched` that contain "sse" substring. Now uses word-boundary regex `(^|_)sse($|_|[A-Z])` on the original (case-preserved) field name to correctly detect camelCase patterns like `sseClient` while avoiding false matches.
@@ -3806,6 +4036,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ---
 
 ## [2.3.7]
+
+**We add rules and enhancements.**
 
 ### Added
 
@@ -3923,6 +4155,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [2.3.6]
 
+**Fixes and refinements.**
+
 ### Fixed
 
 - **CI/CD**: Reverted example project to pure Dart (no Flutter SDK dependency) to fix CI failures caused by `dart pub get` requiring Flutter SDK
@@ -3950,6 +4184,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [2.3.5]
 
+**We fix bugs.**
+
 ### Fixed
 
 - **use_setstate_synchronously**: Fixed false positive for nested mounted checks (e.g., `if (mounted) { setState(...) }` inside callbacks or try blocks). Now properly traverses the AST to find protecting mounted checks in ancestor chain. Also handles `if (!mounted) return;` guard pattern correctly.
@@ -3976,12 +4212,16 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [2.3.4]
 
+**Fixes.**
+
 ### Fixed
 
 - **avoid_dialog_context_after_async**: Fixed `RangeError` crash when analyzing files where `toSource()` produces a different length string than the original source
 - **avoid_set_state_after_async**: Fixed the same `RangeError` in `_hasAwaitBefore` method
 
 ## [2.3.3]
+
+**We make a few changes and updates.**
 
 ### Changed
 
@@ -4031,6 +4271,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [2.3.2]
 
+**We add rules and other additions.**
+
 ### Added
 
 #### Image & Package-Specific Rules (5 rules)
@@ -4064,6 +4306,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [2.3.1]
 
+**We make updates and changes.**
+
 ### Changed
 
 - **`pass_existing_future_to_future_builder`**: Merged `avoid_future_builder_rebuild` into this rule
@@ -4089,6 +4333,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`avoid_future_builder_rebuild`**: Merged into `pass_existing_future_to_future_builder`
 
 ## [2.3.0]
+
+**We add rules and features.**
 
 ### Added
 
@@ -4187,6 +4433,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [2.2.0]
 
+**We add rules and improvements.**
+
 ### Added
 
 #### Pubspec Analyzer Script
@@ -4241,6 +4489,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`prefer_uuid_v4`**: Suggests using UUID v4 over v1 for better randomness
 
 ## [2.1.0]
+
+**We add security and platform rules (SharedPreferences, Android, iOS, etc.) and many new lint rules.**
 
 #### SharedPreferences Security Rules (4 rules)
 
@@ -4412,6 +4662,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_completer_error_handling`**: Warns when Completer in try-catch lacks completeError
 
 ## [2.0.0]
+
+**This is a major release with structural and compatibility changes.**
 
 ### Changed
 
@@ -4614,6 +4866,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.8.2]
 
+**We add many rules (disposal, accessibility, UX, Bluetooth, QR, PDF, GraphQL) and migration and state-management docs.**
+
 ### Added
 
 - **`require_text_editing_controller_dispose`**: Warns when TextEditingController is not disposed in StatefulWidget - very common source of memory leaks in forms
@@ -4677,6 +4931,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.8.1]
 
+**We fix avoid_double_for_money false positives and refactor rule files (money, media, security, test, api_network).**
+
 ### Fixed
 
 - **`avoid_double_for_money`**: Fixed remaining false positives:
@@ -4703,6 +4959,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.8.0]
 
+**We tighten avoid_double_for_money (breaking) and fix avoid_sensitive_data_in_logs and avoid_hardcoded_encryption_keys.**
+
 ### Changed
 
 - **`avoid_double_for_money`**: **BREAKING** - Rule is now much stricter to eliminate false positives. Only flags unambiguous money terms: `price`, `money`, `currency`, `salary`, `wage`, and currency codes (`dollar`, `euro`, `yen`, `usd`, `eur`, `gbp`, `jpy`, `cad`, `aud`). Generic terms like `total`, `amount`, `balance`, `cost`, `fee`, `tax`, `discount`, `payment`, `revenue`, `profit`, `budget`, `expense`, `income` are **no longer flagged** as they have too many non-monetary uses.
@@ -4714,6 +4972,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.7.12]
 
+**We fix a require_unique_iv_per_encryption false positive and add a quick fix for a secure random IV.**
+
 ### Fixed
 
 - **`require_unique_iv_per_encryption`**: Improved IV variable name detection to avoid false positives like "activity", "private", "derivative" - now uses proper word boundary detection for camelCase and snake_case patterns
@@ -4724,12 +4984,16 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.7.11]
 
+**We fix avoid_shrinkwrap_in_scrollview for NeverScrollableScrollPhysics and update fixtures.**
+
 ### Fixed
 
 - **`avoid_shrinkwrap_in_scrollview`**: Rule now properly skips widgets with `NeverScrollableScrollPhysics` - the recommended fix should no longer trigger the lint
 - **Test fixtures**: Updated fixture files with correct `expect_lint` annotations and disabled conflicting rules in example analysis_options.yaml
 
 ## [1.7.10]
+
+**We fix rule detection for implicit constructors and AST visitors for gradient, shrinkWrap, scrollables, and bottom nav.**
 
 ### Fixed
 
@@ -4745,6 +5009,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **Rule implementation**: `AvoidExcessiveBottomNavItemsRule` now uses `addNamedExpression` to detect excessive items
 
 ## [1.7.9]
+
+**We add 29 rules (disposal, build anti-patterns, scroll/list, crypto, JSON/DateTime) and quick fixes.**
 
 ### Added
 
@@ -4810,6 +5076,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.7.8]
 
+**We add 25 rules (network, state management, testing, security, database).**
+
 ### Added
 
 - **25 New Rules** covering network performance, state management, testing, security, and database patterns:
@@ -4865,11 +5133,15 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.7.7]
 
+**We add a README Limitations section (Dart-only analysis, dependency_overrides).**
+
 ### Changed
 
 - **Docs**: README now has a Limitations section clarifying Dart-only analysis and dependency_overrides behavior.
 
 ## [1.7.6]
+
+**We add a quick fix for avoid_isar_enum_field and restore NullabilitySuffix compatibility.**
 
 ### Added
 
@@ -4884,6 +5156,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - Restored NullabilitySuffix-based checks for analyzer compatibility.
 
 ## [1.7.5]
+
+**We add LintImpact.opinionated, the prefer_future_void_function_over_async_callback rule, and analysis_options_template.**
 
 ### Added
 
@@ -4902,9 +5176,13 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.7.4]
 
+**We update the banner image to show Saropa Lints.**
+
 - Updated the banner image to show the project name Saropa Lints.
 
 ## [1.7.3]
+
+**We add guides for using_with_flutter_lints and migration_from_solid_lints and update naming and tier docs.**
 
 ### Added
 
@@ -4918,6 +5196,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.7.2]
 
+**We add impact classification, the impact_report CLI, 47 rules (Riverpod, GetX, Bloc, etc.), and 11 quick fixes.**
+
 ### Added
 
 - **Impact Classification System**: Categorized rules by critical, high, medium, and low.
@@ -4927,11 +5207,15 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.7.1]
 
+**We resolve 25 curly_braces_in_flow_control_structures violations.**
+
 ### Fixed
 
 - Resolved 25 violations for curly_braces_in_flow_control_structures.
 
 ## [1.7.0]
+
+**We add 50 rules (Riverpod, build performance, testing, security, forms) and support sealed events in Bloc.**
 
 ### Added
 
@@ -4941,6 +5225,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ---
 
 ## [1.6.0]
+
+**We add 18 rules: animation, widget/UI, forms, storage, network, resources, state, navigation, and testing.**
 
 ### Added
 
@@ -4990,6 +5276,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.5.3]
 
+**We fix pub.dev scoring (.pubignore, package size), add analyzer 10 support and GitHub Actions publish, and README badges.**
+
 ### Fixed
 
 - **pub.dev scoring** - Fixed issues that caused loss of 70 pub points:
@@ -5014,6 +5302,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.5.2]
 
+**We add dartdoc_options and doc/README for API docs.**
+
 ### Changed
 
 - **API documentation** - Added `dartdoc_options.yaml` to exclude internal `custom_lint_client` library from generated docs, so only the main `saropa_lints` library appears in the sidebar.
@@ -5021,6 +5311,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **API documentation landing page** - Added `doc/README.md` with API-focused content instead of repeating the project README on the documentation homepage.
 
 ## [1.5.1]
+
+**We fix fixture skipping, avoid_unsafe_collection_methods, prefer_where_or_null, and test rules, and add quick fixes.**
 
 ### Fixed
 
@@ -5130,6 +5422,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.4.4]
 
+**We expand the ROADMAP with 14 new categories and 130+ planned rules.**
+
 ### Changed
 
 - **ROADMAP.md** - Major documentation expansion:
@@ -5159,6 +5453,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **cspell.json** - Added technical terms: assetlinks, autovalidate, backgrounded, backgrounding, EXIF, geofencing, unfocus, unindexed, vsync, workmanager
 
 ## [1.4.3]
+
+**We add new rules and update documentation.**
 
 ### Added
 
@@ -5228,6 +5524,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   `onBackupData`, etc.
 
 ## [1.4.2]
+
+**We add rules and improvements.**
 
 ### Added
 
@@ -5306,6 +5604,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.4.1]
 
+**We fix issues and update documentation.**
+
 ### Changed
 
 - `prefer_boolean_prefixes`, `prefer_boolean_prefixes_for_locals`, `prefer_boolean_prefixes_for_params` - **Enhanced boolean naming validation**:
@@ -5316,6 +5616,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - Examples now passing: `_deviceEnabled`, `sortAlphabetically`, `filterCountryHasContacts`, `applyScrollView`, `defaultHideIcons`
 
 ## [1.4.0]
+
+**We add rules and features.**
 
 ### Added
 
@@ -5377,6 +5679,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.3.1]
 
+**We fix bugs and refine a few rules.**
+
 ### Fixed
 
 - **License detection on pub.dev** - LICENSE file now uses LF line endings instead of CRLF, fixing the "(pending)" license display in the pub.dev sidebar
@@ -5396,6 +5700,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **.gitattributes** - Enforces LF line endings for LICENSE file to prevent future license detection issues
 
 ## [1.3.0]
+
+**We add rules and expand features.**
 
 ### Added
 
@@ -5525,6 +5831,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.2.0]
 
+**We overhaul the README, fix pub.dev links, correct tier counts, and update the package description.**
+
 ### Changed
 
 - **README overhaul** - Expanded "Why saropa_lints?" section:
@@ -5545,6 +5853,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **Package description** - Updated pub.dev description from "1,000+" to "500+" rules
 
 ## [1.1.19]
+
+**We add collection-if guards and ValueNotifier disposal patterns, fix require_file_close_in_finally, and improve avoid_null_assertion and avoid_undisposed_instances.**
 
 ### Changed
 
@@ -5572,6 +5882,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `avoid_undisposed_instances` - Enhanced field extraction to handle parenthesized expressions and cascade expressions
 
 ## [1.1.18]
+
+**We add quick fixes for no_empty_block and avoid_null_assertion and recognize guarded access and *Safe() disposal.**
 
 ### Added
 
@@ -5602,6 +5914,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.1.17]
 
+**We add require_timer_cancellation and nullify_after_dispose and fix require_dispose and require_animation_disposal.**
+
 ### Added
 
 - `require_timer_cancellation` - New dedicated rule for Timer and StreamSubscription fields that require `cancel()`. Separated from `require_dispose` for clearer semantics. Crashes can occur if uncanceled timers call setState after widget disposal.
@@ -5619,11 +5933,15 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.1.16]
 
+**We rename docs/ to doc/guides/ to follow Dart package layout.**
+
 ### Changed
 
 - Renamed `docs/` to `doc/guides/` to follow Dart/Pub package layout conventions
 
 ## [1.1.15]
+
+**We fix require_dispose disposeSafe handling, add safe patterns for avoid_logging_sensitive_data, and clarify README YAML and IDE usage.**
 
 ### Fixed
 
@@ -5637,6 +5955,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.1.14]
 
+**We improve avoid_null_assertion with short-circuit and extension-method detection.**
+
 ### Fixed
 
 - `avoid_null_assertion` - Added short-circuit evaluation detection to reduce false positives:
@@ -5646,6 +5966,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - Added `isListNullOrEmpty`, `isNullOrEmpty`, `isNullOrBlank` to recognized null checks
 
 ## [1.1.13]
+
+**We add safe patterns for avoid_null_assertion (ternaries, if-blocks, extensions) and recognize disposeSafe in dispose_controllers.**
 
 ### Changed
 
@@ -5657,6 +5979,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.1.12]
 
+**We tighten avoid_hardcoded_credentials pattern matching (length, character sets, anchoring).**
+
 ### Fixed
 
 - `avoid_hardcoded_credentials` - Improved pattern matching to reduce false positives
@@ -5665,6 +5989,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - End-of-string anchoring for Bearer/Basic tokens
 
 ## [1.1.11]
+
+**We move tier config into Dart (tiers.dart) and add getRulesForTier(); YAML tier includes are removed (breaking).**
 
 ### Changed
 
@@ -5685,11 +6011,15 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [1.1.10]
 
+**We add license: MIT to pubspec.yaml for pub.dev.**
+
 ### Fixed
 
 - Added `license: MIT` field to pubspec.yaml for proper pub.dev display
 
 ## [1.1.9]
+
+**We add quick fixes for 37+ rules, add ROADMAP.md and ENTERPRISE.md, and a "Why saropa_lints?" section and contact info in the README.**
 
 ### Added
 
@@ -5714,6 +6044,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `doc/SAROPA_LINT_RULES_GUIDE.md` (replaced by `ENTERPRISE.md`)
 
 ## [0.1.8]
+
+**We add test infrastructure, fixtures, CI, migration guides, and badges.**
 
 ### Added
 
@@ -5743,6 +6075,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [0.1.7]
 
+**We fix a critical bug: getLintRules() now reads tier config from custom_lint.yaml.**
+
 ### Fixed
 
 - **Critical**: `getLintRules()` now reads tier configuration from `custom_lint.yaml`
@@ -5751,6 +6085,8 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - Supports `enable_all_lint_rules: true` to enable all 500+ rules
 
 ## [0.1.6]
+
+**We update for analyzer 8.x API (DiagnosticSeverity, NamedType.name, etc.).**
 
 ### Fixed
 
@@ -5762,12 +6098,16 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [0.1.5]
 
+**We fix MethodElement.enclosingElement3 and add analyzer 9.x support.**
+
 ### Fixed
 
 - Fixed `MethodElement.enclosingElement3` error - `MethodElement` requires cast to `Element` for `enclosingElement3` access
 - Expanded analyzer constraint to support version 9.x (`>=6.0.0 <10.0.0`)
 
 ## [0.1.4]
+
+**We migrate to the analyzer 7.x API (ErrorSeverity, ErrorReporter, name2, enclosingElement3).**
 
 ### Fixed
 
@@ -5785,11 +6125,15 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [0.1.3]
 
+**We remove the custom documentation URL so pub.dev uses its API docs.**
+
 ### Fixed
 
 - Removed custom documentation URL so pub.dev uses its auto-generated API docs
 
 ## [0.1.2]
+
+**We add formatting rules (digit separators, comment format, member ordering, sorted params) and a publish script.**
 
 ### Added
 
@@ -5809,11 +6153,15 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ## [0.1.1]
 
+**We improve documentation formatting and examples.**
+
 ### Fixed
 
 - Improved documentation formatting and examples
 
 ## [0.1.0]
+
+**This is the initial release: 475 lint rules and 5 tier configs (essential through insanity).**
 
 ### Added
 
