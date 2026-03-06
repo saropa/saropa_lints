@@ -1264,6 +1264,11 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
   RequireAddAutomaticKeepAlivesOffRule() : super(code: _code);
 
   @override
+  List<String> get configAliases => const <String>[
+    'require_addAutomaticKeepAlives_off',
+  ];
+
+  @override
   LintImpact get impact => LintImpact.medium;
 
   @override
