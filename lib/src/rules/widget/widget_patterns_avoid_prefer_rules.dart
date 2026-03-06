@@ -629,8 +629,6 @@ class PreferWidgetPrivateMembersRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       // Check if it's a Widget class
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -638,7 +636,7 @@ class PreferWidgetPrivateMembersRule extends SaropaLintRule {
       final String superclass = extendsClause.superclass.name.lexeme;
       if (!_widgetBaseClasses.contains(superclass)) return;
 
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         // Check for non-final public fields
         if (member is FieldDeclaration) {
           if (member.isStatic) continue;

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/rules/packages/auto_route_rules.dart';
 import 'package:test/test.dart';
 
@@ -37,7 +36,7 @@ void main() {
   group('Auto Route Rules - Rule Instantiation', () {
     test('AvoidAutoRouteContextNavigationRule instantiates correctly', () {
       final rule = AvoidAutoRouteContextNavigationRule();
-      expect(rule.code.lowerCaseName, 'avoid_auto_route_context_navigation');
+      expect(rule.code.name.toLowerCase(), 'avoid_auto_route_context_navigation');
       expect(
         rule.code.problemMessage,
         contains('[avoid_auto_route_context_navigation]'),
@@ -48,7 +47,7 @@ void main() {
 
     test('AvoidAutoRouteKeepHistoryMisuseRule instantiates correctly', () {
       final rule = AvoidAutoRouteKeepHistoryMisuseRule();
-      expect(rule.code.lowerCaseName, 'avoid_auto_route_keep_history_misuse');
+      expect(rule.code.name.toLowerCase(), 'avoid_auto_route_keep_history_misuse');
       expect(
         rule.code.problemMessage,
         contains('[avoid_auto_route_keep_history_misuse]'),
@@ -59,7 +58,7 @@ void main() {
 
     test('RequireAutoRouteGuardResumeRule instantiates correctly', () {
       final rule = RequireAutoRouteGuardResumeRule();
-      expect(rule.code.lowerCaseName, 'require_auto_route_guard_resume');
+      expect(rule.code.name.toLowerCase(), 'require_auto_route_guard_resume');
       expect(
         rule.code.problemMessage,
         contains('[require_auto_route_guard_resume]'),
@@ -70,7 +69,7 @@ void main() {
 
     test('RequireAutoRouteFullHierarchyRule instantiates correctly', () {
       final rule = RequireAutoRouteFullHierarchyRule();
-      expect(rule.code.lowerCaseName, 'require_auto_route_full_hierarchy');
+      expect(rule.code.name.toLowerCase(), 'require_auto_route_full_hierarchy');
       expect(
         rule.code.problemMessage,
         contains('[require_auto_route_full_hierarchy]'),
@@ -81,7 +80,7 @@ void main() {
 
     test('PreferAutoRoutePathParamsSimpleRule instantiates correctly', () {
       final rule = PreferAutoRoutePathParamsSimpleRule();
-      expect(rule.code.lowerCaseName, 'prefer_auto_route_path_params_simple');
+      expect(rule.code.name.toLowerCase(), 'prefer_auto_route_path_params_simple');
       expect(
         rule.code.problemMessage,
         contains('[prefer_auto_route_path_params_simple]'),
@@ -92,7 +91,7 @@ void main() {
 
     test('PreferAutoRouteTypedArgsRule instantiates correctly', () {
       final rule = PreferAutoRouteTypedArgsRule();
-      expect(rule.code.lowerCaseName, 'prefer_auto_route_typed_args');
+      expect(rule.code.name.toLowerCase(), 'prefer_auto_route_typed_args');
       expect(
         rule.code.problemMessage,
         contains('[prefer_auto_route_typed_args]'),

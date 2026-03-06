@@ -522,8 +522,6 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       // Check if extends State
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -532,7 +530,7 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
       if (superclassName != 'State') return;
 
       // Check constructors for bodies
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is ConstructorDeclaration) {
           final FunctionBody body = member.body;
           if (body is BlockFunctionBody && body.block.statements.isNotEmpty) {
@@ -589,8 +587,6 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       // Check if extends StatelessWidget
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
@@ -599,7 +595,7 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
       if (superclassName != 'StatelessWidget') return;
 
       // Check for initialized fields
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             if (variable.initializer != null) {
@@ -1900,9 +1896,7 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
     ClassDeclaration classNode,
     String fieldName,
   ) {
-    final body = classNode.body;
-    if (body is! BlockClassBody) return false;
-    for (final ClassMember member in body.members) {
+    for (final ClassMember member in classNode.members) {
       if (member is FieldDeclaration) {
         for (final VariableDeclaration variable in member.fields.variables) {
           if (variable.name.lexeme == fieldName) {
@@ -2048,8 +2042,8 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
-      // Only check async methods with block body
       final body = node.body;
+      // Only check async methods with block body
       if (body is! BlockFunctionBody) return;
       if (!body.isAsynchronous) return;
 
@@ -2648,7 +2642,7 @@ class PreferWidgetStateMixinRule extends SaropaLintRule {
       }
 
       if (stateFields >= 2) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.name, code);
       }
     });
   }

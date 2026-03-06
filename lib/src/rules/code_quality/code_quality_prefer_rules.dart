@@ -1146,9 +1146,7 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
       if (cls.abstractKeyword == null || cls.finalKeyword == null) {
         return false;
       }
-      final body = cls.body;
-      if (body is! BlockClassBody) return false;
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in cls.members) {
         if (member is FieldDeclaration && !member.isStatic) return false;
         if (member is MethodDeclaration && !member.isStatic) return false;
       }

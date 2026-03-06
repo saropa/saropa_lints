@@ -228,9 +228,7 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
-      final String className = node.namePart.typeName.lexeme.toLowerCase();
+      final String className = node.name.lexeme.toLowerCase();
 
       // Skip if class name suggests it already handles currency
       if (className.contains('money') || className.contains('currency')) {
@@ -247,7 +245,7 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
       bool hasCurrencyField = false;
       bool hasDoubleOrDecimal = false;
 
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is! FieldDeclaration) continue;
 
         for (final VariableDeclaration variable in member.fields.variables) {

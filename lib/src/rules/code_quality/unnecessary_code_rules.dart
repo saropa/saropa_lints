@@ -434,7 +434,7 @@ class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addEnumDeclaration((EnumDeclaration node) {
-      final String enumName = node.namePart.typeName.lexeme;
+      final String enumName = node.name.lexeme;
 
       // Visit all expressions inside the enum
       node.accept(_EnumPrefixVisitor(enumName, reporter, code));
@@ -573,11 +573,9 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       // Collect all final private fields
       final Set<String> finalPrivateFields = <String>{};
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final VariableDeclarationList fields = member.fields;
           if (fields.isFinal) {
@@ -594,7 +592,7 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
       if (finalPrivateFields.isEmpty) return;
 
       // Check getters
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.isGetter) {
           final FunctionBody body = member.body;
 

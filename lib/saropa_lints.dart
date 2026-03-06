@@ -35,6 +35,7 @@ library;
 import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, Platform, stderr;
 
+import 'package:analyzer/error/error.dart' show DiagnosticCode;
 import 'package:saropa_lints/src/baseline/baseline_config.dart';
 import 'package:saropa_lints/src/baseline/baseline_manager.dart';
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
@@ -92,6 +93,11 @@ export 'package:saropa_lints/src/project_context.dart'
         RulePriorityQueue,
         SmartContentFilter,
         ViolationBatch;
+
+/// Analyzer 9: DiagnosticCode has no lowerCaseName; this extension provides it.
+extension DiagnosticCodeLowerCase on DiagnosticCode {
+  String get lowerCaseName => name.toLowerCase();
+}
 
 /// All available Saropa lint rules.
 ///

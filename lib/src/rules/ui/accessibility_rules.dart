@@ -1665,7 +1665,7 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
       }
 
       // Check if widget name suggests visual/custom content
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.name.lexeme;
       const List<String> visualPatterns = <String>[
         'Rating',
         'Chart',
@@ -1693,7 +1693,7 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
       // Check if build method has Semantics
       final String classSource = node.toSource();
       if (!classSource.contains('Semantics')) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.name, code);
       }
     });
   }

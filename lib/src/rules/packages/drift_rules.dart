@@ -209,12 +209,9 @@ class RequireDriftDatabaseCloseRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (!fileImportsPackage(node, PackageImports.drift)) return;
-      final body = node.body;
-      if (body is! BlockClassBody) return;
-
       // Find database fields (type name ending with Database or containing db)
       final dbFields = <String>[];
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (member is FieldDeclaration) {
           final typeAnnotation = member.fields.type;
           if (typeAnnotation is NamedType) {
@@ -233,7 +230,7 @@ class RequireDriftDatabaseCloseRule extends SaropaLintRule {
 
       // Find dispose method
       MethodDeclaration? disposeMethod;
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeMethod = member;
           break;
@@ -1456,9 +1453,6 @@ class RequireDriftSchemaVersionBumpRule extends SaropaLintRule {
       if (superclass == null) return;
       if (!superclass.name.lexeme.startsWith(r'_$')) return;
       if (!fileImportsPackage(node, PackageImports.drift)) return;
-      final body = node.body;
-      if (body is! BlockClassBody) return;
-
       // Check @DriftDatabase annotation for table count
       int tableCount = 0;
       final tablesListRegex = RegExp(r'tables:\s*\[([^\]]*)\]');
@@ -1479,7 +1473,7 @@ class RequireDriftSchemaVersionBumpRule extends SaropaLintRule {
 
       // Find schemaVersion getter
       final schemaVersionOneRegex = RegExp(r'=>\s*1\s*;');
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (member is MethodDeclaration &&
             member.name.lexeme == 'schemaVersion' &&
             member.isGetter) {
@@ -2719,13 +2713,10 @@ class RequireDriftOnUpgradeHandlerRule extends SaropaLintRule {
       if (superclass == null) return;
       if (!superclass.name.lexeme.startsWith(r'_$')) return;
       if (!fileImportsPackage(node, PackageImports.drift)) return;
-      final body = node.body;
-      if (body is! BlockClassBody) return;
-
       // Find schemaVersion getter
       int schemaVersion = 0;
       final schemaVersionMatchRegex = RegExp(r'=>\s*(\d+)\s*;');
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (member is MethodDeclaration &&
             member.name.lexeme == 'schemaVersion' &&
             member.isGetter) {
@@ -2743,7 +2734,7 @@ class RequireDriftOnUpgradeHandlerRule extends SaropaLintRule {
       // Check if any member source mentions onUpgrade (cheaper than full
       // class toSource() — only stringifies individual members)
       final onUpgradeRegex = RegExp(r'\bonUpgrade\b');
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (onUpgradeRegex.hasMatch(member.toSource())) return;
       }
 

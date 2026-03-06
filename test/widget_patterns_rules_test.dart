@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_avoid_prefer_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_require_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_ux_rules.dart';
@@ -18,7 +17,7 @@ void main() {
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
         final rule = create();
-        expect(rule.code.lowerCaseName, codeName);
+        expect(rule.code.name.toLowerCase(), codeName);
         expect(rule.code.problemMessage, contains('[$codeName]'));
         expect(rule.code.problemMessage.length, greaterThan(50));
         expect(rule.code.correctionMessage, isNotNull);
@@ -1439,7 +1438,7 @@ void main() {
     group('avoid_stateful_widget_in_list', () {
       test('StatefulWidget in ListView.builder SHOULD trigger', () {
         expect(
-          AvoidStatefulWidgetInListRule().code.lowerCaseName,
+          AvoidStatefulWidgetInListRule().code.name.toLowerCase(),
           'avoid_stateful_widget_in_list',
         );
       });
@@ -1448,7 +1447,7 @@ void main() {
     group('avoid_fitted_box_for_text', () {
       test('FittedBox around Text SHOULD trigger', () {
         expect(
-          AvoidFittedBoxForTextRule().code.lowerCaseName,
+          AvoidFittedBoxForTextRule().code.name.toLowerCase(),
           'avoid_fitted_box_for_text',
         );
       });

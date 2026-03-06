@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/rules/platforms/web_rules.dart';
 import 'package:test/test.dart';
 
@@ -12,7 +11,7 @@ void main() {
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
         final rule = create();
-        expect(rule.code.lowerCaseName, codeName);
+        expect(rule.code.name.toLowerCase(), codeName);
         expect(rule.code.problemMessage, contains('[$codeName]'));
         expect(rule.code.problemMessage.length, greaterThan(50));
         expect(rule.code.correctionMessage, isNotNull);
@@ -144,7 +143,7 @@ void main() {
         () {
           // False-positive guard: rule uses exact Set match; similar URIs must not match.
           final rule = PreferJsInteropOverDartJsRule();
-          expect(rule.code.lowerCaseName, 'prefer_js_interop_over_dart_js');
+          expect(rule.code.name.toLowerCase(), 'prefer_js_interop_over_dart_js');
           // If the rule used .contains() on string, 'dart:html'.contains('dart:js') could match.
           // Our implementation uses Set.contains(uri) so only exact URIs trigger.
           expect(rule.code.correctionMessage, contains('dart:js_interop'));

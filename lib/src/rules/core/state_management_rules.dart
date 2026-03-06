@@ -443,9 +443,7 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
     String fieldName,
     SaropaDiagnosticReporter reporter,
   ) {
-    final body = classNode.body;
-    if (body is! BlockClassBody) return;
-    for (final ClassMember member in body.members) {
+    for (final ClassMember member in classNode.members) {
       if (member is FieldDeclaration) {
         for (final VariableDeclaration variable in member.fields.variables) {
           if (variable.name.lexeme == fieldName) {

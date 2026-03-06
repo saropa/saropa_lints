@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/rules/packages/rxdart_rules.dart';
 import 'package:test/test.dart';
 
@@ -24,7 +23,7 @@ void main() {
   group('RxDart Rules - Rule Instantiation', () {
     test('AvoidBehaviorSubjectLastValueRule instantiates correctly', () {
       final rule = AvoidBehaviorSubjectLastValueRule();
-      expect(rule.code.lowerCaseName, 'avoid_behavior_subject_last_value');
+      expect(rule.code.name.toLowerCase(), 'avoid_behavior_subject_last_value');
       expect(
         rule.code.problemMessage,
         contains('[avoid_behavior_subject_last_value]'),

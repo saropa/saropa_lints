@@ -1410,11 +1410,9 @@ class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration classNode) {
-      final body = classNode.body;
-      if (body is! BlockClassBody) return;
       // Collect static field names
       final Set<String> staticFields = <String>{};
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in classNode.members) {
         if (member is FieldDeclaration && member.isStatic) {
           for (final VariableDeclaration field in member.fields.variables) {
             staticFields.add(field.name.lexeme);
@@ -1425,7 +1423,7 @@ class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
       if (staticFields.isEmpty) return;
 
       // Check instance methods
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in classNode.members) {
         if (member is MethodDeclaration && !member.isStatic) {
           _checkMethodBody(member.body, staticFields, reporter);
         }
@@ -2082,13 +2080,10 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword != null) return;
-      final body = node.body;
-      if (body is! BlockClassBody) return;
-
       bool hasFields = false;
       bool hasToString = false;
 
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is FieldDeclaration && !member.isStatic) {
           hasFields = true;
         }
@@ -2098,7 +2093,7 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
       }
 
       if (hasFields && !hasToString) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.name, code);
       }
     });
   }
@@ -2711,7 +2706,7 @@ class AvoidShadowedExtensionMethodsRule extends SaropaLintRule {
       }
 
       // Check extension members
-      for (final ClassMember member in node.body.members) {
+      for (final ClassMember member in node.members) {
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme;
           if (classMethods.contains(methodName)) {

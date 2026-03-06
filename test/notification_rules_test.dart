@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/rules/ui/notification_rules.dart';
 import 'package:test/test.dart';
 
@@ -11,7 +10,7 @@ void main() {
   group('Notification Rules - Rule Instantiation', () {
     test('RequireNotificationChannelAndroidRule', () {
       final rule = RequireNotificationChannelAndroidRule();
-      expect(rule.code.lowerCaseName, 'require_notification_channel_android');
+      expect(rule.code.name.toLowerCase(), 'require_notification_channel_android');
       expect(
         rule.code.problemMessage,
         contains('[require_notification_channel_android]'),
@@ -21,7 +20,7 @@ void main() {
     });
     test('AvoidNotificationPayloadSensitiveRule', () {
       final rule = AvoidNotificationPayloadSensitiveRule();
-      expect(rule.code.lowerCaseName, 'avoid_notification_payload_sensitive');
+      expect(rule.code.name.toLowerCase(), 'avoid_notification_payload_sensitive');
       expect(
         rule.code.problemMessage,
         contains('[avoid_notification_payload_sensitive]'),
@@ -32,7 +31,7 @@ void main() {
     test('RequireNotificationInitializePerPlatformRule', () {
       final rule = RequireNotificationInitializePerPlatformRule();
       expect(
-        rule.code.lowerCaseName,
+        rule.code.name.toLowerCase(),
         'require_notification_initialize_per_platform',
       );
       expect(
@@ -45,7 +44,7 @@ void main() {
     test('RequireNotificationTimezoneAwarenessRule', () {
       final rule = RequireNotificationTimezoneAwarenessRule();
       expect(
-        rule.code.lowerCaseName,
+        rule.code.name.toLowerCase(),
         'require_notification_timezone_awareness',
       );
       expect(
@@ -57,7 +56,7 @@ void main() {
     });
     test('AvoidNotificationSameIdRule', () {
       final rule = AvoidNotificationSameIdRule();
-      expect(rule.code.lowerCaseName, 'avoid_notification_same_id');
+      expect(rule.code.name.toLowerCase(), 'avoid_notification_same_id');
       expect(
         rule.code.problemMessage,
         contains('[avoid_notification_same_id]'),
@@ -67,7 +66,7 @@ void main() {
     });
     test('PreferNotificationGroupingRule', () {
       final rule = PreferNotificationGroupingRule();
-      expect(rule.code.lowerCaseName, 'prefer_notification_grouping');
+      expect(rule.code.name.toLowerCase(), 'prefer_notification_grouping');
       expect(
         rule.code.problemMessage,
         contains('[prefer_notification_grouping]'),
@@ -77,7 +76,7 @@ void main() {
     });
     test('AvoidNotificationSilentFailureRule', () {
       final rule = AvoidNotificationSilentFailureRule();
-      expect(rule.code.lowerCaseName, 'avoid_notification_silent_failure');
+      expect(rule.code.name.toLowerCase(), 'avoid_notification_silent_failure');
       expect(
         rule.code.problemMessage,
         contains('[avoid_notification_silent_failure]'),
@@ -88,7 +87,7 @@ void main() {
     test('PreferLocalNotificationForImmediateRule', () {
       final rule = PreferLocalNotificationForImmediateRule();
       expect(
-        rule.code.lowerCaseName,
+        rule.code.name.toLowerCase(),
         'prefer_local_notification_for_immediate',
       );
       expect(

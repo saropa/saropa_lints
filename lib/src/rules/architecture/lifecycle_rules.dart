@@ -399,12 +399,9 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
       final String superclass = extendsClause.superclass.toSource();
       if (!superclass.startsWith('State<')) return;
 
-      final body = node.body;
-      if (body is! BlockClassBody) return;
-
       // Collect late fields
       final Set<String> lateFields = <String>{};
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is FieldDeclaration && member.fields.isLate) {
           for (final VariableDeclaration variable in member.fields.variables) {
             // Only track uninitialized late fields
@@ -418,7 +415,7 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
       if (lateFields.isEmpty) return;
 
       // Find build method and check for late field assignments
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
           _checkBuildMethodForLateAssignments(member, lateFields, reporter);
         }
@@ -532,7 +529,7 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
       if (!_extendsState(node)) return;
       if (_hasLifecycleHandling(node)) return;
       if (_hasBackgroundWork(node)) {
-        reporter.atToken(node.namePart.typeName, code);
+        reporter.atToken(node.name, code);
       }
     });
   }
@@ -558,9 +555,7 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
       }
     }
 
-    final body = node.body;
-    if (body is! BlockClassBody) return false;
-    for (final ClassMember member in body.members) {
+    for (final ClassMember member in node.members) {
       if (member is MethodDeclaration &&
           member.name.lexeme == 'didChangeAppLifecycleState') {
         return true;
@@ -581,9 +576,7 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
   static final RegExp _listenCallPattern = RegExp(r'\.listen\s*\(');
 
   static bool _hasBackgroundWork(ClassDeclaration node) {
-    final body = node.body;
-    if (body is! BlockClassBody) return false;
-    for (final ClassMember member in body.members) {
+    for (final ClassMember member in node.members) {
       if (member is MethodDeclaration) {
         final String bodySource = member.body.toSource();
         if (_timerPeriodicPattern.hasMatch(bodySource)) return true;

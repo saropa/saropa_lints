@@ -529,12 +529,10 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
-      final String className = node.namePart.typeName.lexeme;
+      final String className = node.name.lexeme;
 
       // Find constructor parameters
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         if (member is ConstructorDeclaration && member.name == null) {
           for (final FormalParameter param in member.parameters.parameters) {
             final String? typeName = _getParameterTypeName(param);
@@ -1001,10 +999,7 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Skip abstract classes and mixins
       if (node.abstractKeyword != null) return;
-      final body = node.body;
-      if (body is! BlockClassBody) return;
-
-      for (final ClassMember member in body.members) {
+      for (final ClassMember member in node.members) {
         // Check for late fields with dependency types
         if (member is FieldDeclaration) {
           _checkLateDependencyField(member, reporter);

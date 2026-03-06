@@ -1852,7 +1852,7 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
     }
 
     context.addClassDeclaration((ClassDeclaration node) {
-      checkName(node.namePart.typeName);
+      checkName(node.name);
     });
 
     context.addMixinDeclaration((MixinDeclaration node) {
@@ -1860,7 +1860,7 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
     });
 
     context.addEnumDeclaration((EnumDeclaration node) {
-      checkName(node.namePart.typeName);
+      checkName(node.name);
     });
 
     context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {

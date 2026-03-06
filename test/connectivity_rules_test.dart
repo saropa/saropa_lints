@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/rules/network/connectivity_rules.dart';
 import 'package:test/test.dart';
 
@@ -11,7 +10,7 @@ void main() {
   group('Connectivity Rules - Rule Instantiation', () {
     test('RequireConnectivityErrorHandlingRule', () {
       final rule = RequireConnectivityErrorHandlingRule();
-      expect(rule.code.lowerCaseName, 'require_connectivity_error_handling');
+      expect(rule.code.name.toLowerCase(), 'require_connectivity_error_handling');
       expect(
         rule.code.problemMessage,
         contains('[require_connectivity_error_handling]'),
@@ -21,7 +20,7 @@ void main() {
     });
     test('AvoidConnectivityEqualsInternetRule', () {
       final rule = AvoidConnectivityEqualsInternetRule();
-      expect(rule.code.lowerCaseName, 'avoid_connectivity_equals_internet');
+      expect(rule.code.name.toLowerCase(), 'avoid_connectivity_equals_internet');
       expect(
         rule.code.problemMessage,
         contains('[avoid_connectivity_equals_internet]'),
@@ -31,7 +30,7 @@ void main() {
     });
     test('RequireConnectivityTimeoutRule', () {
       final rule = RequireConnectivityTimeoutRule();
-      expect(rule.code.lowerCaseName, 'require_connectivity_timeout');
+      expect(rule.code.name.toLowerCase(), 'require_connectivity_timeout');
       expect(
         rule.code.problemMessage,
         contains('[require_connectivity_timeout]'),

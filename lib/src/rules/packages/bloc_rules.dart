@@ -3028,8 +3028,8 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
-      // Check if async method
       final body = node.body;
+      // Check if async method
       if (body is! BlockFunctionBody) return;
       if (body.keyword?.lexeme != 'async') return;
 

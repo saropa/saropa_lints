@@ -755,12 +755,10 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
   ) {
     // Check class fields that are databases
     context.addClassDeclaration((ClassDeclaration node) {
-      final body = node.body;
-      if (body is! BlockClassBody) return;
       // Find fields that look like databases
       final List<VariableDeclaration> dbFields = <VariableDeclaration>[];
 
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (member is FieldDeclaration) {
           for (final variable in member.fields.variables) {
             final String typeStr =
@@ -781,7 +779,7 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
       // Check for dispose method with close() calls
       bool hasClose = false;
 
-      for (final member in body.members) {
+      for (final member in node.members) {
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme;
           if (methodName == 'dispose' || methodName == 'close') {
