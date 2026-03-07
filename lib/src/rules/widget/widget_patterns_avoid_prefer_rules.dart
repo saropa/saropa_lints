@@ -1769,8 +1769,8 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
 
 /// Prefer letting Scaffold consume safe area instead of wrapping body in SafeArea.
 ///
-/// **prefer_safe_area_consumer** — Warns when [SafeArea] is used as the direct
-/// body of a [Scaffold] that already has an [AppBar] or [BottomNavigationBar].
+/// **prefer_safe_area_consumer** — Warns when `SafeArea` is used as the direct
+/// body of a `Scaffold` that already has an `AppBar` or `BottomNavigationBar`.
 /// In that case Scaffold insets the body below the AppBar and above the bottom
 /// bar, so a full SafeArea doubles the top/bottom inset and wastes vertical space.
 ///

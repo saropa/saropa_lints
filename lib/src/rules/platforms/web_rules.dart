@@ -376,7 +376,7 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
 /// `dart:js` or `dart:js_util`. Detection uses an exact [Set] match on
 /// [ImportDirective.uri], so there are no heuristics and no false positives
 /// from similar-looking URIs (e.g. `package:foo/dart_js.dart` or strings
-/// containing "dart:js"). One callback per file via [addImportDirective];
+/// containing "dart:js"). One callback per file via `addImportDirective`;
 /// no recursion and no full AST traversal. Impact is [LintImpact.medium]:
 /// migrating off deprecated APIs is a maintainability concern, not a crash.
 ///

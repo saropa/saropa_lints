@@ -3898,8 +3898,8 @@ bool _isArgumentToFromJson(SimpleIdentifier identifier) {
 ///
 /// Reports on [jsonDecode] when the decoded value may be used without validation (e.g. direct field access).
 /// Does **not** report when:
-/// - The [jsonDecode] call is the direct single argument to a [fromJson] call (e.g. `MyType.fromJson(jsonDecode(body))`), or
-/// - The decoded value is assigned to a variable and that variable is only ever passed as the single argument to a [fromJson] call, or
+/// - The [jsonDecode] call is the direct single argument to a `fromJson` call (e.g. `MyType.fromJson(jsonDecode(body))`), or
+/// - The decoded value is assigned to a variable and that variable is only ever passed as the single argument to a `fromJson` call, or
 /// - The decoded value is assigned to a variable and a subsequent [IfStatement] in the same block validates it (e.g. type check for Map/List) and returns or throws on failure (validation-helper pattern).
 ///
 /// **BAD:**

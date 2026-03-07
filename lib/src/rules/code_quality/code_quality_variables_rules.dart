@@ -2218,7 +2218,7 @@ const Set<String> _rngTypeNames = <String>{
 };
 
 /// Returns true if [type] looks like an RNG type: any [InterfaceType] whose
-/// name is [Random], [RNG], or [RandomNumberGenerator] from any library.
+/// name is [Random], `RNG`, or `RandomNumberGenerator` from any library.
 /// Covers dart:math [Random] and project-specific overloads or custom RNG types.
 bool _isRngLikeType(DartType? type) {
   if (type is! InterfaceType) return false;
@@ -2267,7 +2267,7 @@ class _RandomPresenceVisitor extends RecursiveAstVisitor<void> {
 }
 
 /// Returns true if [expression] uses Random or RNG-like APIs: any type named
-/// [Random], [RNG], or [RandomNumberGenerator] (from any library), or a
+/// [Random], `RNG`, or `RandomNumberGenerator` (from any library), or a
 /// variable named like an RNG (rng, random, rand, rnd) calling nextDouble/
 /// nextInt/nextBool/next. Such initializers are excluded from duplicate
 /// detection because each evaluation yields a different value.
@@ -2282,9 +2282,9 @@ bool _expressionUsesRandomOrRng(Expression expression) {
 /// **For developers:**
 ///
 /// **Detection:** Redundant variable declarations within the same block are
-/// detected by comparing initializer source code ([toSource]). Only
+/// detected by comparing initializer source code (`toSource`). Only
 /// initializers that are not literals and not simple identifiers are
-/// considered. Registry: [addBlock]; runs once per block; single pass over
+/// considered. Registry: `addBlock`; runs once per block; single pass over
 /// [Block.statements]; no recursion.
 ///
 /// **Exclusions (false positive avoidance):** The following are excluded from
@@ -2296,9 +2296,9 @@ bool _expressionUsesRandomOrRng(Expression expression) {
 ///    effects). Same source can evaluate to different values per call.
 ///
 /// 2. **Random / RNG usage:** Initializers that use Random or RNG-like APIs:
-///    - Any type named [Random], [RNG], or [RandomNumberGenerator] from any
+///    - Any type named [Random], `RNG`, or `RandomNumberGenerator` from any
 ///      library (dart:math [Random] or project overloads/custom RNG types).
-///    - Instance methods [nextDouble], [nextInt], [nextBool], [next] on such
+///    - Instance methods `nextDouble`, `nextInt`, `nextBool`, [next] on such
 ///      a type, or on a variable with a common RNG-like name (rng, random,
 ///      rand, rnd). Each call yields a different value.
 ///

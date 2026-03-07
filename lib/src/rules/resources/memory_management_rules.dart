@@ -1354,7 +1354,7 @@ class AvoidClosureCaptureLeaksRule extends SaropaLintRule {
 // require_expando_cleanup
 // =============================================================================
 
-/// Expando entries should be cleared (e.g. expando[key] = null) when done.
+/// Expando entries should be cleared (e.g. `expando[key] = null`) when done.
 ///
 /// Expando values are held strongly; long-lived Expandos that only add entries
 /// can grow unbounded. Flags classes whose source contains Expando and ] =

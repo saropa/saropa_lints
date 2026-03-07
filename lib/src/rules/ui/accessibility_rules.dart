@@ -395,12 +395,12 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
 /// Warns when fixed-height Container or SizedBox contains Text, risking overflow at large text scale.
 ///
 /// WCAG 2.1 (Resize Text) and store guidelines expect text to scale. A literal
-/// [height] on [Container] or [SizedBox] that wraps [Text] can clip or overflow
+/// `height` on `Container` or `SizedBox` that wraps [Text] can clip or overflow
 /// when the user increases system font scale. This rule flags such constructors
-/// so teams can switch to [BoxConstraints.minHeight], padding, or flexible layout.
+/// so teams can switch to `BoxConstraints.minHeight`, padding, or flexible layout.
 ///
-/// **Limitation:** Only inspects the direct [child] chain for [Text]; [Column]
-/// with [children] containing [Text] is not recursed (reduces false positives).
+/// **Limitation:** Only inspects the direct `child` chain for [Text]; `Column`
+/// with `children` containing [Text] is not recursed (reduces false positives).
 ///
 /// Since: ROADMAP §5.43 Accessibility Advanced | Rule version: v1
 class RequireTextScaleFactorAwarenessRule extends SaropaLintRule {

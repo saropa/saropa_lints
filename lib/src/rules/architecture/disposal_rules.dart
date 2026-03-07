@@ -1520,9 +1520,9 @@ class RequireSocketCloseRule extends SaropaLintRule {
 /// Debounce timers used for search or input delay must be canceled
 /// to prevent callbacks firing after widget disposal.
 ///
-/// **Implementation:** Restricted to classes extending [State]. Collects
+/// **Implementation:** Restricted to classes extending `State`. Collects
 /// all [Timer]/[Timer?] field names, then for each field checks every
-/// [dispose] method in the class (not only the first) so that classes
+/// `dispose` method in the class (not only the first) so that classes
 /// with mixins (e.g. `State<Foo> with WidgetsBindingObserver`) are
 /// handled correctly. Cleanup is detected via [isFieldCleanedUp] on the
 /// method body and [isFieldCleanedUpInSource] on the full method source,

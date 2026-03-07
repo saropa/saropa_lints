@@ -1883,7 +1883,7 @@ class PreferCacheExtentRule extends SaropaLintRule {
 ///
 /// **Bad:** ListView/GridView inside Column with other widgets (shrinkWrap).
 ///
-/// **Good:** CustomScrollView(slivers: [SliverList(...), SliverToBoxAdapter(...)]).
+/// **Good:** `CustomScrollView(slivers: [SliverList(...), SliverToBoxAdapter(...)])`.
 class PreferSliverForMixedScrollRule extends SaropaLintRule {
   PreferSliverForMixedScrollRule() : super(code: _code);
 

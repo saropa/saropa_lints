@@ -2431,7 +2431,7 @@ abstract class SaropaLintRule extends AnalysisRule {
 
   /// Check if this rule is disabled via configuration.
   ///
-  /// Returns true if [disabledRules] contains this rule's [code.lowerCaseName] or any
+  /// Returns true if [disabledRules] contains this rule's `code.lowerCaseName` or any
   /// [configAliases], so config using an alias (e.g. `require_riverpod_lint_package: false`)
   /// correctly disables the rule.
   bool get isDisabled {
@@ -2446,7 +2446,7 @@ abstract class SaropaLintRule extends AnalysisRule {
 
   /// Get the effective severity for this rule, considering overrides.
   ///
-  /// Checks [severityOverrides] for [code.lowerCaseName] first, then each [configAliases],
+  /// Checks [severityOverrides] for `code.lowerCaseName` first, then each [configAliases],
   /// so config using an alias is applied.
   DiagnosticSeverity? get effectiveSeverity {
     final o = severityOverrides;

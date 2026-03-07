@@ -2640,11 +2640,11 @@ class PreferRootDetectionRule extends SaropaLintRule {
 /// Suggests sandboxing WebView (e.g. disable file access) when not needed.
 ///
 /// **Developer notes:**
-/// - Reports at [WebView] or [WebViewWidget] instance creation when no sandbox
+/// - Reports at `WebView` or `WebViewWidget` instance creation when no sandbox
 ///   configuration is detected for the controller passed as the `controller`
 ///   argument.
 /// - **Controller-level configuration** satisfies the rule when detectable in
-///   the same file: [WebViewController.setNavigationDelegate] (or equivalent)
+///   the same file: `WebViewController.setNavigationDelegate` (or equivalent)
 ///   and/or [AndroidWebViewController.setAllowFileAccess](false) on the same
 ///   controller instance (e.g. in initState). Matching is by the controller
 ///   expression "root" (e.g. `_controller`, `controller`) so same-file setup
