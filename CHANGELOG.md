@@ -12,11 +12,56 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [8.0.6]
+
+### Fixed
+
+- **Removed Flutter SDK constraint from pubspec.yaml** that caused CI publish workflow to fail (`dart pub get` requires only the Dart SDK; this is a pure Dart package).
+- **Fixed 56 unresolved dartdoc reference warnings** across rule files.
+
+---
+
+## [8.0.5]
+
+### Changed
+
+- **Updated publish workflow** with improved retry logic and SDK configuration.
+
+---
+
 ## [8.0.4]
 
 ### Changed
 
 - **Publish script and workflow:** GitHub Actions publish workflow now uses the Dart stable SDK (no exact-version lookup), adds a Verify Dart SDK step, and retries `dart pub get` once on failure. When the release tag already exists on the remote, the script auto-bumps the pubspec version and adds a "Release version" CHANGELOG section instead of failing. The script automatically commits and pushes `.github/workflows/publish.yml` when it has uncommitted changes, so no manual git steps are required.
+
+---
+
+## [8.0.3]
+
+### Changed
+
+- Version bump
+
+---
+
+## [8.0.2]
+
+### Changed
+
+- Version bump
+
+---
+
+## [8.0.1]
+
+### Fixed
+
+- **Tests and init:** Resolve undefined getter `lowerCaseName` on `LintCode` by importing `saropa_lint_rule.dart` (which defines the `LintCodeLowerCase` extension) in test files and `bin/init.dart`.
+
+### Notice
+
+**8.0.0** is the current Flutter-compatible release (analyzer 9). The **7.x line was retracted** (it required analyzer 10, which Flutter does not yet support). Use **saropa_lints ^8.0.0** for new projects and upgrades.
 
 ---
 
@@ -43,6 +88,22 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - From **6.2.x**: bump to `saropa_lints: ^8.0.0` and run `dart pub get`. No config or SDK change required if you are already on Dart 3.6+ and analyzer 9.
 - If you had temporarily tried **7.x** before it was retracted: switch to **8.0.0** and keep your existing `analysis_options.yaml`; 8.0.0 does not require the analyzer 10 / lowerCaseName config migration that 7.x required.
+
+---
+
+## [7.0.3]
+
+### Changed
+
+- Version bump
+
+---
+
+## [7.0.2]
+
+### Changed
+
+- Version bump
 
 ---
 
@@ -107,6 +168,16 @@ In this release we move to the analyzer 10.x API and Dart SDK 3.9+. Rule names n
 - **prefer_named_routes_for_deep_links** — No longer reports when `MaterialPageRoute` or `CupertinoPageRoute` use `settings: RouteSettings(name: ...)` with a non-empty name (literal or variable). Supports path-style names and `onGenerateRoute`-based deep linking. Still reports when there is no `settings`, when `RouteSettings` has no `name`, or when `name` is an empty string literal. Resolves bug_prefer_named_routes_for_deep_links_material_page_route_named.
 
 - **prefer_webview_sandbox** — No longer reports when the controller passed to `WebViewWidget` (or `WebView`) is configured in the same file with `setNavigationDelegate(...)` and/or `setAllowFileAccess(false)` (e.g. in initState). Controller matching is by expression root (e.g. `_controller`, `controller`). Resolves bug_prefer_webview_sandbox_controller_configuration.
+
+---
+
+## [6.2.2]
+
+This is a version bump for compatibility — the last release that supports analyzer < v10 before 7.0.0.
+
+### Changed
+
+- Version bump
 
 ---
 
@@ -728,58 +799,4 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 ## [5.0.3] and Earlier
 
 For details on the initial release and versions 0.1.0 through 5.0.3, please refer to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md).
-
----
-## [8.0.6]
-
-### Changed
-- Version bump
-
----
-## [8.0.5]
-
-### Changed
-- Version bump
-
----
-## [8.0.3]
-
-### Changed
-- Version bump
-
----
-## [8.0.2]
-
-### Changed
-- Version bump
-
----
-## [8.0.1]
-
-### Fixed
-- **Tests and init:** Resolve undefined getter `lowerCaseName` on `LintCode` by importing `saropa_lint_rule.dart` (which defines the `LintCodeLowerCase` extension) in test files and `bin/init.dart`.
-
-### Notice
-
-**8.0.0** is the current Flutter-compatible release (analyzer 9). The **7.x line was retracted** (it required analyzer 10, which Flutter does not yet support). Use **saropa_lints ^8.0.0** for new projects and upgrades.
-
----
-## [7.0.3]
-
-### Changed
-- Version bump
-
----
-## [7.0.2]
-
-### Changed
-- Version bump
-
----
-## [6.2.2]
-
-This is a version bump for compatibility—the last release that supports analyzer &lt; v10 before 7.0.0.
-
-### Changed
-- Version bump
 

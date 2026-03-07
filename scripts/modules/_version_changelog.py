@@ -247,12 +247,12 @@ def add_version_section(
         return False
 
     new_section = (
-        f"---\n## [{version}]\n\n### Changed\n- {message}\n\n"
+        f"---\n\n## [{version}]\n\n### Changed\n\n- {message}\n\n"
     )
 
-    # Insert before the first ---\n## [version] block
+    # Insert before the first ---\n[optional blank]\n## [version] block
     match = re.search(
-        rf"---\n## \[?{_VERSION_RE}", content,
+        rf"---\n\n?## \[?{_VERSION_RE}", content,
     )
     if match:
         pos = match.start()
@@ -275,10 +275,10 @@ def add_unreleased_section(changelog_path: Path) -> bool:
     if re.search(r"## \[Unreleased\]", content):
         return False
 
-    # Insert before the first ---\n## [version] block
+    # Insert before the first ---\n[optional blank]\n## [version] block
     content = re.sub(
-        rf"(---\n)(## \[?{_VERSION_RE})",
-        r"\1## [Unreleased]\n\n---\n\2",
+        rf"(---)\n\n?(## \[?{_VERSION_RE})",
+        r"\1\n\n## [Unreleased]\n\n---\n\n\2",
         content,
         count=1,
     )
