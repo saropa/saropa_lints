@@ -26,10 +26,9 @@ executables:
   baseline: baseline
   impact_report: impact_report
 
-# Dart SDK and Flutter version constraints (Flutter 3.27 = first with Dart 3.6)
+# Dart SDK constraint (pure Dart package; Flutter topic tag provides discoverability)
 environment:
   sdk: ">=3.6.0 <4.0.0"
-  flutter: ">=3.27.0"
 
 # Runtime dependencies for lint rule implementation (analyzer 9 for Flutter compatibility)
 dependencies:
