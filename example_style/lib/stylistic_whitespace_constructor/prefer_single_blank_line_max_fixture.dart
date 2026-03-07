@@ -105,13 +105,46 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_single_blank_line_max
-// expect_lint: prefer_single_blank_line_max
-void _bad1148() {
-  // TODO: Add code that triggers prefer_single_blank_line_max
-}
+// BAD: Two consecutive blank lines between declarations
+// LINT: prefer_single_blank_line_max
 
-// GOOD: Should NOT trigger prefer_single_blank_line_max
-void _good1148() {
-  // TODO: Add compliant code for prefer_single_blank_line_max
-}
+
+void _bad1148a() {}
+
+// BAD: Three consecutive blank lines between declarations
+// LINT: prefer_single_blank_line_max
+
+
+
+void _bad1148b() {}
+
+// GOOD: Single blank line between declarations
+void _good1148a() {}
+
+void _good1148b() {}
+
+// GOOD: Comments between declarations (no consecutive blanks)
+void _good1148c() {}
+
+// ---------------------------------------------------------------------------
+// Section separator
+// ---------------------------------------------------------------------------
+
+void _good1148d() {}
+
+// GOOD: Doc comment between declarations
+void _good1148e() {}
+
+/// Documentation for the next method.
+/// It has multiple lines explaining
+/// what the method does.
+void _good1148f() {}
+
+// BAD: Consecutive blank lines with comments mixed in
+// LINT: prefer_single_blank_line_max
+void _bad1148c() {}
+
+// A comment
+
+
+void _bad1148d() {}

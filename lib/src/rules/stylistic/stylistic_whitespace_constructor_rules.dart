@@ -532,22 +532,30 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
   }
 }
 
-/// Warns when there are more than one consecutive blank lines.
+/// Warns when there are two or more consecutive blank lines anywhere in a file.
 ///
-/// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2
+/// Since: v4.9.11 | Updated: v8.0.9 | Rule version: v3
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
+/// Multiple consecutive blank lines create excessive whitespace that fragments
+/// reading flow. One blank line is sufficient to separate logical sections.
+/// Scans actual line content so comments, doc comments, and section separators
+/// between declarations are not mistakenly counted as blank lines.
+///
+/// **v3 changes:** Rewrote detection to scan actual line content instead of
+/// comparing declaration positions. Fixes false positives from comments and
+/// doc comments between declarations. Now detects consecutive blank lines
+/// everywhere in the file, not just between top-level declarations.
+///
 /// **Pros of single blank lines:**
-/// - Consistent spacing
-/// - No excessive whitespace
+/// - Consistent vertical spacing across the codebase
+/// - No excessive whitespace that fragments reading flow
 ///
 /// **Cons (why some teams allow multiple):**
-/// - May want stronger visual separation
+/// - May want stronger visual separation between major sections
 ///
-/// ### Example
-///
-/// #### BAD (with this rule enabled):
+/// **BAD:**
 /// ```dart
 /// void method1() {}
 ///
@@ -555,9 +563,18 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
 /// void method2() {}
 /// ```
 ///
-/// #### GOOD:
+/// **GOOD:**
 /// ```dart
 /// void method1() {}
+///
+/// void method2() {}
+/// ```
+///
+/// **GOOD** (comments between declarations are not blank lines):
+/// ```dart
+/// void method1() {}
+///
+/// // Section separator
 ///
 /// void method2() {}
 /// ```
@@ -572,7 +589,7 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_single_blank_line_max',
-    '[prefer_single_blank_line_max] Multiple consecutive blank lines waste vertical space and create visual gaps that break reading flow. One blank line is sufficient to separate logical sections. {v2}',
+    '[prefer_single_blank_line_max] Multiple consecutive blank lines waste vertical space and create visual gaps that break reading flow. One blank line is sufficient to separate logical sections. {v3}',
     correctionMessage:
         'Collapse multiple consecutive blank lines into a single blank line to conserve vertical space in the file.',
     severity: DiagnosticSeverity.INFO,
@@ -584,20 +601,30 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addCompilationUnit((node) {
-      final declarations = node.declarations;
-      if (declarations.length < 2) return;
+      final content = context.fileContent;
+      if (content.isEmpty) return;
 
-      for (int i = 0; i < declarations.length - 1; i++) {
-        final current = declarations[i];
-        final next = declarations[i + 1];
+      final lineInfo = context.lineInfo;
+      final lineCount = lineInfo.lineCount;
+      var consecutiveBlanks = 0;
 
-        final currentLine =
-            context.lineInfo.getLocation(current.end).lineNumber;
-        final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
+      for (var line = 0; line < lineCount; line++) {
+        final lineStart = lineInfo.getOffsetOfLine(line);
+        final lineEnd = line + 1 < lineCount
+            ? lineInfo.getOffsetOfLine(line + 1)
+            : content.length;
+        final lineText = content.substring(lineStart, lineEnd).trim();
 
-        // More than 2 lines difference means 2+ blank lines
-        if (nextLine - currentLine > 2) {
-          reporter.atNode(next);
+        if (lineText.isEmpty) {
+          consecutiveBlanks++;
+          if (consecutiveBlanks == 2) {
+            reporter.atOffset(
+              offset: lineStart,
+              length: lineEnd - lineStart,
+            );
+          }
+        } else {
+          consecutiveBlanks = 0;
         }
       }
     });
