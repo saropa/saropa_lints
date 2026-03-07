@@ -208,6 +208,7 @@ from scripts.modules._publish_steps import (
     generate_docs,
     pre_publish_validation,
     run_analysis,
+    run_analyze_to_log,
     run_format,
     run_pre_publish_audits,
     run_tests,
@@ -363,6 +364,7 @@ def _prompt_publish_mode() -> str:
     print("  2) Audit only (tier integrity, DX checks; no publish)")
     print("  3) Fix doc comments (angle brackets, refs; then exit)")
     print("  4) Publish without audit (skip audit; format → analysis → tests → release)")
+    print("  5) Analyze only (run dart analyze, write log; then exit)")
     try:
         raw = input("  Choice [1]: ").strip() or "1"
         n = int(raw)
@@ -372,6 +374,8 @@ def _prompt_publish_mode() -> str:
             return "fix_docs"
         if n == 4:
             return "full_skip_audit"
+        if n == 5:
+            return "analyze_only"
     except (ValueError, EOFError, KeyboardInterrupt):
         pass
     # Default or invalid input: full publish
@@ -382,7 +386,7 @@ def main(
     mode: str = "full",
     output_level: OutputLevel | None = None,
 ) -> int:
-    """Run publish workflow. Returns exit code (0 = success). mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit'."""
+    """Run publish workflow. Returns exit code (0 = success). mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit' | 'analyze_only'."""
     enable_ansi_support()
     set_output_level(output_level or _parse_output_level())
 
@@ -406,6 +410,11 @@ def main(
             f"CHANGELOG.md not found at {changelog_path}",
             ExitCode.PREREQUISITES_FAILED,
         )
+
+    # --- analyze_only: standalone mode, then exit ---
+    if mode == "analyze_only":
+        ok = run_analyze_to_log(project_dir)
+        return ExitCode.SUCCESS.value if ok else ExitCode.ANALYSIS_FAILED.value
 
     # --- fix_docs: standalone mode, then exit ---
     if mode == "fix_docs":

@@ -730,6 +730,12 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 For details on the initial release and versions 0.1.0 through 5.0.3, please refer to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md).
 
 ---
+## [8.0.6]
+
+### Changed
+- Version bump
+
+---
 ## [8.0.5]
 
 ### Changed
