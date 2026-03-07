@@ -1208,9 +1208,9 @@ class PreferReadableLineLengthRule extends SaropaLintRule {
     context.addCompilationUnit((CompilationUnit unit) {
       final LineInfo lineInfo = context.lineInfo;
       final String content = context.fileContent;
-      for (int i = 1; i <= lineInfo.lineCount; i++) {
+      for (int i = 0; i < lineInfo.lineCount; i++) {
         final int lineStart = lineInfo.getOffsetOfLine(i);
-        final int lineEnd = i < lineInfo.lineCount
+        final int lineEnd = i + 1 < lineInfo.lineCount
             ? lineInfo.getOffsetOfLine(i + 1) - 1
             : content.length;
         final int length = lineEnd - lineStart;
