@@ -1059,6 +1059,17 @@ def run_analysis(project_dir: Path) -> bool:
     return result in ("ok", "ignore")
 
 
+def run_analyze_to_log(project_dir: Path) -> bool:
+    """Standalone: run dart analyze and write results to a log file.
+
+    Replaces the old scripts/analyze_to_log.ps1. Writes to
+    reports/YYYYMMDD/<date>_analysis_violations_<time>.log with
+    progress bar lines stripped.
+    """
+    print_header("DART ANALYZE TO LOG")
+    return _run_dart_analyze_core(project_dir)
+
+
 def validate_changelog(
     project_dir: Path, version: str
 ) -> tuple[bool, str]:
