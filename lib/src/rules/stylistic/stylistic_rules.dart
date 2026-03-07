@@ -321,7 +321,7 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
 
 /// Prefer arrow (=>) for simple getters.
 ///
-/// Flags [MethodDeclaration] where [isGetter], body is [BlockFunctionBody] with
+/// Flags [MethodDeclaration] where `isGetter`, body is [BlockFunctionBody] with
 /// exactly one [ReturnStatement] with non-null expression. Single-node callback.
 ///
 /// **Bad:**
@@ -704,7 +704,7 @@ class PreferPositionalBoolParamsRule extends SaropaLintRule {
 
 /// Prefer block body {} for setters.
 ///
-/// Flags [MethodDeclaration] where [isSetter] and body is [ExpressionFunctionBody].
+/// Flags [MethodDeclaration] where `isSetter` and body is [ExpressionFunctionBody].
 /// Single-node callback; no recursion.
 ///
 /// **Bad:**

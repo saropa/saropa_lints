@@ -368,8 +368,8 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
 /// readability (see [doc/guides/good_methods.md](../../../doc/guides/good_methods.md) §9).
 ///
 /// **Implementation notes for developers:**
-/// - Uses [addIfStatement] only; no string or name heuristics.
-/// - Reports on [elseStatement] so [AddBlankLineBeforeFix] inserts at the
+/// - Uses `addIfStatement` only; no string or name heuristics.
+/// - Reports on `elseStatement` so [AddBlankLineBeforeFix] inserts at the
 ///   start of the line containing the else clause.
 /// - Skips when there is no else (no false positive on `if (x) { }`).
 ///
@@ -445,7 +445,7 @@ class NewlineBeforeElseRule extends SaropaLintRule {
 /// [doc/guides/good_methods.md](../../../doc/guides/good_methods.md) §9).
 ///
 /// **Implementation notes for developers:**
-/// - Uses [addBlock] and iterates [Block.statements]; no recursion.
+/// - Uses `addBlock` and iterates [Block.statements]; no recursion.
 /// - Only [ForStatement] and [WhileStatement] count as loops (for-in is
 ///   [ForStatement] with [ForEachParts], so it is covered).
 /// - Reports on the *next* statement so [AddBlankLineBeforeFix] inserts

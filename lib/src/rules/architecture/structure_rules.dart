@@ -1097,8 +1097,8 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
 ///
 /// **Implementation note for developers:** Reporting is gated by
 /// `_shouldSkipLongParameterList`: (1) name equals `copyWith`, or (2) every
-/// parameter is optional (no [isRequiredPositional] or [isRequiredNamed]).
-/// Uses [addFunctionDeclaration] and [addMethodDeclaration] only; no full AST
+/// parameter is optional (no `isRequiredPositional` or `isRequiredNamed`).
+/// Uses `addFunctionDeclaration` and `addMethodDeclaration` only; no full AST
 /// traversal. No quick fix (refactor to config object is context-dependent).
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6

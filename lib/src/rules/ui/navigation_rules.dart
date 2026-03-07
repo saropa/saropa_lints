@@ -3536,8 +3536,8 @@ class RequireAutoRoutePageSuffixRule extends SaropaLintRule {
 
 /// Suggests named routes so that deep links can open the correct screen.
 ///
-/// **When this rule reports:** It reports on [MaterialPageRoute] and
-/// [CupertinoPageRoute] constructions that do **not** supply a named route
+/// **When this rule reports:** It reports on `MaterialPageRoute` and
+/// `CupertinoPageRoute` constructions that do **not** supply a named route
 /// suitable for deep linking — i.e. when there is no `settings:
 /// RouteSettings(name: ...)` with a non-empty name.
 ///

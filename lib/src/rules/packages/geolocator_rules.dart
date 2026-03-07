@@ -307,9 +307,9 @@ class AvoidContinuousLocationUpdatesRule extends SaropaLintRule {
 
 /// Prefer coarse location when high accuracy is not needed (battery and privacy).
 ///
-/// Warns when [Geolocator.getCurrentPosition] or [Geolocator.getPositionStream]
-/// is used with [LocationAccuracy.best] or [LocationAccuracy.high] without
-/// a clear need. Use [LocationAccuracy.low] or [LocationAccuracy.medium]
+/// Warns when `Geolocator.getCurrentPosition` or `Geolocator.getPositionStream`
+/// is used with `LocationAccuracy.best` or `LocationAccuracy.high` without
+/// a clear need. Use `LocationAccuracy.low` or `LocationAccuracy.medium`
 /// when fine location is not required.
 ///
 /// **BAD:**

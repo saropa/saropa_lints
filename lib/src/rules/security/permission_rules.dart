@@ -707,7 +707,7 @@ class AvoidPermissionRequestLoopRule extends SaropaLintRule {
 ///
 /// Requesting unused permissions increases denial risk and privacy concerns.
 ///
-/// **Bad:** request([Permission.storage, Permission.camera, ...]) when only one is used.
+/// **Bad:** `request([Permission.storage, Permission.camera, ...])` when only one is used.
 ///
 /// **Good:** Request only the permission needed for the current feature.
 class PreferPermissionMinimalRequestRule extends SaropaLintRule {

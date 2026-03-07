@@ -1809,7 +1809,7 @@ class AvoidFieldInitializersInConstClassesRule extends SaropaLintRule {
 /// **Category:** Class & constructor (late initialization safety).
 /// **Since:** v4.14.0 | **Rule version:** v1
 ///
-/// `late` variables throw [LateInitializationError] if read before assignment.
+/// `late` variables throw `LateInitializationError` if read before assignment.
 /// When a field is set in methods like `initialize()` or `setToken()` but
 /// read in other methods like `getHeaders()`, call order is uncertain and
 /// can cause runtime crashes. This rule uses a heuristic: it flags any read

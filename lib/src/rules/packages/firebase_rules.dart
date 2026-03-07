@@ -2658,10 +2658,10 @@ class RequireFirebaseAppCheckProductionRule extends SaropaLintRule {
 
 /// Warns when sensitive Firebase Auth operations are used without reauthentication.
 ///
-/// Firebase Auth requires recent sign-in for sensitive operations: [User.delete],
-/// [User.updateEmail], [User.updatePassword], [User.verifyBeforeUpdateEmail].
+/// Firebase Auth requires recent sign-in for sensitive operations: `User.delete`,
+/// `User.updateEmail`, `User.updatePassword`, `User.verifyBeforeUpdateEmail`.
 /// This rule reports those calls when they appear in a method body before any
-/// call to [User.reauthenticateWithCredential] or [User.reauthenticateWithProvider]
+/// call to `User.reauthenticateWithCredential` or `User.reauthenticateWithProvider`
 /// (by source offset). Only runs when the project depends on `firebase_auth`.
 ///
 /// **Heuristic:** Receiver is matched by name (user, User, currentUser); methods
@@ -2770,8 +2770,8 @@ class _FirebaseAuthVisitor extends RecursiveAstVisitor<void> {
 /// Warns when getIdToken() result is stored without idTokenChanges refresh handling.
 ///
 /// Firebase ID tokens expire in one hour. Storing the token (variable, prefs, or
-/// API client) without subscribing to [FirebaseAuth.idTokenChanges] or using
-/// [User.getIdToken] with `forceRefresh: true` can lead to 401s. Only runs when
+/// API client) without subscribing to `FirebaseAuth.idTokenChanges` or using
+/// `User.getIdToken` with `forceRefresh: true` can lead to 401s. Only runs when
 /// the project depends on `firebase_auth`.
 ///
 /// **Heuristic:** "Stored" is detected by assignment, VariableDeclaration
