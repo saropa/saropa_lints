@@ -589,8 +589,7 @@ class PreferImportGroupCommentsRule extends SaropaLintRule {
   String get exampleBad => "import 'dart:async';\n\nimport 'package:x/x.dart';";
 
   @override
-  String get exampleGood =>
-      "/// Dart imports\nimport 'dart:async';\n\n"
+  String get exampleGood => "/// Dart imports\nimport 'dart:async';\n\n"
       "/// Package imports\nimport 'package:x/x.dart';";
 
   @override

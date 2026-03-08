@@ -162,13 +162,11 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'class MyButton extends StatelessWidget { ... }\n'
+  String get exampleBad => 'class MyButton extends StatelessWidget { ... }\n'
       'class MyCard extends StatelessWidget { ... }  // second widget';
 
   @override
-  String get exampleGood =>
-      '// my_button.dart\n'
+  String get exampleGood => '// my_button.dart\n'
       'class MyButton extends StatelessWidget { ... }\n'
       '// my_card.dart  (separate file)\n'
       'class MyCard extends StatelessWidget { ... }';
@@ -866,8 +864,7 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
       "createUser('John', 'j@ex.com', 30, true);  // unclear";
 
   @override
-  String get exampleGood =>
-      "createUser(name: 'John', email: 'j@ex.com',\n"
+  String get exampleGood => "createUser(name: 'John', email: 'j@ex.com',\n"
       "           age: 30, isAdmin: true);  // self-documenting";
 
   /// Threshold for number of positional parameters before suggesting named.
@@ -1143,14 +1140,12 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'class MyClass {\n'
+  String get exampleBad => 'class MyClass {\n'
       '  String name;  // public field\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'class MyClass {\n'
+  String get exampleGood => 'class MyClass {\n'
       '  String _name;  // private\n'
       '  String get name => _name;  // expose via getter\n'
       '}';
@@ -1289,14 +1284,12 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'class _MyIcon extends StatelessWidget {\n'
+  String get exampleBad => 'class _MyIcon extends StatelessWidget {\n'
       '  Widget build(ctx) => Icon(Icons.star);  // class boilerplate\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'Widget _buildIcon() =>\n'
+  String get exampleGood => 'Widget _buildIcon() =>\n'
       '    Icon(Icons.star);  // method in parent widget';
 
   @override
@@ -1424,13 +1417,11 @@ class PreferExplicitTypesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      "var name = 'John';  // var hides type\n"
+  String get exampleBad => "var name = 'John';  // var hides type\n"
       'final count = 42;';
 
   @override
-  String get exampleGood =>
-      "String name = 'John';  // explicit type\n"
+  String get exampleGood => "String name = 'John';  // explicit type\n"
       'final int count = 42;';
 
   static const LintCode _code = LintCode(
@@ -1528,13 +1519,11 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      "(String, int) getUser() =>\n"
+  String get exampleBad => "(String, int) getUser() =>\n"
       "    ('John', 30);  // unnamed fields";
 
   @override
-  String get exampleGood =>
-      'User getUser() =>\n'
+  String get exampleGood => 'User getUser() =>\n'
       "    User('John', 30);  // named fields via class";
 
   static const LintCode _code = LintCode(
@@ -1638,8 +1627,7 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
       'onPressed: _handlePress,  // must jump to definition';
 
   @override
-  String get exampleGood =>
-      'onPressed: () { doSomething(); },  // inline';
+  String get exampleGood => 'onPressed: () { doSomething(); },  // inline';
 
   static const LintCode _code = LintCode(
     'prefer_inline_callbacks',
@@ -2210,8 +2198,7 @@ class PreferSentenceCaseCommentsRule extends _SentenceCaseCommentsBase {
         'Inconsistent capitalization in comments reduces readability and gives '
         'the codebase an unfinished appearance. Skips comments of 1-2 words. '
         '{v5}',
-    correctionMessage:
-        'Capitalize the first letter of the comment to maintain '
+    correctionMessage: 'Capitalize the first letter of the comment to maintain '
         'sentence-case consistency across the codebase.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -2254,8 +2241,7 @@ class PreferSentenceCaseCommentsRelaxedRule extends _SentenceCaseCommentsBase {
       '// calculate the total price including tax  // 6 words, flagged';
 
   @override
-  String get exampleGood =>
-      '// Calculate the total price including tax\n'
+  String get exampleGood => '// Calculate the total price including tax\n'
       '// not used  // 2 words, skipped';
 
   static const LintCode _code = LintCode(
@@ -2264,8 +2250,7 @@ class PreferSentenceCaseCommentsRelaxedRule extends _SentenceCaseCommentsBase {
         'letter. Inconsistent capitalization in comments reduces readability '
         'and gives the codebase an unfinished appearance. Skips comments of '
         '1-4 words. {v1}',
-    correctionMessage:
-        'Capitalize the first letter of the comment to maintain '
+    correctionMessage: 'Capitalize the first letter of the comment to maintain '
         'sentence-case consistency across the codebase.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -2771,13 +2756,11 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'bool flag = true;  // no prefix\n'
+  String get exampleBad => 'bool flag = true;  // no prefix\n'
       'bool processData = true;  // verb, not a question';
 
   @override
-  String get exampleGood =>
-      'bool isActive = true;\n'
+  String get exampleGood => 'bool isActive = true;\n'
       'bool shouldProcessData = true;  // reads as question';
 
   static const LintCode _code = LintCode(
@@ -3109,8 +3092,7 @@ class AvoidSmallTextRule extends SaropaLintRule {
       "Text('Small', style: TextStyle(fontSize: 10));  // < 12";
 
   @override
-  String get exampleGood =>
-      "Text('Readable', style: TextStyle(fontSize: 14));";
+  String get exampleGood => "Text('Readable', style: TextStyle(fontSize: 14));";
 
   /// Minimum font size in logical pixels.
   static const double _minFontSize = 12.0;
@@ -3221,13 +3203,11 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      "// Returns the user's full name.\n"
+  String get exampleBad => "// Returns the user's full name.\n"
       "String getFullName() => '\$first \$last';";
 
   @override
-  String get exampleGood =>
-      "/// Returns the user's full name.\n"
+  String get exampleGood => "/// Returns the user's full name.\n"
       "String getFullName() => '\$first \$last';";
 
   static const LintCode _code = LintCode(
@@ -3294,7 +3274,9 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
       if (node.name.lexeme.startsWith('_')) return;
       if (node.documentationComment != null) return;
       _checkPrecedingComment(
-        node.firstTokenAfterCommentAndMetadata, reporter, context,
+        node.firstTokenAfterCommentAndMetadata,
+        reporter,
+        context,
       );
     });
 
@@ -3303,7 +3285,9 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
       if (node.name.lexeme.startsWith('_')) return;
       if (node.documentationComment != null) return;
       _checkPrecedingComment(
-        node.firstTokenAfterCommentAndMetadata, reporter, context,
+        node.firstTokenAfterCommentAndMetadata,
+        reporter,
+        context,
       );
     });
 
@@ -3312,7 +3296,9 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
       if (node.name.lexeme.startsWith('_')) return;
       if (node.documentationComment != null) return;
       _checkPrecedingComment(
-        node.firstTokenAfterCommentAndMetadata, reporter, context,
+        node.firstTokenAfterCommentAndMetadata,
+        reporter,
+        context,
       );
     });
 
@@ -3329,7 +3315,9 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
       }
       if (!hasPublicField) return;
       _checkPrecedingComment(
-        node.firstTokenAfterCommentAndMetadata, reporter, context,
+        node.firstTokenAfterCommentAndMetadata,
+        reporter,
+        context,
       );
     });
   }
@@ -3910,13 +3898,11 @@ class ArgumentsOrderingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      "Foo(width: 100, color: blue,\n"
+  String get exampleBad => "Foo(width: 100, color: blue,\n"
       "    child: x);  // unsorted args";
 
   @override
-  String get exampleGood =>
-      "Foo(child: x, color: blue,\n"
+  String get exampleGood => "Foo(child: x, color: blue,\n"
       '    width: 100);  // alphabetical';
 
   @override
@@ -4037,13 +4023,11 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      '// final oldValue = compute();\n'
+  String get exampleBad => '// final oldValue = compute();\n'
       '// if (cond) { doSomething(); }  // dead code';
 
   @override
-  String get exampleGood =>
-      '// Compute value using the updated algorithm\n'
+  String get exampleGood => '// Compute value using the updated algorithm\n'
       'final newValue = computeNew();  // prose is fine';
 
   @override
@@ -4138,8 +4122,7 @@ class AvoidEscapingInnerQuotesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad =>
-      "final msg = 'It\\'s a beautiful day';  // escaped";
+  String get exampleBad => "final msg = 'It\\'s a beautiful day';  // escaped";
 
   @override
   String get exampleGood =>
@@ -4205,8 +4188,7 @@ class AvoidSingleCascadeInExpressionStatementsRule extends SaropaLintRule {
   String get exampleBad => 'list..add(item);  // single cascade';
 
   @override
-  String get exampleGood =>
-      'list.add(item);  // direct call\n'
+  String get exampleGood => 'list.add(item);  // direct call\n'
       "list..add('a')..add('b');  // multi-cascade is fine";
 
   static const LintCode _code = LintCode(
@@ -4307,12 +4289,10 @@ class PreferInterpolationToComposeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad =>
-      "final greet = 'Hello, ' + name + '!';  // + concat";
+  String get exampleBad => "final greet = 'Hello, ' + name + '!';  // + concat";
 
   @override
-  String get exampleGood =>
-      "final greet = 'Hello, \$name!';  // interpolation";
+  String get exampleGood => "final greet = 'Hello, \$name!';  // interpolation";
 
   static const LintCode _code = LintCode(
     'prefer_interpolation_to_compose',
@@ -4365,12 +4345,10 @@ class PreferRawStringsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad =>
-      "final re = RegExp('\\\\d+');  // double backslash";
+  String get exampleBad => "final re = RegExp('\\\\d+');  // double backslash";
 
   @override
-  String get exampleGood =>
-      "final re = RegExp(r'\\d+');  // raw string";
+  String get exampleGood => "final re = RegExp(r'\\d+');  // raw string";
 
   static const LintCode _code = LintCode(
     'prefer_raw_strings',

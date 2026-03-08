@@ -505,8 +505,7 @@ class AvoidCubitsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   @override
-  String get exampleBad =>
-      'class CounterCubit extends Cubit<int> {\n'
+  String get exampleBad => 'class CounterCubit extends Cubit<int> {\n'
       '  void increment() => emit(state + 1);\n'
       '}';
 
@@ -2249,14 +2248,12 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   @override
-  String get exampleBad =>
-      'class LoadUser extends UserEvent {\n'
+  String get exampleBad => 'class LoadUser extends UserEvent {\n'
       '  // missing Event suffix\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'class LoadUserEvent extends UserEvent {}';
+  String get exampleGood => 'class LoadUserEvent extends UserEvent {}';
 
   static const LintCode _code = LintCode(
     'prefer_bloc_event_suffix',
@@ -2321,14 +2318,12 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   @override
-  String get exampleBad =>
-      'class UserLoading extends UserState {\n'
+  String get exampleBad => 'class UserLoading extends UserState {\n'
       '  // missing State suffix\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'class UserLoadingState extends UserState {}';
+  String get exampleGood => 'class UserLoadingState extends UserState {}';
 
   static const LintCode _code = LintCode(
     'prefer_bloc_state_suffix',

@@ -109,14 +109,12 @@ class AvoidReturningThisRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad =>
-      'class Builder {\n'
+  String get exampleBad => 'class Builder {\n'
       '  Builder setX(int x) { _x = x; return this; }\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'class Builder {\n'
+  String get exampleGood => 'class Builder {\n'
       '  void setX(int x) { _x = x; }\n'
       '}';
 
@@ -334,15 +332,13 @@ class PreferImmediateReturnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'String getName() {\n'
+  String get exampleBad => 'String getName() {\n'
       '  final name = computeName();\n'
       '  return name;\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'String getName() {\n'
+  String get exampleGood => 'String getName() {\n'
       '  return computeName();\n'
       '}';
 
@@ -429,8 +425,7 @@ class PreferReturningShorthandsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'int getValue() {\n'
+  String get exampleBad => 'int getValue() {\n'
       '  return 42;\n'
       '}';
 

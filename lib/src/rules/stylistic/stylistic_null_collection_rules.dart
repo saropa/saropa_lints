@@ -1096,7 +1096,8 @@ class PreferMutableCollectionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad => 'List<String> get items => UnmodifiableListView(_items);';
+  String get exampleBad =>
+      'List<String> get items => UnmodifiableListView(_items);';
 
   @override
   String get exampleGood => 'List<String> get items => _items;';

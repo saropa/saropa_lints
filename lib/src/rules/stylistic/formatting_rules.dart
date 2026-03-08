@@ -51,15 +51,13 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'switch (x) {\n'
+  String get exampleBad => 'switch (x) {\n'
       '  case 1: break;\n'
       '  case 2: break;  // no blank line\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'switch (x) {\n'
+  String get exampleGood => 'switch (x) {\n'
       '  case 1: break;\n'
       '\n'
       '  case 2: break;\n'
@@ -151,15 +149,13 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'class Foo {\n'
+  String get exampleBad => 'class Foo {\n'
       '  final int v;\n'
       '  Foo(this.v);  // no blank line\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'class Foo {\n'
+  String get exampleGood => 'class Foo {\n'
       '  final int v;\n'
       '\n'
       '  Foo(this.v);\n'
@@ -262,15 +258,13 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'class C {\n'
+  String get exampleBad => 'class C {\n'
       '  void a() {}\n'
       '  void b() {}  // no blank line\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'class C {\n'
+  String get exampleGood => 'class C {\n'
       '  void a() {}\n'
       '\n'
       '  void b() {}\n'
@@ -364,13 +358,11 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'final x = compute();\n'
+  String get exampleBad => 'final x = compute();\n'
       'return x;  // no blank line';
 
   @override
-  String get exampleGood =>
-      'final x = compute();\n'
+  String get exampleGood => 'final x = compute();\n'
       '\n'
       'return x;';
 
@@ -460,16 +452,14 @@ class NewlineBeforeElseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'if (x) {\n'
+  String get exampleBad => 'if (x) {\n'
       '  a();\n'
       '} else {\n'
       '  b();  // no blank line before else\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'if (x) {\n'
+  String get exampleGood => 'if (x) {\n'
       '  a();\n'
       '}\n'
       '\n'
@@ -557,13 +547,11 @@ class NewlineAfterLoopRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'for (final x in list) { process(x); }\n'
+  String get exampleBad => 'for (final x in list) { process(x); }\n'
       'doNext();  // no blank line after loop';
 
   @override
-  String get exampleGood =>
-      'for (final x in list) { process(x); }\n'
+  String get exampleGood => 'for (final x in list) { process(x); }\n'
       '\n'
       'doNext();';
 
@@ -652,15 +640,13 @@ class PreferTrailingCommaRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'final list = [\n'
+  String get exampleBad => 'final list = [\n'
       "  'a',\n"
       "  'b'\n"
       '];  // missing trailing comma';
 
   @override
-  String get exampleGood =>
-      'final list = [\n'
+  String get exampleGood => 'final list = [\n'
       "  'a',\n"
       "  'b',\n"
       '];';
@@ -1075,15 +1061,13 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'class Foo {\n'
+  String get exampleBad => 'class Foo {\n'
       '  void doIt() {}\n'
       '  final int value;  // field after method\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'class Foo {\n'
+  String get exampleGood => 'class Foo {\n'
       '  final int value;\n'
       '  void doIt() {}\n'
       '}';
@@ -1170,7 +1154,8 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'void f({String? n}, int c) {}  // named before positional';
+  String get exampleBad =>
+      'void f({String? n}, int c) {}  // named before positional';
 
   @override
   String get exampleGood => 'void f(int c, {String? n}) {}';
@@ -1336,8 +1321,7 @@ class PreferReadableLineLengthRule extends SaropaLintRule {
       'final x = someVeryLongMethodName(argumentOne, argumentTwo, argumentThree, argumentFour);  // >80 chars';
 
   @override
-  String get exampleGood =>
-      'final x = someMethod(\n'
+  String get exampleGood => 'final x = someMethod(\n'
       '  argOne,\n'
       '  argTwo,\n'
       ');';

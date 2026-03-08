@@ -602,7 +602,8 @@ void main() {
         // Public functions with regular comments above them
         expect(content, contains('String greet()'));
         expect(content, contains('void process()'));
-        expect(content, contains('expect_lint: prefer_doc_comments_over_regular'));
+        expect(
+            content, contains('expect_lint: prefer_doc_comments_over_regular'));
       });
 
       test('fixture has section-header false-positive guards', () {

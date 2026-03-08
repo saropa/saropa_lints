@@ -565,14 +565,12 @@ class PreferForInRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'for (var i = 0; i < list.length; i++) {\n'
+  String get exampleBad => 'for (var i = 0; i < list.length; i++) {\n'
       '  print(list[i]);\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'for (final item in list) {\n'
+  String get exampleGood => 'for (final item in list) {\n'
       '  print(item);\n'
       '}';
 
@@ -1639,14 +1637,12 @@ class PreferUsePrefixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'Widget myCounter() {\n'
+  String get exampleBad => 'Widget myCounter() {\n'
       '  final count = useState(0);  // uses hook, missing use prefix\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'Widget useCounter() {\n'
+  String get exampleGood => 'Widget useCounter() {\n'
       '  final count = useState(0);  // use prefix\n'
       '}';
 
@@ -1973,8 +1969,7 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'if (condition) {\n'
+  String get exampleBad => 'if (condition) {\n'
       '  return true;\n'
       '} else {\n'
       '  return false;\n'

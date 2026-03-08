@@ -3504,13 +3504,11 @@ class RequireAutoRoutePageSuffixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad =>
-      '@RoutePage()\n'
+  String get exampleBad => '@RoutePage()\n'
       'class Home extends StatelessWidget {}  // missing Page suffix';
 
   @override
-  String get exampleGood =>
-      '@RoutePage()\n'
+  String get exampleGood => '@RoutePage()\n'
       'class HomePage extends StatelessWidget {}';
 
   static const LintCode _code = LintCode(

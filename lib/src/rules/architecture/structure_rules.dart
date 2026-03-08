@@ -1440,12 +1440,10 @@ class PreferNamedImportsRule extends SaropaLintRule {
   PreferNamedImportsRule() : super(code: _code);
 
   @override
-  String get exampleBad =>
-      "import 'package:foo/foo.dart'; // no show/hide";
+  String get exampleBad => "import 'package:foo/foo.dart'; // no show/hide";
 
   @override
-  String get exampleGood =>
-      "import 'package:foo/foo.dart' show Bar;";
+  String get exampleGood => "import 'package:foo/foo.dart' show Bar;";
 
   static const LintCode _code = LintCode(
     'prefer_named_imports',
@@ -3214,16 +3212,14 @@ class PreferOverridesLastRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad =>
-      'class C extends B {\n'
+  String get exampleBad => 'class C extends B {\n'
       '  @override\n'
       '  void foo() {}  // override before own members\n'
       '  void bar() {}\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'class C extends B {\n'
+  String get exampleGood => 'class C extends B {\n'
       '  void bar() {}\n'
       '  @override\n'
       '  void foo() {}\n'
@@ -3298,15 +3294,13 @@ class PreferConstructorsOverStaticMethodsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'class C {\n'
+  String get exampleBad => 'class C {\n'
       '  C._();\n'
       '  static C create() => C._();  // static factory\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'class C {\n'
+  String get exampleGood => 'class C {\n'
       '  C._();\n'
       '  factory C.create() => C._();\n'
       '}';
@@ -3362,8 +3356,7 @@ class PreferFunctionOverStaticMethodRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'class MathUtils {\n'
+  String get exampleBad => 'class MathUtils {\n'
       '  static int add(int a, int b) => a + b;\n'
       '}';
 
@@ -3498,13 +3491,11 @@ class PreferStaticMethodOverFunctionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'String formatDate(DateTime dt) =>\n'
+  String get exampleBad => 'String formatDate(DateTime dt) =>\n'
       '    DateFormat("yyyy").format(dt);';
 
   @override
-  String get exampleGood =>
-      'extension on DateTime {\n'
+  String get exampleGood => 'extension on DateTime {\n'
       '  String formatDate() => DateFormat("yyyy").format(this);\n'
       '}';
 
@@ -3573,8 +3564,7 @@ class PreferImportOverPartRule extends SaropaLintRule {
   String get exampleBad => "part 'src/helpers.dart';  // tight coupling";
 
   @override
-  String get exampleGood =>
-      "import 'package:my_pkg/src/helpers.dart';";
+  String get exampleGood => "import 'package:my_pkg/src/helpers.dart';";
 
   static const LintCode _code = LintCode(
     'prefer_import_over_part',

@@ -555,7 +555,18 @@ List<_ShortVar> _findShortVarNames(String code) {
 
 class _ShortVarCollector extends RecursiveAstVisitor<void> {
   static const _allowedShortNames = {
-    'id', 'db', 'io', 'ui', 'x', 'y', 'z', 'i', 'j', 'k', 'e', 'n',
+    'id',
+    'db',
+    'io',
+    'ui',
+    'x',
+    'y',
+    'z',
+    'i',
+    'j',
+    'k',
+    'e',
+    'n',
   };
   static const _smallBlockThreshold = 5;
 

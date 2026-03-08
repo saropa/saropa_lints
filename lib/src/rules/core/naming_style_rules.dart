@@ -27,7 +27,8 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
   List<String> get configAliases => const <String>['avoid_getter_prefix'];
 
   @override
-  String get exampleBad => 'String get getName => _name;  // redundant get prefix';
+  String get exampleBad =>
+      'String get getName => _name;  // redundant get prefix';
 
   @override
   String get exampleGood => 'String get name => _name;';
@@ -1440,7 +1441,8 @@ class PreferCorrectHandlerNameRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
-  String get exampleBad => 'void buttonPressed() {}  // missing on/handle prefix';
+  String get exampleBad =>
+      'void buttonPressed() {}  // missing on/handle prefix';
 
   @override
   String get exampleGood => 'void onButtonPressed() {}';
@@ -1633,7 +1635,8 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'set name(String n) => _name = n;  // not named value';
+  String get exampleBad =>
+      'set name(String n) => _name = n;  // not named value';
 
   @override
   String get exampleGood => 'set name(String value) => _name = value;';
@@ -2009,8 +2012,7 @@ class PreferBasePrefixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad =>
-      'abstract class Animal {}  // missing Base suffix';
+  String get exampleBad => 'abstract class Animal {}  // missing Base suffix';
 
   @override
   String get exampleGood => 'abstract class AnimalBase {}';
@@ -2123,8 +2125,7 @@ class PreferIPrefixInterfacesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad =>
-      'abstract class Repository {}  // missing I prefix';
+  String get exampleBad => 'abstract class Repository {}  // missing I prefix';
 
   @override
   String get exampleGood => 'abstract class IRepository {}';
@@ -2205,8 +2206,7 @@ class PreferImplSuffixRule extends SaropaLintRule {
       'class SqlUserRepo implements UserRepo {}  // missing Impl suffix';
 
   @override
-  String get exampleGood =>
-      'class SqlUserRepoImpl implements UserRepo {}';
+  String get exampleGood => 'class SqlUserRepoImpl implements UserRepo {}';
 
   static const LintCode _code = LintCode(
     'prefer_impl_suffix',
@@ -2399,14 +2399,12 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
   PreferWildcardForUnusedParamRule() : super(code: _code);
 
   @override
-  String get exampleBad =>
-      'void onClick(BuildContext context, int index) {\n'
+  String get exampleBad => 'void onClick(BuildContext context, int index) {\n'
       '  print("Clicked");  // context and index unused\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'void onClick(BuildContext _, int __) {\n'
+  String get exampleGood => 'void onClick(BuildContext _, int __) {\n'
       '  print("Clicked");\n'
       '}';
 
