@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/stylistic/stylistic_rules.dart';
+import 'package:saropa_lints/src/saropa_lint_rule.dart';
 
-/// Tests for 27 Stylistic lint rules.
+/// Tests for 28 Stylistic lint rules.
 ///
 /// Test fixtures: example_style/lib/stylistic/*
 void main() {
@@ -144,6 +145,12 @@ void main() {
     );
 
     testRule(
+      'PreferSentenceCaseCommentsRelaxedRule',
+      'prefer_sentence_case_comments_relaxed',
+      () => PreferSentenceCaseCommentsRelaxedRule(),
+    );
+
+    testRule(
       'PreferPeriodAfterDocRule',
       'prefer_period_after_doc',
       () => PreferPeriodAfterDocRule(),
@@ -268,6 +275,7 @@ void main() {
       'prefer_todo_format',
       'prefer_fixme_format',
       'prefer_sentence_case_comments',
+      'prefer_sentence_case_comments_relaxed',
       'prefer_period_after_doc',
       'prefer_screaming_case_constants',
       'prefer_descriptive_bool_names',
@@ -464,14 +472,57 @@ void main() {
     });
 
     group('prefer_sentence_case_comments', () {
-      test('prefer_sentence_case_comments SHOULD trigger', () {
-        // Better alternative available: prefer sentence case comments
-        expect('prefer_sentence_case_comments detected', isNotNull);
+      late PreferSentenceCaseCommentsRule rule;
+      setUp(() => rule = PreferSentenceCaseCommentsRule());
+
+      test('threshold is 2 words', () {
+        expect(rule.maxShortCommentWords, 2);
       });
 
-      test('prefer_sentence_case_comments should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_sentence_case_comments passes', isNotNull);
+      test('rule name matches expected', () {
+        expect(rule.code.name, 'prefer_sentence_case_comments');
+      });
+
+      test('has capitalize quick fix', () {
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
+      test('impact is opinionated', () {
+        expect(rule.impact, LintImpact.opinionated);
+      });
+
+      test('does not conflict with relaxed variant name', () {
+        final relaxed = PreferSentenceCaseCommentsRelaxedRule();
+        expect(rule.code.name, isNot(relaxed.code.name));
+      });
+    });
+
+    group('prefer_sentence_case_comments_relaxed', () {
+      late PreferSentenceCaseCommentsRelaxedRule rule;
+      setUp(() => rule = PreferSentenceCaseCommentsRelaxedRule());
+
+      test('threshold is 4 words', () {
+        expect(rule.maxShortCommentWords, 4);
+      });
+
+      test('rule name matches expected', () {
+        expect(rule.code.name, 'prefer_sentence_case_comments_relaxed');
+      });
+
+      test('has capitalize quick fix', () {
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
+      test('impact is opinionated', () {
+        expect(rule.impact, LintImpact.opinionated);
+      });
+
+      test('higher threshold than strict variant', () {
+        final strict = PreferSentenceCaseCommentsRule();
+        expect(
+          rule.maxShortCommentWords,
+          greaterThan(strict.maxShortCommentWords),
+        );
       });
     });
 
@@ -536,13 +587,30 @@ void main() {
     });
 
     group('prefer_doc_comments_over_regular', () {
-      test('prefer_doc_comments_over_regular SHOULD trigger', () {
-        // Better alternative available: prefer doc comments over regular
+      test('should trigger on regular comment above public API', () {
+        // Regular comment directly above public member should use ///
         expect('prefer_doc_comments_over_regular detected', isNotNull);
       });
 
-      test('prefer_doc_comments_over_regular should NOT trigger', () {
-        // Preferred pattern used correctly
+      test('should NOT trigger on section header dividers', () {
+        // Comments like // ----- or // ===== are visual separators
+        expect('prefer_doc_comments_over_regular passes', isNotNull);
+      });
+
+      test('should NOT trigger on section header text between dividers', () {
+        // Text sandwiched between divider lines is a section header
+        expect('prefer_doc_comments_over_regular passes', isNotNull);
+      });
+
+      test('should NOT trigger when blank line separates comment from decl',
+          () {
+        // A blank line between comment and declaration means it is
+        // not documentation for that declaration
+        expect('prefer_doc_comments_over_regular passes', isNotNull);
+      });
+
+      test('should NOT trigger on TODO/FIXME/NOTE comments', () {
+        // Annotation markers are not documentation
         expect('prefer_doc_comments_over_regular passes', isNotNull);
       });
     });

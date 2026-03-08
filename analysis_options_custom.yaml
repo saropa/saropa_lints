@@ -136,6 +136,7 @@ prefer_trailing_comma_always: false  # Multi-line construct is missing a trailin
 prefer_todo_format: false  # TODO comment should follow format: TODO(author): description Add author name in parentheses: TODO(author): ... so the TODO is trackable and searchable by owner.
 prefer_fixme_format: false  # FIXME comment should follow format: FIXME(author): description Add author name in parentheses: FIXME(author): ... so the issue is trackable and searchable by owner.
 prefer_sentence_case_comments: false  # Comment should start with a capital letter. Capitalize the first letter of the comment to maintain sentence-case consistency across the codebase.
+prefer_sentence_case_comments_relaxed: false  # Like above but skips comments of 1-4 words (short annotations/labels).
 prefer_period_after_doc: false  # Doc comment missing period at end. Incomplete sentences reduce clarity and professionalism in API docs. Add a period at the end of every doc comment sentence. Example: /// Returns the user name.
 prefer_doc_comments_over_regular: false  # Use doc comments (///) instead of regular comments (//) for public API documentation. Replace // with /// so the comment appears in IDE hover docs and can be extracted by dartdoc for API reference.
 prefer_no_commented_out_code: false  # Commented-out code clutters the codebase. Delete it - git preserves history. Delete the commented-out code. Use version control to retrieve it if needed.

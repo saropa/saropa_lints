@@ -1851,38 +1851,28 @@ class PreferFixmeFormatRule extends SaropaLintRule {
   }
 }
 
-/// Warns when comments don't start with a capital letter.
+/// Shared logic for sentence-case comment rules.
 ///
-/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+/// Both variants always skip:
+/// - Doc comments (`///`), block comments (`/* */`)
+/// - Special markers (TODO, FIXME, NOTE, etc.)
+/// - Comments that look like commented-out code
+/// - Comments starting with a camelCase or snake_case identifier
+///   (e.g., `// userId is the primary key`)
 ///
-/// This is an **opinionated rule** - not included in any tier by default.
-///
-/// **Pros of sentence case comments:**
-/// - More professional appearance
-/// - Consistent with documentation standards
-/// - Easier to read
-///
-/// **Cons (why some teams skip this):**
-/// - Extra effort for quick notes
-/// - May conflict with code references (e.g., "// userId is required")
-///
-/// ### Example
-///
-/// #### BAD (with this rule enabled):
-/// ```dart
-/// // calculate the total
-/// // this is a helper function
-/// ```
-///
-/// #### GOOD:
-/// ```dart
-/// // Calculate the total
-/// // This is a helper function
-/// ```
-class PreferSentenceCaseCommentsRule extends SaropaLintRule {
-  PreferSentenceCaseCommentsRule() : super(code: _code);
+/// Subclasses configure [maxShortCommentWords] to control how many words
+/// a comment can have before sentence-case is enforced:
+/// - [PreferSentenceCaseCommentsRule]: skips ≤2 words, enforces on 3+
+/// - [PreferSentenceCaseCommentsRelaxedRule]: skips ≤4 words, enforces on 5+
+abstract class _SentenceCaseCommentsBase extends SaropaLintRule {
+  _SentenceCaseCommentsBase({
+    required LintCode code,
+    required this.maxShortCommentWords,
+  }) : super(code: code);
 
-  /// Style/consistency. Large counts acceptable in legacy code.
+  /// Comments with this many words or fewer are skipped.
+  final int maxShortCommentWords;
+
   @override
   LintImpact get impact => LintImpact.opinionated;
 
@@ -1895,23 +1885,18 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
             CapitalizeCommentFix(context: context),
       ];
 
-  static const LintCode _code = LintCode(
-    'prefer_sentence_case_comments',
-    '[prefer_sentence_case_comments] Comment starts with a lowercase letter. Inconsistent capitalization in comments reduces readability and gives the codebase an unfinished appearance. {v4}',
-    correctionMessage:
-        'Capitalize the first letter of the comment to maintain sentence-case consistency across the codebase.',
-    severity: DiagnosticSeverity.INFO,
-  );
-
   /// Pattern for special comment markers that should be skipped.
   static final RegExp _specialMarkerPattern = RegExp(
     r'^(ignore|TODO|FIXME|NOTE|HACK|XXX|BUG|WARN|WARNING):?',
     caseSensitive: false,
   );
 
-  /// Pattern for code-like references at start of comment.
-  /// Matches: identifier followed by space, or identifier in prose context.
-  static final RegExp _codeReferencePattern = RegExp(r'^[a-z_][a-zA-Z0-9_]*\s');
+  /// Pattern for code-like identifiers at start of comment.
+  /// Only matches camelCase (e.g., `userId`) or snake_case (e.g., `user_id`)
+  /// identifiers — not plain English words like `calculate`.
+  static final RegExp _codeReferencePattern = RegExp(
+    r'^(?:[a-z]+[A-Z][a-zA-Z0-9]*|[a-z]+_[a-z][a-zA-Z0-9_]*)\s',
+  );
 
   /// Pattern for Dart keywords that typically start code statements.
   /// These indicate commented-out code rather than prose comments.
@@ -2010,6 +1995,12 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
       return;
     }
 
+    // Skip short comments — these are annotations/labels, not prose.
+    // e.g., "// magnifyingGlass", "// not used", "// see above"
+    if (trimmed.split(' ').length <= maxShortCommentWords) {
+      return;
+    }
+
     // Skip if starts with code-like patterns (variable names, etc.)
     // e.g., "// userId is the..." or "// _privateField holds..."
     if (_codeReferencePattern.hasMatch(trimmed)) {
@@ -2039,6 +2030,93 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
       reporter.atOffset(offset: comment.offset, length: comment.length);
     }
   }
+}
+
+/// Warns when comments of 3+ words don't start with a capital letter.
+///
+/// Since: v1.3.0 | Updated: v5.0.0 | Rule version: v5
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// Comments of 1-2 words are always skipped (treated as annotation labels).
+/// For a more relaxed variant that also skips 3-4 word comments, see
+/// [PreferSentenceCaseCommentsRelaxedRule].
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// // calculate the total price
+/// // this is a helper function
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// // Calculate the total price
+/// // This is a helper function
+/// // magnifyingGlass
+/// // not used
+/// ```
+class PreferSentenceCaseCommentsRule extends _SentenceCaseCommentsBase {
+  PreferSentenceCaseCommentsRule()
+      : super(code: _code, maxShortCommentWords: 2);
+
+  static const LintCode _code = LintCode(
+    'prefer_sentence_case_comments',
+    '[prefer_sentence_case_comments] Comment starts with a lowercase letter. '
+        'Inconsistent capitalization in comments reduces readability and gives '
+        'the codebase an unfinished appearance. Skips comments of 1-2 words. '
+        '{v5}',
+    correctionMessage:
+        'Capitalize the first letter of the comment to maintain '
+        'sentence-case consistency across the codebase.',
+    severity: DiagnosticSeverity.INFO,
+  );
+}
+
+/// Warns when comments of 5+ words don't start with a capital letter.
+///
+/// Since: v5.0.0 | Rule version: v1
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// A more relaxed variant of [PreferSentenceCaseCommentsRule] that skips
+/// comments of 1-4 words (treated as short annotations or labels). Only
+/// enforces sentence case on comments of 5 or more words, which are more
+/// likely to be prose sentences.
+///
+/// **Do not enable both this rule and `prefer_sentence_case_comments`.**
+/// They target the same comments at different thresholds.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// // calculate the total price including tax
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// // Calculate the total price including tax
+/// // calculate the total
+/// // not used
+/// // magnifyingGlass
+/// ```
+class PreferSentenceCaseCommentsRelaxedRule extends _SentenceCaseCommentsBase {
+  PreferSentenceCaseCommentsRelaxedRule()
+      : super(code: _code, maxShortCommentWords: 4);
+
+  static const LintCode _code = LintCode(
+    'prefer_sentence_case_comments_relaxed',
+    '[prefer_sentence_case_comments_relaxed] Comment starts with a lowercase '
+        'letter. Inconsistent capitalization in comments reduces readability '
+        'and gives the codebase an unfinished appearance. Skips comments of '
+        '1-4 words. {v1}',
+    correctionMessage:
+        'Capitalize the first letter of the comment to maintain '
+        'sentence-case consistency across the codebase.',
+    severity: DiagnosticSeverity.INFO,
+  );
 }
 
 /// Warns when doc comments don't end with a period.
@@ -2962,7 +3040,7 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_doc_comments_over_regular',
-    '[prefer_doc_comments_over_regular] Use doc comments (///) instead of regular comments (//) for public API documentation. This is an opinionated rule - not included in any tier by default. {v5}',
+    '[prefer_doc_comments_over_regular] Use doc comments (///) instead of regular comments (//) for public API documentation. This is an opinionated rule - not included in any tier by default. {v6}',
     correctionMessage:
         'Replace // with /// so the comment appears in IDE hover docs and can be extracted by dartdoc for API reference.',
     severity: DiagnosticSeverity.INFO,
@@ -2977,6 +3055,10 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
     r'^(TODO|FIXME|FIX|NOTE|HACK|XXX|BUG|OPTIMIZE|WARNING|CHANGED|REVIEW|DEPRECATED|IMPORTANT|MARK)\b',
     caseSensitive: false,
   );
+
+  /// Pattern to detect visual divider lines (3+ repeated characters).
+  /// Matches lines like `// -----`, `// =====`, `// *****`, etc.
+  static final RegExp _dividerLine = RegExp(r'^(.)\1{2,}$');
 
   /// Pattern to detect commented-out code.
   /// Matches lines that look like Dart code rather than documentation.
@@ -3017,37 +3099,35 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
   ) {
     // Check methods
     context.addMethodDeclaration((MethodDeclaration node) {
-      // Skip private methods
       if (node.name.lexeme.startsWith('_')) return;
-
-      // Skip if has doc comment
       if (node.documentationComment != null) return;
-
-      // Check for regular comment above
-      _checkPrecedingComment(node.firstTokenAfterCommentAndMetadata, reporter);
+      _checkPrecedingComment(
+        node.firstTokenAfterCommentAndMetadata, reporter, context,
+      );
     });
 
     // Check functions
     context.addFunctionDeclaration((FunctionDeclaration node) {
       if (node.name.lexeme.startsWith('_')) return;
       if (node.documentationComment != null) return;
-
-      _checkPrecedingComment(node.firstTokenAfterCommentAndMetadata, reporter);
+      _checkPrecedingComment(
+        node.firstTokenAfterCommentAndMetadata, reporter, context,
+      );
     });
 
     // Check classes
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.name.lexeme.startsWith('_')) return;
       if (node.documentationComment != null) return;
-
-      _checkPrecedingComment(node.firstTokenAfterCommentAndMetadata, reporter);
+      _checkPrecedingComment(
+        node.firstTokenAfterCommentAndMetadata, reporter, context,
+      );
     });
 
     // Check fields
     context.addFieldDeclaration((FieldDeclaration node) {
       if (node.documentationComment != null) return;
 
-      // Check if any variable is public
       bool hasPublicField = false;
       for (final VariableDeclaration variable in node.fields.variables) {
         if (!variable.name.lexeme.startsWith('_')) {
@@ -3056,58 +3136,90 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
         }
       }
       if (!hasPublicField) return;
-
-      _checkPrecedingComment(node.firstTokenAfterCommentAndMetadata, reporter);
+      _checkPrecedingComment(
+        node.firstTokenAfterCommentAndMetadata, reporter, context,
+      );
     });
   }
 
-  void _checkPrecedingComment(Token token, SaropaDiagnosticReporter reporter) {
-    Token? comment = token.precedingComments;
+  void _checkPrecedingComment(
+    Token token,
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Collect all preceding comments into a list for context analysis.
+    final comments = <Token>[];
+    Token? c = token.precedingComments;
+    while (c != null) {
+      comments.add(c);
+      c = c.next;
+    }
+    if (comments.isEmpty) return;
 
-    // Look for the last regular comment before the declaration
-    Token? lastRegularComment;
-    while (comment != null) {
-      final String lexeme = comment.lexeme;
-      // Check if it's a regular comment that looks like documentation
-      // (not a doc comment, not an ignore directive)
-      if (lexeme.startsWith('//') &&
-          !lexeme.startsWith('///') &&
-          !lexeme.contains('ignore:') &&
-          !lexeme.contains('ignore_for_file:')) {
-        // Check if it looks like a documentation comment (describes the member)
-        final String content = lexeme.substring(2).trim();
-        // Skip annotation markers like TODO:, FIX:, NOTE:, HACK:, etc.
-        if (_annotationMarker.hasMatch(content)) {
-          comment = comment.next;
-          continue;
-        }
+    // Comments separated by a blank line from the declaration are not docs.
+    final lineInfo = context.lineInfo;
+    final lastCommentLine =
+        lineInfo.getLocation(comments[comments.length - 1].end).lineNumber;
+    final declarationLine = lineInfo.getLocation(token.offset).lineNumber;
+    if (declarationLine - lastCommentLine > 1) return;
 
-        // Skip commented-out code
-        if (_commentedOutCode.hasMatch(content)) {
-          comment = comment.next;
-          continue;
-        }
+    // Identify divider indices for section-header detection.
+    final dividers = _findDividerIndices(comments);
 
-        // Only flag if it looks like a description (starts with capital letter
-        // or common doc patterns)
-        if (content.isNotEmpty &&
-            (_startsWithCapital.hasMatch(content) ||
-                content.startsWith('Returns') ||
-                content.startsWith('Gets') ||
-                content.startsWith('Sets') ||
-                content.startsWith('The '))) {
-          lastRegularComment = comment;
+    final target = _findDocLikeComment(comments, dividers);
+    if (target != null) {
+      reporter.atOffset(offset: target.offset, length: target.length);
+    }
+  }
+
+  /// Returns indices of comments that are visual divider lines.
+  static Set<int> _findDividerIndices(List<Token> comments) {
+    final dividers = <int>{};
+    for (int i = 0; i < comments.length; i++) {
+      final lexeme = comments[i].lexeme;
+      if (lexeme.startsWith('//') && !lexeme.startsWith('///')) {
+        final content = lexeme.substring(2).trim();
+        if (content.isNotEmpty && _dividerLine.hasMatch(content)) {
+          dividers.add(i);
         }
       }
-      comment = comment.next;
     }
+    return dividers;
+  }
 
-    if (lastRegularComment != null) {
-      reporter.atOffset(
-        offset: lastRegularComment.offset,
-        length: lastRegularComment.length,
-      );
+  /// Finds the last regular comment that looks like documentation,
+  /// skipping dividers, section headers, annotations, and code.
+  static Token? _findDocLikeComment(
+    List<Token> comments,
+    Set<int> dividers,
+  ) {
+    Token? lastRegularComment;
+    for (int i = 0; i < comments.length; i++) {
+      final lexeme = comments[i].lexeme;
+      if (!lexeme.startsWith('//') ||
+          lexeme.startsWith('///') ||
+          lexeme.contains('ignore:') ||
+          lexeme.contains('ignore_for_file:')) {
+        continue;
+      }
+      final content = lexeme.substring(2).trim();
+      if (_annotationMarker.hasMatch(content)) continue;
+      if (_commentedOutCode.hasMatch(content)) continue;
+      if (dividers.contains(i)) continue;
+
+      // Section header: text adjacent to a divider line
+      if (dividers.contains(i - 1) || dividers.contains(i + 1)) continue;
+
+      if (content.isNotEmpty &&
+          (_startsWithCapital.hasMatch(content) ||
+              content.startsWith('Returns') ||
+              content.startsWith('Gets') ||
+              content.startsWith('Sets') ||
+              content.startsWith('The '))) {
+        lastRegularComment = comments[i];
+      }
     }
+    return lastRegularComment;
   }
 }
 

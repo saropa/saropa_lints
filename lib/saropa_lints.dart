@@ -988,6 +988,7 @@ final List<SaropaLintRule Function()> _allRuleFactories =
   PreferTodoFormatRule.new,
   PreferFixmeFormatRule.new,
   PreferSentenceCaseCommentsRule.new,
+  PreferSentenceCaseCommentsRelaxedRule.new,
   PreferPeriodAfterDocRule.new,
   PreferScreamingCaseConstantsRule.new,
   PreferDescriptiveBoolNamesRule.new,
