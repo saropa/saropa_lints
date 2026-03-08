@@ -257,6 +257,18 @@ void main() {
           // _noElse has no else clause; rule must not report there.
         },
       );
+
+      test(
+        'fixture has false-positive guard: else-if chains must not trigger',
+        () {
+          final content = File(
+            'example_core/lib/formatting/prefer_blank_line_before_else_fixture.dart',
+          ).readAsStringSync();
+          expect(content, contains('_elseIfChain'));
+          expect(content, contains('else if'));
+          // else-if is a single control-flow construct; rule must skip it.
+        },
+      );
     });
 
     group('prefer_blank_line_after_loop', () {

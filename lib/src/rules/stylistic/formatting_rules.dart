@@ -361,7 +361,7 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
   }
 }
 
-/// Warns when there is no blank line before an `else` or `else if` clause.
+/// Warns when there is no blank line before a standalone `else` clause.
 ///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
 /// A blank line before `else` separates branches visually and improves
@@ -372,6 +372,8 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
 /// - Reports on `elseStatement` so [AddBlankLineBeforeFix] inserts at the
 ///   start of the line containing the else clause.
 /// - Skips when there is no else (no false positive on `if (x) { }`).
+/// - Skips `else if` chains — they are a single control-flow construct and
+///   inserting a blank line before `else if` would be a syntax error.
 ///
 /// **Bad:**
 /// ```dart
@@ -409,8 +411,8 @@ class NewlineBeforeElseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_else',
-    '[prefer_blank_line_before_else] Adding a blank line before else/else if '
-        'separates branches and improves readability. Enable via the stylistic tier. {v1}',
+    '[prefer_blank_line_before_else] Adding a blank line before a standalone '
+        'else clause separates branches and improves readability. Enable via the stylistic tier. {v2}',
     correctionMessage: 'Add a blank line before this else clause.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -424,6 +426,9 @@ class NewlineBeforeElseRule extends SaropaLintRule {
       final Statement? elseStmt = node.elseStatement;
       final Token? elseToken = node.elseKeyword;
       if (elseStmt == null || elseToken == null) return;
+
+      // Skip `else if` chains — they are a single control-flow construct.
+      if (elseStmt is IfStatement) return;
 
       final LineInfo lineInfo = context.lineInfo;
       final int thenEndLine =

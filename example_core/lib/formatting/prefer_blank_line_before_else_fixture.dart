@@ -32,3 +32,15 @@ void _noElse() {
   }
   return;
 }
+
+// FALSE POSITIVE guard: else-if chains must NOT trigger.
+void _elseIfChain() {
+  final x = 1;
+  if (x == 1) {
+    return;
+  } else if (x == 2) {
+    return;
+  } else if (x == 3) {
+    return;
+  }
+}
