@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/stylistic/stylistic_control_flow_rules.dart';
@@ -217,14 +220,77 @@ void main() {
     });
 
     group('prefer_switch_statement', () {
-      test('prefer_switch_statement SHOULD trigger', () {
-        // Better alternative available: prefer switch statement
-        expect('prefer_switch_statement detected', isNotNull);
+      test('switch expression in list literal SHOULD trigger', () {
+        final nodes = _findSwitchExpressions('''
+enum E { a, b }
+void f() {
+  final list = [switch (E.a) { E.a => 1, E.b => 2 }];
+}
+''');
+        expect(nodes, hasLength(1));
+        expect(nodes.first.parent, isNot(isA<ExpressionFunctionBody>()));
+        expect(nodes.first.parent, isNot(isA<ReturnStatement>()));
+        expect(nodes.first.parent, isNot(isA<VariableDeclaration>()));
       });
 
-      test('prefer_switch_statement should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_switch_statement passes', isNotNull);
+      test('switch expression as argument SHOULD trigger', () {
+        final nodes = _findSwitchExpressions('''
+enum E { a, b }
+void f() {
+  print(switch (E.a) { E.a => 'A', E.b => 'B' });
+}
+''');
+        expect(nodes, hasLength(1));
+        expect(nodes.first.parent, isNot(isA<ExpressionFunctionBody>()));
+        expect(nodes.first.parent, isNot(isA<ReturnStatement>()));
+        expect(nodes.first.parent, isNot(isA<VariableDeclaration>()));
+      });
+
+      test('switch in arrow body should NOT trigger (false positive)', () {
+        final nodes = _findSwitchExpressions('''
+enum E { a, b }
+String f(E e) => switch (e) { E.a => 'A', E.b => 'B' };
+''');
+        expect(nodes, hasLength(1));
+        expect(nodes.first.parent, isA<ExpressionFunctionBody>());
+      });
+
+      test('switch in return statement should NOT trigger', () {
+        final nodes = _findSwitchExpressions('''
+enum E { a, b }
+String f(E e) { return switch (e) { E.a => 'A', E.b => 'B' }; }
+''');
+        expect(nodes, hasLength(1));
+        expect(nodes.first.parent, isA<ReturnStatement>());
+      });
+
+      test('switch in variable declaration should NOT trigger', () {
+        final nodes = _findSwitchExpressions('''
+enum E { a, b }
+void f() { final x = switch (E.a) { E.a => 1, E.b => 2 }; }
+''');
+        expect(nodes, hasLength(1));
+        expect(nodes.first.parent, isA<VariableDeclaration>());
+      });
+
+      test('switch in assignment should NOT trigger', () {
+        final nodes = _findSwitchExpressions('''
+enum E { a, b }
+void f() { int x = 0; x = switch (E.a) { E.a => 1, E.b => 2 }; }
+''');
+        expect(nodes, hasLength(1));
+        expect(nodes.first.parent, isA<AssignmentExpression>());
+      });
+
+      test('switch in getter arrow body should NOT trigger', () {
+        final nodes = _findSwitchExpressions('''
+enum E { a, b }
+extension on E {
+  String get label => switch (this) { E.a => 'A', E.b => 'B' };
+}
+''');
+        expect(nodes, hasLength(1));
+        expect(nodes.first.parent, isA<ExpressionFunctionBody>());
       });
     });
 
@@ -324,4 +390,22 @@ void main() {
       });
     });
   });
+}
+
+/// Parses [code] and returns all [SwitchExpression] nodes found in the AST.
+List<SwitchExpression> _findSwitchExpressions(String code) {
+  final result = parseString(content: code);
+  final visitor = _SwitchExpressionCollector();
+  result.unit.accept(visitor);
+  return visitor.nodes;
+}
+
+class _SwitchExpressionCollector extends RecursiveAstVisitor<void> {
+  final List<SwitchExpression> nodes = [];
+
+  @override
+  void visitSwitchExpression(SwitchExpression node) {
+    nodes.add(node);
+    super.visitSwitchExpression(node);
+  }
 }

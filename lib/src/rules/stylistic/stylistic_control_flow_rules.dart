@@ -349,35 +349,38 @@ class PreferGuardClausesRule extends SaropaLintRule {
   }
 }
 
-/// Warns when positive conditions first is preferred (opposite rule).
+/// Warns when a negated condition is used in a guard clause instead of
+/// the positive form.
 ///
-/// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v2
+/// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v3
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
+/// Null-guard clauses (`if (x == null) return;`) are excluded because
+/// `== null` is an equality check, not a negation, and the early-return
+/// pattern keeps the happy path un-nested.
+///
 /// **Pros of positive conditions first:**
-/// - Happy path is prominent
 /// - Less negation in conditions
 /// - More optimistic code style
 ///
-/// **Cons (why some teams prefer guard clauses):**
-/// - More nesting
+/// **Cons (why some teams prefer negated guards):**
 /// - Preconditions not as visible
 ///
 /// ### Example
 ///
 /// #### BAD (with this rule enabled):
 /// ```dart
-/// void process(User? user) {
-///   if (user == null) return;
+/// void process(String input) {
+///   if (!input.isNotEmpty) return;
 ///   // do work
 /// }
 /// ```
 ///
 /// #### GOOD:
 /// ```dart
-/// void process(User? user) {
-///   if (user != null) {
+/// void process(String input) {
+///   if (input.isNotEmpty) {
 ///     // do work
 ///   }
 /// }
@@ -393,9 +396,14 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_positive_conditions_first',
-    '[prefer_positive_conditions_first] Guard clauses with negated conditions push the happy path deeper into the function. Positive conditions make the primary logic path prominent and easier to understand. {v2}',
+    '[prefer_positive_conditions_first] Negated guard clauses '
+        '(if (!condition) return) obscure the intent. '
+        'Rewriting with the positive condition makes the logic clearer. '
+        'Null-guard clauses (== null) are excluded because they are '
+        'equality checks, not negations. {v3}',
     correctionMessage:
-        'Restructure to place the positive condition first so the happy path is prominent and easier to follow.',
+        'Remove the negation and restructure so the positive condition '
+        'is tested first.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -405,7 +413,7 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addIfStatement((node) {
-      // Check for guard clause pattern: if (negative) return;
+      // Only flag guard clauses (no else branch)
       if (node.elseStatement != null) return;
 
       final thenStmt = node.thenStatement;
@@ -414,57 +422,58 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
         inner = inner.statements.first;
       }
 
-      // If the then branch is just a return, it's a guard clause
-      if (inner is ReturnStatement) {
-        // Check if condition is negative
-        final condition = node.expression;
-        if (condition is BinaryExpression &&
-            condition.operator.type == TokenType.EQ_EQ) {
-          if (condition.rightOperand is NullLiteral ||
-              condition.leftOperand is NullLiteral) {
-            reporter.atNode(node);
-          }
-        } else if (condition is PrefixExpression &&
-            condition.operator.type == TokenType.BANG) {
-          reporter.atNode(node);
-        }
+      // Only flag single-return guard clauses
+      if (inner is! ReturnStatement) return;
+
+      // Only flag negated conditions (! operator).
+      // Null-equality checks (== null) are NOT negations and are
+      // excluded — they are valid guard clause patterns.
+      final condition = node.expression;
+      if (condition is PrefixExpression &&
+          condition.operator.type == TokenType.BANG) {
+        reporter.atNode(node);
       }
     });
   }
 }
 
-/// Warns when switch expression is preferred over statement (opposite).
+/// Warns when a switch expression is used outside a value-producing position.
 ///
-/// Since: v4.13.0 | Rule version: v1
+/// Since: v4.13.0 | Rule version: v2
 ///
-/// This is an **opinionated rule** - not included in any tier by default.
+/// This is an **opinionated rule** — not included in any tier by default.
 ///
-/// **Pros of switch statement:**
-/// - More familiar pattern
-/// - Easier to add side effects
-/// - Works in all Dart versions
+/// Switch expressions in Dart 3 are idiomatic for pure value mappings
+/// (arrow bodies, return statements, variable initialisers, assignments,
+/// and yield statements). This rule only fires when a switch expression
+/// appears in a non-value position (e.g. nested in a collection literal
+/// or passed as a function argument), where a switch statement would allow
+/// side effects, breakpoints, and multi-line case bodies.
 ///
-/// **Cons (why some teams prefer expression):**
-/// - More verbose
-/// - Less idiomatic Dart 3.0+
+/// **v2 change:** No longer flags switch expressions in value-producing
+/// positions (`=> switch (...)`, `return switch (...)`, variable init,
+/// assignment, yield). This eliminates false positives on the canonical
+/// Dart 3 enum-to-value mapping pattern.
 ///
 /// ### Example
 ///
 /// #### BAD (with this rule enabled):
 /// ```dart
-/// final label = switch (status) {
-///   Status.active => 'Active',
-///   Status.inactive => 'Inactive',
-/// };
+/// final widgets = [
+///   switch (status) {            // nested in list — not a value position
+///     Status.active => Text('Active'),
+///     Status.inactive => Text('Inactive'),
+///   },
+/// ];
 /// ```
 ///
 /// #### GOOD:
 /// ```dart
-/// String label;
-/// switch (status) {
-///   case Status.active: label = 'Active'; break;
-///   case Status.inactive: label = 'Inactive'; break;
-/// }
+/// // Arrow body — idiomatic Dart 3 value mapping (not flagged)
+/// String get label => switch (status) {
+///   Status.active => 'Active',
+///   Status.inactive => 'Inactive',
+/// };
 /// ```
 class PreferSwitchStatementRule extends SaropaLintRule {
   PreferSwitchStatementRule() : super(code: _code);
@@ -473,11 +482,11 @@ class PreferSwitchStatementRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
-  RuleCost get cost => RuleCost.medium;
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     'prefer_switch_statement',
-    '[prefer_switch_statement] Switch expressions limit flexibility for side effects and debugging. Switch statements support imperative logic, breakpoints, and multi-line case bodies. {v1}',
+    '[prefer_switch_statement] Switch expressions limit flexibility for side effects and debugging. Switch statements support imperative logic, breakpoints, and multi-line case bodies. {v2}',
     correctionMessage:
         'Replace the switch expression with a switch statement to enable side effects, multi-line cases, and debuggability.',
     severity: DiagnosticSeverity.INFO,
@@ -489,8 +498,34 @@ class PreferSwitchStatementRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addSwitchExpression((node) {
+      if (_isValuePositionSwitch(node)) return;
       reporter.atNode(node);
     });
+  }
+
+  /// Returns true when the switch expression is in a value-producing position
+  /// where it is idiomatic Dart 3 (arrow body, return, variable init).
+  static bool _isValuePositionSwitch(SwitchExpression node) {
+    final parent = node.parent;
+
+    // => switch (...) { ... }  (getter / method arrow body)
+    if (parent is ExpressionFunctionBody) return true;
+
+    // return switch (...) { ... };
+    if (parent is ReturnStatement) return true;
+
+    // final x = switch (...) { ... };
+    if (parent is VariableDeclaration) return true;
+
+    // x = switch (...) { ... };
+    if (parent is AssignmentExpression && parent.rightHandSide == node) {
+      return true;
+    }
+
+    // yield switch (...) { ... };
+    if (parent is YieldStatement) return true;
+
+    return false;
   }
 }
 
