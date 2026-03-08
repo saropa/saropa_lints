@@ -29,6 +29,12 @@ class AlwaysFailRule extends SaropaLintRule {
   @override
   List<String> get configAliases => const <String>['always_fail_test_case'];
 
+  @override
+  String get exampleBad => '// any file — rule always triggers';
+
+  @override
+  String get exampleGood => '// disable the rule in analysis_options';
+
   static const LintCode _code = LintCode(
     'prefer_fail_test_case',
     '[prefer_fail_test_case] This custom lint always fails (test hook). Formerly: always_fail_test_case. Test-only rule that always reports a lint at the start of the file. {v3}',

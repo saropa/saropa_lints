@@ -4026,6 +4026,31 @@ void _logTerminal(String message) {
   _logBuffer.writeln(message);
 }
 
+/// Prints a labeled code example with multi-line support.
+///
+/// Splits [example] on `\n`. First line is prefixed with the colored label;
+/// continuation lines are indented to align under the code content.
+void _logExample(
+  String label,
+  String colorCode,
+  String example, {
+  int indent = 2,
+}) {
+  final lines = example.split('\n');
+  final padded = label.padRight(4);
+  final spaces = ' ' * indent;
+  _logTerminal(
+    '$spaces${_Colors.bold}$colorCode$padded:${_Colors.reset} ${lines[0]}',
+  );
+  if (lines.length > 1) {
+    // Align continuation lines under code, not under label
+    final contIndent = ' ' * (indent + padded.length + 2);
+    for (int i = 1; i < lines.length; i++) {
+      _logTerminal('$contIndent${lines[i]}');
+    }
+  }
+}
+
 /// Display "what's new" from CHANGELOG.md (non-blocking, fail-safe).
 void _showWhatsNew(String version, String? packageDir) {
   if (version == 'unknown' || packageDir == null) return;
@@ -4533,16 +4558,10 @@ _CategoryResult? _walkthroughCategory({
     if (meta != null) {
       // Show code examples if available (GOOD first for readability)
       if (meta.exampleGood != null) {
-        _logTerminal(
-          '  ${_Colors.bold}${_Colors.green}GOOD:${_Colors.reset} '
-          '${meta.exampleGood}',
-        );
+        _logExample('GOOD', _Colors.green, meta.exampleGood!);
       }
       if (meta.exampleBad != null) {
-        _logTerminal(
-          '  ${_Colors.bold}${_Colors.red}BAD:${_Colors.reset}  '
-          '${meta.exampleBad}',
-        );
+        _logExample('BAD', _Colors.red, meta.exampleBad!);
       }
       if (meta.exampleBad != null || meta.exampleGood != null) {
         _logTerminal('');
@@ -4643,8 +4662,14 @@ _CategoryResult? _walkthroughConflicting({
     final rule = rules[i];
     final meta = metadata[rule];
     _logTerminal('  ${_Colors.bold}${i + 1}. $rule${_Colors.reset}');
-    if (meta != null && meta.exampleGood != null) {
-      _logTerminal('     ${meta.exampleGood}');
+    if (meta != null &&
+        (meta.exampleGood != null || meta.exampleBad != null)) {
+      if (meta.exampleGood != null) {
+        _logExample('GOOD', _Colors.green, meta.exampleGood!, indent: 5);
+      }
+      if (meta.exampleBad != null) {
+        _logExample('BAD', _Colors.red, meta.exampleBad!, indent: 5);
+      }
     } else if (meta != null) {
       final desc = _stripRulePrefix(meta.correctionMessage).isNotEmpty
           ? _stripRulePrefix(meta.correctionMessage)

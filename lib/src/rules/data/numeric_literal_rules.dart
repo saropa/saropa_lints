@@ -203,6 +203,12 @@ class DoubleLiteralFormatRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'final x = .5;  // missing leading zero';
+
+  @override
+  String get exampleGood => 'final x = 0.5;';
+
   static const LintCode _code = LintCode(
     'double_literal_format',
     '[double_literal_format] Formatting double literals in a specific way (e.g., 1.0 vs 1.) is a stylistic preference. All forms represent the same value with no performance difference. Enable via the stylistic tier. {v4}',

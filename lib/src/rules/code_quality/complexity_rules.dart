@@ -719,6 +719,12 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  String get exampleBad => 'if (5 == status) { }';
+
+  @override
+  String get exampleGood => 'if (status == 5) { }';
+
   static const LintCode _code = LintCode(
     'binary_expression_operand_order',
     '[binary_expression_operand_order] Preferring a specific operand order in binary expressions is a stylistic convention. Both orderings produce equivalent compiled code. Enable via the stylistic tier. {v3}',

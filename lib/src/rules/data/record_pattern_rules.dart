@@ -922,6 +922,14 @@ class PatternFieldsOrderingRule extends SaropaLintRule {
   @override
   List<String> get configAliases => const <String>['pattern_fields_ordering'];
 
+  @override
+  String get exampleBad =>
+      'if (obj case User(name: n, age: a)) { }  // not alphabetical';
+
+  @override
+  String get exampleGood =>
+      'if (obj case User(age: a, name: n)) { }  // alphabetical';
+
   static const LintCode _code = LintCode(
     'prefer_sorted_pattern_fields',
     '[prefer_sorted_pattern_fields] Unsorted pattern fields slow code review and make refactoring error-prone. Alphabetical ordering provides a predictable scanning path, reduces merge conflicts when multiple developers modify the same pattern, and makes it easier to spot missing or duplicate fields at a glance. {v5}',
@@ -1105,6 +1113,14 @@ class RecordFieldsOrderingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'typedef Person = ({String name, int age});  // not alphabetical';
+
+  @override
+  String get exampleGood =>
+      'typedef Person = ({int age, String name});  // alphabetical';
 
   static const LintCode _code = LintCode(
     'prefer_sorted_record_fields',

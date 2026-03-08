@@ -74,6 +74,12 @@ class PreferInterpolationOverConcatenationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => "final msg = 'Hello, ' + name + '!';";
+
+  @override
+  String get exampleGood => "final msg = 'Hello, \$name!';";
+
   static const LintCode _code = LintCode(
     'prefer_interpolation_over_concatenation',
     '[prefer_interpolation_over_concatenation] String concatenation with the + operator was detected where interpolation would be cleaner. Concatenation adds visual noise and is less idiomatic in Dart. Use \$-interpolation for improved readability. {v2}',
@@ -130,6 +136,12 @@ class PreferConcatenationOverInterpolationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => "final msg = 'Hello, \$name!';";
+
+  @override
+  String get exampleGood => "final msg = 'Hello, ' + name + '!';";
 
   static const LintCode _code = LintCode(
     'prefer_concatenation_over_interpolation',
@@ -481,6 +493,12 @@ class PreferSortedImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  String get exampleBad => "import 'dart:io';\nimport 'dart:async';";
+
+  @override
+  String get exampleGood => "import 'dart:async';\nimport 'dart:io';";
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
         ({required CorrectionProducerContext context}) =>
             SortImportsFix(context: context),
@@ -566,6 +584,14 @@ class PreferImportGroupCommentsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => "import 'dart:async';\n\nimport 'package:x/x.dart';";
+
+  @override
+  String get exampleGood =>
+      "/// Dart imports\nimport 'dart:async';\n\n"
+      "/// Package imports\nimport 'package:x/x.dart';";
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -669,6 +695,12 @@ class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'void greet() {}\nfinal String name;';
+
+  @override
+  String get exampleGood => 'final String name;\nvoid greet() {}';
+
   static const LintCode _code = LintCode(
     'prefer_fields_before_methods',
     '[prefer_fields_before_methods] A method appears before a field declaration in this class. Placing fields first improves readability by showing the data model before behavior. Move all field declarations above methods. {v4}',
@@ -723,6 +755,12 @@ class PreferMethodsBeforeFieldsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'final String name;\nvoid greet() {}';
+
+  @override
+  String get exampleGood => 'void greet() {}\nfinal String name;';
 
   static const LintCode _code = LintCode(
     'prefer_methods_before_fields',
@@ -1327,6 +1365,12 @@ class PreferCamelCaseMethodNamesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'void fetch_user_data() {}';
+
+  @override
+  String get exampleGood => 'void fetchUserData() {}';
+
   static const LintCode _code = LintCode(
     'prefer_camel_case_method_names',
     '[prefer_camel_case_method_names] Method name does not follow lowerCamelCase convention. Non-standard casing breaks IDE autocompletion and makes the API inconsistent with Dart SDK and package conventions. {v2}',
@@ -1413,6 +1457,12 @@ class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'final u = getUser();  // unclear purpose';
+
+  @override
+  String get exampleGood => 'final user = getUser();';
 
   static const LintCode _code = LintCode(
     'prefer_descriptive_variable_names',
@@ -1504,6 +1554,12 @@ class PreferConciseVariableNamesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'final theCurrentlyLoggedInUserEmail = e;';
+
+  @override
+  String get exampleGood => 'final userEmail = getEmail();';
+
   static const LintCode _code = LintCode(
     'prefer_concise_variable_names',
     '[prefer_concise_variable_names] Variable name exceeds 30 characters, which reduces readability and makes code harder to scan. Shorten it to a concise name that still conveys its purpose. {v2}',
@@ -1562,6 +1618,12 @@ class PreferExplicitThisRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => "void greet() => print('Hi, \$name');";
+
+  @override
+  String get exampleGood => "void greet() => print('Hi, \${this.name}');";
 
   static const LintCode _code = LintCode(
     'prefer_explicit_this',

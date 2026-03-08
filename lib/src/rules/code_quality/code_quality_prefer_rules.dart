@@ -564,6 +564,18 @@ class PreferForInRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'for (var i = 0; i < list.length; i++) {\n'
+      '  print(list[i]);\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'for (final item in list) {\n'
+      '  print(item);\n'
+      '}';
+
   static const LintCode _code = LintCode(
     'prefer_for_in',
     '[prefer_for_in] Using for-in loops instead of index-based for loops is a stylistic preference. Both have equivalent performance for most Dart collections. Enable via the stylistic tier. {v4}',
@@ -698,6 +710,12 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'condition ? foo(1, 2) : foo(1, 3);';
+
+  @override
+  String get exampleGood => 'foo(1, condition ? 2 : 3);';
 
   static const LintCode _code = LintCode(
     'prefer_pushing_conditional_expressions',
@@ -1620,6 +1638,18 @@ class PreferUsePrefixRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'Widget myCounter() {\n'
+      '  final count = useState(0);  // uses hook, missing use prefix\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'Widget useCounter() {\n'
+      '  final count = useState(0);  // use prefix\n'
+      '}';
+
   static const LintCode _code = LintCode(
     'prefer_use_prefix',
     '[prefer_use_prefix] Prefixing Flutter Hooks function names with use is a naming convention. The prefix does not affect hook behavior or performance. Enable via the stylistic tier. {v2}',
@@ -1738,6 +1768,12 @@ class PreferDotShorthandRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'TextAlign align = TextAlign.center;';
+
+  @override
+  String get exampleGood => 'TextAlign align = .center;';
+
   static const LintCode _code = LintCode(
     'prefer_dot_shorthand',
     '[prefer_dot_shorthand] Fully qualified enum reference detected where the type is already known from context. Use dot shorthand (.value) available in Dart 3 to reduce verbosity while preserving type safety. {v2}',
@@ -1834,6 +1870,12 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'if (isEnabled == true) { }';
+
+  @override
+  String get exampleGood => 'if (isEnabled) { }';
+
   static const LintCode _code = LintCode(
     'no_boolean_literal_compare',
     '[no_boolean_literal_compare] Comparing a boolean to true/false literally (x == true) instead of using the value directly (x) is a stylistic choice with no correctness or performance impact. Enable via the stylistic tier. {v3}',
@@ -1929,6 +1971,17 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'if (condition) {\n'
+      '  return true;\n'
+      '} else {\n'
+      '  return false;\n'
+      '}';
+
+  @override
+  String get exampleGood => 'return condition;';
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [

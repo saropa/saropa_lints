@@ -1963,6 +1963,14 @@ class PreferInlineFunctionTypesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad =>
+      'typedef Predicate = bool Function(int);\n'
+      'void f(Predicate p) {}';
+
+  @override
+  String get exampleGood => 'void f(bool Function(int) p) {}';
+
   static const LintCode _code = LintCode(
     'prefer_inline_function_types',
     '[prefer_inline_function_types] Prefer inline function type over typedef for clarity at use site.',

@@ -51,6 +51,21 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad =>
+      'switch (x) {\n'
+      '  case 1: break;\n'
+      '  case 2: break;  // no blank line\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'switch (x) {\n'
+      '  case 1: break;\n'
+      '\n'
+      '  case 2: break;\n'
+      '}';
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
         ({required CorrectionProducerContext context}) =>
             AddBlankLineBeforeFix(context: context),
@@ -134,6 +149,21 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'class Foo {\n'
+      '  final int v;\n'
+      '  Foo(this.v);  // no blank line\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class Foo {\n'
+      '  final int v;\n'
+      '\n'
+      '  Foo(this.v);\n'
+      '}';
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -232,6 +262,21 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad =>
+      'class C {\n'
+      '  void a() {}\n'
+      '  void b() {}  // no blank line\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class C {\n'
+      '  void a() {}\n'
+      '\n'
+      '  void b() {}\n'
+      '}';
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
         ({required CorrectionProducerContext context}) =>
             AddBlankLineBeforeFix(context: context),
@@ -319,6 +364,17 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad =>
+      'final x = compute();\n'
+      'return x;  // no blank line';
+
+  @override
+  String get exampleGood =>
+      'final x = compute();\n'
+      '\n'
+      'return x;';
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
         ({required CorrectionProducerContext context}) =>
             AddBlankLineBeforeReturnFix(context: context),
@@ -404,6 +460,24 @@ class NewlineBeforeElseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad =>
+      'if (x) {\n'
+      '  a();\n'
+      '} else {\n'
+      '  b();  // no blank line before else\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'if (x) {\n'
+      '  a();\n'
+      '}\n'
+      '\n'
+      'else {\n'
+      '  b();\n'
+      '}';
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
         ({required CorrectionProducerContext context}) =>
             AddBlankLineBeforeFix(context: context),
@@ -481,6 +555,17 @@ class NewlineAfterLoopRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'for (final x in list) { process(x); }\n'
+      'doNext();  // no blank line after loop';
+
+  @override
+  String get exampleGood =>
+      'for (final x in list) { process(x); }\n'
+      '\n'
+      'doNext();';
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -565,6 +650,20 @@ class PreferTrailingCommaRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'final list = [\n'
+      "  'a',\n"
+      "  'b'\n"
+      '];  // missing trailing comma';
+
+  @override
+  String get exampleGood =>
+      'final list = [\n'
+      "  'a',\n"
+      "  'b',\n"
+      '];';
 
   static const LintCode _code = LintCode(
     'prefer_trailing_comma',
@@ -762,6 +861,12 @@ class FormatCommentFormattingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => '// this is a comment  // lowercase start';
+
+  @override
+  String get exampleGood => '// This is a comment.';
+
   static const LintCode _code = LintCode(
     'format_comment_style',
     '[format_comment_style] Enforcing specific comment formatting conventions is a stylistic preference. Comment format has no impact on code behavior or performance. Enable via the stylistic tier. {v3}',
@@ -867,6 +972,12 @@ class RequireIgnoreCommentSpacingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.trivial;
 
   @override
+  String get exampleBad => '// ignore:rule_name  // no space after colon';
+
+  @override
+  String get exampleGood => '// ignore: rule_name';
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
         ({required CorrectionProducerContext context}) =>
             RequireIgnoreCommentSpacingFix(context: context),
@@ -964,6 +1075,20 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad =>
+      'class Foo {\n'
+      '  void doIt() {}\n'
+      '  final int value;  // field after method\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class Foo {\n'
+      '  final int value;\n'
+      '  void doIt() {}\n'
+      '}';
+
+  @override
   List<String> get configAliases => const <String>[
         'enforce_member_ordering',
         'member_ordering',
@@ -1043,6 +1168,12 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'void f({String? n}, int c) {}  // named before positional';
+
+  @override
+  String get exampleGood => 'void f(int c, {String? n}) {}';
 
   /// Alias: parameters_ordering
   @override
@@ -1140,6 +1271,12 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'enum P { high, critical, low }  // not sorted';
+
+  @override
+  String get exampleGood => 'enum P { critical, high, low }  // alphabetical';
+
   static const LintCode _code = LintCode(
     'enum_constants_ordering',
     '[enum_constants_ordering] Ordering enum constants alphabetically is a stylistic preference. Enum constant order does not affect runtime behavior or performance. Enable via the stylistic tier. {v2}',
@@ -1193,6 +1330,17 @@ class PreferReadableLineLengthRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'final x = someVeryLongMethodName(argumentOne, argumentTwo, argumentThree, argumentFour);  // >80 chars';
+
+  @override
+  String get exampleGood =>
+      'final x = someMethod(\n'
+      '  argOne,\n'
+      '  argTwo,\n'
+      ');';
 
   static const LintCode _code = LintCode(
     'prefer_readable_line_length',

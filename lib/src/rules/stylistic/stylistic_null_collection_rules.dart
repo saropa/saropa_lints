@@ -476,6 +476,12 @@ class PreferNullableOverLateRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'late String _name;';
+
+  @override
+  String get exampleGood => 'String? _name;';
+
   static const LintCode _code = LintCode(
     'prefer_nullable_over_late',
     '[prefer_nullable_over_late] Field uses late initialization, which risks a LateInitializationError at runtime if read before assignment. Use a nullable type instead so the compiler enforces null checks at every access point. {v4}',
@@ -695,6 +701,12 @@ class PreferCollectionIfOverTernaryRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => '...(show ? [widget] : [])';
+
+  @override
+  String get exampleGood => 'if (show) widget';
+
   static const LintCode _code = LintCode(
     'prefer_collection_if_over_ternary',
     '[prefer_collection_if_over_ternary] Ternary operator with spread is used to conditionally include collection elements. This pattern is harder to read; use collection-if syntax instead for clearer, more idiomatic Dart. {v2}',
@@ -769,6 +781,12 @@ class PreferTernaryOverCollectionIfRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'if (show) widget';
+
+  @override
+  String get exampleGood => '...(show ? [widget] : [])';
 
   static const LintCode _code = LintCode(
     'prefer_ternary_over_collection_if',
@@ -915,6 +933,14 @@ class PreferMapEntriesIterationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'for (final k in map.keys) {\n  final v = map[k];\n}';
+
+  @override
+  String get exampleGood =>
+      'for (final e in map.entries) {\n  print(e.value);\n}';
+
   static const LintCode _code = LintCode(
     'prefer_map_entries_iteration',
     '[prefer_map_entries_iteration] Iterating a map via .keys and then performing a separate map[key] lookup on each iteration duplicates work. Use map.entries to access both key and value in a single pass. {v2}',
@@ -1002,6 +1028,12 @@ class PreferKeysIterationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'for (final e in map.entries) { ... }';
+
+  @override
+  String get exampleGood => 'for (final k in map.keys) { ... }';
+
   static const LintCode _code = LintCode(
     'prefer_keys_with_lookup',
     '[prefer_keys_with_lookup] Map iteration uses .entries instead of .keys with explicit lookup. Iterating with .keys and map[key] is a familiar loop pattern that matches common imperative styles. {v2}',
@@ -1062,6 +1094,12 @@ class PreferMutableCollectionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'List<String> get items => UnmodifiableListView(_items);';
+
+  @override
+  String get exampleGood => 'List<String> get items => _items;';
 
   static const LintCode _code = LintCode(
     'prefer_mutable_collections',

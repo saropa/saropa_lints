@@ -1304,6 +1304,14 @@ class PreferSortedParametersRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'void f({required String zebra, required String apple}) {}';
+
+  @override
+  String get exampleGood =>
+      'void f({required String apple, required String zebra}) {}';
+
   /// Alias: prefer_sorted_parameter
   static const LintCode _code = LintCode(
     'prefer_sorted_parameters',
@@ -1430,6 +1438,14 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 class PreferNamedImportsRule extends SaropaLintRule {
   PreferNamedImportsRule() : super(code: _code);
+
+  @override
+  String get exampleBad =>
+      "import 'package:foo/foo.dart'; // no show/hide";
+
+  @override
+  String get exampleGood =>
+      "import 'package:foo/foo.dart' show Bar;";
 
   static const LintCode _code = LintCode(
     'prefer_named_imports',
@@ -2172,6 +2188,12 @@ class PreferTrailingUnderscoreForUnusedRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => "list.map((item) => 'fixed');";
+
+  @override
+  String get exampleGood => "list.map((_) => 'fixed');";
 
   static const LintCode _code = LintCode(
     'prefer_trailing_underscore_for_unused',
@@ -3191,6 +3213,22 @@ class PreferOverridesLastRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad =>
+      'class C extends B {\n'
+      '  @override\n'
+      '  void foo() {}  // override before own members\n'
+      '  void bar() {}\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class C extends B {\n'
+      '  void bar() {}\n'
+      '  @override\n'
+      '  void foo() {}\n'
+      '}';
+
   static const LintCode _code = LintCode(
     'prefer_overrides_last',
     '[prefer_overrides_last] Place override methods after non-override members.',
@@ -3259,6 +3297,20 @@ class PreferConstructorsOverStaticMethodsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'class C {\n'
+      '  C._();\n'
+      '  static C create() => C._();  // static factory\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class C {\n'
+      '  C._();\n'
+      '  factory C.create() => C._();\n'
+      '}';
+
   static const LintCode _code = LintCode(
     'prefer_constructors_over_static_methods',
     '[prefer_constructors_over_static_methods] Prefer factory constructor over static method that returns an instance.',
@@ -3308,6 +3360,15 @@ class PreferFunctionOverStaticMethodRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'class MathUtils {\n'
+      '  static int add(int a, int b) => a + b;\n'
+      '}';
+
+  @override
+  String get exampleGood => 'int add(int a, int b) => a + b;';
 
   static const LintCode _code = LintCode(
     'prefer_function_over_static_method',
@@ -3436,6 +3497,17 @@ class PreferStaticMethodOverFunctionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'String formatDate(DateTime dt) =>\n'
+      '    DateFormat("yyyy").format(dt);';
+
+  @override
+  String get exampleGood =>
+      'extension on DateTime {\n'
+      '  String formatDate() => DateFormat("yyyy").format(this);\n'
+      '}';
+
   static const LintCode _code = LintCode(
     'prefer_static_method_over_function',
     '[prefer_static_method_over_function] Top-level function with first parameter of class type could be a static method or extension for better discoverability.',
@@ -3496,6 +3568,13 @@ class PreferImportOverPartRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => "part 'src/helpers.dart';  // tight coupling";
+
+  @override
+  String get exampleGood =>
+      "import 'package:my_pkg/src/helpers.dart';";
 
   static const LintCode _code = LintCode(
     'prefer_import_over_part',

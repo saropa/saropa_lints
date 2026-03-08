@@ -162,6 +162,18 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad =>
+      'class MyButton extends StatelessWidget { ... }\n'
+      'class MyCard extends StatelessWidget { ... }  // second widget';
+
+  @override
+  String get exampleGood =>
+      '// my_button.dart\n'
+      'class MyButton extends StatelessWidget { ... }\n'
+      '// my_card.dart  (separate file)\n'
+      'class MyCard extends StatelessWidget { ... }';
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -342,6 +354,12 @@ class PreferExpressionBodyGettersRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => 'int get value { return _x; }';
+
+  @override
+  String get exampleGood => 'int get value => _x;';
+
   static const LintCode _code = LintCode(
     'prefer_expression_body_getters',
     '[prefer_expression_body_getters] Getter has a block body with a single return; use expression body (=>) for clarity. {v1}',
@@ -391,6 +409,12 @@ class AvoidTypesOnClosureParametersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'list.map((int x) => x + 1);';
+
+  @override
+  String get exampleGood => 'list.map((x) => x + 1);  // type inferred';
 
   static const LintCode _code = LintCode(
     'avoid_types_on_closure_parameters',
@@ -446,6 +470,12 @@ class AvoidExplicitTypeDeclarationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => "final String name = 'x';  // redundant type";
+
+  @override
+  String get exampleGood => "final name = 'x';  // type inferred";
+
   static const LintCode _code = LintCode(
     'avoid_explicit_type_declaration',
     '[avoid_explicit_type_declaration] Variable has explicit type; consider removing it when the type can be inferred.',
@@ -492,6 +522,14 @@ class PreferExplicitNullChecksRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => 'return value!;  // crashes if null';
+
+  @override
+  String get exampleGood =>
+      'if (value == null) throw StateError("expected non-null");\n'
+      'return value;';
+
   static const LintCode _code = LintCode(
     'prefer_explicit_null_checks',
     '[prefer_explicit_null_checks] Prefer explicit == null or != null check over postfix ! when it improves clarity.',
@@ -530,6 +568,12 @@ class PreferOptionalNamedParamsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'void f([int x, int y = 0]) {}  // positional';
+
+  @override
+  String get exampleGood => 'void f({int? x, int y = 0}) {}  // named';
 
   static const LintCode _code = LintCode(
     'prefer_optional_named_params',
@@ -585,6 +629,12 @@ class PreferOptionalPositionalParamsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'void f({bool verbose = false}) {}  // named';
+
+  @override
+  String get exampleGood => 'void f([bool verbose = false]) {}  // positional';
 
   static const LintCode _code = LintCode(
     'prefer_optional_positional_params',
@@ -653,6 +703,14 @@ class PreferPositionalBoolParamsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad =>
+      'void showDialog({bool dismissible = true}) {}  // named';
+
+  @override
+  String get exampleGood =>
+      'void showDialog([bool dismissible = true]) {}  // positional';
 
   static const LintCode _code = LintCode(
     'prefer_positional_bool_params',
@@ -725,6 +783,12 @@ class PreferBlockBodySettersRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => 'set value(int x) => _x = x;  // expression body';
+
+  @override
+  String get exampleGood => 'set value(int x) { _x = x; }  // block body';
+
   static const LintCode _code = LintCode(
     'prefer_block_body_setters',
     '[prefer_block_body_setters] Setter uses expression body; use block body for consistency and to allow multiple statements. {v1}',
@@ -796,6 +860,15 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      "createUser('John', 'j@ex.com', 30, true);  // unclear";
+
+  @override
+  String get exampleGood =>
+      "createUser(name: 'John', email: 'j@ex.com',\n"
+      "           age: 30, isAdmin: true);  // self-documenting";
 
   /// Threshold for number of positional parameters before suggesting named.
   static const int _threshold = 3;
@@ -1069,6 +1142,19 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'class MyClass {\n'
+      '  String name;  // public field\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class MyClass {\n'
+      '  String _name;  // private\n'
+      '  String get name => _name;  // expose via getter\n'
+      '}';
+
   static const LintCode _code = LintCode(
     'prefer_private_underscore_prefix',
     '[prefer_private_underscore_prefix] Instance field is public without documentation, exposing internal state. This is an opinionated rule - not included in any tier by default. {v3}',
@@ -1203,6 +1289,17 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad =>
+      'class _MyIcon extends StatelessWidget {\n'
+      '  Widget build(ctx) => Icon(Icons.star);  // class boilerplate\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'Widget _buildIcon() =>\n'
+      '    Icon(Icons.star);  // method in parent widget';
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   /// Maximum number of lines in build method to suggest conversion.
@@ -1326,6 +1423,16 @@ class PreferExplicitTypesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      "var name = 'John';  // var hides type\n"
+      'final count = 42;';
+
+  @override
+  String get exampleGood =>
+      "String name = 'John';  // explicit type\n"
+      'final int count = 42;';
+
   static const LintCode _code = LintCode(
     'prefer_explicit_types',
     '[prefer_explicit_types] Variable uses var instead of an explicit type annotation. Without a visible type, readers must inspect the right-hand side or hover in the IDE to determine the declared type. {v4}',
@@ -1419,6 +1526,16 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      "(String, int) getUser() =>\n"
+      "    ('John', 30);  // unnamed fields";
+
+  @override
+  String get exampleGood =>
+      'User getUser() =>\n'
+      "    User('John', 30);  // named fields via class";
 
   static const LintCode _code = LintCode(
     'prefer_class_over_record_return',
@@ -1515,6 +1632,14 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'onPressed: _handlePress,  // must jump to definition';
+
+  @override
+  String get exampleGood =>
+      'onPressed: () { doSomething(); },  // inline';
 
   static const LintCode _code = LintCode(
     'prefer_inline_callbacks',
@@ -1710,6 +1835,12 @@ class PreferTodoFormatRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => '// TODO fix this later';
+
+  @override
+  String get exampleGood => '// TODO(john): fix this later';
+
   static const LintCode _code = LintCode(
     'prefer_todo_format',
     '[prefer_todo_format] TODO comment is missing the required author and description format. Use TODO(author): description so the comment is trackable, searchable, and attributable to an owner. {v3}',
@@ -1800,6 +1931,12 @@ class PreferFixmeFormatRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => '// FIXME: this is broken';
+
+  @override
+  String get exampleGood => '// FIXME(john): this is broken';
 
   static const LintCode _code = LintCode(
     'prefer_fixme_format',
@@ -2061,6 +2198,12 @@ class PreferSentenceCaseCommentsRule extends _SentenceCaseCommentsBase {
   PreferSentenceCaseCommentsRule()
       : super(code: _code, maxShortCommentWords: 2);
 
+  @override
+  String get exampleBad => '// calculate the total price';
+
+  @override
+  String get exampleGood => '// Calculate the total price';
+
   static const LintCode _code = LintCode(
     'prefer_sentence_case_comments',
     '[prefer_sentence_case_comments] Comment starts with a lowercase letter. '
@@ -2105,6 +2248,15 @@ class PreferSentenceCaseCommentsRule extends _SentenceCaseCommentsBase {
 class PreferSentenceCaseCommentsRelaxedRule extends _SentenceCaseCommentsBase {
   PreferSentenceCaseCommentsRelaxedRule()
       : super(code: _code, maxShortCommentWords: 4);
+
+  @override
+  String get exampleBad =>
+      '// calculate the total price including tax  // 6 words, flagged';
+
+  @override
+  String get exampleGood =>
+      '// Calculate the total price including tax\n'
+      '// not used  // 2 words, skipped';
 
   static const LintCode _code = LintCode(
     'prefer_sentence_case_comments_relaxed',
@@ -2162,6 +2314,12 @@ class PreferPeriodAfterDocRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => "/// Returns the user's name";
+
+  @override
+  String get exampleGood => "/// Returns the user's name.";
 
   static const LintCode _code = LintCode(
     'prefer_period_after_doc',
@@ -2612,6 +2770,16 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'bool flag = true;  // no prefix\n'
+      'bool processData = true;  // verb, not a question';
+
+  @override
+  String get exampleGood =>
+      'bool isActive = true;\n'
+      'bool shouldProcessData = true;  // reads as question';
+
   static const LintCode _code = LintCode(
     'prefer_descriptive_bool_names_strict',
     '[prefer_descriptive_bool_names_strict] Boolean should use a descriptive prefix (is, has, can, should, etc.). This rule is suitable for the pedantic tier. {v3}',
@@ -2774,6 +2942,12 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'UserService.dart  // PascalCase';
+
+  @override
+  String get exampleGood => 'user_service.dart  // snake_case';
+
   static const LintCode _code = LintCode(
     'prefer_snake_case_files',
     '[prefer_snake_case_files] File name does not follow snake_case convention. Non-standard file names break import autocompletion and make the project structure harder to navigate on case-sensitive file systems. {v4}',
@@ -2930,6 +3104,14 @@ class AvoidSmallTextRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad =>
+      "Text('Small', style: TextStyle(fontSize: 10));  // < 12";
+
+  @override
+  String get exampleGood =>
+      "Text('Readable', style: TextStyle(fontSize: 14));";
+
   /// Minimum font size in logical pixels.
   static const double _minFontSize = 12.0;
 
@@ -3037,6 +3219,16 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      "// Returns the user's full name.\n"
+      "String getFullName() => '\$first \$last';";
+
+  @override
+  String get exampleGood =>
+      "/// Returns the user's full name.\n"
+      "String getFullName() => '\$first \$last';";
 
   static const LintCode _code = LintCode(
     'prefer_doc_comments_over_regular',
@@ -3598,6 +3790,14 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad =>
+      "\"It's a beautiful day\"  // straight apostrophe (')";
+
+  @override
+  String get exampleGood =>
+      '"It\u2019s a beautiful day"  // curly apostrophe (\u2019)';
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
         ({required CorrectionProducerContext context}) =>
             ReplaceStraightWithCurlyFix(context: context),
@@ -3708,6 +3908,16 @@ class ArgumentsOrderingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      "Foo(width: 100, color: blue,\n"
+      "    child: x);  // unsorted args";
+
+  @override
+  String get exampleGood =>
+      "Foo(child: x, color: blue,\n"
+      '    width: 100);  // alphabetical';
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -3827,6 +4037,16 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad =>
+      '// final oldValue = compute();\n'
+      '// if (cond) { doSomething(); }  // dead code';
+
+  @override
+  String get exampleGood =>
+      '// Compute value using the updated algorithm\n'
+      'final newValue = computeNew();  // prose is fine';
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
         ({required CorrectionProducerContext context}) =>
             DeleteCommentedCodeFix(context: context),
@@ -3917,6 +4137,14 @@ class AvoidEscapingInnerQuotesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad =>
+      "final msg = 'It\\'s a beautiful day';  // escaped";
+
+  @override
+  String get exampleGood =>
+      'final msg = "It\'s a beautiful day";  // no escaping';
+
   static const LintCode _code = LintCode(
     'avoid_escaping_inner_quotes',
     '[avoid_escaping_inner_quotes] String literal uses backslash-escaped quote characters when switching the string delimiter would eliminate the need for escaping, improving readability.',
@@ -3973,6 +4201,14 @@ class AvoidSingleCascadeInExpressionStatementsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => 'list..add(item);  // single cascade';
+
+  @override
+  String get exampleGood =>
+      'list.add(item);  // direct call\n'
+      "list..add('a')..add('b');  // multi-cascade is fine";
+
   static const LintCode _code = LintCode(
     'avoid_single_cascade_in_expression_statements',
     '[avoid_single_cascade_in_expression_statements] Cascade with exactly one section used as a statement. Use a direct method call or property access instead of a single cascade.',
@@ -4019,6 +4255,14 @@ class PreferAdjacentStringsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad =>
+      "final sql = 'SELECT * ' + 'FROM users';  // + concat";
+
+  @override
+  String get exampleGood =>
+      "final sql = 'SELECT * ' 'FROM users';  // adjacent";
+
   static const LintCode _code = LintCode(
     'prefer_adjacent_strings',
     '[prefer_adjacent_strings] Use adjacent string literals instead of + for literal concatenation. Adjacent strings are merged at compile time and are the idiomatic Dart pattern.',
@@ -4061,6 +4305,14 @@ class PreferInterpolationToComposeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad =>
+      "final greet = 'Hello, ' + name + '!';  // + concat";
+
+  @override
+  String get exampleGood =>
+      "final greet = 'Hello, \$name!';  // interpolation";
 
   static const LintCode _code = LintCode(
     'prefer_interpolation_to_compose',
@@ -4111,6 +4363,14 @@ class PreferRawStringsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad =>
+      "final re = RegExp('\\\\d+');  // double backslash";
+
+  @override
+  String get exampleGood =>
+      "final re = RegExp(r'\\d+');  // raw string";
 
   static const LintCode _code = LintCode(
     'prefer_raw_strings',

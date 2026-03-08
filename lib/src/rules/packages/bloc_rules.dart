@@ -504,6 +504,20 @@ class AvoidCubitsRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
+  @override
+  String get exampleBad =>
+      'class CounterCubit extends Cubit<int> {\n'
+      '  void increment() => emit(state + 1);\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class CounterBloc extends Bloc<CounterEvent, int> {\n'
+      '  CounterBloc() : super(0) {\n'
+      '    on<Increment>((e, emit) => emit(state + 1));\n'
+      '  }\n'
+      '}';
+
   static const LintCode _code = LintCode(
     'avoid_cubit_usage',
     '[avoid_cubit_usage] Prefer Bloc over Cubit for better event traceability and debugging. {v1}',
@@ -2234,6 +2248,16 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
+  @override
+  String get exampleBad =>
+      'class LoadUser extends UserEvent {\n'
+      '  // missing Event suffix\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class LoadUserEvent extends UserEvent {}';
+
   static const LintCode _code = LintCode(
     'prefer_bloc_event_suffix',
     '[prefer_bloc_event_suffix] Suffixing Bloc event class names with Event is a naming convention. The suffix does not affect Bloc behavior or performance. Enable via the stylistic tier. {v2}',
@@ -2295,6 +2319,16 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
+  @override
+  String get exampleBad =>
+      'class UserLoading extends UserState {\n'
+      '  // missing State suffix\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class UserLoadingState extends UserState {}';
 
   static const LintCode _code = LintCode(
     'prefer_bloc_state_suffix',

@@ -247,6 +247,18 @@ class AvoidParameterReassignmentRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'void process(int value) {\n'
+      '  value = value * 2;  // reassigning parameter\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'void process(int value) {\n'
+      '  final doubled = value * 2;  // use local variable\n'
+      '}';
+
   static const LintCode _code = LintCode(
     'avoid_parameter_reassignment',
     '[avoid_parameter_reassignment] Parameter is being reassigned. '

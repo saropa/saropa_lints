@@ -784,6 +784,18 @@ class PreferNonConstConstructorsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad =>
+      'class Cfg {\n'
+      '  const Cfg();  // flags any const constructor\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class Cfg {\n'
+      '  Cfg();\n'
+      '}';
+
   static const LintCode _code = LintCode(
     'prefer_non_const_constructors',
     '[prefer_non_const_constructors] Prefer non-const constructor when const is not required (stylistic preference).',
@@ -826,6 +838,19 @@ class PreferFactoryConstructorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'class C {\n'
+      '  static C create() => C();\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class C {\n'
+      '  factory C.create() => C._();\n'
+      '  C._();\n'
+      '}';
 
   static const LintCode _code = LintCode(
     'prefer_factory_constructor',
@@ -2420,6 +2445,19 @@ class PreferFinalFieldsAlwaysRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad =>
+      'class C {\n'
+      '  int x = 0; // mutable field\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class C {\n'
+      '  final int x;\n'
+      '  C(this.x);\n'
+      '}';
 
   static const LintCode _code = LintCode(
     'prefer_final_fields_always',
