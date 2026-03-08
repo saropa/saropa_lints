@@ -105,13 +105,53 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_positive_conditions_first
+// BAD: Negated guard clause — should trigger
 // expect_lint: prefer_positive_conditions_first
-void _bad1086() {
-  // TODO: Add code that triggers prefer_positive_conditions_first
+int _badNegatedGuard(bool isValid) {
+  if (!isValid) return -1;
+  return 42;
 }
 
-// GOOD: Should NOT trigger prefer_positive_conditions_first
-void _good1086() {
-  // TODO: Add compliant code for prefer_positive_conditions_first
+// BAD: Negated guard in block form — should trigger
+// expect_lint: prefer_positive_conditions_first
+int _badNegatedGuardBlock(bool ready) {
+  if (!ready) {
+    return 0;
+  }
+  return 1;
+}
+
+// GOOD: Null-guard clause — should NOT trigger (equality, not negation)
+int _goodNullGuard(int? value) {
+  if (value == null) return 0;
+  return value * 2;
+}
+
+// GOOD: Null on left side — should NOT trigger
+int _goodNullLeft(int? value) {
+  if (null == value) return 0;
+  return value * 2;
+}
+
+// GOOD: Positive condition — should NOT trigger
+int _goodPositive(bool isValid) {
+  if (isValid) {
+    return 42;
+  }
+  return -1;
+}
+
+// GOOD: Has else branch — should NOT trigger
+int _goodWithElse(bool flag) {
+  if (!flag) {
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
+// GOOD: Guard with throw, not return — should NOT trigger
+void _goodThrowGuard(bool ok) {
+  if (!ok) throw Exception('bad');
+  print('ok');
 }
