@@ -408,14 +408,20 @@ void main() {
     });
 
     group('prefer_descriptive_variable_names', () {
-      test('prefer_descriptive_variable_names SHOULD trigger', () {
-        // Better alternative available: prefer descriptive variable names
-        expect('prefer_descriptive_variable_names detected', isNotNull);
+      final rule = PreferDescriptiveVariableNamesRule();
+
+      test('rule metadata is v4 with opinionated impact', () {
+        expect(rule.code.name, 'prefer_descriptive_variable_names');
+        expect(rule.code.problemMessage, contains('{v4}'));
+        expect(rule.code.problemMessage, contains('[prefer_descriptive'));
       });
 
-      test('prefer_descriptive_variable_names should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_descriptive_variable_names passes', isNotNull);
+      test('problem message exceeds 200 characters', () {
+        expect(rule.code.problemMessage.length, greaterThan(200));
+      });
+
+      test('correction message is present', () {
+        expect(rule.code.correctionMessage, isNotEmpty);
       });
     });
 
