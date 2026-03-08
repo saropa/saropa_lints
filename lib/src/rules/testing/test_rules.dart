@@ -350,6 +350,14 @@ class FormatTestNameRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
+  @override
+  String get exampleBad =>
+      "test('Returns True When Valid', () {});  // not snake_case";
+
+  @override
+  String get exampleGood =>
+      "test('returns_true_when_valid', () {});";
+
   static const LintCode _code = LintCode(
     'format_test_name',
     '[format_test_name] Test name should be in snake_case format.',
@@ -1603,6 +1611,17 @@ class PreferFakeOverMockRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
+  @override
+  String get exampleBad =>
+      'final mock = MockRepo();\n'
+      'when(mock.get(any)).thenReturn(data);\n'
+      'verify(mock.get(1)).called(1);';
+
+  @override
+  String get exampleGood =>
+      'final fake = FakeRepo()..items = [data];\n'
+      'expect(fake.get(1), data);';
+
   static const LintCode _code = LintCode(
     'prefer_fake_over_mock',
     '[prefer_fake_over_mock] Test uses mock with verify(). A hand-written fake keeps the test simpler and avoids mock-framework coupling. {v4}',
@@ -1837,6 +1856,16 @@ class PreferTestDataBuilderRule extends SaropaLintRule {
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
+
+  @override
+  String get exampleBad =>
+      'final user = User(1, "Test", "t@e.com",\n'
+      '    30, Address(...), Prefs(...));';
+
+  @override
+  String get exampleGood =>
+      'final user = UserBuilder()\n'
+      '    .withName("Test").build();';
 
   static const LintCode _code = LintCode(
     'prefer_test_data_builder',

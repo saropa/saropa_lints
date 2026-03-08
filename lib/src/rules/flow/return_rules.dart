@@ -108,6 +108,18 @@ class AvoidReturningThisRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad =>
+      'class Builder {\n'
+      '  Builder setX(int x) { _x = x; return this; }\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class Builder {\n'
+      '  void setX(int x) { _x = x; }\n'
+      '}';
+
   static const LintCode _code = LintCode(
     'avoid_returning_this',
     '[avoid_returning_this] Returning this from a method encourages fluent chaining but obscures return type and can confuse readers. Prefer explicit return types or void. {v1}',
@@ -322,6 +334,19 @@ class PreferImmediateReturnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad =>
+      'String getName() {\n'
+      '  final name = computeName();\n'
+      '  return name;\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'String getName() {\n'
+      '  return computeName();\n'
+      '}';
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
         ({required CorrectionProducerContext context}) =>
             InlineImmediateReturnFix(context: context),
@@ -402,6 +427,15 @@ class PreferReturningShorthandsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'int getValue() {\n'
+      '  return 42;\n'
+      '}';
+
+  @override
+  String get exampleGood => 'int getValue() => 42;';
 
   static const LintCode _code = LintCode(
     'prefer_returning_shorthands',

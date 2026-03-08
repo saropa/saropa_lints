@@ -516,6 +516,12 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  String get exampleBad => 'BorderRadius.all(Radius.circular(8))';
+
+  @override
+  String get exampleGood => 'BorderRadius.circular(8)';
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   // cspell:ignore borderradius
@@ -923,6 +929,13 @@ class PreferClipRSuperellipseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  String get exampleBad => 'ClipRRect(borderRadius: BorderRadius.circular(10))';
+
+  @override
+  String get exampleGood =>
+      'ClipRSuperellipse(borderRadius: BorderRadius.circular(10))';
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -997,6 +1010,13 @@ class PreferClipRSuperellipseClipperRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'ClipRRect(clipper: MyClipper())';
+
+  @override
+  String get exampleGood =>
+      'ClipRSuperellipse(clipper: MySuperellipseClipper())';
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};

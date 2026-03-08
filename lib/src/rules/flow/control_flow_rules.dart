@@ -443,6 +443,19 @@ class AvoidContinueRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  String get exampleBad =>
+      'for (final x in items) {\n'
+      '  if (x < 0) continue;  // breaks linear flow\n'
+      '  process(x);\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'for (final x in items) {\n'
+      '  if (x >= 0) process(x);\n'
+      '}';
+
+  @override
   List<String> get configAliases => const <String>['avoid_continue_statement'];
 
   static const LintCode _code = LintCode(
@@ -1634,6 +1647,17 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'if (dark) {\n'
+      '  color = black;\n'
+      '} else {\n'
+      '  color = white;\n'
+      '}';
+
+  @override
+  String get exampleGood => 'color = dark ? black : white;';
+
   static const LintCode _code = LintCode(
     'prefer_conditional_expressions',
     '[prefer_conditional_expressions] Using ternary expressions instead of if-else is a code shape preference. Both compile to equivalent code with no performance impact. Enable via the stylistic tier. {v4}',
@@ -1778,6 +1802,16 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'if (x > 0) {\n'
+      '  return true;\n'
+      '}\n'
+      'return false;';
+
+  @override
+  String get exampleGood => 'return x > 0;';
+
   static const LintCode _code = LintCode(
     'prefer_returning_conditionals',
     '[prefer_returning_conditionals] Simplifying return logic to a single conditional expression is a code shape preference. Both forms produce equivalent compiled output. Enable via the stylistic tier. {v4}',
@@ -1883,6 +1917,17 @@ class PreferReturningConditionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'if (x > 0) {\n'
+      '  return true;\n'
+      '} else {\n'
+      '  return false;\n'
+      '}';
+
+  @override
+  String get exampleGood => 'return x > 0;';
 
   static const LintCode _code = LintCode(
     'prefer_returning_condition',

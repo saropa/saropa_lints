@@ -1617,6 +1617,23 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
+  @override
+  String get exampleBad =>
+      'Column(\n'
+      '  children: [\n'
+      '    Text("A"),\n'
+      '    SizedBox(height: 8),\n'
+      '    Text("B"),\n'
+      '  ],\n'
+      ')';
+
+  @override
+  String get exampleGood =>
+      'Column(\n'
+      '  spacing: 8,\n'
+      '  children: [Text("A"), Text("B")],\n'
+      ')';
+
   static const LintCode _code = LintCode(
     'prefer_spacing_over_sizedbox',
     '[prefer_spacing_over_sizedbox] Using SizedBox for gaps instead of the spacing parameter is a stylistic API choice. Both achieve the same layout with no performance difference. Enable via the stylistic tier. {v4}',
@@ -3453,6 +3470,12 @@ class PreferSizedBoxSquareRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
+  @override
+  String get exampleBad => 'SizedBox(width: 50, height: 50)';
+
+  @override
+  String get exampleGood => 'SizedBox.square(dimension: 50)';
+
   static const LintCode _code = LintCode(
     'prefer_sized_box_square',
     '[prefer_sized_box_square] Using SizedBox(width: x, height: x) instead of SizedBox.square(dimension: x) is a stylistic choice — same widget at runtime, no performance benefit. Enable via the stylistic tier. {v3}',
@@ -3543,6 +3566,16 @@ class PreferCenterOverAlignRule extends SaropaLintRule {
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  @override
+  String get exampleBad =>
+      'Align(\n'
+      '  alignment: Alignment.center,\n'
+      '  child: Text("Hello"),\n'
+      ')';
+
+  @override
+  String get exampleGood => 'Center(child: Text("Hello"))';
 
   static const LintCode _code = LintCode(
     'prefer_center_over_align',

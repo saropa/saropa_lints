@@ -10,7 +10,7 @@
 
 Added `_isValuePositionSwitch()` to skip switch expressions in value-producing
 positions: arrow bodies (`=> switch (...)`), return statements, variable
-initialisers, assignments, and yield statements. Rule now only fires for
+initializers, assignments, and yield statements. Rule now only fires for
 non-value positions (collection literals, function arguments) where a switch
 statement would genuinely be clearer.
 

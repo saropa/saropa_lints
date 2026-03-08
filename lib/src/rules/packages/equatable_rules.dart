@@ -558,6 +558,18 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'class Point extends Equatable {\n'
+      '  final int x, y;\n'
+      '  const Point(this.x, this.y);\n'
+      '  @override List<Object?> get props => [x, y];\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'typedef Point = ({int x, int y});';
+
   static const LintCode _code = LintCode(
     'prefer_record_over_equatable',
     '[prefer_record_over_equatable] Simple Equatable class with only final fields and no custom methods detected. Dart 3 records provide built-in equality and immutability with far less boilerplate. Replace with a typedef record. {v5}',

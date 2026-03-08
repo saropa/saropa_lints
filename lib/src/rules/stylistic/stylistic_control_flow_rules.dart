@@ -104,8 +104,9 @@ class PreferEarlyReturnRule extends SaropaLintRule {
   String get exampleBad => 'if (x != null) { if (y != null) { doWork(); } }';
 
   @override
-  String get exampleGood =>
-      'if (x == null) return; if (y == null) return; doWork();';
+  String get exampleGood => 'if (x == null) return;\n'
+      'if (y == null) return;\n'
+      'doWork();';
 
   static const LintCode _code = LintCode(
     'prefer_early_return',
@@ -199,6 +200,16 @@ class PreferSingleExitPointRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'if (x == null) return;\n'
+      'if (y == null) return;\n'
+      'doWork();';
+
+  @override
+  String get exampleGood => 'if (x != null && y != null) {\n'
+      '  doWork();\n'
+      '}';
 
   /// Alias: prefer_single_exit
   static const LintCode _code = LintCode(
@@ -394,6 +405,14 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'if (!isReady) return;  // negated guard';
+
+  @override
+  String get exampleGood => 'if (isReady) {\n'
+      '  doWork();\n'
+      '}';
+
   static const LintCode _code = LintCode(
     'prefer_positive_conditions_first',
     '[prefer_positive_conditions_first] Negated guard clauses '
@@ -444,7 +463,7 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
 /// This is an **opinionated rule** — not included in any tier by default.
 ///
 /// Switch expressions in Dart 3 are idiomatic for pure value mappings
-/// (arrow bodies, return statements, variable initialisers, assignments,
+/// (arrow bodies, return statements, variable initializers, assignments,
 /// and yield statements). This rule only fires when a switch expression
 /// appears in a non-value position (e.g. nested in a collection literal
 /// or passed as a function argument), where a switch statement would allow
@@ -483,6 +502,16 @@ class PreferSwitchStatementRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'final widgets = [\n'
+      '  switch (s) { 0 => a, _ => b },\n'
+      '];';
+
+  @override
+  String get exampleGood => 'String get label => switch (s) {\n'
+      '  0 => "a", _ => "b",\n'
+      '};';
 
   static const LintCode _code = LintCode(
     'prefer_switch_statement',
@@ -725,6 +754,12 @@ class AvoidCascadesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => 'list..add(1)..add(2);  // cascade';
+
+  @override
+  String get exampleGood => 'list.add(1); list.add(2);  // separate';
+
   static const LintCode _code = LintCode(
     'avoid_cascade_notation',
     '[avoid_cascade_notation] Cascade notation (..) can reduce clarity and maintainability. Use separate statements for each operation. {v1}',
@@ -788,6 +823,18 @@ class PreferExhaustiveEnumsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'switch (s) {\n'
+      '  case S.a: break;\n'
+      '  default: break;  // hides missing cases\n'
+      '}';
+
+  @override
+  String get exampleGood => 'switch (s) {\n'
+      '  case S.a: break;\n'
+      '  case S.b: break;  // exhaustive\n'
+      '}';
 
   static const LintCode _code = LintCode(
     'prefer_exhaustive_enums',
@@ -866,6 +913,18 @@ class PreferDefaultEnumCaseRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'switch (s) {\n'
+      '  case S.a: break;\n'
+      '  case S.b: break;  // no default\n'
+      '}';
+
+  @override
+  String get exampleGood => 'switch (s) {\n'
+      '  case S.a: break;\n'
+      '  default: break;  // handles future values\n'
+      '}';
 
   static const LintCode _code = LintCode(
     'prefer_default_enum_case',
@@ -1103,6 +1162,12 @@ class PreferSyncOverAsyncWhereSimpleRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'Future<int> f() async { return 42; }';
+
+  @override
+  String get exampleGood => 'Future<int> f() => Future.value(42);';
+
   static const LintCode _code = LintCode(
     'prefer_sync_over_async_where_possible',
     '[prefer_sync_over_async_where_possible] Marking a function async when it only returns a synchronous value adds unnecessary Future wrapping overhead and obscures intent. {v3}',
@@ -1166,6 +1231,14 @@ class PreferThenCatchErrorRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'try {\n'
+      '  await fetch();\n'
+      '} catch (e) { log(e); }';
+
+  @override
+  String get exampleGood => 'fetch().then(use).catchError(log);';
+
   static const LintCode _code = LintCode(
     'prefer_then_catcherror',
     '[prefer_then_catcherror] Prefer .then().catchError() over try/catch for async error handling when handling a single Future.',
@@ -1213,6 +1286,12 @@ class PreferFireAndForgetRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => 'await logEvent();  // result unused';
+
+  @override
+  String get exampleGood => 'unawaited(logEvent());';
+
   static const LintCode _code = LintCode(
     'prefer_fire_and_forget',
     '[prefer_fire_and_forget] Await is used but the Future result is not used; consider fire-and-forget (unawaited) to make intent explicit.',
@@ -1256,6 +1335,12 @@ class PreferSeparateAssignmentsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'ctx..size = 1..debug = true;  // cascade';
+
+  @override
+  String get exampleGood => 'ctx.size = 1; ctx.debug = true;  // separate';
 
   static const LintCode _code = LintCode(
     'prefer_separate_assignments',
@@ -1309,6 +1394,17 @@ class PreferIfElseOverGuardsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'if (x < 0) return;\n'
+      'if (x > 10) return;  // consecutive guards';
+
+  @override
+  String get exampleGood => 'if (x < 0) {\n'
+      '  return;\n'
+      '} else if (x > 10) {\n'
+      '  return;\n'
+      '}';
 
   static const LintCode _code = LintCode(
     'prefer_if_else_over_guards',
@@ -1373,6 +1469,12 @@ class PreferCascadeAssignmentsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'list.add(1); list.add(2);  // repeated target';
+
+  @override
+  String get exampleGood => 'list..add(1)..add(2);  // cascade';
 
   static const LintCode _code = LintCode(
     'prefer_cascade_assignments',
@@ -1502,6 +1604,20 @@ class PreferPositiveConditionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'if (!isValid) {\n'
+      '  showError();\n'
+      '} else {\n'
+      '  proceed();\n'
+      '}';
+
+  @override
+  String get exampleGood => 'if (isValid) {\n'
+      '  proceed();\n'
+      '} else {\n'
+      '  showError();\n'
+      '}';
 
   static const LintCode _code = LintCode(
     'prefer_positive_conditions',

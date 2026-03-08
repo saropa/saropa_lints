@@ -326,6 +326,18 @@ class PreferSliverPrefixRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
+  @override
+  String get exampleBad =>
+      'class Header extends SliverPersistentHeaderDelegate {\n'
+      '  // missing Sliver prefix\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'class SliverHeader extends SliverPersistentHeaderDelegate {\n'
+      '  // clear sliver intent\n'
+      '}';
+
   static const LintCode _code = LintCode(
     'prefer_sliver_prefix',
     '[prefer_sliver_prefix] Prefixing sliver widget class names with Sliver is a naming convention. It does not affect widget behavior or performance. Enable via the stylistic tier. {v5}',
@@ -1345,6 +1357,19 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  @override
+  String get exampleBad =>
+      'ListView(\n'
+      '  shrinkWrap: true, // O(n) layout cost\n'
+      '  children: items,\n'
+      ')';
+
+  @override
+  String get exampleGood =>
+      'CustomScrollView(\n'
+      '  slivers: [SliverList(delegate: ...)],\n'
+      ')';
 
   static const LintCode _code = LintCode(
     'avoid_shrink_wrap_in_scroll',

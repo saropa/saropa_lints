@@ -993,6 +993,14 @@ class PreferFoldOverReduceRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'final sum = numbers.reduce((a, b) => a + b);';
+
+  @override
+  String get exampleGood =>
+      'final sum = numbers.fold(0, (a, b) => a + b);';
+
   static const LintCode _code = LintCode(
     'prefer_fold_over_reduce',
     '[prefer_fold_over_reduce] Prefer fold() with an explicit initial value for clarity and to avoid empty-collection errors. {v1}',
@@ -1050,6 +1058,12 @@ class PreferForeachRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => 'items.forEach((x) => print(x));';
+
+  @override
+  String get exampleGood => 'for (final x in items) print(x);';
+
   static const LintCode _code = LintCode(
     'prefer_for_in_over_foreach',
     '[prefer_for_in_over_foreach] Prefer for-in loop over .forEach() for clarity and to allow break/continue/return.',
@@ -1104,6 +1118,13 @@ class PreferForeachOverMapEntriesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => 'map.forEach((k, v) => doSomething(k, v));';
+
+  @override
+  String get exampleGood =>
+      'for (final e in map.entries) doSomething(e.key, e.value);';
+
   static const LintCode _code = LintCode(
     'prefer_foreach_over_map_entries',
     '[prefer_foreach_over_map_entries] Prefer for-in over map.entries instead of Map.forEach for consistency with iterable style.',
@@ -1152,6 +1173,12 @@ class PreferConstructorOverLiteralsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'final list = [];';
+
+  @override
+  String get exampleGood => 'final list = List.empty();';
 
   static const LintCode _code = LintCode(
     'prefer_constructor_over_literals',
@@ -1389,6 +1416,14 @@ class MapKeysOrderingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      "final map = {'zebra': 1, 'apple': 2};";
+
+  @override
+  String get exampleGood =>
+      "final map = {'apple': 2, 'zebra': 1};";
+
   static const LintCode _code = LintCode(
     'map_keys_ordering',
     '[map_keys_ordering] Ordering map keys alphabetically is a stylistic preference for readability. Key order does not affect map behavior or performance at runtime. Enable via the stylistic tier. {v4}',
@@ -1522,6 +1557,12 @@ class PreferFirstRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'final first = list[0];';
+
+  @override
+  String get exampleGood => 'final first = list.first;';
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -1729,6 +1770,12 @@ class PreferLastRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'final last = list[list.length - 1];';
+
+  @override
+  String get exampleGood => 'final last = list.last;';
 
   static const LintCode _code = LintCode(
     'prefer_list_last',
@@ -3000,6 +3047,13 @@ class AvoidFunctionLiteralsInForeachCallsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad =>
+      'items.forEach((e) { process(e); });  // function literal';
+
+  @override
+  String get exampleGood => 'items.forEach(process);  // tear-off, OK';
 
   static const LintCode _code = LintCode(
     'avoid_function_literals_in_foreach_calls',

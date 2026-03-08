@@ -26,6 +26,12 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
   @override
   List<String> get configAliases => const <String>['avoid_getter_prefix'];
 
+  @override
+  String get exampleBad => 'String get getName => _name;  // redundant get prefix';
+
+  @override
+  String get exampleGood => 'String get name => _name;';
+
   static const LintCode _code = LintCode(
     'prefer_no_getter_prefix',
     "[prefer_no_getter_prefix] Getter with 'get' prefix is redundant. Dart convention omits it. Formerly: avoid_getter_prefix. A getter name starts with \'get\'. {v2}",
@@ -214,6 +220,12 @@ class FormatCommentRule extends SaropaLintRule {
 
   @override
   List<String> get configAliases => const <String>['capitalize_comment_start'];
+
+  @override
+  String get exampleBad => '// this is a bad comment  // lowercase start';
+
+  @override
+  String get exampleGood => '// This is a good comment';
 
   static const LintCode _code = LintCode(
     'prefer_capitalized_comment_start',
@@ -1232,6 +1244,12 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'final VoidCallback callback;  // missing on prefix';
+
+  @override
+  String get exampleGood => 'final VoidCallback onTap;';
+
   static const LintCode _code = LintCode(
     'prefer_correct_callback_field_name',
     '[prefer_correct_callback_field_name] Using onXxx naming for callback fields is a Dart API convention. Callback naming does not affect code behavior or performance. Enable via the stylistic tier. {v5}',
@@ -1421,6 +1439,12 @@ class PreferCorrectHandlerNameRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  String get exampleBad => 'void buttonPressed() {}  // missing on/handle prefix';
+
+  @override
+  String get exampleGood => 'void onButtonPressed() {}';
+
   static const LintCode _code = LintCode(
     'prefer_correct_handler_name',
     '[prefer_correct_handler_name] Using handleXxx or onXxx naming for handler methods is a convention. Handler naming does not affect code behavior or performance. Enable via the stylistic tier. {v3}',
@@ -1607,6 +1631,12 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'set name(String n) => _name = n;  // not named value';
+
+  @override
+  String get exampleGood => 'set name(String value) => _name = value;';
 
   static const LintCode _code = LintCode(
     'prefer_correct_setter_parameter_name',
@@ -1873,6 +1903,12 @@ class TagNameRule extends SaropaLintRule {
         'prefer_kebab_tag',
       ];
 
+  @override
+  String get exampleBad => 'Element.tag("MyWidget")  // not kebab-case';
+
+  @override
+  String get exampleGood => 'Element.tag("my-widget")';
+
   static const LintCode _code = LintCode(
     'prefer_kebab_tag_name',
     '[prefer_kebab_tag_name] Tag name should follow naming conventions. Widget tag names don\'t follow conventions. This naming violation reduces readability and makes the codebase harder for teams to navigate. {v4}',
@@ -1972,6 +2008,13 @@ class PreferBasePrefixRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad =>
+      'abstract class Animal {}  // missing Base suffix';
+
+  @override
+  String get exampleGood => 'abstract class AnimalBase {}';
+
   static const LintCode _code = LintCode(
     'prefer_base_prefix',
     '[prefer_base_prefix] Abstract or base class name should end with Base for clarity.',
@@ -2002,6 +2045,13 @@ class PreferExtensionSuffixRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad =>
+      'extension StringHelpers on String {}  // missing Ext suffix';
+
+  @override
+  String get exampleGood => 'extension StringHelpersExt on String {}';
 
   static const LintCode _code = LintCode(
     'prefer_extension_suffix',
@@ -2035,6 +2085,13 @@ class PreferMixinPrefixRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad =>
+      'mixin Draggable on Widget {}  // missing Mixin suffix';
+
+  @override
+  String get exampleGood => 'mixin DraggableMixin on Widget {}';
+
   static const LintCode _code = LintCode(
     'prefer_mixin_prefix',
     '[prefer_mixin_prefix] Mixin name should end with Mixin for clarity.',
@@ -2064,6 +2121,13 @@ class PreferIPrefixInterfacesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad =>
+      'abstract class Repository {}  // missing I prefix';
+
+  @override
+  String get exampleGood => 'abstract class IRepository {}';
 
   static const LintCode _code = LintCode(
     'prefer_i_prefix_interfaces',
@@ -2095,6 +2159,13 @@ class PreferNoIPrefixInterfacesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad =>
+      'abstract class IRepository {}  // I prefix is C#-style';
+
+  @override
+  String get exampleGood => 'abstract class Repository {}';
 
   static const LintCode _code = LintCode(
     'prefer_no_i_prefix_interfaces',
@@ -2128,6 +2199,14 @@ class PreferImplSuffixRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad =>
+      'class SqlUserRepo implements UserRepo {}  // missing Impl suffix';
+
+  @override
+  String get exampleGood =>
+      'class SqlUserRepoImpl implements UserRepo {}';
 
   static const LintCode _code = LintCode(
     'prefer_impl_suffix',
@@ -2318,6 +2397,18 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
 /// ```
 class PreferWildcardForUnusedParamRule extends SaropaLintRule {
   PreferWildcardForUnusedParamRule() : super(code: _code);
+
+  @override
+  String get exampleBad =>
+      'void onClick(BuildContext context, int index) {\n'
+      '  print("Clicked");  // context and index unused\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'void onClick(BuildContext _, int __) {\n'
+      '  print("Clicked");\n'
+      '}';
 
   static const LintCode _code = LintCode(
     'prefer_wildcard_for_unused_param',

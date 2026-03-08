@@ -1263,6 +1263,12 @@ class PreferGetterOverMethodRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
+  @override
+  String get exampleBad => 'String getName() => _name;';
+
+  @override
+  String get exampleGood => 'String get name => _name;';
+
   static const LintCode _code = LintCode(
     'prefer_getter_over_method',
     '[prefer_getter_over_method] Using a getter instead of a zero-parameter method is a Dart API style preference. Both produce identical compiled code with no performance difference. Enable via the stylistic tier. {v4}',

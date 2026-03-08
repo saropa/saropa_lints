@@ -493,6 +493,12 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
+  @override
+  String get exampleBad => 'void f() {\n\n  print(x);\n\n}';
+
+  @override
+  String get exampleGood => 'void f() {\n  print(x);\n}';
+
   static const LintCode _code = LintCode(
     'prefer_no_blank_line_inside_blocks',
     '[prefer_no_blank_line_inside_blocks] Blank line at the start or end of a block body wastes vertical space and creates visual inconsistency with the surrounding indentation structure. {v2}',
@@ -586,6 +592,12 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'void a() {}\n\n\nvoid b() {}';
+
+  @override
+  String get exampleGood => 'void a() {}\n\nvoid b() {}';
 
   static const LintCode _code = LintCode(
     'prefer_single_blank_line_max',
@@ -841,6 +853,12 @@ class PreferConstructorBodyAssignmentRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'User(this.name);  // shorthand';
+
+  @override
+  String get exampleGood => 'User(String name) : this.name = name;';
+
   static const LintCode _code = LintCode(
     'prefer_constructor_body_assignment',
     '[prefer_constructor_body_assignment] Constructor uses this.field shorthand which prevents adding validation or transformation logic. Use an explicit initializer list or body assignment instead to keep the constructor flexible. {v2}',
@@ -911,6 +929,19 @@ class PreferFactoryForValidationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'Email(this.v) {\n'
+      "  if (!v.contains('@')) throw ArgumentError('bad');\n"
+      '}';
+
+  @override
+  String get exampleGood =>
+      'factory Email(String v) {\n'
+      "  if (!v.contains('@')) throw ArgumentError('bad');\n"
+      '  return Email._(v);\n'
+      '}';
 
   static const LintCode _code = LintCode(
     'prefer_factory_for_validation',
@@ -1000,6 +1031,17 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'factory Positive(int v) {\n'
+      "  if (v < 0) throw ArgumentError('negative');\n"
+      '  return Positive._(v);\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      "Positive(this.v) : assert(v >= 0, 'Must be positive');";
+
   static const LintCode _code = LintCode(
     'prefer_constructor_assertion',
     '[prefer_constructor_assertion] Use a constructor assertion instead of a factory for simple debug-only precondition checks. This is an opinionated rule - not included in any tier by default. {v2}',
@@ -1075,6 +1117,14 @@ class PreferRequiredBeforeOptionalRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad =>
+      'void create({String? prefix, required String name})';
+
+  @override
+  String get exampleGood =>
+      'void create({required String name, String? prefix})';
+
   static const LintCode _code = LintCode(
     'prefer_required_before_optional',
     '[prefer_required_before_optional] Required parameters appear after optional ones, forcing callers to scan past defaults to find mandatory arguments. Place required parameters first for a clearer API signature. {v2}',
@@ -1138,6 +1188,14 @@ class PreferGroupedByPurposeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'void f({required String a, int? b, required int c, String? d})';
+
+  @override
+  String get exampleGood =>
+      'void f({required String a, required int c, int? b, String? d})';
 
   static const LintCode _code = LintCode(
     'prefer_grouped_by_purpose',
@@ -1220,6 +1278,12 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => '} catch (e) {\n  log(e);\n  throw e;\n}';
+
+  @override
+  String get exampleGood => '} catch (e) {\n  log(e);\n  rethrow;\n}';
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [

@@ -18,11 +18,15 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`prefer_sentence_case_comments_relaxed` (v1):** New relaxed variant of `prefer_sentence_case_comments` that only enforces sentence case on comments of 5+ words. Comments of 1-4 words are skipped as short annotations/labels. Enable one or the other, not both.
 
+### Changed
+
+- **Init wizard walkthrough:** All 223 stylistic rules now display GOOD/BAD code examples with multi-line support and inline comments. Previously 152 rules had no examples, making walkthrough questions unanswerable. Added `_logExample` helper for proper multi-line rendering and updated `_walkthroughConflicting` to show both GOOD and BAD examples (previously only showed GOOD).
+
 ### Fixed
 
 - **`prefer_sentence_case_comments` false positive on short comments (v5):** Rule no longer flags 1-2 word comments (e.g., `// magnifyingGlass`, `// gear`). These are typically identifier annotations or short labels, not prose sentences. Also tightened code-reference detection to only skip camelCase/snake_case identifiers — previously it over-matched all lowercase words, silently suppressing most violations.
 - **`prefer_blank_line_before_else` false positive on `else if` (v2):** Rule no longer flags `else if` chains. Only standalone `} else {` blocks are reported. Previously every `else if` in the project generated a false positive — inserting a blank line before `else if` is a Dart syntax error.
-- **`prefer_switch_statement` false positives (v2):** No longer flags switch expressions in value-producing positions — arrow bodies (`=> switch (...)`), return statements, variable initialisers, assignments, and yield statements are now exempt. Only fires when the switch expression is in a non-value position (e.g. nested in a collection literal or passed as a function argument).
+- **`prefer_switch_statement` false positives (v2):** No longer flags switch expressions in value-producing positions — arrow bodies (`=> switch (...)`), return statements, variable initializers, assignments, and yield statements are now exempt. Only fires when the switch expression is in a non-value position (e.g. nested in a collection literal or passed as a function argument).
 - **`prefer_positive_conditions_first` false positive on null guards (v3):** Null-equality guard clauses (`if (x == null) return;`) are no longer flagged — `== null` is an equality check, not a negation. Rule now only fires on genuinely negated guards (`if (!condition) return;`). Problem message rewritten to accurately describe the narrower scope.
 - **`prefer_doc_comments_over_regular` false positive on section headers (v6):** Section-header comments (text between divider lines like `// -----`) and comments separated from declarations by a blank line are no longer flagged. Divider lines (`// ----`, `// ====`, `// ****`) are now detected and skipped along with adjacent section-header text.
 - **`prefer_descriptive_variable_names` false positive on short-lived variables (v4):** Added scope-size awareness — short names are now allowed in small blocks (<=5 statements) where context is immediately visible. Also skips C-style for-loop index variables and expands the allowed-names list with common conventions (`i`, `j`, `k`, `e`, `n`).

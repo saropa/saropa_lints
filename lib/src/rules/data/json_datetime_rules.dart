@@ -283,6 +283,12 @@ class PreferDurationConstantsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  String get exampleBad => 'Duration(seconds: 60);';
+
+  @override
+  String get exampleGood => 'Duration(minutes: 1);';
+
   static const LintCode _code = LintCode(
     'prefer_duration_constants',
     '[prefer_duration_constants] Using named Duration constants instead of inline constructors is a naming convention. Both create identical Duration objects with no performance difference. Enable via the stylistic tier. {v2}',

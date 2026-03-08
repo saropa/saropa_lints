@@ -192,6 +192,12 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  String get exampleBad => 'class UserNotFound implements Exception {}';
+
+  @override
+  String get exampleGood => 'class UserNotFoundException implements Exception {}';
+
   static const LintCode _code = LintCode(
     'prefer_exception_suffix',
     '[prefer_exception_suffix] Exception classes missing the "Exception" suffix are harder to identify as throwable types during code review and IDE search. {v2}',
@@ -260,6 +266,12 @@ class PreferErrorSuffixRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'class UserNotFoundException implements Exception {}';
+
+  @override
+  String get exampleGood => 'class UserNotFoundError implements Exception {}';
 
   static const LintCode _code = LintCode(
     'prefer_error_suffix',
@@ -740,6 +752,12 @@ class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad => 'assert(result == 5);  // silent in release';
+
+  @override
+  String get exampleGood => 'expect(result, equals(5));  // rich matcher';
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
