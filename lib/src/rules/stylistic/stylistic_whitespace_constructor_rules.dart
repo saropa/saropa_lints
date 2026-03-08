@@ -931,14 +931,12 @@ class PreferFactoryForValidationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'Email(this.v) {\n'
+  String get exampleBad => 'Email(this.v) {\n'
       "  if (!v.contains('@')) throw ArgumentError('bad');\n"
       '}';
 
   @override
-  String get exampleGood =>
-      'factory Email(String v) {\n'
+  String get exampleGood => 'factory Email(String v) {\n'
       "  if (!v.contains('@')) throw ArgumentError('bad');\n"
       '  return Email._(v);\n'
       '}';
@@ -1032,8 +1030,7 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'factory Positive(int v) {\n'
+  String get exampleBad => 'factory Positive(int v) {\n'
       "  if (v < 0) throw ArgumentError('negative');\n"
       '  return Positive._(v);\n'
       '}';

@@ -785,14 +785,12 @@ class PreferNonConstConstructorsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad =>
-      'class Cfg {\n'
+  String get exampleBad => 'class Cfg {\n'
       '  const Cfg();  // flags any const constructor\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'class Cfg {\n'
+  String get exampleGood => 'class Cfg {\n'
       '  Cfg();\n'
       '}';
 
@@ -840,14 +838,12 @@ class PreferFactoryConstructorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'class C {\n'
+  String get exampleBad => 'class C {\n'
       '  static C create() => C();\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'class C {\n'
+  String get exampleGood => 'class C {\n'
       '  factory C.create() => C._();\n'
       '  C._();\n'
       '}';
@@ -2447,14 +2443,12 @@ class PreferFinalFieldsAlwaysRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad =>
-      'class C {\n'
+  String get exampleBad => 'class C {\n'
       '  int x = 0; // mutable field\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'class C {\n'
+  String get exampleGood => 'class C {\n'
       '  final int x;\n'
       '  C(this.x);\n'
       '}';

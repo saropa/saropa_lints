@@ -443,15 +443,13 @@ class AvoidContinueRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'for (final x in items) {\n'
+  String get exampleBad => 'for (final x in items) {\n'
       '  if (x < 0) continue;  // breaks linear flow\n'
       '  process(x);\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'for (final x in items) {\n'
+  String get exampleGood => 'for (final x in items) {\n'
       '  if (x >= 0) process(x);\n'
       '}';
 
@@ -1648,8 +1646,7 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'if (dark) {\n'
+  String get exampleBad => 'if (dark) {\n'
       '  color = black;\n'
       '} else {\n'
       '  color = white;\n'
@@ -1803,8 +1800,7 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'if (x > 0) {\n'
+  String get exampleBad => 'if (x > 0) {\n'
       '  return true;\n'
       '}\n'
       'return false;';
@@ -1919,8 +1915,7 @@ class PreferReturningConditionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'if (x > 0) {\n'
+  String get exampleBad => 'if (x > 0) {\n'
       '  return true;\n'
       '} else {\n'
       '  return false;\n'

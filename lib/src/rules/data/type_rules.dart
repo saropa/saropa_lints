@@ -1964,8 +1964,7 @@ class PreferInlineFunctionTypesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad =>
-      'typedef Predicate = bool Function(int);\n'
+  String get exampleBad => 'typedef Predicate = bool Function(int);\n'
       'void f(Predicate p) {}';
 
   @override

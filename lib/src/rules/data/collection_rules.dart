@@ -994,12 +994,10 @@ class PreferFoldOverReduceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'final sum = numbers.reduce((a, b) => a + b);';
+  String get exampleBad => 'final sum = numbers.reduce((a, b) => a + b);';
 
   @override
-  String get exampleGood =>
-      'final sum = numbers.fold(0, (a, b) => a + b);';
+  String get exampleGood => 'final sum = numbers.fold(0, (a, b) => a + b);';
 
   static const LintCode _code = LintCode(
     'prefer_fold_over_reduce',
@@ -1417,12 +1415,10 @@ class MapKeysOrderingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      "final map = {'zebra': 1, 'apple': 2};";
+  String get exampleBad => "final map = {'zebra': 1, 'apple': 2};";
 
   @override
-  String get exampleGood =>
-      "final map = {'apple': 2, 'zebra': 1};";
+  String get exampleGood => "final map = {'apple': 2, 'zebra': 1};";
 
   static const LintCode _code = LintCode(
     'map_keys_ordering',

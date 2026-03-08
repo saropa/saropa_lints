@@ -559,16 +559,14 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad =>
-      'class Point extends Equatable {\n'
+  String get exampleBad => 'class Point extends Equatable {\n'
       '  final int x, y;\n'
       '  const Point(this.x, this.y);\n'
       '  @override List<Object?> get props => [x, y];\n'
       '}';
 
   @override
-  String get exampleGood =>
-      'typedef Point = ({int x, int y});';
+  String get exampleGood => 'typedef Point = ({int x, int y});';
 
   static const LintCode _code = LintCode(
     'prefer_record_over_equatable',

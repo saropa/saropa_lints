@@ -1229,12 +1229,10 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
       ];
 
   @override
-  String get exampleBad =>
-      'final AsyncCallback onTap;';
+  String get exampleBad => 'final AsyncCallback onTap;';
 
   @override
-  String get exampleGood =>
-      'final Future<void> Function() onTap;';
+  String get exampleGood => 'final Future<void> Function() onTap;';
 
   static const LintCode _code = LintCode(
     'prefer_future_void_function_over_async_callback',

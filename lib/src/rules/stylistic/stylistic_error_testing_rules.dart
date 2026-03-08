@@ -196,7 +196,8 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
   String get exampleBad => 'class UserNotFound implements Exception {}';
 
   @override
-  String get exampleGood => 'class UserNotFoundException implements Exception {}';
+  String get exampleGood =>
+      'class UserNotFoundException implements Exception {}';
 
   static const LintCode _code = LintCode(
     'prefer_exception_suffix',
@@ -268,7 +269,8 @@ class PreferErrorSuffixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'class UserNotFoundException implements Exception {}';
+  String get exampleBad =>
+      'class UserNotFoundException implements Exception {}';
 
   @override
   String get exampleGood => 'class UserNotFoundError implements Exception {}';
