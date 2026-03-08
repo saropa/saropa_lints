@@ -283,6 +283,16 @@ void f(bool ok) {
 ''');
         expect(guards, isEmpty);
       });
+
+      test('throw guard should NOT trigger', () {
+        final guards = _findNegatedGuards('''
+void f(bool ok) {
+  if (!ok) throw Exception('bad');
+  print('ok');
+}
+''');
+        expect(guards, isEmpty);
+      });
     });
 
     group('prefer_switch_statement', () {
@@ -357,6 +367,29 @@ extension on E {
 ''');
         expect(nodes, hasLength(1));
         expect(nodes.first.parent, isA<ExpressionFunctionBody>());
+      });
+
+      test('switch in yield statement should NOT trigger', () {
+        final nodes = _findSwitchExpressions('''
+enum E { a, b }
+Stream<String> f() async* {
+  yield switch (E.a) { E.a => 'A', E.b => 'B' };
+}
+''');
+        expect(nodes, hasLength(1));
+        expect(nodes.first.parent, isA<YieldStatement>());
+      });
+
+      test('switch as named argument should NOT trigger', () {
+        final nodes = _findSwitchExpressions('''
+enum E { a, b }
+void g({required String label}) {}
+void f() {
+  g(label: switch (E.a) { E.a => 'A', E.b => 'B' });
+}
+''');
+        expect(nodes, hasLength(1));
+        expect(nodes.first.parent, isA<NamedExpression>());
       });
     });
 
