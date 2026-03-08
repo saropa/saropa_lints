@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:test/test.dart';
 
@@ -208,14 +209,79 @@ void main() {
     });
 
     group('prefer_positive_conditions_first', () {
-      test('prefer_positive_conditions_first SHOULD trigger', () {
-        // Better alternative available: prefer positive conditions first
-        expect('prefer_positive_conditions_first detected', isNotNull);
+      test('negated guard (!condition) SHOULD trigger', () {
+        final guards = _findNegatedGuards('''
+void f(bool isValid) {
+  if (!isValid) return;
+  print('ok');
+}
+''');
+        expect(guards, hasLength(1));
       });
 
-      test('prefer_positive_conditions_first should NOT trigger', () {
-        // Preferred pattern used correctly
-        expect('prefer_positive_conditions_first passes', isNotNull);
+      test('negated guard in block form SHOULD trigger', () {
+        final guards = _findNegatedGuards('''
+void f(bool ready) {
+  if (!ready) {
+    return;
+  }
+  print('ok');
+}
+''');
+        expect(guards, hasLength(1));
+      });
+
+      test('null-guard (== null) should NOT trigger', () {
+        final guards = _findNegatedGuards('''
+void f(int? value) {
+  if (value == null) return;
+  print(value);
+}
+''');
+        expect(guards, isEmpty);
+      });
+
+      test('null on left side (null == x) should NOT trigger', () {
+        final guards = _findNegatedGuards('''
+void f(int? value) {
+  if (null == value) return;
+  print(value);
+}
+''');
+        expect(guards, isEmpty);
+      });
+
+      test('positive condition should NOT trigger', () {
+        final guards = _findNegatedGuards('''
+void f(bool ok) {
+  if (ok) return;
+  print('not ok');
+}
+''');
+        expect(guards, isEmpty);
+      });
+
+      test('if with else should NOT trigger', () {
+        final guards = _findNegatedGuards('''
+void f(bool ok) {
+  if (!ok) {
+    return;
+  } else {
+    print('ok');
+  }
+}
+''');
+        expect(guards, isEmpty);
+      });
+
+      test('non-return body should NOT trigger', () {
+        final guards = _findNegatedGuards('''
+void f(bool ok) {
+  if (!ok) print('bad');
+  print('continue');
+}
+''');
+        expect(guards, isEmpty);
       });
     });
 
@@ -407,5 +473,36 @@ class _SwitchExpressionCollector extends RecursiveAstVisitor<void> {
   void visitSwitchExpression(SwitchExpression node) {
     nodes.add(node);
     super.visitSwitchExpression(node);
+  }
+}
+
+/// Parses [code] and returns if-statements that match the rule's trigger:
+/// guard clause with negated condition (! operator), single return, no else.
+List<IfStatement> _findNegatedGuards(String code) {
+  final result = parseString(content: code);
+  final visitor = _NegatedGuardCollector();
+  result.unit.accept(visitor);
+  return visitor.nodes;
+}
+
+class _NegatedGuardCollector extends RecursiveAstVisitor<void> {
+  final List<IfStatement> nodes = [];
+
+  @override
+  void visitIfStatement(IfStatement node) {
+    if (node.elseStatement == null) {
+      Statement? inner = node.thenStatement;
+      if (inner is Block && inner.statements.length == 1) {
+        inner = inner.statements.first;
+      }
+      if (inner is ReturnStatement) {
+        final condition = node.expression;
+        if (condition is PrefixExpression &&
+            condition.operator.type == TokenType.BANG) {
+          nodes.add(node);
+        }
+      }
+    }
+    super.visitIfStatement(node);
   }
 }
