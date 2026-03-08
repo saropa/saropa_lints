@@ -1272,7 +1272,7 @@ saropa_lints:
 
     # --- Whitespace & Constructor Rules (v2.7.0) ---
     - prefer_blank_line_before_return: false     # Blank line before return
-    - prefer_blank_line_before_else: false      # Blank line before else/else if
+    - prefer_blank_line_before_else: false      # Blank line before standalone else
     - prefer_blank_line_after_loop: false       # Blank line after for/while before next statement
     - prefer_no_blank_line_before_return: false  # Opposite - compact returns
     - prefer_blank_line_after_declarations: false  # Blank line after declarations

@@ -58,7 +58,7 @@ To enforce good methods with saropa_lints:
 | `prefer_blank_line_before_constructor` | Blank line before constructors. |
 | `prefer_blank_line_before_case` | Blank line before `switch` cases. |
 | `prefer_blank_line_before_return` | Blank line before `return`. |
-| `prefer_blank_line_before_else` | Blank line before `else` / `else if`. |
+| `prefer_blank_line_before_else` | Blank line before standalone `else`. |
 | `prefer_blank_line_after_loop` | Blank line after a for/while loop before the next statement. |
 | `prefer_blank_line_after_declarations` | Blank line after variable declarations (separates setup from logic). |
 | `prefer_single_blank_line_max` | At most one consecutive blank line. |
@@ -543,7 +543,7 @@ Enable in your `analysis_options.yaml` or stylistic overrides to align with this
 | `prefer_blank_line_before_constructor` | One blank line before each constructor. | §9 Formatting and readability |
 | `prefer_blank_line_before_case` | One blank line before each `switch` case. | §9 Formatting and readability |
 | `prefer_blank_line_before_return` | One blank line before each `return` statement. | §9 Formatting and readability |
-| `prefer_blank_line_before_else` | One blank line before `else` / `else if` clauses. | §9 Formatting and readability |
+| `prefer_blank_line_before_else` | One blank line before standalone `else` clauses (not `else if`). | §9 Formatting and readability |
 | `prefer_blank_line_after_loop` | One blank line after a for/while loop before the next statement. | §9 Formatting and readability |
 | `prefer_blank_line_after_declarations` | One blank line after variable declarations (separates setup from logic). | §9 Formatting and readability |
 | `prefer_single_blank_line_max` | At most one consecutive blank line (no large gaps). | §9 Formatting and readability |
