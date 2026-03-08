@@ -1362,24 +1362,45 @@ class PreferCamelCaseMethodNamesRule extends SaropaLintRule {
   }
 }
 
-/// Warns when variable names are too short (less than 3 characters).
+/// Warns when variable names are too short (less than 3 characters) in
+/// non-trivial scopes.
 ///
-/// Since: v2.7.0 | Updated: v4.13.0 | Rule version: v3
+/// Since: v2.7.0 | Updated: v8.0.10 | Rule version: v4
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
+///
+/// v4 adds scope-awareness: short names are allowed in small blocks (<=5
+/// statements) where context is immediately visible, in C-style for-loop
+/// declarations, and expands the allowed-names list with common conventions
+/// (i, j, k, e, n).
 ///
 /// ## Good Example
 /// ```dart
 /// final index = 0;
 /// final user = getUser();
 /// for (final item in items) {}
+///
+/// // Short name OK in small method (<=5 statements):
+/// DevTestPanelPendingData? take() {
+///   final r = _pending;
+///   _pending = null;
+///   return r;
+/// }
+///
+/// // For-loop index variables are always OK:
+/// for (var i = 0; i < 10; i++) {}
 /// ```
 ///
 /// ## Bad Example (flagged)
 /// ```dart
-/// final i = 0;
-/// final u = getUser();
-/// for (final x in items) {}
+/// void longMethod() {
+///   final u = getUser();        // flagged: >5 statements in scope
+///   final pw = getPassword();
+///   validate(u, pw);
+///   log(u);
+///   save(u);
+///   notify(u);
+/// }
 /// ```
 ///
 /// **Pros:** Self-documenting code, clearer intent
@@ -1395,13 +1416,26 @@ class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_descriptive_variable_names',
-    '[prefer_descriptive_variable_names] Variable name is shorter than 3 characters, making its purpose unclear without reading surrounding context. Use a descriptive name that communicates intent at the point of use. {v3}',
+    '[prefer_descriptive_variable_names] Variable name is shorter than 3 '
+        'characters, making its purpose unclear without reading surrounding '
+        'context. Use a descriptive name that communicates intent at the '
+        'point of use. {v4}',
     correctionMessage:
-        'Rename the variable to a descriptive name that communicates its purpose without requiring surrounding context.',
+        'Rename the variable to a descriptive name that communicates its '
+        'purpose without requiring surrounding context.',
     severity: DiagnosticSeverity.INFO,
   );
 
-  static const _allowedShortNames = {'id', 'db', 'io', 'ui', 'x', 'y', 'z'};
+  static const _allowedShortNames = {
+    'id', 'db', 'io', 'ui', // domain abbreviations
+    'x', 'y', 'z', // coordinates
+    'i', 'j', 'k', // loop indices
+    'e', // exception/error
+    'n', // count
+  };
+
+  /// Maximum block size (inclusive) where short names are tolerated.
+  static const _smallBlockThreshold = 5;
 
   @override
   void runWithReporter(
@@ -1410,14 +1444,34 @@ class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
   ) {
     context.addVariableDeclaration((node) {
       final name = node.name.lexeme;
+      if (name.length >= 3) return;
+
       // Skip private and allowed short names
       if (name.startsWith('_')) return;
       if (_allowedShortNames.contains(name.toLowerCase())) return;
 
-      if (name.length < 3) {
-        reporter.atNode(node);
-      }
+      // Skip C-style for-loop index variables
+      if (node.parent?.parent is ForPartsWithDeclarations) return;
+
+      // Skip variables in small blocks where context is immediately visible
+      if (_isInSmallBlock(node)) return;
+
+      reporter.atNode(node);
     });
+  }
+
+  /// Returns `true` when [node] is inside a [Block] with at most
+  /// [_smallBlockThreshold] statements.
+  static bool _isInSmallBlock(VariableDeclaration node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is Block) {
+        return current.statements.length <= _smallBlockThreshold;
+      }
+      if (current is FunctionBody) break;
+      current = current.parent;
+    }
+    return false;
   }
 }
 
