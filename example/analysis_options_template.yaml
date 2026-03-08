@@ -1209,6 +1209,7 @@ saropa_lints:
     - prefer_todo_format: false
     - prefer_fixme_format: false
     - prefer_sentence_case_comments: false
+    - prefer_sentence_case_comments_relaxed: false       # Like above but skips ≤4-word comments
     - prefer_capitalized_comment_start: false            # Comment capitalization (v4.2.0 fix)
     - prefer_no_commented_out_code: false           # Delete dead code (v4.2.0 overhaul)
     - prefer_period_after_doc: false

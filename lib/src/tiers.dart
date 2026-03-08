@@ -150,6 +150,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_todo_format',
   'prefer_fixme_format',
   'prefer_sentence_case_comments',
+  'prefer_sentence_case_comments_relaxed',
   'prefer_period_after_doc',
   'prefer_doc_comments_over_regular',
   'prefer_no_commented_out_code', // Moved from pedantic (v4.2.0)
