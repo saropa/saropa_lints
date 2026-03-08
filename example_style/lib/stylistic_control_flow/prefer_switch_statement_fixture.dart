@@ -105,13 +105,61 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_switch_statement
+enum _Color { red, green, blue }
+
+// BAD: switch expression in non-value position (e.g. standalone or nested)
 // expect_lint: prefer_switch_statement
-void _bad1087() {
-  // TODO: Add code that triggers prefer_switch_statement
+void _bad1() {
+  final list = [
+    // LINT: switch expression nested inside a list literal
+    switch (_Color.red) {
+      _Color.red => 'R',
+      _Color.green => 'G',
+      _Color.blue => 'B',
+    },
+  ];
 }
 
-// GOOD: Should NOT trigger prefer_switch_statement
-void _good1087() {
-  // TODO: Add compliant code for prefer_switch_statement
+// BAD: switch expression as argument
+// expect_lint: prefer_switch_statement
+void _bad2() {
+  print(switch (_Color.red) {
+    _Color.red => 'R',
+    _Color.green => 'G',
+    _Color.blue => 'B',
+  });
+}
+
+// GOOD: switch expression in arrow body (getter)
+extension _ColorExt on _Color {
+  String get label => switch (this) {
+    _Color.red => 'Red',
+    _Color.green => 'Green',
+    _Color.blue => 'Blue',
+  };
+}
+
+// GOOD: switch expression in arrow body (method)
+String _getLabel(_Color c) => switch (c) {
+  _Color.red => 'Red',
+  _Color.green => 'Green',
+  _Color.blue => 'Blue',
+};
+
+// GOOD: switch expression in return statement
+String _getLabelReturn(_Color c) {
+  return switch (c) {
+    _Color.red => 'Red',
+    _Color.green => 'Green',
+    _Color.blue => 'Blue',
+  };
+}
+
+// GOOD: switch expression in variable declaration
+void _varDecl() {
+  final label = switch (_Color.red) {
+    _Color.red => 'Red',
+    _Color.green => 'Green',
+    _Color.blue => 'Blue',
+  };
 }
