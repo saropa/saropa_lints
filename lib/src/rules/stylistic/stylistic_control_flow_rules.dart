@@ -504,7 +504,8 @@ class PreferSwitchStatementRule extends SaropaLintRule {
   }
 
   /// Returns true when the switch expression is in a value-producing position
-  /// where it is idiomatic Dart 3 (arrow body, return, variable init).
+  /// where it is idiomatic Dart 3 (arrow body, return, variable init,
+  /// assignment, yield, named argument).
   static bool _isValuePositionSwitch(SwitchExpression node) {
     final parent = node.parent;
 
@@ -524,6 +525,9 @@ class PreferSwitchStatementRule extends SaropaLintRule {
 
     // yield switch (...) { ... };
     if (parent is YieldStatement) return true;
+
+    // label: switch (...) { ... }  (named argument — value position)
+    if (parent is NamedExpression) return true;
 
     return false;
   }

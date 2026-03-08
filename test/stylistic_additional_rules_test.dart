@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/stylistic/stylistic_additional_rules.dart';
@@ -423,6 +426,63 @@ void main() {
       test('correction message is present', () {
         expect(rule.code.correctionMessage, isNotEmpty);
       });
+
+      test('short name in large block (>5 stmts) is flaggable', () {
+        final vars = _findShortVarNames('''
+void f() {
+  final ab = 1;
+  final name = 2;
+  final v1 = 3;
+  final v2 = 4;
+  final v3 = 5;
+  final v4 = 6;
+}
+''');
+        // 'ab' is 2 chars, block has 6 statements => flaggable
+        expect(vars.any((v) => v.name == 'ab'), isTrue);
+      });
+
+      test('short name in small block (<=5 stmts) is NOT flaggable', () {
+        final vars = _findShortVarNames('''
+void f() {
+  final ab = 1;
+  final name = 2;
+  final v1 = 3;
+}
+''');
+        // 'ab' is 2 chars but block has only 3 statements
+        expect(vars.where((v) => v.name == 'ab'), isEmpty);
+      });
+
+      test('for-loop index variable is NOT flaggable', () {
+        final vars = _findShortVarNames('''
+void f() {
+  for (var ii = 0; ii < 10; ii++) {}
+  final a1 = 1;
+  final a2 = 2;
+  final a3 = 3;
+  final a4 = 4;
+  final a5 = 5;
+}
+''');
+        // 'ii' is in ForPartsWithDeclarations => always exempt
+        expect(vars.where((v) => v.name == 'ii'), isEmpty);
+      });
+
+      test('allowed short names are NOT flaggable in large block', () {
+        final vars = _findShortVarNames('''
+void f() {
+  final id = 1;
+  final db = 2;
+  final x = 3;
+  final e = 4;
+  final n = 5;
+  final extra = 6;
+}
+''');
+        // All are in allowedShortNames => none flaggable
+        expect(vars, isEmpty);
+      });
     });
 
     group('prefer_concise_variable_names', () {
@@ -473,4 +533,58 @@ void main() {
       });
     });
   });
+}
+
+/// A short variable declaration found by [_findShortVarNames].
+class _ShortVar {
+  _ShortVar(this.name, this.blockSize, this.isForLoop);
+  final String name;
+  final int blockSize;
+  final bool isForLoop;
+}
+
+/// Parses [code] and returns variable declarations that the rule would
+/// consider flaggable: name < 3 chars, not private, not in allowed list,
+/// not in a for-loop, and not in a small block (<=5 statements).
+List<_ShortVar> _findShortVarNames(String code) {
+  final result = parseString(content: code);
+  final visitor = _ShortVarCollector();
+  result.unit.accept(visitor);
+  return visitor.vars;
+}
+
+class _ShortVarCollector extends RecursiveAstVisitor<void> {
+  static const _allowedShortNames = {
+    'id', 'db', 'io', 'ui', 'x', 'y', 'z', 'i', 'j', 'k', 'e', 'n',
+  };
+  static const _smallBlockThreshold = 5;
+
+  final List<_ShortVar> vars = [];
+
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) {
+    final name = node.name.lexeme;
+    if (name.length >= 3) return;
+    if (name.startsWith('_')) return;
+    if (_allowedShortNames.contains(name.toLowerCase())) return;
+
+    final isForLoop = node.parent?.parent is ForPartsWithDeclarations;
+    if (isForLoop) return;
+
+    int blockSize = 0;
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is Block) {
+        blockSize = current.statements.length;
+        break;
+      }
+      if (current is FunctionBody) break;
+      current = current.parent;
+    }
+
+    if (blockSize <= _smallBlockThreshold) return;
+
+    vars.add(_ShortVar(name, blockSize, isForLoop));
+    super.visitVariableDeclaration(node);
+  }
 }

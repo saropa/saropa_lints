@@ -587,31 +587,48 @@ void main() {
     });
 
     group('prefer_doc_comments_over_regular', () {
-      test('should trigger on regular comment above public API', () {
-        // Regular comment directly above public member should use ///
-        expect('prefer_doc_comments_over_regular detected', isNotNull);
+      late PreferDocCommentsOverRegularRule rule;
+      setUp(() => rule = PreferDocCommentsOverRegularRule());
+
+      test('rule metadata is v6', () {
+        expect(rule.code.name, 'prefer_doc_comments_over_regular');
+        expect(rule.code.problemMessage, contains('{v6}'));
       });
 
-      test('should NOT trigger on section header dividers', () {
-        // Comments like // ----- or // ===== are visual separators
-        expect('prefer_doc_comments_over_regular passes', isNotNull);
+      test('fixture has BAD examples that trigger', () {
+        final content = File(
+          'example_style/lib/stylistic/prefer_doc_comments_over_regular_fixture.dart',
+        ).readAsStringSync();
+        // Public functions with regular comments above them
+        expect(content, contains('String greet()'));
+        expect(content, contains('void process()'));
+        expect(content, contains('expect_lint: prefer_doc_comments_over_regular'));
       });
 
-      test('should NOT trigger on section header text between dividers', () {
-        // Text sandwiched between divider lines is a section header
-        expect('prefer_doc_comments_over_regular passes', isNotNull);
+      test('fixture has section-header false-positive guards', () {
+        final content = File(
+          'example_style/lib/stylistic/prefer_doc_comments_over_regular_fixture.dart',
+        ).readAsStringSync();
+        // Divider lines should not trigger
+        expect(content, contains('-------'));
+        expect(content, contains('======='));
+        expect(content, contains('afterSectionHeader'));
       });
 
-      test('should NOT trigger when blank line separates comment from decl',
-          () {
-        // A blank line between comment and declaration means it is
-        // not documentation for that declaration
-        expect('prefer_doc_comments_over_regular passes', isNotNull);
+      test('fixture has blank-line-gap false-positive guard', () {
+        final content = File(
+          'example_style/lib/stylistic/prefer_doc_comments_over_regular_fixture.dart',
+        ).readAsStringSync();
+        expect(content, contains('separatedByBlankLine'));
       });
 
-      test('should NOT trigger on TODO/FIXME/NOTE comments', () {
-        // Annotation markers are not documentation
-        expect('prefer_doc_comments_over_regular passes', isNotNull);
+      test('fixture has annotation marker false-positive guards', () {
+        final content = File(
+          'example_style/lib/stylistic/prefer_doc_comments_over_regular_fixture.dart',
+        ).readAsStringSync();
+        expect(content, contains('TODO: Implement'));
+        expect(content, contains('FIXME: Handle'));
+        expect(content, contains('NOTE: This'));
       });
     });
 

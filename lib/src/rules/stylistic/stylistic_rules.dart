@@ -1997,7 +1997,7 @@ abstract class _SentenceCaseCommentsBase extends SaropaLintRule {
 
     // Skip short comments — these are annotations/labels, not prose.
     // e.g., "// magnifyingGlass", "// not used", "// see above"
-    if (trimmed.split(' ').length <= maxShortCommentWords) {
+    if (trimmed.split(RegExp(r'\s+')).length <= maxShortCommentWords) {
       return;
     }
 
@@ -3058,7 +3058,7 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
 
   /// Pattern to detect visual divider lines (3+ repeated characters).
   /// Matches lines like `// -----`, `// =====`, `// *****`, etc.
-  static final RegExp _dividerLine = RegExp(r'^(.)\1{2,}$');
+  static final RegExp _dividerLine = RegExp(r'^[-=*#~_]{3,}$');
 
   /// Pattern to detect commented-out code.
   /// Matches lines that look like Dart code rather than documentation.
@@ -3210,12 +3210,7 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
       // Section header: text adjacent to a divider line
       if (dividers.contains(i - 1) || dividers.contains(i + 1)) continue;
 
-      if (content.isNotEmpty &&
-          (_startsWithCapital.hasMatch(content) ||
-              content.startsWith('Returns') ||
-              content.startsWith('Gets') ||
-              content.startsWith('Sets') ||
-              content.startsWith('The '))) {
+      if (content.isNotEmpty && _startsWithCapital.hasMatch(content)) {
         lastRegularComment = comments[i];
       }
     }
