@@ -29,6 +29,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ### Fixed
 
+- **`prefer_no_commented_out_code` false positive on prose with parentheses and semicolons:** `_hasStrongCodeIndicators` treated bare `()` and `;` as unambiguous code, bypassing the prose guard on natural English like `Speed slider (0.25×–4×) is local to this tab;`. Refined to require function-call patterns (`\w(`) instead of bare parentheses, and removed the standalone semicolon check. Control-flow keyword + paren detection (`for (`, `if (`, etc.) preserves existing true-positive coverage.
+
+- **`prefer_for_in` false positive on numeric counter loops (v5):** The rule now requires the loop's upper bound to be a `.length` property access before firing. Previously it flagged any `for (var i = 0; i < N; i++)` loop regardless of whether `N` was a collection length, an integer literal, or a plain variable. Numeric counter loops (e.g. `i < 12`, `i < count`) where there is no collection to for-in over are no longer flagged.
+
 - **`avoid_uncaught_future_errors` crash on enum declarations (Dart 3.11+):** `_collectFunctionsWithTryCatch` accessed `.body` on declaration nodes, which throws `UnsupportedError` for `EnumDeclaration` in Dart SDK 3.11. This crashed the entire analyzer plugin (exit code 4), losing all diagnostics for all rules in all files. Fixed by switching all declaration types to use `.members` instead of `.body`, and added `ExtensionTypeDeclaration` support.
 
 - **`prefer_sentence_case_comments` false positive on continuation lines (v6):** Multi-line `//` comment blocks are now recognized as a single logical unit. Continuation lines (where the previous `//` line does not end with `.`, `!`, or `?`) are skipped instead of being flagged for lowercase start. Previously every continuation line in a multi-line comment was a false positive. The relaxed variant (`prefer_sentence_case_comments_relaxed`) receives the same fix (v2).

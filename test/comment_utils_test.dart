@@ -176,6 +176,61 @@ void main() {
           isFalse,
         );
       });
+
+      // Regression: prose with parenthetical ranges and English semicolons
+      test('prose with parenthetical range and semicolon', () {
+        expect(
+          CommentPatterns.isLikelyCode(
+            'Speed slider (0.25×–4×) is local to this tab;',
+          ),
+          isFalse,
+        );
+      });
+
+      test('prose with parenthetical note and semicolon', () {
+        expect(
+          CommentPatterns.isLikelyCode(
+            'Widget handles tap events (see docs); delegates to parent.',
+          ),
+          isFalse,
+        );
+      });
+
+      test('prose with parenthetical and trailing semicolon', () {
+        expect(
+          CommentPatterns.isLikelyCode(
+            'Default timeout is 30s (configurable via settings); zero disables.',
+          ),
+          isFalse,
+        );
+      });
+
+      test('prose with parenthetical alternatives and semicolon', () {
+        expect(
+          CommentPatterns.isLikelyCode(
+            'Parse results (JSON or XML) are cached; expired entries evicted.',
+          ),
+          isFalse,
+        );
+      });
+
+      test('prose with only a trailing semicolon', () {
+        expect(
+          CommentPatterns.isLikelyCode(
+            'The overlay covers the viewport; tapping dismisses it.',
+          ),
+          isFalse,
+        );
+      });
+
+      test('prose with only parentheses (no semicolon)', () {
+        expect(
+          CommentPatterns.isLikelyCode(
+            'Speed slider (0.25 to 4) is local to this tab.',
+          ),
+          isFalse,
+        );
+      });
     });
 
     group('should still detect actual code after tightening', () {

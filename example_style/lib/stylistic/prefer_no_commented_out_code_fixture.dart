@@ -114,6 +114,13 @@ void goodExamples() {
   // Iterate over each row in the matrix
   // Sort the list of names in alphabetical order
   // Use expand() method to flatten the 2D list and create a
+
+  // Prose with parenthetical ranges and English semicolons (should NOT trigger)
+  // Stop button resets all controllers. Speed slider (0.25×–4×) is local to this tab;
+  // Widget handles tap events (see docs); delegates to parent controller.
+  // Default timeout is 30s (configurable via settings); zero disables it.
+  // Parse results (JSON or XML) are cached; expired entries are evicted hourly.
+  // The overlay (semi-transparent) covers the viewport; tapping dismisses it.
 }
 
 // =============================================================================
