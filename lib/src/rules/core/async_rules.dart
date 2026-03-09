@@ -3981,7 +3981,7 @@ class _ThenSetStateVisitor extends RecursiveAstVisitor<void> {
 
 /// Check connectivity before making requests that will obviously fail.
 ///
-/// Since: v4.1.5 | Updated: v4.13.0 | Rule version: v2
+/// Since: v4.1.5 | Updated: v8.0.12 | Rule version: v3
 ///
 /// Making network requests without checking connectivity results in
 /// confusing timeout errors instead of appropriate offline UI.
@@ -4016,22 +4016,37 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_network_status_check',
     '[require_network_status_check] `[HEURISTIC]` Network call without '
-        'connectivity check. Verify network status before making requests to avoid silent failures. {v2}',
+        'connectivity check. Verify network status before making requests to avoid silent failures. {v3}',
     correctionMessage:
         'Check Connectivity().checkConnectivity() before making requests.',
     severity: DiagnosticSeverity.INFO,
   );
 
   static final List<RegExp> _networkCallPatterns = [
+    // dart:io / http package
     RegExp(r'\bhttp\.get\b'),
     RegExp(r'\bhttp\.post\b'),
     RegExp(r'\bhttp\.put\b'),
     RegExp(r'\bhttp\.delete\b'),
+    RegExp(r'\bhttp\.head\b'),
+    RegExp(r'\bhttp\.patch\b'),
+    RegExp(r'\bhttp\.read\b'),
+    RegExp(r'\bHttpClient\b'),
+    // Dio package
     RegExp(r'\bDio\s*\(\s*\)'),
-    RegExp(r'\.get\s*\('),
-    RegExp(r'\.post\s*\('),
+    RegExp(r'\bdio\.get\s*\('),
+    RegExp(r'\bdio\.post\s*\('),
+    RegExp(r'\bdio\.put\s*\('),
+    RegExp(r'\bdio\.delete\s*\('),
+    RegExp(r'\bdio\.patch\s*\('),
+    // Qualified client calls (e.g., httpClient.get, apiClient.post)
+    RegExp(r'\bclient\.get\s*\('),
+    RegExp(r'\bclient\.post\s*\('),
+    RegExp(r'\bclient\.put\s*\('),
+    RegExp(r'\bclient\.delete\s*\('),
+    RegExp(r'\bclient\.patch\s*\('),
+    // Common API client class names
     RegExp(r'\bApiClient\b'),
-    RegExp(r'\bfetchData\b'),
   ];
   static final List<RegExp> _connectivityCheckPatterns = [
     RegExp(r'\bConnectivity\b'),
@@ -4042,6 +4057,44 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
     RegExp(r'\bnetworkStatus\b'),
   ];
 
+  /// Parameter type names indicating a server-side request handler.
+  /// Methods receiving these types ARE the endpoint — they don't make
+  /// outbound network calls that need connectivity checks.
+  static const Set<String> _serverHandlerParamTypes = <String>{
+    'HttpRequest',
+    'HttpResponse',
+    'Request', // shelf
+    'RequestContext', // dart_frog
+  };
+
+  /// Returns true if the method has a server-side handler parameter.
+  static bool _isServerHandler(MethodDeclaration node) {
+    final FormalParameterList? params = node.parameters;
+    if (params == null) return false;
+
+    for (final FormalParameter param in params.parameters) {
+      final String? paramType = _extractParamType(param);
+      if (paramType != null &&
+          _serverHandlerParamTypes.any(paramType.contains)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static String? _extractParamType(FormalParameter param) {
+    if (param is SimpleFormalParameter) {
+      return param.type?.toSource();
+    }
+    if (param is DefaultFormalParameter) {
+      final NormalFormalParameter normalParam = param.parameter;
+      if (normalParam is SimpleFormalParameter) {
+        return normalParam.type?.toSource();
+      }
+    }
+    return null;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -4049,6 +4102,10 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (!node.body.isAsynchronous) return;
+
+      // Skip server-side request handlers — they ARE the endpoint,
+      // they don't make outbound network calls.
+      if (_isServerHandler(node)) return;
 
       final bodySource = node.body.toSource();
 

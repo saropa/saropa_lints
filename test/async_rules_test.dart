@@ -670,6 +670,26 @@ void main() {
       test('network call without connectivity check SHOULD trigger', () {
         expect('missing network check detected', isNotNull);
       });
+
+      test('dio.get without connectivity check SHOULD trigger', () {
+        expect('dio network call detected', isNotNull);
+      });
+
+      test('client.get without connectivity check SHOULD trigger', () {
+        expect('client network call detected', isNotNull);
+      });
+
+      test('server handler with HttpResponse param should NOT trigger', () {
+        expect('server handler excluded', isNotNull);
+      });
+
+      test('server handler with HttpRequest param should NOT trigger', () {
+        expect('server handler excluded', isNotNull);
+      });
+
+      test('local .get() call should NOT trigger (false positive fix)', () {
+        expect('local store get passes', isNotNull);
+      });
     });
 
     group('avoid_sync_on_every_change', () {

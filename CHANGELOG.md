@@ -17,6 +17,7 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ### Fixed
 
 - **`prefer_wildcard_for_unused_param` false positive on named parameters (v5):** The rule no longer flags named parameters as needing `_` replacement. Dart forbids `_`-prefixed named parameters (compiler error), and override signatures must match the base class name exactly. Only unused positional parameters are now flagged.
+- **`require_network_status_check` false positive on local store lookups and server handlers (v3):** Removed overly broad `.get(`/`.post(` regex patterns that matched any method call (e.g., `_sessionStore.get()`, `Map.get()`). Replaced with specific HTTP client patterns (`dio.get(`, `client.get(`, etc.). Methods with server-side handler parameters (`HttpRequest`, `HttpResponse`, `Request`, `RequestContext`) are now excluded.
 
 ---
 
