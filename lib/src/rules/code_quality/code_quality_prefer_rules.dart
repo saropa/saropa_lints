@@ -535,11 +535,17 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
       ];
 }
 
-/// Warns when index-based for loop can be replaced with for-in.
+/// Warns when an index-based for loop iterating over a collection can be
+/// replaced with a for-in loop.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
 ///
 /// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Only fires when the upper bound is a `.length` property access (e.g.
+/// `list.length`), indicating a collection iteration. Pure numeric counter
+/// loops (e.g. `i < 12`, `i < count`) are not flagged because there is no
+/// collection to for-in over.
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -576,7 +582,7 @@ class PreferForInRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_for_in',
-    '[prefer_for_in] Using for-in loops instead of index-based for loops is a stylistic preference. Both have equivalent performance for most Dart collections. Enable via the stylistic tier. {v4}',
+    '[prefer_for_in] Using for-in loops instead of index-based for loops is a stylistic preference. Both have equivalent performance for most Dart collections. Enable via the stylistic tier. {v5}',
     correctionMessage:
         'Replace the index-based loop with a for-in loop (for (final item in list)) to iterate directly over elements without managing an index variable.',
     severity: DiagnosticSeverity.INFO,
@@ -603,6 +609,13 @@ class PreferForInRule extends SaropaLintRule {
       final Expression? condition = parts.condition;
       if (condition is! BinaryExpression) return;
       if (condition.operator.type != TokenType.LT) return;
+
+      // Upper bound must be .length — otherwise no collection to for-in
+      final right = condition.rightOperand;
+      final isLength = (right is PrefixedIdentifier &&
+              right.identifier.name == 'length') ||
+          (right is PropertyAccess && right.propertyName.name == 'length');
+      if (!isLength) return;
 
       final NodeList<Expression> updaters = parts.updaters;
       if (updaters.length != 1) return;

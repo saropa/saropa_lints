@@ -122,3 +122,18 @@ void _good196() {
     print(item);
   }
 }
+
+// GOOD: Numeric counter with literal upper bound — no collection
+void _good196b() {
+  for (int i = 0; i < 12; i++) {
+    print(i * 30);
+  }
+}
+
+// GOOD: Counter with variable upper bound (not .length)
+void _good196c() {
+  final count = 5;
+  for (var i = 0; i < count; i++) {
+    print(i);
+  }
+}
