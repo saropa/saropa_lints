@@ -108,6 +108,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 dynamic error;
 dynamic http;
 dynamic response;
+dynamic _sessionStore;
+dynamic jsonEncode;
 final url = 'https://example.com';
 
 // BAD: Should trigger require_network_status_check
@@ -127,5 +129,51 @@ void _good114() async {
       throw OfflineException('No internet connection');
     }
     final response = await http.get(Uri.parse(url));
+  }
+}
+
+// GOOD: Server-side handler with HttpResponse param — NOT an outbound call
+class _ServerHandlerGood {
+  Future<void> handleSessionGet(
+    HttpResponse response,
+    String sessionId,
+  ) async {
+    final session = _sessionStore.get(sessionId);
+    response.write(jsonEncode(session));
+    await response.close();
+  }
+}
+
+// GOOD: Server-side handler with HttpRequest param
+class _RequestHandlerGood {
+  Future<void> handleRequest(HttpRequest request) async {
+    final data = await request.first;
+    request.response.write('OK');
+    await request.response.close();
+  }
+}
+
+// GOOD: .get() on a local store is NOT a network call
+void _goodLocalStoreGet() async {
+  Future<String?> lookupSession(String id) async {
+    final store = <String, String>{};
+    return store.get(id);
+  }
+}
+
+// BAD: Dio usage without connectivity check
+// expect_lint: require_network_status_check
+class _BadDio {
+  Future<void> loadUser() async {
+    final dio = Dio();
+    final response = await dio.get('/user');
+  }
+}
+
+// BAD: client.get usage without connectivity check
+// expect_lint: require_network_status_check
+class _BadClientGet {
+  Future<void> fetchUser(dynamic client) async {
+    final response = await client.get('/user');
   }
 }
