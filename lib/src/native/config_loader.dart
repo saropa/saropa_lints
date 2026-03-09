@@ -7,6 +7,7 @@
 /// analysis_options_custom.yaml. Env vars (e.g. SAROPA_LINTS_MAX) override where applicable.
 ///
 /// Populates:
+/// - [SaropaLintRule.enabledRules] (from diagnostics `true` + severity overrides)
 /// - [SaropaLintRule.severityOverrides] and [SaropaLintRule.disabledRules]
 /// - [BaselineManager] (baseline path, enabled)
 /// - [ProgressTracker] (max_issues, file-only output)
@@ -107,6 +108,7 @@ void _loadSeverityOverrides(String? content) {
   if (content == null) {
     SaropaLintRule.severityOverrides = null;
     SaropaLintRule.disabledRules = null;
+    SaropaLintRule.enabledRules = null;
     return;
   }
 
@@ -145,6 +147,14 @@ void _loadSeverityOverrides(String? content) {
 
   SaropaLintRule.severityOverrides = overrides.isEmpty ? null : overrides;
   SaropaLintRule.disabledRules = disabled.isEmpty ? null : disabled;
+
+  // Severity overrides with a level (ERROR/WARNING/INFO) implicitly enable
+  // the rule, so it fires even without a diagnostics: true entry.
+  if (overrides.isNotEmpty) {
+    final enabled = SaropaLintRule.enabledRules ?? <String>{};
+    enabled.addAll(overrides.keys);
+    SaropaLintRule.enabledRules = enabled;
+  }
 }
 
 /// Parse `diagnostics:` section from `analysis_options.yaml`.
@@ -158,9 +168,13 @@ void _loadSeverityOverrides(String? content) {
 ///       rule_name: false  # disabled
 /// ```
 ///
-/// Rules marked `false` are added to [SaropaLintRule.disabledRules].
-/// This merges with any rules already disabled by `severities:` in the
-/// custom config file.
+/// Rules marked `true` are added to [SaropaLintRule.enabledRules].
+/// Rules marked `false` are removed from [enabledRules] and added to
+/// [SaropaLintRule.disabledRules]. This merges with any severity-implied
+/// enables and severity-disabled rules from the custom config file.
+///
+/// When no file or no diagnostics section is found, returns without
+/// modifying [enabledRules] — preserving any severity-implied enables.
 void _loadDiagnosticsConfig() {
   final content = _readProjectFile('analysis_options.yaml');
   if (content == null) return;
@@ -171,6 +185,7 @@ void _loadDiagnosticsConfig() {
   ).firstMatch(content);
   if (sectionMatch == null) return;
 
+  final enabled = SaropaLintRule.enabledRules ?? <String>{};
   final disabled = SaropaLintRule.disabledRules ?? <String>{};
   final lines = content.substring(sectionMatch.end).split('\n');
 
@@ -183,14 +198,19 @@ void _loadDiagnosticsConfig() {
     if (match == null) continue;
 
     final ruleName = match.group(1);
-    if (match.group(2) == 'false' && ruleName != null && ruleName.isNotEmpty) {
+    if (ruleName == null || ruleName.isEmpty) continue;
+
+    if (match.group(2) == 'true') {
+      enabled.add(ruleName);
+      disabled.remove(ruleName);
+    } else {
       disabled.add(ruleName);
+      enabled.remove(ruleName);
     }
   }
 
-  if (disabled.isNotEmpty) {
-    SaropaLintRule.disabledRules = disabled;
-  }
+  SaropaLintRule.enabledRules = enabled.isEmpty ? null : enabled;
+  SaropaLintRule.disabledRules = disabled.isEmpty ? null : disabled;
 }
 
 /// Parse `baseline:` section and initialize [BaselineManager].

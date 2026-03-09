@@ -2010,7 +2010,6 @@ Future<void> main(List<String> args) async {
     tier: resolvedTier,
     packageVersion: version,
     enabledRules: finalEnabled,
-    disabledRules: finalDisabled,
     userCustomizations: userCustomizations,
     allRules: allRules,
     includeStylistic: cliArgs.isStylisticIncluded,
@@ -3587,7 +3586,6 @@ String _generatePluginsYaml({
   required String tier,
   required String packageVersion,
   required Set<String> enabledRules,
-  required Set<String> disabledRules,
   required Map<String, bool> userCustomizations,
   required Set<String> allRules,
   required bool includeStylistic,
@@ -3697,25 +3695,16 @@ String _generatePluginsYaml({
     buffer.writeln('');
   }
 
-  // Group rules by their tier
+  // Group enabled rules by their tier
   final Map<RuleTier, List<String>> enabledByTier = {};
-  final Map<RuleTier, List<String>> disabledByTier = {};
 
   for (final tier in RuleTier.values) {
     enabledByTier[tier] = [];
-    disabledByTier[tier] = [];
   }
 
-  // Categorize enabled rules by tier
   for (final String rule in enabledRules.difference(customizedRuleNames)) {
     final ruleTier = _getRuleTierFromMetadata(rule);
     (enabledByTier[ruleTier] ??= []).add(rule);
-  }
-
-  // Categorize disabled rules by tier
-  for (final String rule in disabledRules.difference(customizedRuleNames)) {
-    final ruleTier = _getRuleTierFromMetadata(rule);
-    (disabledByTier[ruleTier] ??= []).add(rule);
   }
 
   // Section 2: Enabled rules organized by tier
@@ -3749,11 +3738,10 @@ String _generatePluginsYaml({
     buffer.writeln('');
   }
 
-  // Section 3: Stylistic rules (separate section)
+  // Section 3: Enabled stylistic rules (opt-in, no false entries needed)
   final stylisticEnabled = (enabledByTier[RuleTier.stylistic] ?? [])..sort();
-  final stylisticDisabled = (disabledByTier[RuleTier.stylistic] ?? [])..sort();
 
-  if (stylisticEnabled.isNotEmpty || stylisticDisabled.isNotEmpty) {
+  if (stylisticEnabled.isNotEmpty) {
     buffer.writeln(_sectionHeader('STYLISTIC RULES (opt-in)', '~'));
     buffer.writeln('      # Formatting, ordering, naming conventions.');
     buffer.writeln(
@@ -3761,95 +3749,22 @@ String _generatePluginsYaml({
     );
     buffer.writeln('');
 
-    if (stylisticEnabled.isNotEmpty) {
-      buffer.writeln('      #');
-      buffer.writeln(
-        '      # ┌─────────────────────────────────────────────────────────────────┐',
-      );
-      buffer.writeln(
-        '      # │  ✓ ENABLED STYLISTIC (${stylisticEnabled.length} rules)${' ' * (43 - stylisticEnabled.length.toString().length)}│',
-      );
-      buffer.writeln(
-        '      # └─────────────────────────────────────────────────────────────────┘',
-      );
-      buffer.writeln('      #');
-      for (final String rule in stylisticEnabled) {
-        final String msg = _getProblemMessage(rule);
-        buffer.writeln('      $rule: true  # $msg');
-      }
-      buffer.writeln('');
-    }
-
-    if (stylisticDisabled.isNotEmpty) {
-      buffer.writeln('      #');
-      buffer.writeln(
-        '      # ┌─────────────────────────────────────────────────────────────────┐',
-      );
-      buffer.writeln(
-        '      # │  ✗ DISABLED STYLISTIC (${stylisticDisabled.length} rules)${' ' * (42 - stylisticDisabled.length.toString().length)}│',
-      );
-      buffer.writeln(
-        '      # └─────────────────────────────────────────────────────────────────┘',
-      );
-      buffer.writeln('      #');
-      for (final String rule in stylisticDisabled) {
-        final String msg = _getProblemMessage(rule);
-        buffer.writeln('      $rule: false  # $msg');
-      }
-      buffer.writeln('');
-    }
-  }
-
-  // Section 4: Disabled rules by tier (rules above selected tier)
-  final hasDisabledNonStylistic = [
-    RuleTier.essential,
-    RuleTier.recommended,
-    RuleTier.professional,
-    RuleTier.comprehensive,
-    RuleTier.pedantic,
-  ].any((t) => (disabledByTier[t] ?? []).isNotEmpty);
-
-  if (hasDisabledNonStylistic) {
-    buffer.writeln(_sectionHeader('DISABLED RULES (above $tier tier)', '-'));
-    buffer.writeln('      # These rules are in higher tiers. To enable:');
-    buffer.writeln('      #   1. Choose a higher tier with --tier <tier>');
+    buffer.writeln('      #');
     buffer.writeln(
-      '      #   2. Or manually set to true in USER CUSTOMIZATIONS above',
+      '      # ┌─────────────────────────────────────────────────────────────────┐',
     );
-    buffer.writeln('');
-
-    // Output disabled tiers (from highest to lowest)
-    for (final tierLevel in [
-      RuleTier.pedantic,
-      RuleTier.comprehensive,
-      RuleTier.professional,
-      RuleTier.recommended,
-      RuleTier.essential,
-    ]) {
-      final rules = disabledByTier[tierLevel];
-      if (rules == null || rules.isEmpty) continue;
-      rules.sort();
-
-      final tierName = _tierToString(tierLevel).toUpperCase();
-      final tierNum = _tierIndex(tierLevel) + 1;
-      buffer.writeln('      #');
-      buffer.writeln(
-        '      # ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐',
-      );
-      buffer.writeln(
-        '      #   TIER $tierNum: $tierName (${rules.length} rules disabled)',
-      );
-      buffer.writeln(
-        '      # └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘',
-      );
-      buffer.writeln('      #');
-      for (final String rule in rules) {
-        final String msg = _getProblemMessage(rule);
-        final String severity = _getRuleSeverity(rule);
-        buffer.writeln('      $rule: false  # [$severity] $msg');
-      }
-      buffer.writeln('');
+    buffer.writeln(
+      '      # │  ✓ ENABLED STYLISTIC (${stylisticEnabled.length} rules)${' ' * (43 - stylisticEnabled.length.toString().length)}│',
+    );
+    buffer.writeln(
+      '      # └─────────────────────────────────────────────────────────────────┘',
+    );
+    buffer.writeln('      #');
+    for (final String rule in stylisticEnabled) {
+      final String msg = _getProblemMessage(rule);
+      buffer.writeln('      $rule: true  # $msg');
     }
+    buffer.writeln('');
   }
 
   return buffer.toString();

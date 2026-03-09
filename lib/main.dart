@@ -37,7 +37,7 @@ class SaropaLintsPlugin extends Plugin {
   @override
   String get name => 'saropa_lints';
 
-  /// Loads plugin configuration (severity overrides, disabled rules, etc.)
+  /// Loads plugin configuration (enabled rules, severity overrides, etc.)
   /// from analysis_options / SAROPA env vars before rules are registered.
   @override
   FutureOr<void> start() {
@@ -54,13 +54,19 @@ class SaropaLintsPlugin extends Plugin {
     }
   }
 
-  /// Registers each rule and its quick-fix generators with the analysis server.
-  /// Disabled rules (from config) are skipped; all others get rule + fixes.
-  /// Invalid rules (null code or empty name) are skipped defensively.
+  /// Registers enabled rules and their quick-fix generators with the server.
+  ///
+  /// Only rules in [SaropaLintRule.enabledRules] are instantiated and
+  /// registered. When no config is found (enabledRules is null), no rules
+  /// fire — the safe default. Uses [getRulesFromRegistry] to only
+  /// instantiate the enabled subset instead of all 2050+ rules.
   @override
   void register(PluginRegistry registry) {
     try {
-      final rules = allSaropaRules;
+      final enabled = SaropaLintRule.enabledRules;
+      if (enabled == null || enabled.isEmpty) return;
+
+      final rules = getRulesFromRegistry(enabled);
       if (rules.isEmpty) return;
 
       final disabled = SaropaLintRule.disabledRules;
