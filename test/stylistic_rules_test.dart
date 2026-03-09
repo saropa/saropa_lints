@@ -446,14 +446,42 @@ void main() {
     });
 
     group('prefer_single_quotes', () {
-      test('prefer_single_quotes SHOULD trigger', () {
-        // Better alternative available: prefer single quotes
+      test('prefer_single_quotes SHOULD trigger on simple double-quoted', () {
+        // "John" should be flagged — no single quotes in content
         expect('prefer_single_quotes detected', isNotNull);
       });
 
-      test('prefer_single_quotes should NOT trigger', () {
-        // Preferred pattern used correctly
+      test('prefer_single_quotes SHOULD trigger on interpolated', () {
+        // "Hello, $name!" should be flagged — no single quotes
+        expect('prefer_single_quotes interpolation detected', isNotNull);
+      });
+
+      test('prefer_single_quotes should NOT trigger on single-quoted', () {
+        // Already using single quotes
         expect('prefer_single_quotes passes', isNotNull);
+      });
+
+      test('should NOT trigger on simple string with embedded single quotes',
+          () {
+        // "WHERE col = ''" contains single quotes — converting would need \'
+        expect('false positive prevention: simple string', isNotNull);
+      });
+
+      test(
+          'should NOT trigger on interpolated string with embedded single '
+          'quotes', () {
+        // "WHERE $col = 'active'" contains single quotes in literal parts
+        expect('false positive prevention: interpolated string', isNotNull);
+      });
+
+      test('should NOT trigger on SQL hex literal interpolation', () {
+        // "X'$hex'" contains single quotes around interpolation
+        expect('false positive prevention: SQL hex literal', isNotNull);
+      });
+
+      test('should NOT trigger on raw double-quoted string', () {
+        // r"raw string" is a raw string — skip
+        expect('false positive prevention: raw string', isNotNull);
       });
     });
 

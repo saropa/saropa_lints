@@ -14,6 +14,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
+### Fixed
+
+- **`prefer_wildcard_for_unused_param` false positive on named parameters (v5):** The rule no longer flags named parameters as needing `_` replacement. Dart forbids `_`-prefixed named parameters (compiler error), and override signatures must match the base class name exactly. Only unused positional parameters are now flagged.
+
 ---
 
 ## [8.0.10]

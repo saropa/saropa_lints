@@ -2371,12 +2371,18 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
   }
 }
 
-/// Warns when a parameter is unused and could use wildcard `_`.
+/// Warns when a positional parameter is unused and could use wildcard `_`.
 ///
-/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v4
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Dart 3.7 introduced true wildcard variables where `_` doesn't bind.
-/// Unused parameters should use `_` to signal intent.
+/// Unused positional parameters should use `_` to signal intent.
+///
+/// **Named parameters are excluded** because Dart forbids `_`-prefixed named
+/// parameters (compiler error: "Named parameters can't start with an
+/// underscore"). Override signatures must also match the base class name.
+///
+/// Skips: `this.` params, `super.` params, named params, existing wildcards.
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -2394,9 +2400,19 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
 /// }
 ///
 /// list.map((_) => 42);
+///
+/// // Named params are excluded — cannot use _ prefix
+/// void render({int? opacity}) => print('solid');
 /// ```
 class PreferWildcardForUnusedParamRule extends SaropaLintRule {
   PreferWildcardForUnusedParamRule() : super(code: _code);
+
+  /// Style/intent clarity — unused params are not bugs, just unclear.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   @override
   String get exampleBad => 'void onClick(BuildContext context, int index) {\n'
@@ -2410,7 +2426,7 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_wildcard_for_unused_param',
-    '[prefer_wildcard_for_unused_param] Unused parameter obscures intent and signals incomplete API design. Replacing it with a _ wildcard (Dart 3.7+) makes the function signature self-documenting, communicating that the parameter exists for interface conformance but is intentionally ignored in this implementation. {v4}',
+    '[prefer_wildcard_for_unused_param] Unused positional parameter obscures intent and signals incomplete API design. Replacing it with a _ wildcard (Dart 3.7+) makes the function signature self-documenting, communicating that the parameter exists for interface conformance but is intentionally ignored in this implementation. Named parameters are excluded because Dart forbids _-prefixed named params. {v5}',
     correctionMessage:
         'Replace the parameter with _ to make the function signature self-documenting and signal that the value is intentionally unused.',
     severity: DiagnosticSeverity.INFO,
@@ -2469,6 +2485,11 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
 
       // Skip 'this.' and 'super.' parameters - they're always "used"
       if (param is FieldFormalParameter || param is SuperFormalParameter) {
+        continue;
+      }
+
+      // Skip named parameters — Dart forbids _-prefixed named params
+      if (param.isNamed) {
         continue;
       }
 
