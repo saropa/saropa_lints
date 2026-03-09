@@ -345,6 +345,24 @@ void main() {
     });
 
     group('prefer_type_over_var', () {
+      test('rule offers quick fix (replace var with type)', () {
+        final rule = PreferTypeOverVarRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
+      test('correction message mentions source.fixAll', () {
+        final rule = PreferTypeOverVarRule();
+        expect(rule.code.correctionMessage, contains('source.fixAll'));
+      });
+
+      test('correction message does not mention test coverage', () {
+        final rule = PreferTypeOverVarRule();
+        expect(
+          rule.code.correctionMessage,
+          isNot(contains('Verify the change works')),
+        );
+      });
+
       test('prefer_type_over_var SHOULD trigger', () {
         // Better alternative available: prefer type over var
         expect('prefer_type_over_var detected', isNotNull);

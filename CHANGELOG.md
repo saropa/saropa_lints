@@ -14,7 +14,15 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
+### Added
+
+- **Quick fix for `prefer_trailing_comma_always`:** Adds trailing comma via lightbulb/`source.fixAll`. Reuses existing `AddTrailingCommaFix`.
+- **Quick fix for `prefer_type_over_var`:** Replaces `var` with the inferred explicit type via new `ReplaceVarWithTypeFix`.
+
 ### Changed
+
+- **`prefer_trailing_comma_always` correction message:** Now mentions `source.fixAll` editor setting for automatic bulk fixes on save.
+- **`prefer_type_over_var` correction message:** Replaced alarming "Verify the change works correctly with existing tests" text with `source.fixAll` tip, since the rule is purely cosmetic.
 
 - **Opt-in rule registration (BREAKING):** Rules are now disabled by default. Only rules explicitly set to `true` in `diagnostics:` or with a severity override (ERROR/WARNING/INFO) are registered. No config = no rules fire (safe default). This eliminates the need for hundreds of `false` entries in `analysis_options.yaml`. Run `dart run saropa_lints:init` to regenerate your config — existing `true` entries continue to work. The init tool no longer generates disabled-rules sections, reducing YAML size by up to 85%.
 - **Memory improvement:** Plugin registration now uses `getRulesFromRegistry()` to instantiate only enabled rules instead of all 2050+. Essential tier memory usage drops from ~4GB to ~500MB.

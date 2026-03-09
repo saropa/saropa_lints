@@ -364,6 +364,16 @@ void main() {
     });
 
     group('prefer_trailing_comma_always', () {
+      test('rule offers quick fix (add trailing comma)', () {
+        final rule = PreferTrailingCommaAlwaysRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
+      test('correction message mentions source.fixAll', () {
+        final rule = PreferTrailingCommaAlwaysRule();
+        expect(rule.code.correctionMessage, contains('source.fixAll'));
+      });
+
       test('prefer_trailing_comma_always SHOULD trigger', () {
         // Better alternative available: prefer trailing comma always
         expect('prefer_trailing_comma_always detected', isNotNull);

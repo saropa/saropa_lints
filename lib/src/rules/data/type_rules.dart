@@ -12,6 +12,7 @@ import '../../fixes/type/prefer_final_locals_fix.dart';
 import '../../fixes/type/remove_null_assertion_fix.dart';
 import '../../fixes/type/replace_unnecessary_type_assertion_fix.dart';
 import '../../fixes/type/remove_unnecessary_type_cast_fix.dart';
+import '../../fixes/type/replace_var_with_type_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Warns when casting to an extension type.
@@ -2065,11 +2066,18 @@ class PreferTypeOverVarRule extends SaropaLintRule {
   @override
   String get exampleGood => "String name = 'John';";
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            ReplaceVarWithTypeFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'prefer_type_over_var',
     '[prefer_type_over_var] Preferring explicit type annotations over var is a style choice. Both produce identical compiled code. Conflicts with prefer_var_over_explicit_type. Enable via the stylistic tier. {v4}',
     correctionMessage:
-        'Replace var with the explicit type. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+        'Replace var with the explicit type. '
+        'Tip: enable "source.fixAll" in your editor\'s code-actions-on-save to auto-fix these on every save.',
     severity: DiagnosticSeverity.INFO,
   );
 

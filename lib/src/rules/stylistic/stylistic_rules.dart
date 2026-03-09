@@ -13,6 +13,7 @@ import '../../fixes/stylistic/replace_straight_with_curly_fix.dart';
 import '../../fixes/stylistic/sort_arguments_fix.dart';
 import '../../fixes/stylistic/convert_to_screaming_case_fix.dart';
 import '../../fixes/stylistic/delete_commented_code_fix.dart';
+import '../../fixes/formatting/add_trailing_comma_fix.dart';
 import '../../fixes/stylistic/increase_font_size_fix.dart';
 
 // ============================================================================
@@ -992,11 +993,18 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
   String get exampleGood =>
       'Widget build(BuildContext context,) => Foo(a: 1, b: 2,)';
 
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+        ({required CorrectionProducerContext context}) =>
+            AddTrailingCommaFix(context: context),
+      ];
+
   static const LintCode _code = LintCode(
     'prefer_trailing_comma_always',
     '[prefer_trailing_comma_always] A multi-line argument list or collection is missing a trailing comma. Add one so dart format keeps each element on its own line, producing cleaner diffs and easier reordering. {v4}',
     correctionMessage:
-        'Add a trailing comma so dart format keeps each argument on its own line, producing cleaner git diffs.',
+        'Add a trailing comma so dart format keeps each argument on its own line, producing cleaner git diffs. '
+        'Tip: enable "source.fixAll" in your editor\'s code-actions-on-save to auto-fix these on every save.',
     severity: DiagnosticSeverity.INFO,
   );
 
