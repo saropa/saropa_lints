@@ -18,11 +18,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [8.0.11]
 
-Opt-in rule registration (breaking), quick fixes and `source.fixAll` tips for two rules, false-positive fixes for five rules, and a crash fix for `avoid_uncaught_future_errors` on Dart 3.11+.
+Reduces false-positive noise: strings with embedded quotes (like SQL literals) and non-HTTP `.get()`/`.post()` calls (like map lookups and server handlers) are no longer incorrectly flagged.
 
 ### Fixed
 
-- **`prefer_wildcard_for_unused_param` false positive on named parameters (v5):** The rule no longer flags named parameters as needing `_` replacement. Dart forbids `_`-prefixed named parameters (compiler error), and override signatures must match the base class name exactly. Only unused positional parameters are now flagged.
 - **`prefer_single_quotes` false positive on interpolated strings containing single quotes (v7):** The `StringInterpolation` handler now skips double-quoted strings whose literal parts contain `'` characters (e.g. SQL literals like `"WHERE $col = 'active'"`), matching the existing `SimpleStringLiteral` behavior.
 - **`require_network_status_check` false positive on local store lookups and server handlers (v3):** Removed overly broad `.get(`/`.post(` regex patterns that matched any method call (e.g., `_sessionStore.get()`, `Map.get()`). Replaced with specific HTTP client patterns (`dio.get(`, `client.get(`, etc.). Methods with server-side handler parameters (`HttpRequest`, `HttpResponse`, `Request`, `RequestContext`) are now excluded.
 
@@ -210,9 +209,9 @@ Fix `lowerCaseName` getter errors in tests and init tool.
 
 ---
 
-## [7.0.1] *(retracted)*
+## [7.0.1] _(retracted)_
 
-*Retracted: required analyzer 10; Flutter does not yet support analyzer 10. Use [8.0.0](#800) instead.*
+_Retracted: required analyzer 10; Flutter does not yet support analyzer 10. Use [8.0.0](#800) instead._
 
 In this release we’re preparing bug fixes and small rule refinements.
 
@@ -232,27 +231,27 @@ In this release we’re preparing bug fixes and small rule refinements.
 
 ---
 
-## [7.0.0] *(retracted)*
+## [7.0.0] _(retracted)_
 
-*Retracted: required analyzer 10; Flutter framework does not yet support analyzer 10. Use [8.0.0](#800) instead.*
+_Retracted: required analyzer 10; Flutter framework does not yet support analyzer 10. Use [8.0.0](#800) instead._
 
 In this release we move to the analyzer 10.x API and Dart SDK 3.9+. Rule names now use lowerCaseName—see the migration guide for updating your config.
 
 **Breaking: Analyzer 10 upgrade** — This release upgraded to the analyzer 10.x API. See [Upgrading to v7](doc/guides/upgrading_to_v7.md) for migration steps. **This version was retracted** because Flutter does not yet support analyzer 10.
 
-### Requirements *(retracted release)*
+### Requirements _(retracted release)_
 
 - **Dart SDK:** 3.9 or later.
 - **Analyzer:** 10.x only. **saropa_lints 6.2.2** was the last release compatible with analyzer &lt; v10 before retraction; **8.0.0** is the current release for analyzer 9.
 
-### Breaking changes *(retracted release)*
+### Breaking changes _(retracted release)_
 
 - **Dependencies:** Required `analyzer: ^10.0.0`, `analysis_server_plugin: ^0.3.10`, and `analyzer_plugin: ^0.14.0`. Dropped support for analyzer 9.x.
 - **Config keyed by lowerCaseName:** Rule identifiers and config keys would use the analyzer's **lowerCaseName**. Use `prefer_debugprint` instead of `prefer_debugPrint`. Update `analysis_options.yaml` and any `// ignore:` comments that reference rule names.
 - **AST API:** All rule files were migrated to analyzer 10 `body` and `namePart` API (e.g. `(node.body as BlockClassBody).members`, `node.namePart.typeName`).
 - **Init:** Running `dart run saropa_lints:init` on an existing v6 config would normalize rule names to lowerCaseName; pre-flight warned if Dart SDK &lt; 3.9 when using v7.
 
-### Changed *(retracted release)*
+### Changed _(retracted release)_
 
 - **Version:** 6.2.2 → 7.0.0 (major). Release was later retracted.
 - **DiagnosticCode / LintCode:** All internal and test use of `code.name` replaced with `code.lowerCaseName`.
@@ -322,8 +321,8 @@ In this release we fix a few rules (use_existing_variable, require_debouncer_can
 
 ### Added
 
-  - `prefer_geolocation_coarse_location` — Now fully implemented (was stub). Warns when `Geolocator.getCurrentPosition` or `getPositionStream` use `LocationAccuracy.best` or `.high`; suggests `.low` or `.balanced` for battery and privacy. Config alias: `prefer_geolocator_coarse_location`.
-  - `prefer_const_constructor_declarations` — Prefer declaring constructors as `const` when the class has only final fields (plain classes; @immutable and Widget subclasses remain covered by `prefer_const_constructors_in_immutables`). INFO, comprehensive tier.
+- `prefer_geolocation_coarse_location` — Now fully implemented (was stub). Warns when `Geolocator.getCurrentPosition` or `getPositionStream` use `LocationAccuracy.best` or `.high`; suggests `.low` or `.balanced` for battery and privacy. Config alias: `prefer_geolocator_coarse_location`.
+- `prefer_const_constructor_declarations` — Prefer declaring constructors as `const` when the class has only final fields (plain classes; @immutable and Widget subclasses remain covered by `prefer_const_constructors_in_immutables`). INFO, comprehensive tier.
 
 ---
 
@@ -576,7 +575,6 @@ In this release we add many new stylistic and professional rules (cascade, fold 
 - **prefer_cache_extent** (Comprehensive): ListView.builder/GridView.builder should specify cacheExtent for predictable scroll performance. Fixture: `example_widgets/lib/scroll/prefer_cache_extent_fixture.dart`.
 - **prefer_biometric_protection** (Professional): FlutterSecureStorage should use authenticationRequired in AndroidOptions/IOSOptions. Fixture: `example_async/lib/security/prefer_biometric_protection_fixture.dart`.
 - **avoid_renaming_representation_getters** (Professional): Extension type should not expose the representation via a getter with a different name. Fixture: `example_core/lib/class_constructor/avoid_renaming_representation_getters_fixture.dart`.
-
 
 ### Fixed
 
@@ -902,4 +900,3 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 ## [5.0.3] and Earlier
 
 For details on the initial release and versions 0.1.0 through 5.0.3, please refer to [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md).
-
