@@ -528,8 +528,8 @@ Enable in your `analysis_options.yaml` or stylistic overrides to align with this
 |------|------------------|---------------|
 | `prefer_doc_comments_over_regular` | Use `///` for public API documentation, not `//`. | §5 Documentation |
 | `prefer_period_after_doc` | Doc comment sentences must end with a period. | §5 Documentation |
-| `prefer_sentence_case_comments` | Prose comments (3+ words) must start with a capital letter. | §9, §10 |
-| `prefer_sentence_case_comments_relaxed` | Like above but only enforces on 5+ word comments. | §9, §10 |
+| `prefer_sentence_case_comments` | Prose comments (3+ words) must start with a capital letter. Skips continuation lines in multi-line `//` blocks. | §9, §10 |
+| `prefer_sentence_case_comments_relaxed` | Like above but only enforces on 5+ word comments. Skips continuation lines in multi-line `//` blocks. | §9, §10 |
 | `prefer_capitalized_comment_start` | Same idea; capital letter at start of prose comments. | §9, §10 |
 | `prefer_todo_format` | TODOs must use `TODO(author): description`. | §9 Formatting |
 | `prefer_fixme_format` | FIXMEs must use `FIXME(author): description`. | §9 Formatting |

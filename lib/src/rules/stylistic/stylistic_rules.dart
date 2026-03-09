@@ -2080,6 +2080,11 @@ abstract class _SentenceCaseCommentsBase extends SaropaLintRule {
   /// Pattern to check if first character is lowercase letter.
   static final RegExp _lowercaseFirstChar = RegExp(r'^[a-z]');
 
+  /// Pattern for sentence-ending punctuation (period, exclamation, question).
+  /// Colons are intentionally excluded — they introduce lists or elaborations,
+  /// so the following line is still a continuation.
+  static final RegExp _sentenceEndPattern = RegExp(r'[.!?]\s*$');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2090,8 +2095,10 @@ abstract class _SentenceCaseCommentsBase extends SaropaLintRule {
 
       while (token != null && !token.isEof) {
         Token? comment = token.precedingComments;
+        Token? prevComment;
         while (comment != null) {
-          _checkComment(comment, reporter);
+          _checkComment(comment, reporter, unit, prevComment);
+          prevComment = comment;
           comment = comment.next;
         }
         token = token.next;
@@ -2099,7 +2106,12 @@ abstract class _SentenceCaseCommentsBase extends SaropaLintRule {
     });
   }
 
-  void _checkComment(Token comment, SaropaDiagnosticReporter reporter) {
+  void _checkComment(
+    Token comment,
+    SaropaDiagnosticReporter reporter,
+    CompilationUnit unit,
+    Token? prevComment,
+  ) {
     final String lexeme = comment.lexeme;
 
     // Skip doc comments (handled separately)
@@ -2150,20 +2162,68 @@ abstract class _SentenceCaseCommentsBase extends SaropaLintRule {
       return;
     }
 
+    // Skip continuation lines in multi-line // comment blocks.
+    // e.g., the second line of:
+    //   // Health and generation before query check so probes /
+    //   // live-refresh work without DB.
+    if (_isContinuationLine(comment, prevComment, unit)) {
+      return;
+    }
+
     // Check if the first character is lowercase
     if (_lowercaseFirstChar.hasMatch(trimmed)) {
       reporter.atOffset(offset: comment.offset, length: comment.length);
     }
   }
+
+  /// Returns true if [comment] continues a sentence from [prevComment].
+  ///
+  /// A comment is a continuation if:
+  /// 1. The previous token is a `//` comment (not `///` or `/*`)
+  /// 2. Both are on consecutive lines
+  /// 3. The previous comment text is non-empty (blank `//` = paragraph break)
+  /// 4. The previous comment does not end with sentence-ending punctuation
+  bool _isContinuationLine(
+    Token comment,
+    Token? prevComment,
+    CompilationUnit unit,
+  ) {
+    if (prevComment == null) return false;
+
+    final prevLexeme = prevComment.lexeme;
+
+    // Previous must be a // comment (not /// or /*)
+    if (!prevLexeme.startsWith('//') || prevLexeme.startsWith('///')) {
+      return false;
+    }
+
+    // Must be on consecutive lines
+    final lineInfo = unit.lineInfo;
+    final prevLine = lineInfo.getLocation(prevComment.offset).lineNumber;
+    final currLine = lineInfo.getLocation(comment.offset).lineNumber;
+    if (currLine != prevLine + 1) return false;
+
+    // Blank // line acts as a paragraph break
+    final prevTrimmed = prevLexeme.substring(2).trim();
+    if (prevTrimmed.isEmpty) return false;
+
+    // If previous line ends with sentence terminator, next is a new sentence
+    if (_sentenceEndPattern.hasMatch(prevTrimmed)) return false;
+
+    return true;
+  }
 }
 
 /// Warns when comments of 3+ words don't start with a capital letter.
 ///
-/// Since: v1.3.0 | Updated: v5.0.0 | Rule version: v5
+/// Since: v1.3.0 | Updated: v8.0.10 | Rule version: v6
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// Comments of 1-2 words are always skipped (treated as annotation labels).
+/// Continuation lines in multi-line `//` comment blocks are also skipped —
+/// only the first line of each sentence is checked.
+///
 /// For a more relaxed variant that also skips 3-4 word comments, see
 /// [PreferSentenceCaseCommentsRelaxedRule].
 ///
@@ -2181,6 +2241,8 @@ abstract class _SentenceCaseCommentsBase extends SaropaLintRule {
 /// // This is a helper function
 /// // magnifyingGlass
 /// // not used
+/// // Health and generation before query check so probes /
+/// // live-refresh work without DB.
 /// ```
 class PreferSentenceCaseCommentsRule extends _SentenceCaseCommentsBase {
   PreferSentenceCaseCommentsRule()
@@ -2197,7 +2259,7 @@ class PreferSentenceCaseCommentsRule extends _SentenceCaseCommentsBase {
     '[prefer_sentence_case_comments] Comment starts with a lowercase letter. '
         'Inconsistent capitalization in comments reduces readability and gives '
         'the codebase an unfinished appearance. Skips comments of 1-2 words. '
-        '{v5}',
+        '{v6}',
     correctionMessage: 'Capitalize the first letter of the comment to maintain '
         'sentence-case consistency across the codebase.',
     severity: DiagnosticSeverity.INFO,
@@ -2206,14 +2268,15 @@ class PreferSentenceCaseCommentsRule extends _SentenceCaseCommentsBase {
 
 /// Warns when comments of 5+ words don't start with a capital letter.
 ///
-/// Since: v5.0.0 | Rule version: v1
+/// Since: v5.0.0 | Updated: v8.0.10 | Rule version: v2
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
 /// A more relaxed variant of [PreferSentenceCaseCommentsRule] that skips
 /// comments of 1-4 words (treated as short annotations or labels). Only
 /// enforces sentence case on comments of 5 or more words, which are more
-/// likely to be prose sentences.
+/// likely to be prose sentences. Continuation lines in multi-line `//`
+/// comment blocks are also skipped.
 ///
 /// **Do not enable both this rule and `prefer_sentence_case_comments`.**
 /// They target the same comments at different thresholds.
@@ -2231,6 +2294,8 @@ class PreferSentenceCaseCommentsRule extends _SentenceCaseCommentsBase {
 /// // calculate the total
 /// // not used
 /// // magnifyingGlass
+/// // VM-only implementation: this file is selected by conditional export when
+/// // dart.library.io is available.
 /// ```
 class PreferSentenceCaseCommentsRelaxedRule extends _SentenceCaseCommentsBase {
   PreferSentenceCaseCommentsRelaxedRule()
@@ -2249,7 +2314,7 @@ class PreferSentenceCaseCommentsRelaxedRule extends _SentenceCaseCommentsBase {
     '[prefer_sentence_case_comments_relaxed] Comment starts with a lowercase '
         'letter. Inconsistent capitalization in comments reduces readability '
         'and gives the codebase an unfinished appearance. Skips comments of '
-        '1-4 words. {v1}',
+        '1-4 words. {v2}',
     correctionMessage: 'Capitalize the first letter of the comment to maintain '
         'sentence-case consistency across the codebase.',
     severity: DiagnosticSeverity.INFO,

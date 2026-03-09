@@ -53,6 +53,23 @@ void _badExamples() {
 // doSomething();
 // _privateMethod
 
+// Multi-line continuation: second line is not a new sentence
+// Health and generation before query check so probes /
+// live-refresh work without DB.
+
+// Multi-line continuation: three lines continuing a single sentence
+// VM-only implementation: this file is selected by conditional export when
+// dart.library.io is available. The stub (drift_debug_server_stub.dart) is
+// used on web.
+
+// Continuation after colon (colon introduces a list, not a new sentence)
+// Things to consider:
+// first check the input parameters carefully
+
+// New sentence after period IS still checked (uppercase = OK)
+// First sentence ends here.
+// Second sentence starts with uppercase.
+
 void _goodExamples() {
   // Capitalized 3-word comment
   final x = 1;
@@ -63,3 +80,11 @@ void _goodExamples() {
   // magnifyingGlass
   final z = 3;
 }
+
+// ============================================================
+// BAD: New sentence after period with lowercase start
+// ============================================================
+
+// First sentence ends here.
+// expect_lint: prefer_sentence_case_comments
+// second sentence should be capitalized
