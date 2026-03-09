@@ -190,10 +190,10 @@ class CommentPatterns {
   /// Requires 3+ words with at least 2 common English function words.
   ///
   /// **Important**: If the content contains strong code indicators
-  /// (balanced parentheses, semicolons, arrow functions, or braces),
-  /// the prose guard is bypassed entirely.  This prevents false negatives
-  /// on comments like `// for (int i in list)` where `for` and `in` are
-  /// both prose indicators but the overall pattern is clearly code.
+  /// (function-call parentheses, arrow functions, or braces), the prose
+  /// guard is bypassed entirely.  This prevents false negatives on comments
+  /// like `// for (int i in list)` where `for` and `in` are both prose
+  /// indicators but the overall pattern is clearly code.
   static bool _isLikelyProse(String content) {
     if (_hasStrongCodeIndicators(content)) return false;
 
@@ -210,16 +210,40 @@ class CommentPatterns {
     return false;
   }
 
+  /// Matches an identifier immediately before an opening parenthesis.
+  ///
+  /// Catches function calls (`foo()`, `list.add(item)`) but not
+  /// prose parentheticals (`(see docs)`, `(0.25×–4×)`).
+  static final RegExp _functionCallPattern = RegExp(r'\w\(');
+
+  /// Matches control-flow keywords followed by an opening parenthesis.
+  ///
+  /// Handles `for (`, `if (`, `while (true)` where a space separates
+  /// the keyword from the paren (so [_functionCallPattern] won't match).
+  static final RegExp _controlFlowParenPattern = RegExp(
+    r'\b(if|for|while|switch|catch|try)\s*\(',
+  );
+
   /// Returns true if [content] contains syntax that is unambiguously code.
   ///
   /// When these are present, the prose guard should not override the code
   /// pattern — the comment is almost certainly commented-out code even if
   /// it also contains English function words.
+  ///
+  /// Bare parentheses and semicolons are NOT strong indicators because they
+  /// are common English punctuation (parenthetical notes, clause-joining
+  /// semicolons). Only code-like patterns using these characters qualify.
   static bool _hasStrongCodeIndicators(String content) {
-    if (content.contains('(') && content.contains(')')) return true;
-    if (content.contains(';')) return true;
+    // Arrow functions are almost never used in prose
     if (content.contains('=>')) return true;
+    // Braces are almost never used in prose
     if (content.contains('{') || content.contains('}')) return true;
+    // Function/constructor call: identifier immediately before opening paren
+    if (_functionCallPattern.hasMatch(content) && content.contains(')')) {
+      return true;
+    }
+    // Control flow keyword followed by paren (with optional space)
+    if (_controlFlowParenPattern.hasMatch(content)) return true;
     return false;
   }
 
