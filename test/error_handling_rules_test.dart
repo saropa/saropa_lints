@@ -308,6 +308,132 @@ void main() {
       });
 
       test(
+        'enum declarations must NOT crash the analyzer (SDK 3.11+ regression)',
+        () async {
+          final repoRoot = Directory.current;
+          expect(
+            File(
+              '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
+            ).existsSync(),
+            isTrue,
+            reason: 'Run tests from the saropa_lints repo root.',
+          );
+
+          final tempDir = await Directory.systemTemp.createTemp(
+            'saropa_lints_enum_crash_',
+          );
+          addTearDown(() async {
+            for (var attempt = 0; attempt < 3; attempt++) {
+              try {
+                if (tempDir.existsSync()) {
+                  await tempDir.delete(recursive: true);
+                }
+                return;
+              } on FileSystemException {
+                await Future<void>.delayed(
+                  Duration(milliseconds: 500 * (attempt + 1)),
+                );
+              }
+            }
+          });
+
+          final repoPathForYaml = repoRoot.path.replaceAll('\\', '/');
+
+          await Directory(
+            '${tempDir.path}${Platform.pathSeparator}lib',
+          ).create(recursive: true);
+
+          await File(
+            '${tempDir.path}${Platform.pathSeparator}pubspec.yaml',
+          ).writeAsString('''
+name: tmp_saropa_lints_enum_crash
+publish_to: none
+
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+
+dev_dependencies:
+  saropa_lints:
+    path: "$repoPathForYaml"
+''');
+
+          await File(
+            '${tempDir.path}${Platform.pathSeparator}analysis_options.yaml',
+          ).writeAsString('''
+plugins:
+  saropa_lints:
+    diagnostics:
+      avoid_uncaught_future_errors: true
+''');
+
+          // File with enum, mixin, extension, and extension type declarations.
+          // Before the fix, any enum would crash the entire analyzer plugin.
+          await File(
+            '${tempDir.path}${Platform.pathSeparator}lib${Platform.pathSeparator}main.dart',
+          ).writeAsString('''
+enum MyEnum { a, b, c }
+
+enum EnumWithMethod {
+  x, y;
+  Future<void> doWork() async {}
+}
+
+mixin MyMixin {
+  Future<void> mixinWork() async {}
+}
+
+extension MyExt on String {
+  Future<void> extWork() async {}
+}
+
+extension type MyExtType(int value) {
+  Future<void> extTypeWork() async {}
+}
+
+void main() {}
+''');
+
+          final pubGet = await Process.run(
+            'dart',
+            ['pub', 'get'],
+            workingDirectory: tempDir.path,
+            runInShell: true,
+          );
+          expect(
+            pubGet.exitCode,
+            0,
+            reason: 'dart pub get failed:\n${pubGet.stdout}\n${pubGet.stderr}',
+          );
+
+          final analyze = await Process.run(
+            'dart',
+            ['analyze', 'lib/main.dart'],
+            workingDirectory: tempDir.path,
+            runInShell: true,
+          );
+
+          expect(
+            analyze.exitCode,
+            isNot(4),
+            reason:
+                'Analyzer plugin crashed (exit code 4). '
+                'EnumDeclaration.body likely threw UnsupportedError:\n'
+                '${analyze.stdout}\n${analyze.stderr}',
+          );
+
+          final combined = '${analyze.stdout}\n${analyze.stderr}';
+          expect(
+            combined,
+            isNot(contains('UnsupportedError')),
+            reason:
+                'Analyzer threw UnsupportedError on declaration type:\n'
+                '$combined',
+          );
+        },
+        timeout: const Timeout(Duration(minutes: 2)),
+      );
+
+      test(
         'unawaited(futureCall()) must NOT trigger (explicit fire-and-forget)',
         () async {
           final repoRoot = Directory.current;
