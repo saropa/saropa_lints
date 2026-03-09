@@ -14,6 +14,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
+### Fixed
+
+- **`prefer_sentence_case_comments` false positive on continuation lines (v6):** Multi-line `//` comment blocks are now recognized as a single logical unit. Continuation lines (where the previous `//` line does not end with `.`, `!`, or `?`) are skipped instead of being flagged for lowercase start. Previously every continuation line in a multi-line comment was a false positive. The relaxed variant (`prefer_sentence_case_comments_relaxed`) receives the same fix (v2).
+
 ---
 
 ## [8.0.9]
