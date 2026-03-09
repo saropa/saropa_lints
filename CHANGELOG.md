@@ -12,7 +12,9 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
-## [Unreleased]
+## [8.0.10]
+
+Opt-in rule registration (breaking), quick fixes and `source.fixAll` tips for two rules, false-positive fixes for five rules, and a crash fix for `avoid_uncaught_future_errors` on Dart 3.11+.
 
 ### Added
 
@@ -43,6 +45,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [8.0.9]
 
+New relaxed sentence-case variant, init wizard code examples, and false-positive fixes for six rules.
+
 ### Added
 
 - **`prefer_sentence_case_comments_relaxed` (v1):** New relaxed variant of `prefer_sentence_case_comments` that only enforces sentence case on comments of 5+ words. Comments of 1-4 words are skipped as short annotations/labels. Enable one or the other, not both.
@@ -64,6 +68,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [8.0.8]
 
+Fix `prefer_single_blank_line_max` false positives by rewriting detection to scan actual line content.
+
 ### Fixed
 
 - **`prefer_single_blank_line_max` false positives (v3):** Rewrote detection to scan actual line content instead of comparing top-level declaration positions. Comments, doc comments, and section separators between declarations no longer trigger false positives. Now detects consecutive blank lines everywhere in the file (function bodies, class members), not just between top-level declarations.
@@ -71,6 +77,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 
 ## [8.0.7]
+
+Fix `prefer_readable_line_length` crash and publish script changelog parsing.
 
 ### Fixed
 
@@ -81,6 +89,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [8.0.6]
 
+Remove Flutter SDK constraint that broke CI and fix 56 unresolved dartdoc references.
+
 ### Fixed
 
 - **Removed Flutter SDK constraint from pubspec.yaml** that caused CI publish workflow to fail (`dart pub get` requires only the Dart SDK; this is a pure Dart package).
@@ -90,6 +100,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [8.0.5]
 
+Publish workflow improvements with retry logic and SDK configuration.
+
 ### Changed
 
 - **Updated publish workflow** with improved retry logic and SDK configuration.
@@ -97,6 +109,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 
 ## [8.0.4]
+
+Publish script auto-bumps version on tag conflict; GitHub Actions workflow uses stable Dart SDK.
 
 ### Changed
 
@@ -106,6 +120,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [8.0.3]
 
+Version bump for pub.dev compatibility.
+
 ### Changed
 
 - Version bump
@@ -114,6 +130,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [8.0.2]
 
+Version bump for pub.dev compatibility.
+
 ### Changed
 
 - Version bump
@@ -121,6 +139,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ---
 
 ## [8.0.1]
+
+Fix `lowerCaseName` getter errors in tests and init tool.
 
 ### Fixed
 

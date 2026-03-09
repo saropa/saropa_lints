@@ -612,9 +612,9 @@ class PreferForInRule extends SaropaLintRule {
 
       // Upper bound must be .length — otherwise no collection to for-in
       final right = condition.rightOperand;
-      final isLength = (right is PrefixedIdentifier &&
-              right.identifier.name == 'length') ||
-          (right is PropertyAccess && right.propertyName.name == 'length');
+      final isLength =
+          (right is PrefixedIdentifier && right.identifier.name == 'length') ||
+              (right is PropertyAccess && right.propertyName.name == 'length');
       if (!isLength) return;
 
       final NodeList<Expression> updaters = parts.updaters;
