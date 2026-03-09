@@ -47,6 +47,30 @@ class _AwaitFinder extends RecursiveAstVisitor<void> {
   }
 }
 
+/// Extracts `(targetName, methodName)` from a statement of the form
+/// `target.method(args);`.
+///
+/// Returns `null` if [stmt] is not an [ExpressionStatement] containing a
+/// [MethodInvocation] whose target is a [SimpleIdentifier].
+(String, String)? _extractCascadeTarget(Statement stmt) {
+  if (stmt is! ExpressionStatement) return null;
+  final expr = stmt.expression;
+  if (expr is! MethodInvocation) return null;
+  final target = expr.target;
+  if (target is! SimpleIdentifier) return null;
+  return (target.name, expr.methodName.name);
+}
+
+/// Whether a consecutive run of [count] method calls with
+/// [distinctMethods] distinct names should be flagged for cascade.
+///
+/// - 3+ calls: always flag (strong configuration signal).
+/// - Exactly 2 calls: only flag when a method name repeats
+///   (batch pattern like `add`/`add`), not independent actions.
+bool _isCascadeCandidate(int count, int distinctMethods) {
+  return count >= 3 || distinctMethods < count;
+}
+
 // =============================================================================
 // CONTROL FLOW RULES
 // =============================================================================
@@ -564,18 +588,17 @@ class PreferSwitchStatementRule extends SaropaLintRule {
 
 /// Warns when cascade could be used instead of chained calls for mutations.
 ///
-/// Since: v4.13.0 | Rule version: v1
+/// Since: v4.13.0 | Rule version: v2
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
-/// **Pros of cascade:**
-/// - Clear that mutations are on same object
-/// - Works with void methods
-/// - No intermediate variables
-///
-/// **Cons (why some teams prefer chained):**
-/// - Chaining is more familiar
-/// - Works with builder patterns
+/// Only flags consecutive method calls on the same target when they show a
+/// builder/batch pattern:
+/// - **3+ calls**: always flagged (strong configuration signal).
+/// - **Exactly 2 calls**: only flagged when both use the **same method name**
+///   (e.g., `add`/`add`), indicating a batch operation. Two calls with
+///   **different** method names (e.g., `clearSnackBars`/`showSnackBar`) are
+///   treated as independent actions and are NOT flagged.
 ///
 /// ### Example
 ///
@@ -594,6 +617,12 @@ class PreferSwitchStatementRule extends SaropaLintRule {
 ///   ..add(2)
 ///   ..add(3);
 /// ```
+///
+/// #### GOOD (not flagged - different method names, only 2 calls):
+/// ```dart
+/// messenger.clearSnackBars();
+/// messenger.showSnackBar(bar);
+/// ```
 class PreferCascadeOverChainedRule extends SaropaLintRule {
   PreferCascadeOverChainedRule() : super(code: _code);
 
@@ -611,9 +640,13 @@ class PreferCascadeOverChainedRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_cascade_over_chained',
-    '[prefer_cascade_over_chained] Consecutive method calls on the same variable repeat the target name unnecessarily. Cascade notation (..) signals that all operations mutate the same object. {v1}',
+    '[prefer_cascade_over_chained] Consecutive method calls on the same '
+        'variable repeat the target name unnecessarily. Cascade notation (..) '
+        'signals that all operations mutate the same object. Only flags '
+        'batch patterns (same method repeated) or 3+ consecutive calls. {v2}',
     correctionMessage:
-        'Rewrite consecutive calls using cascade (..) to eliminate the repeated variable name and clarify mutation intent.',
+        'Rewrite consecutive calls using cascade (..) to eliminate the '
+        'repeated variable name and clarify mutation intent.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -623,38 +656,46 @@ class PreferCascadeOverChainedRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addBlock((node) {
-      // Look for consecutive method calls on the same variable
       final statements = node.statements;
       String? lastTarget;
       int consecutiveCount = 0;
       Statement? firstConsecutive;
+      bool reported = false;
+      final methodNames = <String>{};
 
       for (final stmt in statements) {
-        if (stmt is ExpressionStatement) {
-          final expr = stmt.expression;
-          if (expr is MethodInvocation) {
-            final target = expr.target;
-            if (target is SimpleIdentifier) {
-              final targetName = target.name;
-              if (targetName == lastTarget) {
-                consecutiveCount++;
-                if (consecutiveCount == 2) {
-                  final node = firstConsecutive;
-                  if (node != null) reporter.atNode(node, code);
-                }
-              } else {
-                lastTarget = targetName;
-                consecutiveCount = 1;
-                firstConsecutive = stmt;
-              }
-              continue;
+        final pair = _extractCascadeTarget(stmt);
+        if (pair != null) {
+          final (targetName, methodName) = pair;
+          if (targetName == lastTarget) {
+            consecutiveCount++;
+            methodNames.add(methodName);
+            if (!reported &&
+                _isCascadeCandidate(
+                  consecutiveCount,
+                  methodNames.length,
+                )) {
+              final n = firstConsecutive;
+              if (n != null) reporter.atNode(n, code);
+              reported = true;
             }
+          } else {
+            lastTarget = targetName;
+            consecutiveCount = 1;
+            firstConsecutive = stmt;
+            reported = false;
+            methodNames
+              ..clear()
+              ..add(methodName);
           }
+          continue;
         }
         // Reset on non-matching statement
         lastTarget = null;
         consecutiveCount = 0;
         firstConsecutive = null;
+        reported = false;
+        methodNames.clear();
       }
     });
   }
@@ -1449,7 +1490,9 @@ class PreferIfElseOverGuardsRule extends SaropaLintRule {
 
 /// Prefer cascade (..) for consecutive assignments/calls to the same target.
 ///
-/// Same intent as prefer_cascade_over_chained; alternative rule name for tier config.
+/// Same intent as [PreferCascadeOverChainedRule]; alternative rule name for
+/// tier config. Only flags batch patterns (same method repeated) or 3+
+/// consecutive calls on the same target.
 ///
 /// **Bad:**
 /// ```dart
@@ -1460,6 +1503,12 @@ class PreferIfElseOverGuardsRule extends SaropaLintRule {
 /// **Good:**
 /// ```dart
 /// list..add(1)..add(2);
+/// ```
+///
+/// **Good (not flagged - independent actions):**
+/// ```dart
+/// messenger.clearSnackBars();
+/// messenger.showSnackBar(bar);
 /// ```
 class PreferCascadeAssignmentsRule extends SaropaLintRule {
   PreferCascadeAssignmentsRule() : super(code: _code);
@@ -1478,9 +1527,13 @@ class PreferCascadeAssignmentsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_cascade_assignments',
-    '[prefer_cascade_assignments] Consecutive method calls on the same target; consider cascade notation (..).',
+    '[prefer_cascade_assignments] Consecutive method calls on the same '
+        'target repeat the variable name unnecessarily; consider cascade '
+        'notation (..). Only flags batch patterns (same method repeated) '
+        'or 3+ consecutive calls on the same object. {v2}',
     correctionMessage:
-        'Consider using cascade (..) for consecutive calls on the same object.',
+        'Consider using cascade (..) for consecutive calls on the same '
+        'object.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -1494,35 +1547,39 @@ class PreferCascadeAssignmentsRule extends SaropaLintRule {
       String? lastTarget;
       int consecutiveCount = 0;
       Statement? firstConsecutive;
+      final methodNames = <String>{};
 
       for (final stmt in statements) {
-        if (stmt is ExpressionStatement) {
-          final expr = stmt.expression;
-          if (expr is MethodInvocation) {
-            final target = expr.target;
-            if (target is SimpleIdentifier) {
-              final targetName = target.name;
-              if (targetName == lastTarget) {
-                consecutiveCount++;
-                if (consecutiveCount == 2) {
-                  final node = firstConsecutive;
-                  if (node != null) {
-                    reporter.atNode(node);
-                    return;
-                  }
-                }
-              } else {
-                lastTarget = targetName;
-                consecutiveCount = 1;
-                firstConsecutive = stmt;
+        final pair = _extractCascadeTarget(stmt);
+        if (pair != null) {
+          final (targetName, methodName) = pair;
+          if (targetName == lastTarget) {
+            consecutiveCount++;
+            methodNames.add(methodName);
+            if (_isCascadeCandidate(
+              consecutiveCount,
+              methodNames.length,
+            )) {
+              final n = firstConsecutive;
+              if (n != null) {
+                reporter.atNode(n);
+                return;
               }
-              continue;
             }
+          } else {
+            lastTarget = targetName;
+            consecutiveCount = 1;
+            firstConsecutive = stmt;
+            methodNames
+              ..clear()
+              ..add(methodName);
           }
+          continue;
         }
         lastTarget = null;
         consecutiveCount = 0;
         firstConsecutive = null;
+        methodNames.clear();
       }
     });
   }

@@ -101,17 +101,59 @@
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
 // Test fixture for: prefer_cascade_over_chained
-// Source: lib\src\rules\stylistic_control_flow_rules.dart
 
-import 'package:saropa_lints_example/flutter_mocks.dart';
-
-// BAD: Should trigger prefer_cascade_over_chained
+// BAD: Same method repeated (batch pattern) — should trigger
 // expect_lint: prefer_cascade_over_chained
-void _bad1088() {
-  // TODO: Add code that triggers prefer_cascade_over_chained
+void _badSameMethod() {
+  final list = <int>[];
+  list.add(1);
+  list.add(2);
 }
 
-// GOOD: Should NOT trigger prefer_cascade_over_chained
-void _good1088() {
-  // TODO: Add compliant code for prefer_cascade_over_chained
+// BAD: 3+ calls different methods — should trigger
+// expect_lint: prefer_cascade_over_chained
+void _badThreeDifferent() {
+  final list = <int>[];
+  list.add(1);
+  list.remove(0);
+  list.clear();
+}
+
+// BAD: 3+ calls same method — should trigger
+// expect_lint: prefer_cascade_over_chained
+void _badThreeSame() {
+  final list = <int>[];
+  list.add(1);
+  list.add(2);
+  list.add(3);
+}
+
+// GOOD: Different methods, only 2 calls — independent actions
+void _goodDifferentMethods() {
+  final list = <int>[];
+  list.add(1);
+  list.remove(0);
+}
+
+// GOOD: Already using cascade
+void _goodCascade() {
+  final list = <int>[];
+  list
+    ..add(1)
+    ..add(2)
+    ..add(3);
+}
+
+// GOOD: Only one call
+void _goodSingleCall() {
+  final list = <int>[];
+  list.add(1);
+}
+
+// GOOD: Calls on different targets
+void _goodDifferentTargets() {
+  final a = <int>[];
+  final b = <int>[];
+  a.add(1);
+  b.add(2);
 }

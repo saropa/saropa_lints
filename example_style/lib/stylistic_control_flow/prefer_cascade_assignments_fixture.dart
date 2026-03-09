@@ -15,3 +15,10 @@ void g() {
     ..add(1)
     ..add(2);
 }
+
+// OK: different method names, only 2 calls (independent actions)
+void h() {
+  final list = <int>[];
+  list.add(1);
+  list.remove(0);
+}

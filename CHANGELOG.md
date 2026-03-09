@@ -25,6 +25,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 - **`prefer_sentence_case_comments` false positive on continuation lines (v6):** Multi-line `//` comment blocks are now recognized as a single logical unit. Continuation lines (where the previous `//` line does not end with `.`, `!`, or `?`) are skipped instead of being flagged for lowercase start. Previously every continuation line in a multi-line comment was a false positive. The relaxed variant (`prefer_sentence_case_comments_relaxed`) receives the same fix (v2).
 
+- **`prefer_cascade_over_chained` false positive on independent actions (v2):** Two consecutive calls with different method names (e.g., `messenger.clearSnackBars(); messenger.showSnackBar(bar);`) are no longer flagged. Cascade is only suggested for batch patterns (same method repeated, e.g., `add`/`add`) or 3+ consecutive calls. The same fix is applied to `prefer_cascade_assignments`.
+
 ---
 
 ## [8.0.9]
