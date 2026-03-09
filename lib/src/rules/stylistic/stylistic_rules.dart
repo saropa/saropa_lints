@@ -1693,7 +1693,7 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
 
 /// Warns when double quotes are used instead of single quotes for strings.
 ///
-/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v6
+/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v7
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
@@ -1706,6 +1706,10 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
 /// - Familiar from other languages (Java, JavaScript)
 /// - Easier to include apostrophes in strings
 /// - JSON uses double quotes
+///
+/// **Exclusions:** Strings containing literal single-quote characters are
+/// skipped, since converting them would require `\'` escaping and reduce
+/// readability (e.g. SQL literals like `"WHERE col = 'value'"`).
 ///
 /// ### Example
 ///
@@ -1744,7 +1748,7 @@ class PreferSingleQuotesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_single_quotes',
-    '[prefer_single_quotes] Double quotes detected where single quotes would suffice. Prefer single quotes for consistency with Dart style conventions and to reduce visual noise in string literals. {v6}',
+    '[prefer_single_quotes] Double quotes detected where single quotes would suffice. Prefer single quotes for consistency with Dart style conventions and to reduce visual noise in string literals. {v7}',
     correctionMessage:
         "Replace double quotes with single quotes to follow Dart style conventions and maintain codebase consistency.",
     severity: DiagnosticSeverity.INFO,
@@ -1783,6 +1787,13 @@ class PreferSingleQuotesRule extends SaropaLintRule {
 
       // Check if it starts with double quote (including """)
       if (lexeme.startsWith('"')) {
+        // Skip if any literal parts contain single quotes
+        // (would need escaping if converted to single quotes)
+        for (final element in node.elements) {
+          if (element is InterpolationString && element.value.contains("'")) {
+            return;
+          }
+        }
         reporter.atNode(node);
       }
     });
@@ -4435,6 +4446,7 @@ class PreferRawStringsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // cspell:ignore nrtbfv0xu
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (node.isRaw) return;
       if (node.length == 0) return; // skip synthetic (error-recovery) nodes

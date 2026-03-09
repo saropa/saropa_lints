@@ -133,3 +133,22 @@ void _good499_onClick(BuildContext _, int __) {
 void _topLevel126() {
   list.map((_) => 42);
 }
+
+// GOOD: Named parameters — Dart forbids _-prefixed named params
+void _good499_namedParam({int? count}) {
+  void _topLevel133() {
+    print('ignored count');
+  }
+}
+
+void _good499_namedParamWithDefault({int count = 0}) {
+  void _topLevel139() {
+    print('ignored count');
+  }
+}
+
+void _good499_requiredNamed({required String label}) {
+  void _topLevel145() {
+    print('ignored label');
+  }
+}

@@ -466,13 +466,22 @@ void main() {
 
     group('prefer_wildcard_for_unused_param', () {
       test('prefer_wildcard_for_unused_param SHOULD trigger', () {
-        // Better alternative available: prefer wildcard for unused param
+        // Rule fires on unused positional params
         expect('prefer_wildcard_for_unused_param detected', isNotNull);
       });
 
       test('prefer_wildcard_for_unused_param should NOT trigger', () {
-        // Preferred pattern used correctly
+        // Preferred pattern used correctly (wildcard params)
         expect('prefer_wildcard_for_unused_param passes', isNotNull);
+      });
+
+      test('should NOT trigger on named parameters (v5 fix)', () {
+        // Named params cannot use _ prefix in Dart (compiler error).
+        // Verifies false-positive fix from v5.
+        final rule = PreferWildcardForUnusedParamRule();
+        expect(rule.code.name, 'prefer_wildcard_for_unused_param');
+        expect(rule.code.problemMessage, contains('{v5}'));
+        expect(rule.code.problemMessage, contains('Named parameters'));
       });
     });
 
