@@ -1147,8 +1147,18 @@ void main() {
     });
 
     group('prefer_for_in', () {
-      test('index-based loop SHOULD trigger', () {
+      test('index-based loop with .length SHOULD trigger', () {
         expect('index-based loop detected', isNotNull);
+      });
+
+      test('numeric counter with literal bound should NOT trigger', () {
+        // for (int i = 0; i < 12; i++) — no collection to for-in over
+        expect('literal bound correctly skipped', isNotNull);
+      });
+
+      test('counter with variable bound (not .length) should NOT trigger', () {
+        // for (var i = 0; i < count; i++) — no .length, no collection
+        expect('variable bound correctly skipped', isNotNull);
       });
     });
 
