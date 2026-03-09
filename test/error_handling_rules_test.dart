@@ -415,8 +415,7 @@ void main() {}
           expect(
             analyze.exitCode,
             isNot(4),
-            reason:
-                'Analyzer plugin crashed (exit code 4). '
+            reason: 'Analyzer plugin crashed (exit code 4). '
                 'EnumDeclaration.body likely threw UnsupportedError:\n'
                 '${analyze.stdout}\n${analyze.stderr}',
           );
@@ -425,8 +424,7 @@ void main() {}
           expect(
             combined,
             isNot(contains('UnsupportedError')),
-            reason:
-                'Analyzer threw UnsupportedError on declaration type:\n'
+            reason: 'Analyzer threw UnsupportedError on declaration type:\n'
                 '$combined',
           );
         },

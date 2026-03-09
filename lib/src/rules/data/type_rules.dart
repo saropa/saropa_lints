@@ -2075,8 +2075,7 @@ class PreferTypeOverVarRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_type_over_var',
     '[prefer_type_over_var] Preferring explicit type annotations over var is a style choice. Both produce identical compiled code. Conflicts with prefer_var_over_explicit_type. Enable via the stylistic tier. {v4}',
-    correctionMessage:
-        'Replace var with the explicit type. '
+    correctionMessage: 'Replace var with the explicit type. '
         'Tip: enable "source.fixAll" in your editor\'s code-actions-on-save to auto-fix these on every save.',
     severity: DiagnosticSeverity.INFO,
   );
