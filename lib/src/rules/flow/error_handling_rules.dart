@@ -9,7 +9,6 @@ library;
 import 'dart:developer' as developer;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 
@@ -860,37 +859,41 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
   }
 
   /// Collects all function and method names that have try-catch in their body.
+  ///
+  /// Scans top-level functions and methods inside classes, enums, mixins,
+  /// extensions, and extension types. Uses `.members` (not `.body`) on all
+  /// declaration types to avoid the `useDeclaringConstructorsAst` gate that
+  /// crashes on `EnumDeclaration.body` in Dart SDK 3.11+.
   void _collectFunctionsWithTryCatch(CompilationUnit unit, Set<String> result) {
     for (final CompilationUnitMember declaration in unit.declarations) {
       if (declaration is FunctionDeclaration) {
         if (_bodyHasTryCatch(declaration.functionExpression.body)) {
           result.add(declaration.name.lexeme);
         }
-      } else if (declaration is ClassDeclaration) {
-        for (final ClassMember member in declaration.members) {
-          if (member is MethodDeclaration) {
-            if (_bodyHasTryCatch(member.body)) {
-              result.add(member.name.lexeme);
-            }
-          }
+      } else {
+        final NodeList<ClassMember>? members = switch (declaration) {
+          ClassDeclaration d => d.members,
+          EnumDeclaration d => d.members,
+          MixinDeclaration d => d.members,
+          ExtensionDeclaration d => d.members,
+          ExtensionTypeDeclaration d => d.members,
+          _ => null,
+        };
+        if (members != null) {
+          _addMethodsWithTryCatch(members, result);
         }
-      } else if (declaration is MixinDeclaration) {
-        // childEntities is Iterable<SyntacticEntity>, not Iterable<AstNode>.
-        for (final SyntacticEntity child in declaration.body.childEntities) {
-          if (child is MethodDeclaration && _bodyHasTryCatch(child.body)) {
-            result.add(child.name.lexeme);
-          }
-        }
-      } else if (declaration is ExtensionDeclaration) {
-        final body = declaration.body;
-        if (body != null) {
-          // childEntities is Iterable<SyntacticEntity>, not Iterable<AstNode>.
-          for (final SyntacticEntity child in body.childEntities) {
-            if (child is MethodDeclaration && _bodyHasTryCatch(child.body)) {
-              result.add(child.name.lexeme);
-            }
-          }
-        }
+      }
+    }
+  }
+
+  /// Adds method names from [members] that contain a top-level try-catch.
+  void _addMethodsWithTryCatch(
+    NodeList<ClassMember> members,
+    Set<String> result,
+  ) {
+    for (final ClassMember member in members) {
+      if (member is MethodDeclaration && _bodyHasTryCatch(member.body)) {
+        result.add(member.name.lexeme);
       }
     }
   }

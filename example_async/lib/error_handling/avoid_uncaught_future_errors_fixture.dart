@@ -124,3 +124,35 @@ Future<void> _fetchData() async {}
 void unawaitedExample() {
   unawaited(_fetchData());
 }
+
+// --- Enum / mixin / extension declarations must not crash the analyzer ---
+// Before the fix, EnumDeclaration.body threw UnsupportedError on Dart 3.11+.
+
+/// OK: Simple enum — must not crash the analyzer.
+enum SimpleEnum { a, b, c }
+
+/// OK: Enum with a method containing try-catch — method should be collected
+/// as having internal error handling.
+enum EnumWithTryCatch {
+  x,
+  y;
+
+  Future<void> safeWork() async {
+    try {
+      await _fetchData();
+    } on Exception {
+      // handled
+    }
+  }
+}
+
+/// OK: Mixin with a method — must use .members, not .body.
+mixin MixinWithMethod {
+  Future<void> mixinWork() async {
+    try {
+      await _fetchData();
+    } on Exception {
+      // handled
+    }
+  }
+}
