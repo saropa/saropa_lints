@@ -2424,9 +2424,16 @@ abstract class SaropaLintRule extends AnalysisRule {
   /// ```
   static Map<String, DiagnosticSeverity>? severityOverrides;
 
+  /// Rules explicitly enabled via diagnostics config or severity overrides.
+  ///
+  /// When non-null, only rules in this set are registered by the plugin.
+  /// When null (no config found), no rules fire (safe default).
+  static Set<String>? enabledRules;
+
   /// Rules that are completely disabled via severity overrides.
   ///
-  /// Set rule name to null in [severityOverrides] to disable.
+  /// Set rule name to `false` in severities to disable.
+  /// Takes precedence over [enabledRules] — a rule in both sets is disabled.
   static Set<String>? disabledRules;
 
   /// Check if this rule is disabled via configuration.

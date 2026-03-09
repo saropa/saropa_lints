@@ -14,6 +14,11 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
+### Changed
+
+- **Opt-in rule registration (BREAKING):** Rules are now disabled by default. Only rules explicitly set to `true` in `diagnostics:` or with a severity override (ERROR/WARNING/INFO) are registered. No config = no rules fire (safe default). This eliminates the need for hundreds of `false` entries in `analysis_options.yaml`. Run `dart run saropa_lints:init` to regenerate your config — existing `true` entries continue to work. The init tool no longer generates disabled-rules sections, reducing YAML size by up to 85%.
+- **Memory improvement:** Plugin registration now uses `getRulesFromRegistry()` to instantiate only enabled rules instead of all 2050+. Essential tier memory usage drops from ~4GB to ~500MB.
+
 ### Fixed
 
 - **`avoid_uncaught_future_errors` crash on enum declarations (Dart 3.11+):** `_collectFunctionsWithTryCatch` accessed `.body` on declaration nodes, which throws `UnsupportedError` for `EnumDeclaration` in Dart SDK 3.11. This crashed the entire analyzer plugin (exit code 4), losing all diagnostics for all rules in all files. Fixed by switching all declaration types to use `.members` instead of `.body`, and added `ExtensionTypeDeclaration` support.
