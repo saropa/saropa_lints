@@ -14,9 +14,12 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
+Opt-in rule registration (breaking), quick fixes and `source.fixAll` tips for two rules, false-positive fixes for five rules, and a crash fix for `avoid_uncaught_future_errors` on Dart 3.11+.
+
 ### Fixed
 
 - **`prefer_wildcard_for_unused_param` false positive on named parameters (v5):** The rule no longer flags named parameters as needing `_` replacement. Dart forbids `_`-prefixed named parameters (compiler error), and override signatures must match the base class name exactly. Only unused positional parameters are now flagged.
+- **`prefer_single_quotes` false positive on interpolated strings containing single quotes (v7):** The `StringInterpolation` handler now skips double-quoted strings whose literal parts contain `'` characters (e.g. SQL literals like `"WHERE $col = 'active'"`), matching the existing `SimpleStringLiteral` behavior.
 - **`require_network_status_check` false positive on local store lookups and server handlers (v3):** Removed overly broad `.get(`/`.post(` regex patterns that matched any method call (e.g., `_sessionStore.get()`, `Map.get()`). Replaced with specific HTTP client patterns (`dio.get(`, `client.get(`, etc.). Methods with server-side handler parameters (`HttpRequest`, `HttpResponse`, `Request`, `RequestContext`) are now excluded.
 
 ---
