@@ -88,11 +88,14 @@ import 'dart:developer' as dev;
 import 'dart:convert' show utf8;
 import 'dart:io';
 
-import 'package:saropa_lints/saropa_lints.dart'
-    show RuleTier, SaropaLintRule, allSaropaRules;
+import 'package:saropa_lints/saropa_lints.dart' show RuleTier;
 import 'package:saropa_lints/src/init/cli_args.dart';
 import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
+import 'package:saropa_lints/src/init/preflight.dart';
+import 'package:saropa_lints/src/init/project_info.dart';
+import 'package:saropa_lints/src/init/rule_metadata.dart';
+import 'package:saropa_lints/src/init/validation.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/report/analysis_reporter.dart'
     show AnalysisReporter;
@@ -102,174 +105,6 @@ import 'whats_new.dart' show AnsiColors, formatWhatsNew;
 
 /// Shared log writer instance for the init tool session.
 final LogWriter log = LogWriter();
-
-/// Get saropa_lints rootUri from .dart_tool/package_config.json.
-/// Returns null if not found. Used by both version and source detection.
-String? _getSaropaLintsRootUri() {
-  try {
-    final packageConfigFile = File('.dart_tool/package_config.json');
-    if (!packageConfigFile.existsSync()) return null;
-
-    final content = packageConfigFile.readAsStringSync();
-    final match = RegExp(
-      r'"name":\s*"saropa_lints"[^}]*"rootUri":\s*"([^"]+)"',
-    ).firstMatch(content);
-
-    return match?.group(1);
-  } catch (e, st) {
-    dev.log(
-      'Failed to read saropa_lints rootUri from package_config',
-      error: e,
-      stackTrace: st,
-    );
-  }
-
-  return null;
-}
-
-/// Convert rootUri to absolute file path.
-String? _rootUriToPath(String rootUri) {
-  if (rootUri.startsWith('file://')) {
-    return Uri.parse(rootUri).toFilePath();
-  } else if (rootUri.startsWith('../')) {
-    final dartToolDir = Directory('.dart_tool').absolute.path;
-    return Directory('$dartToolDir/$rootUri').absolute.path;
-  }
-
-  return null;
-}
-
-/// Detect which packages the host project uses from its pubspec.yaml.
-///
-/// Reads the project's pubspec.yaml (not the saropa_lints package's),
-/// parses dependencies + dev_dependencies, and returns a map of
-/// saropa_lints package names to whether they were found.
-///
-/// Used to auto-filter stylistic rules irrelevant to the project.
-Map<String, bool> _detectProjectPackages() {
-  // Start with all disabled — only enable what we find
-  final detected = <String, bool>{
-    for (final pkg in tiers.allPackages) pkg: false,
-  };
-
-  try {
-    final pubspecFile = File('pubspec.yaml');
-    if (!pubspecFile.existsSync()) return detected;
-
-    final content = pubspecFile.readAsStringSync();
-
-    // Detect Flutter
-    final isFlutter = content.contains('flutter:') ||
-        content.contains('flutter_test:') ||
-        content.contains('sdk: flutter');
-
-    // Parse indented dependency names (under dependencies: or
-    // dev_dependencies:)
-    final deps = <String>{};
-    final depMatches = RegExp(r'^\s+(\w+):').allMatches(content);
-    for (final match in depMatches) {
-      final dep = match.group(1);
-      if (dep != null) deps.add(dep);
-    }
-
-    // Map detected deps to saropa_lints package names.
-    // Some saropa_lints names differ from pub.dev package names:
-    //   saropa name       → pub.dev name(s)
-    //   bloc              → bloc, flutter_bloc
-    //   getx              → get
-    //   flutter_hooks     → flutter_hooks
-    //   firebase          → firebase_core, firebase_auth, etc.
-    //   qr_scanner        → mobile_scanner, qr_code_scanner
-    const Map<String, List<String>> aliases = {
-      'bloc': ['bloc', 'flutter_bloc'],
-      'getx': ['get', 'getx'],
-      'firebase': [
-        'firebase_core',
-        'firebase_auth',
-        'cloud_firestore',
-        'firebase_storage',
-        'firebase_messaging',
-        'firebase_analytics',
-      ],
-      'qr_scanner': ['mobile_scanner', 'qr_code_scanner'],
-    };
-
-    for (final pkg in tiers.allPackages) {
-      final pubNames = aliases[pkg] ?? [pkg];
-      if (pubNames.any((name) => deps.contains(name))) {
-        detected[pkg] = true;
-      }
-    }
-
-    // If not Flutter, disable Flutter-dependent packages too
-    if (!isFlutter) {
-      // These packages require Flutter
-      for (final pkg in ['flutter_hooks', 'flame']) {
-        detected[pkg] = false;
-      }
-    }
-
-    log.terminal(
-      '${InitColors.dim}Auto-detected packages from pubspec.yaml: '
-      '${detected.entries.where((e) => e.value).map((e) => e.key).join(', ')}'
-      '${isFlutter ? ' (Flutter project)' : ' (pure Dart)'}${InitColors.reset}',
-    );
-  } catch (e, st) {
-    dev.log(
-      'Could not read project pubspec for package detection',
-      error: e,
-      stackTrace: st,
-    );
-    return Map<String, bool>.of(tiers.defaultPackages);
-  }
-
-  return detected;
-}
-
-/// Get package version by reading pubspec.yaml from package location.
-String _getPackageVersion() {
-  try {
-    final rootUri = _getSaropaLintsRootUri();
-    if (rootUri == null) return 'unknown';
-
-    final packageDir = _rootUriToPath(rootUri);
-    if (packageDir == null) return 'unknown';
-
-    final pubspecFile = File('$packageDir/pubspec.yaml');
-    if (!pubspecFile.existsSync()) return 'unknown';
-
-    final content = pubspecFile.readAsStringSync();
-    final match = RegExp(
-      r'^version:\s*(.+)$',
-      multiLine: true,
-    ).firstMatch(content);
-    return match?.group(1)?.trim() ?? 'unknown';
-  } catch (e, st) {
-    dev.log(
-      'Failed to read saropa_lints version from pubspec',
-      error: e,
-      stackTrace: st,
-    );
-  }
-
-  return 'unknown';
-}
-
-/// Detect where the saropa_lints package is loaded from.
-String _getPackageSource() {
-  final rootUri = _getSaropaLintsRootUri();
-
-  if (rootUri == null) return 'unknown';
-
-  if (rootUri.startsWith('file://') || rootUri.startsWith('../')) {
-    return 'local: $rootUri';
-  } else if (rootUri.contains('.pub-cache')) {
-    return 'pub.dev';
-  }
-
-  return rootUri;
-}
-
 
 /// Append a detailed rule-by-rule listing to the log buffer.
 ///
@@ -293,8 +128,8 @@ void _appendDetailedReport({
   for (final rule in allRules) {
     final enabled = enabledRules.contains(rule);
     final marker = enabled ? '+' : '-';
-    final severity = _getRuleSeverity(rule).padRight(7);
-    final tierName = _tierToString(_getRuleTierFromMetadata(rule)).padRight(13);
+    final severity = getRuleSeverity(rule).padRight(7);
+    final tierName = tierToString(getRuleTierFromMetadata(rule)).padRight(13);
     final note = detailNote(
       rule,
       userCustomizations,
@@ -309,366 +144,9 @@ void _appendDetailedReport({
   log.buffer.writeln('${'=' * 80}');
 }
 
-/// Run pre-flight checks before generating the configuration.
-///
-/// All checks are non-fatal (warnings only). Results are logged to both
-/// terminal and the log buffer so they appear in the report file.
-void _runPreflightChecks({required String version}) {
-  log.terminal('${InitColors.bold}Pre-flight checks${InitColors.reset}');
-
-  _checkPubspecDependency();
-  _checkDartSdkVersion();
-  _checkV7SdkIfNeeded(version);
-  _auditExistingConfig(version);
-
-  log.terminal('');
-}
-
-/// Check that pubspec.yaml lists saropa_lints as a dependency.
-void _checkPubspecDependency() {
-  final pubspec = File('pubspec.yaml');
-
-  if (!pubspec.existsSync()) {
-    log.check(
-      'pubspec.yaml',
-      pass: false,
-      detail: 'file not found — are you in the project root?',
-    );
-    return;
-  }
-
-  final content = pubspec.readAsStringSync();
-  final hasDep = RegExp(
-    r'^\s+saropa_lints:',
-    multiLine: true,
-  ).hasMatch(content);
-
-  if (hasDep) {
-    log.check('pubspec.yaml contains saropa_lints dependency', pass: true);
-  } else {
-    log.check(
-      'pubspec.yaml',
-      pass: false,
-      detail: 'saropa_lints not found in dependencies — '
-          'add it to dev_dependencies',
-    );
-  }
-}
-
-/// Parses Dart SDK version from [Platform.version] (e.g. "3.10.0 (stable) ...").
-/// Returns (major, minor) or null if unparseable.
-(int major, int minor)? _parseDartSdkVersion() {
-  final match = RegExp(r'^(\d+)\.(\d+)').firstMatch(Platform.version);
-  if (match == null) return null;
-  final g1 = match.group(1);
-  final g2 = match.group(2);
-  if (g1 == null || g2 == null) return null;
-  return (int.parse(g1), int.parse(g2));
-}
-
-/// Check that the Dart SDK version supports the plugin system (>= 3.6).
-void _checkDartSdkVersion() {
-  final parsed = _parseDartSdkVersion();
-  if (parsed == null) {
-    log.check(
-      'Dart SDK version',
-      pass: false,
-      detail: 'could not parse: ${Platform.version}',
-    );
-    return;
-  }
-  final (major, minor) = parsed;
-  if (major > 3 || (major == 3 && minor >= 6)) {
-    log.check('Dart SDK $major.$minor (plugin support OK)', pass: true);
-  } else {
-    log.check(
-      'Dart SDK version',
-      pass: false,
-      detail: '$major.$minor detected — native plugins require Dart >= 3.6',
-    );
-  }
-}
-
-/// If saropa_lints is v7+, ensure Dart SDK is 3.9+ (analyzer 10 requirement).
-/// v7 was retracted; v8.0.0 uses analyzer 9 and skips this check.
-void _checkV7SdkIfNeeded(String packageVersion) {
-  if (!packageVersion.startsWith('7.')) return;
-
-  final parsed = _parseDartSdkVersion();
-  if (parsed == null) return;
-  final (major, minor) = parsed;
-
-  if (major > 3 || (major == 3 && minor >= 9)) {
-    log.check('Dart SDK $major.$minor (v7 / analyzer 10 OK)', pass: true);
-  } else {
-    log.check(
-      'Dart SDK for v7',
-      pass: false,
-      detail: '$major.$minor detected — saropa_lints v7 requires Dart SDK 3.9+ '
-          '(analyzer 10). v7 was retracted; use saropa_lints 8.0.0 for Flutter.',
-    );
-  }
-}
-
-/// Audit an existing analysis_options.yaml for common issues.
-void _auditExistingConfig(String currentVersion) {
-  final configFile = File('analysis_options.yaml');
-
-  if (!configFile.existsSync()) {
-    log.check('No existing analysis_options.yaml (fresh setup)', pass: true);
-    return;
-  }
-
-  final content = configFile.readAsStringSync();
-
-  // Check for old custom_lint section (v4 leftover)
-  if (RegExp(r'custom_lint:', multiLine: true).hasMatch(content)) {
-    log.check(
-      'Existing config',
-      pass: false,
-      detail: 'contains custom_lint: section — '
-          'saropa_lints v5 uses native plugins, not custom_lint',
-    );
-  }
-
-  // Check for plugins section missing version key
-  if (RegExp(r'^\s+saropa_lints:', multiLine: true).hasMatch(content) &&
-      !RegExp(r'^\s+version:', multiLine: true).hasMatch(content)) {
-    log.check(
-      'Existing config',
-      pass: false,
-      detail: 'plugins section missing version: key — '
-          'the analyzer will silently ignore the plugin',
-    );
-  }
-
-  // Check for stale version constraint
-  final versionMatch = RegExp(
-    r'version:\s*"?\^?([^"\s]+)"?',
-    multiLine: true,
-  ).firstMatch(content);
-
-  if (versionMatch != null && currentVersion != 'unknown') {
-    final existing = versionMatch.group(1);
-    if (existing != null &&
-        existing != currentVersion &&
-        !existing.startsWith(currentVersion)) {
-      log.check(
-        'Existing config',
-        pass: false,
-        detail: 'version $existing may be stale (current: $currentVersion) '
-            '— re-run "dart run saropa_lints" to update',
-      );
-    }
-  }
-
-  // If none of the config-specific checks above fired, report OK
-  if (!log.warnings.any((w) => w.startsWith('Existing config'))) {
-    log.check('Existing analysis_options.yaml looks OK', pass: true);
-  }
-}
 
 // ---------------------------------------------------------------------------
-// Post-write validation
-// ---------------------------------------------------------------------------
 
-/// Validate the written configuration file has the critical sections.
-///
-/// Returns true if all checks pass.
-bool _validateWrittenConfig(String filePath, int expectedRuleCount) {
-  log.terminal('');
-  log.terminal('${InitColors.bold}Post-write validation${InitColors.reset}');
-
-  final file = File(filePath);
-
-  if (!file.existsSync()) {
-    log.check(filePath, pass: false, detail: 'file does not exist');
-    return false;
-  }
-
-  final content = file.readAsStringSync();
-  var allPassed = true;
-
-  // Check plugins: section exists
-  if (RegExp(r'^plugins:', multiLine: true).hasMatch(content)) {
-    log.check('plugins: section present', pass: true);
-  } else {
-    log.check('plugins:', pass: false, detail: 'section missing');
-    allPassed = false;
-  }
-
-  // Check version: key under saropa_lints
-  if (RegExp(r'^\s+version:', multiLine: true).hasMatch(content)) {
-    log.check('version: key present', pass: true);
-  } else {
-    log.check(
-      'version:',
-      pass: false,
-      detail: 'key missing — analyzer will silently ignore plugin',
-    );
-    allPassed = false;
-  }
-
-  // Check diagnostics: section
-  if (RegExp(r'^\s+diagnostics:', multiLine: true).hasMatch(content)) {
-    log.check('diagnostics: section present', pass: true);
-  } else {
-    log.check('diagnostics:', pass: false, detail: 'section missing');
-    allPassed = false;
-  }
-
-  // Check rule count (5% tolerance)
-  final ruleLines = RegExp(
-    r'^\s{6}\w+:\s*(true|false)',
-    multiLine: true,
-  ).allMatches(content).length;
-  final tolerance = (expectedRuleCount * 0.05).ceil();
-  final diff = (ruleLines - expectedRuleCount).abs();
-
-  if (diff <= tolerance) {
-    log.check(
-      'Rule count: $ruleLines (expected ~$expectedRuleCount)',
-      pass: true,
-    );
-  } else {
-    log.check(
-      'Rule count',
-      pass: false,
-      detail: '$ruleLines rules found, expected ~$expectedRuleCount',
-    );
-    allPassed = false;
-  }
-
-  log.terminal('');
-  return allPassed;
-}
-
-
-// ---------------------------------------------------------------------------
-// Rule metadata cache (problem messages, severities)
-// ---------------------------------------------------------------------------
-
-/// Cache for rule metadata (built once from allSaropaRules).
-Map<String, _RuleMetadata>? _ruleMetadataCache;
-
-/// Metadata for a single rule.
-class _RuleMetadata {
-  const _RuleMetadata({
-    required this.name,
-    required this.problemMessage,
-    required this.correctionMessage,
-    required this.severity,
-    required this.tier,
-    required this.hasFix,
-    this.exampleBad,
-    this.exampleGood,
-  });
-
-  final String name;
-  final String problemMessage;
-  final String correctionMessage;
-  final String severity; // 'ERROR', 'WARNING', 'INFO'
-  final RuleTier tier;
-
-  /// Whether this rule provides a quick fix in the IDE.
-  final bool hasFix;
-
-  /// Short BAD example for CLI walkthrough (null if not provided).
-  final String? exampleBad;
-
-  /// Short GOOD example for CLI walkthrough (null if not provided).
-  final String? exampleGood;
-}
-
-/// Builds and returns rule metadata from rule classes.
-Map<String, _RuleMetadata> _getRuleMetadata() {
-  var cache = _ruleMetadataCache;
-  if (cache != null) return cache;
-
-  cache = <String, _RuleMetadata>{};
-  _ruleMetadataCache = cache;
-  for (final SaropaLintRule rule in allSaropaRules) {
-    {
-      final String ruleName = rule.code.lowerCaseName;
-      final String message = rule.code.problemMessage;
-      final String correction = rule.code.correctionMessage ?? '';
-
-      // Extract severity from LintCode
-      final severity = rule.code.severity.name.toUpperCase();
-
-      // Get tier from tiers.dart (single source of truth)
-      final RuleTier tier = _getTierFromSets(ruleName);
-
-      cache[ruleName] = _RuleMetadata(
-        name: ruleName,
-        problemMessage: message,
-        correctionMessage: correction,
-        severity: severity,
-        tier: tier,
-        hasFix: rule.fixGenerators.isNotEmpty,
-        exampleBad: rule.exampleBad,
-        exampleGood: rule.exampleGood,
-      );
-    }
-  }
-
-  return cache;
-}
-
-/// Gets the problem message for a rule (for YAML comment).
-String _getProblemMessage(String ruleName) {
-  final metadata = _getRuleMetadata()[ruleName];
-
-  if (metadata == null) return '';
-
-  return _stripRulePrefix(metadata.problemMessage);
-}
-
-/// Gets a combined description for a rule (problem + correction).
-///
-/// Used in the stylistic section of analysis_options_custom.yaml where
-/// users need enough context to decide whether to enable each rule.
-/// Falls back to just problemMessage if correctionMessage is empty or
-/// redundant.
-String _getStylisticDescription(String ruleName) {
-  final metadata = _getRuleMetadata()[ruleName];
-
-  if (metadata == null) return '';
-
-  final problem = _stripRulePrefix(metadata.problemMessage);
-  final correction = _stripRulePrefix(metadata.correctionMessage);
-
-  if (correction.isEmpty) return problem;
-
-  // If correction just restates the problem, skip it
-  if (problem.contains(correction) || correction.contains(problem)) {
-    // Return whichever is longer (more context)
-    return problem.length >= correction.length ? problem : correction;
-  }
-
-  return '$problem $correction';
-}
-
-/// Remove rule name prefix if present (e.g., "`rule_name` ...").
-String _stripRulePrefix(String msg) {
-  final prefixMatch = RegExp(r'^\[[\w_]+\]\s*').firstMatch(msg);
-
-  if (prefixMatch != null) {
-    return msg.substring(prefixMatch.end);
-  }
-
-  return msg;
-}
-
-/// Gets the severity for a rule.
-String _getRuleSeverity(String ruleName) {
-  return _getRuleMetadata()[ruleName]?.severity ?? 'INFO';
-}
-
-/// Gets the tier for a rule.
-RuleTier _getRuleTierFromMetadata(String ruleName) {
-  return _getRuleMetadata()[ruleName]?.tier ?? RuleTier.professional;
-}
 
 // ---------------------------------------------------------------------------
 // Regex patterns (defined once, used in multiple places)
@@ -1217,56 +695,6 @@ List<_StylisticRuleset> _getStylisticRulesets() {
 }
 
 // ---------------------------------------------------------------------------
-// Tier functions - read directly from rule classes (single source of truth)
-// ---------------------------------------------------------------------------
-
-/// Maps RuleTier enum to tier string name.
-String _tierToString(RuleTier tier) {
-  return switch (tier) {
-    RuleTier.essential => 'essential',
-    RuleTier.recommended => 'recommended',
-    RuleTier.professional => 'professional',
-    RuleTier.comprehensive => 'comprehensive',
-    RuleTier.pedantic => 'pedantic',
-    RuleTier.stylistic => 'stylistic',
-  };
-}
-
-/// Returns the tier order index (lower = stricter requirements).
-int _tierIndex(RuleTier tier) {
-  return switch (tier) {
-    RuleTier.essential => 0,
-    RuleTier.recommended => 1,
-    RuleTier.professional => 2,
-    RuleTier.comprehensive => 3,
-    RuleTier.pedantic => 4,
-    RuleTier.stylistic =>
-      -1, // Stylistic is opt-in, not part of tier progression
-  };
-}
-
-/// Gets tier from tiers.dart sets (single source of truth).
-RuleTier _getTierFromSets(String ruleName) {
-  if (tiers.stylisticRules.contains(ruleName)) return RuleTier.stylistic;
-
-  if (tiers.essentialRules.contains(ruleName)) return RuleTier.essential;
-
-  if (tiers.pedanticOnlyRules.contains(ruleName)) return RuleTier.pedantic;
-
-  if (tiers.comprehensiveOnlyRules.contains(ruleName)) {
-    return RuleTier.comprehensive;
-  }
-
-  if (tiers.professionalOnlyRules.contains(ruleName)) {
-    return RuleTier.professional;
-  }
-
-  if (tiers.recommendedOnlyRules.contains(ruleName)) {
-    return RuleTier.recommended;
-  }
-
-  return RuleTier.professional;
-}
 
 /// Main entry point for the CLI tool.
 Future<void> main(List<String> args) async {
@@ -1283,10 +711,10 @@ Future<void> main(List<String> args) async {
   migrateOldReports();
 
   // Get version, source, and package directory early for logging + what's new
-  final version = _getPackageVersion();
-  final source = _getPackageSource();
-  final rootUri = _getSaropaLintsRootUri();
-  final packageDir = rootUri != null ? _rootUriToPath(rootUri) : null;
+  final version = getPackageVersion();
+  final source = getPackageSource();
+  final rootUri = getSaropaLintsRootUri();
+  final packageDir = rootUri != null ? rootUriToPath(rootUri) : null;
 
   // Add header to log buffer
   log.buffer.writeln('=' * 80);
@@ -1341,7 +769,7 @@ Future<void> main(List<String> args) async {
   log.terminal('');
 
   // Run pre-flight validation checks (non-fatal warnings)
-  _runPreflightChecks(version: version);
+  runPreflightChecks(log,version: version);
 
   // tiers.dart is the source of truth for all rules
   // A unit test validates that all plugin rules are in tiers.dart
@@ -1403,7 +831,7 @@ Future<void> main(List<String> args) async {
     }
   } else {
     // Auto-detect packages from pubspec.yaml for first-time setup
-    packageSettings = _detectProjectPackages();
+    packageSettings = detectProjectPackages(log);
 
     // Create the custom overrides file with a helpful header
     _createCustomOverridesFile(overridesFile);
@@ -1590,18 +1018,18 @@ Future<void> main(List<String> args) async {
   };
 
   for (final rule in finalEnabled) {
-    final severity = _getRuleSeverity(rule);
+    final severity = getRuleSeverity(rule);
     enabledBySeverity[severity] = (enabledBySeverity[severity] ?? 0) + 1;
   }
   for (final rule in finalDisabled) {
-    final severity = _getRuleSeverity(rule);
+    final severity = getRuleSeverity(rule);
     disabledBySeverity[severity] = (disabledBySeverity[severity] ?? 0) + 1;
   }
 
   // Count by tier for enabled rules
   final Map<String, int> enabledByTierCount = {};
   for (final rule in finalEnabled) {
-    final tierName = _tierToString(_getRuleTierFromMetadata(rule));
+    final tierName = tierToString(getRuleTierFromMetadata(rule));
     enabledByTierCount[tierName] = (enabledByTierCount[tierName] ?? 0) + 1;
   }
 
@@ -1627,7 +1055,7 @@ Future<void> main(List<String> args) async {
       'INFO': 0,
     };
     for (final rule in userCustomizations.keys) {
-      final severity = _getRuleSeverity(rule);
+      final severity = getRuleSeverity(rule);
       customBySeverity[severity] = (customBySeverity[severity] ?? 0) + 1;
     }
     log.terminal(
@@ -1722,7 +1150,7 @@ Future<void> main(List<String> args) async {
   }
 
   // Validate the written file has the critical sections
-  _validateWrittenConfig(cliArgs.outputPath, allRules.length);
+  validateWrittenConfig(log,cliArgs.outputPath, allRules.length);
 
   // Convert v4 ignore comments (interactive prompt or --fix-ignores flag)
   if (v4Detected && !cliArgs.isDryRun) {
@@ -2717,7 +2145,7 @@ String _buildStylisticSection({
     buffer.writeln('# --- $category ---');
     for (final rule in activeRules) {
       final enabled = existingValues[rule] ?? false;
-      final msg = _getStylisticDescription(rule);
+      final msg = getStylisticDescription(rule);
       final reviewed = reviewedRules.contains(rule);
       final marker = reviewed ? ' [reviewed]' : '';
       final comment = msg.isNotEmpty ? '  #$marker $msg' : '';
@@ -2738,7 +2166,7 @@ String _buildStylisticSection({
     buffer.writeln('# --- Other stylistic rules ---');
     for (final rule in uncategorized) {
       final enabled = existingValues[rule] ?? false;
-      final msg = _getStylisticDescription(rule);
+      final msg = getStylisticDescription(rule);
       final reviewed = reviewedRules.contains(rule);
       final marker = reviewed ? ' [reviewed]' : '';
       final comment = msg.isNotEmpty ? '  #$marker $msg' : '';
@@ -3334,8 +2762,8 @@ String _generatePluginsYaml({
     for (final String rule in sortedCustomizations) {
       final bool? enabled = userCustomizations[rule];
       if (enabled == null) continue;
-      final String msg = _getProblemMessage(rule);
-      final String severity = _getRuleSeverity(rule);
+      final String msg = getProblemMessage(rule);
+      final String severity = getRuleSeverity(rule);
       buffer.writeln('      $rule: $enabled  # [$severity] $msg');
     }
     buffer.writeln('');
@@ -3349,7 +2777,7 @@ String _generatePluginsYaml({
   }
 
   for (final String rule in enabledRules.difference(customizedRuleNames)) {
-    final ruleTier = _getRuleTierFromMetadata(rule);
+    final ruleTier = getRuleTierFromMetadata(rule);
     (enabledByTier[ruleTier] ??= []).add(rule);
   }
 
@@ -3369,16 +2797,16 @@ String _generatePluginsYaml({
     if (rules == null || rules.isEmpty) continue;
     rules.sort();
 
-    final tierName = _tierToString(tierLevel).toUpperCase();
-    final tierNum = _tierIndex(tierLevel) + 1;
+    final tierName = tierToString(tierLevel).toUpperCase();
+    final tierNum = tierIndex(tierLevel) + 1;
     buffer.writeln('      #');
     buffer.writeln(
       '      # --- TIER $tierNum: $tierName (${rules.length} rules) ---',
     );
     buffer.writeln('      #');
     for (final String rule in rules) {
-      final String msg = _getProblemMessage(rule);
-      final String severity = _getRuleSeverity(rule);
+      final String msg = getProblemMessage(rule);
+      final String severity = getRuleSeverity(rule);
       buffer.writeln('      $rule: true  # [$severity] $msg');
     }
     buffer.writeln('');
@@ -3407,7 +2835,7 @@ String _generatePluginsYaml({
     );
     buffer.writeln('      #');
     for (final String rule in stylisticEnabled) {
-      final String msg = _getProblemMessage(rule);
+      final String msg = getProblemMessage(rule);
       buffer.writeln('      $rule: true  # $msg');
     }
     buffer.writeln('');
@@ -3629,7 +3057,7 @@ _WalkthroughResult _runStylisticWalkthrough({
   );
   log.terminal('');
 
-  final metadata = _getRuleMetadata();
+  final metadata = getRuleMetadata();
   int enabled = 0;
   int disabled = 0;
   int skipped = 0;
@@ -3923,7 +3351,7 @@ _CategoryResult? _walkthroughRemainingBulk({
 _CategoryResult? _walkthroughCategory({
   required String category,
   required List<String> rules,
-  required Map<String, _RuleMetadata> metadata,
+  required Map<String, RuleMetadata> metadata,
   required Map<String, bool> existingValues,
   required int categoryIndex,
   required int totalCategories,
@@ -3979,8 +3407,8 @@ _CategoryResult? _walkthroughCategory({
 
       // Show description
       final desc = meta.correctionMessage.isNotEmpty
-          ? _stripRulePrefix(meta.correctionMessage)
-          : _stripRulePrefix(meta.problemMessage);
+          ? stripRulePrefix(meta.correctionMessage)
+          : stripRulePrefix(meta.problemMessage);
       if (desc.isNotEmpty) {
         log.terminal('  $desc');
         log.terminal('');
@@ -4049,7 +3477,7 @@ _CategoryResult? _walkthroughCategory({
 _CategoryResult? _walkthroughConflicting({
   required String category,
   required List<String> rules,
-  required Map<String, _RuleMetadata> metadata,
+  required Map<String, RuleMetadata> metadata,
   required Map<String, bool> existingValues,
   required int categoryIndex,
   required int totalCategories,
@@ -4081,9 +3509,9 @@ _CategoryResult? _walkthroughConflicting({
         log.example('BAD', InitColors.red, meta.exampleBad!, indent: 5);
       }
     } else if (meta != null) {
-      final desc = _stripRulePrefix(meta.correctionMessage).isNotEmpty
-          ? _stripRulePrefix(meta.correctionMessage)
-          : _stripRulePrefix(meta.problemMessage);
+      final desc = stripRulePrefix(meta.correctionMessage).isNotEmpty
+          ? stripRulePrefix(meta.correctionMessage)
+          : stripRulePrefix(meta.problemMessage);
       log.terminal('     $desc');
     }
     log.terminal('');
