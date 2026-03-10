@@ -86,11 +86,12 @@ import 'dart:developer' as dev;
 /// - [CONTRIBUTING.md](../CONTRIBUTING.md) for adding new rules
 
 import 'dart:convert' show utf8;
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart'
     show RuleTier, SaropaLintRule, allSaropaRules;
+import 'package:saropa_lints/src/init/cli_args.dart';
+import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/report/analysis_reporter.dart'
     show AnalysisReporter;
@@ -205,9 +206,9 @@ Map<String, bool> _detectProjectPackages() {
     }
 
     _logTerminal(
-      '${_Colors.dim}Auto-detected packages from pubspec.yaml: '
+      '${InitColors.dim}Auto-detected packages from pubspec.yaml: '
       '${detected.entries.where((e) => e.value).map((e) => e.key).join(', ')}'
-      '${isFlutter ? ' (Flutter project)' : ' (pure Dart)'}${_Colors.reset}',
+      '${isFlutter ? ' (Flutter project)' : ' (pure Dart)'}${InitColors.reset}',
     );
   } catch (e, st) {
     dev.log(
@@ -297,12 +298,12 @@ void _writeLogFile() {
     File(logPath).writeAsStringSync(logContent);
 
     print(
-      '${_Colors.bold}Log:${_Colors.reset} ${_Colors.cyan}$logPath${_Colors.reset}',
+      '${InitColors.bold}Log:${InitColors.reset} ${InitColors.cyan}$logPath${InitColors.reset}',
     );
   } on Exception catch (e, st) {
     dev.log('Could not write log file', error: e, stackTrace: st);
     print(
-      '${_Colors.yellow}Warning: Could not write log file: $e${_Colors.reset}',
+      '${InitColors.yellow}Warning: Could not write log file: $e${InitColors.reset}',
     );
   }
 }
@@ -340,13 +341,13 @@ void _migrateOldReports() {
     // not configuration data for the init log.
     final n = toMigrate.length;
     print(
-      '${_Colors.dim}Migrated $n old report${n == 1 ? '' : 's'}'
-      ' to date subfolders${_Colors.reset}',
+      '${InitColors.dim}Migrated $n old report${n == 1 ? '' : 's'}'
+      ' to date subfolders${InitColors.reset}',
     );
   } catch (e) {
     print(
-      '${_Colors.yellow}Warning: Could not migrate old reports: '
-      '$e${_Colors.reset}',
+      '${InitColors.yellow}Warning: Could not migrate old reports: '
+      '$e${InitColors.reset}',
     );
   }
 }
@@ -495,8 +496,8 @@ final List<String> _warnings = <String>[];
 /// Log a validation check result to both terminal and log buffer.
 void _logCheck(String label, {required bool pass, String? detail}) {
   final tag = pass
-      ? '${_Colors.green}[PASS]${_Colors.reset}'
-      : '${_Colors.yellow}[WARN]${_Colors.reset}';
+      ? '${InitColors.green}[PASS]${InitColors.reset}'
+      : '${InitColors.yellow}[WARN]${InitColors.reset}';
   final msg = detail != null ? '$tag $label — $detail' : '$tag $label';
   _logTerminal(msg);
 
@@ -510,7 +511,7 @@ void _logCheck(String label, {required bool pass, String? detail}) {
 /// All checks are non-fatal (warnings only). Results are logged to both
 /// terminal and the log buffer so they appear in the report file.
 void _runPreflightChecks({required String version}) {
-  _logTerminal('${_Colors.bold}Pre-flight checks${_Colors.reset}');
+  _logTerminal('${InitColors.bold}Pre-flight checks${InitColors.reset}');
 
   _checkPubspecDependency();
   _checkDartSdkVersion();
@@ -673,7 +674,7 @@ void _auditExistingConfig(String currentVersion) {
 /// Returns true if all checks pass.
 bool _validateWrittenConfig(String filePath, int expectedRuleCount) {
   _logTerminal('');
-  _logTerminal('${_Colors.bold}Post-write validation${_Colors.reset}');
+  _logTerminal('${InitColors.bold}Post-write validation${InitColors.reset}');
 
   final file = File(filePath);
 
@@ -739,136 +740,6 @@ bool _validateWrittenConfig(String filePath, int expectedRuleCount) {
   return allPassed;
 }
 
-// ---------------------------------------------------------------------------
-// Cross-platform ANSI color support
-// ---------------------------------------------------------------------------
-
-/// Enable ANSI virtual terminal processing on Windows 10+.
-///
-/// Windows supports ANSI escape codes but requires enabling
-/// ENABLE_VIRTUAL_TERMINAL_PROCESSING on the console output handle.
-/// Dart's [stdout.supportsAnsiEscapes] only checks the flag; this sets it.
-void _tryEnableAnsiWindows() {
-  if (!Platform.isWindows) return;
-  try {
-    final k = DynamicLibrary.open('kernel32.dll');
-    final getStdHandle =
-        k.lookupFunction<IntPtr Function(Int32), int Function(int)>(
-      'GetStdHandle',
-    );
-    final getMode = k.lookupFunction<Int32 Function(IntPtr, Pointer<Uint32>),
-        int Function(int, Pointer<Uint32>)>('GetConsoleMode');
-    final setMode = k
-        .lookupFunction<Int32 Function(IntPtr, Uint32), int Function(int, int)>(
-      'SetConsoleMode',
-    );
-    final getHeap = k.lookupFunction<IntPtr Function(), int Function()>(
-      'GetProcessHeap',
-    );
-    final alloc = k.lookupFunction<
-        Pointer<Void> Function(IntPtr, Uint32, IntPtr),
-        Pointer<Void> Function(int, int, int)>('HeapAlloc');
-    final free = k.lookupFunction<Int32 Function(IntPtr, Uint32, Pointer<Void>),
-        int Function(int, int, Pointer<Void>)>('HeapFree');
-
-    final handle = getStdHandle(-11); // STD_OUTPUT_HANDLE
-    final heap = getHeap();
-    final ptr = alloc(heap, 0x08, 4); // HEAP_ZERO_MEMORY, 4 bytes
-    if (ptr.address == 0) return;
-
-    final mode = ptr.cast<Uint32>();
-    if (getMode(handle, mode) != 0) {
-      setMode(
-        handle,
-        mode.value | 0x0004,
-      ); // ENABLE_VIRTUAL_TERMINAL_PROCESSING
-    }
-    free(heap, 0, ptr);
-  } catch (e, st) {
-    dev.log(
-      'VTP unavailable; colors degrade to plain text',
-      error: e,
-      stackTrace: st,
-    );
-  }
-}
-
-/// Cached color support result.
-bool? _hasColorSupportCache;
-
-/// Detects if the terminal supports ANSI colors.
-bool get _hasColorSupport {
-  return _hasColorSupportCache ??= _detectColorSupport();
-}
-
-/// Checks terminal capabilities for ANSI color support.
-bool _detectColorSupport() {
-  // Standard NO_COLOR / FORCE_COLOR environment variables
-  if (Platform.environment.containsKey('NO_COLOR')) return false;
-
-  if (Platform.environment.containsKey('FORCE_COLOR')) return true;
-
-  // Not a terminal (piped, redirected)
-  if (!stdout.hasTerminal) return false;
-
-  // Dart's built-in check (reliable after VTP is enabled on Windows)
-  if (stdout.supportsAnsiEscapes) return true;
-
-  // cspell:ignore ANSICON
-  // Windows: detect terminals known to support ANSI
-  if (Platform.isWindows) {
-    final env = Platform.environment;
-    return env.containsKey('WT_SESSION') || // Windows Terminal
-        env['ConEmuANSI'] == 'ON' || // ConEmu
-        env['TERM_PROGRAM'] == 'vscode' || // VS Code terminal
-        env.containsKey('ANSICON') || // ANSICON
-        env['TERM'] == 'xterm'; // xterm-compatible
-  }
-
-  // Unix-like: most terminals support colors
-  return true;
-}
-
-/// ANSI color codes (cross-platform safe).
-class _Colors {
-  static String get reset => _hasColorSupport ? '\x1B[0m' : '';
-  static String get bold => _hasColorSupport ? '\x1B[1m' : '';
-  static String get dim => _hasColorSupport ? '\x1B[2m' : '';
-
-  // Foreground colors
-  static String get red => _hasColorSupport ? '\x1B[31m' : '';
-  static String get green => _hasColorSupport ? '\x1B[32m' : '';
-  static String get yellow => _hasColorSupport ? '\x1B[33m' : '';
-  static String get blue => _hasColorSupport ? '\x1B[34m' : '';
-  static String get magenta => _hasColorSupport ? '\x1B[35m' : '';
-  static String get cyan => _hasColorSupport ? '\x1B[36m' : '';
-
-  // Bright variants
-  static String get brightRed => _hasColorSupport ? '\x1B[91m' : '';
-  static String get brightCyan => _hasColorSupport ? '\x1B[96m' : '';
-}
-
-/// Color helpers for consistent styling.
-String _success(String text) => '${_Colors.green}$text${_Colors.reset}';
-String _error(String text) => '${_Colors.red}$text${_Colors.reset}';
-String _tierColor(String tier) {
-  switch (tier) {
-    case 'essential':
-      return '${_Colors.brightRed}$tier${_Colors.reset}';
-    case 'recommended':
-      return '${_Colors.yellow}$tier${_Colors.reset}';
-    case 'professional':
-      return '${_Colors.blue}$tier${_Colors.reset}';
-    case 'comprehensive':
-      return '${_Colors.magenta}$tier${_Colors.reset}';
-    case 'pedantic':
-      return '${_Colors.brightCyan}$tier${_Colors.reset}';
-    case 'stylistic':
-      return '${_Colors.dim}$tier${_Colors.reset}';
-    default:
-      return tier;
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Rule metadata cache (problem messages, severities)
@@ -1030,34 +901,6 @@ final RegExp _analyzerCustomLintLine = RegExp(
   r'^\s+-\s*custom_lint\s*$',
   multiLine: true,
 );
-
-/// All available tiers in order of strictness.
-const List<String> tierOrder = <String>[
-  'essential',
-  'recommended',
-  'professional',
-  'comprehensive',
-  'pedantic',
-];
-
-/// Map tier names to numeric IDs for user convenience.
-const Map<String, int> tierIds = <String, int>{
-  'essential': 1,
-  'recommended': 2,
-  'professional': 3,
-  'comprehensive': 4,
-  'pedantic': 5,
-};
-
-/// Tier descriptions for display.
-const Map<String, String> tierDescriptions = <String, String>{
-  'essential':
-      'Critical rules preventing crashes, security holes, memory leaks',
-  'recommended': 'Essential + accessibility, performance patterns',
-  'professional': 'Recommended + architecture, testing, documentation',
-  'comprehensive': 'Professional + thorough coverage (recommended)',
-  'pedantic': 'All rules enabled (may have conflicts)',
-};
 
 /// Stylistic rule categories, mirroring the organization in tiers.dart.
 /// Used to generate the STYLISTIC RULES section in analysis_options_custom.yaml.
@@ -1625,7 +1468,7 @@ RuleTier _getTierFromSets(String ruleName) {
 /// Main entry point for the CLI tool.
 Future<void> main(List<String> args) async {
   // Enable ANSI color support on Windows 10+
-  _tryEnableAnsiWindows();
+  tryEnableAnsiWindows();
 
   // Initialize log timestamp for report file
   final now = DateTime.now();
@@ -1652,7 +1495,7 @@ Future<void> main(List<String> args) async {
   _logBuffer.writeln('=' * 80);
   _logBuffer.writeln();
 
-  final CliArgs cliArgs = _parseArguments(args);
+  final CliArgs cliArgs = parseArguments(args);
 
   if (cliArgs.isShowHelp) {
     _printUsage();
@@ -1660,21 +1503,21 @@ Future<void> main(List<String> args) async {
   }
 
   _logTerminal('');
-  _logTerminal('${_Colors.cyan}SAROPA LINTS${_Colors.reset} v$version');
-  _logTerminal('${_Colors.dim}Source: $source${_Colors.reset}');
+  _logTerminal('${InitColors.cyan}SAROPA LINTS${InitColors.reset} v$version');
+  _logTerminal('${InitColors.dim}Source: $source${InitColors.reset}');
   _showWhatsNew(version, packageDir);
   _logTerminal('');
 
   // Resolve tier (handle numeric input, or prompt if not specified)
-  String? tier = _resolveTier(cliArgs.tier);
+  String? tier = resolveTier(cliArgs.tier);
 
   if (tier == null && cliArgs.tier != null) {
     // User explicitly provided an invalid tier name/number
-    _logTerminal(_error('✗ Error: Invalid tier "${cliArgs.tier}"'));
+    _logTerminal(errorText('✗ Error: Invalid tier "${cliArgs.tier}"'));
     _logTerminal('');
     _logTerminal('Valid tiers:');
     for (final MapEntry<String, int> entry in tierIds.entries) {
-      _logTerminal('  ${entry.value} or ${_tierColor(entry.key)}');
+      _logTerminal('  ${entry.value} or ${tierColor(entry.key)}');
     }
     exitCode = 1;
     return;
@@ -1687,10 +1530,10 @@ Future<void> main(List<String> args) async {
   final String resolvedTier = tier;
 
   _logTerminal(
-    '${_Colors.bold}Tier:${_Colors.reset} ${_tierColor(resolvedTier)} (level ${tierIds[resolvedTier]})',
+    '${InitColors.bold}Tier:${InitColors.reset} ${tierColor(resolvedTier)} (level ${tierIds[resolvedTier]})',
   );
   _logTerminal(
-    '${_Colors.dim}${tierDescriptions[resolvedTier]}${_Colors.reset}',
+    '${InitColors.dim}${tierDescriptions[resolvedTier]}${InitColors.reset}',
   );
   _logTerminal('');
 
@@ -1762,7 +1605,7 @@ Future<void> main(List<String> args) async {
     // Create the custom overrides file with a helpful header
     _createCustomOverridesFile(overridesFile);
     _logTerminal(
-      '${_Colors.green}✓ Created:${_Colors.reset} '
+      '${InitColors.green}✓ Created:${InitColors.reset} '
       'analysis_options_custom.yaml',
     );
   }
@@ -1781,9 +1624,9 @@ Future<void> main(List<String> args) async {
         .map((e) => e.key)
         .toList();
     _logTerminal(
-      '${_Colors.yellow}Platforms disabled:${_Colors.reset} '
+      '${InitColors.yellow}Platforms disabled:${InitColors.reset} '
       '${disabledPlatforms.join(', ')} '
-      '${_Colors.dim}(${platformDisabledRules.length} rules affected)${_Colors.reset}',
+      '${InitColors.dim}(${platformDisabledRules.length} rules affected)${InitColors.reset}',
     );
   }
 
@@ -1801,9 +1644,9 @@ Future<void> main(List<String> args) async {
         .map((e) => e.key)
         .toList();
     _logTerminal(
-      '${_Colors.yellow}Packages disabled:${_Colors.reset} '
+      '${InitColors.yellow}Packages disabled:${InitColors.reset} '
       '${disabledPackages.join(', ')} '
-      '${_Colors.dim}(${packageDisabledRules.length} rules affected)${_Colors.reset}',
+      '${InitColors.dim}(${packageDisabledRules.length} rules affected)${InitColors.reset}',
     );
   }
 
@@ -1826,22 +1669,22 @@ Future<void> main(List<String> args) async {
       v4Detected = true;
       _logTerminal('');
       _logTerminal(
-        '${_Colors.yellow}--- V4 MIGRATION DETECTED ---${_Colors.reset}',
+        '${InitColors.yellow}--- V4 MIGRATION DETECTED ---${InitColors.reset}',
       );
       _logTerminal(
-        '${_Colors.yellow}Found custom_lint: section (v4 format)${_Colors.reset}',
+        '${InitColors.yellow}Found custom_lint: section (v4 format)${InitColors.reset}',
       );
 
       v4MigratedRules = _extractV4Rules(existingContent, allRules);
       _logTerminal(
-        '${_Colors.dim}  Extracted ${v4MigratedRules.length} rule '
-        'settings from v4 config${_Colors.reset}',
+        '${InitColors.dim}  Extracted ${v4MigratedRules.length} rule '
+        'settings from v4 config${InitColors.reset}',
       );
 
       existingContent = _removeCustomLintSection(existingContent);
       existingContent = _removeAnalyzerCustomLintPlugin(existingContent);
       _logTerminal(
-        '${_Colors.green}Removed custom_lint: section${_Colors.reset}',
+        '${InitColors.green}Removed custom_lint: section${InitColors.reset}',
       );
 
       _cleanPubspecCustomLint(dryRun: cliArgs.isDryRun);
@@ -1859,15 +1702,15 @@ Future<void> main(List<String> args) async {
       // cspell:ignore prefer_debugprint
       if (v7NormalizedCount[0] > 0) {
         _logTerminal(
-          '${_Colors.yellow}--- V7 MIGRATION ---${_Colors.reset}',
+          '${InitColors.yellow}--- V7 MIGRATION ---${InitColors.reset}',
         );
         _logTerminal(
-          '${_Colors.yellow}Normalized ${v7NormalizedCount[0]} rule name(s) '
-          'to lowerCaseName (v7 config format).${_Colors.reset}',
+          '${InitColors.yellow}Normalized ${v7NormalizedCount[0]} rule name(s) '
+          'to lowerCaseName (v7 config format).${InitColors.reset}',
         );
         _logTerminal(
-          '${_Colors.dim}  Update any // ignore: comments to use '
-          'lowercase rule names (e.g. prefer_debugprint).${_Colors.reset}',
+          '${InitColors.dim}  Update any // ignore: comments to use '
+          'lowercase rule names (e.g. prefer_debugprint).${InitColors.reset}',
         );
         _logTerminal('');
       }
@@ -1875,13 +1718,13 @@ Future<void> main(List<String> args) async {
       // Warn if manual edits in tier sections were recovered
       if (result.tierEdits.isNotEmpty) {
         _logTerminal(
-          '${_Colors.yellow}⚠ Recovered ${result.tierEdits.length} manually '
-          'edited rule(s) from tier sections${_Colors.reset}',
+          '${InitColors.yellow}⚠ Recovered ${result.tierEdits.length} manually '
+          'edited rule(s) from tier sections${InitColors.reset}',
         );
         _logTerminal(
-          '${_Colors.dim}  Tip: add overrides to '
+          '${InitColors.dim}  Tip: add overrides to '
           'analysis_options_custom.yaml RULE OVERRIDES '
-          'section instead${_Colors.reset}',
+          'section instead${InitColors.reset}',
         );
       }
 
@@ -1899,27 +1742,27 @@ Future<void> main(List<String> args) async {
         userCustomizations = {...v4MigratedRules, ...userCustomizations};
         final int skipped = totalV4 - v4MigratedRules.length;
         _logTerminal(
-          '${_Colors.green}${v4MigratedRules.length} v4 rules imported '
-          'as user customizations${_Colors.reset}'
-          '${skipped > 0 ? ' ${_Colors.dim}($skipped matched tier defaults, skipped)${_Colors.reset}' : ''}',
+          '${InitColors.green}${v4MigratedRules.length} v4 rules imported '
+          'as user customizations${InitColors.reset}'
+          '${skipped > 0 ? ' ${InitColors.dim}($skipped matched tier defaults, skipped)${InitColors.reset}' : ''}',
         );
       }
 
       // Warn if suspiciously many customizations (likely corrupted)
       if (userCustomizations.length > 50) {
         _logTerminal(
-          '${_Colors.red}⚠ ${userCustomizations.length} customizations found - consider --reset${_Colors.reset}',
+          '${InitColors.red}⚠ ${userCustomizations.length} customizations found - consider --reset${InitColors.reset}',
         );
       }
     } else {
       if (v4MigratedRules.isNotEmpty) {
         _logTerminal(
-          '${_Colors.yellow}⚠ --reset: discarding ${v4MigratedRules.length} '
-          'v4 rule settings (run without --reset to preserve)${_Colors.reset}',
+          '${InitColors.yellow}⚠ --reset: discarding ${v4MigratedRules.length} '
+          'v4 rule settings (run without --reset to preserve)${InitColors.reset}',
         );
       } else {
         _logTerminal(
-          '${_Colors.yellow}⚠ --reset: discarding customizations${_Colors.reset}',
+          '${InitColors.yellow}⚠ --reset: discarding customizations${InitColors.reset}',
         );
       }
     }
@@ -1965,10 +1808,10 @@ Future<void> main(List<String> args) async {
   final disabledPct =
       totalRules > 0 ? (finalDisabled.length * 100 ~/ totalRules) : 0;
   _logTerminal(
-    '${_Colors.bold}Rules:${_Colors.reset} ${_success('${finalEnabled.length} enabled')} / ${_error('${finalDisabled.length} disabled')} ${_Colors.dim}($disabledPct%)${_Colors.reset}',
+    '${InitColors.bold}Rules:${InitColors.reset} ${successText('${finalEnabled.length} enabled')} / ${errorText('${finalDisabled.length} disabled')} ${InitColors.dim}($disabledPct%)${InitColors.reset}',
   );
   _logTerminal(
-    '${_Colors.bold}Severity:${_Colors.reset} ${_Colors.red}${enabledBySeverity['ERROR']} errors${_Colors.reset} · ${_Colors.yellow}${enabledBySeverity['WARNING']} warnings${_Colors.reset} · ${_Colors.cyan}${enabledBySeverity['INFO']} info${_Colors.reset}',
+    '${InitColors.bold}Severity:${InitColors.reset} ${InitColors.red}${enabledBySeverity['ERROR']} errors${InitColors.reset} · ${InitColors.yellow}${enabledBySeverity['WARNING']} warnings${InitColors.reset} · ${InitColors.cyan}${enabledBySeverity['INFO']} info${InitColors.reset}',
   );
 
   // Project overrides summary
@@ -1985,13 +1828,13 @@ Future<void> main(List<String> args) async {
       customBySeverity[severity] = (customBySeverity[severity] ?? 0) + 1;
     }
     _logTerminal(
-      '${_Colors.bold}Project Overrides${_Colors.reset} ${_Colors.dim}(analysis_options_custom.yaml):${_Colors.reset} '
+      '${InitColors.bold}Project Overrides${InitColors.reset} ${InitColors.dim}(analysis_options_custom.yaml):${InitColors.reset} '
       '$customCount '
-      '${_Colors.dim}(${_Colors.reset}'
-      '${_Colors.red}${customBySeverity['ERROR']} error${_Colors.reset}, '
-      '${_Colors.yellow}${customBySeverity['WARNING']} warning${_Colors.reset}, '
-      '${_Colors.cyan}${customBySeverity['INFO']} info${_Colors.reset}'
-      '${_Colors.dim})${_Colors.reset}',
+      '${InitColors.dim}(${InitColors.reset}'
+      '${InitColors.red}${customBySeverity['ERROR']} error${InitColors.reset}, '
+      '${InitColors.yellow}${customBySeverity['WARNING']} warning${InitColors.reset}, '
+      '${InitColors.cyan}${customBySeverity['INFO']} info${InitColors.reset}'
+      '${InitColors.dim})${InitColors.reset}',
     );
   }
   _logTerminal('');
@@ -2024,9 +1867,9 @@ Future<void> main(List<String> args) async {
   );
 
   if (cliArgs.isDryRun) {
-    _logTerminal('${_Colors.yellow}━━━ DRY RUN ━━━${_Colors.reset}');
+    _logTerminal('${InitColors.yellow}━━━ DRY RUN ━━━${InitColors.reset}');
     _logTerminal(
-      '${_Colors.dim}Would write to: ${cliArgs.outputPath}${_Colors.reset}',
+      '${InitColors.dim}Would write to: ${cliArgs.outputPath}${InitColors.reset}',
     );
     _logTerminal('');
 
@@ -2034,15 +1877,15 @@ Future<void> main(List<String> args) async {
     final List<String> lines = pluginsYaml.split('\n');
     const int previewLines = 100;
     _logTerminal(
-      '${_Colors.bold}Preview${_Colors.reset} ${_Colors.dim}(first $previewLines of ${lines.length} lines):${_Colors.reset}',
+      '${InitColors.bold}Preview${InitColors.reset} ${InitColors.dim}(first $previewLines of ${lines.length} lines):${InitColors.reset}',
     );
-    _logTerminal('${_Colors.dim}${'─' * 60}${_Colors.reset}');
+    _logTerminal('${InitColors.dim}${'─' * 60}${InitColors.reset}');
     for (int i = 0; i < previewLines && i < lines.length; i++) {
       _logTerminal(lines[i]);
     }
     if (lines.length > previewLines) {
       _logTerminal(
-        '${_Colors.dim}... (${lines.length - previewLines} more lines)${_Colors.reset}',
+        '${InitColors.dim}... (${lines.length - previewLines} more lines)${InitColors.reset}',
       );
     }
     return;
@@ -2051,7 +1894,7 @@ Future<void> main(List<String> args) async {
   // Skip writing if the file content hasn't changed
   if (newContent == existingContent) {
     _logTerminal(
-      '${_Colors.dim}✓ No changes needed: ${cliArgs.outputPath}${_Colors.reset}',
+      '${InitColors.dim}✓ No changes needed: ${cliArgs.outputPath}${InitColors.reset}',
     );
   } else {
     // Create backup before overwriting
@@ -2066,10 +1909,10 @@ Future<void> main(List<String> args) async {
 
     try {
       outputFile.writeAsStringSync(newContent);
-      _logTerminal('${_success('✓ Written to:')} ${cliArgs.outputPath}');
+      _logTerminal('${successText('✓ Written to:')} ${cliArgs.outputPath}');
     } on Exception catch (e, st) {
       dev.log('Failed to write config file', error: e, stackTrace: st);
-      _logTerminal(_error('✗ Failed to write file: $e'));
+      _logTerminal(errorText('✗ Failed to write file: $e'));
       exitCode = 2;
       return;
     }
@@ -2089,8 +1932,8 @@ Future<void> main(List<String> args) async {
     } else {
       _logTerminal('');
       stdout.write(
-        '${_Colors.cyan}Convert v4 ignore comments to v5 format? [y/N]: '
-        '${_Colors.reset}',
+        '${InitColors.cyan}Convert v4 ignore comments to v5 format? [y/N]: '
+        '${InitColors.reset}',
       );
       final String resp = stdin.readLineSync()?.toLowerCase().trim() ?? '';
       shouldConvert = resp == 'y' || resp == 'yes';
@@ -2098,7 +1941,7 @@ Future<void> main(List<String> args) async {
 
     if (shouldConvert) {
       _logTerminal(
-        '${_Colors.bold}Converting v4 ignore comments...${_Colors.reset}',
+        '${InitColors.bold}Converting v4 ignore comments...${InitColors.reset}',
       );
       final Map<String, int> ignoreResults = _convertIgnoreComments(
         allRules,
@@ -2106,23 +1949,23 @@ Future<void> main(List<String> args) async {
       );
       if (ignoreResults.isEmpty) {
         _logTerminal(
-          '${_Colors.dim}  No v4 ignore comments found${_Colors.reset}',
+          '${InitColors.dim}  No v4 ignore comments found${InitColors.reset}',
         );
       } else {
         final int total = ignoreResults.values.fold(0, (s, c) => s + c);
         _logTerminal(
-          '${_Colors.green}Converted $total ignore comments in '
-          '${ignoreResults.length} files${_Colors.reset}',
+          '${InitColors.green}Converted $total ignore comments in '
+          '${ignoreResults.length} files${InitColors.reset}',
         );
         for (final MapEntry<String, int> entry in ignoreResults.entries) {
           _logTerminal(
-            '${_Colors.dim}  ${entry.key}: ${entry.value}${_Colors.reset}',
+            '${InitColors.dim}  ${entry.key}: ${entry.value}${InitColors.reset}',
           );
         }
       }
     } else {
       _logTerminal(
-        '${_Colors.dim}  Skipped ignore comment conversion${_Colors.reset}',
+        '${InitColors.dim}  Skipped ignore comment conversion${InitColors.reset}',
       );
     }
   }
@@ -2158,12 +2001,12 @@ Future<void> main(List<String> args) async {
     _logTerminal('');
 
     // Ask user if they want to run analysis
-    stdout.write('${_Colors.cyan}Run analysis now? [y/N]: ${_Colors.reset}');
+    stdout.write('${InitColors.cyan}Run analysis now? [y/N]: ${InitColors.reset}');
     final response = stdin.readLineSync()?.toLowerCase().trim() ?? '';
 
     if (response == 'y' || response == 'yes') {
       _logTerminal('');
-      _logTerminal('${_Colors.bold}Running: dart analyze${_Colors.reset}');
+      _logTerminal('${InitColors.bold}Running: dart analyze${InitColors.reset}');
       _logTerminal('${'─' * 60}');
 
       // Stream output to terminal. The plugin's AnalysisReporter writes
@@ -2191,15 +2034,15 @@ Future<void> main(List<String> args) async {
       _logTerminal('${'─' * 60}');
 
       if (analyzeExitCode == 0) {
-        _logTerminal(_success('✓ dart analyze passed'));
+        _logTerminal(successText('✓ dart analyze passed'));
       } else if (analyzeExitCode <= 2) {
         // Exit codes 1-2 mean "issues found" — the analysis completed.
-        _logTerminal(_success('✓ dart analyze completed'));
+        _logTerminal(successText('✓ dart analyze completed'));
       } else {
         // Exit code 3+ means the analyzer itself failed (internal error,
         // could not analyze, etc.)
         _logTerminal(
-          _error('✗ dart analyze failed (exit code $analyzeExitCode)'),
+          errorText('✗ dart analyze failed (exit code $analyzeExitCode)'),
         );
       }
 
@@ -2211,8 +2054,8 @@ Future<void> main(List<String> args) async {
         final pluginReport = await _findNewestPluginReport(dateFolder);
         if (pluginReport != null) {
           _logTerminal(
-            '${_Colors.bold}Report:${_Colors.reset} '
-            '${_Colors.cyan}$pluginReport${_Colors.reset}',
+            '${InitColors.bold}Report:${InitColors.reset} '
+            '${InitColors.cyan}$pluginReport${InitColors.reset}',
           );
         }
       }
@@ -2493,39 +2336,39 @@ void _cleanPubspecCustomLint({required bool dryRun}) {
   // Skip prompts in non-interactive mode (CI, piped input)
   if (!stdin.hasTerminal) {
     _logTerminal(
-      '${_Colors.dim}  Non-interactive: skipping pubspec.yaml '
-      'cleanup (remove custom_lint manually)${_Colors.reset}',
+      '${InitColors.dim}  Non-interactive: skipping pubspec.yaml '
+      'cleanup (remove custom_lint manually)${InitColors.reset}',
     );
     return;
   }
 
   stdout.write(
-    '${_Colors.cyan}Remove custom_lint from pubspec.yaml '
-    'dev_dependencies? [y/N]: ${_Colors.reset}',
+    '${InitColors.cyan}Remove custom_lint from pubspec.yaml '
+    'dev_dependencies? [y/N]: ${InitColors.reset}',
   );
   final String response = stdin.readLineSync()?.toLowerCase().trim() ?? '';
 
   if (response != 'y' && response != 'yes') {
     _logTerminal(
-      '${_Colors.dim}  Skipped pubspec.yaml cleanup${_Colors.reset}',
+      '${InitColors.dim}  Skipped pubspec.yaml cleanup${InitColors.reset}',
     );
     return;
   }
 
   if (dryRun) {
     _logTerminal(
-      '${_Colors.dim}  (dry-run) Would remove custom_lint from '
-      'pubspec.yaml${_Colors.reset}',
+      '${InitColors.dim}  (dry-run) Would remove custom_lint from '
+      'pubspec.yaml${InitColors.reset}',
     );
     return;
   }
 
   pubspecFile.writeAsStringSync(cleaned);
   _logTerminal(
-    '${_Colors.green}Removed custom_lint from pubspec.yaml${_Colors.reset}',
+    '${InitColors.green}Removed custom_lint from pubspec.yaml${InitColors.reset}',
   );
   _logTerminal(
-    '${_Colors.dim}  Run dart pub get to update dependencies${_Colors.reset}',
+    '${InitColors.dim}  Run dart pub get to update dependencies${InitColors.reset}',
   );
 }
 
@@ -2771,7 +2614,7 @@ void _ensureMaxIssuesSetting(File file) {
     content = _addAnalysisSettingsBlock(content);
     file.writeAsStringSync(content);
     _logTerminal(
-      '${_Colors.green}✓ Added analysis settings to ${file.path}${_Colors.reset}',
+      '${InitColors.green}✓ Added analysis settings to ${file.path}${InitColors.reset}',
     );
     return;
   }
@@ -2781,7 +2624,7 @@ void _ensureMaxIssuesSetting(File file) {
     content = _addOutputSetting(content);
     file.writeAsStringSync(content);
     _logTerminal(
-      '${_Colors.green}✓ Added output setting to ${file.path}${_Colors.reset}',
+      '${InitColors.green}✓ Added output setting to ${file.path}${InitColors.reset}',
     );
   }
 }
@@ -2901,7 +2744,7 @@ platforms:
 
   file.writeAsStringSync(newContent);
   _logTerminal(
-    '${_Colors.green}✓ Added platforms setting to ${file.path}${_Colors.reset}',
+    '${InitColors.green}✓ Added platforms setting to ${file.path}${InitColors.reset}',
   );
 }
 
@@ -2969,7 +2812,7 @@ $packageEntries
 
   file.writeAsStringSync(newContent);
   _logTerminal(
-    '${_Colors.green}✓ Added packages setting to ${file.path}${_Colors.reset}',
+    '${InitColors.green}✓ Added packages setting to ${file.path}${InitColors.reset}',
   );
 }
 
@@ -3197,7 +3040,7 @@ void _insertNewStylisticSection(
 
   file.writeAsStringSync(newContent);
   _logTerminal(
-    '${_Colors.green}✓ Added stylistic rules section to ${file.path}${_Colors.reset}',
+    '${InitColors.green}✓ Added stylistic rules section to ${file.path}${InitColors.reset}',
   );
 }
 
@@ -3222,18 +3065,18 @@ void _logRemovedStylisticRules(String content) {
 
   if (enabledRemoved.isNotEmpty) {
     _logTerminal(
-      '${_Colors.yellow}⚠ Removing ${enabledRemoved.length} obsolete '
-      'stylistic rule(s) that were enabled:${_Colors.reset}',
+      '${InitColors.yellow}⚠ Removing ${enabledRemoved.length} obsolete '
+      'stylistic rule(s) that were enabled:${InitColors.reset}',
     );
     for (final rule in enabledRemoved) {
-      _logTerminal('${_Colors.dim}  - $rule${_Colors.reset}');
+      _logTerminal('${InitColors.dim}  - $rule${InitColors.reset}');
     }
   }
 
   if (disabledRemoved.isNotEmpty) {
     _logTerminal(
-      '${_Colors.dim}  Cleaned up ${disabledRemoved.length} obsolete '
-      'disabled stylistic rule(s)${_Colors.reset}',
+      '${InitColors.dim}  Cleaned up ${disabledRemoved.length} obsolete '
+      'disabled stylistic rule(s)${InitColors.reset}',
     );
   }
 }
@@ -3252,26 +3095,26 @@ void _logRemovedStylisticRules(String content) {
 
   _logTerminal('');
   _logTerminal(
-    '${_Colors.yellow}Found ${skipRules.length} stylistic rule(s) '
-    'in RULE OVERRIDES section:${_Colors.reset}',
+    '${InitColors.yellow}Found ${skipRules.length} stylistic rule(s) '
+    'in RULE OVERRIDES section:${InitColors.reset}',
   );
   for (final rule in skipRules.toList()..sort()) {
-    _logTerminal('${_Colors.dim}  - $rule${_Colors.reset}');
+    _logTerminal('${InitColors.dim}  - $rule${InitColors.reset}');
   }
 
   bool shouldMove = false;
 
   if (stdin.hasTerminal) {
     stdout.write(
-      '${_Colors.cyan}Move to STYLISTIC RULES section? [y/N]: '
-      '${_Colors.reset}',
+      '${InitColors.cyan}Move to STYLISTIC RULES section? [y/N]: '
+      '${InitColors.reset}',
     );
     final response = stdin.readLineSync()?.toLowerCase().trim() ?? '';
     shouldMove = response == 'y' || response == 'yes';
   } else {
     _logTerminal(
-      '${_Colors.dim}  Non-interactive: keeping in RULE OVERRIDES'
-      '${_Colors.reset}',
+      '${InitColors.dim}  Non-interactive: keeping in RULE OVERRIDES'
+      '${InitColors.reset}',
     );
   }
 
@@ -3286,8 +3129,8 @@ void _logRemovedStylisticRules(String content) {
   final updatedContent = _removeRulesFromOverridesSection(content, skipRules);
   existingValues.addAll(movedValues);
   _logTerminal(
-    '${_Colors.green}✓ Moved $movedCount rule(s) to '
-    'STYLISTIC RULES section${_Colors.reset}',
+    '${InitColors.green}✓ Moved $movedCount rule(s) to '
+    'STYLISTIC RULES section${InitColors.reset}',
   );
 
   return (content: updatedContent, skipRules: <String>{});
@@ -3836,105 +3679,6 @@ String _replacePluginsSection(String existingContent, String newPlugins) {
   return '$beforePlugins$newPlugins\n$afterPlugins';
 }
 
-/// Struct for parsed CLI arguments.
-class CliArgs {
-  const CliArgs({
-    required this.isShowHelp,
-    required this.isDryRun,
-    required this.isReset,
-    required this.isStylisticIncluded,
-    required this.isStylisticAll,
-    required this.isNoStylistic,
-    required this.isStylisticReset,
-    required this.isFixIgnores,
-    required this.outputPath,
-    required this.tier,
-  });
-
-  final bool isShowHelp;
-  final bool isDryRun;
-  final bool isReset;
-
-  /// --stylistic: triggers interactive walkthrough (was bulk-enable in v4).
-  final bool isStylisticIncluded;
-
-  /// --stylistic-all: bulk-enable all stylistic rules (old --stylistic
-  /// behavior, useful for CI/non-interactive).
-  final bool isStylisticAll;
-
-  /// --no-stylistic: skip the stylistic walkthrough entirely.
-  final bool isNoStylistic;
-
-  /// --reset-stylistic: clear all [reviewed] markers and re-walkthrough.
-  final bool isStylisticReset;
-
-  final bool isFixIgnores;
-  final String outputPath;
-  final String? tier;
-}
-
-/// Parse CLI arguments into a struct.
-CliArgs _parseArguments(List<String> args) {
-  final bool showHelp = args.contains('--help') || args.contains('-h');
-  final bool dryRun = args.contains('--dry-run');
-  final bool reset = args.contains('--reset');
-  final bool includeStylistic = args.contains('--stylistic');
-  final bool stylisticAll = args.contains('--stylistic-all');
-  final bool noStylistic = args.contains('--no-stylistic');
-  final bool resetStylistic = args.contains('--reset-stylistic');
-  final bool fixIgnores = args.contains('--fix-ignores');
-
-  String outputPath = 'analysis_options.yaml';
-  int outputIndex = args.indexOf('--output');
-
-  if (outputIndex == -1) {
-    outputIndex = args.indexOf('-o');
-  }
-
-  if (outputIndex != -1) {
-    if (outputIndex + 1 < args.length &&
-        !args[outputIndex + 1].startsWith('-')) {
-      outputPath = args[outputIndex + 1];
-    } else {
-      print(
-        'Warning: --output requires a file path. '
-        'Using default: $outputPath',
-      );
-    }
-  }
-
-  String? requestedTier;
-  int tierIndex = args.indexOf('--tier');
-
-  if (tierIndex == -1) {
-    tierIndex = args.indexOf('-t');
-  }
-
-  if (tierIndex != -1) {
-    if (tierIndex + 1 < args.length && !args[tierIndex + 1].startsWith('-')) {
-      requestedTier = args[tierIndex + 1];
-    } else {
-      // --tier without a value: warn and fall through to prompt/default
-      print(
-        'Warning: --tier requires a value (1-5 or tier name). '
-        'Will prompt for selection.',
-      );
-    }
-  }
-
-  return CliArgs(
-    isShowHelp: showHelp,
-    isDryRun: dryRun,
-    isReset: reset,
-    isStylisticIncluded: includeStylistic,
-    isStylisticAll: stylisticAll,
-    isNoStylistic: noStylistic,
-    isStylisticReset: resetStylistic,
-    isFixIgnores: fixIgnores,
-    outputPath: outputPath,
-    tier: requestedTier,
-  );
-}
 
 void _logTerminal(String message) {
   print(message);
@@ -3955,7 +3699,7 @@ void _logExample(
   final padded = label.padRight(4);
   final spaces = ' ' * indent;
   _logTerminal(
-    '$spaces${_Colors.bold}$colorCode$padded:${_Colors.reset} ${lines[0]}',
+    '$spaces${InitColors.bold}$colorCode$padded:${InitColors.reset} ${lines[0]}',
   );
   if (lines.length > 1) {
     // Align continuation lines under code, not under label
@@ -3974,10 +3718,10 @@ void _showWhatsNew(String version, String? packageDir) {
     packageDir: packageDir,
     version: version,
     colors: AnsiColors(
-      bold: _Colors.bold,
-      cyan: _Colors.cyan,
-      dim: _Colors.dim,
-      reset: _Colors.reset,
+      bold: InitColors.bold,
+      cyan: InitColors.cyan,
+      dim: InitColors.dim,
+      reset: InitColors.reset,
     ),
   );
 
@@ -3986,28 +3730,6 @@ void _showWhatsNew(String version, String? packageDir) {
   }
 }
 
-String? _resolveTier(String? input) {
-  if (input == null) return null;
-
-  final int? numericTier = int.tryParse(input);
-
-  if (numericTier != null) {
-    for (final MapEntry<String, int> entry in tierIds.entries) {
-      if (entry.value == numericTier) {
-        return entry.key;
-      }
-    }
-    return null;
-  }
-
-  final String normalized = input.toLowerCase();
-
-  if (tierIds.containsKey(normalized)) {
-    return normalized;
-  }
-
-  return null;
-}
 
 // ---------------------------------------------------------------------------
 // Interactive stylistic rules walkthrough
@@ -4045,8 +3767,8 @@ _WalkthroughResult _runStylisticWalkthrough({
 }) {
   if (!stdin.hasTerminal) {
     _logTerminal(
-      '${_Colors.dim}Non-interactive: skipping stylistic '
-      'walkthrough${_Colors.reset}',
+      '${InitColors.dim}Non-interactive: skipping stylistic '
+      'walkthrough${InitColors.reset}',
     );
     return const _WalkthroughResult(
       reviewed: 0,
@@ -4068,7 +3790,7 @@ _WalkthroughResult _runStylisticWalkthrough({
   if (resetStylistic && content.contains('[reviewed]')) {
     customFile.writeAsStringSync(_stripReviewedMarkers(content));
     _logTerminal(
-      '${_Colors.yellow}Cleared all [reviewed] markers${_Colors.reset}',
+      '${InitColors.yellow}Cleared all [reviewed] markers${InitColors.reset}',
     );
   }
 
@@ -4092,12 +3814,12 @@ _WalkthroughResult _runStylisticWalkthrough({
 
   if (rulesToReview.isEmpty) {
     _logTerminal(
-      '${_Colors.green}All stylistic rules already '
-      'reviewed.${_Colors.reset}',
+      '${InitColors.green}All stylistic rules already '
+      'reviewed.${InitColors.reset}',
     );
     _logTerminal(
-      '${_Colors.dim}Use --reset-stylistic to '
-      're-review.${_Colors.reset}',
+      '${InitColors.dim}Use --reset-stylistic to '
+      're-review.${InitColors.reset}',
     );
     return const _WalkthroughResult(
       reviewed: 0,
@@ -4110,8 +3832,8 @@ _WalkthroughResult _runStylisticWalkthrough({
 
   _logTerminal('');
   _logTerminal(
-    '${_Colors.bold}${_Colors.cyan}'
-    '── Stylistic Rules Walkthrough ──${_Colors.reset}',
+    '${InitColors.bold}${InitColors.cyan}'
+    '── Stylistic Rules Walkthrough ──${InitColors.reset}',
   );
   // Use global counts so progress (e.g. 51/143) persists on resume, not 1/N.
   final int totalAllRules =
@@ -4121,16 +3843,16 @@ _WalkthroughResult _runStylisticWalkthrough({
       irrelevantRules.intersection(tiers.stylisticRules).length;
   _logTerminal(
     alreadyReviewed > 0
-        ? '${_Colors.dim}${rulesToReview.length} rules remaining '
+        ? '${InitColors.dim}${rulesToReview.length} rules remaining '
             '($alreadyReviewed already reviewed, $irrelevantCount '
-            'skipped as irrelevant to project)${_Colors.reset}'
-        : '${_Colors.dim}${rulesToReview.length} rules to review '
-            '($irrelevantCount skipped as irrelevant to project)${_Colors.reset}',
+            'skipped as irrelevant to project)${InitColors.reset}'
+        : '${InitColors.dim}${rulesToReview.length} rules to review '
+            '($irrelevantCount skipped as irrelevant to project)${InitColors.reset}',
   );
   _logTerminal('');
   _logTerminal(
-    '${_Colors.dim}  Per ruleset: [y] enable all  [n] disable all  '
-    '[q] quit & save${_Colors.reset}',
+    '${InitColors.dim}  Per ruleset: [y] enable all  [n] disable all  '
+    '[q] quit & save${InitColors.reset}',
   );
   _logTerminal('');
 
@@ -4274,18 +3996,18 @@ _WalkthroughResult _runStylisticWalkthrough({
   final totalReviewed = enabled + disabled;
   _logTerminal('');
   _logTerminal(
-    '${_Colors.bold}Walkthrough '
-    '${aborted ? 'paused' : 'complete'}:${_Colors.reset} '
+    '${InitColors.bold}Walkthrough '
+    '${aborted ? 'paused' : 'complete'}:${InitColors.reset} '
     '$totalReviewed reviewed '
-    '(${_Colors.green}$enabled enabled${_Colors.reset}, '
-    '${_Colors.red}$disabled disabled${_Colors.reset}, '
-    '${_Colors.dim}$skipped skipped${_Colors.reset})',
+    '(${InitColors.green}$enabled enabled${InitColors.reset}, '
+    '${InitColors.red}$disabled disabled${InitColors.reset}, '
+    '${InitColors.dim}$skipped skipped${InitColors.reset})',
   );
 
   if (aborted) {
     _logTerminal(
-      '${_Colors.dim}Run init again to resume from where you '
-      'left off.${_Colors.reset}',
+      '${InitColors.dim}Run init again to resume from where you '
+      'left off.${InitColors.reset}',
     );
   }
 
@@ -4328,32 +4050,32 @@ bool? _walkthroughMajorGroup({
   bool showRuleNames = false,
 }) {
   _logTerminal(
-    '${_Colors.bold}${_Colors.cyan}'
-    '── Ruleset $groupIndex of $totalGroups ──${_Colors.reset}',
+    '${InitColors.bold}${InitColors.cyan}'
+    '── Ruleset $groupIndex of $totalGroups ──${InitColors.reset}',
   );
   _logTerminal('');
-  _logTerminal('  ${_Colors.bold}$label${_Colors.reset}');
+  _logTerminal('  ${InitColors.bold}$label${InitColors.reset}');
   _logTerminal('');
   _logTerminal('  $description');
   if (showRuleNames && rules.isNotEmpty) {
     _logTerminal('');
     const int _maxRuleNamesToList = 25;
     if (rules.length <= _maxRuleNamesToList) {
-      _logTerminal('  ${_Colors.dim}Rule names:${_Colors.reset}');
+      _logTerminal('  ${InitColors.dim}Rule names:${InitColors.reset}');
       for (final name in rules) {
         _logTerminal('    $name');
       }
     } else {
       _logTerminal(
-        '  ${_Colors.dim}${rules.length} rules (list omitted; see the '
-        'stylistic section in your config for names).${_Colors.reset}',
+        '  ${InitColors.dim}${rules.length} rules (list omitted; see the '
+        'stylistic section in your config for names).${InitColors.reset}',
       );
     }
   }
   _logTerminal('');
   _logTerminal(
-    '  ${_Colors.cyan}Enable all ${rules.length} rules in this ruleset? '
-    '[y/N/q]: ${_Colors.reset}',
+    '  ${InitColors.cyan}Enable all ${rules.length} rules in this ruleset? '
+    '[y/N/q]: ${InitColors.reset}',
   );
   final rawInput = stdin.readLineSync();
   _logTerminal('');
@@ -4371,14 +4093,14 @@ bool? _walkthroughConflictingGate({
   required int categoryCount,
 }) {
   _logTerminal(
-    '${_Colors.bold}${_Colors.cyan}'
+    '${InitColors.bold}${InitColors.cyan}'
     '── Conflicting style choices ($count rules in $categoryCount categories) '
-    '──${_Colors.reset}',
+    '──${InitColors.reset}',
   );
   _logTerminal('');
   _logTerminal(
-    '  ${_Colors.cyan}Set these now (e.g. quote style, blank line before return)? '
-    '[y/N/q]: ${_Colors.reset}',
+    '  ${InitColors.cyan}Set these now (e.g. quote style, blank line before return)? '
+    '[y/N/q]: ${InitColors.reset}',
   );
   final rawInput = stdin.readLineSync();
   _logTerminal('');
@@ -4394,13 +4116,13 @@ _CategoryResult? _walkthroughRemainingBulk({
   required Map<String, bool> existingValues,
 }) {
   _logTerminal(
-    '${_Colors.bold}${_Colors.cyan}'
-    '── Remaining stylistic rules (${rules.length}) ──${_Colors.reset}',
+    '${InitColors.bold}${InitColors.cyan}'
+    '── Remaining stylistic rules (${rules.length}) ──${InitColors.reset}',
   );
   _logTerminal('');
   _logTerminal(
-    '  ${_Colors.cyan}Enable all ${rules.length} remaining rules? '
-    '[y/N/q]: ${_Colors.reset}',
+    '  ${InitColors.cyan}Enable all ${rules.length} remaining rules? '
+    '[y/N/q]: ${InitColors.reset}',
   );
   final rawInput = stdin.readLineSync();
   _logTerminal('');
@@ -4436,9 +4158,9 @@ _CategoryResult? _walkthroughCategory({
   required int totalRules,
 }) {
   _logTerminal(
-    '${_Colors.bold}${_Colors.cyan}'
+    '${InitColors.bold}${InitColors.cyan}'
     '── $category ($categoryIndex of $totalCategories) '
-    '──${_Colors.reset}',
+    '──${InitColors.reset}',
   );
   _logTerminal('');
 
@@ -4455,7 +4177,7 @@ _CategoryResult? _walkthroughCategory({
     if (enableAllRemaining) {
       decisions[rule] = true;
       enabled++;
-      _logTerminal('  ${_Colors.green}+ $rule${_Colors.reset}');
+      _logTerminal('  ${InitColors.green}+ $rule${InitColors.reset}');
       continue;
     }
 
@@ -4463,20 +4185,20 @@ _CategoryResult? _walkthroughCategory({
     final ruleNum = ruleOffset + i + 1;
     final pct = (ruleNum * 100 / totalRules).round();
     final progress =
-        '${_Colors.dim}($ruleNum/$totalRules — $pct%)${_Colors.reset}';
+        '${InitColors.dim}($ruleNum/$totalRules — $pct%)${InitColors.reset}';
     final fixTag = (meta != null && meta.hasFix)
-        ? '  ${_Colors.green}[quick fix]${_Colors.reset}'
+        ? '  ${InitColors.green}[quick fix]${InitColors.reset}'
         : '';
-    _logTerminal('  ${_Colors.bold}$rule${_Colors.reset}$fixTag  $progress');
+    _logTerminal('  ${InitColors.bold}$rule${InitColors.reset}$fixTag  $progress');
     _logTerminal('');
 
     if (meta != null) {
       // Show code examples if available (GOOD first for readability)
       if (meta.exampleGood != null) {
-        _logExample('GOOD', _Colors.green, meta.exampleGood!);
+        _logExample('GOOD', InitColors.green, meta.exampleGood!);
       }
       if (meta.exampleBad != null) {
-        _logExample('BAD', _Colors.red, meta.exampleBad!);
+        _logExample('BAD', InitColors.red, meta.exampleBad!);
       }
       if (meta.exampleBad != null || meta.exampleGood != null) {
         _logTerminal('');
@@ -4496,10 +4218,10 @@ _CategoryResult? _walkthroughCategory({
     final after = rules.length - i - 1;
     final aLabel = after > 0 ? '[a] enable this + $after more  ' : '';
     stdout.write(
-      '  ${_Colors.cyan}[y] enable  [n] disable  '
+      '  ${InitColors.cyan}[y] enable  [n] disable  '
       '[s] skip (keeps current)  '
       '$aLabel'
-      '[q] quit: ${_Colors.reset}',
+      '[q] quit: ${InitColors.reset}',
     );
 
     final rawInput = stdin.readLineSync();
@@ -4532,8 +4254,8 @@ _CategoryResult? _walkthroughCategory({
         return null;
       default:
         _logTerminal(
-          '  ${_Colors.yellow}Unknown "$input", '
-          'skipping${_Colors.reset}',
+          '  ${InitColors.yellow}Unknown "$input", '
+          'skipping${InitColors.reset}',
         );
         // Mark as reviewed with current value so it won't be re-prompted
         decisions[rule] = existingValues[rule] ?? false;
@@ -4564,11 +4286,11 @@ _CategoryResult? _walkthroughConflicting({
   final ruleNum = ruleOffset + 1;
   final pct = (ruleNum * 100 / totalRules).round();
   final progress =
-      '${_Colors.dim}($ruleNum/$totalRules — $pct%)${_Colors.reset}';
+      '${InitColors.dim}($ruleNum/$totalRules — $pct%)${InitColors.reset}';
   _logTerminal(
-    '${_Colors.bold}${_Colors.cyan}'
+    '${InitColors.bold}${InitColors.cyan}'
     '── $category ($categoryIndex of $totalCategories) '
-    '──${_Colors.reset}  $progress',
+    '──${InitColors.reset}  $progress',
   );
   _logTerminal('');
 
@@ -4576,14 +4298,14 @@ _CategoryResult? _walkthroughConflicting({
   for (int i = 0; i < rules.length; i++) {
     final rule = rules[i];
     final meta = metadata[rule];
-    _logTerminal('  ${_Colors.bold}${i + 1}. $rule${_Colors.reset}');
+    _logTerminal('  ${InitColors.bold}${i + 1}. $rule${InitColors.reset}');
     if (meta != null &&
         (meta.exampleGood != null || meta.exampleBad != null)) {
       if (meta.exampleGood != null) {
-        _logExample('GOOD', _Colors.green, meta.exampleGood!, indent: 5);
+        _logExample('GOOD', InitColors.green, meta.exampleGood!, indent: 5);
       }
       if (meta.exampleBad != null) {
-        _logExample('BAD', _Colors.red, meta.exampleBad!, indent: 5);
+        _logExample('BAD', InitColors.red, meta.exampleBad!, indent: 5);
       }
     } else if (meta != null) {
       final desc = _stripRulePrefix(meta.correctionMessage).isNotEmpty
@@ -4597,8 +4319,8 @@ _CategoryResult? _walkthroughConflicting({
   // Prompt
   final nums = List.generate(rules.length, (i) => '${i + 1}').join('/');
   stdout.write(
-    '  ${_Colors.cyan}Choose [$nums] or [s] skip (keeps current)  '
-    '[q] quit: ${_Colors.reset}',
+    '  ${InitColors.cyan}Choose [$nums] or [s] skip (keeps current)  '
+    '[q] quit: ${InitColors.reset}',
   );
 
   final rawInput = stdin.readLineSync();
@@ -4635,8 +4357,8 @@ _CategoryResult? _walkthroughConflicting({
       }
     } else {
       _logTerminal(
-        '  ${_Colors.yellow}Unknown "$input", '
-        'skipping${_Colors.reset}',
+        '  ${InitColors.yellow}Unknown "$input", '
+        'skipping${InitColors.reset}',
       );
       // Mark all rules in group as reviewed with current values
       for (final rule in rules) {
@@ -4716,13 +4438,13 @@ String _promptForTier() {
 
   if (!stdin.hasTerminal) {
     _logTerminal(
-      '${_Colors.dim}Non-interactive: using default tier '
-      '($defaultTier)${_Colors.reset}',
+      '${InitColors.dim}Non-interactive: using default tier '
+      '($defaultTier)${InitColors.reset}',
     );
     return defaultTier;
   }
 
-  _logTerminal('${_Colors.bold}Select a tier:${_Colors.reset}');
+  _logTerminal('${InitColors.bold}Select a tier:${InitColors.reset}');
   _logTerminal('');
 
   for (final String name in tierOrder) {
@@ -4730,30 +4452,30 @@ String _promptForTier() {
     if (id == null) continue;
     final int count = tiers.getRulesForTier(name).length;
     final String desc = tierDescriptions[name] ?? '';
-    final String label = _tierColor(name.padRight(13));
-    final String countStr = '${_Colors.dim}(~$count rules)${_Colors.reset}';
+    final String label = tierColor(name.padRight(13));
+    final String countStr = '${InitColors.dim}(~$count rules)${InitColors.reset}';
     final String isDefault =
-        name == defaultTier ? ' ${_Colors.cyan}(default)${_Colors.reset}' : '';
+        name == defaultTier ? ' ${InitColors.cyan}(default)${InitColors.reset}' : '';
     _logTerminal('  $id. $label $countStr  $desc$isDefault');
   }
 
   _logTerminal('');
   stdout.write(
-    '${_Colors.cyan}Enter tier (1-5) '
-    '[default: ${tierIds[defaultTier]}]: ${_Colors.reset}',
+    '${InitColors.cyan}Enter tier (1-5) '
+    '[default: ${tierIds[defaultTier]}]: ${InitColors.reset}',
   );
 
   final String input = stdin.readLineSync()?.trim() ?? '';
 
   if (input.isEmpty) return defaultTier;
 
-  final String? resolved = _resolveTier(input);
+  final String? resolved = resolveTier(input);
 
   if (resolved != null) return resolved;
 
   _logTerminal(
-    '${_Colors.yellow}Invalid selection "$input", '
-    'using $defaultTier${_Colors.reset}',
+    '${InitColors.yellow}Invalid selection "$input", '
+    'using $defaultTier${InitColors.reset}',
   );
   return defaultTier;
 }
