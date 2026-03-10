@@ -3,7 +3,7 @@ library;
 
 import 'dart:io';
 
-import 'package:saropa_lints/src/init/custom_overrides.dart';
+import 'package:saropa_lints/src/init/stylistic_section_parser.dart';
 import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
 import 'package:saropa_lints/src/init/rule_metadata.dart';
