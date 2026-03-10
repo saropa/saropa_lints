@@ -1,7 +1,6 @@
 /// Init tool orchestration — main workflow logic.
 library;
 
-import 'dart:convert' show utf8;
 import 'dart:developer' as dev;
 import 'dart:io';
 
@@ -11,19 +10,17 @@ import 'package:saropa_lints/src/init/config_writer.dart';
 import 'package:saropa_lints/src/init/custom_overrides_core.dart';
 import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
+import 'package:saropa_lints/src/init/init_post_write.dart';
 import 'package:saropa_lints/src/init/migration.dart';
 import 'package:saropa_lints/src/init/platforms_packages.dart';
 import 'package:saropa_lints/src/init/preflight.dart';
 import 'package:saropa_lints/src/init/project_info.dart';
 import 'package:saropa_lints/src/init/rule_metadata.dart';
 import 'package:saropa_lints/src/init/stylistic_section.dart';
-import 'package:saropa_lints/src/init/stylistic_walkthrough.dart';
 import 'package:saropa_lints/src/init/tier_ui.dart';
 import 'package:saropa_lints/src/init/validation.dart';
 import 'package:saropa_lints/src/init/whats_new.dart'
     show AnsiColors, formatWhatsNew;
-import 'package:saropa_lints/src/report/analysis_reporter.dart'
-    show AnalysisReporter;
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
 /// Append a detailed rule-by-rule listing to the log buffer.
@@ -395,71 +392,11 @@ Future<void> runInit(List<String> args) async {
   if (permanentOverrides.isNotEmpty) {
     userCustomizations = {...userCustomizations, ...permanentOverrides};
   }
-
-  // Count rules by severity for summary
-  final Map<String, int> enabledBySeverity = {
-    'ERROR': 0,
-    'WARNING': 0,
-    'INFO': 0,
-  };
-  final Map<String, int> disabledBySeverity = {
-    'ERROR': 0,
-    'WARNING': 0,
-    'INFO': 0,
-  };
-
-  for (final rule in finalEnabled) {
-    final severity = getRuleSeverity(rule);
-    enabledBySeverity[severity] = (enabledBySeverity[severity] ?? 0) + 1;
-  }
-  for (final rule in finalDisabled) {
-    final severity = getRuleSeverity(rule);
-    disabledBySeverity[severity] = (disabledBySeverity[severity] ?? 0) + 1;
-  }
-
-  // Count by tier for enabled rules
-  final Map<String, int> enabledByTierCount = {};
-  for (final rule in finalEnabled) {
-    final tierName = tierToString(getRuleTierFromMetadata(rule));
-    enabledByTierCount[tierName] = (enabledByTierCount[tierName] ?? 0) + 1;
-  }
-
-  // Compact summary
-  log.terminal('');
-  final totalRules = finalEnabled.length + finalDisabled.length;
-  final disabledPct =
-      totalRules > 0 ? (finalDisabled.length * 100 ~/ totalRules) : 0;
-  log.terminal(
-    '${InitColors.bold}Rules:${InitColors.reset} ${successText('${finalEnabled.length} enabled')} / ${errorText('${finalDisabled.length} disabled')} ${InitColors.dim}($disabledPct%)${InitColors.reset}',
+  _printRuleSummary(
+    finalEnabled: finalEnabled,
+    finalDisabled: finalDisabled,
+    userCustomizations: userCustomizations,
   );
-  log.terminal(
-    '${InitColors.bold}Severity:${InitColors.reset} ${InitColors.red}${enabledBySeverity['ERROR']} errors${InitColors.reset} · ${InitColors.yellow}${enabledBySeverity['WARNING']} warnings${InitColors.reset} · ${InitColors.cyan}${enabledBySeverity['INFO']} info${InitColors.reset}',
-  );
-
-  // Project overrides summary
-  final customCount = userCustomizations.length;
-
-  if (customCount > 0) {
-    final Map<String, int> customBySeverity = {
-      'ERROR': 0,
-      'WARNING': 0,
-      'INFO': 0,
-    };
-    for (final rule in userCustomizations.keys) {
-      final severity = getRuleSeverity(rule);
-      customBySeverity[severity] = (customBySeverity[severity] ?? 0) + 1;
-    }
-    log.terminal(
-      '${InitColors.bold}Project Overrides${InitColors.reset} ${InitColors.dim}(analysis_options_custom.yaml):${InitColors.reset} '
-      '$customCount '
-      '${InitColors.dim}(${InitColors.reset}'
-      '${InitColors.red}${customBySeverity['ERROR']} error${InitColors.reset}, '
-      '${InitColors.yellow}${customBySeverity['WARNING']} warning${InitColors.reset}, '
-      '${InitColors.cyan}${customBySeverity['INFO']} info${InitColors.reset}'
-      '${InitColors.dim})${InitColors.reset}',
-    );
-  }
-  log.terminal('');
 
   // Append rule-by-rule detail to the log file (not printed to terminal)
   appendDetailedReport(
@@ -542,145 +479,76 @@ Future<void> runInit(List<String> args) async {
 
   // Validate the written file has the critical sections
   validateWrittenConfig(log,cliArgs.outputPath, allRules.length);
+  await runPostWriteActions(
+    cliArgs: cliArgs,
+    v4Detected: v4Detected,
+    allRules: allRules,
+    finalEnabled: finalEnabled,
+    finalDisabled: finalDisabled,
+    packageSettings: packageSettings,
+    platformSettings: platformSettings,
+    version: version,
+    resolvedTier: resolvedTier,
+  );
+}
 
-  // Convert v4 ignore comments (interactive prompt or --fix-ignores flag)
-  if (v4Detected && !cliArgs.isDryRun) {
-    final bool shouldConvert;
-    if (cliArgs.isFixIgnores) {
-      shouldConvert = true;
-    } else if (!stdin.hasTerminal) {
-      // Non-interactive: skip unless explicitly requested
-      shouldConvert = false;
-    } else {
-      log.terminal('');
-      stdout.write(
-        '${InitColors.cyan}Convert v4 ignore comments to v5 format? [y/N]: '
-        '${InitColors.reset}',
-      );
-      final String resp = stdin.readLineSync()?.toLowerCase().trim() ?? '';
-      shouldConvert = resp == 'y' || resp == 'yes';
-    }
+/// Print rule count summary to terminal.
+void _printRuleSummary({
+  required Set<String> finalEnabled,
+  required Set<String> finalDisabled,
+  required Map<String, bool> userCustomizations,
+}) {
+  final Map<String, int> enabledBySeverity = {
+    'ERROR': 0,
+    'WARNING': 0,
+    'INFO': 0,
+  };
+  final Map<String, int> disabledBySeverity = {
+    'ERROR': 0,
+    'WARNING': 0,
+    'INFO': 0,
+  };
 
-    if (shouldConvert) {
-      log.terminal(
-        '${InitColors.bold}Converting v4 ignore comments...${InitColors.reset}',
-      );
-      final Map<String, int> ignoreResults = convertIgnoreComments(
-        allRules,
-        false,
-      );
-      if (ignoreResults.isEmpty) {
-        log.terminal(
-          '${InitColors.dim}  No v4 ignore comments found${InitColors.reset}',
-        );
-      } else {
-        final int total = ignoreResults.values.fold(0, (s, c) => s + c);
-        log.terminal(
-          '${InitColors.green}Converted $total ignore comments in '
-          '${ignoreResults.length} files${InitColors.reset}',
-        );
-        for (final MapEntry<String, int> entry in ignoreResults.entries) {
-          log.terminal(
-            '${InitColors.dim}  ${entry.key}: ${entry.value}${InitColors.reset}',
-          );
-        }
-      }
-    } else {
-      log.terminal(
-        '${InitColors.dim}  Skipped ignore comment conversion${InitColors.reset}',
-      );
-    }
+  for (final rule in finalEnabled) {
+    final severity = getRuleSeverity(rule);
+    enabledBySeverity[severity] = (enabledBySeverity[severity] ?? 0) + 1;
   }
-
-  // ── Interactive stylistic walkthrough ──
-  // Runs by default after config generation. Skip with --no-stylistic.
-  // --stylistic-all already handled above (bulk-enable).
-  if (!cliArgs.isDryRun && !cliArgs.isNoStylistic && !cliArgs.isStylisticAll) {
-    final File overridesForWalkthrough = File('analysis_options_custom.yaml');
-    if (overridesForWalkthrough.existsSync()) {
-      runStylisticWalkthrough(
-        customFile: overridesForWalkthrough,
-        packageSettings: packageSettings,
-        platformSettings: platformSettings,
-        resetStylistic: cliArgs.isStylisticReset,
-      );
-    }
+  for (final rule in finalDisabled) {
+    final severity = getRuleSeverity(rule);
+    disabledBySeverity[severity] = (disabledBySeverity[severity] ?? 0) + 1;
   }
 
   log.terminal('');
+  final totalRules = finalEnabled.length + finalDisabled.length;
+  final disabledPct =
+      totalRules > 0 ? (finalDisabled.length * 100 ~/ totalRules) : 0;
+  log.terminal(
+    '${InitColors.bold}Rules:${InitColors.reset} ${successText('${finalEnabled.length} enabled')} / ${errorText('${finalDisabled.length} disabled')} ${InitColors.dim}($disabledPct%)${InitColors.reset}',
+  );
+  log.terminal(
+    '${InitColors.bold}Severity:${InitColors.reset} ${InitColors.red}${enabledBySeverity['ERROR']} errors${InitColors.reset} \u00b7 ${InitColors.yellow}${enabledBySeverity['WARNING']} warnings${InitColors.reset} \u00b7 ${InitColors.cyan}${enabledBySeverity['INFO']} info${InitColors.reset}',
+  );
 
-  if (!cliArgs.isDryRun) {
-    // Write the init log (setup only) BEFORE analysis. The plugin writes
-    // its own detailed report (*_saropa_lint_report.log) during analysis.
-    log.appendSummary((
-      version: version,
-      tier: resolvedTier,
-      enabled: finalEnabled.length,
-      disabled: finalDisabled.length,
-      outputPath: cliArgs.outputPath,
-    ));
-    log.writeFile();
-    log.terminal('');
-
-    // Ask user if they want to run analysis
-    stdout.write('${InitColors.cyan}Run analysis now? [y/N]: ${InitColors.reset}');
-    final response = stdin.readLineSync()?.toLowerCase().trim() ?? '';
-
-    if (response == 'y' || response == 'yes') {
-      log.terminal('');
-      log.terminal('${InitColors.bold}Running: dart analyze${InitColors.reset}');
-      log.terminal('${'─' * 60}');
-
-      // Stream output to terminal. The plugin's AnalysisReporter writes
-      // the structured results to a separate *_saropa_lint_report.log.
-      final process = await Process.start(
-          'dart',
-          [
-            'analyze',
-          ],
-          runInShell: true);
-
-      // Use UTF-8 decoder (not SystemEncoding) because Dart processes
-      // always write UTF-8, and SystemEncoding on Windows uses the
-      // console code page which corrupts Unicode progress bar characters.
-      final stdoutDone =
-          process.stdout.transform(utf8.decoder).forEach(stdout.write);
-      final stderrDone =
-          process.stderr.transform(utf8.decoder).forEach(stderr.write);
-
-      // Wait for exit code AND stream drain together so the separator
-      // line doesn't appear before trailing analyzer output.
-      final exitCodeFuture = process.exitCode;
-      await Future.wait([exitCodeFuture, stdoutDone, stderrDone]);
-      final analyzeExitCode = await exitCodeFuture;
-      log.terminal('${'─' * 60}');
-
-      if (analyzeExitCode == 0) {
-        log.terminal(successText('✓ dart analyze passed'));
-      } else if (analyzeExitCode <= 2) {
-        // Exit codes 1-2 mean "issues found" — the analysis completed.
-        log.terminal(successText('✓ dart analyze completed'));
-      } else {
-        // Exit code 3+ means the analyzer itself failed (internal error,
-        // could not analyze, etc.)
-        log.terminal(
-          errorText('✗ dart analyze failed (exit code $analyzeExitCode)'),
-        );
-      }
-
-      // Show the plugin's lint report path if one was generated.
-      // Retries briefly since the plugin may still be flushing to disk.
-      final logTs = log.timestamp;
-      if (logTs != null) {
-        final dateFolder = AnalysisReporter.dateFolder(logTs);
-        final pluginReport = await findNewestPluginReport(dateFolder);
-        if (pluginReport != null) {
-          log.terminal(
-            '${InitColors.bold}Report:${InitColors.reset} '
-            '${InitColors.cyan}$pluginReport${InitColors.reset}',
-          );
-        }
-      }
+  final customCount = userCustomizations.length;
+  if (customCount > 0) {
+    final Map<String, int> customBySeverity = {
+      'ERROR': 0,
+      'WARNING': 0,
+      'INFO': 0,
+    };
+    for (final rule in userCustomizations.keys) {
+      final severity = getRuleSeverity(rule);
+      customBySeverity[severity] = (customBySeverity[severity] ?? 0) + 1;
     }
+    log.terminal(
+      '${InitColors.bold}Project Overrides${InitColors.reset} ${InitColors.dim}(analysis_options_custom.yaml):${InitColors.reset} '
+      '$customCount '
+      '${InitColors.dim}(${InitColors.reset}'
+      '${InitColors.red}${customBySeverity['ERROR']} error${InitColors.reset}, '
+      '${InitColors.yellow}${customBySeverity['WARNING']} warning${InitColors.reset}, '
+      '${InitColors.cyan}${customBySeverity['INFO']} info${InitColors.reset}'
+      '${InitColors.dim})${InitColors.reset}',
+    );
   }
+  log.terminal('');
 }
