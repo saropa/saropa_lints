@@ -256,3 +256,6 @@ String detailNote(
   if (package.contains(rule)) return '  [package filtered]';
   return '';
 }
+
+/// Shared log writer instance for the init tool session.
+final LogWriter log = LogWriter();
