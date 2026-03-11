@@ -3040,6 +3040,25 @@ class AvoidApiKeyInCodeRule extends SaropaLintRule {
     // Also check string literals with API key patterns
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
+
+      // Skip regex patterns — they contain key prefixes as detection patterns,
+      // not actual keys. Check for regex metacharacters.
+      if (value.contains('[') ||
+          value.contains('{') ||
+          value.contains('+') ||
+          value.contains('*') ||
+          value.contains('?') ||
+          value.contains('\\')) {
+        return;
+      }
+
+      // Skip strings inside RegExp() constructors
+      final AstNode? grandParent = node.parent?.parent;
+      if (grandParent is InstanceCreationExpression) {
+        final String typeName = grandParent.constructorName.type.name.lexeme;
+        if (typeName == 'RegExp') return;
+      }
+
       for (final String prefix in _apiKeyPrefixes) {
         if (value.startsWith(prefix) && value.length > prefix.length + 10) {
           reporter.atNode(node);
@@ -3284,6 +3303,12 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    final normalizedPath = context.filePath.replaceAll('\\', '/');
+    if (normalizedPath.contains('/rules/') ||
+        normalizedPath.contains('/fixes/')) {
+      return;
+    }
+
     checkHttpUrls(context, (AstNode node) => reporter.atNode(node));
   }
 
@@ -3887,6 +3912,7 @@ class RequireCatchLoggingRule extends SaropaLintRule {
     'logger',
     'print',
     'debugprint',
+    'developer.log',
     'console',
     'error',
     'warning',
@@ -3903,6 +3929,7 @@ class RequireCatchLoggingRule extends SaropaLintRule {
     'record_error',
     'reporterror',
     'report_error',
+    'stderr',
   };
   // cspell:enable
 

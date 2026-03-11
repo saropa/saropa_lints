@@ -3347,6 +3347,12 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    final normalizedPath = context.filePath.replaceAll('\\', '/');
+    if (normalizedPath.contains('/rules/') ||
+        normalizedPath.contains('/fixes/')) {
+      return;
+    }
+
     context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme;
 

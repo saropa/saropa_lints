@@ -75,6 +75,12 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    final normalizedPath = context.filePath.replaceAll('\\', '/');
+    if (normalizedPath.contains('/rules/') ||
+        normalizedPath.contains('/fixes/')) {
+      return;
+    }
+
     context.addMethodInvocation((MethodInvocation node) {
       // Check for hardcoded Apple sandbox/production URLs
       final String nodeSource = node.toSource();

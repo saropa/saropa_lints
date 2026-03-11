@@ -67,6 +67,22 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
     caseSensitive: false,
   );
 
+  /// Well-known stable domains that are not environment-dependent config.
+  static const List<String> _safeUrlDomains = <String>[
+    'pub.dev',
+    'github.com',
+    'dart.dev',
+    'flutter.dev',
+    'googleapis.com/auth',
+  ];
+
+  static bool _isSafeUrl(String value) {
+    for (final String domain in _safeUrlDomains) {
+      if (value.contains(domain)) return true;
+    }
+    return false;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -86,7 +102,9 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
 
       // Check if value looks like a hardcoded config
       if (_urlPattern.hasMatch(value) || _keyPattern.hasMatch(value)) {
-        reporter.atNode(node);
+        if (!_isSafeUrl(value)) {
+          reporter.atNode(node);
+        }
       }
     });
 
@@ -104,7 +122,9 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
         // Check for URL or key patterns in config-named variables
         if (_configNamePattern.hasMatch(varName)) {
           if (_urlPattern.hasMatch(value) || _keyPattern.hasMatch(value)) {
-            reporter.atNode(variable);
+            if (!_isSafeUrl(value)) {
+              reporter.atNode(variable);
+            }
           }
         }
       }
@@ -273,6 +293,12 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    final normalizedPath = context.filePath.replaceAll('\\', '/');
+    if (normalizedPath.contains('/rules/') ||
+        normalizedPath.contains('/fixes/')) {
+      return;
+    }
+
     context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();
 
