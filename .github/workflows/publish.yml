@@ -38,6 +38,8 @@ jobs:
             sleep 10
           done
 
+      - name: Strip self-plugin reference
+        run: sed -i '/^plugins:/,$d' analysis_options.yaml
       - name: Analyze
         run: dart analyze --fatal-infos
 

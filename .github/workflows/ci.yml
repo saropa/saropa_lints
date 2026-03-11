@@ -23,6 +23,8 @@ jobs:
           sdk: '3.10.8'
       - name: Install dependencies
         run: dart pub get
+      - name: Strip self-plugin reference
+        run: sed -i '/^plugins:/,$d' analysis_options.yaml
       - name: Analyze
         run: dart analyze --fatal-infos
       - name: Dry run (pub.dev validation)
