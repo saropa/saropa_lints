@@ -1024,12 +1024,19 @@ def run_analysis_with_prompt(
                 )
             remaining = check_pubdev_lint_issues(project_dir)
             if remaining:
-                print_error(
+                print_warning(
                     f"{len(remaining)} unfixable pub.dev lint issue(s) remain:"
                 )
                 for issue in remaining:
                     print_colored(f"      {issue}", Color.YELLOW)
-                return "abort"
+                # Let user decide: these may be non-blocking for dart analyze
+                choice = _prompt_analysis_failure()
+                if choice == "abort":
+                    return "abort"
+                if choice == "ignore":
+                    # Skip dart analyze entirely — user accepted the doc issues
+                    return "ignore"
+                # choice == "retry": fall through to dart analyze loop below
 
     while True:
         if _run_dart_analyze_core(project_dir):
