@@ -63,7 +63,7 @@ void _printUsage() {
   print('                  (default if no command given)');
   print('  baseline        Generate/manage baseline for existing violations');
   print('  impact-report   Run analysis and show results by impact level');
-  print('  scan            Run lint rules against any Dart project');
+  print('  scan            Run configured lint rules against any Dart project');
   print('');
   print('Options:');
   print('  -h, --help      Show this help message');
@@ -75,10 +75,10 @@ void _printUsage() {
   print('');
   print('Examples:');
   print('  dart run saropa_lints init --tier comprehensive');
+  print('  dart run saropa_lints init --target /path/to/project');
   print('  dart run saropa_lints init --tier essential --reset');
   print('  dart run saropa_lints baseline');
   print('  dart run saropa_lints baseline --update');
   print('  dart run saropa_lints impact-report');
-  print('  dart run saropa_lints scan .');
-  print('  dart run saropa_lints scan /path/to/project --tier recommended');
+  print('  dart run saropa_lints init --target . && dart run saropa_lints scan .');
 }
