@@ -10,7 +10,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
-/// Walks a [CompilationUnit] dispatching each node to all [_visitors].
+/// Walks a [CompilationUnit] dispatching each node to all `_visitors`.
 ///
 /// [node.accept(v)] calls the correct `visitXxx` on each visitor based
 /// on the node's runtime type. [node.visitChildren(this)] recurses.
