@@ -12,6 +12,14 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
+## [8.2.2]
+
+### Changed
+
+- Version bump
+
+---
+
 ## [8.2.1]
 
 ### Changed
