@@ -1,0 +1,211 @@
+// ignore_for_file: depend_on_referenced_packages, avoid_print
+
+/// Standalone lint rule scanner that runs saropa_lints rules against
+/// any Dart project without requiring the target to have saropa_lints
+/// as a dependency.
+///
+/// Uses [parseString] for unresolved ASTs and the existing
+/// [SaropaLintRule] infrastructure (via [CapturingRuleVisitorRegistry]).
+library;
+
+import 'dart:io' as io;
+
+import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart' show AstVisitor, CompilationUnit;
+import 'package:analyzer/error/listener.dart';
+import 'package:analyzer/file_system/physical_file_system.dart';
+import 'package:analyzer/src/string_source.dart';
+import 'package:path/path.dart' as p;
+
+import '../../saropa_lints.dart';
+import 'capturing_registry.dart';
+import 'scan_diagnostic.dart';
+import 'scan_rule_context.dart';
+import 'scan_walker.dart';
+
+/// Scans Dart files using saropa_lints rules without the plugin framework.
+class ScanRunner {
+  ScanRunner({required this.tier, required this.targetPath});
+
+  final String tier;
+  final String targetPath;
+
+  /// Runs the scan and returns all diagnostics found.
+  List<ScanDiagnostic> run() {
+    final ruleNames = getRulesForTier(tier);
+    if (ruleNames.isEmpty) {
+      print('No rules found for tier: $tier');
+      return const [];
+    }
+
+    SaropaLintRule.enabledRules = ruleNames;
+    final rules = getRulesFromRegistry(ruleNames);
+    print('Loaded ${rules.length} rules (tier: $tier)');
+
+    final dartFiles = _findDartFiles(targetPath);
+    if (dartFiles.isEmpty) {
+      print('No .dart files found in: $targetPath');
+      return const [];
+    }
+    print('Scanning ${dartFiles.length} files...\n');
+
+    final registrations = _registerRules(rules);
+    return _scanFiles(dartFiles, registrations);
+  }
+
+  List<_RuleRegistration> _registerRules(List<SaropaLintRule> rules) {
+    final result = <_RuleRegistration>[];
+    final dummyUnit = _createContextUnit('', p.absolute(targetPath));
+
+    for (final rule in rules) {
+      final registry = CapturingRuleVisitorRegistry();
+      final context = ScanRuleContext(definingUnit: dummyUnit);
+
+      try {
+        rule.registerNodeProcessors(registry, context);
+      } on Object catch (e) {
+        io.stderr.writeln('  Skipping ${rule.code.name}: $e');
+        continue;
+      }
+
+      final visitors = registry.capturedVisitors;
+      if (visitors.isNotEmpty) {
+        result.add(_RuleRegistration(rule, visitors.cast(), context));
+      }
+    }
+
+    return result;
+  }
+
+  List<ScanDiagnostic> _scanFiles(
+    List<String> files,
+    List<_RuleRegistration> registrations,
+  ) {
+    final diagnostics = <ScanDiagnostic>[];
+    final sw = Stopwatch()..start();
+
+    for (var i = 0; i < files.length; i++) {
+      _showProgress(i, files.length, diagnostics.length, files[i], sw);
+      _scanSingleFile(files[i], registrations, diagnostics);
+    }
+
+    // Clear progress line
+    io.stderr.write('\r${' ' * 79}\r');
+    return diagnostics;
+  }
+
+  void _scanSingleFile(
+    String filePath,
+    List<_RuleRegistration> registrations,
+    List<ScanDiagnostic> diagnostics,
+  ) {
+    final content = io.File(filePath).readAsStringSync();
+    final unit = parseString(
+      content: content,
+      path: filePath,
+      throwIfDiagnostics: false,
+    ).unit;
+
+    final listener = RecordingDiagnosticListener();
+    final source = StringSource(content, filePath);
+    final reporter = DiagnosticReporter(listener, source);
+    final ctxUnit = _createContextUnit(content, filePath, unit: unit);
+
+    final allVisitors = <AstVisitor<void>>[];
+    for (final reg in registrations) {
+      reg.context.currentUnit = ctxUnit;
+      reg.rule.reporter = reporter;
+      allVisitors.addAll(reg.visitors);
+    }
+
+    if (allVisitors.isNotEmpty) {
+      unit.accept(ScanWalker(allVisitors));
+    }
+
+    for (final d in listener.diagnostics) {
+      final loc = unit.lineInfo.getLocation(d.offset);
+      diagnostics.add(ScanDiagnostic(
+        ruleName: d.diagnosticCode.name,
+        filePath: filePath,
+        line: loc.lineNumber,
+        column: loc.columnNumber,
+        offset: d.offset,
+        length: d.length,
+        severity: d.diagnosticCode.severity.name,
+        problemMessage: d.problemMessage.messageText(includeUrl: false),
+      ));
+    }
+  }
+
+  static void _showProgress(
+    int index,
+    int total,
+    int issues,
+    String filePath,
+    Stopwatch sw,
+  ) {
+    if (index % 10 != 0) return;
+    final elapsed = sw.elapsedMilliseconds / 1000;
+    final rate = elapsed > 0 ? (index / elapsed).round() : 0;
+    final name = p.basename(filePath);
+    io.stderr.write(
+      '\r  Files: $index/$total | ${elapsed.toStringAsFixed(1)}s'
+      ' | $rate/s | Issues: $issues | $name'
+      '${' ' * 20}',
+    );
+  }
+
+  /// Creates a [RuleContextUnit] for the given file content.
+  static RuleContextUnit _createContextUnit(
+    String content,
+    String filePath, {
+    CompilationUnit? unit,
+  }) {
+    final provider = PhysicalResourceProvider.INSTANCE;
+    final file = provider.getFile(filePath);
+    final listener = RecordingDiagnosticListener();
+    final reporter = DiagnosticReporter(listener, StringSource(content, filePath));
+    return RuleContextUnit(
+      file: file,
+      content: content,
+      diagnosticReporter: reporter,
+      unit: unit ??
+          parseString(content: content, throwIfDiagnostics: false).unit,
+    );
+  }
+
+  static List<String> _findDartFiles(String directory) {
+    final dir = io.Directory(directory);
+    if (!dir.existsSync()) return const [];
+
+    return dir
+        .listSync(recursive: true)
+        .whereType<io.File>()
+        .where((f) => f.path.endsWith('.dart'))
+        .where((f) => !_isExcluded(f.path))
+        .map((f) => p.normalize(f.path))
+        .toList();
+  }
+
+  static bool _isExcluded(String path) {
+    final n = path.replaceAll('\\', '/');
+    return n.contains('/.dart_tool/') ||
+        n.contains('/build/') ||
+        n.contains('/example') ||
+        n.contains('.g.dart') ||
+        n.contains('.freezed.dart') ||
+        n.contains('.gr.dart') ||
+        n.contains('.gen.dart') ||
+        n.contains('.mocks.dart') ||
+        n.contains('.config.dart') ||
+        n.contains('/generated/');
+  }
+}
+
+class _RuleRegistration {
+  const _RuleRegistration(this.rule, this.visitors, this.context);
+  final SaropaLintRule rule;
+  final List<AstVisitor<void>> visitors;
+  final ScanRuleContext context;
+}
