@@ -45,7 +45,8 @@ Future<void> main(List<String> args) async {
     case 'impact-report' || 'impact_report':
       await impact_cmd.main(commandArgs);
     case 'scan':
-      await scan_cmd.main(commandArgs);
+      // scan.main is synchronous — no await needed
+      scan_cmd.main(commandArgs);
     default:
       print('Unknown command: $command');
       print('');

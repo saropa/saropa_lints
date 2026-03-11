@@ -22,7 +22,7 @@ import 'package:saropa_lints/src/scan/scan_runner.dart';
 ///   0 - No issues found
 ///   1 - Issues found
 ///   2 - No configuration found
-Future<void> main(List<String> args) async {
+void main(List<String> args) {
   if (args.contains('--help') || args.contains('-h')) {
     _printUsage();
     return;
