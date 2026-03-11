@@ -1345,11 +1345,9 @@ class AvoidCatchAllRule extends SaropaLintRule {
       final TypeAnnotation? exceptionType = node.exceptionType;
 
       if (exceptionType == null) {
-        // Allow defensive plugin catches that log with developer.log
-        final String bodySource = node.body.toSource();
-        if (bodySource.contains('developer.log') &&
-            bodySource.contains('error:') &&
-            bodySource.contains('stackTrace:')) {
+        // Allow defensive plugin catches that log with developer.log(error:, stackTrace:)
+        // Uses AST walk instead of bodySource.contains() to avoid false positives
+        if (_hasDeveloperLogWithErrorAndStack(node.body)) {
           return;
         }
 
@@ -1358,6 +1356,28 @@ class AvoidCatchAllRule extends SaropaLintRule {
       }
     });
   }
+}
+
+/// Checks whether [block] contains a `developer.log(...)` call with both
+/// `error:` and `stackTrace:` named arguments (defensive plugin logging).
+bool _hasDeveloperLogWithErrorAndStack(Block block) {
+  for (final statement in block.statements) {
+    if (statement is! ExpressionStatement) continue;
+    final expr = statement.expression;
+    if (expr is! MethodInvocation) continue;
+    // Match `developer.log(...)` — prefixed or imported as `log`
+    if (expr.methodName.name != 'log') continue;
+    final target = expr.target;
+    if (target is! SimpleIdentifier || target.name != 'developer') continue;
+    final hasError = expr.argumentList.arguments.any(
+      (a) => a is NamedExpression && a.name.label.name == 'error',
+    );
+    final hasStack = expr.argumentList.arguments.any(
+      (a) => a is NamedExpression && a.name.label.name == 'stackTrace',
+    );
+    if (hasError && hasStack) return true;
+  }
+  return false;
 }
 
 /// Warns when `on Exception catch` is used without `on Object catch` fallback.

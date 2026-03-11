@@ -667,12 +667,15 @@ def _run_dart_test_to_file(
 
 
 def _prompt_test_failure() -> str:
-    """Ask user what to do after tests failed. Returns 'continue' | 'abort'."""
+    """Ask user what to do after tests failed. Returns 'continue' | 'retry' | 'abort'."""
     print_warning("Tests failed. Choose an action:")
+    print_colored("  [R]etry (re-run tests after fixing the issue)", Color.CYAN)
     print_colored("  [C]ontinue anyway (proceed with publish)", Color.CYAN)
     print_colored("  [A]bort (stop publish)", Color.CYAN)
     try:
-        raw = input("  Choice [c/a]: ").strip().lower() or "a"
+        raw = input("  Choice [r/c/a]: ").strip().lower() or "a"
+        if raw.startswith("r"):
+            return "retry"
         if raw.startswith("c"):
             return "continue"
         if raw.startswith("a"):
@@ -768,24 +771,37 @@ def run_tests(project_dir: Path) -> bool:
         return True
 
     # Both runs failed: show log path and short excerpt, then prompt
-    print_error("Tests failed. Full output in log file (no test output was printed to this terminal).")
-    print_colored(f"  Log: reports/{date_str}/{retry_name}", Color.CYAN)
-    excerpt = _extract_failure_excerpt(retry_path, max_lines=10)
-    if excerpt:
-        print_colored("  Excerpt:", Color.RED)
-        for line_no, content in excerpt:
-            print_colored(f"    {line_no}: {content}", Color.RED)
-    else:
-        print_info("  (No failure markers found in log; open the log file to see output.)")
+    last_log = retry_path
+    while True:
+        print_error("Tests failed. Full output in log file (no test output was printed to this terminal).")
+        print_colored(f"  Log: {last_log.relative_to(project_dir)}", Color.CYAN)
+        excerpt = _extract_failure_excerpt(last_log, max_lines=10)
+        if excerpt:
+            print_colored("  Excerpt:", Color.RED)
+            for line_no, content in excerpt:
+                print_colored(f"    {line_no}: {content}", Color.RED)
+        else:
+            print_info("  (No failure markers found in log; open the log file to see output.)")
 
-    choice = _prompt_test_failure()
-    if choice == "continue":
-        print_info("Continuing despite test failure.")
-        return True
-    # Abort: run chain-stack-traces so a detailed log exists, then return False
-    print_info("Writing detailed trace to log (output → reports/.../chain_stack_traces.log)")
-    _run_chain_stack_traces_and_check(project_dir, env)
-    return False
+        choice = _prompt_test_failure()
+        if choice == "continue":
+            print_info("Continuing despite test failure.")
+            return True
+        if choice == "retry":
+            # Re-run tests (user may have fixed the issue in another terminal)
+            print_info("Re-running tests...")
+            relog_time = datetime.now().strftime("%H%M%S")
+            relog_name = f"{date_str}_{relog_time}_dart_test_retry.log"
+            last_log = reports_dir / relog_name
+            rc = _run_dart_test_to_file(project_dir, env, last_log)
+            if rc == 0:
+                print_success("Tests passed on retry.")
+                return True
+            continue
+        # Abort: run chain-stack-traces so a detailed log exists, then return False
+        print_info("Writing detailed trace to log (output → reports/.../chain_stack_traces.log)")
+        _run_chain_stack_traces_and_check(project_dir, env)
+        return False
 
 
 # Paths passed to ``dart format``. Must match CI (.github/workflows/ci.yml) and
