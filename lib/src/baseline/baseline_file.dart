@@ -128,8 +128,9 @@ class BaselineFile {
       final encoder = const JsonEncoder.withIndent('  ');
       file.writeAsStringSync(encoder.convert(toJson()));
     } on IOException catch (e) {
-      // Best-effort write; log and continue so caller is not forced to handle
-      print('Baseline save failed: $e');
+      // Best-effort write; log and continue so caller is not forced to handle.
+      // Use stderr instead of print() — errors belong on stderr, not stdout.
+      stderr.writeln('Baseline save failed: $e');
     }
   }
 

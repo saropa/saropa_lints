@@ -69,10 +69,14 @@ class BatchData {
       final u = map['u'];
       if (s is! String || i is! String || u is! String) return null;
 
+      // Use tryParse — u comes from serialized JSON that may be corrupted.
+      final updatedAt = DateTime.tryParse(u);
+      if (updatedAt == null) return null;
+
       return BatchData(
         sessionId: s,
         isolateId: i,
-        updatedAt: DateTime.parse(u),
+        updatedAt: updatedAt,
         config: _configFromJson(map['cfg']),
         analyzedFiles: _stringList(map['af']),
         issuesByFile: _intMap(map['ibf']),
