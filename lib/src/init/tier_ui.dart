@@ -8,7 +8,6 @@ import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
-
 /// Prompts the user to select a tier interactively.
 ///
 /// Defaults to the tier found in the existing analysis_options.yaml,
@@ -34,9 +33,11 @@ String promptForTier() {
     final int count = tiers.getRulesForTier(name).length;
     final String desc = tierDescriptions[name] ?? '';
     final String label = tierColor(name.padRight(13));
-    final String countStr = '${InitColors.dim}(~$count rules)${InitColors.reset}';
-    final String isDefault =
-        name == defaultTier ? ' ${InitColors.cyan}(default)${InitColors.reset}' : '';
+    final String countStr =
+        '${InitColors.dim}(~$count rules)${InitColors.reset}';
+    final String isDefault = name == defaultTier
+        ? ' ${InitColors.cyan}(default)${InitColors.reset}'
+        : '';
     log.terminal('  $id. $label $countStr  $desc$isDefault');
   }
 

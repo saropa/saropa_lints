@@ -10,7 +10,6 @@ final RegExp _pluginsSectionPattern = RegExp(r'^plugins:\s*$', multiLine: true);
 /// Matches any top-level YAML key (for finding section boundaries).
 final RegExp topLevelKeyPattern = RegExp(r'^\w+:', multiLine: true);
 
-
 /// Generate the plugins YAML section with proper formatting.
 ///
 /// Organizes rules by tier with problem message comments.

@@ -107,12 +107,14 @@ Future<void> runPostWriteActions({
     log.terminal('');
 
     // Ask user if they want to run analysis
-    stdout.write('${InitColors.cyan}Run analysis now? [y/N]: ${InitColors.reset}');
+    stdout.write(
+        '${InitColors.cyan}Run analysis now? [y/N]: ${InitColors.reset}');
     final response = stdin.readLineSync()?.toLowerCase().trim() ?? '';
 
     if (response == 'y' || response == 'yes') {
       log.terminal('');
-      log.terminal('${InitColors.bold}Running: dart analyze${InitColors.reset}');
+      log.terminal(
+          '${InitColors.bold}Running: dart analyze${InitColors.reset}');
       log.terminal('${'─' * 60}');
 
       // Stream output to terminal. The plugin's AnalysisReporter writes

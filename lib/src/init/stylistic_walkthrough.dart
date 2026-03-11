@@ -11,8 +11,6 @@ import 'package:saropa_lints/src/init/rule_metadata.dart';
 import 'package:saropa_lints/src/init/stylistic_rulesets.dart';
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
-
-
 // ---------------------------------------------------------------------------
 // Interactive stylistic rules walkthrough
 // ---------------------------------------------------------------------------
@@ -33,7 +31,6 @@ class WalkthroughResult {
   final int skipped;
   final bool isAborted;
 }
-
 
 /// Run the interactive stylistic rules walkthrough.
 ///

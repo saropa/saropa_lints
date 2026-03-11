@@ -7,7 +7,6 @@ import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
-
 /// Ensure platforms setting exists in an existing custom config file.
 ///
 /// Older files won't have this setting, so we add it after the

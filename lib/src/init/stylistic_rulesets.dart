@@ -3,7 +3,6 @@ library;
 
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
-
 /// Stylistic rule categories, mirroring the organization in tiers.dart.
 /// Used to generate the STYLISTIC RULES section in analysis_options_custom.yaml.
 ///

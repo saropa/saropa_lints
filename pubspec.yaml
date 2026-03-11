@@ -50,9 +50,5 @@ dependencies:
 
 # Development-only dependencies
 dev_dependencies:
-  # # Saropa custom lints; use custom_lint CLI.
-  # https://pub.dev/packages/saropa_lints/changelog
-  saropa_lints: ^8.0.11
-
   # https://pub.dev/packages/test/changelog
   test: ^1.29.0 # Unit testing framework

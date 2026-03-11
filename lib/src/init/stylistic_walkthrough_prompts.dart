@@ -143,8 +143,7 @@ CategoryResult? walkthroughConflicting({
     final rule = rules[i];
     final meta = metadata[rule];
     log.terminal('  ${InitColors.bold}${i + 1}. $rule${InitColors.reset}');
-    if (meta != null &&
-        (meta.exampleGood != null || meta.exampleBad != null)) {
+    if (meta != null && (meta.exampleGood != null || meta.exampleBad != null)) {
       if (meta.exampleGood != null) {
         log.example('GOOD', InitColors.green, meta.exampleGood!, indent: 5);
       }
