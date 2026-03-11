@@ -39,7 +39,12 @@ jobs:
           done
 
       - name: Strip self-plugin reference
-        run: sed -i '/^plugins:/,$d' analysis_options.yaml
+        # The tier include file also contains a plugins: section that would
+        # re-enable custom lint rules even after stripping the local one.
+        # Remove both so dart analyze runs standard analysis only.
+        run: |
+          sed -i '/^include: package:saropa_lints/d' analysis_options.yaml
+          sed -i '/^plugins:/,$d' analysis_options.yaml
       - name: Analyze
         run: dart analyze --fatal-infos
 
