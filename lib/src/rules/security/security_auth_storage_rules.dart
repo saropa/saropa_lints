@@ -1153,11 +1153,12 @@ class RequireDataEncryptionRule extends SaropaLintRule {
         }
       }
 
-      // Check if key/value contains sensitive data
-      final String nodeSource = node.toSource().toLowerCase();
+      // Check if arguments contain sensitive data (not the full node source,
+      // which includes target/receiver names that may incidentally match).
+      final String argsSource = node.argumentList.toSource().toLowerCase();
 
       for (final String keyword in _sensitiveKeywords) {
-        if (nodeSource.contains(keyword)) {
+        if (argsSource.contains(keyword)) {
           reporter.atNode(node);
           return;
         }

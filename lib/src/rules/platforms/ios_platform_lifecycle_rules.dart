@@ -451,6 +451,12 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    final normalizedPath = context.filePath.replaceAll('\\', '/');
+    if (normalizedPath.contains('/rules/') ||
+        normalizedPath.contains('/fixes/')) {
+      return;
+    }
+
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
@@ -2000,6 +2006,9 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 

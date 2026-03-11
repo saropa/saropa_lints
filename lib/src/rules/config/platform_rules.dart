@@ -152,6 +152,9 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
     // Files that are the native branch of a conditional import (dart.library.io
     // or dart.library.ffi) are never loaded on web; no need to require kIsWeb.
     if (isNativeOnlyConditionalImportTarget(context.filePath)) return;

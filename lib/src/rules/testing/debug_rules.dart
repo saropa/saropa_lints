@@ -586,6 +586,9 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'print') return;
       if (node.target != null) return; // Skip object.print()

@@ -70,6 +70,12 @@ class AvoidAssetManifestJsonRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    final normalizedPath = context.filePath.replaceAll('\\', '/');
+    if (normalizedPath.contains('/rules/') ||
+        normalizedPath.contains('/fixes/')) {
+      return;
+    }
+
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (node.value == 'AssetManifest.json') {
         reporter.atNode(node);

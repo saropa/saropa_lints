@@ -1345,6 +1345,14 @@ class AvoidCatchAllRule extends SaropaLintRule {
       final TypeAnnotation? exceptionType = node.exceptionType;
 
       if (exceptionType == null) {
+        // Allow defensive plugin catches that log with developer.log
+        final String bodySource = node.body.toSource();
+        if (bodySource.contains('developer.log') &&
+            bodySource.contains('error:') &&
+            bodySource.contains('stackTrace:')) {
+          return;
+        }
+
         // catch (e) without type - implicit catch-all, may be accidental
         reporter.atNode(node);
       }

@@ -500,14 +500,9 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    // Check for param.mutatingMethod() pattern (e.g., list.add())
-    final Expression? target = node.target;
-    if (target is SimpleIdentifier && paramNames.contains(target.name)) {
-      final String methodName = node.methodName.name;
-      if (mutatingMethods.contains(methodName)) {
-        reporter.atNode(node);
-      }
-    }
+    // Skip collection mutation methods on direct parameters — these are the
+    // standard accumulator/output pattern (e.g., results.add(item),
+    // visited.add(node)). Only field assignments are flagged.
     super.visitMethodInvocation(node);
   }
 
@@ -536,21 +531,13 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitCascadeExpression(CascadeExpression node) {
-    // Check for param..add()..remove() pattern
+    // Check for param..field = value pattern (skip collection method cascades)
     final Expression target = node.target;
     if (target is SimpleIdentifier && paramNames.contains(target.name)) {
-      // Check if any cascade section is a mutation
       for (final Expression section in node.cascadeSections) {
-        if (section is MethodInvocation) {
-          final String methodName = section.methodName.name;
-          if (mutatingMethods.contains(methodName)) {
-            reporter.atNode(node);
-            return; // Report once per cascade
-          }
-        }
         if (section is AssignmentExpression) {
           reporter.atNode(node);
-          return;
+          return; // Report once per cascade
         }
       }
     }

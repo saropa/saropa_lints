@@ -4349,6 +4349,9 @@ class AvoidBlockingMainThreadRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
     context.addMethodInvocation((MethodInvocation node) {
       if (!_syncMethods.contains(node.methodName.name)) return;
 
