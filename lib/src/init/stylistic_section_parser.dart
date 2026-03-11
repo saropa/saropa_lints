@@ -13,7 +13,6 @@ final RegExp ruleOverridesSectionHeaderPattern = RegExp(
   multiLine: true,
 );
 
-
 /// Find the start of the STYLISTIC RULES section (including the divider).
 int findStylisticSectionStart(String content) {
   // Look for the divider line before "# STYLISTIC RULES"

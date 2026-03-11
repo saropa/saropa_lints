@@ -146,9 +146,8 @@ class _Cat {
 /// [version] is null when showing the [Unreleased] section.
 List<String> _format(List<_Cat> categories, String? version, AnsiColors c) {
   final lines = <String>[];
-  final label = version != null
-      ? "What's new in $version:"
-      : "What's new (unreleased):";
+  final label =
+      version != null ? "What's new in $version:" : "What's new (unreleased):";
   lines.add('');
   lines.add('  ${c.bold}${c.cyan}$label${c.reset}');
 

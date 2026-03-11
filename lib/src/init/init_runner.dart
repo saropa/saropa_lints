@@ -61,9 +61,6 @@ void appendDetailedReport({
   log.buffer.writeln('${'=' * 80}');
 }
 
-
-
-
 /// Display "what's new" from CHANGELOG.md (non-blocking, fail-safe).
 void showWhatsNew(String version, String? packageDir) {
   if (version == 'unknown' || packageDir == null) return;
@@ -157,7 +154,7 @@ Future<void> runInit(List<String> args) async {
   log.terminal('');
 
   // Run pre-flight validation checks (non-fatal warnings)
-  runPreflightChecks(log,version: version);
+  runPreflightChecks(log, version: version);
 
   // tiers.dart is the source of truth for all rules
   // A unit test validates that all plugin rules are in tiers.dart
@@ -478,7 +475,7 @@ Future<void> runInit(List<String> args) async {
   }
 
   // Validate the written file has the critical sections
-  validateWrittenConfig(log,cliArgs.outputPath, allRules.length);
+  validateWrittenConfig(log, cliArgs.outputPath, allRules.length);
   await runPostWriteActions(
     cliArgs: cliArgs,
     v4Detected: v4Detected,

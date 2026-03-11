@@ -12,7 +12,6 @@ import 'package:saropa_lints/src/init/stylistic_rulesets.dart';
 import 'package:saropa_lints/src/init/stylistic_section_parser.dart';
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
-
 /// Builds the STYLISTIC RULES section content for analysis_options_custom.yaml.
 ///
 /// Lists all stylistic rules organized by category with problem message

@@ -4,8 +4,7 @@ library;
 import 'package:saropa_lints/saropa_lints.dart'
     show RuleTier, SaropaLintRule, allSaropaRules;
 // ignore: implementation_imports
-import 'package:saropa_lints/src/saropa_lint_rule.dart'
-    show LintCodeLowerCase;
+import 'package:saropa_lints/src/saropa_lint_rule.dart' show LintCodeLowerCase;
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
 // ---------------------------------------------------------------------------
