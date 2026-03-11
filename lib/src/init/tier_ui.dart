@@ -13,8 +13,9 @@ import 'package:saropa_lints/src/tiers.dart' as tiers;
 /// Defaults to the tier found in the existing analysis_options.yaml,
 /// or 'essential' for fresh setups. In non-interactive mode (piped input,
 /// CI), uses the default without prompting.
-String promptForTier() {
-  final String defaultTier = detectExistingTier() ?? 'essential';
+String promptForTier({required String targetDir}) {
+  final String defaultTier =
+      detectExistingTier(targetDir: targetDir) ?? 'essential';
 
   if (!stdin.hasTerminal) {
     log.terminal(
@@ -64,8 +65,8 @@ String promptForTier() {
 
 /// Reads the existing analysis_options.yaml and returns the tier name
 /// from the `# Tier: <name>` comment, or null if not found.
-String? detectExistingTier() {
-  final file = File('analysis_options.yaml');
+String? detectExistingTier({required String targetDir}) {
+  final file = File('$targetDir/analysis_options.yaml');
 
   if (!file.existsSync()) return null;
 
@@ -96,6 +97,7 @@ Usage: dart run saropa_lints:init [options]
 Options:
   -t, --tier <tier>     Tier level (1-5 or name, prompts if omitted)
   -o, --output <file>   Output file (default: analysis_options.yaml)
+  --target <path>       Target project directory (default: current directory)
   --stylistic           Interactive stylistic rules walkthrough (default)
   --stylistic-all       Bulk-enable all stylistic rules (CI/non-interactive)
   --no-stylistic        Skip stylistic rules walkthrough entirely
@@ -113,6 +115,7 @@ Examples:
   dart run saropa_lints:init --tier comprehensive
   dart run saropa_lints:init --tier 4
   dart run saropa_lints:init --tier essential --reset
+  dart run saropa_lints:init --target /path/to/project  # Configure another project
   dart run saropa_lints:init --stylistic-all            # Bulk-enable all stylistic
   dart run saropa_lints:init --no-stylistic             # Skip stylistic walkthrough
   dart run saropa_lints:init --reset-stylistic          # Re-review all stylistic rules

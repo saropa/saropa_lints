@@ -26,6 +26,7 @@ Future<void> runPostWriteActions({
   required Map<String, bool> platformSettings,
   required String version,
   required String resolvedTier,
+  required String targetDir,
 }) async {
   // Convert v4 ignore comments (interactive prompt or --fix-ignores flag)
   if (v4Detected && !cliArgs.isDryRun) {
@@ -52,6 +53,7 @@ Future<void> runPostWriteActions({
       final Map<String, int> ignoreResults = convertIgnoreComments(
         allRules,
         false,
+        targetDir: targetDir,
       );
       if (ignoreResults.isEmpty) {
         log.terminal(
@@ -80,7 +82,8 @@ Future<void> runPostWriteActions({
   // Runs by default after config generation. Skip with --no-stylistic.
   // --stylistic-all already handled above (bulk-enable).
   if (!cliArgs.isDryRun && !cliArgs.isNoStylistic && !cliArgs.isStylisticAll) {
-    final File overridesForWalkthrough = File('analysis_options_custom.yaml');
+    final File overridesForWalkthrough =
+        File('$targetDir/analysis_options_custom.yaml');
     if (overridesForWalkthrough.existsSync()) {
       runStylisticWalkthrough(
         customFile: overridesForWalkthrough,
@@ -124,6 +127,7 @@ Future<void> runPostWriteActions({
           [
             'analyze',
           ],
+          workingDirectory: targetDir,
           runInShell: true);
 
       // Use UTF-8 decoder (not SystemEncoding) because Dart processes

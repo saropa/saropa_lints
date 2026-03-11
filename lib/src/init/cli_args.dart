@@ -42,6 +42,7 @@ class CliArgs {
     required this.isFixIgnores,
     required this.outputPath,
     required this.tier,
+    this.targetDir,
   });
 
   final bool isShowHelp;
@@ -64,6 +65,9 @@ class CliArgs {
   final bool isFixIgnores;
   final String outputPath;
   final String? tier;
+
+  /// Target project directory. `null` means current working directory.
+  final String? targetDir;
 }
 
 /// Parse CLI arguments into a [CliArgs] struct.
@@ -93,6 +97,21 @@ CliArgs parseArguments(List<String> args) {
       print(
         'Warning: --output requires a file path. '
         'Using default: $outputPath',
+      );
+    }
+  }
+
+  String? targetDir;
+  final int targetIndex = args.indexOf('--target');
+  if (targetIndex != -1) {
+    if (targetIndex + 1 < args.length &&
+        !args[targetIndex + 1].startsWith('-')) {
+      targetDir = args[targetIndex + 1];
+    } else {
+      // ignore: avoid_print
+      print(
+        'Warning: --target requires a directory path. '
+        'Using current directory.',
       );
     }
   }
@@ -128,6 +147,7 @@ CliArgs parseArguments(List<String> args) {
     isFixIgnores: fixIgnores,
     outputPath: outputPath,
     tier: requestedTier,
+    targetDir: targetDir,
   );
 }
 

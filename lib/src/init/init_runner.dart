@@ -118,9 +118,19 @@ Future<void> runInit(List<String> args) async {
     return;
   }
 
+  // Resolve target directory (--target <path> or current directory)
+  final String targetDir = cliArgs.targetDir != null
+      ? Directory(cliArgs.targetDir!).absolute.path
+      : Directory.current.path;
+
   log.terminal('');
   log.terminal('${InitColors.cyan}SAROPA LINTS${InitColors.reset} v$version');
   log.terminal('${InitColors.dim}Source: $source${InitColors.reset}');
+  if (cliArgs.targetDir != null) {
+    log.terminal(
+      '${InitColors.bold}Target:${InitColors.reset} $targetDir',
+    );
+  }
   showWhatsNew(version, packageDir);
   log.terminal('');
 
@@ -141,7 +151,7 @@ Future<void> runInit(List<String> args) async {
 
   if (tier == null) {
     // No tier specified — prompt interactively or fall back to default
-    tier = promptForTier();
+    tier = promptForTier(targetDir: targetDir);
   }
   final String resolvedTier = tier;
 
@@ -154,7 +164,7 @@ Future<void> runInit(List<String> args) async {
   log.terminal('');
 
   // Run pre-flight validation checks (non-fatal warnings)
-  runPreflightChecks(log, version: version);
+  runPreflightChecks(log, version: version, targetDir: targetDir);
 
   // tiers.dart is the source of truth for all rules
   // A unit test validates that all plugin rules are in tiers.dart
@@ -180,7 +190,7 @@ Future<void> runInit(List<String> args) async {
   }
 
   // Read or create custom overrides file (survives --reset)
-  final File overridesFile = File('analysis_options_custom.yaml');
+  final File overridesFile = File('$targetDir/analysis_options_custom.yaml');
   Map<String, bool> permanentOverrides = <String, bool>{};
   Map<String, bool> platformSettings = Map<String, bool>.of(
     tiers.defaultPlatforms,
@@ -216,7 +226,7 @@ Future<void> runInit(List<String> args) async {
     }
   } else {
     // Auto-detect packages from pubspec.yaml for first-time setup
-    packageSettings = detectProjectPackages(log);
+    packageSettings = detectProjectPackages(log, targetDir: targetDir);
 
     // Create the custom overrides file with a helpful header
     createCustomOverridesFile(overridesFile);
@@ -267,7 +277,11 @@ Future<void> runInit(List<String> args) async {
   }
 
   // Read existing config and extract user customizations
-  final File outputFile = File(cliArgs.outputPath);
+  final String resolvedOutput =
+      cliArgs.outputPath.contains('/') || cliArgs.outputPath.contains('\\')
+          ? cliArgs.outputPath
+          : '$targetDir/${cliArgs.outputPath}';
+  final File outputFile = File(resolvedOutput);
   Map<String, bool> userCustomizations = <String, bool>{};
   String existingContent = '';
 
@@ -303,7 +317,7 @@ Future<void> runInit(List<String> args) async {
         '${InitColors.green}Removed custom_lint: section${InitColors.reset}',
       );
 
-      cleanPubspecCustomLint(dryRun: cliArgs.isDryRun);
+      cleanPubspecCustomLint(dryRun: cliArgs.isDryRun, targetDir: targetDir);
       log.terminal('');
     }
 
@@ -475,7 +489,7 @@ Future<void> runInit(List<String> args) async {
   }
 
   // Validate the written file has the critical sections
-  validateWrittenConfig(log, cliArgs.outputPath, allRules.length);
+  validateWrittenConfig(log, resolvedOutput, allRules.length);
   await runPostWriteActions(
     cliArgs: cliArgs,
     v4Detected: v4Detected,
@@ -486,6 +500,7 @@ Future<void> runInit(List<String> args) async {
     platformSettings: platformSettings,
     version: version,
     resolvedTier: resolvedTier,
+    targetDir: targetDir,
   );
 }
 

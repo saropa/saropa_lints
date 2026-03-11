@@ -104,8 +104,11 @@ String removeAnalyzerCustomLintPlugin(String content) {
 
 /// Removes custom_lint from pubspec.yaml dev_dependencies after user
 /// confirmation. Skips silently if not found in dev_dependencies.
-void cleanPubspecCustomLint({required bool dryRun}) {
-  final File pubspecFile = File('pubspec.yaml');
+void cleanPubspecCustomLint({
+  required bool dryRun,
+  required String targetDir,
+}) {
+  final File pubspecFile = File('$targetDir/pubspec.yaml');
 
   if (!pubspecFile.existsSync()) return;
 
@@ -197,11 +200,15 @@ String? removeDevDep(String content, String packageName) {
 /// Changes `// ignore: rule_name` to `// ignore: saropa_lints/rule_name`.
 /// Only converts rules that exist in [allRules].
 /// Returns a map of file path to number of conversions made.
-Map<String, int> convertIgnoreComments(Set<String> allRules, bool dryRun) {
+Map<String, int> convertIgnoreComments(
+  Set<String> allRules,
+  bool dryRun, {
+  required String targetDir,
+}) {
   final Map<String, int> results = <String, int>{};
 
   for (final String dirName in const ['lib', 'test', 'bin']) {
-    final Directory dir = Directory(dirName);
+    final Directory dir = Directory('$targetDir/$dirName');
     if (!dir.existsSync()) continue;
 
     for (final FileSystemEntity entity in dir.listSync(recursive: true)) {

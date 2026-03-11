@@ -93,14 +93,18 @@ String getPackageSource() {
 /// Reads the project's pubspec.yaml (not the saropa_lints package's),
 /// parses dependencies + dev_dependencies, and returns a map of
 /// saropa_lints package names to whether they were found.
-Map<String, bool> detectProjectPackages(LogWriter log) {
+/// [targetDir] is the absolute path to the project being configured.
+Map<String, bool> detectProjectPackages(
+  LogWriter log, {
+  required String targetDir,
+}) {
   // Start with all disabled — only enable what we find
   final detected = <String, bool>{
     for (final pkg in tiers.allPackages) pkg: false,
   };
 
   try {
-    final pubspecFile = File('pubspec.yaml');
+    final pubspecFile = File('$targetDir/pubspec.yaml');
     if (!pubspecFile.existsSync()) return detected;
 
     final content = pubspecFile.readAsStringSync();
