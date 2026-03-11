@@ -4349,6 +4349,7 @@ class AvoidBlockingMainThreadRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // CLI tools and servers have no UI thread — sync I/O is standard practice
     final projectInfo = ProjectContext.getProjectInfo(context.filePath);
     if (projectInfo == null || !projectInfo.isFlutterProject) return;
 

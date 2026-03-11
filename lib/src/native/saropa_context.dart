@@ -62,6 +62,18 @@ class SaropaContext {
   /// Whether the file is in a lib directory.
   bool get isInLibDir => _ruleContext.isInLibDir;
 
+  /// Whether the file is a lint rule or fix implementation.
+  ///
+  /// Used by detection rules to skip their own source code (self-referential
+  /// false positives). Files under `/rules/` or `/fixes/` directories contain
+  /// detection patterns as string literals that would otherwise trigger the
+  /// very rules that define them.
+  bool get isLintPluginSource {
+    final normalized = filePath.replaceAll('\\', '/');
+    return normalized.contains('/rules/') ||
+        normalized.contains('/fixes/');
+  }
+
   /// Line info for the current file.
   ///
   /// Provides line/column lookup via `lineInfo.getLocation(offset)`.

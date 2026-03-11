@@ -3303,11 +3303,8 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    final normalizedPath = context.filePath.replaceAll('\\', '/');
-    if (normalizedPath.contains('/rules/') ||
-        normalizedPath.contains('/fixes/')) {
-      return;
-    }
+    // Skip lint rule/fix source — http:// comparison patterns trigger self-referential FPs
+    if (context.isLintPluginSource) return;
 
     checkHttpUrls(context, (AstNode node) => reporter.atNode(node));
   }

@@ -293,11 +293,8 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    final normalizedPath = context.filePath.replaceAll('\\', '/');
-    if (normalizedPath.contains('/rules/') ||
-        normalizedPath.contains('/fixes/')) {
-      return;
-    }
+    // Skip lint rule/fix source — environment string patterns trigger self-referential FPs
+    if (context.isLintPluginSource) return;
 
     context.addClassDeclaration((ClassDeclaration node) {
       final String className = node.name.lexeme.toLowerCase();

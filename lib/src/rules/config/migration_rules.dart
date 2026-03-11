@@ -70,11 +70,8 @@ class AvoidAssetManifestJsonRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    final normalizedPath = context.filePath.replaceAll('\\', '/');
-    if (normalizedPath.contains('/rules/') ||
-        normalizedPath.contains('/fixes/')) {
-      return;
-    }
+    // Skip lint rule/fix source — detection patterns trigger self-referential FPs
+    if (context.isLintPluginSource) return;
 
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (node.value == 'AssetManifest.json') {

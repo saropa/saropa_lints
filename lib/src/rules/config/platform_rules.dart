@@ -152,6 +152,7 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Non-Flutter projects never run on web — Platform.* checks are safe
     final projectInfo = ProjectContext.getProjectInfo(context.filePath);
     if (projectInfo == null || !projectInfo.isFlutterProject) return;
 

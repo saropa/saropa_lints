@@ -91,6 +91,7 @@ class RequireAndroidPermissionRequestRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Android permissions only apply to Flutter apps, not CLI/server code
     final projectInfo = ProjectContext.getProjectInfo(context.filePath);
     if (projectInfo == null || !projectInfo.isFlutterProject) return;
 
