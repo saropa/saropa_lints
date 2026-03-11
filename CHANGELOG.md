@@ -12,7 +12,11 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
-## [8.1.0] [Unreleased]
+## [8.2.0] [Unreleased]
+
+### Added
+
+- **Standalone scan command:** `dart run saropa_lints scan [path] [--tier <name>]` runs lint rules directly against any Dart project without requiring saropa_lints as a dependency. Enables dogfooding on the package's own source code. Uses unresolved AST parsing via `parseString()`. Includes per-file progress display.
 
 ### Changed
 

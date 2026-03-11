@@ -11,11 +11,13 @@
 ///                   (default if no command given)
 ///   baseline        Generate and manage baseline files for existing violations
 ///   impact-report   Run lint analysis and display results by impact level
+///   scan            Run lint rules against any Dart project
 ///
 /// Examples:
 ///   dart run saropa_lints init --tier comprehensive
 ///   dart run saropa_lints baseline --update
 ///   dart run saropa_lints impact-report
+///   dart run saropa_lints scan . --tier recommended
 ///   dart run saropa_lints --help
 library;
 
@@ -24,6 +26,7 @@ import 'package:collection/collection.dart';
 import 'baseline.dart' as baseline_cmd;
 import 'impact_report.dart' as impact_cmd;
 import 'init.dart' as init_cmd;
+import 'scan.dart' as scan_cmd;
 
 Future<void> main(List<String> args) async {
   if (args.firstOrNull == '--help' || args.firstOrNull == '-h') {
@@ -41,6 +44,8 @@ Future<void> main(List<String> args) async {
       await baseline_cmd.main(commandArgs);
     case 'impact-report' || 'impact_report':
       await impact_cmd.main(commandArgs);
+    case 'scan':
+      await scan_cmd.main(commandArgs);
     default:
       print('Unknown command: $command');
       print('');
@@ -58,6 +63,7 @@ void _printUsage() {
   print('                  (default if no command given)');
   print('  baseline        Generate/manage baseline for existing violations');
   print('  impact-report   Run analysis and show results by impact level');
+  print('  scan            Run lint rules against any Dart project');
   print('');
   print('Options:');
   print('  -h, --help      Show this help message');
@@ -73,4 +79,6 @@ void _printUsage() {
   print('  dart run saropa_lints baseline');
   print('  dart run saropa_lints baseline --update');
   print('  dart run saropa_lints impact-report');
+  print('  dart run saropa_lints scan .');
+  print('  dart run saropa_lints scan /path/to/project --tier recommended');
 }
