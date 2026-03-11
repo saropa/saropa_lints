@@ -408,40 +408,6 @@ class AvoidParameterMutationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  /// Known mutating methods for collection types.
-  static const Set<String> _mutatingMethods = <String>{
-    // List
-    'add',
-    'addAll',
-    'insert',
-    'insertAll',
-    'remove',
-    'removeAt',
-    'removeLast',
-    'removeRange',
-    'removeWhere',
-    'retainWhere',
-    'clear',
-    'sort',
-    'shuffle',
-    'setAll',
-    'setRange',
-    'fillRange',
-    'replaceRange',
-    // Set
-    'removeAll',
-    'retainAll',
-    // Map
-    'addEntries',
-    'putIfAbsent',
-    'update',
-    'updateAll',
-    // Queue
-    'addFirst',
-    'addLast',
-    'removeFirst',
-  };
-
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -476,27 +442,26 @@ class AvoidParameterMutationRule extends SaropaLintRule {
     if (paramNames.isEmpty) return;
 
     body.visitChildren(
-      _ParameterMutationVisitor(paramNames, reporter, _code, _mutatingMethods),
+      _ParameterMutationVisitor(paramNames, reporter, _code),
     );
   }
 }
 
 /// Visitor that detects mutations of parameter objects.
 ///
-/// Checks for: mutating method calls on collections, field assignments,
-/// index assignments, and cascade mutations.
+/// Checks for field assignments, index assignments, and cascade assignments.
+/// Collection method calls (add, addAll, etc.) are intentionally skipped —
+/// they represent the standard accumulator/output pattern in Dart.
 class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
   _ParameterMutationVisitor(
     this.paramNames,
     this.reporter,
     this.code,
-    this.mutatingMethods,
   );
 
   final Set<String> paramNames;
   final SaropaDiagnosticReporter reporter;
   final LintCode code;
-  final Set<String> mutatingMethods;
 
   @override
   void visitMethodInvocation(MethodInvocation node) {

@@ -586,6 +586,7 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // CLI tools use print() for terminal output — no release/debug distinction
     final projectInfo = ProjectContext.getProjectInfo(context.filePath);
     if (projectInfo == null || !projectInfo.isFlutterProject) return;
 
