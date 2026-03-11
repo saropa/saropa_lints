@@ -17,6 +17,8 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 ### Added
 
 - **Standalone scan command:** `dart run saropa_lints scan [path] [--tier <name>]` runs lint rules directly against any Dart project without requiring saropa_lints as a dependency. Enables dogfooding on the package's own source code. Uses unresolved AST parsing via `parseString()`. Includes per-file progress display.
+- **Scan reads project config:** `scan` now reads the target project's `analysis_options.yaml` to respect enabled/disabled rules instead of running all rules at a tier level. Use `--tier` to explicitly override.
+- **Init `--target` flag:** `dart run saropa_lints init --target /path/to/project` generates configuration for any project directory, not just the current working directory.
 
 ### Changed
 
@@ -42,6 +44,13 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
   - `tier_ui.dart` — tier selection UI
   - `validation.dart` — post-write config validation
   - `whats_new.dart` — release notes display (moved from `bin/`)
+
+### Fixed
+
+- **19 false positive bugs fixed across scan rules:**
+  - **Self-referential false positives (8 rules):** `avoid_asset_manifest_json`, `avoid_ios_in_app_browser_for_auth`, `avoid_mixed_environments`, `avoid_purchase_in_sandbox_production`, `require_database_migration`, `require_https_only`, `require_unique_iv_per_encryption`, `require_websocket_reconnection` — rules no longer flag their own detection pattern strings in `lib/src/rules/` and `lib/src/fixes/` directories
+  - **Flutter-only rules skip non-Flutter projects (5 rules):** `avoid_blocking_main_thread` (-170 FPs), `avoid_print_in_release` (-197 FPs), `avoid_long_running_isolates`, `prefer_platform_io_conditional`, `require_android_permission_request` — rules now check `ProjectContext.isFlutterProject` and skip CLI tools, servers, and analysis plugins
+  - **Detection logic improvements (6 rules):** `avoid_api_key_in_code` skips regex patterns; `avoid_catch_all` allows `developer.log(error:, stackTrace:)` defensive catches; `avoid_hardcoded_config` whitelists `pub.dev`/`github.com` URLs; `avoid_parameter_mutation` no longer flags collection accumulator methods (`.add()`, `.addAll()`, etc.); `require_catch_logging` recognizes `developer.log` and `stderr`; `require_data_encryption` checks argument text only (not receiver names)
 
 ---
 
