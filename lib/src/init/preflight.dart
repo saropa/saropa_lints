@@ -10,20 +10,25 @@ import 'package:saropa_lints/src/init/log_writer.dart';
 ///
 /// All checks are non-fatal (warnings only). Results are logged to both
 /// terminal and the log buffer so they appear in the report file.
-void runPreflightChecks(LogWriter log, {required String version}) {
+/// [targetDir] is the absolute path to the project being configured.
+void runPreflightChecks(
+  LogWriter log, {
+  required String version,
+  required String targetDir,
+}) {
   log.terminal('${InitColors.bold}Pre-flight checks${InitColors.reset}');
 
-  _checkPubspecDependency(log);
+  _checkPubspecDependency(log, targetDir);
   _checkDartSdkVersion(log);
   _checkV7SdkIfNeeded(log, version);
-  _auditExistingConfig(log, version);
+  _auditExistingConfig(log, version, targetDir);
 
   log.terminal('');
 }
 
 /// Check that pubspec.yaml lists saropa_lints as a dependency.
-void _checkPubspecDependency(LogWriter log) {
-  final pubspec = File('pubspec.yaml');
+void _checkPubspecDependency(LogWriter log, String targetDir) {
+  final pubspec = File('$targetDir/pubspec.yaml');
 
   if (!pubspec.existsSync()) {
     log.check(
@@ -60,7 +65,12 @@ void _checkPubspecDependency(LogWriter log) {
   final g1 = match.group(1);
   final g2 = match.group(2);
   if (g1 == null || g2 == null) return null;
-  return (int.parse(g1), int.parse(g2));
+  // Use tryParse instead of parse — regex guarantees digits but tryParse
+  // is safer against unexpected Platform.version formats.
+  final major = int.tryParse(g1);
+  final minor = int.tryParse(g2);
+  if (major == null || minor == null) return null;
+  return (major, minor);
 }
 
 /// Check that the Dart SDK version supports the plugin system (>= 3.6).
@@ -107,8 +117,9 @@ void _checkV7SdkIfNeeded(LogWriter log, String packageVersion) {
 }
 
 /// Audit an existing analysis_options.yaml for common issues.
-void _auditExistingConfig(LogWriter log, String currentVersion) {
-  final configFile = File('analysis_options.yaml');
+void _auditExistingConfig(
+    LogWriter log, String currentVersion, String targetDir) {
+  final configFile = File('$targetDir/analysis_options.yaml');
 
   if (!configFile.existsSync()) {
     log.check('No existing analysis_options.yaml (fresh setup)', pass: true);
