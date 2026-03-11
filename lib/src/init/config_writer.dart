@@ -8,7 +8,7 @@ import 'package:saropa_lints/src/init/rule_metadata.dart';
 final RegExp _pluginsSectionPattern = RegExp(r'^plugins:\s*$', multiLine: true);
 
 /// Matches any top-level YAML key (for finding section boundaries).
-final RegExp _topLevelKeyPattern = RegExp(r'^\w+:', multiLine: true);
+final RegExp topLevelKeyPattern = RegExp(r'^\w+:', multiLine: true);
 
 
 /// Generate the plugins YAML section with proper formatting.
@@ -260,7 +260,7 @@ String replacePluginsSection(String existingContent, String newPlugins) {
   );
 
   // Find next top-level section (line starting with a word followed by colon, no indentation)
-  final Match? nextSection = _topLevelKeyPattern.firstMatch(afterPluginsStart);
+  final Match? nextSection = topLevelKeyPattern.firstMatch(afterPluginsStart);
 
   final String afterPlugins =
       nextSection != null ? afterPluginsStart.substring(nextSection.start) : '';

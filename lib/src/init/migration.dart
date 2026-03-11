@@ -3,6 +3,8 @@ library;
 
 import 'dart:io';
 
+import 'package:saropa_lints/src/init/config_writer.dart'
+    show topLevelKeyPattern;
 import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
 
@@ -24,8 +26,6 @@ final RegExp _analyzerCustomLintLine = RegExp(
   multiLine: true,
 );
 
-/// Matches any top-level YAML key (for finding section boundaries).
-final RegExp _topLevelKeyPattern = RegExp(r'^\w+:', multiLine: true);
 
 
 // ---------------------------------------------------------------------------
@@ -53,7 +53,7 @@ Map<String, bool> extractV4Rules(String yamlContent, Set<String> allRules) {
 
   // Get content from custom_lint: until next top-level key or EOF
   final String afterSection = yamlContent.substring(sectionMatch.end);
-  final Match? nextTopLevel = _topLevelKeyPattern.firstMatch(afterSection);
+  final Match? nextTopLevel = topLevelKeyPattern.firstMatch(afterSection);
   final String sectionContent = nextTopLevel != null
       ? afterSection.substring(0, nextTopLevel.start)
       : afterSection;
@@ -83,7 +83,7 @@ String removeCustomLintSection(String content) {
 
   final String before = content.substring(0, sectionMatch.start);
   final String afterStart = content.substring(sectionMatch.end);
-  final Match? nextTopLevel = _topLevelKeyPattern.firstMatch(afterStart);
+  final Match? nextTopLevel = topLevelKeyPattern.firstMatch(afterStart);
   final String after =
       nextTopLevel != null ? afterStart.substring(nextTopLevel.start) : '';
 
@@ -172,7 +172,7 @@ String? removeDevDep(String content, String packageName) {
 
   // Find the section boundaries
   final String afterDevDeps = content.substring(devMatch.end);
-  final Match? nextSection = _topLevelKeyPattern.firstMatch(afterDevDeps);
+  final Match? nextSection = topLevelKeyPattern.firstMatch(afterDevDeps);
   final String devSection = nextSection != null
       ? afterDevDeps.substring(0, nextSection.start)
       : afterDevDeps;

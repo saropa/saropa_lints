@@ -12,7 +12,32 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ---
 
-## [Unreleased]
+## [8.1.0] [Unreleased]
+
+### Changed
+
+- **Init tool modularization:** Extracted `bin/init.dart` (4,819 lines) into 21 focused modules under `lib/src/init/`, reducing the entry point to 15 lines. No behavior changes.
+  - `cli_args.dart` — CLI argument parsing and `CliArgs` class
+  - `config_reader.dart` — user customization extraction
+  - `config_writer.dart` — YAML generation for `analysis_options.yaml`
+  - `custom_overrides_core.dart` — override file creation and settings
+  - `display.dart` — ANSI color support and `InitColors` class
+  - `init_runner.dart` — main orchestrator (`runInit`)
+  - `init_post_write.dart` — post-write phase (ignore conversion, walkthrough, analysis)
+  - `log_writer.dart` — `LogWriter` class, report file management
+  - `migration.dart` — V4/V7 migration detection and conversion
+  - `platforms_packages.dart` — platform and package settings
+  - `preflight.dart` — pre-flight environment checks
+  - `project_info.dart` — project and package detection
+  - `rule_metadata.dart` — rule metadata cache and lookups
+  - `stylistic_rulesets.dart` — stylistic rule category data
+  - `stylistic_section.dart` — stylistic section builder
+  - `stylistic_section_parser.dart` — stylistic section parsing
+  - `stylistic_walkthrough.dart` — interactive walkthrough orchestrator
+  - `stylistic_walkthrough_prompts.dart` — walkthrough UI prompts
+  - `tier_ui.dart` — tier selection UI
+  - `validation.dart` — post-write config validation
+  - `whats_new.dart` — release notes display (moved from `bin/`)
 
 ---
 

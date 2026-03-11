@@ -503,19 +503,10 @@ void _printRuleSummary({
     'WARNING': 0,
     'INFO': 0,
   };
-  final Map<String, int> disabledBySeverity = {
-    'ERROR': 0,
-    'WARNING': 0,
-    'INFO': 0,
-  };
 
   for (final rule in finalEnabled) {
     final severity = getRuleSeverity(rule);
     enabledBySeverity[severity] = (enabledBySeverity[severity] ?? 0) + 1;
-  }
-  for (final rule in finalDisabled) {
-    final severity = getRuleSeverity(rule);
-    disabledBySeverity[severity] = (disabledBySeverity[severity] ?? 0) + 1;
   }
 
   log.terminal('');

@@ -185,7 +185,7 @@ String removeRulesFromOverridesSection(
   for (final rule in rulesToRemove) {
     // Remove the line: "rule_name: true/false" with optional comment/newline
     after = after.replaceAll(
-      RegExp('^$rule:\\s*(true|false).*\\n?', multiLine: true),
+      RegExp('^${RegExp.escape(rule)}:\\s*(true|false).*\\n?', multiLine: true),
       '',
     );
   }

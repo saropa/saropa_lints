@@ -102,24 +102,22 @@ Map<String, RuleMetadata> getRuleMetadata() {
   cache = <String, RuleMetadata>{};
   _ruleMetadataCache = cache;
   for (final SaropaLintRule rule in allSaropaRules) {
-    {
-      final String ruleName = rule.code.lowerCaseName;
-      final String message = rule.code.problemMessage;
-      final String correction = rule.code.correctionMessage ?? '';
-      final severity = rule.code.severity.name.toUpperCase();
-      final RuleTier tier = getTierFromSets(ruleName);
+    final String ruleName = rule.code.lowerCaseName;
+    final String message = rule.code.problemMessage;
+    final String correction = rule.code.correctionMessage ?? '';
+    final severity = rule.code.severity.name.toUpperCase();
+    final RuleTier tier = getTierFromSets(ruleName);
 
-      cache[ruleName] = RuleMetadata(
-        name: ruleName,
-        problemMessage: message,
-        correctionMessage: correction,
-        severity: severity,
-        tier: tier,
-        hasFix: rule.fixGenerators.isNotEmpty,
-        exampleBad: rule.exampleBad,
-        exampleGood: rule.exampleGood,
-      );
-    }
+    cache[ruleName] = RuleMetadata(
+      name: ruleName,
+      problemMessage: message,
+      correctionMessage: correction,
+      severity: severity,
+      tier: tier,
+      hasFix: rule.fixGenerators.isNotEmpty,
+      exampleBad: rule.exampleBad,
+      exampleGood: rule.exampleGood,
+    );
   }
 
   return cache;
