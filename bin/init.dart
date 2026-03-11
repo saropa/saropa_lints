@@ -1,5 +1,4 @@
 #!/usr/bin/env dart
-// ignore_for_file: avoid_print
 
 /// CLI tool to generate analysis_options.yaml with explicit rule
 /// configuration for the native analyzer plugin system.

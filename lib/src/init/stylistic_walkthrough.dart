@@ -251,10 +251,6 @@ WalkthroughResult runStylisticWalkthrough({
 
   // 3) Remaining (uncategorized) rules: one bulk prompt if any
   if (!aborted) {
-    final categorizedRuleNames = <String>{};
-    for (final rules in stylisticRuleCategories.values) {
-      categorizedRuleNames.addAll(rules);
-    }
     final remaining = rulesToReview
         .difference(Set<String>.from(decisions.keys))
         .toList()
