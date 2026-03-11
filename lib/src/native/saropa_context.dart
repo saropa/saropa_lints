@@ -70,8 +70,7 @@ class SaropaContext {
   /// very rules that define them.
   bool get isLintPluginSource {
     final normalized = filePath.replaceAll('\\', '/');
-    return normalized.contains('/rules/') ||
-        normalized.contains('/fixes/');
+    return normalized.contains('/rules/') || normalized.contains('/fixes/');
   }
 
   /// Line info for the current file.
