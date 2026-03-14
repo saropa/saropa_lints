@@ -23,6 +23,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 ### Added (VS Code extension)
 
+- **Health Score (H1–H3):** A single 0–100 score computed from violation count and impact distribution, shown in the Overview view and status bar. The score uses impact-weighted density with exponential decay — critical issues penalize heavily, minor issues less so. Score delta (e.g. "▲4") shows improvement from the last run. Status bar color reflects score band: green (80+), yellow (50–79), red (<50). Score is persisted in run history for trend tracking. New module: `healthScore.ts`.
 - **Focus mode (W7):** Right-click a file in the Issues tree and choose "Show only this file" to filter the tree to that file's violations only. Toolbar "Show all files" button resets. View message shows "Focused: filename.dart".
 - **Trends / mini history (W5):** Last 20 analysis snapshots are persisted in workspace state. Overview shows a "Trends" row with recent totals (e.g. "120 → 115 → 98"). New module: `runHistory.ts`.
 - **Celebration / progress (W6):** When violations decrease after a run, a transient status bar message shows "You fixed N issues!". When critical issues hit zero, a notification says "No critical issues!". Overview shows a "↓ N fewer issues" row when the count dropped.

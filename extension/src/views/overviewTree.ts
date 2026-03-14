@@ -1,11 +1,12 @@
 /**
  * Tree data provider for Saropa Lints Overview (dashboard) view.
- * Single entry point: key number, primary CTA, trends, and links to other views.
+ * Shows Health Score as the primary number, then issues, trends, and links.
  */
 
 import * as vscode from 'vscode';
 import { readViolations } from '../violationsReader';
-import { loadHistory, getTrendSummary } from '../runHistory';
+import { loadHistory, getTrendSummary, findPreviousScore } from '../runHistory';
+import { computeHealthScore, formatScoreDelta } from '../healthScore';
 
 class OverviewItem extends vscode.TreeItem {
   constructor(
@@ -55,21 +56,54 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
 
     const items: OverviewItem[] = [];
 
-    if (total === 0) {
+    if (total === 0 && !data) {
       items.push(
         new OverviewItem('No analysis yet', 'Run analysis to see issues', 'saropaLints.runAnalysis'),
         new OverviewItem('Run Analysis', undefined, 'saropaLints.runAnalysis'),
       );
-    } else {
-      const primaryLabel = critical > 0 ? `${critical} critical, ${total} total` : `${total} violations`;
+      return items;
+    }
+
+    // H2: Health Score — the primary number in Overview.
+    const history = loadHistory(this.workspaceState);
+    if (data) {
+      const health = computeHealthScore(data);
+      if (health) {
+        const prevScore = findPreviousScore(history);
+        const delta = prevScore !== undefined
+          ? formatScoreDelta(health.score, prevScore)
+          : '';
+        const scoreDesc = delta
+          ? `${delta} from last run`
+          : total === 0
+            ? 'No violations'
+            : `${total} violations`;
+        items.push(
+          new OverviewItem(
+            `Health: ${health.score}`,
+            scoreDesc,
+            'saropaLints.focusIssues',
+          ),
+        );
+      }
+    }
+
+    // Violation summary — secondary to the score.
+    if (total > 0) {
+      const issueLabel = critical > 0
+        ? `${critical} critical, ${total} total`
+        : `${total} violations`;
       items.push(
-        new OverviewItem(primaryLabel, 'View in Issues', 'saropaLints.focusIssues'),
-        new OverviewItem('View Issues', undefined, 'saropaLints.focusIssues'),
+        new OverviewItem(issueLabel, 'View in Issues', 'saropaLints.focusIssues'),
+      );
+    } else if (data) {
+      // Zero violations after analysis — clean project.
+      items.push(
+        new OverviewItem('No violations', 'All clear', 'saropaLints.focusIssues'),
       );
     }
 
     // W5: Trends — show run history summary.
-    const history = loadHistory(this.workspaceState);
     const trend = getTrendSummary(history);
     if (trend) {
       items.push(new OverviewItem('Trends', trend, 'saropaLints.focusIssues'));
@@ -79,10 +113,14 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
     if (history.length >= 2) {
       const prev = history[history.length - 2];
       const curr = history[history.length - 1];
-      const delta = prev.total - curr.total;
-      if (delta > 0) {
+      const violationDelta = prev.total - curr.total;
+      if (violationDelta > 0) {
         items.push(
-          new OverviewItem(`\u2193 ${delta} fewer issues`, 'since last run', 'saropaLints.focusIssues'),
+          new OverviewItem(
+            `\u2193 ${violationDelta} fewer issues`,
+            'since last run',
+            'saropaLints.focusIssues',
+          ),
         );
       }
     }

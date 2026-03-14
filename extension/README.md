@@ -18,6 +18,16 @@ Enable and configure [Saropa Lints](https://pub.dev/packages/saropa_lints) from 
    - Optionally run `dart analyze`
 4. Use **Run Analysis** and **Open Config** as needed. Issues appear in the **Issues** view when `reports/.saropa_lints/violations.json` exists (written by the analyzer).
 
+## Health Score
+
+A single 0–100 number in the **Overview** and **status bar**, computed from violation count and impact severity. Higher is better:
+
+- **80–100** (green): Good shape — few issues, none critical.
+- **50–79** (yellow): Needs work — some high-impact issues.
+- **Below 50** (red): Serious problems — many critical/high-impact violations.
+
+The status bar shows the score with a delta from the last run (e.g. "Saropa: 78 ▲4"). When violations decrease, a celebration message includes the score change.
+
 ## Issues view
 
 The Issues view shows violations in a **tree**: first by **severity** (Error, Warning, Info), then by **project structure** (folders and files). Each file lists violations (capped per file; excess shown as “and N more…”).
