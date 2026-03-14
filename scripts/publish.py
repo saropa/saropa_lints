@@ -2,9 +2,9 @@
 """
 Publish saropa_lints package to pub.dev and create GitHub release.
 
-This is the SINGLE ENTRY POINT for the complete release workflow.
-It gates publishing behind comprehensive audit checks, including
-tier integrity verification.
+This is the SINGLE ENTRY POINT for the complete release workflow
+(package to pub.dev and VS Code extension). Package and extension
+are intrinsically linked; both are driven from this script.
 
 Workflow:
     Step 1:  Pre-publish audit (tier integrity, duplicates, quality checks)
@@ -23,10 +23,12 @@ Workflow:
     Step 13: Create git tag
     Step 14: Publish via GitHub Actions
     Step 15: Create GitHub release
+    Step 16: Extension: sync version, package .vsix, optionally publish (Marketplace + Open VSX)
     Post:    Bump version for next cycle (pubspec + [Unreleased])
 
 Run from project root: python scripts/publish.py. Prompts: full publish /
-audit only / fix doc comments / publish without audit. No flags. Other logic is in scripts/modules/
+audit only / fix doc comments / publish without audit / analyze only /
+extension only. No flags. Other logic is in scripts/modules/
 (audit, DX improver, retrigger CI); run standalone with e.g.
 python -m scripts.modules._improve_dx_messages if needed. Historical scripts
 (version_rules, release-note scrapers, lint candidates) are in
@@ -109,6 +111,7 @@ _REQUIRED_MODULES = [
     "modules/_timing.py",
     "modules/_roadmap_implemented.py",
     "modules/_duplicated_messages.py",
+    "modules/_extension_publish.py",
 ]
 
 
@@ -224,6 +227,13 @@ from scripts.modules._rule_metrics import (
     sync_readme_badges,
 )
 
+# Extension: sync version, package .vsix, publish to Marketplace/Open VSX
+from scripts.modules._extension_publish import (
+    extension_exists,
+    package_extension,
+    publish_extension,
+    set_extension_version,
+)
 # Step timing and summary display
 from scripts.modules._timing import StepTimer
 # Version regex, pubspec/changelog read/write, version parse/increment, display
@@ -365,6 +375,7 @@ def _prompt_publish_mode() -> str:
     print("  3) Fix doc comments (angle brackets, refs; then exit)")
     print("  4) Publish without audit (skip audit; format → analysis → tests → release)")
     print("  5) Analyze only (run dart analyze, write log; then exit)")
+    print("  6) Extension only (package .vsix, optionally publish to Marketplace/Open VSX)")
     try:
         raw = input("  Choice [1]: ").strip() or "1"
         n = int(raw)
@@ -376,6 +387,8 @@ def _prompt_publish_mode() -> str:
             return "full_skip_audit"
         if n == 5:
             return "analyze_only"
+        if n == 6:
+            return "extension_only"
     except (ValueError, EOFError, KeyboardInterrupt):
         pass
     # Default or invalid input: full publish
@@ -386,7 +399,7 @@ def main(
     mode: str = "full",
     output_level: OutputLevel | None = None,
 ) -> int:
-    """Run publish workflow. Returns exit code (0 = success). mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit' | 'analyze_only'."""
+    """Run publish workflow. Returns exit code (0 = success). mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit' | 'analyze_only' | 'extension_only'."""
     enable_ansi_support()
     set_output_level(output_level or _parse_output_level())
 
@@ -415,6 +428,36 @@ def main(
     if mode == "analyze_only":
         ok = run_analyze_to_log(project_dir)
         return ExitCode.SUCCESS.value if ok else ExitCode.ANALYSIS_FAILED.value
+
+    # --- extension_only: package .vsix, optionally publish, then exit ---
+    if mode == "extension_only":
+        if not extension_exists(project_dir):
+            exit_with_error(
+                f"Extension directory not found: {project_dir / 'extension'}",
+                ExitCode.PREREQUISITES_FAILED,
+            )
+        ext_version = get_version_from_pubspec(pubspec_path)
+        print_header("EXTENSION: PACKAGE .VSIX")
+        vsix = package_extension(project_dir, ext_version)
+        if not vsix:
+            exit_with_error(
+                "Extension package failed",
+                ExitCode.VALIDATION_FAILED,
+            )
+        response = (
+            input(
+                "  Publish extension to Marketplace and Open VSX? [y/N] "
+            )
+            .strip()
+            .lower()
+        )
+        if response.startswith("y"):
+            if not publish_extension(project_dir, vsix):
+                exit_with_error(
+                    "Extension publish failed",
+                    ExitCode.PUBLISH_FAILED,
+                )
+        return ExitCode.SUCCESS.value
 
     # --- fix_docs: standalone mode, then exit ---
     if mode == "fix_docs":
@@ -727,6 +770,9 @@ def main(
             f"      Publishing: {version}", Color.CYAN,
         )
         print_colored(f"      Tag:        v{version}", Color.CYAN)
+        # Keep extension version in sync with package version
+        if extension_exists(project_dir):
+            set_extension_version(project_dir, version)
         print()
 
         # --- Steps 9-11: Badge sync, CHANGELOG validation, doc generation, dry-run ---
@@ -841,6 +887,24 @@ def main(
                     )
         except Exception as exc:
             print_warning(f"Post-publish version bump failed: {exc}")
+
+        # --- Extension: package .vsix and optionally publish (runs after package publish so versions stay aligned) ---
+        if extension_exists(project_dir):
+            with timer.step("Extension"):
+                vsix = package_extension(project_dir, version)
+                if vsix:
+                    response = (
+                        input(
+                            "  Publish extension to Marketplace and Open VSX? [y/N] "
+                        )
+                        .strip()
+                        .lower()
+                    )
+                    if response.startswith("y"):
+                        if not publish_extension(project_dir, vsix):
+                            print_warning("Extension publish failed (package already published).")
+                else:
+                    print_warning("Extension package failed (package already published).")
 
         # --- Post-publish: open pub.dev page (convenience) ---
         try:
