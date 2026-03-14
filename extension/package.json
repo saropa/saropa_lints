@@ -47,6 +47,10 @@
     "views": {
       "saropaLints": [
         {
+          "id": "saropaLints.overview",
+          "name": "Overview"
+        },
+        {
           "id": "saropaLints.issues",
           "name": "Issues"
         },
@@ -75,9 +79,54 @@
         "when": "!saropaLints.enabled"
       },
       {
+        "view": "saropaLints.overview",
+        "contents": "Saropa Lints is **off** for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)",
+        "when": "!saropaLints.enabled"
+      },
+      {
+        "view": "saropaLints.overview",
+        "contents": "No analysis yet.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
+        "when": "saropaLints.enabled && !saropaLints.hasViolations"
+      },
+      {
         "view": "saropaLints.issues",
         "contents": "No analysis results yet.\n\n[Run Analysis](command:saropaLints.runAnalysis)\n[Open Config](command:saropaLints.openConfig)",
         "when": "saropaLints.enabled && !saropaLints.hasViolations"
+      },
+      {
+        "view": "saropaLints.summary",
+        "contents": "No analysis results yet.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
+        "when": "saropaLints.enabled && !saropaLints.hasViolations"
+      },
+      {
+        "view": "saropaLints.summary",
+        "contents": "Saropa Lints is **off** for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)",
+        "when": "!saropaLints.enabled"
+      },
+      {
+        "view": "saropaLints.config",
+        "contents": "Saropa Lints is **off** for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)",
+        "when": "!saropaLints.enabled"
+      },
+      {
+        "view": "saropaLints.logs",
+        "contents": "No reports yet. Run analysis to generate logs.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
+        "when": "saropaLints.enabled && !saropaLints.hasViolations"
+      },
+      {
+        "view": "saropaLints.logs",
+        "contents": "Saropa Lints is **off** for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)",
+        "when": "!saropaLints.enabled"
+      },
+      {
+        "view": "saropaLints.suggestions",
+        "contents": "Run analysis to get suggestions.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
+        "when": "saropaLints.enabled && !saropaLints.hasViolations"
+      },
+      {
+        "view": "saropaLints.suggestions",
+        "contents": "Saropa Lints is **off** for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)",
+        "when": "!saropaLints.enabled"
       }
     ],
     "commands": [
@@ -100,6 +149,22 @@
       {
         "command": "saropaLints.openConfig",
         "title": "Saropa Lints: Open Config"
+      },
+      {
+        "command": "saropaLints.focusView",
+        "title": "Saropa Lints: Focus Issues View"
+      },
+      {
+        "command": "saropaLints.focusIssues",
+        "title": "Saropa Lints: Show All Issues"
+      },
+      {
+        "command": "saropaLints.focusIssuesWithImpactFilter",
+        "title": "Saropa Lints: Show Issues by Impact"
+      },
+      {
+        "command": "saropaLints.focusIssuesWithSeverityFilter",
+        "title": "Saropa Lints: Show Issues by Severity"
       },
       {
         "command": "saropaLints.refresh",
@@ -170,6 +235,10 @@
       {
         "command": "saropaLints.copyMessage",
         "title": "Copy message"
+      },
+      {
+        "command": "saropaLints.applyFix",
+        "title": "Apply fix"
       }
     ],
     "menus": {
@@ -202,6 +271,11 @@
         {
           "command": "saropaLints.clearSuppressions",
           "when": "view == saropaLints.issues && saropaLints.hasSuppressions",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.refresh",
+          "when": "view == saropaLints.overview",
           "group": "navigation"
         },
         {
@@ -241,6 +315,10 @@
         {
           "command": "saropaLints.copyPath",
           "when": "view == saropaLints.issues && viewItem == file"
+        },
+        {
+          "command": "saropaLints.applyFix",
+          "when": "view == saropaLints.issues && viewItem == violation"
         },
         {
           "command": "saropaLints.hideRule",
