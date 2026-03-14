@@ -22,40 +22,66 @@ export interface RunSnapshot {
   score?: number;
 }
 
+/** Return type for appendSnapshot — includes whether a new entry was recorded. */
+export interface AppendResult {
+  history: RunSnapshot[];
+  /** True when a new snapshot was appended; false when dedup suppressed it. */
+  appended: boolean;
+}
+
 export function loadHistory(state: vscode.Memento): RunSnapshot[] {
   const raw = state.get<RunSnapshot[]>(HISTORY_KEY);
   return Array.isArray(raw) ? raw : [];
 }
 
 function saveHistory(state: vscode.Memento, history: RunSnapshot[]): void {
-  void state.update(HISTORY_KEY, history);
+  // Log write failures so silent data loss is detectable in the output channel.
+  state.update(HISTORY_KEY, history).then(undefined, (err: unknown) => {
+    console.error('[saropaLints] Failed to save run history:', err);
+  });
 }
 
 /**
  * Appends a snapshot from the current violations data.
- * Deduplicates: skips if total matches the last entry (no real change).
- * Returns the updated history array.
+ * Deduplicates by comparing total, severity breakdown, and score to the
+ * last entry — a same-total run with different severity mix is still recorded.
+ * Returns the updated history and whether a new entry was actually appended.
  */
 export function appendSnapshot(
   state: vscode.Memento,
   data: ViolationsData,
-): RunSnapshot[] {
+): AppendResult {
   const history = loadHistory(state);
   const total = data.summary?.totalViolations ?? data.violations.length;
   const last = history.length > 0 ? history[history.length - 1] : undefined;
 
-  // Skip duplicate — same total as last snapshot means no real change.
-  if (last && last.total === total) return history;
-
+  const errorCount = data.summary?.bySeverity?.error ?? 0;
+  const warningCount = data.summary?.bySeverity?.warning ?? 0;
+  const infoCount = data.summary?.bySeverity?.info ?? 0;
+  const criticalCount = data.summary?.byImpact?.critical ?? 0;
   const healthResult = computeHealthScore(data);
+
+  // Skip duplicate — same total, severity breakdown, AND score as last snapshot.
+  // A severity shift with the same total still records a new entry.
+  if (
+    last &&
+    last.total === total &&
+    last.error === errorCount &&
+    last.warning === warningCount &&
+    last.info === infoCount &&
+    last.critical === criticalCount &&
+    (last.score ?? -1) === (healthResult?.score ?? -1)
+  ) {
+    return { history, appended: false };
+  }
 
   const snapshot: RunSnapshot = {
     timestamp: new Date().toISOString(),
     total,
-    error: data.summary?.bySeverity?.error ?? 0,
-    warning: data.summary?.bySeverity?.warning ?? 0,
-    info: data.summary?.bySeverity?.info ?? 0,
-    critical: data.summary?.byImpact?.critical ?? 0,
+    error: errorCount,
+    warning: warningCount,
+    info: infoCount,
+    critical: criticalCount,
     score: healthResult?.score,
   };
 
@@ -67,7 +93,7 @@ export function appendSnapshot(
   }
 
   saveHistory(state, history);
-  return history;
+  return { history, appended: true };
 }
 
 /**
@@ -79,7 +105,8 @@ export function appendSnapshot(
 export function getTrendSummary(history: RunSnapshot[]): string | undefined {
   if (history.length === 0) return undefined;
   if (history.length === 1) {
-    return `First run: ${history[0].total} violations`;
+    const n = history[0].total;
+    return `First run: ${n} ${n === 1 ? 'violation' : 'violations'}`;
   }
   const recent = history.slice(-TREND_DISPLAY_COUNT);
   return recent.map((s) => String(s.total)).join(' \u2192 ');

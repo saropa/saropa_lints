@@ -36,7 +36,7 @@ import 'package:test/test.dart';
 ///
 /// **Not covered here:** Lint behavior (e.g. BAD/GOOD code triggering or not)
 /// is tested in rule-specific test files and in `example*/` fixtures; see
-/// CONTRIBUTING.md and bugs/UNIT_TEST_COVERAGE.md.
+/// CONTRIBUTING.md and bugs/discussion/TESTING_AND_RELEASE.md.
 void main() {
   group('Rule quick fix presence', () {
     void hasFix(String name, dynamic Function() create) {
