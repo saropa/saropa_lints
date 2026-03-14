@@ -2,7 +2,7 @@
 
 **Purpose:** Single prioritized list of work to make the extension-driven experience complete, integrated, and genuinely differentiated. Supersedes the previous separate plans (cohesion/WOW, init redesign). Source material: [003_INIT_REDESIGN.md](003_INIT_REDESIGN.md), [log_capture_integration.md](log_capture_integration.md).
 
-**Already done:** Violation export (`violations.json`), Issues tree (structure, filters, suppressions), Summary/Config/Logs/Suggestions/Overview views, one-click setup, file watcher, C4 (Summary → Issues), W1 (Apply fix from tree), W2 (Code Lens), W3 (rule doc in tooltip), W4 (Problems → Show in Saropa), F1–F4 (foundation), W5 (trends), W6 (celebration), W7 (focus mode), W8 (tier in status bar), H1–H3 (Health Score in Overview + status bar + history).
+**Already done:** Violation export (`violations.json`), Issues tree (structure, filters, suppressions), Summary/Config/Logs/Suggestions/Overview views, one-click setup, file watcher, C4 (Summary → Issues), W1 (Apply fix from tree), W2 (Code Lens), W3 (rule doc in tooltip), W4 (Problems → Show in Saropa), F1–F4 (foundation), W5 (trends), W6 (celebration), W7 (focus mode), W8 (tier in status bar), H1–H3 (Health Score in Overview + status bar + history), C5 (welcome/empty states), C7 (single run analysis + focus).
 
 **Implementation records (done 2026-03-14):**
 - **W5 (Trends):** `runHistory.ts` persists last 20 snapshots in workspace state; Overview shows "Trends" row with last 5 totals arrow-separated.
@@ -14,6 +14,8 @@
 - **W3 (Rule doc):** Violation tooltips include rule name + [More](ROADMAP) link via `ruleMetadata.ts`.
 - **W4 (Problems → Saropa):** Context menu "Show in Saropa Lints" runs `focusIssuesForActiveFile`.
 - **H1–H3 (Health Score):** `healthScore.ts` computes 0–100 score from impact-weighted violation density with exponential decay. Score shown in Overview as primary item with delta ("Health: 78 ▲4 from last run"). Status bar shows "Saropa: 78 ▲4" with color bands (green/yellow/red background via `statusBarItem.backgroundColor`). Score persisted in `RunSnapshot.score` via `runHistory.ts`. Shared `findPreviousScore()` in `runHistory.ts`. Celebration messages include score delta.
+- **C5 (Welcome/empty states):** All six tree providers return `[]` when disabled or when no violations data exists, so VS Code's native `viewsWelcome` content renders with centered text and clickable command buttons ("Enable Saropa Lints", "Run Analysis"). Replaces flat placeholder tree items. Issues tree keeps a "No violations found" item for the 0-violations case (to avoid misleading "No analysis results yet" from viewsWelcome).
+- **C7 (Single Run Analysis + focus):** After `runAnalysis` succeeds, Overview is focused (instead of Issues) to show the Health Score delta. Completion notification includes score ("Analysis complete. Score: 78"). `debouncedRefresh` now calls `updateContext()` to keep viewsWelcome when-clauses current when violations.json appears via file watcher.
 
 ---
 
@@ -99,8 +101,8 @@ These make the extension feel like one product. The Health Score enriches each o
 |---|------|-------------|-------------|
 | C1 | **Overview as home** | First view: **Health Score** (large number + delta), primary CTA, links to Summary/Config/Logs. "Last run: 2 min ago". | Score from H2; trends from H5 |
 | C2 | **Status bar → open view** | Click status bar → Focus Saropa Lints (reveal sidebar, focus Overview). Score shown in status bar (H3). | Score from H3 |
-| C5 | **Welcome/empty on every view** | Summary: "No analysis yet" + [Run Analysis]. Config: when disabled, "Enable Saropa Lints" + [Enable]. Logs: "No reports yet" + [Run Analysis]. Suggestions: "Run analysis to get suggestions". | — |
-| C7 | **Single Run analysis + focus** | One entry point (Overview, Issues empty, palette). After run: update score, auto-focus Overview (show delta), brief notification. | Score delta from H1 |
+| C5 | **Welcome/empty on every view** | *(done)* All views return `[]` for disabled/no-data; VS Code viewsWelcome renders native buttons. | — |
+| C7 | **Single Run analysis + focus** | *(done)* After run: focus Overview (shows score delta), notification includes score. File-watcher refreshes update context. | Score delta from H1 |
 | C3 | **Suggestions deep-link with impact** | "Fix N critical → estimated +6 points" → open Issues filtered by critical. "Address high-impact" → filter high. Suggestions show *score impact*, not just counts. | Score estimation from H1 |
 | C4 | *(done)* | Summary "Total violations" clickable → Issues, clear filters. | — |
 | C6 | **Config as control surface** | "Tier" row → click opens quick pick, set tier and run init. "Enabled" → toggle. After change: re-analyze and show score delta. | Triage (I1), score update (H1) |

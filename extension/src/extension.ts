@@ -136,17 +136,21 @@ export function activate(context: vscode.ExtensionContext): void {
     if (refreshDebounceTimer) clearTimeout(refreshDebounceTimer);
     refreshDebounceTimer = setTimeout(() => {
       refreshDebounceTimer = undefined;
-      refreshAll();
-      // W5/W6/H1: Snapshot current data, update score, show celebration messages.
+      // W5/W6/H1: Record snapshot BEFORE refreshing views so tree providers
+      // see the updated history (avoids stale findPreviousScore reads).
       const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
       if (root) {
         const data = readViolations(root);
         if (data) {
-          const history = appendSnapshot(context.workspaceState, data);
-          // Update status bar with fresh score after snapshot is recorded.
+          const { history, appended } = appendSnapshot(context.workspaceState, data);
+          // Refresh views after snapshot is persisted so Overview reads fresh history.
+          refreshAll();
           // Pass pre-loaded data to avoid re-reading violations.json from disk.
           updateAllStatusBars(data);
-          if (history.length >= 2) {
+          // C7: Keep viewsWelcome when-clauses current when data appears via file watcher.
+          updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
+          // Only show celebration when a genuinely new snapshot was recorded.
+          if (appended && history.length >= 2) {
             const prev = history[history.length - 2];
             const curr = history[history.length - 1];
             const delta = prev.total - curr.total;
@@ -165,8 +169,11 @@ export function activate(context: vscode.ExtensionContext): void {
               void vscode.window.showInformationMessage('Saropa Lints: No critical issues!');
             }
           }
+          return;
         }
       }
+      // Fallback: no root or no data — still refresh views.
+      refreshAll();
     }, 300);
   };
   context.subscriptions.push({
@@ -194,13 +201,13 @@ export function activate(context: vscode.ExtensionContext): void {
   // Combined updater for both status bar items to avoid scattered calls.
   // Accepts optional pre-loaded data to avoid re-reading violations.json from disk
   // when the caller already has it (e.g. debouncedRefresh).
-  const updateAllStatusBars = (preloadedData?: ViolationsData | null) => {
+  const updateAllStatusBars = (preloadedData?: ViolationsData) => {
     const en = getConfig().get<boolean>('enabled', false) ?? false;
     // Main status bar: Health Score when available, else On/Off state.
     if (en) {
-      // Use pre-loaded data when available; otherwise read from disk.
+      // Use pre-loaded data when supplied; otherwise read from disk.
       const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-      const data = preloadedData !== undefined ? preloadedData : (root ? readViolations(root) : null);
+      const data = preloadedData ?? (root ? readViolations(root) : null);
       const health = data ? computeHealthScore(data) : null;
 
       if (health) {
@@ -265,8 +272,14 @@ export function activate(context: vscode.ExtensionContext): void {
         refreshAll();
         updateAllStatusBars();
         updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
-        await vscode.commands.executeCommand('saropaLints.issues.focus');
-        void vscode.window.setStatusBarMessage('Saropa Lints: Analysis complete', 3000);
+        // C7: Focus Overview after analysis to show Health Score delta.
+        await vscode.commands.executeCommand('saropaLints.overview.focus');
+        // C7: Include score in completion message when available.
+        const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        const postData = root ? readViolations(root) : null;
+        const health = postData ? computeHealthScore(postData) : null;
+        const scoreMsg = health ? ` Score: ${health.score}` : '';
+        void vscode.window.setStatusBarMessage(`Saropa Lints: Analysis complete.${scoreMsg}`, 4000);
       }
     }),
     vscode.commands.registerCommand('saropaLints.initializeConfig', async () => {
