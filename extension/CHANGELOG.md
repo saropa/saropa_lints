@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Progress indicators for Run analysis, Initialize config, and Set tier.
+- Debounced refresh (300 ms) when `violations.json` changes.
+- Summary view uses stable node ids for By severity / By impact.
+
 ## [0.1.0] - 2025-03-14
 
 ### Added

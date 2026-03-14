@@ -142,11 +142,24 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
   }
   const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
   const cmd = useFlutter ? 'flutter' : 'dart';
-  const { ok, stderr } = runInWorkspace(workspaceRoot, cmd, ['analyze']);
-  if (!ok) {
-    vscode.window.showWarningMessage(`Analysis reported issues. ${stderr ? stderr.slice(0, 200) : 'See Problems view.'}`);
-  }
-  return true;
+  let ok = false;
+  await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: 'Running analysis',
+      cancellable: false,
+    },
+    async () => {
+      const result = runInWorkspace(workspaceRoot, cmd, ['analyze']);
+      ok = result.ok;
+      if (!ok) {
+        vscode.window.showWarningMessage(
+          `Analysis reported issues. ${result.stderr ? result.stderr.slice(0, 200) : 'See Problems view.'}`,
+        );
+      }
+    },
+  );
+  return ok;
 }
 
 export async function runInitializeConfig(context: vscode.ExtensionContext): Promise<boolean> {
@@ -157,13 +170,24 @@ export async function runInitializeConfig(context: vscode.ExtensionContext): Pro
   }
   const cfg = vscode.workspace.getConfiguration('saropaLints');
   const tier = (cfg.get<string>('tier') ?? 'recommended').trim();
-  const { ok, stderr } = runInWorkspace(workspaceRoot, 'dart', ['run', 'saropa_lints:init', '--tier', tier]);
-  if (!ok) {
-    vscode.window.showErrorMessage(`Init failed. ${stderr || 'Check Output.'}`);
-    return false;
-  }
-  vscode.window.showInformationMessage(`Saropa Lints config updated (tier: ${tier}).`);
-  return true;
+  let ok = false;
+  await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: 'Initializing Saropa Lints config',
+      cancellable: false,
+    },
+    async () => {
+      const result = runInWorkspace(workspaceRoot, 'dart', ['run', 'saropa_lints:init', '--tier', tier]);
+      ok = result.ok;
+      if (!ok) {
+        vscode.window.showErrorMessage(`Init failed. ${result.stderr || 'Check Output.'}`);
+      } else {
+        vscode.window.showInformationMessage(`Saropa Lints config updated (tier: ${tier}).`);
+      }
+    },
+  );
+  return ok;
 }
 
 export async function openConfig(): Promise<void> {
@@ -193,13 +217,24 @@ export async function runSetTier(context: vscode.ExtensionContext): Promise<bool
     return false;
   }
   await vscode.workspace.getConfiguration('saropaLints').update('tier', tier, vscode.ConfigurationTarget.Workspace);
-  const { ok, stderr } = runInWorkspace(workspaceRoot, 'dart', ['run', 'saropa_lints:init', '--tier', tier]);
-  if (!ok) {
-    vscode.window.showErrorMessage(`Init failed. ${stderr || 'Check Output.'}`);
-    return false;
-  }
-  vscode.window.showInformationMessage(`Saropa Lints tier set to ${tier}.`);
-  return true;
+  let ok = false;
+  await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: 'Updating tier',
+      cancellable: false,
+    },
+    async () => {
+      const result = runInWorkspace(workspaceRoot, 'dart', ['run', 'saropa_lints:init', '--tier', tier]);
+      ok = result.ok;
+      if (!ok) {
+        vscode.window.showErrorMessage(`Init failed. ${result.stderr || 'Check Output.'}`);
+      } else {
+        vscode.window.showInformationMessage(`Saropa Lints tier set to ${tier}.`);
+      }
+    },
+  );
+  return ok;
 }
 
 export function showOutputChannel(): void {

@@ -21,6 +21,12 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 - **Suppressions (persisted):** Hide folder, file, rule, rule-in-file, severity, or impact from the tree via context menu. Stored in workspace state; “Clear suppressions” in the view toolbar restores all.
 - **Context menus:** Hide folder/file/rule/rule-in-file/severity/impact, Copy path, Copy message. Toolbar: Filter by text, Filter by type, Filter by rule, Clear filters, Clear suppressions, Refresh.
 
+### Changed (VS Code extension)
+
+- **Progress indicators:** Run analysis, Initialize config, and Set tier show a notification progress spinner while running.
+- **Debounced refresh:** File watcher on `violations.json` debounces refresh by 300 ms to avoid rapid successive updates.
+- **Summary view:** Expandable nodes (By severity, By impact) use a stable `nodeId` so tree expansion does not depend on label text.
+
 ### Fixed (VS Code extension)
 
 - Root-level folder nodes in the Issues tree now use an empty path prefix so expanding e.g. “lib” shows files under `lib/` correctly.

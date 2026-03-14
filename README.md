@@ -29,6 +29,12 @@ Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter be
 
 ---
 
+## Recommended: VS Code extension
+
+**Install the [Saropa Lints VS Code extension](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints)** for the best experience: one-click setup, no init command, issue views, and config from the UI. Also on [Open VSX](https://open-vsx.org/extension/saropa/saropa-lints) (Cursor, VSCodium).
+
+---
+
 ## Quick Start
 
 ### Option A — Zero-config (tier preset)
