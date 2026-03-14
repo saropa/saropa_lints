@@ -60,8 +60,9 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
       items.push(
         new SuggestionItem(
           `Fix ${critical} critical issue(s) first`,
-          'Security/crash/memory',
-          'saropaLints.runAnalysis',
+          'Show in Issues',
+          'saropaLints.focusIssuesWithImpactFilter',
+          ['critical'],
         ),
       );
     }
@@ -69,14 +70,20 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
       items.push(
         new SuggestionItem(
           `Address ${high} high-impact issue(s)`,
-          'Significant quality issues',
-          'saropaLints.runAnalysis',
+          'Show in Issues',
+          'saropaLints.focusIssuesWithImpactFilter',
+          ['high'],
         ),
       );
     }
     if (errors > 0 && !items.some((i) => String(i.label).includes('error'))) {
       items.push(
-        new SuggestionItem(`Fix ${errors} analyzer error(s)`, 'See Problems view', 'saropaLints.runAnalysis'),
+        new SuggestionItem(
+          `Fix ${errors} analyzer error(s)`,
+          'Show in Issues',
+          'saropaLints.focusIssuesWithSeverityFilter',
+          ['error'],
+        ),
       );
     }
 

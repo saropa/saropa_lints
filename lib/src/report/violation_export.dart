@@ -8,6 +8,7 @@ import 'package:path/path.dart' as path;
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
+import 'package:saropa_lints/src/tiers.dart' as tiers;
 
 /// Writes a structured JSON export of all lint violations.
 ///
@@ -83,11 +84,13 @@ class ViolationExporter {
       return <String, Object>{'tier': 'unknown'};
     }
 
+    final stylisticList = tiers.stylisticRules.toList()..sort();
     return <String, Object>{
       'tier': config.effectiveTier,
       'enabledRuleCount': config.enabledRuleCount,
       'enabledRuleCountNote': 'After tier selection and user overrides',
       'enabledRuleNames': config.enabledRuleNames,
+      'stylisticRuleNames': stylisticList,
       'enabledPlatforms': config.enabledPlatforms,
       'disabledPlatforms': config.disabledPlatforms,
       'enabledPackages': config.enabledPackages,

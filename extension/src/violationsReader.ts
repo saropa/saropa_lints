@@ -29,6 +29,11 @@ export interface ByImpact {
   opinionated?: number;
 }
 
+/** Per-rule violation counts for triage grouping (e.g. Group A/B/C/D by volume). */
+export interface IssuesByRule {
+  [rule: string]: number;
+}
+
 export interface ViolationsData {
   violations: Violation[];
   summary?: {
@@ -37,10 +42,16 @@ export interface ViolationsData {
     filesWithIssues?: number;
     bySeverity?: BySeverity;
     byImpact?: ByImpact;
+    /** Rule name → issue count. Use for triage grouping. */
+    issuesByRule?: IssuesByRule;
   };
   config?: {
     tier?: string;
     enabledRuleCount?: number;
+    /** Full list of enabled rule names. */
+    enabledRuleNames?: string[];
+    /** Stylistic rule names (opt-in). Present when export includes rule metadata. */
+    stylisticRuleNames?: string[];
   };
 }
 
@@ -53,10 +64,34 @@ export function readViolations(workspaceRoot: string): ViolationsData | null {
   if (!fs.existsSync(p)) return null;
   try {
     const raw = JSON.parse(fs.readFileSync(p, 'utf-8'));
+    const summary = raw.summary;
     return {
       violations: Array.isArray(raw.violations) ? raw.violations : [],
-      summary: raw.summary ?? undefined,
-      config: raw.config ?? undefined,
+      summary: summary
+        ? {
+            totalViolations: summary.totalViolations,
+            filesAnalyzed: summary.filesAnalyzed,
+            filesWithIssues: summary.filesWithIssues,
+            bySeverity: summary.bySeverity,
+            byImpact: summary.byImpact,
+            issuesByRule:
+              summary.issuesByRule && typeof summary.issuesByRule === 'object'
+                ? summary.issuesByRule
+                : undefined,
+          }
+        : undefined,
+      config: raw.config
+        ? {
+            tier: raw.config.tier,
+            enabledRuleCount: raw.config.enabledRuleCount,
+            enabledRuleNames: Array.isArray(raw.config.enabledRuleNames)
+              ? raw.config.enabledRuleNames
+              : undefined,
+            stylisticRuleNames: Array.isArray(raw.config.stylisticRuleNames)
+              ? raw.config.stylisticRuleNames
+              : undefined,
+          }
+        : undefined,
     };
   } catch {
     return null;
