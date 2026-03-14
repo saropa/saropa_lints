@@ -4,10 +4,14 @@
  * Shows violation messages at the end of affected lines in the editor.
  * One decoration type per severity (error, warning, info) for performance.
  * Respects the `saropaLints.inlineAnnotations` toggle setting.
+ *
+ * Known limitation: decorations are line-number-based and do not shift when
+ * the user edits a file. They refresh on the next violations.json write
+ * (via the file watcher) or on editor switch.
  */
 
 import * as vscode from 'vscode';
-import { readViolations, Violation } from './violationsReader';
+import { readViolations, Violation, ViolationsData } from './violationsReader';
 
 // --- Decoration types (one per severity for VS Code perf) ---
 
@@ -40,6 +44,26 @@ const infoDecorationType = vscode.window.createTextEditorDecorationType({
 
 const MAX_MESSAGE_LENGTH = 80;
 
+// --- Violations cache ---
+// Avoids re-reading violations.json from disk on every editor switch.
+// Invalidated by `invalidateAnnotationCache()` (called from refreshAll).
+
+let cachedData: { root: string; data: ViolationsData | null } | null = null;
+
+function getCachedViolations(root: string): ViolationsData | null {
+  if (cachedData?.root === root) return cachedData.data;
+  const data = readViolations(root);
+  cachedData = { root, data };
+  return data;
+}
+
+/** Invalidate the violations cache. Call when violations.json changes. */
+export function invalidateAnnotationCache(): void {
+  cachedData = null;
+}
+
+// --- Formatting helpers ---
+
 /** Truncate message to MAX_MESSAGE_LENGTH, appending rule name. */
 function formatAnnotation(v: Violation): string {
   const msg = v.message.length > MAX_MESSAGE_LENGTH
@@ -48,48 +72,39 @@ function formatAnnotation(v: Violation): string {
   return `${msg} (${v.rule})`;
 }
 
-function decorationTypeForSeverity(
-  severity: string | undefined,
-): vscode.TextEditorDecorationType {
-  switch (severity) {
-    case 'error':
-      return errorDecorationType;
-    case 'warning':
-      return warningDecorationType;
-    default:
-      return infoDecorationType;
-  }
+function clearAllDecorations(editor: vscode.TextEditor): void {
+  editor.setDecorations(errorDecorationType, []);
+  editor.setDecorations(warningDecorationType, []);
+  editor.setDecorations(infoDecorationType, []);
 }
 
 /**
  * Update inline annotations for a single editor.
- * Clears existing decorations and re-applies from violations data.
+ * Clears existing decorations and re-applies from cached violations data.
  */
 export function updateAnnotationsForEditor(editor: vscode.TextEditor): void {
   const cfg = vscode.workspace.getConfiguration('saropaLints');
   const annotationsEnabled = cfg.get<boolean>('inlineAnnotations', true) ?? true;
 
   // Clear all decorations first — whether enabled or not.
-  editor.setDecorations(errorDecorationType, []);
-  editor.setDecorations(warningDecorationType, []);
-  editor.setDecorations(infoDecorationType, []);
+  clearAllDecorations(editor);
 
   if (!annotationsEnabled) return;
 
   const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!root) return;
 
-  const data = readViolations(root);
+  // Use cached data to avoid disk I/O on every editor switch.
+  const data = getCachedViolations(root);
   if (!data?.violations) return;
 
-  // Normalize the editor file path to forward slashes for comparison.
+  // Normalize both paths to forward slashes for cross-platform comparison.
   const editorRelative = vscode.workspace.asRelativePath(editor.document.uri, false)
     .replace(/\\/g, '/');
 
   // Filter violations for this file.
   const fileViolations = data.violations.filter((v) => {
-    const normalized = v.file.replace(/\\/g, '/');
-    return normalized === editorRelative;
+    return v.file.replace(/\\/g, '/') === editorRelative;
   });
 
   if (fileViolations.length === 0) return;
@@ -111,6 +126,8 @@ export function updateAnnotationsForEditor(editor: vscode.TextEditor): void {
     if (lineSet.has(lineIndex)) continue;
     lineSet.add(lineIndex);
 
+    // Column values are irrelevant for isWholeLine decorations — the `after`
+    // pseudo-element always renders at the line end regardless of range.
     const range = new vscode.Range(lineIndex, 0, lineIndex, 0);
     const deco: vscode.DecorationOptions = {
       range,
@@ -119,13 +136,15 @@ export function updateAnnotationsForEditor(editor: vscode.TextEditor): void {
       },
     };
 
-    const decoType = decorationTypeForSeverity(severity);
-    if (decoType === errorDecorationType) {
-      errorDecos.push(deco);
-    } else if (decoType === warningDecorationType) {
-      warningDecos.push(deco);
-    } else {
-      infoDecos.push(deco);
+    switch (severity) {
+      case 'error':
+        errorDecos.push(deco);
+        break;
+      case 'warning':
+        warningDecos.push(deco);
+        break;
+      default:
+        infoDecos.push(deco);
     }
   }
 

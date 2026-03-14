@@ -4,6 +4,10 @@
  * Two collapsible parents ("Mobile Top 10", "Web Top 10"), each with
  * category rows showing violation counts. Click filters Issues view
  * to rules mapped to that OWASP category.
+ *
+ * OWASP ID contract: violations.json stores OWASP categories as short-form
+ * IDs (e.g. "M1", "A03") in the `owasp.mobile[]` and `owasp.web[]` arrays.
+ * The tree matches these against `idPrefix()` of the display labels.
  */
 
 import * as vscode from 'vscode';
@@ -39,9 +43,12 @@ const WEB_TOP_10: readonly string[] = [
 
 type CategoryType = 'mobile' | 'web';
 
-/** Parse the OWASP ID prefix from a label, e.g. "M1" from "M1: Improper...". */
-function idPrefix(label: string): string {
-  return label.split(':')[0].trim();
+/**
+ * Normalize an OWASP category string to its short-form ID.
+ * Handles both "M1" and "M1: Improper Credential Usage" → "M1".
+ */
+function normalizeOwaspId(raw: string): string {
+  return raw.split(':')[0].trim();
 }
 
 /** Tree item for a top-level group (Mobile Top 10, Web Top 10). */
@@ -91,11 +98,24 @@ class CategoryItem extends vscode.TreeItem {
 
 type SecurityTreeElement = GroupItem | CategoryItem;
 
+/** Per-category counts and rule sets computed from violations data. */
+interface OwaspCounts {
+  mobileCounts: Map<string, number>;
+  mobileCategoryRules: Map<string, string[]>;
+  webCounts: Map<string, number>;
+  webCategoryRules: Map<string, string[]>;
+}
+
 export class SecurityPostureTreeProvider implements vscode.TreeDataProvider<SecurityTreeElement> {
   private _onDidChangeTreeData = new vscode.EventEmitter<SecurityTreeElement | undefined | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
+  // Cache buildCounts result to avoid re-scanning violations on group expand.
+  // Invalidated on refresh() so expanding a group reuses the top-level computation.
+  private cachedCounts: OwaspCounts | null = null;
+
   refresh(): void {
+    this.cachedCounts = null;
     this._onDidChangeTreeData.fire();
   }
 
@@ -113,11 +133,16 @@ export class SecurityPostureTreeProvider implements vscode.TreeDataProvider<Secu
     const data = readViolations(root);
     if (!data) return [];
 
+    // Compute once and cache for both top-level and group-expand calls.
+    if (!this.cachedCounts) {
+      this.cachedCounts = buildCounts(data.violations);
+    }
+    const counts = this.cachedCounts;
+
     if (!element) {
       // Top-level: two group nodes.
-      const { mobileCounts, webCounts } = this.buildCounts(data.violations);
-      const mobileTotal = sumCounts(mobileCounts);
-      const webTotal = sumCounts(webCounts);
+      const mobileTotal = sumValues(counts.mobileCounts);
+      const webTotal = sumValues(counts.webCounts);
       return [
         new GroupItem('mobile', 'Mobile Top 10', mobileTotal),
         new GroupItem('web', 'Web Top 10', webTotal),
@@ -125,68 +150,68 @@ export class SecurityPostureTreeProvider implements vscode.TreeDataProvider<Secu
     }
 
     if (element instanceof GroupItem) {
-      const { mobileCounts, mobileCategoryRules, webCounts, webCategoryRules } = this.buildCounts(data.violations);
       const categories = element.categoryType === 'mobile' ? MOBILE_TOP_10 : WEB_TOP_10;
-      const counts = element.categoryType === 'mobile' ? mobileCounts : webCounts;
-      const categoryRules = element.categoryType === 'mobile' ? mobileCategoryRules : webCategoryRules;
+      const catCounts = element.categoryType === 'mobile' ? counts.mobileCounts : counts.webCounts;
+      const catRules = element.categoryType === 'mobile' ? counts.mobileCategoryRules : counts.webCategoryRules;
       return categories.map((label) => {
-        const id = idPrefix(label);
+        const id = normalizeOwaspId(label);
         return new CategoryItem(
           element.categoryType,
           label,
-          counts.get(id) ?? 0,
-          categoryRules.get(id) ?? [],
+          catCounts.get(id) ?? 0,
+          catRules.get(id) ?? [],
         );
       });
     }
 
     return [];
   }
-
-  /** Scan violations for OWASP data and build per-category counts + rule sets. */
-  private buildCounts(violations: Violation[]): {
-    mobileCounts: Map<string, number>;
-    mobileCategoryRules: Map<string, string[]>;
-    webCounts: Map<string, number>;
-    webCategoryRules: Map<string, string[]>;
-  } {
-    const mobileCounts = new Map<string, number>();
-    const webCounts = new Map<string, number>();
-    const mobileRulesSeen = new Map<string, Set<string>>();
-    const webRulesSeen = new Map<string, Set<string>>();
-
-    for (const v of violations) {
-      if (!v.owasp) continue;
-
-      if (v.owasp.mobile) {
-        for (const cat of v.owasp.mobile) {
-          mobileCounts.set(cat, (mobileCounts.get(cat) ?? 0) + 1);
-          const set = mobileRulesSeen.get(cat) ?? new Set<string>();
-          set.add(v.rule);
-          mobileRulesSeen.set(cat, set);
-        }
-      }
-      if (v.owasp.web) {
-        for (const cat of v.owasp.web) {
-          webCounts.set(cat, (webCounts.get(cat) ?? 0) + 1);
-          const set = webRulesSeen.get(cat) ?? new Set<string>();
-          set.add(v.rule);
-          webRulesSeen.set(cat, set);
-        }
-      }
-    }
-
-    // Convert Sets to arrays for the CategoryItem constructor.
-    const mobileCategoryRules = new Map<string, string[]>();
-    for (const [k, s] of mobileRulesSeen) mobileCategoryRules.set(k, [...s]);
-    const webCategoryRules = new Map<string, string[]>();
-    for (const [k, s] of webRulesSeen) webCategoryRules.set(k, [...s]);
-
-    return { mobileCounts, mobileCategoryRules, webCounts, webCategoryRules };
-  }
 }
 
-function sumCounts(counts: Map<string, number>): number {
+/** Scan violations for OWASP data and build per-category counts + rule sets. */
+function buildCounts(violations: Violation[]): OwaspCounts {
+  const mobileCounts = new Map<string, number>();
+  const webCounts = new Map<string, number>();
+  const mobileRulesSeen = new Map<string, Set<string>>();
+  const webRulesSeen = new Map<string, Set<string>>();
+
+  for (const v of violations) {
+    if (!v.owasp || typeof v.owasp !== 'object') continue;
+
+    // Guard against malformed JSON: owasp.mobile/web must be arrays of strings.
+    if (Array.isArray(v.owasp.mobile)) {
+      for (const rawCat of v.owasp.mobile) {
+        if (typeof rawCat !== 'string') continue;
+        // Normalize to short-form ID in case the Dart side emits full strings.
+        const cat = normalizeOwaspId(rawCat);
+        mobileCounts.set(cat, (mobileCounts.get(cat) ?? 0) + 1);
+        const set = mobileRulesSeen.get(cat) ?? new Set<string>();
+        set.add(v.rule);
+        mobileRulesSeen.set(cat, set);
+      }
+    }
+    if (Array.isArray(v.owasp.web)) {
+      for (const rawCat of v.owasp.web) {
+        if (typeof rawCat !== 'string') continue;
+        const cat = normalizeOwaspId(rawCat);
+        webCounts.set(cat, (webCounts.get(cat) ?? 0) + 1);
+        const set = webRulesSeen.get(cat) ?? new Set<string>();
+        set.add(v.rule);
+        webRulesSeen.set(cat, set);
+      }
+    }
+  }
+
+  // Convert Sets to arrays for the CategoryItem constructor.
+  const mobileCategoryRules = new Map<string, string[]>();
+  for (const [k, s] of mobileRulesSeen) mobileCategoryRules.set(k, [...s]);
+  const webCategoryRules = new Map<string, string[]>();
+  for (const [k, s] of webRulesSeen) webCategoryRules.set(k, [...s]);
+
+  return { mobileCounts, mobileCategoryRules, webCounts, webCategoryRules };
+}
+
+function sumValues(counts: Map<string, number>): number {
   let total = 0;
   for (const v of counts.values()) total += v;
   return total;

@@ -13,8 +13,11 @@ const DEFAULT_VERSION = '^8.0.0';
 
 const OUTPUT_CHANNEL_NAME = 'Saropa Lints';
 
+// Lazily-initialized singleton to avoid creating multiple channel objects.
+let _outputChannel: vscode.OutputChannel | undefined;
 function getOutputChannel(): vscode.OutputChannel {
-  return vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME);
+  if (!_outputChannel) _outputChannel = vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME);
+  return _outputChannel;
 }
 
 function getWorkspaceRoot(): string | undefined {

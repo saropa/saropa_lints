@@ -134,7 +134,7 @@
       },
       {
         "view": "saropaLints.securityPosture",
-        "contents": "OWASP coverage from your latest analysis.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
+        "contents": "Run analysis to see OWASP security coverage.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
         "when": "saropaLints.enabled && !saropaLints.hasViolations"
       },
       {
@@ -275,10 +275,6 @@
         "command": "saropaLints.toggleInlineAnnotations",
         "title": "Saropa Lints: Toggle Inline Annotations"
       },
-      {
-        "command": "saropaLints.focusIssuesForOwasp",
-        "title": "Saropa Lints: Show Issues for OWASP Category"
-      }
     ],
     "menus": {
       "view/title": [

@@ -66,6 +66,14 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 - Tier status bar now updates immediately when tier is changed via Settings UI or the Set Tier command (previously stayed stale until next manual refresh).
 - Root-level folder nodes in the Issues tree now use an empty path prefix so expanding e.g. “lib” shows files under `lib/` correctly.
 - Severity and impact suppressions (e.g. “Hide this severity”) are now applied when building the filtered index.
+- **Inline annotations perf:** Violations data is now cached in the annotations module and only re-read when `violations.json` changes (via file watcher). Previously, every editor switch triggered a synchronous disk read.
+- **Security Posture perf:** OWASP category counts are cached in the tree provider and reused when expanding groups. Previously, `buildCounts()` re-scanned all violations on each `getChildren()` call.
+- **OWASP filter isolation:** Clicking an OWASP category in the Security Posture view now clears text, severity, and impact filters before applying the rule filter, so prior filter state doesn't mask the OWASP selection.
+- **OWASP ID normalization:** `buildCounts()` now strips everything after the first colon before matching OWASP categories, so both short-form (“M1”) and long-form (“M1: Improper Credential Usage”) from violations.json are handled correctly.
+- **OWASP data validation:** `buildCounts()` now validates that `owasp.mobile` and `owasp.web` are arrays of strings before iterating, preventing runtime errors from malformed JSON.
+- **Output channel singleton:** `getOutputChannel()` in setup.ts now lazily creates a single output channel instance instead of calling `createOutputChannel()` on every log write.
+- **Suggestions dead branch removed:** Removed the `items.length === 2` early-return in `suggestionsTree.ts` that was functionally identical to the `slice(0, 8)` fallthrough.
+- **Internal command hidden:** `focusIssuesForOwasp` removed from `contributes.commands` so it no longer appears in the command palette (it's invoked programmatically from the Security Posture tree).
 
 ---
 
