@@ -108,6 +108,9 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
         'saropa_lints:init',
         '--tier',
         tier,
+        '--no-stylistic',
+        '--target',
+        workspaceRoot,
       ]);
       if (!initOk) {
         vscode.window.showErrorMessage(`Saropa Lints: init failed. ${initErr || 'Check Output.'}`);
@@ -178,7 +181,15 @@ export async function runInitializeConfig(context: vscode.ExtensionContext): Pro
       cancellable: false,
     },
     async () => {
-      const result = runInWorkspace(workspaceRoot, 'dart', ['run', 'saropa_lints:init', '--tier', tier]);
+      const result = runInWorkspace(workspaceRoot, 'dart', [
+        'run',
+        'saropa_lints:init',
+        '--tier',
+        tier,
+        '--no-stylistic',
+        '--target',
+        workspaceRoot,
+      ]);
       ok = result.ok;
       if (!ok) {
         vscode.window.showErrorMessage(`Init failed. ${result.stderr || 'Check Output.'}`);
@@ -225,7 +236,15 @@ export async function runSetTier(context: vscode.ExtensionContext): Promise<bool
       cancellable: false,
     },
     async () => {
-      const result = runInWorkspace(workspaceRoot, 'dart', ['run', 'saropa_lints:init', '--tier', tier]);
+      const result = runInWorkspace(workspaceRoot, 'dart', [
+        'run',
+        'saropa_lints:init',
+        '--tier',
+        tier,
+        '--no-stylistic',
+        '--target',
+        workspaceRoot,
+      ]);
       ok = result.ok;
       if (!ok) {
         vscode.window.showErrorMessage(`Init failed. ${result.stderr || 'Check Output.'}`);

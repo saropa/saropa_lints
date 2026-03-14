@@ -18,7 +18,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 ### Changed
 
-- **Publish:** Single script (`scripts/publish.py`) for package and VS Code extension. Extension version is synced with package version; menu option 6 packages .vsix and optionally publishes to Marketplace/Open VSX. Removed `scripts/publish_extension.py`.
+- **Publish:** Single script (`scripts/publish.py`) for package and VS Code extension. Extension version is synced with package version; menu option 6 packages .vsix and optionally publishes to Marketplace/Open VSX. Removed `scripts/publish_extension.py`. Extension `CHANGELOG.md` is generated at publish time from the root `CHANGELOG.md` (single source of truth) and is gitignored.
 - **project_context modularization:** Split `lib/src/project_context.dart` (~5,330 lines) into a main library file and 10 part files (`project_context_path_bloom_git.dart`, `project_context_project_file.dart`, and others). No API or behavior change; imports remain `package:saropa_lints/src/project_context.dart`. Improves maintainability and aligns with project file-size guidelines.
 
 ### Added (VS Code extension)

@@ -38,6 +38,19 @@ def extension_exists(project_dir: Path) -> bool:
     return ext.is_dir() and (ext / "package.json").is_file()
 
 
+def copy_changelog_to_extension(project_dir: Path) -> bool:
+    """Copy root CHANGELOG.md to extension/CHANGELOG.md for the .vsix (single source of truth).
+
+    Returns True if copied, False if root CHANGELOG.md missing.
+    """
+    root_changelog = project_dir / "CHANGELOG.md"
+    ext_changelog = _extension_dir(project_dir) / "CHANGELOG.md"
+    if not root_changelog.is_file():
+        return False
+    ext_changelog.write_text(root_changelog.read_text(encoding="utf-8"), encoding="utf-8")
+    return True
+
+
 def set_extension_version(project_dir: Path, version: str) -> bool:
     """Set extension/package.json version to match the package version.
 
@@ -150,9 +163,11 @@ def publish_extension_to_ovsx(project_dir: Path, vsix_path: Path) -> bool:
 
 
 def package_extension(project_dir: Path, version: str) -> Path | None:
-    """Sync version, compile, and package .vsix. Returns path to .vsix or None."""
+    """Sync version, copy root changelog, compile, and package .vsix. Returns path to .vsix or None."""
     if not set_extension_version(project_dir, version):
         print_warning("Could not set extension version in package.json")
+    if not copy_changelog_to_extension(project_dir):
+        print_warning("Root CHANGELOG.md not found; extension .vsix will have no changelog.")
     if not run_extension_compile(project_dir):
         return None
     vsix = run_extension_package(project_dir)

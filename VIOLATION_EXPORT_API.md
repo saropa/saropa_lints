@@ -66,6 +66,7 @@ Analysis configuration snapshot captured at rule-loading time. If the plugin fai
 | `enabledRuleCount` | `integer` | * | Number of rules enabled after tier selection and user overrides |
 | `enabledRuleCountNote` | `string` | * | Human-readable explanation: `"After tier selection and user overrides"` |
 | `enabledRuleNames` | `string[]` | * | Full list of enabled rule names (e.g. `["avoid_print", "prefer_const", ...]`). May be empty if not captured |
+| `stylisticRuleNames` | `string[]` | * | All rule names in the stylistic (opt-in) tier. Used by extension for triage UI (stylistic section). |
 | `enabledPlatforms` | `string[]` | * | Platforms with rules active (e.g. `["ios", "android"]`) |
 | `disabledPlatforms` | `string[]` | * | Platforms with rules inactive (e.g. `["macos", "web"]`) |
 | `enabledPackages` | `string[]` | * | Package-specific rule sets active (e.g. `["firebase", "riverpod"]`) |
@@ -85,6 +86,7 @@ Analysis configuration snapshot captured at rule-loading time. If the plugin fai
   "enabledRuleCount": 1590,
   "enabledRuleCountNote": "After tier selection and user overrides",
   "enabledRuleNames": ["avoid_print", "prefer_const", "..."],
+  "stylisticRuleNames": ["prefer_member_ordering", "prefer_const", "..."],
   "enabledPlatforms": ["ios", "android"],
   "disabledPlatforms": ["macos", "web"],
   "enabledPackages": ["firebase"],
