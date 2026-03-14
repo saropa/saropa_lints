@@ -285,8 +285,14 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('saropaLints.initializeConfig', async () => {
       const success = await runInitializeConfig(context);
       if (success) {
+        // C6: Auto-run analysis after config change if setting is on.
+        const runAfter = getConfig().get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
+        if (runAfter) {
+          await runAnalysis(context);
+        }
         refreshAll();
         updateAllStatusBars();
+        updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
       }
     }),
     vscode.commands.registerCommand('saropaLints.openConfig', openConfig),
@@ -348,8 +354,14 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('saropaLints.setTier', async () => {
       const success = await runSetTier(context);
       if (success) {
+        // C6: Auto-run analysis after tier change if setting is on.
+        const runAfter = getConfig().get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
+        if (runAfter) {
+          await runAnalysis(context);
+        }
         refreshAll();
         updateAllStatusBars();
+        updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
       }
     }),
     vscode.commands.registerCommand('saropaLints.showOutput', showOutputChannel),
