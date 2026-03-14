@@ -5,6 +5,7 @@
 
 import * as vscode from 'vscode';
 import { ViolationsData } from './violationsReader';
+import { computeHealthScore } from './healthScore';
 
 const HISTORY_KEY = 'saropaLints.runHistory';
 const MAX_ENTRIES = 20;
@@ -17,6 +18,8 @@ export interface RunSnapshot {
   warning: number;
   info: number;
   critical: number;
+  /** Health score (0–100) at time of snapshot. Absent in old history entries. */
+  score?: number;
 }
 
 export function loadHistory(state: vscode.Memento): RunSnapshot[] {
@@ -44,6 +47,8 @@ export function appendSnapshot(
   // Skip duplicate — same total as last snapshot means no real change.
   if (last && last.total === total) return history;
 
+  const healthResult = computeHealthScore(data);
+
   const snapshot: RunSnapshot = {
     timestamp: new Date().toISOString(),
     total,
@@ -51,6 +56,7 @@ export function appendSnapshot(
     warning: data.summary?.bySeverity?.warning ?? 0,
     info: data.summary?.bySeverity?.info ?? 0,
     critical: data.summary?.byImpact?.critical ?? 0,
+    score: healthResult?.score,
   };
 
   history.push(snapshot);
@@ -77,4 +83,17 @@ export function getTrendSummary(history: RunSnapshot[]): string | undefined {
   }
   const recent = history.slice(-TREND_DISPLAY_COUNT);
   return recent.map((s) => String(s.total)).join(' \u2192 ');
+}
+
+/**
+ * Find the most recent snapshot that has a score, excluding the last entry.
+ * Used to compute the score delta ("▲4") shown in Overview and status bar.
+ */
+export function findPreviousScore(
+  history: RunSnapshot[],
+): number | undefined {
+  for (let i = history.length - 2; i >= 0; i--) {
+    if (history[i].score !== undefined) return history[i].score;
+  }
+  return undefined;
 }

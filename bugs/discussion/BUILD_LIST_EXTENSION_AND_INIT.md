@@ -1,120 +1,236 @@
 # What to build: Extension, Init Redesign, and Log Capture
 
-**Purpose:** Single prioritized list of work to make the extension-driven experience complete and better. Draws from [003_INIT_REDESIGN.md](003_INIT_REDESIGN.md), [VSCODE_EXTENSION_COHESION_WOW_PLAN.md](VSCODE_EXTENSION_COHESION_WOW_PLAN.md), and [log_capture_integration.md](log_capture_integration.md).
+**Purpose:** Single prioritized list of work to make the extension-driven experience complete, integrated, and genuinely differentiated. Supersedes the previous separate plans (cohesion/WOW, init redesign). Source material: [003_INIT_REDESIGN.md](003_INIT_REDESIGN.md), [log_capture_integration.md](log_capture_integration.md).
 
-**Already done:** Violation export (`violations.json`), Issues tree (structure, filters, suppressions), Summary/Config/Logs/Suggestions/Overview views, one-click setup, file watcher, C4 (Summary → Issues), W1 (Apply fix from tree).
+**Already done:** Violation export (`violations.json`), Issues tree (structure, filters, suppressions), Summary/Config/Logs/Suggestions/Overview views, one-click setup, file watcher, C4 (Summary → Issues), W1 (Apply fix from tree), W2 (Code Lens), W3 (rule doc in tooltip), W4 (Problems → Show in Saropa), F1–F4 (foundation), W5 (trends), W6 (celebration), W7 (focus mode), W8 (tier in status bar), H1–H3 (Health Score in Overview + status bar + history).
 
-**F1–F4 implemented (foundation):** Extension runs init with `--no-stylistic` and `--target` for non-interactive config write (F1). Violations reader exposes `issuesByRule`, `enabledRuleNames`, `stylisticRuleNames`; `triageUtils.ts` provides `groupRulesByVolume()` and `partitionStylistic()` (F2, F3). Export adds `config.stylisticRuleNames`. Config view shows **Detected** from `pubspecReader.ts` (F4). See CHANGELOG Unreleased and extension README.
-
----
-
-## 1. Foundation (required for “complete”)
-
-These unblock or underpin the rest.
-
-| # | Item | Source | Notes |
-|---|------|--------|--------|
-| F1 | **Extension writes analysis_options** | Init Redesign | *(done)* Init run non-interactively via `--no-stylistic` and `--target`; shared `buildInitArgs()`. |
-| F2 | **Per-rule counts for triage** | Init Redesign | *(done)* `violationsReader` exposes `summary.issuesByRule`; `triageUtils.groupRulesByVolume()`. |
-| F3 | **Rule metadata for triage** | Init Redesign § Implementation | *(done)* Export `config.stylisticRuleNames`; extension `partitionStylistic()`. |
-| F4 | **Platform/package detection** | Init Redesign | *(done)* `pubspecReader.ts`; Config view “Detected” row. |
+**Implementation records (done 2026-03-14):**
+- **W5 (Trends):** `runHistory.ts` persists last 20 snapshots in workspace state; Overview shows "Trends" row with last 5 totals arrow-separated.
+- **W6 (Celebration):** Celebration messages on violation decrease; "↓ N fewer issues" in Overview; "No critical issues" notification when critical hits 0.
+- **W7 (Focus mode):** `focusedFile` filter in IssuesTreeProvider, context menu "Show only this file" on file nodes, toolbar "Show all files".
+- **W8 (Tier in status bar):** Second status bar item showing tier, click to change. Status bar logic consolidated into `updateAllStatusBars()`.
+- **W1 (Apply fix):** Context menu on violations in Issues tree invokes `vscode.executeCodeActionProvider`; prefers matching rule; progress notification.
+- **W2 (Code Lens):** Dart files show "Saropa Lints: N issues — Show in Saropa" at line 0; invalidates on violations.json change.
+- **W3 (Rule doc):** Violation tooltips include rule name + [More](ROADMAP) link via `ruleMetadata.ts`.
+- **W4 (Problems → Saropa):** Context menu "Show in Saropa Lints" runs `focusIssuesForActiveFile`.
+- **H1–H3 (Health Score):** `healthScore.ts` computes 0–100 score from impact-weighted violation density with exponential decay. Score shown in Overview as primary item with delta ("Health: 78 ▲4 from last run"). Status bar shows "Saropa: 78 ▲4" with color bands (green/yellow/red background via `statusBarItem.backgroundColor`). Score persisted in `RunSnapshot.score` via `runHistory.ts`. Shared `findPreviousScore()` in `runHistory.ts`. Celebration messages include score delta.
 
 ---
 
-## 2. Cohesion (do first — single product, clear path)
+## The integration thesis
 
-From Cohesion plan Phase A; makes the extension feel like one product.
+The current plan has good parts that don't talk to each other. The rewrite is organized around one idea: **every feature both consumes and enriches the same data pipeline**, so each piece makes the others more valuable.
 
-| # | Item | Description |
-|---|------|-------------|
-| C1 | **Overview as home** | First view: key number (total or critical), primary CTA (“Run analysis” or “View N issues”), links to Summary/Config/Logs. Optional “Last run: 2 min ago”. |
-| C2 | **Status bar → open view** | Clicking status bar: **Focus Saropa Lints** (reveal sidebar, focus Issues or Overview). “Run analysis” stays in toolbar and command palette; optional secondary on status bar. |
-| C5 | **Welcome/empty on every view** | Summary: “No analysis yet” + [Run Analysis]. Config: when disabled, “Enable Saropa Lints” + [Enable]. Logs: “No reports yet” + [Run Analysis]. Suggestions: when enabled and no data, “Run analysis to get suggestions”. |
-| C7 | **Single Run analysis + focus** | One obvious entry point (Overview, Issues empty state, palette). After run, auto-focus Issues or Overview + brief “Analysis complete”. |
-| C3 | **Suggestions deep-link** | “Fix N critical” → open Issues with filter impact: critical; “Address high-impact” → filter high; “Fix errors” → severity error. “Show in Issues” where it fits. |
-| C4 | *(done)* | Summary “Total violations” clickable → Issues, clear filters. |
-| C6 | **Config actions in place** | Config: “Tier” row → click opens quick pick, set tier and run init. “Enabled” → toggle or Enable/Disable. Config is the control surface. |
+```
+violations.json (source of truth)
+    │
+    ├─► Health Score (computed)
+    │       ├─► Status bar ("Score: 78 ▲4")
+    │       ├─► Overview (score + delta + primary CTA)
+    │       ├─► Code Lens ("Health: 84 | 3 issues — Show in Saropa")
+    │       ├─► Celebration ("Score up! 74 → 78")
+    │       └─► Log Capture bug reports ("Project health: 78 at time of crash")
+    │
+    ├─► Per-rule counts + impact (already in export)
+    │       ├─► Triage UI (I1) ──► Config writes (I2) ──► re-analysis ──► updated score
+    │       ├─► Suggestions deep-link ("Fix 4 critical → +6 points")
+    │       └─► File Risk view (which files have the most critical density)
+    │
+    ├─► OWASP mappings (already on every violation)
+    │       ├─► Security Posture view ("M9: 4 violations, M3: 2")
+    │       ├─► OWASP Compliance export (for audits, app store submissions)
+    │       └─► Log Capture ("crash file has OWASP M9 violations")
+    │
+    ├─► Issues tree (existing, enriched)
+    │       ├─► Inline annotations (Error Lens style — violation text on the line)
+    │       ├─► Fix Impact Preview ("resolves 1 critical, score +2")
+    │       └─► Bulk fix with impact summary ("fixed 12 issues, score 74 → 81")
+    │
+    └─► History (persisted runs)
+            ├─► Trends in Overview ("last 5 runs" sparkline)
+            ├─► Regression detection ("3 new critical since last run")
+            └─► Score trajectory ("62 → 71 → 78 over 2 weeks")
+```
 
----
+The **Health Score** is the integration point. It:
+- Is computed from violations.json (Foundation)
+- Updates when triage decisions change rules (Init Redesign)
+- Appears in Overview, status bar, Code Lens (Cohesion)
+- Drives celebration and trends (WOW)
+- Can be included in Log Capture bug reports
+- Gives developers a number to share: *"Our Saropa score went from 62 to 78 this sprint"*
 
-## 3. Init Redesign in the extension (no CLI init)
-
-Triage and config live in the extension; no `dart run saropa_lints:init`.
-
-| # | Item | Description |
-|---|------|-------------|
-| I1 | **Triage UI in Config (and Overview)** | Data-driven: Critical always on + link to Issues; zero-issue rules auto-enabled; rest grouped by volume (e.g. A: 1–5, B: 6–20, C: 21–100, D: 100+) with [Enable all] [Disable all] [Review]. Stylistic: separate section, opt-in, “Disable all stylistic?”. |
-| I2 | **Apply triage → write YAML** | After user choices, extension writes `analysis_options.yaml` (diagnostics: rule → true/false). Preserve/merge user overrides from minimal `analysis_options_custom.yaml`. |
-| I3 | **Minimal custom config** | Only explicit overrides (rule_name: true/false). Migration: if existing long custom config, read overrides, rewrite to minimal, optionally backup as `.bak`. |
-| I4 | **Deprecate/remove init CLI** | No user-facing `dart run saropa_lints:init`. Optional: headless “apply triage” for scripts/CI (library or non-interactive script reading violations + decisions, writing YAML). |
-| I5 | **First-run flow** | After Enable: “Run analysis?” → run → “Here are your issues” + “Configure rules” (triage). Enable → Run analysis → Triage in Config/Overview → ongoing use. |
-
----
-
-## 4. WOW Tier 1 (high impact)
-
-| # | Item | Description |
-|---|------|-------------|
-| W1 | *(done)* | Apply fix from Issues tree. |
-| W2 | **Code Lens** | In Dart files: “Saropa Lints: N issues — Show in Saropa”. Click focuses Issues filtered to that file. |
-| W3 | **Rule doc in hover/tree** | Violation tooltip: rule name + short “why it matters” (from rule doc or bundled metadata). Optional “More” link. |
-| W4 | **“Show in Saropa Lints” from Problems** | For saropa_lints diagnostics in Problems view: context menu → focus Saropa Issues and filter/select that file. |
-
----
-
-## 5. WOW Tier 2 (differentiators)
-
-| # | Item | Description |
-|---|------|-------------|
-| W5 | **Trends / mini history** | Persist last K run summaries (workspace state or `reports/.saropa_lints/history.json`). Overview/Summary: “Last 5 runs” or “Down from 120 → 98”. |
-| W6 | **Celebration / progress** | When violations drop: “You fixed N issues” or “−12”. When critical hits 0: “No critical issues”. |
-| W7 | **Focus mode: Only this file** | Issues view: context menu on file “Show only this file”; toolbar “Show all” to reset. |
-| W8 | **Tier in status bar** | Status bar segment “Tier: recommended” → click to change tier (quick pick) and re-run init. |
+The **OWASP data** is the unique asset. No other Dart linter maps violations to OWASP categories. This makes Saropa the tool of choice for teams that care about security posture — and it's data you already have.
 
 ---
 
-## 6. WOW Tier 3 (polish)
+## 1. Foundation (done)
 
-| # | Item | Description |
-|---|------|-------------|
-| W9 | **Onboarding** | After Enable: short sequence Run analysis → “Here are your issues” → tip about filter/apply fix. Optional one-time tips in empty states. |
-| W10 | **Bulk actions** | Issues: “Fix all auto-fixable in this file/folder”; optional “Suppress rule in this file” (if project allows). |
-| W11 | **Group by in Issues** | Preset chips or “Group by: Severity | File | Impact | Rule”. |
-| W12 | **Logs parsed / hints** | Logs view: parsed “Analysis: 3 errors, 12 warnings” or “Test X failed” with “Open log” and optional “Run analysis again”. |
-
----
-
-## 7. Log Capture (optional, consumer side)
-
-Nothing new to build on Saropa Lints for Log Capture; integration is the existing file contract. Optional improvements:
-
-| # | Item | Owner | Description |
-|---|------|--------|-------------|
-| L1 | **Staleness message** | Log Capture | When lint data is stale: “Run analysis in Saropa Lints to refresh” (in addition to or instead of “Run `dart run custom_lint`”) for extension users. |
-| L2 | **Extension README line** | Extension | One sentence: violations.json is also used by Saropa Log Capture for bug report correlation. |
+| # | Item | Notes |
+|---|------|-------|
+| F1 | **Extension writes analysis_options** | *(done)* Init run non-interactively via `--no-stylistic` and `--target`; shared `buildInitArgs()`. |
+| F2 | **Per-rule counts for triage** | *(done)* `violationsReader` exposes `summary.issuesByRule`; `triageUtils.groupRulesByVolume()`. |
+| F3 | **Rule metadata for triage** | *(done)* Export `config.stylisticRuleNames`; extension `partitionStylistic()`. |
+| F4 | **Platform/package detection** | *(done)* `pubspecReader.ts`; Config view "Detected" row. |
 
 ---
 
-## 8. Suggested order of work
+## 2. Health Score (new foundation — unlocks integration)
 
-1. **Foundation:** F1 (extension writes YAML), F2 (use issuesByRule), F3 (rule metadata), F4 (platform/package detection).  
-2. **Cohesion:** C1, C2, C5, C7 then C3, C6.  
-3. **Init in extension:** I1 (triage UI), I2 (apply → write YAML), I3 (minimal custom), I5 (first-run), then I4 (remove/deprecate CLI).  
-4. **WOW:** Tier 1 (W2, W3, W4), then Tier 2 (W5–W8), then Tier 3 (W9–W12) as capacity allows.  
-5. **Log Capture:** L1, L2 when touching those codebases.
+Compute a single 0–100 score from violations.json. This becomes the number that ties everything together.
+
+| # | Item | Description | Feeds into |
+|---|------|-------------|------------|
+| H1 | **Score computation** | *(done)* `healthScore.ts`: impact-weighted density with exponential decay. Constants at top for tuning. | Every view, status bar, celebration, Log Capture |
+| H2 | **Score in Overview** | *(done)* Overview shows "Health: 78" with delta ("▲4 from last run") as primary item. | C1 (Overview as home) |
+| H3 | **Score in status bar** | *(done)* Status bar shows "Saropa: 78 ▲4". Color bands: green (80+), yellow (50–79), red (<50). | C2 (status bar → open view) |
+| H4 | **Score in Code Lens** | Per-file: "Saropa: 3 issues (2 critical) — Show in Saropa". Optional file-level health indicator. | W2 (Code Lens, already done — extend it) |
+| H5 | **Score history** | *(done)* Score persisted in `RunSnapshot.score` via `runHistory.ts`. `findPreviousScore()` shared helper. | W5 (trends), celebration, Overview |
+
+**Why this matters:** CodeScene built a business around "Code Health" — a single score with proven correlation to defect rates. Sourcery does function-level quality scores (0–100%). Neither exists for Dart. Saropa's score has a richer input signal (impact levels, OWASP, 2050+ rules) than either.
 
 ---
 
-## 9. Definition of “complete”
+## 3. Cohesion (single product, clear path)
 
-- **Complete:** User never runs init CLI; extension is the single place for setup and triage (Enable → Run analysis → Triage in Config/Overview); cohesion C1–C7 done; extension writes analysis_options and minimal custom config; triage is data-driven with rule groups and stylistic opt-in.  
-- **Better:** Plus WOW Tier 1 (Code Lens, rule doc, Problems → Saropa) and Tier 2 (trends, celebration, focus mode, tier in status bar); optional Log Capture messaging (L1, L2).
+These make the extension feel like one product. The Health Score enriches each one.
+
+| # | Item | Description | Integration |
+|---|------|-------------|-------------|
+| C1 | **Overview as home** | First view: **Health Score** (large number + delta), primary CTA, links to Summary/Config/Logs. "Last run: 2 min ago". | Score from H2; trends from H5 |
+| C2 | **Status bar → open view** | Click status bar → Focus Saropa Lints (reveal sidebar, focus Overview). Score shown in status bar (H3). | Score from H3 |
+| C5 | **Welcome/empty on every view** | Summary: "No analysis yet" + [Run Analysis]. Config: when disabled, "Enable Saropa Lints" + [Enable]. Logs: "No reports yet" + [Run Analysis]. Suggestions: "Run analysis to get suggestions". | — |
+| C7 | **Single Run analysis + focus** | One entry point (Overview, Issues empty, palette). After run: update score, auto-focus Overview (show delta), brief notification. | Score delta from H1 |
+| C3 | **Suggestions deep-link with impact** | "Fix N critical → estimated +6 points" → open Issues filtered by critical. "Address high-impact" → filter high. Suggestions show *score impact*, not just counts. | Score estimation from H1 |
+| C4 | *(done)* | Summary "Total violations" clickable → Issues, clear filters. | — |
+| C6 | **Config as control surface** | "Tier" row → click opens quick pick, set tier and run init. "Enabled" → toggle. After change: re-analyze and show score delta. | Triage (I1), score update (H1) |
+
+---
+
+## 4. Init Redesign in the extension (no CLI init)
+
+Triage and config live in the extension. Triage decisions directly affect the Health Score — users see the impact of their choices.
+
+| # | Item | Description | Integration |
+|---|------|-------------|-------------|
+| I1 | **Triage UI in Config** | Data-driven: Critical always on + link to Issues; zero-issue rules auto-enabled; rest grouped by volume (A: 1–5, B: 6–20, C: 21–100, D: 100+) with [Enable all] [Disable all] [Review]. Stylistic: separate section, opt-in. **Show estimated score impact** per group: "Enabling Group A: +8 points (34 rules, 87 low-severity issues)". | Per-rule counts (F2), score estimation (H1) |
+| I2 | **Apply triage → write YAML** | Extension writes `analysis_options.yaml`. After write: auto re-analyze → update score → show delta in Overview. The feedback loop: triage → analyze → see improvement → triage more. | Config writes → re-analysis → H1 score |
+| I3 | **Minimal custom config** | Only explicit overrides (rule_name: true/false). Migration: read overrides from existing long config, rewrite to minimal, backup as `.bak`. | — |
+| I4 | **Deprecate/remove init CLI** | No user-facing `dart run saropa_lints:init`. Optional headless variant for CI. | — |
+| I5 | **First-run flow** | Enable → "Run analysis?" → run → show score + "Here are your issues" + "Configure rules" (triage). The score gives immediate context: "Your project scores 34/100 — let's improve that." | Score (H1), triage (I1) |
+
+---
+
+## 5. Differentiators (research-driven WOW)
+
+These replace the generic W5–W12 with features backed by what actually differentiates top extensions. Each one leverages the data pipeline — they're not standalone gimmicks.
+
+### Tier 1 — Only Saropa does this (for Dart)
+
+| # | Item | Description | Why it's different | Integration |
+|---|------|-------------|-------------------|-------------|
+| D1 | **Security Posture view** | Dedicated view: OWASP coverage matrix (M1–M10, A01–A10). Each cell shows violation count, click filters Issues. "Your project has gaps in M3, M9." | **No other Dart linter maps to OWASP.** Enterprise/regulated teams need this. Version Lens does OSV.dev vulnerability detection — this is Saropa's equivalent, built from data you already have. | OWASP data from violations.json |
+| D2 | **OWASP Compliance export** | Command: "Export Security Report" → generates markdown/HTML summary of OWASP coverage, violation counts by category, gap analysis. Useful for audits, app store submissions, team reviews. | Unique to Saropa. No Dart tool generates this. | OWASP data + score (H1) |
+| D3 | **Inline annotations** (Error Lens style) | Violation message rendered directly on the line in the editor, not just squiggles. Togglable via setting. Color by severity. | Error Lens has 14M+ installs — this is the #1 most-loved code quality UX pattern. No Dart linting extension does it. | violations.json file/line data |
+| D4 | **Fix Impact Preview** | Before applying a fix (from Issues tree or inline): "This resolves 1 critical violation. Estimated score: 78 → 80." After fix: "Score updated: 80 ▲2". | CodeScene shows health delta in real-time. Saropa can do the same for fixes. Turns "fix lint" into "improve score". | Score estimation (H1), fix (W1 done) |
+
+### Tier 2 — Strong differentiators
+
+| # | Item | Description | Why it's different | Integration |
+|---|------|-------------|-------------------|-------------|
+| D5 | **Score-driven trends** | Overview: sparkline of last K scores with timestamps. "62 → 71 → 78 over 2 weeks." Regression alert: "Score dropped 78 → 72 — 3 new critical violations in auth_service.dart." | CodeScene tracks code health over time but requires a server. This is local-only, zero setup. | Score history (H5) |
+| D6 | **File Risk heatmap** | In explorer sidebar or dedicated view: files color-coded by critical/high violation density. "These 5 files have 60% of your critical issues." Click → filter Issues to that file. | Unique way to answer "where should I focus?" without reading the Issues tree. | issuesByFile + impact from violations.json |
+| D7 | **Bulk fix with impact summary** | "Fix all auto-fixable in this file" → runs, then: "Fixed 12 issues. Score: 74 → 81 ▲7." Optional: "Fix all auto-fixable in project" with confirmation. | Bulk fix exists elsewhere; score-integrated bulk fix does not. | Score (H1), Code Actions API |
+| D8 | **Score-driven celebration** | When score crosses a threshold (e.g. 50→60, 80→90): brief non-intrusive celebration. "Score reached 80 — great work!" When critical hits 0: "Zero critical issues." When score drops: no shaming, just "3 new issues in auth_service.dart — view." | Positive reinforcement tied to a meaningful number, not just "you fixed N issues." | Score history (H5), thresholds |
+
+### Tier 3 — Polish
+
+| # | Item | Description | Integration |
+|---|------|-------------|-------------|
+| D9 | **Onboarding with score** | First-run: Enable → analyze → "Your project scores 34/100" → "Here's what we found" → "Configure rules to improve" → triage. Score gives immediate anchor. | Score (H1), first-run (I5) |
+| D10 | **Group by in Issues** | Preset chips: "Group by: Severity \| File \| Impact \| Rule \| OWASP category". OWASP grouping is unique. | OWASP data, Issues tree |
+| D11 | **Focus mode** | Issues view: "Show only this file" context menu; "Show all" to reset. | Issues tree (existing) |
+| D12 | **Logs parsed / hints** | Logs view: parsed "Analysis: 3 errors, 12 warnings" or "Test X failed" with "Open log" and "Run analysis again". | — |
+
+### Already done (WOW Tier 1 from previous plan)
+
+| # | Item | Status |
+|---|------|--------|
+| W1 | Apply fix from Issues tree | *(done)* |
+| W2 | Code Lens: "N issues — Show in Saropa" | *(done)* — extend with score in H4 |
+| W3 | Rule doc in hover/tree tooltip | *(done)* |
+| W4 | "Show in Saropa Lints" from Problems | *(done)* |
+
+---
+
+## 6. Log Capture (shared data, not shared code)
+
+The integration is the file contract — violations.json is read by both the extension and Log Capture. The Health Score and OWASP data make this richer.
+
+| # | Item | Owner | Description | Integration |
+|---|------|-------|-------------|-------------|
+| L1 | **Staleness message** | Log Capture | "Run analysis in Saropa Lints to refresh" for extension users. | — |
+| L2 | **Extension README line** | Extension | One sentence: violations.json is also used by Saropa Log Capture for bug report correlation. | — |
+| L3 | **Health Score in bug reports** | Log Capture | "Project health: 78/100 at time of crash." One line that gives context to any bug report. | Score (H1) — Log Capture reads from violations.json or a small companion file |
+| L4 | **OWASP in bug reports** | Log Capture | "Crash file has 2 OWASP M9 violations (insecure data storage)." Connects runtime errors to security posture. | OWASP data from violations.json |
+
+---
+
+## 7. Suggested order of work
+
+The order follows the data pipeline: build the score first, then the features that consume it.
+
+1. **Health Score (H1–H3):** Score computation, show in Overview and status bar. This is the new foundation — everything else references it.
+2. **Cohesion (C1, C2, C5, C7):** Overview as home (now with score), status bar (now with score), welcome states, single Run analysis. Then C3 (suggestions with score impact), C6 (config as control surface).
+3. **Security Posture (D1):** OWASP view — high impact, uses existing data, unique differentiator. Do this early because it's a selling point.
+4. **Inline annotations (D3):** Error Lens style — high wow, moderate effort, massive visibility improvement.
+5. **Init in extension (I1, I2, I3, I5):** Triage UI with score impact estimation, apply → write YAML → re-analyze → show score delta. Then I4 (deprecate CLI).
+6. **Fix Impact Preview (D4) + Bulk fix (D7):** Score-aware fixing. Turns "fix lint" into "improve score."
+7. **Trends + celebration (D5, D8):** Score history, sparkline, regression alerts, threshold celebrations.
+8. **Score in Code Lens (H4), History (H5):** Extend existing Code Lens with score; persist history for trends.
+9. **OWASP export (D2), File Risk (D6):** Compliance report and heatmap — polish differentiators.
+10. **Remaining polish (D9–D12):** Onboarding, group-by, focus mode, log hints.
+11. **Log Capture (L1–L4):** When touching those codebases.
+
+---
+
+## 8. Definition of "complete" and "better"
+
+- **Complete:** User never runs init CLI; extension is the single place for setup and triage. Cohesion C1–C7 done. Extension writes analysis_options and minimal custom config. Triage is data-driven with rule groups and stylistic opt-in. **Health Score visible in Overview and status bar.**
+
+- **Better:** Plus inline annotations (D3), Security Posture view (D1), score-driven trends and celebration (D5, D8), Fix Impact Preview (D4), OWASP Compliance export (D2). Log Capture shows score and OWASP context in bug reports (L3, L4).
+
+- **Best:** All of the above plus File Risk heatmap (D6), bulk fix with impact summary (D7), OWASP grouping in Issues (D10), onboarding with score (D9).
+
+---
+
+## 9. Competitive positioning
+
+| Feature | ESLint | SonarQube IDE | CodeScene | Sourcery | **Saropa Lints** |
+|---------|--------|---------------|-----------|----------|-------------------|
+| Squiggles + Problems | Yes | Yes | Yes | Yes | Yes |
+| Quick fixes | Yes | AI CodeFix | AI refactor | AI suggestions | Yes (2050+ rules) |
+| Code Health Score | No | No (server only) | Yes | Per-function | **Yes (project + file)** |
+| OWASP mapping | No | Server only | No | No | **Yes (every violation)** |
+| Security Posture view | No | Server only | No | No | **Yes** |
+| Inline annotations | Via Error Lens | No | No | No | **Yes (built-in)** |
+| Score-driven triage | No | No | No | No | **Yes** |
+| Fix Impact Preview | No | No | Health delta | No | **Yes (score delta)** |
+| Trends (local, no server) | No | No | No | No | **Yes** |
+| Runtime correlation | No | No | No | No | **Yes (via Log Capture)** |
 
 ---
 
 ## 10. References
 
 - [003_INIT_REDESIGN.md](003_INIT_REDESIGN.md) — Extension-driven init, triage, no CLI.
-- [VSCODE_EXTENSION_COHESION_WOW_PLAN.md](VSCODE_EXTENSION_COHESION_WOW_PLAN.md) — Cohesion and WOW phasing.
 - [log_capture_integration.md](log_capture_integration.md) — violations.json contract and extension integration.
 - VIOLATION_EXPORT_API.md — violations.json schema.
+
+### Research sources (informing differentiator choices)
+
+- **CodeScene VS Code** — Code Health scoring with delta tracking, AI-powered refactoring (ACE), real-time code health monitor
+- **Sourcery** — Function quality scores (0–100%) with sub-scores (complexity, working memory, method length), AI chat, PR reviews
+- **SonarQube for IDE** (4.2M installs) — AI CodeFix, connected mode for team settings, educational "coding tutor" framing
+- **Error Lens** (14M+ installs) — Inline annotations directly on the line; the single most-loved code quality UX pattern
+- **Version Lens** — Inline version annotations, vulnerability detection via OSV.dev with red squiggles

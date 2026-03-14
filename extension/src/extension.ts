@@ -23,8 +23,9 @@ import { SummaryTreeProvider } from './views/summaryTree';
 import { ConfigTreeProvider } from './views/configTree';
 import { LogsTreeProvider } from './views/logsTree';
 import { SuggestionsTreeProvider } from './views/suggestionsTree';
-import { readViolations } from './violationsReader';
-import { appendSnapshot } from './runHistory';
+import { readViolations, ViolationsData } from './violationsReader';
+import { appendSnapshot, loadHistory, findPreviousScore } from './runHistory';
+import { computeHealthScore, formatScoreDelta, scoreColorBand } from './healthScore';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -136,19 +137,27 @@ export function activate(context: vscode.ExtensionContext): void {
     refreshDebounceTimer = setTimeout(() => {
       refreshDebounceTimer = undefined;
       refreshAll();
-      // W5/W6: Snapshot current data for trends and show celebration messages.
+      // W5/W6/H1: Snapshot current data, update score, show celebration messages.
       const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
       if (root) {
         const data = readViolations(root);
         if (data) {
           const history = appendSnapshot(context.workspaceState, data);
+          // Update status bar with fresh score after snapshot is recorded.
+          // Pass pre-loaded data to avoid re-reading violations.json from disk.
+          updateAllStatusBars(data);
           if (history.length >= 2) {
             const prev = history[history.length - 2];
             const curr = history[history.length - 1];
             const delta = prev.total - curr.total;
+            // D8: Score-driven celebration — mention score delta when available.
+            const scoreDelta = (prev.score !== undefined && curr.score !== undefined)
+              ? formatScoreDelta(curr.score, prev.score)
+              : '';
             if (delta > 0) {
+              const scoreMsg = scoreDelta ? ` (Score: ${curr.score} ${scoreDelta})` : '';
               void vscode.window.setStatusBarMessage(
-                `You fixed ${delta} issue${delta === 1 ? '' : 's'}!`,
+                `You fixed ${delta} issue${delta === 1 ? '' : 's'}!${scoreMsg}`,
                 5000,
               );
             }
@@ -183,15 +192,40 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(tierStatusBarItem);
 
   // Combined updater for both status bar items to avoid scattered calls.
-  const updateAllStatusBars = () => {
+  // Accepts optional pre-loaded data to avoid re-reading violations.json from disk
+  // when the caller already has it (e.g. debouncedRefresh).
+  const updateAllStatusBars = (preloadedData?: ViolationsData | null) => {
     const en = getConfig().get<boolean>('enabled', false) ?? false;
-    // Main status bar: On/Off state.
+    // Main status bar: Health Score when available, else On/Off state.
     if (en) {
-      statusBarItem.text = issuesProvider.hasViolations() ? '$(checklist) Saropa Lints: On' : '$(checklist) Saropa Lints';
-      statusBarItem.tooltip = 'Saropa Lints is enabled. Click to open view.';
+      // Use pre-loaded data when available; otherwise read from disk.
+      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const data = preloadedData !== undefined ? preloadedData : (root ? readViolations(root) : null);
+      const health = data ? computeHealthScore(data) : null;
+
+      if (health) {
+        // Show score with delta from previous run if available.
+        const history = loadHistory(context.workspaceState);
+        const prevScore = findPreviousScore(history);
+        const delta = prevScore !== undefined ? ` ${formatScoreDelta(health.score, prevScore)}` : '';
+        statusBarItem.text = `$(checklist) Saropa: ${health.score}${delta}`;
+        // Color the status bar based on score band.
+        const band = scoreColorBand(health.score);
+        statusBarItem.backgroundColor = band === 'red'
+          ? new vscode.ThemeColor('statusBarItem.errorBackground')
+          : band === 'yellow'
+            ? new vscode.ThemeColor('statusBarItem.warningBackground')
+            : undefined;
+        statusBarItem.tooltip = `Health Score: ${health.score}/100. Click to open Saropa Lints.`;
+      } else {
+        statusBarItem.text = issuesProvider.hasViolations() ? '$(checklist) Saropa Lints: On' : '$(checklist) Saropa Lints';
+        statusBarItem.tooltip = 'Saropa Lints is enabled. Click to open view.';
+        statusBarItem.backgroundColor = undefined;
+      }
     } else {
       statusBarItem.text = '$(checklist) Saropa Lints: Off';
       statusBarItem.tooltip = 'Enable Saropa Lints';
+      statusBarItem.backgroundColor = undefined;
     }
     statusBarItem.command = 'saropaLints.focusView';
     statusBarItem.show();
