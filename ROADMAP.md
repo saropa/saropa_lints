@@ -517,8 +517,8 @@ DCM solves this with standalone CLI commands. We can do the same, leveraging exi
 
 | Component | Location | Ready |
 |-----------|----------|-------|
-| ImportGraphCache | `lib/src/project_context.dart:3145-3383` | Yes |
-| SemanticTokenCache | `lib/src/project_context.dart:3585-3720` | Yes |
+| ImportGraphCache | `lib/src/project_context_import_location.dart` | Yes |
+| SemanticTokenCache | `lib/src/project_context_semantic_compilation.dart` | Yes |
 | CLI framework | `bin/saropa_lints.dart` | Yes |
 | Argument parsing | `bin/init.dart` pattern | Yes |
 | Baseline system | `bin/baseline.dart` | Yes |

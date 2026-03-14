@@ -14,6 +14,10 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
+### Changed
+
+- **project_context modularization:** Split `lib/src/project_context.dart` (~5,330 lines) into a main library file and 10 part files (`project_context_path_bloom_git.dart`, `project_context_project_file.dart`, and others). No API or behavior change; imports remain `package:saropa_lints/src/project_context.dart`. Improves maintainability and aligns with project file-size guidelines.
+
 ### Added (VS Code extension)
 
 - **Issues view (tree):** Group by severity (Error, Warning, Info) then by project structure (folders and files). Violations per file are capped (default 100, configurable via `saropaLints.issuesPageSize`) with an “and N more…” overflow node for scale (e.g. 65k+ issues).
