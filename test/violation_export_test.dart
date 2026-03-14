@@ -443,6 +443,36 @@ void main() {
       expect(names, ['rule_a', 'rule_b', 'rule_c']);
     });
 
+    test('config includes stylisticRuleNames', () {
+      final config = ReportConfig(
+        version: '4.14.0',
+        effectiveTier: 'recommended',
+        enabledRuleCount: 0,
+        enabledRuleNames: const [],
+        enabledPlatforms: const [],
+        disabledPlatforms: const [],
+        enabledPackages: const [],
+        disabledPackages: const [],
+        userExclusions: const [],
+        maxIssues: 1000,
+        outputMode: 'both',
+      );
+
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(config: config),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final configSection = readExport()['config'] as Map<String, dynamic>;
+      final stylistic =
+          (configSection['stylisticRuleNames'] as List<dynamic>).cast<String>();
+      expect(stylistic, isNotEmpty);
+      expect(stylistic, contains('prefer_member_ordering'));
+      expect(stylistic, equals(stylistic.toList()..sort()));
+    });
+
     test('config includes disabledPackages and userExclusions', () {
       final config = ReportConfig(
         version: '4.14.0',

@@ -23,6 +23,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 ### Added (VS Code extension)
 
+- **Foundation (F1–F4) for extension-driven init and triage:** (1) Init is run non-interactively from the extension with `--no-stylistic` and `--target` so config writes without prompts. (2) Violations data now exposes `summary.issuesByRule` and `config.enabledRuleNames` / `config.stylisticRuleNames` for triage grouping. (3) Violation export adds `config.stylisticRuleNames` (extension can separate stylistic rules in triage UI). (4) Config view shows **Detected** (Flutter and packages from `pubspec.yaml`). New modules: `pubspecReader.ts` (platform/package detection), `triageUtils.ts` (group rules by volume, partition stylistic). Shared `buildInitArgs()` in setup for Enable / Initialize / Set tier.
 - **Apply fix from Issues tree:** Context menu “Apply fix” on a violation runs the Dart analyzer’s quick fix for that location (no need to open the file first).
 - **Summary → Issues:** Clicking “Total violations” in the Summary view opens the Issues view and shows all issues (clears any active filters).
 - **Code Lens (W2):** In Dart files with violations, a Code Lens above the first line shows "Saropa Lints: N issues — Show in Saropa". Click focuses the Issues view filtered to that file.

@@ -52,6 +52,19 @@ function ensureSaropaLintsInPubspec(workspaceRoot: string): boolean {
   return true;
 }
 
+/** Builds args for non-interactive init (Enable, Initialize config, Set tier). */
+function buildInitArgs(workspaceRoot: string, tier: string): string[] {
+  return [
+    'run',
+    'saropa_lints:init',
+    '--tier',
+    tier,
+    '--no-stylistic',
+    '--target',
+    workspaceRoot,
+  ];
+}
+
 function runInWorkspace(workspaceRoot: string, command: string, args: string[], logToOutput = true): { ok: boolean; stderr: string; stdout: string } {
   if (logToOutput) {
     const ch = getOutputChannel();
@@ -103,15 +116,7 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
 
       const cfg = vscode.workspace.getConfiguration('saropaLints');
       const tier = (cfg.get<string>('tier') ?? 'recommended').trim();
-      const { ok: initOk, stderr: initErr } = runInWorkspace(workspaceRoot, 'dart', [
-        'run',
-        'saropa_lints:init',
-        '--tier',
-        tier,
-        '--no-stylistic',
-        '--target',
-        workspaceRoot,
-      ]);
+      const { ok: initOk, stderr: initErr } = runInWorkspace(workspaceRoot, 'dart', buildInitArgs(workspaceRoot, tier));
       if (!initOk) {
         vscode.window.showErrorMessage(`Saropa Lints: init failed. ${initErr || 'Check Output.'}`);
         return;
@@ -181,15 +186,7 @@ export async function runInitializeConfig(context: vscode.ExtensionContext): Pro
       cancellable: false,
     },
     async () => {
-      const result = runInWorkspace(workspaceRoot, 'dart', [
-        'run',
-        'saropa_lints:init',
-        '--tier',
-        tier,
-        '--no-stylistic',
-        '--target',
-        workspaceRoot,
-      ]);
+      const result = runInWorkspace(workspaceRoot, 'dart', buildInitArgs(workspaceRoot, tier));
       ok = result.ok;
       if (!ok) {
         vscode.window.showErrorMessage(`Init failed. ${result.stderr || 'Check Output.'}`);
@@ -236,15 +233,7 @@ export async function runSetTier(context: vscode.ExtensionContext): Promise<bool
       cancellable: false,
     },
     async () => {
-      const result = runInWorkspace(workspaceRoot, 'dart', [
-        'run',
-        'saropa_lints:init',
-        '--tier',
-        tier,
-        '--no-stylistic',
-        '--target',
-        workspaceRoot,
-      ]);
+      const result = runInWorkspace(workspaceRoot, 'dart', buildInitArgs(workspaceRoot, tier));
       ok = result.ok;
       if (!ok) {
         vscode.window.showErrorMessage(`Init failed. ${result.stderr || 'Check Output.'}`);
