@@ -24,6 +24,7 @@ import { ConfigTreeProvider } from './views/configTree';
 import { LogsTreeProvider } from './views/logsTree';
 import { SuggestionsTreeProvider } from './views/suggestionsTree';
 import { readViolations } from './violationsReader';
+import { appendSnapshot } from './runHistory';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -56,7 +57,7 @@ export function activate(context: vscode.ExtensionContext): void {
   updateContext(enabled, false);
 
   const issuesProvider = new IssuesTreeProvider(context.workspaceState);
-  const overviewProvider = new OverviewTreeProvider();
+  const overviewProvider = new OverviewTreeProvider(context.workspaceState);
   const summaryProvider = new SummaryTreeProvider();
   const configProvider = new ConfigTreeProvider();
   const logsProvider = new LogsTreeProvider();
@@ -74,9 +75,14 @@ export function activate(context: vscode.ExtensionContext): void {
 
   function updateIssuesViewMessage(): void {
     const state = issuesProvider.getFilterState();
+    const focused = issuesProvider.getFocusedFile();
     void vscode.commands.executeCommand('setContext', 'saropaLints.hasIssuesFilter', state.hasActiveFilters);
     void vscode.commands.executeCommand('setContext', 'saropaLints.hasSuppressions', state.hasSuppressions);
-    if (state.hasActiveFilters || state.hasSuppressions) {
+    void vscode.commands.executeCommand('setContext', 'saropaLints.hasFocusedFile', focused !== undefined);
+    if (focused) {
+      const basename = focused.split('/').pop() ?? focused;
+      issuesView.message = `Focused: ${basename} \u2014 Showing ${state.filteredCount} of ${state.totalUnfiltered}`;
+    } else if (state.hasActiveFilters || state.hasSuppressions) {
       issuesView.message = `Showing ${state.filteredCount} of ${state.totalUnfiltered}`;
     } else {
       issuesView.message = undefined;
@@ -114,6 +120,8 @@ export function activate(context: vscode.ExtensionContext): void {
       const en = c.get<boolean>('enabled', false) ?? false;
       updateContext(en, issuesProvider.hasViolations());
       refreshAll();
+      // Status bars must update when config changes (e.g. tier changed via Settings UI).
+      updateAllStatusBars();
     }),
   );
 
@@ -128,6 +136,28 @@ export function activate(context: vscode.ExtensionContext): void {
     refreshDebounceTimer = setTimeout(() => {
       refreshDebounceTimer = undefined;
       refreshAll();
+      // W5/W6: Snapshot current data for trends and show celebration messages.
+      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      if (root) {
+        const data = readViolations(root);
+        if (data) {
+          const history = appendSnapshot(context.workspaceState, data);
+          if (history.length >= 2) {
+            const prev = history[history.length - 2];
+            const curr = history[history.length - 1];
+            const delta = prev.total - curr.total;
+            if (delta > 0) {
+              void vscode.window.setStatusBarMessage(
+                `You fixed ${delta} issue${delta === 1 ? '' : 's'}!`,
+                5000,
+              );
+            }
+            if (prev.critical > 0 && curr.critical === 0) {
+              void vscode.window.showInformationMessage('Saropa Lints: No critical issues!');
+            }
+          }
+        }
+      }
     }, 300);
   };
   context.subscriptions.push({
@@ -146,8 +176,16 @@ export function activate(context: vscode.ExtensionContext): void {
   watchViolations();
 
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-  const updateStatusBar = () => {
+  context.subscriptions.push(statusBarItem);
+
+  // W8: Separate status bar item showing the current tier; click to change.
+  const tierStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
+  context.subscriptions.push(tierStatusBarItem);
+
+  // Combined updater for both status bar items to avoid scattered calls.
+  const updateAllStatusBars = () => {
     const en = getConfig().get<boolean>('enabled', false) ?? false;
+    // Main status bar: On/Off state.
     if (en) {
       statusBarItem.text = issuesProvider.hasViolations() ? '$(checklist) Saropa Lints: On' : '$(checklist) Saropa Lints';
       statusBarItem.tooltip = 'Saropa Lints is enabled. Click to open view.';
@@ -157,9 +195,18 @@ export function activate(context: vscode.ExtensionContext): void {
     }
     statusBarItem.command = 'saropaLints.focusView';
     statusBarItem.show();
+    // Tier status bar: current tier, click to change.
+    if (en) {
+      const tier = getConfig().get<string>('tier', 'recommended') ?? 'recommended';
+      tierStatusBarItem.text = `$(tag) ${tier}`;
+      tierStatusBarItem.tooltip = 'Saropa Lints tier. Click to change.';
+      tierStatusBarItem.command = 'saropaLints.setTier';
+      tierStatusBarItem.show();
+    } else {
+      tierStatusBarItem.hide();
+    }
   };
-  updateStatusBar();
-  context.subscriptions.push(statusBarItem);
+  updateAllStatusBars();
 
   context.subscriptions.push(
     vscode.commands.registerCommand('saropaLints.enable', async () => {
@@ -168,7 +215,7 @@ export function activate(context: vscode.ExtensionContext): void {
         await cfg.update('enabled', true, vscode.ConfigurationTarget.Workspace);
         updateContext(true, issuesProvider.hasViolations());
         refreshAll();
-        updateStatusBar();
+        updateAllStatusBars();
       }
     }),
     vscode.commands.registerCommand('saropaLints.disable', async () => {
@@ -176,13 +223,13 @@ export function activate(context: vscode.ExtensionContext): void {
       await cfg.update('enabled', false, vscode.ConfigurationTarget.Workspace);
       updateContext(false, false);
       refreshAll();
-      updateStatusBar();
+      updateAllStatusBars();
     }),
     vscode.commands.registerCommand('saropaLints.runAnalysis', async () => {
       const ok = await runAnalysis(context);
       if (ok) {
         refreshAll();
-        updateStatusBar();
+        updateAllStatusBars();
         updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
         await vscode.commands.executeCommand('saropaLints.issues.focus');
         void vscode.window.setStatusBarMessage('Saropa Lints: Analysis complete', 3000);
@@ -192,7 +239,7 @@ export function activate(context: vscode.ExtensionContext): void {
       const success = await runInitializeConfig(context);
       if (success) {
         refreshAll();
-        updateStatusBar();
+        updateAllStatusBars();
       }
     }),
     vscode.commands.registerCommand('saropaLints.openConfig', openConfig),
@@ -244,7 +291,7 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
     vscode.commands.registerCommand('saropaLints.refresh', () => {
       refreshAll();
-      updateStatusBar();
+      updateAllStatusBars();
       updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
     }),
     vscode.commands.registerCommand('saropaLints.repairConfig', async () => {
@@ -253,7 +300,10 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
     vscode.commands.registerCommand('saropaLints.setTier', async () => {
       const success = await runSetTier(context);
-      if (success) refreshAll();
+      if (success) {
+        refreshAll();
+        updateAllStatusBars();
+      }
     }),
     vscode.commands.registerCommand('saropaLints.showOutput', showOutputChannel),
     vscode.commands.registerCommand('saropaLints.setIssuesFilter', async () => {
@@ -332,6 +382,18 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
     vscode.commands.registerCommand('saropaLints.clearSuppressions', () => {
       issuesProvider.clearSuppressionsAndRefresh();
+      updateIssuesViewMessage();
+    }),
+    // W7: Focus mode — show only one file's violations in the Issues tree.
+    vscode.commands.registerCommand('saropaLints.focusFile', (element: unknown) => {
+      if (element && typeof element === 'object' && 'kind' in element && (element as { kind: string }).kind === 'file') {
+        const filePath = (element as unknown as { filePath: string }).filePath;
+        issuesProvider.setFocusedFile(filePath);
+        updateIssuesViewMessage();
+      }
+    }),
+    vscode.commands.registerCommand('saropaLints.clearFocusFile', () => {
+      issuesProvider.clearFocusedFile();
       updateIssuesViewMessage();
     }),
   );

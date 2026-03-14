@@ -247,6 +247,15 @@
       {
         "command": "saropaLints.applyFix",
         "title": "Apply fix"
+      },
+      {
+        "command": "saropaLints.focusFile",
+        "title": "Show only this file"
+      },
+      {
+        "command": "saropaLints.clearFocusFile",
+        "title": "Show all files",
+        "icon": "$(close-all)"
       }
     ],
     "menus": {
@@ -279,6 +288,11 @@
         {
           "command": "saropaLints.clearSuppressions",
           "when": "view == saropaLints.issues && saropaLints.hasSuppressions",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.clearFocusFile",
+          "when": "view == saropaLints.issues && saropaLints.hasFocusedFile",
           "group": "navigation"
         },
         {
@@ -315,6 +329,10 @@
         {
           "command": "saropaLints.copyPath",
           "when": "view == saropaLints.issues && viewItem == folder"
+        },
+        {
+          "command": "saropaLints.focusFile",
+          "when": "view == saropaLints.issues && viewItem == file"
         },
         {
           "command": "saropaLints.hideFile",

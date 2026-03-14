@@ -90,10 +90,13 @@ function buildFilteredIndex(
   impactsToShow: Set<string>,
   rulesToHide: Set<string>,
   suppressions: Suppressions,
+  focusedFile?: string,
 ): Map<string, Map<string, Violation[]>> {
   const text = textFilter.trim().toLowerCase();
   const bySeverity = new Map<string, Map<string, Violation[]>>();
   for (const v of violations) {
+    // Focus mode: exact file match takes priority over all other filters.
+    if (focusedFile && v.file !== focusedFile) continue;
     const severity = (v.severity ?? 'info').toLowerCase();
     const impact = (v.impact ?? 'low').toLowerCase();
     if (!severitiesToShow.has(severity) || !impactsToShow.has(impact)) continue;
@@ -160,6 +163,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   private severitiesToShow = new Set<string>(SEVERITY_ORDER);
   private impactsToShow = new Set<string>(['critical', 'high', 'medium', 'low', 'opinionated']);
   private rulesToHide = new Set<string>();
+  private focusedFile: string | undefined = undefined;
   private cachedIndex: Map<string, Map<string, Violation[]>> | null = null;
   private totalUnfiltered = 0;
 
@@ -225,6 +229,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
         this.impactsToShow,
         this.rulesToHide,
         this.suppressions,
+        this.focusedFile,
       );
       this.cachedIndex = idx;
       this.totalUnfiltered = totalUnfiltered;
@@ -236,7 +241,8 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       this.textFilter.trim() !== '' ||
       this.severitiesToShow.size < 3 ||
       this.impactsToShow.size < 5 ||
-      this.rulesToHide.size > 0;
+      this.rulesToHide.size > 0 ||
+      this.focusedFile !== undefined;
     const hasSuppressions =
       this.suppressions.hiddenFolders.length > 0 ||
       this.suppressions.hiddenFiles.length > 0 ||
@@ -277,11 +283,28 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     this._onDidChangeTreeData.fire();
   }
 
+  setFocusedFile(filePath: string): void {
+    this.focusedFile = filePath;
+    this.cachedIndex = null;
+    this._onDidChangeTreeData.fire();
+  }
+
+  clearFocusedFile(): void {
+    this.focusedFile = undefined;
+    this.cachedIndex = null;
+    this._onDidChangeTreeData.fire();
+  }
+
+  getFocusedFile(): string | undefined {
+    return this.focusedFile;
+  }
+
   clearFilters(): void {
     this.textFilter = '';
     this.severitiesToShow = new Set(SEVERITY_ORDER);
     this.impactsToShow = new Set(['critical', 'high', 'medium', 'low', 'opinionated']);
     this.rulesToHide = new Set();
+    this.focusedFile = undefined;
     this.cachedIndex = null;
     this._onDidChangeTreeData.fire();
   }
@@ -347,6 +370,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       this.impactsToShow,
       this.rulesToHide,
       this.suppressions,
+      this.focusedFile,
     );
     return this.cachedIndex;
   }
