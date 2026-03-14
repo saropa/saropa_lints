@@ -1,0 +1,268 @@
+/**
+ * Saropa Lints extension entry point.
+ * Master switch (saropaLints.enabled) gates setup and analysis; when on,
+ * extension manages pubspec and analysis_options and runs init/analyze.
+ */
+
+import * as vscode from 'vscode';
+import * as path from 'path';
+import {
+  runEnable,
+  runDisable,
+  runAnalysis,
+  runInitializeConfig,
+  openConfig,
+  runRepairConfig,
+  runSetTier,
+  showOutputChannel,
+} from './setup';
+import { IssuesTreeProvider, registerIssueCommands } from './views/issuesTree';
+import { SummaryTreeProvider } from './views/summaryTree';
+import { ConfigTreeProvider } from './views/configTree';
+import { LogsTreeProvider } from './views/logsTree';
+import { SuggestionsTreeProvider } from './views/suggestionsTree';
+import { readViolations } from './violationsReader';
+
+function getConfig() {
+  return vscode.workspace.getConfiguration('saropaLints');
+}
+
+function updateContext(enabled: boolean, hasViolations: boolean) {
+  void vscode.commands.executeCommand('setContext', 'saropaLints.enabled', enabled);
+  void vscode.commands.executeCommand('setContext', 'saropaLints.hasViolations', hasViolations);
+}
+
+function updateIssuesBadge(view: vscode.TreeView<unknown>, issuesProvider: IssuesTreeProvider) {
+  const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  if (!root) return;
+  const data = readViolations(root);
+  const total = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
+  const critical = data?.summary?.byImpact?.critical ?? 0;
+  if (total > 0 && view.badge !== undefined) {
+    view.badge = {
+      value: critical > 0 ? critical : total,
+      tooltip: critical > 0 ? `${critical} critical, ${total} total` : `${total} violations`,
+    };
+  } else if (view.badge !== undefined) {
+    view.badge = undefined;
+  }
+}
+
+export function activate(context: vscode.ExtensionContext): void {
+  const cfg = getConfig();
+  const enabled = cfg.get<boolean>('enabled', false) ?? false;
+  updateContext(enabled, false);
+
+  const issuesProvider = new IssuesTreeProvider(context.workspaceState);
+  const summaryProvider = new SummaryTreeProvider();
+  const configProvider = new ConfigTreeProvider();
+  const logsProvider = new LogsTreeProvider();
+  const suggestionsProvider = new SuggestionsTreeProvider();
+
+  const issuesView = vscode.window.createTreeView('saropaLints.issues', {
+    treeDataProvider: issuesProvider,
+    showCollapseAll: true,
+  });
+  updateIssuesBadge(issuesView, issuesProvider);
+
+  function updateIssuesViewMessage(): void {
+    const state = issuesProvider.getFilterState();
+    void vscode.commands.executeCommand('setContext', 'saropaLints.hasIssuesFilter', state.hasActiveFilters);
+    void vscode.commands.executeCommand('setContext', 'saropaLints.hasSuppressions', state.hasSuppressions);
+    if (state.hasActiveFilters || state.hasSuppressions) {
+      issuesView.message = `Showing ${state.filteredCount} of ${state.totalUnfiltered}`;
+    } else {
+      issuesView.message = undefined;
+    }
+  }
+  updateIssuesViewMessage();
+
+  registerIssueCommands(issuesProvider, context);
+
+  context.subscriptions.push(
+    issuesView,
+    vscode.window.registerTreeDataProvider('saropaLints.summary', summaryProvider),
+    vscode.window.registerTreeDataProvider('saropaLints.config', configProvider),
+    vscode.window.registerTreeDataProvider('saropaLints.logs', logsProvider),
+    vscode.window.registerTreeDataProvider('saropaLints.suggestions', suggestionsProvider),
+  );
+
+  const refreshAll = () => {
+    issuesProvider.refresh();
+    summaryProvider.refresh();
+    configProvider.refresh();
+    logsProvider.refresh();
+    suggestionsProvider.refresh();
+    updateIssuesBadge(issuesView, issuesProvider);
+    updateIssuesViewMessage();
+  };
+
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (!e.affectsConfiguration('saropaLints')) return;
+      const c = getConfig();
+      const en = c.get<boolean>('enabled', false) ?? false;
+      updateContext(en, issuesProvider.hasViolations());
+      refreshAll();
+    }),
+  );
+
+  const violationsPath = () => {
+    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    return root ? path.join(root, 'reports', '.saropa_lints', 'violations.json') : null;
+  };
+  const watchViolations = () => {
+    const p = violationsPath();
+    if (!p) return;
+    const watcher = vscode.workspace.createFileSystemWatcher(p);
+    watcher.onDidChange(() => refreshAll());
+    watcher.onDidCreate(() => refreshAll());
+    context.subscriptions.push(watcher);
+  };
+  watchViolations();
+
+  const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+  const updateStatusBar = () => {
+    const en = getConfig().get<boolean>('enabled', false) ?? false;
+    if (en) {
+      statusBarItem.text = issuesProvider.hasViolations() ? '$(checklist) Saropa Lints: On' : '$(checklist) Saropa Lints';
+      statusBarItem.tooltip = 'Saropa Lints is enabled. Click to open view.';
+    } else {
+      statusBarItem.text = '$(checklist) Saropa Lints: Off';
+      statusBarItem.tooltip = 'Enable Saropa Lints';
+    }
+    statusBarItem.command = 'saropaLints.refresh';
+    statusBarItem.show();
+  };
+  updateStatusBar();
+  context.subscriptions.push(statusBarItem);
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('saropaLints.enable', async () => {
+      const success = await runEnable(context);
+      if (success) {
+        await cfg.update('enabled', true, vscode.ConfigurationTarget.Workspace);
+        updateContext(true, issuesProvider.hasViolations());
+        refreshAll();
+        updateStatusBar();
+      }
+    }),
+    vscode.commands.registerCommand('saropaLints.disable', async () => {
+      await runDisable();
+      await cfg.update('enabled', false, vscode.ConfigurationTarget.Workspace);
+      updateContext(false, false);
+      refreshAll();
+      updateStatusBar();
+    }),
+    vscode.commands.registerCommand('saropaLints.runAnalysis', async () => {
+      const ok = await runAnalysis(context);
+      if (ok) {
+        refreshAll();
+        updateStatusBar();
+        updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
+      }
+    }),
+    vscode.commands.registerCommand('saropaLints.initializeConfig', async () => {
+      const success = await runInitializeConfig(context);
+      if (success) {
+        refreshAll();
+        updateStatusBar();
+      }
+    }),
+    vscode.commands.registerCommand('saropaLints.openConfig', openConfig),
+    vscode.commands.registerCommand('saropaLints.refresh', () => {
+      refreshAll();
+      updateStatusBar();
+      updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
+    }),
+    vscode.commands.registerCommand('saropaLints.repairConfig', async () => {
+      const success = await runRepairConfig(context);
+      if (success) refreshAll();
+    }),
+    vscode.commands.registerCommand('saropaLints.setTier', async () => {
+      const success = await runSetTier(context);
+      if (success) refreshAll();
+    }),
+    vscode.commands.registerCommand('saropaLints.showOutput', showOutputChannel),
+    vscode.commands.registerCommand('saropaLints.setIssuesFilter', async () => {
+      const state = issuesProvider.getFilterState();
+      const value = await vscode.window.showInputBox({
+        title: 'Filter issues',
+        placeHolder: 'Search file path, rule, or message',
+        value: state.textFilter,
+        prompt: 'Leave empty to show all. Case-insensitive substring match.',
+      });
+      if (value !== undefined) {
+        issuesProvider.setTextFilter(value);
+        updateIssuesViewMessage();
+      }
+    }),
+    vscode.commands.registerCommand('saropaLints.setIssuesFilterByType', async () => {
+      const typeState = issuesProvider.getTypeFilterState();
+      const severityIds = ['error', 'warning', 'info'];
+      const impactIds = ['critical', 'high', 'medium', 'low', 'opinionated'];
+      const quickPick = vscode.window.createQuickPick();
+      quickPick.title = 'Filter by severity and impact';
+      quickPick.canSelectMany = true;
+      quickPick.items = [
+        { label: 'Severity', kind: vscode.QuickPickItemKind.Separator },
+        ...severityIds.map((s) => ({
+          label: s.charAt(0).toUpperCase() + s.slice(1),
+          description: s,
+          picked: typeState.severitiesToShow.has(s),
+        })),
+        { label: 'Impact', kind: vscode.QuickPickItemKind.Separator },
+        ...impactIds.map((s) => ({
+          label: s.charAt(0).toUpperCase() + s.slice(1),
+          description: s,
+          picked: typeState.impactsToShow.has(s),
+        })),
+      ];
+      quickPick.onDidAccept(() => {
+        const selected = new Set(quickPick.selectedItems.map((it) => it.description ?? '').filter(Boolean));
+        const severities = new Set(severityIds.filter((s) => selected.has(s)));
+        const impacts = new Set(impactIds.filter((s) => selected.has(s)));
+        issuesProvider.setSeverityFilter(severities.size > 0 ? severities : new Set(severityIds));
+        issuesProvider.setImpactFilter(impacts.size > 0 ? impacts : new Set(impactIds));
+        updateIssuesViewMessage();
+        quickPick.hide();
+      });
+      quickPick.show();
+    }),
+    vscode.commands.registerCommand('saropaLints.setIssuesFilterByRule', async () => {
+      const ruleNames = issuesProvider.getRuleNamesFromData();
+      if (ruleNames.length === 0) {
+        void vscode.window.showInformationMessage('No violations in current data. Run analysis first.');
+        return;
+      }
+      const rulesToHide = issuesProvider.getRulesToHide();
+      const quickPick = vscode.window.createQuickPick();
+      quickPick.title = 'Filter by rule (deselect to hide)';
+      quickPick.canSelectMany = true;
+      quickPick.matchOnDescription = true;
+      quickPick.items = ruleNames.map((rule) => ({
+        label: rule,
+        description: rule,
+        picked: !rulesToHide.has(rule),
+      }));
+      quickPick.onDidAccept(() => {
+        const selected = new Set(quickPick.selectedItems.map((it) => it.label));
+        const toHide = new Set(ruleNames.filter((r) => !selected.has(r)));
+        issuesProvider.setRulesToHide(toHide);
+        updateIssuesViewMessage();
+        quickPick.hide();
+      });
+      quickPick.show();
+    }),
+    vscode.commands.registerCommand('saropaLints.clearIssuesFilters', () => {
+      issuesProvider.clearFilters();
+      updateIssuesViewMessage();
+    }),
+    vscode.commands.registerCommand('saropaLints.clearSuppressions', () => {
+      issuesProvider.clearSuppressionsAndRefresh();
+      updateIssuesViewMessage();
+    }),
+  );
+}
+
+export function deactivate(): void {}
