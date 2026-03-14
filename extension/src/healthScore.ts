@@ -35,6 +35,14 @@ const IMPACT_WEIGHTS = {
  */
 const DECAY_RATE = 0.3;
 
+/**
+ * Coerce unknown values to number, returning 0 for null/undefined/NaN/non-numeric.
+ * Guards against malformed JSON (e.g. "critical": "bad").
+ */
+function safeNum(v: unknown): number {
+  return typeof v === 'number' && Number.isFinite(v) ? v : 0;
+}
+
 // --- Public API ---
 
 export interface HealthScoreResult {
@@ -61,10 +69,6 @@ export function computeHealthScore(
   if (filesAnalyzed === 0) return null;
 
   const impact = summary.byImpact ?? {};
-  // Guard against non-numeric values from malformed JSON (e.g. "critical": "bad").
-  // `?? 0` only catches null/undefined; non-finite values need an explicit check.
-  const safeNum = (v: unknown): number =>
-    typeof v === 'number' && Number.isFinite(v) ? v : 0;
   const critical = safeNum(impact.critical);
   const high = safeNum(impact.high);
   const medium = safeNum(impact.medium);
@@ -114,8 +118,6 @@ export function estimateScoreWithout(
   if (filesAnalyzed === 0) return null;
 
   const impactCounts = summary.byImpact ?? {};
-  const safeNum = (v: unknown): number =>
-    typeof v === 'number' && Number.isFinite(v) ? v : 0;
 
   // Compute weighted sum with the target impact zeroed out.
   let weighted = 0;

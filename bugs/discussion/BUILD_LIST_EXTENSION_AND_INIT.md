@@ -2,7 +2,7 @@
 
 **Purpose:** Single prioritized list of work to make the extension-driven experience complete, integrated, and genuinely differentiated. Supersedes the previous separate plans (cohesion/WOW, init redesign). Source material: [003_INIT_REDESIGN.md](003_INIT_REDESIGN.md), [log_capture_integration.md](log_capture_integration.md).
 
-**Already done:** Violation export (`violations.json`), Issues tree (structure, filters, suppressions), Summary/Config/Logs/Suggestions/Overview views, one-click setup, file watcher, C4 (Summary → Issues), W1 (Apply fix from tree), W2 (Code Lens), W3 (rule doc in tooltip), W4 (Problems → Show in Saropa), F1–F4 (foundation), W5 (trends), W6 (celebration), W7 (focus mode), W8 (tier in status bar), H1–H3 (Health Score in Overview + status bar + history), C1–C7 (all cohesion items).
+**Already done:** Violation export (`violations.json`), Issues tree (structure, filters, suppressions), Summary/Config/Logs/Suggestions/Overview views, one-click setup, file watcher, C4 (Summary → Issues), W1 (Apply fix from tree), W2 (Code Lens), W3 (rule doc in tooltip), W4 (Problems → Show in Saropa), F1–F4 (foundation), W5 (trends), W6 (celebration), W7 (focus mode), W8 (tier in status bar), H1–H3 (Health Score in Overview + status bar + history), C1–C7 (all cohesion items), D1 (Security Posture view), D3 (inline annotations).
 
 **Implementation records (done 2026-03-14):**
 - **W5 (Trends):** `runHistory.ts` persists last 20 snapshots in workspace state; Overview shows "Trends" row with last 5 totals arrow-separated.
@@ -135,9 +135,9 @@ These replace the generic W5–W12 with features backed by what actually differe
 
 | # | Item | Description | Why it's different | Integration |
 |---|------|-------------|-------------------|-------------|
-| D1 | **Security Posture view** | Dedicated view: OWASP coverage matrix (M1–M10, A01–A10). Each cell shows violation count, click filters Issues. "Your project has gaps in M3, M9." | **No other Dart linter maps to OWASP.** Enterprise/regulated teams need this. Version Lens does OSV.dev vulnerability detection — this is Saropa's equivalent, built from data you already have. | OWASP data from violations.json |
+| D1 | **Security Posture view** | *(done)* OWASP coverage matrix: Mobile Top 10 + Web Top 10, each with 10 category rows showing violation count + rule count. Click filters Issues to mapped rules via `focusIssuesForOwasp`. Green pass icon for zero-violation categories. `securityPostureTree.ts`. | **No other Dart linter maps to OWASP.** Enterprise/regulated teams need this. | OWASP data from violations.json |
 | D2 | **OWASP Compliance export** | Command: "Export Security Report" → generates markdown/HTML summary of OWASP coverage, violation counts by category, gap analysis. Useful for audits, app store submissions, team reviews. | Unique to Saropa. No Dart tool generates this. | OWASP data + score (H1) |
-| D3 | **Inline annotations** (Error Lens style) | Violation message rendered directly on the line in the editor, not just squiggles. Togglable via setting. Color by severity. | Error Lens has 14M+ installs — this is the #1 most-loved code quality UX pattern. No Dart linting extension does it. | violations.json file/line data |
+| D3 | **Inline annotations** (Error Lens style) | *(done)* `inlineAnnotations.ts`: one `TextEditorDecorationType` per severity (error/warning/info). First violation per line per severity, message truncated to 80 chars with rule name. Toggle via `saropaLints.inlineAnnotations` setting and `toggleInlineAnnotations` command. Refreshes on violations.json change via `updateAnnotationsForAllEditors()` in `refreshAll`. | Error Lens has 14M+ installs — #1 most-loved code quality UX pattern. | violations.json file/line data |
 | D4 | **Fix Impact Preview** | Before applying a fix (from Issues tree or inline): "This resolves 1 critical violation. Estimated score: 78 → 80." After fix: "Score updated: 80 ▲2". | CodeScene shows health delta in real-time. Saropa can do the same for fixes. Turns "fix lint" into "improve score". | Score estimation (H1), fix (W1 done) |
 
 ### Tier 2 — Strong differentiators

@@ -23,9 +23,11 @@ import { SummaryTreeProvider } from './views/summaryTree';
 import { ConfigTreeProvider } from './views/configTree';
 import { LogsTreeProvider } from './views/logsTree';
 import { SuggestionsTreeProvider } from './views/suggestionsTree';
+import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { readViolations, ViolationsData } from './violationsReader';
 import { appendSnapshot, loadHistory, findPreviousScore } from './runHistory';
 import { computeHealthScore, formatScoreDelta, scoreColorBand } from './healthScore';
+import { registerInlineAnnotations, updateAnnotationsForAllEditors } from './inlineAnnotations';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -63,6 +65,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const configProvider = new ConfigTreeProvider();
   const logsProvider = new LogsTreeProvider();
   const suggestionsProvider = new SuggestionsTreeProvider();
+  const securityProvider = new SecurityPostureTreeProvider();
 
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('saropaLints.overview', overviewProvider),
@@ -93,6 +96,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
   registerIssueCommands(issuesProvider, context);
   registerCodeLensProvider(context);
+  registerInlineAnnotations(context);
 
   context.subscriptions.push(
     issuesView,
@@ -100,6 +104,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.window.registerTreeDataProvider('saropaLints.config', configProvider),
     vscode.window.registerTreeDataProvider('saropaLints.logs', logsProvider),
     vscode.window.registerTreeDataProvider('saropaLints.suggestions', suggestionsProvider),
+    vscode.window.registerTreeDataProvider('saropaLints.securityPosture', securityProvider),
   );
 
   const refreshAll = () => {
@@ -109,9 +114,12 @@ export function activate(context: vscode.ExtensionContext): void {
     configProvider.refresh();
     logsProvider.refresh();
     suggestionsProvider.refresh();
+    securityProvider.refresh();
     invalidateCodeLenses();
     updateIssuesBadge(issuesView, issuesProvider);
     updateIssuesViewMessage();
+    // D3: Refresh inline annotations when violations data changes.
+    updateAnnotationsForAllEditors();
   };
 
   context.subscriptions.push(
@@ -354,15 +362,25 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('saropaLints.setTier', async () => {
       const success = await runSetTier(context);
       if (success) {
-        // C6: Auto-run analysis after tier change if setting is on.
-        const runAfter = getConfig().get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
-        if (runAfter) {
-          await runAnalysis(context);
-        }
+        // C6: setup.ts already runs analysis inside runSetTier when
+        // runAnalysisAfterConfigChange is on; no duplicate call here.
         refreshAll();
         updateAllStatusBars();
         updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
+        // C6: Focus Overview after tier change so user sees score delta.
+        await vscode.commands.executeCommand('saropaLints.overview.focus');
       }
+    }),
+    // D1: Focus Issues view filtered to rules mapped to an OWASP category.
+    // Uses rule-hide filter: hide all rules EXCEPT the ones mapped to this category.
+    vscode.commands.registerCommand('saropaLints.focusIssuesForOwasp', (rules: string[]) => {
+      if (!Array.isArray(rules) || rules.length === 0) return;
+      const allRules = issuesProvider.getRuleNamesFromData();
+      const keep = new Set(rules);
+      const toHide = new Set(allRules.filter((r) => !keep.has(r)));
+      issuesProvider.setRulesToHide(toHide);
+      updateIssuesViewMessage();
+      void vscode.commands.executeCommand('saropaLints.issues.focus');
     }),
     vscode.commands.registerCommand('saropaLints.showOutput', showOutputChannel),
     vscode.commands.registerCommand('saropaLints.setIssuesFilter', async () => {

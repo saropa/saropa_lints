@@ -5,6 +5,11 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
+export interface OwaspData {
+  mobile?: string[];
+  web?: string[];
+}
+
 export interface Violation {
   file: string;
   line: number;
@@ -13,6 +18,8 @@ export interface Violation {
   severity?: string;
   impact?: string;
   correction?: string;
+  /** OWASP categories this violation maps to (D1: Security Posture). */
+  owasp?: OwaspData;
 }
 
 export interface BySeverity {
