@@ -24,6 +24,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 ### Added (VS Code extension)
 
 - **Health Score (H1–H3):** A single 0–100 score computed from violation count and impact distribution, shown in the Overview view and status bar. The score uses impact-weighted density with exponential decay — critical issues penalize heavily, minor issues less so. Score delta (e.g. "▲4") shows improvement from the last run. Status bar color reflects score band: green (80+), yellow (50–79), red (<50). Score is persisted in run history for trend tracking. New module: `healthScore.ts`.
+- **Welcome states (C5):** All six views now show VS Code's native welcome content with clear call-to-action buttons when disabled ("Enable Saropa Lints") or when no analysis data exists ("Run Analysis"). Replaces flat placeholder tree items.
+- **Analysis focuses Overview (C7):** After "Run Analysis" completes, the Overview view is focused (showing the Health Score delta) instead of the Issues view. The completion notification now includes the score. File-watcher refreshes also update view context so welcome states stay current.
 - **Focus mode (W7):** Right-click a file in the Issues tree and choose "Show only this file" to filter the tree to that file's violations only. Toolbar "Show all files" button resets. View message shows "Focused: filename.dart".
 - **Trends / mini history (W5):** Last 20 analysis snapshots are persisted in workspace state. Overview shows a "Trends" row with recent totals (e.g. "120 → 115 → 98"). New module: `runHistory.ts`.
 - **Celebration / progress (W6):** When violations decrease after a run, a transient status bar message shows "You fixed N issues!". When critical issues hit zero, a notification says "No critical issues!". Overview shows a "↓ N fewer issues" row when the count dropped.
@@ -51,6 +53,11 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 ### Fixed (VS Code extension)
 
+- **Health Score NaN guard:** `computeHealthScore` now validates impact counts against non-numeric JSON values (e.g. `”critical”: “bad”`) and clamps the final score to 0 when the formula produces NaN, preventing corrupt scores from propagating into the status bar and run history.
+- **Run history dedup broadened:** `appendSnapshot` now compares total, severity breakdown (error/warning/info), critical count, and score — not just total. A severity shift with the same total (e.g. 5 warnings resolved, 5 errors introduced) is now correctly recorded as a distinct snapshot.
+- **Celebration guard:** Celebration messages (“You fixed N issues!”, “No critical issues!”) now only fire when a genuinely new snapshot was recorded. Previously, the toast could misfire on every file-save if the dedup logic suppressed the append.
+- **Snapshot-before-refresh ordering:** `debouncedRefresh` now records the snapshot before refreshing tree views, so the Overview tree reads the latest history (including the freshly appended score) instead of stale data.
+- **Run history write errors logged:** `saveHistory` now logs failures to the console instead of silently discarding them.
 - Tier status bar now updates immediately when tier is changed via Settings UI or the Set Tier command (previously stayed stale until next manual refresh).
 - Root-level folder nodes in the Issues tree now use an empty path prefix so expanding e.g. “lib” shows files under `lib/` correctly.
 - Severity and impact suppressions (e.g. “Hide this severity”) are now applied when building the filtered index.

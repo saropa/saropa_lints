@@ -38,17 +38,11 @@ export class SummaryTreeProvider implements vscode.TreeDataProvider<SummaryItem>
 
   async getChildren(element?: SummaryItem): Promise<SummaryItem[]> {
     const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (!root) return [new SummaryItem('No workspace', undefined)];
+    // C5: Return empty for no-workspace and no-data so viewsWelcome renders.
+    if (!root) return [];
 
     const data = readViolations(root);
-    if (!data) {
-      if (!element) {
-        return [
-          new SummaryItem('No violations file', 'Run analysis to generate'),
-        ];
-      }
-      return [];
-    }
+    if (!data) return [];
 
     const s = data.summary;
     const c = data.config;

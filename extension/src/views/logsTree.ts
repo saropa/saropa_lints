@@ -51,13 +51,12 @@ export class LogsTreeProvider implements vscode.TreeDataProvider<LogItem> {
 
   async getChildren(element?: LogItem): Promise<LogItem[]> {
     const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (!root) return [new LogItem('No workspace', '', 'file')];
+    // C5: Return empty for no-workspace so viewsWelcome renders.
+    if (!root) return [];
 
     const reportsDir = path.join(root, 'reports');
-    if (!fs.existsSync(reportsDir)) {
-      if (!element) return [new LogItem('No reports/ folder', '', 'file')];
-      return [];
-    }
+    // C5: Return empty when no reports/ folder so viewsWelcome "Run Analysis" shows.
+    if (!fs.existsSync(reportsDir)) return [];
 
     if (!element) {
       const dirs = fs.readdirSync(reportsDir, { withFileTypes: true })

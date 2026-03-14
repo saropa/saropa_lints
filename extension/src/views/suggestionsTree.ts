@@ -43,12 +43,13 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
     const cfg = vscode.workspace.getConfiguration('saropaLints');
     const enabled = cfg.get<boolean>('enabled', false) ?? false;
 
-    if (!enabled) {
-      items.push(new SuggestionItem('Enable Saropa Lints', 'One-click setup', 'saropaLints.enable'));
-      return items;
-    }
+    // C5: When disabled, return empty so viewsWelcome "Enable" shows.
+    if (!enabled) return [];
 
     const data = root ? readViolations(root) : null;
+    // C5: When no data, return empty so viewsWelcome "Run analysis" shows.
+    if (!data) return [];
+
     const byImpact = data?.summary?.byImpact;
     const bySeverity = data?.summary?.bySeverity;
     const total = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;

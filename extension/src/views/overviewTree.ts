@@ -42,12 +42,8 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
     const cfg = vscode.workspace.getConfiguration('saropaLints');
     const enabled = cfg.get<boolean>('enabled', false) ?? false;
 
-    if (!enabled) {
-      return [
-        new OverviewItem('Saropa Lints is off', 'Enable to get started', 'saropaLints.enable'),
-        new OverviewItem('Enable Saropa Lints', undefined, 'saropaLints.enable'),
-      ];
-    }
+    // C5: Return empty array so VS Code's viewsWelcome content renders instead.
+    if (!enabled) return [];
 
     const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     const data = root ? readViolations(root) : null;
@@ -56,36 +52,30 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
 
     const items: OverviewItem[] = [];
 
-    if (total === 0 && !data) {
-      items.push(
-        new OverviewItem('No analysis yet', 'Run analysis to see issues', 'saropaLints.runAnalysis'),
-        new OverviewItem('Run Analysis', undefined, 'saropaLints.runAnalysis'),
-      );
-      return items;
-    }
+    // C5: No violations.json yet — return empty so viewsWelcome "Run Analysis" shows.
+    if (!data) return [];
 
     // H2: Health Score — the primary number in Overview.
+    // data is guaranteed non-null here (early return above handles null).
     const history = loadHistory(this.workspaceState);
-    if (data) {
-      const health = computeHealthScore(data);
-      if (health) {
-        const prevScore = findPreviousScore(history);
-        const delta = prevScore !== undefined
-          ? formatScoreDelta(health.score, prevScore)
-          : '';
-        const scoreDesc = delta
-          ? `${delta} from last run`
-          : total === 0
-            ? 'No violations'
-            : `${total} violations`;
-        items.push(
-          new OverviewItem(
-            `Health: ${health.score}`,
-            scoreDesc,
-            'saropaLints.focusIssues',
-          ),
-        );
-      }
+    const health = computeHealthScore(data);
+    if (health) {
+      const prevScore = findPreviousScore(history);
+      const delta = prevScore !== undefined
+        ? formatScoreDelta(health.score, prevScore)
+        : '';
+      const scoreDesc = delta
+        ? `${delta} from last run`
+        : total === 0
+          ? 'No violations'
+          : `${total} violations`;
+      items.push(
+        new OverviewItem(
+          `Health: ${health.score}`,
+          scoreDesc,
+          'saropaLints.focusIssues',
+        ),
+      );
     }
 
     // Violation summary — secondary to the score.
@@ -96,7 +86,7 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
       items.push(
         new OverviewItem(issueLabel, 'View in Issues', 'saropaLints.focusIssues'),
       );
-    } else if (data) {
+    } else {
       // Zero violations after analysis — clean project.
       items.push(
         new OverviewItem('No violations', 'All clear', 'saropaLints.focusIssues'),

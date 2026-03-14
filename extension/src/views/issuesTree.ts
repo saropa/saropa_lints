@@ -506,28 +506,19 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     if (!root) return [];
 
     const data = readViolations(root);
-    if (!data) {
-      if (!element) {
-        return [
-          {
-            kind: 'placeholder',
-            id: 'no-data',
-            label: 'No violations file yet. Run analysis.',
-            command: 'saropaLints.runAnalysis',
-          },
-        ];
-      }
-      return [];
-    }
+    // C5: Return empty array when no violations file so viewsWelcome content renders.
+    if (!data) return [];
 
     const violations = data.violations ?? [];
+    // Zero violations after analysis — show a clean-state item (not empty,
+    // because viewsWelcome would misleadingly say "No analysis results yet").
     if (violations.length === 0 && !element) {
       return [
         {
-          kind: 'placeholder',
-          id: 'no-data',
-          label: 'No violations',
-          description: 'Run analysis to see issues',
+          kind: 'placeholder' as const,
+          id: 'no-data' as const,
+          label: 'No violations found',
+          description: 'All clear',
           command: 'saropaLints.runAnalysis',
         },
       ];

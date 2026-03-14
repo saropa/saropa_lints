@@ -35,6 +35,10 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigItem> {
   async getChildren(): Promise<ConfigItem[]> {
     const cfg = vscode.workspace.getConfiguration('saropaLints');
     const enabled = cfg.get<boolean>('enabled', false) ?? false;
+
+    // C5: When disabled, return empty so viewsWelcome "Enable" shows.
+    if (!enabled) return [];
+
     const tier = cfg.get<string>('tier', 'recommended') ?? 'recommended';
     const runAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
 
