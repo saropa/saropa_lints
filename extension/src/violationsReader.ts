@@ -75,7 +75,9 @@ export function readViolations(workspaceRoot: string): ViolationsData | null {
             bySeverity: summary.bySeverity,
             byImpact: summary.byImpact,
             issuesByRule:
-              summary.issuesByRule && typeof summary.issuesByRule === 'object'
+              summary.issuesByRule &&
+              typeof summary.issuesByRule === 'object' &&
+              !Array.isArray(summary.issuesByRule)
                 ? summary.issuesByRule
                 : undefined,
           }

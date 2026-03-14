@@ -14,7 +14,7 @@ Enable and configure [Saropa Lints](https://pub.dev/packages/saropa_lints) from 
 3. Click **Enable Saropa Lints**. The extension will:
    - Add `saropa_lints` to `dev_dependencies`
    - Run `dart pub get` (or `flutter pub get`)
-   - Run `dart run saropa_lints:init --tier recommended`
+   - Run `dart run saropa_lints:init --tier recommended --no-stylistic --target <workspace>` (non-interactive)
    - Optionally run `dart analyze`
 4. Use **Run Analysis** and **Open Config** as needed. Issues appear in the **Issues** view when `reports/.saropa_lints/violations.json` exists (written by the analyzer).
 
@@ -29,6 +29,8 @@ The Issues view shows violations in a **tree**: first by **severity** (Error, Wa
 - **Violation tooltips:** Show rule name and a "More" link to rule documentation (ROADMAP).
 - **Summary → Issues:** Click **Total violations** in the Summary view to open the Issues view with all issues (clears any active filters). By severity / By impact rows open Issues with the matching filter.
 - **Problems view:** Right-click a problem and choose **Saropa Lints: Show in Saropa Lints** to focus the Issues view filtered to the active file.
+
+The **Config** view shows Enabled, Tier, Run analysis after config change, **Detected** (Flutter and packages from `pubspec.yaml`), and actions (Open config, Initialize config, Run analysis).
 
 ## Settings
 

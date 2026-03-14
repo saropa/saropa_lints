@@ -84,6 +84,7 @@ class ViolationExporter {
       return <String, Object>{'tier': 'unknown'};
     }
 
+    // Extension triage UI uses this to separate stylistic (opt-in) rules.
     final stylisticList = tiers.stylisticRules.toList()..sort();
     return <String, Object>{
       'tier': config.effectiveTier,
