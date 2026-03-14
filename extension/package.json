@@ -69,6 +69,10 @@
         {
           "id": "saropaLints.suggestions",
           "name": "Suggestions"
+        },
+        {
+          "id": "saropaLints.securityPosture",
+          "name": "Security Posture"
         }
       ]
     },
@@ -125,6 +129,16 @@
       },
       {
         "view": "saropaLints.suggestions",
+        "contents": "Saropa Lints is **off** for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)",
+        "when": "!saropaLints.enabled"
+      },
+      {
+        "view": "saropaLints.securityPosture",
+        "contents": "OWASP coverage from your latest analysis.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
+        "when": "saropaLints.enabled && !saropaLints.hasViolations"
+      },
+      {
+        "view": "saropaLints.securityPosture",
         "contents": "Saropa Lints is **off** for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)",
         "when": "!saropaLints.enabled"
       }
@@ -256,6 +270,14 @@
         "command": "saropaLints.clearFocusFile",
         "title": "Show all files",
         "icon": "$(close-all)"
+      },
+      {
+        "command": "saropaLints.toggleInlineAnnotations",
+        "title": "Saropa Lints: Toggle Inline Annotations"
+      },
+      {
+        "command": "saropaLints.focusIssuesForOwasp",
+        "title": "Saropa Lints: Show Issues for OWASP Category"
       }
     ],
     "menus": {
@@ -318,6 +340,11 @@
         {
           "command": "saropaLints.refresh",
           "when": "view == saropaLints.suggestions",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.refresh",
+          "when": "view == saropaLints.securityPosture",
           "group": "navigation"
         }
       ],
@@ -397,6 +424,11 @@
           "type": "boolean",
           "default": true,
           "description": "Run dart analyze after init or config change when enabled."
+        },
+        "saropaLints.inlineAnnotations": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show violation messages at the end of affected lines (Error Lens style)."
         },
         "saropaLints.issuesPageSize": {
           "type": "number",

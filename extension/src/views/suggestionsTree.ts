@@ -63,9 +63,13 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
 
     if (critical > 0) {
       // C3: Show estimated score gain from fixing all critical issues.
+      // Skip score message when gain is zero ("+0 points" is not useful).
       const projected = estimateScoreWithout(data, 'critical');
-      const desc = (currentScore !== undefined && projected !== null)
-        ? `estimated +${projected - currentScore} points`
+      const gain = (currentScore !== undefined && projected !== null)
+        ? projected - currentScore
+        : null;
+      const desc = (gain !== null && gain > 0)
+        ? `estimated +${gain} points`
         : 'Show in Issues';
       items.push(
         new SuggestionItem(
@@ -78,8 +82,11 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
     }
     if (high > 0 && items.length < 3) {
       const projected = estimateScoreWithout(data, 'high');
-      const desc = (currentScore !== undefined && projected !== null)
-        ? `estimated +${projected - currentScore} points`
+      const gain = (currentScore !== undefined && projected !== null)
+        ? projected - currentScore
+        : null;
+      const desc = (gain !== null && gain > 0)
+        ? `estimated +${gain} points`
         : 'Show in Issues';
       items.push(
         new SuggestionItem(

@@ -237,8 +237,17 @@ export async function runSetTier(context: vscode.ExtensionContext): Promise<bool
       ok = result.ok;
       if (!ok) {
         vscode.window.showErrorMessage(`Init failed. ${result.stderr || 'Check Output.'}`);
-      } else {
-        vscode.window.showInformationMessage(`Saropa Lints tier set to ${tier}.`);
+        return;
+      }
+      vscode.window.showInformationMessage(`Saropa Lints tier set to ${tier}.`);
+      // C6: Re-analyze after tier change so violations.json reflects the new ruleset,
+      // matching the behavior of runEnable.
+      const cfgAfter = vscode.workspace.getConfiguration('saropaLints');
+      const runAnalysisAfter = cfgAfter.get<boolean>('runAnalysisAfterConfigChange', true);
+      if (runAnalysisAfter) {
+        const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
+        const analyzeCmd = useFlutter ? 'flutter' : 'dart';
+        runInWorkspace(workspaceRoot, analyzeCmd, ['analyze']);
       }
     },
   );
