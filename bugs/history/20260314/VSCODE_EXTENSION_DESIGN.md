@@ -1,6 +1,7 @@
 # Saropa Lints VS Code Extension — Design
 
-**Status:** Draft for review  
+**Archived:** 2026-03-14. MVP implemented; see `VSCODE_EXTENSION_DESIGN_SUMMARY.md` in this folder.
+**Status:** Draft for review (historical)  
 **Goal:** The extension is the **primary way** to use saropa_lints.
 
 **Issues view (tree):** Implemented 2026-03-14 — severity → path tree, filters, suppressions; see `bugs/history/20260314/ISSUES_TREE_IMPLEMENTATION_SUMMARY.md`. It has a **master on/off switch**; when **on**, it sets up the project (pubspec + analysis_options), runs init and analysis, and provides all views and controls. **If the extension doesn't replace the init process from the user's perspective, we have failed.** The Dart analyzer + saropa_lints plugin remain the execution plane for linting; the extension owns setup, config, and UX.

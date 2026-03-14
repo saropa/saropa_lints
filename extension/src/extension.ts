@@ -107,16 +107,30 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
   );
 
-  const violationsPath = () => {
+  const violationsPath = (): string | null => {
     const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     return root ? path.join(root, 'reports', '.saropa_lints', 'violations.json') : null;
   };
+  // Debounce refresh when violations.json changes to avoid rapid successive updates.
+  let refreshDebounceTimer: ReturnType<typeof setTimeout> | undefined;
+  const debouncedRefresh = () => {
+    if (refreshDebounceTimer) clearTimeout(refreshDebounceTimer);
+    refreshDebounceTimer = setTimeout(() => {
+      refreshDebounceTimer = undefined;
+      refreshAll();
+    }, 300);
+  };
+  context.subscriptions.push({
+    dispose: () => {
+      if (refreshDebounceTimer) clearTimeout(refreshDebounceTimer);
+    },
+  });
   const watchViolations = () => {
     const p = violationsPath();
     if (!p) return;
     const watcher = vscode.workspace.createFileSystemWatcher(p);
-    watcher.onDidChange(() => refreshAll());
-    watcher.onDidCreate(() => refreshAll());
+    watcher.onDidChange(debouncedRefresh);
+    watcher.onDidCreate(debouncedRefresh);
     context.subscriptions.push(watcher);
   };
   watchViolations();
