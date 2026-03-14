@@ -20,7 +20,7 @@ Canonical Cursor plan: `vscode_extension_cohesion_and_wow_e4f5a6b7.plan.md` (in 
 
 **Constraints:** VS Code API only; no dependency on Dart/Flutter extension for engine. analysis_options behavior must stay compatible with `dart run saropa_lints:init` for users who don't use the extension. Engines: `^1.74.0` (Cursor-safe). Config prefix: `saropaLints.*`. Publish: vsce + Open VSX; package.json has repository, license, displayName, publisher, icon, .vscodeignore.
 
-**MVP scope (implemented):** Master on/off; one-click setup (pubspec + analysis_options, init from UI); Issues (tree by severity → path, filters, suppressions); Overview, Summary, Config, Logs, Suggestions; progress indicators for long-running commands; debounced refresh on violations.json; custom icon (activity bar + marketplace). Package README promotes extension; publish script supports vsce + Open VSX. Trends view and full config toggles deferred to later phases.
+**MVP scope (implemented):** Master on/off; one-click setup (pubspec + analysis_options, init from UI); Issues (tree by severity → path, filters, suppressions); Overview, Summary, Config, Logs, Suggestions; progress indicators for long-running commands; debounced refresh on violations.json; custom icon (activity bar + marketplace). Package README promotes extension; publish script supports vsce + Open VSX. **Publish script unified (2026-03-14):** Package and extension are published from `scripts/publish.py`; extension version synced with package; option 6 = extension-only package/publish. Trends view and full config toggles deferred to later phases.
 
 ---
 
