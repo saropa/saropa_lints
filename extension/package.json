@@ -1,0 +1,313 @@
+{
+  "name": "saropa-lints",
+  "displayName": "Saropa Lints",
+  "description": "Enable and configure Saropa Lints for Dart/Flutter. One-click setup, no init command—pubspec and analysis_options from the UI.",
+  "version": "0.1.0",
+  "publisher": "saropa",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saropa/saropa_lints"
+  },
+  "homepage": "https://github.com/saropa/saropa_lints#readme",
+  "bugs": {
+    "url": "https://github.com/saropa/saropa_lints/issues"
+  },
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "dart",
+    "flutter",
+    "lint",
+    "static-analysis",
+    "saropa",
+    "analysis-options"
+  ],
+  "activationEvents": [
+    "onLanguage:dart",
+    "workspaceContains:pubspec.yaml"
+  ],
+  "main": "./out/extension.js",
+  "icon": "icon.png",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "saropaLints",
+          "title": "Saropa Lints",
+          "icon": "icon.png"
+        }
+      ]
+    },
+    "views": {
+      "saropaLints": [
+        {
+          "id": "saropaLints.issues",
+          "name": "Issues"
+        },
+        {
+          "id": "saropaLints.summary",
+          "name": "Summary"
+        },
+        {
+          "id": "saropaLints.config",
+          "name": "Config"
+        },
+        {
+          "id": "saropaLints.logs",
+          "name": "Logs"
+        },
+        {
+          "id": "saropaLints.suggestions",
+          "name": "Suggestions"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "saropaLints.issues",
+        "contents": "Saropa Lints is **off** for this workspace.\n\nEnable it to:\n• Add saropa_lints to your project (pubspec + analysis_options)\n• Run init and analysis from the UI—no terminal commands\n• See issues grouped by impact, rule, and file\n\n[Enable Saropa Lints](command:saropaLints.enable)",
+        "when": "!saropaLints.enabled"
+      },
+      {
+        "view": "saropaLints.issues",
+        "contents": "No analysis results yet.\n\n[Run Analysis](command:saropaLints.runAnalysis)\n[Open Config](command:saropaLints.openConfig)",
+        "when": "saropaLints.enabled && !saropaLints.hasViolations"
+      }
+    ],
+    "commands": [
+      {
+        "command": "saropaLints.enable",
+        "title": "Saropa Lints: Enable"
+      },
+      {
+        "command": "saropaLints.disable",
+        "title": "Saropa Lints: Disable"
+      },
+      {
+        "command": "saropaLints.runAnalysis",
+        "title": "Saropa Lints: Run Analysis"
+      },
+      {
+        "command": "saropaLints.initializeConfig",
+        "title": "Saropa Lints: Initialize / Update Config"
+      },
+      {
+        "command": "saropaLints.openConfig",
+        "title": "Saropa Lints: Open Config"
+      },
+      {
+        "command": "saropaLints.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "saropaLints.repairConfig",
+        "title": "Saropa Lints: Repair Config"
+      },
+      {
+        "command": "saropaLints.setTier",
+        "title": "Saropa Lints: Set Tier"
+      },
+      {
+        "command": "saropaLints.showOutput",
+        "title": "Saropa Lints: Show Output"
+      },
+      {
+        "command": "saropaLints.setIssuesFilter",
+        "title": "Filter by text…",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "saropaLints.setIssuesFilterByType",
+        "title": "Filter by type…"
+      },
+      {
+        "command": "saropaLints.setIssuesFilterByRule",
+        "title": "Filter by rule…"
+      },
+      {
+        "command": "saropaLints.clearIssuesFilters",
+        "title": "Clear filters"
+      },
+      {
+        "command": "saropaLints.clearSuppressions",
+        "title": "Clear suppressions"
+      },
+      {
+        "command": "saropaLints.hideFolder",
+        "title": "Hide folder from view"
+      },
+      {
+        "command": "saropaLints.hideFile",
+        "title": "Hide file from view"
+      },
+      {
+        "command": "saropaLints.hideRule",
+        "title": "Hide rule from view"
+      },
+      {
+        "command": "saropaLints.hideRuleInFile",
+        "title": "Hide rule in this file"
+      },
+      {
+        "command": "saropaLints.hideSeverity",
+        "title": "Hide this severity"
+      },
+      {
+        "command": "saropaLints.hideImpact",
+        "title": "Hide this impact"
+      },
+      {
+        "command": "saropaLints.copyPath",
+        "title": "Copy path"
+      },
+      {
+        "command": "saropaLints.copyMessage",
+        "title": "Copy message"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "saropaLints.refresh",
+          "when": "view == saropaLints.issues",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.setIssuesFilter",
+          "when": "view == saropaLints.issues",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.setIssuesFilterByType",
+          "when": "view == saropaLints.issues",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.setIssuesFilterByRule",
+          "when": "view == saropaLints.issues",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.clearIssuesFilters",
+          "when": "view == saropaLints.issues && saropaLints.hasIssuesFilter",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.clearSuppressions",
+          "when": "view == saropaLints.issues && saropaLints.hasSuppressions",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.refresh",
+          "when": "view == saropaLints.summary",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.refresh",
+          "when": "view == saropaLints.config",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.refresh",
+          "when": "view == saropaLints.logs",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.refresh",
+          "when": "view == saropaLints.suggestions",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "saropaLints.hideFolder",
+          "when": "view == saropaLints.issues && viewItem == folder"
+        },
+        {
+          "command": "saropaLints.copyPath",
+          "when": "view == saropaLints.issues && viewItem == folder"
+        },
+        {
+          "command": "saropaLints.hideFile",
+          "when": "view == saropaLints.issues && viewItem == file"
+        },
+        {
+          "command": "saropaLints.copyPath",
+          "when": "view == saropaLints.issues && viewItem == file"
+        },
+        {
+          "command": "saropaLints.hideRule",
+          "when": "view == saropaLints.issues && viewItem == violation"
+        },
+        {
+          "command": "saropaLints.hideRuleInFile",
+          "when": "view == saropaLints.issues && viewItem == violation"
+        },
+        {
+          "command": "saropaLints.copyMessage",
+          "when": "view == saropaLints.issues && viewItem == violation"
+        },
+        {
+          "command": "saropaLints.hideImpact",
+          "when": "view == saropaLints.issues && viewItem == violation"
+        },
+        {
+          "command": "saropaLints.hideSeverity",
+          "when": "view == saropaLints.issues && viewItem == severity"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Saropa Lints",
+      "properties": {
+        "saropaLints.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Saropa Lints for this workspace. When on, the extension sets up pubspec and analysis_options and runs analysis; when off, it does nothing."
+        },
+        "saropaLints.tier": {
+          "type": "string",
+          "enum": [
+            "essential",
+            "recommended",
+            "professional",
+            "comprehensive",
+            "pedantic"
+          ],
+          "default": "recommended",
+          "description": "Default tier when enabling or re-initializing."
+        },
+        "saropaLints.runAnalysisAfterConfigChange": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run dart analyze after init or config change when enabled."
+        },
+        "saropaLints.issuesPageSize": {
+          "type": "number",
+          "default": 100,
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "Maximum number of violations shown per file in the Issues tree. Remaining are shown as \"and N more…\"."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "tsc --noEmit -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.74.0",
+    "typescript": "^5.3.0"
+  }
+}

@@ -14,25 +14,29 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 ## [Unreleased]
 
+### Added (VS Code extension)
+
+- **Issues view (tree):** Group by severity (Error, Warning, Info) then by project structure (folders and files). Violations per file are capped (default 100, configurable via `saropaLints.issuesPageSize`) with an “and N more…” overflow node for scale (e.g. 65k+ issues).
+- **Filters:** Text filter (file path, rule name, message); type filter (severity and impact); rule filter (multi-select rules to show). View message shows “Showing X of Y” when any filter or suppression is active.
+- **Suppressions (persisted):** Hide folder, file, rule, rule-in-file, severity, or impact from the tree via context menu. Stored in workspace state; “Clear suppressions” in the view toolbar restores all.
+- **Context menus:** Hide folder/file/rule/rule-in-file/severity/impact, Copy path, Copy message. Toolbar: Filter by text, Filter by type, Filter by rule, Clear filters, Clear suppressions, Refresh.
+
+### Fixed (VS Code extension)
+
+- Root-level folder nodes in the Issues tree now use an empty path prefix so expanding e.g. “lib” shows files under `lib/` correctly.
+- Severity and impact suppressions (e.g. “Hide this severity”) are now applied when building the filtered index.
+
 ---
 
 ## [8.2.2]
 
 ### Changed
 
-- Version bump
+- Release version bump
 
 ---
 
-## [8.2.1]
-
-### Changed
-
-- Version bump
-
----
-
-## [8.2.0] [Unreleased]
+## [8.2.0]
 
 ### Added
 
