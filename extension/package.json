@@ -159,6 +159,14 @@
         "title": "Saropa Lints: Show All Issues"
       },
       {
+        "command": "saropaLints.focusIssuesForFile",
+        "title": "Saropa Lints: Show Issues for File"
+      },
+      {
+        "command": "saropaLints.focusIssuesForActiveFile",
+        "title": "Saropa Lints: Show in Saropa Lints"
+      },
+      {
         "command": "saropaLints.focusIssuesWithImpactFilter",
         "title": "Saropa Lints: Show Issues by Impact"
       },
@@ -339,6 +347,11 @@
         {
           "command": "saropaLints.hideSeverity",
           "when": "view == saropaLints.issues && viewItem == severity"
+        },
+        {
+          "command": "saropaLints.focusIssuesForActiveFile",
+          "when": "view == workbench.panel.markers.view",
+          "group": "navigation"
         }
       ]
     },

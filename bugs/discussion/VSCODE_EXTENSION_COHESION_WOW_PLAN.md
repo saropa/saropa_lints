@@ -49,6 +49,9 @@ Files changed: `extension/src/suppressionsStore.ts` (new), `extension/src/violat
 
 - **C4 (Summary → Issues):** "Total violations" row is clickable; opens Issues view and clears filters so all issues are shown. Command: `saropaLints.focusIssues`.
 - **W1 (Apply fix from Issues tree):** Context menu "Apply fix" on a violation invokes `vscode.executeCodeActionProvider` for that file/line (QuickFix kind); prefers code action matching the violation's rule, then applies edit/command. Progress notification "Applying fix…" shown while running. Diagnostic code matching supports string, number, and `{ value }` forms.
+- **W2 (Code Lens):** Dart files with violations show a Code Lens at line 0: "Saropa Lints: N issues — Show in Saropa". Command `saropaLints.focusIssuesForFile(filePath)` filters the Issues view to that file. Code Lenses invalidate when `violations.json` changes.
+- **W3 (Rule doc in hover/tree):** Violation tooltips include **Rule:** `ruleName` and a [More](ROADMAP) link. Optional short descriptions via `ruleMetadata.ts` (currently link-only).
+- **W4 (Problems → Saropa Lints):** Context menu on the Problems view ("Saropa Lints: Show in Saropa Lints") runs `saropaLints.focusIssuesForActiveFile`, which filters Issues to the active editor's file.
 
 ---
 

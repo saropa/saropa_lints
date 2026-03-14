@@ -24,8 +24,11 @@ The Issues view shows violations in a **tree**: first by **severity** (Error, Wa
 
 - **Filters (toolbar):** Filter by text (file path, rule, or message), Filter by type (severity and impact), Filter by rule (multi-select). When active, the view shows “Showing X of Y”.
 - **Suppressions:** Right-click a folder, file, violation, or severity node to hide it from the tree (e.g. “Hide folder”, “Hide rule”). Suppressions are persisted; use **Clear suppressions** in the toolbar to restore all.
+- **Code Lens:** In Dart files that have violations, a lens at the top shows e.g. "Saropa Lints: 3 issues — Show in Saropa". Click to open the Issues view filtered to that file.
 - **Context menus:** Apply fix (run quick fix without opening the file), Hide folder/file/rule/rule-in-file/severity/impact, Copy path, Copy message.
+- **Violation tooltips:** Show rule name and a "More" link to rule documentation (ROADMAP).
 - **Summary → Issues:** Click **Total violations** in the Summary view to open the Issues view with all issues (clears any active filters). By severity / By impact rows open Issues with the matching filter.
+- **Problems view:** Right-click a problem and choose **Saropa Lints: Show in Saropa Lints** to focus the Issues view filtered to the active file.
 
 ## Settings
 
@@ -46,6 +49,7 @@ The Issues view shows violations in a **tree**: first by **severity** (Error, Wa
 - **Filter by text…** / **Filter by type…** / **Filter by rule…** — Filter the Issues tree (view toolbar).
 - **Clear filters** / **Clear suppressions** — Reset filters or hidden items (view toolbar when active).
 - **Saropa Lints: Show All Issues** — Open Issues view and show all issues (clears filters). Used when clicking "Total violations" in Summary.
+- **Saropa Lints: Show in Saropa Lints** — Focus Issues view filtered to the active editor's file (e.g. from Problems view context menu or command palette).
 - **Apply fix** — On a violation in the Issues tree (context menu): run the Dart analyzer's quick fix for that location without opening the file.
 
 ## Links
