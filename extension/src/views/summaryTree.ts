@@ -13,9 +13,14 @@ class SummaryItem extends vscode.TreeItem {
     description?: string,
     collapsible: vscode.TreeItemCollapsibleState = vscode.TreeItemCollapsibleState.None,
     public readonly nodeId?: string,
+    commandId?: string,
+    commandArgs?: unknown[],
   ) {
     super(label, collapsible);
     this.description = description;
+    if (commandId) {
+      this.command = { command: commandId, title: label, arguments: commandArgs ?? [] };
+    }
   }
 }
 
@@ -51,7 +56,8 @@ export class SummaryTreeProvider implements vscode.TreeDataProvider<SummaryItem>
     if (!element) {
       const total = s?.totalViolations ?? data.violations.length;
       const items: SummaryItem[] = [
-        new SummaryItem('Total violations', String(total)),
+        // Clickable: opens Issues view with all issues (clears filters).
+        new SummaryItem('Total violations', String(total), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssues'),
         new SummaryItem('Tier', c?.tier ?? '—'),
         new SummaryItem('Files analyzed', s?.filesAnalyzed != null ? String(s.filesAnalyzed) : '—'),
         new SummaryItem('Files with issues', s?.filesWithIssues != null ? String(s.filesWithIssues) : '—'),
@@ -82,18 +88,18 @@ export class SummaryTreeProvider implements vscode.TreeDataProvider<SummaryItem>
 
     if ((element.nodeId === 'bySeverity' || element.label === 'By severity') && s?.bySeverity) {
       return [
-        new SummaryItem('Error', String(s.bySeverity.error ?? 0)),
-        new SummaryItem('Warning', String(s.bySeverity.warning ?? 0)),
-        new SummaryItem('Info', String(s.bySeverity.info ?? 0)),
+        new SummaryItem('Error', String(s.bySeverity.error ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithSeverityFilter', ['error']),
+        new SummaryItem('Warning', String(s.bySeverity.warning ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithSeverityFilter', ['warning']),
+        new SummaryItem('Info', String(s.bySeverity.info ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithSeverityFilter', ['info']),
       ];
     }
     if ((element.nodeId === 'byImpact' || element.label === 'By impact') && s?.byImpact) {
       return [
-        new SummaryItem('Critical', String(s.byImpact.critical ?? 0)),
-        new SummaryItem('High', String(s.byImpact.high ?? 0)),
-        new SummaryItem('Medium', String(s.byImpact.medium ?? 0)),
-        new SummaryItem('Low', String(s.byImpact.low ?? 0)),
-        new SummaryItem('Opinionated', String(s.byImpact.opinionated ?? 0)),
+        new SummaryItem('Critical', String(s.byImpact.critical ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithImpactFilter', ['critical']),
+        new SummaryItem('High', String(s.byImpact.high ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithImpactFilter', ['high']),
+        new SummaryItem('Medium', String(s.byImpact.medium ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithImpactFilter', ['medium']),
+        new SummaryItem('Low', String(s.byImpact.low ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithImpactFilter', ['low']),
+        new SummaryItem('Opinionated', String(s.byImpact.opinionated ?? 0), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssuesWithImpactFilter', ['opinionated']),
       ];
     }
 

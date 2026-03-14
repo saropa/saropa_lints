@@ -17,6 +17,7 @@ import {
   showOutputChannel,
 } from './setup';
 import { IssuesTreeProvider, registerIssueCommands } from './views/issuesTree';
+import { OverviewTreeProvider } from './views/overviewTree';
 import { SummaryTreeProvider } from './views/summaryTree';
 import { ConfigTreeProvider } from './views/configTree';
 import { LogsTreeProvider } from './views/logsTree';
@@ -54,10 +55,15 @@ export function activate(context: vscode.ExtensionContext): void {
   updateContext(enabled, false);
 
   const issuesProvider = new IssuesTreeProvider(context.workspaceState);
+  const overviewProvider = new OverviewTreeProvider();
   const summaryProvider = new SummaryTreeProvider();
   const configProvider = new ConfigTreeProvider();
   const logsProvider = new LogsTreeProvider();
   const suggestionsProvider = new SuggestionsTreeProvider();
+
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider('saropaLints.overview', overviewProvider),
+  );
 
   const issuesView = vscode.window.createTreeView('saropaLints.issues', {
     treeDataProvider: issuesProvider,
@@ -89,6 +95,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
   const refreshAll = () => {
     issuesProvider.refresh();
+    overviewProvider.refresh();
     summaryProvider.refresh();
     configProvider.refresh();
     logsProvider.refresh();
@@ -145,7 +152,7 @@ export function activate(context: vscode.ExtensionContext): void {
       statusBarItem.text = '$(checklist) Saropa Lints: Off';
       statusBarItem.tooltip = 'Enable Saropa Lints';
     }
-    statusBarItem.command = 'saropaLints.refresh';
+    statusBarItem.command = 'saropaLints.focusView';
     statusBarItem.show();
   };
   updateStatusBar();
@@ -174,6 +181,8 @@ export function activate(context: vscode.ExtensionContext): void {
         refreshAll();
         updateStatusBar();
         updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
+        await vscode.commands.executeCommand('saropaLints.issues.focus');
+        void vscode.window.setStatusBarMessage('Saropa Lints: Analysis complete', 3000);
       }
     }),
     vscode.commands.registerCommand('saropaLints.initializeConfig', async () => {
@@ -184,6 +193,31 @@ export function activate(context: vscode.ExtensionContext): void {
       }
     }),
     vscode.commands.registerCommand('saropaLints.openConfig', openConfig),
+    vscode.commands.registerCommand('saropaLints.focusView', () => {
+      void vscode.commands.executeCommand('saropaLints.overview.focus');
+    }),
+    // Show all issues: clear filters and focus Issues view (e.g. from Summary "Total violations").
+    vscode.commands.registerCommand('saropaLints.focusIssues', () => {
+      issuesProvider.clearFilters();
+      updateIssuesViewMessage();
+      void vscode.commands.executeCommand('saropaLints.issues.focus');
+    }),
+    vscode.commands.registerCommand('saropaLints.focusIssuesWithImpactFilter', (impact: string) => {
+      if (impact && typeof impact === 'string') {
+        issuesProvider.setImpactFilter(new Set([impact]));
+        issuesProvider.setSeverityFilter(new Set(['error', 'warning', 'info']));
+        updateIssuesViewMessage();
+        void vscode.commands.executeCommand('saropaLints.issues.focus');
+      }
+    }),
+    vscode.commands.registerCommand('saropaLints.focusIssuesWithSeverityFilter', (severity: string) => {
+      if (severity && typeof severity === 'string') {
+        issuesProvider.setSeverityFilter(new Set([severity]));
+        issuesProvider.setImpactFilter(new Set(['critical', 'high', 'medium', 'low', 'opinionated']));
+        updateIssuesViewMessage();
+        void vscode.commands.executeCommand('saropaLints.issues.focus');
+      }
+    }),
     vscode.commands.registerCommand('saropaLints.refresh', () => {
       refreshAll();
       updateStatusBar();

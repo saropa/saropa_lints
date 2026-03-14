@@ -24,7 +24,8 @@ The Issues view shows violations in a **tree**: first by **severity** (Error, Wa
 
 - **Filters (toolbar):** Filter by text (file path, rule, or message), Filter by type (severity and impact), Filter by rule (multi-select). When active, the view shows “Showing X of Y”.
 - **Suppressions:** Right-click a folder, file, violation, or severity node to hide it from the tree (e.g. “Hide folder”, “Hide rule”). Suppressions are persisted; use **Clear suppressions** in the toolbar to restore all.
-- **Context menus:** Hide folder/file/rule/rule-in-file/severity/impact, Copy path, Copy message.
+- **Context menus:** Apply fix (run quick fix without opening the file), Hide folder/file/rule/rule-in-file/severity/impact, Copy path, Copy message.
+- **Summary → Issues:** Click **Total violations** in the Summary view to open the Issues view with all issues (clears any active filters). By severity / By impact rows open Issues with the matching filter.
 
 ## Settings
 
@@ -44,6 +45,8 @@ The Issues view shows violations in a **tree**: first by **severity** (Error, Wa
 - **Saropa Lints: Open Config** — Open `analysis_options_custom.yaml` or `analysis_options.yaml`.
 - **Filter by text…** / **Filter by type…** / **Filter by rule…** — Filter the Issues tree (view toolbar).
 - **Clear filters** / **Clear suppressions** — Reset filters or hidden items (view toolbar when active).
+- **Saropa Lints: Show All Issues** — Open Issues view and show all issues (clears filters). Used when clicking "Total violations" in Summary.
+- **Apply fix** — On a violation in the Issues tree (context menu): run the Dart analyzer's quick fix for that location without opening the file.
 
 ## Links
 
