@@ -101,6 +101,34 @@ export function formatScoreDelta(current: number, previous: number): string {
 }
 
 /**
+ * Estimate the score if all violations of a given impact level were fixed.
+ * C3: Used by Suggestions to show "Fix N critical → estimated +X points".
+ */
+export function estimateScoreWithout(
+  data: ViolationsData,
+  impact: keyof typeof IMPACT_WEIGHTS,
+): number | null {
+  const summary = data.summary;
+  if (!summary) return null;
+  const filesAnalyzed = summary.filesAnalyzed ?? 0;
+  if (filesAnalyzed === 0) return null;
+
+  const impactCounts = summary.byImpact ?? {};
+  const safeNum = (v: unknown): number =>
+    typeof v === 'number' && Number.isFinite(v) ? v : 0;
+
+  // Compute weighted sum with the target impact zeroed out.
+  let weighted = 0;
+  for (const [key, weight] of Object.entries(IMPACT_WEIGHTS)) {
+    if (key === impact) continue;
+    weighted += safeNum((impactCounts as Record<string, unknown>)[key]) * weight;
+  }
+  const density = weighted / filesAnalyzed;
+  const raw = Math.round(100 * Math.exp(-density * DECAY_RATE));
+  return Number.isFinite(raw) ? raw : 0;
+}
+
+/**
  * Return a color hint based on score thresholds.
  * Used by status bar and overview to pick visual treatment.
  */

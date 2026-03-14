@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { readViolations } from '../violationsReader';
+import { computeHealthScore, estimateScoreWithout } from '../healthScore';
 
 class SuggestionItem extends vscode.TreeItem {
   constructor(
@@ -57,21 +58,33 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
     const high = byImpact?.high ?? 0;
     const errors = bySeverity?.error ?? 0;
 
+    // C3: Compute current score and projected scores for impact suggestions.
+    const currentScore = computeHealthScore(data)?.score;
+
     if (critical > 0) {
+      // C3: Show estimated score gain from fixing all critical issues.
+      const projected = estimateScoreWithout(data, 'critical');
+      const desc = (currentScore !== undefined && projected !== null)
+        ? `estimated +${projected - currentScore} points`
+        : 'Show in Issues';
       items.push(
         new SuggestionItem(
-          `Fix ${critical} critical issue(s) first`,
-          'Show in Issues',
+          `Fix ${critical} critical issue(s)`,
+          desc,
           'saropaLints.focusIssuesWithImpactFilter',
           ['critical'],
         ),
       );
     }
     if (high > 0 && items.length < 3) {
+      const projected = estimateScoreWithout(data, 'high');
+      const desc = (currentScore !== undefined && projected !== null)
+        ? `estimated +${projected - currentScore} points`
+        : 'Show in Issues';
       items.push(
         new SuggestionItem(
           `Address ${high} high-impact issue(s)`,
-          'Show in Issues',
+          desc,
           'saropaLints.focusIssuesWithImpactFilter',
           ['high'],
         ),

@@ -8,6 +8,20 @@ import { readViolations } from '../violationsReader';
 import { loadHistory, getTrendSummary, findPreviousScore } from '../runHistory';
 import { computeHealthScore, formatScoreDelta } from '../healthScore';
 
+/** C1: Format an ISO timestamp as a human-readable relative time. */
+function formatTimeAgo(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime();
+  if (ms < 0 || !Number.isFinite(ms)) return 'just now';
+  const sec = Math.floor(ms / 1000);
+  if (sec < 60) return 'just now';
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min} min ago`;
+  const hrs = Math.floor(min / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
 class OverviewItem extends vscode.TreeItem {
   constructor(
     label: string,
@@ -114,6 +128,19 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
         );
       }
     }
+
+    // C1: "Last run" timestamp from most recent history entry.
+    if (history.length > 0) {
+      const lastTs = history[history.length - 1].timestamp;
+      items.push(
+        new OverviewItem('Last run', formatTimeAgo(lastTs), 'saropaLints.runAnalysis'),
+      );
+    }
+
+    // C1: Primary CTA — always available for re-running analysis.
+    items.push(
+      new OverviewItem('Run Analysis', undefined, 'saropaLints.runAnalysis'),
+    );
 
     items.push(
       new OverviewItem('Summary', undefined, 'saropaLints.summary.focus'),
