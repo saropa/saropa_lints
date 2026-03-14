@@ -375,6 +375,56 @@ and does not require any Saropa Lints changes.
 
 ---
 
+## Integration with the VS Code extension
+
+The Saropa Lints VS Code extension (see `VSCODE_EXTENSION_COHESION_WOW_PLAN.md`) uses
+`reports/.saropa_lints/violations.json` as its **primary data source**. The same file
+is the contract for Log Capture. This alignment is the right design; no different
+implementation is needed.
+
+### Why the current implementation is a good fit
+
+1. **Single source, two consumers** — The extension and Log Capture both read the same
+   path. No second export, API, or format is required. The extension already watches
+   this file and refreshes views when it changes (e.g. after "Run analysis").
+
+2. **Single "Run analysis" entry point** — Cohesion plan C7: one obvious place to run
+   analysis (Overview, Issues empty state, command palette). When the user runs
+   analysis from the extension, violations.json is updated; both the extension UI and
+   Log Capture (on next bug report) see fresh data. No extra step for Log Capture.
+
+3. **Path and contract are stable** — The path is documented in `VIOLATION_EXPORT_API.md`
+   and this doc. The extension uses `getViolationsPath(workspaceRoot)` in
+   `extension/src/violationsReader.ts`; Log Capture uses the same path. No shared
+   package or API is needed unless both products later want a single constant (e.g.
+   for a monorepo); the path is unlikely to change.
+
+### Recommendations
+
+- **Lints side:** Keep the current implementation. No change required for the
+  extension plan.
+- **Log Capture side (messaging):** For staleness, the note currently suggests
+  "Run `dart run custom_lint` to refresh." When the user primarily uses the
+  extension, Log Capture could instead (or additionally) say: "Run analysis in
+  Saropa Lints to refresh" so the action matches the extension workflow. Optional.
+- **Extension docs:** The extension README already states that Run Analysis produces
+  violations.json. Optionally add one line that this file is also used by Saropa Log
+  Capture for bug report correlation, so users of both tools understand the link.
+- **W12 (Logs view):** The cohesion plan’s "Logs parsed / hints" (W12) refers to
+  *analysis log files* under `reports/YYYYMMDD/*.log`, not violations.json or Log
+  Capture. No change to log capture integration is implied by W12.
+
+### What not to do
+
+- Do not add a second export path or format for the extension vs Log Capture; one file
+  serves both.
+- Do not require the extension to "push" data to Log Capture; file-based discovery at
+  the known path is sufficient.
+- Do not couple the extension to Log Capture (e.g. optional dependency or special UI
+  for Log Capture); the integration is the shared file contract only.
+
+---
+
 ## File index for Saropa Lints implementation
 
 | File | Role |

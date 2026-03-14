@@ -24,7 +24,7 @@ const IMPACT_WEIGHTS = {
   medium: 1,
   low: 0.25,
   opinionated: 0.05,
-};
+} as const;
 
 /**
  * Controls how steeply the score drops as density increases.
@@ -61,11 +61,15 @@ export function computeHealthScore(
   if (filesAnalyzed === 0) return null;
 
   const impact = summary.byImpact ?? {};
-  const critical = impact.critical ?? 0;
-  const high = impact.high ?? 0;
-  const medium = impact.medium ?? 0;
-  const low = impact.low ?? 0;
-  const opinionated = impact.opinionated ?? 0;
+  // Guard against non-numeric values from malformed JSON (e.g. "critical": "bad").
+  // `?? 0` only catches null/undefined; non-finite values need an explicit check.
+  const safeNum = (v: unknown): number =>
+    typeof v === 'number' && Number.isFinite(v) ? v : 0;
+  const critical = safeNum(impact.critical);
+  const high = safeNum(impact.high);
+  const medium = safeNum(impact.medium);
+  const low = safeNum(impact.low);
+  const opinionated = safeNum(impact.opinionated);
 
   const weightedViolations =
     critical * IMPACT_WEIGHTS.critical +
@@ -77,7 +81,9 @@ export function computeHealthScore(
   const density = weightedViolations / filesAnalyzed;
 
   // Exponential decay: score drops quickly at first, then flattens.
-  const score = Math.round(100 * Math.exp(-density * DECAY_RATE));
+  // Clamp to 0 as a safety net if density somehow produces NaN.
+  const rawScore = Math.round(100 * Math.exp(-density * DECAY_RATE));
+  const score = Number.isFinite(rawScore) ? rawScore : 0;
 
   return { score, weightedViolations, density };
 }
@@ -87,7 +93,8 @@ export function computeHealthScore(
  * Returns e.g. "▲4", "▼3", or "" if no change.
  */
 export function formatScoreDelta(current: number, previous: number): string {
-  const delta = current - previous;
+  // Round defensively in case callers supply non-integer scores.
+  const delta = Math.round(current - previous);
   if (delta > 0) return `\u25B2${delta}`;
   if (delta < 0) return `\u25BC${Math.abs(delta)}`;
   return '';
