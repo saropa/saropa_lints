@@ -23,6 +23,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 ### Added (VS Code extension)
 
+- **Focus mode (W7):** Right-click a file in the Issues tree and choose "Show only this file" to filter the tree to that file's violations only. Toolbar "Show all files" button resets. View message shows "Focused: filename.dart".
+- **Trends / mini history (W5):** Last 20 analysis snapshots are persisted in workspace state. Overview shows a "Trends" row with recent totals (e.g. "120 → 115 → 98"). New module: `runHistory.ts`.
+- **Celebration / progress (W6):** When violations decrease after a run, a transient status bar message shows "You fixed N issues!". When critical issues hit zero, a notification says "No critical issues!". Overview shows a "↓ N fewer issues" row when the count dropped.
+- **Tier in status bar (W8):** A second status bar item shows the current tier (e.g. "recommended"). Click to open the tier quick pick and re-run init.
 - **Foundation (F1–F4) for extension-driven init and triage:** (1) Init is run non-interactively from the extension with `--no-stylistic` and `--target` so config writes without prompts. (2) Violations data now exposes `summary.issuesByRule` and `config.enabledRuleNames` / `config.stylisticRuleNames` for triage grouping. (3) Violation export adds `config.stylisticRuleNames` (extension can separate stylistic rules in triage UI). (4) Config view shows **Detected** (Flutter and packages from `pubspec.yaml`). New modules: `pubspecReader.ts` (platform/package detection), `triageUtils.ts` (group rules by volume, partition stylistic). Shared `buildInitArgs()` in setup for Enable / Initialize / Set tier.
 - **Apply fix from Issues tree:** Context menu “Apply fix” on a violation runs the Dart analyzer’s quick fix for that location (no need to open the file first).
 - **Summary → Issues:** Clicking “Total violations” in the Summary view opens the Issues view and shows all issues (clears any active filters).
@@ -40,8 +44,13 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 - **Debounced refresh:** File watcher on `violations.json` debounces refresh by 300 ms to avoid rapid successive updates.
 - **Summary view:** Expandable nodes (By severity, By impact) use a stable `nodeId` so tree expansion does not depend on label text.
 
+### Changed (VS Code extension — internal)
+
+- Status bar update logic consolidated into `updateAllStatusBars()` — called from all command handlers and the config-change listener to keep both status bar items (On/Off and tier) in sync.
+
 ### Fixed (VS Code extension)
 
+- Tier status bar now updates immediately when tier is changed via Settings UI or the Set Tier command (previously stayed stale until next manual refresh).
 - Root-level folder nodes in the Issues tree now use an empty path prefix so expanding e.g. “lib” shows files under `lib/` correctly.
 - Severity and impact suppressions (e.g. “Hide this severity”) are now applied when building the filtered index.
 

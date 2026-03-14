@@ -1,10 +1,11 @@
 /**
  * Tree data provider for Saropa Lints Overview (dashboard) view.
- * Single entry point: key number, primary CTA, and links to other views.
+ * Single entry point: key number, primary CTA, trends, and links to other views.
  */
 
 import * as vscode from 'vscode';
 import { readViolations } from '../violationsReader';
+import { loadHistory, getTrendSummary } from '../runHistory';
 
 class OverviewItem extends vscode.TreeItem {
   constructor(
@@ -22,6 +23,11 @@ class OverviewItem extends vscode.TreeItem {
 export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewItem> {
   private _onDidChangeTreeData = new vscode.EventEmitter<OverviewItem | undefined | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
+  private workspaceState: vscode.Memento;
+
+  constructor(workspaceState: vscode.Memento) {
+    this.workspaceState = workspaceState;
+  }
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
@@ -57,9 +63,28 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
     } else {
       const primaryLabel = critical > 0 ? `${critical} critical, ${total} total` : `${total} violations`;
       items.push(
-        new OverviewItem(primaryLabel, 'View in Issues', 'saropaLints.focusView'),
-        new OverviewItem('View Issues', undefined, 'saropaLints.focusView'),
+        new OverviewItem(primaryLabel, 'View in Issues', 'saropaLints.focusIssues'),
+        new OverviewItem('View Issues', undefined, 'saropaLints.focusIssues'),
       );
+    }
+
+    // W5: Trends — show run history summary.
+    const history = loadHistory(this.workspaceState);
+    const trend = getTrendSummary(history);
+    if (trend) {
+      items.push(new OverviewItem('Trends', trend, 'saropaLints.focusIssues'));
+    }
+
+    // W6: Celebration — show delta when violations decreased.
+    if (history.length >= 2) {
+      const prev = history[history.length - 2];
+      const curr = history[history.length - 1];
+      const delta = prev.total - curr.total;
+      if (delta > 0) {
+        items.push(
+          new OverviewItem(`\u2193 ${delta} fewer issues`, 'since last run', 'saropaLints.focusIssues'),
+        );
+      }
     }
 
     items.push(
