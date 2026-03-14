@@ -16,6 +16,7 @@ import {
   runSetTier,
   showOutputChannel,
 } from './setup';
+import { invalidateCodeLenses, registerCodeLensProvider } from './codeLensProvider';
 import { IssuesTreeProvider, registerIssueCommands } from './views/issuesTree';
 import { OverviewTreeProvider } from './views/overviewTree';
 import { SummaryTreeProvider } from './views/summaryTree';
@@ -84,6 +85,7 @@ export function activate(context: vscode.ExtensionContext): void {
   updateIssuesViewMessage();
 
   registerIssueCommands(issuesProvider, context);
+  registerCodeLensProvider(context);
 
   context.subscriptions.push(
     issuesView,
@@ -100,6 +102,7 @@ export function activate(context: vscode.ExtensionContext): void {
     configProvider.refresh();
     logsProvider.refresh();
     suggestionsProvider.refresh();
+    invalidateCodeLenses();
     updateIssuesBadge(issuesView, issuesProvider);
     updateIssuesViewMessage();
   };
@@ -199,6 +202,27 @@ export function activate(context: vscode.ExtensionContext): void {
     // Show all issues: clear filters and focus Issues view (e.g. from Summary "Total violations").
     vscode.commands.registerCommand('saropaLints.focusIssues', () => {
       issuesProvider.clearFilters();
+      updateIssuesViewMessage();
+      void vscode.commands.executeCommand('saropaLints.issues.focus');
+    }),
+    // Focus Issues view filtered to a single file (Code Lens, Problems view "Show in Saropa Lints").
+    vscode.commands.registerCommand('saropaLints.focusIssuesForFile', (filePath: string) => {
+      const normalized = typeof filePath === 'string' ? filePath.replace(/\\/g, '/') : '';
+      if (!normalized) return;
+      issuesProvider.setTextFilter(normalized);
+      updateIssuesViewMessage();
+      void vscode.commands.executeCommand('saropaLints.issues.focus');
+    }),
+    // Focus Issues view filtered to the active editor's file (e.g. from Problems view context menu).
+    vscode.commands.registerCommand('saropaLints.focusIssuesForActiveFile', () => {
+      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const editor = vscode.window.activeTextEditor;
+      if (!root || !editor?.document?.uri) {
+        void vscode.window.showInformationMessage('Open a file to show its issues in Saropa Lints.');
+        return;
+      }
+      const relative = path.relative(root, editor.document.uri.fsPath).replace(/\\/g, '/');
+      issuesProvider.setTextFilter(relative);
       updateIssuesViewMessage();
       void vscode.commands.executeCommand('saropaLints.issues.focus');
     }),

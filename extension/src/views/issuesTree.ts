@@ -6,6 +6,8 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { normalizePath } from '../pathUtils';
+import { getRuleDescription, getRuleDocUrl } from '../ruleMetadata';
 import { readViolations, hasViolations, Violation } from '../violationsReader';
 import {
   loadSuppressions,
@@ -78,10 +80,6 @@ interface PlaceholderItem {
   label: string;
   description?: string;
   command?: string;
-}
-
-function normalizePath(p: string): string {
-  return p.replace(/\\/g, '/');
 }
 
 /** Build index: severity -> file path -> violations[]. Only includes violations that pass filters and suppressions. */
@@ -442,6 +440,15 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       if (v.correction) {
         tooltip.appendMarkdown('\n\n**Fix:** ');
         tooltip.appendMarkdown(v.correction.replace(/]/g, '\\]'));
+      }
+      const ruleName = v.rule ?? '';
+      if (ruleName) {
+        tooltip.appendMarkdown('\n\n**Rule:** `' + ruleName.replace(/`/g, '\\`') + '`');
+        const desc = getRuleDescription(ruleName);
+        if (desc) {
+          tooltip.appendMarkdown('\n\n' + desc.replace(/]/g, '\\]'));
+        }
+        tooltip.appendMarkdown('\n\n[More](' + getRuleDocUrl(ruleName) + ')');
       }
       item.tooltip = tooltip;
       item.contextValue = 'violation';

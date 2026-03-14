@@ -24,6 +24,9 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 - **Apply fix from Issues tree:** Context menu “Apply fix” on a violation runs the Dart analyzer’s quick fix for that location (no need to open the file first).
 - **Summary → Issues:** Clicking “Total violations” in the Summary view opens the Issues view and shows all issues (clears any active filters).
+- **Code Lens (W2):** In Dart files with violations, a Code Lens above the first line shows "Saropa Lints: N issues — Show in Saropa". Click focuses the Issues view filtered to that file.
+- **Rule doc in tooltip (W3):** Violation tooltips in the Issues tree now include the rule name and a "More" link to the ROADMAP for documentation.
+- **Show in Saropa Lints from Problems (W4):** In the Problems view, right-click and choose "Saropa Lints: Show in Saropa Lints" to focus the Issues view filtered to the active editor's file.
 - **Issues view (tree):** Group by severity (Error, Warning, Info) then by project structure (folders and files). Violations per file are capped (default 100, configurable via `saropaLints.issuesPageSize`) with an “and N more…” overflow node for scale (e.g. 65k+ issues).
 - **Filters:** Text filter (file path, rule name, message); type filter (severity and impact); rule filter (multi-select rules to show). View message shows “Showing X of Y” when any filter or suppression is active.
 - **Suppressions (persisted):** Hide folder, file, rule, rule-in-file, severity, or impact from the tree via context menu. Stored in workspace state; “Clear suppressions” in the view toolbar restores all.
