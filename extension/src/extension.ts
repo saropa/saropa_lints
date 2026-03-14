@@ -27,7 +27,7 @@ import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { readViolations, ViolationsData } from './violationsReader';
 import { appendSnapshot, loadHistory, findPreviousScore } from './runHistory';
 import { computeHealthScore, formatScoreDelta, scoreColorBand } from './healthScore';
-import { registerInlineAnnotations, updateAnnotationsForAllEditors } from './inlineAnnotations';
+import { registerInlineAnnotations, updateAnnotationsForAllEditors, invalidateAnnotationCache } from './inlineAnnotations';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -118,7 +118,8 @@ export function activate(context: vscode.ExtensionContext): void {
     invalidateCodeLenses();
     updateIssuesBadge(issuesView, issuesProvider);
     updateIssuesViewMessage();
-    // D3: Refresh inline annotations when violations data changes.
+    // D3: Invalidate cache then refresh inline annotations for new data.
+    invalidateAnnotationCache();
     updateAnnotationsForAllEditors();
   };
 
@@ -373,11 +374,15 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
     // D1: Focus Issues view filtered to rules mapped to an OWASP category.
     // Uses rule-hide filter: hide all rules EXCEPT the ones mapped to this category.
+    // Clears orthogonal filters first so OWASP selection is not masked by prior state.
     vscode.commands.registerCommand('saropaLints.focusIssuesForOwasp', (rules: string[]) => {
       if (!Array.isArray(rules) || rules.length === 0) return;
       const allRules = issuesProvider.getRuleNamesFromData();
       const keep = new Set(rules);
       const toHide = new Set(allRules.filter((r) => !keep.has(r)));
+      issuesProvider.setTextFilter('');
+      issuesProvider.setSeverityFilter(new Set(['error', 'warning', 'info']));
+      issuesProvider.setImpactFilter(new Set(['critical', 'high', 'medium', 'low', 'opinionated']));
       issuesProvider.setRulesToHide(toHide);
       updateIssuesViewMessage();
       void vscode.commands.executeCommand('saropaLints.issues.focus');

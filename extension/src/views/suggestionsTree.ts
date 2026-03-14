@@ -133,9 +133,6 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
     items.push(new SuggestionItem('Run analysis', 'Refresh violations', 'saropaLints.runAnalysis'));
     items.push(new SuggestionItem('Open config', 'analysis_options_custom.yaml', 'saropaLints.openConfig'));
 
-    if (items.length === 2) {
-      return items;
-    }
     return items.slice(0, 8);
   }
 }
