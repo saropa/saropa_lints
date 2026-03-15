@@ -83,7 +83,10 @@ String? detectExistingTier({required String targetDir}) {
 void printUsage() {
   print('''
 
-Saropa Lints Configuration Generator
+Saropa Lints Configuration Generator (headless)
+
+NOTE: The VS Code extension is the recommended way to set up
+and configure Saropa Lints. This CLI is for CI/scripting only.
 
 Generates analysis_options.yaml with explicit rule configuration
 for the native analyzer plugin system.
@@ -92,17 +95,15 @@ IMPORTANT: This tool preserves:
   - All non-plugins sections (analyzer, linter, formatter, etc.)
   - User customizations in plugins.saropa_lints.diagnostics (unless --reset)
 
-Usage: dart run saropa_lints:init [options]
+Usage: dart run saropa_lints:init --tier <tier> [options]
 
 Options:
-  -t, --tier <tier>     Tier level (1-5 or name, prompts if omitted)
+  -t, --tier <tier>     Tier level (1-5 or name, defaults to recommended)
   -o, --output <file>   Output file (default: analysis_options.yaml)
   --target <path>       Target project directory (default: current directory)
-  --stylistic           Interactive stylistic rules walkthrough (default)
-  --stylistic-all       Bulk-enable all stylistic rules (CI/non-interactive)
-  --no-stylistic        Skip stylistic rules walkthrough entirely
-  --reset-stylistic     Clear reviewed markers and re-walkthrough all rules
-  --fix-ignores         Auto-convert v4 ignore comments without prompting
+  --stylistic-all       Bulk-enable all stylistic rules
+  --no-stylistic        Exclude stylistic rules (default)
+  --fix-ignores         Auto-convert v4 ignore comments
   --reset               Discard user customizations and reset to tier defaults
   --dry-run             Preview output without writing
   -h, --help            Show this help message
@@ -111,15 +112,13 @@ Tiers:
 ${tierOrder.map((String t) => '  ${tierIds[t]}. $t\n     ${tierDescriptions[t]}').join('\n')}
 
 Examples:
-  dart run saropa_lints:init                          # Prompts for tier + walkthrough
+  dart run saropa_lints:init --tier recommended
   dart run saropa_lints:init --tier comprehensive
   dart run saropa_lints:init --tier 4
   dart run saropa_lints:init --tier essential --reset
-  dart run saropa_lints:init --target /path/to/project  # Configure another project
-  dart run saropa_lints:init --stylistic-all            # Bulk-enable all stylistic
-  dart run saropa_lints:init --no-stylistic             # Skip stylistic walkthrough
-  dart run saropa_lints:init --reset-stylistic          # Re-review all stylistic rules
-  dart run saropa_lints:init --dry-run
+  dart run saropa_lints:init --tier professional --target /path/to/project
+  dart run saropa_lints:init --tier recommended --stylistic-all
+  dart run saropa_lints:init --dry-run --tier recommended
 
 After generating, run `dart analyze` to verify.
 ''');
