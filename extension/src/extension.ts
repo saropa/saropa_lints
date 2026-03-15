@@ -262,12 +262,28 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand('saropaLints.enable', async () => {
       const success = await runEnable(context);
-      if (success) {
-        await cfg.update('enabled', true, vscode.ConfigurationTarget.Workspace);
-        updateContext(true, issuesProvider.hasViolations());
-        refreshAll();
-        updateAllStatusBars();
+      if (!success) return;
+
+      await cfg.update('enabled', true, vscode.ConfigurationTarget.Workspace);
+      updateContext(true, issuesProvider.hasViolations());
+
+      // I5: Record snapshot before refreshing views so Overview sees fresh history.
+      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const data = root ? readViolations(root) : null;
+      if (data) {
+        appendSnapshot(context.workspaceState, data);
       }
+
+      refreshAll();
+      updateAllStatusBars(data ?? undefined);
+
+      // I5: Auto-focus Overview to show Health Score immediately.
+      await vscode.commands.executeCommand('saropaLints.overview.focus');
+
+      // I5: Show score-aware notification with actionable buttons.
+      const health = data ? computeHealthScore(data) : null;
+      const totalViolations = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
+      await showFirstRunNotification(health, totalViolations);
     }),
     vscode.commands.registerCommand('saropaLints.disable', async () => {
       await runDisable();
@@ -540,6 +556,50 @@ function resolveRulesFromArg(arg: unknown): string[] | undefined {
     if (node.kind === 'triageRule' && typeof node.ruleName === 'string') return [node.ruleName];
   }
   return undefined;
+}
+
+/**
+ * I5: Show a score-aware notification after enable with action buttons.
+ * Three cases:
+ *   1. Score available → "Your project scores 72/100. Room to improve."
+ *   2. Violations but no score → "Saropa Lints found N issues."
+ *   3. No data (analysis didn't run) → "Saropa Lints is enabled."
+ */
+async function showFirstRunNotification(
+  health: { score: number } | null,
+  totalViolations: number,
+): Promise<void> {
+  let message: string;
+  let primaryAction: string;
+
+  if (health) {
+    const band = scoreColorBand(health.score);
+    const qualifier = band === 'green' ? 'Great start!'
+      : band === 'yellow' ? 'Room to improve.'
+      : 'Needs attention.';
+    message = `Saropa Lints: Your project scores ${health.score}/100. ${qualifier}`;
+    primaryAction = 'View Issues';
+  } else if (totalViolations > 0) {
+    message = `Saropa Lints found ${totalViolations} issue${totalViolations === 1 ? '' : 's'}.`;
+    primaryAction = 'View Issues';
+  } else {
+    message = 'Saropa Lints is enabled. Run analysis to see your health score.';
+    primaryAction = 'Run Analysis';
+  }
+
+  const choice = await vscode.window.showInformationMessage(
+    message,
+    primaryAction,
+    'Configure Rules',
+  );
+
+  if (choice === 'View Issues') {
+    await vscode.commands.executeCommand('saropaLints.focusIssues');
+  } else if (choice === 'Run Analysis') {
+    await vscode.commands.executeCommand('saropaLints.runAnalysis');
+  } else if (choice === 'Configure Rules') {
+    await vscode.commands.executeCommand('saropaLints.config.focus');
+  }
 }
 
 export function deactivate(): void {}
