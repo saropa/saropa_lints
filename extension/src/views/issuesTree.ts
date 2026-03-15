@@ -9,6 +9,7 @@ import * as path from 'path';
 import { normalizePath } from '../pathUtils';
 import { getRuleDescription, getRuleDocUrl } from '../ruleMetadata';
 import { readViolations, hasViolations, Violation } from '../violationsReader';
+import { computeHealthScore, estimateScoreWithoutViolation } from '../healthScore';
 import {
   loadSuppressions,
   saveSuppressions,
@@ -667,7 +668,7 @@ function diagnosticCodeString(code: vscode.Diagnostic['code']): string {
  * Invokes the Dart analyzer's quick fix for the given violation at its file/line.
  * Prefers a code action matching the violation's rule; otherwise uses the first quick fix.
  */
-async function applyFixForViolation(v: Violation, root: string): Promise<void> {
+async function applyFixForViolation(v: Violation, root: string): Promise<boolean> {
   const uri = vscode.Uri.file(path.join(root, v.file));
   const line = Math.max(0, (v.line ?? 1) - 1);
   const range = new vscode.Range(line, 0, line, APPLY_FIX_LINE_END);
@@ -680,7 +681,8 @@ async function applyFixForViolation(v: Violation, root: string): Promise<void> {
   );
   if (!Array.isArray(codeActions) || codeActions.length === 0) {
     void vscode.window.showInformationMessage('No quick fix available for this violation.');
-    return;
+    // D4: Return false — no fix was available.
+    return false;
   }
   const rule = (v.rule ?? '').toString();
   const match = codeActions.find(
@@ -698,7 +700,36 @@ async function applyFixForViolation(v: Violation, root: string): Promise<void> {
   }
   if (!action.edit && !action.command) {
     void vscode.window.showInformationMessage('No quick fix available for this violation.');
+    // D4: Return false — code action had no edit or command.
+    return false;
   }
+  return true;
+}
+
+/**
+ * D7: Fix all auto-fixable violations in a single file.
+ * Processes violations bottom-up (descending line order) to avoid
+ * line-number shifts invalidating subsequent fixes.
+ */
+async function fixAllInFile(
+  violations: Violation[],
+  root: string,
+  progress: vscode.Progress<{ message?: string; increment?: number }>,
+): Promise<{ fixed: number; skipped: number }> {
+  const sorted = [...violations].sort((a, b) => (b.line ?? 0) - (a.line ?? 0));
+  let fixed = 0;
+  let skipped = 0;
+
+  for (const v of sorted) {
+    progress.report({ message: `${fixed + skipped + 1}/${sorted.length}` });
+    const ok = await applyFixForViolation(v, root);
+    if (ok) {
+      fixed++;
+    } else {
+      skipped++;
+    }
+  }
+  return { fixed, skipped };
 }
 
 export function registerIssueCommands(
@@ -766,10 +797,73 @@ export function registerIssueCommands(
       const v = (element as ViolationItem).violation;
       const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
       if (!root) return;
-      await vscode.window.withProgress(
+
+      // D4: Estimate score delta before applying fix.
+      const data = readViolations(root);
+      const estimate = data ? estimateScoreWithoutViolation(data, v.impact ?? 'medium') : null;
+
+      const applied = await vscode.window.withProgress(
         { location: vscode.ProgressLocation.Notification, title: 'Applying fix…', cancellable: false },
         () => applyFixForViolation(v, root),
       );
+
+      // D4: Show score-aware result in status bar after successful fix.
+      if (applied && estimate && estimate.delta > 0) {
+        const pts = estimate.delta === 1 ? 'pt' : 'pts';
+        void vscode.window.setStatusBarMessage(
+          `Fixed 1 ${v.impact ?? ''} issue (est. +${estimate.delta} ${pts})`,
+          4000,
+        );
+      }
+    }),
+    // D7: Fix all auto-fixable violations in a file.
+    vscode.commands.registerCommand('saropaLints.fixAllInFile', async (element: unknown) => {
+      if (!element || typeof element !== 'object' || !('kind' in element) ||
+          (element as IssueTreeNode).kind !== 'file') return;
+      const fileNode = element as FileItem;
+      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      if (!root) return;
+
+      const data = readViolations(root);
+      if (!data) return;
+      const fileViolations = data.violations.filter(
+        (v) => v.file === fileNode.filePath,
+      );
+      if (fileViolations.length === 0) return;
+
+      // D7: Confirm before bulk-fixing files with many violations.
+      const fileName = path.basename(fileNode.filePath);
+      if (fileViolations.length > 20) {
+        const ok = await vscode.window.showWarningMessage(
+          `Fix ${fileViolations.length} violations in ${fileName}?`,
+          { modal: true },
+          'Fix All',
+        );
+        if (ok !== 'Fix All') return;
+      }
+
+      const result = await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: `Fixing violations in ${fileName}`,
+          cancellable: false,
+        },
+        (progress) => fixAllInFile(fileViolations, root, progress),
+      );
+
+      // D7: Show result summary.
+      const fixedMsg = `Fixed ${result.fixed}` +
+        (result.skipped > 0 ? `, skipped ${result.skipped} (no fix available)` : '');
+      void vscode.window.showInformationMessage(
+        `${fixedMsg}. Run analysis to update score.`,
+      );
+
+      // D7: Auto-run analysis after bulk fix to update score.
+      const cfg = vscode.workspace.getConfiguration('saropaLints');
+      const runAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true);
+      if (runAfter && result.fixed > 0) {
+        await vscode.commands.executeCommand('saropaLints.runAnalysis');
+      }
     }),
   );
 }

@@ -263,6 +263,10 @@
         "title": "Apply fix"
       },
       {
+        "command": "saropaLints.fixAllInFile",
+        "title": "Fix all in this file"
+      },
+      {
         "command": "saropaLints.focusFile",
         "title": "Show only this file"
       },
@@ -364,6 +368,10 @@
         {
           "command": "saropaLints.copyPath",
           "when": "view == saropaLints.issues && viewItem == folder"
+        },
+        {
+          "command": "saropaLints.fixAllInFile",
+          "when": "view == saropaLints.issues && viewItem == file"
         },
         {
           "command": "saropaLints.focusFile",
