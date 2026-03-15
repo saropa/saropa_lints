@@ -3,7 +3,7 @@
  * to reports/YYYYMMDD/YYYYMMDD_HHMMSS_saropa_extension.md.
  *
  * Mirrors the Dart init log writer pattern: accumulate lines, flush to file.
- * The Logs view automatically discovers .md files in date folders.
+ * Report files are written to date-stamped folders under reports/ for external inspection.
  */
 
 import * as fs from 'fs';
