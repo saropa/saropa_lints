@@ -63,10 +63,6 @@
           "name": "Config"
         },
         {
-          "id": "saropaLints.logs",
-          "name": "Logs"
-        },
-        {
           "id": "saropaLints.suggestions",
           "name": "Suggestions"
         },
@@ -82,14 +78,24 @@
     },
     "viewsWelcome": [
       {
+        "view": "saropaLints.overview",
+        "contents": "Saropa Lints requires a **Dart or Flutter** project.\n\nOpen a folder containing a `pubspec.yaml` to get started.\n\n[Learn More](https://pub.dev/packages/saropa_lints)",
+        "when": "!saropaLints.isDartProject"
+      },
+      {
+        "view": "saropaLints.issues",
+        "contents": "Saropa Lints requires a **Dart or Flutter** project.\n\nOpen a folder containing a `pubspec.yaml` to get started.",
+        "when": "!saropaLints.isDartProject"
+      },
+      {
         "view": "saropaLints.issues",
         "contents": "Saropa Lints is **off** for this workspace.\n\nEnable it to:\n• Add saropa_lints to your project (pubspec + analysis_options)\n• Run init and analysis from the UI—no terminal commands\n• See issues grouped by impact, rule, and file\n\n[Enable Saropa Lints](command:saropaLints.enable)",
-        "when": "!saropaLints.enabled"
+        "when": "saropaLints.isDartProject && !saropaLints.enabled"
       },
       {
         "view": "saropaLints.overview",
         "contents": "Saropa Lints is **off** for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)",
-        "when": "!saropaLints.enabled"
+        "when": "saropaLints.isDartProject && !saropaLints.enabled"
       },
       {
         "view": "saropaLints.overview",
@@ -109,22 +115,22 @@
       {
         "view": "saropaLints.summary",
         "contents": "Enable Saropa Lints in the Overview panel above.",
-        "when": "!saropaLints.enabled"
+        "when": "saropaLints.isDartProject && !saropaLints.enabled"
+      },
+      {
+        "view": "saropaLints.summary",
+        "contents": "Requires a Dart or Flutter project.",
+        "when": "!saropaLints.isDartProject"
       },
       {
         "view": "saropaLints.config",
         "contents": "Enable Saropa Lints in the Overview panel above.",
-        "when": "!saropaLints.enabled"
+        "when": "saropaLints.isDartProject && !saropaLints.enabled"
       },
       {
-        "view": "saropaLints.logs",
-        "contents": "No reports yet. Run analysis to generate logs.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
-        "when": "saropaLints.enabled && !saropaLints.hasViolations"
-      },
-      {
-        "view": "saropaLints.logs",
-        "contents": "Enable Saropa Lints in the Overview panel above.",
-        "when": "!saropaLints.enabled"
+        "view": "saropaLints.config",
+        "contents": "Requires a Dart or Flutter project.",
+        "when": "!saropaLints.isDartProject"
       },
       {
         "view": "saropaLints.suggestions",
@@ -134,7 +140,12 @@
       {
         "view": "saropaLints.suggestions",
         "contents": "Enable Saropa Lints in the Overview panel above.",
-        "when": "!saropaLints.enabled"
+        "when": "saropaLints.isDartProject && !saropaLints.enabled"
+      },
+      {
+        "view": "saropaLints.suggestions",
+        "contents": "Requires a Dart or Flutter project.",
+        "when": "!saropaLints.isDartProject"
       },
       {
         "view": "saropaLints.securityPosture",
@@ -144,7 +155,12 @@
       {
         "view": "saropaLints.securityPosture",
         "contents": "Enable Saropa Lints in the Overview panel above.",
-        "when": "!saropaLints.enabled"
+        "when": "saropaLints.isDartProject && !saropaLints.enabled"
+      },
+      {
+        "view": "saropaLints.securityPosture",
+        "contents": "Requires a Dart or Flutter project.",
+        "when": "!saropaLints.isDartProject"
       },
       {
         "view": "saropaLints.fileRisk",
@@ -154,7 +170,12 @@
       {
         "view": "saropaLints.fileRisk",
         "contents": "Enable Saropa Lints in the Overview panel above.",
-        "when": "!saropaLints.enabled"
+        "when": "saropaLints.isDartProject && !saropaLints.enabled"
+      },
+      {
+        "view": "saropaLints.fileRisk",
+        "contents": "Requires a Dart or Flutter project.",
+        "when": "!saropaLints.isDartProject"
       }
     ],
     "commands": [
@@ -376,12 +397,7 @@
           "when": "view == saropaLints.config",
           "group": "navigation"
         },
-        {
-          "command": "saropaLints.refresh",
-          "when": "view == saropaLints.logs",
-          "group": "navigation"
-        },
-        {
+{
           "command": "saropaLints.refresh",
           "when": "view == saropaLints.suggestions",
           "group": "navigation"

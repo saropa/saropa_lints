@@ -24,6 +24,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 ## [Unreleased]
 
+### Changed
+
+- **Extension:** Welcome views and status bar now detect non-Dart workspaces and show appropriate guidance instead of a misleading "Enable" button
+
 ---
 
 ## [9.0.2]
