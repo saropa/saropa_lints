@@ -178,6 +178,28 @@ export function estimateScoreForRuleRemoval(
 }
 
 /**
+ * D4: Estimate score after removing a single violation of the given impact.
+ * Uses the violation's impact weight to subtract from the weighted total.
+ */
+export function estimateScoreWithoutViolation(
+  data: ViolationsData,
+  impact: string,
+): { projectedScore: number; delta: number } | null {
+  const health = computeHealthScore(data);
+  if (!health) return null;
+  const filesAnalyzed = data.summary?.filesAnalyzed ?? 0;
+  if (filesAnalyzed === 0) return null;
+
+  const weight = IMPACT_WEIGHTS[impact as keyof typeof IMPACT_WEIGHTS] ?? 0;
+  const newWeighted = Math.max(0, health.weightedViolations - weight);
+  const density = newWeighted / filesAnalyzed;
+  const raw = Math.round(100 * Math.exp(-density * DECAY_RATE));
+  const projectedScore = Number.isFinite(raw) ? raw : 0;
+
+  return { projectedScore, delta: projectedScore - health.score };
+}
+
+/**
  * Return a color hint based on score thresholds.
  * Used by status bar and overview to pick visual treatment.
  */
