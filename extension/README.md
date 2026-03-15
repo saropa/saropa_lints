@@ -64,6 +64,10 @@ The **Config** view shows Enabled, Tier, Run analysis after config change, **Det
 - **Saropa Lints: Show in Saropa Lints** — Focus Issues view filtered to the active editor's file (e.g. from Problems view context menu or command palette).
 - **Apply fix** — On a violation in the Issues tree (context menu): run the Dart analyzer's quick fix for that location without opening the file.
 
+## Integration
+
+The `reports/.saropa_lints/violations.json` file is also used by [Saropa Log Capture](https://pub.dev/packages/saropa_log_capture) for bug report correlation — crash reports include the project's health score and OWASP violations affecting the crash file.
+
 ## Links
 
 - [Saropa Lints on pub.dev](https://pub.dev/packages/saropa_lints)
