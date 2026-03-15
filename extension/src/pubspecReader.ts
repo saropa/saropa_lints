@@ -58,6 +58,23 @@ export interface PubspecInfo {
 }
 
 /**
+ * Check whether saropa_lints appears in pubspec.yaml dependencies or
+ * dev_dependencies. Used to auto-enable the extension when the package
+ * is already present — no files are modified.
+ */
+export function hasSaropaLintsDep(workspaceRoot: string): boolean {
+  const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
+  if (!fs.existsSync(pubspecPath)) return false;
+  try {
+    const content = fs.readFileSync(pubspecPath, 'utf-8');
+    // Match "saropa_lints:" as a dependency entry (indented under a deps block).
+    return /^\s+saropa_lints:/m.test(content);
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Read and parse pubspec.yaml in workspace root.
  * Returns default (isFlutter: false, packages: [], platforms: []) if file missing or invalid.
  */
