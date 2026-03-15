@@ -16,12 +16,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 ## [Unreleased]
 
-### Changed
-
-- **Publish:** Single script (`scripts/publish.py`) for package and VS Code extension. Extension version is synced with package version; menu option 6 packages .vsix and optionally publishes to Marketplace/Open VSX. Removed `scripts/publish_extension.py`. Extension `CHANGELOG.md` is generated at publish time from the root `CHANGELOG.md` (single source of truth) and is gitignored.
-- **project_context modularization:** Split `lib/src/project_context.dart` (~5,330 lines) into a main library file and 10 part files (`project_context_path_bloom_git.dart`, `project_context_project_file.dart`, and others). No API or behavior change; imports remain `package:saropa_lints/src/project_context.dart`. Improves maintainability and aligns with project file-size guidelines.
-
-### Added (VS Code extension)
+### Added
 
 - **Health Score (H1–H3):** A single 0–100 score computed from violation count and impact distribution, shown in the Overview view and status bar. The score uses impact-weighted density with exponential decay — critical issues penalize heavily, minor issues less so. Score delta (e.g. "▲4") shows improvement from the last run. Status bar color reflects score band: green (80+), yellow (50–79), red (<50). Score is persisted in run history for trend tracking. New module: `healthScore.ts`.
 - **Welcome states (C5):** All six views now show VS Code's native welcome content with clear call-to-action buttons when disabled ("Enable Saropa Lints") or when no analysis data exists ("Run Analysis"). Replaces flat placeholder tree items.
@@ -32,6 +27,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 - **Inline annotations (D3):** Error Lens style decorations — violation messages displayed at the end of affected lines in the editor, colored by severity (error/warning/info). First violation per line per severity, message truncated to 80 chars with rule name. Toggle on/off via `saropaLints.inlineAnnotations` setting or the "Toggle Inline Annotations" command. Refreshes automatically when violations data changes.
 - **Triage UI in Config view (I1):** Config view now shows rules grouped by priority — critical (flame icon), volume bands A–D (1–5, 6–20, 21–100, 100+ issues), and stylistic (opt-in). Each group is collapsible with estimated score impact (e.g. "est. +8 pts"). Expand to see individual rules sorted by issue count. Click a group or rule to filter the Issues view. Zero-issue rules shown as "N rules with zero issues — auto-enabled". New modules: `triageTree.ts` (node types, data computation, rendering), extended `triageUtils.ts` (impact map, critical rule identification), extended `healthScore.ts` (score estimation for rule removal).
 - **Apply triage to YAML (I2):** Right-click a rule or group in the Config triage view to disable or enable rules. Writes overrides to the RULE OVERRIDES section of `analysis_options_custom.yaml`, then re-runs init and analysis automatically. Score updates in Overview after re-analysis. Confirmation dialog for groups with >5 rules. Config view shows "N rules disabled by override" when overrides exist. New module: `configWriter.ts` (YAML override read/write).
+- **Minimal custom config (I3):** `analysis_options_custom.yaml` reduced from ~420 lines to ~40 lines. Removed STYLISTIC RULES section (327 lines) — enabled stylistic rules migrate to RULE OVERRIDES. Removed PACKAGE SETTINGS section — packages now auto-detected from `pubspec.yaml` on every init run. Kept: analysis settings (`max_issues`, `output`), platform settings, and rule overrides. Old file backed up as `.bak` on first migration. Modified: `custom_overrides_core.dart` (minimal template + migration), `init_runner.dart` (auto-detect packages, call migration).
 - **Security Posture view (D1):** OWASP Top 10 coverage matrix with two collapsible groups (Mobile Top 10, Web Top 10). Each category row shows violation count and distinct rule count. Click a category to filter the Issues view to rules mapped to that OWASP category. Categories with zero violations show a green pass icon.
 - **Focus mode (W7):** Right-click a file in the Issues tree and choose "Show only this file" to filter the tree to that file's violations only. Toolbar "Show all files" button resets. View message shows "Focused: filename.dart".
 - **Trends / mini history (W5):** Last 20 analysis snapshots are persisted in workspace state. Overview shows a "Trends" row with recent totals (e.g. "120 → 115 → 98"). New module: `runHistory.ts`.
@@ -48,17 +44,14 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 - **Suppressions (persisted):** Hide folder, file, rule, rule-in-file, severity, or impact from the tree via context menu. Stored in workspace state; “Clear suppressions” in the view toolbar restores all.
 - **Context menus:** Hide folder/file/rule/rule-in-file/severity/impact, Copy path, Copy message. Toolbar: Filter by text, Filter by type, Filter by rule, Clear filters, Clear suppressions, Refresh.
 
-### Changed (VS Code extension)
+### Changed
 
 - **Progress indicators:** Run analysis, Initialize config, and Set tier show a notification progress spinner while running.
 - **Debounced refresh:** File watcher on `violations.json` debounces refresh by 300 ms to avoid rapid successive updates.
 - **Summary view:** Expandable nodes (By severity, By impact) use a stable `nodeId` so tree expansion does not depend on label text.
-
-### Changed (VS Code extension — internal)
-
 - Status bar update logic consolidated into `updateAllStatusBars()` — called from all command handlers and the config-change listener to keep both status bar items (On/Off and tier) in sync.
 
-### Fixed (VS Code extension)
+### Fixed
 
 - **Health Score NaN guard:** `computeHealthScore` now validates impact counts against non-numeric JSON values (e.g. `”critical”: “bad”`) and clamps the final score to 0 when the formula produces NaN, preventing corrupt scores from propagating into the status bar and run history.
 - **Run history dedup broadened:** `appendSnapshot` now compares total, severity breakdown (error/warning/info), critical count, and score — not just total. A severity shift with the same total (e.g. 5 warnings resolved, 5 errors introduced) is now correctly recorded as a distinct snapshot.
@@ -76,6 +69,11 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 - **Output channel singleton:** `getOutputChannel()` in setup.ts now lazily creates a single output channel instance instead of calling `createOutputChannel()` on every log write.
 - **Suggestions dead branch removed:** Removed the `items.length === 2` early-return in `suggestionsTree.ts` that was functionally identical to the `slice(0, 8)` fallthrough.
 - **Internal command hidden:** `focusIssuesForOwasp` removed from `contributes.commands` so it no longer appears in the command palette (it's invoked programmatically from the Security Posture tree).
+
+### Administration
+
+- **Publish:** Single script (`scripts/publish.py`) for package and VS Code extension. Extension version is synced with package version; menu option 6 packages .vsix and optionally publishes to Marketplace/Open VSX. Removed `scripts/publish_extension.py`. Extension `CHANGELOG.md` is generated at publish time from the root `CHANGELOG.md` (single source of truth) and is gitignored.
+- **project_context modularization:** Split `lib/src/project_context.dart` (~5,330 lines) into a main library file and 10 part files (`project_context_path_bloom_git.dart`, `project_context_project_file.dart`, and others). No API or behavior change; imports remain `package:saropa_lints/src/project_context.dart`. Improves maintainability and aligns with project file-size guidelines.
 
 ---
 
