@@ -33,6 +33,7 @@ VS Code extension buildout: Health Score, triage UI, inline annotations, securit
 
 ### Changed
 
+- **Smart Tier Transitions:** Upgrading to a higher tier auto-filters the Issues view to critical + high violations so users aren't overwhelmed. Notification shows violation delta and "Show All" escape hatch. Tier picker shows rule counts, descriptions, and current-tier marker; same-tier selection is a no-op.
 - Progress indicators for Run Analysis, Initialize Config, and Set Tier.
 - Debounced refresh (300 ms) on `violations.json` changes.
 - Summary view uses stable node IDs for expansion state.

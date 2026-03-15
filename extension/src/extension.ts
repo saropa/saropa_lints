@@ -15,6 +15,7 @@ import {
   runRepairConfig,
   runSetTier,
   showOutputChannel,
+  TIER_ORDER,
 } from './setup';
 import { invalidateCodeLenses, registerCodeLensProvider } from './codeLensProvider';
 import { IssuesTreeProvider, registerIssueCommands } from './views/issuesTree';
@@ -426,15 +427,46 @@ export function activate(context: vscode.ExtensionContext): void {
       if (success) refreshAll();
     }),
     vscode.commands.registerCommand('saropaLints.setTier', async () => {
-      const success = await runSetTier(context);
-      if (success) {
+      // Capture pre-tier violation count for delta display in the notification.
+      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const preTierTotal = root ? (readViolations(root)?.summary?.totalViolations ?? 0) : 0;
+
+      const result = await runSetTier(context);
+      if (result) {
         // C6: setup.ts already runs analysis inside runSetTier when
         // runAnalysisAfterConfigChange is on; no duplicate call here.
         refreshAll();
         updateAllStatusBars();
         updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
-        // C6: Focus Overview after tier change so user sees score delta.
-        await vscode.commands.executeCommand('saropaLints.overview.focus');
+
+        // Smart tier transition: build notification info from post-tier data.
+        // Note: postData may reflect a prior analysis if dart analyze has not yet
+        // written violations.json — counts will update on the next file-watcher refresh.
+        const postData = root ? readViolations(root) : null;
+        const postTotal = postData?.summary?.totalViolations ?? postData?.violations.length ?? 0;
+        const isUpgrade = TIER_ORDER.indexOf(result.tier) > TIER_ORDER.indexOf(result.previousTier);
+
+        // Single pass to count critical+high violations (avoids 3 filter passes over 65k items).
+        let critHigh = 0;
+        for (const v of postData?.violations ?? []) {
+          if (v.impact === 'critical' || v.impact === 'high') critHigh++;
+        }
+
+        // Auto-filter on upgrade when there are many violations and some are critical/high.
+        // This shows the user a manageable set of high-priority issues instead of thousands.
+        if (isUpgrade && postTotal > 50 && critHigh > 0) {
+          issuesProvider.setImpactFilter(new Set(['critical', 'high']));
+          issuesProvider.setSeverityFilter(new Set(['error', 'warning', 'info']));
+          updateIssuesViewMessage();
+        }
+
+        await showTierChangeNotification({
+          tierLabel: result.tierLabel,
+          isUpgrade,
+          postTotal,
+          criticalPlusHigh: critHigh,
+          delta: postTotal - preTierTotal,
+        });
       }
     }),
     // D1/I1: Focus Issues view filtered to a set of rule names.
@@ -655,6 +687,54 @@ function resolveRulesFromArg(arg: unknown): string[] | undefined {
     if (node.kind === 'triageRule' && typeof node.ruleName === 'string') return [node.ruleName];
   }
   return undefined;
+}
+
+/** Pre-computed counts passed from the tier-change handler to the notification. */
+interface TierChangeNotification {
+  tierLabel: string;
+  isUpgrade: boolean;
+  postTotal: number;
+  criticalPlusHigh: number;
+  delta: number;
+}
+
+/**
+ * Show a smart notification after a tier change.
+ *
+ * On upgrade with many violations, tells the user the Issues view has been
+ * auto-filtered to critical+high so they aren't overwhelmed by thousands of
+ * new violations at once. Provides a "Show All" escape hatch.
+ *
+ * On downgrade or small upgrade (≤50 total), shows a simple delta message
+ * without auto-filtering.
+ */
+async function showTierChangeNotification(info: TierChangeNotification): Promise<void> {
+  const deltaText = info.delta > 0 ? `+${info.delta.toLocaleString()}` : info.delta.toLocaleString();
+
+  if (info.isUpgrade && info.postTotal > 50 && info.criticalPlusHigh > 0) {
+    // Auto-filter was applied by the handler — notify user and offer escape hatch.
+    const msg = `${info.tierLabel} tier: ${info.postTotal.toLocaleString()} violations (${deltaText}). `
+      + `Showing ${info.criticalPlusHigh} critical + high — fix these first.`;
+    const choice = await vscode.window.showInformationMessage(msg, 'View Issues', 'Show All');
+    if (choice === 'View Issues') {
+      // Use issues.focus (not focusIssues) to preserve the auto-filter that was
+      // applied by the handler — focusIssues calls clearFilters() first.
+      await vscode.commands.executeCommand('saropaLints.issues.focus');
+    } else if (choice === 'Show All') {
+      // User wants to see everything — clear the auto-filter via the existing command.
+      await vscode.commands.executeCommand('saropaLints.clearIssuesFilters');
+      await vscode.commands.executeCommand('saropaLints.issues.focus');
+    }
+  } else {
+    // Downgrade, small upgrade, or zero critical+high — simple confirmation.
+    const msg = info.delta !== 0
+      ? `Tier changed to ${info.tierLabel} (${deltaText} violations).`
+      : `Tier changed to ${info.tierLabel}.`;
+    const choice = await vscode.window.showInformationMessage(msg, 'View Issues');
+    if (choice === 'View Issues') {
+      await vscode.commands.executeCommand('saropaLints.issues.focus');
+    }
+  }
 }
 
 /**
