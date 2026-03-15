@@ -236,52 +236,102 @@ export async function runRepairConfig(context: vscode.ExtensionContext): Promise
   return runInitializeConfig(context);
 }
 
-export async function runSetTier(context: vscode.ExtensionContext): Promise<boolean> {
-  const tier = await vscode.window.showQuickPick(
-    ['essential', 'recommended', 'professional', 'comprehensive', 'pedantic'],
-    { placeHolder: 'Select tier', title: 'Saropa Lints: Set tier' },
-  );
-  if (!tier) return false;
+/** Tier metadata for the picker — labels, cumulative rule counts, short descriptions. */
+const TIER_INFO = [
+  { id: 'essential', label: 'Essential', rules: 297, desc: 'Security and critical issues only' },
+  { id: 'recommended', label: 'Recommended', rules: 895, desc: 'Best practices for most projects' },
+  { id: 'professional', label: 'Professional', rules: 1834, desc: 'Comprehensive coverage for teams' },
+  { id: 'comprehensive', label: 'Comprehensive', rules: 1959, desc: 'Thorough analysis with minor rules' },
+  { id: 'pedantic', label: 'Pedantic', rules: 1984, desc: 'Every rule enabled' },
+] as const;
+
+/** Ordered tier IDs for upgrade/downgrade comparison. Exported for use in extension.ts. */
+export const TIER_ORDER: readonly string[] = TIER_INFO.map(t => t.id);
+
+/** Result of a successful tier change — includes both tiers for delta display. */
+export interface TierChangeResult {
+  tier: string;
+  tierLabel: string;
+  previousTier: string;
+}
+
+/** Look up the capitalized label for a tier id (e.g. 'recommended' → 'Recommended'). */
+function tierLabel(id: string): string {
+  return TIER_INFO.find(t => t.id === id)?.label ?? id;
+}
+
+/** Run init + optional analysis for a tier change; returns true on success. */
+function applyTierChange(workspaceRoot: string, tier: string, previousTier: string): boolean {
+  logSection('Set Tier');
+  logReport(`- Changed tier: ${previousTier} → ${tier}`);
+  const initResult = runInWorkspace(workspaceRoot, 'dart', buildInitArgs(workspaceRoot, tier));
+  if (!initResult.ok) {
+    logReport(`- Init FAILED: ${initResult.stderr || '(no details)'}`);
+    flushReport(workspaceRoot);
+    vscode.window.showErrorMessage(`Init failed. ${initResult.stderr || 'Check Output.'}`);
+    return false;
+  }
+  logReport(`- Ran init --tier ${tier} --no-stylistic`);
+  // C6: Re-analyze after tier change so violations.json reflects the new ruleset.
+  const runAnalysisAfter = vscode.workspace.getConfiguration('saropaLints')
+    .get<boolean>('runAnalysisAfterConfigChange', true);
+  if (runAnalysisAfter) {
+    const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
+    const analyzeCmd = useFlutter ? 'flutter' : 'dart';
+    const analyzeResult = runInWorkspace(workspaceRoot, analyzeCmd, ['analyze']);
+    // Log whether analysis succeeded — a non-zero exit is expected when violations exist.
+    logReport(analyzeResult.ok ? '- Analysis completed' : '- Analysis reported issues');
+  }
+  flushReport(workspaceRoot);
+  return true;
+}
+
+/**
+ * Show an enhanced tier picker and run init + analysis for the selected tier.
+ * Returns the new and previous tier on success, or null on cancel/failure/same-tier.
+ */
+export async function runSetTier(context: vscode.ExtensionContext): Promise<TierChangeResult | null> {
+  const previousTier = (vscode.workspace.getConfiguration('saropaLints').get<string>('tier') ?? 'recommended').trim();
+
+  // Build descriptive pick items — current tier marked with checkmark, rule counts shown.
+  interface TierPickItem extends vscode.QuickPickItem { id: string }
+  const items: TierPickItem[] = TIER_INFO.map(t => ({
+    label: t.id === previousTier ? `$(check) ${t.label}` : t.label,
+    description: `${t.rules} rules${t.id === previousTier ? ' (current)' : ''}`,
+    detail: t.desc,
+    id: t.id,
+  }));
+
+  const pick = await vscode.window.showQuickPick(items, {
+    placeHolder: `Current: ${tierLabel(previousTier)}`,
+    title: 'Saropa Lints: Set tier',
+  });
+  if (!pick) return null;
+  const tier = pick.id;
+
+  // Same-tier guard — no-op, skip the expensive init + analysis cycle.
+  if (tier === previousTier) {
+    void vscode.window.showInformationMessage(`Already on ${tierLabel(tier)} tier.`);
+    return null;
+  }
+
   const workspaceRoot = getWorkspaceRoot();
   if (!workspaceRoot) {
     vscode.window.showErrorMessage('No workspace folder open.');
-    return false;
+    return null;
   }
   await vscode.workspace.getConfiguration('saropaLints').update('tier', tier, vscode.ConfigurationTarget.Workspace);
   let ok = false;
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: 'Updating tier',
+      title: `Updating tier to ${tierLabel(tier)}`,
       cancellable: false,
     },
-    async () => {
-      logSection('Set Tier');
-      logReport(`- Changed tier to: ${tier}`);
-      const result = runInWorkspace(workspaceRoot, 'dart', buildInitArgs(workspaceRoot, tier));
-      ok = result.ok;
-      if (!ok) {
-        logReport(`- Init FAILED: ${result.stderr || '(no details)'}`);
-        flushReport(workspaceRoot);
-        vscode.window.showErrorMessage(`Init failed. ${result.stderr || 'Check Output.'}`);
-        return;
-      }
-      logReport(`- Ran init --tier ${tier} --no-stylistic`);
-      vscode.window.showInformationMessage(`Saropa Lints tier set to ${tier}.`);
-      // C6: Re-analyze after tier change so violations.json reflects the new ruleset,
-      // matching the behavior of runEnable.
-      const cfgAfter = vscode.workspace.getConfiguration('saropaLints');
-      const runAnalysisAfter = cfgAfter.get<boolean>('runAnalysisAfterConfigChange', true);
-      if (runAnalysisAfter) {
-        const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
-        const analyzeCmd = useFlutter ? 'flutter' : 'dart';
-        runInWorkspace(workspaceRoot, analyzeCmd, ['analyze']);
-        logReport('- Ran analysis after tier change');
-      }
-      flushReport(workspaceRoot);
-    },
+    // Smart notification is shown by the handler in extension.ts after we return.
+    async () => { ok = applyTierChange(workspaceRoot, tier, previousTier); },
   );
-  return ok;
+  return ok ? { tier, tierLabel: tierLabel(tier), previousTier } : null;
 }
 
 export function showOutputChannel(): void {
