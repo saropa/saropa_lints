@@ -68,6 +68,7 @@ Exit Codes:
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 import time
@@ -230,6 +231,7 @@ from scripts.modules._rule_metrics import (
 # Extension: sync version, package .vsix, publish to Marketplace/Open VSX
 from scripts.modules._extension_publish import (
     extension_exists,
+    install_extension,
     package_extension,
     publish_extension,
     set_extension_version,
@@ -322,33 +324,61 @@ def _prompt_version(default: str, timeout: int = 30) -> str:
 # =============================================================================
 
 
+def _get_extension_identity(project_dir: Path) -> tuple[str, str]:
+    """Read publisher and name from extension/package.json.
+
+    Returns (publisher, name) or ('', '') if unavailable.
+    """
+    pkg_json = project_dir / "extension" / "package.json"
+    if not pkg_json.is_file():
+        return ("", "")
+    try:
+        data = json.loads(pkg_json.read_text(encoding="utf-8"))
+        return (data.get("publisher", ""), data.get("name", ""))
+    except (json.JSONDecodeError, OSError):
+        return ("", "")
+
 
 def _print_success_banner(
     package_name: str, version: str, repo_path: str,
+    publisher: str, extension_name: str,
+    extension_published: bool,
 ) -> None:
-    """Print final success banner with pub.dev, CI, release URLs and pubspec snippet."""
+    """Print final success banner with pub.dev, CI, release, and store URLs plus pubspec snippet."""
     print_colored(
         f"  \u2713 PUBLISHED {package_name} v{version}",
         Color.GREEN,
     )
     print()
     print_colored(
-        f"      Package:  https://pub.dev/packages/{package_name}",
+        f"      Package:      https://pub.dev/packages/{package_name}",
         Color.CYAN,
     )
     print_colored(
-        f"      Score:    https://pub.dev/packages/{package_name}/score",
+        f"      Score:        https://pub.dev/packages/{package_name}/score",
         Color.CYAN,
     )
     print_colored(
-        f"      CI:       https://github.com/{repo_path}/actions",
+        f"      CI:           https://github.com/{repo_path}/actions",
         Color.CYAN,
     )
     print_colored(
-        f"      Release:  https://github.com/{repo_path}"
+        f"      Release:      https://github.com/{repo_path}"
         f"/releases/tag/v{version}",
         Color.CYAN,
     )
+    # Store links only shown when the extension was actually published
+    if extension_published and publisher and extension_name:
+        print_colored(
+            f"      Marketplace:  https://marketplace.visualstudio.com"
+            f"/items?itemName={publisher}.{extension_name}",
+            Color.CYAN,
+        )
+        print_colored(
+            f"      Open VSX:     https://open-vsx.org"
+            f"/extension/{publisher}/{extension_name}",
+            Color.CYAN,
+        )
     print()
     print_colored("  Add to your pubspec.yaml:", Color.DIM)
     print()
@@ -444,6 +474,15 @@ def main(
                 "Extension package failed",
                 ExitCode.VALIDATION_FAILED,
             )
+        # Install locally (default yes)
+        response = (
+            input("  Install extension locally? [Y/n] ")
+            .strip()
+            .lower()
+        )
+        if not response.startswith("n"):
+            install_extension(vsix)
+        # Publish to stores (default no)
         response = (
             input(
                 "  Publish extension to Marketplace and Open VSX? [y/N] "
@@ -520,6 +559,7 @@ def main(
     version = pubspec_version
     release_notes = ""
     succeeded = False
+    extension_published = False
 
     try:
         # --- Step 1: Pre-publish audits (tier integrity, duplicates, DX; skip if full_skip_audit) ---
@@ -889,10 +929,20 @@ def main(
             print_warning(f"Post-publish version bump failed: {exc}")
 
         # --- Extension: package .vsix and optionally publish (runs after package publish so versions stay aligned) ---
+        extension_published = False
         if extension_exists(project_dir):
             with timer.step("Extension"):
                 vsix = package_extension(project_dir, version)
                 if vsix:
+                    # Install locally (default yes)
+                    response = (
+                        input("  Install extension locally? [Y/n] ")
+                        .strip()
+                        .lower()
+                    )
+                    if not response.startswith("n"):
+                        install_extension(vsix)
+                    # Publish to stores (default no)
                     response = (
                         input(
                             "  Publish extension to Marketplace and Open VSX? [y/N] "
@@ -901,7 +951,9 @@ def main(
                         .lower()
                     )
                     if response.startswith("y"):
-                        if not publish_extension(project_dir, vsix):
+                        if publish_extension(project_dir, vsix):
+                            extension_published = True
+                        else:
                             print_warning("Extension publish failed (package already published).")
                 else:
                     print_warning("Extension package failed (package already published).")
@@ -923,9 +975,13 @@ def main(
         timer.print_summary()
 
     if succeeded:
-        # Show success banner with package/release links and pubspec snippet
+        # Show success banner with package/release/store links and pubspec snippet
         repo_path = extract_repo_path(remote_url)
-        _print_success_banner(package_name, version, repo_path)
+        publisher, ext_name = _get_extension_identity(project_dir)
+        _print_success_banner(
+            package_name, version, repo_path, publisher, ext_name,
+            extension_published,
+        )
 
     # Return 0 on success, or the exit code set by exit_with_error()
     return exit_code
