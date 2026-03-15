@@ -45,6 +45,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 - **Suppressions (persisted):** Hide folder, file, rule, rule-in-file, severity, or impact from the tree via context menu. Stored in workspace state; “Clear suppressions” in the view toolbar restores all.
 - **Context menus:** Hide folder/file/rule/rule-in-file/severity/impact, Copy path, Copy message. Toolbar: Filter by text, Filter by type, Filter by rule, Clear filters, Clear suppressions, Refresh.
 
+### Deprecated
+
+- **CLI init interactive mode (I4):** `dart run saropa_lints:init` no longer prompts for tier selection, stylistic walkthrough, or "Run analysis?". The command is now headless-only — defaults to `recommended` tier when `--tier` is not specified. Use the Saropa Lints VS Code extension for interactive setup and configuration. The CLI remains available for CI/scripting with explicit flags (`--tier`, `--target`, `--no-stylistic`).
+
 ### Changed
 
 - **Progress indicators:** Run analysis, Initialize config, and Set tier show a notification progress spinner while running.

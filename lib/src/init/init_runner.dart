@@ -131,6 +131,11 @@ Future<void> runInit(List<String> args) async {
     );
   }
   showWhatsNew(version, packageDir);
+  // I4: Deprecation notice — extension is the supported setup path.
+  log.terminal(
+    '${InitColors.yellow}Note: CLI init is deprecated. '
+    'Use the Saropa Lints VS Code extension for setup.${InitColors.reset}',
+  );
   log.terminal('');
 
   // Resolve tier (handle numeric input, or prompt if not specified)
@@ -148,9 +153,14 @@ Future<void> runInit(List<String> args) async {
     return;
   }
 
+  // I4: Default to 'recommended' — interactive tier prompt removed.
+  // Use --tier to specify a different tier.
   if (tier == null) {
-    // No tier specified — prompt interactively or fall back to default
-    tier = promptForTier(targetDir: targetDir);
+    tier = 'recommended';
+    log.terminal(
+      '${InitColors.dim}No --tier specified, defaulting to '
+      'recommended${InitColors.reset}',
+    );
   }
   final String resolvedTier = tier;
 
