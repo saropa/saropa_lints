@@ -290,6 +290,10 @@
       {
         "command": "saropaLints.enableRules",
         "title": "Enable rule(s)"
+      },
+      {
+        "command": "saropaLints.exportOwaspReport",
+        "title": "Saropa Lints: Export OWASP Compliance Report"
       }
     ],
     "menus": {
@@ -437,6 +441,10 @@
         {
           "command": "saropaLints.enableRules",
           "when": "view == saropaLints.config && viewItem == triageRule"
+        },
+        {
+          "command": "saropaLints.exportOwaspReport",
+          "when": "view == saropaLints.securityPosture && viewItem == securityGroup"
         }
       ]
     },

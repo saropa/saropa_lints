@@ -15,7 +15,7 @@ import { readViolations, Violation } from '../violationsReader';
 
 // --- OWASP category labels ---
 
-const MOBILE_TOP_10: readonly string[] = [
+export const MOBILE_TOP_10: readonly string[] = [
   'M1: Improper Credential Usage',
   'M2: Inadequate Supply Chain Security',
   'M3: Insecure Authentication/Authorization',
@@ -28,7 +28,7 @@ const MOBILE_TOP_10: readonly string[] = [
   'M10: Insufficient Cryptography',
 ];
 
-const WEB_TOP_10: readonly string[] = [
+export const WEB_TOP_10: readonly string[] = [
   'A01: Broken Access Control',
   'A02: Cryptographic Failures',
   'A03: Injection',
@@ -47,7 +47,7 @@ type CategoryType = 'mobile' | 'web';
  * Normalize an OWASP category string to its short-form ID.
  * Handles both "M1" and "M1: Improper Credential Usage" → "M1".
  */
-function normalizeOwaspId(raw: string): string {
+export function normalizeOwaspId(raw: string): string {
   return raw.split(':')[0].trim();
 }
 
