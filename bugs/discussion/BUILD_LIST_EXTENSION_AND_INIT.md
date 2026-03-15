@@ -2,7 +2,7 @@
 
 **Purpose:** Single prioritized list of work to make the extension-driven experience complete, integrated, and genuinely differentiated. Supersedes the previous separate plans (cohesion/WOW, init redesign). Source material: [003_INIT_REDESIGN.md](003_INIT_REDESIGN.md), [log_capture_integration.md](log_capture_integration.md).
 
-**Already done:** Violation export (`violations.json`), Issues tree (structure, filters, suppressions), Summary/Config/Logs/Suggestions/Overview views, one-click setup, file watcher, C4 (Summary → Issues), W1 (Apply fix from tree), W2 (Code Lens), W3 (rule doc in tooltip), W4 (Problems → Show in Saropa), F1–F4 (foundation), W5 (trends), W6 (celebration), W7 (focus mode), W8 (tier in status bar), H1–H3 (Health Score in Overview + status bar + history), C1–C7 (all cohesion items), D1 (Security Posture view), D3 (inline annotations).
+**Already done:** Violation export (`violations.json`), Issues tree (structure, filters, suppressions), Summary/Config/Logs/Suggestions/Overview views, one-click setup, file watcher, C4 (Summary → Issues), W1 (Apply fix from tree), W2 (Code Lens), W3 (rule doc in tooltip), W4 (Problems → Show in Saropa), F1–F4 (foundation), W5 (trends), W6 (celebration), W7 (focus mode), W8 (tier in status bar), H1–H3 + H5 (Health Score in Overview + status bar + history + score persistence), C1–C7 (all cohesion items), D1 (Security Posture view), D3 (inline annotations), D11 (focus mode = W7), I1 (Triage UI in Config).
 
 **Implementation records (done 2026-03-14):**
 - **W5 (Trends):** `runHistory.ts` persists last 20 snapshots in workspace state; Overview shows "Trends" row with last 5 totals arrow-separated.
@@ -19,7 +19,10 @@
 - **C1 (Overview as home):** Overview shows "Last run: X min ago" from most recent history timestamp (via `formatTimeAgo()`) and a "Run Analysis" CTA button between trends/celebration and view links.
 - **C2 (Status bar → open view):** Already working — `statusBarItem.command = 'saropaLints.focusView'` → `saropaLints.overview.focus`. Marked done.
 - **C3 (Suggestions with score impact):** `estimateScoreWithout(data, impact)` in `healthScore.ts` projects the score with a given impact level zeroed out. Critical and high suggestions show "estimated +X points" as description. Falls back to "Show in Issues" when score can't be computed.
-- **C6 (Config as control surface):** `setTier` and `initializeConfig` commands now check `runAnalysisAfterConfigChange` setting and auto-run `runAnalysis()` after config change. Views and status bars refresh after, showing score delta.
+- **C6 (Config as control surface):** `initializeConfig` checks `runAnalysisAfterConfigChange` and auto-runs analysis. `setTier` runs analysis inside `runSetTier()` in `setup.ts` (under the same progress notification), then focuses Overview to show score delta. Views and status bars refresh after.
+- **D1 (Security Posture view):** `securityPostureTree.ts` — OWASP Top 10 coverage matrix with two collapsible groups (Mobile Top 10, Web Top 10). Each category row shows violation count + distinct rule count from `Violation.owasp` data. Click filters Issues to mapped rules via `focusIssuesForOwasp` command (rule-hide filter). `OwaspData` interface added to `violationsReader.ts`. `buildCounts()` result cached per refresh cycle. Zero-violation categories show green pass icon.
+- **D3 (Inline annotations):** `inlineAnnotations.ts` — Error Lens style line-end decorations. One `TextEditorDecorationType` per severity (error/warning/info) for VS Code performance. First violation per line per severity; message truncated to 80 chars with rule name. Violations cache (`getCachedViolations`) avoids disk I/O on editor switch; invalidated via `invalidateAnnotationCache()` in `refreshAll`. Toggle via `saropaLints.inlineAnnotations` setting and `toggleInlineAnnotations` command. Decoration types disposed on extension deactivation.
+- **I1 (Triage UI in Config):** `triageTree.ts` — discriminated union node types (ConfigSettingNode, TriageGroupNode, TriageRuleNode, TriageInfoNode). `buildTriageData()` computes all triage groups from `ViolationsData`: critical rules (flame icon, any rule with critical-impact violations), volume bands A–D (1–5, 6–20, 21–100, 100+), zero-issue count (auto-enabled), stylistic (opt-in, paintcan icon). Critical and stylistic rules filtered out of volume grouping to avoid double-counting. `buildRuleImpactMap()` in `triageUtils.ts` does single O(n) scan of violations for per-rule impact breakdown. `estimateScoreForRuleRemoval()` in `healthScore.ts` projects score if group's violations were fixed. Each group description shows "N rules, M issues, est. +X pts". Expand groups to see individual rules sorted by issue count. Click group/rule → `focusIssuesForRules` command filters Issues view. `configTree.ts` refactored from flat `ConfigItem` to `TreeDataProvider<ConfigTreeNode>` with collapsible triage groups. `focusIssuesForRules` and `focusIssuesForOwasp` consolidated into shared handler (handles both TreeItem click and context menu invocation).
 
 ---
 
@@ -119,7 +122,7 @@ Triage and config live in the extension. Triage decisions directly affect the He
 
 | # | Item | Description | Integration |
 |---|------|-------------|-------------|
-| I1 | **Triage UI in Config** | Data-driven: Critical always on + link to Issues; zero-issue rules auto-enabled; rest grouped by volume (A: 1–5, B: 6–20, C: 21–100, D: 100+) with [Enable all] [Disable all] [Review]. Stylistic: separate section, opt-in. **Show estimated score impact** per group: "Enabling Group A: +8 points (34 rules, 87 low-severity issues)". | Per-rule counts (F2), score estimation (H1) |
+| I1 | **Triage UI in Config** | *(done)* Critical + volume A–D + stylistic groups in Config view with score estimation. Click → filter Issues. `triageTree.ts`, extended `triageUtils.ts` + `healthScore.ts`. | Per-rule counts (F2), score estimation (H1) |
 | I2 | **Apply triage → write YAML** | Extension writes `analysis_options.yaml`. After write: auto re-analyze → update score → show delta in Overview. The feedback loop: triage → analyze → see improvement → triage more. | Config writes → re-analysis → H1 score |
 | I3 | **Minimal custom config** | Only explicit overrides (rule_name: true/false). Migration: read overrides from existing long config, rewrite to minimal, backup as `.bak`. | — |
 | I4 | **Deprecate/remove init CLI** | No user-facing `dart run saropa_lints:init`. Optional headless variant for CI. | — |
@@ -155,7 +158,7 @@ These replace the generic W5–W12 with features backed by what actually differe
 |---|------|-------------|-------------|
 | D9 | **Onboarding with score** | First-run: Enable → analyze → "Your project scores 34/100" → "Here's what we found" → "Configure rules to improve" → triage. Score gives immediate anchor. | Score (H1), first-run (I5) |
 | D10 | **Group by in Issues** | Preset chips: "Group by: Severity \| File \| Impact \| Rule \| OWASP category". OWASP grouping is unique. | OWASP data, Issues tree |
-| D11 | **Focus mode** | Issues view: "Show only this file" context menu; "Show all" to reset. | Issues tree (existing) |
+| D11 | **Focus mode** | *(done — W7)* Issues view: "Show only this file" context menu; "Show all" to reset. | Issues tree (existing) |
 | D12 | **Logs parsed / hints** | Logs view: parsed "Analysis: 3 errors, 12 warnings" or "Test X failed" with "Open log" and "Run analysis again". | — |
 
 ### Already done (WOW Tier 1 from previous plan)
@@ -186,16 +189,16 @@ The integration is the file contract — violations.json is read by both the ext
 
 The order follows the data pipeline: build the score first, then the features that consume it.
 
-1. **Health Score (H1–H3):** Score computation, show in Overview and status bar. This is the new foundation — everything else references it.
-2. **Cohesion (C1, C2, C5, C7):** Overview as home (now with score), status bar (now with score), welcome states, single Run analysis. Then C3 (suggestions with score impact), C6 (config as control surface).
-3. **Security Posture (D1):** OWASP view — high impact, uses existing data, unique differentiator. Do this early because it's a selling point.
-4. **Inline annotations (D3):** Error Lens style — high wow, moderate effort, massive visibility improvement.
-5. **Init in extension (I1, I2, I3, I5):** Triage UI with score impact estimation, apply → write YAML → re-analyze → show score delta. Then I4 (deprecate CLI).
+1. ~~**Health Score (H1–H3):**~~ *(done)* Score computation, Overview, status bar. H5 (score persistence) also done.
+2. ~~**Cohesion (C1–C7):**~~ *(done)* Overview as home, status bar, welcome states, single Run analysis, suggestions with score impact, config as control surface.
+3. ~~**Security Posture (D1):**~~ *(done)* OWASP coverage matrix — Mobile + Web Top 10.
+4. ~~**Inline annotations (D3):**~~ *(done)* Error Lens style line-end decorations with toggle.
+5. **Init in extension (I2, I3, I5):** ~~I1 (Triage UI) done.~~ Apply → write YAML → re-analyze → show score delta. Then I4 (deprecate CLI). **← next**
 6. **Fix Impact Preview (D4) + Bulk fix (D7):** Score-aware fixing. Turns "fix lint" into "improve score."
-7. **Trends + celebration (D5, D8):** Score history, sparkline, regression alerts, threshold celebrations.
-8. **Score in Code Lens (H4), History (H5):** Extend existing Code Lens with score; persist history for trends.
+7. **Trends + celebration (D5, D8):** Score sparkline, regression alerts, threshold celebrations. (Basic W5/W6 done; D5/D8 extend with score-driven features.)
+8. **Score in Code Lens (H4):** Extend existing Code Lens with per-file score or critical count.
 9. **OWASP export (D2), File Risk (D6):** Compliance report and heatmap — polish differentiators.
-10. **Remaining polish (D9–D12):** Onboarding, group-by, focus mode, log hints.
+10. **Remaining polish (D9, D10, D12):** Onboarding, group-by, log hints. (D11 done.)
 11. **Log Capture (L1–L4):** When touching those codebases.
 
 ---
