@@ -215,7 +215,7 @@ The order follows the data pipeline: build the score first, then the features th
 8. ~~**Score in Code Lens (H4):**~~ *(done)* Code Lens shows per-file critical count ("Saropa: 3 issues (2 critical) — Show in Saropa").
 9. ~~**OWASP export (D2), File Risk (D6):**~~ *(done)* D2: Compliance markdown report with Mobile + Web Top 10 tables, gap analysis. D6: File Risk view — files ranked by weighted violation density, flame/warning icons, summary "Top N files have X% of critical issues", click to filter Issues.
 10. ~~**Remaining polish (D10):**~~ *(done)* Group-by in Issues — 5 modes (Severity, File, Impact, Rule, OWASP), toolbar button, mode-aware icons. (D9 done via I5, D11 done via W7, D12 done.)
-11. **Log Capture (L1, L3, L4):** When touching those codebases. (L2 done.)
+11. ~~**Log Capture (L1, L2, L3, L4):**~~ *(done)*
 
 ---
 
