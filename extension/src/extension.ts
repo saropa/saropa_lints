@@ -29,6 +29,7 @@ import { appendSnapshot, loadHistory, findPreviousScore, detectThresholdCrossing
 import { computeHealthScore, formatScoreDelta, scoreColorBand } from './healthScore';
 import { registerInlineAnnotations, updateAnnotationsForAllEditors, invalidateAnnotationCache } from './inlineAnnotations';
 import { writeRuleOverrides, removeRuleOverrides } from './configWriter';
+import { logReport, logSection, flushReport } from './reportWriter';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -182,6 +183,10 @@ export function activate(context: vscode.ExtensionContext): void {
             if (curr.score !== undefined) {
               const crossing = detectThresholdCrossing(curr.score, findPreviousScore(history));
               if (crossing?.direction === 'up') {
+                // Report: log milestone crossing.
+                logSection('Milestone');
+                logReport(`- Score reached ${crossing.threshold} (current: ${curr.score})`);
+                if (root) flushReport(root);
                 void vscode.window.showInformationMessage(
                   `Saropa Lints: Score reached ${crossing.threshold} \u2014 great work!`,
                 );
@@ -303,6 +308,17 @@ export function activate(context: vscode.ExtensionContext): void {
       // I5: Show score-aware notification with actionable buttons.
       const health = data ? computeHealthScore(data) : null;
       const totalViolations = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
+
+      // Report: log enable result with score.
+      if (root) {
+        logSection('Enable Result');
+        if (health) {
+          logReport(`- Score: ${health.score}/100`);
+        }
+        logReport(`- Violations: ${totalViolations}`);
+        flushReport(root);
+      }
+
       await showFirstRunNotification(health, totalViolations);
     }),
     vscode.commands.registerCommand('saropaLints.disable', async () => {

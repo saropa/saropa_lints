@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { spawnSync } from 'child_process';
+import { logReport, logSection, flushReport } from './reportWriter';
 
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
 const DEFAULT_VERSION = '^8.0.0';
@@ -107,30 +108,41 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
       cancellable: false,
     },
     async () => {
+      logSection('Enable');
+
       if (!ensureSaropaLintsInPubspec(workspaceRoot)) return;
+      logReport('- Added saropa_lints to pubspec.yaml');
 
       const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
       const pubCmd = useFlutter ? 'flutter' : 'dart';
       const { ok: pubOk, stderr: pubErr } = runInWorkspace(workspaceRoot, pubCmd, ['pub', 'get']);
       if (!pubOk) {
+        logReport(`- pub get FAILED: ${pubErr || '(no details)'}`);
+        flushReport(workspaceRoot);
         vscode.window.showErrorMessage(`Saropa Lints: pub get failed. ${pubErr || 'Check Output.'}`);
         return;
       }
+      logReport(`- Ran pub get (${pubCmd})`);
 
       const cfg = vscode.workspace.getConfiguration('saropaLints');
       const tier = (cfg.get<string>('tier') ?? 'recommended').trim();
       const { ok: initOk, stderr: initErr } = runInWorkspace(workspaceRoot, 'dart', buildInitArgs(workspaceRoot, tier));
       if (!initOk) {
+        logReport(`- init FAILED: ${initErr || '(no details)'}`);
+        flushReport(workspaceRoot);
         vscode.window.showErrorMessage(`Saropa Lints: init failed. ${initErr || 'Check Output.'}`);
         return;
       }
+      logReport(`- Ran init --tier ${tier} --no-stylistic`);
 
       const runAnalysisAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true);
       if (runAnalysisAfter) {
         const analyzeCmd = useFlutter ? 'flutter' : 'dart';
         runInWorkspace(workspaceRoot, analyzeCmd, ['analyze']);
+        logReport('- Ran analysis');
       }
       success = true;
+      flushReport(workspaceRoot);
     },
   );
 
@@ -159,13 +171,18 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
       cancellable: false,
     },
     async () => {
+      logSection('Analysis');
       const result = runInWorkspace(workspaceRoot, cmd, ['analyze']);
       ok = result.ok;
       if (!ok) {
+        logReport(`- Analysis reported issues (${cmd} analyze)`);
         vscode.window.showWarningMessage(
           `Analysis reported issues. ${result.stderr ? result.stderr.slice(0, 200) : 'See Problems view.'}`,
         );
+      } else {
+        logReport('- Analysis completed clean');
       }
+      flushReport(workspaceRoot);
     },
   );
   return ok;
@@ -187,11 +204,16 @@ export async function runInitializeConfig(context: vscode.ExtensionContext, titl
       cancellable: false,
     },
     async () => {
+      logSection('Initialize Config');
       const result = runInWorkspace(workspaceRoot, 'dart', buildInitArgs(workspaceRoot, tier));
       ok = result.ok;
       if (!ok) {
+        logReport(`- Init FAILED: ${result.stderr || '(no details)'}`);
+        flushReport(workspaceRoot);
         vscode.window.showErrorMessage(`Init failed. ${result.stderr || 'Check Output.'}`);
       } else {
+        logReport(`- Config initialized (tier: ${tier})`);
+        flushReport(workspaceRoot);
         vscode.window.showInformationMessage(`Saropa Lints config updated (tier: ${tier}).`);
       }
     },
@@ -234,12 +256,17 @@ export async function runSetTier(context: vscode.ExtensionContext): Promise<bool
       cancellable: false,
     },
     async () => {
+      logSection('Set Tier');
+      logReport(`- Changed tier to: ${tier}`);
       const result = runInWorkspace(workspaceRoot, 'dart', buildInitArgs(workspaceRoot, tier));
       ok = result.ok;
       if (!ok) {
+        logReport(`- Init FAILED: ${result.stderr || '(no details)'}`);
+        flushReport(workspaceRoot);
         vscode.window.showErrorMessage(`Init failed. ${result.stderr || 'Check Output.'}`);
         return;
       }
+      logReport(`- Ran init --tier ${tier} --no-stylistic`);
       vscode.window.showInformationMessage(`Saropa Lints tier set to ${tier}.`);
       // C6: Re-analyze after tier change so violations.json reflects the new ruleset,
       // matching the behavior of runEnable.
@@ -249,7 +276,9 @@ export async function runSetTier(context: vscode.ExtensionContext): Promise<bool
         const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
         const analyzeCmd = useFlutter ? 'flutter' : 'dart';
         runInWorkspace(workspaceRoot, analyzeCmd, ['analyze']);
+        logReport('- Ran analysis after tier change');
       }
+      flushReport(workspaceRoot);
     },
   );
   return ok;
