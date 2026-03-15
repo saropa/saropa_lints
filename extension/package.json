@@ -397,7 +397,7 @@
           "when": "view == saropaLints.config",
           "group": "navigation"
         },
-{
+        {
           "command": "saropaLints.refresh",
           "when": "view == saropaLints.suggestions",
           "group": "navigation"

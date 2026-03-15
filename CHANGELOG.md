@@ -22,11 +22,15 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 ---
 
-## [Unreleased]
+## [9.1.0]
 
 ### Changed
 
 - **Extension:** Welcome views and status bar now detect non-Dart workspaces and show appropriate guidance instead of a misleading "Enable" button
+
+### Removed
+
+- **Logs view:** Removed the Logs panel from the sidebar — it was a file browser for the `reports/` directory, which the built-in file explorer already provides.
 
 ---
 

@@ -165,7 +165,6 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
     items.push(
       new OverviewItem('Summary', undefined, 'saropaLints.summary.focus'),
       new OverviewItem('Config', undefined, 'saropaLints.config.focus'),
-      new OverviewItem('Logs', undefined, 'saropaLints.logs.focus'),
       new OverviewItem('Suggestions', undefined, 'saropaLints.suggestions.focus'),
     );
 
