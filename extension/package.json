@@ -2,7 +2,7 @@
   "name": "saropa-lints",
   "displayName": "Saropa Lints",
   "description": "Enable and configure Saropa Lints for Dart/Flutter. One-click setup, no init command—pubspec and analysis_options from the UI.",
-  "version": "9.0.0",
+  "version": "9.0.1",
   "publisher": "saropa",
   "license": "MIT",
   "repository": {
@@ -40,7 +40,7 @@
         {
           "id": "saropaLints",
           "title": "Saropa Lints",
-          "icon": "icon.png"
+          "icon": "sidebar-icon.svg"
         }
       ]
     },
