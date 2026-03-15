@@ -112,6 +112,25 @@ def run_extension_package(project_dir: Path) -> Path | None:
     return vsix
 
 
+def install_extension(vsix_path: Path) -> bool:
+    """Install .vsix into VS Code locally. Returns True on success."""
+    r = run_command(
+        ["code", "--install-extension", str(vsix_path)],
+        vsix_path.parent,
+        "Install extension locally",
+        capture_output=True,
+        allow_failure=True,
+    )
+    if r.returncode != 0:
+        if r.stderr:
+            print_error(r.stderr.strip())
+        if r.stdout:
+            print_error(r.stdout.strip())
+        return False
+    print_success(f"Installed {vsix_path.name} locally")
+    return True
+
+
 def publish_extension_to_marketplace(
     project_dir: Path, vsix_path: Path
 ) -> bool:
