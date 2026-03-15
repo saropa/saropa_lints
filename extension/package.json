@@ -73,6 +73,10 @@
         {
           "id": "saropaLints.securityPosture",
           "name": "Security Posture"
+        },
+        {
+          "id": "saropaLints.fileRisk",
+          "name": "File Risk"
         }
       ]
     },
@@ -139,6 +143,16 @@
       },
       {
         "view": "saropaLints.securityPosture",
+        "contents": "Saropa Lints is **off** for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)",
+        "when": "!saropaLints.enabled"
+      },
+      {
+        "view": "saropaLints.fileRisk",
+        "contents": "Run analysis to see file risk ranking.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
+        "when": "saropaLints.enabled && !saropaLints.hasViolations"
+      },
+      {
+        "view": "saropaLints.fileRisk",
         "contents": "Saropa Lints is **off** for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)",
         "when": "!saropaLints.enabled"
       }
@@ -361,6 +375,11 @@
         {
           "command": "saropaLints.refresh",
           "when": "view == saropaLints.securityPosture",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.refresh",
+          "when": "view == saropaLints.fileRisk",
           "group": "navigation"
         }
       ],
