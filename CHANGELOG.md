@@ -8,7 +8,15 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 6.2.0.
 
-\*\* See the current published changelog: [saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)
+| | |
+|---|---|
+| **Package** | [pub.dev/packages/saropa_lints](https://pub.dev/packages/saropa_lints) |
+| **Score** | [pub.dev/packages/saropa_lints/score](https://pub.dev/packages/saropa_lints/score) |
+| **Changelog** | [pub.dev/packages/saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog) |
+| **CI** | [github.com/saropa/saropa_lints/actions](https://github.com/saropa/saropa_lints/actions) |
+| **Releases** | [github.com/saropa/saropa_lints/releases](https://github.com/saropa/saropa_lints/releases) |
+| **Marketplace** | [marketplace.visualstudio.com](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints) |
+| **Open VSX** | [open-vsx.org](https://open-vsx.org/extension/saropa/saropa-lints) |
 
 Each version (and [Unreleased]) has a short commentary line in plain language—what this release is about for humans. Only discuss user-facing features; vary the phrasing.
 
