@@ -2,7 +2,7 @@
 
 **Purpose:** Single prioritized list of work to make the extension-driven experience complete, integrated, and genuinely differentiated. Supersedes the previous separate plans (cohesion/WOW, init redesign). Source material: [003_INIT_REDESIGN.md](003_INIT_REDESIGN.md), [log_capture_integration.md](log_capture_integration.md).
 
-**Already done:** Violation export (`violations.json`), Issues tree (structure, filters, suppressions), Summary/Config/Logs/Suggestions/Overview views, one-click setup, file watcher, C4 (Summary → Issues), W1 (Apply fix from tree), W2 (Code Lens), W3 (rule doc in tooltip), W4 (Problems → Show in Saropa), F1–F4 (foundation), W5 (trends), W6 (celebration), W7 (focus mode), W8 (tier in status bar), H1–H3 + H5 (Health Score in Overview + status bar + history + score persistence), C1–C7 (all cohesion items), D1 (Security Posture view), D3 (inline annotations), D11 (focus mode = W7), I1 (Triage UI in Config), I2 (Apply triage → write YAML), I3 (Minimal custom config), I5 (First-run flow), I4 (Deprecate CLI init), D4 (Fix Impact Preview), D7 (Bulk fix with impact summary), D5 (Score-driven trends), D8 (Score-driven celebration).
+**Already done:** Violation export (`violations.json`), Issues tree (structure, filters, suppressions), Summary/Config/Logs/Suggestions/Overview views, one-click setup, file watcher, C4 (Summary → Issues), W1 (Apply fix from tree), W2 (Code Lens), W3 (rule doc in tooltip), W4 (Problems → Show in Saropa), F1–F4 (foundation), W5 (trends), W6 (celebration), W7 (focus mode), W8 (tier in status bar), H1–H3 + H5 (Health Score in Overview + status bar + history + score persistence), C1–C7 (all cohesion items), D1 (Security Posture view), D3 (inline annotations), D11 (focus mode = W7), I1 (Triage UI in Config), I2 (Apply triage → write YAML), I3 (Minimal custom config), I5 (First-run flow), I4 (Deprecate CLI init), D4 (Fix Impact Preview), D7 (Bulk fix with impact summary), D5 (Score-driven trends), D8 (Score-driven celebration), H4 (Score in Code Lens).
 
 **Implementation records (done 2026-03-14):**
 - **W5 (Trends):** `runHistory.ts` persists last 20 snapshots in workspace state; Overview shows "Trends" row with last 5 totals arrow-separated.
@@ -31,6 +31,7 @@
 - **D7 (Bulk fix with impact summary):** `issuesTree.ts` — new `fixAllInFile()` processes violations bottom-up (descending line order) to avoid line-number shifts. New `saropaLints.fixAllInFile` command on file nodes: filters violations for that file, confirms if >20, runs with progress ("3/15"), shows result summary ("Fixed 12, skipped 3"), auto-runs analysis after to update score. `package.json` — command registered and added to file-level context menu.
 - **D5 (Score-driven trends):** `runHistory.ts` — new `getScoreTrendSummary()` shows score sparkline with time span ("62 → 71 → 78 over 2 weeks"), `formatTimeSpan()` formats duration, `detectScoreRegression()` detects score drops. `overviewTree.ts` — Trends row now shows score progression (falls back to violation counts for old history). Regression alert row appears when score dropped ("Score dropped 78 → 72" with critical count).
 - **D8 (Score-driven celebration):** `runHistory.ts` — new `detectThresholdCrossing()` detects when score crosses milestones (50/60/70/80/90) up or down. `extension.ts` — celebration block extended: upward crossing shows "Score reached 80 — great work!", downward crossing shows non-shaming nudge with "View Issues" button. Existing W6 celebrations (violation decrease, zero critical) preserved.
+- **H4 (Score in Code Lens):** `codeLensProvider.ts` — Code Lens now shows critical count per file: "Saropa: 3 issues (2 critical) — Show in Saropa". Critical annotation only appears when file has critical-impact violations. Title shortened from "Saropa Lints:" to "Saropa:" to fit the annotation.
 
 ---
 
@@ -204,8 +205,8 @@ The order follows the data pipeline: build the score first, then the features th
 5. ~~**Init in extension (I1–I5):**~~ *(done)* Triage UI, apply triage, minimal custom config, first-run flow, deprecate CLI.
 6. ~~**Fix Impact Preview (D4) + Bulk fix (D7):**~~ *(done)* Score-aware fixing. Single fix shows score delta in status bar; bulk "Fix all in this file" with progress, confirmation for >20 violations, auto-analyze after.
 7. ~~**Trends + celebration (D5, D8):**~~ *(done)* Score sparkline in Overview with time span, regression alert row, threshold celebrations (50/60/70/80/90), non-shaming regression nudge.
-8. **Score in Code Lens (H4):** Extend existing Code Lens with per-file score or critical count. **← next**
-9. **OWASP export (D2), File Risk (D6):** Compliance report and heatmap — polish differentiators.
+8. ~~**Score in Code Lens (H4):**~~ *(done)* Code Lens shows per-file critical count ("Saropa: 3 issues (2 critical) — Show in Saropa").
+9. **OWASP export (D2), File Risk (D6):** Compliance report and heatmap — polish differentiators. **← next**
 10. **Remaining polish (D9, D10, D12):** Onboarding, group-by, log hints. (D11 done.)
 11. **Log Capture (L1–L4):** When touching those codebases.
 

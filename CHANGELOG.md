@@ -41,7 +41,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 - **Bulk fix with impact summary (D7):** Right-click a file in the Issues tree → “Fix all in this file” to auto-fix all violations in that file. Processes violations bottom-up to avoid line-number shifts. Shows progress, confirms for files with >20 violations, and auto-runs analysis afterward to update the Health Score.
 - **Apply fix from Issues tree:** Context menu “Apply fix” on a violation runs the Dart analyzer’s quick fix for that location (no need to open the file first).
 - **Summary → Issues:** Clicking “Total violations” in the Summary view opens the Issues view and shows all issues (clears any active filters).
-- **Code Lens (W2):** In Dart files with violations, a Code Lens above the first line shows "Saropa Lints: N issues — Show in Saropa". Click focuses the Issues view filtered to that file.
+- **Score in Code Lens (H4):** Code Lens now shows critical violation count per file (e.g. "Saropa: 3 issues (2 critical) — Show in Saropa"). Critical annotation only appears when the file has critical-impact violations.
+- **Code Lens (W2):** In Dart files with violations, a Code Lens above the first line shows issue count. Click focuses the Issues view filtered to that file.
 - **Rule doc in tooltip (W3):** Violation tooltips in the Issues tree now include the rule name and a "More" link to the ROADMAP for documentation.
 - **Show in Saropa Lints from Problems (W4):** In the Problems view, right-click and choose "Saropa Lints: Show in Saropa Lints" to focus the Issues view filtered to the active editor's file.
 - **Issues view (tree):** Group by severity (Error, Warning, Info) then by project structure (folders and files). Violations per file are capped (default 100, configurable via `saropaLints.issuesPageSize`) with an “and N more…” overflow node for scale (e.g. 65k+ issues).

@@ -33,11 +33,17 @@ export function registerCodeLensProvider(context: vscode.ExtensionContext): void
 
       const docPath = document.uri.fsPath;
       const relativePath = normalizePath(path.relative(root, docPath));
-      const count = data.violations.filter((v) => normalizePath(v.file) === relativePath).length;
+      const fileViolations = data.violations.filter((v) => normalizePath(v.file) === relativePath);
+      const count = fileViolations.length;
       if (count === 0) return [];
 
+      // H4: Show critical count when present.
+      const critical = fileViolations.filter((v) => v.impact === 'critical').length;
+      const suffix = critical > 0 ? ` (${critical} critical)` : '';
+      const issueText = count === 1 ? '1 issue' : `${count} issues`;
+
       const lens = new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
-        title: count === 1 ? 'Saropa Lints: 1 issue — Show in Saropa' : `Saropa Lints: ${count} issues — Show in Saropa`,
+        title: `Saropa: ${issueText}${suffix} \u2014 Show in Saropa`,
         command: 'saropaLints.focusIssuesForFile',
         arguments: [relativePath],
       });
