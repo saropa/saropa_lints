@@ -134,9 +134,7 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
     },
   );
 
-  if (success) {
-    vscode.window.showInformationMessage('Saropa Lints is enabled. Use the Saropa Lints view to run analysis and see issues.');
-  }
+  // I5: Notification moved to extension.ts enable handler where health score is available.
   return success;
 }
 
