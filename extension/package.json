@@ -313,6 +313,10 @@
         "command": "saropaLints.setGroupBy",
         "title": "Group by…",
         "icon": "$(list-tree)"
+      },
+      {
+        "command": "saropaLints.openWalkthrough",
+        "title": "Saropa Lints: Getting Started"
       }
     ],
     "menus": {
@@ -515,7 +519,79 @@
           "description": "Maximum number of violations shown per file in the Issues tree. Remaining are shown as \"and N more…\"."
         }
       }
-    }
+    },
+    "walkthroughs": [
+      {
+        "id": "saropaLints.gettingStarted",
+        "title": "Getting Started with Saropa Lints",
+        "description": "Health Score, Issues, Security Posture, Config, and Trends — all from the sidebar.",
+        "steps": [
+          {
+            "id": "saropaLints.walkthrough.healthScore",
+            "title": "Health Score",
+            "description": "Your project's quality at a glance: a **0–100 score** in the status bar and Overview view.\n\nGreen (80+), yellow (50–79), red (<50). Critical issues penalize heavily.\n\n[Enable Saropa Lints](command:saropaLints.enable)",
+            "media": {
+              "markdown": "media/walkthrough-health-score.md"
+            },
+            "completionEvents": [
+              "onSettingChanged:saropaLints.enabled"
+            ]
+          },
+          {
+            "id": "saropaLints.walkthrough.issues",
+            "title": "Issues & Inline Annotations",
+            "description": "Violations in a tree grouped by severity and file. **Error Lens-style** annotations show warnings at the end of each line.\n\nFilter by text, severity, impact, or rule. Right-click to suppress noise.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
+            "media": {
+              "markdown": "media/walkthrough-issues.md"
+            },
+            "completionEvents": [
+              "onCommand:saropaLints.runAnalysis"
+            ]
+          },
+          {
+            "id": "saropaLints.walkthrough.security",
+            "title": "Security Posture",
+            "description": "**OWASP Top 10** coverage matrix — Mobile and Web. Each category shows violation and rule counts. Click to filter Issues.\n\nExport a compliance report for audits.\n\n[Export OWASP Report](command:saropaLints.exportOwaspReport)",
+            "media": {
+              "markdown": "media/walkthrough-security.md"
+            },
+            "completionEvents": [
+              "onView:saropaLints.securityPosture"
+            ]
+          },
+          {
+            "id": "saropaLints.walkthrough.triage",
+            "title": "Triage & Config",
+            "description": "Rules grouped by priority — critical, volume bands, and stylistic. Each group shows **estimated score impact**.\n\nRight-click to disable noisy rules. Changes write to YAML and re-run analysis.\n\n[Open Config](command:saropaLints.config.focus)",
+            "media": {
+              "markdown": "media/walkthrough-triage.md"
+            },
+            "completionEvents": [
+              "onView:saropaLints.config"
+            ]
+          },
+          {
+            "id": "saropaLints.walkthrough.trends",
+            "title": "File Risk & Trends",
+            "description": "**File Risk** ranks files by violation density — riskiest first.\n\nOverview shows score progression over time. Regression alerts and milestone celebrations keep you on track.\n\n[View Overview](command:saropaLints.focusView)",
+            "media": {
+              "markdown": "media/walkthrough-trends.md"
+            },
+            "completionEvents": [
+              "onView:saropaLints.overview"
+            ]
+          },
+          {
+            "id": "saropaLints.walkthrough.aboutSaropa",
+            "title": "About Saropa",
+            "description": "Saropa Pty Limited — building digital safeguards since 2010.\n\nDart packages, VS Code extensions, and consumer apps for developers who value reliability.\n\n[Visit saropa.com](https://saropa.com/)",
+            "media": {
+              "markdown": "media/walkthrough-about-saropa.md"
+            }
+          }
+        ]
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

@@ -29,15 +29,34 @@ Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter be
 
 ---
 
-## Recommended: VS Code extension
+## VS Code Extension (Recommended)
 
-**Install the [Saropa Lints VS Code extension](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints)** for the best experience: one-click setup, no init command, issue views, and config from the UI. Also on [Open VSX](https://open-vsx.org/extension/saropa/saropa-lints) (Cursor, VSCodium).
+**Install the [Saropa Lints VS Code extension](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints)** for the full experience. Also on [Open VSX](https://open-vsx.org/extension/saropa/saropa-lints) (Cursor, VSCodium).
+
+The extension is the primary setup and configuration surface:
+
+- **Health Score** — 0–100 score in the status bar; green/yellow/red bands
+- **Issues tree** — Violations grouped by severity and file, with Error Lens-style inline annotations
+- **Security Posture** — OWASP Top 10 coverage matrix, compliance export
+- **Triage** — Disable noisy rules from the UI; see estimated score impact before acting
+- **File Risk** — Files ranked by violation density; focus on the riskiest first
+- **Trends** — Score progression over time with milestone celebrations
+
+One-click **Enable** sets up `pubspec.yaml`, `analysis_options`, and runs analysis. No terminal commands needed.
 
 ---
 
 ## Quick Start
 
-### Option A — Zero-config (tier preset)
+### Option A — VS Code extension (recommended)
+
+1. Install [Saropa Lints](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints) from the VS Code Marketplace
+2. Open the **Saropa Lints** sidebar (checklist icon in the activity bar)
+3. Click **Enable Saropa Lints**
+
+The extension adds `saropa_lints` to your project, configures analysis options, and runs analysis. Use the Config view to change tier, disable rules, and manage platforms/packages. Run "Saropa Lints: Getting Started" from the command palette for a guided tour.
+
+### Option B — Tier preset (zero-config, no extension)
 
 ```bash
 dart pub add --dev saropa_lints
@@ -49,51 +68,22 @@ Add one line to your `analysis_options.yaml`:
 include: package:saropa_lints/tiers/recommended.yaml
 ```
 
-That's it. Run `dart analyze` and issues appear in your IDE and terminal.
+Run `dart analyze` and issues appear in your IDE and terminal.
 
 Available presets: `essential.yaml` · `recommended.yaml` · `professional.yaml` · `comprehensive.yaml` · `pedantic.yaml`
 
-### Option B — Full control (init tool)
+### Option C — CLI init (full control, CI/scripting)
 
 ```bash
 dart pub add --dev saropa_lints
-
-# Generate explicit rule configuration (pick your tier)
 dart run saropa_lints:init --tier recommended
 ```
 
+> **Note:** The CLI init is headless-only as of v9 — no interactive prompts. For interactive setup, use the VS Code extension.
+
 This updates (or creates) two files:
-- **`analysis_options.yaml`** — the `plugins: saropa_lints: diagnostics:` section is regenerated with every rule set to `true`/`false` for your tier. All other sections (`analyzer:`, `linter:`, etc.) are preserved. Your manual rule overrides are kept.
-- **`analysis_options_custom.yaml`** — your project settings. Created on first run; never overwritten. Missing sections are added automatically on subsequent runs.
-
-### Review your settings
-
-Open `analysis_options_custom.yaml` and adjust for your project:
-
-```yaml
-# Enable only the platforms you target
-platforms:
-  ios: true
-  android: true
-  web: false         # set true if you target web
-  macos: false
-  windows: false
-  linux: false
-
-# Disable packages you don't use (all enabled by default)
-packages:
-  riverpod: true
-  bloc: true
-  firebase: true
-  # ... see file for full list
-
-# Analysis settings
-max_issues: 500      # Max issues shown in Problems tab (0 = show all)
-output: both         # "both" = Problems tab + report file
-                     # "file" = report file only (nothing in Problems tab)
-```
-
-After changing settings, re-run init to apply: `dart run saropa_lints:init`
+- **`analysis_options.yaml`** — the `plugins: saropa_lints: diagnostics:` section is regenerated with every rule set to `true`/`false` for your tier. All other sections are preserved.
+- **`analysis_options_custom.yaml`** — your project settings (platforms, analysis output). Created on first run; never overwritten.
 
 ### Run analysis
 
@@ -101,11 +91,31 @@ After changing settings, re-run init to apply: `dart run saropa_lints:init`
 dart analyze
 ```
 
-Issues appear in your IDE's Problems panel and in the terminal. No extra commands needed — Saropa Lints runs as a native Dart analyzer plugin.
+Issues appear in your IDE's Problems panel and in the terminal. Saropa Lints runs as a native Dart analyzer plugin.
 
 > **Available tiers:** `essential` · `recommended` · `professional` · `comprehensive` · `pedantic` — see [The 5 Tiers](#the-5-tiers) for details
 >
 > **Stuck?** See [Troubleshooting](#troubleshooting) · **Upgrading?** See [Migration guides](#migrating-from-other-tools)
+
+---
+
+## How It Works
+
+```
+Dart package                    VS Code extension
+   │                                  │
+   ▼                                  ▼
+analysis_options.yaml  ◄───  Enable / Set Tier / Triage
+   │                                  │
+   ▼                                  ▼
+dart analyze           ◄───  Run Analysis (from UI)
+   │                                  │
+   ▼                                  ▼
+violations.json        ───►  Health Score, Issues, Security,
+                             File Risk, Trends, Inline Annotations
+```
+
+The **Dart package** provides 2050+ lint rules via the native analyzer plugin. The **VS Code extension** reads `violations.json` and provides the UI: Health Score, Issues tree, Security Posture, File Risk, and Config/Triage. Both are published together and versioned in sync.
 
 ---
 
@@ -291,25 +301,15 @@ Pick the tier that matches your team's needs. Each tier builds on the previous o
 
 **[175+ stylistic rules](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** for formatting, ordering, and naming conventions.
 
-The init tool includes an **interactive walkthrough** that shows code examples and lets you enable/disable each rule:
+Enable stylistic rules individually in your config, or use the VS Code extension's Config/Triage view to enable/disable them with estimated score impact.
+
+For CI/scripting, use `--no-stylistic` (default) or `--stylistic-all` to bulk-enable:
 
 ```bash
-# Interactive walkthrough (default — runs automatically)
-dart run saropa_lints:init
-
-# Bulk-enable all stylistic rules (CI / non-interactive)
-dart run saropa_lints:init --stylistic-all
-
-# Skip the walkthrough entirely
-dart run saropa_lints:init --no-stylistic
-
-# Re-review previously decided rules
-dart run saropa_lints:init --reset-stylistic
+dart run saropa_lints:init --tier recommended --stylistic-all
 ```
 
-Or enable specific stylistic rules in your generated config by changing `false` to `true`.
-
-Conflicting pairs (e.g., `prefer_single_quotes` vs `prefer_double_quotes`) must be enabled individually - you choose which style your team prefers.
+Conflicting pairs (e.g., `prefer_single_quotes` vs `prefer_double_quotes`) must be enabled individually — you choose which style your team prefers.
 
 Stylistic rules are orthogonal to correctness. Your code can be perfectly correct while violating every stylistic rule, or perfectly formatted while crashing on every screen. That's why they're separate.
 
@@ -319,32 +319,24 @@ See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_li
 
 ### Using a tier
 
-**Option A — Tier preset (zero-config):**
+**VS Code extension:** Use **Set Tier** from the command palette or click the tier badge in the status bar.
+
+**Tier preset (zero-config):**
 
 ```yaml
 # In analysis_options.yaml — just pick your tier:
 include: package:saropa_lints/tiers/recommended.yaml
 ```
 
-**Option B — Init tool (full control):**
+**CLI init (full control, CI/scripting):**
 
 ```bash
-# Most teams start here
 dart run saropa_lints:init --tier recommended
-
-# Configure a different project
 dart run saropa_lints:init --target /path/to/project
-
-# See all options
 dart run saropa_lints:init --help
-
-# Preview without writing
-dart run saropa_lints:init --tier professional --dry-run
 ```
 
 Available tiers: `essential` (1), `recommended` (2), `professional` (3), `comprehensive` (4), `pedantic` (5)
-
-The init tool includes an interactive stylistic rules walkthrough by default. Use `--stylistic-all` to bulk-enable, or `--no-stylistic` to skip.
 
 ### Customizing rules
 

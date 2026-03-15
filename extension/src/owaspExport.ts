@@ -14,7 +14,11 @@ interface CategoryRow {
   rules: string[];
 }
 
-/** Build per-category rows from violations for a given OWASP list. */
+/**
+ * Build per-category rows from violations for a given OWASP list (mobile or web).
+ * Counts how many violations map to each OWASP category and collects the distinct rule names.
+ * Categories with zero violations are still included (for gap analysis).
+ */
 function buildCategoryRows(
   violations: Violation[],
   categories: readonly string[],
@@ -52,7 +56,10 @@ function formatTable(rows: CategoryRow[]): string {
   lines.push('| Category | Violations | Rules | Status |');
   lines.push('|----------|-----------|-------|--------|');
   for (const r of rows) {
-    const status = r.count > 0 ? `${r.count} issue${r.count === 1 ? '' : 's'}` : 'Covered';
+    // Distinguish: has issues, has rules but no issues (clean), or no rules mapped at all (gap).
+    const status = r.count > 0
+      ? `${r.count} issue${r.count === 1 ? '' : 's'}`
+      : r.rules.length > 0 ? 'Clean' : 'No rules';
     const ruleList = r.rules.length > 0 ? r.rules.join(', ') : '--';
     lines.push(`| ${r.label} | ${r.count} | ${ruleList} | ${status} |`);
   }
@@ -72,7 +79,8 @@ export function generateOwaspReport(
   const mobileRows = buildCategoryRows(data.violations, MOBILE_TOP_10, 'mobile');
   const webRows = buildCategoryRows(data.violations, WEB_TOP_10, 'web');
 
-  // Gap analysis: categories with zero violations AND zero rules mapped.
+  // Gap analysis: categories where the current tier has no rules mapped at all.
+  // These represent blind spots — OWASP categories with zero lint coverage.
   const mobileGaps = mobileRows.filter((r) => r.count === 0 && r.rules.length === 0);
   const webGaps = webRows.filter((r) => r.count === 0 && r.rules.length === 0);
 

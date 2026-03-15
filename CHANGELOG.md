@@ -16,79 +16,43 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 ## [9.0.0]
 
+VS Code extension buildout: Health Score, triage UI, inline annotations, security posture, and file risk — all native VS Code UI. CLI init is now headless-only; use the extension for interactive setup. Run “Saropa Lints: Getting Started” from the command palette for a guided tour.
+
 ### Added
 
-- **Health Score (H1–H3):** A single 0–100 score computed from violation count and impact distribution, shown in the Overview view and status bar. The score uses impact-weighted density with exponential decay — critical issues penalize heavily, minor issues less so. Score delta (e.g. "▲4") shows improvement from the last run. Status bar color reflects score band: green (80+), yellow (50–79), red (<50). Score is persisted in run history for trend tracking. New module: `healthScore.ts`.
-- **Welcome states (C5):** All six views now show VS Code's native welcome content with clear call-to-action buttons when disabled ("Enable Saropa Lints") or when no analysis data exists ("Run Analysis"). Replaces flat placeholder tree items.
-- **Analysis focuses Overview (C7):** After "Run Analysis" completes, the Overview view is focused (showing the Health Score delta) instead of the Issues view. The completion notification now includes the score. File-watcher refreshes also update view context so welcome states stay current.
-- **Overview as home (C1):** Overview now shows "Last run: X min ago" from history and a "Run Analysis" CTA button. Health Score remains the primary item.
-- **Suggestions with score impact (C3):** Critical and high-impact suggestions now show estimated score improvement (e.g. "Fix 4 critical issue(s) — estimated +12 points"). Uses `estimateScoreWithout()` to project score with a given impact level zeroed out.
-- **Config as control surface (C6):** Changing tier or running "Initialize / Update Config" now auto-runs analysis (when `runAnalysisAfterConfigChange` is on) so the user sees the score delta immediately. Tier change focuses the Overview view to show the score delta.
-- **Inline annotations (D3):** Error Lens style decorations — violation messages displayed at the end of affected lines in the editor, colored by severity (error/warning/info). First violation per line per severity, message truncated to 80 chars with rule name. Toggle on/off via `saropaLints.inlineAnnotations` setting or the "Toggle Inline Annotations" command. Refreshes automatically when violations data changes.
-- **Triage UI in Config view (I1):** Config view now shows rules grouped by priority — critical (flame icon), volume bands A–D (1–5, 6–20, 21–100, 100+ issues), and stylistic (opt-in). Each group is collapsible with estimated score impact (e.g. "est. +8 pts"). Expand to see individual rules sorted by issue count. Click a group or rule to filter the Issues view. Zero-issue rules shown as "N rules with zero issues — auto-enabled". New modules: `triageTree.ts` (node types, data computation, rendering), extended `triageUtils.ts` (impact map, critical rule identification), extended `healthScore.ts` (score estimation for rule removal).
-- **Apply triage to YAML (I2):** Right-click a rule or group in the Config triage view to disable or enable rules. Writes overrides to the RULE OVERRIDES section of `analysis_options_custom.yaml`, then re-runs init and analysis automatically. Score updates in Overview after re-analysis. Confirmation dialog for groups with >5 rules. Config view shows "N rules disabled by override" when overrides exist. New module: `configWriter.ts` (YAML override read/write).
-- **Minimal custom config (I3):** `analysis_options_custom.yaml` reduced from ~420 lines to ~40 lines. Removed STYLISTIC RULES section (327 lines) — enabled stylistic rules migrate to RULE OVERRIDES. Removed PACKAGE SETTINGS section — packages now auto-detected from `pubspec.yaml` on every init run. Kept: analysis settings (`max_issues`, `output`), platform settings, and rule overrides. Old file backed up as `.bak` on first migration. Modified: `custom_overrides_core.dart` (minimal template + migration), `init_runner.dart` (auto-detect packages, call migration).
-- **First-run flow (I5):** After enabling the extension, a score-aware notification guides the user with actionable buttons — "View Issues" or "Configure Rules". The notification shows the Health Score ("Your project scores 72/100. Room to improve.") when analysis data is available, or prompts to run analysis if not. The Overview view is auto-focused so the user immediately sees their score. Replaces the previous generic "Saropa Lints is enabled" message.
-- **Security Posture view (D1):** OWASP Top 10 coverage matrix with two collapsible groups (Mobile Top 10, Web Top 10). Each category row shows violation count and distinct rule count. Click a category to filter the Issues view to rules mapped to that OWASP category. Categories with zero violations show a green pass icon.
-- **Focus mode (W7):** Right-click a file in the Issues tree and choose "Show only this file" to filter the tree to that file's violations only. Toolbar "Show all files" button resets. View message shows "Focused: filename.dart".
-- **Score-driven trends (D5):** Overview "Trends" row now shows score progression ("62 → 71 → 78 over 2 weeks") instead of violation counts. Falls back to violation-count trend for old history without scores. Regression alert row appears when score dropped ("Score dropped 78 → 72" with critical violation count).
-- **Score-driven celebration (D8):** Milestone celebrations when score crosses thresholds (50, 60, 70, 80, 90) — "Score reached 80 — great work!". Non-shaming regression nudge when score drops below a threshold, with actionable "View Issues" button.
-- **Trends / mini history (W5):** Last 20 analysis snapshots are persisted in workspace state. Overview shows a "Trends" row with recent totals (e.g. "120 → 115 → 98"). New module: `runHistory.ts`.
-- **Celebration / progress (W6):** When violations decrease after a run, a transient status bar message shows "You fixed N issues!". When critical issues hit zero, a notification says "No critical issues!". Overview shows a "↓ N fewer issues" row when the count dropped.
-- **Tier in status bar (W8):** A second status bar item shows the current tier (e.g. "recommended"). Click to open the tier quick pick and re-run init.
-- **Foundation (F1–F4) for extension-driven init and triage:** (1) Init is run non-interactively from the extension with `--no-stylistic` and `--target` so config writes without prompts. (2) Violations data now exposes `summary.issuesByRule` and `config.enabledRuleNames` / `config.stylisticRuleNames` for triage grouping. (3) Violation export adds `config.stylisticRuleNames` (extension can separate stylistic rules in triage UI). (4) Config view shows **Detected** (Flutter and packages from `pubspec.yaml`). New modules: `pubspecReader.ts` (platform/package detection), `triageUtils.ts` (group rules by volume, partition stylistic). Shared `buildInitArgs()` in setup for Enable / Initialize / Set tier.
-- **Fix Impact Preview (D4):** After applying a single fix from the Issues tree, the status bar shows the estimated score delta (e.g. “Fixed 1 high issue (est. +2 pts)”). Turns “fix lint” into “improve score”.
-- **Bulk fix with impact summary (D7):** Right-click a file in the Issues tree → “Fix all in this file” to auto-fix all violations in that file. Processes violations bottom-up to avoid line-number shifts. Shows progress, confirms for files with >20 violations, and auto-runs analysis afterward to update the Health Score.
-- **Apply fix from Issues tree:** Context menu “Apply fix” on a violation runs the Dart analyzer’s quick fix for that location (no need to open the file first).
-- **Summary → Issues:** Clicking “Total violations” in the Summary view opens the Issues view and shows all issues (clears any active filters).
-- **Score in Code Lens (H4):** Code Lens now shows critical violation count per file (e.g. "Saropa: 3 issues (2 critical) — Show in Saropa"). Critical annotation only appears when the file has critical-impact violations.
-- **OWASP Compliance Export (D2):** New command "Export OWASP Compliance Report" generates a markdown report with Mobile Top 10 and Web Top 10 coverage tables, gap analysis for uncovered categories, and project health score/tier header. Writes to `reports/.saropa_lints/owasp_compliance_report.md` and opens it. Available from the command palette and Security Posture view context menu.
-- **Extension report writer:** Extension actions (enable, set tier, analysis, fix, bulk fix, milestone crossing) are now logged to `reports/YYYYMMDD/YYYYMMDD_HHMMSS_saropa_extension.md`, mirroring the Dart init log pattern. Creates an audit trail visible in the Logs view.
-- **Log hints (D12):** Logs view now shows parsed descriptions for report files — init logs show the tier used, analysis reports show error/warning counts, extension reports are labeled. A "Run Analysis" action appears when reports are older than 1 hour.
-- **File Risk view (D6):** New "File Risk" view shows files ranked by weighted violation density — the riskiest files appear first. Files with critical violations show a flame icon, high violations a warning icon. A summary line at the top says "Top N files have X% of critical issues". Click any file to filter the Issues view to it.
-- **Group-by in Issues (D10):** The Issues tree can now be grouped by Severity (default), File, Impact, Rule, or OWASP Category. Click the tree icon in the Issues toolbar to switch modes. OWASP grouping is unique to Saropa — see which OWASP categories your violations map to. Mode-aware icons: impact uses severity icons, OWASP uses shield, rule uses method symbol.
-- **Code Lens (W2):** In Dart files with violations, a Code Lens above the first line shows issue count. Click focuses the Issues view filtered to that file.
-- **Rule doc in tooltip (W3):** Violation tooltips in the Issues tree now include the rule name and a "More" link to the ROADMAP for documentation.
-- **Show in Saropa Lints from Problems (W4):** In the Problems view, right-click and choose "Saropa Lints: Show in Saropa Lints" to focus the Issues view filtered to the active editor's file.
-- **Issues view (tree):** Group by severity (Error, Warning, Info) then by project structure (folders and files). Violations per file are capped (default 100, configurable via `saropaLints.issuesPageSize`) with an “and N more…” overflow node for scale (e.g. 65k+ issues).
-- **Filters:** Text filter (file path, rule name, message); type filter (severity and impact); rule filter (multi-select rules to show). View message shows “Showing X of Y” when any filter or suppression is active.
-- **Suppressions (persisted):** Hide folder, file, rule, rule-in-file, severity, or impact from the tree via context menu. Stored in workspace state; “Clear suppressions” in the view toolbar restores all.
-- **Context menus:** Hide folder/file/rule/rule-in-file/severity/impact, Copy path, Copy message. Toolbar: Filter by text, Filter by type, Filter by rule, Clear filters, Clear suppressions, Refresh.
+- **Health Score & Trends:** 0–100 project quality score in the Overview view and status bar, computed from violation count and impact severity. Color bands (green/yellow/red), score delta from last run, trend tracking over last 20 snapshots, milestone celebrations (50/60/70/80/90), and regression alerts when score drops.
+- **Issues & Inline Annotations:** Error Lens-style decorations showing violation messages at the end of affected lines. Issues tree grouped by severity and file with text/severity/impact/rule filters, persistent suppressions, focus mode, group-by presets (Severity/File/Impact/Rule/OWASP), and context-menu quick fixes. Code Lens per file with critical count. Bulk “Fix all in this file” with progress and score delta. “Show in Saropa Lints” from the Problems view.
+- **Security Posture:** OWASP Top 10 coverage matrix (Mobile and Web) with violation and rule counts per category. Click to filter Issues. “Export OWASP Compliance Report” generates a markdown report for audits.
+- **Triage & Config:** Rules grouped by priority (critical, volume bands A–D, stylistic) with estimated score impact per group. Right-click to disable/enable rules — writes overrides to YAML and re-runs analysis. Packages auto-detected from `pubspec.yaml`. Custom config reduced from ~420 to ~40 lines.
+- **File Risk:** Files ranked by weighted violation density — riskiest first. Flame icon for critical, warning icon for high. Summary shows “Top N files have X% of critical issues”.
+- **First-run & Welcome:** Score-aware notification after enabling with actionable buttons. Native welcome states on all views when disabled or no data. Analysis auto-focuses Overview to show score delta. Extension report writer logs actions for audit trail.
 
 ### Deprecated
 
-- **CLI init interactive mode (I4):** `dart run saropa_lints:init` no longer prompts for tier selection, stylistic walkthrough, or "Run analysis?". The command is now headless-only — defaults to `recommended` tier when `--tier` is not specified. Use the Saropa Lints VS Code extension for interactive setup and configuration. The CLI remains available for CI/scripting with explicit flags (`--tier`, `--target`, `--no-stylistic`).
+- **CLI init interactive mode:** `dart run saropa_lints:init` is now headless-only — defaults to `recommended` tier. Use the VS Code extension for interactive setup. CLI remains for CI/scripting with `--tier`, `--target`, `--no-stylistic`.
 
 ### Changed
 
-- **Progress indicators:** Run analysis, Initialize config, and Set tier show a notification progress spinner while running.
-- **Debounced refresh:** File watcher on `violations.json` debounces refresh by 300 ms to avoid rapid successive updates.
-- **Summary view:** Expandable nodes (By severity, By impact) use a stable `nodeId` so tree expansion does not depend on label text.
-- Status bar update logic consolidated into `updateAllStatusBars()` — called from all command handlers and the config-change listener to keep both status bar items (On/Off and tier) in sync.
+- Progress indicators for Run Analysis, Initialize Config, and Set Tier.
+- Debounced refresh (300 ms) on `violations.json` changes.
+- Summary view uses stable node IDs for expansion state.
+- Status bar update logic consolidated across all command handlers.
 
 ### Fixed
 
-- **Health Score NaN guard:** `computeHealthScore` now validates impact counts against non-numeric JSON values (e.g. `”critical”: “bad”`) and clamps the final score to 0 when the formula produces NaN, preventing corrupt scores from propagating into the status bar and run history.
-- **Run history dedup broadened:** `appendSnapshot` now compares total, severity breakdown (error/warning/info), critical count, and score — not just total. A severity shift with the same total (e.g. 5 warnings resolved, 5 errors introduced) is now correctly recorded as a distinct snapshot.
-- **Celebration guard:** Celebration messages (“You fixed N issues!”, “No critical issues!”) now only fire when a genuinely new snapshot was recorded. Previously, the toast could misfire on every file-save if the dedup logic suppressed the append.
-- **Snapshot-before-refresh ordering:** `debouncedRefresh` now records the snapshot before refreshing tree views, so the Overview tree reads the latest history (including the freshly appended score) instead of stale data.
-- **Run history write errors logged:** `saveHistory` now logs failures to the console instead of silently discarding them.
-- Tier status bar now updates immediately when tier is changed via Settings UI or the Set Tier command (previously stayed stale until next manual refresh).
-- Root-level folder nodes in the Issues tree now use an empty path prefix so expanding e.g. “lib” shows files under `lib/` correctly.
-- Severity and impact suppressions (e.g. “Hide this severity”) are now applied when building the filtered index.
-- **Inline annotations perf:** Violations data is now cached in the annotations module and only re-read when `violations.json` changes (via file watcher). Previously, every editor switch triggered a synchronous disk read.
-- **Security Posture perf:** OWASP category counts are cached in the tree provider and reused when expanding groups. Previously, `buildCounts()` re-scanned all violations on each `getChildren()` call.
-- **OWASP filter isolation:** Clicking an OWASP category in the Security Posture view now clears text, severity, and impact filters before applying the rule filter, so prior filter state doesn't mask the OWASP selection.
-- **OWASP ID normalization:** `buildCounts()` now strips everything after the first colon before matching OWASP categories, so both short-form (“M1”) and long-form (“M1: Improper Credential Usage”) from violations.json are handled correctly.
-- **OWASP data validation:** `buildCounts()` now validates that `owasp.mobile` and `owasp.web` are arrays of strings before iterating, preventing runtime errors from malformed JSON.
-- **Output channel singleton:** `getOutputChannel()` in setup.ts now lazily creates a single output channel instance instead of calling `createOutputChannel()` on every log write.
-- **Suggestions dead branch removed:** Removed the `items.length === 2` early-return in `suggestionsTree.ts` that was functionally identical to the `slice(0, 8)` fallthrough.
-- **Internal command hidden:** `focusIssuesForOwasp` removed from `contributes.commands` so it no longer appears in the command palette (it's invoked programmatically from the Security Posture tree).
+- Health Score NaN guard for non-numeric JSON values.
+- Run history dedup compares severity breakdown and score, not just total.
+- Celebration messages only fire on genuinely new snapshots.
+- Snapshot recorded before tree refresh so Overview reads fresh history.
+- Inline annotations cache violations data; re-read only on file-watcher change.
+- Test runner hanging indefinitely: added global 2-minute timeout (`dart_test.yaml`) and per-test timeouts on integration tests that spawn `Process.run` without a cap.
+- Security Posture caches OWASP counts; OWASP filter clears prior filters; ID normalization handles short and long forms; data validation for malformed JSON.
+- Output channel uses singleton pattern.
+- Tree view fixes: root folder path prefix, severity/impact suppression timing, tier status bar immediate update.
 
 ### Administration
 
-- **Publish:** Single script (`scripts/publish.py`) for package and VS Code extension. Extension version is synced with package version; menu option 6 packages .vsix and optionally publishes to Marketplace/Open VSX. Removed `scripts/publish_extension.py`. Extension `CHANGELOG.md` is generated at publish time from the root `CHANGELOG.md` (single source of truth) and is gitignored.
-- **project_context modularization:** Split `lib/src/project_context.dart` (~5,330 lines) into a main library file and 10 part files (`project_context_path_bloom_git.dart`, `project_context_project_file.dart`, and others). No API or behavior change; imports remain `package:saropa_lints/src/project_context.dart`. Improves maintainability and aligns with project file-size guidelines.
+- Unified publish script (`scripts/publish.py`) for package and extension; extension version synced with package version.
 
 ---
 

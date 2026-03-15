@@ -2,6 +2,8 @@
 
 Enable and configure [Saropa Lints](https://pub.dev/packages/saropa_lints) from the IDE. No terminal init command: turn the extension **on** and it sets up `pubspec.yaml` and `analysis_options` for you.
 
+After installing, run **"Saropa Lints: Getting Started"** from the Command Palette for a guided tour of all features.
+
 ## Requirements
 
 - Dart SDK (or Flutter SDK) on PATH
@@ -16,7 +18,8 @@ Enable and configure [Saropa Lints](https://pub.dev/packages/saropa_lints) from 
    - Run `dart pub get` (or `flutter pub get`)
    - Run `dart run saropa_lints:init --tier recommended --no-stylistic --target <workspace>` (non-interactive)
    - Optionally run `dart analyze`
-4. Use **Run Analysis** and **Open Config** as needed. Issues appear in the **Issues** view when `reports/.saropa_lints/violations.json` exists (written by the analyzer).
+4. Run **"Saropa Lints: Getting Started"** from the Command Palette for a guided tour of all features.
+5. Use **Run Analysis** and **Open Config** as needed. Issues appear in the **Issues** view when `reports/.saropa_lints/violations.json` exists (written by the analyzer).
 
 ## Health Score
 
@@ -60,6 +63,7 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 
 ## Commands
 
+- **Saropa Lints: Getting Started** — Open the walkthrough with a guided tour of all features.
 - **Saropa Lints: Enable** — Add saropa_lints to the project and run init (and optionally analyze).
 - **Saropa Lints: Disable** — Turn the extension off for this workspace (does not remove files).
 - **Saropa Lints: Run Analysis** — Run `dart analyze` / `flutter analyze`.

@@ -71,3 +71,6 @@ CLAUDE_SETUP.md
 CODEBASE_INDEX.md
 CODE_INDEX.md
 BROKEN_TIERS.md
+
+# Saropa Log Capture (index & cache)
+.saropa/

@@ -8,7 +8,11 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { readViolations, Violation } from '../violationsReader';
 
-/** Same weights as healthScore.ts for consistent risk ranking. */
+/**
+ * Impact weights matching healthScore.ts so that risk ranking is
+ * consistent with the health score formula. A single critical violation
+ * outweighs 8 medium ones in the weighted score.
+ */
 const RISK_WEIGHTS: Record<string, number> = {
   critical: 8,
   high: 3,
@@ -27,7 +31,10 @@ interface FileRisk {
   riskScore: number;
 }
 
-/** Aggregate violations per file and compute a weighted risk score. */
+/**
+ * Aggregate violations per file and compute a weighted risk score.
+ * Returns files sorted by risk score descending — worst files first.
+ */
 function buildFileRisks(violations: Violation[]): FileRisk[] {
   const byFile = new Map<string, { total: number; critical: number; high: number; weighted: number }>();
 
