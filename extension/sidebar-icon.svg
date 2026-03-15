@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <!-- Shield outline matching the saropa_lints brand icon -->
+  <path d="M12 2L4 5.5V11C4 16.25 7.4 21.1 12 22.5C16.6 21.1 20 16.25 20 11V5.5L12 2Z" fill="currentColor" opacity="0.85"/>
+  <!-- Checkmark -->
+  <path d="M10.2 15.4L7.4 12.6L8.8 11.2L10.2 12.6L15.2 7.6L16.6 9L10.2 15.4Z" fill="white"/>
+</svg>
