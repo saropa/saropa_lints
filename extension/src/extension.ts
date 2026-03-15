@@ -574,6 +574,29 @@ export function activate(context: vscode.ExtensionContext): void {
       issuesProvider.clearFocusedFile();
       updateIssuesViewMessage();
     }),
+    // D10: Group-by picker for the Issues tree.
+    vscode.commands.registerCommand('saropaLints.setGroupBy', async () => {
+      const current = issuesProvider.getGroupBy();
+      const modes: { label: string; id: import('./views/issuesTree').GroupByMode }[] = [
+        { label: 'Severity', id: 'severity' },
+        { label: 'File', id: 'file' },
+        { label: 'Impact', id: 'impact' },
+        { label: 'Rule', id: 'rule' },
+        { label: 'OWASP Category', id: 'owasp' },
+      ];
+      const pick = await vscode.window.showQuickPick(
+        modes.map((m) => ({
+          label: m.id === current ? `$(check) ${m.label}` : m.label,
+          description: m.id === current ? 'Current' : undefined,
+          id: m.id,
+        })),
+        { title: 'Group issues by', placeHolder: `Current: ${current}` },
+      );
+      if (pick) {
+        issuesProvider.setGroupBy((pick as { id: import('./views/issuesTree').GroupByMode }).id);
+        updateIssuesViewMessage();
+      }
+    }),
     // I2: Triage actions — disable/enable rules via analysis_options_custom.yaml overrides.
     // Shared helper extracts rule names from string[] (TreeItem click) or node (context menu).
     ...['saropaLints.disableRules', 'saropaLints.enableRules'].map((cmdId) =>

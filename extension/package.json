@@ -308,12 +308,22 @@
       {
         "command": "saropaLints.exportOwaspReport",
         "title": "Saropa Lints: Export OWASP Compliance Report"
+      },
+      {
+        "command": "saropaLints.setGroupBy",
+        "title": "Group by…",
+        "icon": "$(list-tree)"
       }
     ],
     "menus": {
       "view/title": [
         {
           "command": "saropaLints.refresh",
+          "when": "view == saropaLints.issues",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.setGroupBy",
           "when": "view == saropaLints.issues",
           "group": "navigation"
         },
