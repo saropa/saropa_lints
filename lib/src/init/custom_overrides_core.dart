@@ -1,6 +1,7 @@
 /// Core custom overrides file management.
 ///
-/// Handles file creation, rule extraction, and analysis settings.
+/// Handles file creation, rule extraction, analysis settings, and migration
+/// from the old bloated format to the minimal format (I3).
 library;
 
 import 'dart:io';
@@ -8,7 +9,8 @@ import 'dart:io';
 import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
 import 'package:saropa_lints/src/init/platforms_packages.dart';
-import 'package:saropa_lints/src/init/stylistic_section.dart';
+import 'package:saropa_lints/src/init/stylistic_section_parser.dart';
+import 'package:saropa_lints/src/tiers.dart' as tiers;
 
 /// Extract rule overrides from analysis_options_custom.yaml.
 ///
@@ -54,76 +56,152 @@ Map<String, bool> extractOverridesFromFile(File file, Set<String> allRules) {
   return overrides;
 }
 
-/// Create the analysis_options_custom.yaml file with a helpful header.
+/// Create a minimal analysis_options_custom.yaml file.
 ///
-/// Includes the STYLISTIC RULES section with all opinionated rules
-/// defaulting to false, organized by category.
+/// Contains only: analysis settings, platform settings, and the RULE OVERRIDES
+/// section. Packages are auto-detected from pubspec; stylistic rules are
+/// managed via --no-stylistic/--stylistic-all flags and rule overrides.
 void createCustomOverridesFile(File file) {
-  final stylisticSection = buildStylisticSection();
-  final packageSection = buildPackageSection();
+  file.writeAsStringSync(
+    buildMinimalConfig(tiers.defaultPlatforms, {}),
+  );
+}
 
-  final content = '''
-# ╔═══════════════════════════════════════════════════════════════════════════╗
-# ║                    SAROPA LINTS CUSTOM CONFIG                             ║
-# ║                                                                           ║
-# ║  Settings in this file are ALWAYS applied, even when using --reset.      ║
-# ║  Use this for project-specific customizations that should persist.       ║
-# ╚═══════════════════════════════════════════════════════════════════════════╝
+/// Build the minimal config file content.
+///
+/// Keeps only analysis settings, platform settings, and rule overrides.
+/// Packages and stylistic sections are no longer written — packages are
+/// auto-detected from pubspec, stylistic choices go in RULE OVERRIDES.
+String buildMinimalConfig(
+  Map<String, bool> platforms,
+  Map<String, bool> ruleOverrides, {
+  int maxIssues = 500,
+  String output = 'both',
+}) {
+  final buf = StringBuffer();
 
-# ─────────────────────────────────────────────────────────────────────────────
-# ANALYSIS SETTINGS
-# ─────────────────────────────────────────────────────────────────────────────
-#
-# max_issues: Maximum non-ERROR issues shown in the Problems tab.
-#   After this limit, rules keep running but remaining issues go to the
-#   report log only (reports/<timestamp>_saropa_lint_report.log).
-#   - Default: 500
-#   - Set to 0 for unlimited (all issues in Problems tab)
-#   - Override per-run: SAROPA_LINTS_MAX=200 dart analyze
-#
-# output: Where violations are sent.
-#   - "both"  (default) — Problems tab + report file
-#   - "file"  — Report file only (nothing in Problems tab)
-#   - Override per-run: SAROPA_LINTS_OUTPUT=file dart analyze
+  buf.writeln('# SAROPA LINTS CUSTOM CONFIG');
+  buf.writeln('# Settings that persist across tier changes and --reset.');
+  buf.writeln();
 
-max_issues: 500
-output: both
+  buf.writeln('# ANALYSIS SETTINGS');
+  buf.writeln('max_issues: $maxIssues');
+  buf.writeln('output: $output');
+  buf.writeln();
 
-# ─────────────────────────────────────────────────────────────────────────────
-# PLATFORM SETTINGS
-# ─────────────────────────────────────────────────────────────────────────────
-# Disable platforms your project doesn't target.
-# Rules specific to disabled platforms will be automatically disabled.
-# Only ios and android are enabled by default.
-#
-# EXAMPLES:
-#   - Web-only project: set ios, android, macos, windows, linux to false; web to true
-#   - All platforms: set all to true
-#   - Desktop app: set macos, windows, linux to true
+  // Platform settings (no auto-detection available — user controls these)
+  buf.writeln('# PLATFORM SETTINGS');
+  buf.writeln("# Disable platforms your project doesn't target.");
+  buf.writeln('platforms:');
+  for (final entry in platforms.entries) {
+    buf.writeln('  ${entry.key}: ${entry.value}');
+  }
+  buf.writeln();
 
-platforms:
-  ios: true
-  android: true
-  macos: false
-  web: false
-  windows: false
-  linux: false
+  // Rule overrides section header (must match configWriter.ts OVERRIDES_MARKER)
+  buf.writeln('# ${'─' * 77}');
+  buf.writeln('# RULE OVERRIDES');
+  buf.writeln('# ${'─' * 77}');
+  buf.writeln('# FORMAT: rule_name: true/false');
+  buf.writeln('# Add your custom rule overrides below:');
+  buf.writeln();
 
-$packageSection$stylisticSection# ─────────────────────────────────────────────────────────────────────────────
-# RULE OVERRIDES
-# ─────────────────────────────────────────────────────────────────────────────
-# FORMAT: rule_name: true/false
-#
-# EXAMPLES:
-#   - avoid_print: false                # Allow print statements
-#   - avoid_null_assertion: false       # Allow ! operator
-#   - prefer_const_constructors: true   # Force-enable regardless of tier
-#
-# Add your custom rule overrides below:
+  // Write any migrated overrides (sorted for stable output)
+  final sorted = ruleOverrides.entries.toList()
+    ..sort((a, b) => a.key.compareTo(b.key));
+  for (final entry in sorted) {
+    buf.writeln('${entry.key}: ${entry.value}');
+  }
 
-''';
+  return buf.toString();
+}
 
-  file.writeAsStringSync(content);
+/// Migrate old bloated custom config to minimal format (one-time).
+///
+/// Detects the old format by presence of `# STYLISTIC RULES` section.
+/// Extracts max_issues, output, platforms, enabled stylistic rules, and
+/// existing rule overrides. Backs up old file as .bak, writes minimal.
+void migrateToMinimalFormat(File file, Set<String> stylisticRules) {
+  final content = file.readAsStringSync();
+
+  // Already minimal — no stylistic section to migrate from.
+  if (!stylisticSectionHeaderPattern.hasMatch(content)) return;
+
+  // Extract current analysis settings
+  final maxIssues = _extractMaxIssues(content);
+  final output = _extractOutput(content);
+
+  // Extract current platform settings
+  final platforms = extractPlatformsFromFile(file);
+
+  // Extract enabled stylistic rules to migrate into RULE OVERRIDES.
+  // Only true entries matter — false is the default with --no-stylistic.
+  final stylisticValues = extractStylisticSectionValues(content);
+  final enabledStylistic = <String, bool>{};
+  for (final entry in stylisticValues.entries) {
+    if (entry.value) enabledStylistic[entry.key] = true;
+  }
+
+  // Extract existing rule overrides (from RULE OVERRIDES section only)
+  final existingOverrides = extractOverrideSectionValues(content);
+
+  // Merge: existing overrides take priority over migrated stylistic
+  final allOverrides = <String, bool>{...enabledStylistic, ...existingOverrides};
+
+  // Backup old file before rewriting
+  final backupPath = _uniqueBackupPath(file.path);
+  File(backupPath).writeAsStringSync(content);
+  // Use split on both / and \ so the filename displays correctly on Windows
+  final backupName = backupPath.split(RegExp(r'[/\\]')).last;
+  log.terminal(
+    '${InitColors.dim}Backed up old config as '
+    '$backupName${InitColors.reset}',
+  );
+
+  // Write minimal format with preserved analysis settings
+  file.writeAsStringSync(
+    buildMinimalConfig(
+      platforms,
+      allOverrides,
+      maxIssues: maxIssues,
+      output: output,
+    ),
+  );
+
+  final stylisticCount = enabledStylistic.length;
+  final overrideCount = existingOverrides.length;
+  log.terminal(
+    '${InitColors.green}✓ Migrated to minimal config${InitColors.reset}'
+    '${stylisticCount > 0 ? ' ($stylisticCount stylistic → overrides)' : ''}'
+    '${overrideCount > 0 ? ' ($overrideCount existing overrides kept)' : ''}',
+  );
+}
+
+/// Extract max_issues value from file content. Returns 500 if not found.
+int _extractMaxIssues(String content) {
+  final match = RegExp(r'^max_issues:\s*(\d+)', multiLine: true)
+      .firstMatch(content);
+  if (match == null) return 500;
+  return int.tryParse(match.group(1)!) ?? 500;
+}
+
+/// Extract output value from file content. Returns 'both' if not found.
+String _extractOutput(String content) {
+  final match = RegExp(r'^output:\s*(\w+)', multiLine: true)
+      .firstMatch(content);
+  return match?.group(1) ?? 'both';
+}
+
+/// Generate a unique backup path, appending date if .bak already exists.
+String _uniqueBackupPath(String originalPath) {
+  final basePath = '$originalPath.bak';
+  if (!File(basePath).existsSync()) return basePath;
+
+  final now = DateTime.now();
+  final stamp = '${now.year}'
+      '${now.month.toString().padLeft(2, '0')}'
+      '${now.day.toString().padLeft(2, '0')}';
+  return '$originalPath.bak.$stamp';
 }
 
 /// Ensure max_issues setting exists in an existing custom config file.
@@ -149,7 +227,8 @@ void ensureMaxIssuesSetting(File file) {
     content = addAnalysisSettingsBlock(content);
     file.writeAsStringSync(content);
     log.terminal(
-      '${InitColors.green}✓ Added analysis settings to ${file.path}${InitColors.reset}',
+      '${InitColors.green}✓ Added analysis settings to '
+      '${file.path}${InitColors.reset}',
     );
     return;
   }
@@ -159,36 +238,28 @@ void ensureMaxIssuesSetting(File file) {
     content = addOutputSetting(content);
     file.writeAsStringSync(content);
     log.terminal(
-      '${InitColors.green}✓ Added output setting to ${file.path}${InitColors.reset}',
+      '${InitColors.green}✓ Added output setting to '
+      '${file.path}${InitColors.reset}',
     );
   }
 }
 
 /// Add the full analysis settings block (max_issues + output).
+///
+/// Inserts after the file header comment. Handles both old-format (ASCII box)
+/// and new minimal-format (single-line) headers.
 String addAnalysisSettingsBlock(String content) {
-  final settingBlock = '''
-# ─────────────────────────────────────────────────────────────────────────────
-# ANALYSIS SETTINGS (added in v4.9.1, updated v4.12.2)
-# ─────────────────────────────────────────────────────────────────────────────
-#
-# max_issues: Maximum non-ERROR issues shown in the Problems tab.
-#   After this limit, rules keep running but remaining issues go to the
-#   report log only (reports/<timestamp>_saropa_lint_report.log).
-#   - Default: 500
-#   - Set to 0 for unlimited (all issues in Problems tab)
-#   - Override per-run: SAROPA_LINTS_MAX=200 dart analyze
-#
-# output: Where violations are sent.
-#   - "both"  (default) — Problems tab + report file
-#   - "file"  — Report file only (nothing in Problems tab)
-#   - Override per-run: SAROPA_LINTS_OUTPUT=file dart analyze
-
+  const settingBlock = '''
+# ANALYSIS SETTINGS
 max_issues: 500
 output: both
 
 ''';
 
-  final headerEndMatch = RegExp(r'╚[═]+╝\n*').firstMatch(content);
+  // Try old ASCII box header first, then minimal header
+  final headerEndMatch = RegExp(r'╚[═]+╝\n*').firstMatch(content) ??
+      RegExp(r'^# SAROPA LINTS CUSTOM CONFIG\n[^\n]*\n*', multiLine: true)
+          .firstMatch(content);
 
   if (headerEndMatch != null) {
     final insertPos = headerEndMatch.end;
@@ -211,16 +282,9 @@ String addOutputSetting(String content) {
   if (maxIssuesMatch == null) return content;
 
   final insertPos = maxIssuesMatch.end;
-  const outputBlock = '''
-# output: Where violations are sent.
-#   - "both"  (default) — Problems tab + report file
-#   - "file"  — Report file only (nothing in Problems tab)
-#   - Override per-run: SAROPA_LINTS_OUTPUT=file dart analyze
-output: both
-
-''';
+  const outputLine = 'output: both\n';
 
   return content.substring(0, insertPos) +
-      outputBlock +
+      outputLine +
       content.substring(insertPos);
 }

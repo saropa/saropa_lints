@@ -16,7 +16,6 @@ import 'package:saropa_lints/src/init/platforms_packages.dart';
 import 'package:saropa_lints/src/init/preflight.dart';
 import 'package:saropa_lints/src/init/project_info.dart';
 import 'package:saropa_lints/src/init/rule_metadata.dart';
-import 'package:saropa_lints/src/init/stylistic_section.dart';
 import 'package:saropa_lints/src/init/tier_ui.dart';
 import 'package:saropa_lints/src/init/validation.dart';
 import 'package:saropa_lints/src/init/whats_new.dart'
@@ -200,13 +199,15 @@ Future<void> runInit(List<String> args) async {
   );
 
   if (overridesFile.existsSync()) {
-    // Ensure all sections exist in the file
+    // I3: Migrate old bloated format → minimal (one-time, creates .bak).
+    // Removed ensurePlatformsSetting — migration preserves platforms;
+    // new files include them in the template.
+    // Removed ensurePackagesSetting — packages auto-detected from pubspec.
+    // Removed ensureStylisticRulesSection — stylistic section eliminated;
+    // enabled stylistic rules live in RULE OVERRIDES now.
+    migrateToMinimalFormat(overridesFile, tiers.stylisticRules);
     ensureMaxIssuesSetting(overridesFile);
-    ensurePlatformsSetting(overridesFile);
-    ensurePackagesSetting(overridesFile);
-    ensureStylisticRulesSection(overridesFile);
     platformSettings = extractPlatformsFromFile(overridesFile);
-    packageSettings = extractPackagesFromFile(overridesFile);
 
     // Extract overrides and partition stylistic from non-stylistic
     final allOverrides = extractOverridesFromFile(overridesFile, allRules);
@@ -225,16 +226,16 @@ Future<void> runInit(List<String> args) async {
       }
     }
   } else {
-    // Auto-detect packages from pubspec.yaml for first-time setup
-    packageSettings = detectProjectPackages(log, targetDir: targetDir);
-
-    // Create the custom overrides file with a helpful header
+    // Create the minimal custom overrides file
     createCustomOverridesFile(overridesFile);
     log.terminal(
       '${InitColors.green}✓ Created:${InitColors.reset} '
       'analysis_options_custom.yaml',
     );
   }
+
+  // I3: Always auto-detect packages from pubspec (not from custom file)
+  packageSettings = detectProjectPackages(log, targetDir: targetDir);
 
   // Apply platform filtering - disable rules for disabled platforms
   final Set<String> platformDisabledRules = tiers.getRulesDisabledByPlatforms(
