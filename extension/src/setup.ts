@@ -173,7 +173,7 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
   return ok;
 }
 
-export async function runInitializeConfig(context: vscode.ExtensionContext): Promise<boolean> {
+export async function runInitializeConfig(context: vscode.ExtensionContext, title?: string): Promise<boolean> {
   const workspaceRoot = getWorkspaceRoot();
   if (!workspaceRoot) {
     vscode.window.showErrorMessage('No workspace folder open.');
@@ -185,7 +185,7 @@ export async function runInitializeConfig(context: vscode.ExtensionContext): Pro
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: 'Initializing Saropa Lints config',
+      title: title ?? 'Initializing Saropa Lints config',
       cancellable: false,
     },
     async () => {

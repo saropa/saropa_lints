@@ -278,6 +278,14 @@
       {
         "command": "saropaLints.focusIssuesForRules",
         "title": "Show in Issues"
+      },
+      {
+        "command": "saropaLints.disableRules",
+        "title": "Disable rule(s)"
+      },
+      {
+        "command": "saropaLints.enableRules",
+        "title": "Enable rule(s)"
       }
     ],
     "menus": {
@@ -404,6 +412,22 @@
         },
         {
           "command": "saropaLints.focusIssuesForRules",
+          "when": "view == saropaLints.config && viewItem == triageRule"
+        },
+        {
+          "command": "saropaLints.disableRules",
+          "when": "view == saropaLints.config && viewItem == triageGroup"
+        },
+        {
+          "command": "saropaLints.disableRules",
+          "when": "view == saropaLints.config && viewItem == triageRule"
+        },
+        {
+          "command": "saropaLints.enableRules",
+          "when": "view == saropaLints.config && viewItem == triageGroup"
+        },
+        {
+          "command": "saropaLints.enableRules",
           "when": "view == saropaLints.config && viewItem == triageRule"
         }
       ]

@@ -28,6 +28,7 @@ import { readViolations, ViolationsData } from './violationsReader';
 import { appendSnapshot, loadHistory, findPreviousScore } from './runHistory';
 import { computeHealthScore, formatScoreDelta, scoreColorBand } from './healthScore';
 import { registerInlineAnnotations, updateAnnotationsForAllEditors, invalidateAnnotationCache } from './inlineAnnotations';
+import { writeRuleOverrides, removeRuleOverrides } from './configWriter';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -491,7 +492,54 @@ export function activate(context: vscode.ExtensionContext): void {
       issuesProvider.clearFocusedFile();
       updateIssuesViewMessage();
     }),
+    // I2: Triage actions — disable/enable rules via analysis_options_custom.yaml overrides.
+    // Shared helper extracts rule names from string[] (TreeItem click) or node (context menu).
+    ...['saropaLints.disableRules', 'saropaLints.enableRules'].map((cmdId) =>
+      vscode.commands.registerCommand(cmdId, async (arg: unknown) => {
+        const isDisable = cmdId === 'saropaLints.disableRules';
+        const rules = resolveRulesFromArg(arg);
+        if (!rules || rules.length === 0) return;
+        const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        if (!root) return;
+        // Confirm for large groups (>5 rules).
+        if (rules.length > 5) {
+          const verb = isDisable ? 'Disable' : 'Enable';
+          const ok = await vscode.window.showWarningMessage(
+            `${verb} ${rules.length} rules? This updates analysis_options_custom.yaml.`,
+            { modal: true },
+            verb,
+          );
+          if (ok !== verb) return;
+        }
+        // I2: Write overrides then re-init + re-analyze.
+        if (isDisable) {
+          writeRuleOverrides(root, rules.map((r) => ({ rule: r, enabled: false })));
+        } else {
+          // Enable: remove false overrides so tier default applies.
+          removeRuleOverrides(root, rules);
+        }
+        const initOk = await runInitializeConfig(context, `${isDisable ? 'Disabling' : 'Enabling'} ${rules.length} rule${rules.length === 1 ? '' : 's'}`);
+        if (!initOk) return;
+        const runAfter = getConfig().get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
+        if (runAfter) await runAnalysis(context);
+        refreshAll();
+        updateAllStatusBars();
+        updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
+        await vscode.commands.executeCommand('saropaLints.overview.focus');
+      }),
+    ),
   );
+}
+
+/** Extract rule names from command arg: string[] (TreeItem click) or triage node (context menu). */
+function resolveRulesFromArg(arg: unknown): string[] | undefined {
+  if (Array.isArray(arg)) return arg;
+  if (arg && typeof arg === 'object' && 'kind' in arg) {
+    const node = arg as { kind: string; rules?: string[]; ruleName?: string };
+    if (node.kind === 'triageGroup' && Array.isArray(node.rules)) return node.rules;
+    if (node.kind === 'triageRule' && typeof node.ruleName === 'string') return [node.ruleName];
+  }
+  return undefined;
 }
 
 export function deactivate(): void {}
