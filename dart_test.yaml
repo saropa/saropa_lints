@@ -1,0 +1,3 @@
+# Global test timeout — prevents any test from hanging indefinitely.
+# Individual tests can override with a longer timeout if needed.
+timeout: 2m

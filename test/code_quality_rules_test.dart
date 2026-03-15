@@ -1363,6 +1363,8 @@ void main() {
 
       test(
         'use_existing_variable does NOT report on same-source Random initializers (integration)',
+        // Process.run for pub get + analyze can hang — cap it.
+        timeout: const Timeout(Duration(minutes: 2)),
         () async {
           // Before fix: same-source rng.nextDouble() x2 was reported as duplicate.
           // After fix: must not report. Run analyzer on a temp package with that pattern.

@@ -9,7 +9,10 @@ import 'package:test/test.dart';
 /// Validates that fixture files are actually analyzed and that
 /// parseViolations correctly parses custom_lint output. Run from repo root.
 void main() {
-  group('Fixture lint integration', () {
+  // Process.run('dart', ['run', 'custom_lint']) can hang if the analyzer
+  // plugin stalls or package resolution deadlocks — cap each test.
+  group('Fixture lint integration',
+      timeout: const Timeout(Duration(minutes: 2)), () {
     test('custom_lint on example_async produces parseable violations',
         () async {
       final exampleDir = Directory('example_async');
