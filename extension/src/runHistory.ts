@@ -124,3 +124,93 @@ export function findPreviousScore(
   }
   return undefined;
 }
+
+/**
+ * D5: Score-driven trend summary.
+ * Returns score arrows with time span, e.g. "62 → 71 → 78 over 2 weeks".
+ * Only includes snapshots that have a score. Returns undefined if <1 scored.
+ */
+export function getScoreTrendSummary(
+  history: RunSnapshot[],
+): string | undefined {
+  const scored = history.filter((s) => s.score !== undefined);
+  if (scored.length === 0) return undefined;
+  if (scored.length === 1) return `Score: ${scored[0].score}`;
+  const recent = scored.slice(-TREND_DISPLAY_COUNT);
+  const arrows = recent.map((s) => String(s.score)).join(' \u2192 ');
+  const span = formatTimeSpan(
+    recent[0].timestamp,
+    recent[recent.length - 1].timestamp,
+  );
+  return span ? `${arrows} over ${span}` : arrows;
+}
+
+/** Format the time span between two ISO timestamps as a human-readable duration. */
+function formatTimeSpan(
+  startIso: string,
+  endIso: string,
+): string | undefined {
+  const ms = new Date(endIso).getTime() - new Date(startIso).getTime();
+  if (ms <= 0 || !Number.isFinite(ms)) return undefined;
+  const hours = Math.floor(ms / 3_600_000);
+  if (hours < 1) return undefined;
+  if (hours < 24) return `${hours}h`;
+  const days = Math.floor(hours / 24);
+  if (days < 14) return `${days} day${days === 1 ? '' : 's'}`;
+  const weeks = Math.floor(days / 7);
+  return `${weeks} week${weeks === 1 ? '' : 's'}`;
+}
+
+export interface ScoreRegression {
+  previousScore: number;
+  currentScore: number;
+  /** Positive number: how many points dropped. */
+  drop: number;
+}
+
+/**
+ * D5: Detect whether the latest snapshot represents a score regression.
+ * Returns undefined when no regression (score stable or improved).
+ */
+export function detectScoreRegression(
+  history: RunSnapshot[],
+): ScoreRegression | undefined {
+  if (history.length < 2) return undefined;
+  const curr = history[history.length - 1];
+  if (curr.score === undefined) return undefined;
+  const prevScore = findPreviousScore(history);
+  if (prevScore === undefined) return undefined;
+  const drop = prevScore - curr.score;
+  if (drop <= 0) return undefined;
+  return { previousScore: prevScore, currentScore: curr.score, drop };
+}
+
+const SCORE_THRESHOLDS = [90, 80, 70, 60, 50] as const;
+
+export interface ThresholdCrossing {
+  threshold: number;
+  direction: 'up' | 'down';
+}
+
+/**
+ * D8: Detect whether the score crossed a milestone threshold.
+ * Returns the highest threshold crossed upward, or lowest crossed downward.
+ */
+export function detectThresholdCrossing(
+  current: number,
+  previous: number | undefined,
+): ThresholdCrossing | undefined {
+  if (previous === undefined || current === previous) return undefined;
+  // Upward: find highest threshold where current >= t > previous.
+  for (const t of SCORE_THRESHOLDS) {
+    if (current >= t && previous < t) return { threshold: t, direction: 'up' };
+  }
+  // Downward: find lowest threshold where current < t <= previous.
+  for (let i = SCORE_THRESHOLDS.length - 1; i >= 0; i--) {
+    const t = SCORE_THRESHOLDS[i];
+    if (current < t && previous >= t) {
+      return { threshold: t, direction: 'down' };
+    }
+  }
+  return undefined;
+}

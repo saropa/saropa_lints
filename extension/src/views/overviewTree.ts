@@ -5,7 +5,7 @@
 
 import * as vscode from 'vscode';
 import { readViolations } from '../violationsReader';
-import { loadHistory, getTrendSummary, findPreviousScore } from '../runHistory';
+import { loadHistory, getTrendSummary, getScoreTrendSummary, findPreviousScore, detectScoreRegression } from '../runHistory';
 import { computeHealthScore, formatScoreDelta } from '../healthScore';
 
 /** C1: Format an ISO timestamp as a human-readable relative time. */
@@ -107,10 +107,30 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
       );
     }
 
-    // W5: Trends — show run history summary.
-    const trend = getTrendSummary(history);
-    if (trend) {
-      items.push(new OverviewItem('Trends', trend, 'saropaLints.focusIssues'));
+    // D5: Score-driven trend — show score sparkline with time span.
+    const scoreTrend = getScoreTrendSummary(history);
+    if (scoreTrend) {
+      items.push(new OverviewItem('Trends', scoreTrend, 'saropaLints.focusIssues'));
+    } else {
+      // Fall back to violation-count trend when no scores available yet.
+      const trend = getTrendSummary(history);
+      if (trend) {
+        items.push(new OverviewItem('Trends', trend, 'saropaLints.focusIssues'));
+      }
+    }
+
+    // D5: Regression alert — show when score dropped.
+    const regression = detectScoreRegression(history);
+    if (regression) {
+      const criticalCount = data.summary?.byImpact?.critical ?? 0;
+      const regDesc = criticalCount > 0
+        ? `${criticalCount} critical violation${criticalCount === 1 ? '' : 's'}`
+        : 'View issues';
+      items.push(new OverviewItem(
+        `Score dropped ${regression.previousScore} \u2192 ${regression.currentScore}`,
+        regDesc,
+        'saropaLints.focusIssues',
+      ));
     }
 
     // W6: Celebration — show delta when violations decreased.
