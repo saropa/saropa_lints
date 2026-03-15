@@ -22,6 +22,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 ---
 
+## [Unreleased]
+
+---
+
 ## [9.0.2]
 
 Sidebar icon refinement.
