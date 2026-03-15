@@ -62,6 +62,12 @@ def parse_version(version: str) -> tuple:
 def set_version_in_pubspec(pubspec_path: Path, new_version: str) -> None:
     """Write a new version string into pubspec.yaml."""
     content = pubspec_path.read_text(encoding="utf-8")
+
+    # Already at the target version — nothing to do
+    current = get_version_from_pubspec(pubspec_path)
+    if current == new_version:
+        return
+
     updated = re.sub(
         rf"^(version:\s*){_VERSION_RE}",
         rf"\g<1>{new_version}",

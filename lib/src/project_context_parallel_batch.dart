@@ -726,4 +726,3 @@ class RuleBatchExecutor {
     _fileToApplicableRules.clear();
   }
 }
-

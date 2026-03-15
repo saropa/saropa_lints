@@ -16,7 +16,6 @@ import 'dart:typed_data';
 
 import 'package:path/path.dart' as p;
 
-
 part 'project_context_path_bloom_git.dart';
 part 'project_context_project_file.dart';
 part 'project_context_pattern_metrics.dart';

@@ -336,4 +336,3 @@ class FileTypeDetector {
     _cache.clear();
   }
 }
-
