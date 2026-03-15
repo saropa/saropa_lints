@@ -25,7 +25,7 @@ import { LogsTreeProvider } from './views/logsTree';
 import { SuggestionsTreeProvider } from './views/suggestionsTree';
 import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { readViolations, ViolationsData } from './violationsReader';
-import { appendSnapshot, loadHistory, findPreviousScore } from './runHistory';
+import { appendSnapshot, loadHistory, findPreviousScore, detectThresholdCrossing } from './runHistory';
 import { computeHealthScore, formatScoreDelta, scoreColorBand } from './healthScore';
 import { registerInlineAnnotations, updateAnnotationsForAllEditors, invalidateAnnotationCache } from './inlineAnnotations';
 import { writeRuleOverrides, removeRuleOverrides } from './configWriter';
@@ -177,6 +177,26 @@ export function activate(context: vscode.ExtensionContext): void {
             }
             if (prev.critical > 0 && curr.critical === 0) {
               void vscode.window.showInformationMessage('Saropa Lints: No critical issues!');
+            }
+            // D8: Score crossed a milestone threshold.
+            if (curr.score !== undefined) {
+              const crossing = detectThresholdCrossing(curr.score, findPreviousScore(history));
+              if (crossing?.direction === 'up') {
+                void vscode.window.showInformationMessage(
+                  `Saropa Lints: Score reached ${crossing.threshold} \u2014 great work!`,
+                );
+              } else if (crossing?.direction === 'down') {
+                // D8: Non-shaming regression nudge with actionable button.
+                const msg = curr.critical > 0
+                  ? `${curr.critical} critical issue${curr.critical === 1 ? '' : 's'} \u2014 view.`
+                  : `Score dipped below ${crossing.threshold} \u2014 view issues.`;
+                void vscode.window.showInformationMessage(`Saropa Lints: ${msg}`, 'View Issues')
+                  .then((choice) => {
+                    if (choice === 'View Issues') {
+                      void vscode.commands.executeCommand('saropaLints.focusIssues');
+                    }
+                  });
+              }
             }
           }
           return;
