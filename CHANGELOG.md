@@ -22,7 +22,18 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 ---
 
-## [Unreleased]
+## [9.0.1]
+
+Sidebar polish — fixed the broken activity bar icon, removed repetitive enable buttons, and auto-enabled the extension for existing users.
+
+### Added
+
+- **Auto-enable for existing projects:** The extension now detects `saropa_lints` in pubspec.yaml and enables itself automatically — no manual "Enable" click needed for projects that already depend on the package. New projects still see the welcome prompt.
+
+### Fixed
+
+- **Sidebar icon:** Replaced oversized colorful PNG with monochrome SVG that renders correctly in the VS Code activity bar and respects theme colors.
+- **Repetitive enable buttons:** Removed duplicate "Enable Saropa Lints" buttons from Config, Logs, Suggestions, Security Posture, File Risk, and Summary views. The enable button now appears only in Overview and Issues; other views show a text pointer instead.
 
 ---
 

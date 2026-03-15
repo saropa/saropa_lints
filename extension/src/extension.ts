@@ -27,6 +27,7 @@ import { SuggestionsTreeProvider } from './views/suggestionsTree';
 import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
 import { readViolations, ViolationsData } from './violationsReader';
+import { hasSaropaLintsDep } from './pubspecReader';
 import { appendSnapshot, loadHistory, findPreviousScore, detectThresholdCrossing } from './runHistory';
 import { computeHealthScore, formatScoreDelta, scoreColorBand } from './healthScore';
 import { registerInlineAnnotations, updateAnnotationsForAllEditors, invalidateAnnotationCache } from './inlineAnnotations';
@@ -61,7 +62,26 @@ function updateIssuesBadge(view: vscode.TreeView<unknown>, issuesProvider: Issue
 
 export function activate(context: vscode.ExtensionContext): void {
   const cfg = getConfig();
-  const enabled = cfg.get<boolean>('enabled', false) ?? false;
+  let enabled = cfg.get<boolean>('enabled', false) ?? false;
+
+  // Auto-enable when saropa_lints is already in pubspec.yaml but the user
+  // hasn't explicitly toggled the setting. This avoids the "off by default"
+  // friction for projects that already depend on the package — no files are
+  // touched, we just flip the workspace flag.
+  if (!enabled) {
+    const inspection = cfg.inspect<boolean>('enabled');
+    const explicitlySet = inspection?.workspaceValue !== undefined
+      || inspection?.workspaceFolderValue !== undefined;
+    if (!explicitlySet) {
+      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      if (root && hasSaropaLintsDep(root)) {
+        enabled = true;
+        // Fire-and-forget: persist so subsequent activations skip this check.
+        void cfg.update('enabled', true, vscode.ConfigurationTarget.Workspace);
+      }
+    }
+  }
+
   updateContext(enabled, false);
 
   const issuesProvider = new IssuesTreeProvider(context.workspaceState);
