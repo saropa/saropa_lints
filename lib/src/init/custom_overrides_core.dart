@@ -163,7 +163,10 @@ void migrateToMinimalFormat(File file, Set<String> stylisticRules) {
   final existingOverrides = extractOverrideSectionValues(content);
 
   // Merge: existing overrides take priority over migrated stylistic
-  final allOverrides = <String, bool>{...enabledStylistic, ...existingOverrides};
+  final allOverrides = <String, bool>{
+    ...enabledStylistic,
+    ...existingOverrides
+  };
 
   // Backup old file before rewriting
   final backupPath = _uniqueBackupPath(file.path);
@@ -196,16 +199,16 @@ void migrateToMinimalFormat(File file, Set<String> stylisticRules) {
 
 /// Extract max_issues value from file content. Returns 500 if not found.
 int _extractMaxIssues(String content) {
-  final match = RegExp(r'^max_issues:\s*(\d+)', multiLine: true)
-      .firstMatch(content);
+  final match =
+      RegExp(r'^max_issues:\s*(\d+)', multiLine: true).firstMatch(content);
   if (match == null) return 500;
   return int.tryParse(match.group(1)!) ?? 500;
 }
 
 /// Extract output value from file content. Returns 'both' if not found.
 String _extractOutput(String content) {
-  final match = RegExp(r'^output:\s*(\w+)', multiLine: true)
-      .firstMatch(content);
+  final match =
+      RegExp(r'^output:\s*(\w+)', multiLine: true).firstMatch(content);
   return match?.group(1) ?? 'both';
 }
 

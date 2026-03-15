@@ -376,4 +376,3 @@ class SmartContentFilter {
     return true;
   }
 }
-
