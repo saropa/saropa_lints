@@ -10,6 +10,7 @@ import { normalizePath } from '../pathUtils';
 import { getRuleDescription, getRuleDocUrl } from '../ruleMetadata';
 import { readViolations, hasViolations, Violation } from '../violationsReader';
 import { computeHealthScore, estimateScoreWithoutViolation } from '../healthScore';
+import { logReport, logSection, flushReport } from '../reportWriter';
 import {
   loadSuppressions,
   saveSuppressions,
@@ -815,6 +816,14 @@ export function registerIssueCommands(
           4000,
         );
       }
+
+      // Report: log fix attempt.
+      if (root) {
+        logSection('Fix');
+        logReport(`- Rule: ${v.rule} (${v.file}:${v.line})`);
+        logReport(`- Result: ${applied ? 'applied' : 'no fix available'}`);
+        flushReport(root);
+      }
     }),
     // D7: Fix all auto-fixable violations in a file.
     vscode.commands.registerCommand('saropaLints.fixAllInFile', async (element: unknown) => {
@@ -857,6 +866,14 @@ export function registerIssueCommands(
       void vscode.window.showInformationMessage(
         `${fixedMsg}. Run analysis to update score.`,
       );
+
+      // Report: log bulk fix result.
+      if (root) {
+        logSection('Bulk Fix');
+        logReport(`- File: ${fileNode.filePath}`);
+        logReport(`- Fixed: ${result.fixed}, Skipped: ${result.skipped}`);
+        flushReport(root);
+      }
 
       // D7: Auto-run analysis after bulk fix to update score.
       const cfg = vscode.workspace.getConfiguration('saropaLints');
