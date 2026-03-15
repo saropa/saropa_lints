@@ -60,8 +60,6 @@ export function flushReport(root: string): string | undefined {
   // Derive date folder from the session timestamp to avoid midnight boundary mismatch
   // (session started at 23:59 but flushed at 00:01 would write to a different date folder).
   const folder = path.join(root, 'reports', dateFolderFromTimestamp(ts));
-  fs.mkdirSync(folder, { recursive: true });
-
   const header = [
     '# Saropa Lints Extension Report',
     `**Date:** ${new Date().toISOString()}`,
@@ -70,6 +68,10 @@ export function flushReport(root: string): string | undefined {
   const content = [...header, '', ...reportLines, ''].join('\n');
   const filePath = path.join(folder, `${ts}_saropa_extension.md`);
   try {
+    // mkdirSync can throw on permission errors or read-only filesystems;
+    // recursive:true only suppresses "already exists". Keep both operations
+    // in one try block so any disk failure returns undefined gracefully.
+    fs.mkdirSync(folder, { recursive: true });
     fs.writeFileSync(filePath, content, 'utf-8');
     clearReport();
     return filePath;

@@ -56,10 +56,12 @@ function formatTable(rows: CategoryRow[]): string {
   lines.push('| Category | Violations | Rules | Status |');
   lines.push('|----------|-----------|-------|--------|');
   for (const r of rows) {
-    // Distinguish: has issues, has rules but no issues (clean), or no rules mapped at all (gap).
+    // rules[] is populated only from violations, so r.count === 0 implies r.rules is empty.
+    // We cannot distinguish "covered but clean" from "no rules" without a rule-catalog lookup.
+    // Use a neutral label for zero-violation categories.
     const status = r.count > 0
       ? `${r.count} issue${r.count === 1 ? '' : 's'}`
-      : r.rules.length > 0 ? 'Clean' : 'No rules';
+      : 'No violations';
     const ruleList = r.rules.length > 0 ? r.rules.join(', ') : '--';
     lines.push(`| ${r.label} | ${r.count} | ${ruleList} | ${status} |`);
   }
@@ -79,10 +81,11 @@ export function generateOwaspReport(
   const mobileRows = buildCategoryRows(data.violations, MOBILE_TOP_10, 'mobile');
   const webRows = buildCategoryRows(data.violations, WEB_TOP_10, 'web');
 
-  // Gap analysis: categories where the current tier has no rules mapped at all.
-  // These represent blind spots — OWASP categories with zero lint coverage.
-  const mobileGaps = mobileRows.filter((r) => r.count === 0 && r.rules.length === 0);
-  const webGaps = webRows.filter((r) => r.count === 0 && r.rules.length === 0);
+  // Gap analysis: categories with zero violations.
+  // Without a rule-to-OWASP catalog we cannot distinguish "rules exist but no violations"
+  // from "no rules mapped at all". Both show as r.count === 0.
+  const mobileGaps = mobileRows.filter((r) => r.count === 0);
+  const webGaps = webRows.filter((r) => r.count === 0);
 
   const lines: string[] = [];
   lines.push('# OWASP Compliance Report');
@@ -109,7 +112,7 @@ export function generateOwaspReport(
   if (mobileGaps.length > 0 || webGaps.length > 0) {
     lines.push('## Gap Analysis');
     lines.push('');
-    lines.push('Categories with no mapped rules in the current tier:');
+    lines.push('Categories with no violations detected:');
     lines.push('');
     for (const g of mobileGaps) {
       lines.push(`- **Mobile** ${g.label}`);
