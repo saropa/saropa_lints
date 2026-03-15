@@ -25,7 +25,7 @@ VS Code extension buildout: Health Score, triage UI, inline annotations, securit
 - **Security Posture:** OWASP Top 10 coverage matrix (Mobile and Web) with violation and rule counts per category. Click to filter Issues. “Export OWASP Compliance Report” generates a markdown report for audits.
 - **Triage & Config:** Rules grouped by priority (critical, volume bands A–D, stylistic) with estimated score impact per group. Right-click to disable/enable rules — writes overrides to YAML and re-runs analysis. Packages auto-detected from `pubspec.yaml`. Custom config reduced from ~420 to ~40 lines.
 - **File Risk:** Files ranked by weighted violation density — riskiest first. Flame icon for critical, warning icon for high. Summary shows “Top N files have X% of critical issues”.
-- **First-run & Welcome:** Score-aware notification after enabling with actionable buttons. Native welcome states on all views when disabled or no data. Analysis auto-focuses Overview to show score delta. Extension report writer logs actions for audit trail.
+- **First-run & Welcome:** "Getting Started" walkthrough with guided tour of all features (Health Score, Issues, Security, Triage, Trends, and About Saropa). Score-aware notification after enabling with actionable buttons. Native welcome states on all views when disabled or no data. Analysis auto-focuses Overview to show score delta. Extension report writer logs actions for audit trail.
 
 ### Deprecated
 

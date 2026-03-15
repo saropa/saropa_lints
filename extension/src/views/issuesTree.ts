@@ -25,6 +25,7 @@ import {
   addHiddenImpact,
   clearSuppressions,
 } from '../suppressionsStore';
+import { normalizeOwaspId } from './securityPostureTree';
 
 const SEVERITY_ORDER = ['error', 'warning', 'info'] as const;
 const DEFAULT_PAGE_SIZE = 100;
@@ -742,22 +743,23 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       return buildFileItems(all);
     }
 
-    // For impact/rule/owasp: fan out violations into group buckets.
-    // extractGroupKeys may return multiple keys (e.g. OWASP m1 + a03),
+    // Snapshot mode once so extractGroupKeys and GroupItem.mode are consistent,
+    // and getTreeItem reads element.mode instead of this.groupBy (avoids stale-icon race).
+    const currentMode = this.groupBy;
+
+    // Fan out violations into group buckets.
+    // extractGroupKeys may return multiple keys (e.g. OWASP M1 + A03),
     // so one violation can appear under multiple group headers.
     const groups = new Map<string, Violation[]>();
     for (const v of all) {
-      for (const key of this.extractGroupKeys(v)) {
+      for (const key of this.extractGroupKeys(v, currentMode)) {
         const list = groups.get(key) ?? [];
         list.push(v);
         groups.set(key, list);
       }
     }
 
-    // Snapshot currentMode to embed in each GroupItem — getTreeItem reads
-    // element.mode instead of this.groupBy to avoid stale-icon race.
     const items: GroupItem[] = [];
-    const currentMode = this.groupBy;
     for (const [key, violations] of groups) {
       items.push({
         kind: 'group',
@@ -770,7 +772,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     }
 
     // Impact uses severity-like predefined order; others sort by count desc with name tie-breaker.
-    if (this.groupBy === 'impact') {
+    if (currentMode === 'impact') {
       const order = ['critical', 'high', 'medium', 'low', 'opinionated'];
       items.sort((a, b) => order.indexOf(a.groupKey) - order.indexOf(b.groupKey));
     } else {
@@ -780,20 +782,20 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   }
 
   /**
-   * D10: Extract grouping keys for a violation based on the current groupBy mode.
+   * D10: Extract grouping keys for a violation based on the given mode.
    * Returns an array because OWASP mode can map one violation to multiple categories.
    * Impact and rule modes always return exactly one key.
+   * Accepts explicit mode parameter so callers use the snapshot, not live this.groupBy.
    */
-  private extractGroupKeys(v: Violation): string[] {
-    if (this.groupBy === 'impact') return [(v.impact ?? 'low').toLowerCase()];
-    if (this.groupBy === 'rule') return [v.rule];
-    // File guard: buildGroupedRoot handles file mode separately via buildFileItems,
-    // but guard here for safety if called in unexpected context.
-    if (this.groupBy === 'file') return [v.file];
+  private extractGroupKeys(v: Violation, mode: GroupByMode): string[] {
+    if (mode === 'impact') return [(v.impact ?? 'low').toLowerCase()];
+    if (mode === 'rule') return [v.rule];
+    if (mode === 'file') return [v.file];
     // OWASP: violation can map to multiple categories (e.g. both M1 and A03).
-    // Normalize to lowercase for consistent grouping across data sources.
-    const cats = [...(v.owasp?.mobile ?? []), ...(v.owasp?.web ?? [])].map((c) => c.toLowerCase());
-    return cats.length > 0 ? cats : ['uncategorized'];
+    // Use normalizeOwaspId (strip text after colon) to match the canonical IDs
+    // used by securityPostureTree and owaspExport.
+    const cats = [...(v.owasp?.mobile ?? []), ...(v.owasp?.web ?? [])].map(normalizeOwaspId);
+    return cats.length > 0 ? cats : ['Uncategorized'];
   }
 
   getParent(element: IssueTreeNode): vscode.ProviderResult<IssueTreeNode> {

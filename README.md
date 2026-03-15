@@ -283,7 +283,7 @@ The tool is also built to **fix**. Saropa Lints diagnostics are engineered to be
 - [Migrating from solid_lints](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_solid_lints.md)
 - [Using with flutter_lints](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_flutter_lints.md) (complementary setup)
 
-> **Why two options?** The tier presets (Option A) are great for getting started fast. The init tool (Option B) gives you explicit `true`/`false` for every rule, making it easy to customize individual rules and see exactly what's enabled.
+> **Why three options?** The extension (Option A) is the recommended interactive experience. Tier presets (Option B) are great for quick, zero-config setup. The CLI init tool (Option C) gives you explicit `true`/`false` for every rule, ideal for CI/scripting.
 
 ## The 5 Tiers
 
@@ -657,7 +657,7 @@ Results are written to `reports/<date>/<timestamp>_scan_report.log` with a compa
 
 ## Stylistic Rules
 
-175+ rules for team preferences — not included in any correctness tier. Enable individually, via the interactive walkthrough during `init`, or use `--stylistic-all` to bulk-enable.
+175+ rules for team preferences — not included in any correctness tier. Enable individually in your config, via the VS Code extension's Config/Triage view, or use `--stylistic-all` to bulk-enable.
 
 Examples: `prefer_relative_imports`, `prefer_single_quotes`, `prefer_arrow_functions`, `prefer_trailing_comma_always`, `prefer_for_in`, `prefer_boolean_prefixes_for_params`
 
@@ -794,7 +794,7 @@ Exit code equals the number of critical issues (capped at 125), making it CI-fri
 
 ### IDE Integration
 
-Saropa Lints v5 uses the native Dart analyzer plugin system. Issues appear directly in your IDE's Problems panel — no extra setup required.
+Saropa Lints uses the native Dart analyzer plugin system. Issues appear directly in your IDE's Problems panel — no extra setup required.
 
 **If you don't see warnings:**
 
@@ -815,7 +815,7 @@ Saropa Lints v5 uses the native Dart analyzer plugin system. Issues appear direc
 1. **Install**: Add to your `pubspec.yaml` dev_dependencies:
    ```yaml
    dev_dependencies:
-     saropa_lints: ^5.0.0
+     saropa_lints: ^9.0.0
    ```
 
 2. **Configure**: Add to your `analysis_options.yaml`:
@@ -969,7 +969,7 @@ Then run `dart analyze` again.
 A: You can run them side-by-side, but Saropa Lints covers everything in `flutter_lints` plus 2000+ additional behavioral and security checks. Most teams replace `flutter_lints` entirely. With v5, you no longer need `custom_lint` either — just `saropa_lints` in your dev_dependencies.
 
 **Q: Will this slow down my CI/CD pipeline?**
-A: Saropa Lints v5 runs as a native analyzer plugin, integrated directly into `dart analyze`. The **Tier System** allows you to balance speed and strictness. The `essential` tier is designed to be fast for CI environments.
+A: Saropa Lints runs as a native analyzer plugin, integrated directly into `dart analyze`. The **Tier System** allows you to balance speed and strictness. The `essential` tier is designed to be fast for CI environments.
 
 **Q: Can I use this with existing legacy projects?**
 A: Yes! Use the **Baseline** feature (`dart run saropa_lints:baseline`) to suppress existing issues instantly. This lets you enforce quality on *new* code without having to fix 500+ legacy errors first.
