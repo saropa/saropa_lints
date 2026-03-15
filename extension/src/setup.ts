@@ -39,7 +39,14 @@ function hasFlutterDep(pubspecPath: string): boolean {
 function ensureSaropaLintsInPubspec(workspaceRoot: string): boolean {
   const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
   if (!fs.existsSync(pubspecPath)) {
-    vscode.window.showErrorMessage('No pubspec.yaml found in workspace root.');
+    void vscode.window.showErrorMessage(
+      'Saropa Lints requires a Dart or Flutter project (no pubspec.yaml found).',
+      'Learn More',
+    ).then((choice) => {
+      if (choice === 'Learn More') {
+        void vscode.env.openExternal(vscode.Uri.parse('https://pub.dev/packages/saropa_lints'));
+      }
+    });
     return false;
   }
   let content = fs.readFileSync(pubspecPath, 'utf-8');

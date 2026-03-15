@@ -5,6 +5,7 @@
  */
 
 import * as vscode from 'vscode';
+import * as fs from 'fs';
 import * as path from 'path';
 import {
   runEnable,
@@ -22,7 +23,6 @@ import { IssuesTreeProvider, registerIssueCommands } from './views/issuesTree';
 import { OverviewTreeProvider } from './views/overviewTree';
 import { SummaryTreeProvider } from './views/summaryTree';
 import { ConfigTreeProvider } from './views/configTree';
-import { LogsTreeProvider } from './views/logsTree';
 import { SuggestionsTreeProvider } from './views/suggestionsTree';
 import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
@@ -61,6 +61,12 @@ function updateIssuesBadge(view: vscode.TreeView<unknown>, issuesProvider: Issue
 }
 
 export function activate(context: vscode.ExtensionContext): void {
+  // Detect whether this workspace is a Dart/Flutter project so the UI can
+  // show appropriate welcome content instead of a misleading "Enable" button.
+  const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const isDartProject = root ? fs.existsSync(path.join(root, 'pubspec.yaml')) : false;
+  void vscode.commands.executeCommand('setContext', 'saropaLints.isDartProject', isDartProject);
+
   const cfg = getConfig();
   let enabled = cfg.get<boolean>('enabled', false) ?? false;
 
@@ -68,17 +74,14 @@ export function activate(context: vscode.ExtensionContext): void {
   // hasn't explicitly toggled the setting. This avoids the "off by default"
   // friction for projects that already depend on the package — no files are
   // touched, we just flip the workspace flag.
-  if (!enabled) {
+  if (!enabled && isDartProject) {
     const inspection = cfg.inspect<boolean>('enabled');
     const explicitlySet = inspection?.workspaceValue !== undefined
       || inspection?.workspaceFolderValue !== undefined;
-    if (!explicitlySet) {
-      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-      if (root && hasSaropaLintsDep(root)) {
-        enabled = true;
-        // Fire-and-forget: persist so subsequent activations skip this check.
-        void cfg.update('enabled', true, vscode.ConfigurationTarget.Workspace);
-      }
+    if (!explicitlySet && root && hasSaropaLintsDep(root)) {
+      enabled = true;
+      // Fire-and-forget: persist so subsequent activations skip this check.
+      void cfg.update('enabled', true, vscode.ConfigurationTarget.Workspace);
     }
   }
 
@@ -88,7 +91,6 @@ export function activate(context: vscode.ExtensionContext): void {
   const overviewProvider = new OverviewTreeProvider(context.workspaceState);
   const summaryProvider = new SummaryTreeProvider();
   const configProvider = new ConfigTreeProvider();
-  const logsProvider = new LogsTreeProvider();
   const suggestionsProvider = new SuggestionsTreeProvider();
   const securityProvider = new SecurityPostureTreeProvider();
   const fileRiskProvider = new FileRiskTreeProvider();
@@ -128,7 +130,6 @@ export function activate(context: vscode.ExtensionContext): void {
     issuesView,
     vscode.window.registerTreeDataProvider('saropaLints.summary', summaryProvider),
     vscode.window.registerTreeDataProvider('saropaLints.config', configProvider),
-    vscode.window.registerTreeDataProvider('saropaLints.logs', logsProvider),
     vscode.window.registerTreeDataProvider('saropaLints.suggestions', suggestionsProvider),
     vscode.window.registerTreeDataProvider('saropaLints.securityPosture', securityProvider),
     vscode.window.registerTreeDataProvider('saropaLints.fileRisk', fileRiskProvider),
@@ -139,7 +140,6 @@ export function activate(context: vscode.ExtensionContext): void {
     overviewProvider.refresh();
     summaryProvider.refresh();
     configProvider.refresh();
-    logsProvider.refresh();
     suggestionsProvider.refresh();
     securityProvider.refresh();
     fileRiskProvider.refresh();
@@ -263,6 +263,12 @@ export function activate(context: vscode.ExtensionContext): void {
   // Accepts optional pre-loaded data to avoid re-reading violations.json from disk
   // when the caller already has it (e.g. debouncedRefresh).
   const updateAllStatusBars = (preloadedData?: ViolationsData) => {
+    // Hide status bar entirely for non-Dart projects.
+    if (!isDartProject) {
+      statusBarItem.hide();
+      tierStatusBarItem.hide();
+      return;
+    }
     const en = getConfig().get<boolean>('enabled', false) ?? false;
     // Main status bar: Health Score when available, else On/Off state.
     if (en) {
