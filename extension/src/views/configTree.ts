@@ -81,7 +81,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     if (root) {
       const data = readViolations(root);
       if (data) {
-        this.cachedTriage = buildTriageData(data);
+        this.cachedTriage = buildTriageData(data, root);
         if (this.cachedTriage) {
           items.push(...this.buildTriageNodes(this.cachedTriage));
         }
@@ -106,6 +106,13 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
         kind: 'triageInfo',
         label: `${triage.zeroIssueCount} rules with zero issues`,
         description: 'auto-enabled',
+      });
+    }
+    // I2: Show count of rules explicitly disabled by user overrides.
+    if (triage.disabledOverrideCount > 0) {
+      nodes.push({
+        kind: 'triageInfo',
+        label: `${triage.disabledOverrideCount} rules disabled by override`,
       });
     }
     if (triage.stylisticGroup) nodes.push(triage.stylisticGroup);

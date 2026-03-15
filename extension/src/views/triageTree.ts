@@ -1,19 +1,9 @@
-/**
- * I1: Triage node types and data computation for the Config view.
- * Collapsible groups (critical, volume A–D, stylistic) with score estimation.
- */
-
+/** I1/I2: Triage node types and data computation for the Config view. */
 import * as vscode from 'vscode';
 import type { ViolationsData, IssuesByRule } from '../violationsReader';
-import {
-  groupRulesByVolume,
-  partitionStylistic,
-  buildRuleImpactMap,
-  identifyCriticalRules,
-  getZeroIssueCount,
-  type RuleImpactCounts,
-} from '../triageUtils';
+import { groupRulesByVolume, partitionStylistic, buildRuleImpactMap, identifyCriticalRules, getZeroIssueCount, type RuleImpactCounts } from '../triageUtils';
 import { estimateScoreForRuleRemoval, type RuleRemovalEstimate } from '../healthScore';
+import { countDisabledOverrides } from '../configWriter';
 
 export interface ConfigSettingNode {
   kind: 'configSetting';
@@ -49,12 +39,13 @@ export interface TriageData {
   criticalGroup: TriageGroupNode | null;
   volumeGroups: TriageGroupNode[];
   zeroIssueCount: number;
+  disabledOverrideCount: number;
   stylisticGroup: TriageGroupNode | null;
   issuesByRule: IssuesByRule;
 }
 
 /** Compute all triage groups from violations data. */
-export function buildTriageData(data: ViolationsData): TriageData | null {
+export function buildTriageData(data: ViolationsData, root?: string): TriageData | null {
   const issuesByRule = data.summary?.issuesByRule;
   if (!issuesByRule) return null;
 
@@ -109,10 +100,14 @@ export function buildTriageData(data: ViolationsData): TriageData | null {
   const enabledRuleNames = data.config?.enabledRuleNames ?? [];
   const zeroCount = getZeroIssueCount(enabledRuleNames, issuesByRule);
 
+  // I2: Count rules explicitly disabled by user overrides.
+  const disabledCount = root ? countDisabledOverrides(root) : 0;
+
   return {
     criticalGroup,
     volumeGroups: volumeNodes,
     zeroIssueCount: zeroCount,
+    disabledOverrideCount: disabledCount,
     stylisticGroup,
     issuesByRule,
   };
