@@ -8,17 +8,33 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 6.2.0.
 
-| | |
-|---|---|
-| **Package** | [pub.dev/packages/saropa_lints](https://pub.dev/packages/saropa_lints) |
-| **Score** | [pub.dev/packages/saropa_lints/score](https://pub.dev/packages/saropa_lints/score) |
-| **Changelog** | [pub.dev/packages/saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog) |
-| **CI** | [github.com/saropa/saropa_lints/actions](https://github.com/saropa/saropa_lints/actions) |
-| **Releases** | [github.com/saropa/saropa_lints/releases](https://github.com/saropa/saropa_lints/releases) |
+|                 |                                                                                                         |
+| --------------- | ------------------------------------------------------------------------------------------------------- |
+| **Package**     | [pub.dev/packages/saropa_lints](https://pub.dev/packages/saropa_lints)                                  |
+| **Score**       | [pub.dev/packages/saropa_lints/score](https://pub.dev/packages/saropa_lints/score)                      |
+| **Changelog**   | [pub.dev/packages/saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)              |
+| **CI**          | [github.com/saropa/saropa_lints/actions](https://github.com/saropa/saropa_lints/actions)                |
+| **Releases**    | [github.com/saropa/saropa_lints/releases](https://github.com/saropa/saropa_lints/releases)              |
 | **Marketplace** | [marketplace.visualstudio.com](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints) |
-| **Open VSX** | [open-vsx.org](https://open-vsx.org/extension/saropa/saropa-lints) |
+| **Open VSX**    | [open-vsx.org](https://open-vsx.org/extension/saropa/saropa-lints)                                      |
 
 Each version (and [Unreleased]) has a short commentary line in plain language—what this release is about for humans. Only discuss user-facing features; vary the phrasing.
+
+---
+
+## [9.0.2]
+
+Sidebar icon refinement.
+
+### Changed
+
+- **Sidebar icon:** Changed activity bar icon from solid fill to wireframe (stroked outline) for consistency with VS Code's icon style.
+
+### Administration
+
+- **Open VSX publish:** The publish script now prompts for an OVSX_PAT when the environment variable is missing, with platform-specific setup instructions, instead of silently skipping.
+- **Stale plugin-cache repair:** `dart analyze` failures caused by a stale analyzer plugin cache are now detected automatically. The script offers to update `analysis_options.yaml` and clear the cache in one step.
+- **Post-publish version sync:** After publishing, `analysis_options.yaml` plugin version is updated to the just-published version so `dart analyze` resolves correctly.
 
 ---
 

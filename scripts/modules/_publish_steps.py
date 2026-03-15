@@ -91,6 +91,154 @@ def _parse_analysis_counts(output: str) -> _AnalysisCounts:
     return _AnalysisCounts(errors=errors, warnings=warnings, infos=infos)
 
 
+# ---------------------------------------------------------------------------
+# Stale analyzer-plugin cache detection & repair
+# ---------------------------------------------------------------------------
+
+_STALE_PLUGIN_RE = re.compile(
+    r"plugin_entrypoint depends on (\S+)\s+(\S+)\s+which doesn't match",
+)
+
+
+def _detect_stale_plugin_version(output: str) -> tuple[str, str] | None:
+    """Check analyze output for a stale plugin version error.
+
+    Returns (package_name, stale_version) if found, else None.
+    """
+    m = _STALE_PLUGIN_RE.search(output)
+    if m:
+        return m.group(1), m.group(2)
+    return None
+
+
+def _get_latest_published_version(package_name: str) -> str | None:
+    """Query pub.dev for the latest published version of *package_name*."""
+    import json
+    import urllib.request
+    import urllib.error
+
+    url = f"https://pub.dev/api/packages/{package_name}"
+    try:
+        with urllib.request.urlopen(url, timeout=10) as resp:
+            data = json.loads(resp.read().decode())
+            return data["latest"]["version"]
+    except (urllib.error.URLError, KeyError, json.JSONDecodeError):
+        return None
+
+
+def _get_plugin_manager_dir() -> Path | None:
+    """Return the Dart analysis-server plugin-manager cache directory."""
+    if is_windows():
+        local = os.environ.get("LOCALAPPDATA")
+        if local:
+            return Path(local) / ".dartServer" / ".plugin_manager"
+    else:
+        home = Path.home()
+        return home / ".dartServer" / ".plugin_manager"
+    return None
+
+
+def update_analysis_options_plugin_version(
+    project_dir: Path,
+    package_name: str,
+    new_version: str,
+) -> bool:
+    """Update the plugin version in analysis_options.yaml.
+
+    Looks for ``version: "X.Y.Z"`` under ``plugins: <package_name>:``
+    and replaces it with *new_version*.  Returns True if updated.
+    """
+    ao_path = project_dir / "analysis_options.yaml"
+    if not ao_path.exists():
+        return False
+    content = ao_path.read_text(encoding="utf-8")
+    # Match:  version: "X.Y.Z"  (under the plugin section)
+    pattern = re.compile(
+        rf"(plugins:\s*\n\s+{re.escape(package_name)}:\s*\n"
+        rf'(?:.*\n)*?\s+version:\s*")[^"]+(")',
+        re.MULTILINE,
+    )
+    updated, count = pattern.subn(rf"\g<1>{new_version}\2", content)
+    if count == 0:
+        # Simpler fallback: just replace the version line directly
+        simple = re.compile(r'(\bversion:\s*")[^"]+(")')
+        updated, count = simple.subn(
+            rf"\g<1>{new_version}\2", content, count=1,
+        )
+    if count == 0:
+        return False
+    ao_path.write_text(updated, encoding="utf-8")
+    return True
+
+
+def _try_fix_stale_plugin_cache(
+    project_dir: Path,
+    combined: str,
+) -> bool:
+    """Detect and offer to fix a stale analyzer-plugin cache.
+
+    If the dart-analyze output contains a plugin version-resolution
+    error, query pub.dev for the latest version, update
+    ``analysis_options.yaml``, and clear the plugin-manager cache.
+
+    Returns True if a fix was applied (caller should retry analyze).
+    """
+    import shutil
+
+    stale = _detect_stale_plugin_version(combined)
+    if stale is None:
+        return False
+
+    pkg_name, stale_ver = stale
+    print_warning(
+        f"Stale analyzer-plugin cache: plugin requires "
+        f"{pkg_name} {stale_ver} which is not available."
+    )
+
+    latest = _get_latest_published_version(pkg_name)
+    if latest is None:
+        print_error(
+            f"Could not query pub.dev for latest {pkg_name} version."
+        )
+        return False
+
+    print_info(f"Latest published {pkg_name} version: {latest}")
+    print_colored(
+        f"  [F]ix automatically (update analysis_options.yaml to "
+        f"{latest}, clear plugin cache, and retry)",
+        Color.CYAN,
+    )
+    print_colored("  [S]kip (continue with failure)", Color.CYAN)
+    try:
+        raw = input("  Choice [f/s]: ").strip().lower() or "s"
+    except (EOFError, KeyboardInterrupt):
+        return False
+
+    if not raw.startswith("f"):
+        return False
+
+    # Apply fix: update version in analysis_options.yaml
+    if update_analysis_options_plugin_version(
+        project_dir, pkg_name, latest,
+    ):
+        print_success(
+            f"Updated analysis_options.yaml plugin version to {latest}"
+        )
+    else:
+        print_warning(
+            "Could not update analysis_options.yaml "
+            "(version field not found)"
+        )
+
+    # Clear plugin-manager cache so the analysis server re-resolves
+    pm_dir = _get_plugin_manager_dir()
+    if pm_dir and pm_dir.exists():
+        shutil.rmtree(pm_dir, ignore_errors=True)
+        print_success("Cleared analyzer plugin-manager cache")
+
+    return True
+
+
 # Limit how many diagnostic lines we print to console (rest are in log)
 _MAX_ANALYSIS_REPORT_LINES = 30
 
@@ -982,6 +1130,12 @@ def _run_dart_analyze_core(project_dir: Path) -> bool:
     print()
 
     if result.returncode != 0:
+        # Check for stale plugin-cache error before reporting failure.
+        # If user accepts the fix, retry analyze automatically.
+        if _try_fix_stale_plugin_cache(project_dir, combined):
+            print_info("Retrying dart analyze after plugin-cache fix...")
+            return _run_dart_analyze_core(project_dir)
+
         print_error(
             f"dart analyze failed (exit code {result.returncode}). "
             f"See report above."

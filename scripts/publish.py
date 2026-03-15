@@ -206,6 +206,7 @@ from scripts.modules._pubdev_lint import (
 
 # Prerequisites, working tree, remote sync, format, analysis, tests, audit, docs, validation
 from scripts.modules._publish_steps import (
+    update_analysis_options_plugin_version,
     check_prerequisites,
     check_remote_sync,
     check_working_tree,
@@ -914,6 +915,12 @@ def main(
             with timer.step("Version bump"):
                 next_version = increment_version(version)
                 set_version_in_pubspec(pubspec_path, next_version)
+                # Sync analysis_options.yaml plugin version to the
+                # just-published version so dart analyze can resolve
+                # the plugin from pub.dev (not the unpublished next_version).
+                update_analysis_options_plugin_version(
+                    project_dir, package_name, version,
+                )
                 add_unreleased_section(changelog_path)
                 if post_publish_commit(project_dir, next_version, branch):
                     print_success(

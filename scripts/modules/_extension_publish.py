@@ -16,15 +16,18 @@ Copyright: (c) 2025-2026 Saropa
 from __future__ import annotations
 
 import os
+import platform
 import re
 from pathlib import Path
 
 from scripts.modules._utils import (
+    print_colored,
     print_error,
     print_info,
     print_success,
     print_warning,
     run_command,
+    Color,
 )
 
 
@@ -158,12 +161,56 @@ def publish_extension_to_marketplace(
     return True
 
 
+def _prompt_for_ovsx_pat() -> str:
+    """Prompt user for OVSX_PAT when not set. Returns token or empty string to skip."""
+    print_warning("OVSX_PAT environment variable not set.")
+    print_info("Open VSX requires a Personal Access Token (PAT) to publish.")
+    print_info("Get one at: https://open-vsx.org/user-settings/tokens")
+    print()
+    # Show platform-specific instructions for setting it permanently
+    is_windows = platform.system() == "Windows"
+    if is_windows:
+        print_colored(
+            "  To set permanently (PowerShell):",
+            Color.DIM,
+        )
+        print_colored(
+            '    [Environment]::SetEnvironmentVariable("OVSX_PAT", "your-token", "User")',
+            Color.WHITE,
+        )
+        print_colored(
+            "  Or for current session only:",
+            Color.DIM,
+        )
+        print_colored(
+            '    $env:OVSX_PAT = "your-token"',
+            Color.WHITE,
+        )
+    else:
+        print_colored(
+            "  To set permanently, add to ~/.bashrc or ~/.zshrc:",
+            Color.DIM,
+        )
+        print_colored(
+            '    export OVSX_PAT="your-token"',
+            Color.WHITE,
+        )
+    print()
+    token = input("  Paste your Open VSX PAT now (or press Enter to skip): ").strip()
+    if token:
+        # Set for this process so subsequent calls work without re-prompting
+        os.environ["OVSX_PAT"] = token
+    return token
+
+
 def publish_extension_to_ovsx(project_dir: Path, vsix_path: Path) -> bool:
-    """Publish .vsix to Open VSX if OVSX_PAT is set. Returns True on success or skip."""
+    """Publish .vsix to Open VSX. Prompts for PAT if not set. Returns True on success or skip."""
     ovsx_pat = os.environ.get("OVSX_PAT", "").strip()
     if not ovsx_pat:
-        print_info("OVSX_PAT not set; skipping Open VSX.")
-        return True
+        ovsx_pat = _prompt_for_ovsx_pat()
+        if not ovsx_pat:
+            print_info("Skipping Open VSX publish.")
+            return True
     ext_dir = _extension_dir(project_dir)
     r = run_command(
         ["npx", "ovsx", "publish", str(vsix_path), "-p", ovsx_pat],
