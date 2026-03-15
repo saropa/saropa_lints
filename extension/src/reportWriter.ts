@@ -9,7 +9,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+/** Module-level buffer — lines accumulate across logReport() calls until flushed. */
 const reportLines: string[] = [];
+/** Captured on first logReport() call; ensures filename + date folder stay consistent through the session. */
 let sessionTimestamp: string | undefined;
 
 function pad2(n: number): string {
@@ -21,12 +23,16 @@ function makeTimestamp(): string {
   return `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}_${pad2(d.getHours())}${pad2(d.getMinutes())}${pad2(d.getSeconds())}`;
 }
 
-function makeDateFolder(): string {
-  const d = new Date();
-  return `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}`;
+/** Extract YYYYMMDD date portion from a YYYYMMDD_HHMMSS timestamp. */
+function dateFolderFromTimestamp(ts: string): string {
+  return ts.slice(0, 8);
 }
 
-/** Append a line to the current report buffer. */
+/**
+ * Append a line to the current report buffer.
+ * Lazily captures the session timestamp on first call so the report
+ * filename reflects when logging started, not when it was flushed.
+ */
 export function logReport(line: string): void {
   if (!sessionTimestamp) sessionTimestamp = makeTimestamp();
   reportLines.push(line);
@@ -51,10 +57,10 @@ export function clearReport(): void {
 export function flushReport(root: string): string | undefined {
   if (reportLines.length === 0) return undefined;
   const ts = sessionTimestamp ?? makeTimestamp();
-  const folder = path.join(root, 'reports', makeDateFolder());
-  try {
-    fs.mkdirSync(folder, { recursive: true });
-  } catch { /* already exists */ }
+  // Derive date folder from the session timestamp to avoid midnight boundary mismatch
+  // (session started at 23:59 but flushed at 00:01 would write to a different date folder).
+  const folder = path.join(root, 'reports', dateFolderFromTimestamp(ts));
+  fs.mkdirSync(folder, { recursive: true });
 
   const header = [
     '# Saropa Lints Extension Report',

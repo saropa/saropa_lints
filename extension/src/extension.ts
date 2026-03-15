@@ -366,6 +366,13 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('saropaLints.focusView', () => {
       void vscode.commands.executeCommand('saropaLints.overview.focus');
     }),
+    vscode.commands.registerCommand('saropaLints.openWalkthrough', () => {
+      void vscode.commands.executeCommand(
+        'workbench.action.openWalkthrough',
+        'saropa.saropa-lints#saropaLints.gettingStarted',
+        false,
+      );
+    }),
     // Show all issues: clear filters and focus Issues view (e.g. from Summary "Total violations").
     vscode.commands.registerCommand('saropaLints.focusIssues', () => {
       issuesProvider.clearFilters();
@@ -577,23 +584,26 @@ export function activate(context: vscode.ExtensionContext): void {
     // D10: Group-by picker for the Issues tree.
     vscode.commands.registerCommand('saropaLints.setGroupBy', async () => {
       const current = issuesProvider.getGroupBy();
-      const modes: { label: string; id: import('./views/issuesTree').GroupByMode }[] = [
+      interface GroupByPickItem extends vscode.QuickPickItem {
+        id: import('./views/issuesTree').GroupByMode;
+      }
+      const items: GroupByPickItem[] = [
         { label: 'Severity', id: 'severity' },
         { label: 'File', id: 'file' },
         { label: 'Impact', id: 'impact' },
         { label: 'Rule', id: 'rule' },
         { label: 'OWASP Category', id: 'owasp' },
-      ];
-      const pick = await vscode.window.showQuickPick(
-        modes.map((m) => ({
-          label: m.id === current ? `$(check) ${m.label}` : m.label,
-          description: m.id === current ? 'Current' : undefined,
-          id: m.id,
-        })),
-        { title: 'Group issues by', placeHolder: `Current: ${current}` },
-      );
+      ].map((m) => ({
+        label: m.id === current ? `$(check) ${m.label}` : m.label,
+        description: m.id === current ? 'Current' : undefined,
+        id: m.id as import('./views/issuesTree').GroupByMode,
+      }));
+      const pick = await vscode.window.showQuickPick(items, {
+        title: 'Group issues by',
+        placeHolder: `Current: ${current}`,
+      });
       if (pick) {
-        issuesProvider.setGroupBy((pick as { id: import('./views/issuesTree').GroupByMode }).id);
+        issuesProvider.setGroupBy(pick.id);
         updateIssuesViewMessage();
       }
     }),

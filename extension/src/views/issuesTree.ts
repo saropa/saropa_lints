@@ -35,9 +35,14 @@ function getPageSize(): number {
   return Math.max(1, Math.min(1000, typeof n === 'number' && !Number.isNaN(n) ? n : DEFAULT_PAGE_SIZE));
 }
 
-/** D10: Grouping modes for the Issues tree top level. */
+/**
+ * D10: Grouping modes for the Issues tree top level.
+ * 'severity' is the default (Error/Warning/Info); other modes flatten
+ * across severities and group by the chosen dimension.
+ */
 export type GroupByMode = 'severity' | 'file' | 'impact' | 'rule' | 'owasp';
 
+/** Discriminated union for all node types in the Issues tree. */
 type IssueTreeNode =
   | SeverityItem
   | FolderItem
@@ -47,12 +52,22 @@ type IssueTreeNode =
   | PlaceholderItem
   | GroupItem;
 
-/** D10: Generic group header for impact/rule/owasp grouping modes. */
+/**
+ * D10: Generic group header for non-severity grouping modes.
+ * Used by impact, rule, and owasp modes. Children are FileItem[]
+ * sub-grouped from the violations list.
+ */
 interface GroupItem {
   kind: 'group';
+  /** Snapshot of groupBy mode at creation time — prevents stale icon if mode changes between render cycles. */
+  mode: GroupByMode;
+  /** The raw key used for sorting and deduplication (e.g. 'critical', 'm1', rule name). */
   groupKey: string;
+  /** Human-readable label shown in the tree (may be title-cased). */
   label: string;
+  /** Total violations in this group. */
   count: number;
+  /** All violations belonging to this group — sub-grouped by file when expanded. */
   violations: Violation[];
 }
 
@@ -535,13 +550,13 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
         `${element.label} (${element.count})`,
         vscode.TreeItemCollapsibleState.Collapsed,
       );
-      // D10: Mode-aware icon — impact uses severity icons, owasp uses shield, rule uses symbol-method.
-      if (this.groupBy === 'impact') {
+      // D10: Mode-aware icon — reads from element.mode (snapshot at creation) to avoid stale this.groupBy.
+      if (element.mode === 'impact') {
         const k = element.groupKey;
         item.iconPath = new vscode.ThemeIcon(
           k === 'critical' ? 'error' : k === 'high' ? 'warning' : k === 'medium' ? 'info' : 'circle-outline',
         );
-      } else if (this.groupBy === 'owasp') {
+      } else if (element.mode === 'owasp') {
         item.iconPath = new vscode.ThemeIcon('shield');
       } else {
         item.iconPath = new vscode.ThemeIcon('symbol-method');
@@ -613,19 +628,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
 
     // D10: GroupItem children — sub-group violations by file for easy navigation.
     if (element.kind === 'group') {
-      const byFile = new Map<string, Violation[]>();
-      for (const v of element.violations) {
-        const list = byFile.get(v.file) ?? [];
-        list.push(v);
-        byFile.set(v.file, list);
-      }
-      const items: FileItem[] = [];
-      for (const [filePath, violations] of byFile) {
-        items.push({ kind: 'file', severity: '', filePath, violations });
-      }
-      // Sort by count descending so worst files surface first.
-      items.sort((a, b) => b.violations.length - a.violations.length);
-      return items;
+      return buildFileItems(element.violations);
     }
 
     if (element.kind === 'severity') {
@@ -711,7 +714,10 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     return [];
   }
 
-  /** D10: Flatten all violations from the severity→file index. */
+  /**
+   * D10: Flatten all violations from the severity→file index into a single array.
+   * Needed by non-severity grouping modes which ignore severity boundaries.
+   */
   private collectAllViolations(index: Map<string, Map<string, Violation[]>>): Violation[] {
     const all: Violation[] = [];
     for (const byFile of index.values()) {
@@ -722,27 +728,23 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     return all;
   }
 
-  /** D10: Build root nodes for non-severity grouping modes (file, impact, rule, owasp). */
+  /**
+   * D10: Build root nodes for non-severity grouping modes.
+   * File mode → flat FileItem[] sorted by violation count.
+   * Impact/rule/owasp → GroupItem[] where each group header expands to FileItem[] children.
+   * A single violation can appear in multiple OWASP groups (fan-out).
+   */
   private buildGroupedRoot(index: Map<string, Map<string, Violation[]>>): IssueTreeNode[] {
     const all = this.collectAllViolations(index);
 
-    // File mode: flat list of FileItem[] sorted by violation count descending.
+    // File mode bypasses GroupItem — returns FileItem[] directly.
     if (this.groupBy === 'file') {
-      const byFile = new Map<string, Violation[]>();
-      for (const v of all) {
-        const list = byFile.get(v.file) ?? [];
-        list.push(v);
-        byFile.set(v.file, list);
-      }
-      const items: FileItem[] = [];
-      for (const [filePath, violations] of byFile) {
-        items.push({ kind: 'file', severity: '', filePath, violations });
-      }
-      items.sort((a, b) => b.violations.length - a.violations.length);
-      return items;
+      return buildFileItems(all);
     }
 
-    // impact/rule/owasp: extract group keys per violation, build GroupItem[].
+    // For impact/rule/owasp: fan out violations into group buckets.
+    // extractGroupKeys may return multiple keys (e.g. OWASP m1 + a03),
+    // so one violation can appear under multiple group headers.
     const groups = new Map<string, Violation[]>();
     for (const v of all) {
       for (const key of this.extractGroupKeys(v)) {
@@ -752,18 +754,22 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       }
     }
 
+    // Snapshot currentMode to embed in each GroupItem — getTreeItem reads
+    // element.mode instead of this.groupBy to avoid stale-icon race.
     const items: GroupItem[] = [];
+    const currentMode = this.groupBy;
     for (const [key, violations] of groups) {
       items.push({
         kind: 'group',
+        mode: currentMode,
         groupKey: key,
-        label: this.groupBy === 'impact' ? key.charAt(0).toUpperCase() + key.slice(1) : key,
+        label: currentMode === 'impact' ? key.charAt(0).toUpperCase() + key.slice(1) : key,
         count: violations.length,
         violations,
       });
     }
 
-    // Impact uses predefined order; others sort by count descending.
+    // Impact uses severity-like predefined order; others sort by count desc with name tie-breaker.
     if (this.groupBy === 'impact') {
       const order = ['critical', 'high', 'medium', 'low', 'opinionated'];
       items.sort((a, b) => order.indexOf(a.groupKey) - order.indexOf(b.groupKey));
@@ -773,18 +779,43 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     return items;
   }
 
-  /** D10: Extract grouping keys for a violation based on the current groupBy mode. */
+  /**
+   * D10: Extract grouping keys for a violation based on the current groupBy mode.
+   * Returns an array because OWASP mode can map one violation to multiple categories.
+   * Impact and rule modes always return exactly one key.
+   */
   private extractGroupKeys(v: Violation): string[] {
     if (this.groupBy === 'impact') return [(v.impact ?? 'low').toLowerCase()];
     if (this.groupBy === 'rule') return [v.rule];
-    // OWASP: violation can map to multiple categories; uncategorized if none.
-    const cats = [...(v.owasp?.mobile ?? []), ...(v.owasp?.web ?? [])];
-    return cats.length > 0 ? cats : ['Uncategorized'];
+    // File guard: buildGroupedRoot handles file mode separately via buildFileItems,
+    // but guard here for safety if called in unexpected context.
+    if (this.groupBy === 'file') return [v.file];
+    // OWASP: violation can map to multiple categories (e.g. both M1 and A03).
+    // Normalize to lowercase for consistent grouping across data sources.
+    const cats = [...(v.owasp?.mobile ?? []), ...(v.owasp?.web ?? [])].map((c) => c.toLowerCase());
+    return cats.length > 0 ? cats : ['uncategorized'];
   }
 
   getParent(element: IssueTreeNode): vscode.ProviderResult<IssueTreeNode> {
     return undefined;
   }
+}
+
+/** D10: Group violations by file into FileItem[], sorted by count desc then name. */
+function buildFileItems(violations: Violation[]): FileItem[] {
+  const byFile = new Map<string, Violation[]>();
+  for (const v of violations) {
+    const list = byFile.get(v.file) ?? [];
+    list.push(v);
+    byFile.set(v.file, list);
+  }
+  const items: FileItem[] = [];
+  for (const [filePath, list] of byFile) {
+    items.push({ kind: 'file', severity: '', filePath, violations: list });
+  }
+  // Sort by count descending, then by path ascending as tie-breaker for stable order.
+  items.sort((a, b) => b.violations.length - a.violations.length || a.filePath.localeCompare(b.filePath));
+  return items;
 }
 
 function folderPath(e: FolderItem): string {
