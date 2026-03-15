@@ -24,6 +24,7 @@ import { ConfigTreeProvider } from './views/configTree';
 import { LogsTreeProvider } from './views/logsTree';
 import { SuggestionsTreeProvider } from './views/suggestionsTree';
 import { SecurityPostureTreeProvider } from './views/securityPostureTree';
+import { FileRiskTreeProvider } from './views/fileRiskTree';
 import { readViolations, ViolationsData } from './violationsReader';
 import { appendSnapshot, loadHistory, findPreviousScore, detectThresholdCrossing } from './runHistory';
 import { computeHealthScore, formatScoreDelta, scoreColorBand } from './healthScore';
@@ -69,6 +70,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const logsProvider = new LogsTreeProvider();
   const suggestionsProvider = new SuggestionsTreeProvider();
   const securityProvider = new SecurityPostureTreeProvider();
+  const fileRiskProvider = new FileRiskTreeProvider();
 
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('saropaLints.overview', overviewProvider),
@@ -108,6 +110,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.window.registerTreeDataProvider('saropaLints.logs', logsProvider),
     vscode.window.registerTreeDataProvider('saropaLints.suggestions', suggestionsProvider),
     vscode.window.registerTreeDataProvider('saropaLints.securityPosture', securityProvider),
+    vscode.window.registerTreeDataProvider('saropaLints.fileRisk', fileRiskProvider),
   );
 
   const refreshAll = () => {
@@ -118,6 +121,7 @@ export function activate(context: vscode.ExtensionContext): void {
     logsProvider.refresh();
     suggestionsProvider.refresh();
     securityProvider.refresh();
+    fileRiskProvider.refresh();
     invalidateCodeLenses();
     updateIssuesBadge(issuesView, issuesProvider);
     updateIssuesViewMessage();
