@@ -32,12 +32,8 @@ String buildStylisticSection({
   buffer.writeln(
     '# ─────────────────────────────────────────────────────────────────────────────',
   );
-  // ┌─────────────────────────────────────────────────────────────────────────┐
-  // │ IMPORTANT: The [reviewed] markers below track interactive walkthrough  │
-  // │ progress. Do NOT remove them — they prevent re-prompting users for     │
-  // │ rules they've already decided on. Use --reset-stylistic to clear all   │
-  // │ markers and start the walkthrough from scratch.                        │
-  // └─────────────────────────────────────────────────────────────────────────┘
+  // Legacy section builder for migration — [reviewed] markers are from the
+  // old interactive walkthrough (removed). Preserved for backward compat.
   buffer.writeln(
     '# Opinionated formatting, ordering, and naming convention rules.',
   );
@@ -49,13 +45,6 @@ String buildStylisticSection({
   buffer.writeln('# NOTE: Some rules conflict (e.g., prefer_single_quotes vs');
   buffer.writeln(
     '# prefer_double_quotes). Only enable one from each conflicting group.',
-  );
-  buffer.writeln('#');
-  buffer.writeln(
-    '# [reviewed] markers track walkthrough progress. Do NOT remove them.',
-  );
-  buffer.writeln(
-    '# Use --reset-stylistic to clear markers and re-review all rules.',
   );
   buffer.writeln('');
 

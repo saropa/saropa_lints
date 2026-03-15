@@ -106,7 +106,6 @@ Set<String> extractReviewedRules(String content) {
 }
 
 /// Strip all [reviewed] markers from the STYLISTIC RULES section only.
-/// Used by --reset-stylistic to force re-walkthrough of all rules.
 /// Scoped to the section to avoid stripping the text from user comments
 /// in other sections.
 String stripReviewedMarkers(String content) {
