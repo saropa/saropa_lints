@@ -275,6 +275,10 @@
         "command": "saropaLints.toggleInlineAnnotations",
         "title": "Saropa Lints: Toggle Inline Annotations"
       },
+      {
+        "command": "saropaLints.focusIssuesForRules",
+        "title": "Show in Issues"
+      }
     ],
     "menus": {
       "view/title": [
@@ -393,6 +397,14 @@
           "command": "saropaLints.focusIssuesForActiveFile",
           "when": "view == workbench.panel.markers.view",
           "group": "navigation"
+        },
+        {
+          "command": "saropaLints.focusIssuesForRules",
+          "when": "view == saropaLints.config && viewItem == triageGroup"
+        },
+        {
+          "command": "saropaLints.focusIssuesForRules",
+          "when": "view == saropaLints.config && viewItem == triageRule"
         }
       ]
     },

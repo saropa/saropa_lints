@@ -14,6 +14,7 @@
  */
 
 import { ViolationsData } from './violationsReader';
+import type { RuleImpactCounts } from './triageUtils';
 
 // --- Tuning constants ---
 
@@ -128,6 +129,52 @@ export function estimateScoreWithout(
   const density = weighted / filesAnalyzed;
   const raw = Math.round(100 * Math.exp(-density * DECAY_RATE));
   return Number.isFinite(raw) ? raw : 0;
+}
+
+export interface RuleRemovalEstimate {
+  projectedScore: number;
+  delta: number;
+  issueCount: number;
+}
+
+/**
+ * I1: Estimate score if all violations from a set of rules were fixed.
+ * Uses pre-computed ruleImpactMap (from buildRuleImpactMap) to avoid
+ * re-scanning the violations array per group.
+ */
+export function estimateScoreForRuleRemoval(
+  data: ViolationsData,
+  ruleImpactMap: Map<string, RuleImpactCounts>,
+  rules: string[],
+): RuleRemovalEstimate | null {
+  const health = computeHealthScore(data);
+  if (!health) return null;
+  const filesAnalyzed = data.summary?.filesAnalyzed ?? 0;
+  if (filesAnalyzed === 0) return null;
+
+  // Sum the weighted impact of violations being removed.
+  let removedWeighted = 0;
+  let removedCount = 0;
+  for (const rule of rules) {
+    const counts = ruleImpactMap.get(rule);
+    if (!counts) continue;
+    removedWeighted +=
+      counts.critical * IMPACT_WEIGHTS.critical +
+      counts.high * IMPACT_WEIGHTS.high +
+      counts.medium * IMPACT_WEIGHTS.medium +
+      counts.low * IMPACT_WEIGHTS.low +
+      counts.opinionated * IMPACT_WEIGHTS.opinionated;
+    removedCount += counts.critical + counts.high + counts.medium + counts.low + counts.opinionated;
+  }
+  if (removedCount === 0) return null;
+
+  // Recompute score with the removed violations subtracted.
+  const newWeighted = Math.max(0, health.weightedViolations - removedWeighted);
+  const density = newWeighted / filesAnalyzed;
+  const raw = Math.round(100 * Math.exp(-density * DECAY_RATE));
+  const projectedScore = Number.isFinite(raw) ? raw : 0;
+
+  return { projectedScore, delta: projectedScore - health.score, issueCount: removedCount };
 }
 
 /**

@@ -3,7 +3,7 @@
  * Used for data-driven triage: Group A (1–5), B (6–20), C (21–100), D (100+).
  */
 
-import type { IssuesByRule } from './violationsReader';
+import type { IssuesByRule, Violation } from './violationsReader';
 
 export const TRIAGE_GROUP_BOUNDS = [
   { id: 'A', min: 1, max: 5, label: '1–5 issues' },
@@ -66,4 +66,68 @@ export function partitionStylistic(
     }
   }
   return { stylistic, nonStylistic };
+}
+
+/** Per-impact violation counts for a single rule. */
+export interface RuleImpactCounts {
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+  opinionated: number;
+}
+
+/**
+ * Single O(n) scan of violations to build per-rule impact breakdown.
+ * Returned map is reused by all triage groups for score estimation,
+ * avoiding repeated scans of a potentially large violations array.
+ */
+export function buildRuleImpactMap(
+  violations: Violation[],
+): Map<string, RuleImpactCounts> {
+  const map = new Map<string, RuleImpactCounts>();
+  for (const v of violations) {
+    let counts = map.get(v.rule);
+    if (!counts) {
+      counts = { critical: 0, high: 0, medium: 0, low: 0, opinionated: 0 };
+      map.set(v.rule, counts);
+    }
+    const impact = v.impact ?? 'low';
+    if (impact in counts) {
+      counts[impact as keyof RuleImpactCounts] += 1;
+    }
+  }
+  return map;
+}
+
+/**
+ * Rules that have at least one critical-impact violation.
+ * These are "always on" in the triage — users should fix, not disable.
+ */
+export function identifyCriticalRules(
+  impactMap: Map<string, RuleImpactCounts>,
+  issuesByRule: IssuesByRule,
+): { ruleName: string; issueCount: number }[] {
+  const result: { ruleName: string; issueCount: number }[] = [];
+  for (const [rule, counts] of impactMap) {
+    if (counts.critical > 0) {
+      result.push({ ruleName: rule, issueCount: issuesByRule[rule] ?? counts.critical });
+    }
+  }
+  // Sort by issue count descending for display priority.
+  return result.sort((a, b) => b.issueCount - a.issueCount);
+}
+
+/**
+ * Count of enabled rules with zero violations — good news, auto-enabled.
+ */
+export function getZeroIssueCount(
+  enabledRuleNames: string[],
+  issuesByRule: IssuesByRule,
+): number {
+  let count = 0;
+  for (const rule of enabledRuleNames) {
+    if (!issuesByRule[rule] || issuesByRule[rule] === 0) count += 1;
+  }
+  return count;
 }

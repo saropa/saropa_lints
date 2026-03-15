@@ -372,21 +372,34 @@ export function activate(context: vscode.ExtensionContext): void {
         await vscode.commands.executeCommand('saropaLints.overview.focus');
       }
     }),
-    // D1: Focus Issues view filtered to rules mapped to an OWASP category.
-    // Uses rule-hide filter: hide all rules EXCEPT the ones mapped to this category.
-    // Clears orthogonal filters first so OWASP selection is not masked by prior state.
-    vscode.commands.registerCommand('saropaLints.focusIssuesForOwasp', (rules: string[]) => {
-      if (!Array.isArray(rules) || rules.length === 0) return;
-      const allRules = issuesProvider.getRuleNamesFromData();
-      const keep = new Set(rules);
-      const toHide = new Set(allRules.filter((r) => !keep.has(r)));
-      issuesProvider.setTextFilter('');
-      issuesProvider.setSeverityFilter(new Set(['error', 'warning', 'info']));
-      issuesProvider.setImpactFilter(new Set(['critical', 'high', 'medium', 'low', 'opinionated']));
-      issuesProvider.setRulesToHide(toHide);
-      updateIssuesViewMessage();
-      void vscode.commands.executeCommand('saropaLints.issues.focus');
-    }),
+    // D1/I1: Focus Issues view filtered to a set of rule names.
+    // Shared helper — hides all rules EXCEPT the given set and resets orthogonal filters.
+    ...['saropaLints.focusIssuesForOwasp', 'saropaLints.focusIssuesForRules'].map((cmdId) =>
+      vscode.commands.registerCommand(cmdId, (arg: unknown) => {
+        // Resolve rules: direct string[] (TreeItem click) or node (context menu).
+        let rules: string[] | undefined;
+        if (Array.isArray(arg)) {
+          rules = arg;
+        } else if (arg && typeof arg === 'object' && 'kind' in arg) {
+          const node = arg as { kind: string; rules?: string[]; ruleName?: string };
+          if (node.kind === 'triageGroup' && Array.isArray(node.rules)) {
+            rules = node.rules;
+          } else if (node.kind === 'triageRule' && typeof node.ruleName === 'string') {
+            rules = [node.ruleName];
+          }
+        }
+        if (!rules || rules.length === 0) return;
+        const allRules = issuesProvider.getRuleNamesFromData();
+        const keep = new Set(rules);
+        const toHide = new Set(allRules.filter((r) => !keep.has(r)));
+        issuesProvider.setTextFilter('');
+        issuesProvider.setSeverityFilter(new Set(['error', 'warning', 'info']));
+        issuesProvider.setImpactFilter(new Set(['critical', 'high', 'medium', 'low', 'opinionated']));
+        issuesProvider.setRulesToHide(toHide);
+        updateIssuesViewMessage();
+        void vscode.commands.executeCommand('saropaLints.issues.focus');
+      }),
+    ),
     vscode.commands.registerCommand('saropaLints.showOutput', showOutputChannel),
     vscode.commands.registerCommand('saropaLints.setIssuesFilter', async () => {
       const state = issuesProvider.getFilterState();
