@@ -182,9 +182,8 @@ Future<void> runInit(List<String> args) async {
   final Set<String> disabledRules = allRules.difference(enabledRules);
 
   // Handle stylistic rules (opt-in).
-  // --stylistic-all: bulk-enable all (old --stylistic behavior for CI).
-  // --stylistic / default: interactive walkthrough (handled after config gen).
-  // --no-stylistic: skip entirely, stylistic rules stay as-is in custom yaml.
+  // --stylistic-all: bulk-enable all stylistic rules (CI/non-interactive).
+  // Default: stylistic rules stay as-is in custom yaml overrides.
   Set<String> finalEnabled = enabledRules;
   Set<String> finalDisabled = disabledRules;
 
@@ -223,7 +222,7 @@ Future<void> runInit(List<String> args) async {
     final allOverrides = extractOverridesFromFile(overridesFile, allRules);
     for (final entry in allOverrides.entries) {
       if (tiers.stylisticRules.contains(entry.key)) {
-        // Stylistic overrides apply on top of --stylistic flag
+        // Stylistic overrides apply on top of --stylistic-all flag
         if (entry.value) {
           finalEnabled = finalEnabled.union(<String>{entry.key});
           finalDisabled = finalDisabled.difference(<String>{entry.key});
@@ -436,7 +435,6 @@ Future<void> runInit(List<String> args) async {
     enabledRules: finalEnabled,
     userCustomizations: userCustomizations,
     allRules: allRules,
-    includeStylistic: cliArgs.isStylisticIncluded,
     platformSettings: platformSettings,
     packageSettings: packageSettings,
   );

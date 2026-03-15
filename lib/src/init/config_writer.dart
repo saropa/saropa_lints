@@ -19,7 +19,6 @@ String generatePluginsYaml({
   required Set<String> enabledRules,
   required Map<String, bool> userCustomizations,
   required Set<String> allRules,
-  required bool includeStylistic,
   required Map<String, bool> platformSettings,
   required Map<String, bool> packageSettings,
 }) {
@@ -176,7 +175,7 @@ String generatePluginsYaml({
     buffer.writeln(sectionHeader('STYLISTIC RULES (opt-in)', '~'));
     buffer.writeln('      # Formatting, ordering, naming conventions.');
     buffer.writeln(
-      '      # Enable with: dart run saropa_lints:init --tier <tier> --stylistic',
+      '      # Enable with: dart run saropa_lints:init --tier <tier> --stylistic-all',
     );
     buffer.writeln('');
 

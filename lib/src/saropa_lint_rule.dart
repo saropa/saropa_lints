@@ -1575,7 +1575,7 @@ enum RuleTier {
   pedantic,
 
   /// Stylistic rules (formatting, ordering, naming).
-  /// Opt-in only via --stylistic flag. Not included in any tier by default.
+  /// Opt-in only via --stylistic-all flag or rule overrides. Not in any tier.
   stylistic,
 }
 

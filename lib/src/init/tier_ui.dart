@@ -1,85 +1,9 @@
-/// Tier selection UI, help display, and what's new.
+/// Tier help display.
 library;
 
-import 'dart:io';
-
 import 'package:saropa_lints/src/init/cli_args.dart';
-import 'package:saropa_lints/src/init/display.dart';
-import 'package:saropa_lints/src/init/log_writer.dart';
-import 'package:saropa_lints/src/tiers.dart' as tiers;
 
-/// Prompts the user to select a tier interactively.
-///
-/// Defaults to the tier found in the existing analysis_options.yaml,
-/// or 'essential' for fresh setups. In non-interactive mode (piped input,
-/// CI), uses the default without prompting.
-String promptForTier({required String targetDir}) {
-  final String defaultTier =
-      detectExistingTier(targetDir: targetDir) ?? 'essential';
-
-  if (!stdin.hasTerminal) {
-    log.terminal(
-      '${InitColors.dim}Non-interactive: using default tier '
-      '($defaultTier)${InitColors.reset}',
-    );
-    return defaultTier;
-  }
-
-  log.terminal('${InitColors.bold}Select a tier:${InitColors.reset}');
-  log.terminal('');
-
-  for (final String name in tierOrder) {
-    final int? id = tierIds[name];
-    if (id == null) continue;
-    final int count = tiers.getRulesForTier(name).length;
-    final String desc = tierDescriptions[name] ?? '';
-    final String label = tierColor(name.padRight(13));
-    final String countStr =
-        '${InitColors.dim}(~$count rules)${InitColors.reset}';
-    final String isDefault = name == defaultTier
-        ? ' ${InitColors.cyan}(default)${InitColors.reset}'
-        : '';
-    log.terminal('  $id. $label $countStr  $desc$isDefault');
-  }
-
-  log.terminal('');
-  stdout.write(
-    '${InitColors.cyan}Enter tier (1-5) '
-    '[default: ${tierIds[defaultTier]}]: ${InitColors.reset}',
-  );
-
-  final String input = stdin.readLineSync()?.trim() ?? '';
-
-  if (input.isEmpty) return defaultTier;
-
-  final String? resolved = resolveTier(input);
-
-  if (resolved != null) return resolved;
-
-  log.terminal(
-    '${InitColors.yellow}Invalid selection "$input", '
-    'using $defaultTier${InitColors.reset}',
-  );
-  return defaultTier;
-}
-
-/// Reads the existing analysis_options.yaml and returns the tier name
-/// from the `# Tier: <name>` comment, or null if not found.
-String? detectExistingTier({required String targetDir}) {
-  final file = File('$targetDir/analysis_options.yaml');
-
-  if (!file.existsSync()) return null;
-
-  final match = RegExp(r'# Tier:\s*(\w+)').firstMatch(file.readAsStringSync());
-
-  if (match == null) return null;
-
-  final group = match.group(1);
-  if (group == null) return null;
-  final tier = group.toLowerCase();
-  return tierIds.containsKey(tier) ? tier : null;
-}
-
+// ignore: avoid_print
 void printUsage() {
   print('''
 

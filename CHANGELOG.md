@@ -16,7 +16,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 ## [9.0.0]
 
-VS Code extension buildout: Health Score, triage UI, inline annotations, security posture, and file risk — all native VS Code UI. CLI init is now headless-only; use the extension for interactive setup. Run “Saropa Lints: Getting Started” from the command palette for a guided tour.
+The VS Code extension is now the primary way to use saropa_lints. One-click setup, health scoring, rule triage, inline annotations, OWASP compliance reports, and file risk analysis — all from the sidebar. The CLI remains for CI and scripting but interactive setup has moved entirely to the extension. Run “Saropa Lints: Getting Started” from the command palette to get started.
 
 ### Added
 
@@ -29,10 +29,11 @@ VS Code extension buildout: Health Score, triage UI, inline annotations, securit
 
 ### Deprecated
 
-- **CLI init interactive mode:** `dart run saropa_lints:init` is now headless-only — defaults to `recommended` tier. Use the VS Code extension for interactive setup. CLI remains for CI/scripting with `--tier`, `--target`, `--no-stylistic`.
+- **CLI init interactive mode:** `dart run saropa_lints:init` is now headless-only — defaults to `recommended` tier. Use the VS Code extension for interactive setup. CLI remains for CI/scripting with `--tier`, `--target`, `--no-stylistic`. Removed `--stylistic` (interactive walkthrough) and `--reset-stylistic` flags; use `--stylistic-all` for bulk enable.
 
 ### Changed
 
+- **Custom config notice:** `analysis_options_custom.yaml` now includes a prominent "DO NOT EDIT MANUALLY" banner directing users to the VS Code extension for rule overrides.
 - **Smart Tier Transitions:** Upgrading to a higher tier auto-filters the Issues view to critical + high violations so users aren't overwhelmed. Notification shows violation delta and "Show All" escape hatch. Tier picker shows rule counts, descriptions, and current-tier marker; same-tier selection is a no-op.
 - Progress indicators for Run Analysis, Initialize Config, and Set Tier.
 - Debounced refresh (300 ms) on `violations.json` changes.

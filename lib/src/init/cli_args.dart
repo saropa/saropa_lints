@@ -35,10 +35,8 @@ class CliArgs {
     required this.isShowHelp,
     required this.isDryRun,
     required this.isReset,
-    required this.isStylisticIncluded,
     required this.isStylisticAll,
     required this.isNoStylistic,
-    required this.isStylisticReset,
     required this.isFixIgnores,
     required this.outputPath,
     required this.tier,
@@ -49,18 +47,11 @@ class CliArgs {
   final bool isDryRun;
   final bool isReset;
 
-  /// --stylistic: triggers interactive walkthrough (was bulk-enable in v4).
-  final bool isStylisticIncluded;
-
-  /// --stylistic-all: bulk-enable all stylistic rules (old --stylistic
-  /// behavior, useful for CI/non-interactive).
+  /// --stylistic-all: bulk-enable all stylistic rules (CI/non-interactive).
   final bool isStylisticAll;
 
-  /// --no-stylistic: skip the stylistic walkthrough entirely.
+  /// --no-stylistic: exclude stylistic rules entirely (default).
   final bool isNoStylistic;
-
-  /// --reset-stylistic: clear all [reviewed] markers and re-walkthrough.
-  final bool isStylisticReset;
 
   final bool isFixIgnores;
   final String outputPath;
@@ -75,10 +66,8 @@ CliArgs parseArguments(List<String> args) {
   final bool showHelp = args.contains('--help') || args.contains('-h');
   final bool dryRun = args.contains('--dry-run');
   final bool reset = args.contains('--reset');
-  final bool includeStylistic = args.contains('--stylistic');
   final bool stylisticAll = args.contains('--stylistic-all');
   final bool noStylistic = args.contains('--no-stylistic');
-  final bool resetStylistic = args.contains('--reset-stylistic');
   final bool fixIgnores = args.contains('--fix-ignores');
 
   String outputPath = 'analysis_options.yaml';
@@ -127,11 +116,11 @@ CliArgs parseArguments(List<String> args) {
     if (tierIndex + 1 < args.length && !args[tierIndex + 1].startsWith('-')) {
       requestedTier = args[tierIndex + 1];
     } else {
-      // --tier without a value: warn and fall through to prompt/default
+      // --tier without a value: warn and fall through to default
       // ignore: avoid_print
       print(
         'Warning: --tier requires a value (1-5 or tier name). '
-        'Will prompt for selection.',
+        'Defaulting to recommended.',
       );
     }
   }
@@ -140,10 +129,8 @@ CliArgs parseArguments(List<String> args) {
     isShowHelp: showHelp,
     isDryRun: dryRun,
     isReset: reset,
-    isStylisticIncluded: includeStylistic,
     isStylisticAll: stylisticAll,
     isNoStylistic: noStylistic,
-    isStylisticReset: resetStylistic,
     isFixIgnores: fixIgnores,
     outputPath: outputPath,
     tier: requestedTier,
