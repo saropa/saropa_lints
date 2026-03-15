@@ -30,6 +30,7 @@ import { computeHealthScore, formatScoreDelta, scoreColorBand } from './healthSc
 import { registerInlineAnnotations, updateAnnotationsForAllEditors, invalidateAnnotationCache } from './inlineAnnotations';
 import { writeRuleOverrides, removeRuleOverrides } from './configWriter';
 import { logReport, logSection, flushReport } from './reportWriter';
+import { generateOwaspReport } from './owaspExport';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -454,6 +455,31 @@ export function activate(context: vscode.ExtensionContext): void {
       }),
     ),
     vscode.commands.registerCommand('saropaLints.showOutput', showOutputChannel),
+    // D2: Export OWASP Compliance Report as markdown.
+    vscode.commands.registerCommand('saropaLints.exportOwaspReport', async () => {
+      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      if (!root) {
+        vscode.window.showErrorMessage('No workspace folder open.');
+        return;
+      }
+      const data = readViolations(root);
+      if (!data) {
+        vscode.window.showErrorMessage('No analysis data. Run analysis first.');
+        return;
+      }
+      const report = generateOwaspReport(data, root);
+      const fs = await import('fs');
+      const folder = path.join(root, 'reports', '.saropa_lints');
+      try { fs.mkdirSync(folder, { recursive: true }); } catch { /* exists */ }
+      const filePath = path.join(folder, 'owasp_compliance_report.md');
+      fs.writeFileSync(filePath, report, 'utf-8');
+      const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(filePath));
+      await vscode.window.showTextDocument(doc);
+      // Report: log export action.
+      logSection('OWASP Export');
+      logReport(`- Exported to ${filePath}`);
+      flushReport(root);
+    }),
     vscode.commands.registerCommand('saropaLints.setIssuesFilter', async () => {
       const state = issuesProvider.getFilterState();
       const value = await vscode.window.showInputBox({
