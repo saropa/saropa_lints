@@ -14,6 +14,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language—
 
 ---
 
+## [Unreleased]
+
+---
+
 ## [9.0.0]
 
 The VS Code extension is now the primary way to use saropa_lints. One-click setup, health scoring, rule triage, inline annotations, OWASP compliance reports, and file risk analysis — all from the sidebar. The CLI remains for CI and scripting but interactive setup has moved entirely to the extension. Run “Saropa Lints: Getting Started” from the command palette to get started.
