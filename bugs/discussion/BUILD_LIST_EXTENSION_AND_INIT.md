@@ -2,7 +2,7 @@
 
 **Purpose:** Single prioritized list of work to make the extension-driven experience complete, integrated, and genuinely differentiated. Supersedes the previous separate plans (cohesion/WOW, init redesign). Source material: [003_INIT_REDESIGN.md](003_INIT_REDESIGN.md), [log_capture_integration.md](log_capture_integration.md).
 
-**Already done:** Violation export (`violations.json`), Issues tree (structure, filters, suppressions), Summary/Config/Logs/Suggestions/Overview views, one-click setup, file watcher, C4 (Summary → Issues), W1 (Apply fix from tree), W2 (Code Lens), W3 (rule doc in tooltip), W4 (Problems → Show in Saropa), F1–F4 (foundation), W5 (trends), W6 (celebration), W7 (focus mode), W8 (tier in status bar), H1–H3 + H5 (Health Score in Overview + status bar + history + score persistence), C1–C7 (all cohesion items), D1 (Security Posture view), D3 (inline annotations), D11 (focus mode = W7), I1 (Triage UI in Config), I2 (Apply triage → write YAML), I3 (Minimal custom config), I5 (First-run flow), I4 (Deprecate CLI init), D4 (Fix Impact Preview), D7 (Bulk fix with impact summary), D5 (Score-driven trends), D8 (Score-driven celebration), H4 (Score in Code Lens), D2 (OWASP Compliance Export), D9 (Onboarding with score = I5).
+**Already done:** Violation export (`violations.json`), Issues tree (structure, filters, suppressions), Summary/Config/Logs/Suggestions/Overview views, one-click setup, file watcher, C4 (Summary → Issues), W1 (Apply fix from tree), W2 (Code Lens), W3 (rule doc in tooltip), W4 (Problems → Show in Saropa), F1–F4 (foundation), W5 (trends), W6 (celebration), W7 (focus mode), W8 (tier in status bar), H1–H3 + H5 (Health Score in Overview + status bar + history + score persistence), C1–C7 (all cohesion items), D1 (Security Posture view), D3 (inline annotations), D11 (focus mode = W7), I1 (Triage UI in Config), I2 (Apply triage → write YAML), I3 (Minimal custom config), I5 (First-run flow), I4 (Deprecate CLI init), D4 (Fix Impact Preview), D7 (Bulk fix with impact summary), D5 (Score-driven trends), D8 (Score-driven celebration), H4 (Score in Code Lens), D2 (OWASP Compliance Export), D9 (Onboarding with score = I5), D12 (Log hints), L2 (README integration line).
 
 **Implementation records (done 2026-03-14):**
 - **W5 (Trends):** `runHistory.ts` persists last 20 snapshots in workspace state; Overview shows "Trends" row with last 5 totals arrow-separated.
@@ -35,6 +35,8 @@
 - **D2 (OWASP Compliance Export):** `owaspExport.ts` — `generateOwaspReport()` produces markdown with Mobile + Web Top 10 tables (category, violations, rules, status), gap analysis (categories with no mapped rules in current tier), and header with score/tier/timestamp. Command `saropaLints.exportOwaspReport` writes to `reports/.saropa_lints/owasp_compliance_report.md` and opens it. Context menu on Security Posture group nodes. Reuses `MOBILE_TOP_10`, `WEB_TOP_10`, `normalizeOwaspId` from `securityPostureTree.ts`.
 - **D9 (Onboarding with score):** Already implemented as I5. `showFirstRunNotification()` in `extension.ts` shows score-aware message with action buttons after enable.
 - **Extension Report Writer:** `reportWriter.ts` — accumulates log lines during operations, flushes to `reports/YYYYMMDD/YYYYMMDD_HHMMSS_saropa_extension.md`. Instrumented in `setup.ts` (enable, set tier, analysis, init config), `extension.ts` (enable result, milestone crossing), `issuesTree.ts` (fix, bulk fix). Mirrors Dart init log writer pattern.
+- **D12 (Log hints):** `logsTree.ts` — `parseLogHint()` reads first bytes of log files to extract human-readable descriptions: init logs show tier, analysis reports show error/warning counts, extension reports labeled. "Run Analysis (reports may be stale)" action item shown when latest report is >1 hour old.
+- **L2 (README integration line):** Extension README now documents that `reports/.saropa_lints/violations.json` is also used by Saropa Log Capture for bug report correlation.
 
 ---
 
@@ -210,8 +212,8 @@ The order follows the data pipeline: build the score first, then the features th
 7. ~~**Trends + celebration (D5, D8):**~~ *(done)* Score sparkline in Overview with time span, regression alert row, threshold celebrations (50/60/70/80/90), non-shaming regression nudge.
 8. ~~**Score in Code Lens (H4):**~~ *(done)* Code Lens shows per-file critical count ("Saropa: 3 issues (2 critical) — Show in Saropa").
 9. ~~**OWASP export (D2):**~~ *(done)* Compliance markdown report with Mobile + Web Top 10 tables, gap analysis. `owaspExport.ts`, command `saropaLints.exportOwaspReport`. **File Risk (D6):** heatmap — polish differentiator.
-10. **Remaining polish (D10, D12):** Group-by, log hints. (D9 done via I5, D11 done via W7.)
-11. **Log Capture (L1–L4):** When touching those codebases.
+10. **Remaining polish (D10):** Group-by. (D9 done via I5, D11 done via W7, D12 done.)
+11. **Log Capture (L1, L3, L4):** When touching those codebases. (L2 done.)
 
 ---
 
