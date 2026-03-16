@@ -273,6 +273,10 @@
         "title": "Show in Issues"
       },
       {
+        "command": "saropaLints.focusIssuesForOwasp",
+        "title": "Focus Issues for OWASP Category"
+      },
+      {
         "command": "saropaLints.disableRules",
         "title": "Disable rule(s)"
       },
@@ -837,6 +841,10 @@
         }
       ],
       "commandPalette": [
+        {
+          "command": "saropaLints.focusIssuesForOwasp",
+          "when": "false"
+        },
         {
           "command": "saropaLints.packageVibrancy.showCodeLens",
           "when": "!saropaLints.packageVibrancy.codeLensEnabled"

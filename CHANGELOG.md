@@ -33,6 +33,7 @@ _Housekeeping: plugging minor gaps carried over from the Package Vibrancy merge.
 
 - **Extension** — dispose the upgrade-plan output channel on deactivation (was never cleaned up, minor resource leak)
 - **Extension** — declare `focusIssuesForOwasp` command in `package.json` so VS Code can validate it; hidden from Command Palette since it requires a structured argument
+- **Extension** — set `showPrereleases` context key via `setContext` so the show/hide prerelease toggle buttons reflect the actual state (context key was never set, causing when-clauses to mis-evaluate)
 
 ---
 
