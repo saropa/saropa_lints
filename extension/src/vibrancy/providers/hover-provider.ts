@@ -10,10 +10,18 @@ export class VibrancyHoverProvider implements vscode.HoverProvider {
     private _results = new Map<string, VibrancyResult>();
     private _splitsByPackage = new Map<string, FamilySplit>();
     private _insightsByPackage = new Map<string, PackageInsight>();
+    private _clipboardTexts = new Map<string, string>();
+
+    /** Get the plain markdown text for clipboard copy. */
+    getClipboardText(packageName: string): string | undefined {
+        return this._clipboardTexts.get(packageName);
+    }
 
     /** Update cached results (called after scan). */
     updateResults(results: VibrancyResult[]): void {
         this._results.clear();
+        // Clear stale clipboard text when scan results change.
+        this._clipboardTexts.clear();
         for (const r of results) {
             this._results.set(r.package.name, r);
         }
@@ -54,9 +62,18 @@ export class VibrancyHoverProvider implements vscode.HoverProvider {
 
         const split = this._splitsByPackage.get(word);
         const insight = this._insightsByPackage.get(word);
-        return new vscode.Hover(
-            buildHoverContent(result, split, insight), wordRange,
+        const md = buildHoverContent(result, split, insight);
+
+        // Store content before appending the copy link so the link
+        // itself doesn't appear in the copied text.
+        this._clipboardTexts.set(word, md.value);
+
+        const encodedArg = encodeURIComponent(JSON.stringify(word));
+        md.appendMarkdown(
+            `\n\n[📋 Copy to Clipboard](command:saropaLints.packageVibrancy.copyHoverToClipboard?${encodedArg})`,
         );
+
+        return new vscode.Hover(md, wordRange);
     }
 }
 

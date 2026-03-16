@@ -25,6 +25,14 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 
 ---
 
+## [9.4.2]
+
+### Added
+
+- **Extension** â€” copy-to-clipboard link on package vibrancy hover tooltip; copies full package info as markdown
+
+---
+
 ## [9.4.1]
 
 _Housekeeping: plugging minor gaps carried over from the Package Vibrancy merge._

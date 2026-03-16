@@ -533,6 +533,10 @@
         "command": "saropaLints.packageVibrancy.compareSelected",
         "title": "Compare Selected Packages",
         "icon": "$(diff)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.copyHoverToClipboard",
+        "title": "Saropa: Copy Package Info"
       }
     ],
     "menus": {

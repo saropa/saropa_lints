@@ -465,6 +465,17 @@ function registerCommands(
             'saropaLints.packageVibrancy.comparePackages',
             () => runComparePackages(targets.cache),
         ),
+        vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.copyHoverToClipboard',
+            async (packageName: string) => {
+                const text = targets.hover.getClipboardText(packageName);
+                if (!text) { return; }
+                await vscode.env.clipboard.writeText(text);
+                vscode.window.showInformationMessage(
+                    `Copied ${packageName} info to clipboard`,
+                );
+            },
+        ),
     );
 }
 

@@ -138,4 +138,34 @@ describe('VibrancyHoverProvider', () => {
         const md = hover!.contents as unknown as vscode.MarkdownString;
         assert.ok(!md.value.includes('Unused'));
     });
+
+    it('should include copy-to-clipboard command link', () => {
+        provider.updateResults([makeResult('http', 85)]);
+        const doc = makeMockDocument('  http: ^1.0.0');
+        const hover = provider.provideHover(doc, new vscode.Position(0, 2));
+        const md = hover!.contents as unknown as vscode.MarkdownString;
+        assert.ok(md.value.includes('copyHoverToClipboard'));
+    });
+
+    it('should store clipboard text without the copy link', () => {
+        provider.updateResults([makeResult('http', 85)]);
+        const doc = makeMockDocument('  http: ^1.0.0');
+        provider.provideHover(doc, new vscode.Position(0, 2));
+        const clipText = provider.getClipboardText('http');
+        assert.ok(clipText, 'clipboard text should be stored');
+        // Clipboard text should not contain the copy command link itself.
+        assert.ok(!clipText!.includes('copyHoverToClipboard'));
+        // But should contain the actual hover content.
+        assert.ok(clipText!.includes('pub.dev/packages/http'));
+    });
+
+    it('should clear clipboard texts on updateResults', () => {
+        provider.updateResults([makeResult('http', 85)]);
+        const doc = makeMockDocument('  http: ^1.0.0');
+        provider.provideHover(doc, new vscode.Position(0, 2));
+        assert.ok(provider.getClipboardText('http'));
+        // Rescan clears stale clipboard entries.
+        provider.updateResults([]);
+        assert.strictEqual(provider.getClipboardText('http'), undefined);
+    });
 });
