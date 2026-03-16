@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { normalizePath } from './pathUtils';
 import { readViolations } from './violationsReader';
+import { getProjectRoot } from './projectRoot';
 
 let codeLensChangeEmitter: vscode.EventEmitter<void> | undefined;
 
@@ -25,7 +26,7 @@ export function registerCodeLensProvider(context: vscode.ExtensionContext): void
       document: vscode.TextDocument,
       _token: vscode.CancellationToken,
     ): vscode.ProviderResult<vscode.CodeLens[]> {
-      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const root = getProjectRoot();
       if (!root || document.languageId !== 'dart') return [];
 
       const data = readViolations(root);

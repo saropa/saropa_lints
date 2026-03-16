@@ -3,26 +3,51 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 Dates are not included in version headers — [pub.dev](https://pub.dev/packages/saropa_lints/changelog) displays publish dates separately.
 
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 6.2.0.
 
-|                 |                                                                                                         |
-| --------------- | ------------------------------------------------------------------------------------------------------- |
-| **Package**     | [pub.dev/packages/saropa_lints](https://pub.dev/packages/saropa_lints)                                  |
-| **Score**       | [pub.dev/packages/saropa_lints/score](https://pub.dev/packages/saropa_lints/score)                      |
-| **Changelog**   | [pub.dev/packages/saropa_lints/changelog](https://pub.dev/packages/saropa_lints/changelog)              |
-| **CI**          | [github.com/saropa/saropa_lints/actions](https://github.com/saropa/saropa_lints/actions)                |
-| **Releases**    | [github.com/saropa/saropa_lints/releases](https://github.com/saropa/saropa_lints/releases)              |
-| **Marketplace** | [marketplace.visualstudio.com](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints) |
-| **Open VSX**    | [open-vsx.org](https://open-vsx.org/extension/saropa/saropa-lints)                                      |
+**Package** — [pub.dev / packages / saropa_lints](https://pub.dev/packages/saropa_lints)
 
-Each version (and [Unreleased]) has a short commentary line in plain language—what this release is about for humans. Only discuss user-facing features; vary the phrasing.
+**Score** — [pub.dev / packages / saropa_lints / score](https://pub.dev/packages/saropa_lints/score)
+
+**CI** — [github.com / saropa / saropa_lints / actions](https://github.com/saropa/saropa_lints/actions)
+
+**Releases** — [github.com / saropa / saropa_lints / releases](https://github.com/saropa/saropa_lints/releases)
+
+**VS Code Marketplace** — [marketplace.visualstudio.com / items ? itemName=saropa.saropa-lints](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints)
+
+**Open VSX Registry** — [open-vsx.org / extension / saropa / saropa-lints](https://open-vsx.org/extension/saropa/saropa-lints)
+
+Each version (and [Unreleased]) has a short commentary line in plain language — what this release is about for humans. Only discuss user-facing features; vary the phrasing.
 
 ---
 
-## [Unreleased]
+## [9.2.0]
+
+Extension reliability and subdirectory project support.
+
+### Fixed
+
+- **Extension (CRITICAL):** Fixed YAML corruption in `ensureSaropaLintsInPubspec()` — regex backtracking placed the dependency on the same line as `dev_dependencies:`, producing invalid YAML that caused `dart run saropa_lints:init` to fail on every project
+- **Extension:** Fixed `DEFAULT_VERSION` from stale `^8.0.0` to `^9.1.0`
+- **Extension:** Fixed `fs` import shadowing in OWASP export handler (dynamic `import('fs')` shadowed static `import * as fs`)
+- **Extension:** Fixed `package_config.json` verification to match exact `"saropa_lints"` instead of substring
+- **Extension:** Removed unreachable fallback branch in inline annotations path computation
+
+### Added
+
+- **Extension:** Subdirectory pubspec detection — projects with `pubspec.yaml` one level deep (e.g. `game/pubspec.yaml`) are now discovered automatically
+- **Extension:** Centralized project root discovery (`projectRoot.ts`) with per-session caching
+- **Extension:** Workspace folder change listener invalidates cached project root
+- **Extension:** Added `workspaceContains:*/pubspec.yaml` activation event
+
+### Changed
+
+- **Extension:** All 13 source files now use `getProjectRoot()` instead of scattering `workspaceFolders[0]` references
+- **Extension:** Line-based YAML insertion preserves original CRLF/LF line endings
 
 ---
 

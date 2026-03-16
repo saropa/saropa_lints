@@ -26,6 +26,7 @@ import {
   clearSuppressions,
 } from '../suppressionsStore';
 import { normalizeOwaspId } from './securityPostureTree';
+import { getProjectRoot } from '../projectRoot';
 
 const SEVERITY_ORDER = ['error', 'warning', 'info'] as const;
 const DEFAULT_PAGE_SIZE = 100;
@@ -205,7 +206,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   }
 
   hasViolations(): boolean {
-    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const root = getProjectRoot();
     return root ? hasViolations(root) : false;
   }
 
@@ -223,7 +224,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
 
   /** Rule names that have violations in current data (for Filter by rule). */
   getRuleNamesFromData(): string[] {
-    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const root = getProjectRoot();
     if (!root) return [];
     const data = readViolations(root);
     const violations = data?.violations ?? [];
@@ -243,7 +244,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     totalUnfiltered: number;
     filteredCount: number;
   } {
-    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const root = getProjectRoot();
     let totalUnfiltered = this.totalUnfiltered;
     let filteredCount = 0;
     if (this.cachedIndex) {
@@ -420,7 +421,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   }
 
   getTreeItem(element: IssueTreeNode): vscode.TreeItem {
-    const wsRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? '';
+    const wsRoot = getProjectRoot() ?? '';
     if (element.kind === 'placeholder') {
       const item = new vscode.TreeItem(
         element.label,
@@ -570,7 +571,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   }
 
   async getChildren(element?: IssueTreeNode): Promise<IssueTreeNode[]> {
-    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const root = getProjectRoot();
     if (!root) return [];
 
     const data = readViolations(root);
@@ -971,7 +972,7 @@ export function registerIssueCommands(
         return;
       }
       const v = (element as ViolationItem).violation;
-      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const root = getProjectRoot();
       if (!root) return;
 
       // D4: Estimate score delta before applying fix.
@@ -1005,7 +1006,7 @@ export function registerIssueCommands(
       if (!element || typeof element !== 'object' || !('kind' in element) ||
           (element as IssueTreeNode).kind !== 'file') return;
       const fileNode = element as FileItem;
-      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const root = getProjectRoot();
       if (!root) return;
 
       const data = readViolations(root);
