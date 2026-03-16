@@ -1970,7 +1970,7 @@ class RequireWssOverWsRule extends SaropaLintRule {
 ///
 /// Since: v2.3.3 | Updated: v4.14.0 | Rule version: v4
 ///
-/// Alias: ios_camera_permission, image_picker_plist
+/// Alias: ios_camera_permission
 ///
 /// Camera access via image_picker requires NSCameraUsageDescription in
 /// Info.plist. Only fires when `ImageSource.camera` is actually used in
