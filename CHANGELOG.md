@@ -27,6 +27,12 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ## [Unreleased]
 
+### Fixed
+
+- **Publish (CRITICAL):** Fixed extension never reaching VS Code Marketplace after v9.0.2 — `run_extension_package()` used `next(glob("*.vsix"))` which returned the stale 9.0.2 `.vsix` (alphabetically before 9.1.0/9.2.0) instead of the newly created one; now deletes old `.vsix` files before packaging and looks for the expected filename first
+- **Publish:** Changed extension Marketplace publish prompt default from No to Yes (`[Y/n]`) — previous default silently skipped publishing with no warning
+- **Publish:** Replaced misleading "package already published" error messages with clear descriptions of what actually failed
+
 ### Added
 
 - **Extension:** "About Saropa Lints" screen accessible from Overview `...` menu and command palette — shows extension version (for deployment verification) and full company/product info

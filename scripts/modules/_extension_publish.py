@@ -95,9 +95,20 @@ def run_extension_compile(project_dir: Path) -> bool:
     return True
 
 
-def run_extension_package(project_dir: Path) -> Path | None:
-    """Package .vsix with vsce. Returns path to .vsix or None on failure."""
+def run_extension_package(project_dir: Path, version: str) -> Path | None:
+    """Package .vsix with vsce. Returns path to .vsix or None on failure.
+
+    Removes stale .vsix files first so the glob cannot return an old
+    version (root cause of 9.1.0/9.2.0 never reaching the Marketplace).
+    """
     ext_dir = _extension_dir(project_dir)
+
+    # Remove stale .vsix files so the post-package glob only finds the
+    # newly created file.  Without this, next(glob("*.vsix")) could
+    # return an older .vsix that sorts before the new one alphabetically.
+    for old_vsix in ext_dir.glob("*.vsix"):
+        old_vsix.unlink()
+
     r = run_command(
         ["npx", "@vscode/vsce", "package", "--no-dependencies"],
         ext_dir,
@@ -111,8 +122,15 @@ def run_extension_package(project_dir: Path) -> Path | None:
         if r.stdout:
             print_error(r.stdout.strip())
         return None
-    vsix = next(ext_dir.glob("*.vsix"), None)
-    return vsix
+
+    # Use the expected filename so we never accidentally pick up the
+    # wrong file even if something else created a .vsix.
+    expected = ext_dir / f"saropa-lints-{version}.vsix"
+    if expected.is_file():
+        return expected
+
+    # Fallback: grab whatever vsce created (name may differ).
+    return next(ext_dir.glob("*.vsix"), None)
 
 
 def install_extension(vsix_path: Path) -> bool:
@@ -236,7 +254,7 @@ def package_extension(project_dir: Path, version: str) -> Path | None:
         print_warning("Root CHANGELOG.md not found; extension .vsix will have no changelog.")
     if not run_extension_compile(project_dir):
         return None
-    vsix = run_extension_package(project_dir)
+    vsix = run_extension_package(project_dir, version)
     if vsix:
         print_success(f"Packaged: {vsix.name}")
     return vsix
