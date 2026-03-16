@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 import { readViolations } from '../violationsReader';
 import { loadHistory, getTrendSummary, getScoreTrendSummary, findPreviousScore, detectScoreRegression } from '../runHistory';
 import { computeHealthScore, formatScoreDelta } from '../healthScore';
+import { getProjectRoot } from '../projectRoot';
 
 /** C1: Format an ISO timestamp as a human-readable relative time. */
 function formatTimeAgo(iso: string): string {
@@ -59,7 +60,7 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
     // C5: Return empty array so VS Code's viewsWelcome content renders instead.
     if (!enabled) return [];
 
-    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const root = getProjectRoot();
     const data = root ? readViolations(root) : null;
     const total = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
     const critical = data?.summary?.byImpact?.critical ?? 0;

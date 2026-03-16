@@ -7,6 +7,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { readViolations, Violation } from '../violationsReader';
+import { getProjectRoot } from '../projectRoot';
 
 /**
  * Impact weights matching healthScore.ts so that risk ranking is
@@ -129,7 +130,7 @@ export class FileRiskTreeProvider implements vscode.TreeDataProvider<FileRiskNod
     const cfg = vscode.workspace.getConfiguration('saropaLints');
     if (!(cfg.get<boolean>('enabled', false) ?? false)) return [];
 
-    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const root = getProjectRoot();
     if (!root) return [];
 
     const data = readViolations(root);

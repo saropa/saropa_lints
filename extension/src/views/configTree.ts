@@ -9,6 +9,7 @@
 
 import * as vscode from 'vscode';
 import { readPubspec } from '../pubspecReader';
+import { getProjectRoot } from '../projectRoot';
 import { readViolations } from '../violationsReader';
 import {
   type ConfigTreeNode,
@@ -65,7 +66,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     ];
 
     // Detected platform/packages from pubspec.
-    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const root = getProjectRoot();
     if (root) {
       const pubspec = readPubspec(root);
       const parts: string[] = [];

@@ -11,7 +11,9 @@
  */
 
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { readViolations, Violation, ViolationsData } from './violationsReader';
+import { getProjectRoot } from './projectRoot';
 
 // --- Decoration types (one per severity for VS Code perf) ---
 
@@ -91,16 +93,16 @@ export function updateAnnotationsForEditor(editor: vscode.TextEditor): void {
 
   if (!annotationsEnabled) return;
 
-  const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const root = getProjectRoot();
   if (!root) return;
 
   // Use cached data to avoid disk I/O on every editor switch.
   const data = getCachedViolations(root);
   if (!data?.violations) return;
 
-  // Normalize both paths to forward slashes for cross-platform comparison.
-  const editorRelative = vscode.workspace.asRelativePath(editor.document.uri, false)
-    .replace(/\\/g, '/');
+  // Compute path relative to project root (where violations.json lives),
+  // not workspace root — these differ when pubspec is in a subdirectory.
+  const editorRelative = path.relative(root, editor.document.uri.fsPath).replace(/\\/g, '/');
 
   // Filter violations for this file.
   const fileViolations = data.violations.filter((v) => {

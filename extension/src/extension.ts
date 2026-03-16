@@ -34,6 +34,7 @@ import { registerInlineAnnotations, updateAnnotationsForAllEditors, invalidateAn
 import { writeRuleOverrides, removeRuleOverrides } from './configWriter';
 import { logReport, logSection, flushReport } from './reportWriter';
 import { generateOwaspReport } from './owaspExport';
+import { getProjectRoot, invalidateProjectRoot } from './projectRoot';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -45,7 +46,7 @@ function updateContext(enabled: boolean, hasViolations: boolean) {
 }
 
 function updateIssuesBadge(view: vscode.TreeView<unknown>, issuesProvider: IssuesTreeProvider) {
-  const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const root = getProjectRoot();
   if (!root) return;
   const data = readViolations(root);
   const total = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
@@ -63,8 +64,9 @@ function updateIssuesBadge(view: vscode.TreeView<unknown>, issuesProvider: Issue
 export function activate(context: vscode.ExtensionContext): void {
   // Detect whether this workspace is a Dart/Flutter project so the UI can
   // show appropriate welcome content instead of a misleading "Enable" button.
-  const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  const isDartProject = root ? fs.existsSync(path.join(root, 'pubspec.yaml')) : false;
+  // getProjectRoot() searches workspace root then one-level-deep subdirectories.
+  const root = getProjectRoot();
+  const isDartProject = root !== undefined;
   void vscode.commands.executeCommand('setContext', 'saropaLints.isDartProject', isDartProject);
 
   const cfg = getConfig();
@@ -163,8 +165,17 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
   );
 
+  // Invalidate cached project root when workspace folders change so the
+  // extension re-discovers pubspec.yaml in the new layout.
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeWorkspaceFolders(() => {
+      invalidateProjectRoot();
+      refreshAll();
+    }),
+  );
+
   const violationsPath = (): string | null => {
-    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const root = getProjectRoot();
     return root ? path.join(root, 'reports', '.saropa_lints', 'violations.json') : null;
   };
   // Debounce refresh when violations.json changes to avoid rapid successive updates.
@@ -175,7 +186,7 @@ export function activate(context: vscode.ExtensionContext): void {
       refreshDebounceTimer = undefined;
       // W5/W6/H1: Record snapshot BEFORE refreshing views so tree providers
       // see the updated history (avoids stale findPreviousScore reads).
-      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const root = getProjectRoot();
       if (root) {
         const data = readViolations(root);
         if (data) {
@@ -273,7 +284,7 @@ export function activate(context: vscode.ExtensionContext): void {
     // Main status bar: Health Score when available, else On/Off state.
     if (en) {
       // Use pre-loaded data when supplied; otherwise read from disk.
-      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const root = getProjectRoot();
       const data = preloadedData ?? (root ? readViolations(root) : null);
       const health = data ? computeHealthScore(data) : null;
 
@@ -325,7 +336,7 @@ export function activate(context: vscode.ExtensionContext): void {
       updateContext(true, issuesProvider.hasViolations());
 
       // I5: Record snapshot before refreshing views so Overview sees fresh history.
-      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const root = getProjectRoot();
       const data = root ? readViolations(root) : null;
       if (data) {
         appendSnapshot(context.workspaceState, data);
@@ -369,7 +380,7 @@ export function activate(context: vscode.ExtensionContext): void {
         // C7: Focus Overview after analysis to show Health Score delta.
         await vscode.commands.executeCommand('saropaLints.overview.focus');
         // C7: Include score in completion message when available.
-        const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        const root = getProjectRoot();
         const postData = root ? readViolations(root) : null;
         const health = postData ? computeHealthScore(postData) : null;
         const scoreMsg = health ? ` Score: ${health.score}` : '';
@@ -416,7 +427,7 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
     // Focus Issues view filtered to the active editor's file (e.g. from Problems view context menu).
     vscode.commands.registerCommand('saropaLints.focusIssuesForActiveFile', () => {
-      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const root = getProjectRoot();
       const editor = vscode.window.activeTextEditor;
       if (!root || !editor?.document?.uri) {
         void vscode.window.showInformationMessage('Open a file to show its issues in Saropa Lints.');
@@ -454,7 +465,7 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
     vscode.commands.registerCommand('saropaLints.setTier', async () => {
       // Capture pre-tier violation count for delta display in the notification.
-      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const root = getProjectRoot();
       const preTierTotal = root ? (readViolations(root)?.summary?.totalViolations ?? 0) : 0;
 
       const result = await runSetTier(context);
@@ -526,7 +537,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('saropaLints.showOutput', showOutputChannel),
     // D2: Export OWASP Compliance Report as markdown.
     vscode.commands.registerCommand('saropaLints.exportOwaspReport', async () => {
-      const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const root = getProjectRoot();
       if (!root) {
         vscode.window.showErrorMessage('No workspace folder open.');
         return;
@@ -537,7 +548,6 @@ export function activate(context: vscode.ExtensionContext): void {
         return;
       }
       const report = generateOwaspReport(data, root);
-      const fs = await import('fs');
       const folder = path.join(root, 'reports', '.saropa_lints');
       try { fs.mkdirSync(folder, { recursive: true }); } catch { /* exists */ }
       const filePath = path.join(folder, 'owasp_compliance_report.md');
@@ -672,7 +682,7 @@ export function activate(context: vscode.ExtensionContext): void {
         const isDisable = cmdId === 'saropaLints.disableRules';
         const rules = resolveRulesFromArg(arg);
         if (!rules || rules.length === 0) return;
-        const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        const root = getProjectRoot();
         if (!root) return;
         // Confirm for large groups (>5 rules).
         if (rules.length > 5) {

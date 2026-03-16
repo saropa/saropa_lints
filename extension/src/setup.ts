@@ -8,9 +8,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { spawnSync } from 'child_process';
 import { logReport, logSection, flushReport } from './reportWriter';
+import { getProjectRoot } from './projectRoot';
 
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
-const DEFAULT_VERSION = '^8.0.0';
+const DEFAULT_VERSION = '^9.1.0';
 
 const OUTPUT_CHANNEL_NAME = 'Saropa Lints';
 
@@ -19,12 +20,6 @@ let _outputChannel: vscode.OutputChannel | undefined;
 function getOutputChannel(): vscode.OutputChannel {
   if (!_outputChannel) _outputChannel = vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME);
   return _outputChannel;
-}
-
-function getWorkspaceRoot(): string | undefined {
-  const folder = vscode.workspace.workspaceFolders?.[0];
-  if (!folder) return undefined;
-  return folder.uri.fsPath;
 }
 
 function hasFlutterDep(pubspecPath: string): boolean {
@@ -49,17 +44,26 @@ function ensureSaropaLintsInPubspec(workspaceRoot: string): boolean {
     });
     return false;
   }
-  let content = fs.readFileSync(pubspecPath, 'utf-8');
-  if (content.includes(SAROPA_LINTS_DEV_DEP)) return true;
+  const content = fs.readFileSync(pubspecPath, 'utf-8');
 
-  const devDepsMatch = content.match(/(\s*dev_dependencies:\s*)(\n(?:\s{2}\S+.*\n)*)/);
-  if (devDepsMatch) {
-    const insert = `${devDepsMatch[1]}  ${SAROPA_LINTS_DEV_DEP}: ${DEFAULT_VERSION}\n${devDepsMatch[2]}`;
-    content = content.replace(devDepsMatch[0], insert);
+  // Precision check: match as an actual dependency entry, not a substring
+  // in comments or similarly-named packages like saropa_lints_extra.
+  if (/^\s{2}saropa_lints\s*:/m.test(content)) return true;
+
+  // Line-based insertion avoids regex backtracking bugs that corrupted YAML
+  // by placing the dependency on the same line as dev_dependencies:.
+  // Preserve original line endings (CRLF on Windows) to avoid git noise.
+  const eol = content.includes('\r\n') ? '\r\n' : '\n';
+  const lines = content.split(eol);
+  const devDepsIdx = lines.findIndex(l => /^dev_dependencies:\s*$/.test(l));
+  const entry = `  ${SAROPA_LINTS_DEV_DEP}: ${DEFAULT_VERSION}`;
+
+  if (devDepsIdx !== -1) {
+    lines.splice(devDepsIdx + 1, 0, entry);
   } else {
-    content = content.trimEnd() + `\n\ndev_dependencies:\n  ${SAROPA_LINTS_DEV_DEP}: ${DEFAULT_VERSION}\n`;
+    lines.push('', 'dev_dependencies:', entry);
   }
-  fs.writeFileSync(pubspecPath, content, 'utf-8');
+  fs.writeFileSync(pubspecPath, lines.join(eol), 'utf-8');
   return true;
 }
 
@@ -101,7 +105,7 @@ function runInWorkspace(workspaceRoot: string, command: string, args: string[], 
 }
 
 export async function runEnable(context: vscode.ExtensionContext): Promise<boolean> {
-  const workspaceRoot = getWorkspaceRoot();
+  const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
     vscode.window.showErrorMessage('No workspace folder open.');
     return false;
@@ -130,6 +134,18 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
         return;
       }
       logReport(`- Ran pub get (${pubCmd})`);
+
+      // Verify saropa_lints was actually resolved — corrupted pubspec YAML
+      // can cause pub get to exit 0 without resolving the package.
+      const pkgConfigPath = path.join(workspaceRoot, '.dart_tool', 'package_config.json');
+      if (!fs.existsSync(pkgConfigPath) || !fs.readFileSync(pkgConfigPath, 'utf-8').includes('"saropa_lints"')) {
+        logReport('- saropa_lints not found in package_config.json after pub get');
+        flushReport(workspaceRoot);
+        vscode.window.showErrorMessage(
+          'Saropa Lints: pub get succeeded but saropa_lints was not resolved. Check pubspec.yaml formatting.',
+        );
+        return;
+      }
 
       const cfg = vscode.workspace.getConfiguration('saropaLints');
       const tier = (cfg.get<string>('tier') ?? 'recommended').trim();
@@ -163,7 +179,7 @@ export async function runDisable(): Promise<void> {
 }
 
 export async function runAnalysis(context: vscode.ExtensionContext): Promise<boolean> {
-  const workspaceRoot = getWorkspaceRoot();
+  const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
     vscode.window.showErrorMessage('No workspace folder open.');
     return false;
@@ -196,7 +212,7 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
 }
 
 export async function runInitializeConfig(context: vscode.ExtensionContext, title?: string): Promise<boolean> {
-  const workspaceRoot = getWorkspaceRoot();
+  const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
     vscode.window.showErrorMessage('No workspace folder open.');
     return false;
@@ -229,7 +245,7 @@ export async function runInitializeConfig(context: vscode.ExtensionContext, titl
 }
 
 export async function openConfig(): Promise<void> {
-  const workspaceRoot = getWorkspaceRoot();
+  const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) return;
   const customPath = path.join(workspaceRoot, 'analysis_options_custom.yaml');
   const uri = fs.existsSync(customPath)
@@ -322,7 +338,7 @@ export async function runSetTier(context: vscode.ExtensionContext): Promise<Tier
     return null;
   }
 
-  const workspaceRoot = getWorkspaceRoot();
+  const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
     vscode.window.showErrorMessage('No workspace folder open.');
     return null;

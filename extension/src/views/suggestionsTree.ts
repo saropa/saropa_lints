@@ -8,6 +8,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { readViolations } from '../violationsReader';
 import { computeHealthScore, estimateScoreWithout } from '../healthScore';
+import { getProjectRoot } from '../projectRoot';
 
 class SuggestionItem extends vscode.TreeItem {
   constructor(
@@ -38,7 +39,7 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
   }
 
   async getChildren(): Promise<SuggestionItem[]> {
-    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const root = getProjectRoot();
     const items: SuggestionItem[] = [];
 
     const cfg = vscode.workspace.getConfiguration('saropaLints');

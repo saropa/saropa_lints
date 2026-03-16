@@ -12,6 +12,7 @@
 
 import * as vscode from 'vscode';
 import { readViolations, Violation } from '../violationsReader';
+import { getProjectRoot } from '../projectRoot';
 
 // --- OWASP category labels ---
 
@@ -124,7 +125,7 @@ export class SecurityPostureTreeProvider implements vscode.TreeDataProvider<Secu
   }
 
   getChildren(element?: SecurityTreeElement): SecurityTreeElement[] {
-    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const root = getProjectRoot();
     if (!root) return [];
 
     const cfg = vscode.workspace.getConfiguration('saropaLints');

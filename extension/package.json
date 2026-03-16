@@ -30,7 +30,8 @@
   ],
   "activationEvents": [
     "onLanguage:dart",
-    "workspaceContains:pubspec.yaml"
+    "workspaceContains:pubspec.yaml",
+    "workspaceContains:*/pubspec.yaml"
   ],
   "main": "./out/extension.js",
   "icon": "icon.png",

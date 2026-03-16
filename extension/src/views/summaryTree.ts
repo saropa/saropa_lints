@@ -5,6 +5,7 @@
 
 import * as vscode from 'vscode';
 import { readViolations } from '../violationsReader';
+import { getProjectRoot } from '../projectRoot';
 
 /** Stable id used for expandable nodes (By severity, By impact) so getChildren does not rely on label text. */
 class SummaryItem extends vscode.TreeItem {
@@ -37,7 +38,7 @@ export class SummaryTreeProvider implements vscode.TreeDataProvider<SummaryItem>
   }
 
   async getChildren(element?: SummaryItem): Promise<SummaryItem[]> {
-    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const root = getProjectRoot();
     // C5: Return empty for no-workspace and no-data so viewsWelcome renders.
     if (!root) return [];
 
