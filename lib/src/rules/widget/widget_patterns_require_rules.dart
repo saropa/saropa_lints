@@ -1966,40 +1966,30 @@ class RequireWssOverWsRule extends SaropaLintRule {
   }
 }
 
-/// Warns when `late` is used without guaranteed initialization.
+/// Reminder to add camera permission for image_picker on iOS.
 ///
-/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v2
+/// Since: v2.3.3 | Updated: v4.14.0 | Rule version: v4
 ///
-/// Alias: unsafe_late, late_init_risk
+/// Alias: ios_camera_permission, image_picker_plist
 ///
-/// `late` fields throw LateInitializationError if accessed before init.
-/// Only use late when you can guarantee initialization before access.
+/// Camera access via image_picker requires NSCameraUsageDescription in
+/// Info.plist. Only fires when `ImageSource.camera` is actually used in
+/// `pickImage()` or `pickVideo()` calls. Gallery-only usage does not
+/// require a camera permission and is not flagged.
 ///
 /// **BAD:**
 /// ```dart
-/// class MyWidget extends StatefulWidget {
-///   late String _data;  // May be accessed before init!
-///
-///   void fetchData() async {
-///     _data = await api.getData();
-///   }
-/// }
+/// // Missing NSCameraUsageDescription in Info.plist
+/// final photo = await picker.pickImage(source: ImageSource.camera);
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// class MyWidget extends StatefulWidget {
-///   String? _data;  // Null-safe alternative
+/// // Info.plist has NSCameraUsageDescription
+/// final photo = await picker.pickImage(source: ImageSource.camera);
 ///
-///   // Or use late only with guaranteed init in initState:
-///   late final AnimationController _controller;
-///
-///   @override
-///   void initState() {
-///     super.initState();
-///     _controller = AnimationController(vsync: this);  // Always runs
-///   }
-/// }
+/// // Gallery-only — no camera permission needed
+/// final photo = await picker.pickImage(source: ImageSource.gallery);
 /// ```
 class RequireImagePickerPermissionIosRule extends SaropaLintRule {
   RequireImagePickerPermissionIosRule() : super(code: _code);
@@ -2008,35 +1998,41 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
-  RuleCost get cost => RuleCost.medium;
+  RuleCost get cost => RuleCost.low;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     'require_image_picker_permission_ios',
-    '[require_image_picker_permission_ios] Missing Info.plist entries cause '
-        'app rejection by App Store or instant crash when accessing photos. {v3}',
+    '[require_image_picker_permission_ios] Using ImageSource.camera requires '
+        'NSCameraUsageDescription in Info.plist — missing it causes a crash '
+        'or App Store rejection. Gallery-only usage does not need this. {v4}',
     correctionMessage:
-        'Add NSPhotoLibraryUsageDescription and NSCameraUsageDescription to Info.plist.',
+        'Add NSCameraUsageDescription to Info.plist for camera access.',
     severity: DiagnosticSeverity.WARNING,
   );
+
+  /// Methods that accept an ImageSource parameter and can use the camera.
+  static const _cameraCapableMethods = {'pickImage', 'pickVideo'};
 
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Only report once per file using image_picker
-    bool reported = false;
+    // Fixed: previously fired on any image_picker import, causing false
+    // positives for gallery-only usage. Now only fires when
+    // ImageSource.camera is actually passed to pickImage/pickVideo.
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_cameraCapableMethods.contains(node.methodName.name)) return;
 
-    context.addImportDirective((ImportDirective node) {
-      if (reported) return;
-
-      final uri = node.uri.stringValue ?? '';
-      if (uri.contains('image_picker')) {
-        reporter.atNode(node);
-        reported = true;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'source') {
+          if (arg.expression.toSource() == 'ImageSource.camera') {
+            reporter.atNode(node);
+          }
+        }
       }
     });
   }
