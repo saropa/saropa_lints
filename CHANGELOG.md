@@ -27,6 +27,11 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ## [Unreleased]
 
+### Added
+
+- **Extension:** "About Saropa Lints" screen accessible from Overview `...` menu and command palette — shows extension version (for deployment verification) and full company/product info
+- **Extension:** `precompile` script auto-copies root `ABOUT_SAROPA.md` into extension bundle so the About screen stays in sync with the source of truth
+
 ---
 
 ## [9.2.0]
@@ -35,23 +40,23 @@ Extension reliability and subdirectory project support.
 
 ### Fixed
 
-- **Extension (CRITICAL):** Fixed YAML corruption in `ensureSaropaLintsInPubspec()` — regex backtracking placed the dependency on the same line as `dev_dependencies:`, producing invalid YAML that caused `dart run saropa_lints:init` to fail on every project
-- **Extension:** Fixed `DEFAULT_VERSION` from stale `^8.0.0` to `^9.1.0`
-- **Extension:** Fixed `fs` import shadowing in OWASP export handler (dynamic `import('fs')` shadowed static `import * as fs`)
-- **Extension:** Fixed `package_config.json` verification to match exact `"saropa_lints"` instead of substring
-- **Extension:** Removed unreachable fallback branch in inline annotations path computation
+- **IMPORTANT** Fixed YAML corruption in `ensureSaropaLintsInPubspec()` — regex backtracking placed the dependency on the same line as `dev_dependencies:`, producing invalid YAML that caused `dart run saropa_lints:init` to fail on every project
+- Fixed `DEFAULT_VERSION` from stale `^8.0.0` to `^9.1.0`
+- Fixed `fs` import shadowing in OWASP export handler (dynamic `import('fs')` shadowed static `import * as fs`)
+- Fixed `package_config.json` verification to match exact `"saropa_lints"` instead of substring
+- Removed unreachable fallback branch in inline annotations path computation
 
 ### Added
 
-- **Extension:** Subdirectory pubspec detection — projects with `pubspec.yaml` one level deep (e.g. `game/pubspec.yaml`) are now discovered automatically
-- **Extension:** Centralized project root discovery (`projectRoot.ts`) with per-session caching
-- **Extension:** Workspace folder change listener invalidates cached project root
-- **Extension:** Added `workspaceContains:*/pubspec.yaml` activation event
+- Subdirectory pubspec detection — projects with `pubspec.yaml` one level deep (e.g. `game/pubspec.yaml`) are now discovered automatically
+- Centralized project root discovery (`projectRoot.ts`) with per-session caching
+- Workspace folder change listener invalidates cached project root
+- Added `workspaceContains:*/pubspec.yaml` activation event
 
 ### Changed
 
-- **Extension:** All 13 source files now use `getProjectRoot()` instead of scattering `workspaceFolders[0]` references
-- **Extension:** Line-based YAML insertion preserves original CRLF/LF line endings
+- All 13 source files now use `getProjectRoot()` instead of scattering `workspaceFolders[0]` references
+- Line-based YAML insertion preserves original CRLF/LF line endings
 
 ---
 
@@ -59,7 +64,7 @@ Extension reliability and subdirectory project support.
 
 ### Changed
 
-- **Extension:** Welcome views and status bar now detect non-Dart workspaces and show appropriate guidance instead of a misleading "Enable" button
+- Welcome views and status bar now detect non-Dart workspaces and show appropriate guidance instead of a misleading "Enable" button
 
 ### Removed
 
