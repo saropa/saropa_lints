@@ -874,8 +874,9 @@ function updateFilteredTargets(
     targets.diagnostics.updateFamilySplits(splits);
     targets.diagnostics.updateOverrideAnalyses(lastOverrideAnalyses);
     targets.diagnostics.update(parsed.yamlUri, parsed.yamlContent, active);
-    // Fire callback to update the unified status bar in extension.ts
-    if (vibrancyStatusCallback) {
+    // Fire callback to update the unified status bar in extension.ts.
+    // Guard against empty results to avoid NaN from division by zero.
+    if (vibrancyStatusCallback && results.length > 0) {
         const avg = results.reduce((s, r) => s + r.score, 0) / results.length;
         const updateCount = results.filter(
             r => r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date',
