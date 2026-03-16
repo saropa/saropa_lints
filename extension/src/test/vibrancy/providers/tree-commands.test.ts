@@ -52,7 +52,8 @@ describe('tree-commands', () => {
     beforeEach(() => {
         sandbox = sinon.createSandbox();
         resetMocks();
-        registerTreeCommands(makeMockContext());
+        // Pass a mock tree provider that returns no children (leaf-only serialization in tests).
+        registerTreeCommands(makeMockContext(), { getChildren: () => [] });
     });
 
     afterEach(() => {
@@ -60,15 +61,18 @@ describe('tree-commands', () => {
     });
 
     describe('copyAsJson', () => {
-        it('should copy result JSON to clipboard', async () => {
+        it('should copy result JSON to clipboard in JsonNode envelope', async () => {
             const result = makeResult('http', 80);
             const item = new PackageItem(result);
             await vscode.commands.executeCommand(
                 'saropaLints.packageVibrancy.copyAsJson', item,
             );
             const parsed = JSON.parse(clipboardMock.text);
-            assert.strictEqual(parsed.package.name, 'http');
-            assert.strictEqual(parsed.score, 80);
+            // New format: { type, label, data: { package: { name }, score, ... } }
+            assert.strictEqual(parsed.type, 'vibrancyPackage');
+            assert.strictEqual(parsed.label, 'http');
+            assert.strictEqual(parsed.data.package.name, 'http');
+            assert.strictEqual(parsed.data.score, 80);
         });
 
         it('should show confirmation message', async () => {
@@ -77,15 +81,15 @@ describe('tree-commands', () => {
                 'saropaLints.packageVibrancy.copyAsJson', item,
             );
             assert.strictEqual(messageMock.infos.length, 1);
-            assert.ok(messageMock.infos[0].includes('bloc'));
+            assert.ok(messageMock.infos[0].includes('Vibrancy'));
         });
 
-        it('should show warning when invoked without valid package item', async () => {
+        it('should show warning when invoked without valid item', async () => {
             await vscode.commands.executeCommand(
                 'saropaLints.packageVibrancy.copyAsJson', undefined,
             );
             assert.strictEqual(messageMock.warnings.length, 1);
-            assert.ok(messageMock.warnings[0].includes('Packages view'));
+            assert.ok(messageMock.warnings[0].includes('No tree item'));
         });
     });
 

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { VibrancyResult, FamilySplit, OverrideAnalysis, DepGraphSummary, DependencySection, PackageInsight, BudgetResult } from '../types';
+import { VibrancyResult, VibrancyCategory, FamilySplit, OverrideAnalysis, DepGraphSummary, DependencySection, PackageInsight, BudgetResult } from '../types';
 import {
     PackageItem, DetailItem, GroupItem, SuppressedGroupItem,
     SuppressedPackageItem, buildGroupItems, SectionGroupItem,
@@ -11,14 +11,22 @@ import {
 import {
     FamilyConflictGroupItem, FamilySplitItem, buildFamilySplitDetails,
 } from './family-tree-items';
+import { ProblemItem, SuggestionItem, ProblemSummaryItem } from './problem-tree-items';
+import { ProblemRegistry } from '../problems/problem-registry';
+import {
+    determineBestAction, getUnlockedPackages, SuggestedAction,
+} from '../problems/problem-actions';
 import { arePrereleasesEnabled, getPrereleaseTagFilter } from '../ui/prerelease-toggle';
+import { VibrancyFilterManager, VibrancyFilterState, VibrancyViewMode } from './vibrancy-filter-state';
+import { ProblemSeverity, ProblemType } from '../problems/problem-types';
 
 type TreeNode =
     | PackageItem | GroupItem | DetailItem
     | SuppressedGroupItem | FamilyConflictGroupItem | FamilySplitItem
     | OverridesGroupItem | OverrideItem | DepGraphSummaryItem
     | SectionGroupItem | ActionItemsGroupItem | InsightItem
-    | BudgetGroupItem | BudgetItem | PrereleaseItem;
+    | BudgetGroupItem | BudgetItem | PrereleaseItem
+    | ProblemItem | SuggestionItem | ProblemSummaryItem;
 
 export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
     private _results: VibrancyResult[] = [];
@@ -28,6 +36,15 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
     private _insights: PackageInsight[] = [];
     private _budgetResults: BudgetResult[] = [];
     private _budgetSummary: string = '';
+
+    // Problem data (absorbed from ProblemTreeProvider)
+    private _registry: ProblemRegistry = new ProblemRegistry();
+    private _actionCache = new Map<string, SuggestedAction>();
+    private _unlocksCache = new Map<string, readonly string[]>();
+
+    // Filter state
+    private readonly _filterManager = new VibrancyFilterManager();
+
     private readonly _onDidChangeTreeData = new vscode.EventEmitter<void>();
     readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
@@ -68,6 +85,18 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
         this._onDidChangeTreeData.fire();
     }
 
+    /** Update problem registry and rebuild caches. */
+    updateRegistry(registry: ProblemRegistry): void {
+        this._registry = registry;
+        this._rebuildProblemCaches();
+        this._onDidChangeTreeData.fire();
+    }
+
+    /** Get the current problem registry. */
+    getRegistry(): ProblemRegistry {
+        return this._registry;
+    }
+
     /** Re-fire the change event to refresh the tree display. */
     refresh(): void {
         this._onDidChangeTreeData.fire();
@@ -77,10 +106,59 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
         return this._results;
     }
 
-    /** Get a single result by package name. Used when an Action Items (InsightItem) selection should sync the Package Details panel. */
+    /** Get a single result by package name. */
     getResultByName(name: string): VibrancyResult | undefined {
         return this._results.find(r => r.package.name === name);
     }
+
+    // --- Filter API ---
+
+    setTextFilter(value: string): void {
+        if (this._filterManager.setTextFilter(value)) {
+            this._onDidChangeTreeData.fire();
+        }
+    }
+
+    setViewMode(mode: VibrancyViewMode): void {
+        if (this._filterManager.setViewMode(mode)) {
+            this._onDidChangeTreeData.fire();
+        }
+    }
+
+    setSeverityFilter(severities: ReadonlySet<ProblemSeverity>): void {
+        if (this._filterManager.setSeverityFilter(severities)) {
+            this._onDidChangeTreeData.fire();
+        }
+    }
+
+    setProblemTypeFilter(types: ReadonlySet<ProblemType>): void {
+        if (this._filterManager.setProblemTypeFilter(types)) {
+            this._onDidChangeTreeData.fire();
+        }
+    }
+
+    setCategoryFilter(categories: ReadonlySet<VibrancyCategory>): void {
+        if (this._filterManager.setCategoryFilter(categories)) {
+            this._onDidChangeTreeData.fire();
+        }
+    }
+
+    setSectionFilter(sections: ReadonlySet<DependencySection>): void {
+        if (this._filterManager.setSectionFilter(sections)) {
+            this._onDidChangeTreeData.fire();
+        }
+    }
+
+    getFilterState(): VibrancyFilterState {
+        return this._filterManager.getState();
+    }
+
+    clearFilters(): void {
+        this._filterManager.clearAll();
+        this._onDidChangeTreeData.fire();
+    }
+
+    // --- Tree data ---
 
     getTreeItem(element: TreeNode): vscode.TreeItem {
         return element;
@@ -122,25 +200,12 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
             );
         }
         if (element instanceof SectionGroupItem) {
-            return element.results.map(r => new PackageItem(r));
+            return element.results.map(
+                r => this._buildPackageItem(r),
+            );
         }
         if (element instanceof PackageItem) {
-            const children: TreeNode[] = [];
-            if (arePrereleasesEnabled() && element.result.latestPrerelease) {
-                const tagFilter = getPrereleaseTagFilter();
-                const tag = element.result.prereleaseTag;
-                const passesFilter = tagFilter.length === 0
-                    || (tag && tagFilter.some(f => f.toLowerCase() === tag.toLowerCase()));
-                if (passesFilter) {
-                    children.push(new PrereleaseItem(
-                        element.result.package.name,
-                        element.result.latestPrerelease,
-                        element.result.prereleaseTag,
-                    ));
-                }
-            }
-            children.push(...buildGroupItems(element.result));
-            return children;
+            return this._buildPackageChildren(element);
         }
         if (element instanceof GroupItem) {
             return element.children;
@@ -150,6 +215,13 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
 
     private _buildRootChildren(): TreeNode[] {
         const items: TreeNode[] = [];
+
+        // Problem summary at the top (severity counts bar)
+        const totalProblems = this._registry.totalCount;
+        if (totalProblems > 0) {
+            const counts = this._registry.countBySeverity();
+            items.push(new ProblemSummaryItem(counts.high, counts.medium, counts.low));
+        }
 
         const configuredBudgets = this._budgetResults.filter(
             r => r.status !== 'unconfigured',
@@ -172,17 +244,20 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
                 new FamilyConflictGroupItem(this._familySplits),
             );
         }
+
+        // Apply suppression, then filters
         const suppressed = this._getSuppressedSet();
         const active = this._results.filter(
             r => !suppressed.has(r.package.name),
         );
+        const filtered = this._filterManager.filterResults(active, this._registry);
 
         const grouping = this._getTreeGrouping();
         if (grouping === 'section') {
-            this._buildSectionGroups(active, items);
+            this._buildSectionGroups(filtered, items);
         } else {
-            for (const r of active) {
-                items.push(new PackageItem(r));
+            for (const r of filtered) {
+                items.push(this._buildPackageItem(r));
             }
         }
 
@@ -191,6 +266,63 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
             items.push(new SuppressedGroupItem(suppressedCount));
         }
         return items;
+    }
+
+    /** Build a PackageItem with its problem count attached. */
+    private _buildPackageItem(result: VibrancyResult): PackageItem {
+        const problemCount = this._registry.getForPackage(result.package.name).length;
+        return new PackageItem(result, problemCount);
+    }
+
+    /** Build children for a package: problems + suggestion + prerelease + detail groups. */
+    private _buildPackageChildren(element: PackageItem): TreeNode[] {
+        const children: TreeNode[] = [];
+        const pkgName = element.result.package.name;
+
+        // Problem items for this package
+        const problems = this._registry.getForPackage(pkgName);
+        for (const problem of problems) {
+            children.push(new ProblemItem(problem, pkgName));
+        }
+
+        // Suggested action (if any problems exist)
+        const action = this._actionCache.get(pkgName);
+        if (action && action.type !== 'none') {
+            const unlocks = this._unlocksCache.get(pkgName) ?? [];
+            children.push(new SuggestionItem(action, unlocks, pkgName));
+        }
+
+        // Prerelease item (existing logic)
+        if (arePrereleasesEnabled() && element.result.latestPrerelease) {
+            const tagFilter = getPrereleaseTagFilter();
+            const tag = element.result.prereleaseTag;
+            const passesFilter = tagFilter.length === 0
+                || (tag && tagFilter.some(f => f.toLowerCase() === tag.toLowerCase()));
+            if (passesFilter) {
+                children.push(new PrereleaseItem(
+                    pkgName,
+                    element.result.latestPrerelease,
+                    element.result.prereleaseTag,
+                ));
+            }
+        }
+
+        // Detail groups (Version, Update, Community, etc.)
+        children.push(...buildGroupItems(element.result));
+        return children;
+    }
+
+    private _rebuildProblemCaches(): void {
+        this._actionCache.clear();
+        this._unlocksCache.clear();
+
+        for (const pkgProblems of this._registry.getAllSortedByPriority()) {
+            const action = determineBestAction(pkgProblems.problems, []);
+            this._actionCache.set(pkgProblems.package, action);
+
+            const unlocks = getUnlockedPackages(pkgProblems.package, this._registry);
+            this._unlocksCache.set(pkgProblems.package, unlocks);
+        }
     }
 
     private _getTreeGrouping(): 'none' | 'section' {

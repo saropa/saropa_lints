@@ -161,6 +161,8 @@ export function renderTreeItem(node: ConfigTreeNode): vscode.TreeItem {
       const item = new vscode.TreeItem(node.label, vscode.TreeItemCollapsibleState.None);
       item.description = node.description;
       if (node.commandId) item.command = { command: node.commandId, title: node.label, arguments: [] };
+      // contextValue enables context menu actions (e.g. "Copy as JSON").
+      item.contextValue = 'configSetting';
       return item;
     }
     case 'triageGroup':
@@ -177,6 +179,8 @@ export function renderTreeItem(node: ConfigTreeNode): vscode.TreeItem {
       const item = new vscode.TreeItem(node.label, vscode.TreeItemCollapsibleState.None);
       item.description = node.description;
       item.iconPath = new vscode.ThemeIcon('pass', new vscode.ThemeColor('testing.iconPassed'));
+      // contextValue enables context menu actions (e.g. "Copy as JSON").
+      item.contextValue = 'triageInfo';
       return item;
     }
   }

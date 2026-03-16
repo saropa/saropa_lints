@@ -14,6 +14,7 @@ export const STATE_KEYS = {
     problemCount: `${PREFIX}.problemCount`,
     codeLensEnabled: `${PREFIX}.codeLensEnabled`,
     selectedPackage: `${PREFIX}.selectedPackage`,
+    hasFilter: `${PREFIX}.hasFilter`,
 } as const;
 
 /**
@@ -36,6 +37,7 @@ export class VibrancyStateManager implements vscode.Disposable {
     readonly problemCount: ContextState<number>;
     readonly codeLensEnabled: ContextState<boolean>;
     readonly selectedPackage: ContextState<string | null>;
+    readonly hasFilter: ContextState<boolean>;
 
     private readonly _onDidChangeScanning = new vscode.EventEmitter<boolean>();
     readonly onDidChangeScanning = this._onDidChangeScanning.event;
@@ -54,6 +56,7 @@ export class VibrancyStateManager implements vscode.Disposable {
         this.problemCount = new ContextState(STATE_KEYS.problemCount, 0);
         this.codeLensEnabled = new ContextState(STATE_KEYS.codeLensEnabled, codeLensDefault);
         this.selectedPackage = new ContextState(STATE_KEYS.selectedPackage, null);
+        this.hasFilter = new ContextState(STATE_KEYS.hasFilter, false);
     }
 
     /** Update state from scan results. Call after scan completes. */
@@ -105,6 +108,7 @@ export class VibrancyStateManager implements vscode.Disposable {
         this.updatableCount.reset(0);
         this.problemCount.reset(0);
         this.selectedPackage.reset(null);
+        this.hasFilter.reset(false);
     }
 
     /** Re-sync all state to VS Code context (useful after activation). */
@@ -116,6 +120,7 @@ export class VibrancyStateManager implements vscode.Disposable {
         this.problemCount.sync();
         this.codeLensEnabled.sync();
         this.selectedPackage.sync();
+        this.hasFilter.sync();
     }
 
     dispose(): void {

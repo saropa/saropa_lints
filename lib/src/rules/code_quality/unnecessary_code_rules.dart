@@ -3,7 +3,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import '../../ignore_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/unnecessary_code/comment_out_empty_spread_fix.dart';
 import '../../fixes/unnecessary_code/comment_out_unnecessary_constructor_fix.dart';
@@ -955,9 +954,7 @@ class NoEmptyBlockRule extends SaropaLintRule {
           }
         }
 
-        // Respect file- and node-level ignore (IgnoreUtils).
-        if (IgnoreUtils.isIgnoredForFile(context.fileContent, _name)) return;
-        if (IgnoreUtils.hasIgnoreComment(node, _name)) return;
+        // Ignore checks are handled centrally by SaropaDiagnosticReporter.
         reporter.atNode(node);
       }
     });

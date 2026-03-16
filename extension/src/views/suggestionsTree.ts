@@ -23,6 +23,7 @@ class SuggestionItem extends vscode.TreeItem {
       this.command = { command: commandId, title: label, arguments: args };
     }
     this.iconPath = new vscode.ThemeIcon('lightbulb');
+    this.contextValue = 'suggestionItem';
   }
 }
 

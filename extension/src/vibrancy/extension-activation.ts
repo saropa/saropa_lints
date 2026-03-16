@@ -17,7 +17,7 @@ import { DetailLogger, DETAIL_CHANNEL_NAME } from './services/detail-logger';
 import { exportReports, ReportMetadata } from './services/report-exporter';
 import { exportSbomReport } from './services/sbom-exporter';
 import { ScanLogger } from './services/scan-logger';
-import { VibrancyResult, isUnusedRemovalEligibleSection } from './types';
+import { VibrancyResult, VibrancyCategory, DependencySection, isUnusedRemovalEligibleSection } from './types';
 import { countByCategory } from './scoring/status-classifier';
 import { registerTreeCommands } from './providers/tree-commands';
 import { registerUpgradeCommand } from './providers/upgrade-command';
@@ -76,8 +76,8 @@ import {
 } from './services/ci-generator';
 import { CiPlatform, CiThresholds } from './types';
 import { ProblemRegistry, collectProblemsFromResults, CollectorContext } from './problems';
-import { ProblemTreeProvider, registerProblemTreeView } from './providers/problem-tree-provider';
 import { findPackageRange } from './services/pubspec-parser';
+import { ProblemSeverity, ProblemType, problemTypeLabel } from './problems/problem-types';
 
 let latestResults: VibrancyResult[] = [];
 let lastParsedDeps: ParsedDeps | null = null;
@@ -98,11 +98,15 @@ let detailChannel: vscode.OutputChannel | null = null;
 let saveTaskRunner: SaveTaskRunner | null = null;
 let registryService: RegistryService | null = null;
 const problemRegistry: ProblemRegistry = new ProblemRegistry();
-let problemTreeProvider: ProblemTreeProvider | null = null;
 
 /** Get the latest scan results (used by providers). */
 export function getLatestResults(): readonly VibrancyResult[] {
     return latestResults;
+}
+
+/** Get the pubspec.yaml URI from the last scan (used by navigation commands). */
+export function getScannedPubspecUri(): vscode.Uri | null {
+    return lastParsedDeps?.yamlUri ?? null;
 }
 
 /** Get the latest consolidated insights (used by providers). */
@@ -186,26 +190,10 @@ export function runActivation(context: vscode.ExtensionContext): void {
     detailLogger = new DetailLogger(detailChannel);
     context.subscriptions.push(detailChannel);
 
-    problemTreeProvider = new ProblemTreeProvider();
-    const problemTreeView = registerProblemTreeView(context, problemTreeProvider);
-    syncDetailOnSelection(problemTreeView, item => {
-        if ('pkgProblems' in (item as object)) {
-            return treeProvider.getResultByName(
-                (item as { pkgProblems: { package: string } }).pkgProblems.package,
-            );
-        }
-        // Child nodes (ProblemItem, SuggestionItem, HealthyPackageItem) carry the package name
-        if ('packageName' in (item as object)) {
-            return treeProvider.getResultByName(
-                (item as { packageName: string }).packageName,
-            );
-        }
-        return undefined;
-    });
-
     registerTreeView(context, treeProvider);
     registerProviders(context, hoverProvider, codeLensProvider, codeActionProvider);
     registerCommands(context, targets);
+    registerFilterCommands(context, treeProvider);
     registerTreeCommands(context, treeProvider, detailViewProvider, detailLogger);
     registerUpgradeCommand(context);
     registerAnnotateCommand(context);
@@ -291,6 +279,12 @@ function registerTreeView(
                 (item as { analysis: { entry: { name: string } } }).analysis.entry.name,
             );
         }
+        // Problem child nodes (ProblemItem, SuggestionItem) carry a packageName field
+        if ('packageName' in (item as object)) {
+            return provider.getResultByName(
+                (item as { packageName: string }).packageName,
+            );
+        }
         return undefined;
     });
 }
@@ -332,6 +326,142 @@ function registerProviders(
         ),
         vscode.languages.registerCodeLensProvider(
             pubspecSelector, codeLensProvider,
+        ),
+    );
+}
+
+/** Sync the hasFilter context key after any filter change. */
+function updateVibrancyFilterState(provider: VibrancyTreeProvider): void {
+    if (!stateManager) { return; }
+    const state = provider.getFilterState();
+    stateManager.hasFilter.value = state.hasActiveFilters;
+}
+
+const ALL_SEVERITIES: ProblemSeverity[] = ['high', 'medium', 'low'];
+const ALL_PROBLEM_TYPES: ProblemType[] = [
+    'unhealthy', 'vulnerability', 'family-conflict', 'risky-transitive',
+    'blocked-upgrade', 'unused', 'license-risk', 'stale-override',
+];
+const ALL_CATEGORIES: VibrancyCategory[] = [
+    'vibrant', 'quiet', 'legacy-locked', 'end-of-life',
+];
+const ALL_SECTIONS: DependencySection[] = [
+    'dependencies', 'dev_dependencies', 'transitive',
+];
+const SECTION_LABELS: Record<DependencySection, string> = {
+    dependencies: 'Dependencies',
+    dev_dependencies: 'Dev Dependencies',
+    transitive: 'Transitive',
+};
+
+function registerFilterCommands(
+    context: vscode.ExtensionContext,
+    provider: VibrancyTreeProvider,
+): void {
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.search', async () => {
+                const current = provider.getFilterState().textFilter;
+                const value = await vscode.window.showInputBox({
+                    title: 'Search Packages',
+                    prompt: 'Filter by package name (case-insensitive substring)',
+                    value: current,
+                });
+                if (value !== undefined) {
+                    provider.setTextFilter(value);
+                    updateVibrancyFilterState(provider);
+                }
+            },
+        ),
+        vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.filterBySeverity', async () => {
+                const current = provider.getFilterState().severityFilter;
+                const picks = await vscode.window.showQuickPick(
+                    ALL_SEVERITIES.map(s => ({
+                        label: s.charAt(0).toUpperCase() + s.slice(1),
+                        picked: current.has(s),
+                        id: s,
+                    })),
+                    { canPickMany: true, title: 'Filter by Problem Severity' },
+                );
+                if (picks) {
+                    provider.setSeverityFilter(
+                        new Set(picks.map(p => p.id as ProblemSeverity)),
+                    );
+                    updateVibrancyFilterState(provider);
+                }
+            },
+        ),
+        vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.filterByProblemType', async () => {
+                const current = provider.getFilterState().problemTypeFilter;
+                const picks = await vscode.window.showQuickPick(
+                    ALL_PROBLEM_TYPES.map(t => ({
+                        label: problemTypeLabel(t),
+                        picked: current.has(t),
+                        id: t,
+                    })),
+                    { canPickMany: true, title: 'Filter by Problem Type' },
+                );
+                if (picks) {
+                    provider.setProblemTypeFilter(
+                        new Set(picks.map(p => p.id as ProblemType)),
+                    );
+                    updateVibrancyFilterState(provider);
+                }
+            },
+        ),
+        vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.filterByCategory', async () => {
+                const current = provider.getFilterState().categoryFilter;
+                const picks = await vscode.window.showQuickPick(
+                    ALL_CATEGORIES.map(c => ({
+                        label: c.charAt(0).toUpperCase() + c.slice(1).replace('-', ' '),
+                        picked: current.has(c),
+                        id: c,
+                    })),
+                    { canPickMany: true, title: 'Filter by Health Category' },
+                );
+                if (picks) {
+                    provider.setCategoryFilter(
+                        new Set(picks.map(p => p.id as VibrancyCategory)),
+                    );
+                    updateVibrancyFilterState(provider);
+                }
+            },
+        ),
+        vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.filterBySection', async () => {
+                const current = provider.getFilterState().sectionFilter;
+                const picks = await vscode.window.showQuickPick(
+                    ALL_SECTIONS.map(s => ({
+                        label: SECTION_LABELS[s],
+                        picked: current.has(s),
+                        id: s,
+                    })),
+                    { canPickMany: true, title: 'Filter by Dependency Section' },
+                );
+                if (picks) {
+                    provider.setSectionFilter(
+                        new Set(picks.map(p => p.id as DependencySection)),
+                    );
+                    updateVibrancyFilterState(provider);
+                }
+            },
+        ),
+        vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.showProblemsOnly', () => {
+                const current = provider.getFilterState().viewMode;
+                // Toggle between 'all' and 'problems-only'
+                provider.setViewMode(current === 'all' ? 'problems-only' : 'all');
+                updateVibrancyFilterState(provider);
+            },
+        ),
+        vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.clearFilters', () => {
+                provider.clearFilters();
+                updateVibrancyFilterState(provider);
+            },
         ),
     );
 }
@@ -730,13 +860,8 @@ function updateFilteredTargets(
     };
     collectProblemsFromResults(active, collectorContext, problemRegistry);
 
-    if (problemTreeProvider) {
-        problemTreeProvider.updateRegistry(problemRegistry);
-        const healthy = active.filter(
-            r => problemRegistry.getForPackage(r.package.name).length === 0,
-        );
-        problemTreeProvider.setHealthyPackages(healthy);
-    }
+    // Feed problem data into the unified tree provider
+    targets.tree.updateRegistry(problemRegistry);
 
     targets.tree.updateFamilySplits(splits);
     targets.tree.updateInsights(lastInsights);

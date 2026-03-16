@@ -92,12 +92,6 @@
           "when": "saropaLints.isDartProject"
         },
         {
-          "id": "saropaLints.packageVibrancy.problems",
-          "name": "Package Problems",
-          "icon": "$(warning)",
-          "when": "saropaLints.packageVibrancy.hasResults"
-        },
-        {
           "id": "saropaLints.packageVibrancy.details",
           "name": "Package Details",
           "type": "webview",
@@ -246,6 +240,41 @@
       {
         "command": "saropaLints.copyMessage",
         "title": "Copy message"
+      },
+      {
+        "command": "saropaLints.issues.copyAsJson",
+        "title": "Copy as JSON",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "saropaLints.config.copyAsJson",
+        "title": "Copy as JSON",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "saropaLints.summary.copyAsJson",
+        "title": "Copy as JSON",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "saropaLints.securityPosture.copyAsJson",
+        "title": "Copy as JSON",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "saropaLints.fileRisk.copyAsJson",
+        "title": "Copy as JSON",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "saropaLints.overview.copyAsJson",
+        "title": "Copy as JSON",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "saropaLints.suggestions.copyAsJson",
+        "title": "Copy as JSON",
+        "icon": "$(clippy)"
       },
       {
         "command": "saropaLints.applyFix",
@@ -537,6 +566,37 @@
       {
         "command": "saropaLints.packageVibrancy.copyHoverToClipboard",
         "title": "Saropa: Copy Package Info"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.search",
+        "title": "Saropa: Search Packages...",
+        "icon": "$(search)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.filterBySeverity",
+        "title": "Saropa: Filter by Severity..."
+      },
+      {
+        "command": "saropaLints.packageVibrancy.filterByProblemType",
+        "title": "Saropa: Filter by Problem Type..."
+      },
+      {
+        "command": "saropaLints.packageVibrancy.filterByCategory",
+        "title": "Saropa: Filter by Health..."
+      },
+      {
+        "command": "saropaLints.packageVibrancy.filterBySection",
+        "title": "Saropa: Filter by Section..."
+      },
+      {
+        "command": "saropaLints.packageVibrancy.showProblemsOnly",
+        "title": "Saropa: Show Problems Only",
+        "icon": "$(warning)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.clearFilters",
+        "title": "Saropa: Clear Filters",
+        "icon": "$(clear-all)"
       }
     ],
     "menus": {
@@ -630,6 +690,41 @@
           "command": "saropaLints.packageVibrancy.annotatePubspec",
           "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
           "group": "navigation@4"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.search",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
+          "group": "navigation@5"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.showProblemsOnly",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
+          "group": "navigation@6"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.clearFilters",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasFilter",
+          "group": "navigation@7"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.filterBySeverity",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
+          "group": "1_filter@1"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.filterByProblemType",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
+          "group": "1_filter@2"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.filterByCategory",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
+          "group": "1_filter@3"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.filterBySection",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
+          "group": "1_filter@4"
         },
         {
           "command": "saropaLints.packageVibrancy.suppressByCategory",
@@ -776,7 +871,7 @@
         },
         {
           "command": "saropaLints.packageVibrancy.copyAsJson",
-          "when": "viewItem =~ /vibrancyPackage/",
+          "when": "view == saropaLints.packageVibrancy.packages",
           "group": "navigation@4"
         },
         {
@@ -823,6 +918,41 @@
           "command": "saropaLints.packageVibrancy.updateToPrerelease",
           "when": "viewItem == vibrancyPrerelease",
           "group": "inline"
+        },
+        {
+          "command": "saropaLints.issues.copyAsJson",
+          "when": "view == saropaLints.issues && viewItem =~ /^(severity|folder|file|violation|group)$/",
+          "group": "9_copy@1"
+        },
+        {
+          "command": "saropaLints.config.copyAsJson",
+          "when": "view == saropaLints.config && viewItem =~ /^(configSetting|triageGroup|triageRule|triageInfo)$/",
+          "group": "9_copy@1"
+        },
+        {
+          "command": "saropaLints.summary.copyAsJson",
+          "when": "view == saropaLints.summary && viewItem == summaryItem",
+          "group": "9_copy@1"
+        },
+        {
+          "command": "saropaLints.securityPosture.copyAsJson",
+          "when": "view == saropaLints.securityPosture && viewItem =~ /^(securityGroup|securityCategory)$/",
+          "group": "9_copy@1"
+        },
+        {
+          "command": "saropaLints.fileRisk.copyAsJson",
+          "when": "view == saropaLints.fileRisk && viewItem =~ /^(fileRiskSummary|fileRiskFile)$/",
+          "group": "9_copy@1"
+        },
+        {
+          "command": "saropaLints.overview.copyAsJson",
+          "when": "view == saropaLints.overview && viewItem == overviewItem",
+          "group": "9_copy@1"
+        },
+        {
+          "command": "saropaLints.suggestions.copyAsJson",
+          "when": "view == saropaLints.suggestions && viewItem == suggestionItem",
+          "group": "9_copy@1"
         }
       ],
       "editor/title": [
@@ -879,6 +1009,34 @@
         },
         {
           "command": "saropaLints.packageVibrancy.compareSelected",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.issues.copyAsJson",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.config.copyAsJson",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.summary.copyAsJson",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.securityPosture.copyAsJson",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.fileRisk.copyAsJson",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.overview.copyAsJson",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.suggestions.copyAsJson",
           "when": "false"
         }
       ]

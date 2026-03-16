@@ -25,6 +25,12 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Extension** â€” "Copy as JSON" context menu on all tree views (Issues, Config, Summary, Security Posture, File Risk, Overview, Suggestions, Package Vibrancy) with recursive child serialization and multi-select support
+
 ## [9.4.2]
 
 ### Added
