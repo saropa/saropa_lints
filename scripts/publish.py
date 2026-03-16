@@ -24,7 +24,7 @@ Workflow:
     Step 14: Publish via GitHub Actions
     Step 15: Create GitHub release
     Step 16: Extension: sync version, package .vsix, optionally publish (Marketplace + Open VSX)
-    Post:    Bump version for next cycle (pubspec + [Unreleased])
+    Post:    Bump version for next cycle (pubspec)
 
 Run from project root: python scripts/publish.py. Prompts: full publish /
 audit only / fix doc comments / publish without audit / analyze only /
@@ -242,7 +242,6 @@ from scripts.modules._timing import StepTimer
 # Version regex, pubspec/changelog read/write, version parse/increment, display
 from scripts.modules._version_changelog import (
     _VERSION_RE,
-    add_unreleased_section,
     add_version_section,
     display_changelog,
     get_latest_changelog_version,
@@ -483,15 +482,19 @@ def main(
         )
         if not response.startswith("n"):
             install_extension(vsix)
-        # Publish to stores (default no)
+        # Publish to stores (default yes)
         response = (
             input(
-                "  Publish extension to Marketplace and Open VSX? [y/N] "
+                "  Publish extension to Marketplace and Open VSX? [Y/n] "
             )
             .strip()
             .lower()
         )
-        if response.startswith("y"):
+        if response.startswith("n"):
+            print_warning(
+                "Extension NOT published to Marketplace."
+            )
+        else:
             if not publish_extension(project_dir, vsix):
                 exit_with_error(
                     "Extension publish failed",
@@ -909,9 +912,9 @@ def main(
         # Mark success so final banner is printed and exit code stays 0
         succeeded = True
 
-        # --- Bump pubspec and add [Unreleased] in CHANGELOG for next cycle; commit if possible ---
+        # --- Bump pubspec for next cycle; commit if possible ---
         try:
-            # Timed step: bump pubspec to next version, add [Unreleased], commit
+            # Timed step: bump pubspec to next version, commit
             with timer.step("Version bump"):
                 next_version = increment_version(version)
                 set_version_in_pubspec(pubspec_path, next_version)
@@ -921,11 +924,9 @@ def main(
                 update_analysis_options_plugin_version(
                     project_dir, package_name, version,
                 )
-                add_unreleased_section(changelog_path)
                 if post_publish_commit(project_dir, next_version, branch):
                     print_success(
-                        f"Bumped to {next_version} with "
-                        f"[Unreleased] section"
+                        f"Bumped to {next_version}"
                     )
                 else:  # Commit failed (non-fatal)
                     print_warning(
@@ -949,21 +950,33 @@ def main(
                     )
                     if not response.startswith("n"):
                         install_extension(vsix)
-                    # Publish to stores (default no)
+                    # Publish to stores (default yes — too easy to
+                    # accidentally skip and leave the Marketplace stale).
                     response = (
                         input(
-                            "  Publish extension to Marketplace and Open VSX? [y/N] "
+                            "  Publish extension to Marketplace and Open VSX? [Y/n] "
                         )
                         .strip()
                         .lower()
                     )
-                    if response.startswith("y"):
+                    if response.startswith("n"):
+                        print_warning(
+                            "Extension NOT published to Marketplace. "
+                            "Run option 6 (extension only) to publish later."
+                        )
+                    else:
                         if publish_extension(project_dir, vsix):
                             extension_published = True
                         else:
-                            print_warning("Extension publish failed (package already published).")
+                            print_warning(
+                                "Extension publish to Marketplace/Open VSX failed. "
+                                "Check output above for details."
+                            )
                 else:
-                    print_warning("Extension package failed (package already published).")
+                    print_warning(
+                        "Extension packaging failed — .vsix was not created. "
+                        "Check compile errors above."
+                    )
 
         # --- Post-publish: open pub.dev page (convenience) ---
         try:
