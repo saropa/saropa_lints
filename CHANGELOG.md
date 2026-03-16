@@ -44,6 +44,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 - **Package Vibrancy** — `isDiscontinued` (objective pub.dev signal) now takes priority over known-issue overrides in the status classifier
 - **Package Vibrancy** — reclassified 71 known-issue entries from `end_of_life` to `caution` for packages that are actively maintained with verified publishers and high pub points (e.g. `animations`, `google_fonts`, `flutter_local_notifications`, `camera`, `dio`); these packages are now scored by the vibrancy algorithm instead of being force-classified as dead
 - **Package Vibrancy** — separated "Stale" from "End of Life": packages with score < 10 are now classified as `stale` (low maintenance activity) instead of `end-of-life`; the `end-of-life` label is reserved exclusively for packages that are discontinued on pub.dev, listed in known_issues as `end_of_life`, or archived on GitHub; new budget dimension `maxStale` and CI threshold `maxStale` added
+- **Extension** — removed "Saropa:" prefix from all vibrancy command titles in context menus and command palette; commands now read "Scan Dependencies", "Update All Dependencies", etc. instead of "Saropa: Scan Dependencies"
 
 ### Fixed
 
@@ -51,6 +52,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 - **Package Vibrancy** — clicking a problem child node (e.g. "Unhealthy") now navigates to the correct pubspec.yaml from the last scan instead of opening a random pubspec in a multi-root workspace
 - **Package Vibrancy** — added missing `stale` category handling in comparison view CSS, scan log output, CI threshold prompts, and CI generator templates
 - **Analyzer** — `// ignore:` and `// ignore_for_file:` comments now suppress violations in the extension's Issues tree and `violations.json`, not just in the editor; centralized ignore handling in `SaropaDiagnosticReporter` so all rules benefit without per-rule opt-in
+- **Package Vibrancy** — added missing `.warning` CSS class in detail-view styles; archived-repo row now renders with correct warning colour instead of inheriting default text colour
 
 ## [9.4.2]
 

@@ -1,0 +1,14 @@
+[
+    {
+        "number": 201,
+        "title": "Bump version to 1.2.0",
+        "merged_at": "2024-06-02T14:00:00Z",
+        "state": "closed"
+    },
+    {
+        "number": 202,
+        "title": "Add web platform support",
+        "merged_at": null,
+        "state": "closed"
+    }
+]

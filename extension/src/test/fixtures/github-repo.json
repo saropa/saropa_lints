@@ -1,0 +1,13 @@
+{
+    "full_name": "dart-lang/http",
+    "html_url": "https://github.com/dart-lang/http",
+    "stargazers_count": 890,
+    "open_issues_count": 42,
+    "updated_at": "2024-06-15T10:30:00Z",
+    "pushed_at": "2024-06-10T08:00:00Z",
+    "archived": false,
+    "license": {
+        "spdx_id": "BSD-3-Clause",
+        "name": "BSD 3-Clause \"New\" or \"Revised\" License"
+    }
+}
