@@ -31,6 +31,14 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 - **Extension** — copy-to-clipboard link on package vibrancy hover tooltip; copies full package info as markdown
 
+### Changed
+
+- **Extension** — Issues tree severity and folder nodes now display colored diagnostic icons (error/warning/info) instead of plain folder icons
+
+### Fixed
+
+- **Extension** — clicking a child node (problem, suggestion, or healthy package) in the Package Problems tree now shows the parent package's details instead of clearing the Package Details panel
+
 ---
 
 ## [9.4.1]
