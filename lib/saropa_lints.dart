@@ -2876,6 +2876,7 @@ Set<String> get rulesWithFixes {
   _ruleFactories;
   return _rulesWithFixesSet;
 }
+
 Set<String> _rulesWithFixesSet = const <String>{};
 
 Map<String, SaropaLintRule Function()> _buildRuleFactoriesMap() {

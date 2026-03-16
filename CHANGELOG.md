@@ -25,7 +25,9 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
-## [Unreleased]
+## [9.5.0]
+
+_Smarter dependency health — stale vs end-of-life separation, GitHub archived-repo detection, a unified vibrancy panel with filters, and copy-as-JSON across all tree views._
 
 ### Added
 
@@ -53,9 +55,11 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 - **Package Vibrancy** — clicking a problem child node (e.g. "Unhealthy") now navigates to the correct pubspec.yaml from the last scan instead of opening a random pubspec in a multi-root workspace
 - **Package Vibrancy** — added missing `stale` category handling in comparison view CSS, scan log output, CI threshold prompts, and CI generator templates
 - **Analyzer** — `// ignore:` and `// ignore_for_file:` comments now suppress violations in the extension's Issues tree and `violations.json`, not just in the editor; centralized ignore handling in `SaropaDiagnosticReporter` so all rules benefit without per-rule opt-in
-- **Package Vibrancy** — added missing `.warning` CSS class in detail-view styles; archived-repo row now renders with correct warning colour instead of inheriting default text colour
+- **Package Vibrancy** — added missing `.warning` CSS class in detail-view styles; archived-repo row now renders with correct warning color instead of inheriting default text color
 
 ## [9.4.2]
+
+_Quick polish: colored diagnostic icons in the Issues tree and clipboard support on vibrancy tooltips._
 
 ### Added
 

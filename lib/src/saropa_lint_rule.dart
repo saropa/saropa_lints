@@ -2709,8 +2709,7 @@ class SaropaDiagnosticReporter {
       return _cachedFileIgnored!;
     }
     _cachedFilePath = path;
-    _cachedFileIgnored =
-        IgnoreUtils.isIgnoredForFile(unit.content, _ruleName);
+    _cachedFileIgnored = IgnoreUtils.isIgnoredForFile(unit.content, _ruleName);
     return _cachedFileIgnored!;
   }
 
