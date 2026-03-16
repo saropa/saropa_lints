@@ -31,6 +31,16 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 - **Extension** — "Copy as JSON" context menu on all tree views (Issues, Config, Summary, Security Posture, File Risk, Overview, Suggestions, Package Vibrancy) with recursive child serialization and multi-select support
 
+### Changed
+
+- **Package Vibrancy** — merged Package Problems panel into Package Vibrancy; problems and suggested actions now appear as child nodes under each package instead of in a separate tree view
+- **Package Vibrancy** — added filter toolbar: search by name, filter by severity, problem type, health category, and dependency section; toggle problems-only view mode; clear all filters
+- **Package Vibrancy** — problem summary bar (severity counts) now appears at the top of the unified tree when problems exist
+
+- **Package Vibrancy** — added algorithmic guardrail to prevent editorial `end_of_life` overrides from condemning actively-maintained packages; if live pub.dev data shows a package has ≥130 pub points and was published within 18 months, the classification is capped at Legacy-Locked instead of End of Life
+- **Package Vibrancy** — `isDiscontinued` (objective pub.dev signal) now takes priority over known-issue overrides in the status classifier
+- **Package Vibrancy** — reclassified 71 known-issue entries from `end_of_life` to `caution` for packages that are actively maintained with verified publishers and high pub points (e.g. `animations`, `google_fonts`, `flutter_local_notifications`, `camera`, `dio`); these packages are now scored by the vibrancy algorithm instead of being force-classified as dead
+
 ### Fixed
 
 - **Analyzer** — `// ignore:` and `// ignore_for_file:` comments now suppress violations in the extension's Issues tree and `violations.json`, not just in the editor; centralized ignore handling in `SaropaDiagnosticReporter` so all rules benefit without per-rule opt-in
