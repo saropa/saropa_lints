@@ -2863,14 +2863,35 @@ final List<SaropaLintRule Function()> _allRuleFactories =
 late final Map<String, SaropaLintRule Function()> _ruleFactories =
     _buildRuleFactoriesMap();
 
+/// Rule names that have at least one quick-fix generator.
+///
+/// Computed alongside [_ruleFactories] during the same temporary-instance
+/// pass, so there is zero additional instantiation cost.
+/// Used by [ViolationExporter] to include fix availability in the JSON
+/// export, which the VS Code extension reads to disable "Apply fix" for
+/// rules without fixes.
+Set<String> get rulesWithFixes {
+  // Force lazy initialization of _ruleFactories (which populates this set).
+  // ignore: unnecessary_statements
+  _ruleFactories;
+  return _rulesWithFixesSet;
+}
+Set<String> _rulesWithFixesSet = const <String>{};
+
 Map<String, SaropaLintRule Function()> _buildRuleFactoriesMap() {
   final map = <String, SaropaLintRule Function()>{};
+  final fixes = <String>{};
   for (final factory in _allRuleFactories) {
-    final rule = factory(); // temporary instance to get name
-    map[rule.code.lowerCaseName] = factory;
+    final rule = factory(); // temporary instance to get name + fix info
+    final name = rule.code.lowerCaseName;
+    map[name] = factory;
+    if (rule.fixGenerators.isNotEmpty) {
+      fixes.add(name);
+    }
     // rule goes out of scope, can be GC'd
   }
 
+  _rulesWithFixesSet = fixes;
   return map;
 }
 
