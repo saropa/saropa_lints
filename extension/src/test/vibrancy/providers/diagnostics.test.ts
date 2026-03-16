@@ -129,6 +129,21 @@ describe('VibrancyDiagnostics', () => {
         assert.strictEqual(diags[0].severity, vscode.DiagnosticSeverity.Information);
     });
 
+    // Stale packages (score < 10) use Information severity and "Review" verb
+    it('should set Information severity for stale packages', () => {
+        const results = [makeResult('old_pkg', 5, 'stale')];
+        diagnostics.update(uri, PUBSPEC_CONTENT, results);
+        const diags = collection.get(uri)!;
+        assert.strictEqual(diags[0].severity, vscode.DiagnosticSeverity.Information);
+    });
+
+    it('should use Review verb for stale messages', () => {
+        const results = [makeResult('old_pkg', 5, 'stale')];
+        diagnostics.update(uri, PUBSPEC_CONTENT, results);
+        const diags = collection.get(uri)!;
+        assert.strictEqual(diags[0].message, 'Review old_pkg (1/10)');
+    });
+
     it('should use Deprecated label for end-of-life messages without replacement', () => {
         setTestConfig('saropaLints.packageVibrancy', 'endOfLifeDiagnostics', 'hint');
         const results = [makeResult('old_pkg', 5, 'end-of-life')];

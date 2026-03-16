@@ -779,7 +779,7 @@ async function runScanInner(targets: ScanTargets): Promise<void> {
             logger.info(
                 `Scan complete — ${logger.elapsedMs}ms — ` +
                 `vibrant:${counts.vibrant} quiet:${counts.quiet} ` +
-                `legacy:${counts.legacy} eol:${counts.eol}`,
+                `legacy:${counts.legacy} stale:${counts.stale} eol:${counts.eol}`,
             );
 
             publishResults(targets, results, parsed, depGraphSummary);
@@ -1326,6 +1326,17 @@ async function promptThresholds(
     });
     if (maxEol === undefined) { return undefined; }
 
+    const maxStale = await vscode.window.showInputBox({
+        title: 'Max Stale Packages',
+        prompt: 'Maximum number of stale packages allowed (low maintenance activity)',
+        value: String(suggested.maxStale),
+        validateInput: v => {
+            const n = parseInt(v, 10);
+            return isNaN(n) || n < 0 ? 'Enter a non-negative number' : undefined;
+        },
+    });
+    if (maxStale === undefined) { return undefined; }
+
     const maxLegacy = await vscode.window.showInputBox({
         title: 'Max Legacy-Locked Packages',
         prompt: 'Maximum number of legacy-locked packages allowed',
@@ -1361,6 +1372,7 @@ async function promptThresholds(
     if (!failOnVuln) { return undefined; }
 
     return {
+        maxStale: parseInt(maxStale, 10),
         maxEndOfLife: parseInt(maxEol, 10),
         maxLegacyLocked: parseInt(maxLegacy, 10),
         minAverageVibrancy: parseInt(minVibrancy, 10),

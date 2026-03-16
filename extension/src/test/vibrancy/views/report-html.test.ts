@@ -69,9 +69,11 @@ describe('buildReportHtml', () => {
             makeResult('a', 80, 'vibrant'),
             makeResult('b', 50, 'quiet'),
             makeResult('c', 20, 'legacy-locked'),
-            makeResult('d', 5, 'end-of-life'),
+            makeResult('d', 5, 'stale'),
+            makeResult('e', 0, 'end-of-life'),
         ]);
         assert.ok(html.includes('class="summary-card vibrant"'));
+        assert.ok(html.includes('class="summary-card stale"'));
         assert.ok(html.includes('class="summary-card eol"'));
     });
 

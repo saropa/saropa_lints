@@ -15,6 +15,7 @@ describe('indicator-config', () => {
             assert.strictEqual(config.vibrant, '🟢');
             assert.strictEqual(config.quiet, '🟡');
             assert.strictEqual(config.legacyLocked, '🟠');
+            assert.strictEqual(config.stale, '🟠');
             assert.strictEqual(config.endOfLife, '🔴');
         });
 
@@ -69,6 +70,11 @@ describe('indicator-config', () => {
 
         it('should return emoji for legacy-locked', () => {
             const indicator = getCategoryIndicator('legacy-locked');
+            assert.strictEqual(indicator, '🟠');
+        });
+
+        it('should return emoji for stale', () => {
+            const indicator = getCategoryIndicator('stale');
             assert.strictEqual(indicator, '🟠');
         });
 

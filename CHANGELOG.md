@@ -43,6 +43,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Fixed
 
+- **Package Vibrancy** — clicking a problem child node (e.g. "Unhealthy") now navigates to the correct pubspec.yaml from the last scan instead of opening a random pubspec in a multi-root workspace
+- **Package Vibrancy** — added missing `stale` category handling in comparison view CSS, scan log output, CI threshold prompts, and CI generator templates
 - **Analyzer** — `// ignore:` and `// ignore_for_file:` comments now suppress violations in the extension's Issues tree and `violations.json`, not just in the editor; centralized ignore handling in `SaropaDiagnosticReporter` so all rules benefit without per-rule opt-in
 
 ## [9.4.2]

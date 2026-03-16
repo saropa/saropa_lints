@@ -7,7 +7,7 @@ import { VibrancyResult, BudgetConfig, VibrancyCategory, BudgetResult } from '..
 
 const NO_BUDGET: BudgetConfig = {
     maxDependencies: null, maxTotalSizeMB: null, minAverageVibrancy: null,
-    maxEndOfLife: null, maxLegacyLocked: null, maxUnused: null,
+    maxStale: null, maxEndOfLife: null, maxLegacyLocked: null, maxUnused: null,
 };
 
 function makeResult(
@@ -34,6 +34,7 @@ describe('budget-checker', () => {
             assert.strictEqual(config.maxDependencies, null);
             assert.strictEqual(config.maxTotalSizeMB, null);
             assert.strictEqual(config.minAverageVibrancy, null);
+            assert.strictEqual(config.maxStale, null);
             assert.strictEqual(config.maxEndOfLife, null);
             assert.strictEqual(config.maxLegacyLocked, null);
             assert.strictEqual(config.maxUnused, null);
@@ -44,6 +45,7 @@ describe('budget-checker', () => {
                 'budget.maxDependencies': 50,
                 'budget.maxTotalSizeMB': 100,
                 'budget.minAverageVibrancy': 60,
+                'budget.maxStale': 2,
                 'budget.maxEndOfLife': 0,
                 'budget.maxLegacyLocked': 5,
                 'budget.maxUnused': 3,
@@ -52,6 +54,7 @@ describe('budget-checker', () => {
             assert.strictEqual(config.maxDependencies, 50);
             assert.strictEqual(config.maxTotalSizeMB, 100);
             assert.strictEqual(config.minAverageVibrancy, 60);
+            assert.strictEqual(config.maxStale, 2);
             assert.strictEqual(config.maxEndOfLife, 0);
             assert.strictEqual(config.maxLegacyLocked, 5);
             assert.strictEqual(config.maxUnused, 3);
@@ -74,14 +77,16 @@ describe('budget-checker', () => {
                 makeResult('a', 80, 'vibrant', { archiveSizeBytes: 1024 * 1024 }),
                 makeResult('b', 50, 'quiet', { archiveSizeBytes: 2 * 1024 * 1024 }),
                 makeResult('c', 20, 'legacy-locked', { isUnused: true }),
-                makeResult('d', 5, 'end-of-life'),
+                makeResult('d', 5, 'stale'),
+                makeResult('e', 0, 'end-of-life'),
             ];
 
             const actuals = computeActuals(results);
 
-            assert.strictEqual(actuals.totalCount, 4);
+            assert.strictEqual(actuals.totalCount, 5);
             assert.strictEqual(actuals.totalSizeMB, 3);
-            assert.strictEqual(actuals.averageVibrancy, 39);
+            assert.strictEqual(actuals.averageVibrancy, 31);
+            assert.strictEqual(actuals.staleCount, 1);
             assert.strictEqual(actuals.endOfLifeCount, 1);
             assert.strictEqual(actuals.legacyLockedCount, 1);
             assert.strictEqual(actuals.unusedCount, 1);
@@ -93,6 +98,7 @@ describe('budget-checker', () => {
             assert.strictEqual(actuals.totalCount, 0);
             assert.strictEqual(actuals.totalSizeMB, 0);
             assert.strictEqual(actuals.averageVibrancy, 0);
+            assert.strictEqual(actuals.staleCount, 0);
             assert.strictEqual(actuals.endOfLifeCount, 0);
             assert.strictEqual(actuals.legacyLockedCount, 0);
             assert.strictEqual(actuals.unusedCount, 0);
