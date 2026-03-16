@@ -25,29 +25,29 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
-## [Unreleased]
-
-### Fixed
-
-- **Publish (CRITICAL):** Fixed extension never reaching VS Code Marketplace after v9.0.2 — `run_extension_package()` used `next(glob("*.vsix"))` which returned the stale 9.0.2 `.vsix` (alphabetically before 9.1.0/9.2.0) instead of the newly created one; now deletes old `.vsix` files before packaging and looks for the expected filename first
-- **Publish:** Changed extension Marketplace publish prompt default from No to Yes (`[Y/n]`) — previous default silently skipped publishing with no warning
-- **Publish:** Replaced misleading "package already published" error messages with clear descriptions of what actually failed
+## [9.3.0]
 
 ### Added
 
-- **Extension:** "About Saropa Lints" screen showing extension version and full company/product info from `ABOUT_SAROPA.md` — accessible from the Overview welcome buttons and command palette
-- **Extension:** "Getting Started" walkthrough button in Overview welcome content
-- **Extension:** Overview intro text describing the two components (pub.dev package + VS Code extension)
-- **Extension:** Version number shown in status bar tooltip for deployment verification
-- **Extension:** `precompile` script auto-copies root `ABOUT_SAROPA.md` into extension bundle so the About screen stays in sync with the source of truth
+- "About Saropa Lints" screen showing extension version and full company/product info from `ABOUT_SAROPA.md` — accessible from the Overview welcome buttons and command palette
+- "Getting Started" walkthrough button in Overview welcome content
+- Overview intro text describing the two components (pub.dev package + VS Code extension)
+- Version number shown in status bar tooltip for deployment verification
+- `precompile` script auto-copies root `ABOUT_SAROPA.md` into extension bundle so the About screen stays in sync with the source of truth
 
 ### Changed
 
-- **Extension:** Consolidated three status bar items into one — shows score + tier (e.g. `Saropa: 72% · recommended`), version in tooltip only
-- **Extension:** Score display uses `%` format instead of `/100`
-- **Extension:** Sidebar views hidden when empty — Issues appears with a Dart project, Config when enabled, Summary/Suggestions/Security Posture/File Risk after analysis has data
-- **Extension:** Removed 15 redundant welcome content entries for views now hidden by `when` clauses
-- **Extension:** "Learn More" button renamed to "Learn more online" to clarify it opens a website
+- Consolidated three status bar items into one — shows score + tier (e.g. `Saropa: 72% · recommended`), version in tooltip only
+- Score display uses `%` format instead of `/100`
+- Sidebar views hidden when empty — Issues appears with a Dart project, Config when enabled, Summary/Suggestions/Security Posture/File Risk after analysis has data
+- Removed 15 redundant welcome content entries for views now hidden by `when` clauses
+- "Learn More" button renamed to "Learn more online" to clarify it opens a website
+
+### Administration
+
+- **CRITICAL** Fixed extension never reaching VS Code Marketplace after v9.0.2 — `run_extension_package()` used `next(glob("*.vsix"))` which returned the stale 9.0.2 `.vsix` (alphabetically before 9.1.0/9.2.0) instead of the newly created one; now deletes old `.vsix` files before packaging and looks for the expected filename first
+- Changed extension Marketplace publish prompt default from No to Yes (`[Y/n]`) — previous default silently skipped publishing with no warning
+- Replaced misleading "package already published" error messages with clear descriptions of what actually failed
 
 ---
 

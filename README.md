@@ -1,4 +1,3 @@
-
 ![Saropa Lints - Advanced Static Analysis](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/banner_v2.png)
 
 <!-- # Saropa Lints -->
@@ -13,10 +12,9 @@ Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter be
 
 <!-- Note that the badges are all grouped together so they flow horizontally. -->
 
-[![pub package](https://img.shields.io/pub/v/saropa_lints.svg?style=flat-square&logo=dart&color=blue)](https://pub.dev/packages/saropa_lints) [![pub points](https://img.shields.io/pub/points/saropa_lints?style=flat-square&logo=dart)](https://pub.dev/packages/saropa_lints/score) [![likes](https://img.shields.io/pub/likes/saropa_lints?style=flat-square&logo=dart&color=red)](https://pub.dev/packages/saropa_lints/score) [![ci](https://img.shields.io/github/actions/workflow/status/saropa/saropa_lints/ci.yml?branch=main&style=flat-square&logo=github&label=build)](https://github.com/saropa/saropa_lints/actions) [![GitHub stars](https://img.shields.io/github/stars/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints) [![GitHub forks](https://img.shields.io/github/forks/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints) [![GitHub issues](https://img.shields.io/github/issues/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints/issues) [![GitHub last commit](https://img.shields.io/github/last-commit/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints/commits) 
+[![pub package](https://img.shields.io/pub/v/saropa_lints.svg?style=flat-square&logo=dart&color=blue)](https://pub.dev/packages/saropa_lints) [![pub points](https://img.shields.io/pub/points/saropa_lints?style=flat-square&logo=dart)](https://pub.dev/packages/saropa_lints/score) [![likes](https://img.shields.io/pub/likes/saropa_lints?style=flat-square&logo=dart&color=red)](https://pub.dev/packages/saropa_lints/score) [![ci](https://img.shields.io/github/actions/workflow/status/saropa/saropa_lints/ci.yml?branch=main&style=flat-square&logo=github&label=build)](https://github.com/saropa/saropa_lints/actions) [![GitHub stars](https://img.shields.io/github/stars/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints) [![GitHub forks](https://img.shields.io/github/forks/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints) [![GitHub issues](https://img.shields.io/github/issues/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints/issues) [![GitHub last commit](https://img.shields.io/github/last-commit/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints/commits)
 
 [![Saropa Lints Badge](https://img.shields.io/badge/saropa_lints-2057-blue?style=flat&logo=flutter&logoColor=white&color=435489)](https://pub.dev/packages/saropa_lints) [![Flutter Platform](https://img.shields.io/badge/platform-flutter-02569B.svg?style=flat-square&logo=flutter)](https://flutter.dev/) [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-
 
 [![Share on X](https://img.shields.io/badge/share%20on-X-000000?style=flat-square&logo=x&logoColor=white)](https://twitter.com/intent/tweet?text=Check%20out%20Saropa%20Lints%3A%20Catch%20memory%20leaks%2C%20security%20vulnerabilities%2C%20and%20runtime%20crashes%20in%20Flutter%21&url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Facebook](https://img.shields.io/badge/share%20on-facebook-1877F2?style=flat-square&logo=facebook&logoColor=white)](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Bluesky](https://img.shields.io/badge/share%20on-bluesky-0285FF?style=flat-square&logo=bluesky&logoColor=white)](https://bsky.app/intent/compose?text=Check%20out%20Saropa%20Lints%3A%20Catch%20memory%20leaks%2C%20security%20vulnerabilities%2C%20and%20runtime%20crashes%20in%20Flutter%21%20https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on LinkedIn](https://img.shields.io/badge/share%20on-linkedin-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Reddit](https://img.shields.io/badge/share%20on-reddit-FF4500?style=flat-square&logo=reddit&logoColor=white)](https://www.reddit.com/submit?url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints&title=Saropa%20Lints%20-%20Advanced%20Static%20Analysis)
 
@@ -24,8 +22,6 @@ Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter be
 <br>
 
 > 💬 **Have feedback on Saropa Lints?** Please share it by [opening an issue](https://github.com/saropa/saropa_lints/issues/new) on GitHub!
-
-> ⚠️ **Flutter projects:** Use **saropa_lints 8.0.0**. Do **not** use **7.x** (retracted); it required analyzer 10 and was incompatible with the Flutter SDK. See [Troubleshooting](#cant-use-saropa_lints-v7-in-my-flutter-project).
 
 ---
 
@@ -82,6 +78,7 @@ dart run saropa_lints:init --tier recommended
 > **Note:** The CLI init is headless-only as of v9 — no interactive prompts. For interactive setup, use the VS Code extension.
 
 This updates (or creates) two files:
+
 - **`analysis_options.yaml`** — the `plugins: saropa_lints: diagnostics:` section is regenerated with every rule set to `true`/`false` for your tier. All other sections are preserved.
 - **`analysis_options_custom.yaml`** — your project settings (platforms, analysis output). Created on first run; never overwritten.
 
@@ -160,13 +157,14 @@ Saropa Lints detects these patterns and hundreds more:
 **Accuracy focused**: Rules use proper AST type checking instead of string matching, reducing false positives on variable names like "upstream" or "spinning".
 
 ### Stop Debugging Known Issues
+
 Saropa Lints specifically targets the error messages developers search for when their app crashes. It statically analyzes and prevents:
 
-* **Memory Leaks:** `TextEditingController`, `AnimationController`, and `StreamSubscription` created but never disposed.
-* **Concurrency Bugs:** `BuildContext` usage across async gaps and unawaited futures in `initState`.
-* **Security Flaws:** Hardcoded API keys, insecure HTTP (cleartext), and weak cryptography.
-* **UI Crashes:** `setState() called after dispose()`, layout overflow risks, and null assertions on backend data.
-* **State Errors:** `Riverpod` providers reading inside `build` or `Bloc` events added in constructors.
+- **Memory Leaks:** `TextEditingController`, `AnimationController`, and `StreamSubscription` created but never disposed.
+- **Concurrency Bugs:** `BuildContext` usage across async gaps and unawaited futures in `initState`.
+- **Security Flaws:** Hardcoded API keys, insecure HTTP (cleartext), and weak cryptography.
+- **UI Crashes:** `setState() called after dispose()`, layout overflow risks, and null assertions on backend data.
+- **State Errors:** `Riverpod` providers reading inside `build` or `Bloc` events added in constructors.
 
 ### Essential for popular packages
 
@@ -182,23 +180,21 @@ If you use **GetX**, **Riverpod**, **Provider**, **Bloc**, **Isar**, **Hive**, o
 | **Hive**     | Missing init, unclosed boxes, hardcoded encryption keys, type adapter issues                     | [Using with Hive](doc/guides/using_with_hive.md)         |
 | **Firebase** | Unbounded queries, missing batch writes, invalid Analytics events, FCM token leaks               | [Using with Firebase](doc/guides/using_with_firebase.md) |
 
-
 ![Screenshot of analysis_options_custom.yaml](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260502_analysis_options_custom_yaml.png)
-
 
 Standard linters don't understand these libraries. They see valid Dart code. Saropa Lints has 50+ rules specifically for library-specific anti-patterns that cause crashes, memory leaks, cost overruns, and data corruption in production. Recent update: `require_camera_permission_check` no longer triggers on non-camera controllers (e.g., IsarStreamController), eliminating a key false positive for Isar users. The new `avoid_cached_isar_stream` rule (with quick fix) prevents a common Isar runtime error.
 
 ### Radical Transparency
 
-We build in public. We don't just show you what works; we explicitly document what *doesn't* work yet.
+We build in public. We don't just show you what works; we explicitly document what _doesn't_ work yet.
 
-* [**ROADMAP.md**](ROADMAP.md): Our active backlog. See exactly what rules are coming next and vote on priorities.
-* **Deferred rules** (in [ROADMAP.md](ROADMAP.md)#part-2-deferred-rules--technical-limitations): The "Hard Problems." Rules we *can't* implement yet due to technical limitations (cross-file analysis, heuristics). We invite the community to help crack these barriers.
+- [**ROADMAP.md**](ROADMAP.md): Our active backlog. See exactly what rules are coming next and vote on priorities.
+- **Deferred rules** (in [ROADMAP.md](ROADMAP.md)#part-2-deferred-rules--technical-limitations): The "Hard Problems." Rules we _can't_ implement yet due to technical limitations (cross-file analysis, heuristics). We invite the community to help crack these barriers.
 
-| Marker | Meaning | Example |
-|--------|---------|---------|
-| 🐙 | Tracked as GitHub issue | [Open Issues](https://github.com/saropa/saropa_lints/issues) |
-| 💭 | Announcements, Q&A, and Ideas | [Discussion: Diagnostic Statistics](https://github.com/saropa/saropa_lints/discussions) |
+| Marker | Meaning                       | Example                                                                                 |
+| ------ | ----------------------------- | --------------------------------------------------------------------------------------- |
+| 🐙     | Tracked as GitHub issue       | [Open Issues](https://github.com/saropa/saropa_lints/issues)                            |
+| 💭     | Announcements, Q&A, and Ideas | [Discussion: Diagnostic Statistics](https://github.com/saropa/saropa_lints/discussions) |
 
 ![AI fixing Flutter security vulnerability automatically in Android Studio](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260502_build_report_terminal_tab.png)
 
@@ -212,17 +208,17 @@ These aren't edge cases. They're compliance requirements and security basics tha
 
 Why switch? Saropa Lints covers everything in standard tools plus strict behavioral analysis.
 
-| Feature | `flutter_lints` | `very_good_analysis` | **Saropa Lints** |
-| :--- | :---: | :---: | :--- |
-| **Syntax Checks** | ✅ | ✅ | ✅ |
-| **Strict/Opinionated Style** | ❌ | ✅ | ✅ |
-| **Zero-Config Setup** | ✅ | ✅ | ✅ **(Tier Presets)** |
-| **Controller Leak Detection** | ❌ | ❌ | ✅ **(Deep Analysis)** |
-| **Runtime Crash Prevention** | ❌ | ❌ | ✅ **(Behavioral)** |
-| **Security (OWASP Mapped)** | ❌ | ❌ | ✅ **(ISO/OWASP)** |
-| **Library Specific (Riverpod/Bloc)**| ❌ | ❌ | ✅ **(50+ rules)** |
-| **AI-Ready Diagnostics** | ❌ | ❌ | ✅ |
-| **Dependency Scanning** | ❌ | ❌ | 🚧 **(Coming Soon)** |
+| Feature                              | `flutter_lints` | `very_good_analysis` | **Saropa Lints**       |
+| :----------------------------------- | :-------------: | :------------------: | :--------------------- |
+| **Syntax Checks**                    |       ✅        |          ✅          | ✅                     |
+| **Strict/Opinionated Style**         |       ❌        |          ✅          | ✅                     |
+| **Zero-Config Setup**                |       ✅        |          ✅          | ✅ **(Tier Presets)**  |
+| **Controller Leak Detection**        |       ❌        |          ❌          | ✅ **(Deep Analysis)** |
+| **Runtime Crash Prevention**         |       ❌        |          ❌          | ✅ **(Behavioral)**    |
+| **Security (OWASP Mapped)**          |       ❌        |          ❌          | ✅ **(ISO/OWASP)**     |
+| **Library Specific (Riverpod/Bloc)** |       ❌        |          ❌          | ✅ **(50+ rules)**     |
+| **AI-Ready Diagnostics**             |       ❌        |          ❌          | ✅                     |
+| **Dependency Scanning**              |       ❌        |          ❌          | 🚧 **(Coming Soon)**   |
 
 ### OWASP Compliance Mapping
 
@@ -259,13 +255,14 @@ print(rule.owasp); // Mobile: M1 | Web: A07
 
 Unlike "black box" paid tools, Saropa Lints is 100% open source (MIT). You can inspect the logic behind every rule, verify the security checks yourself, and fork it if you disagree.
 
-* **No hidden logic:** See exactly how we detect vulnerabilities.
-* **No vendor lock-in:** It's standard Dart code.
-* **Community powered:** Rules are often suggested, debated, and refined by the Flutter community, not just a single vendor.
+- **No hidden logic:** See exactly how we detect vulnerabilities.
+- **No vendor lock-in:** It's standard Dart code.
+- **Community powered:** Rules are often suggested, debated, and refined by the Flutter community, not just a single vendor.
 
 ---
 
 ### Built for AI
+
 AI coding assistants like Cursor, Windsurf, and Copilot move fast, but they often hallucinate code that compiles yet fails in production. They might forget to dispose a controller, use a deprecated API, or ignore security best practices.
 
 Saropa Lints acts as the guardrails for your AI. By providing immediate, semantic feedback on **behavior**—not just syntax—it forces the AI to correct its own mistakes in real-time.
@@ -276,6 +273,7 @@ The tool is also built to **fix**. Saropa Lints diagnostics are engineered to be
 ![AI fixing Flutter security vulnerability automatically in Android Studio](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260502_AI_solver_tab.png)
 
 ---
+
 ### Migrating from other tools?
 
 - [Migrating from very_good_analysis](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_vga.md) (also covers `lints`, `lint`, `pedantic`)
@@ -347,8 +345,8 @@ plugins:
   saropa_lints:
     diagnostics:
       # The init tool generates explicit true/false for every rule
-      avoid_hardcoded_strings_in_ui: true  # change to false to disable
-      require_public_api_documentation: false  # change to true to enable
+      avoid_hardcoded_strings_in_ui: true # change to false to disable
+      require_public_api_documentation: false # change to true to enable
 
       # Stylistic rules (enable the ones your team prefers)
       prefer_single_quotes: true
@@ -370,24 +368,24 @@ The `analysis_options_custom.yaml` file includes a `platforms` section that cont
 ```yaml
 # In analysis_options_custom.yaml
 platforms:
-  ios: true         # enabled by default
-  android: true     # enabled by default
-  macos: false      # enable if targeting macOS
-  web: false        # enable if targeting web
-  windows: false    # enable if targeting Windows
-  linux: false      # enable if targeting Linux
+  ios: true # enabled by default
+  android: true # enabled by default
+  macos: false # enable if targeting macOS
+  web: false # enable if targeting web
+  windows: false # enable if targeting Windows
+  linux: false # enable if targeting Linux
 ```
 
 Each platform has dedicated rules that catch platform-specific issues:
 
-| Platform | Rules | Examples |
-|----------|-------|---------|
-| **iOS** | 90+ | Safe area, privacy manifest, App Tracking Transparency, Face ID, HealthKit, keychain |
-| **Android** | 11+ | Runtime permissions, notification channels, PendingIntent flags, cleartext traffic |
-| **macOS** | 15+ | Sandboxing, notarization, hardened runtime, window restoration, entitlements |
-| **Web** | 10+ | CORS handling, platform channels, deferred loading, URL strategy, web renderer |
-| **Windows** | Desktop shared | Menu bar, window close confirmation, native file dialogs, focus indicators |
-| **Linux** | Desktop shared | Same desktop rules as Windows |
+| Platform    | Rules          | Examples                                                                             |
+| ----------- | -------------- | ------------------------------------------------------------------------------------ |
+| **iOS**     | 90+            | Safe area, privacy manifest, App Tracking Transparency, Face ID, HealthKit, keychain |
+| **Android** | 11+            | Runtime permissions, notification channels, PendingIntent flags, cleartext traffic   |
+| **macOS**   | 15+            | Sandboxing, notarization, hardened runtime, window restoration, entitlements         |
+| **Web**     | 10+            | CORS handling, platform channels, deferred loading, URL strategy, web renderer       |
+| **Windows** | Desktop shared | Menu bar, window close confirmation, native file dialogs, focus indicators           |
+| **Linux**   | Desktop shared | Same desktop rules as Windows                                                        |
 
 Some rules are shared across platform groups:
 
@@ -477,8 +475,8 @@ plugins:
   saropa_lints:
     diagnostics:
       # Both of these work:
-      prefer_arguments_ordering: false  # canonical name
-      arguments_ordering: false          # alias
+      prefer_arguments_ordering: false # canonical name
+      arguments_ordering: false # alias
 ```
 
 Aliases are provided for rules where the prefix (`enforce_`, `require_`) might be commonly omitted.
@@ -566,12 +564,12 @@ All three types are combinable - any match suppresses the violation.
 
 The baseline CLI supports these options:
 
-| Option | Description |
-| ------ | ----------- |
-| `--file` | Output file (default: `saropa_baseline.json`) |
-| `--date` | Ignore code unchanged since this date (uses git blame) |
-| `--paths` | Ignore entire directories (glob patterns) |
-| `--only-impacts` | Only baseline certain severities (e.g., `low,medium`) |
+| Option           | Description                                            |
+| ---------------- | ------------------------------------------------------ |
+| `--file`         | Output file (default: `saropa_baseline.json`)          |
+| `--date`         | Ignore code unchanged since this date (uses git blame) |
+| `--paths`        | Ignore entire directories (glob patterns)              |
+| `--only-impacts` | Only baseline certain severities (e.g., `low,medium`)  |
 
 #### Path Pattern Examples
 
@@ -806,24 +804,27 @@ Saropa Lints uses the native Dart analyzer plugin system. Issues appear directly
 
 ### Can't use saropa_lints v7 in my Flutter project
 
-**v7 was retracted.** It required **analyzer 10** (and **meta ^1.18.0**); the Flutter SDK pins **meta** to **1.17.0**, so 7.x could not run in Flutter projects. Use **saropa_lints 8.0.0**, which keeps all 7.x rule fixes and stays on **analyzer 9** for Flutter compatibility. See [CHANGELOG](CHANGELOG.md#800) and [Upgrading to v7](doc/guides/upgrading_to_v7.md) (reference only) for context.
+⚠️ **v7 was retracted.** It required **analyzer 10** (and **meta ^1.18.0**); the Flutter SDK pins **meta** to **1.17.0**, so 7.x could not run in Flutter projects. Use **saropa_lints 8.0.0**, which keeps all 7.x rule fixes and stays on **analyzer 9** for Flutter compatibility. See [CHANGELOG](CHANGELOG.md#800) and [Upgrading to v7](doc/guides/upgrading_to_v7.md) (reference only) for context.
 
 ### I'm new and completely lost
 
 **Start here:**
 
 1. **Install**: Add to your `pubspec.yaml` dev_dependencies:
+
    ```yaml
    dev_dependencies:
      saropa_lints: ^9.0.0
    ```
 
 2. **Configure**: Add to your `analysis_options.yaml`:
+
    ```yaml
    include: package:saropa_lints/tiers/recommended.yaml
    ```
 
 3. **Get dependencies**:
+
    ```bash
    dart pub get
    ```
@@ -902,7 +903,7 @@ Edit your `analysis_options.yaml` and set specific rules to `false`:
 plugins:
   saropa_lints:
     diagnostics:
-      prefer_double_quotes: false  # disabled
+      prefer_double_quotes: false # disabled
       prefer_trailing_comma_always: false
       no_magic_number: false
 ```
@@ -910,6 +911,7 @@ plugins:
 **Option 4: Use quick fixes**
 
 Many rules have automatic fixes:
+
 - Hover over the warning
 - Click "Quick Fix" or press `Ctrl+.`
 - Select "Fix all in file" to fix all instances at once
@@ -972,7 +974,7 @@ A: You can run them side-by-side, but Saropa Lints covers everything in `flutter
 A: Saropa Lints runs as a native analyzer plugin, integrated directly into `dart analyze`. The **Tier System** allows you to balance speed and strictness. The `essential` tier is designed to be fast for CI environments.
 
 **Q: Can I use this with existing legacy projects?**
-A: Yes! Use the **Baseline** feature (`dart run saropa_lints:baseline`) to suppress existing issues instantly. This lets you enforce quality on *new* code without having to fix 500+ legacy errors first.
+A: Yes! Use the **Baseline** feature (`dart run saropa_lints:baseline`) to suppress existing issues instantly. This lets you enforce quality on _new_ code without having to fix 500+ legacy errors first.
 
 **Q: I'm upgrading from v4 — what changed?**
 A: v5 uses the native Dart analyzer plugin system instead of `custom_lint`. Remove `custom_lint` from your dependencies, replace `custom_lint: rules:` with `plugins: saropa_lints: diagnostics:` in your config (or just use a tier preset), and run `dart analyze` instead of `dart run custom_lint`. The init tool handles the config migration automatically.
@@ -1029,16 +1031,16 @@ Contact: [saropa.com](https://saropa.com) | [services@saropa.com](mailto:service
 
 ## Documentation
 
-| Document                                                                                              | Description                                   |
-| ----------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)           | 175+ optional stylistic rules with examples   |
-| [PERFORMANCE.md](https://github.com/saropa/saropa_lints/blob/main/PERFORMANCE.md)                     | Performance optimization guide and profiling  |
-| [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md)                             | Planned rules and project direction           |
+| Document                                                                                                                      | Description                                   |
+| ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)                                   | 175+ optional stylistic rules with examples   |
+| [PERFORMANCE.md](https://github.com/saropa/saropa_lints/blob/main/PERFORMANCE.md)                                             | Performance optimization guide and profiling  |
+| [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md)                                                     | Planned rules and project direction           |
 | [ROADMAP.md#part-2](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md#part-2-deferred-rules--technical-limitations) | Deferred rules (cross-file, heuristic)        |
-| [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md)                   | How to contribute rules and report issues     |
-| [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)                         | Version history and release notes             |
-| [SECURITY.md](https://github.com/saropa/saropa_lints/blob/main/SECURITY.md)                           | Security policy and reporting vulnerabilities |
-| [PROFESSIONAL_SERVICES.md](https://github.com/saropa/saropa_lints/blob/main/PROFESSIONAL_SERVICES.md) | Professional services and custom rules        |
+| [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md)                                           | How to contribute rules and report issues     |
+| [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)                                                 | Version history and release notes             |
+| [SECURITY.md](https://github.com/saropa/saropa_lints/blob/main/SECURITY.md)                                                   | Security policy and reporting vulnerabilities |
+| [PROFESSIONAL_SERVICES.md](https://github.com/saropa/saropa_lints/blob/main/PROFESSIONAL_SERVICES.md)                         | Professional services and custom rules        |
 
 ### Package Integration Guides
 
