@@ -2,6 +2,7 @@ import { VibrancyResult } from '../types';
 import { categoryLabel } from '../scoring/status-classifier';
 import { isReplacementPackageName, getReplacementDisplayText } from '../scoring/known-issues';
 import { formatSizeMB } from '../scoring/bloat-calculator';
+import { formatRelativeTime } from '../scoring/time-formatter';
 import { escapeHtml } from './html-utils';
 import { getDetailStyles } from './detail-view-styles';
 import { getDetailScript } from './detail-view-script';
@@ -170,10 +171,26 @@ function buildCommunitySection(r: VibrancyResult): string {
     const parts: string[] = [];
 
     if (r.github) {
+        const gh = r.github;
         const metrics: string[] = [];
-        metrics.push(`⭐ ${formatNumber(r.github.stars)}`);
-        metrics.push(`📋 ${r.github.openIssues} issues`);
+        metrics.push(`⭐ ${formatNumber(gh.stars)}`);
+        const issueCount = gh.trueOpenIssues ?? gh.openIssues;
+        metrics.push(`📋 ${issueCount} issues`);
+        if (gh.openPullRequests !== undefined) {
+            metrics.push(`🔀 ${gh.openPullRequests} PRs`);
+        }
         parts.push(`<div class="detail-row">${metrics.join('  ')}</div>`);
+
+        const activity = gh.closedIssuesLast90d + gh.mergedPrsLast90d;
+        if (activity > 0) {
+            parts.push(`<div class="detail-row muted">90d: ${gh.closedIssuesLast90d} issues closed, ${gh.mergedPrsLast90d} PRs merged</div>`);
+        }
+        if (gh.daysSinceLastCommit !== undefined) {
+            parts.push(`<div class="detail-row muted">Last commit: ${formatRelativeTime(gh.daysSinceLastCommit)}</div>`);
+        }
+        if (gh.isArchived) {
+            parts.push(`<div class="detail-row warning">🗄️ Repository is archived</div>`);
+        }
     }
 
     if (r.pubDev?.pubPoints !== undefined) {
@@ -246,8 +263,10 @@ function buildLinksSection(r: VibrancyResult): string {
 
     links.push(`<a href="${pubUrl}" data-url="${pubUrl}" class="link">View on pub.dev</a>`);
 
-    if (r.pubDev?.repositoryUrl) {
-        links.push(`<a href="${escapeHtml(r.pubDev.repositoryUrl)}" data-url="${escapeHtml(r.pubDev.repositoryUrl)}" class="link">Repository</a>`);
+    // Prefer canonical GitHub URL (may differ from pubspec URL which can include /tree/main)
+    const repoLink = r.github?.repoUrl ?? r.pubDev?.repositoryUrl;
+    if (repoLink) {
+        links.push(`<a href="${escapeHtml(repoLink)}" data-url="${escapeHtml(repoLink)}" class="link">Repository</a>`);
     }
 
     return `<div class="links-section">${links.join('')}</div>`;

@@ -30,6 +30,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 ### Added
 
 - **Extension** — "Copy as JSON" context menu on all tree views (Issues, Config, Summary, Security Posture, File Risk, Overview, Suggestions, Package Vibrancy) with recursive child serialization and multi-select support
+- **Package Vibrancy** — GitHub archived-repo detection: archived repositories are automatically classified as End of Life and shown with a 🗄️ badge in tree view, hover tooltip, and detail panel
+- **Package Vibrancy** — richer GitHub metrics: true open issue count (separating issues from PRs), open PR count, last commit date, and GitHub license; displayed across hover tooltip, detail panel, and output log
 
 ### Changed
 
@@ -41,6 +43,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 - **Package Vibrancy** — added algorithmic guardrail to prevent editorial `end_of_life` overrides from condemning actively-maintained packages; if live pub.dev data shows a package has ≥130 pub points and was published within 18 months, the classification is capped at Legacy-Locked instead of End of Life
 - **Package Vibrancy** — `isDiscontinued` (objective pub.dev signal) now takes priority over known-issue overrides in the status classifier
 - **Package Vibrancy** — reclassified 71 known-issue entries from `end_of_life` to `caution` for packages that are actively maintained with verified publishers and high pub points (e.g. `animations`, `google_fonts`, `flutter_local_notifications`, `camera`, `dio`); these packages are now scored by the vibrancy algorithm instead of being force-classified as dead
+- **Package Vibrancy** — separated "Stale" from "End of Life": packages with score < 10 are now classified as `stale` (low maintenance activity) instead of `end-of-life`; the `end-of-life` label is reserved exclusively for packages that are discontinued on pub.dev, listed in known_issues as `end_of_life`, or archived on GitHub; new budget dimension `maxStale` and CI threshold `maxStale` added
 
 ### Fixed
 

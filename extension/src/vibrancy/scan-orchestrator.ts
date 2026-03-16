@@ -74,6 +74,7 @@ export async function analyzePackage(
         ? { ...pubDev, pubPoints, publisher } : null;
     const category = classifyStatus({
         score: scores.score, knownIssue, pubDev: pubDevWithPoints,
+        isArchived: github?.isArchived,
     });
 
     log?.score({

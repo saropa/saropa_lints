@@ -12,6 +12,7 @@ import {
 
 describe('ci-generator', () => {
     const defaultThresholds: CiThresholds = {
+        maxStale: 3,
         maxEndOfLife: 2,
         maxLegacyLocked: 5,
         minAverageVibrancy: 60,
@@ -76,6 +77,7 @@ describe('ci-generator', () => {
 
         it('should handle zero thresholds', () => {
             const thresholds: CiThresholds = {
+                maxStale: 0,
                 maxEndOfLife: 0,
                 maxLegacyLocked: 0,
                 minAverageVibrancy: 0,
@@ -270,6 +272,7 @@ describe('ci-generator', () => {
     describe('threshold interpolation edge cases', () => {
         it('should handle large threshold values', () => {
             const thresholds: CiThresholds = {
+                maxStale: 50,
                 maxEndOfLife: 100,
                 maxLegacyLocked: 200,
                 minAverageVibrancy: 95,
@@ -287,6 +290,7 @@ describe('ci-generator', () => {
 
         it('should handle all-zero thresholds', () => {
             const thresholds: CiThresholds = {
+                maxStale: 0,
                 maxEndOfLife: 0,
                 maxLegacyLocked: 0,
                 minAverageVibrancy: 0,

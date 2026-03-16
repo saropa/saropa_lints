@@ -182,7 +182,7 @@ export function resultToComparisonData(
             readonly publisher?: string | null;
             readonly pubPoints?: number;
         } | null;
-        readonly github?: { readonly stars: number; readonly openIssues: number } | null;
+        readonly github?: { readonly stars: number; readonly openIssues: number; readonly trueOpenIssues?: number } | null;
         readonly archiveSizeBytes: number | null;
         readonly bloatRating: number | null;
         readonly license: string | null;
@@ -200,7 +200,7 @@ export function resultToComparisonData(
         publisher: result.pubDev?.publisher ?? null,
         pubPoints: result.pubDev?.pubPoints ?? 0,
         stars: result.github?.stars ?? null,
-        openIssues: result.github?.openIssues ?? null,
+        openIssues: result.github?.trueOpenIssues ?? result.github?.openIssues ?? null,
         archiveSizeBytes: result.archiveSizeBytes,
         bloatRating: result.bloatRating,
         license: result.license,

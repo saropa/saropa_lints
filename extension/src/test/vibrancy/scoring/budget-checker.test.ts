@@ -106,6 +106,7 @@ describe('budget-checker', () => {
     });
 
     describe('checkBudgets', () => {
+        // EOL category is set directly — these represent discontinued packages, not score-based classification
         const results: VibrancyResult[] = [
             makeResult('a', 80, 'vibrant', { archiveSizeBytes: 10 * 1024 * 1024 }),
             makeResult('b', 60, 'quiet', { archiveSizeBytes: 5 * 1024 * 1024 }),
@@ -211,10 +212,15 @@ describe('budget-checker', () => {
             makeResult('a', 80, 'vibrant'), makeResult('b', 5, 'end-of-life'),
             makeResult('c', 5, 'end-of-life'), makeResult('d', 20, 'legacy-locked', { isUnused: true }),
             makeResult('e', 60, 'quiet', { isUnused: true }),
+            makeResult('f', 5, 'stale'),
         ];
 
         it('should return end-of-life packages', () => {
             assert.deepStrictEqual(getPackagesByCategory(results, 'end-of-life'), ['b', 'c']);
+        });
+
+        it('should return stale packages', () => {
+            assert.deepStrictEqual(getPackagesByCategory(results, 'stale'), ['f']);
         });
 
         it('should return unused packages', () => {
@@ -223,6 +229,7 @@ describe('budget-checker', () => {
     });
 
     describe('buildExceededDiagnostics', () => {
+        // EOL category is set directly — these represent discontinued packages, not score-based classification
         const results: VibrancyResult[] = [
             makeResult('a', 5, 'end-of-life'), makeResult('b', 5, 'end-of-life'),
             makeResult('c', 20, 'legacy-locked'),

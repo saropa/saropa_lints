@@ -69,6 +69,43 @@ describe('status-classifier', () => {
                 'quiet',
             );
         });
+
+        it('should handle boundary at 10 (legacy-locked vs stale)', () => {
+            assert.strictEqual(
+                classifyStatus({ score: 10, knownIssue: null, pubDev: null }),
+                'legacy-locked',
+            );
+            assert.strictEqual(
+                classifyStatus({ score: 9.9, knownIssue: null, pubDev: null }),
+                'stale',
+            );
+        });
+
+        it('should classify archived repos as end-of-life', () => {
+            // Archived repos are end-of-life regardless of score
+            const cat = classifyStatus({
+                score: 90, knownIssue: null, pubDev: null,
+                isArchived: true,
+            });
+            assert.strictEqual(cat, 'end-of-life');
+        });
+
+        it('should not override when isArchived is false', () => {
+            const cat = classifyStatus({
+                score: 90, knownIssue: null, pubDev: null,
+                isArchived: false,
+            });
+            assert.strictEqual(cat, 'vibrant');
+        });
+
+        it('should not override when isArchived is undefined', () => {
+            // When GitHub data is unavailable, isArchived is undefined
+            const cat = classifyStatus({
+                score: 90, knownIssue: null, pubDev: null,
+                isArchived: undefined,
+            });
+            assert.strictEqual(cat, 'vibrant');
+        });
     });
 
     describe('categoryIcon', () => {

@@ -1162,6 +1162,11 @@
             "default": true,
             "description": "Show a notification summarizing lock file changes after each scan"
           },
+          "saropaLints.packageVibrancy.showInStatusBar": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show package vibrancy score alongside the lint health score in the status bar"
+          },
           "saropaLints.packageVibrancy.enableCodeLens": {
             "type": "boolean",
             "default": true,

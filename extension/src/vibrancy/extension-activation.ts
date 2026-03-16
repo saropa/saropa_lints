@@ -5,7 +5,6 @@ import { VibrancyDiagnostics } from './providers/diagnostics';
 import { VibrancyCodeActionProvider } from './providers/code-action-provider';
 import { VibrancyCodeLensProvider, setCodeLensToggle, setPrereleaseToggle } from './providers/codelens-provider';
 import { VibrancyHoverProvider } from './providers/hover-provider';
-import { VibrancyStatusBar } from './ui/status-bar';
 import { CodeLensToggle } from './ui/codelens-toggle';
 import { PrereleaseToggle } from './ui/prerelease-toggle';
 import { VibrancyReportPanel } from './views/report-webview';
@@ -102,7 +101,19 @@ let detailLogger: DetailLogger | null = null;
 let detailChannel: vscode.OutputChannel | null = null;
 let saveTaskRunner: SaveTaskRunner | null = null;
 let registryService: RegistryService | null = null;
+let vibrancyStatusCallback: VibrancyStatusCallback | null = null;
 const problemRegistry: ProblemRegistry = new ProblemRegistry();
+
+/** Lightweight vibrancy data for the unified status bar. */
+export interface VibrancyStatusData {
+    readonly packageCount: number;
+    readonly averageScore: number;
+    readonly updateCount: number;
+    readonly actionCount: number;
+}
+
+/** Callback fired when vibrancy scan data changes. */
+export type VibrancyStatusCallback = (data: VibrancyStatusData | null) => void;
 
 /** Get the latest scan results (used by providers). */
 export function getLatestResults(): readonly VibrancyResult[] {
@@ -135,7 +146,11 @@ export function getProblemRegistry(): ProblemRegistry {
 }
 
 /** Main activation wiring. */
-export function runActivation(context: vscode.ExtensionContext): void {
+export function runActivation(
+    context: vscode.ExtensionContext,
+    onStatusUpdate?: VibrancyStatusCallback,
+): void {
+    vibrancyStatusCallback = onStatusUpdate ?? null;
     const cache = new CacheService(context.globalState);
     registryService = new RegistryService(context.secrets);
     context.subscriptions.push(registryService);
@@ -145,7 +160,6 @@ export function runActivation(context: vscode.ExtensionContext): void {
     const codeLensProvider = new VibrancyCodeLensProvider();
     const codeLensToggle = new CodeLensToggle();
     const prereleaseToggle = new PrereleaseToggle();
-    const statusBar = new VibrancyStatusBar();
     const diagCollection = vscode.languages.createDiagnosticCollection(
         'saropa-vibrancy',
     );
@@ -166,7 +180,7 @@ export function runActivation(context: vscode.ExtensionContext): void {
         treeProvider.refresh();
     });
 
-    context.subscriptions.push(diagCollection, statusBar, codeLensToggle, prereleaseToggle, stateManager);
+    context.subscriptions.push(diagCollection, codeLensToggle, prereleaseToggle, stateManager);
 
     const adoptionGate = new AdoptionGateProvider(cache);
     adoptionGate.register(context);
@@ -182,7 +196,7 @@ export function runActivation(context: vscode.ExtensionContext): void {
     const targets: ScanTargets = {
         tree: treeProvider, hover: hoverProvider,
         codeLens: codeLensProvider, codeActions: codeActionProvider,
-        statusBar, diagnostics, cache, adoptionGate, codeLensToggle,
+        diagnostics, cache, adoptionGate, codeLensToggle,
         prereleaseToggle, state: stateManager,
     };
 
@@ -459,7 +473,6 @@ interface ScanTargets {
     hover: VibrancyHoverProvider;
     codeLens: VibrancyCodeLensProvider;
     codeActions: VibrancyCodeActionProvider;
-    statusBar: VibrancyStatusBar;
     diagnostics: VibrancyDiagnostics;
     cache: CacheService;
     adoptionGate: AdoptionGateProvider;
@@ -861,7 +874,19 @@ function updateFilteredTargets(
     targets.diagnostics.updateFamilySplits(splits);
     targets.diagnostics.updateOverrideAnalyses(lastOverrideAnalyses);
     targets.diagnostics.update(parsed.yamlUri, parsed.yamlContent, active);
-    targets.statusBar.update(results, lastInsights);
+    // Fire callback to update the unified status bar in extension.ts
+    if (vibrancyStatusCallback) {
+        const avg = results.reduce((s, r) => s + r.score, 0) / results.length;
+        const updateCount = results.filter(
+            r => r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date',
+        ).length;
+        vibrancyStatusCallback({
+            packageCount: results.length,
+            averageScore: Math.round(avg),
+            updateCount,
+            actionCount: lastInsights.length,
+        });
+    }
 }
 
 let upgradeChannel: vscode.OutputChannel | null = null;
@@ -1484,7 +1509,8 @@ async function fetchComparisonData(
             );
             if (ghMetrics) {
                 stars = ghMetrics.stars;
-                openIssues = ghMetrics.openIssues;
+                // Prefer true issue count (excluding PRs) when available
+                openIssues = ghMetrics.trueOpenIssues ?? ghMetrics.openIssues;
             }
         }
     }

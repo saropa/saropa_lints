@@ -5,6 +5,7 @@ import { formatSizeMB } from '../scoring/bloat-calculator';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
+import { formatRelativeTime } from '../scoring/time-formatter';
 
 export class VibrancyHoverProvider implements vscode.HoverProvider {
     private _results = new Map<string, VibrancyResult>();
@@ -153,8 +154,7 @@ function buildHoverContent(
     }
 
     if (result.github) {
-        md.appendMarkdown(`| GitHub Stars | ${result.github.stars} |\n`);
-        md.appendMarkdown(`| Open Issues | ${result.github.openIssues} |\n`);
+        appendGitHubSection(md, result);
     }
 
     if (result.drift) {
@@ -213,6 +213,57 @@ function buildHoverContent(
     );
 
     return md;
+}
+
+function appendGitHubSection(
+    md: vscode.MarkdownString,
+    result: VibrancyResult,
+): void {
+    const gh = result.github;
+    if (!gh) { return; }
+    const repoUrl = (gh.repoUrl ?? result.pubDev?.repositoryUrl)
+        ?.replace(/\/+$/, '');
+
+    // Stars — linked to repository
+    const starsText = repoUrl
+        ? `[${gh.stars}](${repoUrl})` : `${gh.stars}`;
+    md.appendMarkdown(`| GitHub Stars | ${starsText} |\n`);
+
+    // Open issues — prefer true count (excluding PRs) when available
+    const issueCount = gh.trueOpenIssues ?? gh.openIssues;
+    const issueLink = repoUrl
+        ? `[${issueCount}](${repoUrl}/issues)` : `${issueCount}`;
+    md.appendMarkdown(`| Open Issues | ${issueLink} |\n`);
+
+    // Open PRs — only when the separate fetch succeeded
+    if (gh.openPullRequests !== undefined) {
+        const prLink = repoUrl
+            ? `[${gh.openPullRequests}](${repoUrl}/pulls)`
+            : `${gh.openPullRequests}`;
+        md.appendMarkdown(`| Open PRs | ${prLink} |\n`);
+    }
+
+    // Maintainer activity — how responsive are maintainers in the last 90 days
+    const activity = gh.closedIssuesLast90d + gh.mergedPrsLast90d;
+    if (activity > 0) {
+        md.appendMarkdown(
+            `| Activity (90d) | ${gh.closedIssuesLast90d} issues closed, ${gh.mergedPrsLast90d} PRs merged |\n`,
+        );
+    } else {
+        md.appendMarkdown(`| Activity (90d) | No recent activity |\n`);
+    }
+
+    // Last commit — from pushed_at
+    if (gh.daysSinceLastCommit !== undefined) {
+        md.appendMarkdown(
+            `| Last Commit | ${formatRelativeTime(gh.daysSinceLastCommit)} |\n`,
+        );
+    }
+
+    // Archived warning
+    if (gh.isArchived) {
+        md.appendMarkdown(`| Repository | **ARCHIVED** |\n`);
+    }
 }
 
 function appendFlaggedIssues(

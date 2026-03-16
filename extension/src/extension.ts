@@ -36,7 +36,7 @@ import { writeRuleOverrides, removeRuleOverrides } from './configWriter';
 import { logReport, logSection, flushReport } from './reportWriter';
 import { generateOwaspReport } from './owaspExport';
 import { getProjectRoot, invalidateProjectRoot } from './projectRoot';
-import { runActivation as runVibrancyActivation, stopFreshnessWatcher } from './vibrancy/extension-activation';
+import { runActivation as runVibrancyActivation, stopFreshnessWatcher, VibrancyStatusData } from './vibrancy/extension-activation';
 import { copyTreeNodesToClipboard } from './copyTreeAsJson';
 import {
   serializeIssueNode,
@@ -280,7 +280,10 @@ export function activate(context: vscode.ExtensionContext): void {
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   context.subscriptions.push(statusBarItem);
 
-  // Single status bar item showing score + tier (or state).
+  // Vibrancy data pushed from the vibrancy subsystem via callback.
+  let vibrancyData: VibrancyStatusData | null = null;
+
+  // Single unified status bar item showing lint score, tier, and vibrancy.
   // Accepts optional pre-loaded data to avoid re-reading violations.json from disk
   // when the caller already has it (e.g. debouncedRefresh).
   const updateAllStatusBars = (preloadedData?: ViolationsData) => {
@@ -291,32 +294,60 @@ export function activate(context: vscode.ExtensionContext): void {
     }
     const en = getConfig().get<boolean>('enabled', false) ?? false;
     const tier = getConfig().get<string>('tier', 'recommended') ?? 'recommended';
+
+    // Check whether vibrancy score should be shown in the status bar.
+    const showVibrancy = vscode.workspace
+      .getConfiguration('saropaLints.packageVibrancy')
+      .get<boolean>('showInStatusBar', true) && vibrancyData !== null;
+
+    // Format vibrancy segment: "7/10" (score out of 10).
+    const vibrancyLabel = showVibrancy
+      ? `${Math.round(vibrancyData!.averageScore / 10)}/10`
+      : null;
+
     if (en) {
       // Use pre-loaded data when supplied; otherwise read from disk.
       const root = getProjectRoot();
       const data = preloadedData ?? (root ? readViolations(root) : null);
       const health = data ? computeHealthScore(data) : null;
 
+      // Build the trailing segment: vibrancy score if available, otherwise tier name.
+      const trailLabel = vibrancyLabel ?? tier;
+
       if (health) {
-        // Show score with delta, then tier — e.g. "Saropa: 72% · recommended"
+        // Show lint score with delta + trailing segment.
         const history = loadHistory(context.workspaceState);
         const prevScore = findPreviousScore(history);
         const delta = prevScore !== undefined ? ` ${formatScoreDelta(health.score, prevScore)}` : '';
-        statusBarItem.text = `$(checklist) Saropa: ${health.score}%${delta} · ${tier}`;
-        // Color the status bar based on score band.
+        statusBarItem.text = `$(checklist) Saropa: ${health.score}%${delta} · ${trailLabel}`;
+        // Color the status bar based on lint score band.
         const band = scoreColorBand(health.score);
         statusBarItem.backgroundColor = band === 'red'
           ? new vscode.ThemeColor('statusBarItem.errorBackground')
           : band === 'yellow'
             ? new vscode.ThemeColor('statusBarItem.warningBackground')
             : undefined;
-        statusBarItem.tooltip = `Saropa Lints v${extVersion} — Score: ${health.score}% — Tier: ${tier}`;
       } else {
-        // No score yet — show tier only.
-        statusBarItem.text = `$(checklist) Saropa Lints · ${tier}`;
-        statusBarItem.tooltip = `Saropa Lints v${extVersion} — Tier: ${tier}`;
+        // No lint score yet — show name + trailing segment.
+        statusBarItem.text = `$(checklist) Saropa Lints · ${trailLabel}`;
         statusBarItem.backgroundColor = undefined;
       }
+
+      // Build rich tooltip with all details.
+      const tooltipLines = [`Saropa Lints v${extVersion}`];
+      tooltipLines.push(`Tier: ${tier}`);
+      if (health) { tooltipLines.push(`Lint score: ${health.score}%`); }
+      if (showVibrancy) {
+        tooltipLines.push(`Vibrancy: ${vibrancyLabel}`);
+        tooltipLines.push(`${vibrancyData!.packageCount} packages scanned`);
+        if (vibrancyData!.updateCount > 0) {
+          tooltipLines.push(`${vibrancyData!.updateCount} update(s) available`);
+        }
+        if (vibrancyData!.actionCount > 0) {
+          tooltipLines.push(`${vibrancyData!.actionCount} action item(s)`);
+        }
+      }
+      statusBarItem.tooltip = tooltipLines.join('\n');
     } else {
       statusBarItem.text = '$(checklist) Saropa Lints: Off';
       statusBarItem.tooltip = `Saropa Lints v${extVersion} — Disabled`;

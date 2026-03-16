@@ -122,6 +122,7 @@ describe('threshold-suggester', () => {
         });
 
         it('should handle project with many EOL packages', () => {
+            // EOL category is set directly — these represent discontinued packages, not score-based classification
             const results = [
                 makeResult({ category: 'end-of-life', score: 10 }),
                 makeResult({ category: 'end-of-life', score: 15 }),

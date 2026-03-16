@@ -20,10 +20,13 @@ export function classifyStatus(params: {
     score: number;
     knownIssue: KnownIssue | null;
     pubDev: PubDevPackageInfo | null;
+    /** Archived GitHub repos are definitively end-of-life. */
+    isArchived?: boolean;
 }): VibrancyCategory {
     // Hard overrides: only truly dead packages get 'end-of-life'
     if (params.knownIssue?.status === 'end_of_life') { return 'end-of-life'; }
     if (params.pubDev?.isDiscontinued) { return 'end-of-life'; }
+    if (params.isArchived === true) { return 'end-of-life'; }
 
     if (params.score >= 70) { return 'vibrant'; }
     if (params.score >= 40) { return 'quiet'; }

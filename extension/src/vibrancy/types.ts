@@ -52,12 +52,23 @@ export interface FlaggedIssue {
 /** GitHub repository metrics. */
 export interface GitHubMetrics {
     readonly stars: number;
+    /** Combined open issues + PRs from GitHub API. Prefer trueOpenIssues when available. */
     readonly openIssues: number;
+    /** Open issues only (excludes PRs). Undefined when open-PRs fetch failed. */
+    readonly trueOpenIssues?: number;
+    /** Number of open pull requests. Undefined when the fetch failed. */
+    readonly openPullRequests?: number;
     readonly closedIssuesLast90d: number;
     readonly mergedPrsLast90d: number;
     readonly avgCommentsPerIssue: number;
     readonly daysSinceLastUpdate: number;
     readonly daysSinceLastClose: number;
+    /** Days since last commit (from pushed_at). Undefined when not available. */
+    readonly daysSinceLastCommit?: number;
+    /** Whether the GitHub repository is archived (read-only / abandoned). */
+    readonly isArchived?: boolean;
+    /** Canonical GitHub URL (html_url from the API). */
+    readonly repoUrl?: string;
     readonly flaggedIssues: readonly FlaggedIssue[];
     /** SPDX license identifier from the GitHub repository, if available. */
     readonly license: string | null;
