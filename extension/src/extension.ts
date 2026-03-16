@@ -264,6 +264,15 @@ export function activate(context: vscode.ExtensionContext): void {
   };
   watchViolations();
 
+  // Permanent version indicator — always visible, opens About screen on click.
+  const extVersion = (context.extension.packageJSON as { version: string }).version;
+  const versionStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 98);
+  versionStatusBarItem.text = `$(info) Saropa v${extVersion}`;
+  versionStatusBarItem.tooltip = 'About Saropa Lints';
+  versionStatusBarItem.command = 'saropaLints.showAbout';
+  versionStatusBarItem.show();
+  context.subscriptions.push(versionStatusBarItem);
+
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   context.subscriptions.push(statusBarItem);
 
@@ -413,8 +422,7 @@ export function activate(context: vscode.ExtensionContext): void {
       );
     }),
     vscode.commands.registerCommand('saropaLints.showAbout', () => {
-      const version = (context.extension.packageJSON as { version: string }).version;
-      showAboutPanel(context.extensionUri, version);
+      showAboutPanel(context.extensionUri, extVersion);
     }),
     // Show all issues: clear filters and focus Issues view (e.g. from Summary "Total violations").
     vscode.commands.registerCommand('saropaLints.focusIssues', () => {
