@@ -59,7 +59,10 @@ export class PackageWithProblemsItem extends vscode.TreeItem {
 
 /** A single problem affecting a package. */
 export class ProblemItem extends vscode.TreeItem {
-    constructor(public readonly problem: Problem) {
+    constructor(
+        public readonly problem: Problem,
+        public readonly packageName: string,
+    ) {
         const typeLabel = problemTypeLabel(problem.type);
         super(typeLabel, vscode.TreeItemCollapsibleState.None);
 
@@ -93,6 +96,7 @@ export class SuggestionItem extends vscode.TreeItem {
     constructor(
         public readonly action: SuggestedAction,
         public readonly unlocksPackages: readonly string[],
+        public readonly packageName: string,
     ) {
         const icon = actionIcon(action.type);
         super(`${icon} ${action.description}`, vscode.TreeItemCollapsibleState.None);
@@ -124,8 +128,11 @@ export class HealthyPackagesItem extends vscode.TreeItem {
 
 /** A healthy package with no problems. */
 export class HealthyPackageItem extends vscode.TreeItem {
+    public readonly packageName: string;
+
     constructor(name: string, score: number) {
         super(name, vscode.TreeItemCollapsibleState.None);
+        this.packageName = name;
         this.description = `${Math.round(score / 10)}/10`;
         this.iconPath = new vscode.ThemeIcon(
             'pass',
@@ -165,12 +172,14 @@ export function buildPackageProblemsChildren(
 ): vscode.TreeItem[] {
     const items: vscode.TreeItem[] = [];
 
+    const pkg = pkgProblems.package;
+
     for (const problem of pkgProblems.problems) {
-        items.push(new ProblemItem(problem));
+        items.push(new ProblemItem(problem, pkg));
     }
 
     if (action && action.type !== 'none') {
-        items.push(new SuggestionItem(action, unlocks));
+        items.push(new SuggestionItem(action, unlocks, pkg));
     }
 
     return items;

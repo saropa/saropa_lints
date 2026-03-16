@@ -3,7 +3,9 @@ import {
     DetailItem, buildGroupItems,
     PackageItem, InsightItem, OverrideItem,
 } from '../../../vibrancy/providers/tree-items';
-import { PackageWithProblemsItem } from '../../../vibrancy/providers/problem-tree-items';
+import {
+    PackageWithProblemsItem, ProblemItem, SuggestionItem, HealthyPackageItem,
+} from '../../../vibrancy/providers/problem-tree-items';
 import { VibrancyResult, GitHubMetrics, PubDevPackageInfo, PackageInsight, OverrideAnalysis } from '../../../vibrancy/types';
 
 function makeResult(name: string, score: number): VibrancyResult {
@@ -258,5 +260,36 @@ describe('detail sync duck-typing contracts', () => {
         );
         assert.ok('pkgProblems' in item);
         assert.strictEqual(item.pkgProblems.package, 'http');
+    });
+
+    it('ProblemItem exposes packageName for selection handler', () => {
+        const item = new ProblemItem(
+            {
+                type: 'unused', id: 'http:unused', package: 'http',
+                severity: 'low', line: 0,
+            },
+            'http',
+        );
+        assert.ok('packageName' in item);
+        assert.strictEqual(item.packageName, 'http');
+    });
+
+    it('SuggestionItem exposes packageName for selection handler', () => {
+        const item = new SuggestionItem(
+            {
+                type: 'remove', description: 'Remove this package',
+                targetPackages: ['http'], resolvesProblemIds: [], priority: 80,
+            },
+            [],
+            'http',
+        );
+        assert.ok('packageName' in item);
+        assert.strictEqual(item.packageName, 'http');
+    });
+
+    it('HealthyPackageItem exposes packageName for selection handler', () => {
+        const item = new HealthyPackageItem('http', 85);
+        assert.ok('packageName' in item);
+        assert.strictEqual(item.packageName, 'http');
     });
 });

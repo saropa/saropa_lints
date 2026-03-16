@@ -194,13 +194,19 @@ export function runActivation(context: vscode.ExtensionContext): void {
                 (item as { pkgProblems: { package: string } }).pkgProblems.package,
             );
         }
+        // Child nodes (ProblemItem, SuggestionItem, HealthyPackageItem) carry the package name
+        if ('packageName' in (item as object)) {
+            return treeProvider.getResultByName(
+                (item as { packageName: string }).packageName,
+            );
+        }
         return undefined;
     });
 
     registerTreeView(context, treeProvider);
     registerProviders(context, hoverProvider, codeLensProvider, codeActionProvider);
     registerCommands(context, targets);
-    registerTreeCommands(context, detailViewProvider, detailLogger);
+    registerTreeCommands(context, treeProvider, detailViewProvider, detailLogger);
     registerUpgradeCommand(context);
     registerAnnotateCommand(context);
     registerRegistryCommands(context, registryService);
