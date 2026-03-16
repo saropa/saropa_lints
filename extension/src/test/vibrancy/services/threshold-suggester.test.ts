@@ -39,10 +39,23 @@ describe('threshold-suggester', () => {
         it('should return zero thresholds for empty results', () => {
             const thresholds = suggestThresholds([]);
 
+            assert.strictEqual(thresholds.maxStale, 0);
             assert.strictEqual(thresholds.maxEndOfLife, 0);
             assert.strictEqual(thresholds.maxLegacyLocked, 1);
             assert.strictEqual(thresholds.minAverageVibrancy, 0);
             assert.strictEqual(thresholds.failOnVulnerability, true);
+        });
+
+        it('should count stale packages correctly', () => {
+            const results = [
+                makeResult({ category: 'stale' }),
+                makeResult({ category: 'stale' }),
+                makeResult({ category: 'vibrant' }),
+            ];
+
+            const thresholds = suggestThresholds(results);
+
+            assert.strictEqual(thresholds.maxStale, 2);
         });
 
         it('should count end-of-life packages correctly', () => {
@@ -102,6 +115,7 @@ describe('threshold-suggester', () => {
 
             const thresholds = suggestThresholds(results);
 
+            assert.strictEqual(thresholds.maxStale, 0);
             assert.strictEqual(thresholds.maxEndOfLife, 0);
             assert.strictEqual(thresholds.maxLegacyLocked, 1);
             assert.strictEqual(thresholds.minAverageVibrancy, 75);
@@ -133,6 +147,7 @@ describe('threshold-suggester', () => {
     describe('formatThresholdsSummary', () => {
         it('should format all threshold values', () => {
             const thresholds = {
+                maxStale: 1,
                 maxEndOfLife: 2,
                 maxLegacyLocked: 5,
                 minAverageVibrancy: 60,
@@ -141,6 +156,7 @@ describe('threshold-suggester', () => {
 
             const summary = formatThresholdsSummary(thresholds);
 
+            assert.ok(summary.includes('Stale ≤ 1'));
             assert.ok(summary.includes('EOL ≤ 2'));
             assert.ok(summary.includes('Legacy ≤ 5'));
             assert.ok(summary.includes('Avg ≥ 60'));
@@ -149,6 +165,7 @@ describe('threshold-suggester', () => {
 
         it('should omit vulnerability text when disabled', () => {
             const thresholds = {
+                maxStale: 0,
                 maxEndOfLife: 0,
                 maxLegacyLocked: 1,
                 minAverageVibrancy: 70,

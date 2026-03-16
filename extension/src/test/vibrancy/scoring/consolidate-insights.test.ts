@@ -22,7 +22,8 @@ const makeResult = (
     github: null,
     knownIssue: null,
     score,
-    category: score >= 70 ? 'vibrant' : score >= 40 ? 'quiet' : score >= 10 ? 'legacy-locked' : 'end-of-life',
+    // Score < 10 is 'stale' (low maintenance), not 'end-of-life' (truly dead)
+    category: score >= 70 ? 'vibrant' : score >= 40 ? 'quiet' : score >= 10 ? 'legacy-locked' : 'stale',
     resolutionVelocity: 0,
     engagementLevel: 0,
     popularity: 0,
@@ -77,6 +78,15 @@ describe('consolidate-insights', () => {
             assert.strictEqual(problems.length, 1);
             assert.strictEqual(problems[0].type, 'unhealthy');
             assert.strictEqual(problems[0].severity, 'high');
+        });
+
+        it('should collect unhealthy problem for stale package with medium severity', () => {
+            const result = makeResult('quiet_pkg', 5, { category: 'stale' });
+            const problems = collectProblems(result, new Map(), new Map());
+
+            assert.strictEqual(problems.length, 1);
+            assert.strictEqual(problems[0].type, 'unhealthy');
+            assert.strictEqual(problems[0].severity, 'medium');
         });
 
         it('should collect unhealthy problem for legacy package', () => {

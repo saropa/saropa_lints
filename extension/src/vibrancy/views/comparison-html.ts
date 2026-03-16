@@ -91,6 +91,7 @@ function getComparisonStyles(): string {
         .vibrant { color: var(--vscode-testing-iconPassed); }
         .quiet { color: var(--vscode-editorInfo-foreground); }
         .legacy { color: var(--vscode-editorWarning-foreground); }
+        .stale { color: var(--vscode-editorWarning-foreground); }
         .eol { color: var(--vscode-editorError-foreground); }
         .verified { color: var(--vscode-testing-iconPassed); }
         .platforms { font-size: 0.9em; }
@@ -122,6 +123,7 @@ function getCategoryClass(category: VibrancyCategory | null): string {
         case 'vibrant': return 'vibrant';
         case 'quiet': return 'quiet';
         case 'legacy-locked': return 'legacy';
+        case 'stale': return 'stale';
         case 'end-of-life': return 'eol';
     }
 }

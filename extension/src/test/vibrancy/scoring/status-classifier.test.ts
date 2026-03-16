@@ -23,9 +23,10 @@ describe('status-classifier', () => {
             assert.strictEqual(cat, 'legacy-locked');
         });
 
-        it('should classify <10 as end-of-life', () => {
+        // Score < 10 is now 'stale' (low maintenance), not 'end-of-life'
+        it('should classify <10 as stale', () => {
             const cat = classifyStatus({ score: 5, knownIssue: null, pubDev: null });
-            assert.strictEqual(cat, 'end-of-life');
+            assert.strictEqual(cat, 'stale');
         });
 
         it('should override with known issue', () => {
@@ -73,6 +74,7 @@ describe('status-classifier', () => {
     describe('categoryIcon', () => {
         it('should map categories to icon ids', () => {
             assert.strictEqual(categoryIcon('vibrant'), 'pass');
+            assert.strictEqual(categoryIcon('stale'), 'warning');
             assert.strictEqual(categoryIcon('end-of-life'), 'error');
         });
     });
@@ -80,6 +82,10 @@ describe('status-classifier', () => {
     describe('categoryToSeverity', () => {
         it('should map end-of-life to Warning (1)', () => {
             assert.strictEqual(categoryToSeverity('end-of-life'), 1);
+        });
+
+        it('should map stale to Information (2)', () => {
+            assert.strictEqual(categoryToSeverity('stale'), 2);
         });
 
         it('should map vibrant to Hint (3)', () => {
@@ -90,6 +96,7 @@ describe('status-classifier', () => {
     describe('categoryLabel', () => {
         it('should return human-readable labels', () => {
             assert.strictEqual(categoryLabel('legacy-locked'), 'Legacy-Locked');
+            assert.strictEqual(categoryLabel('stale'), 'Stale');
         });
     });
 });

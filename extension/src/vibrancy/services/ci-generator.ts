@@ -91,13 +91,15 @@ jobs:
             print('   Major updates available: \$majorUpdates');
             
             // Thresholds from configuration
+            const maxStale = ${thresholds.maxStale};
             const maxEol = ${thresholds.maxEndOfLife};
             const maxLegacy = ${thresholds.maxLegacyLocked};
             const minAvgVibrancy = ${thresholds.minAverageVibrancy};
             const failOnVuln = ${failOnVuln};
-            
+
             print('');
             print('   Thresholds:');
+            print('     Max Stale: \$maxStale');
             print('     Max EOL: \$maxEol');
             print('     Max Legacy: \$maxLegacy');
             print('     Min Avg Vibrancy: \$minAvgVibrancy');
@@ -136,6 +138,7 @@ jobs:
               report += '| Metric | Value | Threshold | Status |\\n';
               report += '|--------|-------|-----------|--------|\\n';
               report += \`| Outdated | \${outdatedCount} | — | \${outdatedCount === 0 ? '✅' : 'ℹ️'} |\\n\`;
+              report += \`| Stale Limit | — | ≤ ${thresholds.maxStale} | — |\\n\`;
               report += \`| EOL Limit | — | ≤ ${thresholds.maxEndOfLife} | — |\\n\`;
               report += \`| Legacy Limit | — | ≤ ${thresholds.maxLegacyLocked} | — |\\n\`;
               report += \`| Min Avg Vibrancy | — | ≥ ${thresholds.minAverageVibrancy} | — |\\n\`;
@@ -191,6 +194,7 @@ vibrancy-check:
         print('   Outdated packages: \$outdatedCount');
         
         // Thresholds
+        print('   Max Stale: ${thresholds.maxStale}');
         print('   Max EOL: ${thresholds.maxEndOfLife}');
         print('   Max Legacy: ${thresholds.maxLegacyLocked}');
         print('   Min Avg Vibrancy: ${thresholds.minAverageVibrancy}');
@@ -216,6 +220,7 @@ export function generateShellScript(thresholds: CiThresholds): string {
 set -e
 
 # Configuration thresholds
+MAX_STALE=${thresholds.maxStale}
 MAX_EOL=${thresholds.maxEndOfLife}
 MAX_LEGACY=${thresholds.maxLegacyLocked}
 MIN_AVG_VIBRANCY=${thresholds.minAverageVibrancy}
@@ -282,6 +287,7 @@ void main() {
   
   print('');
   print('Thresholds:');
+  print('  Max Stale: ${thresholds.maxStale}');
   print('  Max End-of-Life: ${thresholds.maxEndOfLife}');
   print('  Max Legacy-Locked: ${thresholds.maxLegacyLocked}');
   print('  Min Average Vibrancy: ${thresholds.minAverageVibrancy}');
