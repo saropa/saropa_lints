@@ -35,7 +35,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Added
 
-- **Extension:** "About Saropa Lints" screen accessible from Overview `...` menu and command palette — shows extension version (for deployment verification) and full company/product info
+- **Extension:** "About Saropa Lints" screen showing extension version and full company/product info from `ABOUT_SAROPA.md` — accessible from the `$(info)` icon on the sidebar container header, the status bar version indicator, and the command palette
+- **Extension:** Permanent status bar item `$(info) Saropa v{version}` — always visible for quick deployment verification, opens About screen on click
 - **Extension:** `precompile` script auto-copies root `ABOUT_SAROPA.md` into extension bundle so the About screen stays in sync with the source of truth
 
 ---
