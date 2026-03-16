@@ -74,3 +74,4 @@ BROKEN_TIERS.md
 
 # Saropa Log Capture (index & cache)
 .saropa/
+*.vsix
