@@ -25,6 +25,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 
 ---
 
+## [Unreleased]
+
+---
+
 ## [9.2.0]
 
 Extension reliability and subdirectory project support.
