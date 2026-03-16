@@ -25,6 +25,31 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [9.4.0]
+
+_Package Vibrancy is now built into Saropa Lints. One extension, one sidebar — lint analysis and dependency health together._
+
+### Added
+
+- **Package Vibrancy integration** — merged the standalone Saropa Package Vibrancy extension into Saropa Lints
+  - Three new collapsible sidebar panels: Package Vibrancy, Package Problems, Package Details
+  - Dependency vibrancy scoring, vulnerability scanning (OSV + GitHub Advisory), SBOM export (CycloneDX)
+  - Upgrade planning with test gates, bulk updates (latest/major/minor/patch)
+  - CodeLens badges on pubspec.yaml dependencies showing vibrancy scores
+  - Unused dependency detection, pubspec annotation, dependency sorting
+  - Background version watching with configurable polling intervals
+  - Budget enforcement (max dependencies, total size, min average vibrancy)
+  - Private registry support with secure token storage
+  - CI pipeline generation for dependency health checks
+  - Package comparison view for side-by-side evaluation
+
+### Changed
+
+- **Build system** migrated from raw tsc to esbuild (bundled single file, smaller .vsix, faster startup)
+- Extension minimum VS Code version remains ^1.74.0
+
+---
+
 ## [9.3.0]
 
 ### Added
@@ -398,15 +423,7 @@ Fix `lowerCaseName` getter errors in tests and init tool.
 
 ### Changed
 
-- Version bump
-
----
-
-## [7.0.2]
-
-### Changed
-
-- Version bump
+- Version bump for release testing
 
 ---
 

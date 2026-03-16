@@ -1,7 +1,7 @@
 {
   "name": "saropa-lints",
   "displayName": "Saropa Lints",
-  "description": "Enable and configure Saropa Lints for Dart/Flutter. One-click setup, no init command—pubspec and analysis_options from the UI.",
+  "description": "2050+ Dart/Flutter lint rules with visual analysis, plus Package Vibrancy for dependency health scoring, vulnerability scanning, and upgrade planning.",
   "version": "9.3.0",
   "publisher": "saropa",
   "license": "MIT",
@@ -26,14 +26,18 @@
     "lint",
     "static-analysis",
     "saropa",
-    "analysis-options"
+    "analysis-options",
+    "dependency",
+    "vibrancy",
+    "pubspec",
+    "health"
   ],
   "activationEvents": [
     "onLanguage:dart",
     "workspaceContains:pubspec.yaml",
     "workspaceContains:*/pubspec.yaml"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "icon": "icon.png",
   "contributes": {
     "viewsContainers": {
@@ -80,6 +84,24 @@
           "id": "saropaLints.fileRisk",
           "name": "File Risk",
           "when": "saropaLints.hasViolations"
+        },
+        {
+          "id": "saropaLints.packageVibrancy.packages",
+          "name": "Package Vibrancy",
+          "icon": "$(package)",
+          "when": "saropaLints.isDartProject"
+        },
+        {
+          "id": "saropaLints.packageVibrancy.problems",
+          "name": "Package Problems",
+          "icon": "$(warning)",
+          "when": "saropaLints.packageVibrancy.hasResults"
+        },
+        {
+          "id": "saropaLints.packageVibrancy.details",
+          "name": "Package Details",
+          "type": "webview",
+          "when": "saropaLints.packageVibrancy.hasResults"
         }
       ]
     },
@@ -275,6 +297,238 @@
         "command": "saropaLints.showAbout",
         "title": "About Saropa Lints",
         "icon": "$(info)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.scan",
+        "title": "Saropa: Scan Package Vibrancy",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.showReport",
+        "title": "Saropa: Show Vibrancy Report",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.clearCache",
+        "title": "Saropa: Clear Cache",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.exportReport",
+        "title": "Saropa: Export Vibrancy Report",
+        "icon": "$(export)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.browseKnownIssues",
+        "title": "Saropa: Browse Known Issues Library",
+        "icon": "$(library)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.about",
+        "title": "Saropa: About Package Vibrancy",
+        "icon": "$(info)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.exportSbom",
+        "title": "Saropa: Export SBOM (CycloneDX)",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.annotatePubspec",
+        "title": "Saropa: Annotate Dependencies",
+        "icon": "$(note)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.goToPackage",
+        "title": "Go to pubspec.yaml",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.goToLine",
+        "title": "Go to line in pubspec.yaml",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.openOnPubDev",
+        "title": "Open on pub.dev",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.showChangelog",
+        "title": "Open Changelog on pub.dev",
+        "icon": "$(book)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.updateToLatest",
+        "title": "Update to Latest",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.copyAsJson",
+        "title": "Copy as JSON",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.upgradeAndTest",
+        "title": "Upgrade & Test",
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.suppressPackage",
+        "title": "Suppress Package",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.unsuppressPackage",
+        "title": "Unsuppress Package",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.openUrl",
+        "title": "Open Link",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.commentOutUnused",
+        "title": "Comment Out Unused Dependency",
+        "icon": "$(comment)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.deleteUnused",
+        "title": "Delete Unused Dependency (with backup)",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.planUpgrades",
+        "title": "Saropa: Plan & Execute Upgrades",
+        "icon": "$(rocket)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.goToOverride",
+        "title": "Go to Dependency Override"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.suppressPackageByName",
+        "title": "Suppress Package Diagnostics"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.suppressByCategory",
+        "title": "Saropa: Suppress by Category...",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.suppressAllProblems",
+        "title": "Saropa: Suppress All Unhealthy Packages",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.unsuppressAll",
+        "title": "Saropa: Unsuppress All Packages",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.sortDependencies",
+        "title": "Saropa: Sort Dependencies Alphabetically",
+        "icon": "$(list-ordered)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.showCodeLens",
+        "title": "Saropa: Show Vibrancy Badges",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.hideCodeLens",
+        "title": "Saropa: Hide Vibrancy Badges",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.toggleCodeLens",
+        "title": "Saropa: Toggle Vibrancy Badges"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.focusDetails",
+        "title": "Saropa: Focus Package Details",
+        "icon": "$(preview)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.logDetails",
+        "title": "Log to Output",
+        "icon": "$(output)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.logAllDetails",
+        "title": "Saropa: Log All Package Details",
+        "icon": "$(output)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.updateFromCodeLens",
+        "title": "Update Package Version"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.focusPackageInTree",
+        "title": "Show Package in Tree View"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.updateAllLatest",
+        "title": "Saropa: Update All Dependencies (Latest)",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.updateAllMajor",
+        "title": "Saropa: Update All Dependencies (Major Only)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.updateAllMinor",
+        "title": "Saropa: Update All Dependencies (Minor Only)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.updateAllPatch",
+        "title": "Saropa: Update All Dependencies (Patch Only)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.showPrereleases",
+        "title": "Saropa: Show Prerelease Versions",
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.hidePrereleases",
+        "title": "Saropa: Hide Prerelease Versions",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.updateToPrerelease",
+        "title": "Update to Prerelease",
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.generateCiConfig",
+        "title": "Saropa: Generate CI Pipeline",
+        "icon": "$(server-process)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.addRegistryAuth",
+        "title": "Saropa: Add Registry Authentication",
+        "icon": "$(key)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.removeRegistryAuth",
+        "title": "Saropa: Remove Registry Authentication",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.listRegistries",
+        "title": "Saropa: List Configured Registries",
+        "icon": "$(list-unordered)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.comparePackages",
+        "title": "Saropa: Compare Packages",
+        "icon": "$(diff)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.compareSelected",
+        "title": "Compare Selected Packages",
+        "icon": "$(diff)"
       }
     ],
     "menus": {
@@ -348,6 +602,66 @@
           "command": "saropaLints.refresh",
           "when": "view == saropaLints.fileRisk",
           "group": "navigation"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.scan",
+          "when": "view == saropaLints.packageVibrancy.packages && !saropaLints.packageVibrancy.isScanning",
+          "group": "navigation@1"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.about",
+          "when": "view == saropaLints.packageVibrancy.packages",
+          "group": "navigation@2"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.planUpgrades",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults && !saropaLints.packageVibrancy.isScanning",
+          "group": "navigation@3"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.annotatePubspec",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
+          "group": "navigation@4"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.suppressByCategory",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
+          "group": "suppress@1"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.unsuppressAll",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
+          "group": "suppress@2"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.sortDependencies",
+          "when": "view == saropaLints.packageVibrancy.packages && !saropaLints.packageVibrancy.isScanning",
+          "group": "organize@1"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.updateAllLatest",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults && !saropaLints.packageVibrancy.isScanning",
+          "group": "2_bulk@1"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.updateAllMajor",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults && !saropaLints.packageVibrancy.isScanning",
+          "group": "2_bulk@2"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.updateAllMinor",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults && !saropaLints.packageVibrancy.isScanning",
+          "group": "2_bulk@3"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.updateAllPatch",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults && !saropaLints.packageVibrancy.isScanning",
+          "group": "2_bulk@4"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.generateCiConfig",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
+          "group": "3_ci@1"
         }
       ],
       "view/item/context": [
@@ -431,48 +745,538 @@
         {
           "command": "saropaLints.exportOwaspReport",
           "when": "view == saropaLints.securityPosture && viewItem == securityGroup"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.goToPackage",
+          "when": "viewItem =~ /vibrancyPackage/",
+          "group": "inline"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.goToPackage",
+          "when": "viewItem =~ /vibrancyPackage/",
+          "group": "navigation@1"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.openOnPubDev",
+          "when": "viewItem =~ /vibrancyPackage/",
+          "group": "navigation@2"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.updateToLatest",
+          "when": "viewItem == vibrancyPackageUpdatable",
+          "group": "navigation@3"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.copyAsJson",
+          "when": "viewItem =~ /vibrancyPackage/",
+          "group": "navigation@4"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.upgradeAndTest",
+          "when": "viewItem == vibrancyPackageUpdatable",
+          "group": "navigation@5"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.suppressPackage",
+          "when": "viewItem =~ /^vibrancyPackage(Unused)?(Updatable)?$/",
+          "group": "2_suppress@1"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.unsuppressPackage",
+          "when": "viewItem =~ /Suppressed/",
+          "group": "2_suppress@1"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.openUrl",
+          "when": "viewItem == vibrancyDetailLink",
+          "group": "inline"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.commentOutUnused",
+          "when": "viewItem =~ /vibrancyPackageUnused/",
+          "group": "3_unused@1"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.deleteUnused",
+          "when": "viewItem =~ /vibrancyPackageUnused/",
+          "group": "3_unused@2"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.logDetails",
+          "when": "viewItem =~ /vibrancyPackage/",
+          "group": "4_output@1"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.compareSelected",
+          "when": "viewItem =~ /vibrancyPackage/ && listMultiSelection",
+          "group": "5_compare@1"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.updateToPrerelease",
+          "when": "viewItem == vibrancyPrerelease",
+          "group": "inline"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "saropaLints.packageVibrancy.hideCodeLens",
+          "when": "resourceFilename == pubspec.yaml && saropaLints.packageVibrancy.codeLensEnabled",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.showCodeLens",
+          "when": "resourceFilename == pubspec.yaml && !saropaLints.packageVibrancy.codeLensEnabled",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "saropaLints.packageVibrancy.sortDependencies",
+          "when": "resourceFilename == pubspec.yaml",
+          "group": "saropa@1"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "saropaLints.packageVibrancy.showCodeLens",
+          "when": "!saropaLints.packageVibrancy.codeLensEnabled"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.hideCodeLens",
+          "when": "saropaLints.packageVibrancy.codeLensEnabled"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.updateFromCodeLens",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.focusPackageInTree",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.showPrereleases",
+          "when": "!saropaLints.packageVibrancy.showPrereleases"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.hidePrereleases",
+          "when": "saropaLints.packageVibrancy.showPrereleases"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.updateToPrerelease",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.compareSelected",
+          "when": "false"
         }
       ]
     },
-    "configuration": {
-      "title": "Saropa Lints",
-      "properties": {
-        "saropaLints.enabled": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable Saropa Lints for this workspace. When on, the extension sets up pubspec and analysis_options and runs analysis; when off, it does nothing."
-        },
-        "saropaLints.tier": {
-          "type": "string",
-          "enum": [
-            "essential",
-            "recommended",
-            "professional",
-            "comprehensive",
-            "pedantic"
-          ],
-          "default": "recommended",
-          "description": "Default tier when enabling or re-initializing."
-        },
-        "saropaLints.runAnalysisAfterConfigChange": {
-          "type": "boolean",
-          "default": true,
-          "description": "Run dart analyze after init or config change when enabled."
-        },
-        "saropaLints.inlineAnnotations": {
-          "type": "boolean",
-          "default": true,
-          "description": "Show violation messages at the end of affected lines (Error Lens style)."
-        },
-        "saropaLints.issuesPageSize": {
-          "type": "number",
-          "default": 100,
-          "minimum": 1,
-          "maximum": 1000,
-          "description": "Maximum number of violations shown per file in the Issues tree. Remaining are shown as \"and N more…\"."
+    "configuration": [
+      {
+        "title": "Saropa Lints",
+        "properties": {
+          "saropaLints.enabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enable Saropa Lints for this workspace. When on, the extension sets up pubspec and analysis_options and runs analysis; when off, it does nothing."
+          },
+          "saropaLints.tier": {
+            "type": "string",
+            "enum": [
+              "essential",
+              "recommended",
+              "professional",
+              "comprehensive",
+              "pedantic"
+            ],
+            "default": "recommended",
+            "description": "Default tier when enabling or re-initializing."
+          },
+          "saropaLints.runAnalysisAfterConfigChange": {
+            "type": "boolean",
+            "default": true,
+            "description": "Run dart analyze after init or config change when enabled."
+          },
+          "saropaLints.inlineAnnotations": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show violation messages at the end of affected lines (Error Lens style)."
+          },
+          "saropaLints.issuesPageSize": {
+            "type": "number",
+            "default": 100,
+            "minimum": 1,
+            "maximum": 1000,
+            "description": "Maximum number of violations shown per file in the Issues tree. Remaining are shown as \"and N more…\"."
+          }
+        }
+      },
+      {
+        "title": "Saropa Package Vibrancy",
+        "properties": {
+          "saropaLints.packageVibrancy.githubToken": {
+            "type": "string",
+            "default": "",
+            "description": "GitHub Personal Access Token for increased API rate limits (60/hr without, 5000/hr with)"
+          },
+          "saropaLints.packageVibrancy.scanOnOpen": {
+            "type": "boolean",
+            "default": true,
+            "description": "Automatically scan when a Flutter project is opened"
+          },
+          "saropaLints.packageVibrancy.includeDevDependencies": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include dev_dependencies in the vibrancy scan"
+          },
+          "saropaLints.packageVibrancy.includeOverriddenPackages": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include dependency_overrides (path/git) in the vibrancy scan for security and health checks"
+          },
+          "saropaLints.packageVibrancy.cacheTtlHours": {
+            "type": "number",
+            "default": 24,
+            "minimum": 1,
+            "maximum": 168,
+            "description": "Cache TTL in hours for API responses"
+          },
+          "saropaLints.packageVibrancy.suppressedPackages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Package names to suppress from vibrancy diagnostics and hover (still scanned, shown dimmed in tree)"
+          },
+          "saropaLints.packageVibrancy.allowlist": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Package names to skip during vibrancy scan (e.g. internal packages)"
+          },
+          "saropaLints.packageVibrancy.repoOverrides": {
+            "type": "object",
+            "default": {},
+            "description": "Override GitHub repository URLs for packages where pub.dev data is wrong.",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "saropaLints.packageVibrancy.registries": {
+            "type": "object",
+            "default": {},
+            "description": "Registry configuration for private Pub servers. Tokens are stored securely in VS Code Secret Storage.",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Display name for this registry"
+                },
+                "packages": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Package names hosted on this registry"
+                }
+              }
+            }
+          },
+          "saropaLints.packageVibrancy.showLockDiffNotifications": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show a notification summarizing lock file changes after each scan"
+          },
+          "saropaLints.packageVibrancy.enableCodeLens": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show vibrancy score badges as CodeLens annotations above each dependency in pubspec.yaml"
+          },
+          "saropaLints.packageVibrancy.enableAdoptionGate": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show inline vibrancy badges for new packages being added to pubspec.yaml"
+          },
+          "saropaLints.packageVibrancy.codeLensDetail": {
+            "type": "string",
+            "enum": [
+              "minimal",
+              "standard",
+              "full"
+            ],
+            "default": "standard",
+            "enumDescriptions": [
+              "Score and category only",
+              "Score, category, and update status",
+              "Score, category, archive size, update status, and alerts"
+            ],
+            "description": "Controls how much detail the CodeLens annotations show"
+          },
+          "saropaLints.packageVibrancy.indicators": {
+            "type": "object",
+            "default": {},
+            "description": "Custom symbols for status indicators."
+          },
+          "saropaLints.packageVibrancy.indicatorStyle": {
+            "type": "string",
+            "enum": [
+              "emoji",
+              "text",
+              "both",
+              "none"
+            ],
+            "default": "emoji",
+            "enumDescriptions": [
+              "Show emoji only",
+              "Show text only (Vibrant)",
+              "Show both (emoji + text)",
+              "Show score only, no indicator"
+            ],
+            "description": "How to display status indicators in CodeLens"
+          },
+          "saropaLints.packageVibrancy.sortSdkFirst": {
+            "type": "boolean",
+            "default": true,
+            "description": "Keep SDK dependencies (flutter, flutter_test) at the top when sorting"
+          },
+          "saropaLints.packageVibrancy.endOfLifeDiagnostics": {
+            "type": "string",
+            "enum": [
+              "none",
+              "hint",
+              "smart"
+            ],
+            "default": "none",
+            "enumDescriptions": [
+              "No diagnostics for end-of-life packages (view in sidebar only)",
+              "Show as Hint (subtle underline)",
+              "Show as Warning only when a replacement is known, otherwise Hint"
+            ],
+            "description": "How to display end-of-life package diagnostics in the editor"
+          },
+          "saropaLints.packageVibrancy.weights.resolutionVelocity": {
+            "type": "number",
+            "default": 0.5,
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Weight for Resolution Velocity in V_score (default 0.5)"
+          },
+          "saropaLints.packageVibrancy.weights.engagementLevel": {
+            "type": "number",
+            "default": 0.4,
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Weight for Engagement Level in V_score (default 0.4)"
+          },
+          "saropaLints.packageVibrancy.weights.popularity": {
+            "type": "number",
+            "default": 0.1,
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Weight for Popularity in V_score (default 0.1)"
+          },
+          "saropaLints.packageVibrancy.publisherTrustBonus": {
+            "type": "number",
+            "default": 15,
+            "minimum": 0,
+            "maximum": 25,
+            "description": "Max bonus for major trusted publishers like dart.dev (0 to disable)."
+          },
+          "saropaLints.packageVibrancy.upgradeAutoCommit": {
+            "type": "boolean",
+            "default": false,
+            "description": "Auto-commit each successful upgrade step (creates one commit per package)"
+          },
+          "saropaLints.packageVibrancy.upgradeSkipTests": {
+            "type": "boolean",
+            "default": false,
+            "description": "Skip flutter test gates during upgrade execution (faster but less safe)"
+          },
+          "saropaLints.packageVibrancy.upgradeMaxSteps": {
+            "type": "number",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 50,
+            "description": "Maximum number of upgrade steps to execute in one run"
+          },
+          "saropaLints.packageVibrancy.bulkUpdateConfirmation": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show confirmation dialog before bulk updating dependencies"
+          },
+          "saropaLints.packageVibrancy.watchEnabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable background polling for new package versions"
+          },
+          "saropaLints.packageVibrancy.watchIntervalHours": {
+            "type": "number",
+            "default": 6,
+            "minimum": 1,
+            "maximum": 24,
+            "description": "How often to check for new package versions (in hours)"
+          },
+          "saropaLints.packageVibrancy.watchFilter": {
+            "type": "string",
+            "enum": [
+              "all",
+              "unhealthy",
+              "custom"
+            ],
+            "default": "all",
+            "enumDescriptions": [
+              "Watch all direct dependencies",
+              "Only watch packages with vibrancy score below 40",
+              "Only watch packages specified in watchList"
+            ],
+            "description": "Filter which packages to watch for new versions"
+          },
+          "saropaLints.packageVibrancy.watchList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Package names to watch for new versions (only used when watchFilter is 'custom')"
+          },
+          "saropaLints.packageVibrancy.annotateSectionHeaders": {
+            "type": "boolean",
+            "default": true,
+            "description": "Insert decorative section headers above major pubspec sections"
+          },
+          "saropaLints.packageVibrancy.treeGrouping": {
+            "type": "string",
+            "enum": [
+              "none",
+              "section"
+            ],
+            "default": "none",
+            "enumDescriptions": [
+              "Flat list sorted by vibrancy score (worst first)",
+              "Group by pubspec section (dependencies, dev_dependencies)"
+            ],
+            "description": "How to group packages in the tree view"
+          },
+          "saropaLints.packageVibrancy.showPrereleases": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show prerelease versions (dev, beta, rc) in CodeLens and tree view"
+          },
+          "saropaLints.packageVibrancy.prereleaseTagFilter": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Only show prereleases matching these tags (e.g., ['beta', 'rc']). Empty = show all."
+          },
+          "saropaLints.packageVibrancy.onSaveChanges": {
+            "type": "string",
+            "default": "",
+            "description": "Command to run when pubspec.yaml is saved with dependency changes. Empty = disabled."
+          },
+          "saropaLints.packageVibrancy.onSaveChangesDetection": {
+            "type": "string",
+            "enum": [
+              "any",
+              "dependencies"
+            ],
+            "default": "dependencies",
+            "enumDescriptions": [
+              "Run on any pubspec.yaml save",
+              "Run only when dependency sections change"
+            ],
+            "description": "When to trigger the on-save task"
+          },
+          "saropaLints.packageVibrancy.budget.maxDependencies": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "default": null,
+            "minimum": 1,
+            "description": "Maximum number of total dependencies allowed (null = no limit)"
+          },
+          "saropaLints.packageVibrancy.budget.maxTotalSizeMB": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "default": null,
+            "minimum": 0.1,
+            "description": "Maximum total archive size in megabytes (null = no limit)"
+          },
+          "saropaLints.packageVibrancy.budget.minAverageVibrancy": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "default": null,
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Minimum average vibrancy score required across all dependencies (null = no limit)"
+          },
+          "saropaLints.packageVibrancy.budget.maxEndOfLife": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "default": null,
+            "minimum": 0,
+            "description": "Maximum number of End-of-Life packages allowed (null = no limit)"
+          },
+          "saropaLints.packageVibrancy.budget.maxLegacyLocked": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "default": null,
+            "minimum": 0,
+            "description": "Maximum number of Legacy-Locked packages allowed (null = no limit)"
+          },
+          "saropaLints.packageVibrancy.budget.maxUnused": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "default": null,
+            "minimum": 0,
+            "description": "Maximum number of unused dependencies allowed (null = no limit)"
+          },
+          "saropaLints.packageVibrancy.enableVulnScan": {
+            "type": "boolean",
+            "default": true,
+            "description": "Query OSV database for known vulnerabilities in dependencies"
+          },
+          "saropaLints.packageVibrancy.enableGitHubAdvisory": {
+            "type": "boolean",
+            "default": true,
+            "description": "Query GitHub Advisory Database for additional security advisories"
+          },
+          "saropaLints.packageVibrancy.vulnSeverityThreshold": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ],
+            "default": "low",
+            "enumDescriptions": [
+              "Only show critical vulnerabilities (CVSS 9.0+)",
+              "Show high and critical vulnerabilities (CVSS 7.0+)",
+              "Show medium, high, and critical (CVSS 4.0+)",
+              "Show all vulnerabilities"
+            ],
+            "description": "Minimum severity level for displaying vulnerability diagnostics"
+          }
         }
       }
-    },
+    ],
     "walkthroughs": [
       {
         "id": "saropaLints.gettingStarted",
@@ -547,15 +1351,27 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run package",
     "precompile": "node -e \"require('fs').copyFileSync('../ABOUT_SAROPA.md','media/about-saropa.md')\"",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "check-types": "tsc --noEmit",
+    "compile": "npm run precompile && npm run check-types && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run precompile && npm run check-types && node esbuild.js --production",
     "lint": "tsc --noEmit -p ./"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.10",
     "@types/node": "^20.10.0",
+    "@types/semver": "^7.7.1",
+    "@types/sinon": "^21.0.0",
     "@types/vscode": "^1.74.0",
+    "esbuild": "^0.25.0",
+    "mocha": "^11.7.5",
+    "npm-run-all": "^4.1.5",
+    "semver": "^7.7.4",
+    "sinon": "^21.0.3",
     "typescript": "^5.3.0"
   }
 }

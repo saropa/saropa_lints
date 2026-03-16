@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Flutter Package Known Issues Schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Path to the JSON schema file."
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The exact name of the package on pub.dev"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "commercial_trap",
+              "commercial",
+              "caution",
+              "end_of_life",
+              "enterprise",
+              "freemium",
+              "maintenance_mode",
+              "paid"
+            ],
+            "description": "The category of the hazard."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why this package should be avoided."
+          },
+          "as_of": {
+            "type": "string",
+            "format": "date",
+            "description": "The date this issue was recorded (YYYY-MM-DD)."
+          },
+          "replacement": {
+            "type": ["string", "null"],
+            "description": "The recommended package to use instead, or null if none exists."
+          },
+          "migrationNotes": {
+            "type": ["string", "null"],
+            "description": "Steps required to move away from this package."
+          },
+          "archiveSizeBytes": {
+            "type": ["integer", "null"],
+            "description": "Archive size in bytes from pub.dev."
+          },
+          "archiveSizeMB": {
+            "type": ["number", "null"],
+            "description": "Archive size in megabytes (derived from archiveSizeBytes)."
+          },
+          "license": {
+            "type": ["string", "null"],
+            "description": "The SPDX license identifier for the package (e.g. MIT, BSD-3-Clause)."
+          },
+          "lastUpdated": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "The date the package was last published on pub.dev (YYYY-MM-DD)."
+          },
+          "pubPoints": {
+            "type": ["integer", "null"],
+            "description": "The pub.dev points score for the package."
+          },
+          "wasmReady": {
+            "type": ["boolean", "null"],
+            "description": "Whether the package supports WASM compilation."
+          },
+          "verifiedPublisher": {
+            "type": ["boolean", "null"],
+            "description": "Whether the package publisher is verified on pub.dev."
+          },
+          "platforms": {
+            "type": ["array", "null"],
+            "items": {
+              "type": "string",
+              "enum": ["android", "ios", "linux", "macos", "web", "windows"]
+            },
+            "description": "The platforms supported by the package."
+          },
+          "overrideReason": {
+            "type": ["string", "null"],
+            "description": "Why a dependency_overrides pin is needed despite no version conflict."
+          },
+          "replacementObsoleteFromVersion": {
+            "type": ["string", "null"],
+            "description": "Do not show replacement when user's version >= this value (semver string)."
+          },
+          "appliesToMinVersion": {
+            "type": ["string", "null"],
+            "description": "Minimum version this issue applies to (semver, inclusive). When absent, no lower bound."
+          },
+          "appliesToMaxVersion": {
+            "type": ["string", "null"],
+            "description": "Maximum version this issue applies to (semver, exclusive). When absent, no upper bound."
+          }
+        },
+        "required": ["name", "status", "as_of"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["$schema", "issues"],
+  "additionalProperties": false
+}
