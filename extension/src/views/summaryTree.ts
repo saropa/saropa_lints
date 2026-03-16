@@ -22,6 +22,7 @@ class SummaryItem extends vscode.TreeItem {
     if (commandId) {
       this.command = { command: commandId, title: label, arguments: commandArgs ?? [] };
     }
+    this.contextValue = 'summaryItem';
   }
 }
 

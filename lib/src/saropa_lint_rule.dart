@@ -2629,6 +2629,10 @@ class SaropaDiagnosticReporter {
   final LintCode lintCode;
   final RuleContext _ruleContext;
 
+  // Cached file-level ignore result to avoid repeated regex per violation.
+  String? _cachedFilePath;
+  bool? _cachedFileIgnored;
+
   /// Reports a diagnostic at the given [node].
   ///
   /// For [AnnotatedNode]s (declarations with doc comments or metadata), the
@@ -2641,12 +2645,12 @@ class SaropaDiagnosticReporter {
     if (node is AnnotatedNode) {
       final adjustedOffset = node.firstTokenAfterCommentAndMetadata.offset;
       final length = node.end - adjustedOffset;
-      if (_isBaselined(adjustedOffset)) return;
+      if (_isSuppressed(adjustedOffset, node)) return;
       _rule.reportAtOffset(adjustedOffset, length);
       _trackViolation(adjustedOffset);
       return;
     }
-    if (_isBaselined(node.offset)) return;
+    if (_isSuppressed(node.offset, node)) return;
     _rule.reportAtNode(node);
     _trackViolation(node.offset);
   }
@@ -2654,6 +2658,8 @@ class SaropaDiagnosticReporter {
   /// Reports a diagnostic at the given [token].
   void atToken(Token token, [LintCode? code]) {
     if (_isBaselined(token.offset)) return;
+    if (_isIgnoredForFile()) return;
+    if (IgnoreUtils.hasIgnoreCommentOnToken(token, _ruleName)) return;
     _rule.reportAtToken(token);
     _trackViolation(token.offset);
   }
@@ -2661,9 +2667,21 @@ class SaropaDiagnosticReporter {
   /// Reports a diagnostic at the given offset and length.
   void atOffset({required int offset, required int length}) {
     if (_isBaselined(offset)) return;
+    // File-level only — no AST node available for node-level ignore check.
+    if (_isIgnoredForFile()) return;
     _rule.reportAtOffset(offset, length);
     _trackViolation(offset);
   }
+
+  /// Check if a violation at [offset] on [node] should be suppressed.
+  ///
+  /// Checks baseline, file-level `// ignore_for_file:`, and node-level
+  /// `// ignore:` directives so suppressed violations are excluded from
+  /// both analyzer output and violations.json.
+  bool _isSuppressed(int offset, AstNode node) =>
+      _isBaselined(offset) ||
+      _isIgnoredForFile() ||
+      IgnoreUtils.hasIgnoreComment(node, _ruleName);
 
   /// Check if this violation is suppressed by the baseline.
   bool _isBaselined(int offset) {
@@ -2677,6 +2695,23 @@ class SaropaDiagnosticReporter {
       line,
       impact: impact.name,
     );
+  }
+
+  /// Check if this rule is suppressed file-wide via `// ignore_for_file:`.
+  ///
+  /// Caches the result per file path so the regex runs at most once per file
+  /// per reporter instance.
+  bool _isIgnoredForFile() {
+    final unit = _ruleContext.currentUnit;
+    if (unit == null) return false;
+    final path = unit.file.path;
+    if (path == _cachedFilePath && _cachedFileIgnored != null) {
+      return _cachedFileIgnored!;
+    }
+    _cachedFilePath = path;
+    _cachedFileIgnored =
+        IgnoreUtils.isIgnoredForFile(unit.content, _ruleName);
+    return _cachedFileIgnored!;
   }
 
   /// Record this violation in impact and progress trackers.

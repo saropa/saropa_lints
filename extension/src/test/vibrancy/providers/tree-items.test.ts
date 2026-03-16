@@ -4,7 +4,7 @@ import {
     PackageItem, InsightItem, OverrideItem,
 } from '../../../vibrancy/providers/tree-items';
 import {
-    PackageWithProblemsItem, ProblemItem, SuggestionItem, HealthyPackageItem,
+    ProblemItem, SuggestionItem,
 } from '../../../vibrancy/providers/problem-tree-items';
 import { VibrancyResult, GitHubMetrics, PubDevPackageInfo, PackageInsight, OverrideAnalysis } from '../../../vibrancy/types';
 
@@ -253,15 +253,6 @@ describe('detail sync duck-typing contracts', () => {
         assert.strictEqual(item.analysis.entry.name, 'http');
     });
 
-    it('PackageWithProblemsItem exposes pkgProblems.package for selection handler', () => {
-        const item = new PackageWithProblemsItem(
-            { package: 'http', problems: [], priorityScore: 0, highestSeverity: 'low' },
-            null,
-        );
-        assert.ok('pkgProblems' in item);
-        assert.strictEqual(item.pkgProblems.package, 'http');
-    });
-
     it('ProblemItem exposes packageName for selection handler', () => {
         const item = new ProblemItem(
             {
@@ -287,9 +278,4 @@ describe('detail sync duck-typing contracts', () => {
         assert.strictEqual(item.packageName, 'http');
     });
 
-    it('HealthyPackageItem exposes packageName for selection handler', () => {
-        const item = new HealthyPackageItem('http', 85);
-        assert.ok('packageName' in item);
-        assert.strictEqual(item.packageName, 'http');
-    });
 });

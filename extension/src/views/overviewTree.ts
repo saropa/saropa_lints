@@ -33,6 +33,7 @@ class OverviewItem extends vscode.TreeItem {
     super(label, vscode.TreeItemCollapsibleState.None);
     this.description = description;
     this.command = { command: commandId, title: label, arguments: args };
+    this.contextValue = 'overviewItem';
   }
 }
 

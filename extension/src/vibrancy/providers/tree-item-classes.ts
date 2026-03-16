@@ -50,7 +50,10 @@ export function severityColor(severity: 'high' | 'medium' | 'low'): vscode.Theme
 }
 
 export class PackageItem extends vscode.TreeItem {
-    constructor(public readonly result: VibrancyResult) {
+    constructor(
+        public readonly result: VibrancyResult,
+        problemCount?: number,
+    ) {
         super(result.package.name, vscode.TreeItemCollapsibleState.Collapsed);
         const hasUpdate = result.updateInfo?.updateStatus
             && result.updateInfo.updateStatus !== 'up-to-date';
@@ -58,6 +61,9 @@ export class PackageItem extends vscode.TreeItem {
         let desc = `${displayScore}/10 — ${categoryLabel(result.category)}`;
         if (hasUpdate) {
             desc += ` → ${result.updateInfo!.latestVersion}`;
+        }
+        if (problemCount && problemCount > 0) {
+            desc += ` — ${problemCount} problem${problemCount === 1 ? '' : 's'}`;
         }
         this.description = desc;
         this.iconPath = new vscode.ThemeIcon(

@@ -37,6 +37,16 @@ import { logReport, logSection, flushReport } from './reportWriter';
 import { generateOwaspReport } from './owaspExport';
 import { getProjectRoot, invalidateProjectRoot } from './projectRoot';
 import { runActivation as runVibrancyActivation, stopFreshnessWatcher } from './vibrancy/extension-activation';
+import { copyTreeNodesToClipboard } from './copyTreeAsJson';
+import {
+  serializeIssueNode,
+  serializeConfigNode,
+  serializeSummaryNode,
+  serializeSecurityNode,
+  serializeFileRiskNode,
+  serializeOverviewNode,
+  serializeSuggestionNode,
+} from './treeSerializers';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -706,6 +716,18 @@ export function activate(context: vscode.ExtensionContext): void {
     ),
   );
 
+  // ── Copy as JSON commands ───────────────────────────────────────────────
+  // Each view gets its own command so context menus target the right view.
+  registerCopyAsJsonCommands(context, {
+    issuesProvider,
+    configProvider,
+    summaryProvider,
+    securityProvider,
+    fileRiskProvider,
+    overviewProvider,
+    suggestionsProvider,
+  });
+
   // Package Vibrancy subsystem — registers its own views, commands, and providers
   // under the shared saropaLints sidebar container.
   // Wrapped in try/catch so a vibrancy failure doesn't kill the entire extension.
@@ -817,6 +839,46 @@ async function showFirstRunNotification(
   } else if (choice === 'Configure Rules') {
     await vscode.commands.executeCommand('saropaLints.config.focus');
   }
+}
+
+/** Register "Copy as JSON" commands for all lints tree views (not vibrancy — handled separately). */
+function registerCopyAsJsonCommands(
+  context: vscode.ExtensionContext,
+  providers: {
+    issuesProvider: IssuesTreeProvider;
+    configProvider: ConfigTreeProvider;
+    summaryProvider: SummaryTreeProvider;
+    securityProvider: SecurityPostureTreeProvider;
+    fileRiskProvider: FileRiskTreeProvider;
+    overviewProvider: OverviewTreeProvider;
+    suggestionsProvider: SuggestionsTreeProvider;
+  },
+): void {
+  const { issuesProvider, configProvider, summaryProvider, securityProvider, fileRiskProvider, overviewProvider, suggestionsProvider } = providers;
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('saropaLints.issues.copyAsJson', (item: unknown, selected?: unknown[]) =>
+      copyTreeNodesToClipboard(item, selected, serializeIssueNode, (n) => issuesProvider.getChildren(n as never), 'Issues'),
+    ),
+    vscode.commands.registerCommand('saropaLints.config.copyAsJson', (item: unknown, selected?: unknown[]) =>
+      copyTreeNodesToClipboard(item, selected, serializeConfigNode, (n) => configProvider.getChildren(n as never), 'Config'),
+    ),
+    vscode.commands.registerCommand('saropaLints.summary.copyAsJson', (item: unknown, selected?: unknown[]) =>
+      copyTreeNodesToClipboard(item, selected, serializeSummaryNode, (n) => summaryProvider.getChildren(n as never), 'Summary'),
+    ),
+    vscode.commands.registerCommand('saropaLints.securityPosture.copyAsJson', (item: unknown, selected?: unknown[]) =>
+      copyTreeNodesToClipboard(item, selected, serializeSecurityNode, (n) => securityProvider.getChildren(n as never), 'Security Posture'),
+    ),
+    vscode.commands.registerCommand('saropaLints.fileRisk.copyAsJson', (item: unknown, selected?: unknown[]) =>
+      copyTreeNodesToClipboard(item, selected, serializeFileRiskNode, (n) => fileRiskProvider.getChildren(n as never), 'File Risk'),
+    ),
+    vscode.commands.registerCommand('saropaLints.overview.copyAsJson', (item: unknown, selected?: unknown[]) =>
+      copyTreeNodesToClipboard(item, selected, serializeOverviewNode, (n) => overviewProvider.getChildren(), 'Overview'),
+    ),
+    vscode.commands.registerCommand('saropaLints.suggestions.copyAsJson', (item: unknown, selected?: unknown[]) =>
+      copyTreeNodesToClipboard(item, selected, serializeSuggestionNode, (n) => suggestionsProvider.getChildren(), 'Suggestions'),
+    ),
+  );
 }
 
 export function deactivate(): void {

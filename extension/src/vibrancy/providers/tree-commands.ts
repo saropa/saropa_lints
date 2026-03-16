@@ -8,9 +8,11 @@ import {
     addSuppressedPackage, removeSuppressedPackage,
 } from '../services/config-service';
 import { DetailItem, PackageItem } from './tree-items';
+import { copyTreeNodesToClipboard } from '../../copyTreeAsJson';
+import { serializeVibrancyNode } from '../../treeSerializers';
 import { DetailViewProvider } from '../views/detail-view-provider';
 import { DetailLogger } from '../services/detail-logger';
-import { getLatestResults } from '../extension-activation';
+import { getLatestResults, getScannedPubspecUri } from '../extension-activation';
 import { UpdateFromCodeLensArgs } from './codelens-provider';
 import { ComparisonPanel } from '../views/comparison-webview';
 import { resultToComparisonData } from '../scoring/comparison-ranker';
@@ -39,11 +41,15 @@ function requirePackageItem(
 /** Register tree-item commands (navigate, open, update, copy, suppress). */
 export function registerTreeCommands(
     context: vscode.ExtensionContext,
+    treeProvider: { getChildren(element?: unknown): unknown[] },
     detailViewProvider?: DetailViewProvider | null,
     detailLogger?: DetailLogger | null,
 ): void {
     _detailViewProvider = detailViewProvider ?? null;
     _detailLogger = detailLogger ?? null;
+
+    // Bind getChildren for the copy command to use for recursive serialization.
+    const getChildren = (n: unknown) => treeProvider.getChildren(n as never);
 
     context.subscriptions.push(
         vscode.commands.registerCommand('saropaLints.packageVibrancy.goToPackage', goToPackage),
@@ -51,7 +57,10 @@ export function registerTreeCommands(
         vscode.commands.registerCommand('saropaLints.packageVibrancy.openOnPubDev', openOnPubDev),
         vscode.commands.registerCommand('saropaLints.packageVibrancy.showChangelog', showChangelog),
         vscode.commands.registerCommand('saropaLints.packageVibrancy.updateToLatest', updateToLatest),
-        vscode.commands.registerCommand('saropaLints.packageVibrancy.copyAsJson', copyAsJson),
+        vscode.commands.registerCommand('saropaLints.packageVibrancy.copyAsJson',
+            (item: unknown, selected?: unknown[]) =>
+                copyTreeNodesToClipboard(item, selected, serializeVibrancyNode, getChildren, 'Vibrancy'),
+        ),
         vscode.commands.registerCommand('saropaLints.packageVibrancy.suppressPackage', suppressPackage),
         vscode.commands.registerCommand('saropaLints.packageVibrancy.unsuppressPackage', unsuppressPackage),
         vscode.commands.registerCommand('saropaLints.packageVibrancy.openUrl', openUrl),
@@ -66,10 +75,18 @@ export function registerTreeCommands(
     );
 }
 
+/**
+ * Resolve the pubspec.yaml URI, preferring the scanned URI from the last scan
+ * over a workspace-wide glob (which can return a wrong file in multi-root workspaces).
+ */
+async function resolveScannedPubspec(): Promise<vscode.Uri | null> {
+    return getScannedPubspecUri() ?? await findPubspecYaml();
+}
+
 /** Navigate to a package's entry in pubspec.yaml. */
 async function goToPackage(packageName: string | undefined): Promise<void> {
     if (!packageName || typeof packageName !== 'string') { return; }
-    const yamlUri = await findPubspecYaml();
+    const yamlUri = await resolveScannedPubspec();
     if (!yamlUri) { return; }
 
     const doc = await vscode.workspace.openTextDocument(yamlUri);
@@ -84,7 +101,7 @@ async function goToPackage(packageName: string | undefined): Promise<void> {
 /** Open pubspec.yaml at a given 0-based line. Used when clicking a problem in the Problems view. */
 async function goToLine(line: number | undefined): Promise<void> {
     if (line == null || typeof line !== 'number' || line < 0) { return; }
-    const yamlUri = await findPubspecYaml();
+    const yamlUri = await resolveScannedPubspec();
     if (!yamlUri) { return; }
 
     const doc = await vscode.workspace.openTextDocument(yamlUri);
@@ -121,7 +138,7 @@ async function updateToLatest(item: PackageItem | undefined): Promise<void> {
     const latest = item.result.updateInfo?.latestVersion;
     if (!latest) { return; }
 
-    const yamlUri = await findPubspecYaml();
+    const yamlUri = await resolveScannedPubspec();
     if (!yamlUri) { return; }
 
     const doc = await vscode.workspace.openTextDocument(yamlUri);
@@ -139,15 +156,7 @@ async function updateToLatest(item: PackageItem | undefined): Promise<void> {
     await doc.save();
 }
 
-/** Copy the package's vibrancy result to the clipboard as JSON. */
-async function copyAsJson(item: PackageItem | undefined): Promise<void> {
-    if (!requirePackageItem(item, 'Copy as JSON')) { return; }
-    const json = JSON.stringify(item.result, null, 2);
-    await vscode.env.clipboard.writeText(json);
-    vscode.window.showInformationMessage(
-        `Copied ${item.result.package.name} vibrancy data to clipboard`,
-    );
-}
+// copyAsJson is now handled inline by copyTreeNodesToClipboard in registerTreeCommands.
 
 /** Add a package to the suppressed list in workspace settings. */
 async function suppressPackage(item: PackageItem | undefined): Promise<void> {
@@ -165,7 +174,7 @@ async function unsuppressPackage(item: PackageItem | undefined): Promise<void> {
 /** Comment out an unused dependency in pubspec.yaml. */
 async function commentOutUnused(item: PackageItem | undefined): Promise<void> {
     if (!requirePackageItem(item, 'Comment Out Unused')) { return; }
-    const yamlUri = await findPubspecYaml();
+    const yamlUri = await resolveScannedPubspec();
     if (!yamlUri) { return; }
 
     const doc = await vscode.workspace.openTextDocument(yamlUri);
@@ -183,7 +192,7 @@ async function commentOutUnused(item: PackageItem | undefined): Promise<void> {
 /** Delete an unused dependency from pubspec.yaml, creating a backup. */
 async function deleteUnused(item: PackageItem | undefined): Promise<void> {
     if (!requirePackageItem(item, 'Delete Unused')) { return; }
-    const yamlUri = await findPubspecYaml();
+    const yamlUri = await resolveScannedPubspec();
     if (!yamlUri) { return; }
 
     const doc = await vscode.workspace.openTextDocument(yamlUri);
@@ -245,7 +254,7 @@ async function updateFromCodeLens(args: UpdateFromCodeLensArgs): Promise<void> {
 
     const yamlUri = args.pubspecPath
         ? vscode.Uri.file(args.pubspecPath)
-        : await findPubspecYaml();
+        : await resolveScannedPubspec();
 
     if (!yamlUri) {
         vscode.window.showWarningMessage('Could not find pubspec.yaml');
