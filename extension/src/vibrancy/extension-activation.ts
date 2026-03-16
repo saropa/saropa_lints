@@ -988,6 +988,13 @@ function getBlockedPackages(): string[] {
 
 export function stopFreshnessWatcher(): void {
     freshnessWatcher?.stop();
+
+    // Dispose the lazily-created output channel to avoid a resource leak
+    // when the extension deactivates (it was never disposed before).
+    if (upgradeChannel) {
+        upgradeChannel.dispose();
+        upgradeChannel = null;
+    }
 }
 
 async function runSortDependencies(): Promise<void> {

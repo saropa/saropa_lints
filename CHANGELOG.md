@@ -25,6 +25,17 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [9.4.1]
+
+_Housekeeping: plugging minor gaps carried over from the Package Vibrancy merge._
+
+### Fixed
+
+- **Extension** — dispose the upgrade-plan output channel on deactivation (was never cleaned up, minor resource leak)
+- **Extension** — declare `focusIssuesForOwasp` command in `package.json` so VS Code can validate it; hidden from Command Palette since it requires a structured argument
+
+---
+
 ## [9.4.0]
 
 _Package Vibrancy is now built into Saropa Lints. One extension, one sidebar — lint analysis and dependency health together._
