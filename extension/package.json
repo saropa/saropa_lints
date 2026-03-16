@@ -342,7 +342,8 @@
       },
       {
         "command": "saropaLints.showAbout",
-        "title": "Saropa Lints: About"
+        "title": "About Saropa Lints",
+        "icon": "$(info)"
       }
     ],
     "menus": {
@@ -395,7 +396,7 @@
         {
           "command": "saropaLints.showAbout",
           "when": "view == saropaLints.overview",
-          "group": "z_about"
+          "group": "navigation"
         },
         {
           "command": "saropaLints.refresh",
