@@ -264,34 +264,22 @@ export function activate(context: vscode.ExtensionContext): void {
   };
   watchViolations();
 
-  // Permanent version indicator — always visible, opens About screen on click.
   const extVersion = (context.extension.packageJSON as { version: string }).version;
-  const versionStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 98);
-  versionStatusBarItem.text = `$(info) Saropa v${extVersion}`;
-  versionStatusBarItem.tooltip = 'About Saropa Lints';
-  versionStatusBarItem.command = 'saropaLints.showAbout';
-  versionStatusBarItem.show();
-  context.subscriptions.push(versionStatusBarItem);
 
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   context.subscriptions.push(statusBarItem);
 
-  // W8: Separate status bar item showing the current tier; click to change.
-  const tierStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
-  context.subscriptions.push(tierStatusBarItem);
-
-  // Combined updater for both status bar items to avoid scattered calls.
+  // Single status bar item showing score + tier (or state).
   // Accepts optional pre-loaded data to avoid re-reading violations.json from disk
   // when the caller already has it (e.g. debouncedRefresh).
   const updateAllStatusBars = (preloadedData?: ViolationsData) => {
     // Hide status bar entirely for non-Dart projects.
     if (!isDartProject) {
       statusBarItem.hide();
-      tierStatusBarItem.hide();
       return;
     }
     const en = getConfig().get<boolean>('enabled', false) ?? false;
-    // Main status bar: Health Score when available, else On/Off state.
+    const tier = getConfig().get<string>('tier', 'recommended') ?? 'recommended';
     if (en) {
       // Use pre-loaded data when supplied; otherwise read from disk.
       const root = getProjectRoot();
@@ -299,11 +287,11 @@ export function activate(context: vscode.ExtensionContext): void {
       const health = data ? computeHealthScore(data) : null;
 
       if (health) {
-        // Show score with delta from previous run if available.
+        // Show score with delta, then tier — e.g. "Saropa: 72% · recommended"
         const history = loadHistory(context.workspaceState);
         const prevScore = findPreviousScore(history);
         const delta = prevScore !== undefined ? ` ${formatScoreDelta(health.score, prevScore)}` : '';
-        statusBarItem.text = `$(checklist) Saropa: ${health.score}${delta}`;
+        statusBarItem.text = `$(checklist) Saropa: ${health.score}%${delta} · ${tier}`;
         // Color the status bar based on score band.
         const band = scoreColorBand(health.score);
         statusBarItem.backgroundColor = band === 'red'
@@ -311,29 +299,20 @@ export function activate(context: vscode.ExtensionContext): void {
           : band === 'yellow'
             ? new vscode.ThemeColor('statusBarItem.warningBackground')
             : undefined;
-        statusBarItem.tooltip = `Health Score: ${health.score}/100. Click to open Saropa Lints.`;
+        statusBarItem.tooltip = `Saropa Lints v${extVersion} — Score: ${health.score}% — Tier: ${tier}`;
       } else {
-        statusBarItem.text = issuesProvider.hasViolations() ? '$(checklist) Saropa Lints: On' : '$(checklist) Saropa Lints';
-        statusBarItem.tooltip = 'Saropa Lints is enabled. Click to open view.';
+        // No score yet — show tier only.
+        statusBarItem.text = `$(checklist) Saropa Lints · ${tier}`;
+        statusBarItem.tooltip = `Saropa Lints v${extVersion} — Tier: ${tier}`;
         statusBarItem.backgroundColor = undefined;
       }
     } else {
       statusBarItem.text = '$(checklist) Saropa Lints: Off';
-      statusBarItem.tooltip = 'Enable Saropa Lints';
+      statusBarItem.tooltip = `Saropa Lints v${extVersion} — Disabled`;
       statusBarItem.backgroundColor = undefined;
     }
     statusBarItem.command = 'saropaLints.focusView';
     statusBarItem.show();
-    // Tier status bar: current tier, click to change.
-    if (en) {
-      const tier = getConfig().get<string>('tier', 'recommended') ?? 'recommended';
-      tierStatusBarItem.text = `$(tag) ${tier}`;
-      tierStatusBarItem.tooltip = 'Saropa Lints tier. Click to change.';
-      tierStatusBarItem.command = 'saropaLints.setTier';
-      tierStatusBarItem.show();
-    } else {
-      tierStatusBarItem.hide();
-    }
   };
   updateAllStatusBars();
 
@@ -366,7 +345,7 @@ export function activate(context: vscode.ExtensionContext): void {
       if (root) {
         logSection('Enable Result');
         if (health) {
-          logReport(`- Score: ${health.score}/100`);
+          logReport(`- Score: ${health.score}%`);
         }
         logReport(`- Violations: ${totalViolations}`);
         flushReport(root);

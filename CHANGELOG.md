@@ -35,9 +35,19 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Added
 
-- **Extension:** "About Saropa Lints" screen showing extension version and full company/product info from `ABOUT_SAROPA.md` — accessible from the `$(info)` icon on the sidebar container header, the status bar version indicator, and the command palette
-- **Extension:** Permanent status bar item `$(info) Saropa v{version}` — always visible for quick deployment verification, opens About screen on click
+- **Extension:** "About Saropa Lints" screen showing extension version and full company/product info from `ABOUT_SAROPA.md` — accessible from the Overview welcome buttons and command palette
+- **Extension:** "Getting Started" walkthrough button in Overview welcome content
+- **Extension:** Overview intro text describing the two components (pub.dev package + VS Code extension)
+- **Extension:** Version number shown in status bar tooltip for deployment verification
 - **Extension:** `precompile` script auto-copies root `ABOUT_SAROPA.md` into extension bundle so the About screen stays in sync with the source of truth
+
+### Changed
+
+- **Extension:** Consolidated three status bar items into one — shows score + tier (e.g. `Saropa: 72% · recommended`), version in tooltip only
+- **Extension:** Score display uses `%` format instead of `/100`
+- **Extension:** Sidebar views hidden when empty — Issues appears with a Dart project, Config when enabled, Summary/Suggestions/Security Posture/File Risk after analysis has data
+- **Extension:** Removed 15 redundant welcome content entries for views now hidden by `when` clauses
+- **Extension:** "Learn More" button renamed to "Learn more online" to clarify it opens a website
 
 ---
 

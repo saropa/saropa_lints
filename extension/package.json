@@ -53,130 +53,61 @@
         },
         {
           "id": "saropaLints.issues",
-          "name": "Issues"
+          "name": "Issues",
+          "when": "saropaLints.isDartProject"
         },
         {
           "id": "saropaLints.summary",
-          "name": "Summary"
+          "name": "Summary",
+          "when": "saropaLints.hasViolations"
         },
         {
           "id": "saropaLints.config",
-          "name": "Config"
+          "name": "Config",
+          "when": "saropaLints.enabled"
         },
         {
           "id": "saropaLints.suggestions",
-          "name": "Suggestions"
+          "name": "Suggestions",
+          "when": "saropaLints.hasViolations"
         },
         {
           "id": "saropaLints.securityPosture",
-          "name": "Security Posture"
+          "name": "Security Posture",
+          "when": "saropaLints.hasViolations"
         },
         {
           "id": "saropaLints.fileRisk",
-          "name": "File Risk"
+          "name": "File Risk",
+          "when": "saropaLints.hasViolations"
         }
       ]
     },
     "viewsWelcome": [
       {
         "view": "saropaLints.overview",
-        "contents": "Saropa Lints requires a **Dart or Flutter** project.\n\nOpen a folder containing a `pubspec.yaml` to get started.\n\n[Learn More](https://pub.dev/packages/saropa_lints)",
+        "contents": "Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.\n\nRequires a Dart or Flutter project.\n\nOpen a folder containing a `pubspec.yaml` to get started.\n\n[Learn more online](https://pub.dev/packages/saropa_lints)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
         "when": "!saropaLints.isDartProject"
       },
       {
         "view": "saropaLints.issues",
-        "contents": "Saropa Lints requires a **Dart or Flutter** project.\n\nOpen a folder containing a `pubspec.yaml` to get started.",
-        "when": "!saropaLints.isDartProject"
-      },
-      {
-        "view": "saropaLints.issues",
-        "contents": "Saropa Lints is **off** for this workspace.\n\nEnable it to:\n• Add saropa_lints to your project (pubspec + analysis_options)\n• Run init and analysis from the UI—no terminal commands\n• See issues grouped by impact, rule, and file\n\n[Enable Saropa Lints](command:saropaLints.enable)",
+        "contents": "Saropa Lints is off for this workspace.\n\nEnable it to:\n• Add saropa_lints to your project (pubspec + analysis_options)\n• Run init and analysis from the UI—no terminal commands\n• See issues grouped by impact, rule, and file\n\n[Enable Saropa Lints](command:saropaLints.enable)",
         "when": "saropaLints.isDartProject && !saropaLints.enabled"
       },
       {
         "view": "saropaLints.overview",
-        "contents": "Saropa Lints is **off** for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)",
+        "contents": "Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.\n\nSaropa Lints is off for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
         "when": "saropaLints.isDartProject && !saropaLints.enabled"
       },
       {
         "view": "saropaLints.overview",
-        "contents": "No analysis yet.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
+        "contents": "Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.\n\nNo analysis yet.\n\n[Run Analysis](command:saropaLints.runAnalysis)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
         "when": "saropaLints.enabled && !saropaLints.hasViolations"
       },
       {
         "view": "saropaLints.issues",
         "contents": "No analysis results yet.\n\n[Run Analysis](command:saropaLints.runAnalysis)\n[Open Config](command:saropaLints.openConfig)",
         "when": "saropaLints.enabled && !saropaLints.hasViolations"
-      },
-      {
-        "view": "saropaLints.summary",
-        "contents": "No analysis results yet.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
-        "when": "saropaLints.enabled && !saropaLints.hasViolations"
-      },
-      {
-        "view": "saropaLints.summary",
-        "contents": "Enable Saropa Lints in the Overview panel above.",
-        "when": "saropaLints.isDartProject && !saropaLints.enabled"
-      },
-      {
-        "view": "saropaLints.summary",
-        "contents": "Requires a Dart or Flutter project.",
-        "when": "!saropaLints.isDartProject"
-      },
-      {
-        "view": "saropaLints.config",
-        "contents": "Enable Saropa Lints in the Overview panel above.",
-        "when": "saropaLints.isDartProject && !saropaLints.enabled"
-      },
-      {
-        "view": "saropaLints.config",
-        "contents": "Requires a Dart or Flutter project.",
-        "when": "!saropaLints.isDartProject"
-      },
-      {
-        "view": "saropaLints.suggestions",
-        "contents": "Run analysis to get suggestions.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
-        "when": "saropaLints.enabled && !saropaLints.hasViolations"
-      },
-      {
-        "view": "saropaLints.suggestions",
-        "contents": "Enable Saropa Lints in the Overview panel above.",
-        "when": "saropaLints.isDartProject && !saropaLints.enabled"
-      },
-      {
-        "view": "saropaLints.suggestions",
-        "contents": "Requires a Dart or Flutter project.",
-        "when": "!saropaLints.isDartProject"
-      },
-      {
-        "view": "saropaLints.securityPosture",
-        "contents": "Run analysis to see OWASP security coverage.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
-        "when": "saropaLints.enabled && !saropaLints.hasViolations"
-      },
-      {
-        "view": "saropaLints.securityPosture",
-        "contents": "Enable Saropa Lints in the Overview panel above.",
-        "when": "saropaLints.isDartProject && !saropaLints.enabled"
-      },
-      {
-        "view": "saropaLints.securityPosture",
-        "contents": "Requires a Dart or Flutter project.",
-        "when": "!saropaLints.isDartProject"
-      },
-      {
-        "view": "saropaLints.fileRisk",
-        "contents": "Run analysis to see file risk ranking.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
-        "when": "saropaLints.enabled && !saropaLints.hasViolations"
-      },
-      {
-        "view": "saropaLints.fileRisk",
-        "contents": "Enable Saropa Lints in the Overview panel above.",
-        "when": "saropaLints.isDartProject && !saropaLints.enabled"
-      },
-      {
-        "view": "saropaLints.fileRisk",
-        "contents": "Requires a Dart or Flutter project.",
-        "when": "!saropaLints.isDartProject"
       }
     ],
     "commands": [
@@ -347,13 +278,6 @@
       }
     ],
     "menus": {
-      "viewContainer/title": [
-        {
-          "command": "saropaLints.showAbout",
-          "when": "viewContainer == saropaLints",
-          "group": "navigation"
-        }
-      ],
       "view/title": [
         {
           "command": "saropaLints.refresh",
