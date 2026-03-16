@@ -347,6 +347,13 @@
       }
     ],
     "menus": {
+      "viewContainer/title": [
+        {
+          "command": "saropaLints.showAbout",
+          "when": "viewContainer == saropaLints",
+          "group": "navigation"
+        }
+      ],
       "view/title": [
         {
           "command": "saropaLints.refresh",
@@ -390,11 +397,6 @@
         },
         {
           "command": "saropaLints.refresh",
-          "when": "view == saropaLints.overview",
-          "group": "navigation"
-        },
-        {
-          "command": "saropaLints.showAbout",
           "when": "view == saropaLints.overview",
           "group": "navigation"
         },
