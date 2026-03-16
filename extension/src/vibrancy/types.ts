@@ -1,5 +1,5 @@
 /** Status categories for package vibrancy. */
-export type VibrancyCategory = 'vibrant' | 'quiet' | 'legacy-locked' | 'end-of-life';
+export type VibrancyCategory = 'vibrant' | 'quiet' | 'legacy-locked' | 'stale' | 'end-of-life';
 
 /** Which pubspec section a dependency belongs to. */
 export type DependencySection = 'dependencies' | 'dev_dependencies' | 'transitive';

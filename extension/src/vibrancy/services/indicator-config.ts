@@ -5,6 +5,7 @@ export interface IndicatorConfig {
     readonly vibrant: string;
     readonly quiet: string;
     readonly legacyLocked: string;
+    readonly stale: string;
     readonly endOfLife: string;
     readonly updateAvailable: string;
     readonly prerelease: string;
@@ -21,6 +22,7 @@ const DEFAULT_INDICATORS: IndicatorConfig = {
     vibrant: '🟢',
     quiet: '🟡',
     legacyLocked: '🟠',
+    stale: '🟠',
     endOfLife: '🔴',
     updateAvailable: '⬆',
     prerelease: '🧪',
@@ -35,6 +37,7 @@ const CATEGORY_TEXT: Record<VibrancyCategory, string> = {
     'vibrant': 'Vibrant',
     'quiet': 'Quiet',
     'legacy-locked': 'Legacy',
+    'stale': 'Stale',
     'end-of-life': 'EOL',
 };
 
@@ -94,6 +97,7 @@ function getCategoryEmoji(category: VibrancyCategory, config: IndicatorConfig): 
         case 'vibrant': return config.vibrant;
         case 'quiet': return config.quiet;
         case 'legacy-locked': return config.legacyLocked;
+        case 'stale': return config.stale;
         case 'end-of-life': return config.endOfLife;
     }
 }

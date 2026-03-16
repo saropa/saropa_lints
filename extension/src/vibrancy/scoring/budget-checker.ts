@@ -9,6 +9,7 @@ export function readBudgetConfig(
         maxDependencies: get<number>('budget.maxDependencies') ?? null,
         maxTotalSizeMB: get<number>('budget.maxTotalSizeMB') ?? null,
         minAverageVibrancy: get<number>('budget.minAverageVibrancy') ?? null,
+        maxStale: get<number>('budget.maxStale') ?? null,
         maxEndOfLife: get<number>('budget.maxEndOfLife') ?? null,
         maxLegacyLocked: get<number>('budget.maxLegacyLocked') ?? null,
         maxUnused: get<number>('budget.maxUnused') ?? null,
@@ -20,6 +21,7 @@ export function hasBudgets(config: BudgetConfig): boolean {
     return config.maxDependencies !== null
         || config.maxTotalSizeMB !== null
         || config.minAverageVibrancy !== null
+        || config.maxStale !== null
         || config.maxEndOfLife !== null
         || config.maxLegacyLocked !== null
         || config.maxUnused !== null;
@@ -30,6 +32,7 @@ export function computeActuals(results: readonly VibrancyResult[]): {
     totalCount: number;
     totalSizeMB: number;
     averageVibrancy: number;
+    staleCount: number;
     endOfLifeCount: number;
     legacyLockedCount: number;
     unusedCount: number;
@@ -38,6 +41,7 @@ export function computeActuals(results: readonly VibrancyResult[]): {
 
     let totalSizeBytes = 0;
     let totalScore = 0;
+    let staleCount = 0;
     let endOfLifeCount = 0;
     let legacyLockedCount = 0;
     let unusedCount = 0;
@@ -46,6 +50,9 @@ export function computeActuals(results: readonly VibrancyResult[]): {
         totalScore += r.score;
         if (r.archiveSizeBytes !== null) {
             totalSizeBytes += r.archiveSizeBytes;
+        }
+        if (r.category === 'stale') {
+            staleCount++;
         }
         if (r.category === 'end-of-life') {
             endOfLifeCount++;
@@ -66,6 +73,7 @@ export function computeActuals(results: readonly VibrancyResult[]): {
         totalCount,
         totalSizeMB,
         averageVibrancy,
+        staleCount,
         endOfLifeCount,
         legacyLockedCount,
         unusedCount,
@@ -160,6 +168,15 @@ export function checkBudgets(
     }));
 
     budgetResults.push(buildResult({
+        dimension: 'Stale',
+        actual: actuals.staleCount,
+        limit: config.maxStale,
+        isMinimum: false,
+        formatActual: v => `${v}`,
+        formatLimit: v => `${v} max`,
+    }));
+
+    budgetResults.push(buildResult({
         dimension: 'End of Life',
         actual: actuals.endOfLifeCount,
         limit: config.maxEndOfLife,
@@ -237,7 +254,7 @@ export function formatBudgetSummary(results: readonly BudgetResult[]): string {
 /** Get packages by category for diagnostic details. */
 export function getPackagesByCategory(
     results: readonly VibrancyResult[],
-    category: 'end-of-life' | 'legacy-locked' | 'unused',
+    category: 'stale' | 'end-of-life' | 'legacy-locked' | 'unused',
 ): string[] {
     if (category === 'unused') {
         return results.filter(r => r.isUnused).map(r => r.package.name);
@@ -261,6 +278,10 @@ export function buildExceededDiagnostics(
         let message: string;
 
         switch (br.dimension) {
+            case 'Stale':
+                packageNames = getPackagesByCategory(results, 'stale');
+                message = `Budget exceeded: ${br.actual} Stale packages (limit: ${br.limit}). Review: ${packageNames.join(', ')}`;
+                break;
             case 'End of Life':
                 packageNames = getPackagesByCategory(results, 'end-of-life');
                 message = `Budget exceeded: ${br.actual} End-of-Life packages (limit: ${br.limit}). Remove or replace: ${packageNames.join(', ')}`;

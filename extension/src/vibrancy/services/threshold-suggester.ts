@@ -11,10 +11,12 @@ import { VibrancyResult, CiThresholds } from '../types';
  */
 export function suggestThresholds(results: readonly VibrancyResult[]): CiThresholds {
     const endOfLifeCount = countCategory(results, 'end-of-life');
+    const staleCount = countCategory(results, 'stale');
     const legacyLockedCount = countCategory(results, 'legacy-locked');
     const averageVibrancy = computeAverageVibrancy(results);
 
     return {
+        maxStale: staleCount,
         maxEndOfLife: endOfLifeCount,
         maxLegacyLocked: legacyLockedCount + 1,
         minAverageVibrancy: roundDownToNearest5(averageVibrancy),
@@ -42,6 +44,7 @@ function roundDownToNearest5(value: number): number {
 /** Format thresholds for display in quick-pick. */
 export function formatThresholdsSummary(thresholds: CiThresholds): string {
     const parts = [
+        `Stale ≤ ${thresholds.maxStale}`,
         `EOL ≤ ${thresholds.maxEndOfLife}`,
         `Legacy ≤ ${thresholds.maxLegacyLocked}`,
         `Avg ≥ ${thresholds.minAverageVibrancy}`,

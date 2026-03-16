@@ -170,13 +170,15 @@ describe('VibrancyStateManager', () => {
         });
 
         it('should count problem packages', () => {
+            // Stale, end-of-life, and legacy-locked are all problem categories
             manager.updateFromResults([
                 makeResult({ category: 'end-of-life' }),
+                makeResult({ category: 'stale' }),
                 makeResult({ category: 'legacy-locked' }),
                 makeResult({ category: 'vibrant' }),
                 makeResult({ category: 'quiet' }),
             ]);
-            assert.strictEqual(manager.problemCount.value, 2);
+            assert.strictEqual(manager.problemCount.value, 3);
         });
 
         it('should fire onDidChangeResults', (done) => {

@@ -14,6 +14,7 @@ const PROBLEM_WEIGHTS: Record<ProblemType, number> = {
 };
 
 const EOL_WEIGHT = 30;
+const STALE_WEIGHT = 25;
 const LEGACY_WEIGHT = 20;
 
 /**
@@ -89,6 +90,12 @@ export function collectProblems(
             severity: 'high',
             message: 'Package is end-of-life',
         });
+    } else if (result.category === 'stale') {
+        problems.push({
+            type: 'unhealthy',
+            severity: 'medium',
+            message: 'Package is stale — low maintenance activity',
+        });
     } else if (result.category === 'legacy-locked') {
         problems.push({
             type: 'unhealthy',
@@ -159,7 +166,9 @@ export function computeCombinedRisk(
 
     for (const problem of problems) {
         if (problem.type === 'unhealthy') {
-            score += result.category === 'end-of-life' ? EOL_WEIGHT : LEGACY_WEIGHT;
+            score += result.category === 'end-of-life' ? EOL_WEIGHT
+                : result.category === 'stale' ? STALE_WEIGHT
+                : LEGACY_WEIGHT;
         } else {
             score += PROBLEM_WEIGHTS[problem.type];
         }

@@ -7,6 +7,7 @@ const CATEGORY_LABELS: Record<VibrancyCategory, string> = {
     'vibrant': 'Vibrant',
     'quiet': 'Quiet',
     'legacy-locked': 'Legacy',
+    'stale': 'Stale',
     'end-of-life': 'End of Life',
 };
 
@@ -14,6 +15,7 @@ const CATEGORY_EMOJI: Record<VibrancyCategory, string> = {
     'vibrant': '🟢',
     'quiet': '🟡',
     'legacy-locked': '🟠',
+    'stale': '🟠',
     'end-of-life': '🔴',
 };
 

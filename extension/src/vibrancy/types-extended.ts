@@ -54,6 +54,7 @@ export interface BudgetConfig {
     readonly maxDependencies: number | null;
     readonly maxTotalSizeMB: number | null;
     readonly minAverageVibrancy: number | null;
+    readonly maxStale: number | null;
     readonly maxEndOfLife: number | null;
     readonly maxLegacyLocked: number | null;
     readonly maxUnused: number | null;
@@ -142,6 +143,7 @@ export type CiPlatform = 'github-actions' | 'gitlab-ci' | 'shell-script';
 
 /** Thresholds for CI vibrancy checks. */
 export interface CiThresholds {
+    readonly maxStale: number;
     readonly maxEndOfLife: number;
     readonly maxLegacyLocked: number;
     readonly minAverageVibrancy: number;

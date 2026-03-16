@@ -78,14 +78,14 @@ function mdHeader(meta: ReportMetadata, isoTimestamp: string): string[] {
 
 function mdSummary(
     total: number,
-    counts: { vibrant: number; quiet: number; legacy: number; eol: number },
+    counts: { vibrant: number; quiet: number; legacy: number; stale: number; eol: number },
     totalSize?: string,
 ): string[] {
     const rows = [
         '', '## Summary', '',
-        `| Total | Vibrant | Quiet | Legacy-Locked | End of Life |`,
-        `|-------|---------|-------|---------------|-------------|`,
-        `| ${total} | ${counts.vibrant} | ${counts.quiet} | ${counts.legacy} | ${counts.eol} |`,
+        `| Total | Vibrant | Quiet | Legacy-Locked | Stale | End of Life |`,
+        `|-------|---------|-------|---------------|-------|-------------|`,
+        `| ${total} | ${counts.vibrant} | ${counts.quiet} | ${counts.legacy} | ${counts.stale} | ${counts.eol} |`,
     ];
     if (totalSize) {
         rows.push('', `**Total archive size:** ${totalSize} *(before tree shaking)*`);
@@ -129,7 +129,7 @@ function buildJsonReport(
         summary: {
             total: results.length, vibrant: counts.vibrant,
             quiet: counts.quiet, legacy_locked: counts.legacy,
-            end_of_life: counts.eol,
+            stale: counts.stale, end_of_life: counts.eol,
         },
         packages: results.map(mapPackageToJson),
     };
