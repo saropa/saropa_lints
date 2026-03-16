@@ -5,19 +5,22 @@ import { VibrancyCategory, DependencySection, VibrancyResult } from '../types';
 /** View modes for the unified package tree. */
 export type VibrancyViewMode = 'all' | 'problems-only';
 
+/** All known problem severities for filter defaults. */
+export const ALL_SEVERITIES: readonly ProblemSeverity[] = ['high', 'medium', 'low'];
+
 /** All known problem types for filter defaults. */
-const ALL_PROBLEM_TYPES: readonly ProblemType[] = [
+export const ALL_PROBLEM_TYPES: readonly ProblemType[] = [
     'unhealthy', 'vulnerability', 'family-conflict', 'risky-transitive',
     'blocked-upgrade', 'unused', 'license-risk', 'stale-override',
 ];
 
 /** All known vibrancy categories for filter defaults. */
-const ALL_CATEGORIES: readonly VibrancyCategory[] = [
-    'vibrant', 'quiet', 'legacy-locked', 'end-of-life',
+export const ALL_CATEGORIES: readonly VibrancyCategory[] = [
+    'vibrant', 'quiet', 'legacy-locked', 'stale', 'end-of-life',
 ];
 
 /** All known dependency sections for filter defaults. */
-const ALL_SECTIONS: readonly DependencySection[] = [
+export const ALL_SECTIONS: readonly DependencySection[] = [
     'dependencies', 'dev_dependencies', 'transitive',
 ];
 

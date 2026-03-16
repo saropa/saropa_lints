@@ -46,6 +46,7 @@ function buildReportSummary(results: VibrancyResult[]): string {
         <div class="summary-card vibrant"><div class="count">${counts.vibrant}</div><div class="label">Vibrant</div></div>
         <div class="summary-card quiet"><div class="count">${counts.quiet}</div><div class="label">Quiet</div></div>
         <div class="summary-card legacy"><div class="count">${counts.legacy}</div><div class="label">Legacy</div></div>
+        <div class="summary-card stale"><div class="count">${counts.stale}</div><div class="label">Stale</div></div>
         <div class="summary-card eol"><div class="count">${counts.eol}</div><div class="label">End of Life</div></div>
         <div class="summary-card updates"><div class="count">${updates}</div><div class="label">Updates</div></div>
         <div class="summary-card unused"><div class="count">${results.filter(r => r.isUnused).length}</div><div class="label">Unused</div></div>

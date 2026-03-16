@@ -11,7 +11,7 @@ interface BaseProblem {
     readonly line: number;
 }
 
-/** Package is unhealthy (EOL or legacy-locked). */
+/** Package is unhealthy (EOL, stale, or legacy-locked). */
 export interface UnhealthyPackageProblem extends BaseProblem {
     readonly type: 'unhealthy';
     readonly score: number;
@@ -102,9 +102,13 @@ export function generateProblemId(pkg: string, type: ProblemType, suffix?: strin
 export function problemMessage(problem: Problem): string {
     switch (problem.type) {
         case 'unhealthy':
-            return problem.category === 'end-of-life'
-                ? 'Package is end-of-life'
-                : `Score ${problem.score}/100 — ${problem.category}`;
+            if (problem.category === 'end-of-life') {
+                return 'Package is end-of-life';
+            }
+            if (problem.category === 'stale') {
+                return 'Package is stale — low maintenance activity';
+            }
+            return `Score ${problem.score}/100 — ${problem.category}`;
         case 'stale-override':
             return 'No version conflict detected — review this override';
         case 'family-conflict':

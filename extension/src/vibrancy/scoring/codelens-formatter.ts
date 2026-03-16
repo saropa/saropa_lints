@@ -14,6 +14,7 @@ export function categoryEmoji(category: VibrancyCategory): string {
         case 'vibrant': return '🟢';
         case 'quiet': return '🟡';
         case 'legacy-locked': return '🟠';
+        case 'stale': return '🟠';
         case 'end-of-life': return '🔴';
     }
 }

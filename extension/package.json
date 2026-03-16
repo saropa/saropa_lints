@@ -1390,6 +1390,15 @@
             "maximum": 100,
             "description": "Minimum average vibrancy score required across all dependencies (null = no limit)"
           },
+          "saropaLints.packageVibrancy.budget.maxStale": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "default": null,
+            "minimum": 0,
+            "description": "Maximum number of Stale packages allowed (null = no limit)"
+          },
           "saropaLints.packageVibrancy.budget.maxEndOfLife": {
             "type": [
               "number",

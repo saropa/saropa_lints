@@ -78,6 +78,11 @@ import { CiPlatform, CiThresholds } from './types';
 import { ProblemRegistry, collectProblemsFromResults, CollectorContext } from './problems';
 import { findPackageRange } from './services/pubspec-parser';
 import { ProblemSeverity, ProblemType, problemTypeLabel } from './problems/problem-types';
+import {
+    ALL_SEVERITIES, ALL_PROBLEM_TYPES, ALL_CATEGORIES, ALL_SECTIONS,
+} from './providers/vibrancy-filter-state';
+import { SECTION_LABELS } from './providers/tree-item-classes';
+import { categoryLabel } from './scoring/status-classifier';
 
 let latestResults: VibrancyResult[] = [];
 let lastParsedDeps: ParsedDeps | null = null;
@@ -337,23 +342,6 @@ function updateVibrancyFilterState(provider: VibrancyTreeProvider): void {
     stateManager.hasFilter.value = state.hasActiveFilters;
 }
 
-const ALL_SEVERITIES: ProblemSeverity[] = ['high', 'medium', 'low'];
-const ALL_PROBLEM_TYPES: ProblemType[] = [
-    'unhealthy', 'vulnerability', 'family-conflict', 'risky-transitive',
-    'blocked-upgrade', 'unused', 'license-risk', 'stale-override',
-];
-const ALL_CATEGORIES: VibrancyCategory[] = [
-    'vibrant', 'quiet', 'legacy-locked', 'end-of-life',
-];
-const ALL_SECTIONS: DependencySection[] = [
-    'dependencies', 'dev_dependencies', 'transitive',
-];
-const SECTION_LABELS: Record<DependencySection, string> = {
-    dependencies: 'Dependencies',
-    dev_dependencies: 'Dev Dependencies',
-    transitive: 'Transitive',
-};
-
 function registerFilterCommands(
     context: vscode.ExtensionContext,
     provider: VibrancyTreeProvider,
@@ -416,7 +404,7 @@ function registerFilterCommands(
                 const current = provider.getFilterState().categoryFilter;
                 const picks = await vscode.window.showQuickPick(
                     ALL_CATEGORIES.map(c => ({
-                        label: c.charAt(0).toUpperCase() + c.slice(1).replace('-', ' '),
+                        label: categoryLabel(c),
                         picked: current.has(c),
                         id: c,
                     })),

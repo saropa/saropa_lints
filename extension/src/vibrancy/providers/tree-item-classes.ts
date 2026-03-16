@@ -12,7 +12,7 @@ import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
  * Extracted from tree-items.ts for modularity.
  */
 
-const SECTION_LABELS: Record<DependencySection, string> = {
+export const SECTION_LABELS: Record<DependencySection, string> = {
     dependencies: 'Dependencies',
     dev_dependencies: 'Dev Dependencies',
     transitive: 'Transitive',
@@ -29,6 +29,7 @@ export function categoryColor(cat: VibrancyCategory): vscode.ThemeColor {
         case 'vibrant': return new vscode.ThemeColor('testing.iconPassed');
         case 'quiet': return new vscode.ThemeColor('editorInfo.foreground');
         case 'legacy-locked': return new vscode.ThemeColor('editorWarning.foreground');
+        case 'stale': return new vscode.ThemeColor('editorWarning.foreground');
         case 'end-of-life': return new vscode.ThemeColor('editorError.foreground');
     }
 }
