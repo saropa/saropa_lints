@@ -36,6 +36,7 @@ import { writeRuleOverrides, removeRuleOverrides } from './configWriter';
 import { logReport, logSection, flushReport } from './reportWriter';
 import { generateOwaspReport } from './owaspExport';
 import { getProjectRoot, invalidateProjectRoot } from './projectRoot';
+import { runActivation as runVibrancyActivation, stopFreshnessWatcher } from './vibrancy/extension-activation';
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
@@ -704,6 +705,15 @@ export function activate(context: vscode.ExtensionContext): void {
       }),
     ),
   );
+
+  // Package Vibrancy subsystem — registers its own views, commands, and providers
+  // under the shared saropaLints sidebar container.
+  // Wrapped in try/catch so a vibrancy failure doesn't kill the entire extension.
+  try {
+    runVibrancyActivation(context);
+  } catch (err) {
+    console.error('[Saropa Lints] Package Vibrancy activation failed:', err);
+  }
 }
 
 /** Extract rule names from command arg: string[] (TreeItem click) or triage node (context menu). */
@@ -809,4 +819,11 @@ async function showFirstRunNotification(
   }
 }
 
-export function deactivate(): void {}
+export function deactivate(): void {
+  // Wrapped in try/catch so a vibrancy teardown error doesn't prevent clean shutdown.
+  try {
+    stopFreshnessWatcher();
+  } catch (err) {
+    console.error('[Saropa Lints] Package Vibrancy deactivation failed:', err);
+  }
+}

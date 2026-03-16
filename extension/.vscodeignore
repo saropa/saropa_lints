@@ -1,11 +1,12 @@
 .vscode/**
 src/**
 test/**
-out/test/**
+out/**
 tsconfig.json
 node_modules/**
 .gitignore
 package-lock.json
+esbuild.js
 *.vsix
 *.md
 !README.md
