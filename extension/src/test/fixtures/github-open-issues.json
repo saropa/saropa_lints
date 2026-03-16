@@ -1,0 +1,16 @@
+[
+    {
+        "number": 301,
+        "title": "Package is obsolete, consider migration",
+        "comments": 15,
+        "html_url": "https://github.com/dart-lang/http/issues/301",
+        "labels": []
+    },
+    {
+        "number": 302,
+        "title": "Normal feature request",
+        "comments": 2,
+        "html_url": "https://github.com/dart-lang/http/issues/302",
+        "labels": []
+    }
+]

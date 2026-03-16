@@ -763,7 +763,10 @@ export function activate(context: vscode.ExtensionContext): void {
   // under the shared saropaLints sidebar container.
   // Wrapped in try/catch so a vibrancy failure doesn't kill the entire extension.
   try {
-    runVibrancyActivation(context);
+    runVibrancyActivation(context, (data) => {
+      vibrancyData = data;
+      updateAllStatusBars();
+    });
   } catch (err) {
     console.error('[Saropa Lints] Package Vibrancy activation failed:', err);
   }
