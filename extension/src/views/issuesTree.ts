@@ -32,6 +32,17 @@ const SEVERITY_ORDER = ['error', 'warning', 'info'] as const;
 const DEFAULT_PAGE_SIZE = 100;
 const MESSAGE_LABEL_LEN = 56;
 
+/** Map a severity string to a colored ThemeIcon matching VS Code's diagnostic palette. */
+function severityThemeIcon(severity: string): vscode.ThemeIcon {
+  const name = severity === 'error' ? 'error' : severity === 'warning' ? 'warning' : 'info';
+  const color = severity === 'error'
+    ? 'list.errorForeground'
+    : severity === 'warning'
+      ? 'list.warningForeground'
+      : 'editorInfo.foreground';
+  return new vscode.ThemeIcon(name, new vscode.ThemeColor(color));
+}
+
 function getPageSize(): number {
   const n = vscode.workspace.getConfiguration('saropaLints').get<number>('issuesPageSize', DEFAULT_PAGE_SIZE);
   return Math.max(1, Math.min(1000, typeof n === 'number' && !Number.isNaN(n) ? n : DEFAULT_PAGE_SIZE));
@@ -45,7 +56,7 @@ function getPageSize(): number {
 export type GroupByMode = 'severity' | 'file' | 'impact' | 'rule' | 'owasp';
 
 /** Discriminated union for all node types in the Issues tree. */
-type IssueTreeNode =
+export type IssueTreeNode =
   | SeverityItem
   | FolderItem
   | FileItem
@@ -449,9 +460,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
         label,
         vscode.TreeItemCollapsibleState.Collapsed,
       );
-      item.iconPath = new vscode.ThemeIcon(
-        element.severity === 'error' ? 'error' : element.severity === 'warning' ? 'warning' : 'info',
-      );
+      item.iconPath = severityThemeIcon(element.severity);
       item.tooltip = `${element.count} ${element.severity}(s)`;
       item.contextValue = 'severity';
       item.accessibilityInformation = { label: `${element.severity}, ${element.count} issues`, role: 'treeitem' };
@@ -462,7 +471,10 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
         element.segmentName,
         vscode.TreeItemCollapsibleState.Collapsed,
       );
-      item.iconPath = new vscode.ThemeIcon('folder');
+      // Inherit severity icon+color from parent so folders visually match their severity group.
+      item.iconPath = element.severity
+        ? severityThemeIcon(element.severity)
+        : new vscode.ThemeIcon('folder');
       item.description = `${element.count} issues`;
       item.tooltip = `${element.pathPrefix || element.segmentName}/ — ${element.count} issues`;
       item.contextValue = 'folder';
