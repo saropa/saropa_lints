@@ -33,6 +33,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Changed
 
+- **Extension** — "Apply fix" context menu item in Issues tree is now greyed out for violations whose rule has no quick-fix generator; `rulesWithFixes` list in `violations.json` config section drives the enablement so the user knows upfront which violations are auto-fixable
 - **Package Vibrancy** — merged Package Problems panel into Package Vibrancy; problems and suggested actions now appear as child nodes under each package instead of in a separate tree view
 - **Package Vibrancy** — added filter toolbar: search by name, filter by severity, problem type, health category, and dependency section; toggle problems-only view mode; clear all filters
 - **Package Vibrancy** — problem summary bar (severity counts) now appears at the top of the unified tree when problems exist
@@ -43,6 +44,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Fixed
 
+- **Lint Rules** — `require_image_picker_permission_ios` no longer fires a false positive on gallery-only usage; the rule now checks for `ImageSource.camera` in `pickImage()`/`pickVideo()` calls instead of triggering on any `image_picker` import, matching the Android rule's approach
 - **Package Vibrancy** — clicking a problem child node (e.g. "Unhealthy") now navigates to the correct pubspec.yaml from the last scan instead of opening a random pubspec in a multi-root workspace
 - **Package Vibrancy** — added missing `stale` category handling in comparison view CSS, scan log output, CI threshold prompts, and CI generator templates
 - **Analyzer** — `// ignore:` and `// ignore_for_file:` comments now suppress violations in the extension's Issues tree and `violations.json`, not just in the editor; centralized ignore handling in `SaropaDiagnosticReporter` so all rules benefit without per-rule opt-in

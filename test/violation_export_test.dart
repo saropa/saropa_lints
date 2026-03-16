@@ -473,6 +473,23 @@ void main() {
       expect(stylistic, equals(stylistic.toList()..sort()));
     });
 
+    test('config includes rulesWithFixes sorted alphabetically', () {
+      ViolationExporter.write(
+        projectRoot: projectRoot,
+        sessionId: 'test_session',
+        data: buildData(),
+        owaspLookup: const <String, OwaspMapping>{},
+      );
+
+      final configSection = readExport()['config'] as Map<String, dynamic>;
+      final fixes =
+          (configSection['rulesWithFixes'] as List<dynamic>).cast<String>();
+      // rulesWithFixes is computed from all rule factories, so it should
+      // be non-empty (many rules have quick-fix generators) and sorted.
+      expect(fixes, isNotEmpty);
+      expect(fixes, equals(fixes.toList()..sort()));
+    });
+
     test('config includes disabledPackages and userExclusions', () {
       final config = ReportConfig(
         version: '4.14.0',

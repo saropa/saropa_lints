@@ -278,7 +278,8 @@
       },
       {
         "command": "saropaLints.applyFix",
-        "title": "Apply fix"
+        "title": "Apply fix",
+        "enablement": "viewItem == violationFixable"
       },
       {
         "command": "saropaLints.fixAllInFile",
@@ -333,42 +334,42 @@
       },
       {
         "command": "saropaLints.packageVibrancy.scan",
-        "title": "Saropa: Scan Package Vibrancy",
+        "title": "Scan Package Vibrancy",
         "icon": "$(refresh)"
       },
       {
         "command": "saropaLints.packageVibrancy.showReport",
-        "title": "Saropa: Show Vibrancy Report",
+        "title": "Show Vibrancy Report",
         "icon": "$(graph)"
       },
       {
         "command": "saropaLints.packageVibrancy.clearCache",
-        "title": "Saropa: Clear Cache",
+        "title": "Clear Cache",
         "icon": "$(trash)"
       },
       {
         "command": "saropaLints.packageVibrancy.exportReport",
-        "title": "Saropa: Export Vibrancy Report",
+        "title": "Export Vibrancy Report",
         "icon": "$(export)"
       },
       {
         "command": "saropaLints.packageVibrancy.browseKnownIssues",
-        "title": "Saropa: Browse Known Issues Library",
+        "title": "Browse Known Issues Library",
         "icon": "$(library)"
       },
       {
         "command": "saropaLints.packageVibrancy.about",
-        "title": "Saropa: About Package Vibrancy",
+        "title": "About Package Vibrancy",
         "icon": "$(info)"
       },
       {
         "command": "saropaLints.packageVibrancy.exportSbom",
-        "title": "Saropa: Export SBOM (CycloneDX)",
+        "title": "Export SBOM (CycloneDX)",
         "icon": "$(shield)"
       },
       {
         "command": "saropaLints.packageVibrancy.annotatePubspec",
-        "title": "Saropa: Annotate Dependencies",
+        "title": "Annotate Dependencies",
         "icon": "$(note)"
       },
       {
@@ -433,7 +434,7 @@
       },
       {
         "command": "saropaLints.packageVibrancy.planUpgrades",
-        "title": "Saropa: Plan & Execute Upgrades",
+        "title": "Plan & Execute Upgrades",
         "icon": "$(rocket)"
       },
       {
@@ -446,41 +447,41 @@
       },
       {
         "command": "saropaLints.packageVibrancy.suppressByCategory",
-        "title": "Saropa: Suppress by Category...",
+        "title": "Suppress by Category...",
         "icon": "$(filter)"
       },
       {
         "command": "saropaLints.packageVibrancy.suppressAllProblems",
-        "title": "Saropa: Suppress All Unhealthy Packages",
+        "title": "Suppress All Unhealthy Packages",
         "icon": "$(eye-closed)"
       },
       {
         "command": "saropaLints.packageVibrancy.unsuppressAll",
-        "title": "Saropa: Unsuppress All Packages",
+        "title": "Unsuppress All Packages",
         "icon": "$(eye)"
       },
       {
         "command": "saropaLints.packageVibrancy.sortDependencies",
-        "title": "Saropa: Sort Dependencies Alphabetically",
+        "title": "Sort Dependencies Alphabetically",
         "icon": "$(list-ordered)"
       },
       {
         "command": "saropaLints.packageVibrancy.showCodeLens",
-        "title": "Saropa: Show Vibrancy Badges",
+        "title": "Show Vibrancy Badges",
         "icon": "$(eye)"
       },
       {
         "command": "saropaLints.packageVibrancy.hideCodeLens",
-        "title": "Saropa: Hide Vibrancy Badges",
+        "title": "Hide Vibrancy Badges",
         "icon": "$(eye-closed)"
       },
       {
         "command": "saropaLints.packageVibrancy.toggleCodeLens",
-        "title": "Saropa: Toggle Vibrancy Badges"
+        "title": "Toggle Vibrancy Badges"
       },
       {
         "command": "saropaLints.packageVibrancy.focusDetails",
-        "title": "Saropa: Focus Package Details",
+        "title": "Focus Package Details",
         "icon": "$(preview)"
       },
       {
@@ -490,7 +491,7 @@
       },
       {
         "command": "saropaLints.packageVibrancy.logAllDetails",
-        "title": "Saropa: Log All Package Details",
+        "title": "Log All Package Details",
         "icon": "$(output)"
       },
       {
@@ -503,29 +504,29 @@
       },
       {
         "command": "saropaLints.packageVibrancy.updateAllLatest",
-        "title": "Saropa: Update All Dependencies (Latest)",
+        "title": "Update All Dependencies (Latest)",
         "icon": "$(cloud-download)"
       },
       {
         "command": "saropaLints.packageVibrancy.updateAllMajor",
-        "title": "Saropa: Update All Dependencies (Major Only)"
+        "title": "Update All Dependencies (Major Only)"
       },
       {
         "command": "saropaLints.packageVibrancy.updateAllMinor",
-        "title": "Saropa: Update All Dependencies (Minor Only)"
+        "title": "Update All Dependencies (Minor Only)"
       },
       {
         "command": "saropaLints.packageVibrancy.updateAllPatch",
-        "title": "Saropa: Update All Dependencies (Patch Only)"
+        "title": "Update All Dependencies (Patch Only)"
       },
       {
         "command": "saropaLints.packageVibrancy.showPrereleases",
-        "title": "Saropa: Show Prerelease Versions",
+        "title": "Show Prerelease Versions",
         "icon": "$(beaker)"
       },
       {
         "command": "saropaLints.packageVibrancy.hidePrereleases",
-        "title": "Saropa: Hide Prerelease Versions",
+        "title": "Hide Prerelease Versions",
         "icon": "$(eye-closed)"
       },
       {
@@ -535,27 +536,27 @@
       },
       {
         "command": "saropaLints.packageVibrancy.generateCiConfig",
-        "title": "Saropa: Generate CI Pipeline",
+        "title": "Generate CI Pipeline",
         "icon": "$(server-process)"
       },
       {
         "command": "saropaLints.packageVibrancy.addRegistryAuth",
-        "title": "Saropa: Add Registry Authentication",
+        "title": "Add Registry Authentication",
         "icon": "$(key)"
       },
       {
         "command": "saropaLints.packageVibrancy.removeRegistryAuth",
-        "title": "Saropa: Remove Registry Authentication",
+        "title": "Remove Registry Authentication",
         "icon": "$(trash)"
       },
       {
         "command": "saropaLints.packageVibrancy.listRegistries",
-        "title": "Saropa: List Configured Registries",
+        "title": "List Configured Registries",
         "icon": "$(list-unordered)"
       },
       {
         "command": "saropaLints.packageVibrancy.comparePackages",
-        "title": "Saropa: Compare Packages",
+        "title": "Compare Packages",
         "icon": "$(diff)"
       },
       {
@@ -565,37 +566,37 @@
       },
       {
         "command": "saropaLints.packageVibrancy.copyHoverToClipboard",
-        "title": "Saropa: Copy Package Info"
+        "title": "Copy Package Info"
       },
       {
         "command": "saropaLints.packageVibrancy.search",
-        "title": "Saropa: Search Packages...",
+        "title": "Search Packages...",
         "icon": "$(search)"
       },
       {
         "command": "saropaLints.packageVibrancy.filterBySeverity",
-        "title": "Saropa: Filter by Severity..."
+        "title": "Filter by Severity..."
       },
       {
         "command": "saropaLints.packageVibrancy.filterByProblemType",
-        "title": "Saropa: Filter by Problem Type..."
+        "title": "Filter by Problem Type..."
       },
       {
         "command": "saropaLints.packageVibrancy.filterByCategory",
-        "title": "Saropa: Filter by Health..."
+        "title": "Filter by Health..."
       },
       {
         "command": "saropaLints.packageVibrancy.filterBySection",
-        "title": "Saropa: Filter by Section..."
+        "title": "Filter by Section..."
       },
       {
         "command": "saropaLints.packageVibrancy.showProblemsOnly",
-        "title": "Saropa: Show Problems Only",
+        "title": "Show Problems Only",
         "icon": "$(warning)"
       },
       {
         "command": "saropaLints.packageVibrancy.clearFilters",
-        "title": "Saropa: Clear Filters",
+        "title": "Clear Filters",
         "icon": "$(clear-all)"
       }
     ],
@@ -794,23 +795,23 @@
         },
         {
           "command": "saropaLints.applyFix",
-          "when": "view == saropaLints.issues && viewItem == violation"
+          "when": "view == saropaLints.issues && viewItem =~ /^violation/"
         },
         {
           "command": "saropaLints.hideRule",
-          "when": "view == saropaLints.issues && viewItem == violation"
+          "when": "view == saropaLints.issues && viewItem =~ /^violation/"
         },
         {
           "command": "saropaLints.hideRuleInFile",
-          "when": "view == saropaLints.issues && viewItem == violation"
+          "when": "view == saropaLints.issues && viewItem =~ /^violation/"
         },
         {
           "command": "saropaLints.copyMessage",
-          "when": "view == saropaLints.issues && viewItem == violation"
+          "when": "view == saropaLints.issues && viewItem =~ /^violation/"
         },
         {
           "command": "saropaLints.hideImpact",
-          "when": "view == saropaLints.issues && viewItem == violation"
+          "when": "view == saropaLints.issues && viewItem =~ /^violation/"
         },
         {
           "command": "saropaLints.hideSeverity",

@@ -59,6 +59,8 @@ export interface ViolationsData {
     enabledRuleNames?: string[];
     /** Stylistic rule names (opt-in). Present when export includes rule metadata. */
     stylisticRuleNames?: string[];
+    /** Rule names that have at least one quick-fix generator. */
+    rulesWithFixes?: string[];
   };
 }
 

@@ -210,6 +210,8 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   private groupBy: GroupByMode = 'severity';
   private cachedIndex: Map<string, Map<string, Violation[]>> | null = null;
   private totalUnfiltered = 0;
+  /** Rules that have quick-fix generators. Null = unknown (older analyzer), treat all as fixable. */
+  private rulesWithFixesSet: Set<string> | null = null;
 
   constructor(workspaceState: vscode.Memento) {
     this.workspaceState = workspaceState;
@@ -223,6 +225,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
 
   refresh(): void {
     this.cachedIndex = null;
+    this.rulesWithFixesSet = null;
     this._onDidChangeTreeData.fire();
   }
 
@@ -419,6 +422,10 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     if (!data) return null;
     const violations = data.violations ?? [];
     this.totalUnfiltered = violations.length;
+    // Cache fix availability for contextValue in getTreeItem.
+    // Null when the analyzer doesn't emit this field (backward compat).
+    const fixNames = data.config?.rulesWithFixes;
+    this.rulesWithFixesSet = fixNames ? new Set(fixNames) : null;
     this.cachedIndex = buildFilteredIndex(
       violations,
       this.textFilter,
@@ -535,7 +542,10 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
         tooltip.appendMarkdown('\n\n[More](' + getRuleDocUrl(ruleName) + ')');
       }
       item.tooltip = tooltip;
-      item.contextValue = 'violation';
+      // Mark fixable violations so "Apply fix" is enabled; null set = unknown,
+      // default to fixable for backward compat with older analyzer output.
+      const hasFix = this.rulesWithFixesSet === null || this.rulesWithFixesSet.has(v.rule);
+      item.contextValue = hasFix ? 'violationFixable' : 'violation';
       item.accessibilityInformation = {
         label: `Line ${v.line} ${v.rule}, ${(v.message ?? '').slice(0, 40)}`,
         role: 'button',

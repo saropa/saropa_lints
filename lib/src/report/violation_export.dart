@@ -5,6 +5,7 @@ import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, stderr;
 
 import 'package:path/path.dart' as path;
+import 'package:saropa_lints/saropa_lints.dart' show rulesWithFixes;
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
@@ -86,12 +87,15 @@ class ViolationExporter {
 
     // Extension triage UI uses this to separate stylistic (opt-in) rules.
     final stylisticList = tiers.stylisticRules.toList()..sort();
+    // Extension uses this to disable "Apply fix" for rules without fixes.
+    final fixList = rulesWithFixes.toList()..sort();
     return <String, Object>{
       'tier': config.effectiveTier,
       'enabledRuleCount': config.enabledRuleCount,
       'enabledRuleCountNote': 'After tier selection and user overrides',
       'enabledRuleNames': config.enabledRuleNames,
       'stylisticRuleNames': stylisticList,
+      'rulesWithFixes': fixList,
       'enabledPlatforms': config.enabledPlatforms,
       'disabledPlatforms': config.disabledPlatforms,
       'enabledPackages': config.enabledPackages,
