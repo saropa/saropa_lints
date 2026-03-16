@@ -3,6 +3,7 @@ import { VibrancyResult, FlaggedIssue } from '../types';
 import { categoryLabel } from '../scoring/status-classifier';
 import { isReplacementPackageName, getReplacementDisplayText } from '../scoring/known-issues';
 import { formatSizeMB } from '../scoring/bloat-calculator';
+import { formatRelativeTime } from '../scoring/time-formatter';
 
 /** Output channel name for package details logging. */
 export const DETAIL_CHANNEL_NAME = 'Vibrancy Details';
@@ -154,8 +155,17 @@ export class DetailLogger {
         const lines: string[] = [];
 
         if (result.github) {
-            lines.push(`Stars: ${result.github.stars} | Open issues: ${result.github.openIssues}`);
-            lines.push(`Closed issues (90d): ${result.github.closedIssuesLast90d} | Merged PRs (90d): ${result.github.mergedPrsLast90d}`);
+            const gh = result.github;
+            const issues = gh.trueOpenIssues ?? gh.openIssues;
+            const prs = gh.openPullRequests !== undefined ? ` | Open PRs: ${gh.openPullRequests}` : '';
+            lines.push(`Stars: ${gh.stars} | Open issues: ${issues}${prs}`);
+            lines.push(`Closed issues (90d): ${gh.closedIssuesLast90d} | Merged PRs (90d): ${gh.mergedPrsLast90d}`);
+            if (gh.daysSinceLastCommit !== undefined) {
+                lines.push(`Last commit: ${formatRelativeTime(gh.daysSinceLastCommit)}`);
+            }
+            if (gh.isArchived) {
+                lines.push(`Repository: ARCHIVED`);
+            }
         }
 
         if (result.pubDev?.pubPoints !== undefined) {

@@ -61,21 +61,25 @@ export async function fetchRepoMetrics(
         const issuesUrl = `${repoUrl}/issues?state=closed&since=${cutoff}&per_page=100`;
         const pullsUrl = `${repoUrl}/pulls?state=closed&per_page=100`;
         const openUrl = `${repoUrl}/issues?state=open&sort=comments&direction=desc&per_page=50`;
+        // per_page=100 is the GitHub API max; repos with 100+ open PRs report a floor of 100
+        const openPrsUrl = `${repoUrl}/pulls?state=open&per_page=100`;
 
         log?.apiRequest('GET', repoUrl);
         log?.apiRequest('GET', issuesUrl);
         log?.apiRequest('GET', pullsUrl);
         log?.apiRequest('GET', openUrl);
+        log?.apiRequest('GET', openPrsUrl);
         const t0 = Date.now();
 
-        const [repoResp, issuesResp, pullsResp, openResp] = await Promise.all([
+        const [repoResp, issuesResp, pullsResp, openResp, openPrsResp] = await Promise.all([
             fetchWithRetry(repoUrl, { headers }, log),
             fetchWithRetry(issuesUrl, { headers }, log),
             fetchWithRetry(pullsUrl, { headers }, log),
             fetchWithRetry(openUrl, { headers }, log),
+            fetchWithRetry(openPrsUrl, { headers }, log),
         ]);
         const elapsed = Date.now() - t0;
-        logResponses(log, [repoResp, issuesResp, pullsResp, openResp], elapsed);
+        logResponses(log, [repoResp, issuesResp, pullsResp, openResp, openPrsResp], elapsed);
 
         if (!repoResp.ok) { return null; }
 
@@ -86,6 +90,9 @@ export async function fetchRepoMetrics(
             ? await pullsResp.json() as any[] : [];
         const rawOpen: any[] = openResp.ok
             ? await openResp.json() as any[] : [];
+        // Open PRs fetch is optional — graceful fallback if it fails
+        const openPrCount: number | undefined = openPrsResp.ok
+            ? (await openPrsResp.json() as any[]).length : undefined;
 
         const filterPrs = (i: any) => !i.pull_request;
         const issues = rawIssues.filter(filterPrs);
@@ -94,7 +101,7 @@ export async function fetchRepoMetrics(
         const htmlUrl = repoData.html_url ?? `https://github.com/${owner}/${repo}`;
         const flagged = flagHighSignalIssues(openIssues, htmlUrl);
         const metrics = buildMetrics(
-            { repoData, closedIssues: issues, pulls, flagged }, now,
+            { repoData, closedIssues: issues, pulls, flagged, openPrCount }, now,
         );
         await params?.cache?.set(cacheKey, metrics);
         return metrics;
@@ -119,6 +126,8 @@ interface RawRepoData {
     readonly closedIssues: any[];
     readonly pulls: any[];
     readonly flagged: FlaggedIssue[];
+    /** Open PR count from the /pulls?state=open call, undefined if that call failed. */
+    readonly openPrCount: number | undefined;
 }
 
 function buildMetrics(raw: RawRepoData, now: number): GitHubMetrics {
@@ -151,14 +160,33 @@ function buildMetrics(raw: RawRepoData, now: number): GitHubMetrics {
         (now - updatedAt) / ONE_DAY_MS,
     );
 
+    // pushed_at = last commit timestamp (available from existing /repos response)
+    const pushedAt = raw.repoData.pushed_at
+        ? new Date(raw.repoData.pushed_at).getTime() : 0;
+    const daysSinceCommit = pushedAt > 0
+        ? Math.max(0, Math.floor((now - pushedAt) / ONE_DAY_MS))
+        : undefined;
+
+    const combinedOpen: number = raw.repoData.open_issues_count ?? 0;
+    // Separate true issues from PRs when open PR count is available
+    const trueOpenIssues = raw.openPrCount !== undefined
+        ? Math.max(0, combinedOpen - raw.openPrCount) : undefined;
+
     return {
         stars: raw.repoData.stargazers_count ?? 0,
-        openIssues: raw.repoData.open_issues_count ?? 0,
+        openIssues: combinedOpen,
+        trueOpenIssues,
+        openPullRequests: raw.openPrCount,
         closedIssuesLast90d: closedRecent.length,
         mergedPrsLast90d: mergedRecent.length,
         avgCommentsPerIssue: Math.round(avgComments * 10) / 10,
         daysSinceLastUpdate: Math.max(0, daysSinceUpdate),
         daysSinceLastClose: daysSinceClose,
+        daysSinceLastCommit: daysSinceCommit,
+        // Only set when the API confirms archived; omit for non-archived repos so the
+        // optional type accurately represents "unknown" vs "confirmed archived".
+        isArchived: raw.repoData.archived === true ? true : undefined,
+        repoUrl: raw.repoData.html_url ?? undefined,
         flaggedIssues: raw.flagged,
         license: raw.repoData.license?.spdx_id ?? null,
     };

@@ -1,6 +1,7 @@
 import { VibrancyResult, UpdateInfo } from '../types';
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
+import { formatRelativeTime } from '../scoring/time-formatter';
 import { severityEmoji, severityLabel, worstSeverity } from '../scoring/vuln-classifier';
 import { DetailItem, GroupItem } from './tree-item-classes';
 
@@ -157,15 +158,39 @@ function appendChangelogItems(
 function buildCommunityGroup(result: VibrancyResult): GroupItem | null {
     const items: DetailItem[] = [];
     if (result.github) {
-        const repoUrl = result.pubDev?.repositoryUrl?.replace(/\/+$/, '');
+        const gh = result.github;
+        const repoUrl = (gh.repoUrl ?? result.pubDev?.repositoryUrl)
+            ?.replace(/\/+$/, '');
         items.push(new DetailItem(
-            '⭐ Stars', `${result.github.stars}`,
+            '⭐ Stars', `${gh.stars}`,
             repoUrl ?? undefined,
         ));
+        const issueCount = gh.trueOpenIssues ?? gh.openIssues;
         items.push(new DetailItem(
-            'Open Issues', `${result.github.openIssues}`,
+            'Open Issues', `${issueCount}`,
             repoUrl ? `${repoUrl}/issues` : undefined,
         ));
+        if (gh.openPullRequests !== undefined) {
+            items.push(new DetailItem(
+                'Open PRs', `${gh.openPullRequests}`,
+                repoUrl ? `${repoUrl}/pulls` : undefined,
+            ));
+        }
+        const activity = gh.closedIssuesLast90d + gh.mergedPrsLast90d;
+        if (activity > 0) {
+            items.push(new DetailItem(
+                '🔧 Activity (90d)',
+                `${gh.closedIssuesLast90d} closed, ${gh.mergedPrsLast90d} merged`,
+            ));
+        }
+        if (gh.daysSinceLastCommit !== undefined) {
+            items.push(new DetailItem(
+                '📅 Last Commit', formatRelativeTime(gh.daysSinceLastCommit),
+            ));
+        }
+        if (gh.isArchived) {
+            items.push(new DetailItem('🗄️ Archived', 'Repository is archived'));
+        }
     }
     if (result.pubDev?.pubPoints !== undefined) {
         items.push(new DetailItem(

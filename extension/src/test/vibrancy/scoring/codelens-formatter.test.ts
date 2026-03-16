@@ -41,6 +41,10 @@ describe('categoryEmoji', () => {
         assert.strictEqual(categoryEmoji('legacy-locked'), '🟠');
     });
 
+    it('should return orange for stale', () => {
+        assert.strictEqual(categoryEmoji('stale'), '🟠');
+    });
+
     it('should return red for end-of-life', () => {
         assert.strictEqual(categoryEmoji('end-of-life'), '🔴');
     });

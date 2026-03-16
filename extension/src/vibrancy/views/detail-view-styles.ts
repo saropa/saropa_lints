@@ -133,6 +133,12 @@ section[data-expanded="false"] .section-content {
     font-size: 12px;
 }
 
+/* Used by archived-repo row in detail view */
+.warning {
+    color: var(--vscode-editorWarning-foreground);
+    font-size: 12px;
+}
+
 .update-header {
     font-weight: 500;
     margin-bottom: 8px;

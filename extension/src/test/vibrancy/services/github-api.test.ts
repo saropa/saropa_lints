@@ -4,7 +4,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { extractGitHubRepo, fetchRepoMetrics } from '../../../vibrancy/services/github-api';
 
-const fixturesDir = path.join(__dirname, '..', '..', '..', 'src', 'test', 'fixtures');
+// From compiled out-test/test/vibrancy/services/ go up 4 levels to extension/,
+// then into src/test/fixtures/.
+const fixturesDir = path.join(__dirname, '..', '..', '..', '..', 'src', 'test', 'fixtures');
 
 describe('github-api', () => {
     describe('extractGitHubRepo', () => {
@@ -77,13 +79,17 @@ describe('github-api', () => {
             return fs.readFileSync(path.join(fixturesDir, name), 'utf8');
         }
 
-        function stubAllEndpoints(openStatus = 200): void {
+        /** Stub all 5 GitHub API endpoints (repo, closed issues, closed PRs, open issues, open PRs). */
+        function stubAllEndpoints(openStatus = 200, openPrsStatus = 200): void {
             fetchStub.onCall(0).resolves(new Response(loadFixture('github-repo.json'), { status: 200 }));
             fetchStub.onCall(1).resolves(new Response(loadFixture('github-issues.json'), { status: 200 }));
             fetchStub.onCall(2).resolves(new Response(loadFixture('github-pulls.json'), { status: 200 }));
             const openBody = openStatus === 200
                 ? loadFixture('github-open-issues.json') : '';
             fetchStub.onCall(3).resolves(new Response(openBody, { status: openStatus }));
+            // 5th call: open PRs count
+            const prsBody = openPrsStatus === 200 ? '[]' : '';
+            fetchStub.onCall(4).resolves(new Response(prsBody, { status: openPrsStatus }));
         }
 
         beforeEach(() => {
@@ -100,6 +106,9 @@ describe('github-api', () => {
             assert.ok(metrics);
             assert.strictEqual(metrics.stars, 890);
             assert.strictEqual(metrics.openIssues, 42);
+            // Default stubAllEndpoints returns 0 open PRs, so trueOpenIssues = 42 - 0
+            assert.strictEqual(metrics.openPullRequests, 0);
+            assert.strictEqual(metrics.trueOpenIssues, 42);
         });
 
         it('should extract license spdx_id from repo response', async () => {
@@ -118,6 +127,7 @@ describe('github-api', () => {
             fetchStub.onCall(1).resolves(new Response('[]', { status: 200 }));
             fetchStub.onCall(2).resolves(new Response('[]', { status: 200 }));
             fetchStub.onCall(3).resolves(new Response('[]', { status: 200 }));
+            fetchStub.onCall(4).resolves(new Response('[]', { status: 200 }));
             const metrics = await fetchRepoMetrics('org', 'pkg');
             assert.ok(metrics);
             assert.strictEqual(metrics.license, null);
@@ -151,6 +161,69 @@ describe('github-api', () => {
             await fetchRepoMetrics('a', 'b', { token: 'my-token' });
             const headers = fetchStub.firstCall.args[1]?.headers;
             assert.ok(headers?.Authorization?.includes('my-token'));
+        });
+
+        it('should extract pushed_at and repoUrl from repo response', async () => {
+            stubAllEndpoints();
+            const metrics = await fetchRepoMetrics('dart-lang', 'http');
+            assert.ok(metrics);
+            // Fixture has pushed_at: "2024-06-10T08:00:00Z"
+            assert.strictEqual(typeof metrics.daysSinceLastCommit, 'number');
+            assert.ok(metrics.daysSinceLastCommit! >= 0);
+            assert.strictEqual(metrics.repoUrl, 'https://github.com/dart-lang/http');
+        });
+
+        it('should omit isArchived for non-archived repos', async () => {
+            // Fixture has archived: false → isArchived should be undefined (not false)
+            stubAllEndpoints();
+            const metrics = await fetchRepoMetrics('dart-lang', 'http');
+            assert.ok(metrics);
+            assert.strictEqual(metrics.isArchived, undefined);
+        });
+
+        it('should compute trueOpenIssues when open PRs available', async () => {
+            // Build stubs inline to avoid double-setting onCall(4)
+            fetchStub.onCall(0).resolves(new Response(loadFixture('github-repo.json'), { status: 200 }));
+            fetchStub.onCall(1).resolves(new Response(loadFixture('github-issues.json'), { status: 200 }));
+            fetchStub.onCall(2).resolves(new Response(loadFixture('github-pulls.json'), { status: 200 }));
+            fetchStub.onCall(3).resolves(new Response(loadFixture('github-open-issues.json'), { status: 200 }));
+            // 3 open PRs
+            fetchStub.onCall(4).resolves(new Response(JSON.stringify([{}, {}, {}]), { status: 200 }));
+            const metrics = await fetchRepoMetrics('dart-lang', 'http');
+            assert.ok(metrics);
+            assert.strictEqual(metrics.openPullRequests, 3);
+            // trueOpenIssues = openIssues (42) minus open PRs (3) = 39
+            assert.strictEqual(metrics.trueOpenIssues, 39);
+        });
+
+        it('should handle open PRs fetch failure gracefully', async () => {
+            stubAllEndpoints(200, 403);
+            const metrics = await fetchRepoMetrics('dart-lang', 'http');
+            assert.ok(metrics);
+            // When open PRs fetch fails, both fields stay undefined
+            assert.strictEqual(metrics.openPullRequests, undefined);
+            assert.strictEqual(metrics.trueOpenIssues, undefined);
+        });
+
+        it('should detect archived repository', async () => {
+            const archivedRepo = JSON.stringify({
+                full_name: 'org/old',
+                html_url: 'https://github.com/org/old',
+                stargazers_count: 50,
+                open_issues_count: 10,
+                updated_at: '2023-01-01T00:00:00Z',
+                pushed_at: '2022-06-01T00:00:00Z',
+                archived: true,
+                license: null,
+            });
+            fetchStub.onCall(0).resolves(new Response(archivedRepo, { status: 200 }));
+            fetchStub.onCall(1).resolves(new Response('[]', { status: 200 }));
+            fetchStub.onCall(2).resolves(new Response('[]', { status: 200 }));
+            fetchStub.onCall(3).resolves(new Response('[]', { status: 200 }));
+            fetchStub.onCall(4).resolves(new Response('[]', { status: 200 }));
+            const metrics = await fetchRepoMetrics('org', 'old');
+            assert.ok(metrics);
+            assert.strictEqual(metrics.isArchived, true);
         });
     });
 });

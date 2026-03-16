@@ -233,6 +233,17 @@ describe('consolidate-insights', () => {
 
             assert.strictEqual(risk, 30);
         });
+
+        it('should use medium weight for stale (between EOL and legacy)', () => {
+            const result = makeResult('quiet_pkg', 5, { category: 'stale' });
+            const problems = [
+                { type: 'unhealthy' as const, severity: 'medium' as const, message: '' },
+            ];
+            const risk = computeCombinedRisk(problems, result);
+
+            // Stale weight (25) sits between EOL (30) and legacy-locked (20)
+            assert.strictEqual(risk, 25);
+        });
     });
 
     describe('determineSuggestedAction', () => {

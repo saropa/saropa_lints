@@ -221,6 +221,48 @@ describe('comparison-ranker', () => {
             assert.deepStrictEqual(data.platforms, []);
         });
 
+        it('should prefer trueOpenIssues over openIssues when available', () => {
+            // trueOpenIssues excludes PRs from the count
+            const mockResult = {
+                package: { name: 'with-prs' },
+                score: 80,
+                category: 'vibrant' as VibrancyCategory,
+                pubDev: null,
+                github: { stars: 100, openIssues: 50, trueOpenIssues: 35 },
+                archiveSizeBytes: null,
+                bloatRating: null,
+                license: null,
+                platforms: null,
+                updateInfo: null,
+            };
+
+            const data = resultToComparisonData(mockResult, false);
+
+            // Should use trueOpenIssues (35) not openIssues (50)
+            assert.strictEqual(data.openIssues, 35);
+        });
+
+        it('should fall back to openIssues when trueOpenIssues unavailable', () => {
+            // When PR fetch fails, trueOpenIssues is undefined
+            const mockResult = {
+                package: { name: 'no-prs-data' },
+                score: 80,
+                category: 'vibrant' as VibrancyCategory,
+                pubDev: null,
+                github: { stars: 100, openIssues: 50 },
+                archiveSizeBytes: null,
+                bloatRating: null,
+                license: null,
+                platforms: null,
+                updateInfo: null,
+            };
+
+            const data = resultToComparisonData(mockResult, false);
+
+            // Should fall back to openIssues (50)
+            assert.strictEqual(data.openIssues, 50);
+        });
+
         it('should extract pubPoints from result', () => {
             const mockResult = {
                 package: { name: 'with-points' },
