@@ -31,6 +31,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 - **Extension** — "Copy as JSON" context menu on all tree views (Issues, Config, Summary, Security Posture, File Risk, Overview, Suggestions, Package Vibrancy) with recursive child serialization and multi-select support
 
+### Fixed
+
+- **Analyzer** — `// ignore:` and `// ignore_for_file:` comments now suppress violations in the extension's Issues tree and `violations.json`, not just in the editor; centralized ignore handling in `SaropaDiagnosticReporter` so all rules benefit without per-rule opt-in
+
 ## [9.4.2]
 
 ### Added
