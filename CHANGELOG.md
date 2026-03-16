@@ -35,6 +35,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Changed
 
+- **Extension** — consolidated 3 right-side status bar items (Saropa Lints, CodeLens toggle, Vibrancy score) into a single unified item; vibrancy score appears in the label when scan data is available, with full detail in the tooltip; new `showInStatusBar` setting lets users hide the vibrancy score without disabling the extension
 - **Extension** — "Apply fix" context menu item in Issues tree is now greyed out for violations whose rule has no quick-fix generator; `rulesWithFixes` list in `violations.json` config section drives the enablement so the user knows upfront which violations are auto-fixable
 - **Package Vibrancy** — merged Package Problems panel into Package Vibrancy; problems and suggested actions now appear as child nodes under each package instead of in a separate tree view
 - **Package Vibrancy** — added filter toolbar: search by name, filter by severity, problem type, health category, and dependency section; toggle problems-only view mode; clear all filters
