@@ -26,6 +26,7 @@ import { ConfigTreeProvider } from './views/configTree';
 import { SuggestionsTreeProvider } from './views/suggestionsTree';
 import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
+import { showAboutPanel } from './views/aboutView';
 import { readViolations, ViolationsData } from './violationsReader';
 import { hasSaropaLintsDep } from './pubspecReader';
 import { appendSnapshot, loadHistory, findPreviousScore, detectThresholdCrossing } from './runHistory';
@@ -410,6 +411,10 @@ export function activate(context: vscode.ExtensionContext): void {
         'saropa.saropa-lints#saropaLints.gettingStarted',
         false,
       );
+    }),
+    vscode.commands.registerCommand('saropaLints.showAbout', () => {
+      const version = (context.extension.packageJSON as { version: string }).version;
+      showAboutPanel(context.extensionUri, version);
     }),
     // Show all issues: clear filters and focus Issues view (e.g. from Summary "Total violations").
     vscode.commands.registerCommand('saropaLints.focusIssues', () => {

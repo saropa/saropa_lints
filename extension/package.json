@@ -339,6 +339,10 @@
       {
         "command": "saropaLints.openWalkthrough",
         "title": "Saropa Lints: Getting Started"
+      },
+      {
+        "command": "saropaLints.showAbout",
+        "title": "Saropa Lints: About"
       }
     ],
     "menus": {
@@ -387,6 +391,11 @@
           "command": "saropaLints.refresh",
           "when": "view == saropaLints.overview",
           "group": "navigation"
+        },
+        {
+          "command": "saropaLints.showAbout",
+          "when": "view == saropaLints.overview",
+          "group": "z_about"
         },
         {
           "command": "saropaLints.refresh",
@@ -612,6 +621,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
+    "precompile": "node -e \"require('fs').copyFileSync('../ABOUT_SAROPA.md','media/about-saropa.md')\"",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "lint": "tsc --noEmit -p ./"
