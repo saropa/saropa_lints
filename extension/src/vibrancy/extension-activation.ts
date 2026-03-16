@@ -206,7 +206,7 @@ export function runActivation(context: vscode.ExtensionContext): void {
     registerRegistryCommands(context, registryService);
     registerFileWatcher(context, targets);
     registerSuppressListener(context, targets);
-    registerConfigListener(context, codeLensProvider, treeProvider);
+    registerConfigListener(context, codeLensProvider, treeProvider, prereleaseToggle);
     autoScanIfPubspec(targets);
 }
 
@@ -240,6 +240,7 @@ function registerConfigListener(
     context: vscode.ExtensionContext,
     codeLensProvider: VibrancyCodeLensProvider,
     treeProvider: VibrancyTreeProvider,
+    prereleaseToggle: PrereleaseToggle,
 ): void {
     context.subscriptions.push(
         vscode.workspace.onDidChangeConfiguration(e => {
@@ -250,6 +251,8 @@ function registerConfigListener(
             }
             if (e.affectsConfiguration('saropaLints.packageVibrancy.showPrereleases')
                 || e.affectsConfiguration('saropaLints.packageVibrancy.prereleaseTagFilter')) {
+                // Sync in-memory state + context key when user edits settings.json directly
+                prereleaseToggle.refresh();
                 codeLensProvider.refresh();
                 treeProvider.refresh();
             }
