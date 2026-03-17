@@ -59,16 +59,20 @@ export class VibrancyDiagnostics {
             );
 
             if (result.category !== 'vibrant') {
-                const shouldSkip = result.category === 'end-of-life' && eolSetting === 'none';
-                if (!shouldSkip) {
-                    const severity = computeSeverity(result, eolSetting);
-                    const message = buildMessage(result);
-                    const diag = new vscode.Diagnostic(
-                        vscodeRange, message, severity,
-                    );
-                    diag.source = 'Saropa Package Vibrancy';
-                    diag.code = result.category;
-                    diagnostics.push(diag);
+                // Skip main vibrancy diagnostic for path/git overrides; resolved artifact is local/git, upstream score is not actionable.
+                const isPathOrGitOverride = result.package.source === 'path' || result.package.source === 'git';
+                if (!isPathOrGitOverride) {
+                    const shouldSkip = result.category === 'end-of-life' && eolSetting === 'none';
+                    if (!shouldSkip) {
+                        const severity = computeSeverity(result, eolSetting);
+                        const message = buildMessage(result);
+                        const diag = new vscode.Diagnostic(
+                            vscodeRange, message, severity,
+                        );
+                        diag.source = 'Saropa Package Vibrancy';
+                        diag.code = result.category;
+                        diagnostics.push(diag);
+                    }
                 }
             }
 
