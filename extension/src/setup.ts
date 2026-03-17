@@ -22,7 +22,7 @@ function getOutputChannel(): vscode.OutputChannel {
   return _outputChannel;
 }
 
-function hasFlutterDep(pubspecPath: string): boolean {
+export function hasFlutterDep(pubspecPath: string): boolean {
   try {
     const content = fs.readFileSync(pubspecPath, 'utf-8');
     return /flutter:\s*$/m.test(content) || content.includes('sdk: flutter');
@@ -80,7 +80,7 @@ function buildInitArgs(workspaceRoot: string, tier: string): string[] {
   ];
 }
 
-function runInWorkspace(workspaceRoot: string, command: string, args: string[], logToOutput = true): { ok: boolean; stderr: string; stdout: string } {
+export function runInWorkspace(workspaceRoot: string, command: string, args: string[], logToOutput = true): { ok: boolean; stderr: string; stdout: string } {
   if (logToOutput) {
     const ch = getOutputChannel();
     ch.appendLine(`$ ${command} ${args.join(' ')}`);

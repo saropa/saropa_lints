@@ -38,6 +38,7 @@ import { generateOwaspReport } from './owaspExport';
 import { getProjectRoot, invalidateProjectRoot } from './projectRoot';
 import { runActivation as runVibrancyActivation, stopFreshnessWatcher, VibrancyStatusData } from './vibrancy/extension-activation';
 import { copyTreeNodesToClipboard } from './copyTreeAsJson';
+import { checkForUpgrade } from './upgrade-checker';
 import {
   serializeIssueNode,
   serializeConfigNode,
@@ -769,6 +770,14 @@ export function activate(context: vscode.ExtensionContext): void {
     });
   } catch (err) {
     console.error('[Saropa Lints] Package Vibrancy activation failed:', err);
+  }
+
+  // Background upgrade check — runs asynchronously, fails silently.
+  // Only checks when saropa_lints is already in the project and extension is enabled.
+  if (isDartProject && enabled && root) {
+    void checkForUpgrade(context, root).catch((err) => {
+      console.error('[Saropa Lints] Upgrade check failed:', err);
+    });
   }
 }
 

@@ -25,6 +25,16 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [Unreleased]
+
+_Keeping your lints fresh — the extension now detects outdated saropa_lints versions and offers one-click upgrades._
+
+### Added
+
+- **Extension** — background upgrade checker: on activation, the extension checks pub.dev for newer saropa_lints versions and shows a non-intrusive notification with Upgrade, View Changelog, and Dismiss actions; throttled to once per 24 hours, remembers dismissed versions, skips path/git dependencies, and respects the new `saropaLints.checkForUpdates` setting
+
+---
+
 ## [9.5.1]
 
 _Streamlining the Package Vibrancy toolbar._
