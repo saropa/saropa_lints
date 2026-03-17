@@ -416,6 +416,22 @@ function updateVibrancyFilterState(provider: VibrancyTreeProvider): void {
     stateManager.hasFilter.value = state.hasActiveFilters;
 }
 
+/**
+ * Resolve selected QuickPick items to a set of values.
+ * Uses item.id when valid, otherwise matches by label (for environments where id is not preserved).
+ */
+function resolveMultiPickValues<T extends string>(
+    picks: { label?: string; id?: string }[],
+    allValues: readonly T[],
+    getLabel: (v: T) => string,
+): Set<T> {
+    const values = picks.map((p): T | undefined => {
+        if (p.id && (allValues as readonly string[]).includes(p.id)) { return p.id as T; }
+        return allValues.find(v => getLabel(v) === p.label);
+    });
+    return new Set(values.filter((t): t is T => t !== undefined));
+}
+
 function registerFilterCommands(
     context: vscode.ExtensionContext,
     provider: VibrancyTreeProvider,
@@ -448,7 +464,7 @@ function registerFilterCommands(
                 );
                 if (picks) {
                     provider.setSeverityFilter(
-                        new Set(picks.map(p => p.id as ProblemSeverity)),
+                        resolveMultiPickValues(picks, ALL_SEVERITIES, s => s.charAt(0).toUpperCase() + s.slice(1)),
                     );
                     updateVibrancyFilterState(provider);
                 }
@@ -467,7 +483,7 @@ function registerFilterCommands(
                 );
                 if (picks) {
                     provider.setProblemTypeFilter(
-                        new Set(picks.map(p => p.id as ProblemType)),
+                        resolveMultiPickValues(picks, ALL_PROBLEM_TYPES, problemTypeLabel),
                     );
                     updateVibrancyFilterState(provider);
                 }
@@ -486,7 +502,7 @@ function registerFilterCommands(
                 );
                 if (picks) {
                     provider.setCategoryFilter(
-                        new Set(picks.map(p => p.id as VibrancyCategory)),
+                        resolveMultiPickValues(picks, ALL_CATEGORIES, categoryLabel),
                     );
                     updateVibrancyFilterState(provider);
                 }
@@ -505,7 +521,7 @@ function registerFilterCommands(
                 );
                 if (picks) {
                     provider.setSectionFilter(
-                        new Set(picks.map(p => p.id as DependencySection)),
+                        resolveMultiPickValues(picks, ALL_SECTIONS, s => SECTION_LABELS[s]),
                     );
                     updateVibrancyFilterState(provider);
                 }
