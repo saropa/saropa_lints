@@ -167,8 +167,9 @@ export class GroupItem extends vscode.TreeItem {
     constructor(
         label: string,
         public readonly children: DetailItem[],
+        collapsibleState = vscode.TreeItemCollapsibleState.Expanded,
     ) {
-        super(label, vscode.TreeItemCollapsibleState.Expanded);
+        super(label, collapsibleState);
     }
 }
 

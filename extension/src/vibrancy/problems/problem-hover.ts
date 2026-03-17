@@ -1,4 +1,4 @@
-import { Problem, problemMessage, severityIcon, problemTypeLabel } from './problem-types';
+import { Problem, problemMessage, severityIcon, problemLabel } from './problem-types';
 import { SuggestedAction, formatAction } from './problem-actions';
 import { ProblemRegistry } from './problem-registry';
 
@@ -21,8 +21,10 @@ export function formatProblemsForHover(
 
     for (const problem of problems) {
         const icon = severityIcon(problem.severity);
-        const typeLabel = problemTypeLabel(problem.type);
-        lines.push(`${icon} **${typeLabel}:** ${problemMessage(problem)}`);
+        // Use problemLabel for context-aware labels (e.g. "End of Life"
+        // instead of generic "Unhealthy")
+        const label = problemLabel(problem);
+        lines.push(`${icon} **${label}:** ${problemMessage(problem)}`);
         lines.push('');
     }
 
@@ -78,7 +80,7 @@ export function formatProblemsSummary(
  */
 export function formatProblemTableRow(problem: Problem): string {
     const icon = severityIcon(problem.severity);
-    return `| ${icon} ${problemTypeLabel(problem.type)} | ${problemMessage(problem)} |`;
+    return `| ${icon} ${problemLabel(problem)} | ${problemMessage(problem)} |`;
 }
 
 /**
@@ -130,7 +132,8 @@ function collectResolutionChain(
  * Format a diagnostic message for a problem.
  */
 export function formatProblemDiagnostic(problem: Problem): string {
-    const typeLabel = problemTypeLabel(problem.type);
+    // Use problemLabel for context-aware label in diagnostics
+    const label = problemLabel(problem);
     const message = problemMessage(problem);
-    return `[Saropa] ${typeLabel}: ${message} (${problem.package})`;
+    return `[Saropa] ${label}: ${message} (${problem.package})`;
 }

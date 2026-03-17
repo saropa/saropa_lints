@@ -1,3 +1,5 @@
+import * as vscode from 'vscode';
+
 import { VibrancyResult, UpdateInfo } from '../types';
 import { formatSizeMB } from '../scoring/bloat-calculator';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
@@ -58,14 +60,22 @@ export function buildGroupItems(result: VibrancyResult): GroupItem[] {
 }
 
 function buildVersionGroup(result: VibrancyResult): GroupItem {
+    // Only mark as latest when explicitly confirmed up-to-date.
+    // updateInfo: null means "no pub.dev data" — not the same as up-to-date.
+    const isLatest = result.updateInfo?.updateStatus === 'up-to-date';
+
+    const versionSuffix = isLatest ? ' (latest)' : '';
     const items: DetailItem[] = [
-        new DetailItem('Version', result.package.constraint),
+        new DetailItem('Version', result.package.constraint + versionSuffix),
     ];
     if (result.pubDev) {
         const name = result.package.name;
         const ver = result.pubDev.latestVersion;
         const versionUrl = `https://pub.dev/packages/${name}/versions/${ver}`;
-        items.push(new DetailItem('Latest', ver, versionUrl));
+        // Only show Latest as a separate row when it differs from constraint
+        if (!isLatest) {
+            items.push(new DetailItem('Latest', ver, versionUrl));
+        }
         if (result.pubDev.publishedDate) {
             items.push(new DetailItem(
                 'Published', result.pubDev.publishedDate.split('T')[0],
@@ -98,7 +108,11 @@ function buildVersionGroup(result: VibrancyResult): GroupItem {
             '🕐 Drift', `${behind} (${d.label})`,
         ));
     }
-    return new GroupItem('📦 Version', items);
+    // Collapse when on latest version — the details are less actionable
+    const state = isLatest
+        ? vscode.TreeItemCollapsibleState.Collapsed
+        : vscode.TreeItemCollapsibleState.Expanded;
+    return new GroupItem('📦 Version', items, state);
 }
 
 function buildUpdateGroup(result: VibrancyResult): GroupItem | null {

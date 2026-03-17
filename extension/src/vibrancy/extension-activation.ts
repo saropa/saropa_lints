@@ -278,10 +278,17 @@ function registerTreeView(
 ): void {
     const tv = vscode.window.createTreeView(
         'saropaLints.packageVibrancy.packages',
-        { treeDataProvider: provider },
+        { treeDataProvider: provider, showCollapseAll: true },
     );
     tv.description = `v${context.extension.packageJSON.version}`;
     context.subscriptions.push(tv);
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.expandAll',
+            () => provider.expandAll(),
+        ),
+    );
 
     syncDetailOnSelection(tv, item => {
         if ('result' in (item as object)) {
