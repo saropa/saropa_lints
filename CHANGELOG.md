@@ -27,6 +27,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ## [Unreleased]
 
+### Added
+
+- **Package Vibrancy** — Action Items tree now shows a simple letter grade (A = best … E = stale … F = dangerous) and problem count instead of a numeric “risk” score; aligns with a single, clear scoring system and correct pluralization (“1 problem” / “2 problems”)
+
 ### Fixed
 
 - **Package Vibrancy** — Filter by Problem Type now correctly applies the selected types; resolved QuickPick selections using a shared id+label fallback so filter state is set reliably across environments

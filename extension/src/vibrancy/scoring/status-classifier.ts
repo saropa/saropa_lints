@@ -67,3 +67,17 @@ export function categoryLabel(category: VibrancyCategory): string {
         case 'end-of-life': return 'End of Life';
     }
 }
+
+/** Letter grade for compact UI: A (best) … E (stale) … F (dangerous). D reserved for future use. */
+export type VibrancyGrade = 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+
+/** Map vibrancy category to a single letter for Action Items tree. */
+export function categoryToGrade(category: VibrancyCategory): VibrancyGrade {
+    switch (category) {
+        case 'vibrant': return 'A';
+        case 'quiet': return 'B';
+        case 'legacy-locked': return 'C';
+        case 'stale': return 'E';
+        case 'end-of-life': return 'F';
+    }
+}
