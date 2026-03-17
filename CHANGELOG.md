@@ -29,6 +29,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 
 _Streamlining the Package Vibrancy toolbar._
 
+### Fixed
+
+- **Package Vibrancy** â€” fixed false positive "unused" detection for packages referenced only via `export` directives (e.g. `analyzer_plugin`); the import scanner now recognizes both `import` and `export` as package usage
+
 ### Removed
 
 - **Extension:** removed the "About Package Vibrancy" info icon and webview panel from the Package Vibrancy sidebar toolbar

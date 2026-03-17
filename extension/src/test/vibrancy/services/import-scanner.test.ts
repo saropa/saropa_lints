@@ -94,6 +94,32 @@ describe('scanDartImports', () => {
         assert.strictEqual(callCount, 2);
     });
 
+    it('should detect export directives as usage', async () => {
+        const files = [makeUri('/proj/lib/native/fix.dart')];
+        (vscode.workspace as any).findFiles = async () => files;
+        (vscode.workspace as any).fs.readFile = async () =>
+            encode("export 'package:analyzer_plugin/utilities/fixes/fixes.dart' show FixKind;");
+
+        const result = await scanDartImports(makeUri('/proj'));
+        assert.ok(result.has('analyzer_plugin'));
+        assert.strictEqual(result.size, 1);
+    });
+
+    it('should detect mixed imports and exports', async () => {
+        const files = [makeUri('/proj/lib/main.dart')];
+        (vscode.workspace as any).findFiles = async () => files;
+        (vscode.workspace as any).fs.readFile = async () =>
+            encode(
+                "import 'package:http/http.dart';\n"
+                + "export 'package:provider/provider.dart';",
+            );
+
+        const result = await scanDartImports(makeUri('/proj'));
+        assert.strictEqual(result.size, 2);
+        assert.ok(result.has('http'));
+        assert.ok(result.has('provider'));
+    });
+
     it('should collect multiple packages from one file', async () => {
         const files = [makeUri('/proj/lib/main.dart')];
         (vscode.workspace as any).findFiles = async () => files;
