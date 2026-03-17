@@ -25,15 +25,17 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
-## [Unreleased]
+## [9.6.0]
+
+_Clearer Package Vibrancy scoring and reliable filter-by-type behavior._
 
 ### Added
 
-- **Package Vibrancy** — Action Items tree now shows a simple letter grade (A = best … E = stale … F = dangerous) and problem count instead of a numeric “risk” score; aligns with a single, clear scoring system and correct pluralization (“1 problem” / “2 problems”)
+• **Package Vibrancy** — Action Items tree now shows a simple letter grade (A = best … E = stale … F = dangerous) and problem count instead of a numeric “risk” score; aligns with a single, clear scoring system and correct pluralization (“1 problem” / “2 problems”)
 
 ### Fixed
 
-- **Package Vibrancy** — Filter by Problem Type now correctly applies the selected types; resolved QuickPick selections using a shared id+label fallback so filter state is set reliably across environments
+• **Package Vibrancy** — Filter by Problem Type now correctly applies the selected types; resolved QuickPick selections using a shared id+label fallback so filter state is set reliably across environments
 
 ---
 
@@ -43,10 +45,13 @@ _Keeping your lints fresh — the extension now detects outdated saropa_lints ve
 
 ### Added
 
-- **Extension** — background upgrade checker: on activation, the extension checks pub.dev for newer saropa_lints versions and shows a non-intrusive notification with Upgrade, View Changelog, and Dismiss actions; throttled to once per 24 hours, remembers dismissed versions, skips path/git dependencies, and respects the new `saropaLints.checkForUpdates` setting
-- **Extension** — SDK constraint diagnostics: inspects the `environment` section of `pubspec.yaml` and reports when Dart SDK or Flutter version constraints are behind the latest stable release; shows Warning when the upper bound excludes latest, Information when behind by a minor version, and Hint for patch-level gaps; fires on file open, on edit (debounced), and after every vibrancy scan
-- **Extension** — overview panel toolbar: added About (info icon) and Run Analysis (play icon) buttons to the overview panel title bar; removed redundant tree items (Run Analysis, Summary, Config, Suggestions) that duplicate existing sidebar views
-- **Extension** — overview tree icons: each overview item now displays a contextual icon (pulse for health score, warning/pass for violations, graph-line for trends, arrow-down for regressions, star-full for celebrations, history for last run)
+• **Extension** — background upgrade checker: on activation, the extension checks pub.dev for newer saropa_lints versions and shows a non-intrusive notification with Upgrade, View Changelog, and Dismiss actions; throttled to once per 24 hours, remembers dismissed versions, skips path/git dependencies, and respects the new `saropaLints.checkForUpdates` setting
+
+• **Extension** — SDK constraint diagnostics: inspects the `environment` section of `pubspec.yaml` and reports when Dart SDK or Flutter version constraints are behind the latest stable release; shows Warning when the upper bound excludes latest, Information when behind by a minor version, and Hint for patch-level gaps; fires on file open, on edit (debounced), and after every vibrancy scan
+
+• **Extension** — overview panel toolbar: added About (info icon) and Run Analysis (play icon) buttons to the overview panel title bar; removed redundant tree items (Run Analysis, Summary, Config, Suggestions) that duplicate existing sidebar views
+
+• **Extension** — overview tree icons: each overview item now displays a contextual icon (pulse for health score, warning/pass for violations, graph-line for trends, arrow-down for regressions, star-full for celebrations, history for last run)
 
 ---
 
@@ -56,27 +61,35 @@ _Streamlining the Package Vibrancy toolbar._
 
 ### Added
 
-- **Package Vibrancy** — added interactive Size Distribution charts (horizontal bar + SVG donut) to the vibrancy report webview; bars animate in, donut segments draw in, hover shows tooltips with cross-highlighting between charts, click scrolls to the package row in the table; small packages are consolidated into "Other (N packages)"
-- **Package Vibrancy** — added Expand All button to the tree toolbar; collapse all uses the built-in VS Code button (`showCollapseAll`)
+• **Package Vibrancy** — added interactive Size Distribution charts (horizontal bar + SVG donut) to the vibrancy report webview; bars animate in, donut segments draw in, hover shows tooltips with cross-highlighting between charts, click scrolls to the package row in the table; small packages are consolidated into "Other (N packages)"
+
+• **Package Vibrancy** — added Expand All button to the tree toolbar; collapse all uses the built-in VS Code button (`showCollapseAll`)
 
 ### Changed
 
-- **Package Vibrancy** — the "Unhealthy" problem label now shows the actual category ("End of Life", "Stale", "Legacy-Locked") instead of the generic "Unhealthy" label; the description shows the vibrancy score for additional context
-- **Package Vibrancy** — the Version group now shows "(latest)" on the version constraint and collapses when the package is confirmed up-to-date; the redundant "Latest" child row is hidden in that case
+• **Package Vibrancy** — the "Unhealthy" problem label now shows the actual category ("End of Life", "Stale", "Legacy-Locked") instead of the generic "Unhealthy" label; the description shows the vibrancy score for additional context
+
+• **Package Vibrancy** — the Version group now shows "(latest)" on the version constraint and collapses when the package is confirmed up-to-date; the redundant "Latest" child row is hidden in that case
 
 ### Fixed
 
-- **Package Vibrancy** — fixed false positive "unused" detection for packages referenced only via `export` directives (e.g. `analyzer_plugin`); the import scanner now recognizes both `import` and `export` as package usage
-- **Extension** — fixed "Annotate pubspec.yaml" command targeting the wrong file in workspaces with multiple `pubspec.yaml` files; now prefers the active editor's pubspec, then falls back to the workspace root; also checks the `applyEdit` return value and shows the target file name in the success message
-- **Lint rules** — registered `prefer_debugPrint` rule that was implemented but never wired into `_allRuleFactories` or assigned a tier; now active in the Recommended tier
-- **Examples** — removed stale `custom_lint` dev dependency from all 6 example projects; `custom_lint ^0.8.0` requires `analyzer ^8.0.0` which conflicts with the v5 native plugin's `analyzer ^9.0.0`
-- **ROADMAP** — removed `prefer_semver_version` and `prefer_correct_package_name` from the "Deferred: Pubspec Rules" section; both are already implemented and registered
-- **Plugin** — removed dead `PreferConstChildWidgetsRule` commented-out factory entry (class never existed)
+• **Package Vibrancy** — fixed false positive "unused" detection for packages referenced only via `export` directives (e.g. `analyzer_plugin`); the import scanner now recognizes both `import` and `export` as package usage
+
+• **Extension** — fixed "Annotate pubspec.yaml" command targeting the wrong file in workspaces with multiple `pubspec.yaml` files; now prefers the active editor's pubspec, then falls back to the workspace root; also checks the `applyEdit` return value and shows the target file name in the success message
+
+• **Lint rules** — registered `prefer_debugPrint` rule that was implemented but never wired into `_allRuleFactories` or assigned a tier; now active in the Recommended tier
+
+• **Examples** — removed stale `custom_lint` dev dependency from all 6 example projects; `custom_lint ^0.8.0` requires `analyzer ^8.0.0` which conflicts with the v5 native plugin's `analyzer ^9.0.0`
+
+• **ROADMAP** — removed `prefer_semver_version` and `prefer_correct_package_name` from the "Deferred: Pubspec Rules" section; both are already implemented and registered
+
+• **Plugin** — removed dead `PreferConstChildWidgetsRule` commented-out factory entry (class never existed)
 
 ### Removed
 
-- **Extension:** removed the "About Package Vibrancy" info icon and webview panel from the Package Vibrancy sidebar toolbar
-- **Package Vibrancy** — removed the cryptic problem-severity summary row (colored dots with bare numbers) from the top of the tree; the Action Items group already communicates problem counts and details
+• **Extension:** removed the "About Package Vibrancy" info icon and webview panel from the Package Vibrancy sidebar toolbar
+
+• **Package Vibrancy** — removed the cryptic problem-severity summary row (colored dots with bare numbers) from the top of the tree; the Action Items group already communicates problem counts and details
 
 ---
 
@@ -86,31 +99,45 @@ _Smarter dependency health — stale vs end-of-life separation, GitHub archived-
 
 ### Added
 
-- **Extension** — "Copy as JSON" context menu on all tree views (Issues, Config, Summary, Security Posture, File Risk, Overview, Suggestions, Package Vibrancy) with recursive child serialization and multi-select support
-- **Package Vibrancy** — GitHub archived-repo detection: archived repositories are automatically classified as End of Life and shown with a 🗄️ badge in tree view, hover tooltip, and detail panel
-- **Package Vibrancy** — richer GitHub metrics: true open issue count (separating issues from PRs), open PR count, last commit date, and GitHub license; displayed across hover tooltip, detail panel, and output log
+• **Extension** — "Copy as JSON" context menu on all tree views (Issues, Config, Summary, Security Posture, File Risk, Overview, Suggestions, Package Vibrancy) with recursive child serialization and multi-select support
+
+• **Package Vibrancy** — GitHub archived-repo detection: archived repositories are automatically classified as End of Life and shown with a 🗄️ badge in tree view, hover tooltip, and detail panel
+
+• **Package Vibrancy** — richer GitHub metrics: true open issue count (separating issues from PRs), open PR count, last commit date, and GitHub license; displayed across hover tooltip, detail panel, and output log
 
 ### Changed
 
-- **Extension** — consolidated 3 right-side status bar items (Saropa Lints, CodeLens toggle, Vibrancy score) into a single unified item; vibrancy score appears in the label when scan data is available, with full detail in the tooltip; new `showInStatusBar` setting lets users hide the vibrancy score without disabling the extension
-- **Extension** — "Apply fix" context menu item in Issues tree is now greyed out for violations whose rule has no quick-fix generator; `rulesWithFixes` list in `violations.json` config section drives the enablement so the user knows upfront which violations are auto-fixable
-- **Package Vibrancy** — merged Package Problems panel into Package Vibrancy; problems and suggested actions now appear as child nodes under each package instead of in a separate tree view
-- **Package Vibrancy** — added filter toolbar: search by name, filter by severity, problem type, health category, and dependency section; toggle problems-only view mode; clear all filters
-- **Package Vibrancy** — problem summary bar (severity counts) now appears at the top of the unified tree when problems exist
+• **Extension** — consolidated 3 right-side status bar items (Saropa Lints, CodeLens toggle, Vibrancy score) into a single unified item; vibrancy score appears in the label when scan data is available, with full detail in the tooltip; new `showInStatusBar` setting lets users hide the vibrancy score without disabling the extension
 
-- **Package Vibrancy** — added algorithmic guardrail to prevent editorial `end_of_life` overrides from condemning actively-maintained packages; if live pub.dev data shows a package has ≥130 pub points and was published within 18 months, the classification is capped at Legacy-Locked instead of End of Life
-- **Package Vibrancy** — `isDiscontinued` (objective pub.dev signal) now takes priority over known-issue overrides in the status classifier
-- **Package Vibrancy** — reclassified 71 known-issue entries from `end_of_life` to `caution` for packages that are actively maintained with verified publishers and high pub points (e.g. `animations`, `google_fonts`, `flutter_local_notifications`, `camera`, `dio`); these packages are now scored by the vibrancy algorithm instead of being force-classified as dead
-- **Package Vibrancy** — separated "Stale" from "End of Life": packages with score < 10 are now classified as `stale` (low maintenance activity) instead of `end-of-life`; the `end-of-life` label is reserved exclusively for packages that are discontinued on pub.dev, listed in known_issues as `end_of_life`, or archived on GitHub; new budget dimension `maxStale` and CI threshold `maxStale` added
-- **Extension** — removed "Saropa:" prefix from all vibrancy command titles in context menus and command palette; commands now read "Scan Dependencies", "Update All Dependencies", etc. instead of "Saropa: Scan Dependencies"
+• **Extension** — "Apply fix" context menu item in Issues tree is now greyed out for violations whose rule has no quick-fix generator; `rulesWithFixes` list in `violations.json` config section drives the enablement so the user knows upfront which violations are auto-fixable
+
+• **Package Vibrancy** — merged Package Problems panel into Package Vibrancy; problems and suggested actions now appear as child nodes under each package instead of in a separate tree view
+
+• **Package Vibrancy** — added filter toolbar: search by name, filter by severity, problem type, health category, and dependency section; toggle problems-only view mode; clear all filters
+
+• **Package Vibrancy** — problem summary bar (severity counts) now appears at the top of the unified tree when problems exist
+
+• **Package Vibrancy** — added algorithmic guardrail to prevent editorial `end_of_life` overrides from condemning actively-maintained packages; if live pub.dev data shows a package has ≥130 pub points and was published within 18 months, the classification is capped at Legacy-Locked instead of End of Life
+
+• **Package Vibrancy** — `isDiscontinued` (objective pub.dev signal) now takes priority over known-issue overrides in the status classifier
+
+• **Package Vibrancy** — reclassified 71 known-issue entries from `end_of_life` to `caution` for packages that are actively maintained with verified publishers and high pub points (e.g. `animations`, `google_fonts`, `flutter_local_notifications`, `camera`, `dio`); these packages are now scored by the vibrancy algorithm instead of being force-classified as dead
+
+• **Package Vibrancy** — separated "Stale" from "End of Life": packages with score < 10 are now classified as `stale` (low maintenance activity) instead of `end-of-life`; the `end-of-life` label is reserved exclusively for packages that are discontinued on pub.dev, listed in known_issues as `end_of_life`, or archived on GitHub; new budget dimension `maxStale` and CI threshold `maxStale` added
+
+• **Extension** — removed "Saropa:" prefix from all vibrancy command titles in context menus and command palette; commands now read "Scan Dependencies", "Update All Dependencies", etc. instead of "Saropa: Scan Dependencies"
 
 ### Fixed
 
-- **Lint Rules** — `require_image_picker_permission_ios` no longer fires a false positive on gallery-only usage; the rule now checks for `ImageSource.camera` in `pickImage()`/`pickVideo()` calls instead of triggering on any `image_picker` import, matching the Android rule's approach
-- **Package Vibrancy** — clicking a problem child node (e.g. "Unhealthy") now navigates to the correct pubspec.yaml from the last scan instead of opening a random pubspec in a multi-root workspace
-- **Package Vibrancy** — added missing `stale` category handling in comparison view CSS, scan log output, CI threshold prompts, and CI generator templates
-- **Analyzer** — `// ignore:` and `// ignore_for_file:` comments now suppress violations in the extension's Issues tree and `violations.json`, not just in the editor; centralized ignore handling in `SaropaDiagnosticReporter` so all rules benefit without per-rule opt-in
-- **Package Vibrancy** — added missing `.warning` CSS class in detail-view styles; archived-repo row now renders with correct warning color instead of inheriting default text color
+• **Lint Rules** — `require_image_picker_permission_ios` no longer fires a false positive on gallery-only usage; the rule now checks for `ImageSource.camera` in `pickImage()`/`pickVideo()` calls instead of triggering on any `image_picker` import, matching the Android rule's approach
+
+• **Package Vibrancy** — clicking a problem child node (e.g. "Unhealthy") now navigates to the correct pubspec.yaml from the last scan instead of opening a random pubspec in a multi-root workspace
+
+• **Package Vibrancy** — added missing `stale` category handling in comparison view CSS, scan log output, CI threshold prompts, and CI generator templates
+
+• **Analyzer** — `// ignore:` and `// ignore_for_file:` comments now suppress violations in the extension's Issues tree and `violations.json`, not just in the editor; centralized ignore handling in `SaropaDiagnosticReporter` so all rules benefit without per-rule opt-in
+
+• **Package Vibrancy** — added missing `.warning` CSS class in detail-view styles; archived-repo row now renders with correct warning color instead of inheriting default text color
 
 ## [9.4.2]
 
@@ -118,15 +145,15 @@ _Quick polish: colored diagnostic icons in the Issues tree and clipboard support
 
 ### Added
 
-- **Extension** — copy-to-clipboard link on package vibrancy hover tooltip; copies full package info as markdown
+• **Extension** — copy-to-clipboard link on package vibrancy hover tooltip; copies full package info as markdown
 
 ### Changed
 
-- **Extension** — Issues tree severity and folder nodes now display colored diagnostic icons (error/warning/info) instead of plain folder icons
+• **Extension** — Issues tree severity and folder nodes now display colored diagnostic icons (error/warning/info) instead of plain folder icons
 
 ### Fixed
 
-- **Extension** — clicking a child node (problem, suggestion, or healthy package) in the Package Problems tree now shows the parent package's details instead of clearing the Package Details panel
+• **Extension** — clicking a child node (problem, suggestion, or healthy package) in the Package Problems tree now shows the parent package's details instead of clearing the Package Details panel
 
 ---
 
@@ -136,9 +163,11 @@ _Housekeeping: plugging minor gaps carried over from the Package Vibrancy merge.
 
 ### Fixed
 
-- **Extension** — dispose the upgrade-plan output channel on deactivation (was never cleaned up, minor resource leak)
-- **Extension** — declare `focusIssuesForOwasp` command in `package.json` so VS Code can validate it; hidden from Command Palette since it requires a structured argument
-- **Extension** — set `showPrereleases` context key via `setContext` so the show/hide prerelease toggle buttons reflect the actual state; also wire `refresh()` into the config-change listener so direct settings.json edits stay in sync
+• **Extension** — dispose the upgrade-plan output channel on deactivation (was never cleaned up, minor resource leak)
+
+• **Extension** — declare `focusIssuesForOwasp` command in `package.json` so VS Code can validate it; hidden from Command Palette since it requires a structured argument
+
+• **Extension** — set `showPrereleases` context key via `setContext` so the show/hide prerelease toggle buttons reflect the actual state; also wire `refresh()` into the config-change listener so direct settings.json edits stay in sync
 
 ---
 
@@ -148,7 +177,7 @@ _Package Vibrancy is now built into Saropa Lints. One extension, one sidebar —
 
 ### Added
 
-- **Package Vibrancy integration** — merged the standalone Saropa Package Vibrancy extension into Saropa Lints
+• **Package Vibrancy integration** — merged the standalone Saropa Package Vibrancy extension into Saropa Lints
   - Three new collapsible sidebar panels: Package Vibrancy, Package Problems, Package Details
   - Dependency vibrancy scoring, vulnerability scanning (OSV + GitHub Advisory), SBOM export (CycloneDX)
   - Upgrade planning with test gates, bulk updates (latest/major/minor/patch)
@@ -162,8 +191,9 @@ _Package Vibrancy is now built into Saropa Lints. One extension, one sidebar —
 
 ### Changed
 
-- **Build system** migrated from raw tsc to esbuild (bundled single file, smaller .vsix, faster startup)
-- Extension minimum VS Code version remains ^1.74.0
+• **Build system** migrated from raw tsc to esbuild (bundled single file, smaller .vsix, faster startup)
+
+• Extension minimum VS Code version remains ^1.74.0
 
 ---
 
@@ -171,25 +201,35 @@ _Package Vibrancy is now built into Saropa Lints. One extension, one sidebar —
 
 ### Added
 
-- "About Saropa Lints" screen showing extension version and full company/product info from `ABOUT_SAROPA.md` — accessible from the Overview welcome buttons and command palette
-- "Getting Started" walkthrough button in Overview welcome content
-- Overview intro text describing the two components (pub.dev package + VS Code extension)
-- Version number shown in status bar tooltip for deployment verification
-- `precompile` script auto-copies root `ABOUT_SAROPA.md` into extension bundle so the About screen stays in sync with the source of truth
+• "About Saropa Lints" screen showing extension version and full company/product info from `ABOUT_SAROPA.md` — accessible from the Overview welcome buttons and command palette
+
+• "Getting Started" walkthrough button in Overview welcome content
+
+• Overview intro text describing the two components (pub.dev package + VS Code extension)
+
+• Version number shown in status bar tooltip for deployment verification
+
+• `precompile` script auto-copies root `ABOUT_SAROPA.md` into extension bundle so the About screen stays in sync with the source of truth
 
 ### Changed
 
-- Consolidated three status bar items into one — shows score + tier (e.g. `Saropa: 72% · recommended`), version in tooltip only
-- Score display uses `%` format instead of `/100`
-- Sidebar views hidden when empty — Issues appears with a Dart project, Config when enabled, Summary/Suggestions/Security Posture/File Risk after analysis has data
-- Removed 15 redundant welcome content entries for views now hidden by `when` clauses
-- "Learn More" button renamed to "Learn more online" to clarify it opens a website
+• Consolidated three status bar items into one — shows score + tier (e.g. `Saropa: 72% · recommended`), version in tooltip only
+
+• Score display uses `%` format instead of `/100`
+
+• Sidebar views hidden when empty — Issues appears with a Dart project, Config when enabled, Summary/Suggestions/Security Posture/File Risk after analysis has data
+
+• Removed 15 redundant welcome content entries for views now hidden by `when` clauses
+
+• "Learn More" button renamed to "Learn more online" to clarify it opens a website
 
 ### Administration
 
-- **CRITICAL** Fixed extension never reaching VS Code Marketplace after v9.0.2 — `run_extension_package()` used `next(glob("*.vsix"))` which returned the stale 9.0.2 `.vsix` (alphabetically before 9.1.0/9.2.0) instead of the newly created one; now deletes old `.vsix` files before packaging and looks for the expected filename first
-- Changed extension Marketplace publish prompt default from No to Yes (`[Y/n]`) — previous default silently skipped publishing with no warning
-- Replaced misleading "package already published" error messages with clear descriptions of what actually failed
+• **CRITICAL** Fixed extension never reaching VS Code Marketplace after v9.0.2 — `run_extension_package()` used `next(glob("*.vsix"))` which returned the stale 9.0.2 `.vsix` (alphabetically before 9.1.0/9.2.0) instead of the newly created one; now deletes old `.vsix` files before packaging and looks for the expected filename first
+
+• Changed extension Marketplace publish prompt default from No to Yes (`[Y/n]`) — previous default silently skipped publishing with no warning
+
+• Replaced misleading "package already published" error messages with clear descriptions of what actually failed
 
 ---
 
@@ -199,23 +239,31 @@ Extension reliability and subdirectory project support.
 
 ### Fixed
 
-- **IMPORTANT** Fixed YAML corruption in `ensureSaropaLintsInPubspec()` — regex backtracking placed the dependency on the same line as `dev_dependencies:`, producing invalid YAML that caused `dart run saropa_lints:init` to fail on every project
-- Fixed `DEFAULT_VERSION` from stale `^8.0.0` to `^9.1.0`
-- Fixed `fs` import shadowing in OWASP export handler (dynamic `import('fs')` shadowed static `import * as fs`)
-- Fixed `package_config.json` verification to match exact `"saropa_lints"` instead of substring
-- Removed unreachable fallback branch in inline annotations path computation
+• **IMPORTANT** Fixed YAML corruption in `ensureSaropaLintsInPubspec()` — regex backtracking placed the dependency on the same line as `dev_dependencies:`, producing invalid YAML that caused `dart run saropa_lints:init` to fail on every project
+
+• Fixed `DEFAULT_VERSION` from stale `^8.0.0` to `^9.1.0`
+
+• Fixed `fs` import shadowing in OWASP export handler (dynamic `import('fs')` shadowed static `import * as fs`)
+
+• Fixed `package_config.json` verification to match exact `"saropa_lints"` instead of substring
+
+• Removed unreachable fallback branch in inline annotations path computation
 
 ### Added
 
-- Subdirectory pubspec detection — projects with `pubspec.yaml` one level deep (e.g. `game/pubspec.yaml`) are now discovered automatically
-- Centralized project root discovery (`projectRoot.ts`) with per-session caching
-- Workspace folder change listener invalidates cached project root
-- Added `workspaceContains:*/pubspec.yaml` activation event
+• Subdirectory pubspec detection — projects with `pubspec.yaml` one level deep (e.g. `game/pubspec.yaml`) are now discovered automatically
+
+• Centralized project root discovery (`projectRoot.ts`) with per-session caching
+
+• Workspace folder change listener invalidates cached project root
+
+• Added `workspaceContains:*/pubspec.yaml` activation event
 
 ### Changed
 
-- All 13 source files now use `getProjectRoot()` instead of scattering `workspaceFolders[0]` references
-- Line-based YAML insertion preserves original CRLF/LF line endings
+• All 13 source files now use `getProjectRoot()` instead of scattering `workspaceFolders[0]` references
+
+• Line-based YAML insertion preserves original CRLF/LF line endings
 
 ---
 
@@ -223,11 +271,11 @@ Extension reliability and subdirectory project support.
 
 ### Changed
 
-- Welcome views and status bar now detect non-Dart workspaces and show appropriate guidance instead of a misleading "Enable" button
+• Welcome views and status bar now detect non-Dart workspaces and show appropriate guidance instead of a misleading "Enable" button
 
 ### Removed
 
-- **Logs view:** Removed the Logs panel from the sidebar — it was a file browser for the `reports/` directory, which the built-in file explorer already provides.
+• **Logs view:** Removed the Logs panel from the sidebar — it was a file browser for the `reports/` directory, which the built-in file explorer already provides.
 
 ---
 
@@ -237,13 +285,15 @@ Sidebar icon refinement.
 
 ### Changed
 
-- **Sidebar icon:** Changed activity bar icon from solid fill to wireframe (stroked outline) for consistency with VS Code's icon style.
+• **Sidebar icon:** Changed activity bar icon from solid fill to wireframe (stroked outline) for consistency with VS Code's icon style.
 
 ### Administration
 
-- **Open VSX publish:** The publish script now prompts for an OVSX_PAT when the environment variable is missing, with platform-specific setup instructions, instead of silently skipping.
-- **Stale plugin-cache repair:** `dart analyze` failures caused by a stale analyzer plugin cache are now detected automatically. The script offers to update `analysis_options.yaml` and clear the cache in one step.
-- **Post-publish version sync:** After publishing, `analysis_options.yaml` plugin version is updated to the just-published version so `dart analyze` resolves correctly.
+• **Open VSX publish:** The publish script now prompts for an OVSX_PAT when the environment variable is missing, with platform-specific setup instructions, instead of silently skipping.
+
+• **Stale plugin-cache repair:** `dart analyze` failures caused by a stale analyzer plugin cache are now detected automatically. The script offers to update `analysis_options.yaml` and clear the cache in one step.
+
+• **Post-publish version sync:** After publishing, `analysis_options.yaml` plugin version is updated to the just-published version so `dart analyze` resolves correctly.
 
 ---
 
@@ -253,12 +303,13 @@ Sidebar polish — fixed the broken activity bar icon, removed repetitive enable
 
 ### Added
 
-- **Auto-enable for existing projects:** The extension now detects `saropa_lints` in pubspec.yaml and enables itself automatically — no manual "Enable" click needed for projects that already depend on the package. New projects still see the welcome prompt.
+• **Auto-enable for existing projects:** The extension now detects `saropa_lints` in pubspec.yaml and enables itself automatically — no manual "Enable" click needed for projects that already depend on the package. New projects still see the welcome prompt.
 
 ### Fixed
 
-- **Sidebar icon:** Replaced oversized colorful PNG with monochrome SVG that renders correctly in the VS Code activity bar and respects theme colors.
-- **Repetitive enable buttons:** Removed duplicate "Enable Saropa Lints" buttons from Config, Logs, Suggestions, Security Posture, File Risk, and Summary views. The enable button now appears only in Overview and Issues; other views show a text pointer instead.
+• **Sidebar icon:** Replaced oversized colorful PNG with monochrome SVG that renders correctly in the VS Code activity bar and respects theme colors.
+
+• **Repetitive enable buttons:** Removed duplicate "Enable Saropa Lints" buttons from Config, Logs, Suggestions, Security Posture, File Risk, and Summary views. The enable button now appears only in Overview and Issues; other views show a text pointer instead.
 
 ---
 
@@ -268,41 +319,59 @@ The VS Code extension is now the primary way to use saropa_lints. One-click setu
 
 ### Added
 
-- **Health Score & Trends:** 0–100 project quality score in the Overview view and status bar, computed from violation count and impact severity. Color bands (green/yellow/red), score delta from last run, trend tracking over last 20 snapshots, milestone celebrations (50/60/70/80/90), and regression alerts when score drops.
-- **Issues & Inline Annotations:** Error Lens-style decorations showing violation messages at the end of affected lines. Issues tree grouped by severity and file with text/severity/impact/rule filters, persistent suppressions, focus mode, group-by presets (Severity/File/Impact/Rule/OWASP), and context-menu quick fixes. Code Lens per file with critical count. Bulk “Fix all in this file” with progress and score delta. “Show in Saropa Lints” from the Problems view.
-- **Security Posture:** OWASP Top 10 coverage matrix (Mobile and Web) with violation and rule counts per category. Click to filter Issues. “Export OWASP Compliance Report” generates a markdown report for audits.
-- **Triage & Config:** Rules grouped by priority (critical, volume bands A–D, stylistic) with estimated score impact per group. Right-click to disable/enable rules — writes overrides to YAML and re-runs analysis. Packages auto-detected from `pubspec.yaml`. Custom config reduced from ~420 to ~40 lines.
-- **File Risk:** Files ranked by weighted violation density — riskiest first. Flame icon for critical, warning icon for high. Summary shows “Top N files have X% of critical issues”.
-- **First-run & Welcome:** "Getting Started" walkthrough with guided tour of all features (Health Score, Issues, Security, Triage, Trends, and About Saropa). Score-aware notification after enabling with actionable buttons. Native welcome states on all views when disabled or no data. Analysis auto-focuses Overview to show score delta. Extension report writer logs actions for audit trail.
+• **Health Score & Trends:** 0–100 project quality score in the Overview view and status bar, computed from violation count and impact severity. Color bands (green/yellow/red), score delta from last run, trend tracking over last 20 snapshots, milestone celebrations (50/60/70/80/90), and regression alerts when score drops.
+
+• **Issues & Inline Annotations:** Error Lens-style decorations showing violation messages at the end of affected lines. Issues tree grouped by severity and file with text/severity/impact/rule filters, persistent suppressions, focus mode, group-by presets (Severity/File/Impact/Rule/OWASP), and context-menu quick fixes. Code Lens per file with critical count. Bulk “Fix all in this file” with progress and score delta. “Show in Saropa Lints” from the Problems view.
+
+• **Security Posture:** OWASP Top 10 coverage matrix (Mobile and Web) with violation and rule counts per category. Click to filter Issues. “Export OWASP Compliance Report” generates a markdown report for audits.
+
+• **Triage & Config:** Rules grouped by priority (critical, volume bands A–D, stylistic) with estimated score impact per group. Right-click to disable/enable rules — writes overrides to YAML and re-runs analysis. Packages auto-detected from `pubspec.yaml`. Custom config reduced from ~420 to ~40 lines.
+
+• **File Risk:** Files ranked by weighted violation density — riskiest first. Flame icon for critical, warning icon for high. Summary shows “Top N files have X% of critical issues”.
+
+• **First-run & Welcome:** "Getting Started" walkthrough with guided tour of all features (Health Score, Issues, Security, Triage, Trends, and About Saropa). Score-aware notification after enabling with actionable buttons. Native welcome states on all views when disabled or no data. Analysis auto-focuses Overview to show score delta. Extension report writer logs actions for audit trail.
 
 ### Deprecated
 
-- **CLI init interactive mode:** `dart run saropa_lints:init` is now headless-only — defaults to `recommended` tier. Use the VS Code extension for interactive setup. CLI remains for CI/scripting with `--tier`, `--target`, `--no-stylistic`. Removed `--stylistic` (interactive walkthrough) and `--reset-stylistic` flags; use `--stylistic-all` for bulk enable.
+• **CLI init interactive mode:** `dart run saropa_lints:init` is now headless-only — defaults to `recommended` tier. Use the VS Code extension for interactive setup. CLI remains for CI/scripting with `--tier`, `--target`, `--no-stylistic`. Removed `--stylistic` (interactive walkthrough) and `--reset-stylistic` flags; use `--stylistic-all` for bulk enable.
 
 ### Changed
 
-- **Custom config notice:** `analysis_options_custom.yaml` now includes a prominent "DO NOT EDIT MANUALLY" banner directing users to the VS Code extension for rule overrides.
-- **Smart Tier Transitions:** Upgrading to a higher tier auto-filters the Issues view to critical + high violations so users aren't overwhelmed. Notification shows violation delta and "Show All" escape hatch. Tier picker shows rule counts, descriptions, and current-tier marker; same-tier selection is a no-op.
-- Progress indicators for Run Analysis, Initialize Config, and Set Tier.
-- Debounced refresh (300 ms) on `violations.json` changes.
-- Summary view uses stable node IDs for expansion state.
-- Status bar update logic consolidated across all command handlers.
+• **Custom config notice:** `analysis_options_custom.yaml` now includes a prominent "DO NOT EDIT MANUALLY" banner directing users to the VS Code extension for rule overrides.
+
+• **Smart Tier Transitions:** Upgrading to a higher tier auto-filters the Issues view to critical + high violations so users aren't overwhelmed. Notification shows violation delta and "Show All" escape hatch. Tier picker shows rule counts, descriptions, and current-tier marker; same-tier selection is a no-op.
+
+• Progress indicators for Run Analysis, Initialize Config, and Set Tier.
+
+• Debounced refresh (300 ms) on `violations.json` changes.
+
+• Summary view uses stable node IDs for expansion state.
+
+• Status bar update logic consolidated across all command handlers.
 
 ### Fixed
 
-- Health Score NaN guard for non-numeric JSON values.
-- Run history dedup compares severity breakdown and score, not just total.
-- Celebration messages only fire on genuinely new snapshots.
-- Snapshot recorded before tree refresh so Overview reads fresh history.
-- Inline annotations cache violations data; re-read only on file-watcher change.
-- Test runner hanging indefinitely: added global 2-minute timeout (`dart_test.yaml`) and per-test timeouts on integration tests that spawn `Process.run` without a cap.
-- Security Posture caches OWASP counts; OWASP filter clears prior filters; ID normalization handles short and long forms; data validation for malformed JSON.
-- Output channel uses singleton pattern.
-- Tree view fixes: root folder path prefix, severity/impact suppression timing, tier status bar immediate update.
+• Health Score NaN guard for non-numeric JSON values.
+
+• Run history dedup compares severity breakdown and score, not just total.
+
+• Celebration messages only fire on genuinely new snapshots.
+
+• Snapshot recorded before tree refresh so Overview reads fresh history.
+
+• Inline annotations cache violations data; re-read only on file-watcher change.
+
+• Test runner hanging indefinitely: added global 2-minute timeout (`dart_test.yaml`) and per-test timeouts on integration tests that spawn `Process.run` without a cap.
+
+• Security Posture caches OWASP counts; OWASP filter clears prior filters; ID normalization handles short and long forms; data validation for malformed JSON.
+
+• Output channel uses singleton pattern.
+
+• Tree view fixes: root folder path prefix, severity/impact suppression timing, tier status bar immediate update.
 
 ### Administration
 
-- Unified publish script (`scripts/publish.py`) for package and extension; extension version synced with package version.
+• Unified publish script (`scripts/publish.py`) for package and extension; extension version synced with package version.
 
 ---
 
@@ -310,7 +379,7 @@ The VS Code extension is now the primary way to use saropa_lints. One-click setu
 
 ### Changed
 
-- Release version bump
+• Release version bump
 
 ---
 
@@ -318,12 +387,13 @@ The VS Code extension is now the primary way to use saropa_lints. One-click setu
 
 ### Added
 
-- **Init `--target` flag:** `dart run saropa_lints init --target /path/to/project` generates configuration for any project directory, not just the current working directory.
-- **Standalone scan command:** `dart run saropa_lints scan [path]` runs lint rules directly against any Dart project without requiring saropa_lints as a dependency. Reads the project's `analysis_options.yaml` (generated by `init`) to determine which rules to run. Results are written to a report file with a compact summary on terminal.
+• **Init `--target` flag:** `dart run saropa_lints init --target /path/to/project` generates configuration for any project directory, not just the current working directory.
+
+• **Standalone scan command:** `dart run saropa_lints scan [path]` runs lint rules directly against any Dart project without requiring saropa_lints as a dependency. Reads the project's `analysis_options.yaml` (generated by `init`) to determine which rules to run. Results are written to a report file with a compact summary on terminal.
 
 ### Changed
 
-- **Init tool modularization:** Extracted `bin/init.dart` (4,819 lines) into 21 focused modules under `lib/src/init/`, reducing the entry point to 15 lines. No behavior changes.
+• **Init tool modularization:** Extracted `bin/init.dart` (4,819 lines) into 21 focused modules under `lib/src/init/`, reducing the entry point to 15 lines. No behavior changes.
   - `cli_args.dart` — CLI argument parsing and `CliArgs` class
   - `config_reader.dart` — user customization extraction
   - `config_writer.dart` — YAML generation for `analysis_options.yaml`
@@ -348,7 +418,7 @@ The VS Code extension is now the primary way to use saropa_lints. One-click setu
 
 ### Fixed
 
-- **19 false positive bugs fixed across scan rules:**
+• **19 false positive bugs fixed across scan rules:**
   - **Self-referential false positives (8 rules):** `avoid_asset_manifest_json`, `avoid_ios_in_app_browser_for_auth`, `avoid_mixed_environments`, `avoid_purchase_in_sandbox_production`, `require_database_migration`, `require_https_only`, `require_unique_iv_per_encryption`, `require_websocket_reconnection` — rules no longer flag their own detection pattern strings in `lib/src/rules/` and `lib/src/fixes/` directories
   - **Flutter-only rules skip non-Flutter projects (5 rules):** `avoid_blocking_main_thread` (-170 FPs), `avoid_print_in_release` (-197 FPs), `avoid_long_running_isolates`, `prefer_platform_io_conditional`, `require_android_permission_request` — rules now check `ProjectContext.isFlutterProject` and skip CLI tools, servers, and analysis plugins
   - **Detection logic improvements (6 rules):** `avoid_api_key_in_code` skips regex patterns; `avoid_catch_all` allows `developer.log(error:, stackTrace:)` defensive catches; `avoid_hardcoded_config` whitelists `pub.dev`/`github.com` URLs; `avoid_parameter_mutation` no longer flags collection accumulator methods (`.add()`, `.addAll()`, etc.); `require_catch_logging` recognizes `developer.log` and `stderr`; `require_data_encryption` checks argument text only (not receiver names)
@@ -361,12 +431,13 @@ Reduces false-positive noise: strings with embedded quotes (like SQL literals) a
 
 ### Fixed
 
-- **`prefer_single_quotes` false positive on interpolated strings containing single quotes (v7):** The `StringInterpolation` handler now skips double-quoted strings whose literal parts contain `'` characters (e.g. SQL literals like `"WHERE $col = 'active'"`), matching the existing `SimpleStringLiteral` behavior.
-- **`require_network_status_check` false positive on local store lookups and server handlers (v3):** Removed overly broad `.get(`/`.post(` regex patterns that matched any method call (e.g., `_sessionStore.get()`, `Map.get()`). Replaced with specific HTTP client patterns (`dio.get(`, `client.get(`, etc.). Methods with server-side handler parameters (`HttpRequest`, `HttpResponse`, `Request`, `RequestContext`) are now excluded.
+• **`prefer_single_quotes` false positive on interpolated strings containing single quotes (v7):** The `StringInterpolation` handler now skips double-quoted strings whose literal parts contain `'` characters (e.g. SQL literals like `"WHERE $col = 'active'"`), matching the existing `SimpleStringLiteral` behavior.
+
+• **`require_network_status_check` false positive on local store lookups and server handlers (v3):** Removed overly broad `.get(`/`.post(` regex patterns that matched any method call (e.g., `_sessionStore.get()`, `Map.get()`). Replaced with specific HTTP client patterns (`dio.get(`, `client.get(`, etc.). Methods with server-side handler parameters (`HttpRequest`, `HttpResponse`, `Request`, `RequestContext`) are now excluded.
 
 ### Archive
 
-- Rules 6.2.0 and older moved to [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md)
+• Rules 6.2.0 and older moved to [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md)
 
 ---
 
@@ -376,28 +447,31 @@ Opt-in rule registration (breaking), quick fixes and `source.fixAll` tips for tw
 
 ### Added
 
-- **Quick fix for `prefer_trailing_comma_always`:** Adds trailing comma via lightbulb/`source.fixAll`. Reuses existing `AddTrailingCommaFix`.
-- **Quick fix for `prefer_type_over_var`:** Replaces `var` with the inferred explicit type via new `ReplaceVarWithTypeFix`.
+• **Quick fix for `prefer_trailing_comma_always`:** Adds trailing comma via lightbulb/`source.fixAll`. Reuses existing `AddTrailingCommaFix`.
+
+• **Quick fix for `prefer_type_over_var`:** Replaces `var` with the inferred explicit type via new `ReplaceVarWithTypeFix`.
 
 ### Changed
 
-- **`prefer_trailing_comma_always` correction message:** Now mentions `source.fixAll` editor setting for automatic bulk fixes on save.
-- **`prefer_type_over_var` correction message:** Replaced alarming "Verify the change works correctly with existing tests" text with `source.fixAll` tip, since the rule is purely cosmetic.
+• **`prefer_trailing_comma_always` correction message:** Now mentions `source.fixAll` editor setting for automatic bulk fixes on save.
 
-- **Opt-in rule registration (BREAKING):** Rules are now disabled by default. Only rules explicitly set to `true` in `diagnostics:` or with a severity override (ERROR/WARNING/INFO) are registered. No config = no rules fire (safe default). This eliminates the need for hundreds of `false` entries in `analysis_options.yaml`. Run `dart run saropa_lints:init` to regenerate your config — existing `true` entries continue to work. The init tool no longer generates disabled-rules sections, reducing YAML size by up to 85%.
-- **Memory improvement:** Plugin registration now uses `getRulesFromRegistry()` to instantiate only enabled rules instead of all 2050+. Essential tier memory usage drops from ~4GB to ~500MB.
+• **`prefer_type_over_var` correction message:** Replaced alarming "Verify the change works correctly with existing tests" text with `source.fixAll` tip, since the rule is purely cosmetic.
+
+• **Opt-in rule registration (BREAKING):** Rules are now disabled by default. Only rules explicitly set to `true` in `diagnostics:` or with a severity override (ERROR/WARNING/INFO) are registered. No config = no rules fire (safe default). This eliminates the need for hundreds of `false` entries in `analysis_options.yaml`. Run `dart run saropa_lints:init` to regenerate your config — existing `true` entries continue to work. The init tool no longer generates disabled-rules sections, reducing YAML size by up to 85%.
+
+• **Memory improvement:** Plugin registration now uses `getRulesFromRegistry()` to instantiate only enabled rules instead of all 2050+. Essential tier memory usage drops from ~4GB to ~500MB.
 
 ### Fixed
 
-- **`prefer_no_commented_out_code` false positive on prose with parentheses and semicolons:** `_hasStrongCodeIndicators` treated bare `()` and `;` as unambiguous code, bypassing the prose guard on natural English like `Speed slider (0.25×–4×) is local to this tab;`. Refined to require function-call patterns (`\w(`) instead of bare parentheses, and removed the standalone semicolon check. Control-flow keyword + paren detection (`for (`, `if (`, etc.) preserves existing true-positive coverage.
+• **`prefer_no_commented_out_code` false positive on prose with parentheses and semicolons:** `_hasStrongCodeIndicators` treated bare `()` and `;` as unambiguous code, bypassing the prose guard on natural English like `Speed slider (0.25×–4×) is local to this tab;`. Refined to require function-call patterns (`\w(`) instead of bare parentheses, and removed the standalone semicolon check. Control-flow keyword + paren detection (`for (`, `if (`, etc.) preserves existing true-positive coverage.
 
-- **`prefer_for_in` false positive on numeric counter loops (v5):** The rule now requires the loop's upper bound to be a `.length` property access before firing. Previously it flagged any `for (var i = 0; i < N; i++)` loop regardless of whether `N` was a collection length, an integer literal, or a plain variable. Numeric counter loops (e.g. `i < 12`, `i < count`) where there is no collection to for-in over are no longer flagged.
+• **`prefer_for_in` false positive on numeric counter loops (v5):** The rule now requires the loop's upper bound to be a `.length` property access before firing. Previously it flagged any `for (var i = 0; i < N; i++)` loop regardless of whether `N` was a collection length, an integer literal, or a plain variable. Numeric counter loops (e.g. `i < 12`, `i < count`) where there is no collection to for-in over are no longer flagged.
 
-- **`avoid_uncaught_future_errors` crash on enum declarations (Dart 3.11+):** `_collectFunctionsWithTryCatch` accessed `.body` on declaration nodes, which throws `UnsupportedError` for `EnumDeclaration` in Dart SDK 3.11. This crashed the entire analyzer plugin (exit code 4), losing all diagnostics for all rules in all files. Fixed by switching all declaration types to use `.members` instead of `.body`, and added `ExtensionTypeDeclaration` support.
+• **`avoid_uncaught_future_errors` crash on enum declarations (Dart 3.11+):** `_collectFunctionsWithTryCatch` accessed `.body` on declaration nodes, which throws `UnsupportedError` for `EnumDeclaration` in Dart SDK 3.11. This crashed the entire analyzer plugin (exit code 4), losing all diagnostics for all rules in all files. Fixed by switching all declaration types to use `.members` instead of `.body`, and added `ExtensionTypeDeclaration` support.
 
-- **`prefer_sentence_case_comments` false positive on continuation lines (v6):** Multi-line `//` comment blocks are now recognized as a single logical unit. Continuation lines (where the previous `//` line does not end with `.`, `!`, or `?`) are skipped instead of being flagged for lowercase start. Previously every continuation line in a multi-line comment was a false positive. The relaxed variant (`prefer_sentence_case_comments_relaxed`) receives the same fix (v2).
+• **`prefer_sentence_case_comments` false positive on continuation lines (v6):** Multi-line `//` comment blocks are now recognized as a single logical unit. Continuation lines (where the previous `//` line does not end with `.`, `!`, or `?`) are skipped instead of being flagged for lowercase start. Previously every continuation line in a multi-line comment was a false positive. The relaxed variant (`prefer_sentence_case_comments_relaxed`) receives the same fix (v2).
 
-- **`prefer_cascade_over_chained` false positive on independent actions (v2):** Two consecutive calls with different method names (e.g., `messenger.clearSnackBars(); messenger.showSnackBar(bar);`) are no longer flagged. Cascade is only suggested for batch patterns (same method repeated, e.g., `add`/`add`) or 3+ consecutive calls. The same fix is applied to `prefer_cascade_assignments`.
+• **`prefer_cascade_over_chained` false positive on independent actions (v2):** Two consecutive calls with different method names (e.g., `messenger.clearSnackBars(); messenger.showSnackBar(bar);`) are no longer flagged. Cascade is only suggested for batch patterns (same method repeated, e.g., `add`/`add`) or 3+ consecutive calls. The same fix is applied to `prefer_cascade_assignments`.
 
 ---
 
@@ -407,20 +481,25 @@ New relaxed sentence-case variant, init wizard code examples, and false-positive
 
 ### Added
 
-- **`prefer_sentence_case_comments_relaxed` (v1):** New relaxed variant of `prefer_sentence_case_comments` that only enforces sentence case on comments of 5+ words. Comments of 1-4 words are skipped as short annotations/labels. Enable one or the other, not both.
+• **`prefer_sentence_case_comments_relaxed` (v1):** New relaxed variant of `prefer_sentence_case_comments` that only enforces sentence case on comments of 5+ words. Comments of 1-4 words are skipped as short annotations/labels. Enable one or the other, not both.
 
 ### Changed
 
-- **Init wizard walkthrough:** All 223 stylistic rules now display GOOD/BAD code examples with multi-line support and inline comments. Previously 152 rules had no examples, making walkthrough questions unanswerable. Added `_logExample` helper for proper multi-line rendering and updated `_walkthroughConflicting` to show both GOOD and BAD examples (previously only showed GOOD).
+• **Init wizard walkthrough:** All 223 stylistic rules now display GOOD/BAD code examples with multi-line support and inline comments. Previously 152 rules had no examples, making walkthrough questions unanswerable. Added `_logExample` helper for proper multi-line rendering and updated `_walkthroughConflicting` to show both GOOD and BAD examples (previously only showed GOOD).
 
 ### Fixed
 
-- **`prefer_sentence_case_comments` false positive on short comments (v5):** Rule no longer flags 1-2 word comments (e.g., `// magnifyingGlass`, `// gear`). These are typically identifier annotations or short labels, not prose sentences. Also tightened code-reference detection to only skip camelCase/snake_case identifiers — previously it over-matched all lowercase words, silently suppressing most violations.
-- **`prefer_blank_line_before_else` false positive on `else if` (v2):** Rule no longer flags `else if` chains. Only standalone `} else {` blocks are reported. Previously every `else if` in the project generated a false positive — inserting a blank line before `else if` is a Dart syntax error.
-- **`prefer_switch_statement` false positives (v2):** No longer flags switch expressions in value-producing positions — arrow bodies (`=> switch (...)`), return statements, variable initializers, assignments, and yield statements are now exempt. Only fires when the switch expression is in a non-value position (e.g. nested in a collection literal or passed as a function argument).
-- **`prefer_positive_conditions_first` false positive on null guards (v3):** Null-equality guard clauses (`if (x == null) return;`) are no longer flagged — `== null` is an equality check, not a negation. Rule now only fires on genuinely negated guards (`if (!condition) return;`). Problem message rewritten to accurately describe the narrower scope.
-- **`prefer_doc_comments_over_regular` false positive on section headers (v6):** Section-header comments (text between divider lines like `// -----`) and comments separated from declarations by a blank line are no longer flagged. Divider lines (`// ----`, `// ====`, `// ****`) are now detected and skipped along with adjacent section-header text.
-- **`prefer_descriptive_variable_names` false positive on short-lived variables (v4):** Added scope-size awareness — short names are now allowed in small blocks (<=5 statements) where context is immediately visible. Also skips C-style for-loop index variables and expands the allowed-names list with common conventions (`i`, `j`, `k`, `e`, `n`).
+• **`prefer_sentence_case_comments` false positive on short comments (v5):** Rule no longer flags 1-2 word comments (e.g., `// magnifyingGlass`, `// gear`). These are typically identifier annotations or short labels, not prose sentences. Also tightened code-reference detection to only skip camelCase/snake_case identifiers — previously it over-matched all lowercase words, silently suppressing most violations.
+
+• **`prefer_blank_line_before_else` false positive on `else if` (v2):** Rule no longer flags `else if` chains. Only standalone `} else {` blocks are reported. Previously every `else if` in the project generated a false positive — inserting a blank line before `else if` is a Dart syntax error.
+
+• **`prefer_switch_statement` false positives (v2):** No longer flags switch expressions in value-producing positions — arrow bodies (`=> switch (...)`), return statements, variable initializers, assignments, and yield statements are now exempt. Only fires when the switch expression is in a non-value position (e.g. nested in a collection literal or passed as a function argument).
+
+• **`prefer_positive_conditions_first` false positive on null guards (v3):** Null-equality guard clauses (`if (x == null) return;`) are no longer flagged — `== null` is an equality check, not a negation. Rule now only fires on genuinely negated guards (`if (!condition) return;`). Problem message rewritten to accurately describe the narrower scope.
+
+• **`prefer_doc_comments_over_regular` false positive on section headers (v6):** Section-header comments (text between divider lines like `// -----`) and comments separated from declarations by a blank line are no longer flagged. Divider lines (`// ----`, `// ====`, `// ****`) are now detected and skipped along with adjacent section-header text.
+
+• **`prefer_descriptive_variable_names` false positive on short-lived variables (v4):** Added scope-size awareness — short names are now allowed in small blocks (<=5 statements) where context is immediately visible. Also skips C-style for-loop index variables and expands the allowed-names list with common conventions (`i`, `j`, `k`, `e`, `n`).
 
 ---
 
@@ -430,7 +509,7 @@ Fix `prefer_single_blank_line_max` false positives by rewriting detection to sca
 
 ### Fixed
 
-- **`prefer_single_blank_line_max` false positives (v3):** Rewrote detection to scan actual line content instead of comparing top-level declaration positions. Comments, doc comments, and section separators between declarations no longer trigger false positives. Now detects consecutive blank lines everywhere in the file (function bodies, class members), not just between top-level declarations.
+• **`prefer_single_blank_line_max` false positives (v3):** Rewrote detection to scan actual line content instead of comparing top-level declaration positions. Comments, doc comments, and section separators between declarations no longer trigger false positives. Now detects consecutive blank lines everywhere in the file (function bodies, class members), not just between top-level declarations.
 
 ---
 
@@ -440,8 +519,9 @@ Fix `prefer_readable_line_length` crash and publish script changelog parsing.
 
 ### Fixed
 
-- **`prefer_readable_line_length` crash:** Fixed off-by-one error in `PreferReadableLineLengthRule` that caused `Invalid line number` exception when analyzing files. The loop used 1-based indexing but `LineInfo.getOffsetOfLine()` requires 0-based, crashing on the last line of every file.
-- **Publish script changelog logic:** Fixed regexes in `_version_changelog.py` that expected `---\n##` but the actual format uses `---\n\n##` (blank line after separator). This caused `add_version_section` to silently append entries at the end of the file and `add_unreleased_section` to fail entirely. Recovered 8 orphaned changelog entries.
+• **`prefer_readable_line_length` crash:** Fixed off-by-one error in `PreferReadableLineLengthRule` that caused `Invalid line number` exception when analyzing files. The loop used 1-based indexing but `LineInfo.getOffsetOfLine()` requires 0-based, crashing on the last line of every file.
+
+• **Publish script changelog logic:** Fixed regexes in `_version_changelog.py` that expected `---\n##` but the actual format uses `---\n\n##` (blank line after separator). This caused `add_version_section` to silently append entries at the end of the file and `add_unreleased_section` to fail entirely. Recovered 8 orphaned changelog entries.
 
 ---
 
@@ -451,8 +531,9 @@ Remove Flutter SDK constraint that broke CI and fix 56 unresolved dartdoc refere
 
 ### Fixed
 
-- **Removed Flutter SDK constraint from pubspec.yaml** that caused CI publish workflow to fail (`dart pub get` requires only the Dart SDK; this is a pure Dart package).
-- **Fixed 56 unresolved dartdoc reference warnings** across rule files.
+• **Removed Flutter SDK constraint from pubspec.yaml** that caused CI publish workflow to fail (`dart pub get` requires only the Dart SDK; this is a pure Dart package).
+
+• **Fixed 56 unresolved dartdoc reference warnings** across rule files.
 
 ---
 
@@ -462,7 +543,7 @@ Publish workflow improvements with retry logic and SDK configuration.
 
 ### Changed
 
-- **Updated publish workflow** with improved retry logic and SDK configuration.
+• **Updated publish workflow** with improved retry logic and SDK configuration.
 
 ---
 
@@ -472,7 +553,7 @@ Publish script auto-bumps version on tag conflict; GitHub Actions workflow uses 
 
 ### Changed
 
-- **Publish script and workflow:** GitHub Actions publish workflow now uses the Dart stable SDK (no exact-version lookup), adds a Verify Dart SDK step, and retries `dart pub get` once on failure. When the release tag already exists on the remote, the script auto-bumps the pubspec version and adds a "Release version" CHANGELOG section instead of failing. The script automatically commits and pushes `.github/workflows/publish.yml` when it has uncommitted changes, so no manual git steps are required.
+• **Publish script and workflow:** GitHub Actions publish workflow now uses the Dart stable SDK (no exact-version lookup), adds a Verify Dart SDK step, and retries `dart pub get` once on failure. When the release tag already exists on the remote, the script auto-bumps the pubspec version and adds a "Release version" CHANGELOG section instead of failing. The script automatically commits and pushes `.github/workflows/publish.yml` when it has uncommitted changes, so no manual git steps are required.
 
 ---
 
@@ -482,7 +563,7 @@ Version bump for pub.dev compatibility.
 
 ### Changed
 
-- Version bump
+• Version bump
 
 ---
 
@@ -492,7 +573,7 @@ Version bump for pub.dev compatibility.
 
 ### Changed
 
-- Version bump
+• Version bump
 
 ---
 
@@ -502,7 +583,7 @@ Fix `lowerCaseName` getter errors in tests and init tool.
 
 ### Fixed
 
-- **Tests and init:** Resolve undefined getter `lowerCaseName` on `LintCode` by importing `saropa_lint_rule.dart` (which defines the `LintCodeLowerCase` extension) in test files and `bin/init.dart`.
+• **Tests and init:** Resolve undefined getter `lowerCaseName` on `LintCode` by importing `saropa_lint_rule.dart` (which defines the `LintCodeLowerCase` extension) in test files and `bin/init.dart`.
 
 ### Notice
 
@@ -516,23 +597,27 @@ Fix `lowerCaseName` getter errors in tests and init tool.
 
 ### Why v8 and not v7?
 
-- **v7.0.0 and v7.0.1 were retracted.** Those releases upgraded to the analyzer 10.x API. The **Flutter framework does not yet support analyzer 10** (Flutter's own dependency tree pins analyzer 9). Publishing with `analyzer: ^10.0.0` made saropa_lints incompatible with Flutter projects, so 7.x was retracted from pub.dev.
-- **v8.0.0** keeps the same rule set and all behavioral fixes from 7.x but stays on **analyzer 9.x**, so Flutter and Dart-only projects can upgrade without waiting for Flutter to adopt analyzer 10.
+• **v7.0.0 and v7.0.1 were retracted.** Those releases upgraded to the analyzer 10.x API. The **Flutter framework does not yet support analyzer 10** (Flutter's own dependency tree pins analyzer 9). Publishing with `analyzer: ^10.0.0` made saropa_lints incompatible with Flutter projects, so 7.x was retracted from pub.dev.
+
+• **v8.0.0** keeps the same rule set and all behavioral fixes from 7.x but stays on **analyzer 9.x**, so Flutter and Dart-only projects can upgrade without waiting for Flutter to adopt analyzer 10.
 
 ### Requirements
 
-- **Dart SDK:** 3.6 or later (unchanged from 6.x).
-- **Analyzer:** 9.x. Uses `analyzer: ^9.0.0`, `analysis_server_plugin: ^0.3.4`, `analyzer_plugin: ^0.13.0`.
+• **Dart SDK:** 3.6 or later (unchanged from 6.x).
+
+• **Analyzer:** 9.x. Uses `analyzer: ^9.0.0`, `analysis_server_plugin: ^0.3.4`, `analyzer_plugin: ^0.13.0`.
 
 ### What's in 8.0.0 (from 7.x)
 
-- All **Fixed** and **Changed** items from [7.0.1](#701) and [7.0.0](#700) (rule fixes, quick fixes, internal use of `lowerCaseName` where needed on analyzer 9, AST adjusted for analyzer 9 `ClassDeclaration.members` and mixin/extension bodies).
-- No analyzer 10–only APIs: no `namePart`, no `BlockClassBody`, no dependency on analyzer 10.
+• All **Fixed** and **Changed** items from [7.0.1](#701) and [7.0.0](#700) (rule fixes, quick fixes, internal use of `lowerCaseName` where needed on analyzer 9, AST adjusted for analyzer 9 `ClassDeclaration.members` and mixin/extension bodies).
+
+• No analyzer 10–only APIs: no `namePart`, no `BlockClassBody`, no dependency on analyzer 10.
 
 ### Upgrade
 
-- From **6.2.x**: bump to `saropa_lints: ^8.0.0` and run `dart pub get`. No config or SDK change required if you are already on Dart 3.6+ and analyzer 9.
-- If you had temporarily tried **7.x** before it was retracted: switch to **8.0.0** and keep your existing `analysis_options.yaml`; 8.0.0 does not require the analyzer 10 / lowerCaseName config migration that 7.x required.
+• From **6.2.x**: bump to `saropa_lints: ^8.0.0` and run `dart pub get`. No config or SDK change required if you are already on Dart 3.6+ and analyzer 9.
+
+• If you had temporarily tried **7.x** before it was retracted: switch to **8.0.0** and keep your existing `analysis_options.yaml`; 8.0.0 does not require the analyzer 10 / lowerCaseName config migration that 7.x required.
 
 ---
 
@@ -540,7 +625,7 @@ Fix `lowerCaseName` getter errors in tests and init tool.
 
 ### Changed
 
-- Version bump for release testing
+• Version bump for release testing
 
 ---
 
@@ -552,17 +637,17 @@ In this release we’re preparing bug fixes and small rule refinements.
 
 ### Fixed
 
-- **avoid_renaming_representation_getters** — No longer reports when the representation is private and there is exactly one public getter that exposes it under a different name (e.g. `String get sql => _sql`). Resolves conflict with prefer_private_extension_type_field. See bugs/history/bug_extension_type_avoid_renaming_vs_prefer_private_conflict.md.
+• **avoid_renaming_representation_getters** — No longer reports when the representation is private and there is exactly one public getter that exposes it under a different name (e.g. `String get sql => _sql`). Resolves conflict with prefer_private_extension_type_field. See bugs/history/bug_extension_type_avoid_renaming_vs_prefer_private_conflict.md.
 
-- **prefer_const_constructor_declarations** — No longer suggests const when: (1) any constructor parameter has a function type (callbacks cannot be const); (2) the class extends a superclass with no const constructor (e.g. ChangeNotifier); (3) the constructor initializer list or super arguments use non-const expressions (method calls, non-const constructor calls, binary/conditional). Resolves bug_prefer_const_constructor_declarations_callback_field, bug_prefer_const_constructor_declarations_change_notifier, bug_prefer_const_constructor_declarations_non_const_initializers.
+• **prefer_const_constructor_declarations** — No longer suggests const when: (1) any constructor parameter has a function type (callbacks cannot be const); (2) the class extends a superclass with no const constructor (e.g. ChangeNotifier); (3) the constructor initializer list or super arguments use non-const expressions (method calls, non-const constructor calls, binary/conditional). Resolves bug_prefer_const_constructor_declarations_callback_field, bug_prefer_const_constructor_declarations_change_notifier, bug_prefer_const_constructor_declarations_non_const_initializers.
 
-- **prefer_safe_area_consumer** — No longer reports when the Scaffold has no `appBar` and no `bottomNavigationBar`. In that case the body extends under system UI and SafeArea is appropriate. Resolves bug_prefer_safe_area_consumer_scaffold_without_appbar.
+• **prefer_safe_area_consumer** — No longer reports when the Scaffold has no `appBar` and no `bottomNavigationBar`. In that case the body extends under system UI and SafeArea is appropriate. Resolves bug_prefer_safe_area_consumer_scaffold_without_appbar.
 
-- **require_api_response_validation** — No longer reports when the decoded value is validated by a subsequent type check (e.g. `if (decoded is! Map && decoded is! List) throw`) in the same block (validation-helper pattern). Resolves bug_require_api_response_validation_require_content_type_in_validator_impl.
+• **require_api_response_validation** — No longer reports when the decoded value is validated by a subsequent type check (e.g. `if (decoded is! Map && decoded is! List) throw`) in the same block (validation-helper pattern). Resolves bug_require_api_response_validation_require_content_type_in_validator_impl.
 
-- **require_content_type_validation** — No longer reports when a dominating content-type guard returns or throws (not only return) before `jsonDecode`, and when the guard is nested inside an outer if block. Resolves bug_require_api_response_validation_require_content_type_in_validator_impl.
+• **require_content_type_validation** — No longer reports when a dominating content-type guard returns or throws (not only return) before `jsonDecode`, and when the guard is nested inside an outer if block. Resolves bug_require_api_response_validation_require_content_type_in_validator_impl.
 
-- **prefer_webview_sandbox** — Internal: removed null assertion in controller root helper; handle nullable `PropertyAccess.target` to satisfy avoid_null_assertion.
+• **prefer_webview_sandbox** — Internal: removed null assertion in controller root helper; handle nullable `PropertyAccess.target` to satisfy avoid_null_assertion.
 
 ---
 
@@ -576,35 +661,41 @@ In this release we move to the analyzer 10.x API and Dart SDK 3.9+. Rule names n
 
 ### Requirements _(retracted release)_
 
-- **Dart SDK:** 3.9 or later.
-- **Analyzer:** 10.x only. **saropa_lints 6.2.2** was the last release compatible with analyzer &lt; v10 before retraction; **8.0.0** is the current release for analyzer 9.
+• **Dart SDK:** 3.9 or later.
+
+• **Analyzer:** 10.x only. **saropa_lints 6.2.2** was the last release compatible with analyzer &lt; v10 before retraction; **8.0.0** is the current release for analyzer 9.
 
 ### Breaking changes _(retracted release)_
 
-- **Dependencies:** Required `analyzer: ^10.0.0`, `analysis_server_plugin: ^0.3.10`, and `analyzer_plugin: ^0.14.0`. Dropped support for analyzer 9.x.
-- **Config keyed by lowerCaseName:** Rule identifiers and config keys would use the analyzer's **lowerCaseName**. Use `prefer_debugprint` instead of `prefer_debugPrint`. Update `analysis_options.yaml` and any `// ignore:` comments that reference rule names.
-- **AST API:** All rule files were migrated to analyzer 10 `body` and `namePart` API (e.g. `(node.body as BlockClassBody).members`, `node.namePart.typeName`).
-- **Init:** Running `dart run saropa_lints:init` on an existing v6 config would normalize rule names to lowerCaseName; pre-flight warned if Dart SDK &lt; 3.9 when using v7.
+• **Dependencies:** Required `analyzer: ^10.0.0`, `analysis_server_plugin: ^0.3.10`, and `analyzer_plugin: ^0.14.0`. Dropped support for analyzer 9.x.
+
+• **Config keyed by lowerCaseName:** Rule identifiers and config keys would use the analyzer's **lowerCaseName**. Use `prefer_debugprint` instead of `prefer_debugPrint`. Update `analysis_options.yaml` and any `// ignore:` comments that reference rule names.
+
+• **AST API:** All rule files were migrated to analyzer 10 `body` and `namePart` API (e.g. `(node.body as BlockClassBody).members`, `node.namePart.typeName`).
+
+• **Init:** Running `dart run saropa_lints:init` on an existing v6 config would normalize rule names to lowerCaseName; pre-flight warned if Dart SDK &lt; 3.9 when using v7.
 
 ### Changed _(retracted release)_
 
-- **Version:** 6.2.2 → 7.0.0 (major). Release was later retracted.
-- **DiagnosticCode / LintCode:** All internal and test use of `code.name` replaced with `code.lowerCaseName`.
-- **Tests:** Expect `rule.code.lowerCaseName` (e.g. `prefer_debugprint`) where rule identity is asserted.
+• **Version:** 6.2.2 → 7.0.0 (major). Release was later retracted.
+
+• **DiagnosticCode / LintCode:** All internal and test use of `code.name` replaced with `code.lowerCaseName`.
+
+• **Tests:** Expect `rule.code.lowerCaseName` (e.g. `prefer_debugprint`) where rule identity is asserted.
 
 ### Fixed
 
-- **require_api_response_validation** — No longer reports when the result of `jsonDecode` is only used as the argument to a `fromJson` call (inline `Type.fromJson(jsonDecode(...))` or variable only passed to `fromJson`). Resolves bug_require_api_response_validation_require_content_type_validation_flow.
+• **require_api_response_validation** — No longer reports when the result of `jsonDecode` is only used as the argument to a `fromJson` call (inline `Type.fromJson(jsonDecode(...))` or variable only passed to `fromJson`). Resolves bug_require_api_response_validation_require_content_type_validation_flow.
 
-- **require_content_type_validation** — No longer reports when a dominating content-type guard exists before `jsonDecode` in the same or outer block (e.g. early return when `contentType?.mimeType != 'application/json'`). Resolves bug_require_api_response_validation_require_content_type_validation_flow.
+• **require_content_type_validation** — No longer reports when a dominating content-type guard exists before `jsonDecode` in the same or outer block (e.g. early return when `contentType?.mimeType != 'application/json'`). Resolves bug_require_api_response_validation_require_content_type_validation_flow.
 
-- **avoid_screenshot_sensitive** — No longer reports on debug/tooling screens: class names containing `debug`, `viewer`, `webview`, `devtool`, or `tooling` are excluded. When the only matched keyword is `settings`, classes whose name contains `fromsettings` (e.g. `_WebViewScreenFromSettings`) are excluded as navigation context. Resolves bug_avoid_screenshot_sensitive_debug_only_screens (debug-only DB viewer, saropa_drift_viewer).
+• **avoid_screenshot_sensitive** — No longer reports on debug/tooling screens: class names containing `debug`, `viewer`, `webview`, `devtool`, or `tooling` are excluded. When the only matched keyword is `settings`, classes whose name contains `fromsettings` (e.g. `_WebViewScreenFromSettings`) are excluded as navigation context. Resolves bug_avoid_screenshot_sensitive_debug_only_screens (debug-only DB viewer, saropa_drift_viewer).
 
-- **prefer_safe_area_consumer** — No longer reports when `SafeArea(top: false, ...)` is used inside a Scaffold body. That pattern only applies bottom (and optionally left/right) insets, so there is no redundant top inset with the AppBar.
+• **prefer_safe_area_consumer** — No longer reports when `SafeArea(top: false, ...)` is used inside a Scaffold body. That pattern only applies bottom (and optionally left/right) insets, so there is no redundant top inset with the AppBar.
 
-- **prefer_named_routes_for_deep_links** — No longer reports when `MaterialPageRoute` or `CupertinoPageRoute` use `settings: RouteSettings(name: ...)` with a non-empty name (literal or variable). Supports path-style names and `onGenerateRoute`-based deep linking. Still reports when there is no `settings`, when `RouteSettings` has no `name`, or when `name` is an empty string literal. Resolves bug_prefer_named_routes_for_deep_links_material_page_route_named.
+• **prefer_named_routes_for_deep_links** — No longer reports when `MaterialPageRoute` or `CupertinoPageRoute` use `settings: RouteSettings(name: ...)` with a non-empty name (literal or variable). Supports path-style names and `onGenerateRoute`-based deep linking. Still reports when there is no `settings`, when `RouteSettings` has no `name`, or when `name` is an empty string literal. Resolves bug_prefer_named_routes_for_deep_links_material_page_route_named.
 
-- **prefer_webview_sandbox** — No longer reports when the controller passed to `WebViewWidget` (or `WebView`) is configured in the same file with `setNavigationDelegate(...)` and/or `setAllowFileAccess(false)` (e.g. in initState). Controller matching is by expression root (e.g. `_controller`, `controller`). Resolves bug_prefer_webview_sandbox_controller_configuration.
+• **prefer_webview_sandbox** — No longer reports when the controller passed to `WebViewWidget` (or `WebView`) is configured in the same file with `setNavigationDelegate(...)` and/or `setAllowFileAccess(false)` (e.g. in initState). Controller matching is by expression root (e.g. `_controller`, `controller`). Resolves bug_prefer_webview_sandbox_controller_configuration.
 
 ---
 
@@ -614,7 +705,7 @@ This is a version bump for compatibility — the last release that supports anal
 
 ### Changed
 
-- Version bump
+• Version bump
 
 ---
 
@@ -624,40 +715,41 @@ In this release we fix a few rules (use_existing_variable, require_debouncer_can
 
 ### Changed
 
-- **Publish script (Step 6 & 7):** Step 6 (analysis) now runs `dart test --chain-stack-traces` after `dart analyze`, piping output to `reports/YYYYMMDD/YYYYMMDD_HHMMSS_chain_stack_traces.log` and checking for failure lines so test failures surface early. Step 7 on failure runs the same command (no retry prompt) and reports the log path and error lines. Shared `_dart_test_env()` for test temp dir; spinner shown during the test run.
+• **Publish script (Step 6 & 7):** Step 6 (analysis) now runs `dart test --chain-stack-traces` after `dart analyze`, piping output to `reports/YYYYMMDD/YYYYMMDD_HHMMSS_chain_stack_traces.log` and checking for failure lines so test failures surface early. Step 7 on failure runs the same command (no retry prompt) and reports the log path and error lines. Shared `_dart_test_env()` for test temp dir; spinner shown during the test run.
 
 ### Added
 
-- **require_pagination_error_recovery** — Recommended tier, INFO. Warns when a paginated list (ListView.builder/GridView.builder with loadMore/fetchMore/nextPage) has no visible error recovery in the enclosing scope (retry, onError, catch, hasError, isError, errorBuilder). Failed page loads need a retry option so users can recover. Resolves GitHub #22, #31.
+• **require_pagination_error_recovery** — Recommended tier, INFO. Warns when a paginated list (ListView.builder/GridView.builder with loadMore/fetchMore/nextPage) has no visible error recovery in the enclosing scope (retry, onError, catch, hasError, isError, errorBuilder). Failed page loads need a retry option so users can recover. Resolves GitHub #22, #31.
 
 ### Fixed
 
-- **require_field_dispose** — Now recognizes cascade notation for disposal (e.g. `_controller..removeListener(_fn)..dispose()`). Previously only matched `_controller.dispose()` on a single line. Resolves GitHub #76.
+• **require_field_dispose** — Now recognizes cascade notation for disposal (e.g. `_controller..removeListener(_fn)..dispose()`). Previously only matched `_controller.dispose()` on a single line. Resolves GitHub #76.
 
-- **max_issues setting** — `analysis_options_custom.yaml` is now loaded from the project root when it is first known (from the first analyzed file), so `max_issues` and `output` take effect even when the plugin runs with cwd in a temporary directory. Resolves GitHub #92.
+• **max_issues setting** — `analysis_options_custom.yaml` is now loaded from the project root when it is first known (from the first analyzed file), so `max_issues` and `output` take effect even when the plugin runs with cwd in a temporary directory. Resolves GitHub #92.
 
 ### Added (continued)
 
-- **avoid_importing_entrypoint_exports** — Professional tier, INFO. Warns when a file imports from another file that re-exports the entry point (e.g. `main.dart`). Implemented by resolving import URIs to paths and checking the imported file for `export '...main.dart'`. Reduces unintended coupling to the app bootstrap.
+• **avoid_importing_entrypoint_exports** — Professional tier, INFO. Warns when a file imports from another file that re-exports the entry point (e.g. `main.dart`). Implemented by resolving import URIs to paths and checking the imported file for `export '...main.dart'`. Reduces unintended coupling to the app bootstrap.
 
-- **require_ignore_comment_spacing** — Stylistic tier, INFO. Warns when `// ignore:` or `// ignore_for_file:` has no space after the colon (e.g. `// ignore:rule_name`). The analyzer expects a space so the directive can suppress the lint. Quick fix: add a space after the colon.
+• **require_ignore_comment_spacing** — Stylistic tier, INFO. Warns when `// ignore:` or `// ignore_for_file:` has no space after the colon (e.g. `// ignore:rule_name`). The analyzer expects a space so the directive can suppress the lint. Quick fix: add a space after the colon.
 
-- **Quick fixes (Batches 12+):** Added 28+ quick fixes across 28 rules. No new lint rules or tier changes. Fixes include: `avoid_assigning_to_static_field` (DeleteStaticFieldAssignmentFix), `avoid_wildcard_cases_with_enums` / `avoid_wildcard_cases_with_sealed_classes` / `require_exhaustive_sealed_switch` (RemoveWildcardOrDefaultCaseFix), `avoid_duplicate_initializers` (DeleteDuplicateInitializerFix), `avoid_duplicate_patterns` (RemoveDuplicatePatternCaseFix), `avoid_throw_in_finally` (DeleteThrowInFinallyFix), `avoid_duplicate_cascades` (RemoveDuplicateCascadeSectionFix), `avoid_empty_build_when` (RemoveEmptyBuildWhenFix), `avoid_unnecessary_futures` (AvoidRedundantAsyncFix), `avoid_misused_set_literals` (AddSetOrMapTypeArgumentFix), `no_equal_nested_conditions` (FlattenRedundantNestedConditionFix), `avoid_unused_assignment` (RemoveUnusedAssignmentFix), `prefer_any_or_every` (ReplaceWhereIsEmptyWithAnyFix), `avoid_asset_manifest_json` (ReplaceAssetManifestJsonFix), `prefer_null_aware_spread` (SimplifyRedundantNullAwareSpreadFix, ReplaceConditionalSpreadWithNullAwareFix), `prefer_use_prefix` (AddUsePrefixFix), `avoid_passing_default_values` (RemoveDefaultValueArgumentFix), `prefer_enums_by_name` (ReplaceFirstWhereWithByNameFix), `prefer_test_matchers` (ReplaceExpectLengthEqualsZeroWithIsEmptyFix, ReplaceExpectContainsIsTrueWithContainsFix). `AvoidRedundantAsyncFix` now resolves body from function name token for `avoid_unnecessary_futures`. Fixed `replace_expect_contains_is_true_with_contains_fix` to avoid `dart:collection` (use `isEmpty`/`first`). See `bugs/QUICK_FIX_PLAN.md`.
+• **Quick fixes (Batches 12+):** Added 28+ quick fixes across 28 rules. No new lint rules or tier changes. Fixes include: `avoid_assigning_to_static_field` (DeleteStaticFieldAssignmentFix), `avoid_wildcard_cases_with_enums` / `avoid_wildcard_cases_with_sealed_classes` / `require_exhaustive_sealed_switch` (RemoveWildcardOrDefaultCaseFix), `avoid_duplicate_initializers` (DeleteDuplicateInitializerFix), `avoid_duplicate_patterns` (RemoveDuplicatePatternCaseFix), `avoid_throw_in_finally` (DeleteThrowInFinallyFix), `avoid_duplicate_cascades` (RemoveDuplicateCascadeSectionFix), `avoid_empty_build_when` (RemoveEmptyBuildWhenFix), `avoid_unnecessary_futures` (AvoidRedundantAsyncFix), `avoid_misused_set_literals` (AddSetOrMapTypeArgumentFix), `no_equal_nested_conditions` (FlattenRedundantNestedConditionFix), `avoid_unused_assignment` (RemoveUnusedAssignmentFix), `prefer_any_or_every` (ReplaceWhereIsEmptyWithAnyFix), `avoid_asset_manifest_json` (ReplaceAssetManifestJsonFix), `prefer_null_aware_spread` (SimplifyRedundantNullAwareSpreadFix, ReplaceConditionalSpreadWithNullAwareFix), `prefer_use_prefix` (AddUsePrefixFix), `avoid_passing_default_values` (RemoveDefaultValueArgumentFix), `prefer_enums_by_name` (ReplaceFirstWhereWithByNameFix), `prefer_test_matchers` (ReplaceExpectLengthEqualsZeroWithIsEmptyFix, ReplaceExpectContainsIsTrueWithContainsFix). `AvoidRedundantAsyncFix` now resolves body from function name token for `avoid_unnecessary_futures`. Fixed `replace_expect_contains_is_true_with_contains_fix` to avoid `dart:collection` (use `isEmpty`/`first`). See `bugs/QUICK_FIX_PLAN.md`.
 
-- **Quick-fix presence tests:** Dedicated file `test/rule_quick_fix_presence_test.dart` with 100 unit tests asserting each listed rule has at least one quick fix (`fixGenerators` non-empty), plus one inverse test that a rule without fixes ([AvoidNonFinalExceptionClassFieldsRule]) has empty `fixGenerators`. Replaces duplicate rule entries with distinct rules (e.g. `AvoidEmptyBuildWhenRule`, `AvoidUnnecessaryFuturesRule`, `AvoidUnnecessaryNullableReturnTypeRule`, `AvoidThrowInCatchBlockRule`, `PreferPublicExceptionClassesRule`). Additional fix-presence assertions remain in code_quality_rules_test, complexity_rules_test, and structure_rules_test where relevant.
+• **Quick-fix presence tests:** Dedicated file `test/rule_quick_fix_presence_test.dart` with 100 unit tests asserting each listed rule has at least one quick fix (`fixGenerators` non-empty), plus one inverse test that a rule without fixes ([AvoidNonFinalExceptionClassFieldsRule]) has empty `fixGenerators`. Replaces duplicate rule entries with distinct rules (e.g. `AvoidEmptyBuildWhenRule`, `AvoidUnnecessaryFuturesRule`, `AvoidUnnecessaryNullableReturnTypeRule`, `AvoidThrowInCatchBlockRule`, `PreferPublicExceptionClassesRule`). Additional fix-presence assertions remain in code_quality_rules_test, complexity_rules_test, and structure_rules_test where relevant.
 
 ### Fixed
 
-- **require_debouncer_cancel** — False positive when a `State` subclass (e.g. with `WidgetsBindingObserver` mixin) already had `_debounce?.cancel()` in `dispose()`. The rule now checks every `dispose` method in the class (not only the first) and uses both body source and full method source for cleanup detection, so cancel-in-dispose is reliably found. Added `isFieldCleanedUpInSource` in `target_matcher_utils.dart` and a regression fixture + tests.
+• **require_debouncer_cancel** — False positive when a `State` subclass (e.g. with `WidgetsBindingObserver` mixin) already had `_debounce?.cancel()` in `dispose()`. The rule now checks every `dispose` method in the class (not only the first) and uses both body source and full method source for cleanup detection, so cancel-in-dispose is reliably found. Added `isFieldCleanedUpInSource` in `target_matcher_utils.dart` and a regression fixture + tests.
 
-- **Duplicate diagnostics (positional bool):** `prefer_named_bool_params` was removed from the stylistic tier so it is no longer enabled by default alongside `avoid_positional_boolean_parameters` (professional tier). Both rules report the same issue (positional boolean parameters) with the same fix (use a named parameter). Enabling both produced two diagnostics per parameter. Use `avoid_positional_boolean_parameters` from the professional tier, or enable `prefer_named_bool_params` explicitly if desired.
+• **Duplicate diagnostics (positional bool):** `prefer_named_bool_params` was removed from the stylistic tier so it is no longer enabled by default alongside `avoid_positional_boolean_parameters` (professional tier). Both rules report the same issue (positional boolean parameters) with the same fix (use a named parameter). Enabling both produced two diagnostics per parameter. Use `avoid_positional_boolean_parameters` from the professional tier, or enable `prefer_named_bool_params` explicitly if desired.
 
-- **use_existing_variable** — No longer reports a duplicate when two variables share the same initializer **source** and that initializer uses `Random` or RNG-like APIs (e.g. `rng.nextDouble()`, `Random().nextInt(10)`). Each call yields a different value, so same-source initializers are not duplicates. The rule now explicitly detects `dart:math` Random constructors and instance methods (`nextDouble`, `nextInt`, `nextBool`, `next`) and common RNG receiver names (`rng`, `random`, `rand`, `rnd`), and excludes such initializers from duplicate detection in addition to the existing “contains any invocation” check.
+• **use_existing_variable** — No longer reports a duplicate when two variables share the same initializer **source** and that initializer uses `Random` or RNG-like APIs (e.g. `rng.nextDouble()`, `Random().nextInt(10)`). Each call yields a different value, so same-source initializers are not duplicates. The rule now explicitly detects `dart:math` Random constructors and instance methods (`nextDouble`, `nextInt`, `nextBool`, `next`) and common RNG receiver names (`rng`, `random`, `rand`, `rnd`), and excludes such initializers from duplicate detection in addition to the existing “contains any invocation” check.
 
 ### Added
 
-- `prefer_geolocation_coarse_location` — Now fully implemented (was stub). Warns when `Geolocator.getCurrentPosition` or `getPositionStream` use `LocationAccuracy.best` or `.high`; suggests `.low` or `.balanced` for battery and privacy. Config alias: `prefer_geolocator_coarse_location`.
-- `prefer_const_constructor_declarations` — Prefer declaring constructors as `const` when the class has only final fields (plain classes; @immutable and Widget subclasses remain covered by `prefer_const_constructors_in_immutables`). INFO, comprehensive tier.
+• `prefer_geolocation_coarse_location` — Now fully implemented (was stub). Warns when `Geolocator.getCurrentPosition` or `getPositionStream` use `LocationAccuracy.best` or `.high`; suggests `.low` or `.balanced` for battery and privacy. Config alias: `prefer_geolocator_coarse_location`.
+
+• `prefer_const_constructor_declarations` — Prefer declaring constructors as `const` when the class has only final fields (plain classes; @immutable and Widget subclasses remain covered by `prefer_const_constructors_in_immutables`). INFO, comprehensive tier.
 
 ---
 
