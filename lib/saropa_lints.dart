@@ -747,7 +747,6 @@ final List<SaropaLintRule Function()> _allRuleFactories =
   PreferPoolPatternRule.new,
   PreferDiskCacheForPersistenceRule.new,
   AvoidExpensiveBuildRule.new,
-  // PreferConstChildWidgetsRule.new,
   AvoidSynchronousFileIoRule.new,
   PreferComputeForHeavyWorkRule.new,
   AvoidObjectCreationInHotLoopsRule.new,
@@ -2377,6 +2376,7 @@ final List<SaropaLintRule Function()> _allRuleFactories =
   AvoidPrintInReleaseRule.new,
   RequireStructuredLoggingRule.new,
   AvoidSensitiveInLogsRule.new,
+  PreferDebugPrintRule.new,
 
   // Platform rules (platform_rules.dart)
   RequirePlatformCheckRule.new,

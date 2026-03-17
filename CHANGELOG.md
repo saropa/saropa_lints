@@ -43,6 +43,10 @@ _Streamlining the Package Vibrancy toolbar._
 
 - **Package Vibrancy** — fixed false positive "unused" detection for packages referenced only via `export` directives (e.g. `analyzer_plugin`); the import scanner now recognizes both `import` and `export` as package usage
 - **Extension** — fixed "Annotate pubspec.yaml" command targeting the wrong file in workspaces with multiple `pubspec.yaml` files; now prefers the active editor's pubspec, then falls back to the workspace root; also checks the `applyEdit` return value and shows the target file name in the success message
+- **Lint rules** — registered `prefer_debugPrint` rule that was implemented but never wired into `_allRuleFactories` or assigned a tier; now active in the Recommended tier
+- **Examples** — removed stale `custom_lint` dev dependency from all 6 example projects; `custom_lint ^0.8.0` requires `analyzer ^8.0.0` which conflicts with the v5 native plugin's `analyzer ^9.0.0`
+- **ROADMAP** — removed `prefer_semver_version` and `prefer_correct_package_name` from the "Deferred: Pubspec Rules" section; both are already implemented and registered
+- **Plugin** — removed dead `PreferConstChildWidgetsRule` commented-out factory entry (class never existed)
 
 ### Removed
 

@@ -77,7 +77,7 @@ Rules and features in this section are **deferred**: we do not implement them ye
 
 ---
 
-### Deferred: Pubspec Rules (18 rules)
+### Deferred: Pubspec Rules (16 rules)
 
 > **Why deferred:** saropa_lints only analyzes `.dart` files via the Dart AST. Pubspec rules require reading and parsing `pubspec.yaml` (and sometimes other YAML or external data). Until we have a YAML-capable analyzer or a separate CLI that runs on non-Dart files, these rules cannot be implemented without extending the plugin beyond its current scope.
 
@@ -95,10 +95,8 @@ Rules and features in this section are **deferred**: we do not implement them ye
 |------|------|----------|-------------|
 | 📦 `avoid_any_version` | Essential | WARNING | `any` version constraint in dependencies |
 | 📦 `prefer_publish_to_none` | Recommended | INFO | Private package without `publish_to: none` |
-| 📦 `prefer_semver_version` | Essential | WARNING | Version not matching `x.y.z` format |
 | 📦 `prefer_caret_version_syntax` | Stylistic | INFO | Version constraint without `^` prefix |
 | 📦 `avoid_dependency_overrides` | Recommended | WARNING | `dependency_overrides` without explanatory comment |
-| 📦 `prefer_correct_package_name` | Essential | ERROR | Package name not matching Dart conventions |
 | 🚨📦 `require_compatible_versions` | Essential | ERROR | Check for incompatible package versions. Detect known version conflicts. |
 | ℹ️📦 `prefer_latest_stable` | Recommended | INFO | Use latest stable versions. Detect outdated packages. |
 | ⚠️📦 `avoid_deprecated_packages` | Essential | WARNING | Don't use deprecated packages. Detect known deprecated packages. |
