@@ -32,6 +32,7 @@ _Streamlining the Package Vibrancy toolbar._
 ### Fixed
 
 - **Package Vibrancy** — fixed false positive "unused" detection for packages referenced only via `export` directives (e.g. `analyzer_plugin`); the import scanner now recognizes both `import` and `export` as package usage
+- **Extension** — fixed "Annotate pubspec.yaml" command targeting the wrong file in workspaces with multiple `pubspec.yaml` files; now prefers the active editor's pubspec, then falls back to the workspace root; also checks the `applyEdit` return value and shows the target file name in the success message
 
 ### Removed
 
