@@ -23,17 +23,22 @@ function formatTimeAgo(iso: string): string {
   return `${days}d ago`;
 }
 
+/** Dashboard row: label + optional description, click command, and Codicon icon. */
 class OverviewItem extends vscode.TreeItem {
   constructor(
     label: string,
     description: string | undefined,
     commandId: string,
-    args: unknown[] = [],
+    iconId?: string,
+    iconColor?: vscode.ThemeColor,
   ) {
     super(label, vscode.TreeItemCollapsibleState.None);
     this.description = description;
-    this.command = { command: commandId, title: label, arguments: args };
+    this.command = { command: commandId, title: label, arguments: [] };
     this.contextValue = 'overviewItem';
+    if (iconId) {
+      this.iconPath = new vscode.ThemeIcon(iconId, iconColor);
+    }
   }
 }
 
@@ -90,6 +95,7 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
           `Health: ${health.score}`,
           scoreDesc,
           'saropaLints.focusIssues',
+          'pulse',
         ),
       );
     }
@@ -100,24 +106,30 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
         ? `${critical} critical, ${total} total`
         : `${total} violations`;
       items.push(
-        new OverviewItem(issueLabel, 'View in Issues', 'saropaLints.focusIssues'),
+        new OverviewItem(
+          issueLabel, 'View in Issues', 'saropaLints.focusIssues',
+          'warning', new vscode.ThemeColor('list.warningForeground'),
+        ),
       );
     } else {
       // Zero violations after analysis — clean project.
       items.push(
-        new OverviewItem('No violations', 'All clear', 'saropaLints.focusIssues'),
+        new OverviewItem(
+          'No violations', 'All clear', 'saropaLints.focusIssues',
+          'pass', new vscode.ThemeColor('testing.iconPassed'),
+        ),
       );
     }
 
     // D5: Score-driven trend — show score sparkline with time span.
     const scoreTrend = getScoreTrendSummary(history);
     if (scoreTrend) {
-      items.push(new OverviewItem('Trends', scoreTrend, 'saropaLints.focusIssues'));
+      items.push(new OverviewItem('Trends', scoreTrend, 'saropaLints.focusIssues', 'graph-line'));
     } else {
       // Fall back to violation-count trend when no scores available yet.
       const trend = getTrendSummary(history);
       if (trend) {
-        items.push(new OverviewItem('Trends', trend, 'saropaLints.focusIssues'));
+        items.push(new OverviewItem('Trends', trend, 'saropaLints.focusIssues', 'graph-line'));
       }
     }
 
@@ -132,6 +144,8 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
         `Score dropped ${regression.previousScore} \u2192 ${regression.currentScore}`,
         regDesc,
         'saropaLints.focusIssues',
+        'arrow-down',
+        new vscode.ThemeColor('list.errorForeground'),
       ));
     }
 
@@ -146,6 +160,8 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
             `\u2193 ${violationDelta} fewer issues`,
             'since last run',
             'saropaLints.focusIssues',
+            'star-full',
+            new vscode.ThemeColor('testing.iconPassed'),
           ),
         );
       }
@@ -155,20 +171,9 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewIte
     if (history.length > 0) {
       const lastTs = history[history.length - 1].timestamp;
       items.push(
-        new OverviewItem('Last run', formatTimeAgo(lastTs), 'saropaLints.runAnalysis'),
+        new OverviewItem('Last run', formatTimeAgo(lastTs), 'saropaLints.runAnalysis', 'history'),
       );
     }
-
-    // C1: Primary CTA — always available for re-running analysis.
-    items.push(
-      new OverviewItem('Run Analysis', undefined, 'saropaLints.runAnalysis'),
-    );
-
-    items.push(
-      new OverviewItem('Summary', undefined, 'saropaLints.summary.focus'),
-      new OverviewItem('Config', undefined, 'saropaLints.config.focus'),
-      new OverviewItem('Suggestions', undefined, 'saropaLints.suggestions.focus'),
-    );
 
     return items;
   }
