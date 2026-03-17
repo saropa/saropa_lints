@@ -497,8 +497,8 @@ class PreferDebugPrintRule extends SaropaLintRule {
       ];
 
   static const LintCode _code = LintCode(
-    'prefer_debugPrint',
-    '[prefer_debugPrint] print() should use debugPrint() for throttled console output. {v1}',
+    'prefer_debugprint',
+    '[prefer_debugprint] print() should use debugPrint() for throttled console output. {v1}',
     correctionMessage:
         'Replace print() with debugPrint() to prevent console buffer overflow.',
     severity: DiagnosticSeverity.INFO,

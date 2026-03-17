@@ -40,10 +40,10 @@ void main() {
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
-    test('PreferDebugPrintRule (prefer_debugPrint)', () {
+    test('PreferDebugPrintRule (prefer_debugprint)', () {
       final rule = PreferDebugPrintRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_debugprint');
-      expect(rule.code.problemMessage, contains('[prefer_debugPrint]'));
+      expect(rule.code.name, 'prefer_debugprint');
+      expect(rule.code.problemMessage, contains('[prefer_debugprint]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
