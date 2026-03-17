@@ -593,6 +593,11 @@
         "command": "saropaLints.packageVibrancy.clearFilters",
         "title": "Clear Filters",
         "icon": "$(clear-all)"
+      },
+      {
+        "command": "saropaLints.packageVibrancy.expandAll",
+        "title": "Expand All",
+        "icon": "$(expand-all)"
       }
     ],
     "menus": {
@@ -696,6 +701,11 @@
           "command": "saropaLints.packageVibrancy.clearFilters",
           "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasFilter",
           "group": "navigation@6"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.expandAll",
+          "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
+          "group": "navigation@7"
         },
         {
           "command": "saropaLints.packageVibrancy.filterBySeverity",

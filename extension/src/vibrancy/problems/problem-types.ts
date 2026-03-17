@@ -1,4 +1,5 @@
 import { VibrancyCategory } from '../types';
+import { categoryLabel } from '../scoring/status-classifier';
 
 /** Severity levels for problems. */
 export type ProblemSeverity = 'high' | 'medium' | 'low';
@@ -102,13 +103,15 @@ export function generateProblemId(pkg: string, type: ProblemType, suffix?: strin
 export function problemMessage(problem: Problem): string {
     switch (problem.type) {
         case 'unhealthy':
+            // Label already shows the category (End of Life, Stale, etc.),
+            // so the message adds context: the vibrancy score
             if (problem.category === 'end-of-life') {
-                return 'Package is end-of-life';
+                return `Score ${problem.score}/100 — discontinued or abandoned`;
             }
             if (problem.category === 'stale') {
-                return 'Package is stale — low maintenance activity';
+                return `Score ${problem.score}/100 — low maintenance activity`;
             }
-            return `Score ${problem.score}/100 — ${problem.category}`;
+            return `Score ${problem.score}/100 — behind on updates`;
         case 'stale-override':
             return 'No version conflict detected — review this override';
         case 'family-conflict':
@@ -131,6 +134,8 @@ export function problemMessage(problem: Problem): string {
 /** Get a short label for a problem type. */
 export function problemTypeLabel(type: ProblemType): string {
     switch (type) {
+        // 'unhealthy' uses the generic label; prefer problemLabel()
+        // which includes the specific category (End of Life, Stale, etc.)
         case 'unhealthy': return 'Unhealthy';
         case 'stale-override': return 'Stale Override';
         case 'family-conflict': return 'Family Conflict';
@@ -140,6 +145,20 @@ export function problemTypeLabel(type: ProblemType): string {
         case 'license-risk': return 'License Risk';
         case 'vulnerability': return 'Vulnerability';
     }
+}
+
+/**
+ * Get a context-aware label for a problem.
+ * Unlike problemTypeLabel (which only knows the type string),
+ * this uses the full problem to produce a specific label —
+ * e.g. "End of Life" or "Stale" instead of generic "Unhealthy".
+ */
+export function problemLabel(problem: Problem): string {
+    if (problem.type === 'unhealthy') {
+        // Reuse categoryLabel from status-classifier to avoid label duplication
+        return categoryLabel(problem.category);
+    }
+    return problemTypeLabel(problem.type);
 }
 
 /** Get the emoji icon for a problem severity. */
