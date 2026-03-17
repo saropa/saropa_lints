@@ -25,6 +25,14 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **Package Vibrancy** — Filter by Problem Type now correctly applies the selected types; resolved QuickPick selections using a shared id+label fallback so filter state is set reliably across environments
+
+---
+
 ## [9.5.2]
 
 _Keeping your lints fresh — the extension now detects outdated saropa_lints versions and offers one-click upgrades, plus new SDK constraint diagnostics._
