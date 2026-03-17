@@ -6,12 +6,16 @@ import * as vscode from 'vscode';
  * (services should not import from providers).
  */
 
-/** Find the first pubspec.yaml in the workspace. */
+/** Find the root pubspec.yaml in the workspace (shortest path wins). */
 export async function findPubspecYaml(): Promise<vscode.Uri | null> {
     const files = await vscode.workspace.findFiles(
-        '**/pubspec.yaml', '**/.*/**', 1,
+        '**/pubspec.yaml', '**/.*/**',
     );
-    return files[0] ?? null;
+    if (files.length === 0) { return null; }
+
+    // Prefer the pubspec.yaml closest to the workspace root
+    files.sort((a, b) => a.fsPath.length - b.fsPath.length);
+    return files[0];
 }
 
 /** Build a workspace edit to replace a package's version constraint. */

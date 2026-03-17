@@ -46,8 +46,17 @@ async function annotatePubspec(): Promise<void> {
     }
 }
 
+/** Return the active editor's URI if it's a pubspec.yaml, else find the root one. */
+async function resolveTargetPubspec(): Promise<vscode.Uri | null> {
+    const active = vscode.window.activeTextEditor?.document;
+    if (active && active.fileName.endsWith('pubspec.yaml')) {
+        return active.uri;
+    }
+    return findPubspecYaml();
+}
+
 async function annotatePubspecInner(): Promise<void> {
-    const yamlUri = await findPubspecYaml();
+    const yamlUri = await resolveTargetPubspec();
     if (!yamlUri) {
         vscode.window.showWarningMessage('No pubspec.yaml found in workspace');
         return;
@@ -104,9 +113,14 @@ async function annotatePubspecInner(): Promise<void> {
         wsEdit.insert(yamlUri, edit.insertPos, edit.text);
     }
 
-    await vscode.workspace.applyEdit(wsEdit);
+    const applied = await vscode.workspace.applyEdit(wsEdit);
+    if (!applied) {
+        vscode.window.showErrorMessage('Failed to apply annotations to pubspec.yaml');
+        return;
+    }
     await doc.save();
 
+    const basename = yamlUri.fsPath.split(/[\\/]/).slice(-2).join('/');
     const parts: string[] = [];
     if (edits.length > 0) {
         parts.push(`${edits.length} dependencies`);
@@ -115,7 +129,7 @@ async function annotatePubspecInner(): Promise<void> {
         parts.push(`${allSectionEdits.length} section headers`);
     }
     vscode.window.showInformationMessage(
-        `Annotated ${parts.join(' and ')} in pubspec.yaml`,
+        `Annotated ${parts.join(' and ')} in ${basename}`,
     );
 }
 
