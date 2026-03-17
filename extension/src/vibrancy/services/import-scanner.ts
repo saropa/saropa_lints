@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
 
-const IMPORT_PATTERN = /import\s+['"]package:(\w+)\//g;
+// Match both `import` and `export` directives — re-exported packages are used too
+const IMPORT_PATTERN = /(?:import|export)\s+['"]package:(\w+)\//g;
 
 /**
- * Scan Dart source files for package import statements.
- * Returns the set of package names that appear in any import.
+ * Scan Dart source files for package import and export statements.
+ * Returns the set of package names that appear in any import or export.
  */
 export async function scanDartImports(
     workspaceRoot: vscode.Uri,
