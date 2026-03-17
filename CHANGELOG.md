@@ -31,6 +31,7 @@ _Streamlining the Package Vibrancy toolbar._
 
 ### Added
 
+- **Package Vibrancy** — added interactive Size Distribution charts (horizontal bar + SVG donut) to the vibrancy report webview; bars animate in, donut segments draw in, hover shows tooltips with cross-highlighting between charts, click scrolls to the package row in the table; small packages are consolidated into "Other (N packages)"
 - **Package Vibrancy** — added Expand All button to the tree toolbar; collapse all uses the built-in VS Code button (`showCollapseAll`)
 
 ### Changed
