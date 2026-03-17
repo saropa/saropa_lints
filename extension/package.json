@@ -1079,6 +1079,11 @@
             "minimum": 1,
             "maximum": 1000,
             "description": "Maximum number of violations shown per file in the Issues tree. Remaining are shown as \"and N more…\"."
+          },
+          "saropaLints.checkForUpdates": {
+            "type": "boolean",
+            "default": true,
+            "description": "Periodically check for newer versions of the saropa_lints package and offer to upgrade."
           }
         }
       },
