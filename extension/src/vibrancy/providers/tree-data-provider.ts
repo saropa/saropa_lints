@@ -11,7 +11,7 @@ import {
 import {
     FamilyConflictGroupItem, FamilySplitItem, buildFamilySplitDetails,
 } from './family-tree-items';
-import { ProblemItem, SuggestionItem, ProblemSummaryItem } from './problem-tree-items';
+import { ProblemItem, SuggestionItem } from './problem-tree-items';
 import { ProblemRegistry } from '../problems/problem-registry';
 import {
     determineBestAction, getUnlockedPackages, SuggestedAction,
@@ -26,7 +26,7 @@ type TreeNode =
     | OverridesGroupItem | OverrideItem | DepGraphSummaryItem
     | SectionGroupItem | ActionItemsGroupItem | InsightItem
     | BudgetGroupItem | BudgetItem | PrereleaseItem
-    | ProblemItem | SuggestionItem | ProblemSummaryItem;
+    | ProblemItem | SuggestionItem;
 
 export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
     private _results: VibrancyResult[] = [];
@@ -45,11 +45,22 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
     // Filter state
     private readonly _filterManager = new VibrancyFilterManager();
 
+    // When true, getTreeItem overrides Collapsed → Expanded.
+    // Cleared on next data update (scan, registry change, etc.).
+    private _expandAllOverride = false;
+
     private readonly _onDidChangeTreeData = new vscode.EventEmitter<void>();
     readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
+    /** Expand all tree nodes by forcing Collapsed → Expanded and refreshing. */
+    expandAll(): void {
+        this._expandAllOverride = true;
+        this._onDidChangeTreeData.fire();
+    }
+
     /** Update results and refresh the tree. Sorted worst-first. */
     updateResults(results: VibrancyResult[]): void {
+        this._expandAllOverride = false;
         this._results = [...results].sort((a, b) => a.score - b.score);
         this._onDidChangeTreeData.fire();
     }
@@ -161,6 +172,11 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
     // --- Tree data ---
 
     getTreeItem(element: TreeNode): vscode.TreeItem {
+        // When expand-all is active, force Collapsed items to Expanded
+        if (this._expandAllOverride
+            && element.collapsibleState === vscode.TreeItemCollapsibleState.Collapsed) {
+            element.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
+        }
         return element;
     }
 
@@ -215,13 +231,6 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
 
     private _buildRootChildren(): TreeNode[] {
         const items: TreeNode[] = [];
-
-        // Problem summary at the top (severity counts bar)
-        const totalProblems = this._registry.totalCount;
-        if (totalProblems > 0) {
-            const counts = this._registry.countBySeverity();
-            items.push(new ProblemSummaryItem(counts.high, counts.medium, counts.low));
-        }
 
         const configuredBudgets = this._budgetResults.filter(
             r => r.status !== 'unconfigured',

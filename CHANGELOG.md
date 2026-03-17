@@ -29,6 +29,15 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 _Streamlining the Package Vibrancy toolbar._
 
+### Added
+
+- **Package Vibrancy** — added Expand All button to the tree toolbar; collapse all uses the built-in VS Code button (`showCollapseAll`)
+
+### Changed
+
+- **Package Vibrancy** — the "Unhealthy" problem label now shows the actual category ("End of Life", "Stale", "Legacy-Locked") instead of the generic "Unhealthy" label; the description shows the vibrancy score for additional context
+- **Package Vibrancy** — the Version group now shows "(latest)" on the version constraint and collapses when the package is confirmed up-to-date; the redundant "Latest" child row is hidden in that case
+
 ### Fixed
 
 - **Package Vibrancy** — fixed false positive "unused" detection for packages referenced only via `export` directives (e.g. `analyzer_plugin`); the import scanner now recognizes both `import` and `export` as package usage
@@ -37,6 +46,7 @@ _Streamlining the Package Vibrancy toolbar._
 ### Removed
 
 - **Extension:** removed the "About Package Vibrancy" info icon and webview panel from the Package Vibrancy sidebar toolbar
+- **Package Vibrancy** — removed the cryptic problem-severity summary row (colored dots with bare numbers) from the top of the tree; the Action Items group already communicates problem counts and details
 
 ---
 

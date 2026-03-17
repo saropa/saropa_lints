@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import {
-    Problem, problemMessage, problemTypeLabel, severityIcon,
+    Problem, problemMessage, problemLabel, severityIcon,
 } from '../problems/problem-types';
 import { SuggestedAction, actionIcon } from '../problems/problem-actions';
 import {
@@ -13,8 +13,10 @@ export class ProblemItem extends vscode.TreeItem {
         public readonly problem: Problem,
         public readonly packageName: string,
     ) {
-        const typeLabel = problemTypeLabel(problem.type);
-        super(typeLabel, vscode.TreeItemCollapsibleState.None);
+        // Use problemLabel for context-aware labels (e.g. "End of Life"
+        // instead of generic "Unhealthy")
+        const label = problemLabel(problem);
+        super(label, vscode.TreeItemCollapsibleState.None);
 
         this.description = problemMessage(problem);
         this.iconPath = new vscode.ThemeIcon(
@@ -34,7 +36,7 @@ export class ProblemItem extends vscode.TreeItem {
 
     private _buildTooltip(): string {
         const icon = severityIcon(this.problem.severity);
-        let md = `**${icon} ${problemTypeLabel(this.problem.type)}**\n\n`;
+        let md = `**${icon} ${problemLabel(this.problem)}**\n\n`;
         md += `${problemMessage(this.problem)}\n\n`;
         md += `*Line ${this.problem.line + 1}*`;
         return md;
@@ -61,22 +63,5 @@ export class SuggestionItem extends vscode.TreeItem {
         );
 
         this.contextValue = `vibrancySuggestion.${action.type}`;
-    }
-}
-
-/** Summary statistics item. */
-export class ProblemSummaryItem extends vscode.TreeItem {
-    constructor(
-        highCount: number,
-        mediumCount: number,
-        lowCount: number,
-    ) {
-        const parts: string[] = [];
-        if (highCount > 0) { parts.push(`🔴 ${highCount}`); }
-        if (mediumCount > 0) { parts.push(`🟡 ${mediumCount}`); }
-        if (lowCount > 0) { parts.push(`🔵 ${lowCount}`); }
-
-        super(parts.join('  '), vscode.TreeItemCollapsibleState.None);
-        this.contextValue = 'vibrancyProblemSummary';
     }
 }
