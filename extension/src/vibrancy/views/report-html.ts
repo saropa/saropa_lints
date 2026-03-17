@@ -5,6 +5,9 @@ import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-cla
 import { getReportStyles } from './report-styles';
 import { getReportScript } from './report-script';
 import { escapeHtml } from './html-utils';
+import { buildChartSection } from './chart-html';
+import { getChartStyles } from './chart-styles';
+import { getChartScript } from './chart-script';
 
 /** Build the full HTML for the vibrancy report webview. */
 export function buildReportHtml(results: VibrancyResult[]): string {
@@ -14,13 +17,14 @@ export function buildReportHtml(results: VibrancyResult[]): string {
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
-    <style>${getReportStyles()}</style>
+    <style>${getReportStyles()}${getChartStyles()}</style>
 </head>
 <body>
     <h1>Package Vibrancy Report</h1>
     ${buildReportSummary(results)}
+    ${buildChartSection(results)}
     ${buildReportTable(results)}
-    <script>${getReportScript()}</script>
+    <script>${getReportScript()}${getChartScript()}</script>
 </body>
 </html>`;
 }
