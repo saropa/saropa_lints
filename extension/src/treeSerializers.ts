@@ -436,11 +436,6 @@ export function serializeVibrancyNode(node: unknown): JsonNode | null {
         };
     }
 
-    // ProblemSummaryItem
-    if (cv === 'vibrancyProblemSummary') {
-        return { type: 'vibrancyProblemSummary', label };
-    }
-
     // Fallback for any other vibrancy node
     if (label) {
         return {
