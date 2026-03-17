@@ -4,6 +4,7 @@ import {
     categoryIcon,
     categoryToSeverity,
     categoryLabel,
+    categoryToGrade,
 } from '../../../vibrancy/scoring/status-classifier';
 
 describe('status-classifier', () => {
@@ -134,6 +135,16 @@ describe('status-classifier', () => {
         it('should return human-readable labels', () => {
             assert.strictEqual(categoryLabel('legacy-locked'), 'Legacy-Locked');
             assert.strictEqual(categoryLabel('stale'), 'Stale');
+        });
+    });
+
+    describe('categoryToGrade', () => {
+        it('should map categories to A (best) … E (stale) … F (dangerous)', () => {
+            assert.strictEqual(categoryToGrade('vibrant'), 'A');
+            assert.strictEqual(categoryToGrade('quiet'), 'B');
+            assert.strictEqual(categoryToGrade('legacy-locked'), 'C');
+            assert.strictEqual(categoryToGrade('stale'), 'E');
+            assert.strictEqual(categoryToGrade('end-of-life'), 'F');
         });
     });
 });

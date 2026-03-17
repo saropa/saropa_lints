@@ -4,7 +4,7 @@ import {
     VibrancyResult, VibrancyCategory, DepGraphSummary,
     OverrideAnalysis, DependencySection, PackageInsight,
 } from '../types';
-import { categoryIcon, categoryLabel } from '../scoring/status-classifier';
+import { categoryIcon, categoryLabel, categoryToGrade } from '../scoring/status-classifier';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
 
 /**
@@ -235,7 +235,7 @@ export class ActionItemsGroupItem extends vscode.TreeItem {
             'target',
             new vscode.ThemeColor('editorWarning.foreground'),
         );
-        this.tooltip = `${insights.length} package(s) need attention. Sorted by risk.`;
+        this.tooltip = `${insights.length} package(s) need attention. Sorted by priority.`;
         this.contextValue = 'vibrancyActionItemsGroup';
     }
 }
@@ -244,7 +244,10 @@ export class InsightItem extends vscode.TreeItem {
     constructor(public readonly insight: PackageInsight) {
         const problemCount = insight.problems.length;
         super(insight.name, vscode.TreeItemCollapsibleState.Collapsed);
-        this.description = `${insight.combinedRiskScore} risk — ${problemCount} problem(s)`;
+        // PackageInsightCategory matches VibrancyCategory; cast for status-classifier.
+        const grade = categoryToGrade(insight.category as VibrancyCategory);
+        const problemNoun = problemCount === 1 ? 'problem' : 'problems';
+        this.description = `${grade} — ${problemCount} ${problemNoun}`;
 
         const highestSeverity = insight.problems.reduce<'low' | 'medium' | 'high'>(
             (max, p) => {
@@ -258,7 +261,7 @@ export class InsightItem extends vscode.TreeItem {
             severityIcon(highestSeverity),
             severityColor(highestSeverity),
         );
-        this.tooltip = insight.suggestedAction ?? `${problemCount} problem(s) detected`;
+        this.tooltip = insight.suggestedAction ?? `${problemCount} ${problemNoun} detected`;
         this.contextValue = 'vibrancyInsight';
         this.command = {
             command: 'saropaLints.packageVibrancy.goToPackage',

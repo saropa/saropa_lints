@@ -230,6 +230,8 @@ describe('detail sync duck-typing contracts', () => {
         const insight: PackageInsight = {
             name: 'http',
             combinedRiskScore: 5,
+            vibrancyScore: 50,
+            category: 'quiet',
             problems: [],
             suggestedAction: null,
             actionType: 'none',

@@ -44,6 +44,8 @@ export function consolidateInsights(
         insights.push({
             name: result.package.name,
             combinedRiskScore,
+            vibrancyScore: result.score,
+            category: result.category, // Drives A–F grade in Action Items tree
             problems,
             suggestedAction: action,
             actionType,
