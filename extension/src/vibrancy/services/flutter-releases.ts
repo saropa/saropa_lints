@@ -8,6 +8,7 @@ const RELEASES_URL =
 export interface FlutterRelease {
     readonly version: string;
     readonly releaseDate: string;
+    readonly dartSdkVersion: string;
 }
 
 /** Fetch stable Flutter releases, newest first. */
@@ -48,6 +49,7 @@ export function parseStableReleases(json: any): FlutterRelease[] {
         .map((r: any) => ({
             version: r.version ?? '',
             releaseDate: r.release_date ?? '',
+            dartSdkVersion: r.dart_sdk_version ?? '',
         }))
         .sort((a, b) =>
             new Date(b.releaseDate).getTime()

@@ -144,6 +144,81 @@ export function findPackageRange(
     return null;
 }
 
+/** Parsed environment constraint values from pubspec.yaml. */
+export interface EnvironmentConstraints {
+    readonly sdk?: string;
+    readonly flutter?: string;
+}
+
+/**
+ * Iterate over lines inside the `environment:` section of pubspec.yaml.
+ * Calls `visitor` for each indented line with its index and trimmed text.
+ * Stops when a new top-level key appears.
+ */
+function forEachEnvironmentLine(
+    lines: readonly string[],
+    visitor: (lineIndex: number, trimmed: string) => boolean | void,
+): void {
+    let inSection = false;
+    for (let i = 0; i < lines.length; i++) {
+        const trimmed = lines[i].trimEnd();
+        if (/^environment\s*:/.test(trimmed)) {
+            inSection = true;
+            continue;
+        }
+        if (inSection && /^\S/.test(trimmed)) { break; }
+        if (!inSection) { continue; }
+        // Return true from visitor to stop iteration early
+        if (visitor(i, trimmed) === true) { break; }
+    }
+}
+
+/**
+ * Parse the environment section from pubspec.yaml content.
+ * Extracts sdk and flutter version constraint strings.
+ */
+export function parseEnvironmentConstraints(
+    content: string,
+): EnvironmentConstraints {
+    const result: { sdk?: string; flutter?: string } = {};
+    forEachEnvironmentLine(content.split('\n'), (_i, trimmed) => {
+        const match = trimmed.match(/^\s+(sdk|flutter)\s*:\s*"?([^"]*)"?\s*$/);
+        if (match) {
+            result[match[1] as 'sdk' | 'flutter'] = match[2].trim();
+        }
+    });
+    return result;
+}
+
+/**
+ * Find the line and character range of an environment key (sdk or flutter)
+ * within the environment section of pubspec.yaml.
+ * Highlights the value portion (the constraint string).
+ */
+export function findEnvironmentRange(
+    content: string,
+    key: 'sdk' | 'flutter',
+): PackageRange | null {
+    const lines = content.split('\n');
+    let found: PackageRange | null = null;
+
+    // Match e.g. '  sdk: ">=3.10.7 <4.0.0"' or '  flutter: ">=3.41.2"'
+    const pattern = new RegExp(
+        `^(\\s+${key}\\s*:\\s*"?)([^"]*?)("?\\s*)$`,
+    );
+    forEachEnvironmentLine(lines, (lineIndex) => {
+        const match = lines[lineIndex].match(pattern);
+        if (!match) { return; }
+        found = {
+            line: lineIndex,
+            startChar: match[1].length,
+            endChar: match[1].length + match[2].length,
+        };
+        return true; // Stop iteration — found the key
+    });
+    return found;
+}
+
 /**
  * Parse dependency_overrides section from pubspec.yaml content.
  * Returns array of package names that are overridden.
