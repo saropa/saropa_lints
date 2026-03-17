@@ -9,7 +9,6 @@ import { CodeLensToggle } from './ui/codelens-toggle';
 import { PrereleaseToggle } from './ui/prerelease-toggle';
 import { VibrancyReportPanel } from './views/report-webview';
 import { KnownIssuesPanel } from './views/known-issues-webview';
-import { AboutPanel } from './views/about-webview';
 import { ComparisonPanel } from './views/comparison-webview';
 import { DetailViewProvider, DETAIL_VIEW_ID } from './views/detail-view-provider';
 import { DetailLogger, DETAIL_CHANNEL_NAME } from './services/detail-logger';
@@ -511,12 +510,6 @@ function registerCommands(
         vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.browseKnownIssues',
             () => KnownIssuesPanel.createOrShow(),
-        ),
-        vscode.commands.registerCommand(
-            'saropaLints.packageVibrancy.about',
-            () => AboutPanel.createOrShow(
-                context.extension.packageJSON.version,
-            ),
         ),
         vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.exportSbom',
