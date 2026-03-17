@@ -358,11 +358,6 @@
         "icon": "$(library)"
       },
       {
-        "command": "saropaLints.packageVibrancy.about",
-        "title": "About Package Vibrancy",
-        "icon": "$(info)"
-      },
-      {
         "command": "saropaLints.packageVibrancy.exportSbom",
         "title": "Export SBOM (CycloneDX)",
         "icon": "$(shield)"
@@ -678,34 +673,29 @@
           "group": "navigation@1"
         },
         {
-          "command": "saropaLints.packageVibrancy.about",
-          "when": "view == saropaLints.packageVibrancy.packages",
-          "group": "navigation@2"
-        },
-        {
           "command": "saropaLints.packageVibrancy.planUpgrades",
           "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults && !saropaLints.packageVibrancy.isScanning",
-          "group": "navigation@3"
+          "group": "navigation@2"
         },
         {
           "command": "saropaLints.packageVibrancy.annotatePubspec",
           "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
-          "group": "navigation@4"
+          "group": "navigation@3"
         },
         {
           "command": "saropaLints.packageVibrancy.search",
           "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
-          "group": "navigation@5"
+          "group": "navigation@4"
         },
         {
           "command": "saropaLints.packageVibrancy.showProblemsOnly",
           "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
-          "group": "navigation@6"
+          "group": "navigation@5"
         },
         {
           "command": "saropaLints.packageVibrancy.clearFilters",
           "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasFilter",
-          "group": "navigation@7"
+          "group": "navigation@6"
         },
         {
           "command": "saropaLints.packageVibrancy.filterBySeverity",

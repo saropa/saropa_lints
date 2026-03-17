@@ -25,6 +25,16 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 
 ---
 
+## [Unreleased]
+
+_Streamlining the Package Vibrancy toolbar._
+
+### Removed
+
+- **Extension:** removed the "About Package Vibrancy" info icon and webview panel from the Package Vibrancy sidebar toolbar
+
+---
+
 ## [9.5.0]
 
 _Smarter dependency health â€” stale vs end-of-life separation, GitHub archived-repo detection, a unified vibrancy panel with filters, and copy-as-JSON across all tree views._
