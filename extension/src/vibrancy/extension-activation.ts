@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { CacheService } from './services/cache-service';
 import { VibrancyTreeProvider } from './providers/tree-data-provider';
 import { VibrancyDiagnostics } from './providers/diagnostics';
+import { SdkDiagnostics } from './providers/sdk-diagnostics';
 import { VibrancyCodeActionProvider } from './providers/code-action-provider';
 import { VibrancyCodeLensProvider, setCodeLensToggle, setPrereleaseToggle } from './providers/codelens-provider';
 import { VibrancyHoverProvider } from './providers/hover-provider';
@@ -93,6 +94,8 @@ let lastScanMeta: ReportMetadata = {
     dartVersion: 'unknown',
     executionTimeMs: 0,
 };
+let lastFlutterReleases: readonly import('./services/flutter-releases').FlutterRelease[] = [];
+let sdkDiagnostics: SdkDiagnostics | null = null;
 let freshnessWatcher: FreshnessWatcher | null = null;
 let stateManager: VibrancyStateManager | null = null;
 let detailViewProvider: DetailViewProvider | null = null;
@@ -164,6 +167,11 @@ export function runActivation(
     );
     const diagnostics = new VibrancyDiagnostics(diagCollection);
 
+    const sdkDiagCollection = vscode.languages.createDiagnosticCollection(
+        'saropa-sdk',
+    );
+    sdkDiagnostics = new SdkDiagnostics(sdkDiagCollection);
+
     stateManager = new VibrancyStateManager();
 
     setCodeLensToggle(codeLensToggle);
@@ -179,7 +187,7 @@ export function runActivation(
         treeProvider.refresh();
     });
 
-    context.subscriptions.push(diagCollection, codeLensToggle, prereleaseToggle, stateManager);
+    context.subscriptions.push(diagCollection, sdkDiagCollection, codeLensToggle, prereleaseToggle, stateManager);
 
     const adoptionGate = new AdoptionGateProvider(cache);
     adoptionGate.register(context);
@@ -217,6 +225,7 @@ export function runActivation(
     registerAnnotateCommand(context);
     registerRegistryCommands(context, registryService);
     registerFileWatcher(context, targets);
+    registerSdkDiagnosticListeners(context, cache);
     registerSuppressListener(context, targets);
     registerConfigListener(context, codeLensProvider, treeProvider, prereleaseToggle);
     autoScanIfPubspec(targets);
@@ -229,6 +238,51 @@ function registerFileWatcher(
     const watcher = vscode.workspace.createFileSystemWatcher('**/pubspec.lock');
     watcher.onDidChange(() => runScan(targets));
     context.subscriptions.push(watcher);
+}
+
+/**
+ * Register listeners that update SDK constraint diagnostics when
+ * pubspec.yaml is opened or edited, without requiring a full scan.
+ */
+function registerSdkDiagnosticListeners(
+    context: vscode.ExtensionContext,
+    cache: CacheService,
+): void {
+    const isPubspec = (doc: vscode.TextDocument) =>
+        doc.fileName.endsWith('pubspec.yaml');
+
+    const refresh = async (doc: vscode.TextDocument) => {
+        if (!sdkDiagnostics || !isPubspec(doc)) { return; }
+        // Use cached releases when available; fetch otherwise
+        const releases = lastFlutterReleases.length > 0
+            ? lastFlutterReleases
+            : await fetchFlutterReleases(cache);
+        sdkDiagnostics.update(doc.uri, doc.getText(), releases);
+    };
+
+    // Debounce edits — avoid re-computing on every keystroke (500ms)
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+    const debouncedRefresh = (doc: vscode.TextDocument) => {
+        if (debounceTimer) { clearTimeout(debounceTimer); }
+        debounceTimer = setTimeout(() => { void refresh(doc); }, 500);
+    };
+
+    // Fire immediately on open
+    context.subscriptions.push(
+        vscode.workspace.onDidOpenTextDocument(doc => { void refresh(doc); }),
+    );
+    // Fire with debounce on edit
+    context.subscriptions.push(
+        vscode.workspace.onDidChangeTextDocument(e => {
+            debouncedRefresh(e.document);
+        }),
+    );
+    // Fire for already-open pubspec.yaml editors
+    for (const editor of vscode.window.visibleTextEditors) {
+        if (isPubspec(editor.document)) {
+            void refresh(editor.document);
+        }
+    }
 }
 
 function registerSuppressListener(
@@ -661,6 +715,8 @@ async function runScanInner(targets: ScanTargets): Promise<void> {
             const flutterReleases = await fetchFlutterReleases(
                 targets.cache, logger,
             );
+            // Cache releases for SDK diagnostics on file open
+            lastFlutterReleases = flutterReleases;
             const scanConfig = {
                 ...readScanConfig(), logger, flutterReleases,
             };
@@ -874,6 +930,8 @@ function updateFilteredTargets(
     targets.diagnostics.updateFamilySplits(splits);
     targets.diagnostics.updateOverrideAnalyses(lastOverrideAnalyses);
     targets.diagnostics.update(parsed.yamlUri, parsed.yamlContent, active);
+    // Update SDK constraint diagnostics alongside vibrancy diagnostics
+    sdkDiagnostics?.update(parsed.yamlUri, parsed.yamlContent, lastFlutterReleases);
     // Fire callback to update the unified status bar in extension.ts.
     // Guard against empty results to avoid NaN from division by zero.
     if (vibrancyStatusCallback && results.length > 0) {
