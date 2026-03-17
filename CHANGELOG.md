@@ -25,6 +25,14 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [9.6.1]
+
+### Fixed
+
+• **Package Vibrancy** — Do not show the main vibrancy diagnostic (Review/stale/legacy-locked/end-of-life/monitor) for dependencies resolved via path or git override; the resolved artifact is local or from git, so the upstream pub.dev score is not actionable and was causing false positives.
+
+---
+
 ## [9.6.0]
 
 _Clearer Package Vibrancy scoring and reliable filter-by-type behavior._

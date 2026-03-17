@@ -10,6 +10,9 @@ const PUBSPEC_CONTENT = `dependencies:
   old_pkg: ^0.1.0
 `;
 
+/** Category codes for the main vibrancy diagnostic (stale/legacy-locked/end-of-life/quiet). */
+const MAIN_VIBRANCY_CATEGORY_CODES = ['stale', 'legacy-locked', 'end-of-life', 'quiet'];
+
 function makeResult(
     name: string,
     score: number,
@@ -284,5 +287,52 @@ describe('VibrancyDiagnostics', () => {
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
         diagnostics.clear();
         assert.strictEqual(collection.get(uri), undefined);
+    });
+
+    it('should not emit vibrancy diagnostic for path-overridden packages', () => {
+        setTestConfig('saropaLints.packageVibrancy', 'endOfLifeDiagnostics', 'hint');
+        const result: VibrancyResult = {
+            ...makeResult('old_pkg', 5, 'stale'),
+            package: {
+                name: 'old_pkg',
+                version: '1.0.0',
+                constraint: '^0.1.0',
+                source: 'path',
+                isDirect: true,
+                section: 'dependencies',
+            },
+        };
+        diagnostics.update(uri, PUBSPEC_CONTENT, [result]);
+        const diags = collection.get(uri) ?? [];
+        const categoryDiags = diags.filter(d => typeof d.code === 'string' && MAIN_VIBRANCY_CATEGORY_CODES.includes(d.code));
+        assert.strictEqual(categoryDiags.length, 0, 'path-overridden package should not get main vibrancy diagnostic');
+    });
+
+    it('should not emit vibrancy diagnostic for git-overridden packages', () => {
+        setTestConfig('saropaLints.packageVibrancy', 'endOfLifeDiagnostics', 'hint');
+        const result: VibrancyResult = {
+            ...makeResult('old_pkg', 5, 'stale'),
+            package: {
+                name: 'old_pkg',
+                version: '1.0.0',
+                constraint: '^0.1.0',
+                source: 'git',
+                isDirect: true,
+                section: 'dependencies',
+            },
+        };
+        diagnostics.update(uri, PUBSPEC_CONTENT, [result]);
+        const diags = collection.get(uri) ?? [];
+        const categoryDiags = diags.filter(d => typeof d.code === 'string' && MAIN_VIBRANCY_CATEGORY_CODES.includes(d.code));
+        assert.strictEqual(categoryDiags.length, 0, 'git-overridden package should not get main vibrancy diagnostic');
+    });
+
+    it('should still emit vibrancy diagnostic for hosted (non-overridden) packages', () => {
+        setTestConfig('saropaLints.packageVibrancy', 'endOfLifeDiagnostics', 'hint');
+        const results = [makeResult('old_pkg', 5, 'stale')];
+        diagnostics.update(uri, PUBSPEC_CONTENT, results);
+        const diags = collection.get(uri) ?? [];
+        const staleDiags = diags.filter(d => d.code === 'stale');
+        assert.strictEqual(staleDiags.length, 1, 'hosted package should still get stale diagnostic');
     });
 });
