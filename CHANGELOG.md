@@ -33,6 +33,8 @@ _Keeping your lints fresh — the extension now detects outdated saropa_lints ve
 
 - **Extension** — background upgrade checker: on activation, the extension checks pub.dev for newer saropa_lints versions and shows a non-intrusive notification with Upgrade, View Changelog, and Dismiss actions; throttled to once per 24 hours, remembers dismissed versions, skips path/git dependencies, and respects the new `saropaLints.checkForUpdates` setting
 - **Extension** — SDK constraint diagnostics: inspects the `environment` section of `pubspec.yaml` and reports when Dart SDK or Flutter version constraints are behind the latest stable release; shows Warning when the upper bound excludes latest, Information when behind by a minor version, and Hint for patch-level gaps; fires on file open, on edit (debounced), and after every vibrancy scan
+- **Extension** — overview panel toolbar: added About (info icon) and Run Analysis (play icon) buttons to the overview panel title bar; removed redundant tree items (Run Analysis, Summary, Config, Suggestions) that duplicate existing sidebar views
+- **Extension** — overview tree icons: each overview item now displays a contextual icon (pulse for health score, warning/pass for violations, graph-line for trends, arrow-down for regressions, star-full for celebrations, history for last run)
 
 ---
 

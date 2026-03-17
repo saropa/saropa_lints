@@ -137,7 +137,8 @@
       },
       {
         "command": "saropaLints.runAnalysis",
-        "title": "Saropa Lints: Run Analysis"
+        "title": "Saropa Lints: Run Analysis",
+        "icon": "$(play)"
       },
       {
         "command": "saropaLints.initializeConfig",
@@ -640,6 +641,16 @@
         {
           "command": "saropaLints.clearFocusFile",
           "when": "view == saropaLints.issues && saropaLints.hasFocusedFile",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.showAbout",
+          "when": "view == saropaLints.overview",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.runAnalysis",
+          "when": "view == saropaLints.overview && saropaLints.enabled",
           "group": "navigation"
         },
         {
