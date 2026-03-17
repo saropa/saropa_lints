@@ -25,7 +25,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 
 ---
 
-## [Unreleased]
+## [9.5.1]
 
 _Streamlining the Package Vibrancy toolbar._
 
