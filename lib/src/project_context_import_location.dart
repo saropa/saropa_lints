@@ -194,6 +194,11 @@ class ImportGraphCache {
     return _graph.containsKey(filePath);
   }
 
+  /// All file paths currently in the graph.
+  static Set<String> getFilePaths() {
+    return _graph.keys.toSet();
+  }
+
   /// Detect circular imports involving a file.
   static List<List<String>> detectCircularImports(String filePath) {
     final cycles = <List<String>>[];

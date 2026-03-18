@@ -618,6 +618,19 @@ dart run saropa_lints:baseline ./my_project  # Run on specific directory
 dart run saropa_lints:baseline --help        # See all options
 ```
 
+### Cross-file analysis CLI
+
+Find unused files and circular import chains (no IDE integration; CLI only):
+
+```bash
+dart run saropa_lints:cross_file unused-files   # Files not imported by any other file
+dart run saropa_lints:cross_file circular-deps  # Circular import chains
+dart run saropa_lints:cross_file import-stats   # Import graph statistics
+dart run saropa_lints:cross_file --help
+```
+
+Options: `--path <dir>`, `--output text|json`. Exit codes: 0 = no issues, 1 = issues found, 2 = error. See [ROADMAP Part 3](ROADMAP.md).
+
 ### Standalone Scanner
 
 Run saropa_lints rules against **any Dart project** — even one that doesn't have saropa_lints as a dependency. Useful for evaluating a project before adopting the package, or for scanning the saropa_lints codebase itself.
