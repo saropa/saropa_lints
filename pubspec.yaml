@@ -24,6 +24,7 @@ executables:
   saropa_lints: saropa_lints
   init: init
   baseline: baseline
+  cross_file: cross_file
   impact_report: impact_report
   scan: scan
 

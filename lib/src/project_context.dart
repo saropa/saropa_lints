@@ -26,3 +26,4 @@ part 'project_context_dispatch_baseline.dart';
 part 'project_context_import_location.dart';
 part 'project_context_semantic_compilation.dart';
 part 'project_context_throttle_memory.dart';
+part 'project_context_cache_stats.dart';
