@@ -39,7 +39,7 @@ The Issues view shows violations in a **tree**: first by **severity** (Error, Wa
 - **Filters (toolbar):** Filter by text (file path, rule, or message), Filter by type (severity and impact), Filter by rule (multi-select). When active, the view shows “Showing X of Y”.
 - **Suppressions:** Right-click a folder, file, violation, or severity node to hide it from the tree (e.g. “Hide folder”, “Hide rule”). Suppressions are persisted; use **Clear suppressions** in the toolbar to restore all.
 - **Code Lens:** In Dart files that have violations, a lens at the top shows e.g. “Saropa Lints: 3 issues — Show in Saropa”. Click to open the Issues view filtered to that file.
-- **Context menus:** Apply fix (run quick fix without opening the file), Fix all in file, Hide folder/file/rule/rule-in-file/severity/impact, Copy path, Copy message.
+- **Context menus:** Apply fix (wrench icon) and Copy message (clipboard icon), then a separator, then hide options: Hide rule from view, Hide rule in this file. On folders/files: Hide folder, Hide file, Copy path; on files: Fix all in file, Show only this file. On severity nodes: Hide this severity.
 - **Violation tooltips:** Show rule name and a “More” link to rule documentation (ROADMAP).
 - **Summary → Issues:** Click **Total violations** in the Summary view to open the Issues view with all issues (clears any active filters). By severity / By impact rows open Issues with the matching filter.
 - **Problems view:** Right-click a problem and choose **Saropa Lints: Show in Saropa Lints** to focus the Issues view filtered to the active file.
@@ -76,6 +76,22 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 - **Group by…** — Change how the Issues tree is organized: Severity, File, Impact, Rule, or OWASP Category (view toolbar).
 - **Apply fix** — On a violation in the Issues tree (context menu): run the Dart analyzer's quick fix for that location without opening the file.
 - **Fix all in this file** — On a file in the Issues tree (context menu): run all available quick fixes for that file bottom-up.
+
+### Violation context menu: Hide options
+
+On a violation, the two “Hide” options mean:
+
+| Option | Effect |
+|--------|--------|
+| **Hide rule from view** | Hides that rule **everywhere** in the Issues tree (all files). |
+| **Hide rule in this file** | Hides that rule **only in this file**; the same rule still appears in other files. |
+
+(“Hide this impact” is not shown on violations: it would hide all violations with that impact level, which is confusing from a single violation. Severity nodes still have “Hide this severity”.)
+
+These are **view-only** suppressions: they do not change `analysis_options.yaml` or source code. They are stored in workspace state and only affect what the Issues tree shows.
+
+**To undo or manage:** Use **Clear suppressions** in the Issues view toolbar (it appears when any suppressions are active). That clears all hidden folders, files, rules, rule-in-file, severities, and impacts at once. There is no per-item “unhide”;
+ clearing restores everything. To see or edit raw suppressions you would need to inspect workspace state (e.g. extension storage); the UI only offers Clear suppressions.
 - **Export OWASP Compliance Report** — Generate a markdown report with Mobile/Web Top 10 coverage tables and gap analysis.
 
 ## Integration

@@ -240,7 +240,8 @@
       },
       {
         "command": "saropaLints.copyMessage",
-        "title": "Copy message"
+        "title": "Copy message",
+        "icon": "$(clippy)"
       },
       {
         "command": "saropaLints.issues.copyAsJson",
@@ -280,6 +281,7 @@
       {
         "command": "saropaLints.applyFix",
         "title": "Apply fix",
+        "icon": "$(wrench)",
         "enablement": "viewItem == violationFixable"
       },
       {
@@ -806,23 +808,23 @@
         },
         {
           "command": "saropaLints.applyFix",
-          "when": "view == saropaLints.issues && viewItem =~ /^violation/"
-        },
-        {
-          "command": "saropaLints.hideRule",
-          "when": "view == saropaLints.issues && viewItem =~ /^violation/"
-        },
-        {
-          "command": "saropaLints.hideRuleInFile",
-          "when": "view == saropaLints.issues && viewItem =~ /^violation/"
+          "when": "view == saropaLints.issues && viewItem =~ /^violation/",
+          "group": "1_actions@1"
         },
         {
           "command": "saropaLints.copyMessage",
-          "when": "view == saropaLints.issues && viewItem =~ /^violation/"
+          "when": "view == saropaLints.issues && viewItem =~ /^violation/",
+          "group": "1_actions@2"
         },
         {
-          "command": "saropaLints.hideImpact",
-          "when": "view == saropaLints.issues && viewItem =~ /^violation/"
+          "command": "saropaLints.hideRule",
+          "when": "view == saropaLints.issues && viewItem =~ /^violation/",
+          "group": "2_hide@1"
+        },
+        {
+          "command": "saropaLints.hideRuleInFile",
+          "when": "view == saropaLints.issues && viewItem =~ /^violation/",
+          "group": "2_hide@2"
         },
         {
           "command": "saropaLints.hideSeverity",
