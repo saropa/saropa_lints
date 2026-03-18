@@ -1,0 +1,25 @@
+/**
+ * Dart & Flutter version history table from PACKAGE_VIBRANCY.md.
+ * Shown in SDK constraint hovers and linked from sdk-constraint diagnostics.
+ * Keep in sync with repo root PACKAGE_VIBRANCY.md.
+ */
+export const PACKAGE_VIBRANCY_DOC_URL =
+    'https://github.com/saropa/saropa_lints/blob/main/PACKAGE_VIBRANCY.md';
+
+/** Markdown table: version, release date, key feature, impact, packages requiring this minimum. */
+export const SDK_VIBRANCY_TABLE_MD = `
+| Version  | Release Date | Key Feature / Major Addition                        | Impact & Focus                   | Packages Requiring This Minimum |
+| :------- | :----------- | :-------------------------------------------------- | :------------------------------- | :------------------------------ |
+| **3.0**  | May 10, 2023 | 100% sound null safety required, records, patterns. | Forced ecosystem modernization   | \`provider\`, \`go_router\`, \`dio\`  |
+| **3.1**  | Aug 16, 2023 | \`NativeCallable.listener\` for C FFI.                | Smoother native C-bindings       | \`url_launcher\`                  |
+| **3.2**  | Nov 15, 2023 | Non-null type promotion for private final fields.   | Less boilerplate null-checking   | \`uuid\`, \`connectivity_plus\`     |
+| **3.3**  | Feb 15, 2024 | Extension types and revamped JS interop.            | Zero-cost wrapper objects        | \`drift\`, \`saropa_drift_advisor\` |
+| **3.4**  | May 14, 2024 | Wasm compilation and experimental macros.           | Faster web app load times        | \`image_picker\`                  |
+| **3.5**  | Aug 6, 2024  | Stable Web/JS interop (required for Wasm).          | Full Wasm readiness              | \`firebase_core\`                 |
+| **3.6**  | Dec 11, 2024 | Digit separators (\`1_000\`) and pub workspaces.      | Lower IDE memory usage           | \`sqflite\`                       |
+| **3.7**  | Feb 12, 2025 | Wildcard variables (\`_\`) and new formatter style.   | Cleaner code & strict formatting | **\`riverpod\`**                  |
+| **3.8**  | May 20, 2025 | Null-aware collection elements.                     | Safer, cleaner UI collections    | \`freezed\`                       |
+| **3.9**  | Aug 13, 2025 | Null safety assumed for reachability.               | Stricter dependency resolution   | **\`shared_preferences\`**        |
+| **3.10** | Nov 12, 2025 | Dot shorthands for enums and statics.               | Faster typing for UI widgets     | \`flutter_animate\`               |
+| **3.11** | Feb 11, 2026 | Purely focused on IDE support and analyzer fixes.   | Improved code completion         | *(Most haven't bumped yet)*     |
+`.trim();

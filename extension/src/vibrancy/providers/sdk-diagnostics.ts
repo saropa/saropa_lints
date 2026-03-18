@@ -3,6 +3,7 @@ import { FlutterRelease } from '../services/flutter-releases';
 import {
     parseEnvironmentConstraints, findEnvironmentRange,
 } from '../services/pubspec-parser';
+import { PACKAGE_VIBRANCY_DOC_URL } from '../sdk-vibrancy-table';
 
 interface SemverParts {
     readonly major: number;
@@ -26,6 +27,14 @@ function isGreaterThan(a: SemverParts, b: SemverParts): boolean {
     if (a.minor !== b.minor) { return a.minor > b.minor; }
     return a.patch > b.patch;
 }
+
+/** True if a >= b. */
+function isAtLeast(a: SemverParts, b: SemverParts): boolean {
+    return !isGreaterThan(b, a);
+}
+
+/** Don't show "behind latest" when SDK minimum is already at or above this. */
+const ACCEPTABLE_SDK_FLOOR: SemverParts = { major: 3, minor: 9, patch: 0 };
 
 /** Parse a Dart/Flutter SDK constraint string into min and upper bound. */
 function parseConstraint(
@@ -64,6 +73,18 @@ function classifyBehind(
 
 const SOURCE = 'Package Vibrancy';
 const CODE = 'sdk-constraint';
+
+/** Build a diagnostic with Package Vibrancy source and sdk-constraint code (link to doc). */
+function createDiagnostic(
+    range: vscode.Range,
+    message: string,
+    severity: vscode.DiagnosticSeverity,
+): vscode.Diagnostic {
+    const d = new vscode.Diagnostic(range, message, severity);
+    d.source = SOURCE;
+    d.code = { value: CODE, target: vscode.Uri.parse(PACKAGE_VIBRANCY_DOC_URL) };
+    return d;
+}
 
 /**
  * Generates inline diagnostics for SDK and Flutter version constraints
@@ -142,42 +163,38 @@ function buildConstraintDiagnostics(
 
     const diagnostics: vscode.Diagnostic[] = [];
 
-    // Check if upper bound excludes latest stable
+    // Upper bound excludes latest stable
     if (parsed.upperBound) {
         const upper = parseSemver(parsed.upperBound);
         if (upper && !isGreaterThan(upper, latestSemver)) {
-            // Upper bound <= latest, so latest is excluded
             const msg = `${label} upper bound (<${parsed.upperBound}) excludes latest stable (${latestVersion})`;
-            const diag = new vscode.Diagnostic(
+            diagnostics.push(createDiagnostic(
                 vscodeRange, msg, vscode.DiagnosticSeverity.Warning,
-            );
-            diag.source = SOURCE;
-            diag.code = CODE;
-            diagnostics.push(diag);
+            ));
         }
     }
 
-    // Check if min version is behind latest
+    // Check if min version is behind latest (only for Dart SDK; don't nag when already >= 3.9.0)
     if (parsed.min) {
         const minSemver = parseSemver(parsed.min);
         if (minSemver) {
-            const status = classifyBehind(minSemver, latestSemver);
-            if (status === 'minor') {
-                const msg = `${label} minimum (${parsed.min}) is behind latest stable (${latestVersion})`;
-                const diag = new vscode.Diagnostic(
-                    vscodeRange, msg, vscode.DiagnosticSeverity.Information,
-                );
-                diag.source = SOURCE;
-                diag.code = CODE;
-                diagnostics.push(diag);
-            } else if (status === 'patch') {
-                const msg = `${label} minimum (${parsed.min}) — latest stable is ${latestVersion}`;
-                const diag = new vscode.Diagnostic(
-                    vscodeRange, msg, vscode.DiagnosticSeverity.Hint,
-                );
-                diag.source = SOURCE;
-                diag.code = CODE;
-                diagnostics.push(diag);
+            const atOrAboveFloor = key === 'sdk' && isAtLeast(minSemver, ACCEPTABLE_SDK_FLOOR);
+            if (!atOrAboveFloor) {
+                const status = classifyBehind(minSemver, latestSemver);
+                const recommendation = key === 'sdk'
+                    ? ' Aim for >=3.10.0; use >=3.9.0 only if you need to support more legacy setups.'
+                    : '';
+                if (status === 'minor') {
+                    const msg = `${label} minimum (${parsed.min}) is behind latest stable (${latestVersion}).${recommendation}`;
+                    diagnostics.push(createDiagnostic(
+                        vscodeRange, msg, vscode.DiagnosticSeverity.Information,
+                    ));
+                } else if (status === 'patch') {
+                    const msg = `${label} minimum (${parsed.min}) — latest stable is ${latestVersion}.${recommendation}`;
+                    diagnostics.push(createDiagnostic(
+                        vscodeRange, msg, vscode.DiagnosticSeverity.Hint,
+                    ));
+                }
             }
         }
     }

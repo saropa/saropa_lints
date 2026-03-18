@@ -25,6 +25,18 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [Unreleased]
+
+### Added
+
+• **Package Vibrancy** — SDK constraint diagnostic now includes actionable guidance: "Aim for >=3.10.0; use >=3.9.0 only if you need to support more legacy setups." Quick fixes: **Set Dart SDK to >=3.10.0** (preferred) and **Set Dart SDK to >=3.9.0 (legacy support)**; both preserve the existing upper bound (e.g. <4.0.0). Hover on the `sdk:` or `flutter:` line in `pubspec.yaml` shows the Dart/Flutter version history table; diagnostic code links to [PACKAGE_VIBRANCY.md](https://github.com/saropa/saropa_lints/blob/main/PACKAGE_VIBRANCY.md).
+
+### Changed
+
+• **Package Vibrancy** — "Behind latest stable" is no longer shown when the Dart SDK minimum is already >=3.9.0, to avoid nagging projects that have adopted the recommended legacy floor.
+
+---
+
 ## [9.8.0]
 
 ### Changed
