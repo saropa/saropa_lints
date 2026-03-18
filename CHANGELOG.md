@@ -25,6 +25,16 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+• **Package Vibrancy** — Inline diagnostics in `pubspec.yaml` are now simplified by default: a single summary line (e.g. "Package Vibrancy: 12 stale, 8 legacy-locked — Open Package Vibrancy view for details.") instead of one warning per package. New setting `saropaLints.packageVibrancy.inlineDiagnostics`: **summary** (default), **critical** (only end-of-life/vulnerabilities/family conflicts per-line), **all** (one diagnostic per package, previous behavior), or **none** (sidebar only). Reduces noise in large projects while keeping the Package Vibrancy view as the place for full details.
+
+• **Package Vibrancy** — All user-facing text and diagnostic sources now use "Package Vibrancy" only; the former "Saropa Package Vibrancy" label has been removed from the extension (settings title, report headers, CI-generated comments, and diagnostics).
+
+---
+
 ## [9.7.0]
 
 ### Added
@@ -205,7 +215,7 @@ _Package Vibrancy is now built into Saropa Lints. One extension, one sidebar —
 
 ### Added
 
-• **Package Vibrancy integration** — merged the standalone Saropa Package Vibrancy extension into Saropa Lints
+• **Package Vibrancy integration** — merged the standalone Package Vibrancy extension into Saropa Lints
   - Three new collapsible sidebar panels: Package Vibrancy, Package Problems, Package Details
   - Dependency vibrancy scoring, vulnerability scanning (OSV + GitHub Advisory), SBOM export (CycloneDX)
   - Upgrade planning with test gates, bulk updates (latest/major/minor/patch)

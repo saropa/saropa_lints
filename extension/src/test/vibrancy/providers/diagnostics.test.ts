@@ -48,6 +48,7 @@ describe('VibrancyDiagnostics', () => {
 
     beforeEach(() => {
         clearTestConfig();
+        setTestConfig('saropaLints.packageVibrancy', 'inlineDiagnostics', 'all');
         collection = new MockDiagnosticCollection('test');
         diagnostics = new VibrancyDiagnostics(
             collection as unknown as vscode.DiagnosticCollection,
@@ -246,12 +247,12 @@ describe('VibrancyDiagnostics', () => {
         assert.ok(diags[0].message.includes('No longer maintained'));
     });
 
-    it('should set source to Saropa Package Vibrancy', () => {
+    it('should set source to Package Vibrancy', () => {
         setTestConfig('saropaLints.packageVibrancy', 'endOfLifeDiagnostics', 'hint');
         const results = [makeResult('old_pkg', 5, 'end-of-life')];
         diagnostics.update(uri, PUBSPEC_CONTENT, results);
         const diags = collection.get(uri)!;
-        assert.strictEqual(diags[0].source, 'Saropa Package Vibrancy');
+        assert.strictEqual(diags[0].source, 'Package Vibrancy');
     });
 
     it('should create Hint diagnostic for unused packages', () => {
@@ -334,5 +335,56 @@ describe('VibrancyDiagnostics', () => {
         const diags = collection.get(uri) ?? [];
         const staleDiags = diags.filter(d => d.code === 'stale');
         assert.strictEqual(staleDiags.length, 1, 'hosted package should still get stale diagnostic');
+    });
+
+    describe('inlineDiagnostics mode', () => {
+        it('summary mode: one summary diagnostic, no per-line health', () => {
+            setTestConfig('saropaLints.packageVibrancy', 'inlineDiagnostics', 'summary');
+            setTestConfig('saropaLints.packageVibrancy', 'endOfLifeDiagnostics', 'hint');
+            const results = [
+                makeResult('http', 80, 'vibrant'),
+                makeResult('flutter_bloc', 35, 'legacy-locked'),
+                makeResult('old_pkg', 5, 'stale'),
+            ];
+            diagnostics.update(uri, PUBSPEC_CONTENT, results);
+            const diags = collection.get(uri) ?? [];
+            const summaryDiags = diags.filter(d => d.code === 'vibrancy-summary');
+            const categoryDiags = diags.filter(d => typeof d.code === 'string' && MAIN_VIBRANCY_CATEGORY_CODES.includes(d.code));
+            assert.strictEqual(summaryDiags.length, 1, 'should have one summary diagnostic');
+            assert.ok(summaryDiags[0].message.includes('Package Vibrancy'));
+            assert.ok(summaryDiags[0].message.includes('Open Package Vibrancy view'));
+            assert.strictEqual(categoryDiags.length, 0, 'summary mode should not show per-line health');
+        });
+
+        it('none mode: only summary diagnostic, no per-line', () => {
+            setTestConfig('saropaLints.packageVibrancy', 'inlineDiagnostics', 'none');
+            setTestConfig('saropaLints.packageVibrancy', 'endOfLifeDiagnostics', 'hint');
+            const result: VibrancyResult = {
+                ...makeResult('old_pkg', 5, 'end-of-life'),
+                isUnused: true,
+            };
+            diagnostics.update(uri, PUBSPEC_CONTENT, [result]);
+            const diags = collection.get(uri) ?? [];
+            const summaryDiags = diags.filter(d => d.code === 'vibrancy-summary');
+            assert.strictEqual(summaryDiags.length, 1);
+            assert.strictEqual(diags.length, 1, 'none mode should only show summary');
+        });
+
+        it('critical mode: per-line only for end-of-life, plus summary', () => {
+            setTestConfig('saropaLints.packageVibrancy', 'inlineDiagnostics', 'critical');
+            setTestConfig('saropaLints.packageVibrancy', 'endOfLifeDiagnostics', 'hint');
+            const results = [
+                makeResult('old_pkg', 3, 'end-of-life'),
+                makeResult('flutter_bloc', 8, 'stale'),
+            ];
+            diagnostics.update(uri, PUBSPEC_CONTENT, results);
+            const diags = collection.get(uri) ?? [];
+            const summaryDiags = diags.filter(d => d.code === 'vibrancy-summary');
+            const eolDiags = diags.filter(d => d.code === 'end-of-life');
+            const staleDiags = diags.filter(d => d.code === 'stale');
+            assert.strictEqual(summaryDiags.length, 1);
+            assert.strictEqual(eolDiags.length, 1, 'critical mode shows EOL per-line');
+            assert.strictEqual(staleDiags.length, 0, 'critical mode hides stale per-line');
+        });
     });
 });

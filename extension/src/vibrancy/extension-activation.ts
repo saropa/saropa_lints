@@ -291,7 +291,9 @@ function registerSuppressListener(
 ): void {
     context.subscriptions.push(
         vscode.workspace.onDidChangeConfiguration(e => {
-            if (!e.affectsConfiguration('saropaLints.packageVibrancy.suppressedPackages')) {
+            if (!e.affectsConfiguration('saropaLints.packageVibrancy.suppressedPackages')
+                && !e.affectsConfiguration('saropaLints.packageVibrancy.inlineDiagnostics')
+                && !e.affectsConfiguration('saropaLints.packageVibrancy.endOfLifeDiagnostics')) {
                 return;
             }
             targets.tree.refresh();

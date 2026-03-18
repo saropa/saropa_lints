@@ -62,7 +62,7 @@ function classifyBehind(
     return 'patch';
 }
 
-const SOURCE = 'Saropa Package Vibrancy';
+const SOURCE = 'Package Vibrancy';
 const CODE = 'sdk-constraint';
 
 /**

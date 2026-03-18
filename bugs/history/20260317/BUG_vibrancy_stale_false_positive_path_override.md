@@ -3,7 +3,7 @@
 **Status:** Fixed  
 **Date:** 2026-03-17  
 **Fixed:** 2026-03-17 — Skip main vibrancy diagnostic when `result.package.source` is `path` or `git` in `extension/src/vibrancy/providers/diagnostics.ts`; unit tests added.  
-**Component:** VS Code extension — Saropa Package Vibrancy (dependency vibrancy diagnostics)  
+**Component:** VS Code extension — Package Vibrancy (dependency vibrancy diagnostics)  
 **Severity:** Medium — false positive; user is not consuming the pub.dev package at runtime  
 **Source:** User report from contacts app; repro with any path- or git-overridden dependency that scores low on pub.dev
 
@@ -17,7 +17,7 @@ When a dependency declared in `dependencies` (or `dev_dependencies`) is **overri
 
 ## Environment / repro
 
-- **Extension:** Saropa Package Vibrancy (VS Code extension, part of saropa_lints ecosystem)
+- **Extension:** Package Vibrancy (VS Code extension, part of saropa_lints ecosystem)
 - **Repro project:** Any Flutter/Dart project that:
   1. Declares a direct dependency in `pubspec.yaml` (e.g. `toggle_switch: ^2.2.3`)
   2. Overrides that dependency with a path or git source (e.g. in `pubspec_overrides.yaml` or `dependency_overrides:` in `pubspec.yaml`)
@@ -44,7 +44,7 @@ When a dependency declared in `dependencies` (or `dev_dependencies`) is **overri
 - **Observed diagnostic** (inline on the `toggle_switch` line in pubspec.yaml):
   - **Message:** `Review toggle_switch (0/10)`
   - **Code:** `stale`
-  - **Source:** Saropa Package Vibrancy  
+  - **Source:** Package Vibrancy  
   - **Severity:** Information (severity 2)
 
 The pub.dev package `toggle_switch` may legitimately be classified as stale (e.g. low GitHub activity, "Published 24 months ago"). The bug is that the extension shows this **on the dependency declaration** even though the project does **not** use the pub.dev package at runtime — it uses the local path override.
@@ -105,7 +105,7 @@ if (result.category !== 'vibrant') {
 
 ## Impact
 
-- **Who is affected:** Any user of the Saropa Package Vibrancy extension who uses `dependency_overrides` (or `pubspec_overrides.yaml`) with **path** or **git** for one or more direct dependencies. Common for maintained forks, local patches, or abandoned pub packages that are kept in-tree.
+- **Who is affected:** Any user of the Package Vibrancy extension who uses `dependency_overrides` (or `pubspec_overrides.yaml`) with **path** or **git** for one or more direct dependencies. Common for maintained forks, local patches, or abandoned pub packages that are kept in-tree.
 - **Consequence:** Noisy, misleading "Review X (0/10)" / "stale" on dependency lines that are intentionally overridden. Users may waste time "reviewing" or trying to "fix" a dependency they have already taken ownership of, or may suppress/suppress-by-ignore the extension for that file.
 
 ---
