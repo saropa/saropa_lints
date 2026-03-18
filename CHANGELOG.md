@@ -27,6 +27,14 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ## [Unreleased]
 
+### Changed
+
+• **Extension** — First-run notification: score qualifier uses an if/else chain instead of a nested ternary (lint compliance, readability).
+
+### Fixed
+
+• **Extension** — Prefer `.at(-n)` for from-end array access in celebration/snapshot logic (lint compliance).
+
 ### Added
 
 • **Extension** — **Explain rule**: right-click any violation in the Issues view (or run **Saropa Lints: Explain rule** from the command palette) to open a side tab with full rule details: problem message, how to fix, severity, impact, OWASP mapping (when present), and a link to the ROADMAP. The panel reuses a single tab; the documentation link opens in the default browser.

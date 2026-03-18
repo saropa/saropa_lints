@@ -213,8 +213,8 @@ export function activate(context: vscode.ExtensionContext): void {
           updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
           // Only show celebration when a genuinely new snapshot was recorded.
           if (appended && history.length >= 2) {
-            const prev = history[history.length - 2];
-            const curr = history[history.length - 1];
+            const prev = history.at(-2)!;
+            const curr = history.at(-1)!;
             const delta = prev.total - curr.total;
             // D8: Score-driven celebration — mention score delta when available.
             const scoreDelta = (prev.score !== undefined && curr.score !== undefined)
@@ -886,9 +886,15 @@ async function showFirstRunNotification(
 
   if (health) {
     const band = scoreColorBand(health.score);
-    const qualifier = band === 'green' ? 'Great start!'
-      : band === 'yellow' ? 'Room to improve.'
-      : 'Needs attention.';
+    // User-facing qualifier for the score band (avoids nested ternary for lint compliance).
+    let qualifier: string;
+    if (band === 'green') {
+      qualifier = 'Great start!';
+    } else if (band === 'yellow') {
+      qualifier = 'Room to improve.';
+    } else {
+      qualifier = 'Needs attention.';
+    }
     message = `Saropa Lints: Your project scores ${health.score}/100. ${qualifier}`;
     primaryAction = 'View Issues';
   } else if (totalViolations > 0) {
