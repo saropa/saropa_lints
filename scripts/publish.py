@@ -73,6 +73,7 @@ import re
 import sys
 import time
 import webbrowser
+from dataclasses import dataclass
 from pathlib import Path
 
 # Allow running as `python scripts/publish.py` from project root (add parent to path)
@@ -409,6 +410,490 @@ def _print_success_banner(
     print()
 
 
+@dataclass(frozen=True)
+class _PublishContext:
+    """Holds project paths and derived info for the publish workflow."""
+
+    project_dir: Path
+    pubspec_path: Path
+    changelog_path: Path
+    bugs_dir: Path
+    package_name: str
+    pubspec_version: str
+    branch: str
+    remote_url: str
+    rule_count: int
+    category_count: int
+
+
+def _run_analyze_only(mode: str, project_dir: Path) -> int | None:
+    """If mode is analyze_only, run analyze-to-log and return exit code; else None."""
+    if mode != "analyze_only":
+        return None
+    ok = run_analyze_to_log(project_dir)
+    return ExitCode.SUCCESS.value if ok else ExitCode.ANALYSIS_FAILED.value
+
+
+def _prompt_extension_install_and_publish(
+    vsix: Path, skip_publish_msg: str = "Extension NOT published to Marketplace.",
+) -> bool:
+    """Prompt to install .vsix locally and to publish to Marketplace/Open VSX. Returns True if user chose to publish."""
+    response = input("  Install extension locally? [Y/n] ").strip().lower()
+    if not response.startswith("n"):
+        install_extension(vsix)
+    response = (
+        input("  Publish extension to Marketplace and Open VSX? [Y/n] ")
+        .strip()
+        .lower()
+    )
+    if response.startswith("n"):
+        print_warning(skip_publish_msg)
+        return False
+    return True
+
+
+def _run_extension_only_mode(
+    mode: str,
+    project_dir: Path,
+    pubspec_path: Path,
+) -> int | None:
+    """If mode is extension_only, run workflow and return exit code; else None. Exits on failure."""
+    if mode != "extension_only":
+        return None
+    if not extension_exists(project_dir):
+        exit_with_error(
+            f"Extension directory not found: {project_dir / 'extension'}",
+            ExitCode.PREREQUISITES_FAILED,
+        )
+    ext_version = get_version_from_pubspec(pubspec_path)
+    print_header("EXTENSION: PACKAGE .VSIX")
+    vsix = package_extension(project_dir, ext_version)
+    if not vsix:
+        exit_with_error(
+            "Extension package failed",
+            ExitCode.VALIDATION_FAILED,
+        )
+    if _prompt_extension_install_and_publish(vsix):
+        if not publish_extension(project_dir, vsix):
+            exit_with_error(
+                "Extension publish failed",
+                ExitCode.PUBLISH_FAILED,
+            )
+    return ExitCode.SUCCESS.value
+
+
+def _run_fix_docs_mode(mode: str, project_dir: Path) -> int | None:
+    """If mode is fix_docs, run fix-docs workflow and return exit code; else None."""
+    if mode != "fix_docs":
+        return None
+    print_header("FIX DOC COMMENT ISSUES")
+    issues = check_pubdev_lint_issues(project_dir)
+    if not issues:
+        print_success("No doc comment issues found.")
+        return ExitCode.SUCCESS.value
+    print_info(f"Found {len(issues)} issue(s):")
+    for issue in issues:
+        print_colored(f"      {issue}", Color.YELLOW)
+    fixed_brackets = fix_doc_angle_brackets(project_dir)
+    fixed_refs = fix_doc_references(project_dir)
+    total_fixed = fixed_brackets + fixed_refs
+    if total_fixed:
+        print_success(
+            f"Fixed {total_fixed} issue(s) "
+            f"({fixed_brackets} angle bracket(s), "
+            f"{fixed_refs} doc reference(s))."
+        )
+    else:
+        print_warning("No auto-fixable issues found.")
+    return ExitCode.SUCCESS.value
+
+
+def _validate_pubspec_changelog(
+    pubspec_path: Path, changelog_path: Path,
+) -> None:
+    """Ensure pubspec and CHANGELOG exist; exit on failure."""
+    if not pubspec_path.exists():
+        exit_with_error(
+            f"pubspec.yaml not found at {pubspec_path}",
+            ExitCode.PREREQUISITES_FAILED,
+        )
+    if not changelog_path.exists():
+        exit_with_error(
+            f"CHANGELOG.md not found at {changelog_path}",
+            ExitCode.PREREQUISITES_FAILED,
+        )
+
+
+def _print_package_banner(ctx: _PublishContext) -> None:
+    """Print package info, changelog, coverage, and roadmap summary."""
+    print_header(f"SAROPA LINTS PUBLISHER v{SCRIPT_VERSION}")
+    print_colored("  Package Information:", Color.WHITE)
+    print_colored(f"      Name:       {ctx.package_name}", Color.CYAN)
+    print_colored(f"      Current:    {ctx.pubspec_version}", Color.CYAN)
+    print_colored(f"      Branch:     {ctx.branch}", Color.CYAN)
+    print_colored(f"      Repository: {ctx.remote_url}", Color.CYAN)
+    print_colored(
+        f"      Rules:      {ctx.rule_count} in {ctx.category_count} categories",
+        Color.CYAN,
+    )
+    print()
+    display_changelog(ctx.project_dir)
+    display_test_coverage(ctx.project_dir)
+    todo_log = display_roadmap_summary(
+        ctx.project_dir, bugs_dir=ctx.bugs_dir,
+    )
+    if todo_log:
+        print_info(f"TODO log: {todo_log.relative_to(ctx.project_dir)}")
+
+
+def _run_audit_step(
+    project_dir: Path,
+    skip_audit: bool,
+    audit_only: bool,
+    timer: StepTimer,
+) -> int | None:
+    """Run pre-publish audit. Returns exit code to return from main, or None to continue."""
+    if not skip_audit:
+        with timer.step("Pre-publish audit"):
+            print_header("STEP 1: AUDIT")
+            audit_ok, audit_result = run_pre_publish_audits(project_dir)
+            while not audit_ok and audit_result:
+                rules_dir = project_dir / "lib" / "src" / "rules"
+                missing_prefix = getattr(
+                    audit_result, "rules_missing_prefix", None,
+                )
+                if missing_prefix:
+                    from scripts.modules._audit_checks import fix_missing_prefix
+
+                    n = fix_missing_prefix(rules_dir)
+                    if n:
+                        print_success(
+                            f"Added [rule_name] prefix to {n} rule(s)."
+                        )
+                        print_info("Re-running audit...")
+                        audit_ok, audit_result = run_pre_publish_audits(
+                            project_dir,
+                        )
+                        if audit_ok:
+                            break
+                        continue
+                exit_with_error(
+                    _AUDIT_FAILED_MSG,
+                    ExitCode.AUDIT_FAILED,
+                )
+            if not audit_ok:
+                exit_with_error(_AUDIT_FAILED_MSG, ExitCode.AUDIT_FAILED)
+
+        if audit_only:
+            print_success(
+                "Audit-only run complete (no format/analysis/tests)."
+            )
+            return ExitCode.SUCCESS.value
+    elif audit_only:
+        return ExitCode.USER_CANCELED.value
+
+    if skip_audit:
+        print_warning("Audit skipped (publish without audit).")
+    return None
+
+
+def _run_pre_publish_pipeline(
+    project_dir: Path, branch: str, timer: StepTimer,
+) -> None:
+    """Run prerequisites, working tree, sync, workflow, format, analysis, tests. Exits on failure."""
+    with timer.step("Prerequisites"):
+        if not check_prerequisites():
+            exit_with_error(
+                "Prerequisites failed",
+                ExitCode.PREREQUISITES_FAILED,
+            )
+    with timer.step("Working tree"):
+        ok, _ = check_working_tree(project_dir)
+        if not ok:
+            exit_with_error("Aborted.", ExitCode.USER_CANCELED)
+    with timer.step("Remote sync"):
+        if not check_remote_sync(project_dir, branch):
+            exit_with_error(
+                "Remote sync failed",
+                ExitCode.WORKING_TREE_FAILED,
+            )
+    with timer.step("Publish workflow"):
+        if not ensure_publish_workflow_committed(project_dir, branch):
+            exit_with_error(
+                "Failed to commit/push .github/workflows/publish.yml",
+                ExitCode.GIT_FAILED,
+            )
+    with timer.step("Format"):
+        if not run_format(project_dir):
+            exit_with_error(
+                "Formatting failed.", ExitCode.VALIDATION_FAILED,
+            )
+    with timer.step("Analysis"):
+        if not run_analysis(project_dir):
+            exit_with_error(
+                "Analysis failed.", ExitCode.ANALYSIS_FAILED,
+            )
+    with timer.step("Tests"):
+        if not run_tests(project_dir):
+            exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
+
+
+def _prompt_version_until_valid(default_version: str) -> str:
+    """Prompt for version until valid semver; return version string."""
+    while True:
+        version = _prompt_version(default_version)
+        if re.match(rf"^{_VERSION_RE}$", version):
+            return version
+        print_warning(
+            f"Invalid version format '{version}'. "
+            f"Use X.Y.Z or X.Y.Z-pre.N"
+        )
+
+
+def _sync_version_with_changelog(
+    project_dir: Path,
+    pubspec_path: Path,
+    changelog_path: Path,
+    pubspec_version: str,
+    version: str,
+) -> str:
+    """Update pubspec/CHANGELOG with chosen version; reconcile; handle tag clash. Returns final version."""
+    version_to_sync = version
+    while True:
+        if version_to_sync != pubspec_version:
+            set_version_in_pubspec(pubspec_path, version_to_sync)
+            print_success(f"Updated pubspec.yaml to {version_to_sync}")
+        try:
+            if rename_unreleased_to_version(
+                changelog_path, version_to_sync,
+            ):
+                print_success(
+                    f"Renamed [Unreleased] to [{version_to_sync}] "
+                    f"in CHANGELOG.md"
+                )
+            break
+        except ValueError as exc:
+            suggested = increment_version(version_to_sync)
+            print_warning(str(exc))
+            print_colored(
+                f"  Suggested version: {suggested} (press Enter or edit)",
+                Color.CYAN,
+            )
+            version_to_sync = _prompt_version(suggested)
+            if not re.match(rf"^{_VERSION_RE}$", version_to_sync):
+                print_warning(
+                    f"Invalid version format '{version_to_sync}'. "
+                    f"Use X.Y.Z or X.Y.Z-pre.N"
+                )
+                continue
+    changelog_version = get_latest_changelog_version(changelog_path)
+    if changelog_version is None:
+        exit_with_error(
+            "Could not extract version from CHANGELOG.md",
+            ExitCode.CHANGELOG_FAILED,
+        )
+    if version_to_sync != changelog_version:
+        if parse_version(version_to_sync) < parse_version(changelog_version):
+            print_warning(
+                f"pubspec version ({version_to_sync}) is behind "
+                f"CHANGELOG ({changelog_version}). Updating pubspec..."
+            )
+            set_version_in_pubspec(pubspec_path, changelog_version)
+            version_to_sync = changelog_version
+            print_success(f"Updated pubspec.yaml to {version_to_sync}")
+        else:
+            print_warning(
+                f"pubspec version ({version_to_sync}) is ahead "
+                f"of CHANGELOG ({changelog_version})."
+            )
+            response = (
+                input(
+                    f"  Add a [{version_to_sync}] section to "
+                    f"CHANGELOG.md? [Y/n] "
+                )
+                .strip()
+                .lower()
+            )
+            if response.startswith("n"):
+                exit_with_error(
+                    "Publish canceled — update CHANGELOG.md manually.",
+                    ExitCode.CHANGELOG_FAILED,
+                )
+            add_version_section(
+                changelog_path, version_to_sync, "Version bump",
+            )
+            print_success(
+                f"Added [{version_to_sync}] section to CHANGELOG.md"
+            )
+    tag_name = f"v{version_to_sync}"
+    if tag_exists_on_remote(project_dir, tag_name):
+        next_version = increment_version(version_to_sync)
+        print_warning(
+            f"Tag {tag_name} already exists on remote. "
+            f"Version {version_to_sync} has already been published."
+        )
+        print_info(
+            f"Bumping to {next_version} and adding CHANGELOG section."
+        )
+        set_version_in_pubspec(pubspec_path, next_version)
+        add_version_section(
+            changelog_path, next_version, "Release version",
+        )
+        version_to_sync = next_version
+        print_success(
+            f"Updated pubspec.yaml to {version_to_sync} and added "
+            f"[{version_to_sync}] to CHANGELOG.md (Release version)."
+        )
+    return version_to_sync
+
+
+def _run_badge_validation_docs_dryrun(
+    project_dir: Path,
+    version: str,
+    rule_count: int,
+    timer: StepTimer,
+) -> str:
+    """Badge sync, CHANGELOG validation, docs, pre-publish dry-run. Returns release_notes for GitHub. Exits on failure."""
+    with timer.step("Badge sync"):
+        sync_readme_badges(project_dir, version, rule_count)
+    with timer.step("CHANGELOG validation"):
+        ok, release_notes = validate_changelog(project_dir, version)
+        if not ok:
+            exit_with_error(
+                "CHANGELOG failed",
+                ExitCode.CHANGELOG_FAILED,
+            )
+    with timer.step("Docs"):
+        if not generate_docs(project_dir):
+            exit_with_error(
+                "Docs failed",
+                ExitCode.VALIDATION_FAILED,
+            )
+    with timer.step("Pre-publish validation"):
+        if not pre_publish_validation(project_dir):
+            exit_with_error(
+                "Validation failed",
+                ExitCode.VALIDATION_FAILED,
+            )
+    return release_notes
+
+
+def _run_final_ci_gate(project_dir: Path, timer: StepTimer) -> None:
+    """Re-run analysis after version bump; exit on failure."""
+    with timer.step("Final CI gate"):
+        print_header("FINAL CI GATE")
+        print_info(
+            "Re-running CI checks after version changes to "
+            "prevent burning a tag on a broken build..."
+        )
+        if not run_analysis(project_dir):
+            exit_with_error(
+                "Final CI gate failed — aborting before "
+                "tag creation. Fix analysis issues and re-run.",
+                ExitCode.ANALYSIS_FAILED,
+            )
+        print_success("CI gate passed — safe to create tag")
+
+
+def _run_commit_tag_publish_release(
+    project_dir: Path,
+    version: str,
+    branch: str,
+    release_notes: str,
+    timer: StepTimer,
+) -> None:
+    """Commit/push, retrigger CI, tag, publish to pub.dev, GitHub release. Exits on failure."""
+    with timer.step("Git commit & push"):
+        if not git_commit_and_push(project_dir, version, branch):
+            exit_with_error(
+                "Git operations failed",
+                ExitCode.GIT_FAILED,
+            )
+    with timer.step("CI status"):
+        from scripts.modules._retrigger_ci import offer_retrigger_ci
+
+        offer_retrigger_ci(limit=10)
+    with timer.step("Git tag"):
+        if not create_git_tag(project_dir, version):
+            exit_with_error(
+                "Git tag failed",
+                ExitCode.GIT_FAILED,
+            )
+    with timer.step("Publish"):
+        if not publish_to_pubdev_step(project_dir, version):
+            exit_with_error(
+                "Publish failed",
+                ExitCode.PUBLISH_FAILED,
+            )
+    with timer.step("GitHub release"):
+        gh_success, gh_error = create_github_release(
+            project_dir, version, release_notes,
+        )
+        if not gh_success:
+            exit_with_error(
+                f"GitHub release failed: {gh_error}",
+                ExitCode.GITHUB_RELEASE_FAILED,
+            )
+
+
+def _run_version_bump(
+    project_dir: Path,
+    pubspec_path: Path,
+    package_name: str,
+    version: str,
+    branch: str,
+    timer: StepTimer,
+) -> None:
+    """Bump pubspec to next version; commit if possible. Non-fatal on failure."""
+    try:
+        with timer.step("Version bump"):
+            next_version = increment_version(version)
+            set_version_in_pubspec(pubspec_path, next_version)
+            update_analysis_options_plugin_version(
+                project_dir, package_name, version,
+            )
+            if post_publish_commit(project_dir, next_version, branch):
+                print_success(f"Bumped to {next_version}")
+            else:
+                print_warning(
+                    f"Version bump to {next_version} "
+                    "not committed — commit manually"
+                )
+    except Exception as exc:
+        print_warning(f"Post-publish version bump failed: {exc}")
+
+
+def _run_extension_after_publish(
+    project_dir: Path, version: str, timer: StepTimer,
+) -> bool:
+    """Package .vsix, optionally install and publish. Returns True if published."""
+    if not extension_exists(project_dir):
+        return False
+    with timer.step("Extension"):
+        vsix = package_extension(project_dir, version)
+        if not vsix:
+            print_warning(
+                "Extension packaging failed — .vsix was not created. "
+                "Check compile errors above."
+            )
+            return False
+        if not _prompt_extension_install_and_publish(
+            vsix,
+            skip_publish_msg=(
+                "Extension NOT published to Marketplace. "
+                "Run option 6 (extension only) to publish later."
+            ),
+        ):
+            return False
+        if publish_extension(project_dir, vsix):
+            return True
+        print_warning(
+            "Extension publish to Marketplace/Open VSX failed. "
+            "Check output above for details."
+        )
+        return False
+
+
 # =============================================================================
 # MAIN
 # =============================================================================
@@ -448,581 +933,134 @@ def main(
     mode: str = "full",
     output_level: OutputLevel | None = None,
 ) -> int:
-    """Run publish workflow. Returns exit code (0 = success). mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit' | 'analyze_only' | 'extension_only'."""
+    """Run publish workflow. Returns exit code (0 = success). mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit' | 'analyze_only' | 'extension_only'.
+
+    Flow: validate paths → early modes (analyze/extension/fix_docs) → build context →
+    audit → pre-publish pipeline → version prompt & sync → badge/validation/docs/dry-run →
+    final CI gate → commit/tag/publish/release → version bump → extension. SystemExit
+    from exit_with_error() is caught so finally (timer summary) runs and exit code is returned.
+    """
     enable_ansi_support()
     set_output_level(output_level or _parse_output_level())
-
     show_saropa_logo()
 
-    # --- Resolve project paths and validate presence of pubspec/CHANGELOG ---
     project_dir = get_project_dir()
     pubspec_path = project_dir / "pubspec.yaml"
     changelog_path = project_dir / "CHANGELOG.md"
     bugs_dir = project_dir / "bugs"
+    _validate_pubspec_changelog(pubspec_path, changelog_path)
 
-    # Abort if pubspec or CHANGELOG missing (required for publish)
-    if not pubspec_path.exists():
-        exit_with_error(
-            f"pubspec.yaml not found at {pubspec_path}",
-            ExitCode.PREREQUISITES_FAILED,
-        )
+    code = _run_analyze_only(mode, project_dir)
+    if code is not None:
+        return code
+    code = _run_extension_only_mode(mode, project_dir, pubspec_path)
+    if code is not None:
+        return code
+    code = _run_fix_docs_mode(mode, project_dir)
+    if code is not None:
+        return code
 
-    if not changelog_path.exists():
-        exit_with_error(
-            f"CHANGELOG.md not found at {changelog_path}",
-            ExitCode.PREREQUISITES_FAILED,
-        )
-
-    # --- analyze_only: standalone mode, then exit ---
-    if mode == "analyze_only":
-        ok = run_analyze_to_log(project_dir)
-        return ExitCode.SUCCESS.value if ok else ExitCode.ANALYSIS_FAILED.value
-
-    # --- extension_only: package .vsix, optionally publish, then exit ---
-    if mode == "extension_only":
-        if not extension_exists(project_dir):
-            exit_with_error(
-                f"Extension directory not found: {project_dir / 'extension'}",
-                ExitCode.PREREQUISITES_FAILED,
-            )
-        ext_version = get_version_from_pubspec(pubspec_path)
-        print_header("EXTENSION: PACKAGE .VSIX")
-        vsix = package_extension(project_dir, ext_version)
-        if not vsix:
-            exit_with_error(
-                "Extension package failed",
-                ExitCode.VALIDATION_FAILED,
-            )
-        # Install locally (default yes)
-        response = (
-            input("  Install extension locally? [Y/n] ")
-            .strip()
-            .lower()
-        )
-        if not response.startswith("n"):
-            install_extension(vsix)
-        # Publish to stores (default yes)
-        response = (
-            input(
-                "  Publish extension to Marketplace and Open VSX? [Y/n] "
-            )
-            .strip()
-            .lower()
-        )
-        if response.startswith("n"):
-            print_warning(
-                "Extension NOT published to Marketplace."
-            )
-        else:
-            if not publish_extension(project_dir, vsix):
-                exit_with_error(
-                    "Extension publish failed",
-                    ExitCode.PUBLISH_FAILED,
-                )
-        return ExitCode.SUCCESS.value
-
-    # --- fix_docs: standalone mode, then exit ---
-    if mode == "fix_docs":
-        print_header("FIX DOC COMMENT ISSUES")
-        issues = check_pubdev_lint_issues(project_dir)
-        if not issues:
-            print_success("No doc comment issues found.")
-            # fix_docs mode: nothing to fix, exit success
-            return ExitCode.SUCCESS.value
-        print_info(f"Found {len(issues)} issue(s):")
-        for issue in issues:
-            print_colored(f"      {issue}", Color.YELLOW)
-        fixed_brackets = fix_doc_angle_brackets(project_dir)
-        fixed_refs = fix_doc_references(project_dir)
-        total_fixed = fixed_brackets + fixed_refs
-        if total_fixed:  # Some issues were auto-fixable
-            print_success(
-                f"Fixed {total_fixed} issue(s) "
-                f"({fixed_brackets} angle bracket(s), "
-                f"{fixed_refs} doc reference(s))."
-            )
-        else:
-            print_warning("No auto-fixable issues found.")
-        # fix_docs mode: done (fixed or not), exit success
-        return ExitCode.SUCCESS.value
-
-    # --- Show package info (name, current version, branch, rule/category counts) ---
-    # Fields used for banner, version prompt, and release
-    package_name = get_package_name(pubspec_path)
-    pubspec_version = get_version_from_pubspec(pubspec_path)
-    branch = get_current_branch(project_dir)
-    remote_url = get_remote_url(project_dir)
-    rule_count = count_rules(project_dir)
-    category_count = count_categories(project_dir)
-
-    print_header(f"SAROPA LINTS PUBLISHER v{SCRIPT_VERSION}")
-    print_colored("  Package Information:", Color.WHITE)
-    print_colored(f"      Name:       {package_name}", Color.CYAN)
-    print_colored(f"      Current:    {pubspec_version}", Color.CYAN)
-    print_colored(f"      Branch:     {branch}", Color.CYAN)
-    print_colored(f"      Repository: {remote_url}", Color.CYAN)
-    print_colored(
-        f"      Rules:      {rule_count} in {category_count} categories",
-        Color.CYAN,
+    ctx = _PublishContext(
+        project_dir=project_dir,
+        pubspec_path=pubspec_path,
+        changelog_path=changelog_path,
+        bugs_dir=bugs_dir,
+        package_name=get_package_name(pubspec_path),
+        pubspec_version=get_version_from_pubspec(pubspec_path),
+        branch=get_current_branch(project_dir),
+        remote_url=get_remote_url(project_dir),
+        rule_count=count_rules(project_dir),
+        category_count=count_categories(project_dir),
     )
-    print()
+    _print_package_banner(ctx)
 
-    display_changelog(project_dir)
-    display_test_coverage(project_dir)
-    todo_log = display_roadmap_summary(project_dir, bugs_dir=bugs_dir)
-    if todo_log:
-        print_info(f"TODO log: {todo_log.relative_to(project_dir)}")
-
-    # --- Timed workflow: audit (optional), then prerequisites → format → analysis → tests ---
-    # Fields: mode flags, timer, exit code, version/release_notes (set later), success flag
     audit_only = mode == "audit_only"
     skip_audit = mode == "full_skip_audit"
     timer = StepTimer()
     exit_code = ExitCode.SUCCESS.value
-    version = pubspec_version
+    version = ctx.pubspec_version
     release_notes = ""
     succeeded = False
     extension_published = False
 
     try:
-        # --- Step 1: Pre-publish audits (tier integrity, duplicates, DX; skip if full_skip_audit) ---
-        if not skip_audit:
-            # Timed step: run tier integrity, duplicates, DX checks; retry if prefix fix applied
-            with timer.step("Pre-publish audit"):
-                print_header("STEP 1: AUDIT")
-                # audit_ok: True if all checks passed; audit_result: details for auto-fix or error
-                audit_ok, audit_result = run_pre_publish_audits(project_dir)
-                while not audit_ok and audit_result:
-                    rules_dir = project_dir / "lib" / "src" / "rules"
-                    missing_prefix = getattr(
-                        audit_result, "rules_missing_prefix", None
-                    )
-                    if missing_prefix:
-                        # Lazy import: fix missing [rule_name] prefix in rule problem messages
-                        from scripts.modules._audit_checks import fix_missing_prefix
-
-                        n = fix_missing_prefix(rules_dir)
-                        if n:
-                            print_success(
-                                f"Added [rule_name] prefix to {n} rule(s)."
-                            )
-                            print_info("Re-running audit...")
-                            audit_ok, audit_result = run_pre_publish_audits(
-                                project_dir
-                            )
-                            if audit_ok:
-                                break
-                            continue
-                    # No auto-fix (e.g. tier/duplicate error): show message and exit
-                    exit_with_error(
-                        _AUDIT_FAILED_MSG,
-                        ExitCode.AUDIT_FAILED,
-                    )
-                if not audit_ok:
-                    exit_with_error(_AUDIT_FAILED_MSG, ExitCode.AUDIT_FAILED)
-
-            if audit_only:
-                print_success("Audit-only run complete (no format/analysis/tests).")
-                succeeded = True
-                # Audit-only: stop here, do not run format/analysis/tests
-                return ExitCode.SUCCESS.value
-
-            # Gate: user must confirm before format/analysis/tests (commented out)
-            # print()
-            # response = (
-            #     input(
-            #         "  Audit step done. Continue to format, analysis, and tests? [Y/n] "
-            #     )
-            #     .strip()
-            #     .lower()
-            # )
-            # if response.startswith("n"):  # User declined to continue
-            #     print_warning("Publish canceled by user.")
-            #     return ExitCode.USER_CANCELED.value
-        elif audit_only:
-            # audit_only but skip_audit was true (invalid combination)
-            return ExitCode.USER_CANCELED.value
-
-        if skip_audit:
-            print_warning("Audit skipped (publish without audit).")
-
-        # --- Steps 2-7: Pre-publish analysis workflow ---
-        # Timed step: ensure flutter, git, gh are available
-        with timer.step("Prerequisites"):
-            if not check_prerequisites():  # Missing required tool
-                exit_with_error(
-                    "Prerequisites failed",
-                    ExitCode.PREREQUISITES_FAILED,
-                )
-
-        # Timed step: ensure working tree clean or user confirms uncommitted changes
-        with timer.step("Working tree"):
-            # ok: True if clean or user chose to continue with changes
-            ok, _ = check_working_tree(project_dir)
-            if not ok:
-                exit_with_error("Aborted.", ExitCode.USER_CANCELED)
-
-        # Timed step: ensure local branch is in sync with remote
-        with timer.step("Remote sync"):
-            if not check_remote_sync(project_dir, branch):  # Sync failed
-                exit_with_error(
-                    "Remote sync failed",
-                    ExitCode.WORKING_TREE_FAILED,
-                )
-
-        # Timed step: commit and push publish workflow if changed (so tag sees it; no manual git)
-        with timer.step("Publish workflow"):
-            if not ensure_publish_workflow_committed(project_dir, branch):
-                exit_with_error(
-                    "Failed to commit/push .github/workflows/publish.yml",
-                    ExitCode.GIT_FAILED,
-                )
-
-        # Format and analyze before tests: fail fast on analysis without
-        # running 7k+ tests (which can fill temp and fail with disk space errors).
-        # Timed step: run dart format on project
-        with timer.step("Format"):
-            if not run_format(project_dir):  # Format error
-                exit_with_error(
-                    "Formatting failed.", ExitCode.VALIDATION_FAILED,
-                )
-
-        # Timed step: run dart analyze --fatal-infos
-        with timer.step("Analysis"):
-            if not run_analysis(project_dir):  # Analysis error
-                exit_with_error(
-                    "Analysis failed.", ExitCode.ANALYSIS_FAILED,
-                )
-
-        # Timed step: run dart test
-        with timer.step("Tests"):
-            if not run_tests(project_dir):  # Test failure
-                exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
-
-        # --- Step 8: Version prompt (interactive; suggest next patch if current tag exists) ---
-        print_header("VERSION")
-        if tag_exists_on_remote(project_dir, f"v{pubspec_version}"):
-            default_version = increment_version(pubspec_version)
-        else:
-            default_version = pubspec_version
-
-        while True:
-            # Accept only semver (X.Y.Z or X.Y.Z-pre.N)
-            version = _prompt_version(default_version)
-            if re.match(rf"^{_VERSION_RE}$", version):  # Valid semver
-                break
-            print_warning(  # Invalid format — prompt again
-                f"Invalid version format '{version}'. "
-                f"Use X.Y.Z or X.Y.Z-pre.N"
-            )
-
-        # Timed step: write version to pubspec, rename [Unreleased] in CHANGELOG, reconcile versions
-        with timer.step("Version sync"):
-            # Align pubspec and CHANGELOG: update pubspec if needed, then rename [Unreleased] → [version]
-            # version_to_sync: may be re-prompted if CHANGELOG has duplicate version sections
-            version_to_sync = version
-            while True:
-                if version_to_sync != pubspec_version:
-                    set_version_in_pubspec(pubspec_path, version_to_sync)
-                    print_success(f"Updated pubspec.yaml to {version_to_sync}")
-
-                try:
-                    # Rename [Unreleased] to [version_to_sync] in CHANGELOG
-                    if rename_unreleased_to_version(
-                        changelog_path, version_to_sync
-                    ):
-                        print_success(
-                            f"Renamed [Unreleased] to [{version_to_sync}] "
-                            f"in CHANGELOG.md"
-                        )
-                    break
-                except ValueError as exc:
-                    # CHANGELOG already has both [Unreleased] and [version]: prompt for which version to use
-                    suggested = increment_version(version_to_sync)
-                    print_warning(str(exc))
-                    print_colored(
-                        f"  Suggested version: {suggested} "
-                        f"(press Enter or edit)",
-                        Color.CYAN,
-                    )
-                    version_to_sync = _prompt_version(suggested)
-                    if not re.match(rf"^{_VERSION_RE}$", version_to_sync):
-                        print_warning(
-                            f"Invalid version format '{version_to_sync}'. "
-                            f"Use X.Y.Z or X.Y.Z-pre.N"
-                        )
-                        continue
-            # Use synced version for rest of workflow
-            version = version_to_sync
-
-            # Ensure pubspec and CHANGELOG agree (reconcile or add section if needed)
-            # changelog_version: latest version heading found in CHANGELOG
-            changelog_version = get_latest_changelog_version(
-                changelog_path,
-            )
-            if changelog_version is None:  # No version found in CHANGELOG
-                exit_with_error(
-                    "Could not extract version from CHANGELOG.md",
-                    ExitCode.CHANGELOG_FAILED,
-                )
-            if version != changelog_version:
-                if parse_version(version) < parse_version(changelog_version):
-                    # Pubspec behind CHANGELOG: update pubspec to match
-                    print_warning(
-                        f"pubspec version ({version}) is behind "
-                        f"CHANGELOG ({changelog_version}). "
-                        f"Updating pubspec..."
-                    )
-                    set_version_in_pubspec(
-                        pubspec_path, changelog_version,
-                    )
-                    version = changelog_version
-                    print_success(
-                        f"Updated pubspec.yaml to {version}"
-                    )
-                else:
-                    # Pubspec ahead of CHANGELOG: offer to add [version] section
-                    print_warning(
-                        f"pubspec version ({version}) is ahead "
-                        f"of CHANGELOG ({changelog_version})."
-                    )
-                    response = (
-                        input(
-                            f"  Add a [{version}] section to "
-                            f"CHANGELOG.md? [Y/n] "
-                        )
-                        .strip()
-                        .lower()
-                    )
-                    if response.startswith("n"):  # User wants manual fix
-                        exit_with_error(
-                            "Publish canceled — update "
-                            "CHANGELOG.md manually.",
-                            ExitCode.CHANGELOG_FAILED,
-                        )
-                    add_version_section(
-                        changelog_path, version, "Version bump",
-                    )
-                    print_success(
-                        f"Added [{version}] section to "
-                        f"CHANGELOG.md"
-                    )
-
-            # If version already published, auto-bump pubspec and add release note to CHANGELOG
-            tag_name = f"v{version}"
-            if tag_exists_on_remote(project_dir, tag_name):
-                next_version = increment_version(version)
-                print_warning(
-                    f"Tag {tag_name} already exists on remote. "
-                    f"Version {version} has already been published."
-                )
-                print_info(
-                    f"Bumping to {next_version} and adding CHANGELOG section."
-                )
-                set_version_in_pubspec(pubspec_path, next_version)
-                add_version_section(
-                    changelog_path, next_version, "Release version",
-                )
-                version = next_version
-                print_success(
-                    f"Updated pubspec.yaml to {version} and added "
-                    f"[{version}] to CHANGELOG.md (Release version)."
-                )
-
-        print_colored(
-            f"      Publishing: {version}", Color.CYAN,
+        code = _run_audit_step(
+            ctx.project_dir, skip_audit, audit_only, timer,
         )
+        if code is not None:
+            return code
+
+        _run_pre_publish_pipeline(
+            ctx.project_dir, ctx.branch, timer,
+        )
+
+        print_header("VERSION")
+        default_version = (
+            increment_version(ctx.pubspec_version)
+            if tag_exists_on_remote(
+                ctx.project_dir, f"v{ctx.pubspec_version}",
+            )
+            else ctx.pubspec_version
+        )
+        version = _prompt_version_until_valid(default_version)
+        with timer.step("Version sync"):
+            version = _sync_version_with_changelog(
+                ctx.project_dir,
+                ctx.pubspec_path,
+                ctx.changelog_path,
+                ctx.pubspec_version,
+                version,
+            )
+
+        print_colored(f"      Publishing: {version}", Color.CYAN)
         print_colored(f"      Tag:        v{version}", Color.CYAN)
-        # Keep extension version in sync with package version
-        if extension_exists(project_dir):
-            set_extension_version(project_dir, version)
+        if extension_exists(ctx.project_dir):
+            set_extension_version(ctx.project_dir, version)
         print()
 
-        # --- Steps 9-11: Badge sync, CHANGELOG validation, doc generation, dry-run ---
-        # Timed step: update README badges with version and rule count
-        with timer.step("Badge sync"):
-            sync_readme_badges(project_dir, version, rule_count)
-
-        # Timed step: ensure CHANGELOG has entry for this version and extract release notes
-        with timer.step("CHANGELOG validation"):
-            # ok: version present and valid; release_notes: body for GitHub release
-            ok, release_notes = validate_changelog(
-                project_dir, version,
-            )
-            if not ok:
-                exit_with_error(
-                    "CHANGELOG failed",                     ExitCode.CHANGELOG_FAILED,
-                )
-
-        # Timed step: generate API docs (dart doc)
-        with timer.step("Docs"):
-            if not generate_docs(project_dir):  # Doc generation error
-                exit_with_error(
-                    "Docs failed",                     ExitCode.VALIDATION_FAILED,
-                )
-
-        # Timed step: dart pub publish --dry-run to catch pub.dev issues
-        with timer.step("Pre-publish validation"):
-            if not pre_publish_validation(project_dir):  # Would fail on pub.dev
-                exit_with_error(
-                    "Validation failed", ExitCode.VALIDATION_FAILED,
-                )
-
-        # --- Re-run analysis after version bump so we don't tag a broken build ---
-        # Timed step: re-run analysis after version changes; abort if it fails
-        with timer.step("Final CI gate"):
-            print_header("FINAL CI GATE")
-            print_info(
-                "Re-running CI checks after version changes to "
-                "prevent burning a tag on a broken build..."
-            )
-            if not run_analysis(project_dir):  # Post-bump analysis failure
-                exit_with_error(
-                    "Final CI gate failed \u2014 aborting before "
-                    "tag creation. Fix analysis issues and re-run.",
-                    ExitCode.ANALYSIS_FAILED,
-                )
-            print_success("CI gate passed \u2014 safe to create tag")
-
-        # --- Commit and push versioned files, then tag, publish to pub.dev, create GitHub release ---
-        # Timed step: stage all changes, commit, push to remote
-        with timer.step("Git commit & push"):
-            if not git_commit_and_push(
-                project_dir, version, branch,
-            ):
-                exit_with_error(
-                    "Git operations failed", ExitCode.GIT_FAILED,
-                )
-
-        # --- Optionally re-trigger CI if workflow failed (e.g. flaky check) ---
-        # Timed step: optionally re-run failed GitHub Actions workflow
-        with timer.step("CI status"):
-            # Lazy import: prompt to re-run failed GitHub Actions workflow
-            from scripts.modules._retrigger_ci import offer_retrigger_ci
-
-            offer_retrigger_ci(limit=10)
-
-        # Timed step: create git tag vX.Y.Z
-        with timer.step("Git tag"):
-            if not create_git_tag(project_dir, version):
-                exit_with_error(
-                    "Git tag failed",                     ExitCode.GIT_FAILED,
-                )
-
-        # Timed step: publish package to pub.dev (dart pub publish)
-        with timer.step("Publish"):
-            if not publish_to_pubdev_step(project_dir, version):
-                exit_with_error(
-                    "Publish failed",                     ExitCode.PUBLISH_FAILED,
-                )
-
-        # Timed step: create GitHub release with notes from CHANGELOG
-        with timer.step("GitHub release"):
-            # gh_success: True if release created; gh_error: message on failure
-            gh_success, gh_error = create_github_release(
-                project_dir, version, release_notes,
-            )
-            if not gh_success:
-                exit_with_error(
-                    f"GitHub release failed: {gh_error}",
-                    ExitCode.GITHUB_RELEASE_FAILED,
-                )
-
-        # Mark success so final banner is printed and exit code stays 0
+        release_notes = _run_badge_validation_docs_dryrun(
+            ctx.project_dir, version, ctx.rule_count, timer,
+        )
+        _run_final_ci_gate(ctx.project_dir, timer)
+        _run_commit_tag_publish_release(
+            ctx.project_dir, version, ctx.branch, release_notes, timer,
+        )
         succeeded = True
 
-        # --- Bump pubspec for next cycle; commit if possible ---
-        try:
-            # Timed step: bump pubspec to next version, commit
-            with timer.step("Version bump"):
-                next_version = increment_version(version)
-                set_version_in_pubspec(pubspec_path, next_version)
-                # Sync analysis_options.yaml plugin version to the
-                # just-published version so dart analyze can resolve
-                # the plugin from pub.dev (not the unpublished next_version).
-                update_analysis_options_plugin_version(
-                    project_dir, package_name, version,
-                )
-                if post_publish_commit(project_dir, next_version, branch):
-                    print_success(
-                        f"Bumped to {next_version}"
-                    )
-                else:  # Commit failed (non-fatal)
-                    print_warning(
-                        f"Version bump to {next_version} "
-                        f"not committed \u2014 commit manually"
-                    )
-        except Exception as exc:
-            print_warning(f"Post-publish version bump failed: {exc}")
+        _run_version_bump(
+            ctx.project_dir,
+            ctx.pubspec_path,
+            ctx.package_name,
+            version,
+            ctx.branch,
+            timer,
+        )
+        extension_published = _run_extension_after_publish(
+            ctx.project_dir, version, timer,
+        )
 
-        # --- Extension: package .vsix and optionally publish (runs after package publish so versions stay aligned) ---
-        extension_published = False
-        if extension_exists(project_dir):
-            with timer.step("Extension"):
-                vsix = package_extension(project_dir, version)
-                if vsix:
-                    # Install locally (default yes)
-                    response = (
-                        input("  Install extension locally? [Y/n] ")
-                        .strip()
-                        .lower()
-                    )
-                    if not response.startswith("n"):
-                        install_extension(vsix)
-                    # Publish to stores (default yes — too easy to
-                    # accidentally skip and leave the Marketplace stale).
-                    response = (
-                        input(
-                            "  Publish extension to Marketplace and Open VSX? [Y/n] "
-                        )
-                        .strip()
-                        .lower()
-                    )
-                    if response.startswith("n"):
-                        print_warning(
-                            "Extension NOT published to Marketplace. "
-                            "Run option 6 (extension only) to publish later."
-                        )
-                    else:
-                        if publish_extension(project_dir, vsix):
-                            extension_published = True
-                        else:
-                            print_warning(
-                                "Extension publish to Marketplace/Open VSX failed. "
-                                "Check output above for details."
-                            )
-                else:
-                    print_warning(
-                        "Extension packaging failed — .vsix was not created. "
-                        "Check compile errors above."
-                    )
-
-        # --- Post-publish: open pub.dev page (convenience) ---
         try:
             webbrowser.open(
-                f"https://pub.dev/packages/{package_name}",
+                f"https://pub.dev/packages/{ctx.package_name}",
             )
         except Exception:
-            pass  # Browser open is non-critical
-
-    except SystemExit as exc:
-        # Capture exit code from exit_with_error() or sys.exit() for final return
-        exit_code = exc.code if isinstance(exc.code, int) else 1
+            pass
 
     finally:
-        # Always print step timing summary
         timer.print_summary()
 
     if succeeded:
-        # Show success banner with package/release/store links and pubspec snippet
-        repo_path = extract_repo_path(remote_url)
-        publisher, ext_name = _get_extension_identity(project_dir)
+        repo_path = extract_repo_path(ctx.remote_url)
+        publisher, ext_name = _get_extension_identity(ctx.project_dir)
         _print_success_banner(
-            package_name, version, repo_path, publisher, ext_name,
+            ctx.package_name,
+            version,
+            repo_path,
+            publisher,
+            ext_name,
             extension_published,
         )
-
-    # Return 0 on success, or the exit code set by exit_with_error()
+    # On success we return 0; exit_with_error() raises SystemExit and never returns here.
     return exit_code
 
 

@@ -29,6 +29,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Changed
 
+• **Scripts** — `publish.py` main workflow refactored into smaller helpers (`_PublishContext`, `_run_audit_step`, `_run_pre_publish_pipeline`, `_run_badge_validation_docs_dryrun`, etc.) to reduce cognitive complexity; behavior unchanged. Extension install/publish prompts centralized in `_prompt_extension_install_and_publish`. Main docstring documents flow for reviewers. `SystemExit` from `exit_with_error()` is caught so `finally` (timer summary) runs and the intended exit code is returned.
+
 • **Scripts** — Version prompt in `publish.py` refactored into smaller helpers (`_handle_win_key`, `_prompt_version_windows`, `_prompt_version_unix`) to satisfy cognitive complexity limits; behavior unchanged.
 
 • **Extension** — First-run notification: score qualifier uses an if/else chain instead of a nested ternary (lint compliance, readability).
