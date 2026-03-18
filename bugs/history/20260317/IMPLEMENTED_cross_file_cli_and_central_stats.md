@@ -21,3 +21,15 @@
 5. **README** — Cross-file section expanded: `--exclude` (reserved) in options, JSON-to-file example, link to CI example doc.
 
 6. **GitHub Actions example** — `doc/cross_file_ci_example.md`: copy-paste workflow that runs `unused-files` and `circular-deps`, with optional JSON output and artifact upload. README links to it.
+
+---
+
+## Remaining plans (all four implemented)
+
+7. **Cross-file analyzer** — Already implemented: `lib/src/cli/cross_file_analyzer.dart` used by the CLI.
+
+8. **Unit tests** — Fixture at `test/fixtures/cross_file_fixture/` (orphan + cycle a→b→c→a). Tests assert one unused file (orphan.dart), one cycle, 4 files and 3 imports. Path normalization in `ImportGraphCache._parseImports` for consistent graph keys on Windows.
+
+9. **Baseline** — `lib/src/cli/cross_file_baseline.dart`: load/save JSON (unusedFiles, circularDependencies). CLI: `--baseline <file>`, `--update-baseline`. Exit 0 when no new violations vs baseline.
+
+10. **HTML report** — `lib/src/cli/cross_file_html_reporter.dart` and `report` command. `--output-dir` (default reports). Writes index.html, unused-files.html, circular-deps.html.

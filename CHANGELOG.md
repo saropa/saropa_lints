@@ -29,7 +29,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Added
 
-• **Cross-file analysis CLI** — New `cross_file` executable: `dart run saropa_lints:cross_file <command>` with commands `unused-files`, `circular-deps`, `import-stats`. Builds the import graph from `lib/`, reports files with no importers, circular import chains, and graph statistics. Output format text (default) or JSON; exit codes 0 (no issues), 1 (issues found), 2 (error). README documents options and JSON-to-file example; [doc/cross_file_ci_example.md](doc/cross_file_ci_example.md) provides a copy-paste GitHub Actions workflow for CI. See [ROADMAP Part 3](ROADMAP.md) and `bugs/plan/`.
+• **Cross-file analysis CLI** — New `cross_file` executable: `dart run saropa_lints:cross_file <command>` with commands `unused-files`, `circular-deps`, `import-stats`, and `report`. Builds the import graph from `lib/`, reports files with no importers, circular import chains, and graph statistics. Output: text (default), JSON, or HTML via `report --output-dir`. Baseline: `--baseline <file>` and `--update-baseline` to suppress known issues and fail only on new violations. Exit codes 0/1/2. README and [doc/cross_file_ci_example.md](doc/cross_file_ci_example.md) for CI. See [ROADMAP Part 3](ROADMAP.md).
 
 • **Central cache stats** — `CacheStatsAggregator.getStats()` returns a single map aggregating statistics from all project caches (import graph, throttle, speculative, rule batch, baseline, semantic, etc.) for debugging and monitoring.
 

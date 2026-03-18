@@ -16,6 +16,8 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/cross_file_analyzer.dart';
+import 'package:saropa_lints/src/cli/cross_file_baseline.dart';
+import 'package:saropa_lints/src/cli/cross_file_html_reporter.dart';
 import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
 
 Future<void> main(List<String> args) async {
@@ -31,6 +33,9 @@ Future<int> _run(List<String> args) async {
 
   String projectPath = p.current;
   String outputFormat = 'text';
+  String? outputDir;
+  String? baselinePath;
+  bool updateBaseline = false;
   final excludes = <String>[];
 
   var i = 0;
@@ -40,6 +45,12 @@ Future<int> _run(List<String> args) async {
       projectPath = args[++i];
     } else if (arg == '--output' && i + 1 < args.length) {
       outputFormat = args[++i];
+    } else if (arg == '--output-dir' && i + 1 < args.length) {
+      outputDir = args[++i];
+    } else if (arg == '--baseline' && i + 1 < args.length) {
+      baselinePath = args[++i];
+    } else if (arg == '--update-baseline') {
+      updateBaseline = true;
     } else if (arg == '--exclude' && i + 1 < args.length) {
       excludes.add(args[++i]);
     } else if (!arg.startsWith('-')) {
@@ -56,7 +67,7 @@ Future<int> _run(List<String> args) async {
   }
 
   final command = rest.first;
-  final validCommands = ['unused-files', 'circular-deps', 'import-stats'];
+  final validCommands = ['unused-files', 'circular-deps', 'import-stats', 'report'];
   if (!validCommands.contains(command)) {
     print('Error: unknown command "$command".');
     _printUsage();
@@ -83,7 +94,36 @@ Future<int> _run(List<String> args) async {
     return 2;
   }
 
+  if (updateBaseline) {
+    final path = baselinePath ?? 'cross_file_baseline.json';
+    CrossFileBaseline(
+      unusedFiles: result.unusedFiles,
+      circularDependencies: result.circularDependencies,
+    ).save(path);
+    stderr.writeln('Baseline written to $path');
+    return 0;
+  }
+
+  if (command == 'report') {
+    String dir = outputDir ?? 'reports';
+    final outputDirIdx = rest.indexOf('--output-dir');
+    if (outputDirIdx >= 0 && outputDirIdx + 1 < rest.length) {
+      dir = rest[outputDirIdx + 1];
+    }
+    reportToHtml(result, dir);
+    stderr.writeln('HTML report written to $dir/');
+    return 0;
+  }
+
   CrossFileReporter.report(result, format: outputFormat, sink: stdout);
+
+  if (baselinePath != null) {
+    final base = CrossFileBaseline.load(baselinePath);
+    if (CrossFileBaseline.hasNewViolations(result, base)) {
+      return 1;
+    }
+    return 0;
+  }
 
   final hasIssues = result.unusedFiles.isNotEmpty ||
       result.circularDependencies.isNotEmpty;
@@ -100,12 +140,16 @@ Commands:
   unused-files   Find files not imported by any other file
   circular-deps  Detect circular import chains
   import-stats   Show import graph statistics
+  report         Write HTML report (use --output-dir)
 
 Options:
-  --path <dir>     Project directory (default: current)
-  --output <fmt>   Output format: text, json (default: text)
-  --exclude <glob> Reserved for future use (can repeat)
-  -h, --help       Show this help
+  --path <dir>         Project directory (default: current)
+  --output <fmt>       Output format: text, json (default: text)
+  --output-dir <path>  For report: directory for HTML output (default: reports)
+  --baseline <file>    Load baseline JSON; exit 0 only if no new violations
+  --update-baseline    Write current results to baseline file (default: cross_file_baseline.json)
+  --exclude <glob>     Reserved for future use (can repeat)
+  -h, --help           Show this help
 
 Exit codes: 0 = no issues, 1 = issues found, 2 = configuration error
 ''');

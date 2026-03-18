@@ -101,6 +101,7 @@ class ImportGraphCache {
   /// Parse imports from a single file.
   static void _parseImports(String filePath) {
     try {
+      filePath = p.normalize(filePath).replaceAll('\\', '/');
       final file = File(filePath);
       if (!file.existsSync()) return;
 

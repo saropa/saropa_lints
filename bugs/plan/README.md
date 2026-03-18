@@ -1,14 +1,20 @@
 # Plan files (⭐ next in line)
 
-Plans in this folder correspond to the **10 easiest / next-in-line** items marked with ⭐ in [ROADMAP.md](../../ROADMAP.md).
+Plans in this folder corresponded to the **10 easiest / next-in-line** items marked with ⭐ in [ROADMAP.md](../../ROADMAP.md).
 
-**Implemented and moved to history:** Cross-file CLI entry point, reporter, Central Stats Aggregator, CI exit codes, README usage, GitHub Actions example → [bugs/history/20260317/](../history/20260317/IMPLEMENTED_cross_file_cli_and_central_stats.md).
+**All 10 plans implemented and moved to history:** [bugs/history/20260317/](../history/20260317/IMPLEMENTED_cross_file_cli_and_central_stats.md).
 
-| Plan | ROADMAP section |
-|------|------------------|
-| [plan_cross_file_analyzer.md](plan_cross_file_analyzer.md) | Part 3 Phase 1 — Analysis logic (implemented with CLI) |
-| [plan_cross_file_unit_tests.md](plan_cross_file_unit_tests.md) | Part 3 Phase 1 — Unit tests |
-| [plan_cross_file_html_report.md](plan_cross_file_html_report.md) | Part 3 Phase 3 — HTML reports |
-| [plan_cross_file_baseline.md](plan_cross_file_baseline.md) | Part 3 Phase 3 — Baseline integration |
+| Implemented plan | Section |
+|------------------|---------|
+| plan_cross_file_cli_entry_point | Part 3 Phase 1 |
+| plan_cross_file_analyzer | Part 3 Phase 1 |
+| plan_cross_file_reporter | Part 3 Phase 1 |
+| plan_cross_file_unit_tests | Part 3 Phase 1 |
+| plan_cross_file_readme | Part 3 Phase 1 |
+| plan_central_stats_aggregator | Part 2 Future Optimizations |
+| plan_cross_file_html_report | Part 3 Phase 3 |
+| plan_cross_file_baseline | Part 3 Phase 3 |
+| plan_cross_file_ci_exit_codes | Part 3 Phase 3 |
+| plan_cross_file_github_actions | Part 3 Phase 3 |
 
-Each plan includes summary, scope, acceptance criteria, and dependencies.
+No remaining plans in this folder. See [ROADMAP.md](../../ROADMAP.md) for other planned work.
