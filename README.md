@@ -626,12 +626,16 @@ Find unused files and circular import chains (no IDE integration; CLI only):
 dart run saropa_lints:cross_file unused-files   # Files not imported by any other file
 dart run saropa_lints:cross_file circular-deps  # Circular import chains
 dart run saropa_lints:cross_file import-stats   # Import graph statistics
+dart run saropa_lints:cross_file report         # HTML report (default: reports/)
 dart run saropa_lints:cross_file --help
 # JSON output to file (e.g. for CI or tooling)
 dart run saropa_lints:cross_file unused-files --output json > unused.json
+# Baseline: suppress known issues, fail only on new violations
+dart run saropa_lints:cross_file unused-files --baseline cross_file_baseline.json
+dart run saropa_lints:cross_file unused-files --update-baseline
 ```
 
-Options: `--path <dir>`, `--output text|json`, `--exclude <glob>` (reserved). Exit codes: 0 = no issues, 1 = issues found, 2 = error. [Example GitHub Actions workflow](doc/cross_file_ci_example.md) for CI. See [ROADMAP Part 3](ROADMAP.md).
+Options: `--path <dir>`, `--output text|json`, `--output-dir <path>` (for report), `--baseline <file>`, `--update-baseline`, `--exclude <glob>` (reserved). Exit codes: 0 = no issues, 1 = issues found, 2 = error. [Example GitHub Actions workflow](doc/cross_file_ci_example.md) for CI. See [ROADMAP Part 3](ROADMAP.md).
 
 ### Standalone Scanner
 
