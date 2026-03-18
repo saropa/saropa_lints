@@ -279,6 +279,11 @@
         "icon": "$(clippy)"
       },
       {
+        "command": "saropaLints.explainRule",
+        "title": "Explain rule",
+        "icon": "$(book)"
+      },
+      {
         "command": "saropaLints.applyFix",
         "title": "Apply fix",
         "icon": "$(wrench)",
@@ -807,14 +812,19 @@
           "when": "view == saropaLints.issues && viewItem == file"
         },
         {
-          "command": "saropaLints.applyFix",
+          "command": "saropaLints.explainRule",
           "when": "view == saropaLints.issues && viewItem =~ /^violation/",
           "group": "1_actions@1"
         },
         {
-          "command": "saropaLints.copyMessage",
+          "command": "saropaLints.applyFix",
           "when": "view == saropaLints.issues && viewItem =~ /^violation/",
           "group": "1_actions@2"
+        },
+        {
+          "command": "saropaLints.copyMessage",
+          "when": "view == saropaLints.issues && viewItem =~ /^violation/",
+          "group": "1_actions@3"
         },
         {
           "command": "saropaLints.hideRule",

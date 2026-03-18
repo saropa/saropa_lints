@@ -19,7 +19,7 @@ import {
   TIER_ORDER,
 } from './setup';
 import { invalidateCodeLenses, registerCodeLensProvider } from './codeLensProvider';
-import { IssuesTreeProvider, registerIssueCommands } from './views/issuesTree';
+import { IssuesTreeProvider, registerIssueCommands, type IssueTreeNode } from './views/issuesTree';
 import { OverviewTreeProvider } from './views/overviewTree';
 import { SummaryTreeProvider } from './views/summaryTree';
 import { ConfigTreeProvider } from './views/configTree';
@@ -27,6 +27,7 @@ import { SuggestionsTreeProvider } from './views/suggestionsTree';
 import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
 import { showAboutPanel } from './views/aboutView';
+import { openRuleExplainPanelForViolation, openRuleExplainPanel } from './views/ruleExplainView';
 import { readViolations, ViolationsData } from './violationsReader';
 import { hasSaropaLintsDep } from './pubspecReader';
 import { appendSnapshot, loadHistory, findPreviousScore, detectThresholdCrossing } from './runHistory';
@@ -569,6 +570,35 @@ export function activate(context: vscode.ExtensionContext): void {
         void vscode.commands.executeCommand('saropaLints.issues.focus');
       }),
     ),
+    vscode.commands.registerCommand('saropaLints.explainRule', (arg: unknown) => {
+      const node = arg as IssueTreeNode | undefined;
+      if (node?.kind === 'violation' && 'violation' in node) {
+        openRuleExplainPanelForViolation(node.violation);
+        return;
+      }
+      const root = getProjectRoot();
+      if (!root) {
+        void vscode.window.showInformationMessage('Open a workspace folder first.');
+        return;
+      }
+      const data = readViolations(root);
+      const violations = data?.violations ?? [];
+      if (violations.length === 0) {
+        void vscode.window.showInformationMessage('No violations in current data. Run analysis first.');
+        return;
+      }
+      const ruleNames = [...new Set(violations.map((v) => v.rule))].sort((a, b) => a.localeCompare(b));
+      void vscode.window.showQuickPick(ruleNames, {
+        title: 'Explain rule',
+        placeHolder: 'Select a rule to view details',
+        matchOnDescription: true,
+      }).then((selected) => {
+        if (!selected) return;
+        const first = violations.find((v) => v.rule === selected);
+        if (first) openRuleExplainPanelForViolation(first);
+        else openRuleExplainPanel({ ruleName: selected });
+      });
+    }),
     vscode.commands.registerCommand('saropaLints.showOutput', showOutputChannel),
     // D2: Export OWASP Compliance Report as markdown.
     vscode.commands.registerCommand('saropaLints.exportOwaspReport', async () => {

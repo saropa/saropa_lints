@@ -39,7 +39,8 @@ The Issues view shows violations in a **tree**: first by **severity** (Error, Wa
 - **Filters (toolbar):** Filter by text (file path, rule, or message), Filter by type (severity and impact), Filter by rule (multi-select). When active, the view shows “Showing X of Y”.
 - **Suppressions:** Right-click a folder, file, violation, or severity node to hide it from the tree (e.g. “Hide folder”, “Hide rule”). Suppressions are persisted; use **Clear suppressions** in the toolbar to restore all.
 - **Code Lens:** In Dart files that have violations, a lens at the top shows e.g. “Saropa Lints: 3 issues — Show in Saropa”. Click to open the Issues view filtered to that file.
-- **Context menus:** Apply fix (wrench icon) and Copy message (clipboard icon), then a separator, then hide options: Hide rule from view, Hide rule in this file. On folders/files: Hide folder, Hide file, Copy path; on files: Fix all in file, Show only this file. On severity nodes: Hide this severity.
+- **Context menus:** **Explain rule** (book icon) opens a side tab with full rule details; Apply fix (wrench icon) and Copy message (clipboard icon), then a separator, then hide options: Hide rule from view, Hide rule in this file. On folders/files: Hide folder, Hide file, Copy path; on files: Fix all in file, Show only this file. On severity nodes: Hide this severity.
+- **Explain rule:** Right-click a violation and choose **Explain rule** (or run **Saropa Lints: Explain rule** from the command palette and pick a rule) to open a tab beside your code with the rule’s problem message, how to fix, severity, impact, OWASP mapping (if any), and a link to the ROADMAP.
 - **Violation tooltips:** Show rule name and a “More” link to rule documentation (ROADMAP).
 - **Summary → Issues:** Click **Total violations** in the Summary view to open the Issues view with all issues (clears any active filters). By severity / By impact rows open Issues with the matching filter.
 - **Problems view:** Right-click a problem and choose **Saropa Lints: Show in Saropa Lints** to focus the Issues view filtered to the active file.
@@ -74,6 +75,7 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 - **Saropa Lints: Show All Issues** — Open Issues view and show all issues (clears filters). Used when clicking "Total violations" in Summary.
 - **Saropa Lints: Show in Saropa Lints** — Focus Issues view filtered to the active editor's file (e.g. from Problems view context menu or command palette).
 - **Group by…** — Change how the Issues tree is organized: Severity, File, Impact, Rule, or OWASP Category (view toolbar).
+- **Explain rule** — On a violation in the Issues tree (context menu) or from the command palette (pick a rule): open a side tab with full rule details (message, fix, severity, impact, OWASP, ROADMAP link).
 - **Apply fix** — On a violation in the Issues tree (context menu): run the Dart analyzer's quick fix for that location without opening the file.
 - **Fix all in this file** — On a file in the Issues tree (context menu): run all available quick fixes for that file bottom-up.
 
