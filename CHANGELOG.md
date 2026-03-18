@@ -29,6 +29,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Changed
 
+• **Scripts** — Version prompt in `publish.py` refactored into smaller helpers (`_handle_win_key`, `_prompt_version_windows`, `_prompt_version_unix`) to satisfy cognitive complexity limits; behavior unchanged.
+
 • **Extension** — First-run notification: score qualifier uses an if/else chain instead of a nested ternary (lint compliance, readability).
 
 ### Fixed

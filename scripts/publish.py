@@ -266,6 +266,66 @@ def _parse_output_level() -> OutputLevel:
 
 
 # cspell:ignore kbhit getwch
+# Version prompt split into helpers to keep cognitive complexity under limit (SonarQube).
+def _handle_win_key(
+    ch: str, buffer: list[str], default: str
+) -> tuple[str | None, bool]:
+    """Handle one Windows key; return (value to return or None, raise KeyboardInterrupt)."""
+    if ch in ("\r", "\n"):
+        return ("".join(buffer).strip() or default, False)
+    if ch == "\x08":  # Backspace
+        if buffer:
+            buffer.pop()
+            sys.stdout.write("\b \b")
+            sys.stdout.flush()
+        return (None, False)
+    if ch == "\x03":  # Ctrl+C
+        return (None, True)
+    if ch.isprintable():
+        buffer.append(ch)
+        sys.stdout.write(ch)
+        sys.stdout.flush()
+    return (None, False)
+
+
+def _prompt_version_windows(default: str, timeout: int) -> str:
+    """Windows: editable pre-filled prompt; return buffer or default on Enter/timeout."""
+    import msvcrt
+
+    sys.stdout.write(f"  Version to publish: {default}")
+    sys.stdout.flush()
+    buffer = list(default)
+    start = time.time()
+    while time.time() - start < timeout:
+        if not msvcrt.kbhit():
+            time.sleep(0.05)
+            continue
+        ch = msvcrt.getwch()
+        result, do_raise = _handle_win_key(ch, buffer, default)
+        if do_raise:
+            raise KeyboardInterrupt
+        if result is not None:
+            print()
+            return result
+        time.sleep(0.05)
+    print()
+    return "".join(buffer).strip() or default
+
+
+def _prompt_version_unix(default: str, timeout: int) -> str:
+    """Unix: readline with select-based timeout; [default] in brackets."""
+    import select
+
+    sys.stdout.write(f"  Version to publish [{default}]: ")
+    sys.stdout.flush()
+    ready, _, _ = select.select([sys.stdin], [], [], timeout)
+    if not ready:
+        print()
+        return default
+    user_input = sys.stdin.readline().strip()
+    return user_input if user_input else default
+
+
 def _prompt_version(default: str, timeout: int = 30) -> str:
     """Prompt for publish version with timeout.
 
@@ -274,49 +334,8 @@ def _prompt_version(default: str, timeout: int = 30) -> str:
     Returns the default after *timeout* seconds of inactivity.
     """
     if sys.platform == "win32":
-        # Windows: editable pre-filled prompt (no readline with prefill on Windows)
-        import msvcrt
-
-        sys.stdout.write(f"  Version to publish: {default}")
-        sys.stdout.flush()
-        buffer = list(default)
-        start = time.time()
-        while time.time() - start < timeout:
-            if msvcrt.kbhit():
-                ch = msvcrt.getwch()
-                if ch in ("\r", "\n"):
-                    print()
-                    # Enter: submit current buffer or default
-                    return "".join(buffer).strip() or default
-                if ch == "\x08":  # Backspace
-                    if buffer:
-                        buffer.pop()
-                        sys.stdout.write("\b \b")
-                        sys.stdout.flush()
-                elif ch == "\x03":  # Ctrl+C
-                    raise KeyboardInterrupt
-                elif ch.isprintable():
-                    buffer.append(ch)
-                    sys.stdout.write(ch)
-                    sys.stdout.flush()
-            time.sleep(0.05)
-        print()
-        # Timeout: submit current buffer or default
-        return "".join(buffer).strip() or default
-
-    # Unix: readline with select-based timeout; [default] shown in brackets
-    import select
-
-    sys.stdout.write(f"  Version to publish [{default}]: ")
-    sys.stdout.flush()
-    ready, _, _ = select.select([sys.stdin], [], [], timeout)
-    if ready:
-        user_input = sys.stdin.readline().strip()
-        # User entered something; use it or default
-        return user_input if user_input else default
-    print()
-    # Timeout: use default version
-    return default
+        return _prompt_version_windows(default, timeout)
+    return _prompt_version_unix(default, timeout)
 
 
 # =============================================================================
