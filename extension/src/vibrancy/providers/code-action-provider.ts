@@ -3,6 +3,13 @@ import { VibrancyResult, AlternativeSuggestion } from '../types';
 import { findKnownIssue, isReplacementPackageName } from '../scoring/known-issues';
 import { findOverrideRange } from '../services/override-parser';
 
+function getDiagnosticCode(diag: vscode.Diagnostic): string | number | undefined {
+    const c = diag.code;
+    if (c === undefined || c === null) { return c; }
+    if (typeof c === 'object' && 'value' in c) { return c.value; }
+    return c as string | number;
+}
+
 export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
     private _results = new Map<string, VibrancyResult>();
 
@@ -23,7 +30,12 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
 
         for (const diag of context.diagnostics) {
             if (diag.source !== 'Package Vibrancy') { continue; }
-            if (diag.code === 'vibrancy-summary') { continue; }
+            const code = getDiagnosticCode(diag);
+            if (code === 'vibrancy-summary') { continue; }
+            if (code === 'sdk-constraint') {
+                actions.push(...this.createSdkConstraintActions(document, diag));
+                continue;
+            }
 
             const packageName = document.getText(diag.range);
             const issue = findKnownIssue(packageName);
@@ -56,7 +68,7 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
                 actions.push(this.createSuppressAction(packageName, diag));
             }
 
-            if (diag.code === 'stale-override') {
+            if (code === 'stale-override') {
                 const removeAction = this._createRemoveOverrideAction(
                     document, packageName, diag,
                 );
@@ -84,6 +96,35 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
             arguments: [packageName],
         };
         return action;
+    }
+
+    /** Quick fixes for sdk-constraint: set Dart SDK minimum to >=3.10.0 (preferred) or >=3.9.0 (legacy). Only on sdk: line. */
+    private createSdkConstraintActions(
+        document: vscode.TextDocument,
+        diag: vscode.Diagnostic,
+    ): vscode.CodeAction[] {
+        const lineText = document.getText(document.lineAt(diag.range.start).range);
+        if (!lineText.includes('sdk:')) { return []; }
+        const current = document.getText(diag.range);
+        const upperMatch = current.match(/<\s*(\d+\.\d+\.\d+)/);
+        const upper = upperMatch ? ` <${upperMatch[1]}` : '';
+        const actions: vscode.CodeAction[] = [];
+        for (const [min, label, preferred] of [
+            ['>=3.10.0', 'Set Dart SDK to >=3.10.0', true],
+            ['>=3.9.0', 'Set Dart SDK to >=3.9.0 (legacy support)', false],
+        ] as const) {
+            const replacement = min + upper;
+            const action = new vscode.CodeAction(
+                label,
+                vscode.CodeActionKind.QuickFix,
+            );
+            action.diagnostics = [diag];
+            action.edit = new vscode.WorkspaceEdit();
+            action.edit.replace(document.uri, diag.range, replacement);
+            if (preferred) { action.isPreferred = true; }
+            actions.push(action);
+        }
+        return actions;
     }
 
     private _createRemoveOverrideAction(

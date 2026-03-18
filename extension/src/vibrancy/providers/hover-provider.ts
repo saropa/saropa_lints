@@ -6,6 +6,11 @@ import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
+import { findEnvironmentRange } from '../services/pubspec-parser';
+import {
+    SDK_VIBRANCY_TABLE_MD,
+    PACKAGE_VIBRANCY_DOC_URL,
+} from '../sdk-vibrancy-table';
 
 export class VibrancyHoverProvider implements vscode.HoverProvider {
     private _results = new Map<string, VibrancyResult>();
@@ -53,6 +58,25 @@ export class VibrancyHoverProvider implements vscode.HoverProvider {
         position: vscode.Position,
     ): vscode.Hover | null {
         if (!document.fileName.endsWith('pubspec.yaml')) { return null; }
+
+        const content = document.getText();
+        const sdkRange = findEnvironmentRange(content, 'sdk');
+        const flutterRange = findEnvironmentRange(content, 'flutter');
+        const onSdkLine = sdkRange?.line === position.line;
+        const onFlutterLine = flutterRange?.line === position.line;
+        if (onSdkLine || onFlutterLine) {
+            const lineRange = document.lineAt(position.line).range;
+            const md = new vscode.MarkdownString();
+            md.isTrusted = true;
+            md.appendMarkdown(
+                '**Dart & Flutter version history** — minimums, features, and packages:\n\n',
+            );
+            md.appendMarkdown(SDK_VIBRANCY_TABLE_MD);
+            md.appendMarkdown(
+                `\n\n[Open full doc](${PACKAGE_VIBRANCY_DOC_URL})`,
+            );
+            return new vscode.Hover(md, lineRange);
+        }
 
         const wordRange = document.getWordRangeAtPosition(position, /[\w_]+/);
         if (!wordRange) { return null; }
