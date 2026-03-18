@@ -25,7 +25,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 
 ---
 
-## [Unreleased]
+## [9.8.0]
 
 ### Changed
 
