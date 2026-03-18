@@ -94,10 +94,13 @@ String getPackageSource() {
 /// parses dependencies + dev_dependencies, and returns a map of
 /// saropa_lints package names to whether they were found.
 /// [targetDir] is the absolute path to the project being configured.
+/// If [logLine] is null, no terminal output is produced (for headless use).
 Map<String, bool> detectProjectPackages(
   LogWriter log, {
   required String targetDir,
+  void Function(String)? logLine,
 }) {
+  final report = logLine ?? log.terminal;
   // Start with all disabled — only enable what we find
   final detected = <String, bool>{
     for (final pkg in tiers.allPackages) pkg: false,
@@ -148,7 +151,7 @@ Map<String, bool> detectProjectPackages(
       }
     }
 
-    log.terminal(
+    report(
       '${InitColors.dim}Auto-detected packages from pubspec.yaml: '
       '${detected.entries.where((e) => e.value).map((e) => e.key).join(', ')}'
       '${isFlutter ? ' (Flutter project)' : ' (pure Dart)'}${InitColors.reset}',

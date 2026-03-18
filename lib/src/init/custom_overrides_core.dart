@@ -138,7 +138,12 @@ String buildMinimalConfig(
 /// Detects the old format by presence of `# STYLISTIC RULES` section.
 /// Extracts max_issues, output, platforms, enabled stylistic rules, and
 /// existing rule overrides. Backs up old file as .bak, writes minimal.
-void migrateToMinimalFormat(File file, Set<String> stylisticRules) {
+/// If [logLine] is non-null, it is called instead of [log.terminal] (for headless use).
+void migrateToMinimalFormat(
+  File file,
+  Set<String> stylisticRules, {
+  void Function(String)? logLine,
+}) {
   final content = file.readAsStringSync();
 
   // Already minimal — no stylistic section to migrate from.
@@ -173,7 +178,8 @@ void migrateToMinimalFormat(File file, Set<String> stylisticRules) {
   File(backupPath).writeAsStringSync(content);
   // Use split on both / and \ so the filename displays correctly on Windows
   final backupName = backupPath.split(RegExp(r'[/\\]')).last;
-  log.terminal(
+  final report = logLine ?? log.terminal;
+  report(
     '${InitColors.dim}Backed up old config as '
     '$backupName${InitColors.reset}',
   );
@@ -190,7 +196,7 @@ void migrateToMinimalFormat(File file, Set<String> stylisticRules) {
 
   final stylisticCount = enabledStylistic.length;
   final overrideCount = existingOverrides.length;
-  log.terminal(
+  report(
     '${InitColors.green}✓ Migrated to minimal config${InitColors.reset}'
     '${stylisticCount > 0 ? ' ($stylisticCount stylistic → overrides)' : ''}'
     '${overrideCount > 0 ? ' ($overrideCount existing overrides kept)' : ''}',
@@ -228,7 +234,8 @@ String _uniqueBackupPath(String originalPath) {
 ///
 /// Added in v4.9.1 - older files won't have this setting, so we add it
 /// at the top of the file if missing.
-void ensureMaxIssuesSetting(File file) {
+/// If [logLine] is non-null, it is called instead of [log.terminal] (for headless use).
+void ensureMaxIssuesSetting(File file, {void Function(String)? logLine}) {
   var content = file.readAsStringSync();
 
   final hasMaxIssues = RegExp(
@@ -242,11 +249,12 @@ void ensureMaxIssuesSetting(File file) {
 
   if (hasMaxIssues && hasOutput) return; // Both settings present
 
+  final report = logLine ?? log.terminal;
   if (!hasMaxIssues) {
     // Neither setting exists — add the full block
     content = addAnalysisSettingsBlock(content);
     file.writeAsStringSync(content);
-    log.terminal(
+    report(
       '${InitColors.green}✓ Added analysis settings to '
       '${file.path}${InitColors.reset}',
     );
@@ -257,7 +265,7 @@ void ensureMaxIssuesSetting(File file) {
   if (!hasOutput) {
     content = addOutputSetting(content);
     file.writeAsStringSync(content);
-    log.terminal(
+    report(
       '${InitColors.green}✓ Added output setting to '
       '${file.path}${InitColors.reset}',
     );

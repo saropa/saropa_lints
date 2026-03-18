@@ -67,14 +67,13 @@ function ensureSaropaLintsInPubspec(workspaceRoot: string): boolean {
   return true;
 }
 
-/** Builds args for non-interactive init (Enable, Initialize config, Set tier). */
-function buildInitArgs(workspaceRoot: string, tier: string): string[] {
+/** Builds args for headless config write (Enable, Initialize config, Set tier). Uses write_config so the extension does not shell out to init. */
+function buildWriteConfigArgs(workspaceRoot: string, tier: string): string[] {
   return [
     'run',
-    'saropa_lints:init',
+    'saropa_lints:write_config',
     '--tier',
     tier,
-    '--no-stylistic',
     '--target',
     workspaceRoot,
   ];
@@ -149,14 +148,14 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
 
       const cfg = vscode.workspace.getConfiguration('saropaLints');
       const tier = (cfg.get<string>('tier') ?? 'recommended').trim();
-      const { ok: initOk, stderr: initErr } = runInWorkspace(workspaceRoot, 'dart', buildInitArgs(workspaceRoot, tier));
+      const { ok: initOk, stderr: initErr } = runInWorkspace(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier));
       if (!initOk) {
-        logReport(`- init FAILED: ${initErr || '(no details)'}`);
+        logReport(`- write_config FAILED: ${initErr || '(no details)'}`);
         flushReport(workspaceRoot);
-        vscode.window.showErrorMessage(`Saropa Lints: init failed. ${initErr || 'Check Output.'}`);
+        vscode.window.showErrorMessage(`Saropa Lints: config write failed. ${initErr || 'Check Output.'}`);
         return;
       }
-      logReport(`- Ran init --tier ${tier} --no-stylistic`);
+      logReport(`- Wrote config (tier: ${tier})`);
 
       const runAnalysisAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true);
       if (runAnalysisAfter) {
@@ -228,12 +227,12 @@ export async function runInitializeConfig(context: vscode.ExtensionContext, titl
     },
     async () => {
       logSection('Initialize Config');
-      const result = runInWorkspace(workspaceRoot, 'dart', buildInitArgs(workspaceRoot, tier));
+      const result = runInWorkspace(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier));
       ok = result.ok;
       if (!ok) {
-        logReport(`- Init FAILED: ${result.stderr || '(no details)'}`);
+        logReport(`- write_config FAILED: ${result.stderr || '(no details)'}`);
         flushReport(workspaceRoot);
-        vscode.window.showErrorMessage(`Init failed. ${result.stderr || 'Check Output.'}`);
+        vscode.window.showErrorMessage(`Config write failed. ${result.stderr || 'Check Output.'}`);
       } else {
         logReport(`- Config initialized (tier: ${tier})`);
         flushReport(workspaceRoot);
@@ -283,18 +282,18 @@ function tierLabel(id: string): string {
   return TIER_INFO.find(t => t.id === id)?.label ?? id;
 }
 
-/** Run init + optional analysis for a tier change; returns true on success. */
+/** Run write_config + optional analysis for a tier change; returns true on success. */
 function applyTierChange(workspaceRoot: string, tier: string, previousTier: string): boolean {
   logSection('Set Tier');
   logReport(`- Changed tier: ${previousTier} → ${tier}`);
-  const initResult = runInWorkspace(workspaceRoot, 'dart', buildInitArgs(workspaceRoot, tier));
-  if (!initResult.ok) {
-    logReport(`- Init FAILED: ${initResult.stderr || '(no details)'}`);
+  const writeResult = runInWorkspace(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier));
+  if (!writeResult.ok) {
+    logReport(`- write_config FAILED: ${writeResult.stderr || '(no details)'}`);
     flushReport(workspaceRoot);
-    vscode.window.showErrorMessage(`Init failed. ${initResult.stderr || 'Check Output.'}`);
+    vscode.window.showErrorMessage(`Config write failed. ${writeResult.stderr || 'Check Output.'}`);
     return false;
   }
-  logReport(`- Ran init --tier ${tier} --no-stylistic`);
+  logReport(`- Wrote config (tier: ${tier})`);
   // C6: Re-analyze after tier change so violations.json reflects the new ruleset.
   const runAnalysisAfter = vscode.workspace.getConfiguration('saropaLints')
     .get<boolean>('runAnalysisAfterConfigChange', true);
@@ -310,7 +309,7 @@ function applyTierChange(workspaceRoot: string, tier: string, previousTier: stri
 }
 
 /**
- * Show an enhanced tier picker and run init + analysis for the selected tier.
+ * Show an enhanced tier picker and run write_config + analysis for the selected tier.
  * Returns the new and previous tier on success, or null on cancel/failure/same-tier.
  */
 export async function runSetTier(context: vscode.ExtensionContext): Promise<TierChangeResult | null> {

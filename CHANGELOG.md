@@ -29,6 +29,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Added
 
+• **Headless config writer (write_config)** — New `write_config` executable and `lib/src/init/write_config_runner.dart` for writing `analysis_options.yaml` from tier + `analysis_options_custom.yaml` without interactive output. Extension now calls `dart run saropa_lints:write_config --tier <tier> --target <workspace>` instead of init for Enable, Initialize Config, and Set tier. Init remains for CI/scripting. Aligns with [003_INIT_REDESIGN](bugs/discussion/003_INIT_REDESIGN.md) (extension-driven config).
+
 • **Cross-file analysis CLI** — New `cross_file` executable: `dart run saropa_lints:cross_file <command>` with commands `unused-files`, `circular-deps`, `import-stats`, and `report`. Builds the import graph from `lib/`, reports files with no importers, circular import chains, and graph statistics. Output: text (default), JSON, or HTML via `report --output-dir`. Baseline: `--baseline <file>` and `--update-baseline` to suppress known issues and fail only on new violations. Exit codes 0/1/2. README and [doc/cross_file_ci_example.md](doc/cross_file_ci_example.md) for CI. See [ROADMAP Part 3](ROADMAP.md).
 
 • **Central cache stats** — `CacheStatsAggregator.getStats()` returns a single map aggregating statistics from all project caches (import graph, throttle, speculative, rule batch, baseline, semantic, etc.) for debugging and monitoring.

@@ -23,6 +23,7 @@ topics:
 executables:
   saropa_lints: saropa_lints
   init: init
+  write_config: write_config
   baseline: baseline
   cross_file: cross_file
   impact_report: impact_report

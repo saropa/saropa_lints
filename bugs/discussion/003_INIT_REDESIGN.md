@@ -1,10 +1,15 @@
 # Init Redesign: Extension-Driven, Data-Driven Triage
 
-**Status**: Proposed  
+**Status**: Partially implemented  
 **Priority**: High  
 **Impact**: User adoption, retention, upgrade experience
 
 **Principle:** No init command line. The **VS Code extension** is the primary way to set up and configure saropa_lints. Triage is data-driven and happens in the extension UI.
+
+### Implementation status (as of 2026-03)
+
+- **Done:** Violation export (`reports/.saropa_lints/violations.json`) with `summary.issuesByRule`; extension consumes it. Data-driven triage in extension (critical, volume groups A–D, zero-issue count, stylistic) via `triageUtils.ts` and Config view; right-click enable/disable writes RULE OVERRIDES in `analysis_options_custom.yaml`. CLI init is headless-only; extension is the documented path for interactive setup. Minimal `analysis_options_custom.yaml` (createCustomOverridesFile, migrateToMinimalFormat); packages auto-detected from pubspec; no long stylistic block in new/minimal file.
+- **Addressed (2026-03):** Extension invokes `dart run saropa_lints:write_config` to write `analysis_options.yaml`. Init no longer used by extension for normal flow; init remains for CI/scripting. `write_config_runner.dart` + `bin/write_config.dart` + unit tests in `test/init/write_config_test.dart`.
 
 ---
 
@@ -127,7 +132,7 @@ Migration: If an existing `analysis_options_custom.yaml` is present, extension (
 |------|--------|
 | Tier selection prompt (CLI) | **Removed.** Replaced by extension triage UI (and optional tier quick pick in Config). |
 | Per-rule stylistic walkthrough (CLI) | **Removed.** Replaced by bulk stylistic triage in extension. |
-| `dart run saropa_lints:init` | **Removed.** Extension only. |
+| `dart run saropa_lints:init` | **Headless only.** Extension uses `write_config` instead; init kept for CI/scripting. |
 | `dart run saropa_lints` (default init) | **Removed.** No interactive init in CLI. |
 | Tier presets (e.g. recommended.yaml) | **Optional.** Can remain for "zero-config" include; extension may set tier or write diagnostics directly. |
 | Platform/package manual config | **Replaced** by auto-detection; override in minimal custom config or Config view. |
