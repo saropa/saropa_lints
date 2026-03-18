@@ -184,7 +184,7 @@ The "Lints" status bar item is controlled entirely by the [Dart-Code VSCode exte
 | **Full Throttled Analysis** | Hard | Medium | `ThrottledAnalysis` class exists but debounce requires `recordEdit()` calls when user types. custom_lint doesn't expose keystroke events. Current workaround: simple content-hash-based throttle in `run()` prevents duplicate analysis of identical content within 300ms. |
 | Cache Warming on Startup | Medium | Low | Pre-analyze visible/open files when IDE starts. Requires knowing which files are open (IDE-specific) or using heuristics (recent files, pubspec.yaml siblings). Could delay startup. |
 | Result Memoization by AST Hash | Hard | Medium | Cache rule results keyed by AST subtree hash. Skip re-running rules on unchanged AST nodes. Requires efficient AST hashing, careful invalidation logic, and significant memory management. |
-| Central Stats Aggregator | Low | Low | Unified API to get all cache statistics in one call. Useful for debugging and monitoring. |
+| ⭐ Central Stats Aggregator | Low | Low | Unified API to get all cache statistics in one call. Useful for debugging and monitoring. |
 | Auto-Disable Inactive Rules | Medium | Low | Track rule hit rates over many analysis runs. Rules with 0% violation rate over 100+ files are candidates for automatic disabling (opt-in). Requires persistence of hit rate statistics and user configuration. |
 | Memory Pooling | Medium | Low | Reuse visitor and reporter objects instead of allocating new ones for each file. Reduces GC pressure for high-frequency analysis. Would require resettable object design and pool management. |
 | Lazy Rule Instantiation | Medium | Low | Create rule instances on-demand based on enabled tier rather than `const` list. Current approach uses compile-time constants (low overhead), but lazy instantiation could reduce initial memory for projects using minimal tiers. |
@@ -584,11 +584,11 @@ executables:
 ```
 
 #### Deliverables
-- [ ] `bin/cross_file.dart` - CLI entry point
-- [ ] `lib/src/cli/cross_file_analyzer.dart` - Analysis logic
-- [ ] `lib/src/cli/cross_file_reporter.dart` - Output formatting
-- [ ] Unit tests for each command
-- [ ] Update README with usage
+- [ ] ⭐ `bin/cross_file.dart` - CLI entry point
+- [ ] ⭐ `lib/src/cli/cross_file_analyzer.dart` - Analysis logic
+- [ ] ⭐ `lib/src/cli/cross_file_reporter.dart` - Output formatting
+- [ ] ⭐ Unit tests for each command
+- [ ] ⭐ Update README with usage
 
 ---
 
@@ -714,11 +714,11 @@ dart run saropa_lints:cross_file watch
 Re-runs analysis on file changes, useful during development.
 
 #### Deliverables
-- [ ] HTML report generation
-- [ ] Baseline integration
-- [ ] CI-friendly exit codes
+- [ ] ⭐ HTML report generation
+- [ ] ⭐ Baseline integration
+- [ ] ⭐ CI-friendly exit codes
 - [ ] Watch mode
-- [ ] GitHub Actions example workflow
+- [ ] ⭐ GitHub Actions example workflow
 
 ---
 
