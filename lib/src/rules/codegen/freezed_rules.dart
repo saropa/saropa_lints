@@ -52,9 +52,9 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveJsonSerializableFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveJsonSerializableFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_freezed_json_serializable_conflict',
@@ -553,8 +553,9 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
     }
 
     // Check if parameter has @Default annotation
-    final NodeList<Annotation>? metadata =
-        actualParam is NormalFormalParameter ? actualParam.metadata : null;
+    final NodeList<Annotation>? metadata = actualParam is NormalFormalParameter
+        ? actualParam.metadata
+        : null;
     if (metadata != null) {
       for (final Annotation annotation in metadata) {
         if (annotation.name.name == 'Default') {

@@ -46,9 +46,9 @@ class AvoidEmptySpreadRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CommentOutEmptySpreadFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CommentOutEmptySpreadFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_empty_spread',
@@ -115,9 +115,9 @@ class AvoidUnnecessaryNullAwareElementsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceNullAwareSpreadFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceNullAwareSpreadFix(context: context),
+  ];
 }
 
 /// Warns when unnecessary block braces are used.
@@ -183,9 +183,9 @@ class AvoidUnnecessaryBlockRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryBlockFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryBlockFix(context: context),
+  ];
 }
 
 /// Warns when `.call()` is used explicitly on a callable.
@@ -245,9 +245,9 @@ class AvoidUnnecessaryCallRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryCallFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryCallFix(context: context),
+  ];
 }
 
 /// Warns when a class has an empty constructor (no parameters, no body, no initializers).
@@ -283,9 +283,9 @@ class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CommentOutUnnecessaryConstructorFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CommentOutUnnecessaryConstructorFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_constructor',
@@ -401,9 +401,9 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryEnumArgumentFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryEnumArgumentFix(context: context),
+  ];
 }
 
 /// Warns when using enum name prefix inside the enum declaration.
@@ -442,9 +442,9 @@ class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryEnumPrefixFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryEnumPrefixFix(context: context),
+  ];
 }
 
 class _EnumPrefixVisitor extends RecursiveAstVisitor<void> {
@@ -494,9 +494,9 @@ class AvoidUnnecessaryExtendsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveExtendsObjectFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveExtendsObjectFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_extends',
@@ -636,9 +636,9 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryGetterFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryGetterFix(context: context),
+  ];
 }
 
 /// Warns when length > 0 or length != 0 can be replaced with isNotEmpty.
@@ -658,9 +658,9 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseIsEmptyOrIsNotEmptyFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseIsEmptyOrIsNotEmptyFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_length_check',
@@ -807,9 +807,9 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            InvertUnnecessaryNegationFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        InvertUnnecessaryNegationFix(context: context),
+  ];
 }
 
 /// Warns when super call is unnecessary in constructor.
@@ -843,9 +843,9 @@ class AvoidUnnecessarySuperRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessarySuperFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessarySuperFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_super',
@@ -962,9 +962,9 @@ class NoEmptyBlockRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            NoEmptyBlockFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        NoEmptyBlockFix(context: context),
+  ];
 }
 
 /// Warns when an empty string literal is used.
@@ -1021,7 +1021,7 @@ class NoEmptyStringRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            NoEmptyStringPreferIsEmptyFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        NoEmptyStringPreferIsEmptyFix(context: context),
+  ];
 }

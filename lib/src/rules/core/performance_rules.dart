@@ -214,8 +214,8 @@ class AvoidExpensiveBuildRule extends SaropaLintRule {
       if (node.name.lexeme != 'build') return;
 
       // Check if this is a widget build method
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -321,9 +321,9 @@ class AvoidSynchronousFileIoRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceSyncFileIoFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceSyncFileIoFix(context: context),
+  ];
 }
 
 /// Warns when compute() should be used for heavy work.
@@ -911,8 +911,8 @@ class PreferImagePrecacheRule extends SaropaLintRule {
       if (namedConstructor != 'asset' && namedConstructor != 'network') return;
 
       // Check if in build method
-      final MethodDeclaration? method =
-          node.thisOrAncestorOfType<MethodDeclaration>();
+      final MethodDeclaration? method = node
+          .thisOrAncestorOfType<MethodDeclaration>();
       if (method == null || method.name.lexeme != 'build') return;
 
       // Check if image name suggests it's a hero/important image
@@ -1912,9 +1912,9 @@ class PreferConstWidgetsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferConstWidgetsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferConstWidgetsFix(context: context),
+  ];
 
   bool _isConstExpression(Expression expr) {
     if (expr is Literal) return true;
@@ -2842,8 +2842,8 @@ class PreferBuilderForConditionalRule extends SaropaLintRule {
   ) {
     context.addConditionalExpression((ConditionalExpression node) {
       // Check if inside a build method
-      final MethodDeclaration? method =
-          node.thisOrAncestorOfType<MethodDeclaration>();
+      final MethodDeclaration? method = node
+          .thisOrAncestorOfType<MethodDeclaration>();
       if (method == null || method.name.lexeme != 'build') return;
 
       // Check thenExpression and elseExpression for expensive widgets

@@ -559,7 +559,8 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'class Point extends Equatable {\n'
+  String get exampleBad =>
+      'class Point extends Equatable {\n'
       '  final int x, y;\n'
       '  const Point(this.x, this.y);\n'
       '  @override List<Object?> get props => [x, y];\n'
@@ -1201,8 +1202,9 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
 
             for (final ClassMember constructor in node.members) {
               if (constructor is ConstructorDeclaration) {
-                final String? initSource =
-                    constructor.initializers.map((e) => e.toSource()).join();
+                final String? initSource = constructor.initializers
+                    .map((e) => e.toSource())
+                    .join();
                 if (initSource != null &&
                     unmodifiablePattern.hasMatch(initSource)) {
                   madeUnmodifiable = true;
@@ -1357,8 +1359,8 @@ class AvoidEquatableNestedEqualityRule extends SaropaLintRule {
       if (!node.isGetter || node.name.lexeme != 'props') return;
 
       // Must be inside an Equatable class
-      final ClassDeclaration? cls =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? cls = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (cls == null) return;
 
       if (!isEquatable(cls)) return;

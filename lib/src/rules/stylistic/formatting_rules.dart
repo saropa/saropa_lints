@@ -51,13 +51,15 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'switch (x) {\n'
+  String get exampleBad =>
+      'switch (x) {\n'
       '  case 1: break;\n'
       '  case 2: break;  // no blank line\n'
       '}';
 
   @override
-  String get exampleGood => 'switch (x) {\n'
+  String get exampleGood =>
+      'switch (x) {\n'
       '  case 1: break;\n'
       '\n'
       '  case 2: break;\n'
@@ -65,9 +67,9 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddBlankLineBeforeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_case',
@@ -96,10 +98,12 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
         final root = node.root;
         if (root is! CompilationUnit) continue;
         final unit = root;
-        final int prevEndLine =
-            unit.lineInfo.getLocation(previous.end).lineNumber;
-        final int currStartLine =
-            unit.lineInfo.getLocation(current.offset).lineNumber;
+        final int prevEndLine = unit.lineInfo
+            .getLocation(previous.end)
+            .lineNumber;
+        final int currStartLine = unit.lineInfo
+            .getLocation(current.offset)
+            .lineNumber;
 
         if (currStartLine - prevEndLine < 2) {
           // Use beginToken to handle SwitchCase, SwitchDefault, and SwitchPatternCase
@@ -149,13 +153,15 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'class Foo {\n'
+  String get exampleBad =>
+      'class Foo {\n'
       '  final int v;\n'
       '  Foo(this.v);  // no blank line\n'
       '}';
 
   @override
-  String get exampleGood => 'class Foo {\n'
+  String get exampleGood =>
+      'class Foo {\n'
       '  final int v;\n'
       '\n'
       '  Foo(this.v);\n'
@@ -163,9 +169,9 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddBlankLineBeforeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_constructor',
@@ -201,10 +207,12 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
       if (current is! ConstructorDeclaration) continue;
 
       // Get line numbers
-      final int prevEndLine =
-          unit.lineInfo.getLocation(previous.end).lineNumber;
-      final int currStartLine =
-          unit.lineInfo.getLocation(current.offset).lineNumber;
+      final int prevEndLine = unit.lineInfo
+          .getLocation(previous.end)
+          .lineNumber;
+      final int currStartLine = unit.lineInfo
+          .getLocation(current.offset)
+          .lineNumber;
 
       // Should have at least one blank line
       if (currStartLine - prevEndLine < 2) {
@@ -258,13 +266,15 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'class C {\n'
+  String get exampleBad =>
+      'class C {\n'
       '  void a() {}\n'
       '  void b() {}  // no blank line\n'
       '}';
 
   @override
-  String get exampleGood => 'class C {\n'
+  String get exampleGood =>
+      'class C {\n'
       '  void a() {}\n'
       '\n'
       '  void b() {}\n'
@@ -272,9 +282,9 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddBlankLineBeforeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_method',
@@ -324,10 +334,12 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
       if (current is! MethodDeclaration) continue;
 
       // Get line numbers
-      final int prevEndLine =
-          unit.lineInfo.getLocation(previous.end).lineNumber;
-      final int currStartLine =
-          unit.lineInfo.getLocation(current.offset).lineNumber;
+      final int prevEndLine = unit.lineInfo
+          .getLocation(previous.end)
+          .lineNumber;
+      final int currStartLine = unit.lineInfo
+          .getLocation(current.offset)
+          .lineNumber;
 
       // Should have at least one blank line
       if (currStartLine - prevEndLine < 2) {
@@ -358,19 +370,21 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'final x = compute();\n'
+  String get exampleBad =>
+      'final x = compute();\n'
       'return x;  // no blank line';
 
   @override
-  String get exampleGood => 'final x = compute();\n'
+  String get exampleGood =>
+      'final x = compute();\n'
       '\n'
       'return x;';
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddBlankLineBeforeReturnFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeReturnFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_return',
@@ -397,10 +411,12 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
 
       // Check if previous statement ends on the line immediately before
       final Statement previous = statements[index - 1];
-      final int prevEndLine =
-          context.lineInfo.getLocation(previous.end).lineNumber;
-      final int returnStartLine =
-          context.lineInfo.getLocation(node.offset).lineNumber;
+      final int prevEndLine = context.lineInfo
+          .getLocation(previous.end)
+          .lineNumber;
+      final int returnStartLine = context.lineInfo
+          .getLocation(node.offset)
+          .lineNumber;
 
       if (returnStartLine - prevEndLine < 2) {
         reporter.atNode(node);
@@ -452,14 +468,16 @@ class NewlineBeforeElseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'if (x) {\n'
+  String get exampleBad =>
+      'if (x) {\n'
       '  a();\n'
       '} else {\n'
       '  b();  // no blank line before else\n'
       '}';
 
   @override
-  String get exampleGood => 'if (x) {\n'
+  String get exampleGood =>
+      'if (x) {\n'
       '  a();\n'
       '}\n'
       '\n'
@@ -469,9 +487,9 @@ class NewlineBeforeElseRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddBlankLineBeforeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_before_else',
@@ -495,10 +513,12 @@ class NewlineBeforeElseRule extends SaropaLintRule {
       if (elseStmt is IfStatement) return;
 
       final LineInfo lineInfo = context.lineInfo;
-      final int thenEndLine =
-          lineInfo.getLocation(node.thenStatement.end).lineNumber;
-      final int elseStartLine =
-          lineInfo.getLocation(elseToken.offset).lineNumber;
+      final int thenEndLine = lineInfo
+          .getLocation(node.thenStatement.end)
+          .lineNumber;
+      final int elseStartLine = lineInfo
+          .getLocation(elseToken.offset)
+          .lineNumber;
       // At least one full blank line required (gap >= 2).
       if (elseStartLine - thenEndLine < 2) {
         reporter.atNode(elseStmt, code);
@@ -547,19 +567,21 @@ class NewlineAfterLoopRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'for (final x in list) { process(x); }\n'
+  String get exampleBad =>
+      'for (final x in list) { process(x); }\n'
       'doNext();  // no blank line after loop';
 
   @override
-  String get exampleGood => 'for (final x in list) { process(x); }\n'
+  String get exampleGood =>
+      'for (final x in list) { process(x); }\n'
       '\n'
       'doNext();';
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddBlankLineBeforeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_after_loop',
@@ -640,13 +662,15 @@ class PreferTrailingCommaRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'final list = [\n'
+  String get exampleBad =>
+      'final list = [\n'
       "  'a',\n"
       "  'b'\n"
       '];  // missing trailing comma';
 
   @override
-  String get exampleGood => 'final list = [\n'
+  String get exampleGood =>
+      'final list = [\n'
       "  'a',\n"
       "  'b',\n"
       '];';
@@ -720,9 +744,9 @@ class PreferTrailingCommaRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddTrailingCommaFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddTrailingCommaFix(context: context),
+  ];
 }
 
 /// Warns when trailing commas are unnecessary.
@@ -809,9 +833,9 @@ class UnnecessaryTrailingCommaRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryTrailingCommaFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryTrailingCommaFix(context: context),
+  ];
 }
 
 /// Warns when comments don't follow formatting conventions.
@@ -965,9 +989,9 @@ class RequireIgnoreCommentSpacingRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RequireIgnoreCommentSpacingFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RequireIgnoreCommentSpacingFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'require_ignore_comment_spacing',
@@ -1061,23 +1085,25 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'class Foo {\n'
+  String get exampleBad =>
+      'class Foo {\n'
       '  void doIt() {}\n'
       '  final int value;  // field after method\n'
       '}';
 
   @override
-  String get exampleGood => 'class Foo {\n'
+  String get exampleGood =>
+      'class Foo {\n'
       '  final int value;\n'
       '  void doIt() {}\n'
       '}';
 
   @override
   List<String> get configAliases => const <String>[
-        'enforce_member_ordering',
-        'member_ordering',
-        'prefer_sorted_members',
-      ];
+    'enforce_member_ordering',
+    'member_ordering',
+    'prefer_sorted_members',
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_member_ordering',
@@ -1276,8 +1302,8 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addEnumDeclaration((EnumDeclaration node) {
-      final List<EnumConstantDeclaration> constants =
-          node.body.constants.toList();
+      final List<EnumConstantDeclaration> constants = node.body.constants
+          .toList();
       if (constants.length < 2) return;
 
       // Check if already sorted
@@ -1321,7 +1347,8 @@ class PreferReadableLineLengthRule extends SaropaLintRule {
       'final x = someVeryLongMethodName(argumentOne, argumentTwo, argumentThree, argumentFour);  // >80 chars';
 
   @override
-  String get exampleGood => 'final x = someMethod(\n'
+  String get exampleGood =>
+      'final x = someMethod(\n'
       '  argOne,\n'
       '  argTwo,\n'
       ');';

@@ -360,7 +360,8 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
       final String classSource = node.toSource();
 
       // Check for eviction patterns
-      final bool hasEviction = classSource.contains('remove(') ||
+      final bool hasEviction =
+          classSource.contains('remove(') ||
           classSource.contains('clear(') ||
           classSource.contains('maxSize') ||
           classSource.contains('_maxSize') ||
@@ -691,7 +692,8 @@ class RequireCacheExpirationRule extends SaropaLintRule {
       final String classSource = node.toSource().toLowerCase();
 
       // Check for expiration-related patterns
-      final bool hasExpiration = classSource.contains('expire') ||
+      final bool hasExpiration =
+          classSource.contains('expire') ||
           classSource.contains('ttl') ||
           classSource.contains('duration') ||
           classSource.contains('timestamp') ||
@@ -817,7 +819,8 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
       // Check for size limiting patterns
       // Note: Use word boundaries to avoid false matches (e.g., Uint8List contains 'limit')
       // Note: Don't use 'bounded' - it matches 'unbounded' in expect_lint comments
-      final bool hasSizeLimit = classSource.contains('maxsize') ||
+      final bool hasSizeLimit =
+          classSource.contains('maxsize') ||
           classSource.contains('max_size') ||
           classSource.contains('capacity') ||
           _hasLimitPattern(classSource) ||
@@ -1232,9 +1235,9 @@ class AvoidClosureCaptureLeaksRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddMountedCheckFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddMountedCheckFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_closure_capture_leaks',

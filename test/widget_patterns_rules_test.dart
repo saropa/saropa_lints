@@ -1274,8 +1274,7 @@ void main() {
         expect('redundant SafeArea detected', isNotNull);
       });
 
-      test('fixture has exactly one BAD (expect_lint) and GOOD top:false case',
-          () {
+      test('fixture has exactly one BAD (expect_lint) and GOOD top:false case', () {
         final file = File(
           'example_widgets/lib/widget_patterns/prefer_safe_area_consumer_fixture.dart',
         );

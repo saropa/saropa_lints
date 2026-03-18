@@ -235,16 +235,14 @@ void main() {
         expect('require_file_path_sanitization passes', isNotNull);
       });
 
-      test(
-          'platform path API in function body should NOT trigger '
+      test('platform path API in function body should NOT trigger '
           '(regression)', () {
         // getApplicationDocumentsDirectory in the same function body
         // indicates the parameter comes from a trusted OS path
         expect('platform path API recognized as trusted', isNotNull);
       });
 
-      test(
-          'private helper receiving platform path should NOT trigger '
+      test('private helper receiving platform path should NOT trigger '
           '(inter-procedural)', () {
         // Regression: private method receives dbDir.path from
         // getApplicationDocumentsDirectory() in the caller. The rule should

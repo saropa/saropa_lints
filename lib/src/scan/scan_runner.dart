@@ -75,8 +75,9 @@ class ScanRunner {
     final config = loadScanConfig(p.absolute(targetPath));
     if (config == null) return null;
 
-    SaropaLintRule.disabledRules =
-        config.disabledRules.isEmpty ? null : config.disabledRules;
+    SaropaLintRule.disabledRules = config.disabledRules.isEmpty
+        ? null
+        : config.disabledRules;
     return config.enabledRules;
   }
 
@@ -151,16 +152,18 @@ class ScanRunner {
 
     for (final d in listener.diagnostics) {
       final loc = unit.lineInfo.getLocation(d.offset);
-      diagnostics.add(ScanDiagnostic(
-        ruleName: d.diagnosticCode.name,
-        filePath: filePath,
-        line: loc.lineNumber,
-        column: loc.columnNumber,
-        offset: d.offset,
-        length: d.length,
-        severity: d.diagnosticCode.severity.name,
-        problemMessage: d.problemMessage.messageText(includeUrl: false),
-      ));
+      diagnostics.add(
+        ScanDiagnostic(
+          ruleName: d.diagnosticCode.name,
+          filePath: filePath,
+          line: loc.lineNumber,
+          column: loc.columnNumber,
+          offset: d.offset,
+          length: d.length,
+          severity: d.diagnosticCode.severity.name,
+          problemMessage: d.problemMessage.messageText(includeUrl: false),
+        ),
+      );
     }
   }
 
@@ -191,8 +194,10 @@ class ScanRunner {
     final provider = PhysicalResourceProvider.INSTANCE;
     final file = provider.getFile(filePath);
     final listener = RecordingDiagnosticListener();
-    final reporter =
-        DiagnosticReporter(listener, StringSource(content, filePath));
+    final reporter = DiagnosticReporter(
+      listener,
+      StringSource(content, filePath),
+    );
     return RuleContextUnit(
       file: file,
       content: content,

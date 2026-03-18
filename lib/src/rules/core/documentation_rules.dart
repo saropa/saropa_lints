@@ -79,8 +79,8 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
       }
 
       // Check if in public class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl != null && classDecl.name.lexeme.startsWith('_')) return;
 
       if (node.documentationComment == null) {
@@ -135,8 +135,10 @@ class AvoidMisleadingDocumentationRule extends SaropaLintRule {
       if (docComment == null) return;
 
       final String methodName = node.name.lexeme.toLowerCase();
-      final String docText =
-          docComment.tokens.map((Token t) => t.lexeme).join(' ').toLowerCase();
+      final String docText = docComment.tokens
+          .map((Token t) => t.lexeme)
+          .join(' ')
+          .toLowerCase();
 
       // Check for common mismatches (word-boundary for method name)
       if ((methodName == 'get' || methodName.startsWith('get')) &&
@@ -300,7 +302,8 @@ class RequireComplexLogicCommentsRule extends SaropaLintRule {
 
       if (complexity >= _complexityThreshold) {
         // Check if there are any comments
-        final bool hasComments = _lineCommentRegex.hasMatch(bodySource) ||
+        final bool hasComments =
+            _lineCommentRegex.hasMatch(bodySource) ||
             _blockCommentStartRegex.hasMatch(bodySource);
         if (!hasComments && node.documentationComment == null) {
           reporter.atNode(node);
@@ -369,8 +372,9 @@ class RequireParameterDocumentationRule extends SaropaLintRule {
       final Comment? docComment = node.documentationComment;
       if (docComment == null) return;
 
-      final String docText =
-          docComment.tokens.map((Token t) => t.lexeme).join(' ');
+      final String docText = docComment.tokens
+          .map((Token t) => t.lexeme)
+          .join(' ');
 
       // Check if parameters are documented
       for (final FormalParameter param in params.parameters) {
@@ -456,8 +460,10 @@ class RequireReturnDocumentationRule extends SaropaLintRule {
       final Comment? docComment = node.documentationComment;
       if (docComment == null) return;
 
-      final String docText =
-          docComment.tokens.map((Token t) => t.lexeme).join(' ').toLowerCase();
+      final String docText = docComment.tokens
+          .map((Token t) => t.lexeme)
+          .join(' ')
+          .toLowerCase();
 
       // Check for return documentation
       if (!docText.contains('return') && !docText.contains('yields')) {
@@ -531,8 +537,10 @@ class RequireExceptionDocumentationRule extends SaropaLintRule {
         return;
       }
 
-      final String docText =
-          docComment.tokens.map((Token t) => t.lexeme).join(' ').toLowerCase();
+      final String docText = docComment.tokens
+          .map((Token t) => t.lexeme)
+          .join(' ')
+          .toLowerCase();
 
       // Check for throw documentation
       if (!docText.contains('throw')) {
@@ -617,8 +625,9 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
       final Comment? docComment = node.documentationComment;
       if (docComment == null) return;
 
-      final String docText =
-          docComment.tokens.map((Token t) => t.lexeme).join(' ');
+      final String docText = docComment.tokens
+          .map((Token t) => t.lexeme)
+          .join(' ');
 
       // Check for example code block
       if (!docText.contains('```') && !docText.contains('Example')) {
@@ -756,8 +765,9 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
     final Set<String> classFieldNames = _extractClassFieldNames(enclosingClass);
 
     // Joined text for semantic context (e.g. bullet/keyword detection).
-    final String docText =
-        docComment.tokens.map((Token t) => t.lexeme).join('\n');
+    final String docText = docComment.tokens
+        .map((Token t) => t.lexeme)
+        .join('\n');
 
     // Iterate per-token so reported offsets map to the correct source line.
     // Joining tokens into a single string loses inter-line gaps (non-doc

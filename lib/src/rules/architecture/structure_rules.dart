@@ -187,9 +187,9 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveDoubleSlashImportsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveDoubleSlashImportsFix(context: context),
+  ];
 }
 
 /// Warns when the same file is exported multiple times.
@@ -250,9 +250,9 @@ class AvoidDuplicateExportsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            DeleteDuplicateExportFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        DeleteDuplicateExportFix(context: context),
+  ];
 }
 
 /// Warns when the same mixin is applied multiple times in a class hierarchy.
@@ -312,9 +312,9 @@ class AvoidDuplicateMixinsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            DeleteDuplicateMixinFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        DeleteDuplicateMixinFix(context: context),
+  ];
 }
 
 /// Warns when the same import is declared with different prefixes.
@@ -375,9 +375,9 @@ class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            DeleteDuplicateImportFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        DeleteDuplicateImportFix(context: context),
+  ];
 }
 
 /// Warns when mutable global state is declared.
@@ -562,8 +562,8 @@ int _countCodeLinesInTokenRange(
 /// See also: [PreferSingleDeclarationPerFileRule._allClassesAreStaticNamespaces]
 /// which performs the same check (kept separate to avoid cross-file imports).
 bool _isUtilityNamespaceFile(CompilationUnit unit) {
-  final Iterable<ClassDeclaration> classes =
-      unit.declarations.whereType<ClassDeclaration>();
+  final Iterable<ClassDeclaration> classes = unit.declarations
+      .whereType<ClassDeclaration>();
   if (classes.isEmpty) return false;
 
   for (final ClassDeclaration cls in classes) {
@@ -1699,9 +1699,9 @@ class AvoidUnnecessaryLocalVariableRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            InlineImmediateReturnFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        InlineImmediateReturnFix(context: context),
+  ];
 }
 
 /// Warns when a variable is assigned the same value it already has.
@@ -1765,9 +1765,9 @@ class AvoidUnnecessaryReassignmentRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryReassignmentFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryReassignmentFix(context: context),
+  ];
 }
 
 /// Warns when an instance method doesn't use `this` and could be static.
@@ -2228,9 +2228,9 @@ class PreferTrailingUnderscoreForUnusedRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferTrailingUnderscoreForUnusedFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferTrailingUnderscoreForUnusedFix(context: context),
+  ];
 }
 
 class _IdentifierCollectorStructure extends RecursiveAstVisitor<void> {
@@ -2309,9 +2309,9 @@ class AvoidUnnecessaryFuturesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AvoidRedundantAsyncFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AvoidRedundantAsyncFix(context: context),
+  ];
 
   bool _containsAwaitExpression(FunctionBody body) {
     bool found = false;
@@ -2393,9 +2393,9 @@ class AvoidThrowInFinallyRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            DeleteThrowInFinallyFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        DeleteThrowInFinallyFix(context: context),
+  ];
 }
 
 class _ThrowFinder extends RecursiveAstVisitor<void> {
@@ -2470,9 +2470,9 @@ class AvoidUnnecessaryNullableReturnTypeRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryNullableReturnTypeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryNullableReturnTypeFix(context: context),
+  ];
 
   bool _canReturnNull(FunctionBody body) {
     if (body is ExpressionFunctionBody) {
@@ -2644,8 +2644,8 @@ class AvoidSettersWithoutGettersRule extends SaropaLintRule {
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (!node.isSetter) return;
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
       if (classDecl.abstractKeyword != null) return;
       final String setterName = node.name.lexeme;
@@ -2852,8 +2852,9 @@ class PreferMixinOverAbstractRule extends SaropaLintRule {
         }
       }
 
-      final constructors =
-          node.members.whereType<ConstructorDeclaration>().toList();
+      final constructors = node.members
+          .whereType<ConstructorDeclaration>()
+          .toList();
       final hasGenerative = constructors.any((c) => c.factoryKeyword == null);
       if (hasGenerative) return;
 
@@ -2920,8 +2921,9 @@ class PreferRecordOverTupleClassRule extends SaropaLintRule {
         return;
       }
 
-      final constructors =
-          node.members.whereType<ConstructorDeclaration>().toList();
+      final constructors = node.members
+          .whereType<ConstructorDeclaration>()
+          .toList();
       if (constructors.length != 1) return;
       if (constructors[0].factoryKeyword != null) return;
 
@@ -3212,14 +3214,16 @@ class PreferOverridesLastRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad => 'class C extends B {\n'
+  String get exampleBad =>
+      'class C extends B {\n'
       '  @override\n'
       '  void foo() {}  // override before own members\n'
       '  void bar() {}\n'
       '}';
 
   @override
-  String get exampleGood => 'class C extends B {\n'
+  String get exampleGood =>
+      'class C extends B {\n'
       '  void bar() {}\n'
       '  @override\n'
       '  void foo() {}\n'
@@ -3294,13 +3298,15 @@ class PreferConstructorsOverStaticMethodsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'class C {\n'
+  String get exampleBad =>
+      'class C {\n'
       '  C._();\n'
       '  static C create() => C._();  // static factory\n'
       '}';
 
   @override
-  String get exampleGood => 'class C {\n'
+  String get exampleGood =>
+      'class C {\n'
       '  C._();\n'
       '  factory C.create() => C._();\n'
       '}';
@@ -3356,7 +3362,8 @@ class PreferFunctionOverStaticMethodRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'class MathUtils {\n'
+  String get exampleBad =>
+      'class MathUtils {\n'
       '  static int add(int a, int b) => a + b;\n'
       '}';
 
@@ -3442,8 +3449,9 @@ class PreferExtensionMethodsRule extends SaropaLintRule {
       if (params == null || params.parameters.isEmpty) return;
 
       final FormalParameter first = params.parameters.first;
-      final FormalParameter inner =
-          first is DefaultFormalParameter ? first.parameter : first;
+      final FormalParameter inner = first is DefaultFormalParameter
+          ? first.parameter
+          : first;
       if (inner is! SimpleFormalParameter) return;
 
       final TypeAnnotation? typeAnnotation = inner.type;
@@ -3491,11 +3499,13 @@ class PreferStaticMethodOverFunctionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'String formatDate(DateTime dt) =>\n'
+  String get exampleBad =>
+      'String formatDate(DateTime dt) =>\n'
       '    DateFormat("yyyy").format(dt);';
 
   @override
-  String get exampleGood => 'extension on DateTime {\n'
+  String get exampleGood =>
+      'extension on DateTime {\n'
       '  String formatDate() => DateFormat("yyyy").format(this);\n'
       '}';
 
@@ -3518,8 +3528,9 @@ class PreferStaticMethodOverFunctionRule extends SaropaLintRule {
       if (params == null || params.parameters.isEmpty) return;
 
       final FormalParameter first = params.parameters.first;
-      final FormalParameter inner =
-          first is DefaultFormalParameter ? first.parameter : first;
+      final FormalParameter inner = first is DefaultFormalParameter
+          ? first.parameter
+          : first;
       if (inner is! SimpleFormalParameter) return;
 
       final TypeAnnotation? typeAnnotation = inner.type;
@@ -3738,12 +3749,14 @@ class PreferExtensionTypeForWrapperRule extends SaropaLintRule {
       final ConstructorDeclaration ctor = constructors[0];
       if (ctor.parameters.parameters.length != 1) return;
       final FormalParameter p = ctor.parameters.parameters.single;
-      final FormalParameter inner =
-          p is DefaultFormalParameter ? p.parameter : p;
+      final FormalParameter inner = p is DefaultFormalParameter
+          ? p.parameter
+          : p;
       if (inner is! FieldFormalParameter) return;
 
-      final int methodCount =
-          node.members.whereType<MethodDeclaration>().length;
+      final int methodCount = node.members
+          .whereType<MethodDeclaration>()
+          .length;
       if (methodCount > 4) return;
 
       reporter.atNode(node);
@@ -3881,8 +3894,9 @@ class AvoidImportingEntrypointExportsRule extends SaropaLintRule {
     if (_isEntryPointFile(normalizedPath)) return;
 
     final String? projectRoot = ProjectContext.findProjectRoot(filePath);
-    final String packageName =
-        projectRoot != null ? ProjectContext.getPackageName(projectRoot) : '';
+    final String packageName = projectRoot != null
+        ? ProjectContext.getPackageName(projectRoot)
+        : '';
 
     context.addImportDirective((ImportDirective node) {
       final String? uri = node.uri.stringValue;

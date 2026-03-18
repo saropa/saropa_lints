@@ -23,8 +23,9 @@ class ChangeToFutureVoidFunctionFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final target =
-        node is NamedType ? node : node.thisOrAncestorOfType<NamedType>();
+    final target = node is NamedType
+        ? node
+        : node.thisOrAncestorOfType<NamedType>();
     if (target == null) return;
 
     await builder.addDartFileEdit(file, (builder) {

@@ -82,8 +82,9 @@ String removeCustomLintSection(String content) {
   final String before = content.substring(0, sectionMatch.start);
   final String afterStart = content.substring(sectionMatch.end);
   final Match? nextTopLevel = topLevelKeyPattern.firstMatch(afterStart);
-  final String after =
-      nextTopLevel != null ? afterStart.substring(nextTopLevel.start) : '';
+  final String after = nextTopLevel != null
+      ? afterStart.substring(nextTopLevel.start)
+      : '';
 
   return '${before.trimRight()}\n\n$after'.trimRight() + '\n';
 }
@@ -104,10 +105,7 @@ String removeAnalyzerCustomLintPlugin(String content) {
 
 /// Removes custom_lint from pubspec.yaml dev_dependencies after user
 /// confirmation. Skips silently if not found in dev_dependencies.
-void cleanPubspecCustomLint({
-  required bool dryRun,
-  required String targetDir,
-}) {
+void cleanPubspecCustomLint({required bool dryRun, required String targetDir}) {
   final File pubspecFile = File('$targetDir/pubspec.yaml');
 
   if (!pubspecFile.existsSync()) return;
@@ -189,8 +187,9 @@ String? removeDevDep(String content, String packageName) {
   // Remove only within the dev_dependencies section
   final String cleanedSection = devSection.replaceAll(depLine, '');
   final String before = content.substring(0, devMatch.end);
-  final String after =
-      nextSection != null ? afterDevDeps.substring(nextSection.start) : '';
+  final String after = nextSection != null
+      ? afterDevDeps.substring(nextSection.start)
+      : '';
 
   return '$before$cleanedSection$after';
 }

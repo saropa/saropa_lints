@@ -193,7 +193,8 @@ void noComments() {
         (i) => '  /// Documentation line $i explaining important details.',
       ).join('\n');
 
-      final code = '''
+      final code =
+          '''
 void wellDocumented() {
 $commentBlock
   var a = 1;

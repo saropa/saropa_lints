@@ -238,12 +238,12 @@ class ContentFingerprint {
     final sizeBucket = lineCount < 50
         ? 0
         : lineCount < 200
-            ? 1
-            : lineCount < 500
-                ? 2
-                : lineCount < 1000
-                    ? 3
-                    : 4;
+        ? 1
+        : lineCount < 500
+        ? 2
+        : lineCount < 1000
+        ? 3
+        : 4;
 
     return Object.hash(
       importCount.clamp(0, 20), // Cap at 20 imports

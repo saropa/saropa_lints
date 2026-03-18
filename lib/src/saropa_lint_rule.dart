@@ -117,7 +117,7 @@ extension LintCodeLowerCase on LintCode {
 /// Set via environment variable: SAROPA_LINTS_PROFILE=true
 final bool _profilingEnabled =
     const bool.fromEnvironment('SAROPA_LINTS_PROFILE') ||
-        const String.fromEnvironment('SAROPA_LINTS_PROFILE') == 'true';
+    const String.fromEnvironment('SAROPA_LINTS_PROFILE') == 'true';
 
 /// Threshold in milliseconds for logging slow rules.
 const int _slowRuleThresholdMs = 10;
@@ -133,25 +133,25 @@ const int _deferThresholdMs = 50;
 /// Set via environment variable: SAROPA_LINTS_DEFER=true
 final bool _isDeferSlowRules =
     const bool.fromEnvironment('SAROPA_LINTS_DEFER') ||
-        const String.fromEnvironment('SAROPA_LINTS_DEFER') == 'true';
+    const String.fromEnvironment('SAROPA_LINTS_DEFER') == 'true';
 
 /// Controls whether to run ONLY deferred (slow) rules.
 ///
 /// Set via environment variable: SAROPA_LINTS_DEFERRED=true
 final bool _isRunDeferredOnly =
     const bool.fromEnvironment('SAROPA_LINTS_DEFERRED') ||
-        const String.fromEnvironment('SAROPA_LINTS_DEFERRED') == 'true';
+    const String.fromEnvironment('SAROPA_LINTS_DEFERRED') == 'true';
 
 /// Controls whether progress reporting is enabled (default: true).
 ///
 /// Disable via environment variable: SAROPA_LINTS_PROGRESS=false
 final bool _progressEnabled =
     const bool.fromEnvironment('SAROPA_LINTS_PROGRESS', defaultValue: true) &&
-        const String.fromEnvironment(
-              'SAROPA_LINTS_PROGRESS',
-              defaultValue: 'true',
-            ) !=
-            'false';
+    const String.fromEnvironment(
+          'SAROPA_LINTS_PROGRESS',
+          defaultValue: 'true',
+        ) !=
+        'false';
 
 // =============================================================================
 // TERMINAL COLOR SUPPORT
@@ -615,14 +615,16 @@ class ProgressTracker {
         : '$_violationsFound';
 
     if (_isDiscoveredFromFiles && _totalExpectedFiles > 0) {
-      final percent =
-          (fileCount * 100 / _totalExpectedFiles).clamp(0, 100).round();
+      final percent = (fileCount * 100 / _totalExpectedFiles)
+          .clamp(0, 100)
+          .round();
       final remaining = (_totalExpectedFiles - fileCount).clamp(
         0,
         _totalExpectedFiles,
       );
-      final etaSeconds =
-          filesPerSec > 0 ? (remaining / filesPerSec).round() : 0;
+      final etaSeconds = filesPerSec > 0
+          ? (remaining / filesPerSec).round()
+          : 0;
 
       // Visual progress bar (20 chars wide)
       const barWidth = 20;
@@ -634,8 +636,8 @@ class ProgressTracker {
       final issuesColor = _violationsFound == 0
           ? green
           : _errorCount > 0
-              ? red
-              : yellow;
+          ? red
+          : yellow;
       final issuesStr = '$issuesColor$issuesDisplay$reset';
 
       // Build compact status line with clear labels
@@ -704,8 +706,8 @@ class ProgressTracker {
       final issuesColor = _violationsFound == 0
           ? green
           : _errorCount > 0
-              ? red
-              : yellow;
+          ? red
+          : yellow;
       // End with newline so the 100% bar persists above the summary box
       stderr.writeln(
         '$clearLine$bar ${bold}100%$reset '
@@ -726,14 +728,16 @@ class ProgressTracker {
 
     // Overview with color
     buf.writeln();
-    final rulesStr =
-        _totalEnabledRules > 0 ? ' with $_totalEnabledRules rules' : '';
+    final rulesStr = _totalEnabledRules > 0
+        ? ' with $_totalEnabledRules rules'
+        : '';
     buf.writeln(
       '  $dim📁$reset Files: $bold$fileCount$reset analyzed$rulesStr in $cyan${_formatDuration(elapsed.inSeconds)}$reset (${filesPerSec.round()}/s)',
     );
 
-    final issuePercent =
-        fileCount > 0 ? (_filesWithIssues * 100 / fileCount).round() : 0;
+    final issuePercent = fileCount > 0
+        ? (_filesWithIssues * 100 / fileCount).round()
+        : 0;
     final issueColor = _filesWithIssues == 0 ? green : yellow;
     buf.writeln(
       '  $dim📄$reset Files with issues: $issueColor$_filesWithIssues$reset ($issuePercent%)',
@@ -806,8 +810,8 @@ class ProgressTracker {
         final severityColor = severity == 'ERROR'
             ? red
             : severity == 'WARNING'
-                ? yellow
-                : cyan;
+            ? yellow
+            : cyan;
         buf.writeln(
           '    $severityColor●$reset ${entry.value.toString().padLeft(3)}x  $dim${entry.key}$reset',
         );
@@ -909,16 +913,16 @@ class ProgressTracker {
 
   /// Get a snapshot of all tracking data for report generation.
   static ProgressTrackerData get reportData => ProgressTrackerData(
-        filesAnalyzed: _seenFiles.length,
-        filesWithIssues: _filesWithIssues,
-        violationsFound: _violationsFound,
-        errorCount: _errorCount,
-        warningCount: _warningCount,
-        infoCount: _infoCount,
-        issuesByFile: Map<String, int>.unmodifiable(_issuesByFile),
-        issuesByRule: Map<String, int>.unmodifiable(_issuesByRule),
-        ruleSeverities: Map<String, String>.unmodifiable(_ruleSeverities),
-      );
+    filesAnalyzed: _seenFiles.length,
+    filesWithIssues: _filesWithIssues,
+    violationsFound: _violationsFound,
+    errorCount: _errorCount,
+    warningCount: _warningCount,
+    infoCount: _infoCount,
+    issuesByFile: Map<String, int>.unmodifiable(_issuesByFile),
+    issuesByRule: Map<String, int>.unmodifiable(_issuesByRule),
+    ruleSeverities: Map<String, String>.unmodifiable(_ruleSeverities),
+  );
 
   /// Check for `.saropa_stop` sentinel file in the project root.
   ///
@@ -1150,8 +1154,9 @@ class RuleTimingTracker {
     buffer.writeln('');
 
     for (final timing in timings) {
-      final isSlowMarker =
-          _slowRules.contains(timing.ruleName) ? '[SLOW] ' : '';
+      final isSlowMarker = _slowRules.contains(timing.ruleName)
+          ? '[SLOW] '
+          : '';
       buffer.writeln(
         '  $isSlowMarker${timing.ruleName}: '
         '${timing.totalTime.inMilliseconds}ms total, '
@@ -1218,7 +1223,8 @@ class RuleTimingRecord {
 /// Controls whether report writing is enabled.
 ///
 /// Set via environment variable: SAROPA_LINTS_REPORT=true
-final bool _reportEnabled = const bool.fromEnvironment('SAROPA_LINTS_REPORT') ||
+final bool _reportEnabled =
+    const bool.fromEnvironment('SAROPA_LINTS_REPORT') ||
     const String.fromEnvironment('SAROPA_LINTS_REPORT') == 'true';
 
 /// Writes detailed analysis reports to a reports/ folder.
@@ -1422,8 +1428,9 @@ class ReportWriter {
   // ignore: avoid_dynamic
   static Future<void> _writeSummaryReport(dynamic io) {
     final start = _analysisStartTime;
-    final elapsed =
-        start != null ? DateTime.now().difference(start) : Duration.zero;
+    final elapsed = start != null
+        ? DateTime.now().difference(start)
+        : Duration.zero;
 
     final buffer = StringBuffer();
     buffer.writeln('SAROPA LINTS ANALYSIS SUMMARY');
@@ -1664,19 +1671,17 @@ class ImpactTracker {
 
   /// Get all violations grouped by impact.
   static Map<LintImpact, List<ViolationRecord>> get violations => {
-        for (final entry in _violations.entries)
-          entry.key: entry.value.toList(),
-      };
+    for (final entry in _violations.entries) entry.key: entry.value.toList(),
+  };
 
   /// Get count of violations by impact level.
   static Map<LintImpact, int> get counts => {
-        LintImpact.critical: _violations[LintImpact.critical]?.length ?? 0,
-        LintImpact.high: _violations[LintImpact.high]?.length ?? 0,
-        LintImpact.medium: _violations[LintImpact.medium]?.length ?? 0,
-        LintImpact.low: _violations[LintImpact.low]?.length ?? 0,
-        LintImpact.opinionated:
-            _violations[LintImpact.opinionated]?.length ?? 0,
-      };
+    LintImpact.critical: _violations[LintImpact.critical]?.length ?? 0,
+    LintImpact.high: _violations[LintImpact.high]?.length ?? 0,
+    LintImpact.medium: _violations[LintImpact.medium]?.length ?? 0,
+    LintImpact.low: _violations[LintImpact.low]?.length ?? 0,
+    LintImpact.opinionated: _violations[LintImpact.opinionated]?.length ?? 0,
+  };
 
   /// Get total violation count.
   static int get total =>
@@ -1833,8 +1838,8 @@ class ViolationRecord {
 /// ```
 abstract class SaropaLintRule extends AnalysisRule {
   SaropaLintRule({required LintCode code})
-      : _lintCode = code,
-        super(name: code.lowerCaseName, description: code.problemMessage);
+    : _lintCode = code,
+      super(name: code.lowerCaseName, description: code.problemMessage);
 
   final LintCode _lintCode;
 
@@ -2375,7 +2380,8 @@ abstract class SaropaLintRule extends AnalysisRule {
     // Check fixture files - but NOT in example/ directory
     // (example fixtures are specifically for testing the linter rules)
     if (skipFixtureFiles) {
-      final isInExample = normalizedPath.contains('/example/') ||
+      final isInExample =
+          normalizedPath.contains('/example/') ||
           normalizedPath.contains('/examples/');
       if (!isInExample) {
         if (normalizedPath.contains('/fixture/') ||

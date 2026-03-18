@@ -129,7 +129,8 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
 
       // Report workers not disposed in onClose
       for (final String fieldName in workerFields) {
-        final bool isDisposed = onCloseMethod != null &&
+        final bool isDisposed =
+            onCloseMethod != null &&
             isFieldCleanedUp(fieldName, 'dispose', onCloseMethod.body);
 
         if (!isDisposed) {
@@ -272,13 +273,13 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
       final String classSource = enclosingClass.toSource();
       final bool hasDelete =
           RegExp(r'\bGet\.delete\s*\(').hasMatch(classSource) ||
-              RegExp(r'\bGet\.deleteAll\s*\(').hasMatch(classSource) ||
-              (controllerType != null &&
-                  RegExp(
-                    r'\bGet\.delete\s*<' +
-                        RegExp.escape(controllerType) +
-                        r'>\s*\(',
-                  ).hasMatch(classSource));
+          RegExp(r'\bGet\.deleteAll\s*\(').hasMatch(classSource) ||
+          (controllerType != null &&
+              RegExp(
+                r'\bGet\.delete\s*<' +
+                    RegExp.escape(controllerType) +
+                    r'>\s*\(',
+              ).hasMatch(classSource));
 
       if (!hasDelete) {
         reporter.atNode(node);
@@ -394,8 +395,8 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
       if (target.name != 'Get') return;
 
       // Check if this is inside a widget class
-      final ClassDeclaration? enclosingClass =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? enclosingClass = node
+          .thisOrAncestorOfType<ClassDeclaration>();
 
       if (enclosingClass == null) {
         // Top-level or function scope - not in a widget
@@ -428,8 +429,8 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
       if (prefix != 'Get') return;
 
       // Check if this is inside a widget class
-      final ClassDeclaration? enclosingClass =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? enclosingClass = node
+          .thisOrAncestorOfType<ClassDeclaration>();
 
       if (enclosingClass == null) {
         // Top-level or function scope - not in a widget
@@ -1064,8 +1065,8 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
   ) {
     // Check for .obs in field declarations (most common case)
     context.addFieldDeclaration((FieldDeclaration node) {
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       // Check if this class extends a GetX controller type

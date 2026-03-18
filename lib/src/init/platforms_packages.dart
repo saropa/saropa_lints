@@ -42,7 +42,8 @@ platforms:
 
   if (maxIssuesMatch != null) {
     final insertPos = maxIssuesMatch.end;
-    newContent = content.substring(0, insertPos) +
+    newContent =
+        content.substring(0, insertPos) +
         '\n' +
         settingBlock +
         content.substring(insertPos);
@@ -50,7 +51,8 @@ platforms:
     final headerEndMatch = RegExp(r'╚[═]+╝\n*').firstMatch(content);
     if (headerEndMatch != null) {
       final insertPos = headerEndMatch.end;
-      newContent = content.substring(0, insertPos) +
+      newContent =
+          content.substring(0, insertPos) +
           '\n' +
           settingBlock +
           content.substring(insertPos);
@@ -81,7 +83,8 @@ void ensurePackagesSetting(File file) {
       .map((p) => '  $p: ${tiers.defaultPackages[p]}')
       .join('\n');
 
-  final settingBlock = '''
+  final settingBlock =
+      '''
 # ─────────────────────────────────────────────────────────────────────────────
 # PACKAGE SETTINGS
 # ─────────────────────────────────────────────────────────────────────────────
@@ -109,7 +112,8 @@ $packageEntries
 
   if (platformsEndMatch != null) {
     final insertPos = platformsEndMatch.end;
-    newContent = content.substring(0, insertPos) +
+    newContent =
+        content.substring(0, insertPos) +
         '\n' +
         settingBlock +
         content.substring(insertPos);
@@ -118,7 +122,8 @@ $packageEntries
     final maxIssuesMatch = RegExp(r'max_issues:\s*\d+\n*').firstMatch(content);
     if (maxIssuesMatch != null) {
       final insertPos = maxIssuesMatch.end;
-      newContent = content.substring(0, insertPos) +
+      newContent =
+          content.substring(0, insertPos) +
           '\n' +
           settingBlock +
           content.substring(insertPos);

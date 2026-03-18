@@ -305,8 +305,7 @@ void main() {
         expect('avoid_unsafe_reduce passes', isNotNull);
       });
 
-      test(
-          'reduce after length < 2 early return should NOT trigger '
+      test('reduce after length < 2 early return should NOT trigger '
           '(regression)', () {
         // if (data.length < 2) return; data.reduce(...)
         expect('length guard for reduce recognized', isNotNull);

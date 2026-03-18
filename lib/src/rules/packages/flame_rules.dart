@@ -85,7 +85,8 @@ class _VectorVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    final String typeName = node.constructorName.type.element?.name ??
+    final String typeName =
+        node.constructorName.type.element?.name ??
         node.constructorName.type.name.lexeme;
 
     if (vectorTypes.contains(typeName)) {

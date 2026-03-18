@@ -4,13 +4,13 @@ import 'package:test/test.dart';
 /// All tier sets in tiers.dart, for validation.
 const List<({String name, Set<String> rules})> _allTierSets =
     <({String name, Set<String> rules})>[
-  (name: 'stylisticRules', rules: stylisticRules),
-  (name: 'essentialRules', rules: essentialRules),
-  (name: 'recommendedOnlyRules', rules: recommendedOnlyRules),
-  (name: 'professionalOnlyRules', rules: professionalOnlyRules),
-  (name: 'comprehensiveOnlyRules', rules: comprehensiveOnlyRules),
-  (name: 'pedanticOnlyRules', rules: pedanticOnlyRules),
-];
+      (name: 'stylisticRules', rules: stylisticRules),
+      (name: 'essentialRules', rules: essentialRules),
+      (name: 'recommendedOnlyRules', rules: recommendedOnlyRules),
+      (name: 'professionalOnlyRules', rules: professionalOnlyRules),
+      (name: 'comprehensiveOnlyRules', rules: comprehensiveOnlyRules),
+      (name: 'pedanticOnlyRules', rules: pedanticOnlyRules),
+    ];
 
 void main() {
   group('SaropaLints Plugin', () {
@@ -47,7 +47,8 @@ void main() {
       expect(
         missingFromTiers,
         isEmpty,
-        reason: 'Rules exist in plugin but not in tiers.dart:\n'
+        reason:
+            'Rules exist in plugin but not in tiers.dart:\n'
             '${missingFromTiers.toList()..sort()}\n\n'
             'Add these rules to the appropriate tier in lib/src/tiers.dart',
       );
@@ -61,7 +62,8 @@ void main() {
       expect(
         phantomRules,
         isEmpty,
-        reason: 'Rules in tiers.dart do not exist in plugin:\n'
+        reason:
+            'Rules in tiers.dart do not exist in plugin:\n'
             '${phantomRules.toList()..sort()}\n\n'
             'Remove these phantom rules from lib/src/tiers.dart',
       );
@@ -80,15 +82,16 @@ void main() {
 
       final Map<String, List<String>> duplicates =
           Map<String, List<String>>.fromEntries(
-        ruleToSets.entries.where(
-          (MapEntry<String, List<String>> e) => e.value.length > 1,
-        ),
-      );
+            ruleToSets.entries.where(
+              (MapEntry<String, List<String>> e) => e.value.length > 1,
+            ),
+          );
 
       expect(
         duplicates,
         isEmpty,
-        reason: 'Rules found in multiple tier sets:\n'
+        reason:
+            'Rules found in multiple tier sets:\n'
             '${duplicates.entries.map((e) => '  ${e.key}: ${e.value.join(', ')}').join('\n')}\n\n'
             'Each rule must appear in exactly one tier set.',
       );
@@ -111,7 +114,8 @@ void main() {
       expect(
         missingRules,
         isEmpty,
-        reason: 'Rules not in any tier set:\n'
+        reason:
+            'Rules not in any tier set:\n'
             '${missingRules.toList()..sort()}\n\n'
             'Every rule must be in exactly one tier set in tiers.dart.',
       );
@@ -133,7 +137,8 @@ void main() {
       expect(
         totalCount,
         allRules.length,
-        reason: 'Total entries across all tier sets ($totalCount) '
+        reason:
+            'Total entries across all tier sets ($totalCount) '
             'exceeds unique rule count (${allRules.length}). '
             'A rule appears in multiple sets.',
       );
@@ -159,7 +164,8 @@ void main() {
       expect(
         misclassified,
         isEmpty,
-        reason: 'Opinionated prefer_* rules must be in '
+        reason:
+            'Opinionated prefer_* rules must be in '
             'stylisticRules, not a tier set:\n'
             '${misclassified.map((n) => '  $n').join('\n')}\n\n'
             'Move these rules to stylisticRules in lib/src/tiers.dart.',
@@ -191,7 +197,8 @@ void main() {
       expect(
         phantomRules,
         isEmpty,
-        reason: 'Rules in package sets do not exist in plugin:\n'
+        reason:
+            'Rules in package sets do not exist in plugin:\n'
             '${phantomRules.toList()..sort()}\n\n'
             'Remove these phantom rules from package sets in '
             'lib/src/tiers.dart',
@@ -210,7 +217,8 @@ void main() {
       expect(
         orphaned,
         isEmpty,
-        reason: 'Package rules not in any tier set:\n'
+        reason:
+            'Package rules not in any tier set:\n'
             '${orphaned.toList()..sort()}\n\n'
             'Package sets are orthogonal to tiers. Every rule '
             'in a package set must also be in a tier set.',
@@ -224,7 +232,8 @@ void main() {
       expect(
         allSet,
         defaultKeys,
-        reason: 'allPackages and defaultPackages.keys must match.\n'
+        reason:
+            'allPackages and defaultPackages.keys must match.\n'
             'In allPackages only: ${allSet.difference(defaultKeys)}\n'
             'In defaultPackages only: ${defaultKeys.difference(allSet)}',
       );
@@ -237,7 +246,8 @@ void main() {
       expect(
         allSet,
         ruleSetKeys,
-        reason: 'allPackages and packageRuleSets.keys must match.\n'
+        reason:
+            'allPackages and packageRuleSets.keys must match.\n'
             'In allPackages only: ${allSet.difference(ruleSetKeys)}\n'
             'In packageRuleSets only: ${ruleSetKeys.difference(allSet)}',
       );
@@ -281,7 +291,8 @@ void main() {
       expect(
         notInStylistic,
         isEmpty,
-        reason: 'flutterStylisticRules contains rules not in stylisticRules:\n'
+        reason:
+            'flutterStylisticRules contains rules not in stylisticRules:\n'
             '${notInStylistic.toList()..sort()}\n\n'
             'flutterStylisticRules must be a subset of stylisticRules.',
       );
@@ -306,7 +317,8 @@ void main() {
       expect(
         missing,
         isEmpty,
-        reason: 'Widget-only stylistic rules missing from '
+        reason:
+            'Widget-only stylistic rules missing from '
             'flutterStylisticRules:\n'
             '${missing.toList()..sort()}\n\n'
             'Add these to flutterStylisticRules in lib/src/tiers.dart.',
@@ -329,14 +341,16 @@ void main() {
       expect(
         badOnly,
         isEmpty,
-        reason: 'Rules with exampleBad but no exampleGood:\n'
+        reason:
+            'Rules with exampleBad but no exampleGood:\n'
             '${badOnly.join('\n')}\n\n'
             'Always provide both examples.',
       );
       expect(
         goodOnly,
         isEmpty,
-        reason: 'Rules with exampleGood but no exampleBad:\n'
+        reason:
+            'Rules with exampleGood but no exampleBad:\n'
             '${goodOnly.join('\n')}\n\n'
             'Always provide both examples.',
       );
@@ -375,7 +389,8 @@ void main() {
       expect(
         identical,
         isEmpty,
-        reason: 'Rules where exampleBad == exampleGood (no diff shown):\n'
+        reason:
+            'Rules where exampleBad == exampleGood (no diff shown):\n'
             '${identical.join('\n')}',
       );
     });

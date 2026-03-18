@@ -1359,13 +1359,15 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   @override
-  String get exampleBad => 'ListView(\n'
+  String get exampleBad =>
+      'ListView(\n'
       '  shrinkWrap: true, // O(n) layout cost\n'
       '  children: items,\n'
       ')';
 
   @override
-  String get exampleGood => 'CustomScrollView(\n'
+  String get exampleGood =>
+      'CustomScrollView(\n'
       '  slivers: [SliverList(delegate: ...)],\n'
       ')';
 
@@ -2070,7 +2072,8 @@ class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
     '[avoid_scrollable_in_intrinsic] Scrollable widget inside '
         'IntrinsicHeight/IntrinsicWidth causes a geometry loop crash. '
         'Scrollables have no natural size. {v2}',
-    correctionMessage: 'Use SizedBox with explicit dimensions instead of '
+    correctionMessage:
+        'Use SizedBox with explicit dimensions instead of '
         'IntrinsicHeight/IntrinsicWidth around scrollable widgets.',
     severity: DiagnosticSeverity.ERROR,
   );

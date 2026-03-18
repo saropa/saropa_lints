@@ -461,14 +461,15 @@ void main() {
         expect('prefer_single_quotes passes', isNotNull);
       });
 
-      test('should NOT trigger on simple string with embedded single quotes',
-          () {
-        // "WHERE col = ''" contains single quotes — converting would need \'
-        expect('false positive prevention: simple string', isNotNull);
-      });
-
       test(
-          'should NOT trigger on interpolated string with embedded single '
+        'should NOT trigger on simple string with embedded single quotes',
+        () {
+          // "WHERE col = ''" contains single quotes — converting would need \'
+          expect('false positive prevention: simple string', isNotNull);
+        },
+      );
+
+      test('should NOT trigger on interpolated string with embedded single '
           'quotes', () {
         // "WHERE $col = 'active'" contains single quotes in literal parts
         expect('false positive prevention: interpolated string', isNotNull);
@@ -641,7 +642,9 @@ void main() {
         expect(content, contains('String greet()'));
         expect(content, contains('void process()'));
         expect(
-            content, contains('expect_lint: prefer_doc_comments_over_regular'));
+          content,
+          contains('expect_lint: prefer_doc_comments_over_regular'),
+        );
       });
 
       test('fixture has section-header false-positive guards', () {

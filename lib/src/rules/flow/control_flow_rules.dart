@@ -90,9 +90,9 @@ class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceAssignmentWithComparisonFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceAssignmentWithComparisonFix(context: context),
+  ];
 
   void _checkCondition(
     Expression condition,
@@ -257,9 +257,9 @@ class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            SimplifyBooleanLiteralFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        SimplifyBooleanLiteralFix(context: context),
+  ];
 }
 
 /// Warns when assert has a constant condition (always true or always false).
@@ -326,9 +326,9 @@ class AvoidConstantAssertConditionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveConstantAssertFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveConstantAssertFix(context: context),
+  ];
 
   bool _areSameLiteral(Expression left, Expression right) {
     if (left is IntegerLiteral && right is IntegerLiteral) {
@@ -443,13 +443,15 @@ class AvoidContinueRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'for (final x in items) {\n'
+  String get exampleBad =>
+      'for (final x in items) {\n'
       '  if (x < 0) continue;  // breaks linear flow\n'
       '  process(x);\n'
       '}';
 
   @override
-  String get exampleGood => 'for (final x in items) {\n'
+  String get exampleGood =>
+      'for (final x in items) {\n'
       '  if (x >= 0) process(x);\n'
       '}';
 
@@ -572,9 +574,9 @@ class AvoidDuplicateSwitchCaseConditionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveDuplicateSwitchCaseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveDuplicateSwitchCaseFix(context: context),
+  ];
 }
 
 /// Warns when an if statement has too many branches.
@@ -708,9 +710,9 @@ class AvoidInvertedBooleanChecksRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            InvertOperatorFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        InvertOperatorFix(context: context),
+  ];
 }
 
 /// Warns when a negated condition can be simplified.
@@ -786,9 +788,9 @@ class AvoidNegatedConditionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UsePositiveFormFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UsePositiveFormFix(context: context),
+  ];
 }
 
 /// Warns when assignment is used inside another expression.
@@ -1176,9 +1178,9 @@ class AvoidRedundantElseRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveRedundantElseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveRedundantElseFix(context: context),
+  ];
 }
 
 /// Warns when break or continue is unconditionally executed.
@@ -1266,9 +1268,9 @@ class AvoidUnconditionalBreakRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnconditionalBreakFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnconditionalBreakFix(context: context),
+  ];
 }
 
 /// Warns when a condition is always true or always false.
@@ -1366,9 +1368,9 @@ class AvoidUnnecessaryContinueRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CommentOutUnnecessaryContinueFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CommentOutUnnecessaryContinueFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_continue',
@@ -1622,9 +1624,9 @@ class NoEqualThenElseRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceWithThenBranchFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithThenBranchFix(context: context),
+  ];
 }
 
 /// Warns when an if-else could be simplified to a conditional expression.
@@ -1646,7 +1648,8 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'if (dark) {\n'
+  String get exampleBad =>
+      'if (dark) {\n'
       '  color = black;\n'
       '} else {\n'
       '  color = white;\n'
@@ -1800,7 +1803,8 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'if (x > 0) {\n'
+  String get exampleBad =>
+      'if (x > 0) {\n'
       '  return true;\n'
       '}\n'
       'return false;';
@@ -1864,9 +1868,9 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferReturningConditionalsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferReturningConditionalsFix(context: context),
+  ];
 
   bool _returnsBoolLiteral(Statement stmt, bool value) {
     if (stmt is ReturnStatement) {
@@ -1915,7 +1919,8 @@ class PreferReturningConditionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'if (x > 0) {\n'
+  String get exampleBad =>
+      'if (x > 0) {\n'
       '  return true;\n'
       '} else {\n'
       '  return false;\n'
@@ -2153,11 +2158,11 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveDoubleNegationFix(context: context),
-        ({required CorrectionProducerContext context}) =>
-            SimplifyDeMorganFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveDoubleNegationFix(context: context),
+    ({required CorrectionProducerContext context}) =>
+        SimplifyDeMorganFix(context: context),
+  ];
 
   /// Check if an expression is simple enough that negating it is readable.
   /// We want to avoid suggesting De Morgan's for complex nested expressions.

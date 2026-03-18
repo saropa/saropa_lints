@@ -31,7 +31,7 @@ executables:
 
 # Dart SDK constraint (pure Dart package; Flutter topic tag provides discoverability)
 environment:
-  sdk: ">=3.6.0 <4.0.0"
+  sdk: ">=3.9.0 <4.0.0"
 
 # Runtime dependencies for lint rule implementation (analyzer 9 for Flutter compatibility)
 dependencies:

@@ -630,8 +630,9 @@ class AnalysisReporter {
 
     all.sort((a, b) => b.priority.compareTo(a.priority));
 
-    final showing =
-        all.length > _maxInlineViolations ? _maxInlineViolations : all.length;
+    final showing = all.length > _maxInlineViolations
+        ? _maxInlineViolations
+        : all.length;
 
     buf.writeln('${'=' * 70}');
     buf.writeln(
@@ -729,7 +730,8 @@ class AnalysisReporter {
     final layer = ImportGraphTracker.getLayer(file);
     final fanIn = ImportGraphTracker.importersOf(file).length;
     final fanOut = ImportGraphTracker.importsOf(file).length;
-    final label = '${_relativePath(file)} '
+    final label =
+        '${_relativePath(file)} '
         '[$layer] (fan-in: $fanIn, fan-out: $fanOut)';
 
     if (!visited.add(file)) {
@@ -741,8 +743,9 @@ class AnalysisReporter {
 
     final children = ImportGraphTracker.importsOf(file).toList()..sort();
     // Only show children that are in our project graph
-    final projectChildren =
-        children.where((c) => ImportGraphTracker.allFiles.contains(c)).toList();
+    final projectChildren = children
+        .where((c) => ImportGraphTracker.allFiles.contains(c))
+        .toList();
 
     final childPrefix =
         prefix + (prefix.isEmpty ? '' : (isLast ? '    ' : '│   '));
@@ -784,8 +787,8 @@ class AnalysisReporter {
         if (entity is Directory && !dirName.startsWith('.')) {
           reportFiles.addAll(
             entity.listSync().whereType<File>().where(
-                  (f) => f.path.endsWith('_saropa_lint_report.log'),
-                ),
+              (f) => f.path.endsWith('_saropa_lint_report.log'),
+            ),
           );
         }
       }

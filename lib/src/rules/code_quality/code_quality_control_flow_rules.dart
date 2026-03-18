@@ -138,9 +138,9 @@ class AvoidConstantConditionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceConstantConditionFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceConstantConditionFix(context: context),
+  ];
 
   bool _isConstant(Expression expr) {
     return expr is IntegerLiteral ||
@@ -201,9 +201,9 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveWildcardOrDefaultCaseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveWildcardOrDefaultCaseFix(context: context),
+  ];
 
   bool _looksLikeEnumType(String typeName) {
     if (typeName.isEmpty) return false;
@@ -264,9 +264,9 @@ class NoEqualNestedConditionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            FlattenRedundantNestedConditionFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        FlattenRedundantNestedConditionFix(context: context),
+  ];
 }
 
 class _NestedConditionChecker extends RecursiveAstVisitor<void> {
@@ -326,8 +326,9 @@ class NoEqualSwitchCaseRule extends SaropaLintRule {
 
       for (final SwitchMember member in node.members) {
         if (member is SwitchCase && member.statements.isNotEmpty) {
-          final String body =
-              member.statements.map((Statement s) => s.toSource()).join();
+          final String body = member.statements
+              .map((Statement s) => s.toSource())
+              .join();
           caseBodies.add(body);
           members.add(member);
         }
@@ -345,9 +346,9 @@ class NoEqualSwitchCaseRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveDuplicateSwitchCaseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveDuplicateSwitchCaseFix(context: context),
+  ];
 }
 
 /// Warns when isEmpty/isNotEmpty is used after where().
@@ -415,9 +416,9 @@ class AvoidDuplicatePatternsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveDuplicatePatternCaseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveDuplicatePatternCaseFix(context: context),
+  ];
 }
 
 /// Warns when an extension type contains another extension type.
@@ -486,9 +487,9 @@ class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveWildcardOrDefaultCaseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveWildcardOrDefaultCaseFix(context: context),
+  ];
 }
 
 /// Warns when switch on sealed types uses default or wildcard, defeating exhaustiveness.
@@ -554,9 +555,9 @@ class RequireExhaustiveSealedSwitchRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveWildcardOrDefaultCaseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveWildcardOrDefaultCaseFix(context: context),
+  ];
 }
 
 /// Warns when switch expression cases have identical expressions.
@@ -612,9 +613,9 @@ class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveDuplicateSwitchCaseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveDuplicateSwitchCaseFix(context: context),
+  ];
 }
 
 /// Prefer switch expression over switch statement when all cases are simple
@@ -669,8 +670,9 @@ class PreferSwitchExpressionRule extends SaropaLintRule {
         if (statements.isEmpty) continue;
 
         // Filter out break statements
-        final List<Statement> meaningful =
-            statements.where((s) => s is! BreakStatement).toList();
+        final List<Statement> meaningful = statements
+            .where((s) => s is! BreakStatement)
+            .toList();
         if (meaningful.isEmpty) continue;
 
         // If any case has multiple meaningful statements, it's complex

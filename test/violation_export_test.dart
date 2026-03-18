@@ -241,8 +241,9 @@ void main() {
       );
 
       final exported = readExport()['violations'] as List<dynamic>;
-      final owasp = (exported.first as Map<String, dynamic>)['owasp']
-          as Map<String, dynamic>;
+      final owasp =
+          (exported.first as Map<String, dynamic>)['owasp']
+              as Map<String, dynamic>;
 
       final mobile = (owasp['mobile'] as List<dynamic>).cast<String>();
       final web = (owasp['web'] as List<dynamic>).cast<String>();
@@ -267,8 +268,9 @@ void main() {
       );
 
       final exported = readExport()['violations'] as List<dynamic>;
-      final owasp = (exported.first as Map<String, dynamic>)['owasp']
-          as Map<String, dynamic>;
+      final owasp =
+          (exported.first as Map<String, dynamic>)['owasp']
+              as Map<String, dynamic>;
 
       expect(owasp['mobile'], isEmpty);
       expect(owasp['web'], isEmpty);
@@ -438,8 +440,8 @@ void main() {
       );
 
       final configSection = readExport()['config'] as Map<String, dynamic>;
-      final names =
-          (configSection['enabledRuleNames'] as List<dynamic>).cast<String>();
+      final names = (configSection['enabledRuleNames'] as List<dynamic>)
+          .cast<String>();
       expect(names, ['rule_a', 'rule_b', 'rule_c']);
     });
 
@@ -466,8 +468,8 @@ void main() {
       );
 
       final configSection = readExport()['config'] as Map<String, dynamic>;
-      final stylistic =
-          (configSection['stylisticRuleNames'] as List<dynamic>).cast<String>();
+      final stylistic = (configSection['stylisticRuleNames'] as List<dynamic>)
+          .cast<String>();
       expect(stylistic, isNotEmpty);
       expect(stylistic, contains('prefer_member_ordering'));
       expect(stylistic, equals(stylistic.toList()..sort()));
@@ -482,8 +484,8 @@ void main() {
       );
 
       final configSection = readExport()['config'] as Map<String, dynamic>;
-      final fixes =
-          (configSection['rulesWithFixes'] as List<dynamic>).cast<String>();
+      final fixes = (configSection['rulesWithFixes'] as List<dynamic>)
+          .cast<String>();
       // rulesWithFixes is computed from all rule factories, so it should
       // be non-empty (many rules have quick-fix generators) and sorted.
       expect(fixes, isNotEmpty);
@@ -513,12 +515,12 @@ void main() {
       );
 
       final configSection = readExport()['config'] as Map<String, dynamic>;
-      final disabled =
-          (configSection['disabledPackages'] as List<dynamic>).cast<String>();
+      final disabled = (configSection['disabledPackages'] as List<dynamic>)
+          .cast<String>();
       expect(disabled, ['isar', 'hive']);
 
-      final exclusions =
-          (configSection['userExclusions'] as List<dynamic>).cast<String>();
+      final exclusions = (configSection['userExclusions'] as List<dynamic>)
+          .cast<String>();
       expect(exclusions, ['no_magic_numbers', 'prefer_const']);
     });
 

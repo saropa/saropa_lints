@@ -85,8 +85,10 @@ String generatePluginsYaml({
   }
 
   // Show package status
-  final disabledPackages =
-      packageSettings.entries.where((e) => !e.value).map((e) => e.key).toList();
+  final disabledPackages = packageSettings.entries
+      .where((e) => !e.value)
+      .map((e) => e.key)
+      .toList();
 
   if (disabledPackages.isNotEmpty) {
     buffer.writeln('    # Disabled packages: ${disabledPackages.join(', ')}');
@@ -260,8 +262,9 @@ String replacePluginsSection(String existingContent, String newPlugins) {
   // Find next top-level section (line starting with a word followed by colon, no indentation)
   final Match? nextSection = topLevelKeyPattern.firstMatch(afterPluginsStart);
 
-  final String afterPlugins =
-      nextSection != null ? afterPluginsStart.substring(nextSection.start) : '';
+  final String afterPlugins = nextSection != null
+      ? afterPluginsStart.substring(nextSection.start)
+      : '';
 
   return '$beforePlugins$newPlugins\n$afterPlugins';
 }

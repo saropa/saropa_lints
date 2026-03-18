@@ -11,7 +11,9 @@ void main() {
     test('RequireConnectivityErrorHandlingRule', () {
       final rule = RequireConnectivityErrorHandlingRule();
       expect(
-          rule.code.name.toLowerCase(), 'require_connectivity_error_handling');
+        rule.code.name.toLowerCase(),
+        'require_connectivity_error_handling',
+      );
       expect(
         rule.code.problemMessage,
         contains('[require_connectivity_error_handling]'),
@@ -22,7 +24,9 @@ void main() {
     test('AvoidConnectivityEqualsInternetRule', () {
       final rule = AvoidConnectivityEqualsInternetRule();
       expect(
-          rule.code.name.toLowerCase(), 'avoid_connectivity_equals_internet');
+        rule.code.name.toLowerCase(),
+        'avoid_connectivity_equals_internet',
+      );
       expect(
         rule.code.problemMessage,
         contains('[avoid_connectivity_equals_internet]'),

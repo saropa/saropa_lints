@@ -128,7 +128,8 @@ class PreferEarlyReturnRule extends SaropaLintRule {
   String get exampleBad => 'if (x != null) { if (y != null) { doWork(); } }';
 
   @override
-  String get exampleGood => 'if (x == null) return;\n'
+  String get exampleGood =>
+      'if (x == null) return;\n'
       'if (y == null) return;\n'
       'doWork();';
 
@@ -226,12 +227,14 @@ class PreferSingleExitPointRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'if (x == null) return;\n'
+  String get exampleBad =>
+      'if (x == null) return;\n'
       'if (y == null) return;\n'
       'doWork();';
 
   @override
-  String get exampleGood => 'if (x != null && y != null) {\n'
+  String get exampleGood =>
+      'if (x != null && y != null) {\n'
       '  doWork();\n'
       '}';
 
@@ -433,7 +436,8 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
   String get exampleBad => 'if (!isReady) return;  // negated guard';
 
   @override
-  String get exampleGood => 'if (isReady) {\n'
+  String get exampleGood =>
+      'if (isReady) {\n'
       '  doWork();\n'
       '}';
 
@@ -528,12 +532,14 @@ class PreferSwitchStatementRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad => 'final widgets = [\n'
+  String get exampleBad =>
+      'final widgets = [\n'
       '  switch (s) { 0 => a, _ => b },\n'
       '];';
 
   @override
-  String get exampleGood => 'String get label => switch (s) {\n'
+  String get exampleGood =>
+      'String get label => switch (s) {\n'
       '  0 => "a", _ => "b",\n'
       '};';
 
@@ -671,10 +677,7 @@ class PreferCascadeOverChainedRule extends SaropaLintRule {
             consecutiveCount++;
             methodNames.add(methodName);
             if (!reported &&
-                _isCascadeCandidate(
-                  consecutiveCount,
-                  methodNames.length,
-                )) {
+                _isCascadeCandidate(consecutiveCount, methodNames.length)) {
               final n = firstConsecutive;
               if (n != null) reporter.atNode(n, code);
               reported = true;
@@ -866,13 +869,15 @@ class PreferExhaustiveEnumsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'switch (s) {\n'
+  String get exampleBad =>
+      'switch (s) {\n'
       '  case S.a: break;\n'
       '  default: break;  // hides missing cases\n'
       '}';
 
   @override
-  String get exampleGood => 'switch (s) {\n'
+  String get exampleGood =>
+      'switch (s) {\n'
       '  case S.a: break;\n'
       '  case S.b: break;  // exhaustive\n'
       '}';
@@ -956,13 +961,15 @@ class PreferDefaultEnumCaseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'switch (s) {\n'
+  String get exampleBad =>
+      'switch (s) {\n'
       '  case S.a: break;\n'
       '  case S.b: break;  // no default\n'
       '}';
 
   @override
-  String get exampleGood => 'switch (s) {\n'
+  String get exampleGood =>
+      'switch (s) {\n'
       '  case S.a: break;\n'
       '  default: break;  // handles future values\n'
       '}';
@@ -1273,7 +1280,8 @@ class PreferThenCatchErrorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'try {\n'
+  String get exampleBad =>
+      'try {\n'
       '  await fetch();\n'
       '} catch (e) { log(e); }';
 
@@ -1437,11 +1445,13 @@ class PreferIfElseOverGuardsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'if (x < 0) return;\n'
+  String get exampleBad =>
+      'if (x < 0) return;\n'
       'if (x > 10) return;  // consecutive guards';
 
   @override
-  String get exampleGood => 'if (x < 0) {\n'
+  String get exampleGood =>
+      'if (x < 0) {\n'
       '  return;\n'
       '} else if (x > 10) {\n'
       '  return;\n'
@@ -1556,10 +1566,7 @@ class PreferCascadeAssignmentsRule extends SaropaLintRule {
           if (targetName == lastTarget) {
             consecutiveCount++;
             methodNames.add(methodName);
-            if (_isCascadeCandidate(
-              consecutiveCount,
-              methodNames.length,
-            )) {
+            if (_isCascadeCandidate(consecutiveCount, methodNames.length)) {
               final n = firstConsecutive;
               if (n != null) {
                 reporter.atNode(n);
@@ -1663,14 +1670,16 @@ class PreferPositiveConditionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad => 'if (!isValid) {\n'
+  String get exampleBad =>
+      'if (!isValid) {\n'
       '  showError();\n'
       '} else {\n'
       '  proceed();\n'
       '}';
 
   @override
-  String get exampleGood => 'if (isValid) {\n'
+  String get exampleGood =>
+      'if (isValid) {\n'
       '  proceed();\n'
       '} else {\n'
       '  showError();\n'
@@ -1680,7 +1689,8 @@ class PreferPositiveConditionsRule extends SaropaLintRule {
     'prefer_positive_conditions',
     '[prefer_positive_conditions] Prefer a positive condition with '
         'the branches swapped for readability. {v3}',
-    correctionMessage: 'Invert the condition to its positive form and swap the '
+    correctionMessage:
+        'Invert the condition to its positive form and swap the '
         'then/else branches.',
     severity: DiagnosticSeverity.INFO,
   );

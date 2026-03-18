@@ -595,9 +595,9 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferLoggerOverPrintFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferLoggerOverPrintFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_logger_over_print',
@@ -1123,7 +1123,8 @@ class RequireSearchDebounceRule extends SaropaLintRule {
       final callbackSource = onChangedArg.expression.toSource().toLowerCase();
 
       // Check if it's search-related
-      final isSearchRelated = callbackSource.contains('search') ||
+      final isSearchRelated =
+          callbackSource.contains('search') ||
           callbackSource.contains('query') ||
           callbackSource.contains('find') ||
           callbackSource.contains('fetch') ||
@@ -1172,8 +1173,8 @@ class RequireSearchDebounceRule extends SaropaLintRule {
   /// matches a known debounce utility, avoiding expensive full-class
   /// `toSource()` serialization.
   bool _hasDebounceInEnclosingClass(AstNode node) {
-    final ClassDeclaration? classDecl =
-        node.thisOrAncestorOfType<ClassDeclaration>();
+    final ClassDeclaration? classDecl = node
+        .thisOrAncestorOfType<ClassDeclaration>();
     if (classDecl == null) return false;
 
     for (final ClassMember member in classDecl.members) {
@@ -1268,7 +1269,8 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
       // cspell:ignore loadmore fetchmore nextpage loadnext
 
       // Check for pagination pattern (loadMore, fetchMore, nextPage)
-      final hasPagination = builderSource.contains('loadmore') ||
+      final hasPagination =
+          builderSource.contains('loadmore') ||
           builderSource.contains('fetchmore') ||
           builderSource.contains('nextpage') ||
           builderSource.contains('loadnext');
@@ -1290,7 +1292,8 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
       final itemCountSource = itemCountArg.expression.toSource().toLowerCase();
 
       // Check if itemCount includes loading state
-      final hasLoadingInCount = itemCountSource.contains('loading') ||
+      final hasLoadingInCount =
+          itemCountSource.contains('loading') ||
           itemCountSource.contains('+ 1') ||
           itemCountSource.contains('+1');
 

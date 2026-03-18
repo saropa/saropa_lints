@@ -163,11 +163,13 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'class MyButton extends StatelessWidget { ... }\n'
+  String get exampleBad =>
+      'class MyButton extends StatelessWidget { ... }\n'
       'class MyCard extends StatelessWidget { ... }  // second widget';
 
   @override
-  String get exampleGood => '// my_button.dart\n'
+  String get exampleGood =>
+      '// my_button.dart\n'
       'class MyButton extends StatelessWidget { ... }\n'
       '// my_card.dart  (separate file)\n'
       'class MyCard extends StatelessWidget { ... }';
@@ -865,7 +867,8 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
       "createUser('John', 'j@ex.com', 30, true);  // unclear";
 
   @override
-  String get exampleGood => "createUser(name: 'John', email: 'j@ex.com',\n"
+  String get exampleGood =>
+      "createUser(name: 'John', email: 'j@ex.com',\n"
       "           age: 30, isAdmin: true);  // self-documenting";
 
   /// Threshold for number of positional parameters before suggesting named.
@@ -995,9 +998,9 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddTrailingCommaFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddTrailingCommaFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_trailing_comma_always',
@@ -1086,8 +1089,9 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
   /// Handles both positional and named arguments.
   bool _lastArgIsCallback(NodeList<Expression> arguments) {
     final Expression lastArg = arguments.last;
-    final Expression expr =
-        lastArg is NamedExpression ? lastArg.expression : lastArg;
+    final Expression expr = lastArg is NamedExpression
+        ? lastArg.expression
+        : lastArg;
     return expr is FunctionExpression;
   }
 
@@ -1148,12 +1152,14 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'class MyClass {\n'
+  String get exampleBad =>
+      'class MyClass {\n'
       '  String name;  // public field\n'
       '}';
 
   @override
-  String get exampleGood => 'class MyClass {\n'
+  String get exampleGood =>
+      'class MyClass {\n'
       '  String _name;  // private\n'
       '  String get name => _name;  // expose via getter\n'
       '}';
@@ -1292,12 +1298,14 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'class _MyIcon extends StatelessWidget {\n'
+  String get exampleBad =>
+      'class _MyIcon extends StatelessWidget {\n'
       '  Widget build(ctx) => Icon(Icons.star);  // class boilerplate\n'
       '}';
 
   @override
-  String get exampleGood => 'Widget _buildIcon() =>\n'
+  String get exampleGood =>
+      'Widget _buildIcon() =>\n'
       '    Icon(Icons.star);  // method in parent widget';
 
   @override
@@ -1425,11 +1433,13 @@ class PreferExplicitTypesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => "var name = 'John';  // var hides type\n"
+  String get exampleBad =>
+      "var name = 'John';  // var hides type\n"
       'final count = 42;';
 
   @override
-  String get exampleGood => "String name = 'John';  // explicit type\n"
+  String get exampleGood =>
+      "String name = 'John';  // explicit type\n"
       'final int count = 42;';
 
   static const LintCode _code = LintCode(
@@ -1527,11 +1537,13 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => "(String, int) getUser() =>\n"
+  String get exampleBad =>
+      "(String, int) getUser() =>\n"
       "    ('John', 30);  // unnamed fields";
 
   @override
-  String get exampleGood => 'User getUser() =>\n'
+  String get exampleGood =>
+      'User getUser() =>\n'
       "    User('John', 30);  // named fields via class";
 
   static const LintCode _code = LintCode(
@@ -1742,9 +1754,9 @@ class PreferSingleQuotesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ConvertToSingleQuotesFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ConvertToSingleQuotesFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_single_quotes',
@@ -2025,9 +2037,9 @@ abstract class _SentenceCaseCommentsBase extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CapitalizeCommentFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CapitalizeCommentFix(context: context),
+  ];
 
   /// Pattern for special comment markers that should be skipped.
   static final RegExp _specialMarkerPattern = RegExp(
@@ -2265,7 +2277,7 @@ abstract class _SentenceCaseCommentsBase extends SaropaLintRule {
 /// ```
 class PreferSentenceCaseCommentsRule extends _SentenceCaseCommentsBase {
   PreferSentenceCaseCommentsRule()
-      : super(code: _code, maxShortCommentWords: 2);
+    : super(code: _code, maxShortCommentWords: 2);
 
   @override
   String get exampleBad => '// calculate the total price';
@@ -2279,7 +2291,8 @@ class PreferSentenceCaseCommentsRule extends _SentenceCaseCommentsBase {
         'Inconsistent capitalization in comments reduces readability and gives '
         'the codebase an unfinished appearance. Skips comments of 1-2 words. '
         '{v6}',
-    correctionMessage: 'Capitalize the first letter of the comment to maintain '
+    correctionMessage:
+        'Capitalize the first letter of the comment to maintain '
         'sentence-case consistency across the codebase.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -2318,14 +2331,15 @@ class PreferSentenceCaseCommentsRule extends _SentenceCaseCommentsBase {
 /// ```
 class PreferSentenceCaseCommentsRelaxedRule extends _SentenceCaseCommentsBase {
   PreferSentenceCaseCommentsRelaxedRule()
-      : super(code: _code, maxShortCommentWords: 4);
+    : super(code: _code, maxShortCommentWords: 4);
 
   @override
   String get exampleBad =>
       '// calculate the total price including tax  // 6 words, flagged';
 
   @override
-  String get exampleGood => '// Calculate the total price including tax\n'
+  String get exampleGood =>
+      '// Calculate the total price including tax\n'
       '// not used  // 2 words, skipped';
 
   static const LintCode _code = LintCode(
@@ -2334,7 +2348,8 @@ class PreferSentenceCaseCommentsRelaxedRule extends _SentenceCaseCommentsBase {
         'letter. Inconsistent capitalization in comments reduces readability '
         'and gives the codebase an unfinished appearance. Skips comments of '
         '1-4 words. {v2}',
-    correctionMessage: 'Capitalize the first letter of the comment to maintain '
+    correctionMessage:
+        'Capitalize the first letter of the comment to maintain '
         'sentence-case consistency across the codebase.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -2598,9 +2613,9 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ConvertToScreamingCaseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ConvertToScreamingCaseFix(context: context),
+  ];
 }
 
 /// Warns when boolean variables/parameters don't use descriptive prefixes.
@@ -2840,11 +2855,13 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'bool flag = true;  // no prefix\n'
+  String get exampleBad =>
+      'bool flag = true;  // no prefix\n'
       'bool processData = true;  // verb, not a question';
 
   @override
-  String get exampleGood => 'bool isActive = true;\n'
+  String get exampleGood =>
+      'bool isActive = true;\n'
       'bool shouldProcessData = true;  // reads as question';
 
   static const LintCode _code = LintCode(
@@ -3100,8 +3117,9 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
 
       if (!_snakeCasePattern.hasMatch(baseName)) {
         // Report at the library directive if present, otherwise at the first token
-        final LibraryDirective? library =
-            unit.directives.whereType<LibraryDirective>().firstOrNull;
+        final LibraryDirective? library = unit.directives
+            .whereType<LibraryDirective>()
+            .firstOrNull;
         if (library != null) {
           reporter.atNode(library);
         } else {
@@ -3235,9 +3253,9 @@ class AvoidSmallTextRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            IncreaseFontSizeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        IncreaseFontSizeFix(context: context),
+  ];
 }
 
 /// Warns when regular comments (`//`) are used instead of doc comments (`///`)
@@ -3287,11 +3305,13 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => "// Returns the user's full name.\n"
+  String get exampleBad =>
+      "// Returns the user's full name.\n"
       "String getFullName() => '\$first \$last';";
 
   @override
-  String get exampleGood => "/// Returns the user's full name.\n"
+  String get exampleGood =>
+      "/// Returns the user's full name.\n"
       "String getFullName() => '\$first \$last';";
 
   static const LintCode _code = LintCode(
@@ -3422,8 +3442,9 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
 
     // Comments separated by a blank line from the declaration are not docs.
     final lineInfo = context.lineInfo;
-    final lastCommentLine =
-        lineInfo.getLocation(comments[comments.length - 1].end).lineNumber;
+    final lastCommentLine = lineInfo
+        .getLocation(comments[comments.length - 1].end)
+        .lineNumber;
     final declarationLine = lineInfo.getLocation(token.offset).lineNumber;
     if (declarationLine - lastCommentLine > 1) return;
 
@@ -3453,10 +3474,7 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
 
   /// Finds the last regular comment that looks like documentation,
   /// skipping dividers, section headers, annotations, and code.
-  static Token? _findDocLikeComment(
-    List<Token> comments,
-    Set<int> dividers,
-  ) {
+  static Token? _findDocLikeComment(List<Token> comments, Set<int> dividers) {
     Token? lastRegularComment;
     for (int i = 0; i < comments.length; i++) {
       final lexeme = comments[i].lexeme;
@@ -3535,9 +3553,9 @@ class PreferStraightApostropheRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceCurlyApostropheFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceCurlyApostropheFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_straight_apostrophe',
@@ -3871,9 +3889,9 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceStraightWithCurlyFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceStraightWithCurlyFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_curly_apostrophe',
@@ -3982,24 +4000,26 @@ class ArgumentsOrderingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => "Foo(width: 100, color: blue,\n"
+  String get exampleBad =>
+      "Foo(width: 100, color: blue,\n"
       "    child: x);  // unsorted args";
 
   @override
-  String get exampleGood => "Foo(child: x, color: blue,\n"
+  String get exampleGood =>
+      "Foo(child: x, color: blue,\n"
       '    width: 100);  // alphabetical';
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            SortArgumentsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        SortArgumentsFix(context: context),
+  ];
 
   @override
   List<String> get configAliases => const <String>[
-        'enforce_arguments_ordering',
-        'arguments_ordering',
-      ];
+    'enforce_arguments_ordering',
+    'arguments_ordering',
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_arguments_ordering',
@@ -4107,24 +4127,26 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => '// final oldValue = compute();\n'
+  String get exampleBad =>
+      '// final oldValue = compute();\n'
       '// if (cond) { doSomething(); }  // dead code';
 
   @override
-  String get exampleGood => '// Compute value using the updated algorithm\n'
+  String get exampleGood =>
+      '// Compute value using the updated algorithm\n'
       'final newValue = computeNew();  // prose is fine';
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            DeleteCommentedCodeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        DeleteCommentedCodeFix(context: context),
+  ];
 
   @override
   List<String> get configAliases => const <String>[
-        'avoid_commented_out_code',
-        'prefer_no_commented_code',
-      ];
+    'avoid_commented_out_code',
+    'prefer_no_commented_code',
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_no_commented_out_code',
@@ -4272,7 +4294,8 @@ class AvoidSingleCascadeInExpressionStatementsRule extends SaropaLintRule {
   String get exampleBad => 'list..add(item);  // single cascade';
 
   @override
-  String get exampleGood => 'list.add(item);  // direct call\n'
+  String get exampleGood =>
+      'list.add(item);  // direct call\n'
       "list..add('a')..add('b');  // multi-cascade is fine";
 
   static const LintCode _code = LintCode(
@@ -4396,10 +4419,12 @@ class PreferInterpolationToComposeRule extends SaropaLintRule {
       if (node.staticType?.isDartCoreString != true) return;
       final left = node.leftOperand;
       final right = node.rightOperand;
-      final leftLiteral = left is SimpleStringLiteral ||
+      final leftLiteral =
+          left is SimpleStringLiteral ||
           left is StringInterpolation ||
           left is AdjacentStrings;
-      final rightLiteral = right is SimpleStringLiteral ||
+      final rightLiteral =
+          right is SimpleStringLiteral ||
           right is StringInterpolation ||
           right is AdjacentStrings;
       if (!leftLiteral && !rightLiteral) return;

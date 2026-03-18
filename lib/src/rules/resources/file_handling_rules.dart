@@ -1341,8 +1341,8 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
 
       // Check if we're inside a non-singleton context
       // Look for common singleton patterns: static field, getter, or factory
-      final FunctionBody? enclosingBody =
-          node.thisOrAncestorOfType<FunctionBody>();
+      final FunctionBody? enclosingBody = node
+          .thisOrAncestorOfType<FunctionBody>();
       if (enclosingBody == null) return;
 
       // Check if enclosing function/method is a static getter or uses null-aware
@@ -1626,9 +1626,9 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m1},
-        web: <OwaspWeb>{OwaspWeb.a01},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m1},
+    web: <OwaspWeb>{OwaspWeb.a01},
+  );
 
   static const LintCode _code = LintCode(
     'require_file_path_sanitization',
@@ -1699,10 +1699,10 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
     if (isFromPlatformPathApi(node)) return;
 
     // Get function parameters
-    final FunctionDeclaration? funcDecl =
-        node.thisOrAncestorOfType<FunctionDeclaration>();
-    final MethodDeclaration? methodDecl =
-        node.thisOrAncestorOfType<MethodDeclaration>();
+    final FunctionDeclaration? funcDecl = node
+        .thisOrAncestorOfType<FunctionDeclaration>();
+    final MethodDeclaration? methodDecl = node
+        .thisOrAncestorOfType<MethodDeclaration>();
 
     FormalParameterList? params;
     if (funcDecl != null) {

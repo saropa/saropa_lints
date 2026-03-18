@@ -144,9 +144,9 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddMountedCheckFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddMountedCheckFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_context_after_navigation',
@@ -165,8 +165,8 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
       if (!node.body.isAsynchronous) return;
 
       // Check if in a State class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -2041,9 +2041,9 @@ class PreferMaybePopRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceWithMaybePopFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithMaybePopFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_maybe_pop',
@@ -2278,7 +2278,8 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
         (String segment) => pathSource.contains(segment),
       );
 
-      final bool hasDynamicParam = pathSource.contains(r'$') ||
+      final bool hasDynamicParam =
+          pathSource.contains(r'$') ||
           pathSource.contains(':id') ||
           pathSource.contains(':userid') ||
           pathSource.contains(':itemid');
@@ -2438,8 +2439,10 @@ class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
       final String path = pathArg.value;
 
       // Count path segments
-      final List<String> segments =
-          path.split('/').where((s) => s.isNotEmpty).toList();
+      final List<String> segments = path
+          .split('/')
+          .where((s) => s.isNotEmpty)
+          .toList();
 
       // Warn if navigating to path with 3+ segments (deeply nested)
       if (segments.length >= 3) {
@@ -3268,9 +3271,9 @@ class RequireNavigationResultHandlingRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddAwaitToNavigatorPushFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddAwaitToNavigatorPushFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'require_navigation_result_handling',
@@ -3504,11 +3507,13 @@ class RequireAutoRoutePageSuffixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad => '@RoutePage()\n'
+  String get exampleBad =>
+      '@RoutePage()\n'
       'class Home extends StatelessWidget {}  // missing Page suffix';
 
   @override
-  String get exampleGood => '@RoutePage()\n'
+  String get exampleGood =>
+      '@RoutePage()\n'
       'class HomePage extends StatelessWidget {}';
 
   static const LintCode _code = LintCode(

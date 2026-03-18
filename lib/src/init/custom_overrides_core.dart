@@ -62,9 +62,7 @@ Map<String, bool> extractOverridesFromFile(File file, Set<String> allRules) {
 /// section. Packages are auto-detected from pubspec; stylistic rules are
 /// managed via --no-stylistic/--stylistic-all flags and rule overrides.
 void createCustomOverridesFile(File file) {
-  file.writeAsStringSync(
-    buildMinimalConfig(tiers.defaultPlatforms, {}),
-  );
+  file.writeAsStringSync(buildMinimalConfig(tiers.defaultPlatforms, {}));
 }
 
 /// Build the minimal config file content.
@@ -170,7 +168,7 @@ void migrateToMinimalFormat(
   // Merge: existing overrides take priority over migrated stylistic
   final allOverrides = <String, bool>{
     ...enabledStylistic,
-    ...existingOverrides
+    ...existingOverrides,
   };
 
   // Backup old file before rewriting
@@ -205,16 +203,20 @@ void migrateToMinimalFormat(
 
 /// Extract max_issues value from file content. Returns 500 if not found.
 int _extractMaxIssues(String content) {
-  final match =
-      RegExp(r'^max_issues:\s*(\d+)', multiLine: true).firstMatch(content);
+  final match = RegExp(
+    r'^max_issues:\s*(\d+)',
+    multiLine: true,
+  ).firstMatch(content);
   if (match == null) return 500;
   return int.tryParse(match.group(1)!) ?? 500;
 }
 
 /// Extract output value from file content. Returns 'both' if not found.
 String _extractOutput(String content) {
-  final match =
-      RegExp(r'^output:\s*(\w+)', multiLine: true).firstMatch(content);
+  final match = RegExp(
+    r'^output:\s*(\w+)',
+    multiLine: true,
+  ).firstMatch(content);
   return match?.group(1) ?? 'both';
 }
 
@@ -224,7 +226,8 @@ String _uniqueBackupPath(String originalPath) {
   if (!File(basePath).existsSync()) return basePath;
 
   final now = DateTime.now();
-  final stamp = '${now.year}'
+  final stamp =
+      '${now.year}'
       '${now.month.toString().padLeft(2, '0')}'
       '${now.day.toString().padLeft(2, '0')}';
   return '$originalPath.bak.$stamp';
@@ -285,9 +288,12 @@ output: both
 ''';
 
   // Try old ASCII box header first, then minimal header
-  final headerEndMatch = RegExp(r'╚[═]+╝\n*').firstMatch(content) ??
-      RegExp(r'^# SAROPA LINTS CUSTOM CONFIG\n[^\n]*\n*', multiLine: true)
-          .firstMatch(content);
+  final headerEndMatch =
+      RegExp(r'╚[═]+╝\n*').firstMatch(content) ??
+      RegExp(
+        r'^# SAROPA LINTS CUSTOM CONFIG\n[^\n]*\n*',
+        multiLine: true,
+      ).firstMatch(content);
 
   if (headerEndMatch != null) {
     final insertPos = headerEndMatch.end;

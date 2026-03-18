@@ -15,7 +15,8 @@ enum OwaspMobile {
   m1(
     id: 'M1',
     name: 'Improper Credential Usage',
-    description: 'Hardcoded credentials, insecure credential storage, '
+    description:
+        'Hardcoded credentials, insecure credential storage, '
         'or improper credential transmission.',
     url:
         'https://owasp.org/www-project-mobile-top-10/2024-risks/m1-improper-credential-usage',
@@ -27,7 +28,8 @@ enum OwaspMobile {
   m2(
     id: 'M2',
     name: 'Inadequate Supply Chain Security',
-    description: 'Vulnerabilities in third-party libraries, SDKs, '
+    description:
+        'Vulnerabilities in third-party libraries, SDKs, '
         'or dependencies.',
     url:
         'https://owasp.org/www-project-mobile-top-10/2024-risks/m2-inadequate-supply-chain-security',
@@ -39,7 +41,8 @@ enum OwaspMobile {
   m3(
     id: 'M3',
     name: 'Insecure Authentication/Authorization',
-    description: 'Weak authentication mechanisms or improper '
+    description:
+        'Weak authentication mechanisms or improper '
         'authorization controls.',
     url:
         'https://owasp.org/www-project-mobile-top-10/2024-risks/m3-insecure-authentication-authorization',
@@ -52,7 +55,8 @@ enum OwaspMobile {
   m4(
     id: 'M4',
     name: 'Insufficient Input/Output Validation',
-    description: 'Failure to properly validate, filter, or sanitize '
+    description:
+        'Failure to properly validate, filter, or sanitize '
         'user input and output data.',
     url:
         'https://owasp.org/www-project-mobile-top-10/2024-risks/m4-insufficient-input-output-validation',
@@ -65,7 +69,8 @@ enum OwaspMobile {
   m5(
     id: 'M5',
     name: 'Insecure Communication',
-    description: 'Transmitting sensitive data over unencrypted channels '
+    description:
+        'Transmitting sensitive data over unencrypted channels '
         'or improper certificate validation.',
     url:
         'https://owasp.org/www-project-mobile-top-10/2024-risks/m5-insecure-communication',
@@ -78,7 +83,8 @@ enum OwaspMobile {
   m6(
     id: 'M6',
     name: 'Inadequate Privacy Controls',
-    description: 'Improper handling of PII, excessive data collection, '
+    description:
+        'Improper handling of PII, excessive data collection, '
         'or insufficient privacy protections.',
     url:
         'https://owasp.org/www-project-mobile-top-10/2024-risks/m6-inadequate-privacy-controls',
@@ -91,7 +97,8 @@ enum OwaspMobile {
   m7(
     id: 'M7',
     name: 'Insufficient Binary Protections',
-    description: 'Lack of code obfuscation, anti-tampering, or '
+    description:
+        'Lack of code obfuscation, anti-tampering, or '
         'reverse engineering protections.',
     url:
         'https://owasp.org/www-project-mobile-top-10/2024-risks/m7-insufficient-binary-protections',
@@ -104,7 +111,8 @@ enum OwaspMobile {
   m8(
     id: 'M8',
     name: 'Security Misconfiguration',
-    description: 'Insecure default settings, overly permissive configurations, '
+    description:
+        'Insecure default settings, overly permissive configurations, '
         'or improper security controls.',
     url:
         'https://owasp.org/www-project-mobile-top-10/2024-risks/m8-security-misconfiguration',
@@ -117,7 +125,8 @@ enum OwaspMobile {
   m9(
     id: 'M9',
     name: 'Insecure Data Storage',
-    description: 'Storing sensitive data insecurely on the device, '
+    description:
+        'Storing sensitive data insecurely on the device, '
         'including unencrypted storage or world-readable files.',
     url:
         'https://owasp.org/www-project-mobile-top-10/2024-risks/m9-insecure-data-storage',
@@ -171,7 +180,8 @@ enum OwaspWeb {
   a01(
     id: 'A01',
     name: 'Broken Access Control',
-    description: 'Failures in access control enforcement allowing '
+    description:
+        'Failures in access control enforcement allowing '
         'unauthorized access to resources or functions.',
     url: 'https://owasp.org/Top10/A01_2021-Broken_Access_Control/',
   ),
@@ -183,7 +193,8 @@ enum OwaspWeb {
   a02(
     id: 'A02',
     name: 'Cryptographic Failures',
-    description: 'Failures related to cryptography that expose '
+    description:
+        'Failures related to cryptography that expose '
         'sensitive data, including weak algorithms or improper key handling.',
     url: 'https://owasp.org/Top10/A02_2021-Cryptographic_Failures/',
   ),
@@ -195,7 +206,8 @@ enum OwaspWeb {
   a03(
     id: 'A03',
     name: 'Injection',
-    description: 'User-supplied data interpreted as commands or queries, '
+    description:
+        'User-supplied data interpreted as commands or queries, '
         'including SQL, NoSQL, OS, and LDAP injection.',
     url: 'https://owasp.org/Top10/A03_2021-Injection/',
   ),
@@ -207,7 +219,8 @@ enum OwaspWeb {
   a04(
     id: 'A04',
     name: 'Insecure Design',
-    description: 'Missing or ineffective security controls due to '
+    description:
+        'Missing or ineffective security controls due to '
         'design flaws, rather than implementation bugs.',
     url: 'https://owasp.org/Top10/A04_2021-Insecure_Design/',
   ),
@@ -219,7 +232,8 @@ enum OwaspWeb {
   a05(
     id: 'A05',
     name: 'Security Misconfiguration',
-    description: 'Insecure default configurations, incomplete configurations, '
+    description:
+        'Insecure default configurations, incomplete configurations, '
         'or ad hoc configurations.',
     url: 'https://owasp.org/Top10/A05_2021-Security_Misconfiguration/',
   ),
@@ -231,7 +245,8 @@ enum OwaspWeb {
   a06(
     id: 'A06',
     name: 'Vulnerable and Outdated Components',
-    description: 'Using components with known vulnerabilities '
+    description:
+        'Using components with known vulnerabilities '
         'or without proper version management.',
     url: 'https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/',
   ),
@@ -243,7 +258,8 @@ enum OwaspWeb {
   a07(
     id: 'A07',
     name: 'Identification and Authentication Failures',
-    description: 'Weaknesses in authentication and session management '
+    description:
+        'Weaknesses in authentication and session management '
         'that allow attackers to compromise identities.',
     url:
         'https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/',
@@ -256,7 +272,8 @@ enum OwaspWeb {
   a08(
     id: 'A08',
     name: 'Software and Data Integrity Failures',
-    description: 'Code and infrastructure that does not protect '
+    description:
+        'Code and infrastructure that does not protect '
         'against integrity violations.',
     url:
         'https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/',
@@ -269,7 +286,8 @@ enum OwaspWeb {
   a09(
     id: 'A09',
     name: 'Security Logging and Monitoring Failures',
-    description: 'Insufficient logging, detection, monitoring, '
+    description:
+        'Insufficient logging, detection, monitoring, '
         'and active response capabilities.',
     url:
         'https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/',
@@ -282,7 +300,8 @@ enum OwaspWeb {
   a10(
     id: 'A10',
     name: 'Server-Side Request Forgery (SSRF)',
-    description: 'Application fetches remote resources without '
+    description:
+        'Application fetches remote resources without '
         'validating user-supplied URLs.',
     url:
         'https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/',
@@ -336,9 +355,9 @@ class OwaspMapping {
 
   /// Returns all category IDs as a combined list.
   List<String> get allIds => <String>[
-        ...mobile.map((OwaspMobile m) => m.id),
-        ...web.map((OwaspWeb w) => w.id),
-      ];
+    ...mobile.map((OwaspMobile m) => m.id),
+    ...web.map((OwaspWeb w) => w.id),
+  ];
 
   @override
   String toString() {

@@ -55,8 +55,8 @@ class RemoveAlwaysNullArgumentFix extends SaropaFixProducer {
       }
       if (i < content.length && content[i] == ',') {
         i++;
-        while (
-            i < content.length && (content[i] == ' ' || content[i] == '\t')) {
+        while (i < content.length &&
+            (content[i] == ' ' || content[i] == '\t')) {
           i++;
         }
         end = i;

@@ -280,10 +280,12 @@ class FileMetricsCache {
 
     // Package import detection (single pass through content)
     final hasFlutterImport = content.contains('package:flutter/');
-    final hasBlocImport = content.contains('package:bloc/') ||
+    final hasBlocImport =
+        content.contains('package:bloc/') ||
         content.contains('package:flutter_bloc/');
     final hasProviderImport = content.contains('package:provider/');
-    final hasRiverpodImport = content.contains('package:riverpod/') ||
+    final hasRiverpodImport =
+        content.contains('package:riverpod/') ||
         content.contains('package:flutter_riverpod/') ||
         content.contains('package:hooks_riverpod/');
 

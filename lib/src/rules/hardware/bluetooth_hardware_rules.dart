@@ -825,7 +825,8 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
 
       // Check the target's static type
       final String? typeName = target.staticType?.element?.name;
-      final bool isBleCharacteristic = typeName == 'BluetoothCharacteristic' ||
+      final bool isBleCharacteristic =
+          typeName == 'BluetoothCharacteristic' ||
           typeName == 'BleCharacteristic' ||
           typeName == 'Characteristic';
 

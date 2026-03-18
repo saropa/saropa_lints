@@ -9,10 +9,9 @@ void main() {
     test('invalid tier returns error', () {
       final dir = Directory.systemTemp.createTempSync('write_config_test');
       try {
-        final result = runWriteConfig(WriteConfigOptions(
-          targetDir: dir.path,
-          tier: 'invalid_tier',
-        ));
+        final result = runWriteConfig(
+          WriteConfigOptions(targetDir: dir.path, tier: 'invalid_tier'),
+        );
         expect(result.ok, isFalse);
         expect(result.error, contains('Invalid tier'));
       } finally {
@@ -23,13 +22,13 @@ void main() {
     test('valid tier writes analysis_options.yaml with plugins section', () {
       final dir = Directory.systemTemp.createTempSync('write_config_test');
       try {
-        final result = runWriteConfig(WriteConfigOptions(
-          targetDir: dir.path,
-          tier: 'recommended',
-        ));
+        final result = runWriteConfig(
+          WriteConfigOptions(targetDir: dir.path, tier: 'recommended'),
+        );
         expect(result.ok, isTrue);
-        final outputFile =
-            File('${dir.path}${Platform.pathSeparator}analysis_options.yaml');
+        final outputFile = File(
+          '${dir.path}${Platform.pathSeparator}analysis_options.yaml',
+        );
         expect(outputFile.existsSync(), isTrue);
         final content = outputFile.readAsStringSync();
         expect(content, contains('plugins:'));
@@ -43,13 +42,13 @@ void main() {
     test('creates analysis_options_custom.yaml when missing', () {
       final dir = Directory.systemTemp.createTempSync('write_config_test');
       try {
-        final result = runWriteConfig(WriteConfigOptions(
-          targetDir: dir.path,
-          tier: 'essential',
-        ));
+        final result = runWriteConfig(
+          WriteConfigOptions(targetDir: dir.path, tier: 'essential'),
+        );
         expect(result.ok, isTrue);
         final customFile = File(
-            '${dir.path}${Platform.pathSeparator}analysis_options_custom.yaml');
+          '${dir.path}${Platform.pathSeparator}analysis_options_custom.yaml',
+        );
         expect(customFile.existsSync(), isTrue);
       } finally {
         dir.deleteSync(recursive: true);

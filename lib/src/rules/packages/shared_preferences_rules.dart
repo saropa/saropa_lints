@@ -474,9 +474,9 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m9},
-        web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m9},
+    web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
+  );
 
   static const LintCode _code = LintCode(
     'avoid_auth_state_in_prefs',
@@ -581,9 +581,9 @@ class PreferEncryptedPrefsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m9},
-        web: <OwaspWeb>{OwaspWeb.a02},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m9},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
 
   static const LintCode _code = LintCode(
     'prefer_encrypted_prefs',
@@ -684,9 +684,9 @@ class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m9},
-        web: <OwaspWeb>{OwaspWeb.a02},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m9},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
 
   static const LintCode _code = LintCode(
     'avoid_shared_prefs_sensitive_data',

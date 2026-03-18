@@ -1350,8 +1350,7 @@ void main() {
         },
       );
 
-      test('same-source initializers that use Random or RNG should NOT trigger',
-          () {
+      test('same-source initializers that use Random or RNG should NOT trigger', () {
         // e.g. final x = 0.2 + rng.nextDouble() * 0.6; final y = 0.2 + rng.nextDouble() * 0.6;
         // Fixture: _goodSameSourceWithRandom(), _goodSameSourceWithRandomInt().
         // Rule explicitly excludes initializers using any type Random/RNG/RandomNumberGenerator or RNG-like receiver names.
@@ -1620,8 +1619,7 @@ void main() {
         expect('multi-declaration file detected', isNotNull);
       });
 
-      test(
-          'multiple abstract final static-only classes should NOT trigger '
+      test('multiple abstract final static-only classes should NOT trigger '
           '(regression)', () {
         // Pure constant/utility namespaces co-located for discoverability
         expect('constant namespaces are exempt', isNotNull);

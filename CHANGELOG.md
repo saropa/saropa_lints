@@ -25,7 +25,9 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 
 ---
 
-## [Unreleased]
+## [9.8.1]
+
+_Smarter SDK guidance in pubspec and less noise when already on 3.9+._
 
 ### Added
 
@@ -39,6 +41,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 
 ## [9.8.0]
 
+_One-line vibrancy summary in pubspec by default and consistent "Package Vibrancy" naming._
+
 ### Changed
 
 â€¢ **Package Vibrancy** â€” Inline diagnostics in `pubspec.yaml` are now simplified by default: a single summary line (e.g. "Package Vibrancy: 12 stale, 8 legacy-locked â€” Open Package Vibrancy view for details.") instead of one warning per package. New setting `saropaLints.packageVibrancy.inlineDiagnostics`: **summary** (default), **critical** (only end-of-life/vulnerabilities/family conflicts per-line), **all** (one diagnostic per package, previous behavior), or **none** (sidebar only). Reduces noise in large projects while keeping the Package Vibrancy view as the place for full details.
@@ -48,6 +52,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 ---
 
 ## [9.7.0]
+
+_Headless config writer, cross-file analysis CLI, and a polished Issues view._
 
 ### Added
 
@@ -68,6 +74,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 ---
 
 ## [9.6.1]
+
+_No more vibrancy warnings for path or git-resolved dependencies._
 
 ### Fixed
 

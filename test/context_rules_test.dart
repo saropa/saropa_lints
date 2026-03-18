@@ -28,7 +28,9 @@ void main() {
     test('AvoidContextAfterAwaitInStaticRule', () {
       final rule = AvoidContextAfterAwaitInStaticRule();
       expect(
-          rule.code.name.toLowerCase(), 'avoid_context_after_await_in_static');
+        rule.code.name.toLowerCase(),
+        'avoid_context_after_await_in_static',
+      );
       expect(
         rule.code.problemMessage,
         contains('[avoid_context_after_await_in_static]'),
@@ -59,7 +61,9 @@ void main() {
     test('AvoidContextDependencyInCallbackRule', () {
       final rule = AvoidContextDependencyInCallbackRule();
       expect(
-          rule.code.name.toLowerCase(), 'avoid_context_dependency_in_callback');
+        rule.code.name.toLowerCase(),
+        'avoid_context_dependency_in_callback',
+      );
       expect(
         rule.code.problemMessage,
         contains('[avoid_context_dependency_in_callback]'),

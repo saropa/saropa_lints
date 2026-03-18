@@ -59,9 +59,9 @@ class AvoidAdjacentStringsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CombineAdjacentStringsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CombineAdjacentStringsFix(context: context),
+  ];
 }
 
 /// Warns when accessing enum values by index (`EnumName.values[i]`).
@@ -266,9 +266,9 @@ class AvoidLateKeywordRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveLateKeywordFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveLateKeywordFix(context: context),
+  ];
 }
 
 /// Warns when a getter is called without parentheses in print/debugPrint.
@@ -403,7 +403,8 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
     'avoid_misused_set_literals',
     '[avoid_misused_set_literals] Set literal may be misused. '
         'Empty `{}` without type annotation creates a Map, not a Set. {v2}',
-    correctionMessage: 'Add explicit type annotation: `<Type>{}` for Set '
+    correctionMessage:
+        'Add explicit type annotation: `<Type>{}` for Set '
         'or `<K, V>{}` for Map.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -433,9 +434,9 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddSetOrMapTypeArgumentFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddSetOrMapTypeArgumentFix(context: context),
+  ];
 }
 
 /// Warns when an object is passed as an argument to its own method.
@@ -496,8 +497,9 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
 
       // Check if any argument matches the target
       for (final Expression arg in node.argumentList.arguments) {
-        final Expression actualArg =
-            arg is NamedExpression ? arg.expression : arg;
+        final Expression actualArg = arg is NamedExpression
+            ? arg.expression
+            : arg;
         if (actualArg.toSource() == targetSource) {
           reporter.atNode(actualArg);
         }
@@ -866,9 +868,9 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveRedundantPragmaInlineFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveRedundantPragmaInlineFix(context: context),
+  ];
 }
 
 /// Warns when String.substring() is used.
@@ -925,9 +927,9 @@ class AvoidSubstringRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AvoidSubstringTodoFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AvoidSubstringTodoFix(context: context),
+  ];
 }
 
 /// Warns when unknown pragma annotations are used.
@@ -1003,9 +1005,9 @@ class AvoidUnknownPragmaRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            DeleteUnknownPragmaFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        DeleteUnknownPragmaFix(context: context),
+  ];
 }
 
 /// Warns when a function parameter is unused.
@@ -1104,9 +1106,9 @@ class AvoidUnusedParametersRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PrefixUnusedParameterFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PrefixUnusedParameterFix(context: context),
+  ];
 }
 
 class _IdentifierCollector extends RecursiveAstVisitor<void> {
@@ -1179,9 +1181,9 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceWeakCryptoFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWeakCryptoFix(context: context),
+  ];
 }
 
 /// Warns when a function returns a value that should have @useResult.
@@ -1303,9 +1305,9 @@ class NoObjectDeclarationRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceObjectWithDynamicFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceObjectWithDynamicFix(context: context),
+  ];
 }
 
 /// Warns when only one inlining annotation is used.
@@ -1373,9 +1375,9 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveAlwaysNullArgumentFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveAlwaysNullArgumentFix(context: context),
+  ];
 }
 
 /// Warns when an instance method assigns to a static field.
@@ -1431,9 +1433,9 @@ class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            DeleteStaticFieldAssignmentFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        DeleteStaticFieldAssignmentFix(context: context),
+  ];
 
   void _checkMethodBody(
     FunctionBody body,
@@ -1910,10 +1912,14 @@ class AvoidSimilarNamesRule extends SaropaLintRule {
 
     // Check for common confusable patterns
     // 1 and l, 0 and O
-    final String normalizedA =
-        a.replaceAll('1', 'l').replaceAll('0', 'O').toLowerCase();
-    final String normalizedB =
-        b.replaceAll('1', 'l').replaceAll('0', 'O').toLowerCase();
+    final String normalizedA = a
+        .replaceAll('1', 'l')
+        .replaceAll('0', 'O')
+        .toLowerCase();
+    final String normalizedB = b
+        .replaceAll('1', 'l')
+        .replaceAll('0', 'O')
+        .toLowerCase();
 
     if (normalizedA == normalizedB && a != b) return true;
 
@@ -2202,9 +2208,9 @@ class AvoidDuplicateInitializersRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            DeleteDuplicateInitializerFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        DeleteDuplicateInitializerFix(context: context),
+  ];
 }
 
 /// Warns when an override just calls super without additional logic.
@@ -2285,9 +2291,9 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryOverrideFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryOverrideFix(context: context),
+  ];
 }
 
 /// Warns when a statement has no effect.
@@ -2351,9 +2357,9 @@ class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryStatementFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryStatementFix(context: context),
+  ];
 }
 
 /// Warns when an assignment is never used.
@@ -2506,8 +2512,8 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
 
   @override
   List<String> get configAliases => const <String>[
-        'avoid_inferrable_type_arguments',
-      ];
+    'avoid_inferrable_type_arguments',
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_inferred_type_arguments',
@@ -2564,9 +2570,9 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveInferrableTypeArgumentsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveInferrableTypeArgumentsFix(context: context),
+  ];
 }
 
 /// Warns when an empty collection default value is passed explicitly.
@@ -2638,9 +2644,9 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveDefaultValueArgumentFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveDefaultValueArgumentFix(context: context),
+  ];
 
   bool _isEmptyCollectionLiteral(Expression expr) {
     // Check for empty list literal
@@ -3058,8 +3064,9 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
             // Check for { return true; }
             else if (body is BlockFunctionBody) {
               final List<Statement> statements = body.block.statements;
-              final Statement? single =
-                  statements.length == 1 ? statements.first : null;
+              final Statement? single = statements.length == 1
+                  ? statements.first
+                  : null;
               if (single is ReturnStatement) {
                 final Expression? returnExpr = single.expression;
                 if (returnExpr is BooleanLiteral && returnExpr.value) {
@@ -3075,9 +3082,9 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveEmptyBuildWhenFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveEmptyBuildWhenFix(context: context),
+  ];
 }
 
 /// Suggests using 'use' prefix for custom hooks.

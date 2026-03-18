@@ -70,7 +70,7 @@ class BloomFilter {
   /// Default of 8192 bits (1KB) gives ~1% false positive rate for 500 patterns.
   /// If [bitSize] is <= 0, uses 8192 as fallback.
   BloomFilter([int bitSize = 8192])
-      : _bits = Uint8List(((bitSize > 0 ? bitSize : 8192) + 7) ~/ 8);
+    : _bits = Uint8List(((bitSize > 0 ? bitSize : 8192) + 7) ~/ 8);
 
   final Uint8List _bits;
   int get _bitSize => _bits.length * 8;
@@ -205,14 +205,11 @@ class GitAwarePriority {
 
     try {
       // Get modified and staged files
-      final result = await Process.run(
-          'git',
-          [
-            'status',
-            '--porcelain',
-            '-z',
-          ],
-          workingDirectory: root);
+      final result = await Process.run('git', [
+        'status',
+        '--porcelain',
+        '-z',
+      ], workingDirectory: root);
 
       if (result.exitCode != 0) return;
 

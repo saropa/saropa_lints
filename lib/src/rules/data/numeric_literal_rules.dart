@@ -106,9 +106,9 @@ class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            NormalizeDigitSeparatorsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        NormalizeDigitSeparatorsFix(context: context),
+  ];
 }
 
 /// Warns when digit separators are used unnecessarily.
@@ -180,9 +180,9 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryDigitSeparatorsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryDigitSeparatorsFix(context: context),
+  ];
 }
 
 /// Warns when double literals don't follow a consistent format.
@@ -237,9 +237,9 @@ class DoubleLiteralFormatRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            DoubleLiteralFormatFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        DoubleLiteralFormatFix(context: context),
+  ];
 }
 
 /// Warns when magic numbers are used instead of named constants.
@@ -488,9 +488,9 @@ class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferAdditionSubtractionAssignmentsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferAdditionSubtractionAssignmentsFix(context: context),
+  ];
 }
 
 /// Warns when binary operators can be simplified to compound assignment.
@@ -560,9 +560,9 @@ class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferCompoundAssignmentOperatorsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferCompoundAssignmentOperatorsFix(context: context),
+  ];
 }
 
 /// Warns when large numbers don't use digit separators.
@@ -596,9 +596,9 @@ class PreferDigitSeparatorsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddDigitSeparatorsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddDigitSeparatorsFix(context: context),
+  ];
 
   static const int _threshold =
       100000; // Numbers >= 100000 (6+ digits) should use separators
@@ -730,9 +730,9 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveDigitSeparatorsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveDigitSeparatorsFix(context: context),
+  ];
 }
 
 /// Warns when magic numbers are used in test files.

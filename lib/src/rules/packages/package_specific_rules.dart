@@ -570,7 +570,8 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
         }
       }
 
-      final bool hasCleanup = disposeMethod != null &&
+      final bool hasCleanup =
+          disposeMethod != null &&
           (disposeCancelPattern.hasMatch(disposeMethod.body.toSource()) ||
               RegExp(
                 r'\bdispose\s*\(\s*\)',
@@ -691,7 +692,8 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
 
       // Check if speech is stopped
       for (final String name in speechFieldNames) {
-        final bool isStopped = disposeMethod != null &&
+        final bool isStopped =
+            disposeMethod != null &&
             (isFieldCleanedUp(name, 'stop', disposeMethod.body) ||
                 isFieldCleanedUp(name, 'cancel', disposeMethod.body));
 
@@ -1264,9 +1266,9 @@ class PreferUuidV4Rule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceV1WithV4Fix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceV1WithV4Fix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_uuid_v4',
@@ -1575,13 +1577,15 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
 
       // Check if LocationSettings has distanceFilter
       if (locationSettingsArg is InstanceCreationExpression) {
-        final bool hasDistanceFilter =
-            locationSettingsArg.argumentList.arguments.any((arg) {
-          if (arg is NamedExpression) {
-            return arg.name.label.name == 'distanceFilter';
-          }
-          return false;
-        });
+        final bool hasDistanceFilter = locationSettingsArg
+            .argumentList
+            .arguments
+            .any((arg) {
+              if (arg is NamedExpression) {
+                return arg.name.label.name == 'distanceFilter';
+              }
+              return false;
+            });
 
         if (!hasDistanceFilter) {
           reporter.atNode(locationSettingsArg);

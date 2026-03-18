@@ -512,8 +512,7 @@ void main() {
         expect('platform path API recognized as trusted', isNotNull);
       });
 
-      test(
-          'private helper receiving platform path should NOT trigger '
+      test('private helper receiving platform path should NOT trigger '
           '(inter-procedural)', () {
         // Regression: _deleteOldUnencryptedDb receives dbDir.path from
         // getApplicationDocumentsDirectory() in the caller. The rule should
@@ -775,8 +774,7 @@ void main() {
         expect('screenshot-enabled sensitive screen detected', isNotNull);
       });
 
-      test('fixture has exactly one BAD (expect_lint) so rule triggers once',
-          () {
+      test('fixture has exactly one BAD (expect_lint) so rule triggers once', () {
         final path =
             'example_async/lib/security/avoid_screenshot_sensitive_fixture.dart';
         final file = File(path);

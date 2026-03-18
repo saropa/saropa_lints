@@ -98,9 +98,9 @@ class AvoidSwallowingExceptionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddRethrowInCatchFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddRethrowInCatchFix(context: context),
+  ];
 }
 
 class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
@@ -1254,7 +1254,8 @@ class _UiErrorDisplayVisitor extends RecursiveAstVisitor<void> {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
-        final String? name = current.constructorName.type.element?.name ??
+        final String? name =
+            current.constructorName.type.element?.name ??
             current.constructorName.type.name.lexeme;
         if (uiWidgets.contains(name)) return true;
       }
@@ -1449,9 +1450,9 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ChangeExceptionToObjectFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ChangeExceptionToObjectFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_catch_exception_alone',

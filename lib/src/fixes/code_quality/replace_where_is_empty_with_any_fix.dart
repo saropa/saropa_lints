@@ -42,8 +42,9 @@ class ReplaceWhereIsEmptyWithAnyFix extends SaropaFixProducer {
     if (whereReceiver == null) return;
 
     final String receiverSrc = whereReceiver.toSource();
-    final String argsSrc =
-        target.argumentList.arguments.map((e) => e.toSource()).join(', ');
+    final String argsSrc = target.argumentList.arguments
+        .map((e) => e.toSource())
+        .join(', ');
     final bool useNegation = propertyName == 'isEmpty';
     final String replacement = useNegation
         ? '!$receiverSrc.any($argsSrc)'

@@ -91,8 +91,9 @@ class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
       final secondLastStmt = statements[statements.length - 2];
 
       final lastLine = context.lineInfo.getLocation(lastStmt.offset).lineNumber;
-      final prevLine =
-          context.lineInfo.getLocation(secondLastStmt.end).lineNumber;
+      final prevLine = context.lineInfo
+          .getLocation(secondLastStmt.end)
+          .lineNumber;
 
       // Flag if there's a blank line
       if (lastLine - prevLine >= 2) {
@@ -157,9 +158,9 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddBlankLineAfterDeclarationsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineAfterDeclarationsFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_line_after_declarations',
@@ -185,8 +186,9 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
         // Check if current is a variable declaration and next is not
         if (current is VariableDeclarationStatement &&
             next is! VariableDeclarationStatement) {
-          final currentLine =
-              context.lineInfo.getLocation(current.end).lineNumber;
+          final currentLine = context.lineInfo
+              .getLocation(current.end)
+              .lineNumber;
           final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
 
           if (nextLine - currentLine < 2) {
@@ -269,8 +271,9 @@ class PreferCompactDeclarationsRule extends SaropaLintRule {
 
         if (current is VariableDeclarationStatement &&
             next is! VariableDeclarationStatement) {
-          final currentLine =
-              context.lineInfo.getLocation(current.end).lineNumber;
+          final currentLine = context.lineInfo
+              .getLocation(current.end)
+              .lineNumber;
           final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
 
           if (nextLine - currentLine >= 2) {
@@ -332,9 +335,9 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddBlankLineBeforeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_blank_lines_between_members',
@@ -360,8 +363,9 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
         // Skip field declarations - they can be grouped
         if (current is FieldDeclaration && next is FieldDeclaration) continue;
 
-        final currentLine =
-            context.lineInfo.getLocation(current.end).lineNumber;
+        final currentLine = context.lineInfo
+            .getLocation(current.end)
+            .lineNumber;
         final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
 
         if (nextLine - currentLine < 2) {
@@ -439,8 +443,9 @@ class PreferCompactClassMembersRule extends SaropaLintRule {
         final current = members[i];
         final next = members[i + 1];
 
-        final currentLine =
-            context.lineInfo.getLocation(current.end).lineNumber;
+        final currentLine = context.lineInfo
+            .getLocation(current.end)
+            .lineNumber;
         final nextLine = context.lineInfo.getLocation(next.offset).lineNumber;
 
         if (nextLine - currentLine >= 2) {
@@ -516,20 +521,24 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
       if (node.statements.isEmpty) return;
 
       // Check for blank line at start
-      final openBraceLine =
-          context.lineInfo.getLocation(node.leftBracket.offset).lineNumber;
-      final firstStmtLine =
-          context.lineInfo.getLocation(node.statements.first.offset).lineNumber;
+      final openBraceLine = context.lineInfo
+          .getLocation(node.leftBracket.offset)
+          .lineNumber;
+      final firstStmtLine = context.lineInfo
+          .getLocation(node.statements.first.offset)
+          .lineNumber;
 
       if (firstStmtLine - openBraceLine > 1) {
         reporter.atNode(node.statements.first, code);
       }
 
       // Check for blank line at end
-      final lastStmtLine =
-          context.lineInfo.getLocation(node.statements.last.end).lineNumber;
-      final closeBraceLine =
-          context.lineInfo.getLocation(node.rightBracket.offset).lineNumber;
+      final lastStmtLine = context.lineInfo
+          .getLocation(node.statements.last.end)
+          .lineNumber;
+      final closeBraceLine = context.lineInfo
+          .getLocation(node.rightBracket.offset)
+          .lineNumber;
 
       if (closeBraceLine - lastStmtLine > 1) {
         reporter.atNode(node.statements.last, code);
@@ -630,10 +639,7 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
         if (lineText.isEmpty) {
           consecutiveBlanks++;
           if (consecutiveBlanks == 2) {
-            reporter.atOffset(
-              offset: lineStart,
-              length: lineEnd - lineStart,
-            );
+            reporter.atOffset(offset: lineStart, length: lineEnd - lineStart);
           }
         } else {
           consecutiveBlanks = 0;
@@ -931,12 +937,14 @@ class PreferFactoryForValidationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'Email(this.v) {\n'
+  String get exampleBad =>
+      'Email(this.v) {\n'
       "  if (!v.contains('@')) throw ArgumentError('bad');\n"
       '}';
 
   @override
-  String get exampleGood => 'factory Email(String v) {\n'
+  String get exampleGood =>
+      'factory Email(String v) {\n'
       "  if (!v.contains('@')) throw ArgumentError('bad');\n"
       '  return Email._(v);\n'
       '}';
@@ -1030,7 +1038,8 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'factory Positive(int v) {\n'
+  String get exampleBad =>
+      'factory Positive(int v) {\n'
       "  if (v < 0) throw ArgumentError('negative');\n"
       '  return Positive._(v);\n'
       '}';
@@ -1284,9 +1293,9 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferClipRSuperellipseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferClipRSuperellipseFix(context: context),
+  ];
 
   /// Alias: prefer_rethrow_throw_e
   static const LintCode _code = LintCode(
