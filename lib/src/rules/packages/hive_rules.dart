@@ -187,8 +187,9 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
       if (args.isEmpty) return;
 
       // Get the value argument (2nd for put, 1st for add)
-      final Expression valueArg =
-          methodName == 'put' && args.length > 1 ? args[1] : args.first;
+      final Expression valueArg = methodName == 'put' && args.length > 1
+          ? args[1]
+          : args.first;
 
       // Check if value is a user-defined class instance
       final String? typeName = valueArg.staticType?.element?.name;
@@ -523,15 +524,16 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
       // Check for database open patterns (word-boundary)
       final bool opensDatabase =
           RegExp(r'\bIsar\.open\b').hasMatch(classSource) ||
-              RegExp(r'\bHive\.openBox\b').hasMatch(classSource) ||
-              RegExp(r'\bopenDatabase\b').hasMatch(classSource) ||
-              RegExp(r'\bRealm\.open\b').hasMatch(classSource) ||
-              RegExp(r'\bDatabase\.open\b').hasMatch(classSource);
+          RegExp(r'\bHive\.openBox\b').hasMatch(classSource) ||
+          RegExp(r'\bopenDatabase\b').hasMatch(classSource) ||
+          RegExp(r'\bRealm\.open\b').hasMatch(classSource) ||
+          RegExp(r'\bDatabase\.open\b').hasMatch(classSource);
 
       if (!opensDatabase) return;
 
       // Check for close patterns
-      final bool hasClose = RegExp(r'\.close\s*\(').hasMatch(classSource) ||
+      final bool hasClose =
+          RegExp(r'\.close\s*\(').hasMatch(classSource) ||
           RegExp(r'\bdispose\s*\(\s*\)').hasMatch(classSource) ||
           RegExp(r'\b_close\b').hasMatch(classSource) ||
           RegExp(r'\bcloseDatabase\b').hasMatch(classSource);
@@ -999,11 +1001,12 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
   ) {
     context.addFieldDeclaration((FieldDeclaration node) {
       // Check if field has @HiveField annotation
-      final Annotation? hiveFieldAnnotation =
-          node.metadata.cast<Annotation?>().firstWhere(
-                (Annotation? a) => a?.name.name == 'HiveField',
-                orElse: () => null,
-              );
+      final Annotation? hiveFieldAnnotation = node.metadata
+          .cast<Annotation?>()
+          .firstWhere(
+            (Annotation? a) => a?.name.name == 'HiveField',
+            orElse: () => null,
+          );
 
       if (hiveFieldAnnotation == null) return;
 
@@ -1432,9 +1435,9 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferHiveLazyBoxFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferHiveLazyBoxFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_hive_lazy_box',
@@ -1865,9 +1868,9 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddHiveSubDirFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddHiveSubDirFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'require_hive_web_subdirectory',

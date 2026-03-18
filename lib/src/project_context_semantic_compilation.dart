@@ -252,7 +252,8 @@ class CompilationUnitCache {
   /// Quick content analysis to populate basic data.
   static void _analyzeContent(String content, CompilationUnitDerivedData data) {
     // Check for widgets
-    data.hasWidgets = content.contains('extends StatelessWidget') ||
+    data.hasWidgets =
+        content.contains('extends StatelessWidget') ||
         content.contains('extends StatefulWidget') ||
         content.contains('extends State<');
 
@@ -261,7 +262,8 @@ class CompilationUnitCache {
         content.contains('async') || content.contains('Future<');
 
     // Check for tests
-    data.hasTests = content.contains('@Test') ||
+    data.hasTests =
+        content.contains('@Test') ||
         content.contains('void main()') && content.contains('test(');
 
     // Check for main function

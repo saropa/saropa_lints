@@ -612,8 +612,9 @@ class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
     if (args.length != 4) return;
 
     // Get all values as strings
-    final List<String> values =
-        args.map((Expression e) => e.toSource()).toList();
+    final List<String> values = args
+        .map((Expression e) => e.toSource())
+        .toList();
 
     // Check if all values are the same (could use .all)
     if (values.toSet().length == 1) {
@@ -1363,9 +1364,9 @@ class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceContainerWithSizedBoxFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceContainerWithSizedBoxFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1618,7 +1619,8 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   @override
-  String get exampleBad => 'Column(\n'
+  String get exampleBad =>
+      'Column(\n'
       '  children: [\n'
       '    Text("A"),\n'
       '    SizedBox(height: 8),\n'
@@ -1627,7 +1629,8 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
       ')';
 
   @override
-  String get exampleGood => 'Column(\n'
+  String get exampleGood =>
+      'Column(\n'
       '  spacing: 8,\n'
       '  children: [Text("A"), Text("B")],\n'
       ')';
@@ -1635,7 +1638,8 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_spacing_over_sizedbox',
     '[prefer_spacing_over_sizedbox] Using SizedBox for gaps instead of the spacing parameter is a stylistic API choice. Both achieve the same layout with no performance difference. Enable via the stylistic tier. {v4}',
-    correctionMessage: 'Remove spacer children and add spacing: <value> to the '
+    correctionMessage:
+        'Remove spacer children and add spacing: <value> to the '
         'Row/Column constructor. Test on multiple screen sizes to verify the layout adapts correctly.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -3461,9 +3465,9 @@ class PreferSizedBoxSquareRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferSizedBoxSquareFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferSizedBoxSquareFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3558,15 +3562,16 @@ class PreferCenterOverAlignRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferCenterOverAlignFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferCenterOverAlignFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   @override
-  String get exampleBad => 'Align(\n'
+  String get exampleBad =>
+      'Align(\n'
       '  alignment: Alignment.center,\n'
       '  child: Text("Hello"),\n'
       ')';
@@ -3646,9 +3651,9 @@ class PreferAlignOverContainerRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferAlignOverContainerFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferAlignOverContainerFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3737,9 +3742,9 @@ class PreferPaddingOverContainerRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferPaddingOverContainerFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferPaddingOverContainerFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3826,9 +3831,9 @@ class PreferConstrainedBoxOverContainerRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferConstrainedBoxOverContainerFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferConstrainedBoxOverContainerFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4224,8 +4229,9 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
       final Set<String> itemCountBoundLists = _getItemCountBoundLists(node);
 
       // One combined RegExp per check type (avoid_regex_in_loop).
-      final String listNameAlternation =
-          accessedLists.map(RegExp.escape).join('|');
+      final String listNameAlternation = accessedLists
+          .map(RegExp.escape)
+          .join('|');
       if (listNameAlternation.isEmpty) return;
       final RegExp combinedLengthPattern = RegExp(
         r'\b(' + listNameAlternation + r')\.length\b',

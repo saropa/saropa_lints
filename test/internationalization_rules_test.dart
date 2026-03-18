@@ -240,8 +240,7 @@ void main() {
         expect('avoid_hardcoded_locale passes', isNotNull);
       });
 
-      test(
-          'locale strings in collection literals should NOT trigger '
+      test('locale strings in collection literals should NOT trigger '
           '(regression)', () {
         // e.g., const Set<String> locales = {'en_US', 'en_CA'};
         expect('collection literal locale data is exempt', isNotNull);

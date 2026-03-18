@@ -23,8 +23,9 @@ class PreferReturningConditionalExpressionsFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final target =
-        node is IfStatement ? node : node.thisOrAncestorOfType<IfStatement>();
+    final target = node is IfStatement
+        ? node
+        : node.thisOrAncestorOfType<IfStatement>();
     if (target == null) return;
 
     final condition = target.expression.toSource();

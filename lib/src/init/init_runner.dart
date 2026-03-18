@@ -126,9 +126,7 @@ Future<void> runInit(List<String> args) async {
   log.terminal('${InitColors.cyan}SAROPA LINTS${InitColors.reset} v$version');
   log.terminal('${InitColors.dim}Source: $source${InitColors.reset}');
   if (cliArgs.targetDir != null) {
-    log.terminal(
-      '${InitColors.bold}Target:${InitColors.reset} $targetDir',
-    );
+    log.terminal('${InitColors.bold}Target:${InitColors.reset} $targetDir');
   }
   showWhatsNew(version, packageDir);
   // I4: Deprecation notice — extension is the supported setup path.
@@ -289,8 +287,8 @@ Future<void> runInit(List<String> args) async {
   // Read existing config and extract user customizations
   final String resolvedOutput =
       cliArgs.outputPath.contains('/') || cliArgs.outputPath.contains('\\')
-          ? cliArgs.outputPath
-          : '$targetDir/${cliArgs.outputPath}';
+      ? cliArgs.outputPath
+      : '$targetDir/${cliArgs.outputPath}';
   final File outputFile = File(resolvedOutput);
   Map<String, bool> userCustomizations = <String, bool>{};
   String existingContent = '';
@@ -440,10 +438,7 @@ Future<void> runInit(List<String> args) async {
   );
 
   // Replace plugins section in existing content, preserving everything else
-  final String newContent = replacePluginsSection(
-    existingContent,
-    pluginsYaml,
-  );
+  final String newContent = replacePluginsSection(existingContent, pluginsYaml);
 
   if (cliArgs.isDryRun) {
     log.terminal('${InitColors.yellow}━━━ DRY RUN ━━━${InitColors.reset}');
@@ -532,8 +527,9 @@ void _printRuleSummary({
 
   log.terminal('');
   final totalRules = finalEnabled.length + finalDisabled.length;
-  final disabledPct =
-      totalRules > 0 ? (finalDisabled.length * 100 ~/ totalRules) : 0;
+  final disabledPct = totalRules > 0
+      ? (finalDisabled.length * 100 ~/ totalRules)
+      : 0;
   log.terminal(
     '${InitColors.bold}Rules:${InitColors.reset} ${successText('${finalEnabled.length} enabled')} / ${errorText('${finalDisabled.length} disabled')} ${InitColors.dim}($disabledPct%)${InitColors.reset}',
   );

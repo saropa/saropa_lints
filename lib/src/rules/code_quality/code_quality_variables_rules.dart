@@ -248,12 +248,14 @@ class AvoidParameterReassignmentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  String get exampleBad => 'void process(int value) {\n'
+  String get exampleBad =>
+      'void process(int value) {\n'
       '  value = value * 2;  // reassigning parameter\n'
       '}';
 
   @override
-  String get exampleGood => 'void process(int value) {\n'
+  String get exampleGood =>
+      'void process(int value) {\n'
       '  final doubled = value * 2;  // use local variable\n'
       '}';
 
@@ -441,9 +443,7 @@ class AvoidParameterMutationRule extends SaropaLintRule {
 
     if (paramNames.isEmpty) return;
 
-    body.visitChildren(
-      _ParameterMutationVisitor(paramNames, reporter, _code),
-    );
+    body.visitChildren(_ParameterMutationVisitor(paramNames, reporter, _code));
   }
 }
 
@@ -453,11 +453,7 @@ class AvoidParameterMutationRule extends SaropaLintRule {
 /// Collection method calls (add, addAll, etc.) are intentionally skipped —
 /// they represent the standard accumulator/output pattern in Dart.
 class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
-  _ParameterMutationVisitor(
-    this.paramNames,
-    this.reporter,
-    this.code,
-  );
+  _ParameterMutationVisitor(this.paramNames, this.reporter, this.code);
 
   final Set<String> paramNames;
   final SaropaDiagnosticReporter reporter;
@@ -829,9 +825,9 @@ class AvoidUnusedAssignmentRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnusedAssignmentFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnusedAssignmentFix(context: context),
+  ];
 
   /// Returns true if [node] is inside a loop body (while, do, for).
   static bool _isInsideLoop(AstNode node) {
@@ -1836,8 +1832,9 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
           for (final VariableDeclaration variable
               in statement.variables.variables) {
             final String name = variable.name.lexeme;
-            declarationLines[name] =
-                context.lineInfo.getLocation(variable.offset).lineNumber;
+            declarationLines[name] = context.lineInfo
+                .getLocation(variable.offset)
+                .lineNumber;
             declarations[name] = variable;
           }
         }

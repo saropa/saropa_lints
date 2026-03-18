@@ -1367,7 +1367,7 @@ class AvoidRedundantNullCheckRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceRedundantNullCheckFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceRedundantNullCheckFix(context: context),
+  ];
 }

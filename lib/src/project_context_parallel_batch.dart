@@ -83,8 +83,9 @@ class ParallelAnalysisResult {
         hasRiverpodImport: hr is bool ? hr : false,
       ),
       fingerprint: fpr,
-      fileTypes:
-          ft.map<FileType>((e) => FileType.values[e is int ? e : 0]).toSet(),
+      fileTypes: ft
+          .map<FileType>((e) => FileType.values[e is int ? e : 0])
+          .toSet(),
       matchingPatterns: mp.cast<String>().toSet(),
     );
   }
@@ -450,10 +451,12 @@ class ParallelAnalyzer {
 
     // Package import detection
     final hasFlutterImport = content.contains('package:flutter/');
-    final hasBlocImport = content.contains('package:bloc/') ||
+    final hasBlocImport =
+        content.contains('package:bloc/') ||
         content.contains('package:flutter_bloc/');
     final hasProviderImport = content.contains('package:provider/');
-    final hasRiverpodImport = content.contains('package:riverpod/') ||
+    final hasRiverpodImport =
+        content.contains('package:riverpod/') ||
         content.contains('package:flutter_riverpod/') ||
         content.contains('package:hooks_riverpod/');
 
@@ -477,12 +480,12 @@ class ParallelAnalyzer {
     final sizeBucket = metrics.lineCount < 50
         ? 0
         : metrics.lineCount < 200
-            ? 1
-            : metrics.lineCount < 500
-                ? 2
-                : metrics.lineCount < 1000
-                    ? 3
-                    : 4;
+        ? 1
+        : metrics.lineCount < 500
+        ? 2
+        : metrics.lineCount < 1000
+        ? 3
+        : 4;
 
     return Object.hash(
       metrics.importCount.clamp(0, 20),

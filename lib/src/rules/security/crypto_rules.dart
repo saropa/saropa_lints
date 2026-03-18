@@ -68,9 +68,9 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m1, OwaspMobile.m10},
-        web: <OwaspWeb>{OwaspWeb.a02},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m1, OwaspMobile.m10},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
 
   static const LintCode _code = LintCode(
     'avoid_hardcoded_encryption_keys',
@@ -189,15 +189,15 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseSecureRandomFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseSecureRandomFix(context: context),
+  ];
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m10},
-        web: <OwaspWeb>{OwaspWeb.a02},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m10},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
 
   static const LintCode _code = LintCode(
     'prefer_secure_random_for_crypto',
@@ -308,9 +308,9 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m10},
-        web: <OwaspWeb>{OwaspWeb.a02},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m10},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
 
   static const LintCode _code = LintCode(
     'avoid_deprecated_crypto_algorithms',
@@ -407,15 +407,15 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseSecureRandomIvFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseSecureRandomIvFix(context: context),
+  ];
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m10},
-        web: <OwaspWeb>{OwaspWeb.a02},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m10},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
 
   static final RegExp _ivWordRegex = RegExp(r'\bIV\b');
 
@@ -462,7 +462,8 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
         // Check variable name for IV-related patterns
         final String originalName = variable.name.lexeme;
         final String lowerName = originalName.toLowerCase();
-        final bool hasIvName = lowerName == 'iv' ||
+        final bool hasIvName =
+            lowerName == 'iv' ||
             lowerName == 'nonce' ||
             _isIvVariableName(originalName);
 
@@ -480,8 +481,9 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
     // Check for const IV
     context.addVariableDeclaration((VariableDeclaration node) {
       final p = node.parent;
-      final VariableDeclarationList? parent =
-          p is VariableDeclarationList ? p : null;
+      final VariableDeclarationList? parent = p is VariableDeclarationList
+          ? p
+          : null;
       if (parent == null) return;
 
       final bool isConst = parent.isConst;
@@ -566,9 +568,9 @@ class RequireSecureKeyGenerationRule extends SaropaLintRule {
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m5, OwaspMobile.m10},
-        web: <OwaspWeb>{OwaspWeb.a02},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m5, OwaspMobile.m10},
+    web: <OwaspWeb>{OwaspWeb.a02},
+  );
 
   static const LintCode _code = LintCode(
     'require_secure_key_generation',

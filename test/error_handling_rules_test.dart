@@ -156,7 +156,9 @@ void main() {
     test('RequireNotificationActionHandlingRule', () {
       final rule = RequireNotificationActionHandlingRule();
       expect(
-          rule.code.name.toLowerCase(), 'require_notification_action_handling');
+        rule.code.name.toLowerCase(),
+        'require_notification_action_handling',
+      );
       expect(
         rule.code.problemMessage,
         contains('[require_notification_action_handling]'),
@@ -181,7 +183,9 @@ void main() {
     test('RequireAppStartupErrorHandlingRule', () {
       final rule = RequireAppStartupErrorHandlingRule();
       expect(
-          rule.code.name.toLowerCase(), 'require_app_startup_error_handling');
+        rule.code.name.toLowerCase(),
+        'require_app_startup_error_handling',
+      );
       expect(
         rule.code.problemMessage,
         contains('[require_app_startup_error_handling]'),
@@ -415,7 +419,8 @@ void main() {}
           expect(
             analyze.exitCode,
             isNot(4),
-            reason: 'Analyzer plugin crashed (exit code 4). '
+            reason:
+                'Analyzer plugin crashed (exit code 4). '
                 'EnumDeclaration.body likely threw UnsupportedError:\n'
                 '${analyze.stdout}\n${analyze.stderr}',
           );
@@ -424,7 +429,8 @@ void main() {}
           expect(
             combined,
             isNot(contains('UnsupportedError')),
-            reason: 'Analyzer threw UnsupportedError on declaration type:\n'
+            reason:
+                'Analyzer threw UnsupportedError on declaration type:\n'
                 '$combined',
           );
         },
@@ -692,8 +698,7 @@ void main() {
         expect('startup error handling passes', isNotNull);
       });
 
-      test(
-          'main() without crash reporting dependency should NOT trigger '
+      test('main() without crash reporting dependency should NOT trigger '
           '(regression)', () {
         // Apps without firebase_crashlytics/sentry_flutter/etc. should
         // not be forced to add runZonedGuarded with no reporting target

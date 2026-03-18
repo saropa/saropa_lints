@@ -18,24 +18,32 @@ void tryEnableAnsiWindows() {
   if (!Platform.isWindows) return;
   try {
     final k = DynamicLibrary.open('kernel32.dll');
-    final getStdHandle =
-        k.lookupFunction<IntPtr Function(Int32), int Function(int)>(
-      'GetStdHandle',
-    );
-    final getMode = k.lookupFunction<Int32 Function(IntPtr, Pointer<Uint32>),
-        int Function(int, Pointer<Uint32>)>('GetConsoleMode');
+    final getStdHandle = k
+        .lookupFunction<IntPtr Function(Int32), int Function(int)>(
+          'GetStdHandle',
+        );
+    final getMode = k
+        .lookupFunction<
+          Int32 Function(IntPtr, Pointer<Uint32>),
+          int Function(int, Pointer<Uint32>)
+        >('GetConsoleMode');
     final setMode = k
         .lookupFunction<Int32 Function(IntPtr, Uint32), int Function(int, int)>(
-      'SetConsoleMode',
-    );
+          'SetConsoleMode',
+        );
     final getHeap = k.lookupFunction<IntPtr Function(), int Function()>(
       'GetProcessHeap',
     );
-    final alloc = k.lookupFunction<
-        Pointer<Void> Function(IntPtr, Uint32, IntPtr),
-        Pointer<Void> Function(int, int, int)>('HeapAlloc');
-    final free = k.lookupFunction<Int32 Function(IntPtr, Uint32, Pointer<Void>),
-        int Function(int, int, Pointer<Void>)>('HeapFree');
+    final alloc = k
+        .lookupFunction<
+          Pointer<Void> Function(IntPtr, Uint32, IntPtr),
+          Pointer<Void> Function(int, int, int)
+        >('HeapAlloc');
+    final free = k
+        .lookupFunction<
+          Int32 Function(IntPtr, Uint32, Pointer<Void>),
+          int Function(int, int, Pointer<Void>)
+        >('HeapFree');
 
     final handle = getStdHandle(-11); // STD_OUTPUT_HANDLE
     final heap = getHeap();

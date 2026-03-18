@@ -44,8 +44,9 @@ class BaselineConfig {
 
     // Parse file path (defensive: trim and reject empty)
     final fileRaw = map['file'];
-    final file =
-        fileRaw is String && fileRaw.trim().isNotEmpty ? fileRaw.trim() : null;
+    final file = fileRaw is String && fileRaw.trim().isNotEmpty
+        ? fileRaw.trim()
+        : null;
 
     // Parse date
     final dateStr = map['date'] as String?;
@@ -121,7 +122,8 @@ class BaselineConfig {
   }
 
   @override
-  String toString() => 'BaselineConfig('
+  String toString() =>
+      'BaselineConfig('
       'file: $file, '
       'date: $date, '
       'paths: $paths, '

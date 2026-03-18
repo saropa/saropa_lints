@@ -56,9 +56,9 @@ class PreferAutovalidateOnInteractionRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ChangeToOnUserInteractionFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ChangeToOnUserInteractionFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_autovalidate_on_interaction',
@@ -991,8 +991,8 @@ class AvoidClearingFormOnErrorRule extends SaropaLintRule {
       // Check for !validate() or validate() == false
       final bool isValidationFailure =
           (condition.contains('!') && condition.contains('validate()')) ||
-              condition.contains('validate() == false') ||
-              condition.contains('validate()==false');
+          condition.contains('validate() == false') ||
+          condition.contains('validate()==false');
 
       if (isValidationFailure) {
         // Check if body contains .clear()
@@ -1966,8 +1966,9 @@ class PreferRegexValidationRule extends SaropaLintRule {
 
         // Get label/hint text
         if (paramName == 'decoration') {
-          final String decorationSource =
-              arg.expression.toSource().toLowerCase();
+          final String decorationSource = arg.expression
+              .toSource()
+              .toLowerCase();
           for (final String label in _structuredDataLabels) {
             if (decorationSource.contains(label)) {
               labelText = label;

@@ -175,8 +175,8 @@ String _resolveVersion() {
 /// This list contains constructor references (`.new`), not instances.
 /// Rules are only instantiated when needed via [getRulesFromRegistry].
 /// This reduces memory usage from ~4GB (all rules) to ~500MB (essential tier).
-final List<SaropaLintRule Function()> _allRuleFactories =
-    <SaropaLintRule Function()>[
+final List<SaropaLintRule Function()>
+_allRuleFactories = <SaropaLintRule Function()>[
   // Core rules
   AlwaysFailRule.new,
   AvoidNullAssertionRule.new,

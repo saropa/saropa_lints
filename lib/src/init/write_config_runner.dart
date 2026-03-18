@@ -93,13 +93,16 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
     disabledRules = disabledRules.union(tiers.stylisticRules);
   }
 
-  final overridesFile =
-      File('$targetDir${Platform.pathSeparator}analysis_options_custom.yaml');
+  final overridesFile = File(
+    '$targetDir${Platform.pathSeparator}analysis_options_custom.yaml',
+  );
   Map<String, bool> permanentOverrides = <String, bool>{};
-  Map<String, bool> platformSettings =
-      Map<String, bool>.of(tiers.defaultPlatforms);
-  Map<String, bool> packageSettings =
-      Map<String, bool>.of(tiers.defaultPackages);
+  Map<String, bool> platformSettings = Map<String, bool>.of(
+    tiers.defaultPlatforms,
+  );
+  Map<String, bool> packageSettings = Map<String, bool>.of(
+    tiers.defaultPackages,
+  );
 
   if (overridesFile.existsSync()) {
     migrateToMinimalFormat(overridesFile, tiers.stylisticRules, logLine: _noOp);
@@ -130,15 +133,17 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
     logLine: _noOp,
   );
 
-  final platformDisabledRules =
-      tiers.getRulesDisabledByPlatforms(platformSettings);
+  final platformDisabledRules = tiers.getRulesDisabledByPlatforms(
+    platformSettings,
+  );
   if (platformDisabledRules.isNotEmpty) {
     enabledRules = enabledRules.difference(platformDisabledRules);
     disabledRules = disabledRules.union(platformDisabledRules);
   }
 
-  final packageDisabledRules =
-      tiers.getRulesDisabledByPackages(packageSettings);
+  final packageDisabledRules = tiers.getRulesDisabledByPackages(
+    packageSettings,
+  );
   if (packageDisabledRules.isNotEmpty) {
     enabledRules = enabledRules.difference(packageDisabledRules);
     disabledRules = disabledRules.union(packageDisabledRules);

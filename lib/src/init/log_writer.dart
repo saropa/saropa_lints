@@ -217,13 +217,14 @@ Future<String?> findNewestPluginReport(
         continue;
       }
 
-      final reports = dir
-          .listSync()
-          .whereType<File>()
-          .where((f) => f.path.endsWith('_saropa_lint_report.log'))
-          .toList()
-        // Filenames start with YYYYMMDD_HHMMSS — lexicographic = newest first
-        ..sort((a, b) => b.path.compareTo(a.path));
+      final reports =
+          dir
+              .listSync()
+              .whereType<File>()
+              .where((f) => f.path.endsWith('_saropa_lint_report.log'))
+              .toList()
+            // Filenames start with YYYYMMDD_HHMMSS — lexicographic = newest first
+            ..sort((a, b) => b.path.compareTo(a.path));
 
       if (reports.isNotEmpty) {
         final name = reports.first.path.split('/').last.split('\\').last;

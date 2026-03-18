@@ -76,11 +76,12 @@ String buildStylisticSection({
   }
 
   // Add any uncategorized stylistic rules (safety net for new rules)
-  final uncategorized = tiers.stylisticRules
-      .difference(categorizedRules)
-      .difference(skipRules)
-      .toList()
-    ..sort();
+  final uncategorized =
+      tiers.stylisticRules
+          .difference(categorizedRules)
+          .difference(skipRules)
+          .toList()
+        ..sort();
 
   if (uncategorized.isNotEmpty) {
     buffer.writeln('# --- Other stylistic rules ---');
@@ -111,8 +112,8 @@ void ensureStylisticRulesSection(File file) {
   // Find stylistic rules in the RULE OVERRIDES section (to skip them)
   final overrideValues = extractOverrideSectionValues(content);
   var skipRules = overrideValues.keys.toSet().intersection(
-        tiers.stylisticRules,
-      );
+    tiers.stylisticRules,
+  );
 
   // Check if STYLISTIC RULES section exists
   final sectionMatch = stylisticSectionHeaderPattern.firstMatch(content);
@@ -149,7 +150,8 @@ void ensureStylisticRulesSection(File file) {
   final sectionStart = findStylisticSectionStart(content);
   final sectionEnd = findStylisticSectionEnd(content, sectionStart);
 
-  final newContent = content.substring(0, sectionStart) +
+  final newContent =
+      content.substring(0, sectionStart) +
       newSection +
       content.substring(sectionEnd);
 
@@ -174,7 +176,8 @@ void insertNewStylisticSection(
   String newContent;
 
   if (overridesHeaderMatch != null) {
-    newContent = content.substring(0, overridesHeaderMatch.start) +
+    newContent =
+        content.substring(0, overridesHeaderMatch.start) +
         insertContent +
         content.substring(overridesHeaderMatch.start);
   } else {
@@ -195,16 +198,12 @@ void logRemovedStylisticRules(String content) {
 
   if (removedRules.isEmpty) return;
 
-  final enabledRemoved = removedRules.entries
-      .where((e) => e.value)
-      .map((e) => e.key)
-      .toList()
-    ..sort();
-  final disabledRemoved = removedRules.entries
-      .where((e) => !e.value)
-      .map((e) => e.key)
-      .toList()
-    ..sort();
+  final enabledRemoved =
+      removedRules.entries.where((e) => e.value).map((e) => e.key).toList()
+        ..sort();
+  final disabledRemoved =
+      removedRules.entries.where((e) => !e.value).map((e) => e.key).toList()
+        ..sort();
 
   if (enabledRemoved.isNotEmpty) {
     log.terminal(

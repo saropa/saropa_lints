@@ -112,7 +112,8 @@ Map<String, bool> detectProjectPackages(
 
     final content = pubspecFile.readAsStringSync();
 
-    final isFlutter = content.contains('flutter:') ||
+    final isFlutter =
+        content.contains('flutter:') ||
         content.contains('flutter_test:') ||
         content.contains('sdk: flutter');
 

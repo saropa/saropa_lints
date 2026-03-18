@@ -791,8 +791,9 @@ class HotPathProfiler {
       'totalMeasurements': totalMeasurements,
       'recentEntries': _recentEntries.length,
       'slowOperationCount': slowOperations.length,
-      'slowestOperations':
-          slowest.map((e) => '${e.key}: ${e.value.inMilliseconds}ms').toList(),
+      'slowestOperations': slowest
+          .map((e) => '${e.key}: ${e.value.inMilliseconds}ms')
+          .toList(),
     };
   }
 }

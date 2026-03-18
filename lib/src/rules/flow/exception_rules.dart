@@ -123,9 +123,9 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveTryCatchOnlyRethrowFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveTryCatchOnlyRethrowFix(context: context),
+  ];
 }
 
 /// Warns when throw is used inside a catch block, which loses the stack trace.
@@ -185,9 +185,9 @@ class AvoidThrowInCatchBlockRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceThrowWithRethrowFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceThrowWithRethrowFix(context: context),
+  ];
 }
 
 class _ThrowVisitor extends RecursiveAstVisitor<void> {
@@ -333,7 +333,7 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveLeadingUnderscoreFromExceptionClassFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveLeadingUnderscoreFromExceptionClassFix(context: context),
+  ];
 }

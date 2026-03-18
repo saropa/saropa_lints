@@ -273,9 +273,9 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddSubscriptionCheckTodoFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddSubscriptionCheckTodoFix(context: context),
+  ];
 }
 
 // =============================================================================
@@ -514,9 +514,9 @@ class AvoidEntitlementWithoutServerRule extends SaropaLintRule {
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-        'PurchaseStatus',
-        'PurchaseDetails',
-      };
+    'PurchaseStatus',
+    'PurchaseDetails',
+  };
 
   static const LintCode _code = LintCode(
     'avoid_entitlement_without_server',

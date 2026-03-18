@@ -323,8 +323,8 @@ class AvoidProviderRecreateRule extends SaropaLintRule {
       if (node.name.lexeme != 'build') return;
 
       // Check if this is a StatefulWidget's State class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -433,8 +433,8 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
   ) {
     context.addFieldDeclaration((FieldDeclaration node) {
       // Check if inside a class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       // Check each field
@@ -1296,7 +1296,7 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
           if (expr is InstanceCreationExpression) {
             final String? createdType =
                 expr.constructorName.type.element?.name ??
-                    expr.constructorName.type.name.lexeme;
+                expr.constructorName.type.name.lexeme;
             if (_disposableTypes.contains(createdType)) {
               reporter.atNode(node);
             }
@@ -1651,8 +1651,8 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
 
   @override
   List<String> get configAliases => const <String>[
-        'prefer_context_read_not_watch',
-      ];
+    'prefer_context_read_not_watch',
+  ];
 
   @override
   LintImpact get impact => LintImpact.medium;
@@ -2059,8 +2059,8 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
             // Check for patterns like ref.watch(provider).property or
             // ref.watch(provider).field
             // This suggests the Consumer is only using one property
-            final Iterable<RegExpMatch> matches =
-                _singlePropertyPattern.allMatches(bodySource);
+            final Iterable<RegExpMatch> matches = _singlePropertyPattern
+                .allMatches(bodySource);
 
             // If we only see one property being accessed from the watched
             // provider, suggest using Selector
@@ -2520,9 +2520,9 @@ class AvoidProviderListenFalseInBuildRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveListenFalseFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveListenFalseFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_provider_listen_false_in_build',

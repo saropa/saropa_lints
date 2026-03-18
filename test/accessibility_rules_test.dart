@@ -563,8 +563,7 @@ void main() {
         expect('require_minimum_contrast passes', isNotNull);
       });
 
-      test(
-          'light text in container with variable background should NOT '
+      test('light text in container with variable background should NOT '
           'trigger (regression)', () {
         // Container(color: myVariableColor, child: Text(style: TextStyle(
         //   color: Colors.white))) — background can't be resolved statically

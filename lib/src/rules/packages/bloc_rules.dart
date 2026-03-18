@@ -64,8 +64,8 @@ class AvoidBlocEventInConstructorRule extends SaropaLintRule {
   ) {
     context.addConstructorDeclaration((ConstructorDeclaration node) {
       // Check if in a Bloc class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -82,9 +82,9 @@ class AvoidBlocEventInConstructorRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveBlocEventInConstructorFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveBlocEventInConstructorFix(context: context),
+  ];
 }
 
 class _AddCallVisitor extends RecursiveAstVisitor<void> {
@@ -184,7 +184,8 @@ class RequireBlocCloseRule extends SaropaLintRule {
             if (initializer == null) continue;
 
             final String? typeName = member.fields.type?.toSource();
-            final bool isBlocOrCubitType = typeName != null &&
+            final bool isBlocOrCubitType =
+                typeName != null &&
                 (typeName.endsWith('Bloc') ||
                     typeName.endsWith('Cubit') ||
                     blocGenericPattern.hasMatch(typeName) ||
@@ -221,7 +222,8 @@ class RequireBlocCloseRule extends SaropaLintRule {
 
       // Check if each bloc is closed
       for (final String name in blocNames) {
-        final bool isClosed = disposeMethod != null &&
+        final bool isClosed =
+            disposeMethod != null &&
             (isFieldCleanedUp(name, 'close', disposeMethod.body) ||
                 isFieldCleanedUp(name, 'closeSafe', disposeMethod.body));
 
@@ -505,7 +507,8 @@ class AvoidCubitsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   @override
-  String get exampleBad => 'class CounterCubit extends Cubit<int> {\n'
+  String get exampleBad =>
+      'class CounterCubit extends Cubit<int> {\n'
       '  void increment() => emit(state + 1);\n'
       '}';
 
@@ -2248,7 +2251,8 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   @override
-  String get exampleBad => 'class LoadUser extends UserEvent {\n'
+  String get exampleBad =>
+      'class LoadUser extends UserEvent {\n'
       '  // missing Event suffix\n'
       '}';
 
@@ -2318,7 +2322,8 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   @override
-  String get exampleBad => 'class UserLoading extends UserState {\n'
+  String get exampleBad =>
+      'class UserLoading extends UserState {\n'
       '  // missing State suffix\n'
       '}';
 
@@ -3088,7 +3093,8 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
       final beforeAwait = methodSource.substring(0, awaitIndex);
 
       // cspell:ignore inprogress
-      final hasLoadingEmit = beforeAwait.contains('emit(') &&
+      final hasLoadingEmit =
+          beforeAwait.contains('emit(') &&
           (beforeAwait.toLowerCase().contains('loading') ||
               beforeAwait.toLowerCase().contains('inprogress'));
 
@@ -3158,7 +3164,8 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
       final baseName = className.replaceAll('State', '');
 
       // Look for error/failure subclass
-      final hasError = fileSource.contains('${baseName}Error') ||
+      final hasError =
+          fileSource.contains('${baseName}Error') ||
           fileSource.contains('${baseName}Failure') ||
           fileSource.contains('${className}Error') ||
           fileSource.contains('Error extends $className');
@@ -3315,7 +3322,8 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
 
       // Check if all disposable fields are cleaned up
       for (final String fieldName in disposableFields) {
-        final bool isCleaned = closeBody != null &&
+        final bool isCleaned =
+            closeBody != null &&
             (closeBody.contains('$fieldName.close()') ||
                 closeBody.contains('$fieldName?.close()') ||
                 closeBody.contains('$fieldName.dispose()') ||

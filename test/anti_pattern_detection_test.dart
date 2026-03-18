@@ -124,8 +124,7 @@ void main() {
       }
     });
 
-    test('security_rules and disposal_rules have zero dangerous .contains()',
-        () {
+    test('security_rules and disposal_rules have zero dangerous .contains()', () {
       final rulesDir = Directory(p.join('lib', 'src', 'rules'));
       final files = [
         p.join('security', 'security_auth_storage_rules.dart'),
@@ -140,7 +139,8 @@ void main() {
         expect(
           count,
           0,
-          reason: '$name must have zero dangerous .contains() (false-positive '
+          reason:
+              '$name must have zero dangerous .contains() (false-positive '
               'reduction). If you reintroduced one, use word-boundary RegExp or '
               'target_matcher_utils instead.',
         );

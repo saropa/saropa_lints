@@ -10,8 +10,10 @@ void main() {
   group('Complexity Rules - Rule Instantiation', () {
     test('AvoidBitwiseOperatorsWithBooleansRule', () {
       final rule = AvoidBitwiseOperatorsWithBooleansRule();
-      expect(rule.code.name.toLowerCase(),
-          'avoid_bitwise_operators_with_booleans');
+      expect(
+        rule.code.name.toLowerCase(),
+        'avoid_bitwise_operators_with_booleans',
+      );
       expect(
         rule.code.problemMessage,
         contains('[avoid_bitwise_operators_with_booleans]'),
@@ -32,7 +34,9 @@ void main() {
     test('AvoidComplexArithmeticExpressionsRule', () {
       final rule = AvoidComplexArithmeticExpressionsRule();
       expect(
-          rule.code.name.toLowerCase(), 'avoid_complex_arithmetic_expressions');
+        rule.code.name.toLowerCase(),
+        'avoid_complex_arithmetic_expressions',
+      );
       expect(
         rule.code.problemMessage,
         contains('[avoid_complex_arithmetic_expressions]'),
@@ -67,7 +71,9 @@ void main() {
     test('AvoidImmediatelyInvokedFunctionsRule', () {
       final rule = AvoidImmediatelyInvokedFunctionsRule();
       expect(
-          rule.code.name.toLowerCase(), 'avoid_immediately_invoked_functions');
+        rule.code.name.toLowerCase(),
+        'avoid_immediately_invoked_functions',
+      );
       expect(
         rule.code.problemMessage,
         contains('[avoid_immediately_invoked_functions]'),

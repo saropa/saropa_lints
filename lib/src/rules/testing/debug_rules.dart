@@ -88,9 +88,9 @@ class AvoidDebugPrintRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CommentOutDebugPrintFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CommentOutDebugPrintFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_debug_print',
@@ -166,7 +166,8 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_unguarded_debug',
     '[avoid_unguarded_debug] debugPrint() is not guarded by a debug mode check. {v3}',
-    correctionMessage: 'Wrap in if (kDebugMode) or if (DebugType.*.isDebug). '
+    correctionMessage:
+        'Wrap in if (kDebugMode) or if (DebugType.*.isDebug). '
         'Consider using debug() instead, which is production-safe.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -492,9 +493,9 @@ class PreferDebugPrintRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceWithDebugPrintFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceWithDebugPrintFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_debugprint',
@@ -630,9 +631,9 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            WrapInDebugModeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        WrapInDebugModeFix(context: context),
+  ];
 }
 
 /// Warns when log calls use string concatenation instead of structured logging.
@@ -763,8 +764,8 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
   /// Config alias for backwards compatibility with avoid_sensitive_data_in_logs
   @override
   List<String> get configAliases => const <String>[
-        'avoid_sensitive_data_in_logs',
-      ];
+    'avoid_sensitive_data_in_logs',
+  ];
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -774,16 +775,16 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CommentOutSensitiveLogFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CommentOutSensitiveLogFix(context: context),
+  ];
 
   /// OWASP mapping: M6 (Privacy Controls), A09 (Logging Failures)
   @override
   OwaspMapping get owasp => const OwaspMapping(
-        mobile: <OwaspMobile>{OwaspMobile.m6},
-        web: <OwaspWeb>{OwaspWeb.a09},
-      );
+    mobile: <OwaspMobile>{OwaspMobile.m6},
+    web: <OwaspWeb>{OwaspWeb.a09},
+  );
 
   static const LintCode _code = LintCode(
     'avoid_sensitive_in_logs',
@@ -978,7 +979,8 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
         'a debug-mode guard. In production builds, verbose logging exposes '
         'internal application state, degrades performance, and may leak '
         'sensitive information to device logs accessible by other apps. {v1}',
-    correctionMessage: 'Wrap verbose logging in if (kDebugMode) { ... } or use '
+    correctionMessage:
+        'Wrap verbose logging in if (kDebugMode) { ... } or use '
         'a log-level-aware logger that suppresses verbose output in release.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -1111,8 +1113,9 @@ class PreferConditionalLoggingRule extends SaropaLintRule {
       final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
       final firstArg = args.first;
-      final Expression first =
-          firstArg is NamedExpression ? firstArg.expression : firstArg;
+      final Expression first = firstArg is NamedExpression
+          ? firstArg.expression
+          : firstArg;
       if (first is! StringInterpolation && first is! AdjacentStrings) return;
       reporter.atNode(node.methodName, code);
     });

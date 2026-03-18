@@ -194,8 +194,8 @@ class ViolationExporter {
     if (impactCmp != 0) return impactCmp;
 
     final fileCmp = a.relativePath.toLowerCase().compareTo(
-          b.relativePath.toLowerCase(),
-        );
+      b.relativePath.toLowerCase(),
+    );
     if (fileCmp != 0) return fileCmp;
 
     return a.record.line.compareTo(b.record.line);

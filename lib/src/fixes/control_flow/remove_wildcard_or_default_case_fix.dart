@@ -25,7 +25,8 @@ class RemoveWildcardOrDefaultCaseFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final AstNode? toDelete = node.thisOrAncestorOfType<SwitchDefault>() ??
+    final AstNode? toDelete =
+        node.thisOrAncestorOfType<SwitchDefault>() ??
         node.thisOrAncestorOfType<SwitchExpressionCase>();
     if (toDelete == null) return;
 
@@ -57,8 +58,8 @@ class RemoveWildcardOrDefaultCaseFix extends SaropaFixProducer {
       }
       if (i < content.length && content[i] == ',') {
         i++;
-        while (
-            i < content.length && (content[i] == ' ' || content[i] == '\t')) {
+        while (i < content.length &&
+            (content[i] == ' ' || content[i] == '\t')) {
           i++;
         }
         end = i;

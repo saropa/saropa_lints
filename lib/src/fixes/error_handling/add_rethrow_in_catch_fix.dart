@@ -24,8 +24,9 @@ class AddRethrowInCatchFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final catchClause =
-        node is CatchClause ? node : node.thisOrAncestorOfType<CatchClause>();
+    final catchClause = node is CatchClause
+        ? node
+        : node.thisOrAncestorOfType<CatchClause>();
     if (catchClause == null) return;
 
     final Block body = catchClause.body;

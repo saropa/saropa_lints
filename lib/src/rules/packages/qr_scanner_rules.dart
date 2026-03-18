@@ -74,7 +74,8 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
 
       if (callbackSource.isEmpty) return;
 
-      final bool hasFeedback = callbackSource.contains('HapticFeedback') ||
+      final bool hasFeedback =
+          callbackSource.contains('HapticFeedback') ||
           callbackSource.contains('haptic') ||
           callbackSource.contains('vibrate') ||
           callbackSource.contains('Vibration') ||
@@ -181,7 +182,7 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
       final String classSource = enclosingClass.toSource();
       final bool hasLifecycleHandling =
           classSource.contains('WidgetsBindingObserver') &&
-              classSource.contains('didChangeAppLifecycleState');
+          classSource.contains('didChangeAppLifecycleState');
 
       if (!hasLifecycleHandling) {
         reporter.atNode(node.fields.variables.first, code);
@@ -304,7 +305,8 @@ class RequireQrContentValidationRule extends SaropaLintRule {
       // Check for validation patterns
       // Uri.tryParse is always safe (returns null on failure)
       // Uri.parse is only safe if combined with scheme validation
-      final bool hasValidation = callbackSource.contains('Uri.tryParse') ||
+      final bool hasValidation =
+          callbackSource.contains('Uri.tryParse') ||
           (callbackSource.contains('Uri.parse') &&
               callbackSource.contains('scheme')) ||
           callbackSource.contains('isValidUrl') ||

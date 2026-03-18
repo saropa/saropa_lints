@@ -66,9 +66,9 @@ class AvoidEqualExpressionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceSelfCompareWithConstantFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceSelfCompareWithConstantFix(context: context),
+  ];
 }
 
 /// Warns when negation is used in equality checks.
@@ -131,9 +131,9 @@ class AvoidNegationsInEqualityChecksRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseNotEqualsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseNotEqualsFix(context: context),
+  ];
 }
 
 /// Warns when a variable is assigned to itself.
@@ -171,9 +171,9 @@ class AvoidSelfAssignmentRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveSelfAssignmentFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveSelfAssignmentFix(context: context),
+  ];
 
   @override
   void runWithReporter(
@@ -254,9 +254,9 @@ class AvoidSelfCompareRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceSelfCompareWithConstantFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceSelfCompareWithConstantFix(context: context),
+  ];
 }
 
 /// Warns when compareTo is used for equality instead of ==.
@@ -315,9 +315,9 @@ class AvoidUnnecessaryCompareToRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseDirectEqualityFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseDirectEqualityFix(context: context),
+  ];
 }
 
 /// Warns when the same argument value is passed multiple times.
@@ -427,9 +427,9 @@ class AvoidDatetimeComparisonWithoutPrecisionRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            UseDateTimeDifferenceFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        UseDateTimeDifferenceFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_datetime_comparison_without_precision',

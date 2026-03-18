@@ -23,8 +23,9 @@ class DeleteDuplicateMixinFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final mixinType =
-        node is NamedType ? node : node.thisOrAncestorOfType<NamedType>();
+    final mixinType = node is NamedType
+        ? node
+        : node.thisOrAncestorOfType<NamedType>();
     if (mixinType == null) return;
 
     final withClause = mixinType.parent;

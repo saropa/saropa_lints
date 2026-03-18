@@ -372,7 +372,8 @@ class PreferUseCallbackRule extends SaropaLintRule {
         'memoization. Child widgets receiving this callback will rebuild '
         'unnecessarily. Use useCallback to memoize the function and '
         'maintain stable references across rebuilds. {v1}',
-    correctionMessage: 'Extract the inline closure into a useCallback hook: '
+    correctionMessage:
+        'Extract the inline closure into a useCallback hook: '
         'final handler = useCallback(() { ... }, [dependencies]);',
     severity: DiagnosticSeverity.INFO,
   );

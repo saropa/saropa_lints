@@ -26,8 +26,8 @@ class DeleteDuplicateInitializerFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final ConstructorFieldInitializer? toDelete =
-        node.thisOrAncestorOfType<ConstructorFieldInitializer>();
+    final ConstructorFieldInitializer? toDelete = node
+        .thisOrAncestorOfType<ConstructorFieldInitializer>();
     if (toDelete == null) return;
 
     final content = unitResult.content;

@@ -316,7 +316,8 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
 
       // Check if controllers are disposed
       for (final String name in controllerNames) {
-        final bool isDisposed = disposeMethodBody != null &&
+        final bool isDisposed =
+            disposeMethodBody != null &&
             isFieldCleanedUp(name, 'dispose', disposeMethodBody);
 
         if (!isDisposed) {
@@ -874,7 +875,8 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
           if (!hasTransition) return;
 
           // Check if using staggered animations
-          final bool hasStagger = builderSource.contains('Interval') ||
+          final bool hasStagger =
+              builderSource.contains('Interval') ||
               builderSource.contains('index *') ||
               builderSource.contains('index*') ||
               builderSource.contains('delay') ||
@@ -1127,12 +1129,12 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-        'ScaleTransition',
-        'FadeTransition',
-        'SlideTransition',
-        'RotationTransition',
-        'SizeTransition',
-      };
+    'ScaleTransition',
+    'FadeTransition',
+    'SlideTransition',
+    'RotationTransition',
+    'SizeTransition',
+  };
 
   static const LintCode _code = LintCode(
     'avoid_overlapping_animations',
@@ -1956,7 +1958,8 @@ class AvoidMultipleAnimationControllersRule extends SaropaLintRule {
         'Complex multi-controller state increases the risk of lifecycle bugs, '
         'memory leaks from missed disposal, and makes animation timing '
         'difficult to reason about. {v1}',
-    correctionMessage: 'Use a single AnimationController with TweenSequence or '
+    correctionMessage:
+        'Use a single AnimationController with TweenSequence or '
         'staggered_animations. For complex animations, consider Rive or '
         'Lottie instead of manual controller management.',
     severity: DiagnosticSeverity.WARNING,

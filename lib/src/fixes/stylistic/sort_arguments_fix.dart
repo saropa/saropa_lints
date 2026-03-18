@@ -23,8 +23,9 @@ class SortArgumentsFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final target =
-        node is ArgumentList ? node : node.thisOrAncestorOfType<ArgumentList>();
+    final target = node is ArgumentList
+        ? node
+        : node.thisOrAncestorOfType<ArgumentList>();
     if (target == null) return;
 
     // Separate positional and named arguments

@@ -22,8 +22,9 @@ class PreferConstStringListFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final target =
-        node is ListLiteral ? node : node.thisOrAncestorOfType<ListLiteral>();
+    final target = node is ListLiteral
+        ? node
+        : node.thisOrAncestorOfType<ListLiteral>();
     if (target == null) return;
 
     await builder.addDartFileEdit(file, (builder) {

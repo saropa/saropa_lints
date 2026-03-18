@@ -89,9 +89,9 @@ class AvoidAssetManifestJsonRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceAssetManifestJsonFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceAssetManifestJsonFix(context: context),
+  ];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -140,14 +140,14 @@ class PreferDropdownInitialValueRule extends SaropaLintRule {
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-        'DropdownButtonFormField',
-      };
+    'DropdownButtonFormField',
+  };
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            _PreferDropdownInitialValueFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        _PreferDropdownInitialValueFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_dropdown_initial_value',
@@ -262,9 +262,9 @@ class PreferOnPopWithResultRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            _PreferOnPopWithResultFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        _PreferOnPopWithResultFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_on_pop_with_result',

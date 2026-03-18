@@ -28,7 +28,8 @@ class AddBlankLineBeforeFix extends SaropaFixProducer {
 
     // Navigate to the enclosing declaration for proper placement
     // (before annotations/doc comments, not just the name token).
-    final target = node.thisOrAncestorOfType<ClassMember>() ??
+    final target =
+        node.thisOrAncestorOfType<ClassMember>() ??
         node.thisOrAncestorOfType<SwitchMember>() ??
         node;
 

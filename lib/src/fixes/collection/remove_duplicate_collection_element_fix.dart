@@ -27,8 +27,9 @@ class RemoveDuplicateCollectionElementFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final element =
-        node is Expression ? node : node.thisOrAncestorOfType<Expression>();
+    final element = node is Expression
+        ? node
+        : node.thisOrAncestorOfType<Expression>();
     if (element == null) return;
 
     final content = unitResult.content;
@@ -56,8 +57,8 @@ class RemoveDuplicateCollectionElementFix extends SaropaFixProducer {
       }
       if (i < content.length && content[i] == ',') {
         i++;
-        while (
-            i < content.length && (content[i] == ' ' || content[i] == '\t')) {
+        while (i < content.length &&
+            (content[i] == ' ' || content[i] == '\t')) {
           i++;
         }
         end = i;

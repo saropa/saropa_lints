@@ -109,7 +109,8 @@ class PreferMacosMenuBarIntegrationRule extends SaropaLintRule {
   ) {
     // First, check if this appears to be a macOS app
     final String fileSource = context.fileContent;
-    final bool isMacosApp = fileSource.contains('Platform.isMacOS') ||
+    final bool isMacosApp =
+        fileSource.contains('Platform.isMacOS') ||
         fileSource.contains('TargetPlatform.macOS') ||
         fileSource.contains('window_manager') ||
         fileSource.contains('WindowManager');
@@ -208,7 +209,8 @@ class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
   ) {
     // First, check if this appears to be a macOS app
     final String fileSource = context.fileContent;
-    final bool isMacosApp = fileSource.contains('Platform.isMacOS') ||
+    final bool isMacosApp =
+        fileSource.contains('Platform.isMacOS') ||
         fileSource.contains('TargetPlatform.macOS') ||
         fileSource.contains('window_manager') ||
         fileSource.contains('WindowManager');
@@ -218,7 +220,8 @@ class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
     }
 
     // Check if Shortcuts widget is used anywhere in the file
-    final bool hasShortcuts = fileSource.contains('Shortcuts') ||
+    final bool hasShortcuts =
+        fileSource.contains('Shortcuts') ||
         fileSource.contains('CallbackShortcuts') ||
         fileSource.contains('LogicalKeySet');
 
@@ -302,7 +305,8 @@ class RequireMacosWindowSizeConstraintsRule extends SaropaLintRule {
   ) {
     // First, check if this appears to be a macOS app
     final String fileSource = context.fileContent;
-    final bool isMacosApp = fileSource.contains('Platform.isMacOS') ||
+    final bool isMacosApp =
+        fileSource.contains('Platform.isMacOS') ||
         fileSource.contains('TargetPlatform.macOS') ||
         fileSource.contains('window_manager');
 
@@ -311,7 +315,8 @@ class RequireMacosWindowSizeConstraintsRule extends SaropaLintRule {
     }
 
     // Check for window size constraint patterns
-    final bool hasConstraints = fileSource.contains('setMinimumSize') ||
+    final bool hasConstraints =
+        fileSource.contains('setMinimumSize') ||
         fileSource.contains('setMaximumSize') ||
         fileSource.contains('minimumSize') ||
         fileSource.contains('WindowOptions');
@@ -1037,8 +1042,9 @@ class AvoidMacosHardenedRuntimeViolationsRule extends SaropaLintRule {
         final Expression? target = node.target;
         if (target != null && target.toSource() == 'DynamicLibrary') {
           // Check if path is absolute
-          final List<Expression> args =
-              node.argumentList.arguments.whereType<Expression>().toList();
+          final List<Expression> args = node.argumentList.arguments
+              .whereType<Expression>()
+              .toList();
           if (args.isNotEmpty) {
             final String pathArg = args.first.toSource();
             if (pathArg.contains('/') && !pathArg.contains('Frameworks')) {

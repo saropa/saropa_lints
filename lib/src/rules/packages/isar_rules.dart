@@ -1446,9 +1446,9 @@ class RequireIsarNullableFieldRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            AddTryCatchTodoFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        AddTryCatchTodoFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'require_isar_nullable_field',

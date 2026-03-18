@@ -136,8 +136,7 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addDotShorthandConstructorInvocation(
     AbstractAnalysisRule r,
     AstVisitor v,
-  ) =>
-      _capture(v);
+  ) => _capture(v);
   @override
   void addDotShorthandInvocation(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
@@ -221,19 +220,13 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addFunctionDeclaration(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
-  void addFunctionDeclarationStatement(
-    AbstractAnalysisRule r,
-    AstVisitor v,
-  ) =>
+  void addFunctionDeclarationStatement(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
   void addFunctionExpression(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
-  void addFunctionExpressionInvocation(
-    AbstractAnalysisRule r,
-    AstVisitor v,
-  ) =>
+  void addFunctionExpressionInvocation(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
   void addFunctionReference(AbstractAnalysisRule r, AstVisitor v) =>
@@ -242,10 +235,7 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addFunctionTypeAlias(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
-  void addFunctionTypedFormalParameter(
-    AbstractAnalysisRule r,
-    AstVisitor v,
-  ) =>
+  void addFunctionTypedFormalParameter(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
   void addGenericFunctionType(AbstractAnalysisRule r, AstVisitor v) =>
@@ -365,8 +355,7 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addPatternVariableDeclarationStatement(
     AbstractAnalysisRule r,
     AstVisitor v,
-  ) =>
-      _capture(v);
+  ) => _capture(v);
   @override
   void addPostfixExpression(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
@@ -394,26 +383,22 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addRecordTypeAnnotationNamedField(
     AbstractAnalysisRule r,
     AstVisitor v,
-  ) =>
-      _capture(v);
+  ) => _capture(v);
   @override
   void addRecordTypeAnnotationNamedFields(
     AbstractAnalysisRule r,
     AstVisitor v,
-  ) =>
-      _capture(v);
+  ) => _capture(v);
   @override
   void addRecordTypeAnnotationPositionalField(
     AbstractAnalysisRule r,
     AstVisitor v,
-  ) =>
-      _capture(v);
+  ) => _capture(v);
   @override
   void addRedirectingConstructorInvocation(
     AbstractAnalysisRule r,
     AstVisitor v,
-  ) =>
-      _capture(v);
+  ) => _capture(v);
   @override
   void addRelationalPattern(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
@@ -499,10 +484,7 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addVariableDeclarationList(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
-  void addVariableDeclarationStatement(
-    AbstractAnalysisRule r,
-    AstVisitor v,
-  ) =>
+  void addVariableDeclarationStatement(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
   void addWhenClause(AbstractAnalysisRule r, AstVisitor v) => _capture(v);

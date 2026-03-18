@@ -644,9 +644,9 @@ class AvoidNullAssertionRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveNullAssertionFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveNullAssertionFix(context: context),
+  ];
 
   /// Checks if the null assertion is safe because it follows a ??= assignment.
   ///
@@ -1628,9 +1628,9 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceUnnecessaryTypeAssertionFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceUnnecessaryTypeAssertionFix(context: context),
+  ];
 }
 
 /// Warns when a type cast (as) is unnecessary.
@@ -1698,9 +1698,9 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveUnnecessaryTypeCastFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveUnnecessaryTypeCastFix(context: context),
+  ];
 }
 
 /// Warns when an 'is' type check can never be true.
@@ -1965,7 +1965,8 @@ class PreferInlineFunctionTypesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  String get exampleBad => 'typedef Predicate = bool Function(int);\n'
+  String get exampleBad =>
+      'typedef Predicate = bool Function(int);\n'
       'void f(Predicate p) {}';
 
   @override
@@ -2068,14 +2069,15 @@ class PreferTypeOverVarRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            ReplaceVarWithTypeFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        ReplaceVarWithTypeFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_type_over_var',
     '[prefer_type_over_var] Preferring explicit type annotations over var is a style choice. Both produce identical compiled code. Conflicts with prefer_var_over_explicit_type. Enable via the stylistic tier. {v4}',
-    correctionMessage: 'Replace var with the explicit type. '
+    correctionMessage:
+        'Replace var with the explicit type. '
         'Tip: enable "source.fixAll" in your editor\'s code-actions-on-save to auto-fix these on every save.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -2153,8 +2155,8 @@ class AvoidShadowingTypeParametersRule extends SaropaLintRule {
       if (methodTypeParams == null) return;
 
       // Find enclosing class
-      final ClassDeclaration? enclosingClass =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? enclosingClass = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (enclosingClass == null) return;
 
       final TypeParameterList? classTypeParams = enclosingClass.typeParameters;
@@ -2283,9 +2285,9 @@ class PreferFinalLocalsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferFinalLocalsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferFinalLocalsFix(context: context),
+  ];
 
   bool _assignsToName(Statement stmt, String name) {
     if (stmt is ExpressionStatement) {
@@ -2395,9 +2397,9 @@ class PreferConstDeclarationsRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            PreferConstDeclarationsFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        PreferConstDeclarationsFix(context: context),
+  ];
 
   static bool _isConstExpression(Expression e) {
     if (e is NullLiteral ||

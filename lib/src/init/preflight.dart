@@ -51,7 +51,8 @@ void _checkPubspecDependency(LogWriter log, String targetDir) {
     log.check(
       'pubspec.yaml',
       pass: false,
-      detail: 'saropa_lints not found in dependencies — '
+      detail:
+          'saropa_lints not found in dependencies — '
           'add it to dev_dependencies',
     );
   }
@@ -110,7 +111,8 @@ void _checkV7SdkIfNeeded(LogWriter log, String packageVersion) {
     log.check(
       'Dart SDK for v7',
       pass: false,
-      detail: '$major.$minor detected — saropa_lints v7 requires Dart SDK 3.9+ '
+      detail:
+          '$major.$minor detected — saropa_lints v7 requires Dart SDK 3.9+ '
           '(analyzer 10). v7 was retracted; use saropa_lints 8.0.0 for Flutter.',
     );
   }
@@ -118,7 +120,10 @@ void _checkV7SdkIfNeeded(LogWriter log, String packageVersion) {
 
 /// Audit an existing analysis_options.yaml for common issues.
 void _auditExistingConfig(
-    LogWriter log, String currentVersion, String targetDir) {
+  LogWriter log,
+  String currentVersion,
+  String targetDir,
+) {
   final configFile = File('$targetDir/analysis_options.yaml');
 
   if (!configFile.existsSync()) {
@@ -133,7 +138,8 @@ void _auditExistingConfig(
     log.check(
       'Existing config',
       pass: false,
-      detail: 'contains custom_lint: section — '
+      detail:
+          'contains custom_lint: section — '
           'saropa_lints v5 uses native plugins, not custom_lint',
     );
   }
@@ -144,7 +150,8 @@ void _auditExistingConfig(
     log.check(
       'Existing config',
       pass: false,
-      detail: 'plugins section missing version: key — '
+      detail:
+          'plugins section missing version: key — '
           'the analyzer will silently ignore the plugin',
     );
   }
@@ -163,7 +170,8 @@ void _auditExistingConfig(
       log.check(
         'Existing config',
         pass: false,
-        detail: 'version $existing may be stale (current: $currentVersion) '
+        detail:
+            'version $existing may be stale (current: $currentVersion) '
             '— re-run "dart run saropa_lints" to update',
       );
     }

@@ -9,27 +9,35 @@ import 'package:test/test.dart';
 /// Unit tests for cross-file CLI: analyzer result shape, reporter, and fixture-based behavior.
 void main() {
   final projectRoot = Directory.current.path;
-  final fixturePath =
-      p.join(projectRoot, 'test', 'fixtures', 'cross_file_fixture');
+  final fixturePath = p.join(
+    projectRoot,
+    'test',
+    'fixtures',
+    'cross_file_fixture',
+  );
 
   group('runCrossFileAnalysis', () {
-    test('returns result with unusedFiles, circularDependencies, stats',
-        () async {
-      final result = await runCrossFileAnalysis(projectPath: projectRoot);
-      expect(result.unusedFiles, isA<List<String>>());
-      expect(result.circularDependencies, isA<List<List<String>>>());
-      expect(result.stats, isA<Map<String, dynamic>>());
-      expect(result.stats['fileCount'], isA<int>());
-    });
+    test(
+      'returns result with unusedFiles, circularDependencies, stats',
+      () async {
+        final result = await runCrossFileAnalysis(projectPath: projectRoot);
+        expect(result.unusedFiles, isA<List<String>>());
+        expect(result.circularDependencies, isA<List<List<String>>>());
+        expect(result.stats, isA<Map<String, dynamic>>());
+        expect(result.stats['fileCount'], isA<int>());
+      },
+    );
 
-    test('accepts excludeGlobs without error (reserved for future use)',
-        () async {
-      final result = await runCrossFileAnalysis(
-        projectPath: projectRoot,
-        excludeGlobs: ['**/*.g.dart'],
-      );
-      expect(result.stats['fileCount'], isA<int>());
-    });
+    test(
+      'accepts excludeGlobs without error (reserved for future use)',
+      () async {
+        final result = await runCrossFileAnalysis(
+          projectPath: projectRoot,
+          excludeGlobs: ['**/*.g.dart'],
+        );
+        expect(result.stats['fileCount'], isA<int>());
+      },
+    );
   });
 
   group('CrossFileReporter', () {
@@ -53,13 +61,17 @@ void main() {
   });
 
   group('fixture: cross_file_fixture (orphan + cycle)', () {
-    test('unused-files: fixture has exactly one unused file (orphan.dart)',
-        () async {
-      final result = await runCrossFileAnalysis(projectPath: fixturePath);
-      expect(result.unusedFiles.any((path) => path.endsWith('orphan.dart')),
-          isTrue);
-      expect(result.unusedFiles.length, 1);
-    });
+    test(
+      'unused-files: fixture has exactly one unused file (orphan.dart)',
+      () async {
+        final result = await runCrossFileAnalysis(projectPath: fixturePath);
+        expect(
+          result.unusedFiles.any((path) => path.endsWith('orphan.dart')),
+          isTrue,
+        );
+        expect(result.unusedFiles.length, 1);
+      },
+    );
 
     test('circular-deps: fixture has one cycle (a -> b -> c -> a)', () async {
       final result = await runCrossFileAnalysis(projectPath: fixturePath);

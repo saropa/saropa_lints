@@ -501,10 +501,10 @@ class RulePriorityQueue {
   /// Sort rules by priority (lowest priority number runs first).
   static List<T> sortByPriority<T>(List<T> rules, String Function(T) getName) {
     return [...rules]..sort((a, b) {
-        final pa = _rulePriority[getName(a)] ?? 200;
-        final pb = _rulePriority[getName(b)] ?? 200;
-        return pa.compareTo(pb);
-      });
+      final pa = _rulePriority[getName(a)] ?? 200;
+      final pb = _rulePriority[getName(b)] ?? 200;
+      return pa.compareTo(pb);
+    });
   }
 
   /// Get priority for a rule (lower = runs first).

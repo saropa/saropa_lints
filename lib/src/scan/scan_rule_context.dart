@@ -20,8 +20,8 @@ import 'package:analyzer/workspace/workspace.dart';
 /// [UnsupportedError] — this is expected for unresolved ASTs.
 class ScanRuleContext implements RuleContext {
   ScanRuleContext({required RuleContextUnit definingUnit})
-      : _definingUnit = definingUnit,
-        currentUnit = definingUnit;
+    : _definingUnit = definingUnit,
+      currentUnit = definingUnit;
 
   final RuleContextUnit _definingUnit;
 

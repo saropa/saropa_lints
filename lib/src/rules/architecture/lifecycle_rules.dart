@@ -206,7 +206,8 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
       final methodSource = node.toSource();
 
       // Check if it handles paused
-      final handlesPaused = methodSource.contains('AppLifecycleState.paused') ||
+      final handlesPaused =
+          methodSource.contains('AppLifecycleState.paused') ||
           methodSource.contains('.paused');
 
       if (!handlesPaused) {
@@ -216,7 +217,7 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
       // Check if it handles resumed
       final handlesResumed =
           methodSource.contains('AppLifecycleState.resumed') ||
-              methodSource.contains('.resumed');
+          methodSource.contains('.resumed');
 
       if (!handlesResumed) {
         reporter.atNode(node);
@@ -505,15 +506,16 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
 
   @override
   List<String> get configAliases => const <String>[
-        'require_ios_lifecycle_handling',
-      ];
+    'require_ios_lifecycle_handling',
+  ];
 
   static const LintCode _code = LintCode(
     'require_app_lifecycle_handling',
     '[require_app_lifecycle_handling] Timer or subscription detected '
         'without lifecycle handling. '
         'Stop background work when app is inactive to save battery. {v4}',
-    correctionMessage: 'Implement WidgetsBindingObserver and pause/resume in '
+    correctionMessage:
+        'Implement WidgetsBindingObserver and pause/resume in '
         'didChangeAppLifecycleState, or use AppLifecycleListener.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -622,14 +624,14 @@ class RequireConflictResolutionStrategyRule extends SaropaLintRule {
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-        'sync',
-        'upload',
-        'push',
-        'reconcile',
-        'pull',
-        '.put',
-        'putAll',
-      };
+    'sync',
+    'upload',
+    'push',
+    'reconcile',
+    'pull',
+    '.put',
+    'putAll',
+  };
 
   static const LintCode _code = LintCode(
     'require_conflict_resolution_strategy',

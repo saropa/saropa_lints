@@ -23,8 +23,9 @@ class AvoidRedundantAsyncFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    FunctionBody? target =
-        node is FunctionBody ? node : node.thisOrAncestorOfType<FunctionBody>();
+    FunctionBody? target = node is FunctionBody
+        ? node
+        : node.thisOrAncestorOfType<FunctionBody>();
     if (target == null) {
       final method = node.thisOrAncestorOfType<MethodDeclaration>();
       if (method != null) {

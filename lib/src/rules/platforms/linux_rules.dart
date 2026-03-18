@@ -68,7 +68,8 @@ class AvoidHardcodedUnixPathsRule extends SaropaLintRule {
     'avoid_hardcoded_unix_paths',
     '[avoid_hardcoded_unix_paths] Hardcoded Unix path detected. '
         'This breaks under different users, containers, or non-standard layouts. {v3}',
-    correctionMessage: 'Use path_provider (getApplicationSupportDirectory, '
+    correctionMessage:
+        'Use path_provider (getApplicationSupportDirectory, '
         'getTemporaryDirectory) or Platform.environment instead.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -146,7 +147,8 @@ class PreferXdgDirectoryConventionRule extends SaropaLintRule {
     'prefer_xdg_directory_convention',
     '[prefer_xdg_directory_convention] Manual XDG directory path '
         'construction detected. This ignores XDG environment overrides. {v3}',
-    correctionMessage: 'Use path_provider (getApplicationSupportDirectory, '
+    correctionMessage:
+        'Use path_provider (getApplicationSupportDirectory, '
         'getApplicationCacheDirectory) which respects XDG variables.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -342,7 +344,8 @@ class RequireLinuxFontFallbackRule extends SaropaLintRule {
     'require_linux_font_fallback',
     '[require_linux_font_fallback] Platform-specific font used without '
         'fontFamilyFallback. This font may not exist on Linux. {v3}',
-    correctionMessage: 'Add fontFamilyFallback with cross-platform fonts like '
+    correctionMessage:
+        'Add fontFamilyFallback with cross-platform fonts like '
         "'Roboto', 'Noto Sans', or 'Liberation Sans'.",
     severity: DiagnosticSeverity.INFO,
   );

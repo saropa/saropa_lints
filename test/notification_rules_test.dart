@@ -11,7 +11,9 @@ void main() {
     test('RequireNotificationChannelAndroidRule', () {
       final rule = RequireNotificationChannelAndroidRule();
       expect(
-          rule.code.name.toLowerCase(), 'require_notification_channel_android');
+        rule.code.name.toLowerCase(),
+        'require_notification_channel_android',
+      );
       expect(
         rule.code.problemMessage,
         contains('[require_notification_channel_android]'),
@@ -22,7 +24,9 @@ void main() {
     test('AvoidNotificationPayloadSensitiveRule', () {
       final rule = AvoidNotificationPayloadSensitiveRule();
       expect(
-          rule.code.name.toLowerCase(), 'avoid_notification_payload_sensitive');
+        rule.code.name.toLowerCase(),
+        'avoid_notification_payload_sensitive',
+      );
       expect(
         rule.code.problemMessage,
         contains('[avoid_notification_payload_sensitive]'),

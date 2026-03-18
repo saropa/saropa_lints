@@ -11,10 +11,8 @@ import 'package:test/test.dart';
 void main() {
   // Process.run('dart', ['run', 'custom_lint']) can hang if the analyzer
   // plugin stalls or package resolution deadlocks — cap each test.
-  group('Fixture lint integration',
-      timeout: const Timeout(Duration(minutes: 2)), () {
-    test('custom_lint on example_async produces parseable violations',
-        () async {
+  group('Fixture lint integration', timeout: const Timeout(Duration(minutes: 2)), () {
+    test('custom_lint on example_async produces parseable violations', () async {
       final exampleDir = Directory('example_async');
       if (!exampleDir.existsSync()) {
         return; // Skip when example_async not present (e.g. in some CI)

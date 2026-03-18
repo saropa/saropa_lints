@@ -224,9 +224,9 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            RemoveEmptySetStateFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        RemoveEmptySetStateFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_empty_setstate',
@@ -678,8 +678,8 @@ class AvoidUnnecessarySetStateRule extends SaropaLintRule {
       if (!_lifecycleMethods.contains(methodName)) return;
 
       // Check if in a State class
-      final ClassDeclaration? parent =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? parent = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (parent == null) return;
 
       final ExtendsClause? extendsClause = parent.extendsClause;
@@ -759,10 +759,10 @@ class RequireInitStateIdempotentRule extends SaropaLintRule {
 
   @override
   Set<String>? get requiredPatterns => const <String>{
-        'initState',
-        'addListener',
-        'addObserver',
-      };
+    'initState',
+    'addListener',
+    'addObserver',
+  };
 
   static const LintCode _code = LintCode(
     'require_init_state_idempotent',
@@ -1220,7 +1220,8 @@ class RequireDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_field_dispose',
     '[require_field_dispose] Disposable field may not be properly disposed. {v3}',
-    correctionMessage: 'Add a dispose() method that disposes this field, '
+    correctionMessage:
+        'Add a dispose() method that disposes this field, '
         'or ensure the existing dispose() method handles it.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -1706,8 +1707,9 @@ class RequireTimerCancellationRule extends SaropaLintRule {
       '$name?.cancelSafe(',
       '$name..cancelSafe(',
     ];
-    final List<RegExp> compiledPatterns =
-        patterns.map((p) => RegExp(RegExp.escape(p))).toList();
+    final List<RegExp> compiledPatterns = patterns
+        .map((p) => RegExp(RegExp.escape(p)))
+        .toList();
 
     for (final RegExp re in compiledPatterns) {
       if (re.hasMatch(disposeBody)) {
@@ -2085,9 +2087,9 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            WrapSetStateInMountedCheckFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        WrapSetStateInMountedCheckFix(context: context),
+  ];
 }
 
 // Note: _SetStateWithMountedCheckFinder and _AwaitFinder removed.
@@ -4197,7 +4199,8 @@ class AvoidExpensiveDidChangeDependenciesRule extends SaropaLintRule {
         'which can be very frequent. Network calls, database queries, and '
         'heavy computation here cause redundant work, jank, and wasted '
         'bandwidth on every dependency change. {v1}',
-    correctionMessage: 'Move one-time initialization to initState() or add an '
+    correctionMessage:
+        'Move one-time initialization to initState() or add an '
         '_initialized guard. Only use didChangeDependencies for '
         'lightweight InheritedWidget lookups like Theme.of(context).',
     severity: DiagnosticSeverity.WARNING,

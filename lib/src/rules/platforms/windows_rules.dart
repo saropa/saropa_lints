@@ -105,7 +105,8 @@ class AvoidHardcodedDriveLettersRule extends SaropaLintRule {
     'avoid_hardcoded_drive_letters',
     '[avoid_hardcoded_drive_letters] Hardcoded Windows drive letter path '
         'detected. This breaks on other drives, users, or platforms. {v3}',
-    correctionMessage: 'Use path_provider (getApplicationSupportDirectory) or '
+    correctionMessage:
+        'Use path_provider (getApplicationSupportDirectory) or '
         "Platform.environment['APPDATA'] instead.",
     severity: DiagnosticSeverity.WARNING,
   );
@@ -131,7 +132,8 @@ class AvoidHardcodedDriveLettersRule extends SaropaLintRule {
     final int firstChar = value.codeUnitAt(0);
 
     // Check for A-Z or a-z
-    final bool isLetter = (firstChar >= 0x41 && firstChar <= 0x5A) || // A-Z
+    final bool isLetter =
+        (firstChar >= 0x41 && firstChar <= 0x5A) || // A-Z
         (firstChar >= 0x61 && firstChar <= 0x7A); // a-z
 
     if (!isLetter) return false;
@@ -274,9 +276,9 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
-        ({required CorrectionProducerContext context}) =>
-            CaseInsensitivePathFix(context: context),
-      ];
+    ({required CorrectionProducerContext context}) =>
+        CaseInsensitivePathFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'avoid_case_sensitive_path_comparison',
