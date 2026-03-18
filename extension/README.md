@@ -16,7 +16,7 @@ After installing, run **"Saropa Lints: Getting Started"** from the Command Palet
 3. Click **Enable Saropa Lints**. The extension will:
    - Add `saropa_lints` to `dev_dependencies`
    - Run `dart pub get` (or `flutter pub get`)
-   - Run `dart run saropa_lints:init --tier recommended --no-stylistic --target <workspace>` (non-interactive)
+   - Run `dart run saropa_lints:write_config --tier recommended --target <workspace>` (headless)
    - Optionally run `dart analyze`
 4. Run **"Saropa Lints: Getting Started"** from the Command Palette for a guided tour of all features.
 5. Use **Run Analysis** and **Open Config** as needed. Issues appear in the **Issues** view when `reports/.saropa_lints/violations.json` exists (written by the analyzer).
@@ -67,7 +67,7 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 - **Saropa Lints: Enable** — Add saropa_lints to the project and run init (and optionally analyze).
 - **Saropa Lints: Disable** — Turn the extension off for this workspace (does not remove files).
 - **Saropa Lints: Run Analysis** — Run `dart analyze` / `flutter analyze`.
-- **Saropa Lints: Initialize / Update Config** — Re-run init with the current tier.
+- **Saropa Lints: Initialize / Update Config** — Write analysis_options.yaml with the current tier (uses write_config).
 - **Saropa Lints: Open Config** — Open `analysis_options_custom.yaml` or `analysis_options.yaml`.
 - **Filter by text…** / **Filter by type…** / **Filter by rule…** — Filter the Issues tree (view toolbar).
 - **Clear filters** / **Clear suppressions** — Reset filters or hidden items (view toolbar when active).

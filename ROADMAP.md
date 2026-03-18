@@ -57,7 +57,7 @@ The `SaropaLintRule` base class provides enhanced features for all lint rules.
 
 #### Planned Enhancements
 
-Details and design notes for each enhancement are in [bugs/discussion/](bugs/discussion/) (one file per discussion: `discussion_055_diagnostic_statistics.md` through `discussion_061_tier_based_filtering.md`).
+⭐ Details and design notes for each enhancement are in [bugs/discussion/](bugs/discussion/) (one file per discussion: `discussion_055_diagnostic_statistics.md` through `discussion_061_tier_based_filtering.md`).
 
 ---
 
@@ -182,18 +182,18 @@ The "Lints" status bar item is controlled entirely by the [Dart-Code VSCode exte
 |--------------|--------|--------|-------------|
 | **Speculative Analysis** | Hard | Medium | `SpeculativeAnalysis` class exists but requires IDE hooks to know when files are opened. custom_lint doesn't expose these events. Would pre-analyze files the user is likely to open next. |
 | **Full Throttled Analysis** | Hard | Medium | `ThrottledAnalysis` class exists but debounce requires `recordEdit()` calls when user types. custom_lint doesn't expose keystroke events. Current workaround: simple content-hash-based throttle in `run()` prevents duplicate analysis of identical content within 300ms. |
-| Cache Warming on Startup | Medium | Low | Pre-analyze visible/open files when IDE starts. Requires knowing which files are open (IDE-specific) or using heuristics (recent files, pubspec.yaml siblings). Could delay startup. |
-| Result Memoization by AST Hash | Hard | Medium | Cache rule results keyed by AST subtree hash. Skip re-running rules on unchanged AST nodes. Requires efficient AST hashing, careful invalidation logic, and significant memory management. |
-| ⭐ Central Stats Aggregator | Low | Low | Unified API to get all cache statistics in one call. Useful for debugging and monitoring. |
-| Auto-Disable Inactive Rules | Medium | Low | Track rule hit rates over many analysis runs. Rules with 0% violation rate over 100+ files are candidates for automatic disabling (opt-in). Requires persistence of hit rate statistics and user configuration. |
-| Memory Pooling | Medium | Low | Reuse visitor and reporter objects instead of allocating new ones for each file. Reduces GC pressure for high-frequency analysis. Would require resettable object design and pool management. |
-| Lazy Rule Instantiation | Medium | Low | Create rule instances on-demand based on enabled tier rather than `const` list. Current approach uses compile-time constants (low overhead), but lazy instantiation could reduce initial memory for projects using minimal tiers. |
-| **Rule Hit Rate Decay** | Medium | High | Track violation rate per rule. Rules with 0% hits over 50+ files get deprioritized (run last). Self-tuning optimization that adapts to codebase patterns. |
+| ⭐ Cache Warming on Startup | Medium | Low | Pre-analyze visible/open files when IDE starts. Requires knowing which files are open (IDE-specific) or using heuristics (recent files, pubspec.yaml siblings). Could delay startup. |
+| ⭐ Result Memoization by AST Hash | Hard | Medium | Cache rule results keyed by AST subtree hash. Skip re-running rules on unchanged AST nodes. Requires efficient AST hashing, careful invalidation logic, and significant memory management. |
+| ~~⭐ Central Stats Aggregator~~ | Low | Low | **Done:** [CacheStatsAggregator](lib/src/project_context_cache_stats.dart) provides unified cache stats. |
+| ⭐ Auto-Disable Inactive Rules | Medium | Low | Track rule hit rates over many analysis runs. Rules with 0% violation rate over 100+ files are candidates for automatic disabling (opt-in). Requires persistence of hit rate statistics and user configuration. |
+| ⭐ Memory Pooling | Medium | Low | Reuse visitor and reporter objects instead of allocating new ones for each file. Reduces GC pressure for high-frequency analysis. Would require resettable object design and pool management. |
+| ⭐ Lazy Rule Instantiation | Medium | Low | Create rule instances on-demand based on enabled tier rather than `const` list. Current approach uses compile-time constants (low overhead), but lazy instantiation could reduce initial memory for projects using minimal tiers. |
+| ⭐ **Rule Hit Rate Decay** | Medium | High | Track violation rate per rule. Rules with 0% hits over 50+ files get deprioritized (run last). Self-tuning optimization that adapts to codebase patterns. |
 | ~~**Negative Pattern Index**~~ | Low | Medium | **SKIPPED - Safety Risk**: At startup, scan codebase for patterns that NEVER appear. Skip rules requiring absent patterns globally. **Problem**: If a developer adds a pattern (e.g., `Timer.periodic`) to a file after IDE startup, rules would be incorrectly skipped until IDE restart, causing real violations to be missed. This optimization trades correctness for speed, which violates our principle that optimizations must never miss actual violations. |
 | **Semantic Similarity Skip** | Hard | High | Files with identical import+class structure likely have same violations. Hash structure → cache rule results. Skip analysis on structurally identical files. |
-| **Violation Locality Heuristic** | Medium | Medium | Track where violations cluster (imports, class bodies, etc). Focus analysis on high-violation regions first for faster initial feedback. |
+| ⭐ **Violation Locality Heuristic** | Medium | Medium | Track where violations cluster (imports, class bodies, etc). Focus analysis on high-violation regions first for faster initial feedback. |
 | **Co-Edit Prediction** | Hard | Medium | From git history, learn which files are edited together. When A changes, pre-warm B's cache. Requires git log parsing and pattern learning. |
-| **Type Resolution Batching** | Medium | High | Rules needing type resolution share the expensive resolver setup. Batch them instead of per-rule setup cost. Requires grouping rules by type resolution needs. |
+| ⭐ **Type Resolution Batching** | Medium | High | Rules needing type resolution share the expensive resolver setup. Batch them instead of per-rule setup cost. Requires grouping rules by type resolution needs. |
 
 **Alternative under consideration**: A standalone precompiled CLI binary could bypass framework limitations for CI pipelines (parallel execution, lower memory), but would sacrifice real-time IDE feedback. May revisit when rule count exceeds 2000.
 
@@ -584,11 +584,11 @@ executables:
 ```
 
 #### Deliverables
-- [ ] ⭐ `bin/cross_file.dart` - CLI entry point
-- [ ] ⭐ `lib/src/cli/cross_file_analyzer.dart` - Analysis logic
-- [ ] ⭐ `lib/src/cli/cross_file_reporter.dart` - Output formatting
-- [ ] ⭐ Unit tests for each command
-- [ ] ⭐ Update README with usage
+- [x] `bin/cross_file.dart` - CLI entry point
+- [x] `lib/src/cli/cross_file_analyzer.dart` - Analysis logic
+- [x] `lib/src/cli/cross_file_reporter.dart` - Output formatting
+- [x] Unit tests for each command
+- [x] Update README with usage
 
 ---
 
@@ -714,11 +714,11 @@ dart run saropa_lints:cross_file watch
 Re-runs analysis on file changes, useful during development.
 
 #### Deliverables
-- [ ] ⭐ HTML report generation
-- [ ] ⭐ Baseline integration
-- [ ] ⭐ CI-friendly exit codes
-- [ ] Watch mode
-- [ ] ⭐ GitHub Actions example workflow
+- [x] HTML report generation
+- [x] Baseline integration
+- [x] CI-friendly exit codes
+- [ ] ⭐ Watch mode
+- [x] GitHub Actions example workflow
 
 ---
 
