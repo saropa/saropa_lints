@@ -80,7 +80,7 @@ Future<int> _run(List<String> args) async {
     return 2;
   }
 
-  // Options must appear before the command; --exclude is reserved for future use.
+  // Options before the command apply to all; report also accepts --output-dir after the command.
   stderr.writeln('Building import graph...');
   CrossFileResult result;
   try {

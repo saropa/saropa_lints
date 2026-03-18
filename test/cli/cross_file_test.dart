@@ -52,7 +52,7 @@ void main() {
   group('fixture: cross_file_fixture (orphan + cycle)', () {
     test('unused-files: fixture has exactly one unused file (orphan.dart)', () async {
       final result = await runCrossFileAnalysis(projectPath: fixturePath);
-      expect(result.unusedFiles.any((p) => p.endsWith('orphan.dart')), isTrue);
+      expect(result.unusedFiles.any((path) => path.endsWith('orphan.dart')), isTrue);
       expect(result.unusedFiles.length, 1);
     });
 
@@ -60,9 +60,9 @@ void main() {
       final result = await runCrossFileAnalysis(projectPath: fixturePath);
       expect(result.circularDependencies, isNotEmpty);
       final cycle = result.circularDependencies.first;
-      expect(cycle.any((p) => p.endsWith('a.dart')), isTrue);
-      expect(cycle.any((p) => p.endsWith('b.dart')), isTrue);
-      expect(cycle.any((p) => p.endsWith('c.dart')), isTrue);
+      expect(cycle.any((path) => path.endsWith('a.dart')), isTrue);
+      expect(cycle.any((path) => path.endsWith('b.dart')), isTrue);
+      expect(cycle.any((path) => path.endsWith('c.dart')), isTrue);
     });
 
     test('import-stats: fixture has 4 files and 3 imports', () async {
