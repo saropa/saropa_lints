@@ -22,7 +22,8 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
         const seen = new Set<string>();
 
         for (const diag of context.diagnostics) {
-            if (diag.source !== 'Saropa Package Vibrancy') { continue; }
+            if (diag.source !== 'Package Vibrancy') { continue; }
+            if (diag.code === 'vibrancy-summary') { continue; }
 
             const packageName = document.getText(diag.range);
             const issue = findKnownIssue(packageName);

@@ -54,7 +54,7 @@ describe('VibrancyCodeActionProvider', () => {
             ...makeMockDocument(),
             getText: (_range?: vscode.Range) => 'pedantic',
         } as unknown as vscode.TextDocument;
-        const diag = makeDiagnostic('Saropa Package Vibrancy');
+        const diag = makeDiagnostic('Package Vibrancy');
         const context = { diagnostics: [diag] } as unknown as vscode.CodeActionContext;
         const actions = provider.provideCodeActions(
             doc, new vscode.Range(0, 0, 0, 8), context,
@@ -70,7 +70,7 @@ describe('VibrancyCodeActionProvider', () => {
             ...makeMockDocument(),
             getText: (_range?: vscode.Range) => 'flutter_secure_storage',
         } as unknown as vscode.TextDocument;
-        const diag = makeDiagnostic('Saropa Package Vibrancy');
+        const diag = makeDiagnostic('Package Vibrancy');
         const context = { diagnostics: [diag] } as unknown as vscode.CodeActionContext;
         const actions = provider.provideCodeActions(
             doc, new vscode.Range(0, 0, 0, 24), context,
@@ -84,7 +84,7 @@ describe('VibrancyCodeActionProvider', () => {
             ...makeMockDocument(),
             getText: (_range?: vscode.Range) => 'totally_unknown_pkg',
         } as unknown as vscode.TextDocument;
-        const diag = makeDiagnostic('Saropa Package Vibrancy');
+        const diag = makeDiagnostic('Package Vibrancy');
         const context = { diagnostics: [diag] } as unknown as vscode.CodeActionContext;
         const actions = provider.provideCodeActions(
             doc, new vscode.Range(0, 0, 0, 19), context,
@@ -98,7 +98,7 @@ describe('VibrancyCodeActionProvider', () => {
             ...makeMockDocument(),
             getText: (_range?: vscode.Range) => 'test_pkg',
         } as unknown as vscode.TextDocument;
-        const diag = makeDiagnostic('Saropa Package Vibrancy');
+        const diag = makeDiagnostic('Package Vibrancy');
         const context = { diagnostics: [diag] } as unknown as vscode.CodeActionContext;
 
         provider.updateResults([
@@ -163,7 +163,7 @@ describe('VibrancyCodeActionProvider', () => {
             range: new vscode.Range(4, 2, 4, 11),
             message: 'No version conflict detected',
             severity: vscode.DiagnosticSeverity.Warning,
-            source: 'Saropa Package Vibrancy',
+            source: 'Package Vibrancy',
             code: 'stale-override',
         };
         const context = { diagnostics: [diag] } as unknown as vscode.CodeActionContext;
@@ -183,7 +183,7 @@ describe('VibrancyCodeActionProvider', () => {
             ...makeMockDocument(),
             getText: (_range?: vscode.Range) => 'totally_unknown_pkg',
         } as unknown as vscode.TextDocument;
-        const diag = makeDiagnostic('Saropa Package Vibrancy');
+        const diag = makeDiagnostic('Package Vibrancy');
         const context = { diagnostics: [diag] } as unknown as vscode.CodeActionContext;
         const actions = provider.provideCodeActions(
             doc, new vscode.Range(0, 0, 0, 19), context,
@@ -197,12 +197,12 @@ describe('VibrancyCodeActionProvider', () => {
             ...makeMockDocument(),
             getText: (_range?: vscode.Range) => 'pedantic',
         } as unknown as vscode.TextDocument;
-        const diag1 = makeDiagnostic('Saropa Package Vibrancy');
+        const diag1 = makeDiagnostic('Package Vibrancy');
         const diag2: vscode.Diagnostic = {
             range: new vscode.Range(0, 0, 0, 11),
             message: 'Unused dependency',
             severity: vscode.DiagnosticSeverity.Hint,
-            source: 'Saropa Package Vibrancy',
+            source: 'Package Vibrancy',
             code: 'unused-dependency',
         };
         const context = {
@@ -224,7 +224,7 @@ describe('VibrancyCodeActionProvider', () => {
             ...makeMockDocument(),
             getText: (_range?: vscode.Range) => 'pedantic',
         } as unknown as vscode.TextDocument;
-        const diag = makeDiagnostic('Saropa Package Vibrancy');
+        const diag = makeDiagnostic('Package Vibrancy');
         const context = { diagnostics: [diag] } as unknown as vscode.CodeActionContext;
 
         const actions = provider.provideCodeActions(

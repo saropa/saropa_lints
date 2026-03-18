@@ -2,7 +2,11 @@ import * as vscode from 'vscode';
 import { VibrancyResult, FamilySplit, OverrideAnalysis, BudgetResult, VulnSeverity, Vulnerability } from '../types';
 import { findPackageRange } from '../services/pubspec-parser';
 import { categoryToSeverity } from '../scoring/status-classifier';
-import { getEndOfLifeDiagnostics, getVulnSeverityThreshold } from '../services/config-service';
+import {
+    getEndOfLifeDiagnostics,
+    getVulnSeverityThreshold,
+    getInlineDiagnosticsMode,
+} from '../services/config-service';
 import { buildExceededDiagnostics } from '../scoring/budget-checker';
 import { filterBySeverity } from '../scoring/vuln-classifier';
 import { isReplacementPackageName, getReplacementDisplayText } from '../scoring/known-issues';
@@ -48,6 +52,18 @@ export class VibrancyDiagnostics {
     update(uri: vscode.Uri, content: string, results: VibrancyResult[]): void {
         const diagnostics: vscode.Diagnostic[] = [];
         const eolSetting = getEndOfLifeDiagnostics();
+        const inlineMode = getInlineDiagnosticsMode();
+
+        const showPerLineHealth = (category: VibrancyResult['category']): boolean => {
+            if (inlineMode === 'all') { return true; }
+            if (inlineMode === 'none') { return false; }
+            if (inlineMode === 'critical') {
+                return category === 'end-of-life';
+            }
+            return false; // summary: no per-line health
+        };
+
+        const showPerLineOther = inlineMode !== 'none';
 
         for (const result of results) {
             const range = findPackageRange(content, result.package.name);
@@ -59,70 +75,84 @@ export class VibrancyDiagnostics {
             );
 
             if (result.category !== 'vibrant') {
-                // Skip main vibrancy diagnostic for path/git overrides; resolved artifact is local/git, upstream score is not actionable.
                 const isPathOrGitOverride = result.package.source === 'path' || result.package.source === 'git';
                 if (!isPathOrGitOverride) {
                     const shouldSkip = result.category === 'end-of-life' && eolSetting === 'none';
-                    if (!shouldSkip) {
+                    if (!shouldSkip && showPerLineHealth(result.category)) {
                         const severity = computeSeverity(result, eolSetting);
                         const message = buildMessage(result);
                         const diag = new vscode.Diagnostic(
                             vscodeRange, message, severity,
                         );
-                        diag.source = 'Saropa Package Vibrancy';
+                        diag.source = 'Package Vibrancy';
                         diag.code = result.category;
                         diagnostics.push(diag);
                     }
                 }
             }
 
-            if (result.isUnused) {
+            if (showPerLineOther && result.isUnused) {
                 const unusedMsg = `Unused dependency — no imports found for ${result.package.name} in lib/, bin/, or test/`;
                 const unusedDiag = new vscode.Diagnostic(
                     vscodeRange, unusedMsg, vscode.DiagnosticSeverity.Hint,
                 );
-                unusedDiag.source = 'Saropa Package Vibrancy';
+                unusedDiag.source = 'Package Vibrancy';
                 unusedDiag.code = 'unused-dependency';
                 diagnostics.push(unusedDiag);
             }
 
-            const split = this._splitsByPackage.get(result.package.name);
-            if (split) {
-                const msg = buildFamilyConflictMessage(
-                    result.package.name, split,
-                );
-                const splitDiag = new vscode.Diagnostic(
-                    vscodeRange, msg, vscode.DiagnosticSeverity.Warning,
-                );
-                splitDiag.source = 'Saropa Package Vibrancy';
-                splitDiag.code = 'family-conflict';
-                diagnostics.push(splitDiag);
+            if (showPerLineOther) {
+                const split = this._splitsByPackage.get(result.package.name);
+                if (split) {
+                    const msg = buildFamilyConflictMessage(
+                        result.package.name, split,
+                    );
+                    const splitDiag = new vscode.Diagnostic(
+                        vscodeRange, msg, vscode.DiagnosticSeverity.Warning,
+                    );
+                    splitDiag.source = 'Package Vibrancy';
+                    splitDiag.code = 'family-conflict';
+                    diagnostics.push(splitDiag);
+                }
             }
 
             const threshold = getVulnSeverityThreshold();
             const filteredVulns = filterBySeverity(result.vulnerabilities, threshold);
-            for (const vuln of filteredVulns) {
-                const vulnDiag = buildVulnDiagnostic(vscodeRange, vuln);
-                diagnostics.push(vulnDiag);
+            if (showPerLineOther) {
+                for (const vuln of filteredVulns) {
+                    const vulnDiag = buildVulnDiagnostic(vscodeRange, vuln);
+                    diagnostics.push(vulnDiag);
+                }
             }
 
-            // Vibrant packages skip the vibrancy diagnostic above,
-            // so show a standalone Hint when an update is available.
-            if (result.category === 'vibrant'
+            if (showPerLineOther
+                && result.category === 'vibrant'
                 && result.updateInfo
                 && result.updateInfo.updateStatus !== 'up-to-date') {
                 const updateMsg = `${result.package.name} — Update available: ${result.updateInfo.currentVersion} → ${result.updateInfo.latestVersion} (${result.updateInfo.updateStatus})`;
                 const updateDiag = new vscode.Diagnostic(
                     vscodeRange, updateMsg, vscode.DiagnosticSeverity.Hint,
                 );
-                updateDiag.source = 'Saropa Package Vibrancy';
+                updateDiag.source = 'Package Vibrancy';
                 updateDiag.code = 'update-available';
                 diagnostics.push(updateDiag);
             }
         }
 
-        this._addOverrideDiagnostics(content, diagnostics);
+        if (showPerLineOther) {
+            this._addOverrideDiagnostics(content, diagnostics);
+        }
         this._addBudgetDiagnostics(results, diagnostics);
+
+        if (inlineMode === 'summary' || inlineMode === 'critical' || inlineMode === 'none') {
+            const counts = countActionableUnhealthy(results, eolSetting);
+            const total = counts.stale + counts.legacy + counts.quiet + counts.eol;
+            if (total > 0) {
+                const summaryDiag = buildSummaryDiagnostic(counts);
+                diagnostics.unshift(summaryDiag);
+            }
+        }
+
         this._collection.set(uri, diagnostics);
     }
 
@@ -138,7 +168,7 @@ export class VibrancyDiagnostics {
             const diag = new vscode.Diagnostic(
                 range, message, vscode.DiagnosticSeverity.Warning,
             );
-            diag.source = 'Saropa Package Vibrancy';
+            diag.source = 'Package Vibrancy';
             diag.code = 'budget-exceeded';
             diagnostics.push(diag);
         }
@@ -172,7 +202,7 @@ export class VibrancyDiagnostics {
             const diag = new vscode.Diagnostic(
                 vscodeRange, msg, vscode.DiagnosticSeverity.Warning,
             );
-            diag.source = 'Saropa Package Vibrancy';
+            diag.source = 'Package Vibrancy';
             diag.code = 'stale-override';
             diagnostics.push(diag);
         }
@@ -284,10 +314,51 @@ function buildVulnDiagnostic(
     const msg = `Security: ${vuln.id} — ${vuln.summary}${fixInfo}`;
     const severity = VULN_SEVERITY_MAP[vuln.severity];
     const diag = new vscode.Diagnostic(range, msg, severity);
-    diag.source = 'Saropa Package Vibrancy';
+    diag.source = 'Package Vibrancy';
     diag.code = {
         value: vuln.id,
         target: vscode.Uri.parse(vuln.url),
     };
+    return diag;
+}
+
+/** Count unhealthy packages that would get an inline diagnostic (excludes path/git, respects EOL setting). */
+function countActionableUnhealthy(
+    results: VibrancyResult[],
+    eolSetting: string,
+): { stale: number; legacy: number; quiet: number; eol: number } {
+    let stale = 0, legacy = 0, quiet = 0, eol = 0;
+    for (const r of results) {
+        if (r.category === 'vibrant') continue;
+        if (r.package.source === 'path' || r.package.source === 'git') continue;
+        if (r.category === 'end-of-life' && eolSetting === 'none') continue;
+        switch (r.category) {
+            case 'stale': stale++; break;
+            case 'legacy-locked': legacy++; break;
+            case 'quiet': quiet++; break;
+            case 'end-of-life': eol++; break;
+        }
+    }
+    return { stale, legacy, quiet, eol };
+}
+
+function buildSummaryDiagnostic(
+    counts: { stale: number; legacy: number; quiet: number; eol: number },
+): vscode.Diagnostic {
+    const parts: string[] = [];
+    if (counts.stale > 0) parts.push(`${counts.stale} stale`);
+    if (counts.legacy > 0) parts.push(`${counts.legacy} legacy-locked`);
+    if (counts.quiet > 0) parts.push(`${counts.quiet} quiet`);
+    if (counts.eol > 0) parts.push(`${counts.eol} end-of-life`);
+    const summary = parts.length > 0
+        ? `Package Vibrancy: ${parts.join(', ')} — Open Package Vibrancy view for details.`
+        : 'Package Vibrancy: Open Package Vibrancy view for details.';
+    const diag = new vscode.Diagnostic(
+        new vscode.Range(0, 0, 0, 0),
+        summary,
+        vscode.DiagnosticSeverity.Information,
+    );
+    diag.source = 'Package Vibrancy';
+    diag.code = 'vibrancy-summary';
     return diag;
 }

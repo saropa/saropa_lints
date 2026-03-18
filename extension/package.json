@@ -1101,7 +1101,7 @@
         }
       },
       {
-        "title": "Saropa Package Vibrancy",
+        "title": "Package Vibrancy",
         "properties": {
           "saropaLints.packageVibrancy.githubToken": {
             "type": "string",
@@ -1251,6 +1251,23 @@
               "Show as Warning only when a replacement is known, otherwise Hint"
             ],
             "description": "How to display end-of-life package diagnostics in the editor"
+          },
+          "saropaLints.packageVibrancy.inlineDiagnostics": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "critical",
+              "all",
+              "none"
+            ],
+            "default": "summary",
+            "enumDescriptions": [
+              "One summary line in pubspec — open Package Vibrancy view for details (recommended for large projects)",
+              "Only critical issues inline: end-of-life, vulnerabilities, family conflicts",
+              "One diagnostic per package (can be noisy in large pubspecs)",
+              "No inline diagnostics — use Package Vibrancy sidebar only"
+            ],
+            "description": "How many Package Vibrancy issues to show as inline diagnostics in pubspec.yaml. Use \"summary\" to avoid dozens of warnings."
           },
           "saropaLints.packageVibrancy.weights.resolutionVelocity": {
             "type": "number",
