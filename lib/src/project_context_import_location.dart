@@ -101,6 +101,7 @@ class ImportGraphCache {
   /// Parse imports from a single file.
   static void _parseImports(String filePath) {
     try {
+      // Normalize so graph keys match _resolveImport output (forward slashes); needed on Windows.
       filePath = p.normalize(filePath).replaceAll('\\', '/');
       final file = File(filePath);
       if (!file.existsSync()) return;
