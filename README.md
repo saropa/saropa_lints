@@ -627,9 +627,11 @@ dart run saropa_lints:cross_file unused-files   # Files not imported by any othe
 dart run saropa_lints:cross_file circular-deps  # Circular import chains
 dart run saropa_lints:cross_file import-stats   # Import graph statistics
 dart run saropa_lints:cross_file --help
+# JSON output to file (e.g. for CI or tooling)
+dart run saropa_lints:cross_file unused-files --output json > unused.json
 ```
 
-Options: `--path <dir>`, `--output text|json`. Exit codes: 0 = no issues, 1 = issues found, 2 = error. See [ROADMAP Part 3](ROADMAP.md).
+Options: `--path <dir>`, `--output text|json`, `--exclude <glob>` (reserved). Exit codes: 0 = no issues, 1 = issues found, 2 = error. [Example GitHub Actions workflow](doc/cross_file_ci_example.md) for CI. See [ROADMAP Part 3](ROADMAP.md).
 
 ### Standalone Scanner
 

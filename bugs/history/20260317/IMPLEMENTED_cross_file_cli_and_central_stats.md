@@ -11,3 +11,13 @@
 3. **Central Stats Aggregator** — `lib/src/project_context_cache_stats.dart` (part of `project_context`): `CacheStatsAggregator.getStats()` returns one map aggregating all cache statistics (import graph, throttle, speculative, rule batch, baseline, semantic, etc.) for debugging/monitoring.
 
 **Supporting:** `lib/src/cli/cross_file_analyzer.dart` (builds graph, computes unused files and cycles); `ImportGraphCache.getFilePaths()` in `project_context_import_location.dart`; unit tests in `test/cli/cross_file_test.dart`. README and CHANGELOG updated.
+
+---
+
+## Later (same session): CI exit codes, README, GitHub Actions example
+
+4. **CI exit codes** — Already implemented: `bin/cross_file.dart` exits 0 (no issues), 1 (issues found), 2 (config error). Documented in `--help` and README.
+
+5. **README** — Cross-file section expanded: `--exclude` (reserved) in options, JSON-to-file example, link to CI example doc.
+
+6. **GitHub Actions example** — `doc/cross_file_ci_example.md`: copy-paste workflow that runs `unused-files` and `circular-deps`, with optional JSON output and artifact upload. README links to it.
