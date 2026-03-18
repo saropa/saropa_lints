@@ -35,6 +35,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 • **Central cache stats** — `CacheStatsAggregator.getStats()` returns a single map aggregating statistics from all project caches (import graph, throttle, speculative, rule batch, baseline, semantic, etc.) for debugging and monitoring.
 
+### Changed
+
+• **Extension** — Polished Issues view violation context menu with icons for Apply fix / Copy message, a separator between action and hide groups, and clearer suppression behavior (rule vs rule-in-file); extension README documents how to clear and manage suppressions from the toolbar.
+
 ### Archive
 
 • Rules 8.0.11 and earlier moved to [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md)
