@@ -36,7 +36,7 @@ jobs:
 
 ## Optional: JSON output
 
-To capture results for reporting or later steps:
+Add the following steps to the same job if you want to capture the report as JSON:
 
 ```yaml
       - name: Cross-file analysis (JSON)
@@ -54,5 +54,6 @@ To capture results for reporting or later steps:
 |----------|-------------|
 | `--path` | Project directory (default: current). Set to e.g. `./my_package` for monorepos. |
 | `--output` | `text` (default) or `json`. |
+| `--exclude` | Reserved for future use (repeatable). |
 
 Exit codes: **0** = no issues, **1** = issues found, **2** = configuration error.
