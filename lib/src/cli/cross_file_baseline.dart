@@ -80,9 +80,14 @@ class CrossFileBaseline {
 
   /// True if [current] has no new violations compared to this baseline.
   /// New = unused file or cycle present in current but not in baseline.
-  static bool hasNewViolations(CrossFileResult current, CrossFileBaseline? base) {
-    if (base == null) return current.unusedFiles.isNotEmpty || current.circularDependencies.isNotEmpty;
-    final newUnused = current.unusedFiles.toSet().difference(base.unusedFiles.toSet());
+  static bool hasNewViolations(
+      CrossFileResult current, CrossFileBaseline? base) {
+    if (base == null) {
+      return current.unusedFiles.isNotEmpty ||
+          current.circularDependencies.isNotEmpty;
+    }
+    final newUnused =
+        current.unusedFiles.toSet().difference(base.unusedFiles.toSet());
     if (newUnused.isNotEmpty) return true;
     final baseCycleKeys = base.circularDependencies.map(_cycleKey).toSet();
     for (final cycle in current.circularDependencies) {
