@@ -28,7 +28,8 @@ void main() {
           tier: 'recommended',
         ));
         expect(result.ok, isTrue);
-        final outputFile = File('${dir.path}${Platform.pathSeparator}analysis_options.yaml');
+        final outputFile =
+            File('${dir.path}${Platform.pathSeparator}analysis_options.yaml');
         expect(outputFile.existsSync(), isTrue);
         final content = outputFile.readAsStringSync();
         expect(content, contains('plugins:'));
@@ -47,7 +48,8 @@ void main() {
           tier: 'essential',
         ));
         expect(result.ok, isTrue);
-        final customFile = File('${dir.path}${Platform.pathSeparator}analysis_options_custom.yaml');
+        final customFile = File(
+            '${dir.path}${Platform.pathSeparator}analysis_options_custom.yaml');
         expect(customFile.existsSync(), isTrue);
       } finally {
         dir.deleteSync(recursive: true);
