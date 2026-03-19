@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import * as assert from 'node:assert';
 import { detectUnused } from '../../../vibrancy/scoring/unused-detector';
 
 describe('unused-detector', () => {
@@ -46,6 +46,39 @@ describe('unused-detector', () => {
                 'url_launcher_platform_interface',
             ];
             const result = detectUnused(declared, new Set());
+            assert.deepStrictEqual(result, []);
+        });
+
+        it('should skip non-standard platform plugins when parent is imported', () => {
+            const declared = [
+                'google_maps_flutter_ios_sdk10',
+                'webview_flutter_wkwebview',
+                'path_provider_foundation',
+                'camera_android_camerax',
+                'video_player_avfoundation',
+            ];
+            const imported = new Set([
+                'google_maps_flutter',
+                'webview_flutter',
+                'path_provider',
+                'camera',
+                'video_player',
+            ]);
+            const result = detectUnused(declared, imported);
+            assert.deepStrictEqual(result, []);
+        });
+
+        it('should still flag packages with similar prefix but no imported parent', () => {
+            const declared = ['google_maps_flutter_ios_sdk10'];
+            const imported = new Set<string>();  // parent NOT imported
+            const result = detectUnused(declared, imported);
+            assert.deepStrictEqual(result, ['google_maps_flutter_ios_sdk10']);
+        });
+
+        it('should document a prefix-collision false negative (http_parser)', () => {
+            const declared = ['http_parser'];
+            const imported = new Set(['http']);
+            const result = detectUnused(declared, imported);
             assert.deepStrictEqual(result, []);
         });
 

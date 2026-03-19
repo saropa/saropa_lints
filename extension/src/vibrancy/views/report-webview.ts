@@ -4,7 +4,10 @@ import { buildReportHtml } from './report-html';
 
 /** Singleton webview panel for the vibrancy report. */
 export class VibrancyReportPanel {
-    public static currentPanel: VibrancyReportPanel | undefined;
+    private static _currentPanel: VibrancyReportPanel | undefined;
+    public static get currentPanel(): VibrancyReportPanel | undefined {
+        return VibrancyReportPanel._currentPanel;
+    }
     private readonly _panel: vscode.WebviewPanel;
     private _disposables: vscode.Disposable[] = [];
 
@@ -17,12 +20,12 @@ export class VibrancyReportPanel {
 
         const panel = vscode.window.createWebviewPanel(
             'saropaVibrancyReport',
-            'Package Vibrancy Report',
+            'Saropa Package Vibrancy Report',
             vscode.ViewColumn.One,
             { enableScripts: true, retainContextWhenHidden: true },
         );
 
-        VibrancyReportPanel.currentPanel = new VibrancyReportPanel(
+        VibrancyReportPanel._currentPanel = new VibrancyReportPanel(
             panel, results,
         );
     }
@@ -39,7 +42,7 @@ export class VibrancyReportPanel {
     }
 
     private _dispose(): void {
-        VibrancyReportPanel.currentPanel = undefined;
+        VibrancyReportPanel._currentPanel = undefined;
         for (const d of this._disposables) {
             d.dispose();
         }

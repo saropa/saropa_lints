@@ -745,6 +745,8 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_string_substring',
   'prefer_single_container',
   'prefer_api_pagination',
+  // HACK marker (review item that should surface in Issues). prefer_todo_format is in stylisticRules only.
+  'prefer_hack_format',
 
   // Code quality (roadmap detail requirements)
   'prefer_final_locals',
@@ -753,10 +755,12 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_interpolation_to_compose',
   'prefer_lowercase_constants',
   'prefer_null_aware_method_calls',
+  'no_runtimetype_tostring',
   'avoid_unnecessary_containers',
   'prefer_adjacent_strings',
   'prefer_const_declarations',
   'prefer_const_literals_to_create_immutables',
+  'use_truncating_division',
 
   // v5.1.0 - New rules (Recommended)
   'avoid_cached_image_web',

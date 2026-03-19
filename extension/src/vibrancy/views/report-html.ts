@@ -20,7 +20,7 @@ export function buildReportHtml(results: VibrancyResult[]): string {
     <style>${getReportStyles()}${getChartStyles()}</style>
 </head>
 <body>
-    <h1>Package Vibrancy Report</h1>
+    <h1>Saropa Package Vibrancy Report</h1>
     ${buildReportSummary(results)}
     ${buildChartSection(results)}
     ${buildReportTable(results)}
@@ -96,16 +96,18 @@ function buildRow(r: VibrancyResult): string {
     const updateText = hasUpdate
         ? `→ ${escapeHtml(r.updateInfo!.latestVersion)}`
         : '✓';
-    const updateClass = r.updateInfo?.updateStatus === 'major' ? 'update-major'
-        : r.updateInfo?.updateStatus === 'minor' ? 'update-minor'
-        : r.updateInfo?.updateStatus === 'patch' ? 'update-patch'
-        : '';
+    const updateStatus = r.updateInfo?.updateStatus;
+    let updateClass = '';
+    if (updateStatus === 'major') updateClass = 'update-major';
+    else if (updateStatus === 'minor') updateClass = 'update-minor';
+    else if (updateStatus === 'patch') updateClass = 'update-patch';
 
     const transitiveCount = r.transitiveInfo?.transitiveCount ?? 0;
     const flaggedCount = r.transitiveInfo?.flaggedCount ?? 0;
-    const transitiveText = transitiveCount > 0
-        ? (flaggedCount > 0 ? `${transitiveCount} (${flaggedCount}⚠)` : `${transitiveCount}`)
-        : '—';
+    let transitiveText: string;
+    if (transitiveCount === 0) transitiveText = '—';
+    else if (flaggedCount > 0) transitiveText = `${transitiveCount} (${flaggedCount}⚠)`;
+    else transitiveText = `${transitiveCount}`;
     const transitiveClass = flaggedCount > 0 ? 'transitive-flagged' : '';
 
     const vulnCount = r.vulnerabilities.length;
