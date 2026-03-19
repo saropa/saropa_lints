@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:saropa_lints/src/project_context.dart' show ProjectContext;
 import 'package:saropa_lints/src/saropa_lint_rule.dart' show LintImpact;
 
 /// Numeric weights for [LintImpact] used in priority scoring.
@@ -17,9 +18,16 @@ extension _LintImpactNumeric on LintImpact {
 /// Collects import edges during analysis and computes file importance
 /// scores at report time.
 ///
-/// Call [collectImports] from each analyzed file during rule execution.
+/// Call [collectImports] once per file during analysis (wired from
+/// `SaropaContext`, immediately after progress records the file path).
 /// Call [compute] once before rendering the report to resolve imports,
-/// build the dependency graph, and calculate scores.
+/// build the graph, and calculate scores.
+///
+/// **Multi-isolate:** State is static per analyzer isolate. Violations are
+/// merged from all isolates when writing the consolidated report, but the
+/// import graph only includes files that this isolate analyzed. Files not
+/// in the graph still get default layer/`other` and zero fan-in for
+/// [getPriority] / [getFileScore] in the report.
 class ImportGraphTracker {
   ImportGraphTracker._();
 
@@ -85,9 +93,21 @@ class ImportGraphTracker {
 
   /// Extract import/export URIs from [content] for [filePath].
   ///
-  /// Runs once per file (guarded by containsKey check). Called from
-  /// [SaropaLintRule.run] after content is loaded.
+  /// Runs at most once per path (map guard). Invoked from
+  /// `SaropaContext._shouldSkipCurrentFile` immediately after
+  /// `ProgressTracker.recordFile` so graph data uses the same unit content
+  /// as the analyzer (no extra I/O).
+  ///
+  /// If [setProjectInfo] was not called yet (e.g. progress reporting
+  /// disabled so `AnalysisReporter.initialize` never ran), infers root and
+  /// package name from [filePath] once.
   static void collectImports(String filePath, String content) {
+    if (_projectRoot == null) {
+      final root = ProjectContext.findProjectRoot(filePath);
+      if (root != null && root.isNotEmpty) {
+        setProjectInfo(root, ProjectContext.getPackageName(root));
+      }
+    }
     if (_rawImports.containsKey(filePath)) return;
     final uris = <String>{};
     for (final match in _importExportRe.allMatches(content)) {
@@ -200,8 +220,7 @@ class ImportGraphTracker {
       if (uri.startsWith(prefix)) {
         final relative = uri.substring(prefix.length);
         final resolved = _normalize('$_projectRoot/lib/$relative');
-        // Only include if we've seen this file
-        return _rawImports.containsKey(resolved) ? resolved : null;
+        return _coerceToRegisteredPath(resolved);
       }
       // External package — skip
       return null;
@@ -213,7 +232,26 @@ class ImportGraphTracker {
     // Relative imports
     final fromDir = _parentDir(fromFile);
     final resolved = _normalize('$fromDir/$uri');
-    return _rawImports.containsKey(resolved) ? resolved : null;
+    return _coerceToRegisteredPath(resolved);
+  }
+
+  /// Maps a normalized path to the matching key in [_rawImports] so edges
+  /// align on Windows (mixed separators in analyzer paths vs [_normalize]).
+  static String? _coerceToRegisteredPath(String path) {
+    for (final k in _rawImports.keys) {
+      if (_pathsSameFile(k, path)) return k;
+    }
+    return null;
+  }
+
+  static bool _pathsSameFile(String a, String b) {
+    final na = a.replaceAll('\\', '/');
+    final nb = b.replaceAll('\\', '/');
+    if (na == nb) return true;
+    if (Platform.isWindows && na.toLowerCase() == nb.toLowerCase()) {
+      return true;
+    }
+    return false;
   }
 
   /// Get parent directory of a file path.

@@ -21,6 +21,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/line_info.dart';
 
 import '../project_context.dart' show FileTypeDetector;
+import '../report/import_graph_tracker.dart' show ImportGraphTracker;
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 import 'compat_visitor.dart';
 
@@ -124,6 +125,9 @@ class SaropaContext {
     if (path == _lastCheckedPath) return _wasLastFileSkipped;
     _lastCheckedPath = path;
     ProgressTracker.recordFile(path);
+    // Populate import graph for report FILE IMPORTANCE / FIX PRIORITY /
+    // PROJECT STRUCTURE (idempotent per path; see ImportGraphTracker).
+    ImportGraphTracker.collectImports(path, fileContent);
 
     final rule = _saropaRule;
     if (rule == null) return false;
