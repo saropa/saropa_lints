@@ -11,6 +11,6 @@
 - **Commands:** Refresh (toolbar + command), Toggle group by tag / folder. "Scanning…" message shown for 4s on refresh/toggle.
 - **Auto-refresh:** onDidSaveTextDocument, debounced 600 ms, when autoRefresh is true and doc under a workspace folder.
 - **Tests:** `extension/src/test/todosAndHacks/scanner.test.ts` — buildRegex, extractMarkersFromLines, getExcludePattern (12 tests). Run: `npm run test` in extension. Uses core only (no vscode).
-- **Fixes in review:** regex.exec → line.match in core to avoid stateful lastIndex with custom `g` regex; concurrency guard in ensureAllScanned.
+- **Code quality:** Core uses `regex.exec()` with `lastIndex` reset when global (Sonar S6594). Tree: concurrency guard in ensureAllScanned; Sonar/TS fixes (node:path, replaceAll, readonly, cognitive complexity refactor, localeCompare, unified capped message).
 
 **Files:** package.json (config, commands, view, menu), extension.ts (tree view, save listener, refresh/toggle handlers), todosAndHacksTypes.ts, todosAndHacksScanner.ts, todosAndHacksScannerCore.ts, todosAndHacksTree.ts, scanner.test.ts, tsconfig.todosAndHacks.test.json. README, CHANGELOG, plan acceptance criteria and completed-optional section updated.
