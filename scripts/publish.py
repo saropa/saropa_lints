@@ -546,6 +546,35 @@ def _print_package_banner(ctx: _PublishContext) -> None:
         print_info(f"TODO log: {todo_log.relative_to(ctx.project_dir)}")
 
 
+def _run_audit_with_retry(project_dir: Path) -> tuple[bool, object]:
+    """Run pre-publish audit; if prefix fix applies, fix and retry. Returns (ok, result)."""
+    audit_ok, audit_result = run_pre_publish_audits(project_dir)
+    while not audit_ok and audit_result:
+        rules_dir = project_dir / "lib" / "src" / "rules"
+        missing_prefix = getattr(
+            audit_result, "rules_missing_prefix", None,
+        )
+        if not missing_prefix:
+            exit_with_error(
+                _AUDIT_FAILED_MSG,
+                ExitCode.AUDIT_FAILED,
+            )
+        from scripts.modules._audit_checks import fix_missing_prefix
+
+        n = fix_missing_prefix(rules_dir)
+        if not n:
+            exit_with_error(
+                _AUDIT_FAILED_MSG,
+                ExitCode.AUDIT_FAILED,
+            )
+        print_success(
+            f"Added [rule_name] prefix to {n} rule(s)."
+        )
+        print_info("Re-running audit...")
+        audit_ok, audit_result = run_pre_publish_audits(project_dir)
+    return audit_ok, audit_result
+
+
 def _run_audit_step(
     project_dir: Path,
     skip_audit: bool,
@@ -556,31 +585,7 @@ def _run_audit_step(
     if not skip_audit:
         with timer.step("Pre-publish audit"):
             print_header("STEP 1: AUDIT")
-            audit_ok, audit_result = run_pre_publish_audits(project_dir)
-            while not audit_ok and audit_result:
-                rules_dir = project_dir / "lib" / "src" / "rules"
-                missing_prefix = getattr(
-                    audit_result, "rules_missing_prefix", None,
-                )
-                if missing_prefix:
-                    from scripts.modules._audit_checks import fix_missing_prefix
-
-                    n = fix_missing_prefix(rules_dir)
-                    if n:
-                        print_success(
-                            f"Added [rule_name] prefix to {n} rule(s)."
-                        )
-                        print_info("Re-running audit...")
-                        audit_ok, audit_result = run_pre_publish_audits(
-                            project_dir,
-                        )
-                        if audit_ok:
-                            break
-                        continue
-                exit_with_error(
-                    _AUDIT_FAILED_MSG,
-                    ExitCode.AUDIT_FAILED,
-                )
+            audit_ok, _ = _run_audit_with_retry(project_dir)
             if not audit_ok:
                 exit_with_error(_AUDIT_FAILED_MSG, ExitCode.AUDIT_FAILED)
 
@@ -650,14 +655,13 @@ def _prompt_version_until_valid(default_version: str) -> str:
         )
 
 
-def _sync_version_with_changelog(
-    project_dir: Path,
+def _apply_version_and_rename_unreleased(
     pubspec_path: Path,
     changelog_path: Path,
     pubspec_version: str,
     version: str,
 ) -> str:
-    """Update pubspec/CHANGELOG with chosen version; reconcile; handle tag clash. Returns final version."""
+    """Write version to pubspec and rename [Unreleased] in CHANGELOG; retry on conflict. Returns version_to_sync."""
     version_to_sync = version
     while True:
         if version_to_sync != pubspec_version:
@@ -671,7 +675,7 @@ def _sync_version_with_changelog(
                     f"Renamed [Unreleased] to [{version_to_sync}] "
                     f"in CHANGELOG.md"
                 )
-            break
+            return version_to_sync
         except ValueError as exc:
             suggested = increment_version(version_to_sync)
             print_warning(str(exc))
@@ -685,66 +689,102 @@ def _sync_version_with_changelog(
                     f"Invalid version format '{version_to_sync}'. "
                     f"Use X.Y.Z or X.Y.Z-pre.N"
                 )
-                continue
+
+
+def _reconcile_pubspec_changelog_versions(
+    pubspec_path: Path,
+    changelog_path: Path,
+    version_to_sync: str,
+) -> str:
+    """Ensure pubspec and CHANGELOG versions match; exit on failure. Returns version_to_sync."""
     changelog_version = get_latest_changelog_version(changelog_path)
     if changelog_version is None:
         exit_with_error(
             "Could not extract version from CHANGELOG.md",
             ExitCode.CHANGELOG_FAILED,
         )
-    if version_to_sync != changelog_version:
-        if parse_version(version_to_sync) < parse_version(changelog_version):
-            print_warning(
-                f"pubspec version ({version_to_sync}) is behind "
-                f"CHANGELOG ({changelog_version}). Updating pubspec..."
-            )
-            set_version_in_pubspec(pubspec_path, changelog_version)
-            version_to_sync = changelog_version
-            print_success(f"Updated pubspec.yaml to {version_to_sync}")
-        else:
-            print_warning(
-                f"pubspec version ({version_to_sync}) is ahead "
-                f"of CHANGELOG ({changelog_version})."
-            )
-            response = (
-                input(
-                    f"  Add a [{version_to_sync}] section to "
-                    f"CHANGELOG.md? [Y/n] "
-                )
-                .strip()
-                .lower()
-            )
-            if response.startswith("n"):
-                exit_with_error(
-                    "Publish canceled — update CHANGELOG.md manually.",
-                    ExitCode.CHANGELOG_FAILED,
-                )
-            add_version_section(
-                changelog_path, version_to_sync, "Version bump",
-            )
-            print_success(
-                f"Added [{version_to_sync}] section to CHANGELOG.md"
-            )
-    tag_name = f"v{version_to_sync}"
-    if tag_exists_on_remote(project_dir, tag_name):
-        next_version = increment_version(version_to_sync)
+    if version_to_sync == changelog_version:
+        return version_to_sync
+    if parse_version(version_to_sync) < parse_version(changelog_version):
         print_warning(
-            f"Tag {tag_name} already exists on remote. "
-            f"Version {version_to_sync} has already been published."
+            f"pubspec version ({version_to_sync}) is behind "
+            f"CHANGELOG ({changelog_version}). Updating pubspec..."
         )
-        print_info(
-            f"Bumping to {next_version} and adding CHANGELOG section."
+        set_version_in_pubspec(pubspec_path, changelog_version)
+        print_success(f"Updated pubspec.yaml to {changelog_version}")
+        return changelog_version
+    print_warning(
+        f"pubspec version ({version_to_sync}) is ahead "
+        f"of CHANGELOG ({changelog_version})."
+    )
+    response = (
+        input(
+            f"  Add a [{version_to_sync}] section to "
+            f"CHANGELOG.md? [Y/n] "
         )
-        set_version_in_pubspec(pubspec_path, next_version)
-        add_version_section(
-            changelog_path, next_version, "Release version",
+        .strip()
+        .lower()
+    )
+    if response.startswith("n"):
+        exit_with_error(
+            "Publish canceled — update CHANGELOG.md manually.",
+            ExitCode.CHANGELOG_FAILED,
         )
-        version_to_sync = next_version
-        print_success(
-            f"Updated pubspec.yaml to {version_to_sync} and added "
-            f"[{version_to_sync}] to CHANGELOG.md (Release version)."
-        )
+    add_version_section(
+        changelog_path, version_to_sync, "Version bump",
+    )
+    print_success(
+        f"Added [{version_to_sync}] section to CHANGELOG.md"
+    )
     return version_to_sync
+
+
+def _maybe_bump_for_tag_clash(
+    project_dir: Path,
+    pubspec_path: Path,
+    changelog_path: Path,
+    version_to_sync: str,
+) -> str:
+    """If tag v{version} exists on remote, bump version and add CHANGELOG section; return final version."""
+    tag_name = f"v{version_to_sync}"
+    if not tag_exists_on_remote(project_dir, tag_name):
+        return version_to_sync
+    next_version = increment_version(version_to_sync)
+    print_warning(
+        f"Tag {tag_name} already exists on remote. "
+        f"Version {version_to_sync} has already been published."
+    )
+    print_info(
+        f"Bumping to {next_version} and adding CHANGELOG section."
+    )
+    set_version_in_pubspec(pubspec_path, next_version)
+    add_version_section(
+        changelog_path, next_version, "Release version",
+    )
+    print_success(
+        f"Updated pubspec.yaml to {next_version} and added "
+        f"[{next_version}] to CHANGELOG.md (Release version)."
+    )
+    return next_version
+
+
+def _sync_version_with_changelog(
+    project_dir: Path,
+    pubspec_path: Path,
+    changelog_path: Path,
+    pubspec_version: str,
+    version: str,
+) -> str:
+    """Update pubspec/CHANGELOG with chosen version; reconcile; handle tag clash. Returns final version."""
+    version_to_sync = _apply_version_and_rename_unreleased(
+        pubspec_path, changelog_path, pubspec_version, version,
+    )
+    version_to_sync = _reconcile_pubspec_changelog_versions(
+        pubspec_path, changelog_path, version_to_sync,
+    )
+    return _maybe_bump_for_tag_clash(
+        project_dir, pubspec_path, changelog_path, version_to_sync,
+    )
 
 
 def _run_badge_validation_docs_dryrun(

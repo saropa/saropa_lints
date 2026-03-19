@@ -1862,7 +1862,7 @@ class PreferTodoFormatRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_todo_format',
-    '[prefer_todo_format] TODO comment is missing the required author and description format. Use TODO(author): description so the comment is trackable, searchable, and attributable to an owner. {v3}',
+    '[prefer_todo_format] TODO comment is missing the required author and description format. Use TODO(author): description so the TODO is trackable, searchable, and attributable to an owner. {v3}',
     correctionMessage:
         'Add author name in parentheses: TODO(author): ... so the TODO is trackable and searchable by owner.',
     severity: DiagnosticSeverity.INFO,
@@ -1894,14 +1894,61 @@ class PreferTodoFormatRule extends SaropaLintRule {
         while (comment != null) {
           final String lexeme = comment.lexeme;
 
-          // Check if it's a TODO comment
-          if (_anyTodoPattern.hasMatch(lexeme)) {
-            // Check if it follows the correct format
-            if (!_validTodoPattern.hasMatch(lexeme)) {
-              reporter.atOffset(offset: comment.offset, length: comment.length);
-            }
+          // Report TODO markers only when they don't follow `TODO(author): description`.
+          if (_anyTodoPattern.hasMatch(lexeme)
+              && !_validTodoPattern.hasMatch(lexeme)) {
+            reporter.atOffset(offset: comment.offset, length: comment.length);
           }
 
+          comment = comment.next;
+        }
+        token = token.next;
+      }
+    });
+  }
+}
+
+/// Reports any `// HACK:` comment so it appears in the extension's Issues tree.
+///
+/// Note: this intentionally reports markers (not format correctness) to match
+/// the user's expectation that TODO/HACK are first-class review items.
+class PreferHackFormatRule extends SaropaLintRule {
+  PreferHackFormatRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_hack_format',
+    '[prefer_hack_format] HACK comment detected. Consider converting to a TODO(author): description or removing the hack. {v3}',
+    correctionMessage:
+        'Convert to TODO(author): description (with owner) or remove the HACK.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static final RegExp _anyHackPattern = RegExp(
+    r'^//\s*HACK\s*:',
+    caseSensitive: false,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit unit) {
+      Token? token = unit.beginToken;
+
+      while (token != null && !token.isEof) {
+        Token? comment = token.precedingComments;
+        while (comment != null) {
+          final String lexeme = comment.lexeme;
+          if (_anyHackPattern.hasMatch(lexeme)) {
+            reporter.atOffset(offset: comment.offset, length: comment.length);
+          }
           comment = comment.next;
         }
         token = token.next;
@@ -4482,6 +4529,118 @@ class PreferRawStringsRule extends SaropaLintRule {
       if (RegExp(r'\$[a-zA-Z_]').hasMatch(lexeme)) return;
       reporter.atNode(node);
     });
+  }
+}
+
+/// Avoid calling `toString()` on `runtimeType`.
+///
+/// `runtimeType` already returns a `Type`, and calling `toString()` creates an
+/// extra string conversion that is often used in hot paths (e.g., logs,
+/// diagnostics, map keys). Prefer using `object is SomeType` checks, explicit
+/// type names, or `Type` comparison where possible.
+class NoRuntimeTypeToStringRule extends SaropaLintRule {
+  NoRuntimeTypeToStringRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => "final name = user.runtimeType.toString();";
+
+  @override
+  String get exampleGood => "final isUser = user is User;";
+
+  static const LintCode _code = LintCode(
+    'no_runtimeType_toString',
+    '[no_runtimeType_toString] Avoid calling toString() on runtimeType. This adds unnecessary string conversion and is often slower than direct type checks.',
+    correctionMessage:
+        'Use type checks (`is`) or compare `runtimeType` directly without converting to string.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'toString') return;
+      if (node.argumentList.arguments.isNotEmpty) return;
+
+      final target = node.target;
+      if (target == null) return;
+      if (!_isRuntimeTypeAccess(target)) return;
+
+      reporter.atNode(node);
+    });
+  }
+
+  static bool _isRuntimeTypeAccess(Expression target) {
+    if (target is PropertyAccess) {
+      return target.propertyName.name == 'runtimeType';
+    }
+    if (target is PrefixedIdentifier) {
+      return target.identifier.name == 'runtimeType';
+    }
+    return false;
+  }
+}
+
+/// Prefer truncating division (`~/`) over `/` followed by `.toInt()`.
+///
+/// `a ~/ b` expresses intent directly and avoids creating an intermediate
+/// `double` result only to truncate it immediately.
+class UseTruncatingDivisionRule extends SaropaLintRule {
+  UseTruncatingDivisionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'final pages = (items / pageSize).toInt();';
+
+  @override
+  String get exampleGood => 'final pages = items ~/ pageSize;';
+
+  static const LintCode _code = LintCode(
+    'use_truncating_division',
+    '[use_truncating_division] Prefer truncating division (`~/`) instead of `/` followed by `.toInt()`.',
+    correctionMessage: 'Replace `(a / b).toInt()` with `a ~/ b`.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'toInt') return;
+      if (node.argumentList.arguments.isNotEmpty) return;
+
+      final target = node.target;
+      if (target == null) return;
+
+      final unwrapped = _unwrapParenthesized(target);
+      if (unwrapped is! BinaryExpression) return;
+      if (unwrapped.operator.type != TokenType.SLASH) return;
+
+      reporter.atNode(node);
+    });
+  }
+
+  static Expression _unwrapParenthesized(Expression expression) {
+    var current = expression;
+    while (current is ParenthesizedExpression) {
+      current = current.expression;
+    }
+    return current;
   }
 }
 
