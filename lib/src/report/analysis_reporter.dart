@@ -448,56 +448,6 @@ class AnalysisReporter {
   /// Write violations grouped by impact level, capped at
   /// [_maxInlineViolations] total. Higher-impact violations take
   /// priority when the cap is reached.
-  static void _writeViolationList(
-    StringBuffer buf,
-    Map<LintImpact, List<ViolationRecord>> violations,
-  ) {
-    final total = violations.values.fold(0, (s, l) => s + l.length);
-
-    buf.writeln('${'=' * 70}');
-    buf.writeln(
-      'ALL VIOLATIONS${total > _maxInlineViolations ? ' (showing $_maxInlineViolations of $total)' : ''}',
-    );
-    buf.writeln('${'=' * 70}');
-    buf.writeln();
-
-    var remaining = _maxInlineViolations;
-
-    for (final impact in LintImpact.values) {
-      final list = violations[impact];
-      if (list == null || list.isEmpty) continue;
-
-      final toWrite = remaining >= list.length ? list.length : remaining;
-      _writeImpactViolations(buf, impact, list, toWrite);
-      remaining -= toWrite;
-    }
-  }
-
-  /// Write violations for a single impact level, capped at [limit].
-  static void _writeImpactViolations(
-    StringBuffer buf,
-    LintImpact impact,
-    List<ViolationRecord> list,
-    int limit,
-  ) {
-    buf.writeln('--- ${impact.name.toUpperCase()} (${list.length}) ---');
-
-    for (var i = 0; i < limit; i++) {
-      final v = list[i];
-      buf.writeln(
-        '  ${v.file}:${v.line} '
-        '| [${v.rule}] ${v.message} '
-        '| ${impact.name}',
-      );
-    }
-
-    final omitted = list.length - limit;
-    if (omitted > 0) {
-      buf.writeln('  ... $omitted more ${impact.name} violations omitted');
-    }
-    buf.writeln();
-  }
-
   /// Write impact breakdown section.
   static void _writeImpactSection(
     StringBuffer buf,
