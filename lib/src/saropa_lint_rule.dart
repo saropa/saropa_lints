@@ -1995,7 +1995,7 @@ abstract class SaropaLintRule extends AnalysisRule {
   // Rule metadata (type, status, standards, tags)
   // ============================================================
 
-  /// Semantic type of this rule. Default [null] = unspecified (legacy).
+  /// Semantic type of this rule. Default `null` = unspecified (legacy).
   /// When set, used for quality gates, accuracy targets, and reporting.
   RuleType? get ruleType => null;
 
