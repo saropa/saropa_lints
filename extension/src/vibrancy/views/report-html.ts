@@ -20,7 +20,7 @@ export function buildReportHtml(results: VibrancyResult[]): string {
     <style>${getReportStyles()}${getChartStyles()}</style>
 </head>
 <body>
-    <h1>Saropa Package Vibrancy Report</h1>
+    <h1>Package Vibrancy Report</h1>
     ${buildReportSummary(results)}
     ${buildChartSection(results)}
     ${buildReportTable(results)}
