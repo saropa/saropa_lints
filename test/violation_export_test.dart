@@ -56,6 +56,11 @@ void main() {
     return '$projectRoot${sep}reports$sep.saropa_lints${sep}violations.json';
   }
 
+  String consumerContractPath() {
+    final sep = Platform.pathSeparator;
+    return '$projectRoot${sep}reports$sep.saropa_lints${sep}consumer_contract.json';
+  }
+
   Map<String, dynamic> readExport() {
     final content = File(exportPath()).readAsStringSync();
     return json.decode(content) as Map<String, dynamic>;
@@ -78,6 +83,30 @@ void main() {
       final parsed = readExport();
       expect(parsed['schema'], '1.0');
       expect(parsed['sessionId'], '20260209_143022');
+
+      // Consumer manifest written alongside violations.json
+      final contractFile = File(consumerContractPath());
+      expect(contractFile.existsSync(), isTrue);
+      final contract = json.decode(contractFile.readAsStringSync()) as Map<String, dynamic>;
+      expect(contract['schemaVersion'], '1.0');
+      expect(contract['healthScore'], isA<Map<String, dynamic>>());
+      final healthScore = contract['healthScore'] as Map<String, dynamic>;
+      expect(healthScore['impactWeights'], isA<Map<String, dynamic>>());
+      final weights = healthScore['impactWeights'] as Map<String, dynamic>;
+      expect(weights['critical'], 8);
+      expect(weights['high'], 3);
+      expect(weights['medium'], 1);
+      expect(weights['low'], 0.25);
+      expect(weights['opinionated'], 0.05);
+      expect(healthScore['decayRate'], 0.3);
+      // tierRuleSets: consumers can filter by tier without reimplementing tier logic
+      expect(contract['tierRuleSets'], isA<Map<String, dynamic>>());
+      final tierRuleSets = contract['tierRuleSets'] as Map<String, dynamic>;
+      const tierIds = ['essential', 'recommended', 'professional', 'comprehensive', 'pedantic', 'stylistic'];
+      for (final tierId in tierIds) {
+        expect(tierRuleSets[tierId], isA<List<dynamic>>());
+        expect((tierRuleSets[tierId] as List<dynamic>).isNotEmpty, isTrue);
+      }
       expect(parsed.containsKey('timestamp'), isTrue);
       expect(parsed.containsKey('config'), isTrue);
       expect(parsed.containsKey('summary'), isTrue);

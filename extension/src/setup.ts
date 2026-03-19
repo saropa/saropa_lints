@@ -4,9 +4,9 @@
  */
 
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
-import { spawnSync } from 'child_process';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { logReport, logSection, flushReport } from './reportWriter';
 import { getProjectRoot } from './projectRoot';
 
@@ -18,7 +18,7 @@ const OUTPUT_CHANNEL_NAME = 'Saropa Lints';
 // Lazily-initialized singleton to avoid creating multiple channel objects.
 let _outputChannel: vscode.OutputChannel | undefined;
 function getOutputChannel(): vscode.OutputChannel {
-  if (!_outputChannel) _outputChannel = vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME);
+  _outputChannel ??= vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME);
   return _outputChannel;
 }
 
@@ -58,10 +58,10 @@ function ensureSaropaLintsInPubspec(workspaceRoot: string): boolean {
   const devDepsIdx = lines.findIndex(l => /^dev_dependencies:\s*$/.test(l));
   const entry = `  ${SAROPA_LINTS_DEV_DEP}: ${DEFAULT_VERSION}`;
 
-  if (devDepsIdx !== -1) {
-    lines.splice(devDepsIdx + 1, 0, entry);
-  } else {
+  if (devDepsIdx === -1) {
     lines.push('', 'dev_dependencies:', entry);
+  } else {
+    lines.splice(devDepsIdx + 1, 0, entry);
   }
   fs.writeFileSync(pubspecPath, lines.join(eol), 'utf-8');
   return true;
@@ -177,6 +177,8 @@ export async function runDisable(): Promise<void> {
   vscode.window.showInformationMessage('Saropa Lints is disabled. Project files were not changed.');
 }
 
+const RUN_ANALYSIS_FOR_FILES_CAP = 50;
+
 export async function runAnalysis(context: vscode.ExtensionContext): Promise<boolean> {
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
@@ -196,18 +198,81 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
       logSection('Analysis');
       const result = runInWorkspace(workspaceRoot, cmd, ['analyze']);
       ok = result.ok;
-      if (!ok) {
+      if (ok) {
+        logReport('- Analysis completed clean');
+      } else {
         logReport(`- Analysis reported issues (${cmd} analyze)`);
         vscode.window.showWarningMessage(
           `Analysis reported issues. ${result.stderr ? result.stderr.slice(0, 200) : 'See Problems view.'}`,
         );
-      } else {
-        logReport('- Analysis completed clean');
       }
       flushReport(workspaceRoot);
     },
   );
   return ok;
+}
+
+/**
+ * Run analysis only for the given files (e.g. stack-trace files for Log Capture).
+ * Same as runAnalysis but passes file paths to dart/flutter analyze.
+ * Paths are normalized (relative → absolute under workspace), deduplicated, and capped at 50.
+ * When invoked via API, no progress UI is shown unless showProgress is true.
+ */
+export async function runAnalysisForFiles(
+  context: vscode.ExtensionContext,
+  files: string[],
+  options?: { showProgress?: boolean },
+): Promise<boolean> {
+  const workspaceRoot = getProjectRoot();
+  if (!workspaceRoot || !files.length) return false;
+
+  const normalized = new Set<string>();
+  for (const f of files) {
+    const trimmed = f.trim();
+    if (!trimmed) continue;
+    const absolute = path.isAbsolute(trimmed)
+      ? path.normalize(trimmed)
+      : path.join(workspaceRoot, path.normalize(trimmed));
+    normalized.add(absolute.replaceAll('\\', '/'));
+  }
+
+  let toRun = [...normalized].sort();
+  if (toRun.length > RUN_ANALYSIS_FOR_FILES_CAP) {
+    toRun = toRun.slice(0, RUN_ANALYSIS_FOR_FILES_CAP);
+    console.warn(
+      `[Saropa Lints] runAnalysisForFiles: capped at ${RUN_ANALYSIS_FOR_FILES_CAP} files (${normalized.size} requested).`,
+    );
+  }
+
+  const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
+  const cmd = useFlutter ? 'flutter' : 'dart';
+  const args = ['analyze', ...toRun];
+
+  const doRun = (): boolean => {
+    logSection('Analysis (files)');
+    const result = runInWorkspace(workspaceRoot, cmd, args, true);
+    if (result.ok) {
+      logReport('- Analysis completed');
+    } else {
+      logReport(`- Analysis reported issues (${cmd} analyze ${toRun.length} files)`);
+    }
+    flushReport(workspaceRoot);
+    return result.ok;
+  };
+
+  if (options?.showProgress) {
+    let ok = false;
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: 'Running analysis (selected files)',
+        cancellable: false,
+      },
+      async () => { ok = doRun(); },
+    );
+    return ok;
+  }
+  return doRun();
 }
 
 export async function runInitializeConfig(context: vscode.ExtensionContext, title?: string): Promise<boolean> {
@@ -229,14 +294,14 @@ export async function runInitializeConfig(context: vscode.ExtensionContext, titl
       logSection('Initialize Config');
       const result = runInWorkspace(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier));
       ok = result.ok;
-      if (!ok) {
-        logReport(`- write_config FAILED: ${result.stderr || '(no details)'}`);
-        flushReport(workspaceRoot);
-        vscode.window.showErrorMessage(`Config write failed. ${result.stderr || 'Check Output.'}`);
-      } else {
+      if (ok) {
         logReport(`- Config initialized (tier: ${tier})`);
         flushReport(workspaceRoot);
         vscode.window.showInformationMessage(`Saropa Lints config updated (tier: ${tier}).`);
+      } else {
+        logReport(`- write_config FAILED: ${result.stderr || '(no details)'}`);
+        flushReport(workspaceRoot);
+        vscode.window.showErrorMessage(`Config write failed. ${result.stderr || 'Check Output.'}`);
       }
     },
   );

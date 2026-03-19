@@ -7,6 +7,7 @@ import 'dart:io' show Directory, File, stderr;
 import 'package:path/path.dart' as path;
 import 'package:saropa_lints/saropa_lints.dart' show rulesWithFixes;
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
+import 'package:saropa_lints/src/report/health_score_constants.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/tiers.dart' as tiers;
@@ -49,8 +50,94 @@ class ViolationExporter {
       final encoded = const JsonEncoder.withIndent('  ').convert(json);
 
       _writeAtomic(projectRoot, encoded);
+      _writeConsumerContract(projectRoot);
     } catch (e) {
       stderr.writeln('[saropa_lints] Could not write violation export: $e');
+    }
+  }
+
+  static const String _consumerContractFileName = 'consumer_contract.json';
+
+  static const List<String> _tierIds = <String>[
+    'essential',
+    'recommended',
+    'professional',
+    'comprehensive',
+    'pedantic',
+    'stylistic',
+  ];
+
+  /// Write consumer_contract.json (schemaVersion, healthScore, tierRuleSets) for consumers that do not use the extension.
+  static void _writeConsumerContract(String projectRoot) {
+    try {
+      final tierRuleSets = <String, Object>{};
+      for (final tierId in _tierIds) {
+        final rules = tiers.getRulesForTier(tierId).toList()..sort();
+        tierRuleSets[tierId] = rules;
+      }
+      final json = <String, Object>{
+        'schemaVersion': _schemaVersion,
+        'healthScore': <String, Object>{
+          'impactWeights': Map<String, num>.from(healthScoreImpactWeights),
+          'decayRate': healthScoreDecayRate,
+        },
+        'tierRuleSets': tierRuleSets,
+      };
+      final encoded = const JsonEncoder.withIndent('  ').convert(json);
+      _writeAtomicFile(projectRoot, _consumerContractFileName, encoded);
+    } catch (e) {
+      stderr.writeln('[saropa_lints] Could not write consumer_contract.json: $e');
+    }
+  }
+
+  /// Writes [content] to [fileName] under reports/.saropa_lints/ using temp-file-then-rename for atomicity.
+  /// Shared by violations.json and consumer_contract.json; fallback to direct write on rename failure.
+  static void _writeAtomicFile(
+    String projectRoot,
+    String fileName,
+    String content,
+  ) {
+    final base = path.normalize(projectRoot);
+    final dirPath = path.join(base, 'reports', _dirName);
+    if (!path.isWithin(base, dirPath)) return;
+
+    final dir = Directory(dirPath);
+    if (!dir.existsSync()) {
+      dir.createSync(recursive: true);
+    }
+
+    final targetPath = path.join(dir.path, fileName);
+    final tmpPath = '$targetPath.tmp';
+    final tmpFile = File(tmpPath);
+    final targetFile = File(targetPath);
+
+    try {
+      tmpFile.writeAsStringSync(content);
+      if (targetFile.existsSync()) {
+        targetFile.deleteSync();
+      }
+      tmpFile.renameSync(targetPath);
+    } catch (e, st) {
+      developer.log(
+        'ViolationExporter._writeAtomicFile failed: $fileName',
+        name: 'saropa_lints',
+        error: e,
+        stackTrace: st,
+      );
+      try {
+        targetFile.writeAsStringSync(content);
+      } catch (e2, st2) {
+        developer.log(
+          'ViolationExporter._writeAtomicFile fallback failed: $fileName',
+          name: 'saropa_lints',
+          error: e2,
+          stackTrace: st2,
+        );
+        stderr.writeln('[saropa_lints] Could not write $fileName: $e2');
+      }
+      try {
+        if (tmpFile.existsSync()) tmpFile.deleteSync();
+      } catch (_) {}
     }
   }
 
@@ -233,64 +320,7 @@ class ViolationExporter {
   /// delete the target first. If any step fails, fall back to a
   /// direct write.
   static void _writeAtomic(String projectRoot, String content) {
-    final base = path.normalize(projectRoot);
-    final dirPath = path.join(base, 'reports', _dirName);
-    if (!path.isWithin(base, dirPath)) return;
-
-    final dir = Directory(dirPath);
-    if (!dir.existsSync()) {
-      dir.createSync(recursive: true);
-    }
-
-    final targetPath = path.join(dir.path, _fileName);
-    final tmpPath = '$targetPath.tmp';
-    final tmpFile = File(tmpPath);
-    final targetFile = File(targetPath);
-
-    try {
-      // Write to temp file
-      tmpFile.writeAsStringSync(content);
-
-      // Delete existing target (required for Windows rename)
-      if (targetFile.existsSync()) {
-        targetFile.deleteSync();
-      }
-
-      // Rename temp to target
-      tmpFile.renameSync(targetPath);
-    } catch (e, st) {
-      developer.log(
-        'ViolationExporter.write atomic rename failed',
-        name: 'saropa_lints',
-        error: e,
-        stackTrace: st,
-      );
-      // Fallback: direct write if atomic strategy fails
-      try {
-        targetFile.writeAsStringSync(content);
-      } catch (e2, st2) {
-        developer.log(
-          'ViolationExporter.write fallback write failed',
-          name: 'saropa_lints',
-          error: e2,
-          stackTrace: st2,
-        );
-        stderr.writeln('[saropa_lints] Could not write violation export: $e2');
-      }
-
-      // Clean up temp file if it still exists
-      try {
-        if (tmpFile.existsSync()) tmpFile.deleteSync();
-      } catch (e2, st2) {
-        developer.log(
-          'ViolationExporter.write temp cleanup failed',
-          name: 'saropa_lints',
-          error: e2,
-          stackTrace: st2,
-        );
-        // Cleanup failure is non-critical.
-      }
-    }
+    _writeAtomicFile(projectRoot, _fileName, content);
   }
 }
 

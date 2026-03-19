@@ -17,9 +17,11 @@ import { ViolationsData } from './violationsReader';
 import type { RuleImpactCounts } from './triageUtils';
 
 // --- Tuning constants ---
+// Keep in sync with lib/src/report/health_score_constants.dart (Dart package).
+// Used by getHealthScoreParams() for Log Capture and consumer_contract.json.
 
 /** How much each impact level contributes to the weighted violation count. */
-const IMPACT_WEIGHTS = {
+export const IMPACT_WEIGHTS = {
   critical: 8,
   high: 3,
   medium: 1,
@@ -34,7 +36,7 @@ const IMPACT_WEIGHTS = {
  *   density 2 → score ~55
  *   density 5 → score ~22
  */
-const DECAY_RATE = 0.3;
+export const DECAY_RATE = 0.3;
 
 /**
  * Coerce unknown values to number, returning 0 for null/undefined/NaN/non-numeric.

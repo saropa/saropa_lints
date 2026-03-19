@@ -10,7 +10,8 @@ import * as path from 'node:path';
 import {
   runEnable,
   runDisable,
-  runAnalysis,
+  runAnalysis as runAnalysisCommand,
+  runAnalysisForFiles as runAnalysisForFilesCommand,
   runInitializeConfig,
   openConfig,
   runRepairConfig,
@@ -18,6 +19,7 @@ import {
   showOutputChannel,
   TIER_ORDER,
 } from './setup';
+import type { SaropaLintsApi } from './api';
 import { invalidateCodeLenses, registerCodeLensProvider } from './codeLensProvider';
 import { IssuesTreeProvider, registerIssueCommands, type IssueTreeNode } from './views/issuesTree';
 import { OverviewTreeProvider } from './views/overviewTree';
@@ -29,7 +31,7 @@ import { FileRiskTreeProvider } from './views/fileRiskTree';
 import { TodosAndHacksTreeProvider } from './views/todosAndHacksTree';
 import { showAboutPanel } from './views/aboutView';
 import { openRuleExplainPanelForViolation, openRuleExplainPanel } from './views/ruleExplainView';
-import { readViolations, ViolationsData } from './violationsReader';
+import { readViolations, ViolationsData, getViolationsPath as getViolationsFilePath } from './violationsReader';
 import { hasSaropaLintsDep } from './pubspecReader';
 import {
   appendSnapshot,
@@ -38,7 +40,13 @@ import {
   detectThresholdCrossing,
   type RunSnapshot,
 } from './runHistory';
-import { computeHealthScore, formatScoreDelta, scoreColorBand } from './healthScore';
+import {
+  computeHealthScore,
+  formatScoreDelta,
+  scoreColorBand,
+  IMPACT_WEIGHTS,
+  DECAY_RATE,
+} from './healthScore';
 import { registerInlineAnnotations, updateAnnotationsForAllEditors, invalidateAnnotationCache } from './inlineAnnotations';
 import { writeRuleOverrides, removeRuleOverrides } from './configWriter';
 import { logReport, logSection, flushReport } from './reportWriter';
@@ -132,7 +140,7 @@ function updateIssuesBadge(view: vscode.TreeView<unknown>, issuesProvider: Issue
   }
 }
 
-export function activate(context: vscode.ExtensionContext): void {
+export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Detect whether this workspace is a Dart/Flutter project so the UI can
   // show appropriate welcome content instead of a misleading "Enable" button.
   // getProjectRoot() searches workspace root then one-level-deep subdirectories.
@@ -430,7 +438,7 @@ export function activate(context: vscode.ExtensionContext): void {
       updateAllStatusBars();
     }),
     vscode.commands.registerCommand('saropaLints.runAnalysis', async () => {
-      const ok = await runAnalysis(context);
+      const ok = await runAnalysisCommand(context);
       if (ok) {
         refreshAll();
         updateAllStatusBars();
@@ -451,7 +459,7 @@ export function activate(context: vscode.ExtensionContext): void {
         // C6: Auto-run analysis after config change if setting is on.
         const runAfter = getConfig().get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
         if (runAfter) {
-          await runAnalysis(context);
+          await runAnalysisCommand(context);
         }
         refreshAll();
         updateAllStatusBars();
@@ -841,7 +849,7 @@ export function activate(context: vscode.ExtensionContext): void {
         const initOk = await runInitializeConfig(context, `${isDisable ? 'Disabling' : 'Enabling'} ${rules.length} rule${rules.length === 1 ? '' : 's'}`);
         if (!initOk) return;
         const runAfter = getConfig().get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
-        if (runAfter) await runAnalysis(context);
+        if (runAfter) await runAnalysisCommand(context);
         refreshAll();
         updateAllStatusBars();
         updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
@@ -881,6 +889,34 @@ export function activate(context: vscode.ExtensionContext): void {
       console.error('[Saropa Lints] Upgrade check failed:', err);
     });
   }
+
+  // Public API for other extensions (e.g. Saropa Log Capture). See api.ts and extension README.
+  const api: SaropaLintsApi = {
+    getViolationsData(): ViolationsData | null {
+      const r = getProjectRoot();
+      return r ? readViolations(r) : null;
+    },
+    getViolationsPath(): string | null {
+      const r = getProjectRoot();
+      return r ? getViolationsFilePath(r) : null;
+    },
+    getHealthScoreParams() {
+      return {
+        impactWeights: { ...IMPACT_WEIGHTS },
+        decayRate: DECAY_RATE,
+      };
+    },
+    runAnalysis(): Promise<boolean> {
+      return runAnalysisCommand(context);
+    },
+    runAnalysisForFiles(files: string[]): Promise<boolean> {
+      return runAnalysisForFilesCommand(context, files, { showProgress: false });
+    },
+    getVersion(): string {
+      return extVersion || '0.0.0';
+    },
+  };
+  return api;
 }
 
 /** Extract rule names from command arg: string[] (TreeItem click) or triage node (context menu). */

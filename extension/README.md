@@ -110,6 +110,35 @@ These are **view-only** suppressions: they do not change `analysis_options.yaml`
  clearing restores everything. To see or edit raw suppressions you would need to inspect workspace state (e.g. extension storage); the UI only offers Clear suppressions.
 - **Export OWASP Compliance Report** — Generate a markdown report with Mobile/Web Top 10 coverage tables and gap analysis.
 
+## API for other extensions
+
+When the extension is activated, it exposes a **public API** so other extensions (e.g. [Saropa Log Capture](https://pub.dev/packages/saropa_log_capture)) can read violations and run analysis without parsing `violations.json` from disk.
+
+Usage:
+
+```ts
+const ext = vscode.extensions.getExtension<import('./api').SaropaLintsApi>('saropa.saropa-lints');
+if (ext?.exports) {
+  const data = ext.exports.getViolationsData();
+  const path = ext.exports.getViolationsPath();
+  const params = ext.exports.getHealthScoreParams();
+  const version = ext.exports.getVersion();
+  await ext.exports.runAnalysis();
+  await ext.exports.runAnalysisForFiles(['lib/main.dart', 'lib/auth.dart']);
+}
+```
+
+| Method | Description |
+|--------|-------------|
+| `getViolationsData()` | Same shape as `violations.json`; `null` if no project root or read fails. |
+| `getViolationsPath()` | Absolute path to `reports/.saropa_lints/violations.json`; `null` if no project root. |
+| `getHealthScoreParams()` | `{ impactWeights, decayRate }` used by the health score formula. |
+| `runAnalysis()` | Runs full `dart analyze` / `flutter analyze` in the workspace. Returns `true` if exit code 0. |
+| `runAnalysisForFiles(files)` | Runs analyze for the given file paths only (e.g. stack-trace files). Capped at 50 files. Returns `true` if exit code 0. |
+| `getVersion()` | Extension version string (e.g. from package.json). |
+
+The file contract `reports/.saropa_lints/violations.json` remains the primary integration point; the API is optional and allows Log Capture to avoid disk reads and to refresh analysis for specific files. For the violation export schema, see the root [VIOLATION_EXPORT_API.md](../VIOLATION_EXPORT_API.md).
+
 ## Integration
 
 The `reports/.saropa_lints/violations.json` file is also used by [Saropa Log Capture](https://pub.dev/packages/saropa_log_capture) for bug report correlation — crash reports include the project's health score and OWASP violations affecting the crash file.
