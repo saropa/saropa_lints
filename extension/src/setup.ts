@@ -157,12 +157,12 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
       }
       logReport(`- Wrote config (tier: ${tier})`);
 
-      const runAnalysisAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true);
-      if (runAnalysisAfter) {
-        const analyzeCmd = useFlutter ? 'flutter' : 'dart';
-        runInWorkspace(workspaceRoot, analyzeCmd, ['analyze']);
-        logReport('- Ran analysis');
-      }
+      await runAnalysisAfterConfigChangeScoped(
+        context,
+        workspaceRoot,
+        '- Ran analysis',
+        '- Ran analysis',
+      );
       success = true;
       flushReport(workspaceRoot);
     },
@@ -179,22 +179,114 @@ export async function runDisable(): Promise<void> {
 
 const RUN_ANALYSIS_FOR_FILES_CAP = 50;
 
+// Directories to ignore when deriving the "open editors only" file list.
+const OPEN_DART_ANALYSIS_SKIP_SUBSTRINGS = [
+  '/.dart_tool/',
+  '/build/',
+  '/node_modules/',
+  '/.git/',
+  '/reports/',
+  '/coverage/',
+  '/dist/',
+];
+
+/** Collects `.dart` files from VS Code open editors under the detected project root. */
+function getOpenDartFilePaths(workspaceRoot: string): string[] {
+  const rootNorm = path.normalize(workspaceRoot).replaceAll('\\', '/');
+  const rootNormLower = rootNorm.toLowerCase();
+
+  const normalized = new Set<string>();
+  for (const doc of vscode.workspace.textDocuments) {
+    if (doc.uri.scheme !== 'file') continue;
+
+    const fileNameLower = doc.fileName.toLowerCase();
+    if (!fileNameLower.endsWith('.dart')) continue;
+
+    const abs = doc.uri.fsPath;
+    const absNorm = abs.replaceAll('\\', '/');
+    const absNormLower = absNorm.toLowerCase();
+
+    // Must be under the project root (dir containing pubspec.yaml).
+    if (!absNormLower.startsWith(`${rootNormLower}/`) && absNormLower !== rootNormLower) continue;
+
+    const rel = path.relative(workspaceRoot, abs);
+    if (!rel || rel.startsWith('..')) continue;
+
+    const relNorm = rel.replaceAll('\\', '/');
+
+    const shouldSkip = OPEN_DART_ANALYSIS_SKIP_SUBSTRINGS
+      .some(substr => relNorm.toLowerCase().includes(substr));
+    if (shouldSkip) continue;
+
+    normalized.add(relNorm);
+  }
+
+  return [...normalized];
+}
+
+/** Shared logic so Enable + tier changes can reuse open-editor scoping. */
+async function runAnalysisAfterConfigChangeScoped(
+  context: vscode.ExtensionContext,
+  workspaceRoot: string,
+  fullOkMessage: string,
+  fullFailMessage: string,
+): Promise<void> {
+  const cfg = vscode.workspace.getConfiguration('saropaLints');
+  const runAnalysisAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true);
+  if (!runAnalysisAfter) return;
+
+  const openEditorsOnly = cfg.get<boolean>('runAnalysisOpenEditorsOnly', false) ?? false;
+  if (openEditorsOnly) {
+    const files = getOpenDartFilePaths(workspaceRoot);
+    if (files.length > 0) {
+      await runAnalysisForFiles(context, files, { showProgress: false });
+    } else {
+      logReport('- Skipped analysis (no open Dart files)');
+    }
+    return;
+  }
+
+  const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
+  const analyzeCmd = useFlutter ? 'flutter' : 'dart';
+  const analysisResult = runInWorkspace(workspaceRoot, analyzeCmd, ['analyze']);
+  logReport(analysisResult.ok ? fullOkMessage : fullFailMessage);
+}
+
 export async function runAnalysis(context: vscode.ExtensionContext): Promise<boolean> {
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
     vscode.window.showErrorMessage('No workspace folder open.');
     return false;
   }
-  const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
-  const cmd = useFlutter ? 'flutter' : 'dart';
   let ok = false;
+  const cfg = vscode.workspace.getConfiguration('saropaLints');
+  const openEditorsOnly = cfg.get<boolean>('runAnalysisOpenEditorsOnly', false) ?? false;
+
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: 'Running analysis',
+      title: openEditorsOnly ? 'Running analysis (open editors)' : 'Running analysis',
       cancellable: false,
     },
     async () => {
+      if (openEditorsOnly) {
+        const files = getOpenDartFilePaths(workspaceRoot);
+        if (files.length === 0) {
+          vscode.window.showInformationMessage(
+            'Saropa Lints: no open Dart files found. Re-open a Dart file or turn off the "Open editors only" setting.',
+          );
+          ok = false;
+          return;
+        }
+        ok = await runAnalysisForFiles(context, files, { showProgress: false });
+        if (!ok) {
+          vscode.window.showWarningMessage('Analysis reported issues (open Dart files only). Check the Issues view.');
+        }
+        return;
+      }
+
+      const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
+      const cmd = useFlutter ? 'flutter' : 'dart';
       logSection('Analysis');
       const result = runInWorkspace(workspaceRoot, cmd, ['analyze']);
       ok = result.ok;
@@ -236,7 +328,7 @@ export async function runAnalysisForFiles(
     normalized.add(absolute.replaceAll('\\', '/'));
   }
 
-  let toRun = [...normalized].sort();
+  let toRun = [...normalized].sort((a, b) => a.localeCompare(b));
   if (toRun.length > RUN_ANALYSIS_FOR_FILES_CAP) {
     toRun = toRun.slice(0, RUN_ANALYSIS_FOR_FILES_CAP);
     console.warn(
@@ -348,7 +440,12 @@ function tierLabel(id: string): string {
 }
 
 /** Run write_config + optional analysis for a tier change; returns true on success. */
-function applyTierChange(workspaceRoot: string, tier: string, previousTier: string): boolean {
+async function applyTierChange(
+  context: vscode.ExtensionContext,
+  workspaceRoot: string,
+  tier: string,
+  previousTier: string,
+): Promise<boolean> {
   logSection('Set Tier');
   logReport(`- Changed tier: ${previousTier} → ${tier}`);
   const writeResult = runInWorkspace(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier));
@@ -360,15 +457,12 @@ function applyTierChange(workspaceRoot: string, tier: string, previousTier: stri
   }
   logReport(`- Wrote config (tier: ${tier})`);
   // C6: Re-analyze after tier change so violations.json reflects the new ruleset.
-  const runAnalysisAfter = vscode.workspace.getConfiguration('saropaLints')
-    .get<boolean>('runAnalysisAfterConfigChange', true);
-  if (runAnalysisAfter) {
-    const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
-    const analyzeCmd = useFlutter ? 'flutter' : 'dart';
-    const analyzeResult = runInWorkspace(workspaceRoot, analyzeCmd, ['analyze']);
-    // Log whether analysis succeeded — a non-zero exit is expected when violations exist.
-    logReport(analyzeResult.ok ? '- Analysis completed' : '- Analysis reported issues');
-  }
+  await runAnalysisAfterConfigChangeScoped(
+    context,
+    workspaceRoot,
+    '- Analysis completed',
+    '- Analysis reported issues',
+  );
   flushReport(workspaceRoot);
   return true;
 }
@@ -416,7 +510,7 @@ export async function runSetTier(context: vscode.ExtensionContext): Promise<Tier
       cancellable: false,
     },
     // Smart notification is shown by the handler in extension.ts after we return.
-    async () => { ok = applyTierChange(workspaceRoot, tier, previousTier); },
+    async () => { ok = await applyTierChange(context, workspaceRoot, tier, previousTier); },
   );
   return ok ? { tier, tierLabel: tierLabel(tier), previousTier } : null;
 }

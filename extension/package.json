@@ -1150,6 +1150,11 @@
             "default": true,
             "description": "Run dart analyze after init or config change when enabled."
           },
+          "saropaLints.runAnalysisOpenEditorsOnly": {
+            "type": "boolean",
+            "default": false,
+            "description": "When true, Saropa Lints runs dart analyze only for Dart files currently open in VS Code (workspace.textDocuments) under the detected project root."
+          },
           "saropaLints.inlineAnnotations": {
             "type": "boolean",
             "default": true,
