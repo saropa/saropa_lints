@@ -985,6 +985,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferInlineCallbacksRule.new,
   PreferSingleQuotesRule.new,
   PreferTodoFormatRule.new,
+  PreferHackFormatRule.new,
   PreferFixmeFormatRule.new,
   PreferSentenceCaseCommentsRule.new,
   PreferSentenceCaseCommentsRelaxedRule.new,
@@ -2830,6 +2831,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidJsRoundedIntsRule.new,
   AvoidPositionalBooleanParametersRule.new,
   AvoidPrivateTypedefFunctionsRule.new,
+  NoRuntimeTypeToStringRule.new,
   AvoidSettersWithoutGettersRule.new,
   AvoidSingleCascadeInExpressionStatementsRule.new,
   PreferAdjacentStringsRule.new,
@@ -2849,6 +2851,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferSealedClassesRule.new,
   PreferSealedForStateRule.new,
   PreferStaticBeforeInstanceRule.new,
+  UseTruncatingDivisionRule.new,
   PreferVerbMethodNamesRule.new,
 ];
 

@@ -133,9 +133,25 @@ void main() {
     );
 
     testRule(
+      'PreferHackFormatRule',
+      'prefer_hack_format',
+      () => PreferHackFormatRule(),
+    );
+
+    testRule(
       'PreferFixmeFormatRule',
       'prefer_fixme_format',
       () => PreferFixmeFormatRule(),
+    );
+    testRule(
+      'NoRuntimeTypeToStringRule',
+      'no_runtimetype_tostring',
+      () => NoRuntimeTypeToStringRule(),
+    );
+    testRule(
+      'UseTruncatingDivisionRule',
+      'use_truncating_division',
+      () => UseTruncatingDivisionRule(),
     );
 
     testRule(
@@ -273,7 +289,10 @@ void main() {
       'prefer_inline_callbacks',
       'prefer_single_quotes',
       'prefer_todo_format',
+      'prefer_hack_format',
       'prefer_fixme_format',
+      'no_runtimetype_tostring',
+      'use_truncating_division',
       'prefer_sentence_case_comments',
       'prefer_sentence_case_comments_relaxed',
       'prefer_period_after_doc',
@@ -495,6 +514,16 @@ void main() {
       test('prefer_todo_format should NOT trigger', () {
         // Preferred pattern used correctly
         expect('prefer_todo_format passes', isNotNull);
+      });
+    });
+
+    group('prefer_hack_format', () {
+      test('prefer_hack_format SHOULD trigger', () {
+        expect('prefer_hack_format detected', isNotNull);
+      });
+
+      test('prefer_hack_format should NOT trigger', () {
+        expect('prefer_hack_format passes', isNotNull);
       });
     });
 

@@ -1895,8 +1895,8 @@ class PreferTodoFormatRule extends SaropaLintRule {
           final String lexeme = comment.lexeme;
 
           // Report TODO markers only when they don't follow `TODO(author): description`.
-          if (_anyTodoPattern.hasMatch(lexeme)
-              && !_validTodoPattern.hasMatch(lexeme)) {
+          if (_anyTodoPattern.hasMatch(lexeme) &&
+              !_validTodoPattern.hasMatch(lexeme)) {
             reporter.atOffset(offset: comment.offset, length: comment.length);
           }
 
@@ -4538,6 +4538,12 @@ class PreferRawStringsRule extends SaropaLintRule {
 /// extra string conversion that is often used in hot paths (e.g., logs,
 /// diagnostics, map keys). Prefer using `object is SomeType` checks, explicit
 /// type names, or `Type` comparison where possible.
+///
+/// ### Example
+///
+/// **Bad:** `obj.runtimeType.toString()`
+///
+/// **Good:** `obj is MyClass` or `obj.runtimeType == MyClass`
 class NoRuntimeTypeToStringRule extends SaropaLintRule {
   NoRuntimeTypeToStringRule() : super(code: _code);
 
@@ -4555,7 +4561,7 @@ class NoRuntimeTypeToStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'no_runtimeType_toString',
-    '[no_runtimeType_toString] Avoid calling toString() on runtimeType. This adds unnecessary string conversion and is often slower than direct type checks.',
+    '[no_runtimetype_tostring] Avoid calling toString() on runtimeType. This adds unnecessary string conversion and is often slower than direct type checks.',
     correctionMessage:
         'Use type checks (`is`) or compare `runtimeType` directly without converting to string.',
     severity: DiagnosticSeverity.WARNING,
@@ -4566,6 +4572,7 @@ class NoRuntimeTypeToStringRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Report only .toString() calls whose receiver is .runtimeType (property or prefix.id).
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'toString') return;
       if (node.argumentList.arguments.isNotEmpty) return;
@@ -4578,6 +4585,7 @@ class NoRuntimeTypeToStringRule extends SaropaLintRule {
     });
   }
 
+  /// True when [target] is a .runtimeType access (PropertyAccess or PrefixedIdentifier).
   static bool _isRuntimeTypeAccess(Expression target) {
     if (target is PropertyAccess) {
       return target.propertyName.name == 'runtimeType';
@@ -4593,6 +4601,12 @@ class NoRuntimeTypeToStringRule extends SaropaLintRule {
 ///
 /// `a ~/ b` expresses intent directly and avoids creating an intermediate
 /// `double` result only to truncate it immediately.
+///
+/// ### Example
+///
+/// **Bad:** `(items / pageSize).toInt()`
+///
+/// **Good:** `items ~/ pageSize`
 class UseTruncatingDivisionRule extends SaropaLintRule {
   UseTruncatingDivisionRule() : super(code: _code);
 
@@ -4620,6 +4634,7 @@ class UseTruncatingDivisionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Report .toInt() only when the receiver is (or parenthesized) division.
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'toInt') return;
       if (node.argumentList.arguments.isNotEmpty) return;
@@ -4635,6 +4650,7 @@ class UseTruncatingDivisionRule extends SaropaLintRule {
     });
   }
 
+  /// Strips outer parentheses so (a / b) is recognized as division.
   static Expression _unwrapParenthesized(Expression expression) {
     var current = expression;
     while (current is ParenthesizedExpression) {
