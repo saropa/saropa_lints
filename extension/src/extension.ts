@@ -553,17 +553,19 @@ export function activate(context: vscode.ExtensionContext): void {
       updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
     }),
     vscode.commands.registerCommand('saropaLints.todosAndHacks.refresh', () => {
+      todosAndHacksView.message = 'Scanning…';
       todosAndHacksProvider.refresh();
-      todosAndHacksView.message = undefined;
       void vscode.commands.executeCommand('saropaLints.todosAndHacks.focus');
+      setTimeout(() => { todosAndHacksView.message = undefined; }, 4000);
     }),
     vscode.commands.registerCommand('saropaLints.todosAndHacks.toggleGroupByTag', async () => {
       const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
       const current = cfg.get<boolean>('groupByTag', false);
       await cfg.update('groupByTag', !current, vscode.ConfigurationTarget.Workspace);
+      todosAndHacksView.message = 'Scanning…';
       todosAndHacksProvider.refresh();
-      todosAndHacksView.message = undefined;
       void vscode.commands.executeCommand('saropaLints.todosAndHacks.focus');
+      setTimeout(() => { todosAndHacksView.message = undefined; }, 4000);
     }),
     vscode.commands.registerCommand('saropaLints.repairConfig', async () => {
       const success = await runRepairConfig(context);
