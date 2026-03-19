@@ -215,7 +215,8 @@ export class TodosAndHacksTreeProvider implements vscode.TreeDataProvider<TodoTr
     options: ReturnType<typeof getOptions>,
   ): Promise<void> {
     if (this.allMarkers !== null) return;
-    if (this.ensureScanPromise) return this.ensureScanPromise;
+    const existing = this.ensureScanPromise;
+    if (existing != null) return existing;
     this.ensureScanPromise = this.runEnsureAllScanned(folders, options);
     return this.ensureScanPromise;
   }
