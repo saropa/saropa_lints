@@ -43,6 +43,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 • **Extension** — **Explain rule**: right-click any violation in the Issues view (or run **Saropa Lints: Explain rule** from the command palette) to open a side tab with full rule details: problem message, how to fix, severity, impact, OWASP mapping (when present), and a link to the ROADMAP. The panel reuses a single tab; the documentation link opens in the default browser.
 
+• **Scripts** — Gap analysis export: `scripts/export_saropa_rules_for_gap.py` exports rule names and categories to JSON for comparison with external Dart rule sets. Procedure and inputs/outputs are documented in `bugs/discussion/GAP_ANALYSIS_EXTERNAL_DART.md`. Rule metadata plan (rule types, accuracy targets, tags, quality gates, etc.) is in `bugs/discussion/PLAN_RULE_METADATA_AND_QUALITY.md`.
+
 ---
 
 ## [9.8.1]
