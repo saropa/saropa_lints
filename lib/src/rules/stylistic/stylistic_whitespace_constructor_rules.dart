@@ -60,6 +60,12 @@ class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -146,6 +152,12 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -240,6 +252,12 @@ class PreferCompactDeclarationsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -323,6 +341,12 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -414,6 +438,12 @@ class PreferCompactClassMembersRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -491,6 +521,12 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -600,6 +636,12 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -690,6 +732,12 @@ class PreferSuperParametersRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -776,6 +824,12 @@ class PreferInitializingFormalsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -857,6 +911,12 @@ class PreferConstructorBodyAssignmentRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -932,6 +992,12 @@ class PreferFactoryForValidationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1035,6 +1101,12 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1121,6 +1193,12 @@ class PreferRequiredBeforeOptionalRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1191,6 +1269,12 @@ class PreferGroupedByPurposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1281,6 +1365,12 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;

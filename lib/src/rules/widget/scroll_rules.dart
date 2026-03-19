@@ -49,6 +49,12 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -191,6 +197,12 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -315,6 +327,12 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -383,6 +401,12 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -461,6 +485,12 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -584,6 +614,12 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -654,6 +690,12 @@ class AvoidMultipleAutofocusRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -739,6 +781,12 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
   /// UX improvement - standard mobile pattern.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -830,6 +878,12 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -946,6 +1000,12 @@ class PreferItemExtentRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1019,6 +1079,12 @@ class PreferPrototypeItemRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1097,6 +1163,12 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1272,6 +1344,12 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1371,6 +1449,12 @@ class PreferSliverFillRemainingForEmptyRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1503,6 +1587,12 @@ class AvoidInfiniteScrollDuplicateRequestsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1593,6 +1683,12 @@ class PreferInfiniteScrollPreloadRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1693,6 +1789,12 @@ class RequirePaginationForLargeListsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1829,6 +1931,12 @@ class PreferCacheExtentRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1892,6 +2000,12 @@ class PreferSliverForMixedScrollRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.low;

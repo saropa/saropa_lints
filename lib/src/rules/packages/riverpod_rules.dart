@@ -53,6 +53,12 @@ class AvoidRefReadInsideBuildRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -133,6 +139,12 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -268,6 +280,12 @@ class AvoidRefInsideStateDisposeRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -340,6 +358,12 @@ class UseRefReadSynchronouslyRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -425,6 +449,12 @@ class UseRefAndStateSynchronouslyRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -515,6 +545,12 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.high;
@@ -674,6 +710,12 @@ class AvoidNotifierConstructorsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -763,6 +805,12 @@ class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -819,6 +867,12 @@ class AvoidUnnecessaryConsumerWidgetsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -914,6 +968,12 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -995,6 +1055,12 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1066,6 +1132,12 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1154,6 +1226,12 @@ class PreferRiverpodSelectRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1224,6 +1302,12 @@ class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1283,6 +1367,12 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
   /// Memory leaks from retained providers.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1372,6 +1462,12 @@ class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1441,6 +1537,12 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1537,6 +1639,12 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1617,6 +1725,12 @@ class RequireAutoDisposeRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1716,6 +1830,12 @@ class AvoidRiverpodStringProviderNameRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1800,6 +1920,12 @@ class AvoidRefInBuildBodyRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1948,6 +2074,12 @@ class RequireProviderScopeRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -2032,6 +2164,12 @@ class PreferSelectForPartialRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2162,6 +2300,12 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   /// Alias: prefer_family_for_params_pattern
@@ -2235,6 +2379,12 @@ class PreferRefWatchOverReadRule extends SaropaLintRule {
   /// UI will show stale data until something else triggers a rebuild.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2313,6 +2463,12 @@ class AvoidCircularProviderDepsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2461,6 +2617,12 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -2550,6 +2712,12 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2648,6 +2816,12 @@ class RequireRiverpodLintRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2750,6 +2924,12 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -2830,6 +3010,12 @@ class RequireAsyncValueOrderRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -2896,6 +3082,12 @@ class PreferSelectorRule extends SaropaLintRule {
   /// select() provides more granular rebuild control.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2969,6 +3161,12 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
   /// State is lost on every rebuild.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -3062,6 +3260,12 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -3145,6 +3349,12 @@ class RequireFlutterRiverpodNotRiverpodRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -3212,6 +3422,12 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -3345,6 +3561,12 @@ class AvoidRiverpodForNetworkOnlyRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -3406,6 +3628,12 @@ class PreferRiverpodCodeGenRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -3477,6 +3705,12 @@ class PreferRiverpodKeepAliveRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;

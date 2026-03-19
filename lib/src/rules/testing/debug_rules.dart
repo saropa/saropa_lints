@@ -24,6 +24,12 @@ class AlwaysFailRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -82,6 +88,12 @@ class AvoidDebugPrintRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -159,6 +171,12 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -353,6 +371,12 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -489,6 +513,12 @@ class PreferDebugPrintRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -570,6 +600,12 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -660,6 +696,12 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -769,6 +811,12 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -971,6 +1019,12 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1078,6 +1132,12 @@ class PreferConditionalLoggingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1139,6 +1199,12 @@ class PreferLogLevelsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1219,6 +1285,12 @@ class PreferLogTimestampRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;

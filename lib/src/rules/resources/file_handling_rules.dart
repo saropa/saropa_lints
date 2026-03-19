@@ -36,6 +36,12 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -143,6 +149,12 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -239,6 +251,12 @@ class RequireGraphqlErrorHandlingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -332,6 +350,12 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -447,6 +471,12 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -557,6 +587,12 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -641,6 +677,12 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -734,6 +776,12 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -842,6 +890,12 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1094,6 +1148,12 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1192,6 +1252,12 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
   /// High impact - can cause OOM crashes on mobile devices.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1311,6 +1377,12 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1396,6 +1468,12 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
   /// Runtime errors from column name typos.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1497,6 +1575,12 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1620,6 +1704,12 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.medium;

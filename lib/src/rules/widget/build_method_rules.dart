@@ -50,6 +50,12 @@ class AvoidGradientInBuildRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -153,6 +159,12 @@ class AvoidDialogInBuildRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -294,6 +306,12 @@ class AvoidSnackbarInBuildRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -383,6 +401,12 @@ class AvoidAnalyticsInBuildRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -505,6 +529,12 @@ class AvoidJsonEncodeInBuildRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -590,6 +620,12 @@ class AvoidCanvasInBuildRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -662,6 +698,12 @@ class AvoidHardcodedFeatureFlagsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -719,6 +761,12 @@ class PreferSingleSetStateRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -804,6 +852,12 @@ class PreferComputeOverIsolateRunRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -862,6 +916,12 @@ class PreferForLoopInChildrenRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -935,6 +995,12 @@ class PreferContainerRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.low;

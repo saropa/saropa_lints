@@ -31,6 +31,12 @@ class AvoidBottomTypeInPatternsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -86,6 +92,12 @@ class AvoidBottomTypeInRecordsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -161,6 +173,12 @@ class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -232,6 +250,12 @@ class AvoidExtensionsOnRecordsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -282,6 +306,12 @@ class AvoidFunctionTypeInRecordsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -341,6 +371,12 @@ class AvoidKeywordsInWildcardPatternRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -454,6 +490,12 @@ class AvoidLongRecordsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const int _maxFields = 5;
@@ -515,6 +557,12 @@ class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -584,6 +632,12 @@ class AvoidNestedRecordsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -644,6 +698,12 @@ class AvoidOneFieldRecordsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -743,6 +803,12 @@ class AvoidRedundantPositionalFieldNameRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -800,6 +866,12 @@ class AvoidSingleFieldDestructuringRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -863,6 +935,12 @@ class MoveRecordsToTypedefsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -995,6 +1073,12 @@ class PreferSimplerPatternsNullCheckRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1049,6 +1133,12 @@ class PreferWildcardPatternRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1111,6 +1201,12 @@ class RecordFieldsOrderingRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1253,6 +1349,12 @@ class PreferClassDestructuringRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.low;

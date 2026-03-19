@@ -20,6 +20,12 @@ class PreferIosSafeAreaRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'flutter', 'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -123,6 +129,12 @@ class AvoidIosHardcodedStatusBarRule extends SaropaLintRule {
   /// Hardcoded values cause UI bugs on specific devices.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'flutter', 'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -262,6 +274,12 @@ class PreferIosHapticFeedbackRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'flutter', 'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -355,6 +373,12 @@ class PreferCupertinoForIosRule extends SaropaLintRule {
   /// Using non-native widgets is a UX preference.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'flutter', 'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -469,6 +493,12 @@ class RequireHttpsForIosRule extends SaropaLintRule {
   /// HTTP requests fail without configuration.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'flutter', 'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -601,6 +631,12 @@ class RequireAppleSignInRule extends SaropaLintRule {
   /// App Store rejection is critical.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'flutter', 'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -744,6 +780,12 @@ class RequireIosKeychainAccessibilityRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'flutter', 'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -834,6 +876,12 @@ class RequireIosAtsExceptionDocumentationRule extends SaropaLintRule {
   /// HTTP without ATS documentation causes confusion and potential issues.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'flutter', 'security'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -930,6 +978,12 @@ class RequireIosUniversalLinksDomainMatchingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'flutter', 'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -978,6 +1032,12 @@ class RequireIosCertificatePinningRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'flutter', 'security'};
 
   @override
   RuleCost get cost => RuleCost.medium;

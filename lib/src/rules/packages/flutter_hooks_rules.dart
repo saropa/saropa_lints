@@ -50,6 +50,12 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -124,6 +130,12 @@ class AvoidConditionalHooksRule extends SaropaLintRule {
   /// Critical - runtime error.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -230,6 +242,12 @@ class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -360,6 +378,12 @@ class PreferUseCallbackRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -503,6 +527,12 @@ class AvoidMisusedHooksRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;

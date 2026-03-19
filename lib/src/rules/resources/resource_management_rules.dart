@@ -51,6 +51,12 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -143,6 +149,12 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
   /// Each occurrence is a resource leak.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -248,6 +260,12 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -316,6 +334,12 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
   /// Each occurrence is a memory leak.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -405,6 +429,12 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
   /// Each occurrence is a resource leak.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -506,6 +536,12 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -603,6 +639,12 @@ class RequireIsolateKillRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -683,6 +725,12 @@ class RequireCameraDisposeRule extends SaropaLintRule {
   /// Each occurrence is a critical resource leak.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -791,6 +839,12 @@ class RequireImageCompressionRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -874,6 +928,12 @@ class PreferCoarseLocationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -941,6 +1001,12 @@ class AvoidImagePickerWithoutSourceRule extends SaropaLintRule {
   /// UX bug that affects user experience.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1015,6 +1081,12 @@ class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1083,6 +1155,12 @@ class PreferGeolocatorLastKnownRule extends SaropaLintRule {
   /// Battery optimization opportunity.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1163,6 +1241,12 @@ class PreferImagePickerMultiSelectionRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1208,6 +1292,12 @@ class PreferUsingForTempResourcesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.low;

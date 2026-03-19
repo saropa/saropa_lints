@@ -20,6 +20,12 @@ class AvoidLateFinalReassignmentRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -139,6 +145,12 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -243,6 +255,12 @@ class AvoidParameterReassignmentRule extends SaropaLintRule {
   /// Style issue - low impact.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -399,6 +417,12 @@ class AvoidParameterMutationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -524,6 +548,12 @@ class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -609,6 +639,12 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -972,6 +1008,12 @@ class AvoidUnusedInstancesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   /// Types whose constructors are intentionally used for side effects
@@ -1097,6 +1139,12 @@ class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1176,6 +1224,12 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1291,6 +1345,12 @@ class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1365,6 +1425,12 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1462,6 +1528,12 @@ class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1582,6 +1654,12 @@ class AvoidUnnecessaryPatternsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
@@ -1638,6 +1716,12 @@ class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1803,6 +1887,12 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1918,6 +2008,12 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -2023,6 +2119,12 @@ class UseExistingDestructuringRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2301,6 +2403,12 @@ class UseExistingVariableRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -2394,6 +2502,12 @@ class PreferLateFinalRule extends SaropaLintRule {
   /// Code quality improvement - prevents accidental mutation.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2653,6 +2767,12 @@ class AvoidLateForNullableRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -2723,6 +2843,12 @@ class PreferLateLazyInitializationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.low;

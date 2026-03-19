@@ -13,6 +13,12 @@ class PreferSemanticWidgetNamesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -88,6 +94,12 @@ class PreferTextThemeRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -168,6 +180,12 @@ class PreferColorSchemeFromSeedRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -260,6 +278,12 @@ class PreferRichTextForComplexRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -342,6 +366,12 @@ class PreferSystemThemeDefaultRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -505,6 +535,12 @@ class PreferCupertinoForIosFeelRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -575,6 +611,12 @@ class PreferKeyboardShortcutsRule extends SaropaLintRule {
   /// App works but power users may find it less productive.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -683,6 +725,12 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -753,6 +801,12 @@ class PreferVoidCallbackRule extends SaropaLintRule {
   /// Style improvement.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
 
   @override
   RuleCost get cost => RuleCost.medium;

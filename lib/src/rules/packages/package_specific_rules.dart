@@ -50,6 +50,12 @@ class RequireGoogleSigninErrorHandlingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -150,6 +156,12 @@ class RequireAppleSigninNonceRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -238,6 +250,12 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -322,6 +340,12 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
   // WARNING severity with high impact - security concern but not crash-causing
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -420,6 +444,12 @@ class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -526,6 +556,12 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -639,6 +675,12 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -746,6 +788,12 @@ class AvoidAppLinksSensitiveParamsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -850,6 +898,12 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -962,6 +1016,12 @@ class AvoidOpenaiKeyInCodeRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1026,6 +1086,12 @@ class RequireOpenaiErrorHandlingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1116,6 +1182,12 @@ class RequireSvgErrorHandlerRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1196,6 +1268,12 @@ class RequireGoogleFontsFallbackRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1260,6 +1338,12 @@ class PreferUuidV4Rule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1353,6 +1437,12 @@ class PreferImagePickerMaxDimensionsRule extends SaropaLintRule {
   /// High impact - OOM crashes affect user experience significantly.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1453,6 +1543,12 @@ class RequireUrlLauncherModeRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1529,6 +1625,12 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
   /// High impact - affects battery life significantly.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1675,6 +1777,12 @@ class AvoidImagePickerQuickSuccessionRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1763,6 +1871,12 @@ class RequireAnalyticsErrorHandlingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;

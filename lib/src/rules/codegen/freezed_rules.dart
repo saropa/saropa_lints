@@ -48,6 +48,12 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'codegen'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -112,6 +118,12 @@ class AvoidFreezedInvalidAnnotationTargetRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'codegen'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -166,6 +178,12 @@ class RequireFreezedArrowSyntaxRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'codegen'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -241,6 +259,12 @@ class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'codegen'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -339,6 +363,12 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
   /// Potential bug. Nested objects may not serialize correctly.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'codegen'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -503,6 +533,12 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'codegen'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -612,6 +648,12 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
   /// JSON serialization failures at runtime.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'codegen'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -736,6 +778,12 @@ class RequireFreezedLintPackageRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'codegen'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -797,6 +845,12 @@ class AvoidFreezedForLogicClassesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'codegen'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -913,6 +967,12 @@ class PreferFreezedForDataClassesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'codegen'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1016,6 +1076,12 @@ class AvoidFreezedAnyMapIssueRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'codegen'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1102,6 +1168,12 @@ class PreferFreezedUnionTypesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'codegen'};
 
   @override
   RuleCost get cost => RuleCost.medium;

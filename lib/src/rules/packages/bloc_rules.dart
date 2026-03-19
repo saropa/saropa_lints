@@ -44,6 +44,12 @@ class AvoidBlocEventInConstructorRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -139,6 +145,12 @@ class RequireBlocCloseRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -291,6 +303,12 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -436,6 +454,12 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -499,6 +523,12 @@ class AvoidCubitsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -598,6 +628,12 @@ class RequireBlocObserverRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -680,6 +716,12 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -737,6 +779,12 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -798,6 +846,12 @@ class AvoidBlocListenInBuildRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -886,6 +940,12 @@ class RequireInitialStateRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -958,6 +1018,12 @@ class RequireErrorStateRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1047,6 +1113,12 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1151,6 +1223,12 @@ class PreferSealedEventsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   /// Alias: prefer_sealed_events_pattern
@@ -1219,6 +1297,12 @@ class RequireBlocTransformerRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1328,6 +1412,12 @@ class AvoidLongEventHandlersRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1400,6 +1490,12 @@ class PreferMultiBlocProviderRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1475,6 +1571,12 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
   /// Critical - memory leak potential.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1554,6 +1656,12 @@ class AvoidExistingInstancesInBlocProviderRule extends SaropaLintRule {
   /// Critical - unexpected bloc closure.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1639,6 +1747,12 @@ class PreferCorrectBlocProviderRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1722,6 +1836,12 @@ class CheckIsNotClosedAfterAsyncGapRule extends SaropaLintRule {
   /// Critical bug. Emit after close causes crash.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1851,6 +1971,12 @@ class AvoidDuplicateBlocEventHandlersRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1964,6 +2090,12 @@ class PreferImmutableBlocEventsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -2031,6 +2163,12 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
   /// Bug risk. Mutable state breaks bloc pattern.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2105,6 +2243,12 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -2173,6 +2317,12 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
   /// Code quality. Sealed classes improve type safety.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2245,6 +2395,12 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -2314,6 +2470,12 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2391,6 +2553,12 @@ class AvoidYieldInOnEventRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -2449,6 +2617,12 @@ class EmitNewBlocStateInstancesRule extends SaropaLintRule {
   /// State mutation breaks Bloc equality and causes bugs.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2516,6 +2690,12 @@ class AvoidBlocPublicFieldsRule extends SaropaLintRule {
   /// Public fields expose Bloc internals and break encapsulation.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2589,6 +2769,12 @@ class AvoidBlocPublicMethodsRule extends SaropaLintRule {
   /// Public methods bypass Bloc's event-driven architecture.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2679,6 +2865,12 @@ class RequireBlocSelectorRule extends SaropaLintRule {
   /// BlocSelector provides more targeted rebuilds.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2779,6 +2971,12 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2885,6 +3083,12 @@ class AvoidBlocStateMutationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -2964,6 +3168,12 @@ class RequireBlocInitialStateRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -3039,6 +3249,12 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -3135,6 +3351,12 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -3220,6 +3442,12 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -3388,6 +3616,12 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -3485,6 +3719,12 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -3585,6 +3825,12 @@ class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -3673,6 +3919,12 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -3757,6 +4009,12 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
   /// Blocs with UI code are hard to test and violate separation.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -3846,6 +4104,12 @@ class RequireBlocEventSealedRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -3920,6 +4184,12 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
   /// Architecture improvement.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -4028,6 +4298,12 @@ class PreferBlocTransformRule extends SaropaLintRule {
   /// Performance suggestion.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -4144,6 +4420,12 @@ class AvoidPassingBlocToBlocRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -4251,6 +4533,12 @@ class AvoidPassingBuildContextToBlocsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -4345,6 +4633,12 @@ class AvoidReturningValueFromCubitMethodsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -4453,6 +4747,12 @@ class RequireBlocRepositoryInjectionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -4583,6 +4883,12 @@ class PreferBlocHydrationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -4692,6 +4998,12 @@ class AvoidLargeBlocRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -4768,6 +5080,12 @@ class AvoidOverengineeredBlocStatesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -4842,6 +5160,12 @@ class PreferBlocExtensionsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
 
   @override
   RuleCost get cost => RuleCost.low;

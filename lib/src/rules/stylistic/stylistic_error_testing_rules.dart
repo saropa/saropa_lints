@@ -51,6 +51,12 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -114,6 +120,12 @@ class PreferGenericExceptionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -190,6 +202,12 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -264,6 +282,12 @@ class PreferErrorSuffixRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -353,6 +377,12 @@ class PreferOnOverCatchRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -427,6 +457,12 @@ class PreferCatchOverOnRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -565,6 +601,12 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -665,6 +707,12 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -757,6 +805,12 @@ class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -832,6 +886,12 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -942,6 +1002,12 @@ class PreferGroupedExpectationsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1042,6 +1108,12 @@ class PreferTestNameShouldWhenRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1115,6 +1187,12 @@ class PreferTestNameDescriptiveRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.low;

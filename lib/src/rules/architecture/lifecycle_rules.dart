@@ -53,6 +53,12 @@ class AvoidWorkInPausedStateRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -183,6 +189,12 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -260,6 +272,12 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -371,6 +389,12 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -499,6 +523,12 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -618,6 +648,12 @@ class RequireConflictResolutionStrategyRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;

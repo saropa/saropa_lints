@@ -28,6 +28,12 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'hardware'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -100,6 +106,12 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
   /// Critical for robust Bluetooth apps.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'hardware'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -212,6 +224,12 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'hardware'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -304,6 +322,12 @@ class RequireAudioFocusHandlingRule extends SaropaLintRule {
   /// Important for proper audio behavior.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'hardware'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -409,6 +433,12 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'hardware'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -500,6 +530,12 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'hardware'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -575,6 +611,12 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'hardware'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -654,6 +696,12 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'hardware'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -717,6 +765,12 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'hardware'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -789,6 +843,12 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
   /// Important for BLE performance.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'hardware'};
 
   @override
   RuleCost get cost => RuleCost.medium;

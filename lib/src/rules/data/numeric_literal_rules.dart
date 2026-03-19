@@ -39,6 +39,12 @@ class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -138,6 +144,12 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -201,6 +213,12 @@ class DoubleLiteralFormatRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -254,6 +272,12 @@ class NoMagicNumberRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -337,6 +361,12 @@ class NoMagicStringRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -434,6 +464,12 @@ class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -521,6 +557,12 @@ class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -590,6 +632,12 @@ class PreferDigitSeparatorsRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -686,6 +734,12 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -818,6 +872,12 @@ class NoMagicNumberInTestsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1010,6 +1070,12 @@ class NoMagicStringInTestsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;

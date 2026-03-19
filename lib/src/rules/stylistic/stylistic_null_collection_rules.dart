@@ -55,6 +55,12 @@ class PreferNullAwareAssignmentRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -146,6 +152,12 @@ class PreferExplicitNullAssignmentRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -207,6 +219,12 @@ class PreferIfNullOverTernaryRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -314,6 +332,12 @@ class PreferTernaryOverIfNullRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -385,6 +409,12 @@ class PreferLateOverNullableRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -472,6 +502,12 @@ class PreferNullableOverLateRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -568,6 +604,12 @@ class PreferSpreadOverAddAllRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -629,6 +671,12 @@ class PreferAddAllOverSpreadRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -697,6 +745,12 @@ class PreferCollectionIfOverTernaryRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -780,6 +834,12 @@ class PreferTernaryOverCollectionIfRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -839,6 +899,12 @@ class PreferWhereTypeOverWhereIsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -929,6 +995,12 @@ class PreferMapEntriesIterationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1026,6 +1098,12 @@ class PreferKeysIterationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1091,6 +1169,12 @@ class PreferMutableCollectionsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
 
   @override
   RuleCost get cost => RuleCost.low;

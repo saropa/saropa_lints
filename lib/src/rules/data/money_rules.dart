@@ -42,6 +42,12 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -186,6 +192,12 @@ class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;

@@ -47,6 +47,12 @@ class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -112,6 +118,12 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -245,6 +257,12 @@ class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -347,6 +365,12 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -408,6 +432,12 @@ class RequireTextScaleFactorAwarenessRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -507,6 +537,12 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -594,6 +630,12 @@ class RequireSemanticsLabelRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -686,6 +728,12 @@ class AvoidMergedSemanticsHidingInfoRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -781,6 +829,12 @@ class RequireLiveRegionRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -897,6 +951,12 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1004,6 +1064,12 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1118,6 +1184,12 @@ class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1205,6 +1277,12 @@ class RequireImageSemanticsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1324,6 +1402,12 @@ class AvoidHiddenInteractiveRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1456,6 +1540,12 @@ class PreferScalableTextRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1533,6 +1623,12 @@ class RequireButtonSemanticsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1638,6 +1734,12 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1736,6 +1838,12 @@ class AvoidHoverOnlyRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1839,6 +1947,12 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
   /// Accessibility issue affecting colorblind users.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1959,6 +2073,12 @@ class RequireMinimumContrastRule extends SaropaLintRule {
   /// Accessibility issue affecting users with low vision.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2130,6 +2250,12 @@ class RequireAvatarAltTextRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -2196,6 +2322,12 @@ class RequireBadgeSemanticsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2269,6 +2401,12 @@ class RequireBadgeCountLimitRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2349,6 +2487,12 @@ class RequireImageDescriptionRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -2416,6 +2560,12 @@ class AvoidSemanticsExclusionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2488,6 +2638,12 @@ class PreferMergeSemanticsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2595,6 +2751,12 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -2690,6 +2852,12 @@ class AvoidFlashingContentRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2799,6 +2967,12 @@ class PreferAdequateSpacingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -2886,6 +3060,12 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -2965,6 +3145,12 @@ class RequireSemanticLabelIconsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -3073,6 +3259,12 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -3177,6 +3369,12 @@ class AvoidAutoPlayMediaRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -3315,6 +3513,12 @@ class PreferLargeTouchTargetsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -3486,6 +3690,12 @@ class AvoidTimeLimitsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -3629,6 +3839,12 @@ class RequireDragAlternativesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -3731,6 +3947,12 @@ class PreferFocusTraversalOrderRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -3819,6 +4041,12 @@ class PreferSemanticsContainerRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -3899,6 +4127,12 @@ class AvoidRedundantSemanticsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -3991,6 +4225,12 @@ class AvoidColorOnlyMeaningRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -4131,6 +4371,12 @@ class PreferSemanticsSortRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -4170,6 +4416,12 @@ class RequireFocusOrderRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -4198,6 +4450,12 @@ class RequireHeadingHierarchyRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -4223,6 +4481,12 @@ class RequireReducedMotionSupportRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -4253,6 +4517,12 @@ class AvoidSemanticsInAnimationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -4279,6 +4549,12 @@ class PreferAnnounceForChangesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -4309,6 +4585,12 @@ class PreferShowHideRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -4335,6 +4617,12 @@ class RequireLinkDistinctionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -4365,6 +4653,12 @@ class RequireSwitchControlRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -4391,6 +4685,12 @@ class PreferExternalKeyboardRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'a11y', 'accessibility', 'flutter'};
 
   @override
   RuleCost get cost => RuleCost.low;

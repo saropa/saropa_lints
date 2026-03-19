@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:saropa_lints/saropa_lints.dart' show RuleType;
 import 'package:saropa_lints/src/rules/security/crypto_rules.dart';
 import 'package:test/test.dart';
 
@@ -60,6 +61,30 @@ void main() {
       );
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
+
+  group('Cryptography Rules - metadata (CWE, ruleType)', () {
+    test('hardcoded key rule maps to CWE-798 and vulnerability', () {
+      final rule = AvoidHardcodedEncryptionKeysRule();
+      expect(rule.ruleType, RuleType.vulnerability);
+      expect(rule.cweIds, contains(798));
+    });
+    test('secure random rule maps to CWE-330', () {
+      final rule = PreferSecureRandomForCryptoRule();
+      expect(rule.cweIds, contains(330));
+    });
+    test('deprecated algorithms rule maps to CWE-327', () {
+      final rule = AvoidDeprecatedCryptoAlgorithmsRule();
+      expect(rule.cweIds, contains(327));
+    });
+    test('unique IV rule maps to CWE-329', () {
+      final rule = RequireUniqueIvPerEncryptionRule();
+      expect(rule.cweIds, contains(329));
+    });
+    test('secure key generation maps to CWE-335 (predictable PRNG / key material)', () {
+      final rule = RequireSecureKeyGenerationRule();
+      expect(rule.cweIds, contains(335));
     });
   });
 

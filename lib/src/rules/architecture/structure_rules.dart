@@ -56,6 +56,12 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -146,6 +152,12 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -214,6 +226,12 @@ class AvoidDuplicateExportsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -274,6 +292,12 @@ class AvoidDuplicateMixinsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -337,6 +361,12 @@ class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -403,6 +433,12 @@ class AvoidGlobalStateRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -602,6 +638,12 @@ class PreferSmallFilesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.trivial;
 
   static const int _maxLines = 200;
@@ -650,6 +692,12 @@ class AvoidMediumFilesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.trivial;
@@ -701,6 +749,12 @@ class AvoidLongFilesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.trivial;
 
   static const int _maxLines = 500;
@@ -749,6 +803,12 @@ class AvoidVeryLongFilesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.trivial;
@@ -833,6 +893,12 @@ class PreferSmallTestFilesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.trivial;
 
   static const int _maxLines = 400;
@@ -882,6 +948,12 @@ class AvoidMediumTestFilesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.trivial;
@@ -935,6 +1007,12 @@ class AvoidLongTestFilesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.trivial;
 
   static const int _maxLines = 1000;
@@ -986,6 +1064,12 @@ class AvoidVeryLongTestFilesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.trivial;
 
   static const int _maxLines = 2000;
@@ -1032,6 +1116,12 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1120,6 +1210,12 @@ class AvoidLongParameterListRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1199,6 +1295,12 @@ class AvoidLocalFunctionsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1239,6 +1341,12 @@ class MaxImportsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1300,6 +1408,12 @@ class PreferSortedParametersRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1383,6 +1497,12 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1508,6 +1628,12 @@ class PreferNamedParametersRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1650,6 +1776,12 @@ class AvoidUnnecessaryLocalVariableRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1725,6 +1857,12 @@ class AvoidUnnecessaryReassignmentRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1904,6 +2042,12 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1986,6 +2130,12 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2185,6 +2335,12 @@ class PreferTrailingUnderscoreForUnusedRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -2269,6 +2425,12 @@ class AvoidUnnecessaryFuturesRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2362,6 +2524,12 @@ class AvoidThrowInFinallyRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2562,6 +2730,12 @@ class AvoidClassesWithOnlyStaticMembersRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -2625,6 +2799,12 @@ class AvoidSettersWithoutGettersRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2693,6 +2873,12 @@ class PreferGettersBeforeSettersRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -2757,6 +2943,12 @@ class PreferStaticBeforeInstanceRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2824,6 +3016,12 @@ class PreferMixinOverAbstractRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -2876,6 +3074,12 @@ class PreferRecordOverTupleClassRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2944,6 +3148,12 @@ class PreferSealedClassesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -2994,6 +3204,12 @@ class PreferSealedForStateRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -3075,6 +3291,12 @@ class PreferConstructorsFirstRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -3145,6 +3367,12 @@ class PreferFactoryBeforeNamedRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -3209,6 +3437,12 @@ class PreferOverridesLastRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -3295,6 +3529,12 @@ class PreferConstructorsOverStaticMethodsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -3357,6 +3597,12 @@ class PreferFunctionOverStaticMethodRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -3428,6 +3674,12 @@ class PreferExtensionMethodsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -3494,6 +3746,12 @@ class PreferStaticMethodOverFunctionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -3569,6 +3827,12 @@ class PreferImportOverPartRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -3624,6 +3888,12 @@ class PreferExtensionOverUtilityClassRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -3709,6 +3979,12 @@ class PreferExtensionTypeForWrapperRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -3775,6 +4051,12 @@ class PreferDeferredImportsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -3801,6 +4083,12 @@ class PreferPartOverImportRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -3874,6 +4162,12 @@ class AvoidImportingEntrypointExportsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -3980,6 +4274,12 @@ class IllegalEnumValuesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -4036,6 +4336,12 @@ class WrongNumberOfParametersForSetterRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -4099,6 +4405,12 @@ class UnnecessaryLibraryNameRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
 
   @override
   RuleCost get cost => RuleCost.low;

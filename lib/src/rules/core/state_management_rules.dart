@@ -49,6 +49,12 @@ class RequireNotifyListenersRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -168,6 +174,12 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -312,6 +324,12 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -607,6 +625,12 @@ class RequireMountedCheckRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -784,6 +808,12 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -913,6 +943,12 @@ class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1016,6 +1052,12 @@ class AvoidSetStateInLargeStateClassRule extends SaropaLintRule {
   /// Performance issue in large state classes. May require refactoring.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1123,6 +1165,12 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1193,6 +1241,12 @@ class AvoidStaticStateRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1307,6 +1361,12 @@ class PreferOptimisticUpdatesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1413,6 +1473,12 @@ class AvoidCollectionMutatingMethodsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core'};
 
   @override
   RuleCost get cost => RuleCost.medium;

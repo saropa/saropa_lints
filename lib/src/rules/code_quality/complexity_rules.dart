@@ -40,6 +40,12 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
@@ -109,6 +115,12 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -167,6 +179,12 @@ class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -247,6 +265,12 @@ class AvoidComplexConditionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -337,6 +361,12 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -402,6 +432,12 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -563,6 +599,12 @@ class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -608,6 +650,12 @@ class AvoidNestedShorthandsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -680,6 +728,12 @@ class AvoidMultiAssignmentRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -718,6 +772,12 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
   /// Stylistic preference only. No performance or correctness benefit.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   String get exampleBad => 'if (5 == status) { }';
@@ -769,6 +829,12 @@ class PreferMovingToVariableRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -858,6 +924,12 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -955,6 +1027,12 @@ class AvoidDeepNestingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1055,6 +1133,12 @@ class AvoidHighCyclomaticComplexityRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.high;

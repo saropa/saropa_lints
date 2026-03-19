@@ -64,6 +64,15 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  List<int> get cweIds => const <int>[798];
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -185,6 +194,15 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  List<int> get cweIds => const <int>[330];
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -304,6 +322,15 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  List<int> get cweIds => const <int>[327];
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -401,6 +428,15 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  List<int> get cweIds => const <int>[329];
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -562,6 +598,16 @@ class RequireSecureKeyGenerationRule extends SaropaLintRule {
   /// Predictable keys are extractable from binaries — critical security flaw.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  /// CWE-335: incorrect / predictable use of PRNG for key material.
+  @override
+  List<int> get cweIds => const <int>[335];
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
