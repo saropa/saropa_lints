@@ -274,6 +274,7 @@ class AnalysisReporter {
         info: trackerData.infoCount,
       ),
       violations: ImpactTracker.violations,
+      rawImportsByFile: ImportGraphTracker.snapshotRawImportsForBatch(),
     );
 
     ReportConsolidator.writeBatch(projectRoot, batch);
@@ -281,6 +282,9 @@ class AnalysisReporter {
 
   /// Write the consolidated report (summary + full violation list).
   static void _writeCombinedReport(String path, ConsolidatedData data) {
+    if (data.mergedRawImports.isNotEmpty) {
+      ImportGraphTracker.applyMergedImportSnapshot(data.mergedRawImports);
+    }
     ImportGraphTracker.compute();
 
     final config = data.config ?? _config;
@@ -575,7 +579,7 @@ class AnalysisReporter {
         score: ImportGraphTracker.getFileScore(file),
         fanIn: ImportGraphTracker.importersOf(file).length,
         layer: ImportGraphTracker.getLayer(file),
-        issues: issuesByFile[file] ?? 0,
+        issues: ImportGraphTracker.lookupIssuesForGraphPath(issuesByFile, file),
       ));
     }
     scored.sort((a, b) => b.score.compareTo(a.score));

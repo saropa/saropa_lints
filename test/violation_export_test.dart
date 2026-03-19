@@ -48,6 +48,7 @@ void main() {
       ruleSeverities: ruleSeverities ?? const <String, String>{},
       violations: violations ?? const <LintImpact, List<ViolationRecord>>{},
       batchCount: batchCount,
+      mergedRawImports: const <String, List<String>>{},
     );
   }
 
@@ -87,7 +88,8 @@ void main() {
       // Consumer manifest written alongside violations.json
       final contractFile = File(consumerContractPath());
       expect(contractFile.existsSync(), isTrue);
-      final contract = json.decode(contractFile.readAsStringSync()) as Map<String, dynamic>;
+      final contract =
+          json.decode(contractFile.readAsStringSync()) as Map<String, dynamic>;
       expect(contract['schemaVersion'], '1.0');
       expect(contract['healthScore'], isA<Map<String, dynamic>>());
       final healthScore = contract['healthScore'] as Map<String, dynamic>;
@@ -102,7 +104,14 @@ void main() {
       // tierRuleSets: consumers can filter by tier without reimplementing tier logic
       expect(contract['tierRuleSets'], isA<Map<String, dynamic>>());
       final tierRuleSets = contract['tierRuleSets'] as Map<String, dynamic>;
-      const tierIds = ['essential', 'recommended', 'professional', 'comprehensive', 'pedantic', 'stylistic'];
+      const tierIds = [
+        'essential',
+        'recommended',
+        'professional',
+        'comprehensive',
+        'pedantic',
+        'stylistic',
+      ];
       for (final tierId in tierIds) {
         expect(tierRuleSets[tierId], isA<List<dynamic>>());
         expect((tierRuleSets[tierId] as List<dynamic>).isNotEmpty, isTrue);

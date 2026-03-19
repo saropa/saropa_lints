@@ -21,6 +21,7 @@ class BatchData {
     required this.ruleSeverities,
     required this.severityCounts,
     required this.violations,
+    this.rawImportsByFile = const <String, List<String>>{},
   });
 
   static const int _formatVersion = 1;
@@ -35,6 +36,10 @@ class BatchData {
   final Map<String, String> ruleSeverities;
   final SeverityCounts severityCounts;
   final Map<LintImpact, List<ViolationRecord>> violations;
+
+  /// Raw `import` / `export` URI strings per analyzed file path (absolute
+  /// or project-relative). Serialized as `ig` for cross-isolate merge.
+  final Map<String, List<String>> rawImportsByFile;
 
   /// Serialize to JSON string.
   String toJsonString() {
@@ -53,6 +58,9 @@ class BatchData {
     if (config != null) {
       map['cfg'] = _configToJson(config!);
     }
+    if (rawImportsByFile.isNotEmpty) {
+      map['ig'] = rawImportsByFile;
+    }
     return const JsonEncoder().convert(map);
   }
 
@@ -60,8 +68,8 @@ class BatchData {
   static BatchData? fromJsonString(String source) {
     try {
       final decoded = json.decode(source);
-      if (decoded is! Map<String, dynamic>) return null;
-      final map = decoded;
+      if (decoded is! Map) return null;
+      final map = Map<String, dynamic>.from(decoded as Map);
       if (map['v'] != _formatVersion) return null;
 
       final s = map['s'];
@@ -84,6 +92,7 @@ class BatchData {
         ruleSeverities: _stringMap(map['rs']),
         severityCounts: _severityCountsFromJson(map['sc']),
         violations: _violationsFromJson(map['vl']),
+        rawImportsByFile: _stringListMap(map['ig']),
       );
     } on FormatException {
       return null;
@@ -231,4 +240,16 @@ Map<String, int> _intMap(dynamic raw) {
 Map<String, String> _stringMap(dynamic raw) {
   if (raw is! Map<String, dynamic>) return {};
   return raw.map((k, v) => MapEntry(k, v is String ? v : ''));
+}
+
+Map<String, List<String>> _stringListMap(dynamic raw) {
+  if (raw == null || raw is! Map) return {};
+  final out = <String, List<String>>{};
+  raw.forEach((key, value) {
+    if (key is! String) return;
+    if (value is List) {
+      out[key] = value.map((e) => e.toString()).toList();
+    }
+  });
+  return out;
 }

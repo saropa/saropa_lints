@@ -23,11 +23,11 @@ extension _LintImpactNumeric on LintImpact {
 /// Call [compute] once before rendering the report to resolve imports,
 /// build the graph, and calculate scores.
 ///
-/// **Multi-isolate:** State is static per analyzer isolate. Violations are
-/// merged from all isolates when writing the consolidated report, but the
-/// import graph only includes files that this isolate analyzed. Files not
-/// in the graph still get default layer/`other` and zero fan-in for
-/// [getPriority] / [getFileScore] in the report.
+/// **Multi-isolate:** Each isolate collects imports in memory; snapshots are
+/// written in batch JSON (`rawImportsByFile`) and merged when building the
+/// consolidated report, so the graph spans all isolates in the session.
+/// Falls back to in-memory data only when batch files omit import snapshots
+/// (legacy batches).
 class ImportGraphTracker {
   ImportGraphTracker._();
 
@@ -146,26 +146,44 @@ class ImportGraphTracker {
       _importsOf.values.fold(0, (s, v) => s + v.length);
 
   /// Files that [path] imports (fan-out).
-  static Set<String> importsOf(String path) =>
-      _importsOf[path] ?? const <String>{};
+  static Set<String> importsOf(String path) {
+    final key = _canonicalTrackedPath(path);
+    return _importsOf[key ?? path] ?? const <String>{};
+  }
 
   /// Files that import [path] (fan-in).
-  static Set<String> importersOf(String path) =>
-      _importedBy[path] ?? const <String>{};
+  static Set<String> importersOf(String path) {
+    final key = _canonicalTrackedPath(path);
+    return _importedBy[key ?? path] ?? const <String>{};
+  }
 
-  /// Computed importance score for [path].
-  static double getImportance(String path) => _importanceScores[path] ?? 0.0;
+  /// Computed importance score for [path] (relative or absolute file path).
+  static double getImportance(String path) {
+    final key = _canonicalTrackedPath(path);
+    return _importanceScores[key ?? path] ?? 0.0;
+  }
 
   /// Layer name for [path] (e.g. 'data', 'screen', 'utility').
-  static String getLayer(String path) => _layers[path] ?? 'other';
+  static String getLayer(String path) {
+    final key = _canonicalTrackedPath(path);
+    return _layers[key ?? path] ?? 'other';
+  }
 
   /// Numeric layer weight for [path].
-  static double getLayerWeight(String path) => _layerWeights[path] ?? 1.0;
+  static double getLayerWeight(String path) {
+    final key = _canonicalTrackedPath(path);
+    return _layerWeights[key ?? path] ?? 1.0;
+  }
 
   /// Combined priority score for a violation in [path] with [impact].
+  ///
+  /// [path] may be project-relative (as in consolidated reports) or absolute;
+  /// it is matched to internal graph keys via [_canonicalTrackedPath].
   static double getPriority(String path, LintImpact impact) {
-    final importance = getImportance(path);
-    final layerWeight = getLayerWeight(path);
+    final key = _canonicalTrackedPath(path);
+    final k = key ?? path;
+    final importance = _importanceScores[k] ?? 0.0;
+    final layerWeight = _layerWeights[k] ?? 1.0;
     return impact.numericValue * (importance + 1) * layerWeight;
   }
 
@@ -174,8 +192,51 @@ class ImportGraphTracker {
       issuesByFile[path] ?? 0;
 
   /// File importance score for ranking (without lint impact).
-  static double getFileScore(String path) =>
-      (getImportance(path) + 1) * getLayerWeight(path);
+  static double getFileScore(String path) {
+    final key = _canonicalTrackedPath(path);
+    final k = key ?? path;
+    final imp = _importanceScores[k] ?? 0.0;
+    final w = _layerWeights[k] ?? 1.0;
+    return (imp + 1) * w;
+  }
+
+  /// Issue count for a graph file path against [issuesByFile] keys (often
+  /// project-relative after consolidation).
+  static int lookupIssuesForGraphPath(
+    Map<String, int> issuesByFile,
+    String graphKey,
+  ) {
+    final rel = _toRelative(graphKey);
+    return issuesByFile[rel] ??
+        issuesByFile[graphKey] ??
+        issuesByFile[graphKey.replaceAll('\\', '/')] ??
+        0;
+  }
+
+  /// Serializable copy of raw import URIs per file for batch JSON.
+  static Map<String, List<String>> snapshotRawImportsForBatch() => {
+    for (final e in _rawImports.entries) e.key: e.value.toList(),
+  };
+
+  /// Replace collected imports with a merged snapshot from all isolates,
+  /// then recompute on next [compute]. Clears derived graph state only.
+  static void applyMergedImportSnapshot(Map<String, List<String>> merged) {
+    reset();
+    for (final e in merged.entries) {
+      _rawImports[e.key] = e.value.toSet();
+    }
+  }
+
+  /// Maps consolidated / relative paths to internal absolute graph keys.
+  static String? _canonicalTrackedPath(String path) {
+    if (path.isEmpty) return null;
+    if (_rawImports.containsKey(path)) return path;
+    final norm = path.replaceAll('\\', '/');
+    for (final k in _rawImports.keys) {
+      if (_toRelative(k) == norm) return k;
+    }
+    return null;
+  }
 
   // ══════════════════════════════════════════════════════════════════
   // Reset
