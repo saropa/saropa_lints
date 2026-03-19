@@ -35,13 +35,15 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Added
 
-• **Extension** — **TODOs & Hacks** view: Todo-Tree-style sidebar that lists TODO, FIXME, HACK, XXX, and BUG comment markers by scanning workspace files (no Dart analyzer or violations.json). Tree shows by folder → file → line, or by tag → file → line when "Group by tag" is enabled. Click a line to open the file at that line. Settings: tags, include/exclude globs, maxFilesToScan, autoRefresh (debounced refresh on save), groupByTag. When the scan hits the file cap, a placeholder node explains how to increase the limit.
+• **Extension** — **TODOs & Hacks** view: Todo-Tree-style sidebar that lists TODO, FIXME, HACK, XXX, and BUG comment markers by scanning workspace files (no Dart analyzer or violations.json). Tree shows by folder → file → line, or by tag → file → line when "Group by tag" is enabled. Click a line to open the file at that line. Settings: tags, include/exclude globs, maxFilesToScan, autoRefresh (debounced refresh on save), groupByTag, and optional customRegex override. View toolbar: **Refresh** and **Toggle group by tag / folder**. When the scan hits the file cap, a placeholder node explains how to increase the limit. Unit tests for regex and exclude-pattern logic (run `npm run test` in extension directory).
 
 • **Lint rules** — **no_runtimeType_toString**: flags `runtimeType.toString()` and suggests type checks or direct `Type` comparison (performance, MAJOR, Recommended tier).
 
 • **Lint rules** — **use_truncating_division**: flags `(a / b).toInt()` and suggests `a ~/ b` (MAJOR, Recommended tier).
 
 • **Extension** — **Explain rule**: right-click any violation in the Issues view (or run **Saropa Lints: Explain rule** from the command palette) to open a side tab with full rule details: problem message, how to fix, severity, impact, OWASP mapping (when present), and a link to the ROADMAP. The panel reuses a single tab; the documentation link opens in the default browser.
+
+• **Extension** — **Create Saropa Lints Instructions for AI Agents**: Command (Overview title bar and Command Palette) creates `.cursor/rules/saropa_lints_instructions.mdc` in the workspace from a bundled template, so AI agents get project guidelines (essential files, workflow, prohibitions, principles). Uses async file I/O and a short progress notification.
 
 ### Administration
 

@@ -51,6 +51,8 @@ The **Security Posture** view shows OWASP Mobile and Web Top 10 coverage based o
 
 The **Config** view shows Enabled, Tier, Run analysis after config change, **Detected** (Flutter and packages from `pubspec.yaml`), and actions (Open config, Initialize config, Run analysis).
 
+**TODOs & Hacks** — A Todo-Tree-style sidebar view that lists TODO, FIXME, HACK, XXX, and BUG comment markers by scanning workspace files. No Dart analyzer or violations.json; works in any workspace with supported file types (Dart, YAML, Markdown, TypeScript, JavaScript by default). Tree shows by folder → file → line (or by tag → file → line when "Group by tag" is on). Click a line to open the file at that line. Use the **Refresh** or **Toggle group by tag / folder** buttons in the view toolbar, or **TODOs & Hacks: Refresh** from the command palette. Auto-refresh on save is optional (see settings). Optional custom regex override is supported (see `saropaLints.todosAndHacks.customRegex`).
+
 The **Logs** view lists analysis reports from `reports/`. Each log shows a parsed hint (e.g. violation counts, init tier). A "Run Analysis" action appears when the latest report is over 1 hour old.
 
 ## Settings
@@ -61,6 +63,15 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 | `saropaLints.tier` | `recommended` | Tier used when enabling or re-initializing (essential, recommended, professional, comprehensive, pedantic). |
 | `saropaLints.runAnalysisAfterConfigChange` | `true` | Run `dart analyze` after init when enabling. |
 | `saropaLints.issuesPageSize` | `100` | Max violations shown per file in the Issues tree (1–1000). Remaining appear as “and N more…”. |
+
+| **TODOs & Hacks** | | |
+| `saropaLints.todosAndHacks.tags` | `["TODO", "FIXME", "HACK", "XXX", "BUG"]` | Tags to search for in comments (case-sensitive). |
+| `saropaLints.todosAndHacks.includeGlobs` | `["**/*.dart", "**/*.yaml", "**/*.md", "**/*.ts", "**/*.js"]` | Glob patterns for files to scan. |
+| `saropaLints.todosAndHacks.excludeGlobs` | `["**/node_modules/**", "**/.dart_tool/**", "**/build/**", "**/.git/**"]` | Extra exclude patterns (merged with search.exclude). |
+| `saropaLints.todosAndHacks.maxFilesToScan` | `2000` | Maximum number of files to scan; view shows a message when capped. |
+| `saropaLints.todosAndHacks.autoRefresh` | `true` | Refresh the TODOs & Hacks view when a file is saved (debounced). |
+| `saropaLints.todosAndHacks.groupByTag` | `false` | When true, group tree by tag (TODO, FIXME, …) then by file; when false, by folder then file. |
+| `saropaLints.todosAndHacks.customRegex` | `""` | Optional regex override for comment markers. Use capture group 1 for tag, optional group 2 for snippet. Empty = default (//, #, <!-- + tags). Invalid regex falls back to default. |
 
 ## Commands
 
@@ -78,6 +89,9 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 - **Explain rule** — On a violation in the Issues tree (context menu) or from the command palette (pick a rule): open a side tab with full rule details (message, fix, severity, impact, OWASP, ROADMAP link).
 - **Apply fix** — On a violation in the Issues tree (context menu): run the Dart analyzer's quick fix for that location without opening the file.
 - **Fix all in this file** — On a file in the Issues tree (context menu): run all available quick fixes for that file bottom-up.
+- **TODOs & Hacks: Refresh** — Rescan the workspace for TODO/FIXME/HACK/XXX/BUG markers and refresh the TODOs & Hacks view.
+- **Create Saropa Lints Instructions for AI Agents** — Create `.cursor/rules/saropa_lints_instructions.mdc` in the workspace from the bundled template (Overview title bar or Command Palette). Gives AI agents project guidelines for working on saropa_lints.
+- **TODOs & Hacks: Toggle group by tag / folder** — Switch between grouping by folder→file→line and by tag→file→line (view toolbar).
 
 ### Violation context menu: Hide options
 

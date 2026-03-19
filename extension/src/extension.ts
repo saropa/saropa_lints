@@ -472,26 +472,36 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('saropaLints.showAbout', () => {
       showAboutPanel(context.extensionUri, extVersion);
     }),
-    vscode.commands.registerCommand('saropaLints.createSonarQubeMcpInstructions', async () => {
+    // Creates .cursor/rules/saropa_lints_instructions.mdc from bundled template for AI agent guidelines.
+    vscode.commands.registerCommand('saropaLints.createSaropaInstructions', async () => {
       const folder = vscode.workspace.workspaceFolders?.[0];
       if (!folder) {
         void vscode.window.showErrorMessage('Open a workspace folder first.');
         return;
       }
       const rulesDir = path.join(folder.uri.fsPath, '.cursor', 'rules');
-      const destPath = path.join(rulesDir, 'sonarqube_mcp_instructions.mdc');
-      const templatePath = path.join(context.extensionUri.fsPath, 'media', 'sonarqube_mcp_instructions.mdc');
+      const destPath = path.join(rulesDir, 'saropa_lints_instructions.mdc');
+      const templatePath = path.join(context.extensionUri.fsPath, 'media', 'saropa_lints_instructions.mdc');
       try {
-        fs.mkdirSync(rulesDir, { recursive: true });
-        fs.copyFileSync(templatePath, destPath);
+        await vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: 'Creating Saropa Lints instructions…',
+            cancellable: false,
+          },
+          async () => {
+            await fs.promises.mkdir(rulesDir, { recursive: true });
+            await fs.promises.copyFile(templatePath, destPath);
+          },
+        );
         void vscode.window.showInformationMessage(
-          'Created .cursor/rules/sonarqube_mcp_instructions.mdc for AI agents.',
+          'Created .cursor/rules/saropa_lints_instructions.mdc for AI agents.',
         );
         const doc = await vscode.workspace.openTextDocument(destPath);
         void vscode.window.showTextDocument(doc);
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        void vscode.window.showErrorMessage(`Failed to create SonarQube MCP instructions: ${msg}`);
+        void vscode.window.showErrorMessage(`Failed to create Saropa Lints instructions: ${msg}`);
       }
     }),
     // Show all issues: clear filters and focus Issues view (e.g. from Summary "Total violations").

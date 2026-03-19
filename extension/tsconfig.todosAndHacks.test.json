@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "out-test",
+    "types": ["mocha", "node"]
+  },
+  "include": [
+    "src/services/todosAndHacksScannerCore.ts",
+    "src/test/todosAndHacks/scanner.test.ts",
+    "src/test/todosAndHacks/saropaInstructions.test.ts"
+  ],
+  "exclude": ["node_modules", ".vscode-test", "out", "dist"]
+}
