@@ -2,8 +2,16 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
-    "types": ["mocha", "node", "sinon"]
+    "outDir": "out-test",
+    "types": ["mocha", "node"]
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/services/todosAndHacksScannerCore.ts",
+    "src/test/todosAndHacks/**/*.ts",
+    "src/driftAdvisor/types.ts",
+    "src/driftAdvisor/discovery.ts",
+    "src/driftAdvisor/client.ts",
+    "src/test/driftAdvisor/**/*.ts"
+  ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }
