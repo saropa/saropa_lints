@@ -5,8 +5,8 @@
  */
 
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import {
   runEnable,
   runDisable,
@@ -26,11 +26,18 @@ import { ConfigTreeProvider } from './views/configTree';
 import { SuggestionsTreeProvider } from './views/suggestionsTree';
 import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
+import { TodosAndHacksTreeProvider } from './views/todosAndHacksTree';
 import { showAboutPanel } from './views/aboutView';
 import { openRuleExplainPanelForViolation, openRuleExplainPanel } from './views/ruleExplainView';
 import { readViolations, ViolationsData } from './violationsReader';
 import { hasSaropaLintsDep } from './pubspecReader';
-import { appendSnapshot, loadHistory, findPreviousScore, detectThresholdCrossing } from './runHistory';
+import {
+  appendSnapshot,
+  loadHistory,
+  findPreviousScore,
+  detectThresholdCrossing,
+  type RunSnapshot,
+} from './runHistory';
 import { computeHealthScore, formatScoreDelta, scoreColorBand } from './healthScore';
 import { registerInlineAnnotations, updateAnnotationsForAllEditors, invalidateAnnotationCache } from './inlineAnnotations';
 import { writeRuleOverrides, removeRuleOverrides } from './configWriter';
@@ -52,6 +59,56 @@ import {
 
 function getConfig() {
   return vscode.workspace.getConfiguration('saropaLints');
+}
+
+/** D8: Show regression nudge when score dipped below a threshold; offers "View Issues" action. */
+function showRegressionNudge(crossing: { threshold: number }, curr: RunSnapshot): void {
+  const criticalSuffix = curr.critical === 1 ? '' : 's';
+  const msg =
+    curr.critical > 0
+      ? `${curr.critical} critical issue${criticalSuffix} \u2014 view.`
+      : `Score dipped below ${crossing.threshold} \u2014 view issues.`;
+  vscode.window.showInformationMessage(`Saropa Lints: ${msg}`, 'View Issues').then((choice) => {
+    if (choice === 'View Issues') {
+      vscode.commands.executeCommand('saropaLints.focusIssues');
+    }
+  });
+}
+
+/** Show celebration/milestone UI when a new snapshot was appended and history has at least 2 entries. */
+function runCelebrationIfNeeded(root: string, history: RunSnapshot[], appended: boolean): void {
+  if (!appended || history.length < 2) return;
+  const prev = history.at(-2)!;
+  const curr = history.at(-1)!;
+  const delta = prev.total - curr.total;
+  const scoreDelta =
+    prev.score !== undefined && curr.score !== undefined
+      ? formatScoreDelta(curr.score, prev.score)
+      : '';
+  if (delta > 0) {
+    const scoreMsg = scoreDelta ? ` (Score: ${curr.score} ${scoreDelta})` : '';
+    vscode.window.setStatusBarMessage(
+      `You fixed ${delta} issue${delta === 1 ? '' : 's'}!${scoreMsg}`,
+      5000,
+    );
+  }
+  if (prev.critical > 0 && curr.critical === 0) {
+    vscode.window.showInformationMessage('Saropa Lints: No critical issues!');
+  }
+  if (curr.score === undefined) return;
+  const crossing = detectThresholdCrossing(curr.score, findPreviousScore(history));
+  if (crossing?.direction === 'up') {
+    logSection('Milestone');
+    logReport(`- Score reached ${crossing.threshold} (current: ${curr.score})`);
+    flushReport(root);
+    vscode.window.showInformationMessage(
+      `Saropa Lints: Score reached ${crossing.threshold} \u2014 great work!`,
+    );
+    return;
+  }
+  if (crossing?.direction === 'down') {
+    showRegressionNudge(crossing, curr);
+  }
 }
 
 function updateContext(enabled: boolean, hasViolations: boolean) {
@@ -110,9 +167,32 @@ export function activate(context: vscode.ExtensionContext): void {
   const suggestionsProvider = new SuggestionsTreeProvider();
   const securityProvider = new SecurityPostureTreeProvider();
   const fileRiskProvider = new FileRiskTreeProvider();
+  const todosAndHacksProvider = new TodosAndHacksTreeProvider();
 
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('saropaLints.overview', overviewProvider),
+  );
+
+  const todosAndHacksView = vscode.window.createTreeView('saropaLints.todosAndHacks', {
+    treeDataProvider: todosAndHacksProvider,
+    showCollapseAll: true,
+  });
+  context.subscriptions.push(todosAndHacksView);
+
+  let todosAndHacksSaveDebounce: ReturnType<typeof setTimeout> | undefined;
+  context.subscriptions.push(
+    vscode.workspace.onDidSaveTextDocument((doc) => {
+      const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
+      if (!cfg.get<boolean>('autoRefresh', true)) return;
+      const folder = vscode.workspace.getWorkspaceFolder(doc.uri);
+      if (!folder) return;
+      if (todosAndHacksSaveDebounce) clearTimeout(todosAndHacksSaveDebounce);
+      todosAndHacksSaveDebounce = setTimeout(() => {
+        todosAndHacksSaveDebounce = undefined;
+        todosAndHacksProvider.refresh();
+        todosAndHacksView.message = undefined;
+      }, 600);
+    }),
   );
 
   const issuesView = vscode.window.createTreeView('saropaLints.issues', {
@@ -143,6 +223,11 @@ export function activate(context: vscode.ExtensionContext): void {
   registerInlineAnnotations(context);
 
   context.subscriptions.push(
+    {
+      dispose: () => {
+        if (todosAndHacksSaveDebounce) clearTimeout(todosAndHacksSaveDebounce);
+      },
+    },
     issuesView,
     vscode.window.registerTreeDataProvider('saropaLints.summary', summaryProvider),
     vscode.window.registerTreeDataProvider('saropaLints.config', configProvider),
@@ -177,11 +262,6 @@ export function activate(context: vscode.ExtensionContext): void {
       // Status bars must update when config changes (e.g. tier changed via Settings UI).
       updateAllStatusBars();
     }),
-  );
-
-  // Invalidate cached project root when workspace folders change so the
-  // extension re-discovers pubspec.yaml in the new layout.
-  context.subscriptions.push(
     vscode.workspace.onDidChangeWorkspaceFolders(() => {
       invalidateProjectRoot();
       refreshAll();
@@ -205,56 +285,10 @@ export function activate(context: vscode.ExtensionContext): void {
         const data = readViolations(root);
         if (data) {
           const { history, appended } = appendSnapshot(context.workspaceState, data);
-          // Refresh views after snapshot is persisted so Overview reads fresh history.
           refreshAll();
-          // Pass pre-loaded data to avoid re-reading violations.json from disk.
           updateAllStatusBars(data);
-          // C7: Keep viewsWelcome when-clauses current when data appears via file watcher.
           updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
-          // Only show celebration when a genuinely new snapshot was recorded.
-          if (appended && history.length >= 2) {
-            const prev = history.at(-2)!;
-            const curr = history.at(-1)!;
-            const delta = prev.total - curr.total;
-            // D8: Score-driven celebration — mention score delta when available.
-            const scoreDelta = (prev.score !== undefined && curr.score !== undefined)
-              ? formatScoreDelta(curr.score, prev.score)
-              : '';
-            if (delta > 0) {
-              const scoreMsg = scoreDelta ? ` (Score: ${curr.score} ${scoreDelta})` : '';
-              void vscode.window.setStatusBarMessage(
-                `You fixed ${delta} issue${delta === 1 ? '' : 's'}!${scoreMsg}`,
-                5000,
-              );
-            }
-            if (prev.critical > 0 && curr.critical === 0) {
-              void vscode.window.showInformationMessage('Saropa Lints: No critical issues!');
-            }
-            // D8: Score crossed a milestone threshold.
-            if (curr.score !== undefined) {
-              const crossing = detectThresholdCrossing(curr.score, findPreviousScore(history));
-              if (crossing?.direction === 'up') {
-                // Report: log milestone crossing.
-                logSection('Milestone');
-                logReport(`- Score reached ${crossing.threshold} (current: ${curr.score})`);
-                if (root) flushReport(root);
-                void vscode.window.showInformationMessage(
-                  `Saropa Lints: Score reached ${crossing.threshold} \u2014 great work!`,
-                );
-              } else if (crossing?.direction === 'down') {
-                // D8: Non-shaming regression nudge with actionable button.
-                const msg = curr.critical > 0
-                  ? `${curr.critical} critical issue${curr.critical === 1 ? '' : 's'} \u2014 view.`
-                  : `Score dipped below ${crossing.threshold} \u2014 view issues.`;
-                void vscode.window.showInformationMessage(`Saropa Lints: ${msg}`, 'View Issues')
-                  .then((choice) => {
-                    if (choice === 'View Issues') {
-                      void vscode.commands.executeCommand('saropaLints.focusIssues');
-                    }
-                  });
-              }
-            }
-          }
+          runCelebrationIfNeeded(root, history, appended);
           return;
         }
       }
@@ -285,71 +319,62 @@ export function activate(context: vscode.ExtensionContext): void {
   // Vibrancy data pushed from the vibrancy subsystem via callback.
   let vibrancyData: VibrancyStatusData | null = null;
 
+  /** Theme color for status bar by score band (red / yellow / none). */
+  function statusBarBackgroundForScore(score: number): vscode.ThemeColor | undefined {
+    const band = scoreColorBand(score);
+    if (band === 'red') return new vscode.ThemeColor('statusBarItem.errorBackground');
+    if (band === 'yellow') return new vscode.ThemeColor('statusBarItem.warningBackground');
+    return undefined;
+  }
+
+  /** Build tooltip lines for the status bar (version, tier, score, vibrancy details). */
+  function buildStatusBarTooltipLines(
+    tier: string,
+    health: { score: number } | null,
+    showVibrancy: boolean,
+    vibrancyLabel: string | null,
+  ): string[] {
+    const base = [`Saropa Lints v${extVersion}`, `Tier: ${tier}`];
+    if (health) base.push(`Lint score: ${health.score}%`);
+    if (showVibrancy && vibrancyData !== null) {
+      base.push(`Vibrancy: ${vibrancyLabel}`, `${vibrancyData.packageCount} packages scanned`);
+      if (vibrancyData.updateCount > 0) base.push(`${vibrancyData.updateCount} update(s) available`);
+      if (vibrancyData.actionCount > 0) base.push(`${vibrancyData.actionCount} action item(s)`);
+    }
+    return base;
+  }
+
   // Single unified status bar item showing lint score, tier, and vibrancy.
   // Accepts optional pre-loaded data to avoid re-reading violations.json from disk
   // when the caller already has it (e.g. debouncedRefresh).
   const updateAllStatusBars = (preloadedData?: ViolationsData) => {
-    // Hide status bar entirely for non-Dart projects.
     if (!isDartProject) {
       statusBarItem.hide();
       return;
     }
     const en = getConfig().get<boolean>('enabled', false) ?? false;
     const tier = getConfig().get<string>('tier', 'recommended') ?? 'recommended';
-
-    // Check whether vibrancy score should be shown in the status bar.
-    const showVibrancy = vscode.workspace
-      .getConfiguration('saropaLints.packageVibrancy')
-      .get<boolean>('showInStatusBar', true) && vibrancyData !== null;
-
-    // Format vibrancy segment: "7/10" (score out of 10).
-    const vibrancyLabel = showVibrancy
-      ? `${Math.round(vibrancyData!.averageScore / 10)}/10`
-      : null;
+    const showVibrancy =
+      vscode.workspace.getConfiguration('saropaLints.packageVibrancy').get<boolean>('showInStatusBar', true) &&
+      vibrancyData !== null;
+    const vibrancyLabel = showVibrancy ? `${Math.round(vibrancyData!.averageScore / 10)}/10` : null;
+    const trailLabel = vibrancyLabel ?? tier;
 
     if (en) {
-      // Use pre-loaded data when supplied; otherwise read from disk.
       const root = getProjectRoot();
       const data = preloadedData ?? (root ? readViolations(root) : null);
       const health = data ? computeHealthScore(data) : null;
-
-      // Build the trailing segment: vibrancy score if available, otherwise tier name.
-      const trailLabel = vibrancyLabel ?? tier;
-
       if (health) {
-        // Show lint score with delta + trailing segment.
         const history = loadHistory(context.workspaceState);
         const prevScore = findPreviousScore(history);
-        const delta = prevScore !== undefined ? ` ${formatScoreDelta(health.score, prevScore)}` : '';
+        const delta = prevScore === undefined ? '' : ` ${formatScoreDelta(health.score, prevScore)}`;
         statusBarItem.text = `$(checklist) Saropa: ${health.score}%${delta} · ${trailLabel}`;
-        // Color the status bar based on lint score band.
-        const band = scoreColorBand(health.score);
-        statusBarItem.backgroundColor = band === 'red'
-          ? new vscode.ThemeColor('statusBarItem.errorBackground')
-          : band === 'yellow'
-            ? new vscode.ThemeColor('statusBarItem.warningBackground')
-            : undefined;
+        statusBarItem.backgroundColor = statusBarBackgroundForScore(health.score);
       } else {
-        // No lint score yet — show name + trailing segment.
         statusBarItem.text = `$(checklist) Saropa Lints · ${trailLabel}`;
         statusBarItem.backgroundColor = undefined;
       }
-
-      // Build rich tooltip with all details.
-      const tooltipLines = [`Saropa Lints v${extVersion}`];
-      tooltipLines.push(`Tier: ${tier}`);
-      if (health) { tooltipLines.push(`Lint score: ${health.score}%`); }
-      if (showVibrancy) {
-        tooltipLines.push(`Vibrancy: ${vibrancyLabel}`);
-        tooltipLines.push(`${vibrancyData!.packageCount} packages scanned`);
-        if (vibrancyData!.updateCount > 0) {
-          tooltipLines.push(`${vibrancyData!.updateCount} update(s) available`);
-        }
-        if (vibrancyData!.actionCount > 0) {
-          tooltipLines.push(`${vibrancyData!.actionCount} action item(s)`);
-        }
-      }
-      statusBarItem.tooltip = tooltipLines.join('\n');
+      statusBarItem.tooltip = buildStatusBarTooltipLines(tier, health, showVibrancy, vibrancyLabel).join('\n');
     } else {
       statusBarItem.text = '$(checklist) Saropa Lints: Off';
       statusBarItem.tooltip = `Saropa Lints v${extVersion} — Disabled`;
@@ -417,7 +442,7 @@ export function activate(context: vscode.ExtensionContext): void {
         const postData = root ? readViolations(root) : null;
         const health = postData ? computeHealthScore(postData) : null;
         const scoreMsg = health ? ` Score: ${health.score}` : '';
-        void vscode.window.setStatusBarMessage(`Saropa Lints: Analysis complete.${scoreMsg}`, 4000);
+        vscode.window.setStatusBarMessage(`Saropa Lints: Analysis complete.${scoreMsg}`, 4000);
       }
     }),
     vscode.commands.registerCommand('saropaLints.initializeConfig', async () => {
@@ -435,7 +460,7 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
     vscode.commands.registerCommand('saropaLints.openConfig', openConfig),
     vscode.commands.registerCommand('saropaLints.focusView', () => {
-      void vscode.commands.executeCommand('saropaLints.overview.focus');
+      vscode.commands.executeCommand('saropaLints.overview.focus');
     }),
     vscode.commands.registerCommand('saropaLints.openWalkthrough', () => {
       void vscode.commands.executeCommand(
@@ -447,6 +472,28 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('saropaLints.showAbout', () => {
       showAboutPanel(context.extensionUri, extVersion);
     }),
+    vscode.commands.registerCommand('saropaLints.createSonarQubeMcpInstructions', async () => {
+      const folder = vscode.workspace.workspaceFolders?.[0];
+      if (!folder) {
+        void vscode.window.showErrorMessage('Open a workspace folder first.');
+        return;
+      }
+      const rulesDir = path.join(folder.uri.fsPath, '.cursor', 'rules');
+      const destPath = path.join(rulesDir, 'sonarqube_mcp_instructions.mdc');
+      const templatePath = path.join(context.extensionUri.fsPath, 'media', 'sonarqube_mcp_instructions.mdc');
+      try {
+        fs.mkdirSync(rulesDir, { recursive: true });
+        fs.copyFileSync(templatePath, destPath);
+        void vscode.window.showInformationMessage(
+          'Created .cursor/rules/sonarqube_mcp_instructions.mdc for AI agents.',
+        );
+        const doc = await vscode.workspace.openTextDocument(destPath);
+        void vscode.window.showTextDocument(doc);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        void vscode.window.showErrorMessage(`Failed to create SonarQube MCP instructions: ${msg}`);
+      }
+    }),
     // Show all issues: clear filters and focus Issues view (e.g. from Summary "Total violations").
     vscode.commands.registerCommand('saropaLints.focusIssues', () => {
       issuesProvider.clearFilters();
@@ -455,7 +502,7 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
     // Focus Issues view filtered to a single file (Code Lens, Problems view "Show in Saropa Lints").
     vscode.commands.registerCommand('saropaLints.focusIssuesForFile', (filePath: string) => {
-      const normalized = typeof filePath === 'string' ? filePath.replace(/\\/g, '/') : '';
+      const normalized = typeof filePath === 'string' ? filePath.replaceAll('\\', '/') : '';
       if (!normalized) return;
       issuesProvider.setTextFilter(normalized);
       updateIssuesViewMessage();
@@ -469,7 +516,7 @@ export function activate(context: vscode.ExtensionContext): void {
         void vscode.window.showInformationMessage('Open a file to show its issues in Saropa Lints.');
         return;
       }
-      const relative = path.relative(root, editor.document.uri.fsPath).replace(/\\/g, '/');
+      const relative = path.relative(root, editor.document.uri.fsPath).replaceAll('\\', '/');
       issuesProvider.setTextFilter(relative);
       updateIssuesViewMessage();
       void vscode.commands.executeCommand('saropaLints.issues.focus');
@@ -494,6 +541,19 @@ export function activate(context: vscode.ExtensionContext): void {
       refreshAll();
       updateAllStatusBars();
       updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
+    }),
+    vscode.commands.registerCommand('saropaLints.todosAndHacks.refresh', () => {
+      todosAndHacksProvider.refresh();
+      todosAndHacksView.message = undefined;
+      void vscode.commands.executeCommand('saropaLints.todosAndHacks.focus');
+    }),
+    vscode.commands.registerCommand('saropaLints.todosAndHacks.toggleGroupByTag', async () => {
+      const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
+      const current = cfg.get<boolean>('groupByTag', false);
+      await cfg.update('groupByTag', !current, vscode.ConfigurationTarget.Workspace);
+      todosAndHacksProvider.refresh();
+      todosAndHacksView.message = undefined;
+      void vscode.commands.executeCommand('saropaLints.todosAndHacks.focus');
     }),
     vscode.commands.registerCommand('saropaLints.repairConfig', async () => {
       const success = await runRepairConfig(context);
@@ -860,9 +920,9 @@ async function showTierChangeNotification(info: TierChangeNotification): Promise
     }
   } else {
     // Downgrade, small upgrade, or zero critical+high — simple confirmation.
-    const msg = info.delta !== 0
-      ? `Tier changed to ${info.tierLabel} (${deltaText} violations).`
-      : `Tier changed to ${info.tierLabel}.`;
+    const msg = info.delta === 0
+      ? `Tier changed to ${info.tierLabel}.`
+      : `Tier changed to ${info.tierLabel} (${deltaText} violations).`;
     const choice = await vscode.window.showInformationMessage(msg, 'View Issues');
     if (choice === 'View Issues') {
       await vscode.commands.executeCommand('saropaLints.issues.focus');
