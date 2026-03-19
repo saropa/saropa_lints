@@ -23,15 +23,19 @@ const String kScanJsonByRule = 'byRule';
 /// - `summary`: object with totalCount, byFile (map filePath -> count),
 ///   byRule (map ruleName -> count)
 Map<String, Object> scanDiagnosticsToJson(List<ScanDiagnostic> diagnostics) {
-  final list = diagnostics.map((d) => <String, Object?>{
-        'filePath': d.filePath,
-        'line': d.line,
-        'column': d.column,
-        'ruleName': d.ruleName,
-        'severity': d.severity,
-        'problemMessage': d.problemMessage,
-        'correctionMessage': d.correctionMessage,
-      }).toList();
+  final list = diagnostics
+      .map(
+        (d) => <String, Object?>{
+          'filePath': d.filePath,
+          'line': d.line,
+          'column': d.column,
+          'ruleName': d.ruleName,
+          'severity': d.severity,
+          'problemMessage': d.problemMessage,
+          'correctionMessage': d.correctionMessage,
+        },
+      )
+      .toList();
 
   final byFile = <String, int>{};
   final byRule = <String, int>{};
@@ -53,5 +57,7 @@ Map<String, Object> scanDiagnosticsToJson(List<ScanDiagnostic> diagnostics) {
 
 /// Encodes [diagnostics] to a JSON string (pretty-printed).
 String scanDiagnosticsToJsonString(List<ScanDiagnostic> diagnostics) {
-  return const JsonEncoder.withIndent('  ').convert(scanDiagnosticsToJson(diagnostics));
+  return const JsonEncoder.withIndent(
+    '  ',
+  ).convert(scanDiagnosticsToJson(diagnostics));
 }

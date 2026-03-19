@@ -337,7 +337,7 @@ Future<void> runInit(List<String> args) async {
       );
       userCustomizations = result.customizations;
 
-      // cspell:ignore prefer_debugprint
+      // cspell:ignore prefer_debug_print
       if (v7NormalizedCount[0] > 0) {
         log.terminal(
           '${InitColors.yellow}--- V7 MIGRATION ---${InitColors.reset}',
@@ -348,7 +348,7 @@ Future<void> runInit(List<String> args) async {
         );
         log.terminal(
           '${InitColors.dim}  Update any // ignore: comments to use '
-          'lowercase rule names (e.g. prefer_debugprint).${InitColors.reset}',
+          'lowercase rule names (e.g. prefer_debug_print).${InitColors.reset}',
         );
         log.terminal('');
       }

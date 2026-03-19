@@ -1,4 +1,5 @@
-import 'dart:io' show Platform;
+import 'dart:io' show Platform, stdout;
+import 'dart:typed_data' show Uint64List;
 
 import 'package:saropa_lints/src/project_context.dart' show ProjectContext;
 import 'package:saropa_lints/src/saropa_lint_rule.dart' show LintImpact;
@@ -52,6 +53,10 @@ class ImportGraphTracker {
 
   /// Layer weights.
   static final Map<String, double> _layerWeights = {};
+
+  /// Canonical path (normalized separators + platform case rules) -> the
+  /// corresponding key in [_rawImports].
+  static final Map<String, String> _registeredKeyByCanonical = {};
 
   static bool _isComputed = false;
   static String? _projectRoot;
@@ -127,11 +132,42 @@ class ImportGraphTracker {
   static void compute() {
     if (_isComputed) return;
     _isComputed = true;
+    final timingEnabled =
+        Platform.environment['SAROPA_LINTS_IMPORT_GRAPH_TIMING'] == 'true';
+    Stopwatch? swResolve;
+    if (timingEnabled) {
+      swResolve = Stopwatch()..start();
+    }
 
+    _buildRegisteredKeyLookup();
     _resolveAllImports();
+    swResolve?.stop();
+
     _buildReverseGraph();
+    // _buildReverseGraph is fast; no separate stopwatch.
+
+    Stopwatch? swFanIn;
+    if (timingEnabled) {
+      swFanIn = Stopwatch()..start();
+    }
     _computeFanIn();
+    swFanIn?.stop();
+
+    Stopwatch? swClassify;
+    if (timingEnabled) {
+      swClassify = Stopwatch()..start();
+    }
     _classifyLayers();
+    swClassify?.stop();
+
+    if (timingEnabled) {
+      // Print to stdout so it shows up in unit test logs.
+      stdout.writeln(
+        'ImportGraphTracker timing: resolve=${swResolve?.elapsedMilliseconds}ms '
+        'fanIn=${swFanIn?.elapsedMilliseconds}ms '
+        'classify=${swClassify?.elapsedMilliseconds}ms',
+      );
+    }
   }
 
   // ══════════════════════════════════════════════════════════════════
@@ -250,6 +286,7 @@ class ImportGraphTracker {
     _importanceScores.clear();
     _layers.clear();
     _layerWeights.clear();
+    _registeredKeyByCanonical.clear();
     _isComputed = false;
     // Keep _projectRoot and _packageName — they're config, not state.
   }
@@ -280,7 +317,9 @@ class ImportGraphTracker {
       final prefix = 'package:$_packageName/';
       if (uri.startsWith(prefix)) {
         final relative = uri.substring(prefix.length);
-        final resolved = _normalize('$_projectRoot/lib/$relative');
+        // Fast path: package self-imports are already library-relative.
+        // We only need canonical separator/case matching in lookup.
+        final resolved = '$_projectRoot/lib/$relative';
         return _coerceToRegisteredPath(resolved);
       }
       // External package — skip
@@ -292,27 +331,33 @@ class ImportGraphTracker {
 
     // Relative imports
     final fromDir = _parentDir(fromFile);
-    final resolved = _normalize('$fromDir/$uri');
+    final candidate = '$fromDir/$uri';
+    final needsNormalize =
+        uri.contains('../') ||
+        uri.contains('/./') ||
+        uri.startsWith('./') ||
+        uri.startsWith('../');
+    final resolved = needsNormalize ? _normalize(candidate) : candidate;
     return _coerceToRegisteredPath(resolved);
   }
 
   /// Maps a normalized path to the matching key in [_rawImports] so edges
-  /// align on Windows (mixed separators in analyzer paths vs [_normalize]).
+  /// align on Windows (mixed separators in analyzer paths vs `_normalize`).
   static String? _coerceToRegisteredPath(String path) {
-    for (final k in _rawImports.keys) {
-      if (_pathsSameFile(k, path)) return k;
-    }
-    return null;
+    final key = _canonicalPathKey(path);
+    return _registeredKeyByCanonical[key];
   }
 
-  static bool _pathsSameFile(String a, String b) {
-    final na = a.replaceAll('\\', '/');
-    final nb = b.replaceAll('\\', '/');
-    if (na == nb) return true;
-    if (Platform.isWindows && na.toLowerCase() == nb.toLowerCase()) {
-      return true;
+  static String _canonicalPathKey(String path) {
+    final normalized = path.replaceAll('\\', '/');
+    return Platform.isWindows ? normalized.toLowerCase() : normalized;
+  }
+
+  static void _buildRegisteredKeyLookup() {
+    _registeredKeyByCanonical.clear();
+    for (final registered in _rawImports.keys) {
+      _registeredKeyByCanonical[_canonicalPathKey(registered)] = registered;
     }
-    return false;
   }
 
   /// Get parent directory of a file path.
@@ -324,7 +369,24 @@ class ImportGraphTracker {
 
   /// Normalize a path: replace backslashes, resolve `.` and `..`.
   static String _normalize(String path) {
-    final parts = path.replaceAll('\\', '/').split('/');
+    final replaced = path.replaceAll('\\', '/');
+    // Fast path: most analyzer-generated paths don't contain `.` or `..`
+    // segments. Avoid splitting/iterating in those cases.
+    //
+    // Note: we intentionally check for `'/./'` and `'/../'` (segment-level),
+    // not for '.' in filenames like `foo.dart`.
+    final hasDotSegments =
+        replaced.contains('/./') ||
+        replaced.contains('/../') ||
+        replaced.startsWith('./') ||
+        replaced.startsWith('../') ||
+        replaced.endsWith('/.') ||
+        replaced.endsWith('/..') ||
+        replaced == '.' ||
+        replaced == '..';
+    if (!hasDotSegments) return replaced;
+
+    final parts = replaced.split('/');
     final normalized = <String>[];
     for (final part in parts) {
       if (part == '..') {
@@ -335,10 +397,10 @@ class ImportGraphTracker {
     }
     // Preserve drive letter on Windows (e.g. D:)
     final result = normalized.join('/');
-    if (Platform.isWindows && path.length >= 2 && path[1] == ':') {
+    if (Platform.isWindows && replaced.length >= 2 && replaced[1] == ':') {
       return result;
     }
-    return path.startsWith('/') ? '/$result' : result;
+    return replaced.startsWith('/') ? '/$result' : result;
   }
 
   // ══════════════════════════════════════════════════════════════════
@@ -363,35 +425,230 @@ class ImportGraphTracker {
   // ══════════════════════════════════════════════════════════════════
 
   static void _computeFanIn() {
-    for (final file in _rawImports.keys) {
-      final direct = (_importedBy[file] ?? const <String>{}).length;
-      final indirect = _countTransitiveImporters(file) - direct;
+    final files = _rawImports.keys.toList(growable: false);
+    final n = files.length;
+    if (n == 0) return;
+
+    // Build adjacency list on the reverse graph: fileIndex -> importerIndex.
+    final indexOf = <String, int>{};
+    for (var i = 0; i < n; i++) {
+      indexOf[files[i]] = i;
+    }
+
+    final adj = List<List<int>>.generate(n, (_) => <int>[]);
+    final directCounts = List<int>.filled(n, 0, growable: false);
+    final indegreeNode = List<int>.filled(n, 0, growable: false);
+    for (var i = 0; i < n; i++) {
+      final file = files[i];
+      final importers = _importedBy[file] ?? const <String>{};
+      directCounts[i] = importers.length;
+      for (final importer in importers) {
+        final j = indexOf[importer];
+        if (j == null) continue;
+        adj[i].add(j);
+        indegreeNode[j]++;
+      }
+    }
+
+    // Fast path: if the reverse graph is acyclic, compute transitive importer
+    // sets directly on node-level DAG (faster than SCC condensation).
+    final topoNode = <int>[];
+    final queueNode = <int>[];
+    for (var i = 0; i < n; i++) {
+      if (indegreeNode[i] == 0) queueNode.add(i);
+    }
+    while (queueNode.isNotEmpty) {
+      final v = queueNode.removeLast();
+      topoNode.add(v);
+      for (final w in adj[v]) {
+        indegreeNode[w]--;
+        if (indegreeNode[w] == 0) queueNode.add(w);
+      }
+    }
+    if (topoNode.length == n) {
+      final words = (n + 63) >> 6;
+      final reach = List<Uint64List>.generate(n, (_) => Uint64List(words));
+
+      for (final v in topoNode.reversed) {
+        final reachV = reach[v];
+        for (final w in adj[v]) {
+          reachV[w >> 6] |= (1 << (w & 63));
+          final reachW = reach[w];
+          for (var k = 0; k < words; k++) {
+            reachV[k] |= reachW[k];
+          }
+        }
+      }
+
+      for (var i = 0; i < n; i++) {
+        var transitiveCount = 0;
+        final bits = reach[i];
+        for (var w = 0; w < words; w++) {
+          transitiveCount += _popcount64(bits[w]);
+        }
+        final direct = directCounts[i];
+        final indirect = transitiveCount - direct;
+        _importanceScores[files[i]] =
+            direct + (indirect * _transitiveImportWeight);
+      }
+      return;
+    }
+
+    // Fallback: SCC condensation for cyclic graphs.
+    final indexArr = List<int>.filled(n, -1, growable: false);
+    final lowlink = List<int>.filled(n, 0, growable: false);
+    final onStack = List<bool>.filled(n, false, growable: false);
+    final stack = <int>[];
+    var indexCounter = 0;
+
+    var sccCount = 0;
+    final sccId = List<int>.filled(n, -1, growable: false);
+    final sccSizes = <int>[];
+
+    void strongconnect(int v) {
+      indexArr[v] = indexCounter;
+      lowlink[v] = indexCounter;
+      indexCounter++;
+
+      stack.add(v);
+      onStack[v] = true;
+
+      for (final w in adj[v]) {
+        if (indexArr[w] == -1) {
+          strongconnect(w);
+          // lowlink[v] = min(lowlink[v], lowlink[w])
+          if (lowlink[w] < lowlink[v]) lowlink[v] = lowlink[w];
+        } else if (onStack[w]) {
+          // lowlink[v] = min(lowlink[v], indexArr[w])
+          if (indexArr[w] < lowlink[v]) lowlink[v] = indexArr[w];
+        }
+      }
+
+      if (lowlink[v] == indexArr[v]) {
+        var size = 0;
+        while (true) {
+          final w = stack.removeLast();
+          onStack[w] = false;
+          sccId[w] = sccCount;
+          size++;
+          if (w == v) break;
+        }
+        sccSizes.add(size);
+        sccCount++;
+      }
+    }
+
+    for (var v = 0; v < n; v++) {
+      if (indexArr[v] == -1) strongconnect(v);
+    }
+
+    // Condensation DAG edges between SCCs.
+    // We intentionally allow duplicate edges here: reachability is computed
+    // via bitset OR (idempotent), and Kahn's topo sort remains correct as
+    // indegrees are decremented per edge occurrence.
+    final dag = List<List<int>>.generate(sccCount, (_) => <int>[]);
+    final indegree = List<int>.filled(sccCount, 0, growable: false);
+    for (var v = 0; v < n; v++) {
+      final sv = sccId[v];
+      for (final w in adj[v]) {
+        final sw = sccId[w];
+        if (sv == sw) continue;
+        dag[sv].add(sw);
+        indegree[sw]++;
+      }
+    }
+
+    // Topo sort SCC DAG.
+    final queue = <int>[];
+    for (var s = 0; s < sccCount; s++) {
+      if (indegree[s] == 0) queue.add(s);
+    }
+    final topo = <int>[];
+    while (queue.isNotEmpty) {
+      final s = queue.removeLast();
+      topo.add(s);
+      for (final t in dag[s]) {
+        indegree[t]--;
+        if (indegree[t] == 0) queue.add(t);
+      }
+    }
+
+    // SCC reachability via DP with bitsets on the SCC DAG.
+    final m = sccCount;
+    final wordsM = (m + 63) >> 6;
+    final reachScc = List<Uint64List>.generate(m, (_) => Uint64List(wordsM));
+
+    for (final s in topo.reversed) {
+      final reachS = reachScc[s];
+      for (final t in dag[s]) {
+        // Include t itself.
+        reachS[t >> 6] |= (1 << (t & 63));
+        // Include everything t can reach.
+        final reachT = reachScc[t];
+        for (var w = 0; w < wordsM; w++) {
+          reachS[w] |= reachT[w];
+        }
+      }
+    }
+
+    // Compute transitive importer counts per SCC:
+    // includes (sccSize - 1) nodes inside SCC (excluding starting node),
+    // plus all nodes in reachable other SCCs.
+    final reachCountOtherScc = List<int>.filled(m, 0, growable: false);
+    for (var s = 0; s < m; s++) {
+      var sum = 0;
+      final bits = reachScc[s];
+      for (var t = 0; t < m; t++) {
+        if ((bits[t >> 6] & (1 << (t & 63))) == 0) continue;
+        sum += sccSizes[t];
+      }
+      reachCountOtherScc[s] = sum;
+    }
+
+    for (var i = 0; i < n; i++) {
+      final file = files[i];
+      final s = sccId[i];
+      final transitiveCount = (sccSizes[s] - 1) + reachCountOtherScc[s];
+      final direct = directCounts[i];
+      final indirect = transitiveCount - direct;
       _importanceScores[file] = direct + (indirect * _transitiveImportWeight);
     }
   }
 
-  /// Count all transitive importers of [file] via BFS.
-  static int _countTransitiveImporters(String file) {
-    final visited = <String>{file};
-    final queue = <String>[...(_importedBy[file] ?? const <String>{})];
+  static int _popcount64(int x) {
+    var v = x;
     var count = 0;
-    while (queue.isNotEmpty) {
-      final current = queue.removeLast();
-      if (!visited.add(current)) continue;
-      count++;
-      final importers = _importedBy[current];
-      if (importers != null) queue.addAll(importers);
+    while (v != 0) {
+      count += _popcount8[v & 0xFF];
+      v = v >>> 8;
     }
     return count;
   }
+
+  static final List<int> _popcount8 = List<int>.generate(256, (i) {
+    var v = i;
+    var c = 0;
+    while (v != 0) {
+      v &= v - 1;
+      c++;
+    }
+    return c;
+  }, growable: false);
 
   // ══════════════════════════════════════════════════════════════════
   // Private — Layer Classification
   // ══════════════════════════════════════════════════════════════════
 
   static void _classifyLayers() {
+    final root = _projectRoot;
+    final rootPath = root?.replaceAll('\\', '/');
+
     for (final file in _rawImports.keys) {
-      final relativePath = _toRelative(file);
+      final fileNorm = file.replaceAll('\\', '/');
+      final relativePath = rootPath != null && fileNorm.startsWith('$rootPath/')
+          ? fileNorm.substring(rootPath.length + 1)
+          : fileNorm;
+
       final (layer, weight) = _classifyFile(relativePath);
       _layers[file] = layer;
       _layerWeights[file] = weight;
@@ -400,27 +657,36 @@ class ImportGraphTracker {
 
   /// Classify a relative file path into an architectural layer.
   static (String, double) _classifyFile(String relativePath) {
-    final normalized = relativePath.replaceAll('\\', '/').toLowerCase();
+    // `relativePath` is already normalized to `/` by `_classifyLayers`.
+    // Avoid allocating a lowercase copy when the path is already lowercase.
+    final normalized = _toLowerAsciiIfNeeded(relativePath);
 
     for (final (layer, patterns, weight) in _layerRules) {
       for (final pattern in patterns) {
         if (pattern.endsWith('.dart')) {
           // Filename match (e.g. main.dart)
-          if (normalized.endsWith('/$pattern') ||
-              normalized == pattern ||
-              normalized.endsWith(pattern)) {
+          if (normalized.endsWith('/$pattern') || normalized == pattern) {
             return (layer, weight);
           }
         } else {
           // Directory match
-          if (normalized.contains('/$pattern') ||
-              normalized.startsWith(pattern)) {
+          if (normalized.contains('/$pattern')) {
             return (layer, weight);
           }
         }
       }
     }
     return ('other', 1.0);
+  }
+
+  static String _toLowerAsciiIfNeeded(String value) {
+    for (var i = 0; i < value.length; i++) {
+      final c = value.codeUnitAt(i);
+      if (c >= 0x41 && c <= 0x5A) {
+        return value.toLowerCase();
+      }
+    }
+    return value;
   }
 
   /// Convert an absolute path to relative (from project root).

@@ -100,7 +100,7 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: prefer_debugprint
+// Test fixture for: prefer_debug_print
 // Source: lib\src\rules\debug_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
@@ -109,15 +109,15 @@ dynamic item;
 final largeList = List.generate(1000, (i) => i);
 dynamic output;
 
-// BAD: Should trigger prefer_debugprint
-// expect_lint: prefer_debugprint
+// BAD: Should trigger prefer_debug_print
+// expect_lint: prefer_debug_print
 void _bad309() {
   for (final item in largeList) {
     print('Processing: $item'); // Can overflow console buffer!
   }
 }
 
-// GOOD: Should NOT trigger prefer_debugprint
+// GOOD: Should NOT trigger prefer_debug_print
 void _good309() {
   for (final item in largeList) {
     debugPrint('Processing: $item'); // Throttled output

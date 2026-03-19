@@ -38,6 +38,7 @@ custom_lint:
     - prefer_sentence_case_comments: true
     # - prefer_sentence_case_comments_relaxed: true  # Alternative: skips ≤4-word comments
     - prefer_todo_format: true
+    - prefer_hack_format: true
 
     # === Code style preferences ===
     - prefer_all_named_parameters: true

@@ -12,6 +12,7 @@ include: package:saropa_lints/tiers/recommended.yaml
 analyzer:
   errors:
     todo: ignore
+    hack: ignore
     # Analyzer 9 marks ClassDeclaration.body as experimental; ignore for analyzer-9 compatibility (8.0.x).
     experimental_member_use: ignore
   exclude:
@@ -41,7 +42,7 @@ linter:
 
 plugins:
   saropa_lints:
-    version: "9.8.2"
+    version: "9.8.1"
     # ═══════════════════════════════════════════════════════════════════
     # SAROPA LINTS CONFIGURATION
     # ═══════════════════════════════════════════════════════════════════
@@ -548,7 +549,7 @@ plugins:
       prefer_correct_type_name: true  # [WARNING] Type name is not UpperCamelCase. Nonstandard type names reduce code readability and break Dart conventions. Quick fix available: Adds a comment to flag for manual review. {v4}
       prefer_cursor_for_buttons: true  # [INFO] Interactive widget on web/desktop without a pointer cursor leaves the default arrow cursor, giving users no visual indication that the element is clickable. This violates web platform conventions and reduces discoverability of interactive elements, especially for GestureDetector-based custom buttons. {v6}
       prefer_data_masking: true  # [INFO] Unmasked sensitive data visible in UI and screenshots. Sensitive data (SSN, credit cards, passwords) must be partially masked when displayed to prevent shoulder surfing. {v4}
-      prefer_debugprint: true  # [INFO] print() should use debugPrint() for throttled console output. {v1}
+      prefer_debug_print: true  # [INFO] print() should use debugPrint() for throttled console output. {v1}
       prefer_define_hero_tag: true  # [WARNING] Hero widget without an explicit tag defaults to the widget itself, causing conflicts when multiple Hero widgets exist on the same screen. Duplicate tags trigger runtime assertion errors that crash the app during navigation transitions. {v4}
       prefer_delayed_permission_prompt: true  # [WARNING] Permission request detected in main() or initState(). Asking too early reduces acceptance rates. {v2}
       prefer_dispose_before_new_instance: true  # [WARNING] Reassigning without dispose leaks the old instance. Listeners and resources remain active forever. {v4}

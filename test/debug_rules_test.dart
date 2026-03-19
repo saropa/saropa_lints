@@ -42,10 +42,10 @@ void main() {
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
-    test('PreferDebugPrintRule (prefer_debugprint)', () {
+    test('PreferDebugPrintRule (prefer_debug_print)', () {
       final rule = PreferDebugPrintRule();
-      expect(rule.code.name, 'prefer_debugprint');
-      expect(rule.code.problemMessage, contains('[prefer_debugprint]'));
+      expect(rule.code.name, 'prefer_debug_print');
+      expect(rule.code.problemMessage, contains('[prefer_debug_print]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -92,7 +92,7 @@ void main() {
       'avoid_unguarded_debug',
       'prefer_commenting_analyzer_ignores',
       'prefer_conditional_logging',
-      'prefer_debugprint',
+      'prefer_debug_print',
       'avoid_print_in_release',
       'require_structured_logging',
       'avoid_sensitive_in_logs',
@@ -186,7 +186,7 @@ void main() {
         expect('commented analyzer ignores', isNotNull);
       });
     });
-    group('prefer_debugprint', () {
+    group('prefer_debug_print', () {
       test('print() for debug output SHOULD trigger', () {
         expect('print() for debug output', isNotNull);
       });

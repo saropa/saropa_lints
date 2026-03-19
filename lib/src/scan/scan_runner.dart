@@ -158,7 +158,11 @@ class ScanRunner {
     final root = p.absolute(targetPath);
     var list = raw
         .where((path) => path.trim().isNotEmpty)
-        .map((path) => p.isAbsolute(path) ? p.normalize(path) : p.normalize(p.join(root, path)))
+        .map(
+          (path) => p.isAbsolute(path)
+              ? p.normalize(path)
+              : p.normalize(p.join(root, path)),
+        )
         .where((path) => path.endsWith('.dart'))
         .toList();
     if (applyExclusionsToFileList) {

@@ -12,7 +12,11 @@ void main() {
         runInShell: true,
         workingDirectory: Directory.current.path,
       );
-      expect(result.exitCode, 2, reason: 'Expected exit 2 when --tier has no value');
+      expect(
+        result.exitCode,
+        2,
+        reason: 'Expected exit 2 when --tier has no value',
+      );
       expect(result.stdout.toString(), contains('--tier requires a value'));
     });
   });
@@ -41,9 +45,19 @@ void main() {
     });
 
     test('--files collects paths until next option', () {
-      final result = parseScanArgs(<String>['.', '--files', 'lib/a.dart', 'lib/b.dart', '--tier', 'recommended']);
+      final result = parseScanArgs(<String>[
+        '.',
+        '--files',
+        'lib/a.dart',
+        'lib/b.dart',
+        '--tier',
+        'recommended',
+      ]);
       expect(result, isA<ScanParseOk>());
-      expect((result as ScanParseOk).args.dartFiles, ['lib/a.dart', 'lib/b.dart']);
+      expect((result as ScanParseOk).args.dartFiles, [
+        'lib/a.dart',
+        'lib/b.dart',
+      ]);
       expect((result).args.tier, 'recommended');
     });
 
@@ -53,11 +67,20 @@ void main() {
         stdinLines: ['lib/foo.dart', 'lib/bar.dart'],
       );
       expect(result, isA<ScanParseOk>());
-      expect((result as ScanParseOk).args.dartFiles, ['lib/foo.dart', 'lib/bar.dart']);
+      expect((result as ScanParseOk).args.dartFiles, [
+        'lib/foo.dart',
+        'lib/bar.dart',
+      ]);
     });
 
     test('--tier with value parses', () {
-      for (final tier in ['essential', 'recommended', 'professional', 'comprehensive', 'pedantic']) {
+      for (final tier in [
+        'essential',
+        'recommended',
+        'professional',
+        'comprehensive',
+        'pedantic',
+      ]) {
         final result = parseScanArgs(<String>['.', '--tier', tier]);
         expect(result, isA<ScanParseOk>(), reason: tier);
         expect((result as ScanParseOk).args.tier, tier);
@@ -67,7 +90,10 @@ void main() {
     test('--tier with no value returns invalid', () {
       final result = parseScanArgs(<String>['.', '--tier']);
       expect(result, isA<ScanParseInvalid>());
-      expect((result as ScanParseInvalid).message, contains('--tier requires a value'));
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--tier requires a value'),
+      );
       expect((result).message, contains('essential'));
     });
 

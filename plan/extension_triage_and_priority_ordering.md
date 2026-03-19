@@ -1,6 +1,6 @@
 # Extension-Driven Triage and Priority-Based Fix Ordering
 
-**Status:** Partially implemented (triage); priority ordering **implemented in plugin** (2026-03: import collection + project info wiring; Windows path key fix). Extension/UI follow-ups remain.  
+**Status:** Triage and extension UI flow implemented in `extension/`; priority ordering **implemented in plugin** (2026-03: import collection + project info wiring; Windows path key fix). Remaining gap: performance target (`<20ms`) for priority compute/report overhead.  
 **Priority:** High  
 **Impact:** User adoption, retention, upgrade experience, and actionable fix order
 
@@ -179,7 +179,8 @@ Deduplication must land first. Prioritization on duplicated data is meaningless.
 - **Tests:** `test/import_graph_tracker_test.dart` (package edge resolution, idempotent collect).
 - **Done (2026-03 follow-up):** Batch JSON field `ig` + `ConsolidatedData.mergedRawImports` + merge in `ReportConsolidator`; report hydrates graph from merged snapshot when non-empty. Relative vs absolute file paths aligned for FIX PRIORITY / FILE IMPORTANCE issue column.
 - **Done (correctness):** Progress/report counts are deduplicated by `(ruleName, offset)` and the consolidated report omits the legacy flat `ALL VIOLATIONS` section.
-- **Benchmarked (2026-03 follow-up):** Added `test/import_graph_tracker_perf_test.dart` to measure synthetic overhead for `ImportGraphTracker.compute()` plus ordering/traversal work. On this machine, the synthetic “200 files chain + 500 violations” case took ~60-80ms, so the “<20ms” target still needs optimization.
+- **Benchmarked (2026-03 follow-up):** Added `test/import_graph_tracker_perf_test.dart` to measure synthetic overhead for `ImportGraphTracker.compute()` plus ordering/traversal work. On this machine, the synthetic “200 files chain + 500 violations” case now measures ~31ms total (compute ~24ms), improved from ~60-80ms; the “<20ms” target still needs optimization.
+- **Extension UI follow-ups:** The extension-side triage prompts/history UX is implemented in this workspace (`extension/src/extension.ts`, `extension/src/views/triageTree.ts`, `extension/src/runHistory.ts`, `extension/src/views/overviewTree.ts`), so these items are no longer blocked by a missing extension repo.
 
 ## What the developer sees (end state)
 
@@ -409,7 +410,7 @@ In `AnalysisReporter._writeCombinedReport()`:
 | URI resolution | ~0.01ms per import | Once, during `compute()` |
 | Reverse graph + BFS | ~5ms for 200 files | Once, during `compute()` |
 | Tree rendering | ~10ms for 200 files | Once, during report write |
-| **Total overhead** | **~61ms observed** for synthetic “200-file chain” case in unit perf test | Needs optimization to meet “< 20ms per report” |
+| **Total overhead** | **~31ms observed** for synthetic “200-file chain” case in unit perf test | Improved, but still needs optimization to meet “< 20ms per report” |
 
 ## Edge cases (priority ordering)
 
@@ -434,7 +435,7 @@ In `AnalysisReporter._writeCombinedReport()`:
 - [x] Priority score formula: `impact_numeric * (fan_in + 1) * layer_weight`
 - [x] Circular imports detected and marked, don't cause infinite loops *(tree uses `[shown above]` for revisits)*
 - [x] Standalone files (fan-in 0) listed separately in structure tree
-- [ ] Performance overhead < 20ms per report write *(benchmarked locally: ~60-80ms for synthetic “200-file chain” case; optimization required to reliably meet <20ms)*
+- [ ] Performance overhead < 20ms per report write *(benchmarked locally: ~31ms for synthetic “200-file chain” case; improved but still above <20ms)*
 - [x] No changes to Problems tab output (report file only)
 - [x] `ImportGraphTracker.reset()` called in session reset to prevent stale data
 

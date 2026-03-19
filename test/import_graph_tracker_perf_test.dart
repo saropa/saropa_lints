@@ -36,10 +36,13 @@ void main() {
         ImportGraphTracker.collectImports(filePath, content);
       }
 
-      final sw = Stopwatch()..start();
+      final swTotal = Stopwatch()..start();
+      final swCompute = Stopwatch()..start();
       ImportGraphTracker.compute();
+      swCompute.stop();
 
       // FILE IMPORTANCE ranking work (same shape as report writer).
+      final swTable = Stopwatch()..start();
       final files = ImportGraphTracker.allFiles.toList(growable: false);
       final scored = <double>[];
       for (final file in files) {
@@ -49,8 +52,10 @@ void main() {
         ImportGraphTracker.getLayer(file);
       }
       scored.sort();
+      swTable.stop();
 
       // FIX PRIORITY ordering work (priority computation + sort).
+      final swPriority = Stopwatch()..start();
       final violations = <ViolationRecord>[];
       for (var i = 0; i < violationCount; i++) {
         final fileIndex = i % fileCount;
@@ -70,8 +75,10 @@ void main() {
           .map((v) => ImportGraphTracker.getPriority(v.file, LintImpact.high))
           .toList(growable: false);
       priorities.sort((a, b) => b.compareTo(a));
+      swPriority.stop();
 
       // PROJECT STRUCTURE traversal work (same graph walk style as writer).
+      final swDfs = Stopwatch()..start();
       final allFiles = ImportGraphTracker.allFiles;
       final visited = <String>{};
       final roots = files.where((f) {
@@ -92,16 +99,21 @@ void main() {
         dfs(r);
       }
 
-      sw.stop();
-      final ms = sw.elapsedMilliseconds;
+      swDfs.stop();
+      swTotal.stop();
+      final ms = swTotal.elapsedMilliseconds;
 
       // Gentle regression guard: report ordering work should not explode.
       // If this trips, the plan’s “<20ms overhead” assumption likely broke.
       expect(ms, lessThan(2000));
 
       stdout.writeln(
-        'ImportGraphTracker perf: compute+ordering for $fileCount files '
-        'and $violationCount violations took ${sw.elapsedMilliseconds}ms.',
+        'ImportGraphTracker perf: total=${swTotal.elapsedMilliseconds}ms '
+        '(compute=${swCompute.elapsedMilliseconds}ms, '
+        'table=${swTable.elapsedMilliseconds}ms, '
+        'priority=${swPriority.elapsedMilliseconds}ms, '
+        'dfs=${swDfs.elapsedMilliseconds}ms) '
+        'for $fileCount files and $violationCount violations.',
       );
     } finally {
       ImportGraphTracker.reset();

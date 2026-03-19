@@ -4820,7 +4820,7 @@ class NoRuntimeTypeToStringRule extends SaropaLintRule {
   String get exampleGood => "final isUser = user is User;";
 
   static const LintCode _code = LintCode(
-    'no_runtimeType_toString',
+    'no_runtimetype_tostring',
     '[no_runtimetype_tostring] Avoid calling toString() on runtimeType. This adds unnecessary string conversion and is often slower than direct type checks.',
     correctionMessage:
         'Use type checks (`is`) or compare `runtimeType` directly without converting to string.',
@@ -4927,7 +4927,7 @@ class UseTruncatingDivisionRule extends SaropaLintRule {
 }
 
 // =============================================================================
-// duplicate_ignore
+// duplicate_ignore_comment
 // =============================================================================
 
 /// Flags when the same diagnostic is listed more than once in a single
@@ -4964,8 +4964,8 @@ class DuplicateIgnoreRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    'duplicate_ignore',
-    '[duplicate_ignore] The same diagnostic is listed more than once in this ignore comment.',
+    'duplicate_ignore_comment',
+    '[duplicate_ignore_comment] The same diagnostic is listed more than once in this ignore comment.',
     correctionMessage: 'Remove the duplicate diagnostic name from the comment.',
     severity: DiagnosticSeverity.WARNING,
   );

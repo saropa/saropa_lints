@@ -16,23 +16,14 @@ library;
 /// - [codeSmell]: Maintainability; fix recommended; target zero false positives.
 /// - [securityHotspot]: Security-sensitive; review required (may be safe); target
 ///   high "resolved after review" rate.
-enum RuleType {
-  bug,
-  vulnerability,
-  codeSmell,
-  securityHotspot,
-}
+enum RuleType { bug, vulnerability, codeSmell, securityHotspot }
 
 /// Lifecycle status of a rule.
 ///
 /// - [ready]: Stable; recommended for production use.
 /// - [beta]: Under evaluation; may have more false positives or behavior changes.
 /// - [deprecated]: No longer recommended; will be removed in a future version.
-enum RuleStatus {
-  ready,
-  beta,
-  deprecated,
-}
+enum RuleStatus { ready, beta, deprecated }
 
 /// Optional accuracy target for a rule (for documentation and tooling).
 ///

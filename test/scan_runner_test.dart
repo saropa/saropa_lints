@@ -40,7 +40,11 @@ void main() {
       expect(result, isA<List<ScanDiagnostic>>());
       // All diagnostics should be from the single file we passed
       for (final d in result!) {
-        expect(d.filePath, endsWith('scan.dart'), reason: 'diagnostics should be from the single file requested');
+        expect(
+          d.filePath,
+          endsWith('scan.dart'),
+          reason: 'diagnostics should be from the single file requested',
+        );
       }
     });
 
