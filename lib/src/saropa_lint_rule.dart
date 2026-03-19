@@ -240,8 +240,9 @@ class ProgressTracker {
   static final Map<String, Map<String, int>> _issuesByFileBySeverity = {};
   static final Map<String, Map<String, int>> _issuesByFileByRule = {};
 
-  // Per-file dedup keys: 'ruleName:line' — prevents duplicate counting when
-  // the analyzer re-visits the same file without _clearFileData firing.
+  // Per-file dedup keys: 'ruleName:offset' — prevents duplicate counting when
+  // the analyzer reports the same lint at the same location multiple times
+  // within a session.
   static final Map<String, Set<String>> _fileViolationKeys = {};
 
   // Rolling rate samples for more stable ETA (last N samples)
@@ -383,13 +384,14 @@ class ProgressTracker {
     String? severity,
     String? ruleName,
     int line = 0,
+    int offset = 0,
   }) {
     // Dedup: skip if this exact violation was already counted for this file.
     // Prevents inflated counts when the analyzer re-visits a file without
     // _clearFileData firing (consecutive re-analysis of the same file).
     final currentFile = _currentFile;
     if (currentFile != null && ruleName != null) {
-      final key = '$ruleName:$line';
+      final key = '$ruleName:$offset';
       final keys = _fileViolationKeys[currentFile] ??= {};
       if (!keys.add(key)) return;
     }
@@ -2769,6 +2771,7 @@ class SaropaDiagnosticReporter {
       severity: lintCode.severity.name,
       ruleName: _ruleName,
       line: line,
+      offset: offset,
     );
   }
 }

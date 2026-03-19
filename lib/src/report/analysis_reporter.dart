@@ -298,7 +298,6 @@ class AnalysisReporter {
     _writeTopRulesFromMap(buf, data.issuesByRule, data.ruleSeverities);
     _writeFileImportance(buf, data.issuesByFile);
     _writePrioritizedViolations(buf, data.violations);
-    _writeViolationList(buf, data.violations);
     _writeProjectStructure(buf);
 
     buf.writeln('${'=' * 70}');
