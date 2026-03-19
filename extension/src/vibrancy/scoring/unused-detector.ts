@@ -23,6 +23,10 @@ export function detectUnused(
     );
 }
 
+/**
+ * Returns true if the package is treated as a platform/federated plugin and
+ * should not be reported as unused. Uses known suffixes and a parent-package heuristic.
+ */
 function isPlatformPlugin(name: string, imported: ReadonlySet<string>): boolean {
     // 1) Existing suffix check for known platform implementation packages.
     if (PLATFORM_SUFFIXES.some(suffix => name.endsWith(suffix))) {

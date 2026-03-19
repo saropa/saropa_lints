@@ -31,6 +31,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 • **Package Vibrancy** — Unused-package detection no longer flags federated platform plugins with non-standard suffixes (e.g. `google_maps_flutter_ios_sdk10`) when the parent package is in `dependencies` or `dev_dependencies`; uses a parent-package heuristic in addition to the existing hard-coded suffix list.
 
+• **Package Vibrancy** — Report and webview titles use "Package Vibrancy Report" consistently (removed leftover "Saropa " from markdown export and HTML/webview panel).
+
 ### Added
 
 • **Extension** — **Explain rule**: right-click any violation in the Issues view (or run **Saropa Lints: Explain rule** from the command palette) to open a side tab with full rule details: problem message, how to fix, severity, impact, OWASP mapping (when present), and a link to the ROADMAP. The panel reuses a single tab; the documentation link opens in the default browser.

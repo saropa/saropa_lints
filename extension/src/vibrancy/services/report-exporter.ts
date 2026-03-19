@@ -67,7 +67,7 @@ function buildMarkdownReport(
 
 function mdHeader(meta: ReportMetadata, isoTimestamp: string): string[] {
     return [
-        '# Saropa Package Vibrancy Report', '',
+        '# Package Vibrancy Report', '',
         `| | |`, `|---|---|`,
         `| Timestamp | ${isoTimestamp} |`,
         `| Flutter | ${meta.flutterVersion} |`,
