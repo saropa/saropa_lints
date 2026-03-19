@@ -1,13 +1,13 @@
 /// Parsed scan CLI arguments for the scan command.
 ///
 /// This library provides [parseScanArgs], which parses the argument list
-/// for `dart run saropa_lints:scan`. It is used by [bin/scan.dart] and is
+/// for `dart run saropa_lints:scan`. It is used by `bin/scan.dart` and is
 /// extracted here so that CLI behavior can be unit-tested without
 /// running the full binary.
 ///
 /// **Usage from the binary:** Call [parseScanArgs] with [readStdin] set to
 /// a function that reads lines from process stdin (used when [--files-from-stdin]
-/// is present). The binary passes `_readStdinLines` from [bin/scan.dart].
+/// is present). The binary passes `_readStdinLines` from `bin/scan.dart`.
 ///
 /// **Usage from tests:** Call [parseScanArgs] with [stdinLines] set to a
 /// fixed list of paths so that stdin is not read. Omit [readStdin].
@@ -59,8 +59,9 @@ ScanParseResult parseScanArgs(
   List<String>? stdinLines,
   List<String> Function()? readStdin,
 }) {
-  final positionals =
-      args.where((a) => !a.startsWith('--') && a != 'scan').toList();
+  final positionals = args
+      .where((a) => !a.startsWith('--') && a != 'scan')
+      .toList();
   final path = positionals.isNotEmpty ? positionals.first : '.';
 
   List<String> dartFiles = [];
@@ -105,10 +106,12 @@ ScanParseResult parseScanArgs(
     }
     i++;
   }
-  return ScanParseOk(ScanCliArgs(
-    path: path,
-    dartFiles: dartFiles,
-    tier: tier,
-    formatJson: formatJson,
-  ));
+  return ScanParseOk(
+    ScanCliArgs(
+      path: path,
+      dartFiles: dartFiles,
+      tier: tier,
+      formatJson: formatJson,
+    ),
+  );
 }

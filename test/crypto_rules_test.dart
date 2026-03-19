@@ -82,10 +82,13 @@ void main() {
       final rule = RequireUniqueIvPerEncryptionRule();
       expect(rule.cweIds, contains(329));
     });
-    test('secure key generation maps to CWE-335 (predictable PRNG / key material)', () {
-      final rule = RequireSecureKeyGenerationRule();
-      expect(rule.cweIds, contains(335));
-    });
+    test(
+      'secure key generation maps to CWE-335 (predictable PRNG / key material)',
+      () {
+        final rule = RequireSecureKeyGenerationRule();
+        expect(rule.cweIds, contains(335));
+      },
+    );
   });
 
   group('Cryptography Rules - Fixture Verification', () {

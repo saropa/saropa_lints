@@ -17,8 +17,6 @@
 // ignore_for_file: argument_type_not_assignable
 // ignore_for_file: invalid_constructor_name
 // ignore_for_file: super_formal_parameter_without_associated_named
-// ignore_for_file: undefined_annotation, creation_with_non_type
-// ignore_for_file: invalid_factory_name_not_a_class
 // ignore_for_file: invalid_reference_to_this
 // ignore_for_file: expected_class_member
 // ignore_for_file: body_might_complete_normally
@@ -100,18 +98,19 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: prefer_todo_format
+// Test fixture for: prefer_hack_format
 // Source: lib\src\rules\stylistic_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_todo_format
-// expect_lint: prefer_todo_format
-void _bad1131() {
-  // TODO: Add code that triggers prefer_todo_format
+// BAD: Should trigger prefer_hack_format
+// expect_lint: prefer_hack_format
+void _bad1133() {
+  // HACK: Add code that triggers prefer_hack_format
 }
 
-// GOOD: Should NOT trigger prefer_todo_format
-void _good1131() {
-  // No TODO marker here
+// GOOD: Should NOT trigger prefer_hack_format
+void _good1133() {
+  // No hack marker here
 }
+

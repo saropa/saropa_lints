@@ -86,7 +86,9 @@ class ViolationExporter {
       final encoded = const JsonEncoder.withIndent('  ').convert(json);
       _writeAtomicFile(projectRoot, _consumerContractFileName, encoded);
     } catch (e) {
-      stderr.writeln('[saropa_lints] Could not write consumer_contract.json: $e');
+      stderr.writeln(
+        '[saropa_lints] Could not write consumer_contract.json: $e',
+      );
     }
   }
 

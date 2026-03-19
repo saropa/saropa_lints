@@ -1399,7 +1399,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_contradictory_expressions',
   'avoid_controller_in_build',
   'avoid_debug_print',
-  'prefer_debugprint',
+  'prefer_debug_print',
   'avoid_double_slash_imports',
   'avoid_duplicate_number_elements',
   'avoid_duplicate_string_elements',
@@ -2859,10 +2859,9 @@ const Set<String> comprehensiveOnlyRules = <String>{
 
   // v4.15.0 - ROADMAP ⭐ Rules (Comprehensive)
   'avoid_redundant_semantics', // INFO - Semantics wrapping Image with semanticLabel
-
   // Additional rules (plan_additional_rules_1_through_10)
   'argument_must_be_native',
-  'duplicate_ignore',
+  'duplicate_ignore_comment',
   'external_with_initializer',
   'illegal_enum_values',
   'invalid_runtime_check_with_js_interop_types',

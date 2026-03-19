@@ -3,7 +3,7 @@
 /// Canonical health score constants used by the violation export and the VS Code extension.
 ///
 /// The extension's [healthScore.ts] must keep the same values so that
-/// [getHealthScoreParams()] and [consumer_contract.json] match.
+/// [getHealthScoreParams()] and `consumer_contract.json` match.
 ///
 /// Formula: score = 100 * exp(-density * decayRate), where density is
 /// weighted violations per file and weights are applied per impact level.
