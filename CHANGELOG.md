@@ -27,6 +27,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ## [Unreleased]
 
+### Fixed
+
+• **Package** — Analysis log report sections **FILE IMPORTANCE**, **FIX PRIORITY**, and **PROJECT STRUCTURE** now receive import graph data: `ImportGraphTracker.collectImports` runs from `SaropaContext` on each analyzed file (right after the file is recorded for progress), and `ImportGraphTracker.setProjectInfo` runs from `AnalysisReporter.initialize` so `package:` self-imports resolve. If the reporter is never initialized (e.g. progress reporting off), `collectImports` infers project root and package name from the file path once. Windows path keys (`\` vs `/`) are aligned when resolving edges so the graph matches analyzer file paths.
+
 ### Added
 
 • **Extension** — **Drift Advisor integration (optional):** When using a Dart/Drift project and a running Saropa Drift Advisor server, enable `saropaLints.driftAdvisor.integration` in settings. The extension discovers the server (ports 8642–8649 by default via GET /api/health), fetches index suggestions and anomalies (GET /api/issues when supported, else legacy endpoints), maps table/column to Dart file/line via PascalCase/camelCase heuristics, and shows issues in the **Drift Advisor** sidebar view and optionally in the Problems list (source "Saropa Drift Advisor"). Settings: integration, portRange, pollIntervalMs, showInProblems. Commands: Refresh, Open in Browser. No dependency on the Drift Advisor extension at install time. See About Saropa Lints and plan in bugs/history.

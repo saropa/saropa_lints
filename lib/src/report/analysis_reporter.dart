@@ -96,9 +96,17 @@ class AnalysisReporter {
   ///
   /// Joins an existing session (from a prior isolate in the same
   /// analysis run) or creates a new one. Safe to call multiple times.
+  ///
+  /// Sets [ImportGraphTracker] project root and package name on first init
+  /// so `package:` self-imports resolve before any [ImportGraphTracker.collectImports]
+  /// calls (collection runs from [ProgressTracker.recordFile] on the first file).
   static void initialize(String projectRoot) {
     if (_projectRoot != null) return;
     _projectRoot = projectRoot;
+    ImportGraphTracker.setProjectInfo(
+      projectRoot,
+      ProjectContext.getPackageName(projectRoot),
+    );
     _hasPathsLogged = false;
     _sessionId = ReportConsolidator.initSession(projectRoot);
     _isolateId = _generateIsolateId();

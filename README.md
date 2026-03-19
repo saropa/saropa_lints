@@ -114,6 +114,8 @@ violations.json        ───►  Health Score, Issues, Security,
 
 The **Dart package** provides 2050+ lint rules via the native analyzer plugin. The **VS Code extension** reads `violations.json` and provides the UI: Health Score, Issues tree, Security Posture, File Risk, and Config/Triage. Optional **Drift Advisor** integration shows index suggestions and data-quality anomalies from a running Drift Advisor server in a dedicated sidebar view and in Problems. Both are published together and versioned in sync.
 
+**Rule metadata:** Each rule can expose optional semantics—`RuleType` (bug, vulnerability, code smell, security hotspot), `tags`, MITRE **CWE** IDs, and `RuleStatus` (e.g. beta)—for compliance and future quality gates. Defaults are backward compatible; see [CONTRIBUTING.md](CONTRIBUTING.md) and [bugs/discussion/RULE_METADATA_BULK_STATUS.md](bugs/discussion/RULE_METADATA_BULK_STATUS.md).
+
 ---
 
 ## Why Saropa Lints?
@@ -790,6 +792,8 @@ dart analyze
 ```
 
 Saropa Lints runs as a native Dart analyzer plugin. Issues appear automatically in your IDE's Problems panel and in `dart analyze` output.
+
+When analysis runs with reporting enabled, the plugin also writes a combined log under `reports/<date>/` (filename contains `_saropa_lint_report`). That file includes **FILE IMPORTANCE** (fan-in × layer), **FIX PRIORITY** (violations sorted by impact × importance), and **PROJECT STRUCTURE** (import tree), built from import data collected during analysis.
 
 ### Impact Report
 
