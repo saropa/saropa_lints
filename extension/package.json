@@ -96,6 +96,10 @@
           "name": "Package Details",
           "type": "webview",
           "when": "saropaLints.packageVibrancy.hasResults"
+        },
+        {
+          "id": "saropaLints.todosAndHacks",
+          "name": "TODOs & Hacks"
         }
       ]
     },
@@ -339,6 +343,11 @@
         "command": "saropaLints.showAbout",
         "title": "About Saropa Lints",
         "icon": "$(info)"
+      },
+      {
+        "command": "saropaLints.createSaropaInstructions",
+        "title": "Create Saropa Lints Instructions for AI Agents",
+        "icon": "$(book)"
       },
       {
         "command": "saropaLints.packageVibrancy.scan",
@@ -606,6 +615,16 @@
         "command": "saropaLints.packageVibrancy.expandAll",
         "title": "Expand All",
         "icon": "$(expand-all)"
+      },
+      {
+        "command": "saropaLints.todosAndHacks.refresh",
+        "title": "TODOs & Hacks: Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "saropaLints.todosAndHacks.toggleGroupByTag",
+        "title": "TODOs & Hacks: Toggle group by tag / folder",
+        "icon": "$(list-tree)"
       }
     ],
     "menus": {
@@ -652,6 +671,11 @@
         },
         {
           "command": "saropaLints.showAbout",
+          "when": "view == saropaLints.overview",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.createSaropaInstructions",
           "when": "view == saropaLints.overview",
           "group": "navigation"
         },
@@ -784,6 +808,16 @@
           "command": "saropaLints.packageVibrancy.generateCiConfig",
           "when": "view == saropaLints.packageVibrancy.packages && saropaLints.packageVibrancy.hasResults",
           "group": "3_ci@1"
+        },
+        {
+          "command": "saropaLints.todosAndHacks.refresh",
+          "when": "view == saropaLints.todosAndHacks",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.todosAndHacks.toggleGroupByTag",
+          "when": "view == saropaLints.todosAndHacks",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
@@ -1107,6 +1141,50 @@
             "type": "boolean",
             "default": true,
             "description": "Periodically check for newer versions of the saropa_lints package and offer to upgrade."
+          }
+        }
+      },
+      {
+        "title": "TODOs & Hacks",
+        "properties": {
+          "saropaLints.todosAndHacks.tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": ["TODO", "FIXME", "HACK", "XXX", "BUG"],
+            "description": "Tags to search for in comments (case-sensitive in regex)."
+          },
+          "saropaLints.todosAndHacks.includeGlobs": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": ["**/*.dart", "**/*.yaml", "**/*.md", "**/*.ts", "**/*.js"],
+            "description": "Glob patterns for files to scan."
+          },
+          "saropaLints.todosAndHacks.excludeGlobs": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": ["**/node_modules/**", "**/.dart_tool/**", "**/build/**", "**/.git/**"],
+            "description": "Extra exclude patterns (merged with search.exclude)."
+          },
+          "saropaLints.todosAndHacks.maxFilesToScan": {
+            "type": "number",
+            "default": 2000,
+            "minimum": 1,
+            "description": "Maximum number of files to scan; view shows a message when capped."
+          },
+          "saropaLints.todosAndHacks.autoRefresh": {
+            "type": "boolean",
+            "default": true,
+            "description": "Refresh the TODOs & Hacks view when a file is saved (debounced)."
+          },
+          "saropaLints.todosAndHacks.groupByTag": {
+            "type": "boolean",
+            "default": false,
+            "description": "Group tree by tag (TODO, FIXME, …) then by file; when off, group by folder then file."
+          },
+          "saropaLints.todosAndHacks.customRegex": {
+            "type": "string",
+            "default": "",
+            "description": "Optional regex override for matching comment markers. Line-based; use capture group 1 for tag and optional group 2 for snippet. Empty = use default (//, #, <!-- + tags). Invalid regex falls back to default."
           }
         }
       },
@@ -1589,7 +1667,8 @@
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run precompile && npm run check-types && node esbuild.js --production",
-    "lint": "tsc --noEmit -p ./"
+    "lint": "tsc --noEmit -p ./",
+    "test": "tsc -p tsconfig.todosAndHacks.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" --timeout 5000"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

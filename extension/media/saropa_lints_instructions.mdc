@@ -1,0 +1,37 @@
+---
+description: Saropa Lints project guidelines for AI agents
+globs:
+alwaysApply: true
+---
+
+Guidelines when working on the saropa_lints codebase (Dart custom lint rules package).
+
+# Essential Files to Update
+
+- **New rule:** Register in [lib/src/rules/all_rules.dart](lib/src/rules/all_rules.dart) and [lib/src/tiers.dart](lib/src/tiers.dart). Add entry to [ROADMAP.md](ROADMAP.md).
+- **Structural changes:** Update [CODEBASE_INDEX.md](CODEBASE_INDEX.md) and [CODE_INDEX.md](CODE_INDEX.md) when adding utilities or moving files.
+- **Before publish:** Update [CHANGELOG.md](CHANGELOG.md).
+
+# Workflow
+
+- **Adding a rule:** Implement in appropriate `lib/src/rules/*_rules.dart`, extend `DartLintRule` or `SaropaLintRule`, add DartDoc with Bad/Good examples, register in all_rules.dart and tiers.dart, add ROADMAP entry, add fixture in `example/` (mark violations with `// LINT`) and unit test in `test/`.
+- **Validation:** Run `/analyze`, `/test`, `/format`. Use `Skill(lint-rules)` when adding or modifying rules.
+- **Example dirs:** All `example*/` must be in `analysis_options.yaml` under `analyzer > exclude` (they contain intentional violations).
+
+# You Must NOT
+
+- Add or support `// ignore:` or `// ignore_for_file:` (no quick fixes that insert ignore; no custom ignore-detection in rules). Fix the rule or the code instead.
+- Add quick fixes that only insert a `// TODO: ...` comment; fixes must make a real code change that resolves the violation.
+- Add Co-authored-by, AI attribution, or emojis to commit messages.
+
+# Principles
+
+- **Search first:** Check CODE_INDEX.md and lib/src utilities before adding new code.
+- **ProjectContext:** Use for package detection, platform detection, file classification—do not reimplement.
+- **Type checking** over string matching; **early returns** for simple checks.
+- **Code quality:** Functions ≤50 lines, parameters ≤3, nesting ≤3, files ≤200 lines (self-reviewer enforces).
+
+# Commands and Skills
+
+- `/analyze`, `/test`, `/format`, `/review`, `/commit` as in [CLAUDE.md](CLAUDE.md).
+- `Skill(lint-rules)` for rule work; `Skill(publishing)` for releasing.
