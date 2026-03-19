@@ -3955,3 +3955,171 @@ class AvoidImportingEntrypointExportsRule extends SaropaLintRule {
     }
   }
 }
+
+// =============================================================================
+// illegal_enum_values
+// =============================================================================
+
+/// An enum must not declare an instance member named `values`, because enums
+/// expose a static `values` getter and the instance member would shadow or
+/// conflict.
+///
+/// **Bad:**
+/// ```dart
+/// enum E { a, b; int get values => 0; }
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// enum E { a, b; int get count => 0; }
+/// ```
+class IllegalEnumValuesRule extends SaropaLintRule {
+  IllegalEnumValuesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'illegal_enum_values',
+    '[illegal_enum_values] An enum must not declare an instance member named "values"; it would shadow the static values getter.',
+    correctionMessage: 'Rename the instance member (e.g. to enumValues).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addEnumDeclaration((EnumDeclaration node) {
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration &&
+            !member.isStatic &&
+            member.name.lexeme == 'values') {
+          reporter.atNode(member);
+        } else if (member is FieldDeclaration && !member.isStatic) {
+          for (final VariableDeclaration v in member.fields.variables) {
+            final Token? nameToken = v.name;
+            if (nameToken != null && nameToken.lexeme == 'values') {
+              reporter.atNode(v);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// wrong_number_of_parameters_for_setter
+// =============================================================================
+
+/// A setter must declare exactly one required positional parameter (no optional
+/// positional, no named parameters).
+///
+/// **Bad:**
+/// ```dart
+/// set value(int x, int y) {}
+/// set value() {}
+/// set value([int x]) {}
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// set value(int x) {}
+/// ```
+class WrongNumberOfParametersForSetterRule extends SaropaLintRule {
+  WrongNumberOfParametersForSetterRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'wrong_number_of_parameters_for_setter',
+    '[wrong_number_of_parameters_for_setter] A setter must declare exactly one required positional parameter.',
+    correctionMessage:
+        'Use a single required positional parameter (e.g. set value(int x) {}).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.isSetter) return;
+
+      final FormalParameterList? params = node.parameters;
+      if (params == null) return;
+
+      final List<FormalParameter> list = params.parameters;
+      if (list.isEmpty) {
+        reporter.atNode(node);
+        return;
+      }
+      if (list.length > 1) {
+        reporter.atNode(node);
+        return;
+      }
+
+      final FormalParameter single = list.single;
+      if (single is DefaultFormalParameter || single.isNamed) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// unnecessary_library_name
+// =============================================================================
+
+/// A library directive that only has a name (e.g. `library my_lib;`) with no
+/// URI is unnecessary for the analyzer and can be removed or replaced with a
+/// nameless `library;` for documentation.
+///
+/// **Bad:**
+/// ```dart
+/// library my_lib;
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// library;
+/// ```
+class UnnecessaryLibraryNameRule extends SaropaLintRule {
+  UnnecessaryLibraryNameRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'unnecessary_library_name',
+    '[unnecessary_library_name] A library directive with only a name and no URI is unnecessary; use "library;" or remove it.',
+    correctionMessage: 'Replace with "library;" or remove the name.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addLibraryDirective((LibraryDirective node) {
+      final LibraryIdentifier? name = node.name;
+      if (name == null) return;
+      if (name.name.isEmpty) return;
+      reporter.atNode(name);
+    });
+  }
+}

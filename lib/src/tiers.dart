@@ -745,7 +745,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_string_substring',
   'prefer_single_container',
   'prefer_api_pagination',
-  // HACK marker (review item that should surface in Issues). prefer_todo_format is in stylisticRules only.
+  // Review item for extension Issues tree; prefer_todo_format is in stylisticRules only.
   'prefer_hack_format',
 
   // Code quality (roadmap detail requirements)
@@ -2859,6 +2859,16 @@ const Set<String> comprehensiveOnlyRules = <String>{
 
   // v4.15.0 - ROADMAP ⭐ Rules (Comprehensive)
   'avoid_redundant_semantics', // INFO - Semantics wrapping Image with semanticLabel
+
+  // Additional rules (plan_additional_rules_1_through_10)
+  'argument_must_be_native',
+  'duplicate_ignore',
+  'external_with_initializer',
+  'illegal_enum_values',
+  'invalid_runtime_check_with_js_interop_types',
+  'type_check_with_null',
+  'unnecessary_library_name',
+  'wrong_number_of_parameters_for_setter',
 };
 
 /// Pedantic tier rules - pedantic, highly opinionated rules.

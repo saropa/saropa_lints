@@ -118,6 +118,26 @@ void main() {
       'prefer_const_declarations',
       () => PreferConstDeclarationsRule(),
     );
+    testRule(
+      'ExternalWithInitializerRule',
+      'external_with_initializer',
+      () => ExternalWithInitializerRule(),
+    );
+    testRule(
+      'TypeCheckWithNullRule',
+      'type_check_with_null',
+      () => TypeCheckWithNullRule(),
+    );
+    testRule(
+      'InvalidRuntimeCheckWithJsInteropTypesRule',
+      'invalid_runtime_check_with_js_interop_types',
+      () => InvalidRuntimeCheckWithJsInteropTypesRule(),
+    );
+    testRule(
+      'ArgumentMustBeNativeRule',
+      'argument_must_be_native',
+      () => ArgumentMustBeNativeRule(),
+    );
   });
 
   group('Type Rules - Fixture Verification', () {
@@ -142,6 +162,8 @@ void main() {
       'avoid_private_typedef_functions',
       'prefer_final_locals',
       'prefer_const_declarations',
+      'external_with_initializer',
+      'type_check_with_null',
     ];
 
     for (final fixture in fixtures) {
