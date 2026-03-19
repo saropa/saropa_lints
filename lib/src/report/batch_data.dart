@@ -69,7 +69,7 @@ class BatchData {
     try {
       final decoded = json.decode(source);
       if (decoded is! Map) return null;
-      final map = Map<String, dynamic>.from(decoded as Map);
+      final map = Map<String, dynamic>.from(decoded);
       if (map['v'] != _formatVersion) return null;
 
       final s = map['s'];
