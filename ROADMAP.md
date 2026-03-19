@@ -821,6 +821,78 @@ cross_file:
 
 ---
 
+## Additional rules
+
+Use as a todo list for implementation candidates. Sorted by **Effort** (L → M → H) then **Wow** (H → M → L).
+
+**Implementation plans** (by developer usefulness): [bugs/plan/](bugs/plan/) — see `plan_additional_rules_1_through_10.md` through `plan_additional_rules_81_through_90.md` for target files, approach, and acceptance criteria per rule.
+
+**Legend:** 🐛 BUG · 💨 CODE_SMELL · ⚠️ MINOR · 🚨 MAJOR · 🔴 BLOCKER · 🟢 L / 🟡 M / 🔴 H effort · ★ / ★★ / ★★★ wow
+
+| Rule key | Kind | Name | Checks for (summary) | Severity | Effort | Wow |
+|----------------|------|------|----------------------|----------|--------|-----|
+| missing_code_block_language_in_doc_comment | 💨 CODE_SMELL | Missing code block language in doc comment | Code block in doc comment should specify language. | ⚠️ MINOR | 🟡 M | ★★ M |
+| prefer_for_elements_to_map_fromIterable | 💨 CODE_SMELL | Prefer for elements to map fromIterable | Prefer for elements over Map.fromIterable. | 🚨 MAJOR | 🟡 M | ★★ M |
+| unintended_html_in_doc_comment | 💨 CODE_SMELL | Unintended html in doc comment | Angle brackets in doc comment interpreted as HTML. | ⚠️ MINOR | 🟡 M | ★★ M |
+| uri_does_not_exist_in_doc_import | 💨 CODE_SMELL | Uri does not exist in doc import | Doc-import URI refers to non-existent file. | ⚠️ MINOR | 🟡 M | ★★ M |
+| conflicting_constructor_and_static_member | 🐛 BUG | Conflicting constructor and static member | Named constructor and static method/field have same name. | ⚠️ MINOR | 🟡 M | ★ L |
+| duplicate_constructor | 🐛 BUG | Duplicate constructor | More than one unnamed or same-named constructor. | ⚠️ MINOR | 🟡 M | ★ L |
+| duplicate_field_name | 🐛 BUG | Duplicate field name | Record literal/type has duplicate field name. | ⚠️ MINOR | 🟡 M | ★ L |
+| field_initializer_redirecting_constructor | 🐛 BUG | Field initializer redirecting constructor | Redirecting constructor initializes a field. | ⚠️ MINOR | 🟡 M | ★ L |
+| illegal_concrete_enum_member | 🐛 BUG | Illegal concrete enum member | Enum/concrete Enum implementer has concrete instance member. | ⚠️ MINOR | 🟡 M | ★ L |
+| invalid_extension_argument_count | 🐛 BUG | Invalid extension argument count | Extension override doesn't have exactly one argument. | ⚠️ MINOR | 🟡 M | ★ L |
+| invalid_field_name | 🐛 BUG | Invalid field name | Record literal/type has invalid field name. | ⚠️ MINOR | 🟡 M | ★ L |
+| invalid_literal_annotation | 🐛 BUG | Invalid literal annotation | literal annotation applied to non–const constructor. | ⚠️ MINOR | 🟡 M | ★ L |
+| invalid_non_virtual_annotation | 🐛 BUG | Invalid non virtual annotation | nonVirtual on wrong declaration or non-concrete member. | ⚠️ MINOR | 🟡 M | ★ L |
+| invalid_super_formal_parameter_location | 🐛 BUG | Invalid super formal parameter location | Super parameter used outside non-redirecting generative constructor. | ⚠️ MINOR | 🟡 M | ★ L |
+| non_constant_map_element | 🐛 BUG | Non constant map element | if or spread element in const map isn't constant. | ⚠️ MINOR | 🟡 M | ★ L |
+| return_in_generator | 🐛 BUG | Return in generator | Generator uses return with value or implicit return. | ⚠️ MINOR | 🟡 M | ★ L |
+| subtype_of_disallowed_type | 🐛 BUG | Subtype of disallowed type | extends/implements/with/on restricted type (bool, int, etc.). | ⚠️ MINOR | 🟡 M | ★ L |
+| undefined_enum_constructor | 🐛 BUG | Undefined enum constructor | Enum value constructor doesn't exist. | ⚠️ MINOR | 🟡 M | ★ L |
+| yield_in_non_generator | 🐛 BUG | Yield in non generator | yield/yield* in non–async*/sync* function. | ⚠️ MINOR | 🟡 M | ★ L |
+| abstract_field_initializer | 💨 CODE_SMELL | Abstract field initializer | Abstract field has initializer. | ⚠️ MINOR | 🟡 M | ★ L |
+| annotate_redeclares | 💨 CODE_SMELL | Annotate redeclares | Redeclared members should be annotated. | ⚠️ MINOR | 🟡 M | ★ L |
+| deprecated_new_in_comment_reference | 💨 CODE_SMELL | Deprecated new in comment reference | Doc comment uses new in comment reference. | ⚠️ MINOR | 🟡 M | ★ L |
+| document_ignores | 💨 CODE_SMELL | Document ignores | Ignored diagnostics should be documented. | ⚠️ MINOR | 🟡 M | ★ L |
+| invalid_visible_outside_template_annotation | 💨 CODE_SMELL | Invalid visible outside template annotation | @visibleOutsideTemplate used incorrectly. | 🚨 MAJOR | 🟡 M | ★ L |
+| depend_on_referenced_packages | 💨 CODE_SMELL | Depend on referenced packages | Imported package must be in pubspec. | 🚨 MAJOR | 🔴 H | ★★★ H |
+| secure_pubspec_urls | 💨 CODE_SMELL | Secure pubspec urls | Use https (not http/git:) in pubspec. | 🚨 MAJOR | 🔴 H | ★★★ H |
+| package_names | 💨 CODE_SMELL | Package names | Package names: lowercase_with_underscores. | ⚠️ MINOR | 🔴 H | ★★ M |
+| sort_pub_dependencies | 💨 CODE_SMELL | Sort pub dependencies | Sort pub dependencies A–Z in pubspec. | ⚠️ MINOR | 🔴 H | ★★ M |
+| abi_specific_integer_invalid | 🐛 BUG | Abi specific integer invalid | Class extending AbiSpecificInteger doesn't meet requirements. | ⚠️ MINOR | 🔴 H | ★ L |
+| argument_type_not_assignable_to_error_handler | 🐛 BUG | Argument type not assignable to error handler | Future.catchError argument function parameters incompatible. | ⚠️ MINOR | 🔴 H | ★ L |
+| body_might_complete_normally | 🐛 BUG | Body might complete normally | Method/function with non-nullable return type could implicitly return null. | ⚠️ MINOR | 🔴 H | ★ L |
+| const_map_key_not_primitive_equality | 🐛 BUG | Const map key not primitive equality | Const map key class implements == or hashCode. | ⚠️ MINOR | 🔴 H | ★ L |
+| dead_null_aware_expression | 🐛 BUG | Dead null aware expression | Left operand of ?? can't be null, or unnecessary null-aware usage. | ⚠️ MINOR | 🔴 H | ★ L |
+| duplicate_pattern_field | 🐛 BUG | Duplicate pattern field | Record/object pattern matches same field or getter more than once. | ⚠️ MINOR | 🔴 H | ★ L |
+| implicit_super_initializer_missing_arguments | 🐛 BUG | Implicit super initializer missing arguments | Super constructor has required parameter not passed. | ⚠️ MINOR | 🔴 H | ★ L |
+| inconsistent_pattern_variable_logical_or | 🐛 BUG | Inconsistent pattern variable logical or | Pattern variable in logical-or has different type on branches. | ⚠️ MINOR | 🔴 H | ★ L |
+| invalid_annotation | 🐛 BUG | Invalid annotation | Annotation not const variable or const constructor invocation. | ⚠️ MINOR | 🔴 H | ★ L |
+| invalid_null_aware_operator | 🐛 BUG | Invalid null aware operator | Null-aware operator on known non-nullable receiver. | ⚠️ MINOR | 🔴 H | ★ L |
+| invalid_pattern_variable_in_shared_case_scope | 🐛 BUG | Invalid pattern variable in shared case scope | Shared switch case body references variable from one case. | ⚠️ MINOR | 🔴 H | ★ L |
+| invalid_return_type_for_catch_error | 🐛 BUG | Invalid return type for catch error | Future.catchError callback return type incompatible. | ⚠️ MINOR | 🔴 H | ★ L |
+| invalid_type_argument_in_const_literal | 🐛 BUG | Invalid type argument in const literal | Type parameter as type argument in const literal. | ⚠️ MINOR | 🔴 H | ★ L |
+| invocation_of_non_function_expression | 🐛 BUG | Invocation of non function expression | Invocation target isn't a function. | ⚠️ MINOR | 🔴 H | ★ L |
+| missing_default_value_for_parameter | 🐛 BUG | Missing default value for parameter | Optional parameter has non-nullable type and no default. | ⚠️ MINOR | 🔴 H | ★ L |
+| not_assigned_potentially_non_nullable_local_variable | 🐛 BUG | Not assigned potentially non nullable local variable | Local variable referenced but not definitely assigned. | ⚠️ MINOR | 🔴 H | ★ L |
+| not_initialized_non_nullable_instance_field | 🐛 BUG | Not initialized non nullable instance field | Non-nullable instance field not initialized. | ⚠️ MINOR | 🔴 H | ★ L |
+| not_initialized_non_nullable_variable | 🐛 BUG | Not initialized non nullable variable | Static/top-level non-nullable variable has no initializer. | ⚠️ MINOR | 🔴 H | ★ L |
+| recursive_constructor_redirect | 🐛 BUG | Recursive constructor redirect | Constructor redirects to itself (directly or indirectly). | ⚠️ MINOR | 🔴 H | ★ L |
+| redirect_to_invalid_function_type | 🐛 BUG | Redirect to invalid function type | Factory redirects to constructor with incompatible parameters. | ⚠️ MINOR | 🔴 H | ★ L |
+| super_formal_parameter_without_associated_positional | 🐛 BUG | Super formal parameter without associated positional | Positional super parameter but super constructor has no matching positional. | ⚠️ MINOR | 🔴 H | ★ L |
+| undefined_constructor_in_initializer | 🐛 BUG | Undefined constructor in initializer | Super constructor invoked doesn't exist. | ⚠️ MINOR | 🔴 H | ★ L |
+| undefined_extension_getter | 🐛 BUG | Undefined extension getter | Extension override getter not defined. | ⚠️ MINOR | 🔴 H | ★ L |
+| undefined_extension_setter | 🐛 BUG | Undefined extension setter | Extension override setter not defined. | ⚠️ MINOR | 🔴 H | ★ L |
+| undefined_super_member | 🐛 BUG | Undefined super member | super member not in superclass chain. | ⚠️ MINOR | 🔴 H | ★ L |
+| uri_does_not_exist | 🐛 BUG | Uri does not exist | Import/export/part URI refers to non-existent file. | 🔴 BLOCKER | 🔴 H | ★ L |
+| wrong_number_of_type_arguments | 🐛 BUG | Wrong number of type arguments | Type arguments count doesn't match type parameters. | ⚠️ MINOR | 🔴 H | ★ L |
+| omit_obvious_local_variable_types | 💨 CODE_SMELL | Omit obvious local variable types | Don't type annotate when type is obvious. | ⚠️ MINOR | 🔴 H | ★ L |
+| type_parameter_supertype_of_its_bound | 💨 CODE_SMELL | Type parameter supertype of its bound | Type parameter bound is (indirectly) itself. | ⚠️ MINOR | 🔴 H | ★ L |
+| unnecessary_null_comparison | 💨 CODE_SMELL | Unnecessary null comparison | Equality with null where operand can't be null. | ⚠️ MINOR | 🔴 H | ★ L |
+| avoid_unstable_final_fields | 💨 CODE_SMELL | Avoid unstable final fields | (Rule removed.) | MINOR | ⚪ — | ⚪ — |
+
+---
+
 ## Contributing
 
 Want to help implement these rules? See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) for guidelines.

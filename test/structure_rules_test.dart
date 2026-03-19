@@ -274,6 +274,21 @@ void main() {
       'prefer_extension_type_for_wrapper',
       () => PreferExtensionTypeForWrapperRule(),
     );
+    testRule(
+      'IllegalEnumValuesRule',
+      'illegal_enum_values',
+      () => IllegalEnumValuesRule(),
+    );
+    testRule(
+      'WrongNumberOfParametersForSetterRule',
+      'wrong_number_of_parameters_for_setter',
+      () => WrongNumberOfParametersForSetterRule(),
+    );
+    testRule(
+      'UnnecessaryLibraryNameRule',
+      'unnecessary_library_name',
+      () => UnnecessaryLibraryNameRule(),
+    );
   });
   group('Structure Rules - Fixture Verification', () {
     final fixtures = [
@@ -329,6 +344,9 @@ void main() {
       'prefer_extension_methods',
       'prefer_extension_over_utility_class',
       'prefer_extension_type_for_wrapper',
+      'illegal_enum_values',
+      'wrong_number_of_parameters_for_setter',
+      'unnecessary_library_name',
     ];
 
     for (final fixture in fixtures) {

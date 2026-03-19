@@ -2853,6 +2853,16 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferStaticBeforeInstanceRule.new,
   UseTruncatingDivisionRule.new,
   PreferVerbMethodNamesRule.new,
+
+  // Additional rules (plan_additional_rules_1_through_10)
+  ArgumentMustBeNativeRule.new,
+  DuplicateIgnoreRule.new,
+  ExternalWithInitializerRule.new,
+  IllegalEnumValuesRule.new,
+  InvalidRuntimeCheckWithJsInteropTypesRule.new,
+  TypeCheckWithNullRule.new,
+  UnnecessaryLibraryNameRule.new,
+  WrongNumberOfParametersForSetterRule.new,
 ];
 
 // =============================================================================

@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/source/line_info.dart';
 
 import '../../comment_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -1908,10 +1909,12 @@ class PreferTodoFormatRule extends SaropaLintRule {
   }
 }
 
-/// Reports any `// HACK:` comment so it appears in the extension's Issues tree.
+/// Reports comment lines that start with "// HACK :" so they appear in the
+/// extension's Issues tree.
 ///
 /// Note: this intentionally reports markers (not format correctness) to match
-/// the user's expectation that TODO/HACK are first-class review items.
+/// the user's expectation that TODO and HACK-style markers are first-class
+/// review items.
 class PreferHackFormatRule extends SaropaLintRule {
   PreferHackFormatRule() : super(code: _code);
 
@@ -1946,6 +1949,11 @@ class PreferHackFormatRule extends SaropaLintRule {
         Token? comment = token.precedingComments;
         while (comment != null) {
           final String lexeme = comment.lexeme;
+          // Skip doc and block comments so we don't flag documentation.
+          if (lexeme.startsWith('///') || lexeme.startsWith('/*')) {
+            comment = comment.next;
+            continue;
+          }
           if (_anyHackPattern.hasMatch(lexeme)) {
             reporter.atOffset(offset: comment.offset, length: comment.length);
           }
@@ -4657,6 +4665,85 @@ class UseTruncatingDivisionRule extends SaropaLintRule {
       current = current.expression;
     }
     return current;
+  }
+}
+
+// =============================================================================
+// duplicate_ignore
+// =============================================================================
+
+/// Flags when the same diagnostic is listed more than once in a single
+/// `// ignore:` or `// ignore_for_file:` comment (e.g. `// ignore: rule_a, rule_a`).
+///
+/// Detection: [addCompilationUnit], scan source lines with regex for
+/// `// ignore:` / `// ignore_for_file:`, split trailing list by comma,
+/// normalize names (lowercase, hyphen→underscore), report if any name
+/// appears more than once. Does not honor or suppress other rules.
+///
+/// **Bad:**
+/// ```dart
+/// // ignore: rule_a, rule_a
+/// // ignore_for_file: x, x
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// // ignore: rule_a, rule_b
+/// ```
+class DuplicateIgnoreRule extends SaropaLintRule {
+  DuplicateIgnoreRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'duplicate_ignore',
+    '[duplicate_ignore] The same diagnostic is listed more than once in this ignore comment.',
+    correctionMessage: 'Remove the duplicate diagnostic name from the comment.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static final RegExp _ignoreLinePattern = RegExp(
+    r'//\s*ignore(?:_for_file)?\s*:(.*)$',
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit unit) {
+      final LineInfo? lineInfo = unit.lineInfo;
+      final String content = context.fileContent;
+      if (lineInfo == null) return;
+
+      final List<String> lines = content.split('\n');
+      for (int i = 0; i < lines.length; i++) {
+        final String line = lines[i];
+        final Match? match = _ignoreLinePattern.firstMatch(line);
+        if (match == null) continue;
+
+        final String rest = match.group(1) ?? '';
+        final List<String> names = rest
+            .split(',')
+            .map((String s) => s.trim().toLowerCase().replaceAll('-', '_'))
+            .where((String s) => s.isNotEmpty)
+            .toList();
+        if (names.length <= 1) continue;
+
+        final Set<String> seen = {};
+        for (final String name in names) {
+          if (!seen.add(name)) {
+            final int offset = lineInfo.getOffsetOfLine(i + 1);
+            reporter.atOffset(offset: offset, length: line.length);
+            break;
+          }
+        }
+      }
+    });
   }
 }
 

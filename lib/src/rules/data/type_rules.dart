@@ -7,6 +7,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../analyzer_metadata_compat_utils.dart';
 import '../../fixes/type/prefer_const_declarations_fix.dart';
 import '../../fixes/type/prefer_final_locals_fix.dart';
 import '../../fixes/type/remove_null_assertion_fix.dart';
@@ -1790,6 +1791,211 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
   }
 }
 
+/// Flags a type test with `Null` (e.g. `x is Null`, `x is! Null`) as
+/// redundant; use `x == null` or `x != null` instead.
+///
+/// **Bad:**
+/// ```dart
+/// if (x is Null) {}
+/// if (x is! Null) {}
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// if (x == null) {}
+/// if (x != null) {}
+/// ```
+class TypeCheckWithNullRule extends SaropaLintRule {
+  TypeCheckWithNullRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'type_check_with_null',
+    '[type_check_with_null] Prefer "x == null" or "x != null" instead of "x is Null" or "x is! Null".',
+    correctionMessage:
+        'Replace "x is Null" with "x == null" and "x is! Null" with "x != null".',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addIsExpression((IsExpression node) {
+      final DartType? testedType = node.type.type;
+      if (testedType == null) return;
+
+      final String? typeName = testedType.element?.name;
+      final String? libName = testedType.element?.library?.name;
+      if (typeName == 'Null' && libName == 'dart.core') {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+/// Warns when using `is` or `is!` with a JS interop type at runtime; JS
+/// interop types are not real Dart types at runtime and the check is invalid
+/// or unreliable.
+///
+/// Only runs in projects that use dart:js_interop or package:js.
+///
+/// **Bad (in JS project):**
+/// ```dart
+/// if (x is JSAny) {}
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// if (x is SomeDartClass) {}
+/// ```
+class InvalidRuntimeCheckWithJsInteropTypesRule extends SaropaLintRule {
+  InvalidRuntimeCheckWithJsInteropTypesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => {'is ', 'is! '};
+
+  static const LintCode _code = LintCode(
+    'invalid_runtime_check_with_js_interop_types',
+    '[invalid_runtime_check_with_js_interop_types] Using is/is! with a JS interop type at runtime is invalid or unreliable; JS interop types are not real Dart types at runtime.',
+    correctionMessage:
+        'Remove the check or use a different pattern (e.g. try-catch or explicit tag).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final String path = context.filePath;
+    final String content = context.fileContent;
+    final bool usesJs =
+        content.contains('dart:js_interop') ||
+        content.contains('package:js') ||
+        ProjectContext.hasDependency(path, 'js');
+    if (!usesJs) return;
+
+    context.addIsExpression((IsExpression node) {
+      final DartType? testedType = node.type.type;
+      if (testedType == null) return;
+
+      final String? libName = testedType.element?.library?.name;
+      final String lib = libName ?? '';
+      if (lib == 'dart.js_interop' ||
+          lib == 'package:js' ||
+          lib.startsWith('package:js/')) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+/// Warns when `Native.addressOf` (and similar FFI APIs) is called with an
+/// argument that is not annotated with `@Native` or is not a known native type.
+///
+/// Only runs in projects/files that use dart:ffi.
+///
+/// **Bad (in FFI project):**
+/// ```dart
+/// class NotNative { }
+/// Native.addressOf(notNativeVariable);
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// @Native()
+/// class MyStruct extends Struct { }
+/// Native.addressOf(nativeTypedVariable);
+/// ```
+class ArgumentMustBeNativeRule extends SaropaLintRule {
+  ArgumentMustBeNativeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<String>? get requiredPatterns => {'Native.addressOf', 'dart:ffi'};
+
+  static const LintCode _code = LintCode(
+    'argument_must_be_native',
+    '[argument_must_be_native] Native.addressOf requires the argument to be annotated with @Native or to be a native type.',
+    correctionMessage:
+        'Add @Native() (or the correct annotation) to the argument type, or use a proper native struct.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (!context.fileContent.contains('dart:ffi') &&
+        !context.fileContent.contains('Native.addressOf')) {
+      return;
+    }
+
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'addressOf') return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+      final DartType? targetType = target.staticType;
+      if (targetType != null) {
+        final String? tName = targetType.element?.name;
+        final String? tLib = targetType.element?.library?.name;
+        if (tName == 'Native' && tLib == 'dart.ffi') {
+          // Confirmed dart:ffi Native; continue to check argument.
+        } else {
+          return;
+        }
+      } else {
+        final String targetStr = target.toSource();
+        if (targetStr != 'Native' && !targetStr.endsWith('.Native')) return;
+      }
+
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression arg = args.first;
+      final DartType? argType = arg.staticType;
+      if (argType == null) return;
+
+      final Element? el = argType.element;
+      if (el == null) return;
+
+      final String? libName = el.library?.name;
+      if (libName == 'dart.ffi') return;
+
+      final bool hasNativeAnnotation =
+          readElementAnnotationsFromMetadata(el.metadata).any((
+            ElementAnnotation a,
+          ) {
+            final String? annName = a.element?.name;
+            return annName == 'Native';
+          });
+      if (hasNativeAnnotation) return;
+
+      reporter.atNode(arg);
+    });
+  }
+}
+
 /// Warns when type names don't follow Dart conventions.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
@@ -2091,6 +2297,57 @@ class PreferTypeOverVarRule extends SaropaLintRule {
       // Check if using var (no type annotation and not final/const)
       if (node.type == null && node.keyword?.lexeme == 'var') {
         reporter.atNode(node);
+      }
+    });
+  }
+}
+
+/// Warns when an external field or variable has an initializer.
+///
+/// External declarations have no Dart implementation; an initializer is invalid.
+/// Detection: [addVariableDeclarationList], first token after metadata is
+/// `external`, then report any variable in the list that has a non-null
+/// initializer (covers top-level and field declarations).
+///
+/// **Bad:**
+/// ```dart
+/// external int x = 0;
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// external int x;
+/// int x = 0;
+/// ```
+class ExternalWithInitializerRule extends SaropaLintRule {
+  ExternalWithInitializerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'external_with_initializer',
+    '[external_with_initializer] An external field or variable must not have an initializer; external declarations have no Dart implementation.',
+    correctionMessage: 'Remove the initializer from the external declaration.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addVariableDeclarationList((VariableDeclarationList node) {
+      final Token? first = node.firstTokenAfterCommentAndMetadata;
+      if (first?.lexeme != 'external') return;
+
+      for (final VariableDeclaration v in node.variables) {
+        if (v.initializer != null) {
+          reporter.atNode(v);
+        }
       }
     });
   }
