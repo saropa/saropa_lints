@@ -166,7 +166,7 @@ The existing `TOP FILES` section is just a count of violations per file. That te
 
 ## Prerequisites (priority ordering)
 
-- [violation_deduplication.md](violation_deduplication.md) — same violation repeated 10-15x due to consecutive re-analysis bypass *(plan path may differ; see discussion_058_batch_deduplication.md for offset-level dedup)*
+- [violation_deduplication.md](violation_deduplication.md) — same violation repeated due to duplicate reporting during analysis; counts are now deduplicated by `(ruleName, offset)` (offset-level dedup), not just by line.
 - [report_session_management.md](report_session_management.md) — session boundary detection for clean per-build reports (fixed)
 
 Deduplication must land first. Prioritization on duplicated data is meaningless.
@@ -178,6 +178,7 @@ Deduplication must land first. Prioritization on duplicated data is meaningless.
 - **Done (Windows):** `_coerceToRegisteredPath` / `_pathsSameFile` so resolved edges match registered file keys when separators differ.
 - **Tests:** `test/import_graph_tracker_test.dart` (package edge resolution, idempotent collect).
 - **Done (2026-03 follow-up):** Batch JSON field `ig` + `ConsolidatedData.mergedRawImports` + merge in `ReportConsolidator`; report hydrates graph from merged snapshot when non-empty. Relative vs absolute file paths aligned for FIX PRIORITY / FILE IMPORTANCE issue column.
+- **Done (correctness):** Progress/report counts are deduplicated by `(ruleName, offset)` and the consolidated report omits the legacy flat `ALL VIOLATIONS` section.
 
 ## What the developer sees (end state)
 
