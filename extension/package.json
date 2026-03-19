@@ -100,6 +100,11 @@
         {
           "id": "saropaLints.todosAndHacks",
           "name": "TODOs & Hacks"
+        },
+        {
+          "id": "saropaLints.driftAdvisor",
+          "name": "Drift Advisor",
+          "when": "saropaLints.isDartProject"
         }
       ]
     },
@@ -625,6 +630,16 @@
         "command": "saropaLints.todosAndHacks.toggleGroupByTag",
         "title": "TODOs & Hacks: Toggle group by tag / folder",
         "icon": "$(list-tree)"
+      },
+      {
+        "command": "saropaLints.driftAdvisor.refresh",
+        "title": "Drift Advisor: Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "saropaLints.driftAdvisor.openInBrowser",
+        "title": "Drift Advisor: Open in Browser",
+        "icon": "$(link-external)"
       }
     ],
     "menus": {
@@ -817,6 +832,16 @@
         {
           "command": "saropaLints.todosAndHacks.toggleGroupByTag",
           "when": "view == saropaLints.todosAndHacks",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.driftAdvisor.refresh",
+          "when": "view == saropaLints.driftAdvisor",
+          "group": "navigation"
+        },
+        {
+          "command": "saropaLints.driftAdvisor.openInBrowser",
+          "when": "view == saropaLints.driftAdvisor && saropaLints.driftAdvisor.connected",
           "group": "navigation"
         }
       ],
@@ -1185,6 +1210,33 @@
             "type": "string",
             "default": "",
             "description": "Optional regex override for matching comment markers. Line-based; use capture group 1 for tag and optional group 2 for snippet. Empty = use default (//, #, <!-- + tags). Invalid regex falls back to default."
+          }
+        }
+      },
+      {
+        "title": "Drift Advisor",
+        "properties": {
+          "saropaLints.driftAdvisor.integration": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enable optional integration with Saropa Drift Advisor. When on, the extension discovers a running Drift Advisor server (ports 8642–8649), fetches index suggestions and anomalies, and shows them in the Drift Advisor view and optionally in Problems."
+          },
+          "saropaLints.driftAdvisor.portRange": {
+            "type": "array",
+            "items": { "type": "number" },
+            "default": [8642, 8649],
+            "description": "Port range [min, max] to scan for Drift Advisor server (inclusive)."
+          },
+          "saropaLints.driftAdvisor.pollIntervalMs": {
+            "type": "number",
+            "default": 30000,
+            "minimum": 5000,
+            "description": "How often to poll the Drift Advisor server for issues (milliseconds). Set to 0 to disable automatic polling (refresh manually)."
+          },
+          "saropaLints.driftAdvisor.showInProblems": {
+            "type": "boolean",
+            "default": true,
+            "description": "Publish Drift Advisor issues as diagnostics in the Problems view (source: Saropa Drift Advisor)."
           }
         }
       },
@@ -1668,7 +1720,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run precompile && npm run check-types && node esbuild.js --production",
     "lint": "tsc --noEmit -p ./",
-    "test": "tsc -p tsconfig.todosAndHacks.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" --timeout 5000"
+    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" --timeout 10000"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

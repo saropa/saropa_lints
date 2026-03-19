@@ -30,6 +30,10 @@ import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
 import { TodosAndHacksTreeProvider } from './views/todosAndHacksTree';
 import { showAboutPanel } from './views/aboutView';
+import { discoverServer } from './driftAdvisor/discovery';
+import { fetchIssues } from './driftAdvisor/client';
+import { mapIssuesToLocations } from './driftAdvisor/mapper';
+import { DriftAdvisorTreeProvider } from './driftAdvisor/driftAdvisorTree';
 import { openRuleExplainPanelForViolation, openRuleExplainPanel } from './views/ruleExplainView';
 import { readViolations, ViolationsData, getViolationsPath as getViolationsFilePath } from './violationsReader';
 import { hasSaropaLintsDep } from './pubspecReader';
@@ -187,6 +191,16 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   });
   context.subscriptions.push(todosAndHacksView);
 
+  const driftAdvisorDiagCollection = vscode.languages.createDiagnosticCollection('Saropa Drift Advisor');
+  context.subscriptions.push(driftAdvisorDiagCollection);
+  const driftAdvisorProvider = new DriftAdvisorTreeProvider(driftAdvisorDiagCollection);
+  const driftAdvisorView = vscode.window.createTreeView('saropaLints.driftAdvisor', {
+    treeDataProvider: driftAdvisorProvider,
+    showCollapseAll: true,
+  });
+  context.subscriptions.push(driftAdvisorView);
+  let driftAdvisorRefreshInProgress = false;
+
   let todosAndHacksSaveDebounce: ReturnType<typeof setTimeout> | undefined;
   context.subscriptions.push(
     vscode.workspace.onDidSaveTextDocument((doc) => {
@@ -260,6 +274,32 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     updateAnnotationsForAllEditors();
   };
 
+  void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', false);
+
+  let driftAdvisorPollTimer: ReturnType<typeof setInterval> | undefined;
+  function scheduleDriftAdvisorPoll(): void {
+    if (driftAdvisorPollTimer) {
+      clearInterval(driftAdvisorPollTimer);
+      driftAdvisorPollTimer = undefined;
+    }
+    const cfg = vscode.workspace.getConfiguration('saropaLints.driftAdvisor');
+    if (!cfg.get<boolean>('integration', false)) return;
+    const ms = cfg.get<number>('pollIntervalMs', 30000);
+    if (ms <= 0) return;
+    driftAdvisorPollTimer = setInterval(() => {
+      void vscode.commands.executeCommand('saropaLints.driftAdvisor.refresh');
+    }, ms);
+  }
+  scheduleDriftAdvisorPoll();
+  if (vscode.workspace.getConfiguration('saropaLints.driftAdvisor').get<boolean>('integration', false)) {
+    void vscode.commands.executeCommand('saropaLints.driftAdvisor.refresh');
+  }
+  context.subscriptions.push({
+    dispose: () => {
+      if (driftAdvisorPollTimer) clearInterval(driftAdvisorPollTimer);
+    },
+  });
+
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (!e.affectsConfiguration('saropaLints')) return;
@@ -269,6 +309,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       refreshAll();
       // Status bars must update when config changes (e.g. tier changed via Settings UI).
       updateAllStatusBars();
+      if (e.affectsConfiguration('saropaLints.driftAdvisor')) {
+        void vscode.commands.executeCommand('saropaLints.driftAdvisor.refresh');
+        scheduleDriftAdvisorPoll();
+      }
     }),
     vscode.workspace.onDidChangeWorkspaceFolders(() => {
       invalidateProjectRoot();
@@ -574,6 +618,49 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       todosAndHacksProvider.refresh();
       void vscode.commands.executeCommand('saropaLints.todosAndHacks.focus');
       setTimeout(() => { todosAndHacksView.message = undefined; }, 4000);
+    }),
+    vscode.commands.registerCommand('saropaLints.driftAdvisor.refresh', async () => {
+      const cfg = vscode.workspace.getConfiguration('saropaLints.driftAdvisor');
+      if (!cfg.get<boolean>('integration', false)) {
+        driftAdvisorProvider.setState(null, []);
+        void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', false);
+        return;
+      }
+      if (driftAdvisorRefreshInProgress) return;
+      driftAdvisorRefreshInProgress = true;
+      driftAdvisorView.message = 'Discovering…';
+      driftAdvisorProvider.setLoading(true);
+      const portRange = cfg.get<number[]>('portRange', [8642, 8649]);
+      const portMin = Array.isArray(portRange) && portRange.length >= 1 ? Math.max(1, portRange[0]) : 8642;
+      const portMax = Array.isArray(portRange) && portRange.length >= 2 ? Math.min(65535, portRange[1]) : 8649;
+      try {
+        const server = await discoverServer(portMin, portMax);
+        if (!server) {
+          driftAdvisorProvider.setState(null, []);
+          void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', false);
+          driftAdvisorView.message = 'No server found';
+          return;
+        }
+        const issues = await fetchIssues(server);
+        const mapped = await mapIssuesToLocations(issues);
+        driftAdvisorProvider.setState(server, mapped);
+        void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', true);
+        driftAdvisorView.message = undefined;
+      } catch {
+        driftAdvisorProvider.setState(null, []);
+        void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', false);
+        driftAdvisorView.message = 'Error fetching issues';
+      } finally {
+        driftAdvisorRefreshInProgress = false;
+      }
+    }),
+    vscode.commands.registerCommand('saropaLints.driftAdvisor.openInBrowser', () => {
+      const server = driftAdvisorProvider.getServer();
+      if (server?.baseUrl) {
+        void vscode.env.openExternal(vscode.Uri.parse(server.baseUrl));
+      } else {
+        void vscode.window.showInformationMessage('Drift Advisor is not connected. Click Refresh after starting the server.');
+      }
     }),
     vscode.commands.registerCommand('saropaLints.repairConfig', async () => {
       const success = await runRepairConfig(context);

@@ -112,7 +112,7 @@ violations.json        ───►  Health Score, Issues, Security,
                              File Risk, Trends, Inline Annotations
 ```
 
-The **Dart package** provides 2050+ lint rules via the native analyzer plugin. The **VS Code extension** reads `violations.json` and provides the UI: Health Score, Issues tree, Security Posture, File Risk, and Config/Triage. Both are published together and versioned in sync.
+The **Dart package** provides 2050+ lint rules via the native analyzer plugin. The **VS Code extension** reads `violations.json` and provides the UI: Health Score, Issues tree, Security Posture, File Risk, and Config/Triage. Optional **Drift Advisor** integration shows index suggestions and data-quality anomalies from a running Drift Advisor server in a dedicated sidebar view and in Problems. Both are published together and versioned in sync.
 
 ---
 
