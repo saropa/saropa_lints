@@ -177,7 +177,7 @@ Deduplication must land first. Prioritization on duplicated data is meaningless.
 - **Done (wiring):** `ImportGraphTracker.collectImports` from `SaropaContext._shouldSkipCurrentFile` immediately after `ProgressTracker.recordFile`; `ImportGraphTracker.setProjectInfo` from `AnalysisReporter.initialize` with `ProjectContext.getPackageName`. Regex collects `import` / `export` URIs (not only single-quote `import` as in older sketch).
 - **Done (Windows):** `_coerceToRegisteredPath` / `_pathsSameFile` so resolved edges match registered file keys when separators differ.
 - **Tests:** `test/import_graph_tracker_test.dart` (package edge resolution, idempotent collect).
-- **Limitation:** Graph is per analyzer isolate; consolidated violations merge across isolates but the import graph reflects files seen in the isolate that writes the report (see class doc on `ImportGraphTracker`).
+- **Done (2026-03 follow-up):** Batch JSON field `ig` + `ConsolidatedData.mergedRawImports` + merge in `ReportConsolidator`; report hydrates graph from merged snapshot when non-empty. Relative vs absolute file paths aligned for FIX PRIORITY / FILE IMPORTANCE issue column.
 
 ## What the developer sees (end state)
 

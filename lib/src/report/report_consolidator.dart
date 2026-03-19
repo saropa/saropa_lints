@@ -22,6 +22,7 @@ class ConsolidatedData {
     required this.ruleSeverities,
     required this.violations,
     required this.batchCount,
+    this.mergedRawImports = const <String, List<String>>{},
   });
 
   final ReportConfig? config;
@@ -35,6 +36,10 @@ class ConsolidatedData {
   final Map<String, String> ruleSeverities;
   final Map<LintImpact, List<ViolationRecord>> violations;
   final int batchCount;
+
+  /// Union of per-file import/export URIs from all isolate batches, keyed by
+  /// absolute normalized paths. Empty when batches omit `ig` (legacy).
+  final Map<String, List<String>> mergedRawImports;
 
   /// Total violation count across all impact levels.
   int get total => violations.values.fold(0, (s, l) => s + l.length);
@@ -334,6 +339,8 @@ class ReportConsolidator {
       }
     }
 
+    final mergedImports = _mergeImportSnapshots(projectRoot, batches);
+
     return ConsolidatedData(
       config: config,
       filesAnalyzed: allFiles.length,
@@ -346,7 +353,49 @@ class ReportConsolidator {
       ruleSeverities: ruleSeverities,
       violations: deduped,
       batchCount: batches.length,
+      mergedRawImports: mergedImports,
     );
+  }
+
+  /// Merge `rawImportsByFile` from every batch into one map (absolute keys).
+  static Map<String, List<String>> _mergeImportSnapshots(
+    String projectRoot,
+    List<BatchData> batches,
+  ) {
+    final merged = <String, Set<String>>{};
+    for (final batch in batches) {
+      if (batch.rawImportsByFile.isEmpty) continue;
+      for (final e in batch.rawImportsByFile.entries) {
+        final abs = _absoluteImportSnapshotKey(e.key, projectRoot);
+        final canon = _findMergePathKey(merged.keys, abs) ?? abs;
+        merged.putIfAbsent(canon, () => <String>{}).addAll(e.value);
+      }
+    }
+    return merged.map((k, s) => MapEntry(k, s.toList()));
+  }
+
+  static String _absoluteImportSnapshotKey(String key, String projectRoot) {
+    final t = key.trim();
+    if (t.isEmpty) return key;
+    if (path.isAbsolute(t)) return path.normalize(t);
+    return path.normalize(path.join(projectRoot, t));
+  }
+
+  static String? _findMergePathKey(Iterable<String> keys, String candidate) {
+    for (final k in keys) {
+      if (_mergeSameFilePath(k, candidate)) return k;
+    }
+    return null;
+  }
+
+  static bool _mergeSameFilePath(String a, String b) {
+    final na = a.replaceAll('\\', '/');
+    final nb = b.replaceAll('\\', '/');
+    if (na == nb) return true;
+    if (Platform.isWindows && na.toLowerCase() == nb.toLowerCase()) {
+      return true;
+    }
+    return false;
   }
 
   /// Deduplicate violations by `(file, line, rule)` across all batches.

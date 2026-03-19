@@ -29,10 +29,7 @@ void main() {
     const pkg = 'test_pkg';
     ImportGraphTracker.setProjectInfo(projectRoot, pkg);
 
-    ImportGraphTracker.collectImports(
-      libA,
-      "import 'package:$pkg/b.dart';\n",
-    );
+    ImportGraphTracker.collectImports(libA, "import 'package:$pkg/b.dart';\n");
     ImportGraphTracker.collectImports(libB, '// leaf\n');
 
     ImportGraphTracker.compute();
@@ -53,5 +50,20 @@ void main() {
     ImportGraphTracker.collectImports(libA, "import 'dart:io';\n");
     ImportGraphTracker.compute();
     expect(ImportGraphTracker.importsOf(libA), isEmpty);
+  });
+
+  test('getPriority matches graph when violation path is project-relative', () {
+    const pkg = 'test_pkg';
+    ImportGraphTracker.setProjectInfo(projectRoot, pkg);
+    ImportGraphTracker.collectImports(libA, "import 'package:$pkg/b.dart';\n");
+    ImportGraphTracker.collectImports(libB, '// leaf\n');
+    ImportGraphTracker.compute();
+
+    final relA = 'lib/a.dart';
+    final relB = 'lib/b.dart';
+    expect(
+      ImportGraphTracker.getPriority(relB, LintImpact.high),
+      greaterThan(ImportGraphTracker.getPriority(relA, LintImpact.high)),
+    );
   });
 }

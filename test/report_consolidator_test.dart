@@ -1,4 +1,4 @@
-import 'dart:io' show Directory;
+import 'dart:io' show Directory, Platform;
 
 import 'package:saropa_lints/src/report/batch_data.dart';
 import 'package:saropa_lints/src/report/report_consolidator.dart';
@@ -87,6 +87,86 @@ void main() {
       expect(list.single.file, 'lib/foo.dart');
       expect(list.single.rule, 'test_rule');
       expect(list.single.line, 10);
+    });
+
+    test('merges rawImportsByFile from two isolates', () {
+      final sessionId = ReportConsolidator.initSession(projectRoot);
+      final sep = Platform.pathSeparator;
+      final absA = '$projectRoot${sep}lib${sep}a.dart';
+      final absB = '$projectRoot${sep}lib${sep}b.dart';
+
+      final batch1 = BatchData(
+        sessionId: sessionId,
+        isolateId: 'iso1',
+        updatedAt: DateTime.now(),
+        config: null,
+        analyzedFiles: [absA],
+        issuesByFile: {},
+        issuesByRule: {},
+        ruleSeverities: {},
+        severityCounts: const SeverityCounts(error: 0, warning: 0, info: 0),
+        violations: {},
+        rawImportsByFile: {
+          absA: ["import 'dart:async';"],
+        },
+      );
+      final batch2 = BatchData(
+        sessionId: sessionId,
+        isolateId: 'iso2',
+        updatedAt: DateTime.now(),
+        config: null,
+        analyzedFiles: [absB],
+        issuesByFile: {},
+        issuesByRule: {},
+        ruleSeverities: {},
+        severityCounts: const SeverityCounts(error: 0, warning: 0, info: 0),
+        violations: {},
+        rawImportsByFile: {
+          absB: ["import 'dart:io';"],
+        },
+      );
+
+      ReportConsolidator.writeBatch(projectRoot, batch1);
+      ReportConsolidator.writeBatch(projectRoot, batch2);
+
+      final consolidated = ReportConsolidator.consolidate(
+        projectRoot,
+        sessionId,
+      );
+
+      expect(consolidated, isNotNull);
+      expect(consolidated!.mergedRawImports.length, 2);
+      expect(
+        consolidated.mergedRawImports[absA],
+        contains("import 'dart:async';"),
+      );
+      expect(
+        consolidated.mergedRawImports[absB],
+        contains("import 'dart:io';"),
+      );
+    });
+
+    test('BatchData round-trips optional ig import snapshot', () {
+      final batch = BatchData(
+        sessionId: 's',
+        isolateId: 'i',
+        updatedAt: DateTime.now(),
+        config: null,
+        analyzedFiles: const ['lib/x.dart'],
+        issuesByFile: const {},
+        issuesByRule: const {},
+        ruleSeverities: const {},
+        severityCounts: const SeverityCounts(error: 0, warning: 0, info: 0),
+        violations: const {},
+        rawImportsByFile: {
+          'lib/x.dart': ["import 'dart:core';"],
+        },
+      );
+      final restored = BatchData.fromJsonString(batch.toJsonString());
+      expect(restored, isNotNull);
+      expect(restored!.rawImportsByFile['lib/x.dart'], [
+        'import \'dart:core\';',
+      ]);
     });
   });
 }
