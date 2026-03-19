@@ -1279,11 +1279,84 @@ def validate_changelog(
     return True, release_notes
 
 
+def _extract_dart_doc_summary(output: str) -> tuple[str, int, int]:
+    """Return (summary_line, warning_count, error_count) from dart doc output."""
+    for line in output.splitlines():
+        stripped = line.strip()
+        m = re.search(
+            r"Found\s+(\d+)\s+warnings?\s+and\s+(\d+)\s+errors?",
+            stripped,
+            re.IGNORECASE,
+        )
+        if m:
+            return stripped, int(m.group(1)), int(m.group(2))
+    return "", 0, 0
+
+
+def _print_dart_doc_summary(summary_line: str, warning_count: int) -> None:
+    """Print a one-line summary for dart doc output."""
+    if not summary_line:
+        print_info("dart doc finished (see log for details).")
+        return
+    if warning_count > 0:
+        print_warning(summary_line)
+    else:
+        print_info(summary_line)
+
+
+def _print_dart_doc_failure_tail(output: str) -> None:
+    """Print a short tail excerpt for a failed dart doc run."""
+    tail_lines = [line for line in output.splitlines() if line.strip()][-10:]
+    if not tail_lines:
+        return
+    print_colored("  Last output lines:", Color.RED)
+    for line in tail_lines:
+        print_colored(f"    {line}", Color.RED)
+
+
 def generate_docs(project_dir: Path) -> bool:
     """Step 10: Generate documentation."""
     print_header("STEP 10: GENERATING DOCUMENTATION")
-    result = run_command(["dart", "doc"], project_dir, "Generating docs")
-    return result.returncode == 0
+    now = datetime.now()
+    date_prefix = now.strftime("%Y%m%d")
+    time_suffix = now.strftime("%H%M%S")
+    reports_dir = project_dir / "reports" / date_prefix
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    log_name = f"{date_prefix}_dart_doc_{time_suffix}.log"
+    log_path = reports_dir / log_name
+
+    print_info(f"Generating docs (output → reports/{date_prefix}/{log_name})")
+    use_shell = get_shell_mode()
+    result = subprocess.run(
+        ["dart", "doc"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        shell=use_shell,
+    )
+
+    combined = (result.stdout or "") + (result.stderr or "")
+    log_path.write_text(combined, encoding="utf-8", errors="replace")
+
+    summary_line, warning_count, error_count = _extract_dart_doc_summary(
+        combined
+    )
+    _print_dart_doc_summary(summary_line, warning_count)
+    print_colored(f"  Log: {log_path}", Color.DIM)
+
+    if result.returncode != 0:
+        print_error(f"Generating docs failed (exit code {result.returncode})")
+        _print_dart_doc_failure_tail(combined)
+        return False
+
+    print_success("Generating docs completed")
+    if warning_count > 0 and error_count == 0:
+        print_warning(
+            "dart doc reported warnings. Open the log file above for full details."
+        )
+    return True
 
 
 def pre_publish_validation(project_dir: Path) -> bool:

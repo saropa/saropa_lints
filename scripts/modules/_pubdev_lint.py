@@ -259,6 +259,8 @@ def _is_unresolvable_ref(text: str) -> str | None:
     """
     if ":" in text:
         return "contains colon (OWASP/category code)"
+    if text in {"null", "true", "false"}:
+        return "language literal (not a Dart symbol)"
     if any(text.endswith(ext) for ext in _FILE_EXTS):
         return "file name reference"
     if "_" in text and text == text.lower():

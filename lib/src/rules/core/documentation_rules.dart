@@ -752,7 +752,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
   };
 
   /// Built-in types and literals that are valid doc references (not parameters).
-  /// Suppresses false positives for [String], [int], [null], [true], [false], etc.
+  /// Suppresses false positives for [String], [int], `null`, `true`, `false`, etc.
   static const Set<String> _knownDocRefNames = <String>{
     'null',
     'true',
