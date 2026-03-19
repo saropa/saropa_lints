@@ -61,6 +61,12 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -198,6 +204,12 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -515,6 +527,12 @@ class RequireTextEditingControllerDisposeRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -588,6 +606,12 @@ class RequirePageControllerDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -683,6 +707,12 @@ class RequireLifecycleObserverRule extends SaropaLintRule {
   /// Important for battery life and app stability.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -783,6 +813,12 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -900,6 +936,12 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1041,6 +1083,12 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1236,6 +1284,12 @@ class RequireChangeNotifierDisposeRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1334,6 +1388,12 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1443,6 +1503,12 @@ class RequireSocketCloseRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1578,6 +1644,12 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1698,6 +1770,12 @@ class RequireIntervalTimerCancelRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1826,6 +1904,12 @@ class RequireFileHandleCloseRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1951,6 +2035,12 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
   /// Critical - resources leak without dispose.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2090,6 +2180,12 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
   /// Critical - old resources leak on reassignment.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -2284,6 +2380,12 @@ class DisposeClassFieldsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -2429,6 +2531,12 @@ class PreferDeactivateForCleanupRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'disposal', 'flutter', 'reliability'};
 
   @override
   RuleCost get cost => RuleCost.low;

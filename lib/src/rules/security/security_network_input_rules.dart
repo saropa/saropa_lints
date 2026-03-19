@@ -25,6 +25,15 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.securityHotspot;
+
+  @override
+  List<int> get cweIds => const <int>[532];
+
+  @override
+  Set<String> get tags => const {'security', 'review-required'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -190,6 +199,12 @@ class RequireInputSanitizationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -285,6 +300,12 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -367,6 +388,12 @@ class AvoidEvalLikePatternsRule extends SaropaLintRule {
   /// Each occurrence is a serious security vulnerability.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -458,6 +485,12 @@ class AvoidDynamicCodeLoadingRule extends SaropaLintRule {
   /// Each occurrence is a critical security vulnerability.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -606,6 +639,12 @@ class AvoidUnverifiedNativeLibraryRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -691,6 +730,12 @@ class AvoidHardcodedSigningConfigRule extends SaropaLintRule {
   /// Signing config in source code aids reverse engineering.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -815,6 +860,12 @@ class RequireCertificatePinningRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -886,6 +937,15 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
   /// Each occurrence exposes credentials.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  List<int> get cweIds => const <int>[598];
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -960,6 +1020,15 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
   /// Each occurrence risks credential exposure.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.securityHotspot;
+
+  @override
+  List<int> get cweIds => const <int>[200];
+
+  @override
+  Set<String> get tags => const {'security', 'review-required'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1045,6 +1114,12 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
   /// Each occurrence is a critical security vulnerability.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1190,6 +1265,12 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1260,6 +1341,12 @@ class PreferSecureRandomRule extends SaropaLintRule {
   /// Use Random.secure() for tokens and crypto operations.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1389,6 +1476,12 @@ class PreferTypedDataRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1462,6 +1555,12 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
   /// Performance optimization, not a bug.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1570,6 +1669,12 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
   /// Deep links without validation enable injection attacks.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1718,6 +1823,15 @@ class PreferDataMaskingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.securityHotspot;
+
+  @override
+  List<int> get cweIds => const <int>[359];
+
+  @override
+  Set<String> get tags => const {'security', 'review-required'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1833,6 +1947,15 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.securityHotspot;
+
+  @override
+  List<int> get cweIds => const <int>[200];
+
+  @override
+  Set<String> get tags => const {'security', 'review-required'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1961,6 +2084,12 @@ class AvoidPathTraversalRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2114,6 +2243,12 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -2227,6 +2362,12 @@ class RequireUrlValidationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -2338,6 +2479,12 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
   /// Security vulnerability - open redirects enable phishing.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.high;
@@ -2514,6 +2661,12 @@ class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -2638,6 +2791,12 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -2743,6 +2902,12 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
   /// Critical security vulnerability.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2861,6 +3026,12 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -2958,6 +3129,18 @@ class AvoidApiKeyInCodeRule extends SaropaLintRule {
   /// Hardcoded API keys can be extracted from builds.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  RuleStatus get ruleStatus => RuleStatus.beta;
+
+  @override
+  List<int> get cweIds => const <int>[798];
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -3102,6 +3285,15 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  List<int> get cweIds => const <int>[295];
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -3238,6 +3430,15 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
   /// Critical for any network communication.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  List<int> get cweIds => const <int>[319];
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -3387,6 +3588,12 @@ class RequireHttpsOnlyTestRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -3475,6 +3682,12 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
   /// Untrusted deserialization can lead to data integrity issues.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -3662,6 +3875,12 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
   /// Critical vulnerability in server-facing applications.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.high;
@@ -3895,6 +4114,15 @@ class RequireCatchLoggingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.securityHotspot;
+
+  @override
+  List<int> get cweIds => const <int>[703];
+
+  @override
+  Set<String> get tags => const {'security', 'review-required'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -4077,6 +4305,15 @@ class AvoidStackTraceInProductionRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.securityHotspot;
+
+  @override
+  List<int> get cweIds => const <int>[209];
+
+  @override
+  Set<String> get tags => const {'security', 'review-required'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -4221,6 +4458,12 @@ class AvoidWebViewCorsIssuesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -4305,6 +4548,12 @@ class RequireInputValidationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.medium;

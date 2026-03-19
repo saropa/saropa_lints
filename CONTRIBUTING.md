@@ -116,6 +116,10 @@ LintImpact get impact => LintImpact.critical; // Memory leak - each one matters
 
 **DO NOT default to `medium` without thought.** Consider the real-world consequence of 1000 violations of your rule.
 
+#### Optional: Semantic metadata (`ruleType`, `tags`, `cweIds`, …)
+
+`SaropaLintRule` includes optional getters (see [lib/src/rule_metadata.dart](lib/src/rule_metadata.dart)): **`ruleType`** (bug / vulnerability / codeSmell / securityHotspot), **`tags`**, **`cweIds`**, **`certIds`**, **`accuracyTarget`**, **`ruleStatus`**. Folder-level defaults were applied with [scripts/bulk_rule_metadata.py](scripts/bulk_rule_metadata.py). For new or security-sensitive rules, set **`RuleType.securityHotspot`** and tag **`review-required`** when the finding may be intentional; add **CWE** IDs where the mapping is clear ([MITRE CWE](https://cwe.mitre.org/)). Progress and conventions: [bugs/discussion/RULE_METADATA_BULK_STATUS.md](bugs/discussion/RULE_METADATA_BULK_STATUS.md).
+
 ### 3. Set performance optimizations (optional but recommended)
 
 With 1400+ rules, performance matters. Two getters help the framework optimize rule execution:

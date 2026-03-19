@@ -48,6 +48,12 @@ class AvoidAssetManifestJsonRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -131,6 +137,12 @@ class PreferDropdownInitialValueRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -250,6 +262,12 @@ class PreferOnPopWithResultRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
 
   @override
   RuleCost get cost => RuleCost.low;

@@ -42,6 +42,12 @@ class RequirePlatformCheckRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -129,6 +135,12 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -229,6 +241,12 @@ class PreferFoundationPlatformCheckRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -295,6 +313,12 @@ class PreferPlatformWidgetAdaptiveRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
 
   @override
   RuleCost get cost => RuleCost.low;

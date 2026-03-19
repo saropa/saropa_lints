@@ -40,6 +40,12 @@ class RequireJsonDecodeTryCatchRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -121,6 +127,12 @@ class AvoidDateTimeParseUnvalidatedRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -194,6 +206,12 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -281,6 +299,12 @@ class PreferDurationConstantsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -364,6 +388,12 @@ class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -440,6 +470,12 @@ class AvoidNotEncodableInToJsonRule extends SaropaLintRule {
   /// Critical issue - causes runtime crashes when encoding JSON.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.high;
@@ -647,6 +683,12 @@ class RequireDateFormatSpecificationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -713,6 +755,12 @@ class PreferIso8601DatesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -777,6 +825,12 @@ class AvoidOptionalFieldCrashRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -867,6 +921,12 @@ class PreferExplicitJsonKeysRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -972,6 +1032,12 @@ class RequireJsonSchemaValidationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1091,6 +1157,12 @@ class PreferJsonSerializableRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1186,6 +1258,12 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1297,6 +1375,12 @@ class PreferCorrectJsonCastsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1341,6 +1425,12 @@ class PreferJsonCodegenRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1408,6 +1498,12 @@ class RequireJsonDateFormatConsistencyRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
 
   @override
   RuleCost get cost => RuleCost.low;

@@ -39,6 +39,12 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'media'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -100,6 +106,12 @@ class PreferCameraResolutionSelectionRule extends SaropaLintRule {
   /// Performance/battery consideration.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'media'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -165,6 +177,12 @@ class PreferAudioSessionConfigRule extends SaropaLintRule {
   /// Audio UX issue - unexpected behavior with other apps.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'media'};
 
   @override
   RuleCost get cost => RuleCost.low;

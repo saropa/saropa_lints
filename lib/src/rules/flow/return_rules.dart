@@ -51,6 +51,12 @@ class AvoidReturningCascadesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -104,6 +110,12 @@ class AvoidReturningThisRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -178,6 +190,12 @@ class AvoidReturningVoidRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -246,6 +264,12 @@ class AvoidUnnecessaryReturnRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -329,6 +353,12 @@ class PreferImmediateReturnRule extends SaropaLintRule {
   /// Stylistic preference only. No performance or correctness benefit.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -426,6 +456,12 @@ class PreferReturningShorthandsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.opinionated;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -515,6 +551,12 @@ class AvoidReturningNullForVoidRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -588,6 +630,12 @@ class AvoidReturningNullForFutureRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
 
   @override
   RuleCost get cost => RuleCost.low;

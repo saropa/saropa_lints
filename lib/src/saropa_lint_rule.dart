@@ -22,8 +22,10 @@ import 'report/analysis_reporter.dart';
 import 'report/import_graph_tracker.dart';
 import 'owasp/owasp.dart';
 import 'project_context.dart';
+import 'rule_metadata.dart';
 import 'tiers.dart' show essentialRules;
 export 'package:analyzer/error/error.dart' show DiagnosticSeverity, LintCode;
+export 'rule_metadata.dart' show AccuracyTarget, RuleStatus, RuleType;
 export 'native/saropa_context.dart' show SaropaContext;
 export 'native/saropa_fix.dart'
     show
@@ -1986,6 +1988,34 @@ abstract class SaropaLintRule extends AnalysisRule {
   /// - Risk categorization aligned with industry standards
   /// - Coverage analysis across OWASP categories
   OwaspMapping? get owasp => null;
+
+  // ============================================================
+  // Rule metadata (type, status, standards, tags)
+  // ============================================================
+
+  /// Semantic type of this rule. Default [null] = unspecified (legacy).
+  /// When set, used for quality gates, accuracy targets, and reporting.
+  RuleType? get ruleType => null;
+
+  /// Optional accuracy target for this rule (for documentation and tooling).
+  /// Does not enforce; used by reports and rule-audit scripts.
+  AccuracyTarget? get accuracyTarget => null;
+
+  /// Lifecycle status. Default [RuleStatus.ready]. Use [RuleStatus.beta] for
+  /// new or heuristic-heavy rules; [RuleStatus.deprecated] for sunset.
+  RuleStatus get ruleStatus => RuleStatus.ready;
+
+  /// CWE identifiers this rule helps prevent or detect.
+  /// https://cwe.mitre.org/ — e.g. [798] for CWE-798 (Hardcoded Credentials).
+  List<int> get cweIds => const <int>[];
+
+  /// CERT coding standard identifiers (e.g. STR02-C). Populate only where
+  /// there is a clear mapping; leave empty for most rules initially.
+  List<String> get certIds => const <String>[];
+
+  /// Tags for filtering and discovery (e.g. in docs, IDE, or CI).
+  /// Examples: 'performance', 'accessibility', 'suspicious', 'convention'.
+  Set<String> get tags => const <String>{};
 
   // ============================================================
   // Quick Fixes

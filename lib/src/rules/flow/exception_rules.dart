@@ -23,6 +23,12 @@ class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -94,6 +100,12 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -157,6 +169,12 @@ class AvoidThrowInCatchBlockRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -233,6 +251,12 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
+
+  @override
   RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
@@ -296,6 +320,12 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
 
   @override
   RuleCost get cost => RuleCost.medium;

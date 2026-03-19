@@ -1,10 +1,12 @@
 # Plan: Rule Metadata, Standards Mapping, and Quality System
 
-**Status:** Draft  
+**Status:** Draft (partially implemented — see [RULE_METADATA_BULK_STATUS.md](RULE_METADATA_BULK_STATUS.md))  
 **Priority:** Medium (incremental adoption)  
 **Scope:** Rule base class, reporting, tooling, documentation  
 
 **Review note:** Plan only; no runtime code in this file. Check alignment with CONTRIBUTING, CODEBASE_INDEX, and ROADMAP.
+
+**Implementation note (2026-03-19):** Base types and `SaropaLintRule` getters are in place; bulk `ruleType`/`tags`; security CWE and hotspot pass started. **Not done:** quality gates CLI, new-code metrics reporting, `requiresReview` on diagnostics, full CWE coverage, `accuracyTarget` population.
 
 ---
 

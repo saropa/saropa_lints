@@ -42,6 +42,12 @@ class AvoidEmptySpreadRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -91,6 +97,12 @@ class AvoidUnnecessaryNullAwareElementsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -150,6 +162,12 @@ class AvoidUnnecessaryBlockRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -217,6 +235,12 @@ class AvoidUnnecessaryCallRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -277,6 +301,12 @@ class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -364,6 +394,12 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -415,6 +451,12 @@ class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -490,6 +532,12 @@ class AvoidUnnecessaryExtendsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -554,6 +602,12 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -652,6 +706,12 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -759,6 +819,12 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -839,6 +905,12 @@ class AvoidUnnecessarySuperRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -894,6 +966,12 @@ class NoEmptyBlockRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -986,6 +1064,12 @@ class NoEmptyStringRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
 
   @override
   RuleCost get cost => RuleCost.medium;

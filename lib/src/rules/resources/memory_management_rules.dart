@@ -44,6 +44,12 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -135,6 +141,12 @@ class RequireImageDisposalRule extends SaropaLintRule {
   /// Each occurrence is a memory leak.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -241,6 +253,12 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -334,6 +352,12 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -409,6 +433,12 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
   /// Consider for memory-sensitive applications.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -488,6 +518,12 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -562,6 +598,12 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
   /// Performance issue, not a memory leak.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -666,6 +708,12 @@ class RequireCacheExpirationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -764,6 +812,12 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -999,6 +1053,12 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1103,6 +1163,12 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
   /// Retaining disposed widgets causes memory leaks and crashes.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1223,6 +1289,12 @@ class AvoidClosureCaptureLeaksRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -1370,6 +1442,12 @@ class RequireExpandoCleanupRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1419,6 +1497,12 @@ class PreferLruCacheRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -1457,6 +1541,12 @@ class PreferWeakReferencesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'resources'};
 
   @override
   RuleCost get cost => RuleCost.low;

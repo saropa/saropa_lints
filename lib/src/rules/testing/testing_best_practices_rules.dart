@@ -66,6 +66,12 @@ class RequireTestAssertionsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -162,6 +168,12 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -269,6 +281,12 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -381,6 +399,12 @@ class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -466,6 +490,12 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -548,6 +578,12 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -680,6 +716,12 @@ class AvoidProductionConfigInTestsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -770,6 +812,12 @@ class PreferPumpAndSettleRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -884,6 +932,12 @@ class AvoidTestSleepRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -971,6 +1025,12 @@ class AvoidFindByTextRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1066,6 +1126,12 @@ class RequireTestKeysRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1172,6 +1238,12 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1266,6 +1338,12 @@ class PreferMockNavigatorRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1343,6 +1421,12 @@ class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1425,6 +1509,12 @@ class RequireMockVerificationRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1503,6 +1593,12 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1604,6 +1700,12 @@ class PreferTestWrapperRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -1743,6 +1845,12 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1827,6 +1935,12 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1905,6 +2019,12 @@ class PreferMockHttpRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2062,6 +2182,12 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2226,6 +2352,12 @@ class PreferSingleAssertionRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -2301,6 +2433,12 @@ class AvoidFindAllRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2409,6 +2547,12 @@ class RequireIntegrationTestSetupRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -2483,6 +2627,12 @@ class AvoidHardcodedDelaysRule extends SaropaLintRule {
   /// Tests may fail intermittently in CI environments.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2584,6 +2734,12 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
   /// Tests without error cases miss important edge cases.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.low;
@@ -2761,6 +2917,12 @@ class PreferTestFindByKeyRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -2866,6 +3028,12 @@ class PreferSetupTeardownRule extends SaropaLintRule {
   /// Test quality improvement.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -3096,6 +3264,12 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -3204,6 +3378,12 @@ class PreferBlocTestPackageRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -3287,6 +3467,12 @@ class PreferMockVerifyRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -3368,6 +3554,12 @@ class RequireDialogTestsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -3465,6 +3657,12 @@ class PreferFakePlatformRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -3594,6 +3792,12 @@ class RequireTestDocumentationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
 
   @override
   RuleCost get cost => RuleCost.medium;

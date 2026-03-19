@@ -58,6 +58,12 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -173,6 +179,12 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.medium;
@@ -326,6 +338,12 @@ class PreferImageCroppingRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -445,6 +463,12 @@ class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -556,6 +580,12 @@ class PreferPermissionRequestInContextRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -654,6 +684,12 @@ class AvoidPermissionRequestLoopRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -720,6 +756,12 @@ class PreferPermissionMinimalRequestRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
+
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -756,6 +798,12 @@ class RequirePermissionLifecycleObserverRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.vulnerability;
+
+  @override
+  Set<String> get tags => const {'security'};
 
   @override
   RuleCost get cost => RuleCost.low;
