@@ -35,6 +35,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Added
 
+• **Lint rules** — **no_runtimeType_toString**: flags `runtimeType.toString()` and suggests type checks or direct `Type` comparison (performance, MAJOR, Recommended tier).
+
+• **Lint rules** — **use_truncating_division**: flags `(a / b).toInt()` and suggests `a ~/ b` (MAJOR, Recommended tier).
+
 • **Extension** — **Explain rule**: right-click any violation in the Issues view (or run **Saropa Lints: Explain rule** from the command palette) to open a side tab with full rule details: problem message, how to fix, severity, impact, OWASP mapping (when present), and a link to the ROADMAP. The panel reuses a single tab; the documentation link opens in the default browser.
 
 ### Administration
