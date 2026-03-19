@@ -28,6 +28,8 @@ class RequireSecureStorageRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[311];
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -256,6 +258,8 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[287];
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -347,6 +351,8 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[522];
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -437,6 +443,8 @@ class RequireAuthCheckRule extends SaropaLintRule {
   @override
   Set<String> get tags => const {'security'};
 
+  @override
+  List<int> get cweIds => const <int>[285];
   @override
   RuleCost get cost => RuleCost.medium;
 
@@ -690,6 +698,8 @@ class RequireTokenRefreshRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[613];
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -816,6 +826,8 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[345];
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -933,6 +945,8 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[613];
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1031,6 +1045,8 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
   @override
   Set<String> get tags => const {'security'};
 
+  @override
+  List<int> get cweIds => const <int>[598];
   @override
   RuleCost get cost => RuleCost.medium;
 
@@ -1149,6 +1165,8 @@ class RequireDataEncryptionRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[311];
+  @override
   RuleCost get cost => RuleCost.low;
 
   @override
@@ -1263,6 +1281,8 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
   @override
   Set<String> get tags => const {'security'};
 
+  @override
+  List<int> get cweIds => const <int>[522];
   @override
   RuleCost get cost => RuleCost.low;
 
@@ -1381,6 +1401,8 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[311];
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1490,6 +1512,8 @@ class PreferLocalAuthRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[287];
+  @override
   RuleCost get cost => RuleCost.medium;
 
   @override
@@ -1588,6 +1612,8 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
   @override
   Set<String> get tags => const {'security'};
 
+  @override
+  List<int> get cweIds => const <int>[311];
   @override
   RuleCost get cost => RuleCost.low;
 
@@ -1721,6 +1747,8 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
   @override
   Set<String> get tags => const {'security'};
 
+  @override
+  List<int> get cweIds => const <int>[311];
   @override
   RuleCost get cost => RuleCost.low;
 
@@ -1882,6 +1910,8 @@ class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[703];
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -1984,6 +2014,8 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[311];
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -2083,6 +2115,8 @@ class PreferBiometricProtectionRule extends SaropaLintRule {
   @override
   Set<String> get tags => const {'security'};
 
+  @override
+  List<int> get cweIds => const <int>[287];
   @override
   RuleCost get cost => RuleCost.low;
 
@@ -2270,6 +2304,8 @@ class RequireClipboardPasteValidationRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[20];
+  @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
@@ -2377,6 +2413,8 @@ class AvoidEncryptionKeyInMemoryRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[200];
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -2454,6 +2492,8 @@ class PreferOauthPkceRule extends SaropaLintRule {
   @override
   Set<String> get tags => const {'security'};
 
+  @override
+  List<int> get cweIds => const <int>[345];
   @override
   RuleCost get cost => RuleCost.low;
 
@@ -2584,6 +2624,8 @@ class RequireSessionTimeoutRule extends SaropaLintRule {
   @override
   Set<String> get tags => const {'security'};
 
+  @override
+  List<int> get cweIds => const <int>[613];
   @override
   RuleCost get cost => RuleCost.medium;
 
@@ -2749,6 +2791,8 @@ class PreferRootDetectionRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[284];
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -2813,11 +2857,13 @@ class PreferWebviewSandboxRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
-  RuleType? get ruleType => RuleType.vulnerability;
+  RuleType? get ruleType => RuleType.securityHotspot;
 
   @override
-  Set<String> get tags => const {'security'};
+  Set<String> get tags => const {'security', 'review-required'};
 
+  @override
+  List<int> get cweIds => const <int>[284];
   @override
   RuleCost get cost => RuleCost.low;
 
@@ -2965,6 +3011,8 @@ class PreferWhitelistValidationRule extends SaropaLintRule {
   Set<String> get tags => const {'security'};
 
   @override
+  List<int> get cweIds => const <int>[20];
+  @override
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
@@ -2997,6 +3045,8 @@ class RequireKeychainAccessRule extends SaropaLintRule {
   @override
   Set<String> get tags => const {'security'};
 
+  @override
+  List<int> get cweIds => const <int>[522];
   @override
   RuleCost get cost => RuleCost.low;
 
@@ -3065,6 +3115,8 @@ class RequireMultiFactorRule extends SaropaLintRule {
   @override
   Set<String> get tags => const {'security'};
 
+  @override
+  List<int> get cweIds => const <int>[287];
   @override
   RuleCost get cost => RuleCost.low;
 

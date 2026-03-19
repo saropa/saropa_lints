@@ -1,7 +1,7 @@
 # Rule metadata bulk application — status and remaining work
 
 **Date:** 2026-03-19 (updated: phase 2 started)  
-**Script:** `scripts/bulk_rule_metadata.py`
+**Script:** `scripts/bulk_rule_metadata.py` + `scripts/apply_security_metadata_cwe_hotspots.py`
 
 ---
 
@@ -27,6 +27,15 @@
 | `require_catch_logging` | CWE-703 |
 | `avoid_clipboard_sensitive` | CWE-200 |
 | `avoid_sensitive_data_in_clipboard` | CWE-200 (auth/storage file) |
+| `avoid_webview_cors_issues` | CWE-346 |
+| `avoid_webview_insecure_content` | CWE-319 |
+| `avoid_webview_javascript_enabled` | CWE-79 |
+| `prefer_webview_javascript_disabled` | CWE-79 |
+| `require_webview_error_handling` | CWE-703 |
+| `prefer_webview_sandbox` | CWE-284 |
+| `avoid_redirect_injection` | CWE-601 |
+| `avoid_user_controlled_urls` | CWE-601 |
+| `require_deep_link_validation` | CWE-601 |
 
 #### CWE on high-value vulnerability rules (sample batch)
 
@@ -75,15 +84,17 @@
 
 ### 1. Security hotspots — further review
 
-- **Done:** 7 rules reclassified to `securityHotspot` with `review-required` tag.
-- **Remaining:** Scan remaining `security_network_input_rules.dart` / `security_auth_storage_rules.dart` / `permission_rules.dart` for “context-dependent” findings (e.g. WebView rules where JS might be intentional); promote or demote individually.
+- **Done:** 16 rules reclassified to `securityHotspot` with `review-required` tag.
+- **Remaining:** Review any remaining security rules without CWE (mainly `permission_rules.dart`) to confirm we are not missing “review required” cases.
 
 ### 2. CWE mapping — expand
 
-- **Done:** Crypto file (5), credentials/token/SSL/HTTPS batch, hotspot CWEs.
-- **Remaining:** ~60+ security rules still on default empty `cweIds`. Options:
-  - Extend `scripts/bulk_rule_metadata.py` or add `scripts/apply_security_cwe.py` with a `rule_name → [cwe]` table.
-  - Add `docs/cwe_mapping.md` (CWE id → short name) for compliance reports (per plan).
+- **Done:** Crypto + security bulk fill:
+  - **50 security-rule classes** now have `cweIds` populated.
+  - Hotspot rules above also include CWE.
+- **Remaining:** 11 security classes intentionally left without CWE:
+  - All 8 permission rules (UX/security-hardening category but no clear CWE match).
+  - `avoid_unnecessary_to_list`, `prefer_typed_data`, `require_webview_user_agent` (non-vulnerability helper rules).
 
 ### 3. Rule lifecycle (`ruleStatus`)
 
@@ -120,8 +131,8 @@
 | Item                    | Status |
 |-------------------------|--------|
 | ruleType + tags (bulk)  | Done — 108 files |
-| securityHotspot         | **Started** — 7 rules |
-| cweIds                  | **Started** — crypto + credentials/URL/SSL/HTTPS + hotspots |
+| securityHotspot         | **Done** — 16 rules |
+| cweIds                  | **Done (phase 2)** — 50 security classes |
 | ruleStatus (beta)       | **Started** — `avoid_api_key_in_code` |
 | certIds                 | Pending |
 | accuracyTarget          | Optional; pending |
