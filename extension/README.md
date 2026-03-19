@@ -62,6 +62,7 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 | `saropaLints.enabled` | `false` | Master switch. When on, the extension has set up the project and you can run analysis from the UI. |
 | `saropaLints.tier` | `recommended` | Tier used when enabling or re-initializing (essential, recommended, professional, comprehensive, pedantic). |
 | `saropaLints.runAnalysisAfterConfigChange` | `true` | Run `dart analyze` after init when enabling. |
+| `saropaLints.runAnalysisOpenEditorsOnly` | `false` | When true, `Run Analysis` runs `dart/flutter analyze` only for Dart files currently open in VS Code (workspace text documents) under the detected project root (pubspec.yaml directory). |
 | `saropaLints.issuesPageSize` | `100` | Max violations shown per file in the Issues tree (1–1000). Remaining appear as “and N more…”. |
 
 | **TODOs & Hacks** | | |
