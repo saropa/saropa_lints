@@ -410,6 +410,65 @@ Consumers should ignore unknown fields for forward compatibility.
 
 ---
 
+## Consumer manifest (consumer_contract.json)
+
+Alongside `violations.json`, the plugin writes a small **consumer manifest** so that tools (e.g. [Saropa Log Capture](https://pub.dev/packages/saropa_log_capture)) can read the schema version and health score constants without depending on the VS Code extension or duplicating constants.
+
+### File location
+
+```
+<project_root>/reports/.saropa_lints/consumer_contract.json
+```
+
+Same directory as `violations.json` (`.saropa_lints` under the project’s `reports/` folder).
+
+### When it is written
+
+After every successful write of `violations.json` (same write cycle). If the violation export write fails, the consumer manifest is not written.
+
+### Schema
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `schemaVersion` | `string` | Yes | Same as the violation export schema version (e.g. `"1.0"`). |
+| `healthScore` | `object` | Yes | Health score parameters used by the extension and consumers. |
+| `healthScore.impactWeights` | `object` | Yes | Weights per impact level (critical, high, medium, low, opinionated). |
+| `healthScore.decayRate` | `number` | Yes | Decay rate for the score formula (e.g. `0.3`). |
+
+The extension’s health score formula must use the same values so that scores computed by the extension and by consumers (e.g. from `violations.json` + this manifest) are consistent. The canonical source for these constants is `lib/src/report/health_score_constants.dart` in the saropa_lints package; the extension keeps the same values in `healthScore.ts`.
+
+| `tierRuleSets` | `object` | Yes | Rule names per tier so consumers can filter by tier without reimplementing tier logic. Keys: `essential`, `recommended`, `professional`, `comprehensive`, `pedantic`, `stylistic`. Each value is a sorted array of rule name strings. |
+
+### Example
+
+```json
+{
+  "schemaVersion": "1.0",
+  "healthScore": {
+    "impactWeights": {
+      "critical": 8,
+      "high": 3,
+      "medium": 1,
+      "low": 0.25,
+      "opinionated": 0.05
+    },
+    "decayRate": 0.3
+  },
+  "tierRuleSets": {
+    "essential": ["avoid_hardcoded_credentials", "..."],
+    "recommended": ["avoid_print", "prefer_const", "..."],
+    "professional": ["..."],
+    "comprehensive": ["..."],
+    "pedantic": ["..."],
+    "stylistic": ["prefer_member_ordering", "..."]
+  }
+}
+```
+
+Consumers (e.g. Log Capture) can use `tierRuleSets` to know which rules belong to which tier without calling the extension or reimplementing tier logic.
+
+---
+
 ## Consumer Notes
 
 ### Reading the Export
