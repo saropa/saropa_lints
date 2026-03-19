@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/scan.dart';
+import 'package:saropa_lints/src/scan/scan_cli_args.dart';
 
 /// Standalone lint scanner that runs saropa_lints rules against any Dart
 /// project without requiring it as a dependency.
@@ -27,7 +28,15 @@ void main(List<String> args) {
     return;
   }
 
-  final parsed = _parseArgs(args);
+  final result = parseScanArgs(
+    args,
+    readStdin: _readStdinLines,
+  );
+  if (result is ScanParseInvalid) {
+    print(result.message);
+    exit(2);
+  }
+  final parsed = (result as ScanParseOk).args;
   final path = parsed.path;
   final dartFiles = parsed.dartFiles;
   final tier = parsed.tier;
@@ -63,67 +72,15 @@ void main(List<String> args) {
   exit(1);
 }
 
-class _ParsedArgs {
-  const _ParsedArgs({
-    required this.path,
-    required this.dartFiles,
-    required this.tier,
-    required this.formatJson,
-  });
-  final String path;
-  final List<String> dartFiles;
-  final String? tier;
-  final bool formatJson;
-}
-
-_ParsedArgs _parseArgs(List<String> args) {
-  final positionals = args.where((a) => !a.startsWith('--') && a != 'scan').toList();
-  final path = positionals.isNotEmpty ? positionals.first : '.';
-
-  List<String> dartFiles = [];
-  String? tier;
-  bool formatJson = false;
-
-  var i = 0;
-  while (i < args.length) {
-    final arg = args[i];
-    if (arg == '--files') {
-      i++;
-      while (i < args.length && !args[i].startsWith('--')) {
-        dartFiles.add(args[i]);
-        i++;
-      }
-      continue;
-    }
-    if (arg == '--files-from-stdin') {
-      // Read one path per line until EOF (supports piped input and multi-line lists).
-      String? line;
-      while ((line = stdin.readLineSync()) != null) {
-        final trimmed = line!.trim();
-        if (trimmed.isNotEmpty) dartFiles.add(trimmed);
-      }
-      i++;
-      continue;
-    }
-    if (arg == '--tier') {
-      i++;
-      if (i < args.length) {
-        tier = args[i];
-        i++;
-      }
-      continue;
-    }
-    if (arg == '--format') {
-      i++;
-      if (i < args.length) {
-        formatJson = args[i].toLowerCase() == 'json';
-        i++;
-      }
-      continue;
-    }
-    i++;
+/// Reads stdin until EOF; returns non-empty trimmed lines (for --files-from-stdin).
+List<String> _readStdinLines() {
+  final lines = <String>[];
+  String? line;
+  while ((line = stdin.readLineSync()) != null) {
+    final trimmed = line!.trim();
+    if (trimmed.isNotEmpty) lines.add(trimmed);
   }
-  return _ParsedArgs(path: path, dartFiles: dartFiles, tier: tier, formatJson: formatJson);
+  return lines;
 }
 
 /// Write detailed results to a report file. Returns the file path.
