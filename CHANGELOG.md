@@ -25,7 +25,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 
 ---
 
-## [Unreleased]
+## [9.10.0]
 
 This release adds version-gap awareness: see which PRs and issues landed between your pinned version and latest, triage them with a persistent review checklist, and focus your pubspec tooltip on must-know stats with a "View Full Details" link to a full-detail panel.
 
