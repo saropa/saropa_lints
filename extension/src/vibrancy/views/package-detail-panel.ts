@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { VibrancyResult, VersionGapResult } from '../types';
+import { VibrancyResult } from '../types';
 import { ReviewStateService } from '../services/review-state';
-import { buildPackageDetailHtml, buildVersionGapSectionHtml } from './package-detail-html';
+import { buildPackageDetailHtml } from './package-detail-html';
 import { fetchVersionGap } from '../services/github-version-gap';
 import { getVersionGapEnabled, getGithubToken } from '../services/config-service';
 import { CacheService } from '../services/cache-service';
