@@ -900,6 +900,10 @@ class PackageNamesRule extends SaropaLintRule {
     multiLine: true,
   );
 
+  /// Track which project roots have already been reported, so we report
+  /// at most once per project (not once per file in lib/).
+  static final Set<String> _reportedRoots = {};
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -908,21 +912,30 @@ class PackageNamesRule extends SaropaLintRule {
     final root = ProjectContext.findProjectRoot(context.filePath);
     if (root == null) return;
 
+    // Deduplicate: only report once per project root
+    if (_reportedRoots.contains(root)) return;
+
     // Read raw package name from pubspec — must use broad regex because
     // ProjectContext.getPackageName() only captures already-conforming names.
     final pubspec = File('$root/pubspec.yaml');
     if (!pubspec.existsSync()) return;
     final content = pubspec.readAsStringSync();
     final nameMatch = _rawNameField.firstMatch(content);
-    final packageName = nameMatch?.group(1) ?? '';
+    var packageName = nameMatch?.group(1) ?? '';
     if (packageName.isEmpty) return;
+
+    // Strip surrounding quotes (YAML allows `name: "My-Package"` or
+    // `name: 'My-Package'`) to avoid false positives from the quote chars.
+    if ((packageName.startsWith('"') && packageName.endsWith('"')) ||
+        (packageName.startsWith("'") && packageName.endsWith("'"))) {
+      packageName = packageName.substring(1, packageName.length - 1);
+    }
 
     // Valid name — no issue
     if (_validPackageName.hasMatch(packageName)) return;
 
-    // Only report once per project: only for files in lib/
-    final path = context.filePath.replaceAll('\\', '/');
-    if (!path.contains('/lib/')) return;
+    // Mark as reported so other files in this project don't re-trigger
+    _reportedRoots.add(root);
 
     context.addCompilationUnit((CompilationUnit unit) {
       final token = unit.beginToken;
@@ -980,8 +993,9 @@ class SortPubDependenciesRule extends SaropaLintRule {
   );
 
   /// Matches a YAML section header for dependency sections.
+  /// Includes dependency_overrides — those should also be sorted.
   static final RegExp _sectionHeader = RegExp(
-    r'^(dependencies|dev_dependencies):',
+    r'^(dependencies|dev_dependencies|dependency_overrides):',
     multiLine: true,
   );
 
@@ -992,6 +1006,10 @@ class SortPubDependenciesRule extends SaropaLintRule {
   /// but this is rare in practice since pubspec dependencies use flat key: value.
   static final RegExp _depEntry = RegExp(r'^  (\w[\w-]*):');
 
+  /// Track which project roots have already been reported, so we report
+  /// at most once per project (not once per file in lib/).
+  static final Set<String> _reportedRoots = {};
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1000,15 +1018,17 @@ class SortPubDependenciesRule extends SaropaLintRule {
     final root = ProjectContext.findProjectRoot(context.filePath);
     if (root == null) return;
 
+    // Deduplicate: only report once per project root
+    if (_reportedRoots.contains(root)) return;
+
     final pubspec = File('$root/pubspec.yaml');
     if (!pubspec.existsSync()) return;
 
     final content = pubspec.readAsStringSync();
     if (!_hasSortingIssue(content)) return;
 
-    // Only report once per project: only for files in lib/
-    final path = context.filePath.replaceAll('\\', '/');
-    if (!path.contains('/lib/')) return;
+    // Mark as reported so other files in this project don't re-trigger
+    _reportedRoots.add(root);
 
     context.addCompilationUnit((CompilationUnit unit) {
       final token = unit.beginToken;
@@ -1129,6 +1149,10 @@ class SecurePubspecUrlsRule extends SaropaLintRule {
     r'^(dependencies|dev_dependencies|dependency_overrides):',
   );
 
+  /// Track which project roots have already been reported, so we report
+  /// at most once per project (not once per file in lib/).
+  static final Set<String> _reportedRoots = {};
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1137,6 +1161,9 @@ class SecurePubspecUrlsRule extends SaropaLintRule {
     final root = ProjectContext.findProjectRoot(context.filePath);
     if (root == null) return;
 
+    // Deduplicate: only report once per project root
+    if (_reportedRoots.contains(root)) return;
+
     final pubspec = File('$root/pubspec.yaml');
     if (!pubspec.existsSync()) return;
 
@@ -1144,9 +1171,22 @@ class SecurePubspecUrlsRule extends SaropaLintRule {
 
     // Only check inside dependency sections (not homepage, description, etc.)
     // to avoid false positives on non-dependency URLs.
+    if (!_hasInsecureDepUrl(content)) return;
+
+    // Mark as reported so other files in this project don't re-trigger
+    _reportedRoots.add(root);
+
+    context.addCompilationUnit((CompilationUnit unit) {
+      final token = unit.beginToken;
+      if (token.isEof) return;
+      reporter.atOffset(offset: token.offset, length: token.length);
+    });
+  }
+
+  /// Checks if any dependency section contains insecure URLs.
+  bool _hasInsecureDepUrl(String content) {
     final lines = content.split('\n');
     bool inDepSection = false;
-    bool foundInsecure = false;
     for (final line in lines) {
       // Track whether we're inside a dependency section
       if (_depSectionHeader.hasMatch(line)) {
@@ -1162,23 +1202,9 @@ class SecurePubspecUrlsRule extends SaropaLintRule {
       if (_commentLine.hasMatch(line)) continue;
       // Strip inline comments before checking for URLs
       final beforeComment = line.contains('#') ? line.split('#').first : line;
-      if (_insecureUrl.hasMatch(beforeComment)) {
-        foundInsecure = true;
-        break;
-      }
+      if (_insecureUrl.hasMatch(beforeComment)) return true;
     }
-
-    if (!foundInsecure) return;
-
-    // Only report once per project: only for files in lib/
-    final path = context.filePath.replaceAll('\\', '/');
-    if (!path.contains('/lib/')) return;
-
-    context.addCompilationUnit((CompilationUnit unit) {
-      final token = unit.beginToken;
-      if (token.isEof) return;
-      reporter.atOffset(offset: token.offset, length: token.length);
-    });
+    return false;
   }
 }
 
@@ -1193,6 +1219,14 @@ class SecurePubspecUrlsRule extends SaropaLintRule {
 /// Every `package:foo/...` import must correspond to a dependency declared
 /// in pubspec.yaml. Missing dependencies cause resolution failures and
 /// make the project non-portable.
+///
+/// **Known limitation:** This rule checks both `dependencies` and
+/// `dev_dependencies` against ALL imports. It does not distinguish whether
+/// a file is under `lib/` (which should only use `dependencies`) or
+/// `test/` (which may also use `dev_dependencies`). A package listed in
+/// `dev_dependencies` but imported from `lib/` will not be flagged. This
+/// is a pragmatic trade-off: accurately distinguishing lib vs test imports
+/// requires resolving the package layout, which is expensive and fragile.
 ///
 /// **BAD:**
 /// ```dart

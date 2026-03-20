@@ -2888,7 +2888,8 @@ class InvalidVisibleOutsideTemplateAnnotationRule extends SaropaLintRule {
           parent is ClassDeclaration ||
           parent is EnumDeclaration ||
           parent is MixinDeclaration ||
-          parent is ExtensionDeclaration) {
+          parent is ExtensionDeclaration ||
+          parent is ExtensionTypeDeclaration) {
         reporter.atNode(node);
         return;
       }

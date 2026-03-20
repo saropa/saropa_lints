@@ -461,8 +461,7 @@ class PreferTabbarThemeIndicatorColorRule extends SaropaLintRule {
       if (typeName != 'ThemeData') return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'indicatorColor') {
+        if (arg is NamedExpression && arg.name.label.name == 'indicatorColor') {
           reporter.atNode(arg.name);
           return;
         }
@@ -480,8 +479,7 @@ class PreferTabbarThemeIndicatorColorRule extends SaropaLintRule {
       if (!typeName.startsWith('ThemeData')) return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'indicatorColor') {
+        if (arg is NamedExpression && arg.name.label.name == 'indicatorColor') {
           reporter.atNode(arg.name);
           return;
         }
@@ -552,8 +550,7 @@ class _RemoveIndicatorColorArgFix extends SaropaFixProducer {
     // Remove leading comma + whitespace/newlines if present
     if (start > 0) {
       int i = start - 1;
-      while (
-          i >= 0 &&
+      while (i >= 0 &&
           (content[i] == ' ' || content[i] == '\t' || content[i] == '\n')) {
         i--;
       }
@@ -568,8 +565,7 @@ class _RemoveIndicatorColorArgFix extends SaropaFixProducer {
     // Remove trailing comma + whitespace if this is the first argument
     if (end < content.length) {
       int i = end;
-      while (i < content.length &&
-          (content[i] == ' ' || content[i] == '\t')) {
+      while (i < content.length && (content[i] == ' ' || content[i] == '\t')) {
         i++;
       }
       if (i < content.length && content[i] == ',') {
