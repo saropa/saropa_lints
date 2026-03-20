@@ -1179,7 +1179,7 @@ class MissingCodeBlockLanguageInDocCommentRule extends SaropaLintRule {
 ///
 /// **BAD:**
 /// ```dart
-/// /// Returns a List<String> of names.
+/// /// Returns a `List<String>` of names.
 /// void getNames() {}
 /// ```
 ///

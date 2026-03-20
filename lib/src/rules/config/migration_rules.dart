@@ -1110,8 +1110,7 @@ class PreferButtonStyleIconAlignmentRule extends SaropaLintRule {
       if (!_buttonTypes.contains(typeName)) return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'iconAlignment') {
+        if (arg is NamedExpression && arg.name.label.name == 'iconAlignment') {
           reporter.atNode(arg.name);
           return;
         }
@@ -1409,8 +1408,7 @@ class PreferM3TextThemeRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
   ) {
     for (final arg in argList.arguments) {
-      if (arg is NamedExpression &&
-          _renames.containsKey(arg.name.label.name)) {
+      if (arg is NamedExpression && _renames.containsKey(arg.name.label.name)) {
         reporter.atNode(arg.name);
       }
     }

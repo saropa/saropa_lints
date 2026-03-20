@@ -301,10 +301,7 @@ void main() {
     test('PreferKeepaliveDisposeRule instantiates correctly', () {
       final rule = PreferKeepaliveDisposeRule();
       expect(rule.code.name.toLowerCase(), 'prefer_keepalive_dispose');
-      expect(
-        rule.code.problemMessage,
-        contains('[prefer_keepalive_dispose]'),
-      );
+      expect(rule.code.problemMessage, contains('[prefer_keepalive_dispose]'));
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
       expect(rule.code.correctionMessage, contains('dispose'));
@@ -399,9 +396,7 @@ void main() {
 
   group('prefer_pan_axis', () {
     test('fixture file exists', () {
-      final file = File(
-        'example/lib/migration/prefer_pan_axis_fixture.dart',
-      );
+      final file = File('example/lib/migration/prefer_pan_axis_fixture.dart');
       expect(file.existsSync(), isTrue);
     });
 
@@ -508,9 +503,7 @@ void main() {
 
   group('prefer_key_event', () {
     test('fixture file exists', () {
-      final file = File(
-        'example/lib/migration/prefer_key_event_fixture.dart',
-      );
+      final file = File('example/lib/migration/prefer_key_event_fixture.dart');
       expect(file.existsSync(), isTrue);
     });
 
