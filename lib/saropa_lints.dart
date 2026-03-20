@@ -2780,6 +2780,15 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferOnPopWithResultRule.new,
   PreferTabbarThemeIndicatorColorRule.new,
 
+  // v9.10.0 - Migration rules (Flutter SDK deprecations)
+  PreferPlatformMenuBarChildRule.new,
+  PreferKeepaliveDisposeRule.new,
+  PreferContextMenuBuilderRule.new,
+  PreferPanAxisRule.new,
+  PreferButtonStyleIconAlignmentRule.new,
+  PreferKeyEventRule.new,
+  PreferM3TextThemeRule.new,
+
   // v5.1.0 - New lint rules
   AvoidCachedImageWebRule.new,
   AvoidClipDuringAnimationRule.new,

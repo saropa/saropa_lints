@@ -583,3 +583,885 @@ class _RemoveIndicatorColorArgFix extends SaropaFixProducer {
     });
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_platform_menu_bar_child
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Detects deprecated `body` parameter on `PlatformMenuBar`.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// Flutter 3.1 deprecated the `body` constructor parameter on
+/// `PlatformMenuBar` in favor of `child`. The parameter was renamed to
+/// follow the standard Flutter widget convention where the single child
+/// widget is named `child`. The deprecated `body` parameter was removed
+/// after Flutter 3.16.
+///
+/// **BAD:**
+/// ```dart
+/// PlatformMenuBar(
+///   menus: menus,
+///   body: MyApp(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// PlatformMenuBar(
+///   menus: menus,
+///   child: MyApp(),
+/// )
+/// ```
+///
+/// See: https://github.com/flutter/flutter/pull/138509
+class PreferPlatformMenuBarChildRule extends SaropaLintRule {
+  PreferPlatformMenuBarChildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'PlatformMenuBar'};
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _PreferPlatformMenuBarChildFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_platform_menu_bar_child',
+    "[prefer_platform_menu_bar_child] The 'body' parameter on PlatformMenuBar "
+        'was deprecated in Flutter 3.1 and removed after Flutter 3.16 '
+        '(PR #138509). The parameter was renamed to follow the standard '
+        "Flutter widget convention where the single child widget is named "
+        "'child'. Code using the old 'body' parameter will fail to compile "
+        'on Flutter 3.19 and later. {v1}',
+    correctionMessage:
+        "Rename the 'body' named argument to 'child'. The behavior is "
+        'identical — only the parameter name changed.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'PlatformMenuBar') return;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'body') {
+          reporter.atNode(arg.name);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Quick fix: rename `body:` to `child:` in PlatformMenuBar.
+class _PreferPlatformMenuBarChildFix extends SaropaFixProducer {
+  _PreferPlatformMenuBarChildFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.preferPlatformMenuBarChild',
+    80,
+    "Rename 'body' to 'child'",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    if (node == null) return;
+
+    final label = node is Label ? node : node.thisOrAncestorOfType<Label>();
+    if (label == null) return;
+
+    final identifier = label.label;
+    if (identifier.name != 'body') return;
+
+    await builder.addDartFileEdit(file, (builder) {
+      builder.addSimpleReplacement(
+        SourceRange(identifier.offset, identifier.length),
+        'child',
+      );
+    });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_keepalive_dispose
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Detects deprecated `release()` method on `KeepAliveHandle`.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// Flutter 3.3 deprecated `KeepAliveHandle.release()` in favor of
+/// `dispose()`. The `release()` method was often called without a
+/// subsequent `dispose()`, leading to memory leaks. The functionality was
+/// consolidated into `dispose()` so a single call handles both releasing
+/// the keep-alive and cleaning up the handle. The deprecated `release()`
+/// was removed after Flutter 3.19.
+///
+/// **BAD:**
+/// ```dart
+/// keepAliveHandle.release();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// keepAliveHandle.dispose();
+/// ```
+///
+/// See: https://github.com/flutter/flutter/pull/143961
+class PreferKeepaliveDisposeRule extends SaropaLintRule {
+  PreferKeepaliveDisposeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'release'};
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _PreferKeepaliveDisposeFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_keepalive_dispose',
+    "[prefer_keepalive_dispose] The 'release()' method on KeepAliveHandle was "
+        'deprecated in Flutter 3.3 and removed after Flutter 3.19 '
+        '(PR #143961). Calling release() without dispose() caused memory '
+        'leaks because the handle was never cleaned up. The functionality '
+        'was consolidated into dispose(), which both releases the keep-alive '
+        'and cleans up the handle in a single call. {v1}',
+    correctionMessage:
+        "Replace 'release()' with 'dispose()'. The dispose() method now "
+        'performs both release and cleanup. Review call sites to ensure '
+        'dispose() is not called twice.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'release') return;
+
+      // Verify the target type is KeepAliveHandle via static type
+      final targetType = node.realTarget?.staticType;
+      if (targetType == null) return;
+      final typeName = targetType.getDisplayString();
+      if (!typeName.startsWith('KeepAliveHandle')) return;
+
+      reporter.atNode(node.methodName);
+    });
+  }
+}
+
+/// Quick fix: rename `release()` to `dispose()` on KeepAliveHandle.
+class _PreferKeepaliveDisposeFix extends SaropaFixProducer {
+  _PreferKeepaliveDisposeFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.preferKeepaliveDispose',
+    80,
+    "Replace 'release()' with 'dispose()'",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    if (node == null) return;
+
+    // The error is reported on the method name SimpleIdentifier.
+    if (node is! SimpleIdentifier) return;
+    if (node.name != 'release') return;
+
+    await builder.addDartFileEdit(file, (builder) {
+      builder.addSimpleReplacement(
+        SourceRange(node.offset, node.length),
+        'dispose',
+      );
+    });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_context_menu_builder
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Detects deprecated `previewBuilder` parameter on `CupertinoContextMenu`.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// Flutter 3.4 deprecated the `previewBuilder` parameter on
+/// `CupertinoContextMenu` in favor of `builder`. The old `previewBuilder`
+/// only handled the second half of the context menu's opening animation
+/// (after `CupertinoContextMenu.animationOpensAt`). The new `builder`
+/// covers the full animation lifecycle from 0 to 1, giving more control.
+/// The deprecated parameter was removed after Flutter 3.19.
+///
+/// **BAD:**
+/// ```dart
+/// CupertinoContextMenu(
+///   previewBuilder: (context, animation, child) {
+///     return FittedBox(child: child);
+///   },
+///   child: myWidget,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// CupertinoContextMenu(
+///   builder: (context, animation) {
+///     return FittedBox(child: myWidget);
+///   },
+///   child: myWidget,
+/// )
+/// ```
+///
+/// See: https://github.com/flutter/flutter/pull/143990
+class PreferContextMenuBuilderRule extends SaropaLintRule {
+  PreferContextMenuBuilderRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'CupertinoContextMenu'};
+
+  static const LintCode _code = LintCode(
+    'prefer_context_menu_builder',
+    "[prefer_context_menu_builder] The 'previewBuilder' parameter on "
+        'CupertinoContextMenu was deprecated in Flutter 3.4 and removed '
+        'after Flutter 3.19 (PR #143990). The old previewBuilder only '
+        'handled the second half of the opening animation (after '
+        'animationOpensAt). The replacement builder parameter covers the '
+        'full animation lifecycle from 0 to 1. Note: the callback signature '
+        'changed from (context, animation, child) to (context, animation) — '
+        'manual migration is required. {v1}',
+    correctionMessage:
+        "Replace 'previewBuilder' with 'builder' and update the callback "
+        'signature from (context, animation, child) to (context, animation). '
+        'The child widget must be referenced directly instead of via the '
+        'callback parameter.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Skip lint rule/fix source — detection patterns trigger self-referential FPs
+    if (context.isLintPluginSource) return;
+
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'CupertinoContextMenu') return;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'previewBuilder') {
+          reporter.atNode(arg.name);
+          return;
+        }
+      }
+    });
+  }
+
+  // No auto-fix: callback signature changed from 3 params to 2 params,
+  // requiring manual migration of the child reference.
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_pan_axis
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Detects deprecated `alignPanAxis` parameter on `InteractiveViewer`.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// Flutter 3.7 deprecated the `alignPanAxis` boolean parameter on
+/// `InteractiveViewer` in favor of the `panAxis` enum parameter. The old
+/// boolean only supported two modes (free or aligned), while the new
+/// `PanAxis` enum adds `horizontal` and `vertical` options. The deprecated
+/// parameter was removed after Flutter 3.19.
+///
+/// **BAD:**
+/// ```dart
+/// InteractiveViewer(
+///   alignPanAxis: true,
+///   child: child,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// InteractiveViewer(
+///   panAxis: PanAxis.aligned,
+///   child: child,
+/// )
+/// ```
+///
+/// See: https://github.com/flutter/flutter/pull/142500
+class PreferPanAxisRule extends SaropaLintRule {
+  PreferPanAxisRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'alignPanAxis'};
+
+  static const LintCode _code = LintCode(
+    'prefer_pan_axis',
+    "[prefer_pan_axis] The 'alignPanAxis' parameter on InteractiveViewer was "
+        'deprecated in Flutter 3.7 and removed after Flutter 3.19 '
+        '(PR #142500). The boolean parameter only supported two modes (free '
+        'or aligned). The replacement panAxis parameter uses a PanAxis enum '
+        'that adds horizontal-only and vertical-only panning options. '
+        'Use PanAxis.aligned instead of alignPanAxis: true, or PanAxis.free '
+        '(the default) instead of alignPanAxis: false. {v1}',
+    correctionMessage:
+        "Replace 'alignPanAxis: true' with 'panAxis: PanAxis.aligned', or "
+        "remove 'alignPanAxis: false' (PanAxis.free is the default).",
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'InteractiveViewer') return;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'alignPanAxis') {
+          reporter.atNode(arg.name);
+          return;
+        }
+      }
+    });
+  }
+
+  // No auto-fix: the value transformation (bool → PanAxis enum) requires
+  // context-dependent replacement that is not safe to automate.
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_button_style_icon_alignment
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Detects deprecated `iconAlignment` parameter on button constructors.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// Flutter 3.28 deprecated the `iconAlignment` parameter directly on
+/// `ButtonStyleButton` subclass constructors (`ElevatedButton.icon`,
+/// `FilledButton.icon`, `OutlinedButton.icon`, `TextButton.icon`). The
+/// property was moved into `ButtonStyle` so it can be customized through
+/// themes and `styleFrom` methods consistently with other icon properties.
+///
+/// **BAD:**
+/// ```dart
+/// ElevatedButton.icon(
+///   label: Text('Button'),
+///   icon: Icon(Icons.add),
+///   iconAlignment: IconAlignment.end,
+///   onPressed: () {},
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ElevatedButton.icon(
+///   label: Text('Button'),
+///   icon: Icon(Icons.add),
+///   style: ElevatedButton.styleFrom(
+///     iconAlignment: IconAlignment.end,
+///   ),
+///   onPressed: () {},
+/// )
+/// ```
+///
+/// See: https://github.com/flutter/flutter/pull/160023
+class PreferButtonStyleIconAlignmentRule extends SaropaLintRule {
+  PreferButtonStyleIconAlignmentRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'iconAlignment'};
+
+  static const LintCode _code = LintCode(
+    'prefer_button_style_icon_alignment',
+    "[prefer_button_style_icon_alignment] The 'iconAlignment' parameter on "
+        'ButtonStyleButton subclass constructors (ElevatedButton.icon, '
+        'FilledButton.icon, OutlinedButton.icon, TextButton.icon) was '
+        'deprecated in Flutter 3.28 (PR #160023). The property was moved '
+        'into ButtonStyle so it can be customized through themes and '
+        "styleFrom methods. Use ButtonStyle.iconAlignment via the 'style' "
+        'parameter instead of passing it directly to the constructor. {v1}',
+    correctionMessage:
+        "Remove 'iconAlignment' from the constructor and set it via "
+        "the 'style' parameter instead, e.g. "
+        'ElevatedButton.styleFrom(iconAlignment: IconAlignment.end).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Button types whose `.icon` constructor had the deprecated parameter.
+  static const _buttonTypes = <String>{
+    'ElevatedButton',
+    'FilledButton',
+    'OutlinedButton',
+    'TextButton',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Skip lint rule/fix source — detection patterns trigger self-referential FPs
+    if (context.isLintPluginSource) return;
+
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (!_buttonTypes.contains(typeName)) return;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'iconAlignment') {
+          reporter.atNode(arg.name);
+          return;
+        }
+      }
+    });
+  }
+
+  // No auto-fix: moving the value into ButtonStyle requires restructuring
+  // the constructor call, which is too complex for a safe automated fix.
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_key_event
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Detects deprecated `RawKeyEvent`/`RawKeyboard` API usage.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// Flutter 3.18 deprecated the `RawKeyEvent`/`RawKeyboard` key event system
+/// in favor of the `KeyEvent`/`HardwareKeyboard` system. The old system is
+/// being removed. The new system provides better key repeat handling (via a
+/// separate `KeyRepeatEvent` type) and moves modifier key state queries to
+/// `HardwareKeyboard.instance` instead of the event object.
+///
+/// **BAD:**
+/// ```dart
+/// RawKeyboardListener(
+///   focusNode: focusNode,
+///   onKey: (event) {
+///     if (event is RawKeyDownEvent) { ... }
+///   },
+///   child: child,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// KeyboardListener(
+///   focusNode: focusNode,
+///   onKeyEvent: (event) {
+///     if (event is KeyDownEvent) { ... }
+///   },
+///   child: child,
+/// )
+/// ```
+///
+/// See: https://github.com/flutter/flutter/pull/136677
+class PreferKeyEventRule extends SaropaLintRule {
+  PreferKeyEventRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  // 'RawKey' is more specific than 'Raw' — avoids scanning files that merely
+  // contain RawImage, RawGestureDetector, rawValue, etc.
+  @override
+  Set<String>? get requiredPatterns => const <String>{'RawKey'};
+
+  static const LintCode _code = LintCode(
+    'prefer_key_event',
+    "[prefer_key_event] The RawKeyEvent/RawKeyboard key event system was "
+        'deprecated in Flutter 3.18 (PR #136677) in favor of '
+        'KeyEvent/HardwareKeyboard. The old system will be removed in a '
+        'future release. Migrate: RawKeyEvent → KeyEvent, '
+        'RawKeyDownEvent → KeyDownEvent, RawKeyUpEvent → KeyUpEvent, '
+        'RawKeyboard → HardwareKeyboard, '
+        'RawKeyboardListener → KeyboardListener. Also replace onKey '
+        'callbacks with onKeyEvent on Focus/FocusNode/FocusScope. {v1}',
+    correctionMessage:
+        'Replace RawKeyEvent with KeyEvent, RawKeyboard with '
+        'HardwareKeyboard, RawKeyboardListener with KeyboardListener, '
+        'and onKey with onKeyEvent. See the Flutter key event migration '
+        'guide for details.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Deprecated type names and their replacements.
+  static const _deprecatedTypes = <String>{
+    'RawKeyEvent',
+    'RawKeyDownEvent',
+    'RawKeyUpEvent',
+    'RawKeyboard',
+    'RawKeyboardListener',
+  };
+
+  /// Widget types where `onKey:` is deprecated in favor of `onKeyEvent:`.
+  static const _onKeyWidgets = <String>{
+    'Focus',
+    'FocusNode',
+    'FocusScope',
+    'FocusScopeNode',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Skip lint rule/fix source — detection patterns trigger self-referential FPs
+    if (context.isLintPluginSource) return;
+
+    // Case 1: Detect deprecated type references (e.g., RawKeyEvent in type
+    // annotations, is-checks, and constructor calls).
+    context.addNamedType((NamedType node) {
+      if (_deprecatedTypes.contains(node.name.lexeme)) {
+        reporter.atNode(node);
+      }
+    });
+
+    // Case 2: Detect `onKey:` named argument in Focus/FocusNode constructors.
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (!_onKeyWidgets.contains(typeName)) return;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'onKey') {
+          reporter.atNode(arg.name);
+          return;
+        }
+      }
+    });
+  }
+
+  // No auto-fix: the migration involves multiple interrelated changes
+  // (type renames, callback signature changes, modifier key query changes)
+  // that are not safe to automate piecemeal.
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_m3_text_theme
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Detects deprecated 2018-era `TextTheme` member names.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// Flutter 3.1 deprecated the 2018-era `TextTheme` property names in favor
+/// of the Material 3 naming scheme. The deprecated names were removed in
+/// Flutter 3.22 (PR #139255). The full mapping is:
+///
+/// - `headline1` → `displayLarge`
+/// - `headline2` → `displayMedium`
+/// - `headline3` → `displaySmall`
+/// - `headline4` → `headlineMedium`
+/// - `headline5` → `headlineSmall`
+/// - `headline6` → `titleLarge`
+/// - `subtitle1` → `titleMedium`
+/// - `subtitle2` → `titleSmall`
+/// - `bodyText1` → `bodyLarge`
+/// - `bodyText2` → `bodyMedium`
+/// - `caption` → `bodySmall`
+/// - `button` → `labelLarge`
+/// - `overline` → `labelSmall`
+///
+/// **BAD:**
+/// ```dart
+/// final style = Theme.of(context).textTheme.headline1;
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final style = Theme.of(context).textTheme.displayLarge;
+/// ```
+///
+/// See: https://github.com/flutter/flutter/pull/139255
+class PreferM3TextThemeRule extends SaropaLintRule {
+  PreferM3TextThemeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'TextTheme'};
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _PreferM3TextThemeFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_m3_text_theme',
+    "[prefer_m3_text_theme] This TextTheme member uses the deprecated "
+        '2018-era naming scheme that was removed in Flutter 3.22 '
+        '(PR #139255). The 13 deprecated names (headline1-6, subtitle1-2, '
+        'bodyText1-2, caption, button, overline) were replaced by the '
+        'Material 3 naming scheme (displayLarge/Medium/Small, '
+        'headlineMedium/Small, titleLarge/Medium/Small, '
+        'bodyLarge/Medium/Small, labelLarge/Small). Code using the old '
+        'names will fail to compile on Flutter 3.22 and later. {v1}',
+    correctionMessage:
+        'Rename the deprecated TextTheme member to its Material 3 '
+        'equivalent (e.g. headline1 → displayLarge, bodyText2 → bodyMedium, '
+        'caption → bodySmall).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Maps deprecated 2018 TextTheme member names to M3 replacements.
+  static const _renames = <String, String>{
+    'headline1': 'displayLarge',
+    'headline2': 'displayMedium',
+    'headline3': 'displaySmall',
+    'headline4': 'headlineMedium',
+    'headline5': 'headlineSmall',
+    'headline6': 'titleLarge',
+    'subtitle1': 'titleMedium',
+    'subtitle2': 'titleSmall',
+    'bodyText1': 'bodyLarge',
+    'bodyText2': 'bodyMedium',
+    'caption': 'bodySmall',
+    'button': 'labelLarge',
+    'overline': 'labelSmall',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Skip lint rule/fix source — detection patterns trigger self-referential FPs
+    if (context.isLintPluginSource) return;
+
+    // Case 1: TextTheme(headline1: ...) or textTheme.copyWith(headline1: ...)
+    // Detect deprecated named args in TextTheme constructor and copyWith.
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'TextTheme') return;
+
+      _flagDeprecatedArgs(node.argumentList, reporter);
+    });
+
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'copyWith') return;
+
+      final targetType = node.realTarget?.staticType;
+      if (targetType == null) return;
+      if (!targetType.getDisplayString().startsWith('TextTheme')) return;
+
+      _flagDeprecatedArgs(node.argumentList, reporter);
+    });
+
+    // Case 2: textTheme.headline1 (property access on TextTheme instance)
+    context.addPropertyAccess((PropertyAccess node) {
+      final propName = node.propertyName.name;
+      if (!_renames.containsKey(propName)) return;
+
+      final targetType = node.realTarget.staticType;
+      if (targetType == null) return;
+      if (!targetType.getDisplayString().startsWith('TextTheme')) return;
+
+      reporter.atNode(node.propertyName);
+    });
+
+    // Case 3: textTheme.headline1 via PrefixedIdentifier (simple variable)
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      final propName = node.identifier.name;
+      if (!_renames.containsKey(propName)) return;
+
+      final prefixType = node.prefix.staticType;
+      if (prefixType == null) return;
+      if (!prefixType.getDisplayString().startsWith('TextTheme')) return;
+
+      reporter.atNode(node.identifier);
+    });
+  }
+
+  /// Flags any deprecated named arguments in the given argument list.
+  static void _flagDeprecatedArgs(
+    ArgumentList argList,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    for (final arg in argList.arguments) {
+      if (arg is NamedExpression &&
+          _renames.containsKey(arg.name.label.name)) {
+        reporter.atNode(arg.name);
+      }
+    }
+  }
+}
+
+/// Quick fix: rename a deprecated TextTheme member to its M3 equivalent.
+class _PreferM3TextThemeFix extends SaropaFixProducer {
+  _PreferM3TextThemeFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.preferM3TextTheme',
+    80,
+    'Rename to Material 3 text theme name',
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    if (node == null) return;
+
+    // For named arguments: reported on Label → find the identifier
+    final label = node is Label ? node : node.thisOrAncestorOfType<Label>();
+    if (label != null) {
+      final identifier = label.label;
+      final replacement = PreferM3TextThemeRule._renames[identifier.name];
+      if (replacement == null) return;
+
+      await builder.addDartFileEdit(file, (b) {
+        b.addSimpleReplacement(
+          SourceRange(identifier.offset, identifier.length),
+          replacement,
+        );
+      });
+      return;
+    }
+
+    // For property access: reported on the SimpleIdentifier
+    if (node is SimpleIdentifier) {
+      final replacement = PreferM3TextThemeRule._renames[node.name];
+      if (replacement == null) return;
+
+      await builder.addDartFileEdit(file, (b) {
+        b.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          replacement,
+        );
+      });
+    }
+  }
+}
