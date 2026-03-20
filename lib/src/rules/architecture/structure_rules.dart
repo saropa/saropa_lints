@@ -4435,3 +4435,111 @@ class UnnecessaryLibraryNameRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// uri_does_not_exist
+// =============================================================================
+
+/// Warns when an import, export, or part URI refers to a non-existent file.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// Broken URIs in import, export, or part directives prevent compilation.
+/// This rule catches relative URIs that resolve to missing files.
+///
+/// **Note:** The Dart analyzer natively reports `uri_does_not_exist` for the
+/// same cases. This saropa_lints rule provides unified severity/messaging
+/// within the framework and catches cases where analyzer diagnostics are
+/// suppressed or configured differently. Users who see duplicate diagnostics
+/// can disable one via tier configuration or analysis_options.
+///
+/// **BAD:**
+/// ```dart
+/// import 'missing_file.dart';        // file does not exist
+/// part 'missing_part.g.dart';        // generated file not yet created
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'existing_file.dart';       // file exists
+/// part 'generated.g.dart';           // file exists after codegen
+/// ```
+class UriDoesNotExistRule extends SaropaLintRule {
+  UriDoesNotExistRule() : super(code: _code);
+
+  /// Medium impact: the built-in analyzer already catches most cases;
+  /// this rule is supplementary for consistent saropa_lints messaging.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'architecture', 'reliability'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'uri_does_not_exist',
+    '[uri_does_not_exist] Import, export, or part directive URI refers to a file that does not exist. Broken URIs prevent the Dart compiler from resolving dependencies, causing build failures. This can happen when files are renamed, moved, or deleted without updating the referencing directives. Note: the Dart analyzer also reports this natively. {v1}',
+    correctionMessage:
+        'Create the missing file, fix the URI path, or remove the broken directive.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Check import directives
+    context.addImportDirective((ImportDirective node) {
+      _checkUri(node.uri, context.filePath, reporter, node);
+    });
+
+    // Check export directives
+    context.addExportDirective((ExportDirective node) {
+      _checkUri(node.uri, context.filePath, reporter, node);
+    });
+
+    // Check part directives (traverse CompilationUnit since no addPartDirective)
+    context.addCompilationUnit((CompilationUnit unit) {
+      for (final directive in unit.directives) {
+        if (directive is PartDirective) {
+          _checkUri(directive.uri, context.filePath, reporter, directive);
+        }
+      }
+    });
+  }
+
+  void _checkUri(
+    StringLiteral uriLiteral,
+    String filePath,
+    SaropaDiagnosticReporter reporter,
+    AstNode node,
+  ) {
+    final String? uri = uriLiteral.stringValue;
+    if (uri == null || uri.isEmpty) return;
+
+    // Skip package: and dart: URIs — those are resolved by the package
+    // system, not the filesystem. The analyzer handles those separately.
+    if (uri.startsWith('package:') || uri.startsWith('dart:')) return;
+
+    // Resolve relative URI against the current file's directory.
+    // p.normalize handles ".." segments consistently with the rest of
+    // structure_rules.dart (see _resolveImportUri in this file).
+    final String dirPath = p.dirname(filePath);
+    final String resolvedPath = p.normalize(p.join(dirPath, uri));
+
+    try {
+      if (!File(resolvedPath).existsSync()) {
+        reporter.atNode(node);
+      }
+    } on IOException {
+      // If we can't check the file, skip silently — the analyzer will
+      // report it through its own error recovery.
+    }
+  }
+}
