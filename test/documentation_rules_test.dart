@@ -96,6 +96,8 @@ void main() {
       'require_exception_documentation',
       'require_example_in_documentation',
       'verify_documented_parameters_exist',
+      'missing_code_block_language_in_doc_comment',
+      'unintended_html_in_doc_comment',
     ];
 
     for (final fixture in fixtures) {

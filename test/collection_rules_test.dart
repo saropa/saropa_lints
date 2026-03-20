@@ -196,6 +196,7 @@ void main() {
       'require_key_for_collection',
       'avoid_function_literals_in_foreach_calls',
       'prefer_inlined_adds',
+      'prefer_for_elements_to_map_from_iterable',
     ];
 
     for (final fixture in fixtures) {
