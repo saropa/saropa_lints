@@ -1,5 +1,5 @@
 import {
-    VibrancyResult, VersionGapResult, VersionGapItem, ReviewEntry,
+    VibrancyResult, VersionGapResult, ReviewEntry,
 } from '../types';
 import { ReviewSummary } from '../services/review-state';
 import { categoryLabel } from '../scoring/status-classifier';
@@ -34,19 +34,6 @@ export function buildPackageDetailHtml(
     ];
 
     return wrapHtml(result.package.name, parts.join('\n'));
-}
-
-/**
- * Build just the version-gap section HTML (for async update after lazy fetch).
- * Injected into the panel via postMessage when gap data arrives.
- */
-export function buildVersionGapSectionHtml(
-    gap: VersionGapResult,
-    label: string,
-    reviews: readonly ReviewEntry[],
-    reviewSummary: ReviewSummary | null,
-): string {
-    return buildVersionGapSection(gap, label, reviews, reviewSummary);
 }
 
 // ---------------------------------------------------------------------------
