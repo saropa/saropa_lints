@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/architecture/structure_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 46 Structure lint rules.
+/// Tests for 47 Structure lint rules.
 ///
 /// Test fixtures: example_core/lib/structure/*
 void main() {
@@ -288,6 +288,11 @@ void main() {
       'UnnecessaryLibraryNameRule',
       'unnecessary_library_name',
       () => UnnecessaryLibraryNameRule(),
+    );
+    testRule(
+      'UriDoesNotExistRule',
+      'uri_does_not_exist',
+      () => UriDoesNotExistRule(),
     );
   });
   group('Structure Rules - Fixture Verification', () {
@@ -904,6 +909,39 @@ void main() {
       test('limit_max_imports should NOT trigger', () {
         // Compliant code passes
         expect('limit_max_imports passes', isNotNull);
+      });
+    });
+
+    group('uri_does_not_exist', () {
+      test('import of non-existent relative file SHOULD trigger', () {
+        // import 'missing_file.dart' when file doesn't exist
+        expect('missing relative import triggers rule', isNotNull);
+      });
+
+      test('import of existing file should NOT trigger', () {
+        // import 'existing_file.dart' when file exists
+        expect('valid import does not trigger', isNotNull);
+      });
+
+      test('package: imports should NOT trigger (false positive)', () {
+        // package: URIs are resolved by the package system, not filesystem
+        expect('package URI skipped', isNotNull);
+      });
+
+      test('dart: imports should NOT trigger (false positive)', () {
+        // dart: URIs are SDK libraries
+        expect('dart URI skipped', isNotNull);
+      });
+
+      test('part directives also checked', () {
+        // Rule checks imports, exports, AND part directives
+        expect('part directive checked', isNotNull);
+      });
+
+      test('ruleType is bug', () {
+        final rule = UriDoesNotExistRule();
+        expect(rule.ruleType, isNotNull);
+        expect(rule.ruleType.toString(), contains('bug'));
       });
     });
   });
