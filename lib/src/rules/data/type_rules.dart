@@ -2816,3 +2816,114 @@ class PreferConstDeclarationsRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// invalid_visible_outside_template_annotation
+// =============================================================================
+
+/// Warns when `@visibleOutsideTemplate` is used incorrectly.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// The `@visibleOutsideTemplate` annotation is specific to AngularDart and
+/// should only be applied to concrete instance members of component classes.
+/// Applying it to top-level declarations, static members, or non-component
+/// classes has no effect and indicates a misunderstanding of the annotation.
+///
+/// **BAD:**
+/// ```dart
+/// @visibleOutsideTemplate  // Wrong: top-level function
+/// void myHelper() {}
+///
+/// class NotAComponent {
+///   @visibleOutsideTemplate  // Wrong: not a component class
+///   void method() {}
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @Component(selector: 'my-comp')
+/// class MyComponent {
+///   @visibleOutsideTemplate  // Correct: instance member of a component
+///   String get title => _title;
+/// }
+/// ```
+class InvalidVisibleOutsideTemplateAnnotationRule extends SaropaLintRule {
+  InvalidVisibleOutsideTemplateAnnotationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'angular', 'annotations'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'invalid_visible_outside_template_annotation',
+    '[invalid_visible_outside_template_annotation] The @visibleOutsideTemplate annotation is used incorrectly. This annotation is specific to AngularDart and should only appear on concrete instance members of @Component classes. Applying it elsewhere has no effect and misleads developers about the member\'s visibility intent. {v1}',
+    correctionMessage:
+        'Remove @visibleOutsideTemplate or move it to an instance member of a @Component class.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addAnnotation((Annotation node) {
+      if (node.name.name != 'visibleOutsideTemplate') return;
+
+      final parent = node.parent;
+
+      // Top-level declarations — always invalid
+      if (parent is FunctionDeclaration ||
+          parent is TopLevelVariableDeclaration ||
+          parent is ClassDeclaration ||
+          parent is EnumDeclaration ||
+          parent is MixinDeclaration ||
+          parent is ExtensionDeclaration) {
+        reporter.atNode(node);
+        return;
+      }
+
+      // Constructors — annotation has no effect on constructors
+      if (parent is ConstructorDeclaration) {
+        reporter.atNode(node);
+        return;
+      }
+
+      // Instance members — only valid inside @Component classes
+      if (parent is MethodDeclaration || parent is FieldDeclaration) {
+        // Check if static — annotation only applies to instance members
+        if (parent is MethodDeclaration && parent.isStatic) {
+          reporter.atNode(node);
+          return;
+        }
+        if (parent is FieldDeclaration && parent.isStatic) {
+          reporter.atNode(node);
+          return;
+        }
+
+        // Check enclosing class for @Component annotation
+        final classDecl = parent.thisOrAncestorOfType<ClassDeclaration>();
+        if (classDecl == null || !_hasComponentAnnotation(classDecl)) {
+          reporter.atNode(node);
+        }
+      }
+    });
+  }
+
+  bool _hasComponentAnnotation(ClassDeclaration classDecl) {
+    for (final annotation in classDecl.metadata) {
+      if (annotation.name.name == 'Component') return true;
+    }
+    return false;
+  }
+}

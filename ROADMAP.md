@@ -6,7 +6,7 @@
 # Roadmap: Aiming for 2,100 Lint Rules
 <!-- cspell:disable -->
 
-See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2100 rules (2051 implemented, 49 remaining).
+See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2100 rules (2061 implemented, 39 remaining).
 
 > **When implementing**: Remove from ROADMAP, add to CHANGELOG, register in `all_rules.dart` + `tiers.dart`. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -831,10 +831,6 @@ Use as a todo list for implementation candidates. Sorted by **Effort** (L → M 
 
 | Rule key | Kind | Name | Checks for (summary) | Severity | Effort | Wow |
 |----------------|------|------|----------------------|----------|--------|-----|
-| missing_code_block_language_in_doc_comment | 💨 CODE_SMELL | Missing code block language in doc comment | Code block in doc comment should specify language. | ⚠️ MINOR | 🟡 M | ★★ M |
-| prefer_for_elements_to_map_fromIterable | 💨 CODE_SMELL | Prefer for elements to map fromIterable | Prefer for elements over Map.fromIterable. | 🚨 MAJOR | 🟡 M | ★★ M |
-| unintended_html_in_doc_comment | 💨 CODE_SMELL | Unintended html in doc comment | Angle brackets in doc comment interpreted as HTML. | ⚠️ MINOR | 🟡 M | ★★ M |
-| uri_does_not_exist_in_doc_import | 💨 CODE_SMELL | Uri does not exist in doc import | Doc-import URI refers to non-existent file. | ⚠️ MINOR | 🟡 M | ★★ M |
 | conflicting_constructor_and_static_member | 🐛 BUG | Conflicting constructor and static member | Named constructor and static method/field have same name. | ⚠️ MINOR | 🟡 M | ★ L |
 | duplicate_constructor | 🐛 BUG | Duplicate constructor | More than one unnamed or same-named constructor. | ⚠️ MINOR | 🟡 M | ★ L |
 | duplicate_field_name | 🐛 BUG | Duplicate field name | Record literal/type has duplicate field name. | ⚠️ MINOR | 🟡 M | ★ L |
@@ -854,11 +850,6 @@ Use as a todo list for implementation candidates. Sorted by **Effort** (L → M 
 | annotate_redeclares | 💨 CODE_SMELL | Annotate redeclares | Redeclared members should be annotated. | ⚠️ MINOR | 🟡 M | ★ L |
 | deprecated_new_in_comment_reference | 💨 CODE_SMELL | Deprecated new in comment reference | Doc comment uses new in comment reference. | ⚠️ MINOR | 🟡 M | ★ L |
 | document_ignores | 💨 CODE_SMELL | Document ignores | Ignored diagnostics should be documented. | ⚠️ MINOR | 🟡 M | ★ L |
-| invalid_visible_outside_template_annotation | 💨 CODE_SMELL | Invalid visible outside template annotation | @visibleOutsideTemplate used incorrectly. | 🚨 MAJOR | 🟡 M | ★ L |
-| depend_on_referenced_packages | 💨 CODE_SMELL | Depend on referenced packages | Imported package must be in pubspec. | 🚨 MAJOR | 🔴 H | ★★★ H |
-| secure_pubspec_urls | 💨 CODE_SMELL | Secure pubspec urls | Use https (not http/git:) in pubspec. | 🚨 MAJOR | 🔴 H | ★★★ H |
-| package_names | 💨 CODE_SMELL | Package names | Package names: lowercase_with_underscores. | ⚠️ MINOR | 🔴 H | ★★ M |
-| sort_pub_dependencies | 💨 CODE_SMELL | Sort pub dependencies | Sort pub dependencies A–Z in pubspec. | ⚠️ MINOR | 🔴 H | ★★ M |
 | abi_specific_integer_invalid | 🐛 BUG | Abi specific integer invalid | Class extending AbiSpecificInteger doesn't meet requirements. | ⚠️ MINOR | 🔴 H | ★ L |
 | argument_type_not_assignable_to_error_handler | 🐛 BUG | Argument type not assignable to error handler | Future.catchError argument function parameters incompatible. | ⚠️ MINOR | 🔴 H | ★ L |
 | body_might_complete_normally | 🐛 BUG | Body might complete normally | Method/function with non-nullable return type could implicitly return null. | ⚠️ MINOR | 🔴 H | ★ L |
@@ -884,7 +875,6 @@ Use as a todo list for implementation candidates. Sorted by **Effort** (L → M 
 | undefined_extension_getter | 🐛 BUG | Undefined extension getter | Extension override getter not defined. | ⚠️ MINOR | 🔴 H | ★ L |
 | undefined_extension_setter | 🐛 BUG | Undefined extension setter | Extension override setter not defined. | ⚠️ MINOR | 🔴 H | ★ L |
 | undefined_super_member | 🐛 BUG | Undefined super member | super member not in superclass chain. | ⚠️ MINOR | 🔴 H | ★ L |
-| uri_does_not_exist | 🐛 BUG | Uri does not exist | Import/export/part URI refers to non-existent file. | 🔴 BLOCKER | 🔴 H | ★ L |
 | wrong_number_of_type_arguments | 🐛 BUG | Wrong number of type arguments | Type arguments count doesn't match type parameters. | ⚠️ MINOR | 🔴 H | ★ L |
 | omit_obvious_local_variable_types | 💨 CODE_SMELL | Omit obvious local variable types | Don't type annotate when type is obvious. | ⚠️ MINOR | 🔴 H | ★ L |
 | type_parameter_supertype_of_its_bound | 💨 CODE_SMELL | Type parameter supertype of its bound | Type parameter bound is (indirectly) itself. | ⚠️ MINOR | 🔴 H | ★ L |

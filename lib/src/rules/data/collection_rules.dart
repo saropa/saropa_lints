@@ -3339,3 +3339,104 @@ class PreferInlinedAddsRule extends SaropaLintRule {
     return name == 'add' || name == 'addAll';
   }
 }
+
+// =============================================================================
+// prefer_for_elements_to_map_from_iterable
+// =============================================================================
+
+/// Warns when `Map.fromIterable` can be replaced with a for-element map
+/// literal.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// The for-element syntax `{ for (final e in items) key: value }` is more
+/// concise and idiomatic than `Map.fromIterable(items, key: ..., value: ...)`.
+///
+/// **BAD:**
+/// ```dart
+/// final map = Map.fromIterable(items, key: (e) => e.id, value: (e) => e.name);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final map = { for (final e in items) e.id: e.name };
+/// ```
+class PreferForElementsToMapFromIterableRule extends SaropaLintRule {
+  PreferForElementsToMapFromIterableRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'collections', 'style'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_for_elements_to_map_from_iterable',
+    '[prefer_for_elements_to_map_from_iterable] Map.fromIterable can be replaced with a for-element map literal. The for-element syntax { for (final e in items) key: value } is more concise, avoids unnecessary closure allocation, and is the idiomatic Dart pattern recommended by the language team. {v1}',
+    correctionMessage:
+        'Replace with a for-element map literal: { for (final e in iterable) keyExpr: valueExpr }.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Map.fromIterable is a named constructor — always parsed as
+    // InstanceCreationExpression in the Dart analyzer AST.
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      _checkFromIterable(node, reporter);
+    });
+  }
+
+  void _checkFromIterable(
+    InstanceCreationExpression node,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final constructorName = node.constructorName;
+    final type = constructorName.type;
+    final name = constructorName.name;
+
+    // Check for Map.fromIterable(...)
+    if (name?.name != 'fromIterable') return;
+    if (type.name.lexeme != 'Map') return;
+
+    // Must have key and value named arguments with simple closures
+    if (!_hasSimpleKeyValueArgs(node.argumentList)) return;
+    reporter.atNode(node);
+  }
+
+  /// Returns true when the argument list has `key:` and `value:` named
+  /// arguments whose values are simple single-expression closures.
+  bool _hasSimpleKeyValueArgs(ArgumentList args) {
+    bool hasKey = false;
+    bool hasValue = false;
+
+    for (final arg in args.arguments) {
+      if (arg is! NamedExpression) continue;
+      final label = arg.name.label.name;
+
+      if (label == 'key' && _isSimpleClosure(arg.expression)) {
+        hasKey = true;
+      } else if (label == 'value' && _isSimpleClosure(arg.expression)) {
+        hasValue = true;
+      }
+    }
+
+    return hasKey && hasValue;
+  }
+
+  /// A simple closure is a function expression with an expression body
+  /// (e.g. `(e) => e.id`), not a block body.
+  bool _isSimpleClosure(Expression expr) {
+    if (expr is! FunctionExpression) return false;
+    return expr.body is ExpressionFunctionBody;
+  }
+}

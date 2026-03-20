@@ -848,3 +848,418 @@ class RequireConfigValidationRule extends SaropaLintRule {
     SaropaContext context,
   ) {}
 }
+
+// =============================================================================
+// package_names
+// =============================================================================
+
+/// Warns when the pubspec package name does not follow conventions.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// Dart package names should be `lowercase_with_underscores` per pub.dev
+/// convention. Names with uppercase letters, hyphens, or other characters
+/// cause publishing issues and violate ecosystem norms.
+///
+/// **BAD:** `name: MyPackage` or `name: my-package`
+///
+/// **GOOD:** `name: my_package`
+class PackageNamesRule extends SaropaLintRule {
+  PackageNamesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config', 'pubspec'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'package_names',
+    '[package_names] Package name in pubspec.yaml does not follow the lowercase_with_underscores convention. Non-conforming names cause issues with pub.dev publishing, make imports harder to read, and violate the Dart ecosystem naming standard that all published packages follow. {v1}',
+    correctionMessage:
+        'Rename the package to use only lowercase letters, digits, and underscores (e.g. my_package).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Valid Dart package name: lowercase letters, digits, underscores.
+  /// Must start with a lowercase letter.
+  static final RegExp _validPackageName = RegExp(r'^[a-z][a-z0-9_]*$');
+
+  /// Broader regex that captures ANY non-empty name value from pubspec,
+  /// including non-conforming names like "MyPackage" or "my-package".
+  /// ProjectContext.getPackageName() only captures conforming names, so
+  /// we must parse the raw value ourselves to detect violations.
+  static final RegExp _rawNameField = RegExp(
+    r'^name:\s+(\S+)',
+    multiLine: true,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final root = ProjectContext.findProjectRoot(context.filePath);
+    if (root == null) return;
+
+    // Read raw package name from pubspec — must use broad regex because
+    // ProjectContext.getPackageName() only captures already-conforming names.
+    final pubspec = File('$root/pubspec.yaml');
+    if (!pubspec.existsSync()) return;
+    final content = pubspec.readAsStringSync();
+    final nameMatch = _rawNameField.firstMatch(content);
+    final packageName = nameMatch?.group(1) ?? '';
+    if (packageName.isEmpty) return;
+
+    // Valid name — no issue
+    if (_validPackageName.hasMatch(packageName)) return;
+
+    // Only report once per project: only for files in lib/
+    final path = context.filePath.replaceAll('\\', '/');
+    if (!path.contains('/lib/')) return;
+
+    context.addCompilationUnit((CompilationUnit unit) {
+      final token = unit.beginToken;
+      if (token.isEof) return;
+      reporter.atOffset(offset: token.offset, length: token.length);
+    });
+  }
+}
+
+// =============================================================================
+// sort_pub_dependencies
+// =============================================================================
+
+/// Warns when pubspec dependencies are not sorted alphabetically.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// Keeping dependencies sorted in pubspec.yaml makes them easier to
+/// scan, reduces merge conflicts, and matches the `dart pub add` behavior.
+///
+/// **BAD:**
+/// ```yaml
+/// dependencies:
+///   http: ^1.0.0
+///   args: ^2.0.0
+/// ```
+///
+/// **GOOD:**
+/// ```yaml
+/// dependencies:
+///   args: ^2.0.0
+///   http: ^1.0.0
+/// ```
+class SortPubDependenciesRule extends SaropaLintRule {
+  SortPubDependenciesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config', 'pubspec'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'sort_pub_dependencies',
+    '[sort_pub_dependencies] Dependencies in pubspec.yaml are not sorted alphabetically. Unsorted dependency lists are harder to scan visually, increase the chance of merge conflicts when multiple developers add packages, and deviate from the alphabetical order that `dart pub add` uses by default. {v1}',
+    correctionMessage:
+        'Sort dependencies alphabetically within each section (dependencies, dev_dependencies).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  /// Matches a YAML section header for dependency sections.
+  static final RegExp _sectionHeader = RegExp(
+    r'^(dependencies|dev_dependencies):',
+    multiLine: true,
+  );
+
+  /// Matches an indented dependency entry (2-space indent, name followed by :).
+  /// Known limitation: relies on standard 2-space YAML indentation. Nested
+  /// sub-keys (git:, hosted:, path:) use 4+ spaces and won't match. Unusual
+  /// inline map structures at the 2-space level could produce false positives,
+  /// but this is rare in practice since pubspec dependencies use flat key: value.
+  static final RegExp _depEntry = RegExp(r'^  (\w[\w-]*):');
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final root = ProjectContext.findProjectRoot(context.filePath);
+    if (root == null) return;
+
+    final pubspec = File('$root/pubspec.yaml');
+    if (!pubspec.existsSync()) return;
+
+    final content = pubspec.readAsStringSync();
+    if (!_hasSortingIssue(content)) return;
+
+    // Only report once per project: only for files in lib/
+    final path = context.filePath.replaceAll('\\', '/');
+    if (!path.contains('/lib/')) return;
+
+    context.addCompilationUnit((CompilationUnit unit) {
+      final token = unit.beginToken;
+      if (token.isEof) return;
+      reporter.atOffset(offset: token.offset, length: token.length);
+    });
+  }
+
+  /// Checks if any dependency section has unsorted entries.
+  bool _hasSortingIssue(String content) {
+    final lines = content.split('\n');
+    bool inDepSection = false;
+    final List<String> currentDeps = [];
+
+    for (final line in lines) {
+      // Check for section headers
+      if (_sectionHeader.hasMatch(line)) {
+        // Check previous section before starting new one
+        if (_isUnsorted(currentDeps)) return true;
+        currentDeps.clear();
+        inDepSection = true;
+        continue;
+      }
+
+      // Non-indented line ends the current section
+      if (inDepSection && line.isNotEmpty && !line.startsWith(' ')) {
+        if (_isUnsorted(currentDeps)) return true;
+        currentDeps.clear();
+        inDepSection = false;
+        continue;
+      }
+
+      if (inDepSection) {
+        final match = _depEntry.firstMatch(line);
+        if (match != null) {
+          currentDeps.add(match.group(1)!);
+        }
+      }
+    }
+
+    // Check the last section
+    return _isUnsorted(currentDeps);
+  }
+
+  bool _isUnsorted(List<String> deps) {
+    if (deps.length < 2) return false;
+    for (int i = 1; i < deps.length; i++) {
+      if (deps[i].compareTo(deps[i - 1]) < 0) return true;
+    }
+    return false;
+  }
+}
+
+// =============================================================================
+// secure_pubspec_urls
+// =============================================================================
+
+/// Warns when pubspec.yaml contains insecure HTTP URLs.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// Dependency sources in pubspec.yaml should use HTTPS for integrity and
+/// security. Plain HTTP URLs are vulnerable to man-in-the-middle attacks
+/// that could inject malicious code into dependencies.
+///
+/// **BAD:**
+/// ```yaml
+/// dependencies:
+///   my_pkg:
+///     git:
+///       url: http://github.com/org/repo.git
+/// ```
+///
+/// **GOOD:**
+/// ```yaml
+/// dependencies:
+///   my_pkg:
+///     git:
+///       url: https://github.com/org/repo.git
+/// ```
+class SecurePubspecUrlsRule extends SaropaLintRule {
+  SecurePubspecUrlsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  /// Security-sensitive — insecure dependency URLs enable MITM attacks.
+  /// Classified as hotspot: http:// in homepage/description is benign,
+  /// but in dependency sources it's a genuine security risk.
+  @override
+  RuleType? get ruleType => RuleType.securityHotspot;
+
+  @override
+  Set<String> get tags => const {'security', 'config', 'pubspec'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'secure_pubspec_urls',
+    '[secure_pubspec_urls] Insecure URL (http:// or git://) found in pubspec.yaml dependency source. Plain HTTP and unencrypted git:// URLs are vulnerable to man-in-the-middle attacks that could inject malicious code into your dependencies. Always use https:// for dependency URLs to ensure integrity and authenticity. {v1}',
+    correctionMessage:
+        'Replace http:// with https:// in the dependency URL. For git dependencies, use https://github.com/... instead of git://github.com/...',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Matches insecure URLs: http:// or git:// (not https://)
+  static final RegExp _insecureUrl = RegExp(
+    r'(?:^|\s)(http://|git://)',
+    multiLine: true,
+  );
+
+  /// Matches YAML comment lines to exclude them.
+  static final RegExp _commentLine = RegExp(r'^\s*#');
+
+  /// Section headers for dependency-related YAML blocks.
+  static final RegExp _depSectionHeader = RegExp(
+    r'^(dependencies|dev_dependencies|dependency_overrides):',
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final root = ProjectContext.findProjectRoot(context.filePath);
+    if (root == null) return;
+
+    final pubspec = File('$root/pubspec.yaml');
+    if (!pubspec.existsSync()) return;
+
+    final content = pubspec.readAsStringSync();
+
+    // Only check inside dependency sections (not homepage, description, etc.)
+    // to avoid false positives on non-dependency URLs.
+    final lines = content.split('\n');
+    bool inDepSection = false;
+    bool foundInsecure = false;
+    for (final line in lines) {
+      // Track whether we're inside a dependency section
+      if (_depSectionHeader.hasMatch(line)) {
+        inDepSection = true;
+        continue;
+      }
+      // Non-indented, non-empty line ends the current section
+      if (line.isNotEmpty && !line.startsWith(' ') && !line.startsWith('#')) {
+        inDepSection = false;
+        continue;
+      }
+      if (!inDepSection) continue;
+      if (_commentLine.hasMatch(line)) continue;
+      // Strip inline comments before checking for URLs
+      final beforeComment = line.contains('#') ? line.split('#').first : line;
+      if (_insecureUrl.hasMatch(beforeComment)) {
+        foundInsecure = true;
+        break;
+      }
+    }
+
+    if (!foundInsecure) return;
+
+    // Only report once per project: only for files in lib/
+    final path = context.filePath.replaceAll('\\', '/');
+    if (!path.contains('/lib/')) return;
+
+    context.addCompilationUnit((CompilationUnit unit) {
+      final token = unit.beginToken;
+      if (token.isEof) return;
+      reporter.atOffset(offset: token.offset, length: token.length);
+    });
+  }
+}
+
+// =============================================================================
+// depend_on_referenced_packages
+// =============================================================================
+
+/// Warns when an imported package is not listed in pubspec dependencies.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// Every `package:foo/...` import must correspond to a dependency declared
+/// in pubspec.yaml. Missing dependencies cause resolution failures and
+/// make the project non-portable.
+///
+/// **BAD:**
+/// ```dart
+/// import 'package:http/http.dart';  // http not in pubspec.yaml
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'package:http/http.dart';  // http listed in dependencies
+/// ```
+class DependOnReferencedPackagesRule extends SaropaLintRule {
+  DependOnReferencedPackagesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config', 'reliability'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'depend_on_referenced_packages',
+    '[depend_on_referenced_packages] Imported package is not listed in pubspec.yaml dependencies. Using a package without declaring the dependency means builds rely on transitive resolution, which can break unexpectedly when other packages update their own dependencies. Every package import must have a corresponding entry in pubspec.yaml. {v1}',
+    correctionMessage:
+        'Add the missing package to dependencies (or dev_dependencies for test files) in pubspec.yaml.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Extracts the package name from a package: URI.
+  /// e.g. 'package:http/http.dart' -> 'http'
+  static final RegExp _packageUri = RegExp(r'^package:(\w+)/');
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Resolve project root and own package name once per file (not per
+    // import directive) to avoid N directory traversals for N imports.
+    final root = ProjectContext.findProjectRoot(context.filePath);
+    final ownName = root != null ? ProjectContext.getPackageName(root) : '';
+
+    context.addImportDirective((ImportDirective node) {
+      final String? uri = node.uri.stringValue;
+      if (uri == null) return;
+
+      // Only check package: imports (skip dart: and relative)
+      if (!uri.startsWith('package:')) return;
+
+      final match = _packageUri.firstMatch(uri);
+      if (match == null) return;
+
+      final String packageName = match.group(1)!;
+
+      // Skip the project's own package name
+      if (packageName == ownName) return;
+
+      // Check if the package is in pubspec dependencies
+      if (ProjectContext.hasDependency(context.filePath, packageName)) return;
+
+      // Package not found in dependencies — report at the import directive
+      reporter.atNode(node);
+    });
+  }
+}
