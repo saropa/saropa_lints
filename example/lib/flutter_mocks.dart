@@ -2981,6 +2981,10 @@ class InteractiveViewer extends Widget {
 
 // ── ThemeData extras ────────────────────────────────────────────────────
 
+class TabBarThemeData {
+  const TabBarThemeData({dynamic indicatorColor});
+}
+
 class ThemeData {
   ThemeData({
     dynamic primarySwatch,
@@ -2993,12 +2997,27 @@ class ThemeData {
     dynamic elevatedButtonTheme,
     dynamic inputDecorationTheme,
     dynamic useMaterial3,
+    dynamic indicatorColor,
+    dynamic tabBarTheme,
   });
   dynamic get colorScheme => _ColorScheme();
   dynamic get textTheme => _TextTheme();
   dynamic get primaryColor => null;
   dynamic get scaffoldBackgroundColor => null;
   dynamic get brightness => null;
+  dynamic get indicatorColor => null;
+  dynamic get tabBarTheme => null;
+
+  ThemeData copyWith({
+    dynamic primaryColor,
+    dynamic colorScheme,
+    dynamic textTheme,
+    dynamic brightness,
+    dynamic scaffoldBackgroundColor,
+    dynamic indicatorColor,
+    dynamic tabBarTheme,
+  }) =>
+      ThemeData();
 }
 
 class _ColorScheme {
