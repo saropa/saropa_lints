@@ -372,3 +372,218 @@ class _PreferOnPopWithResultFix extends SaropaFixProducer {
     }
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_tabbar_theme_indicator_color
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Detects usage of the deprecated `ThemeData.indicatorColor` property.
+///
+/// Since: v9.10.0 | Rule version: v1
+///
+/// Flutter 3.32.0 deprecated `ThemeData.indicatorColor` as part of the
+/// Material Theme System Updates. The indicator color for tab bars should be
+/// set through `TabBarThemeData.indicatorColor` instead of the top-level
+/// `ThemeData` property. Using the deprecated property bypasses the
+/// component-level theme system and will be removed in a future release.
+///
+/// **BAD:**
+/// ```dart
+/// ThemeData(
+///   indicatorColor: Colors.blue,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ThemeData(
+///   tabBarTheme: TabBarThemeData(
+///     indicatorColor: Colors.blue,
+///   ),
+/// )
+/// ```
+///
+/// See: https://github.com/flutter/flutter/pull/160024
+class PreferTabbarThemeIndicatorColorRule extends SaropaLintRule {
+  PreferTabbarThemeIndicatorColorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'indicatorColor'};
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _RemoveIndicatorColorArgFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_tabbar_theme_indicator_color',
+    "[prefer_tabbar_theme_indicator_color] The 'indicatorColor' property on "
+        'ThemeData was deprecated in Flutter 3.32.0 (PR #160024) as part of '
+        'the Material Theme System Updates. Using ThemeData.indicatorColor '
+        'directly bypasses the component-level theme system and will be '
+        'removed in a future Flutter release. Migrate to '
+        'TabBarThemeData.indicatorColor to keep tab indicator colors '
+        'consistent with the Material Theme System. {v1}',
+    correctionMessage:
+        "Move 'indicatorColor' from ThemeData to TabBarThemeData. Set it via "
+        'ThemeData(tabBarTheme: TabBarThemeData(indicatorColor: ...)) or '
+        'Theme.of(context).tabBarTheme.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Skip lint rule/fix source — detection patterns trigger self-referential FPs
+    if (context.isLintPluginSource) return;
+
+    // Case 1: ThemeData(indicatorColor: value)
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'ThemeData') return;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'indicatorColor') {
+          reporter.atNode(arg.name);
+          return;
+        }
+      }
+    });
+
+    // Case 2: themeData.copyWith(indicatorColor: value)
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'copyWith') return;
+
+      // Verify the target type is ThemeData via static type
+      final targetType = node.realTarget?.staticType;
+      if (targetType == null) return;
+      final typeName = targetType.getDisplayString();
+      if (!typeName.startsWith('ThemeData')) return;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'indicatorColor') {
+          reporter.atNode(arg.name);
+          return;
+        }
+      }
+    });
+
+    // Case 3: themeData.indicatorColor (property access)
+    context.addPropertyAccess((PropertyAccess node) {
+      if (node.propertyName.name != 'indicatorColor') return;
+
+      // realTarget is non-nullable on PropertyAccess; staticType may be null
+      final targetType = node.realTarget.staticType;
+      if (targetType == null) return;
+      final typeName = targetType.getDisplayString();
+      if (!typeName.startsWith('ThemeData')) return;
+
+      reporter.atNode(node.propertyName);
+    });
+
+    // Case 4: themeData.indicatorColor via PrefixedIdentifier
+    // (when prefix is a simple identifier, e.g., a local variable)
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (node.identifier.name != 'indicatorColor') return;
+
+      final prefixType = node.prefix.staticType;
+      if (prefixType == null) return;
+      final typeName = prefixType.getDisplayString();
+      if (!typeName.startsWith('ThemeData')) return;
+
+      reporter.atNode(node.identifier);
+    });
+  }
+}
+
+/// Quick fix: remove the `indicatorColor:` named argument.
+///
+/// This removes the deprecated argument from ThemeData constructors and
+/// copyWith calls. The user must manually add the value to TabBarThemeData.
+class _RemoveIndicatorColorArgFix extends SaropaFixProducer {
+  _RemoveIndicatorColorArgFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.removeIndicatorColorArg',
+    80,
+    "Remove 'indicatorColor' (migrate to TabBarThemeData)",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    if (node == null) return;
+
+    // Navigate to the NamedExpression containing this label
+    final named = node.thisOrAncestorOfType<NamedExpression>();
+    if (named == null) return;
+
+    // Only fix constructor/copyWith args, not property access
+    final parent = named.parent;
+    if (parent is! ArgumentList) return;
+
+    final content = unitResult.content;
+    int start = named.offset;
+    int end = named.end;
+
+    // Remove leading comma + whitespace/newlines if present
+    if (start > 0) {
+      int i = start - 1;
+      while (
+          i >= 0 &&
+          (content[i] == ' ' || content[i] == '\t' || content[i] == '\n')) {
+        i--;
+      }
+      if (i >= 0 && content[i] == ',') {
+        while (i > 0 && (content[i - 1] == ' ' || content[i - 1] == '\t')) {
+          i--;
+        }
+        start = i;
+      }
+    }
+
+    // Remove trailing comma + whitespace if this is the first argument
+    if (end < content.length) {
+      int i = end;
+      while (i < content.length &&
+          (content[i] == ' ' || content[i] == '\t')) {
+        i++;
+      }
+      if (i < content.length && content[i] == ',') {
+        i++;
+        while (i < content.length &&
+            (content[i] == ' ' || content[i] == '\t')) {
+          i++;
+        }
+        end = i;
+      }
+    }
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addDeletion(SourceRange(start, end - start));
+    });
+  }
+}

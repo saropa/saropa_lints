@@ -25,6 +25,24 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [Unreleased]
+
+### Added
+
+• **Lint rules** — **prefer_tabbar_theme_indicator_color**: flags `ThemeData.indicatorColor` usage deprecated in Flutter 3.32.0; migrate to `TabBarThemeData.indicatorColor` (WARNING, Recommended tier). Quick fix removes the deprecated argument.
+
+• **Lint rules** — 10 new rules from ROADMAP additional rules 11–20:
+  - **uri_does_not_exist** (ERROR, Essential): import/export/part URI refers to a non-existent file.
+  - **depend_on_referenced_packages** (WARNING, Essential): imported package not listed in pubspec.yaml dependencies.
+  - **secure_pubspec_urls** (WARNING, Recommended): flags insecure http:// or git:// URLs in pubspec dependency sources.
+  - **package_names** (WARNING, Recommended): package name in pubspec must be lowercase_with_underscores.
+  - **prefer_for_elements_to_map_from_iterable** (WARNING, Professional): prefer for-element map literal over Map.fromIterable with key/value closures.
+  - **missing_code_block_language_in_doc_comment** (INFO, Comprehensive): fenced code block in doc comment missing language identifier.
+  - **unintended_html_in_doc_comment** (INFO, Comprehensive): angle brackets in doc comment prose interpreted as HTML.
+  - **uri_does_not_exist_in_doc_import** (INFO, Comprehensive): @docImport URI refers to a non-existent file.
+  - **invalid_visible_outside_template_annotation** (WARNING, Comprehensive): @visibleOutsideTemplate used on wrong declaration type.
+  - **sort_pub_dependencies** (INFO, Comprehensive): pubspec dependencies not sorted alphabetically.
+
 ## [9.9.0]
 
 ### Fixed
