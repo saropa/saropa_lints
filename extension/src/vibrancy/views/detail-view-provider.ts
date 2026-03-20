@@ -83,6 +83,15 @@ export class DetailViewProvider implements vscode.WebviewViewProvider {
                     await vscode.env.openExternal(vscode.Uri.parse(message.url));
                 }
                 break;
+
+            case 'fullDetails':
+                if (message.package) {
+                    await vscode.commands.executeCommand(
+                        'saropaLints.packageVibrancy.showPackagePanel',
+                        message.package,
+                    );
+                }
+                break;
         }
     }
 

@@ -36,6 +36,10 @@ export function getIncludeOverriddenPackages(): boolean {
     return getConfig().get<boolean>('includeOverriddenPackages', true);
 }
 
+export function getVersionGapEnabled(): boolean {
+    return getConfig().get<boolean>('enableVersionGap', false);
+}
+
 export function getAllowlist(): readonly string[] {
     return getConfig().get<string[]>('allowlist', []);
 }

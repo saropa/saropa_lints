@@ -132,6 +132,8 @@ export async function analyzePackage(
         latestPrerelease: prereleaseInfo?.latestPrerelease ?? null,
         prereleaseTag: prereleaseInfo?.prereleaseTag ?? null,
         vulnerabilities: [],
+        versionGap: null,
+        overrideGap: null,
     };
 }
 

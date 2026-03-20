@@ -27,7 +27,8 @@ export function extractGitHubRepo(
     return { owner: match[1], repo: match[2] };
 }
 
-function buildHeaders(token?: string): Record<string, string> {
+/** Build GitHub API request headers with optional auth token. */
+export function buildHeaders(token?: string): Record<string, string> {
     const headers: Record<string, string> = {
         'Accept': 'application/vnd.github.v3+json',
         'User-Agent': 'saropa-package-vibrancy',

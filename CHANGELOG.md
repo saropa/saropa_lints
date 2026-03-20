@@ -25,32 +25,56 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [Unreleased]
+
+This release adds version-gap awareness: see which PRs and issues landed between your pinned version and latest, triage them with a persistent review checklist, and focus your pubspec tooltip on must-know stats with a "View Full Details" link to a full-detail panel.
+
+### Added
+
+• **Version-gap PR/issue viewer** — new "Package Details" webview panel shows merged PRs and closed issues between your current package version and latest, fetched from GitHub on demand. Includes searchable/filterable/sortable table with per-item review controls.
+
+• **Review checklist** — persistent triage state for version-gap items. Mark each PR/issue as reviewed, applicable, or not-applicable. State persists across sessions and auto-prunes when package versions change.
+
+• **Full-detail package panel** — new command `Show Package Details` opens a comprehensive editor-area panel with version info, community metrics, alerts, vulnerabilities, version-gap table, platforms, and suggestions.
+
+• **"View Full Details" links** — compact hover tooltip and sidebar detail view now include a "View Full Details" button that opens the full panel.
+
+• **Version-gap configuration** — new setting `saropaLints.packageVibrancy.enableVersionGap` (default: off) to enable GitHub version-gap fetching. Recommended with a GitHub token for best results.
+
+### Changed
+
+• **Compact hover tooltip** — pubspec dependency hover reduced from 60-100+ lines to ~10 lines of must-know stats (score, update, license, vulnerabilities, critical alerts, action item count).
+
+---
+
 ## [9.9.1]
 
 ### Added
 
 • **Lint rules** — 7 new Flutter deprecation migration rules (WARNING, Recommended tier):
-  - **prefer_m3_text_theme**: flags deprecated 2018-era TextTheme member names (headline1–6, subtitle1–2, bodyText1–2, caption, button, overline) removed in Flutter 3.22. Quick fix renames to M3 equivalents.
-  - **prefer_keepalive_dispose**: flags `KeepAliveHandle.release()` removed after Flutter 3.19; use `dispose()` instead. Quick fix renames the method call.
-  - **prefer_pan_axis**: flags `InteractiveViewer.alignPanAxis` removed after Flutter 3.19; use `panAxis` enum parameter instead.
-  - **prefer_context_menu_builder**: flags `CupertinoContextMenu.previewBuilder` removed after Flutter 3.19; use `builder` (callback signature changed, manual migration required).
-  - **prefer_button_style_icon_alignment**: flags `iconAlignment` parameter on button constructors deprecated in Flutter 3.28; move to `ButtonStyle.iconAlignment`.
-  - **prefer_key_event**: flags deprecated `RawKeyEvent`/`RawKeyboard` system deprecated in Flutter 3.18; migrate to `KeyEvent`/`HardwareKeyboard`.
-  - **prefer_platform_menu_bar_child**: flags `PlatformMenuBar.body` removed after Flutter 3.16; use `child` instead. Quick fix renames the parameter.
+
+- **prefer_m3_text_theme**: flags deprecated 2018-era TextTheme member names (headline1–6, subtitle1–2, bodyText1–2, caption, button, overline) removed in Flutter 3.22. Quick fix renames to M3 equivalents.
+- **prefer_keepalive_dispose**: flags `KeepAliveHandle.release()` removed after Flutter 3.19; use `dispose()` instead. Quick fix renames the method call.
+- **prefer_pan_axis**: flags `InteractiveViewer.alignPanAxis` removed after Flutter 3.19; use `panAxis` enum parameter instead.
+- **prefer_context_menu_builder**: flags `CupertinoContextMenu.previewBuilder` removed after Flutter 3.19; use `builder` (callback signature changed, manual migration required).
+- **prefer_button_style_icon_alignment**: flags `iconAlignment` parameter on button constructors deprecated in Flutter 3.28; move to `ButtonStyle.iconAlignment`.
+- **prefer_key_event**: flags deprecated `RawKeyEvent`/`RawKeyboard` system deprecated in Flutter 3.18; migrate to `KeyEvent`/`HardwareKeyboard`.
+- **prefer_platform_menu_bar_child**: flags `PlatformMenuBar.body` removed after Flutter 3.16; use `child` instead. Quick fix renames the parameter.
 
 • **Lint rules** — **prefer_tabbar_theme_indicator_color**: flags `ThemeData.indicatorColor` usage deprecated in Flutter 3.32.0; migrate to `TabBarThemeData.indicatorColor` (WARNING, Recommended tier). Quick fix removes the deprecated argument.
 
 • **Lint rules** — 10 new rules from ROADMAP additional rules 11–20:
-  - **uri_does_not_exist** (ERROR, Essential): import/export/part URI refers to a non-existent file.
-  - **depend_on_referenced_packages** (WARNING, Essential): imported package not listed in pubspec.yaml dependencies.
-  - **secure_pubspec_urls** (WARNING, Recommended): flags insecure http:// or git:// URLs in pubspec dependency sources.
-  - **package_names** (WARNING, Recommended): package name in pubspec must be lowercase_with_underscores.
-  - **prefer_for_elements_to_map_from_iterable** (WARNING, Professional): prefer for-element map literal over Map.fromIterable with key/value closures.
-  - **missing_code_block_language_in_doc_comment** (INFO, Comprehensive): fenced code block in doc comment missing language identifier.
-  - **unintended_html_in_doc_comment** (INFO, Comprehensive): angle brackets in doc comment prose interpreted as HTML.
-  - **uri_does_not_exist_in_doc_import** (INFO, Comprehensive): @docImport URI refers to a non-existent file.
-  - **invalid_visible_outside_template_annotation** (WARNING, Comprehensive): @visibleOutsideTemplate used on wrong declaration type.
-  - **sort_pub_dependencies** (INFO, Comprehensive): pubspec dependencies not sorted alphabetically.
+
+- **uri_does_not_exist** (ERROR, Essential): import/export/part URI refers to a non-existent file.
+- **depend_on_referenced_packages** (WARNING, Essential): imported package not listed in pubspec.yaml dependencies.
+- **secure_pubspec_urls** (WARNING, Recommended): flags insecure http:// or git:// URLs in pubspec dependency sources.
+- **package_names** (WARNING, Recommended): package name in pubspec must be lowercase_with_underscores.
+- **prefer_for_elements_to_map_from_iterable** (WARNING, Professional): prefer for-element map literal over Map.fromIterable with key/value closures.
+- **missing_code_block_language_in_doc_comment** (INFO, Comprehensive): fenced code block in doc comment missing language identifier.
+- **unintended_html_in_doc_comment** (INFO, Comprehensive): angle brackets in doc comment prose interpreted as HTML.
+- **uri_does_not_exist_in_doc_import** (INFO, Comprehensive): @docImport URI refers to a non-existent file.
+- **invalid_visible_outside_template_annotation** (WARNING, Comprehensive): @visibleOutsideTemplate used on wrong declaration type.
+- **sort_pub_dependencies** (INFO, Comprehensive): pubspec dependencies not sorted alphabetically.
 
 ## [9.9.0]
 
@@ -61,6 +85,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 • **Package** — **Cross-isolate import graph:** each batch file (`.batches/*.json`) now includes optional `ig` (raw import/export URIs per file). `ReportConsolidator` merges `ig` across isolates into `ConsolidatedData.mergedRawImports`; the combined report hydrates `ImportGraphTracker` from that merge so FILE IMPORTANCE / PROJECT STRUCTURE reflect the whole session. Legacy batches without `ig` still use in-memory graph data from the writing isolate. **Path alignment:** consolidated violations use project-relative paths; `ImportGraphTracker` resolves scores and FILE IMPORTANCE issue counts against graph keys via canonical path matching.
 
 • **Package** — Priority report correctness: progress/report counts are now deduplicated by `ruleName:offset` (offset-based) instead of `ruleName:line`, preventing inflated FIX PRIORITY / FILE IMPORTANCE counts when the same rule emits multiple diagnostics at the same location. The combined report also omits the legacy flat `ALL VIOLATIONS` section so developers work from the prioritized view.
+
 ### Added
 
 • **Package** — Performance benchmark: added `test/import_graph_tracker_perf_test.dart` to measure ordering overhead for FILE IMPORTANCE / FIX PRIORITY / PROJECT STRUCTURE sections. Synthetic “200-file chain + 500 violations” took ~60-80ms in unit test (the “<20ms” target still needs optimization).
@@ -323,16 +348,17 @@ _Package Vibrancy is now built into Saropa Lints. One extension, one sidebar —
 ### Added
 
 • **Package Vibrancy integration** — merged the standalone Package Vibrancy extension into Saropa Lints
-  - Three new collapsible sidebar panels: Package Vibrancy, Package Problems, Package Details
-  - Dependency vibrancy scoring, vulnerability scanning (OSV + GitHub Advisory), SBOM export (CycloneDX)
-  - Upgrade planning with test gates, bulk updates (latest/major/minor/patch)
-  - CodeLens badges on pubspec.yaml dependencies showing vibrancy scores
-  - Unused dependency detection, pubspec annotation, dependency sorting
-  - Background version watching with configurable polling intervals
-  - Budget enforcement (max dependencies, total size, min average vibrancy)
-  - Private registry support with secure token storage
-  - CI pipeline generation for dependency health checks
-  - Package comparison view for side-by-side evaluation
+
+- Three new collapsible sidebar panels: Package Vibrancy, Package Problems, Package Details
+- Dependency vibrancy scoring, vulnerability scanning (OSV + GitHub Advisory), SBOM export (CycloneDX)
+- Upgrade planning with test gates, bulk updates (latest/major/minor/patch)
+- CodeLens badges on pubspec.yaml dependencies showing vibrancy scores
+- Unused dependency detection, pubspec annotation, dependency sorting
+- Background version watching with configurable polling intervals
+- Budget enforcement (max dependencies, total size, min average vibrancy)
+- Private registry support with secure token storage
+- CI pipeline generation for dependency health checks
+- Package comparison view for side-by-side evaluation
 
 ### Changed
 
@@ -539,34 +565,36 @@ The VS Code extension is now the primary way to use saropa_lints. One-click setu
 ### Changed
 
 • **Init tool modularization:** Extracted `bin/init.dart` (4,819 lines) into 21 focused modules under `lib/src/init/`, reducing the entry point to 15 lines. No behavior changes.
-  - `cli_args.dart` — CLI argument parsing and `CliArgs` class
-  - `config_reader.dart` — user customization extraction
-  - `config_writer.dart` — YAML generation for `analysis_options.yaml`
-  - `custom_overrides_core.dart` — override file creation and settings
-  - `display.dart` — ANSI color support and `InitColors` class
-  - `init_runner.dart` — main orchestrator (`runInit`)
-  - `init_post_write.dart` — post-write phase (ignore conversion, walkthrough, analysis)
-  - `log_writer.dart` — `LogWriter` class, report file management
-  - `migration.dart` — V4/V7 migration detection and conversion
-  - `platforms_packages.dart` — platform and package settings
-  - `preflight.dart` — pre-flight environment checks
-  - `project_info.dart` — project and package detection
-  - `rule_metadata.dart` — rule metadata cache and lookups
-  - `stylistic_rulesets.dart` — stylistic rule category data
-  - `stylistic_section.dart` — stylistic section builder
-  - `stylistic_section_parser.dart` — stylistic section parsing
-  - `stylistic_walkthrough.dart` — interactive walkthrough orchestrator
-  - `stylistic_walkthrough_prompts.dart` — walkthrough UI prompts
-  - `tier_ui.dart` — tier selection UI
-  - `validation.dart` — post-write config validation
-  - `whats_new.dart` — release notes display (moved from `bin/`)
+
+- `cli_args.dart` — CLI argument parsing and `CliArgs` class
+- `config_reader.dart` — user customization extraction
+- `config_writer.dart` — YAML generation for `analysis_options.yaml`
+- `custom_overrides_core.dart` — override file creation and settings
+- `display.dart` — ANSI color support and `InitColors` class
+- `init_runner.dart` — main orchestrator (`runInit`)
+- `init_post_write.dart` — post-write phase (ignore conversion, walkthrough, analysis)
+- `log_writer.dart` — `LogWriter` class, report file management
+- `migration.dart` — V4/V7 migration detection and conversion
+- `platforms_packages.dart` — platform and package settings
+- `preflight.dart` — pre-flight environment checks
+- `project_info.dart` — project and package detection
+- `rule_metadata.dart` — rule metadata cache and lookups
+- `stylistic_rulesets.dart` — stylistic rule category data
+- `stylistic_section.dart` — stylistic section builder
+- `stylistic_section_parser.dart` — stylistic section parsing
+- `stylistic_walkthrough.dart` — interactive walkthrough orchestrator
+- `stylistic_walkthrough_prompts.dart` — walkthrough UI prompts
+- `tier_ui.dart` — tier selection UI
+- `validation.dart` — post-write config validation
+- `whats_new.dart` — release notes display (moved from `bin/`)
 
 ### Fixed
 
 • **19 false positive bugs fixed across scan rules:**
-  - **Self-referential false positives (8 rules):** `avoid_asset_manifest_json`, `avoid_ios_in_app_browser_for_auth`, `avoid_mixed_environments`, `avoid_purchase_in_sandbox_production`, `require_database_migration`, `require_https_only`, `require_unique_iv_per_encryption`, `require_websocket_reconnection` — rules no longer flag their own detection pattern strings in `lib/src/rules/` and `lib/src/fixes/` directories
-  - **Flutter-only rules skip non-Flutter projects (5 rules):** `avoid_blocking_main_thread` (-170 FPs), `avoid_print_in_release` (-197 FPs), `avoid_long_running_isolates`, `prefer_platform_io_conditional`, `require_android_permission_request` — rules now check `ProjectContext.isFlutterProject` and skip CLI tools, servers, and analysis plugins
-  - **Detection logic improvements (6 rules):** `avoid_api_key_in_code` skips regex patterns; `avoid_catch_all` allows `developer.log(error:, stackTrace:)` defensive catches; `avoid_hardcoded_config` whitelists `pub.dev`/`github.com` URLs; `avoid_parameter_mutation` no longer flags collection accumulator methods (`.add()`, `.addAll()`, etc.); `require_catch_logging` recognizes `developer.log` and `stderr`; `require_data_encryption` checks argument text only (not receiver names)
+
+- **Self-referential false positives (8 rules):** `avoid_asset_manifest_json`, `avoid_ios_in_app_browser_for_auth`, `avoid_mixed_environments`, `avoid_purchase_in_sandbox_production`, `require_database_migration`, `require_https_only`, `require_unique_iv_per_encryption`, `require_websocket_reconnection` — rules no longer flag their own detection pattern strings in `lib/src/rules/` and `lib/src/fixes/` directories
+- **Flutter-only rules skip non-Flutter projects (5 rules):** `avoid_blocking_main_thread` (-170 FPs), `avoid_print_in_release` (-197 FPs), `avoid_long_running_isolates`, `prefer_platform_io_conditional`, `require_android_permission_request` — rules now check `ProjectContext.isFlutterProject` and skip CLI tools, servers, and analysis plugins
+- **Detection logic improvements (6 rules):** `avoid_api_key_in_code` skips regex patterns; `avoid_catch_all` allows `developer.log(error:, stackTrace:)` defensive catches; `avoid_hardcoded_config` whitelists `pub.dev`/`github.com` URLs; `avoid_parameter_mutation` no longer flags collection accumulator methods (`.add()`, `.addAll()`, etc.); `require_catch_logging` recognizes `developer.log` and `stderr`; `require_data_encryption` checks argument text only (not receiver names)
 
 ---
 

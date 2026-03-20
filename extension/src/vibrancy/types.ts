@@ -1,3 +1,5 @@
+import type { VersionGapResult } from './types-extended';
+
 /** Status categories for package vibrancy. */
 export type VibrancyCategory = 'vibrant' | 'quiet' | 'legacy-locked' | 'stale' | 'end-of-life';
 
@@ -218,6 +220,10 @@ export interface VibrancyResult {
     readonly prereleaseTag: string | null;
     /** Security vulnerabilities affecting this package version. */
     readonly vulnerabilities: readonly Vulnerability[];
+    /** PRs/issues between current and latest versions. Fetched on demand. */
+    readonly versionGap: VersionGapResult | null;
+    /** For overridden packages: PRs/issues from override version to latest. */
+    readonly overrideGap: VersionGapResult | null;
 }
 
 /** A single package entry from `dart pub outdated --json`. */
