@@ -1004,15 +1004,80 @@ class _ThrowFinder extends RecursiveAstVisitor<void> {
 }
 
 // =============================================================================
+// Shared doc comment utilities
+// =============================================================================
+
+/// Strips `///`, `/** */`, or ` * ` prefix from a doc comment token.
+///
+/// Handles all standard Dart doc comment formats:
+/// - `/// content` and `///` (triple-slash)
+/// - `/** content` (block doc start)
+/// - ` * content` and ` *` (block doc continuation)
+String _stripDocCommentPrefix(String line) {
+  if (line.startsWith('/// ')) return line.substring(4);
+  if (line.startsWith('///')) return line.substring(3);
+  if (line.startsWith('/** ')) return line.substring(4);
+  if (line.startsWith('/**')) return line.substring(3);
+  if (line.startsWith(' * ')) return line.substring(3);
+  if (line.startsWith(' *')) return line.substring(2);
+  return line;
+}
+
+/// Fence regex: matches ``` at end of line (with optional trailing whitespace).
+/// Used for both opening fences without language tags and closing fences,
+/// since they are syntactically identical.
+final RegExp _fenceWithoutTag = RegExp(r'```\s*$');
+
+/// Fence regex: matches ``` immediately followed by a word character,
+/// indicating a language tag (e.g. ```dart, ```json).
+final RegExp _fenceWithTag = RegExp(r'```\w');
+
+/// Visits all doc comments in a compilation unit — both top-level
+/// declarations AND class/enum/mixin/extension members.
+void _visitAllDocComments(
+  CompilationUnit unit,
+  void Function(Comment docComment) callback,
+) {
+  for (final declaration in unit.declarations) {
+    // Top-level declaration doc comment
+    final topDoc = declaration.documentationComment;
+    if (topDoc != null) callback(topDoc);
+
+    // Member doc comments inside classes, enums, mixins, extensions
+    final NodeList<ClassMember>? members;
+    if (declaration is ClassDeclaration) {
+      members = declaration.members;
+    } else if (declaration is EnumDeclaration) {
+      members = declaration.members;
+    } else if (declaration is MixinDeclaration) {
+      members = declaration.members;
+    } else if (declaration is ExtensionDeclaration) {
+      members = declaration.members;
+    } else if (declaration is ExtensionTypeDeclaration) {
+      members = declaration.members;
+    } else {
+      members = null;
+    }
+
+    if (members == null) continue;
+    for (final member in members) {
+      final memberDoc = member.documentationComment;
+      if (memberDoc != null) callback(memberDoc);
+    }
+  }
+}
+
+// =============================================================================
 // missing_code_block_language_in_doc_comment
 // =============================================================================
 
 /// Warns when a fenced code block in a doc comment lacks a language tag.
 ///
-/// Since: v9.10.0 | Rule version: v1
+/// Since: v9.10.0 | Rule version: v2
 ///
 /// Code blocks in doc comments should specify a language (e.g. ```dart)
 /// for proper syntax highlighting in generated documentation and IDEs.
+/// Checks doc comments on top-level declarations and class members.
 ///
 /// **BAD:**
 /// ```dart
@@ -1020,6 +1085,7 @@ class _ThrowFinder extends RecursiveAstVisitor<void> {
 /// /// ```
 /// /// final x = 1;
 /// /// ```
+/// class MyClass {}
 /// ```
 ///
 /// **GOOD:**
@@ -1028,6 +1094,7 @@ class _ThrowFinder extends RecursiveAstVisitor<void> {
 /// /// ```dart
 /// /// final x = 1;
 /// /// ```
+/// class MyClass {}
 /// ```
 class MissingCodeBlockLanguageInDocCommentRule extends SaropaLintRule {
   MissingCodeBlockLanguageInDocCommentRule() : super(code: _code);
@@ -1046,22 +1113,11 @@ class MissingCodeBlockLanguageInDocCommentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'missing_code_block_language_in_doc_comment',
-    '[missing_code_block_language_in_doc_comment] Fenced code block in doc comment is missing a language identifier. Without a language tag (e.g. ```dart), generated documentation and IDEs cannot apply syntax highlighting, reducing readability and discoverability of code examples. {v1}',
+    '[missing_code_block_language_in_doc_comment] Fenced code block in doc comment is missing a language identifier. Without a language tag (e.g. ```dart), generated documentation and IDEs cannot apply syntax highlighting, reducing readability and discoverability of code examples. {v2}',
     correctionMessage:
         'Add a language identifier after the opening fence, e.g. ```dart.',
     severity: DiagnosticSeverity.INFO,
   );
-
-  /// Matches an opening fence (```) that has NO language tag after it.
-  /// The fence must be at the end of a doc comment line (after /// or *).
-  static final RegExp _bareOpeningFence = RegExp(r'```\s*$');
-
-  /// Matches an opening fence WITH a language tag (e.g. ```dart, ```json).
-  static final RegExp _taggedOpeningFence = RegExp(r'```\w');
-
-  /// Matches a closing fence (``` alone on a line — same as bare opening).
-  /// We track open/close state to avoid flagging closing fences.
-  static final RegExp _closingFence = RegExp(r'```\s*$');
 
   @override
   void runWithReporter(
@@ -1069,56 +1125,38 @@ class MissingCodeBlockLanguageInDocCommentRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addCompilationUnit((CompilationUnit unit) {
-      for (final declaration in unit.declarations) {
-        _checkDocComment(declaration.documentationComment, reporter);
-      }
+      _visitAllDocComments(unit, (Comment doc) {
+        _checkDocComment(doc, reporter);
+      });
     });
   }
 
-  void _checkDocComment(
-    Comment? docComment,
-    SaropaDiagnosticReporter reporter,
-  ) {
-    if (docComment == null) return;
-
+  void _checkDocComment(Comment docComment, SaropaDiagnosticReporter reporter) {
     bool inCodeBlock = false;
 
     for (final Token token in docComment.tokens) {
-      // Strip the doc comment prefix (/// or /** ... */)
-      final String line = token.lexeme;
-      final String content = _stripDocPrefix(line);
+      final String content = _stripDocCommentPrefix(token.lexeme);
 
       if (inCodeBlock) {
         // Inside a code block — look for closing fence
-        if (_closingFence.hasMatch(content)) {
+        if (_fenceWithoutTag.hasMatch(content)) {
           inCodeBlock = false;
         }
         continue;
       }
 
       // Outside code block — check for opening fence
-      if (_taggedOpeningFence.hasMatch(content)) {
-        // Has a language tag — good, skip into block
-        inCodeBlock = true;
+      if (_fenceWithTag.hasMatch(content)) {
+        inCodeBlock = true; // Has a language tag — good
         continue;
       }
 
-      if (_bareOpeningFence.hasMatch(content)) {
+      if (_fenceWithoutTag.hasMatch(content)) {
         // Opening fence without language tag — report
         reporter.atNode(docComment);
         return; // One report per doc comment is enough
       }
     }
-  }
-
-  /// Strips `///` or `/// ` prefix from a doc comment line.
-  static String _stripDocPrefix(String line) {
-    if (line.startsWith('/// ')) return line.substring(4);
-    if (line.startsWith('///')) return line.substring(3);
-    if (line.startsWith('/** ')) return line.substring(4);
-    if (line.startsWith(' * ')) return line.substring(3);
-    if (line.startsWith(' *')) return line.substring(2);
-    return line;
   }
 }
 
@@ -1128,20 +1166,24 @@ class MissingCodeBlockLanguageInDocCommentRule extends SaropaLintRule {
 
 /// Warns when angle brackets in doc comments may be interpreted as HTML.
 ///
-/// Since: v9.10.0 | Rule version: v1
+/// Since: v9.10.0 | Rule version: v2
 ///
 /// Angle brackets like `<String>` or `<int>` in doc comment prose are
 /// interpreted as HTML tags by documentation generators, causing content
 /// to disappear or render incorrectly. Wrap in backticks or use `[...]`.
+/// Checks both top-level and member doc comments. Skips content inside
+/// fenced code blocks and inline backtick-delimited code.
 ///
 /// **BAD:**
 /// ```dart
 /// /// Returns a List<String> of names.
+/// void getNames() {}
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
 /// /// Returns a `List<String>` of names.
+/// void getNames() {}
 /// ```
 class UnintendedHtmlInDocCommentRule extends SaropaLintRule {
   UnintendedHtmlInDocCommentRule() : super(code: _code);
@@ -1160,17 +1202,20 @@ class UnintendedHtmlInDocCommentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'unintended_html_in_doc_comment',
-    '[unintended_html_in_doc_comment] Angle brackets in doc comment text may be interpreted as HTML tags by documentation generators. Content like <String> or <MyType> will be treated as unknown HTML elements, causing text to disappear or render incorrectly in generated documentation. {v1}',
+    '[unintended_html_in_doc_comment] Angle brackets in doc comment text may be interpreted as HTML tags by documentation generators. Content like <String> or <MyType> will be treated as unknown HTML elements, causing text to disappear or render incorrectly in generated documentation. {v2}',
     correctionMessage:
         'Wrap the type reference in backticks (e.g. `List<String>`) or use square bracket references (e.g. [List]<[String]>).',
     severity: DiagnosticSeverity.INFO,
   );
 
   /// Matches `<word>` patterns that look like unintended HTML.
-  /// Captures: `<String>`, `<int>`, `<MyClass>`, `<Map<String, int>>`, etc.
+  /// Captures the first word inside angle brackets (e.g. `String` from
+  /// `<String>`, or `String` from `<String, int>`). Does not match
+  /// nested generics like `<Map<String, int>>` as a whole — it matches
+  /// the innermost `<String, int>` fragment.
   static final RegExp _angleBracketType = RegExp(r'<(\w+)(?:\s*,\s*\w+)*>');
 
-  /// Known safe HTML tags that are intentionally used in doc comments.
+  /// Known safe HTML tags intentionally used in doc comments.
   static const Set<String> _safeHtmlTags = <String>{
     'br',
     'p',
@@ -1208,58 +1253,46 @@ class UnintendedHtmlInDocCommentRule extends SaropaLintRule {
   /// Single uppercase letters used as generic type parameters.
   static final RegExp _singleTypeParam = RegExp(r'^[A-Z]$');
 
+  /// Strips inline code spans (backtick-wrapped) from a line.
+  static final RegExp _inlineCode = RegExp(r'`[^`]+`');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
     context.addCompilationUnit((CompilationUnit unit) {
-      for (final declaration in unit.declarations) {
-        _checkDocComment(declaration.documentationComment, reporter);
-      }
+      _visitAllDocComments(unit, (Comment doc) {
+        _checkDocComment(doc, reporter);
+      });
     });
   }
 
-  void _checkDocComment(
-    Comment? docComment,
-    SaropaDiagnosticReporter reporter,
-  ) {
-    if (docComment == null) return;
-
+  void _checkDocComment(Comment docComment, SaropaDiagnosticReporter reporter) {
     bool inCodeBlock = false;
 
     for (final Token token in docComment.tokens) {
-      final String content =
-          MissingCodeBlockLanguageInDocCommentRule._stripDocPrefix(
-            token.lexeme,
-          );
+      final String content = _stripDocCommentPrefix(token.lexeme);
 
-      // Track code block boundaries
-      if (content.contains('```')) {
+      // Track code block boundaries using end-of-line-anchored regex
+      // to avoid false toggles from prose mentions of triple backticks.
+      if (_fenceWithTag.hasMatch(content) ||
+          _fenceWithoutTag.hasMatch(content)) {
         inCodeBlock = !inCodeBlock;
         continue;
       }
       if (inCodeBlock) continue;
 
-      // Skip lines that are entirely in inline code (backtick-wrapped)
-      final String withoutInlineCode = content.replaceAll(
-        RegExp(r'`[^`]+`'),
-        '',
-      );
+      // Strip inline code spans before checking for angle brackets
+      final String withoutInlineCode = content.replaceAll(_inlineCode, '');
 
-      // Check remaining text for angle bracket patterns
       for (final Match match in _angleBracketType.allMatches(
         withoutInlineCode,
       )) {
         final String innerType = match.group(1) ?? '';
-
-        // Skip known HTML tags
         if (_safeHtmlTags.contains(innerType.toLowerCase())) continue;
-
-        // Skip single uppercase letters (generic type params like <T>, <E>)
         if (_singleTypeParam.hasMatch(innerType)) continue;
 
-        // Found an unintended HTML-like pattern
         reporter.atNode(docComment);
         return; // One report per doc comment
       }
@@ -1273,20 +1306,25 @@ class UnintendedHtmlInDocCommentRule extends SaropaLintRule {
 
 /// Warns when a `@docImport` URI refers to a non-existent file.
 ///
-/// Since: v9.10.0 | Rule version: v1
+/// Since: v9.10.0 | Rule version: v2
 ///
 /// The `@docImport` directive (Dart 3.2+) imports symbols for use in
-/// doc comment references. A broken URI means those references will fail.
+/// doc comment references. A broken URI means those references will fail
+/// silently, producing broken links in generated documentation.
+///
+/// `@docImport` is only valid in the library-level doc comment (the doc
+/// comment before the `library;` directive). This rule checks only that
+/// location.
 ///
 /// **BAD:**
 /// ```dart
-/// /// @docImport 'package:foo/missing.dart';
+/// /// @docImport 'missing_file.dart';
 /// library;
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// /// @docImport 'package:foo/existing.dart';
+/// /// @docImport 'existing_file.dart';
 /// library;
 /// ```
 class UriDoesNotExistInDocImportRule extends SaropaLintRule {
@@ -1306,7 +1344,7 @@ class UriDoesNotExistInDocImportRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'uri_does_not_exist_in_doc_import',
-    '[uri_does_not_exist_in_doc_import] A @docImport URI refers to a file that does not exist. Broken doc imports cause documentation references ([ClassName]) to fail silently, producing broken links in generated documentation and preventing IDE navigation to the referenced symbols. {v1}',
+    '[uri_does_not_exist_in_doc_import] A @docImport URI refers to a file that does not exist. Broken doc imports cause documentation references ([ClassName]) to fail silently, producing broken links in generated documentation and preventing IDE navigation to the referenced symbols. {v2}',
     correctionMessage:
         'Fix the URI to point to an existing file, or remove the @docImport if it is no longer needed.',
     severity: DiagnosticSeverity.INFO,
@@ -1324,33 +1362,23 @@ class UriDoesNotExistInDocImportRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addCompilationUnit((CompilationUnit unit) {
-      // @docImport appears in doc comments before the library directive
-      // or at the top of the file.
+      // @docImport is only valid in the library-level doc comment
+      // (before the `library;` directive). Check only that location.
       final Comment? libraryDoc = unit.directives
           .whereType<LibraryDirective>()
           .firstOrNull
           ?.documentationComment;
 
+      if (libraryDoc == null) return;
       _checkForBrokenDocImports(libraryDoc, context.filePath, reporter);
-
-      // Also check file-level doc comments on the first declaration
-      if (unit.declarations.isNotEmpty) {
-        _checkForBrokenDocImports(
-          unit.declarations.first.documentationComment,
-          context.filePath,
-          reporter,
-        );
-      }
     });
   }
 
   void _checkForBrokenDocImports(
-    Comment? docComment,
+    Comment docComment,
     String filePath,
     SaropaDiagnosticReporter reporter,
   ) {
-    if (docComment == null) return;
-
     final String docText = docComment.tokens
         .map((Token t) => t.lexeme)
         .join('\n');
@@ -1359,8 +1387,8 @@ class UriDoesNotExistInDocImportRule extends SaropaLintRule {
       final String uri = match.group(1) ?? '';
       if (uri.isEmpty) continue;
 
-      // Skip package: and dart: URIs — we can't easily resolve those
-      // without package_config, and they're less likely to be broken.
+      // Skip package: and dart: URIs — we can't resolve those without
+      // package_config. They are less likely to have broken paths.
       if (uri.startsWith('package:') || uri.startsWith('dart:')) continue;
 
       // Resolve relative URI against the current file's directory
