@@ -2778,6 +2778,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidAssetManifestJsonRule.new,
   PreferDropdownInitialValueRule.new,
   PreferOnPopWithResultRule.new,
+  PreferTabbarThemeIndicatorColorRule.new,
 
   // v5.1.0 - New lint rules
   AvoidCachedImageWebRule.new,
@@ -2866,6 +2867,18 @@ _allRuleFactories = <SaropaLintRule Function()>[
   TypeCheckWithNullRule.new,
   UnnecessaryLibraryNameRule.new,
   WrongNumberOfParametersForSetterRule.new,
+
+  // Additional rules (plan_additional_rules_11_through_20)
+  MissingCodeBlockLanguageInDocCommentRule.new,
+  UnintendedHtmlInDocCommentRule.new,
+  UriDoesNotExistInDocImportRule.new,
+  PreferForElementsToMapFromIterableRule.new,
+  InvalidVisibleOutsideTemplateAnnotationRule.new,
+  PackageNamesRule.new,
+  SortPubDependenciesRule.new,
+  SecurePubspecUrlsRule.new,
+  DependOnReferencedPackagesRule.new,
+  UriDoesNotExistRule.new,
 ];
 
 // =============================================================================

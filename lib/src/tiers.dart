@@ -718,6 +718,9 @@ const Set<String> essentialRules = <String>{
   'require_auto_route_full_hierarchy', // WARNING - push() bypasses hierarchy
   // v5.1.0 - Batch 3 (Essential)
   'avoid_connectivity_equals_internet', // WARNING - ConnectivityResult != internet
+  // Additional rules (plan_additional_rules_11_through_20)
+  'depend_on_referenced_packages', // WARNING - package import not in pubspec
+  'uri_does_not_exist', // ERROR - import/export/part URI missing
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -734,6 +737,7 @@ const Set<String> recommendedOnlyRules = <String>{
   // v5.1.0 - Migration rules (Recommended)
   'prefer_dropdown_initial_value', // WARNING - deprecated in Flutter 3.35.0
   'prefer_on_pop_with_result', // WARNING - deprecated in Flutter 3.35.0
+  'prefer_tabbar_theme_indicator_color', // WARNING - deprecated in Flutter 3.32.0
   // Moved from Essential (style/quality, not crash prevention)
   // 'prefer_list_first' moved to stylisticRules (opinionated)
   // 'prefer_list_last' moved to stylisticRules (opinionated)
@@ -1546,6 +1550,9 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_platform_specific_imports', // WARNING - dart:io in shared code
   'avoid_shared_prefs_sync_race', // WARNING - un-awaited SharedPreferences writes
   'avoid_stack_trace_in_production', // WARNING - stack trace exposed to users
+  // Additional rules (plan_additional_rules_11_through_20)
+  'package_names', // WARNING - package name convention
+  'secure_pubspec_urls', // WARNING - insecure URLs in pubspec
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -2706,6 +2713,8 @@ const Set<String> professionalOnlyRules = <String>{
   'require_context_in_build_descendants',
   'require_dispose_verification_tests',
   'require_error_context_in_logs',
+  // Additional rules (plan_additional_rules_11_through_20)
+  'prefer_for_elements_to_map_from_iterable', // WARNING - use for-element map
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).
@@ -2868,6 +2877,12 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'type_check_with_null',
   'unnecessary_library_name',
   'wrong_number_of_parameters_for_setter',
+  // Additional rules (plan_additional_rules_11_through_20)
+  'missing_code_block_language_in_doc_comment', // INFO - doc code block language
+  'unintended_html_in_doc_comment', // INFO - angle brackets as HTML
+  'uri_does_not_exist_in_doc_import', // INFO - broken @docImport URI
+  'invalid_visible_outside_template_annotation', // WARNING - wrong annotation use
+  'sort_pub_dependencies', // INFO - unsorted pubspec deps
 };
 
 /// Pedantic tier rules - pedantic, highly opinionated rules.
