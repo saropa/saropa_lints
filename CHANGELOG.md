@@ -29,6 +29,15 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Added
 
+• **Lint rules** — 7 new Flutter deprecation migration rules (WARNING, Recommended tier):
+  - **prefer_m3_text_theme**: flags deprecated 2018-era TextTheme member names (headline1–6, subtitle1–2, bodyText1–2, caption, button, overline) removed in Flutter 3.22. Quick fix renames to M3 equivalents.
+  - **prefer_keepalive_dispose**: flags `KeepAliveHandle.release()` removed after Flutter 3.19; use `dispose()` instead. Quick fix renames the method call.
+  - **prefer_pan_axis**: flags `InteractiveViewer.alignPanAxis` removed after Flutter 3.19; use `panAxis` enum parameter instead.
+  - **prefer_context_menu_builder**: flags `CupertinoContextMenu.previewBuilder` removed after Flutter 3.19; use `builder` (callback signature changed, manual migration required).
+  - **prefer_button_style_icon_alignment**: flags `iconAlignment` parameter on button constructors deprecated in Flutter 3.28; move to `ButtonStyle.iconAlignment`.
+  - **prefer_key_event**: flags deprecated `RawKeyEvent`/`RawKeyboard` system deprecated in Flutter 3.18; migrate to `KeyEvent`/`HardwareKeyboard`.
+  - **prefer_platform_menu_bar_child**: flags `PlatformMenuBar.body` removed after Flutter 3.16; use `child` instead. Quick fix renames the parameter.
+
 • **Lint rules** — **prefer_tabbar_theme_indicator_color**: flags `ThemeData.indicatorColor` usage deprecated in Flutter 3.32.0; migrate to `TabBarThemeData.indicatorColor` (WARNING, Recommended tier). Quick fix removes the deprecated argument.
 
 • **Lint rules** — 10 new rules from ROADMAP additional rules 11–20:

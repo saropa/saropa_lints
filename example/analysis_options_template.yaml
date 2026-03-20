@@ -1482,6 +1482,13 @@ saropa_lints:
     - prefer_dropdown_initial_value: false            # WARNING - value→initialValue, Flutter 3.35.0 (v5.1.0, quick fix)
     - prefer_on_pop_with_result: false                # WARNING - onPop→onPopWithResult, Flutter 3.35.0 (v5.1.0, quick fix)
     - prefer_tabbar_theme_indicator_color: false      # WARNING - indicatorColor→TabBarThemeData, Flutter 3.32.0 (quick fix)
+    - prefer_platform_menu_bar_child: false           # WARNING - body→child, removed after Flutter 3.16 (quick fix)
+    - prefer_keepalive_dispose: false                  # WARNING - release()→dispose(), removed after Flutter 3.19 (quick fix)
+    - prefer_context_menu_builder: false               # WARNING - previewBuilder→builder, removed after Flutter 3.19
+    - prefer_pan_axis: false                           # WARNING - alignPanAxis→panAxis enum, removed after Flutter 3.19
+    - prefer_button_style_icon_alignment: false        # WARNING - iconAlignment→ButtonStyle, deprecated Flutter 3.28
+    - prefer_key_event: false                          # WARNING - RawKeyEvent→KeyEvent, deprecated Flutter 3.18
+    - prefer_m3_text_theme: false                      # WARNING - TextTheme 2018 names→M3 names, removed Flutter 3.22 (quick fix)
 
     # =========================================================================
     # V5.1.0 RULES - New lint rules

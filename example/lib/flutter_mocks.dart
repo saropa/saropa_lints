@@ -763,7 +763,11 @@ class PageController {
 }
 
 class FocusNode {
-  FocusNode();
+  FocusNode({
+    // Deprecated in Flutter 3.18 — use onKeyEvent instead
+    dynamic onKey,
+    dynamic onKeyEvent,
+  });
   void dispose() {}
 }
 
@@ -793,12 +797,88 @@ class PageView extends Widget {
 // ============================================================================
 
 class ElevatedButton extends Widget {
-  const ElevatedButton({super.key, VoidCallback? onPressed, Widget? child});
+  const ElevatedButton({
+    super.key,
+    VoidCallback? onPressed,
+    Widget? child,
+    dynamic style,
+    // Deprecated in Flutter 3.28 — use ButtonStyle.iconAlignment instead
+    dynamic iconAlignment,
+  });
+  const ElevatedButton.icon({
+    Key? key,
+    VoidCallback? onPressed,
+    required Widget icon,
+    required Widget label,
+    dynamic style,
+    // Deprecated in Flutter 3.28 — use ButtonStyle.iconAlignment instead
+    dynamic iconAlignment,
+  }) : super(key: key);
+
+  static dynamic styleFrom({dynamic iconAlignment}) => null;
 }
 
 class TextButton extends Widget {
-  const TextButton({super.key, VoidCallback? onPressed, Widget? child});
+  const TextButton({
+    super.key,
+    VoidCallback? onPressed,
+    Widget? child,
+    dynamic style,
+    // Deprecated in Flutter 3.28 — use ButtonStyle.iconAlignment instead
+    dynamic iconAlignment,
+  });
+  const TextButton.icon({
+    Key? key,
+    VoidCallback? onPressed,
+    required Widget icon,
+    required Widget label,
+    dynamic style,
+    // Deprecated in Flutter 3.28 — use ButtonStyle.iconAlignment instead
+    dynamic iconAlignment,
+  }) : super(key: key);
 }
+
+class FilledButton extends Widget {
+  const FilledButton({
+    super.key,
+    VoidCallback? onPressed,
+    Widget? child,
+    dynamic style,
+    // Deprecated in Flutter 3.28 — use ButtonStyle.iconAlignment instead
+    dynamic iconAlignment,
+  });
+  const FilledButton.icon({
+    Key? key,
+    VoidCallback? onPressed,
+    required Widget icon,
+    required Widget label,
+    dynamic style,
+    // Deprecated in Flutter 3.28 — use ButtonStyle.iconAlignment instead
+    dynamic iconAlignment,
+  }) : super(key: key);
+}
+
+class OutlinedButton extends Widget {
+  const OutlinedButton({
+    super.key,
+    VoidCallback? onPressed,
+    Widget? child,
+    dynamic style,
+    // Deprecated in Flutter 3.28 — use ButtonStyle.iconAlignment instead
+    dynamic iconAlignment,
+  });
+  const OutlinedButton.icon({
+    Key? key,
+    VoidCallback? onPressed,
+    required Widget icon,
+    required Widget label,
+    dynamic style,
+    // Deprecated in Flutter 3.28 — use ButtonStyle.iconAlignment instead
+    dynamic iconAlignment,
+  }) : super(key: key);
+}
+
+enum IconAlignment { start, end }
 
 // ============================================================================
 // Navigation
@@ -1439,7 +1519,32 @@ class _MediaQueryData {
 }
 
 class Focus extends Widget {
-  const Focus({super.key, Widget? child, dynamic onFocusChange});
+  const Focus({
+    super.key,
+    Widget? child,
+    dynamic onFocusChange,
+    // Deprecated in Flutter 3.18 — use onKeyEvent instead
+    dynamic onKey,
+    dynamic onKeyEvent,
+  });
+}
+
+class FocusScope extends Widget {
+  const FocusScope({
+    super.key,
+    Widget? child,
+    // Deprecated in Flutter 3.18 — use onKeyEvent instead
+    dynamic onKey,
+    dynamic onKeyEvent,
+  });
+}
+
+class FocusScopeNode {
+  FocusScopeNode({
+    // Deprecated in Flutter 3.18 — use onKeyEvent instead
+    dynamic onKey,
+    dynamic onKeyEvent,
+  });
 }
 
 class FocusTraversalGroup extends Widget {
@@ -2970,14 +3075,22 @@ class Placeholder extends Widget {
 }
 
 class InteractiveViewer extends Widget {
-  const InteractiveViewer(
-      {super.key,
-      required Widget child,
-      double? minScale,
-      double? maxScale,
-      bool? panEnabled,
-      bool? scaleEnabled});
+  const InteractiveViewer({
+    super.key,
+    required Widget child,
+    double? minScale,
+    double? maxScale,
+    bool? panEnabled,
+    bool? scaleEnabled,
+    // Deprecated in Flutter 3.7, removed after 3.19
+    bool? alignPanAxis,
+    // Replacement: PanAxis enum
+    PanAxis? panAxis,
+  });
 }
+
+/// PanAxis enum for InteractiveViewer (replacement for bool alignPanAxis).
+enum PanAxis { free, aligned, horizontal, vertical }
 
 // ── ThemeData extras ────────────────────────────────────────────────────
 
@@ -3001,7 +3114,8 @@ class ThemeData {
     dynamic tabBarTheme,
   });
   dynamic get colorScheme => _ColorScheme();
-  dynamic get textTheme => _TextTheme();
+  // Returns TextTheme so migration rules can resolve the static type
+  TextTheme get textTheme => const _TextTheme();
   dynamic get primaryColor => null;
   dynamic get scaffoldBackgroundColor => null;
   dynamic get brightness => null;
@@ -3032,7 +3146,58 @@ class _ColorScheme {
   dynamic get background => null;
 }
 
-class _TextTheme {
+// Public TextTheme: includes both deprecated (2018) and current (M3) names
+// so migration rule fixtures can test both detection and false positives.
+class TextTheme {
+  const TextTheme({
+    // Deprecated 2018-era names (removed in Flutter 3.22)
+    dynamic headline1,
+    dynamic headline2,
+    dynamic headline3,
+    dynamic headline4,
+    dynamic headline5,
+    dynamic headline6,
+    dynamic subtitle1,
+    dynamic subtitle2,
+    dynamic bodyText1,
+    dynamic bodyText2,
+    dynamic caption,
+    dynamic button,
+    dynamic overline,
+    // Current M3 names
+    dynamic displayLarge,
+    dynamic displayMedium,
+    dynamic displaySmall,
+    dynamic headlineLarge,
+    dynamic headlineMedium,
+    dynamic headlineSmall,
+    dynamic titleLarge,
+    dynamic titleMedium,
+    dynamic titleSmall,
+    dynamic bodyLarge,
+    dynamic bodyMedium,
+    dynamic bodySmall,
+    dynamic labelLarge,
+    dynamic labelMedium,
+    dynamic labelSmall,
+  });
+
+  // Deprecated 2018-era property accessors
+  dynamic get headline1 => null;
+  dynamic get headline2 => null;
+  dynamic get headline3 => null;
+  dynamic get headline4 => null;
+  dynamic get headline5 => null;
+  dynamic get headline6 => null;
+  dynamic get subtitle1 => null;
+  dynamic get subtitle2 => null;
+  dynamic get bodyText1 => null;
+  dynamic get bodyText2 => null;
+  dynamic get caption => null;
+  dynamic get button => null;
+  dynamic get overline => null;
+
+  // Current M3 property accessors
   dynamic get displayLarge => null;
   dynamic get displayMedium => null;
   dynamic get displaySmall => null;
@@ -3048,6 +3213,44 @@ class _TextTheme {
   dynamic get labelLarge => null;
   dynamic get labelMedium => null;
   dynamic get labelSmall => null;
+
+  TextTheme copyWith({
+    // Deprecated names
+    dynamic headline1,
+    dynamic headline2,
+    dynamic headline3,
+    dynamic headline4,
+    dynamic headline5,
+    dynamic headline6,
+    dynamic subtitle1,
+    dynamic subtitle2,
+    dynamic bodyText1,
+    dynamic bodyText2,
+    dynamic caption,
+    dynamic button,
+    dynamic overline,
+    // Current M3 names
+    dynamic displayLarge,
+    dynamic displayMedium,
+    dynamic displaySmall,
+    dynamic headlineLarge,
+    dynamic headlineMedium,
+    dynamic headlineSmall,
+    dynamic titleLarge,
+    dynamic titleMedium,
+    dynamic titleSmall,
+    dynamic bodyLarge,
+    dynamic bodyMedium,
+    dynamic bodySmall,
+    dynamic labelLarge,
+    dynamic labelMedium,
+    dynamic labelSmall,
+  }) =>
+      const TextTheme();
+}
+
+class _TextTheme extends TextTheme {
+  const _TextTheme();
 }
 
 class ColorScheme {
@@ -3284,6 +3487,85 @@ class AssetBundle {
 }
 
 final AssetBundle rootBundle = AssetBundle();
+
+// ============================================================================
+// Migration rule mocks — deprecated Flutter APIs and their replacements
+// ============================================================================
+
+// ── KeepAliveHandle (Flutter 3.3 deprecation, removed after 3.19) ──────
+class KeepAliveHandle {
+  // Deprecated: use dispose() instead
+  void release() {}
+  void dispose() {}
+}
+
+// ── CupertinoContextMenu (Flutter 3.4 deprecation, removed after 3.19) ─
+class CupertinoContextMenu extends Widget {
+  const CupertinoContextMenu({
+    super.key,
+    required Widget child,
+    // Deprecated — use builder instead (callback signature changed)
+    dynamic previewBuilder,
+    // Replacement: covers full animation lifecycle
+    dynamic builder,
+  });
+}
+
+// ── PlatformMenuBar (Flutter 3.1 deprecation, removed after 3.16) ──────
+class PlatformMenuBar extends Widget {
+  const PlatformMenuBar({
+    super.key,
+    List<dynamic>? menus,
+    // Deprecated — renamed to child
+    Widget? body,
+    // Replacement
+    Widget? child,
+  });
+}
+
+// ── RawKeyEvent / RawKeyboard (Flutter 3.18 deprecation) ───────────────
+class RawKeyEvent {}
+
+class RawKeyDownEvent extends RawKeyEvent {}
+
+class RawKeyUpEvent extends RawKeyEvent {}
+
+class RawKeyboard {
+  static final RawKeyboard instance = RawKeyboard();
+}
+
+class RawKeyboardListener extends Widget {
+  const RawKeyboardListener({
+    super.key,
+    required FocusNode focusNode,
+    required dynamic onKey,
+    required Widget child,
+  });
+}
+
+// Replacements
+class KeyEvent {}
+
+class KeyDownEvent extends KeyEvent {}
+
+class KeyUpEvent extends KeyEvent {}
+
+class KeyRepeatEvent extends KeyEvent {}
+
+class HardwareKeyboard {
+  static final HardwareKeyboard instance = HardwareKeyboard();
+  bool get isControlPressed => false;
+  bool isLogicalKeyPressed(dynamic key) => false;
+}
+
+class KeyboardListener extends Widget {
+  const KeyboardListener({
+    super.key,
+    required FocusNode focusNode,
+    required dynamic onKeyEvent,
+    required Widget child,
+  });
+}
 
 // ============================================================================
 // RxDart mocks

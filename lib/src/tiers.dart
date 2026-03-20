@@ -738,6 +738,14 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_dropdown_initial_value', // WARNING - deprecated in Flutter 3.35.0
   'prefer_on_pop_with_result', // WARNING - deprecated in Flutter 3.35.0
   'prefer_tabbar_theme_indicator_color', // WARNING - deprecated in Flutter 3.32.0
+  // v9.10.0 - Migration rules (Recommended)
+  'prefer_platform_menu_bar_child', // WARNING - removed after Flutter 3.16
+  'prefer_keepalive_dispose', // WARNING - removed after Flutter 3.19
+  'prefer_context_menu_builder', // WARNING - removed after Flutter 3.19
+  'prefer_pan_axis', // WARNING - removed after Flutter 3.19
+  'prefer_button_style_icon_alignment', // WARNING - deprecated in Flutter 3.28
+  'prefer_key_event', // WARNING - deprecated in Flutter 3.18
+  'prefer_m3_text_theme', // WARNING - removed in Flutter 3.22
   // Moved from Essential (style/quality, not crash prevention)
   // 'prefer_list_first' moved to stylisticRules (opinionated)
   // 'prefer_list_last' moved to stylisticRules (opinionated)
