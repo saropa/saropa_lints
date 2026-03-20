@@ -261,6 +261,12 @@ function buildLinksSection(r: VibrancyResult): string {
     const pubUrl = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}`;
     const links: string[] = [];
 
+    // "View Full Details" opens the full editor-area detail panel
+    links.push(
+        `<button class="action-btn" data-action="fullDetails" `
+        + `data-package="${escapeHtml(r.package.name)}">View Full Details</button>`,
+    );
+
     links.push(`<a href="${pubUrl}" data-url="${pubUrl}" class="link">View on pub.dev</a>`);
 
     // Prefer canonical GitHub URL (may differ from pubspec URL which can include /tree/main)

@@ -11,6 +11,8 @@ import { PrereleaseToggle } from './ui/prerelease-toggle';
 import { VibrancyReportPanel } from './views/report-webview';
 import { KnownIssuesPanel } from './views/known-issues-webview';
 import { ComparisonPanel } from './views/comparison-webview';
+import { PackageDetailPanel } from './views/package-detail-panel';
+import { ReviewStateService } from './services/review-state';
 import { DetailViewProvider, DETAIL_VIEW_ID } from './views/detail-view-provider';
 import { DetailLogger, DETAIL_CHANNEL_NAME } from './services/detail-logger';
 import { exportReports, ReportMetadata } from './services/report-exporter';
@@ -99,6 +101,7 @@ let sdkDiagnostics: SdkDiagnostics | null = null;
 let freshnessWatcher: FreshnessWatcher | null = null;
 let stateManager: VibrancyStateManager | null = null;
 let detailViewProvider: DetailViewProvider | null = null;
+let reviewStateService: ReviewStateService | null = null;
 let detailLogger: DetailLogger | null = null;
 let detailChannel: vscode.OutputChannel | null = null;
 let saveTaskRunner: SaveTaskRunner | null = null;
@@ -154,6 +157,7 @@ export function runActivation(
 ): void {
     vibrancyStatusCallback = onStatusUpdate ?? null;
     const cache = new CacheService(context.globalState);
+    reviewStateService = new ReviewStateService(context.workspaceState);
     registryService = new RegistryService(context.secrets);
     context.subscriptions.push(registryService);
 
@@ -685,6 +689,14 @@ function registerCommands(
                 );
             },
         ),
+        vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.showPackagePanel',
+            (packageName: string) => {
+                const result = latestResults.find(r => r.package.name === packageName);
+                if (!result || !reviewStateService) { return; }
+                PackageDetailPanel.createOrShow(result, reviewStateService, targets.cache);
+            },
+        ),
     );
 }
 
@@ -871,6 +883,16 @@ async function runScanInner(targets: ScanTargets): Promise<void> {
 
             publishResults(targets, results, parsed, depGraphSummary);
             notifyLockDiff(oldVersions, results);
+
+            // Prune review entries for packages whose version changed
+            if (reviewStateService) {
+                const currentVersions = new Map(
+                    results.map(r => [r.package.name, r.package.version]),
+                );
+                await reviewStateService.pruneStale(currentVersions).catch(() => {
+                    // Pruning is best-effort — never block scan
+                });
+            }
 
             try {
                 await logger.writeToFile();

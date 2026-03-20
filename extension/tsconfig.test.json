@@ -11,7 +11,9 @@
     "src/driftAdvisor/types.ts",
     "src/driftAdvisor/discovery.ts",
     "src/driftAdvisor/client.ts",
-    "src/test/driftAdvisor/**/*.ts"
+    "src/test/driftAdvisor/**/*.ts",
+    "src/vibrancy/**/*.ts",
+    "src/test/vibrancy/services/review-state.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

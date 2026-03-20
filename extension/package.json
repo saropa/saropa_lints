@@ -586,6 +586,11 @@
         "title": "Copy Package Info"
       },
       {
+        "command": "saropaLints.packageVibrancy.showPackagePanel",
+        "title": "Show Package Details",
+        "category": "Saropa"
+      },
+      {
         "command": "saropaLints.packageVibrancy.search",
         "title": "Search Packages...",
         "icon": "$(search)"
@@ -1622,6 +1627,11 @@
             "default": true,
             "description": "Query GitHub Advisory Database for additional security advisories"
           },
+          "saropaLints.packageVibrancy.enableVersionGap": {
+            "type": "boolean",
+            "default": false,
+            "description": "Fetch PRs and issues between your current version and latest from GitHub. Requires a GitHub token for best results."
+          },
           "saropaLints.packageVibrancy.vulnSeverityThreshold": {
             "type": "string",
             "enum": [
@@ -1725,7 +1735,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run precompile && npm run check-types && node esbuild.js --production",
     "lint": "tsc --noEmit -p ./",
-    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" --timeout 10000"
+    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" --timeout 10000"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

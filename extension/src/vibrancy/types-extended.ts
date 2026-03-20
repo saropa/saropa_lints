@@ -146,6 +146,47 @@ export interface PackageInsight {
     readonly unlocksIfFixed: readonly string[];
 }
 
+/** A PR or issue from GitHub relevant to the version gap. */
+export interface VersionGapItem {
+    readonly number: number;
+    readonly title: string;
+    readonly url: string;
+    readonly type: 'pr' | 'issue';
+    readonly state: 'merged' | 'closed' | 'open';
+    readonly author: string;
+    readonly createdAt: string;
+    readonly closedAt: string | null;
+    readonly labels: readonly string[];
+}
+
+/** Result of fetching PRs/issues between two versions. */
+export interface VersionGapResult {
+    readonly packageName: string;
+    readonly currentVersion: string;
+    readonly latestVersion: string;
+    readonly owner: string;
+    readonly repo: string;
+    readonly items: readonly VersionGapItem[];
+    readonly truncated: boolean;
+    /** ISO date of the current-version release tag. */
+    readonly fromDate: string | null;
+    /** ISO date of the latest-version release tag. */
+    readonly toDate: string | null;
+}
+
+/** Review status for a single version-gap item. */
+export type ReviewStatus = 'unreviewed' | 'reviewed' | 'applicable' | 'not-applicable';
+
+/** Persisted review state for a single version-gap item. */
+export interface ReviewEntry {
+    readonly packageName: string;
+    readonly itemNumber: number;
+    readonly status: ReviewStatus;
+    readonly notes: string;
+    /** ISO timestamp of when the review was last updated. */
+    readonly updatedAt: string;
+}
+
 /** CI platform targets for workflow generation. */
 export type CiPlatform = 'github-actions' | 'gitlab-ci' | 'shell-script';
 
