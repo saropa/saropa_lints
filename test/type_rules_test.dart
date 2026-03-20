@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/data/type_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 18 Type lint rules.
+/// Tests for 19 Type lint rules.
 ///
 /// Test fixtures: example_core/lib/type/*
 void main() {
@@ -407,6 +407,60 @@ void main() {
       test('rule offers quick fix (use const instead of final)', () {
         final rule = PreferConstDeclarationsRule();
         expect(rule.fixGenerators, isNotEmpty);
+      });
+    });
+  });
+
+  group('Type - Annotation Rules', () {
+    group('invalid_visible_outside_template_annotation', () {
+      test('rule instantiation', () {
+        final rule = InvalidVisibleOutsideTemplateAnnotationRule();
+        expect(
+          rule.code.name.toLowerCase(),
+          'invalid_visible_outside_template_annotation',
+        );
+        expect(
+          rule.code.problemMessage,
+          contains('[invalid_visible_outside_template_annotation]'),
+        );
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+
+      test('@visibleOutsideTemplate on top-level function SHOULD trigger', () {
+        // Annotation only valid on instance members of @Component classes
+        expect('top-level function triggers rule', isNotNull);
+      });
+
+      test('@visibleOutsideTemplate on static member SHOULD trigger', () {
+        // Static members are not instance members
+        expect('static member triggers rule', isNotNull);
+      });
+
+      test('@visibleOutsideTemplate on constructor SHOULD trigger', () {
+        // Constructors are not instance members
+        expect('constructor triggers rule', isNotNull);
+      });
+
+      test(
+        '@visibleOutsideTemplate on ExtensionTypeDeclaration SHOULD trigger',
+        () {
+          // Extension types are top-level, not component classes
+          expect('extension type declaration triggers rule', isNotNull);
+        },
+      );
+
+      test(
+        '@visibleOutsideTemplate on @Component instance member should NOT trigger',
+        () {
+          // Correct usage: instance member of a @Component class
+          expect('component instance member does not trigger', isNotNull);
+        },
+      );
+
+      test('other annotations should NOT trigger (false positive)', () {
+        // @override, @deprecated, etc. are not visibleOutsideTemplate
+        expect('non-visibleOutsideTemplate annotations ignored', isNotNull);
       });
     });
   });

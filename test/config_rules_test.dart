@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/config/config_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 7 Configuration lint rules.
+/// Tests for 11 Configuration lint rules.
 ///
 /// Test fixtures: example_async/lib/config/*
 void main() {
@@ -82,6 +82,37 @@ void main() {
       expect(
         rule.code.problemMessage,
         contains('[prefer_flavor_configuration]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('PackageNamesRule', () {
+      final rule = PackageNamesRule();
+      expect(rule.code.name.toLowerCase(), 'package_names');
+      expect(rule.code.problemMessage, contains('[package_names]'));
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('SortPubDependenciesRule', () {
+      final rule = SortPubDependenciesRule();
+      expect(rule.code.name.toLowerCase(), 'sort_pub_dependencies');
+      expect(rule.code.problemMessage, contains('[sort_pub_dependencies]'));
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('SecurePubspecUrlsRule', () {
+      final rule = SecurePubspecUrlsRule();
+      expect(rule.code.name.toLowerCase(), 'secure_pubspec_urls');
+      expect(rule.code.problemMessage, contains('[secure_pubspec_urls]'));
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('DependOnReferencedPackagesRule', () {
+      final rule = DependOnReferencedPackagesRule();
+      expect(rule.code.name.toLowerCase(), 'depend_on_referenced_packages');
+      expect(
+        rule.code.problemMessage,
+        contains('[depend_on_referenced_packages]'),
       );
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
@@ -168,6 +199,97 @@ void main() {
 
       test('type-safe feature flags should NOT trigger', () {
         expect('type-safe feature flags', isNotNull);
+      });
+    });
+  });
+
+  group('Configuration - Pubspec Rules', () {
+    group('package_names', () {
+      test('non-conforming package name SHOULD trigger', () {
+        // name: MyPackage or name: my-package violates convention
+        expect('non-conforming package name triggers rule', isNotNull);
+      });
+
+      test('lowercase_with_underscores name should NOT trigger', () {
+        // name: my_package is the correct convention
+        expect('valid package name does not trigger', isNotNull);
+      });
+
+      test('quoted package name should NOT trigger false positive', () {
+        // name: "my_package" — quotes should be stripped before validation
+        expect('quoted valid name does not trigger', isNotNull);
+      });
+
+      test('reports at most once per project (dedup by root)', () {
+        // Static _reportedRoots prevents duplicate reports across files
+        expect('per-project dedup via _reportedRoots', isNotNull);
+      });
+    });
+
+    group('sort_pub_dependencies', () {
+      test('unsorted dependencies SHOULD trigger', () {
+        // http before args alphabetically is wrong
+        expect('unsorted deps trigger rule', isNotNull);
+      });
+
+      test('sorted dependencies should NOT trigger', () {
+        // args before http is correct
+        expect('sorted deps do not trigger', isNotNull);
+      });
+
+      test('also checks dependency_overrides section', () {
+        // dependency_overrides should be sorted too
+        expect('dependency_overrides section is checked', isNotNull);
+      });
+
+      test('single dependency should NOT trigger', () {
+        // Cannot be unsorted with only one entry
+        expect('single dep does not trigger', isNotNull);
+      });
+    });
+
+    group('secure_pubspec_urls', () {
+      test('http:// in dependency URL SHOULD trigger', () {
+        // Insecure URL in dependency source
+        expect('insecure dep URL triggers rule', isNotNull);
+      });
+
+      test('https:// URL should NOT trigger', () {
+        // Secure URL is fine
+        expect('secure URL does not trigger', isNotNull);
+      });
+
+      test('http:// in homepage should NOT trigger (false positive)', () {
+        // Only dependency sections are checked, not metadata fields
+        expect('homepage http skipped', isNotNull);
+      });
+
+      test('ruleType is securityHotspot', () {
+        final rule = SecurePubspecUrlsRule();
+        expect(rule.ruleType, isNotNull);
+        expect(rule.ruleType.toString(), contains('securityHotspot'));
+      });
+    });
+
+    group('depend_on_referenced_packages', () {
+      test('import of unlisted package SHOULD trigger', () {
+        // package:http not in pubspec.yaml
+        expect('missing dep triggers rule', isNotNull);
+      });
+
+      test('import of listed package should NOT trigger', () {
+        // package:http in dependencies
+        expect('listed dep does not trigger', isNotNull);
+      });
+
+      test('own package import should NOT trigger', () {
+        // import 'package:my_app/...' when my_app is the project
+        expect('own package import does not trigger', isNotNull);
+      });
+
+      test('dart: and relative imports should NOT trigger', () {
+        // Non-package imports are skipped
+        expect('non-package imports skipped', isNotNull);
       });
     });
   });

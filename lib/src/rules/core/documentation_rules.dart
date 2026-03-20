@@ -1023,14 +1023,17 @@ String _stripDocCommentPrefix(String line) {
   return line;
 }
 
-/// Fence regex: matches ``` at end of line (with optional trailing whitespace).
-/// Used for both opening fences without language tags and closing fences,
-/// since they are syntactically identical.
-final RegExp _fenceWithoutTag = RegExp(r'```\s*$');
+/// Fence regex: matches ``` at start of content (after optional whitespace)
+/// with nothing after it except optional trailing whitespace. Used for both
+/// opening fences without language tags and closing fences, since they are
+/// syntactically identical. Start-anchored to avoid false matches on prose.
+final RegExp _fenceWithoutTag = RegExp(r'^\s*```\s*$');
 
-/// Fence regex: matches ``` immediately followed by a word character,
-/// indicating a language tag (e.g. ```dart, ```json).
-final RegExp _fenceWithTag = RegExp(r'```\w');
+/// Fence regex: matches ``` at start of content (after optional whitespace),
+/// immediately followed by a word character indicating a language tag
+/// (e.g. ```dart, ```json). Start-anchored to avoid false matches on prose
+/// like "Example using ```dart blocks:" where the fence is mid-line.
+final RegExp _fenceWithTag = RegExp(r'^\s*```\w');
 
 /// Visits all doc comments in a compilation unit — both top-level
 /// declarations AND class/enum/mixin/extension members.

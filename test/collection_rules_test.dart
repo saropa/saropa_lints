@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/data/collection_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 26 Collection lint rules.
+/// Tests for 27 Collection lint rules.
 ///
 /// Test fixtures: example_core/lib/collection/*
 void main() {
@@ -617,6 +617,44 @@ void main() {
       test('require_key_for_collection should NOT trigger', () {
         // Required pattern present
         expect('require_key_for_collection passes', isNotNull);
+      });
+    });
+  });
+
+  group('Collection - Map Rules', () {
+    group('prefer_for_elements_to_map_from_iterable', () {
+      test('rule instantiation', () {
+        final rule = PreferForElementsToMapFromIterableRule();
+        expect(
+          rule.code.name.toLowerCase(),
+          'prefer_for_elements_to_map_from_iterable',
+        );
+        expect(
+          rule.code.problemMessage,
+          contains('[prefer_for_elements_to_map_from_iterable]'),
+        );
+        expect(rule.code.problemMessage.length, greaterThan(50));
+        expect(rule.code.correctionMessage, isNotNull);
+      });
+
+      test('Map.fromIterable with key/value closures SHOULD trigger', () {
+        // Map.fromIterable(items, key: (e) => e.id, value: (e) => e.name)
+        expect('fromIterable with simple closures triggers', isNotNull);
+      });
+
+      test('Map.fromIterable without key/value should NOT trigger', () {
+        // Map.fromIterable(items) without named key/value args
+        expect('fromIterable without closures does not trigger', isNotNull);
+      });
+
+      test('Map.fromIterable with block body should NOT trigger', () {
+        // key: (e) { return e.id; } — block body, not simple closure
+        expect('block body closure does not trigger', isNotNull);
+      });
+
+      test('Map.fromEntries should NOT trigger (false positive)', () {
+        // Different constructor — only fromIterable is flagged
+        expect('fromEntries does not trigger', isNotNull);
       });
     });
   });

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/core/documentation_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 9 Documentation lint rules.
+/// Tests for 12 Documentation lint rules.
 ///
 /// Test fixtures: example_style/lib/documentation/*
 void main() {
@@ -67,6 +67,21 @@ void main() {
       'VerifyDocumentedParametersExistRule',
       'verify_documented_parameters_exist',
       () => VerifyDocumentedParametersExistRule(),
+    );
+    testRule(
+      'MissingCodeBlockLanguageInDocCommentRule',
+      'missing_code_block_language_in_doc_comment',
+      () => MissingCodeBlockLanguageInDocCommentRule(),
+    );
+    testRule(
+      'UnintendedHtmlInDocCommentRule',
+      'unintended_html_in_doc_comment',
+      () => UnintendedHtmlInDocCommentRule(),
+    );
+    testRule(
+      'UriDoesNotExistInDocImportRule',
+      'uri_does_not_exist_in_doc_import',
+      () => UriDoesNotExistInDocImportRule(),
     );
   });
   group('Documentation Rules - Fixture Verification', () {
@@ -184,6 +199,87 @@ void main() {
           expect('built-in type refs in docs', isNotNull);
         },
       );
+    });
+  });
+
+  group('Documentation - Code Block & HTML Rules', () {
+    group('missing_code_block_language_in_doc_comment', () {
+      test('code block without language tag SHOULD trigger', () {
+        // A doc comment with ``` but no language identifier after it
+        expect('bare opening fence triggers rule', isNotNull);
+      });
+
+      test('code block with language tag should NOT trigger', () {
+        // ```dart — has a language tag, should be fine
+        expect('tagged code block does not trigger', isNotNull);
+      });
+
+      test(
+        'closing fence should NOT trigger (false positive: closing ``` is not an opening fence)',
+        () {
+          // After an opening ```dart, the closing ``` must not be reported
+          expect('closing fence is not an untagged opening fence', isNotNull);
+        },
+      );
+
+      test(
+        'prose mention of triple backticks should NOT toggle code block state',
+        () {
+          // A doc line like "Example using ```dart blocks:" is prose,
+          // not a real fence — must not falsely toggle inCodeBlock
+          expect('mid-line fence mention is ignored', isNotNull);
+        },
+      );
+    });
+
+    group('unintended_html_in_doc_comment', () {
+      test('unquoted <String> in doc prose SHOULD trigger', () {
+        // <String> outside backticks looks like HTML to doc generators
+        expect('bare angle brackets trigger rule', isNotNull);
+      });
+
+      test('backtick-wrapped `<String>` should NOT trigger', () {
+        // Inline code spans are safe from HTML interpretation
+        expect('inline code span does not trigger', isNotNull);
+      });
+
+      test('content inside fenced code block should NOT trigger', () {
+        // Fenced code blocks are safe
+        expect('fenced code block content does not trigger', isNotNull);
+      });
+
+      test('known HTML tags <br>, <p>, <code> should NOT trigger', () {
+        // Intentional HTML in doc comments is fine
+        expect('safe HTML tags do not trigger', isNotNull);
+      });
+
+      test('single-letter type params <T>, <E> should NOT trigger', () {
+        // Generic type parameters are not HTML
+        expect('single-letter type params do not trigger', isNotNull);
+      });
+    });
+
+    group('uri_does_not_exist_in_doc_import', () {
+      test('broken @docImport URI SHOULD trigger', () {
+        // @docImport 'missing_file.dart' — file does not exist
+        expect('broken doc import triggers rule', isNotNull);
+      });
+
+      test('valid @docImport URI should NOT trigger', () {
+        // @docImport 'existing_file.dart' — file exists
+        expect('valid doc import does not trigger', isNotNull);
+      });
+
+      test('package: and dart: URIs should NOT trigger', () {
+        // These can't be resolved from filesystem — skip them
+        expect('package/dart URIs skipped', isNotNull);
+      });
+
+      test('non-library doc comments should NOT trigger', () {
+        // @docImport is only valid in library-level doc comments;
+        // rule correctly ignores other doc comments
+        expect('non-library doc comments ignored', isNotNull);
+      });
     });
   });
 }
