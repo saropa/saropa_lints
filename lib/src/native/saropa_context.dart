@@ -365,6 +365,11 @@ class SaropaContext {
     _registry.addExtensionDeclaration(_rule, _visitor);
   }
 
+  void addExtensionOverride(void Function(ExtensionOverride) callback) {
+    _visitor.onExtensionOverride = _wrapCallback(callback);
+    _registry.addExtensionOverride(_rule, _visitor);
+  }
+
   void addExtensionTypeDeclaration(
     void Function(ExtensionTypeDeclaration) callback,
   ) {

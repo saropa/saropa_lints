@@ -49,6 +49,7 @@ class CompatVisitor extends SimpleAstVisitor<void> {
   void Function(ExportDirective)? onExportDirective;
   void Function(ExpressionStatement)? onExpressionStatement;
   void Function(ExtensionDeclaration)? onExtensionDeclaration;
+  void Function(ExtensionOverride)? onExtensionOverride;
   void Function(ExtensionTypeDeclaration)? onExtensionTypeDeclaration;
   void Function(FieldDeclaration)? onFieldDeclaration;
   void Function(ForEachPartsWithDeclaration)? onForEachPartsWithDeclaration;
@@ -178,6 +179,9 @@ class CompatVisitor extends SimpleAstVisitor<void> {
   @override
   void visitExtensionDeclaration(ExtensionDeclaration node) =>
       onExtensionDeclaration?.call(node);
+  @override
+  void visitExtensionOverride(ExtensionOverride node) =>
+      onExtensionOverride?.call(node);
   @override
   void visitExtensionTypeDeclaration(ExtensionTypeDeclaration node) =>
       onExtensionTypeDeclaration?.call(node);

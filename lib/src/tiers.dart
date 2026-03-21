@@ -277,6 +277,7 @@ const Set<String> stylisticRules = <String>{
 /// projects that have no Flutter dependency. These are a subset of
 /// [stylisticRules] — not a separate tier.
 const Set<String> flutterStylisticRules = <String>{
+  'avoid_chip_delete_inkwell_circle_border',
   'avoid_shrink_wrap_in_scroll',
   'avoid_small_text',
   'prefer_borderradius_circular',
@@ -721,6 +722,17 @@ const Set<String> essentialRules = <String>{
   // Additional rules (plan_additional_rules_11_through_20)
   'depend_on_referenced_packages', // WARNING - package import not in pubspec
   'uri_does_not_exist', // ERROR - import/export/part URI missing
+  // Additional rules (plan_additional_rules_21_through_30)
+  'conflicting_constructor_and_static_member',
+  'duplicate_constructor',
+  'duplicate_field_name',
+  'field_initializer_redirecting_constructor',
+  'illegal_concrete_enum_member',
+  'invalid_extension_argument_count',
+  'invalid_field_name',
+  'invalid_literal_annotation',
+  'invalid_non_virtual_annotation',
+  'invalid_super_formal_parameter_location',
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -746,6 +758,23 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_button_style_icon_alignment', // WARNING - deprecated in Flutter 3.28
   'prefer_key_event', // WARNING - deprecated in Flutter 3.18
   'prefer_m3_text_theme', // WARNING - removed in Flutter 3.22
+  'prefer_overflow_bar_over_button_bar', // INFO - OverflowBar over ButtonBar (Flutter 3.13+)
+  // Dart SDK 3.0 removed APIs
+  'avoid_deprecated_list_constructor',
+  'avoid_removed_proxy_annotation',
+  'avoid_removed_provisional_annotation',
+  'avoid_deprecated_expires_getter',
+  'avoid_removed_cast_error',
+  'avoid_removed_fall_through_error',
+  'avoid_removed_abstract_class_instantiation_error',
+  'avoid_removed_cyclic_initialization_error',
+  'avoid_removed_nosuchmethoderror_default_constructor',
+  'avoid_removed_bidirectional_iterator',
+  'avoid_removed_deferred_library',
+  'avoid_deprecated_has_next_iterator',
+  'avoid_removed_max_user_tags_constant',
+  'avoid_removed_dart_developer_metrics',
+  'avoid_deprecated_network_interface_list_supported',
   // Moved from Essential (style/quality, not crash prevention)
   // 'prefer_list_first' moved to stylisticRules (opinionated)
   // 'prefer_list_last' moved to stylisticRules (opinionated)
@@ -1882,6 +1911,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_hardcoded_duration',
   'require_animation_curve',
   'prefer_implicit_animations',
+  'avoid_implicit_animation_dispose_cast', // WARNING - redundant CurvedAnimation.dispose in implicit state
   // Note: require_staggered_animation_delays moved to Comprehensive
 
   // Navigation (Professional - consistency)
@@ -2730,6 +2760,7 @@ const Set<String> professionalOnlyRules = <String>{
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
   // Code style / Web (roadmap detail requirements)
+  'avoid_chip_delete_inkwell_circle_border',
   'avoid_js_rounded_ints',
   'avoid_private_typedef_functions',
   // Import sorting
@@ -2809,6 +2840,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_notifier_over_state',
   'prefer_provider_extensions',
   'prefer_redirecting_superclass_constructor',
+  'prefer_super_key',
   'prefer_factory_before_named',
 
   // Kept from original Comprehensive

@@ -6,7 +6,7 @@
 # Roadmap: Aiming for 2,100 Lint Rules
 <!-- cspell:disable -->
 
-See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2100 rules (2071 implemented, 29 remaining).
+See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2100 rules (2090 implemented, 10 remaining).
 
 > **When implementing**: Remove from ROADMAP, add to CHANGELOG, register in `all_rules.dart` + `tiers.dart`. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -43,6 +43,7 @@ Some rules intentionally conflict or overlap; the **init wizard** (`dart run sar
 |--------------|--------|--------|
 | **Intentional pair** | `avoid_cubit_usage` vs `prefer_cubit_for_simple_state` | Opposite preferences: prefer Bloc (event traceability) vs prefer Cubit for simple state. Enable one via the wizard. |
 | **Narrow variant** | `prefer_expression_body_getters` vs `prefer_arrow_functions` | Getter-only vs all single-expression bodies. Can enable both (getters get the narrow rule; methods the broad one) or just one. |
+| **Narrow variant** | `prefer_super_parameters` vs `prefer_super_key` | Both can flag `super(key: key)` on widgets; `prefer_super_key` is Flutter-widget + `Key` only. Enable one or accept duplicate diagnostics on `key` forwarding. |
 | **Other pairs** | e.g. `prefer_type_over_var` / `prefer_var_over_explicit_type` | Documented in rule DartDoc and in CHANGELOG; wizard shows both so users pick one. |
 
 When adding or reviewing rules, check CODE_INDEX and tiers for existing stylistic opposites; document pairs in the rule’s DartDoc and, if needed, in this table.
@@ -825,22 +826,12 @@ cross_file:
 
 Use as a todo list for implementation candidates. Sorted by **Effort** (L → M → H) then **Wow** (H → M → L).
 
-**Implementation plans** (by developer usefulness): [bugs/plan/](bugs/plan/) — see `plan_additional_rules_1_through_10.md` through `plan_additional_rules_81_through_90.md` for target files, approach, and acceptance criteria per rule.
+**Implementation plans** (by developer usefulness): [bugs/plan/](bugs/plan/) — see `plan_additional_rules_1_through_10.md` through `plan_additional_rules_81_through_90.md` for target files, approach, and acceptance criteria per rule. Implemented batch 21–30: [plan/history/20260320/IMPLEMENTED_plan_additional_rules_21_through_30.md](plan/history/20260320/IMPLEMENTED_plan_additional_rules_21_through_30.md).
 
 **Legend:** 🐛 BUG · 💨 CODE_SMELL · ⚠️ MINOR · 🚨 MAJOR · 🔴 BLOCKER · 🟢 L / 🟡 M / 🔴 H effort · ★ / ★★ / ★★★ wow
 
 | Rule key | Kind | Name | Checks for (summary) | Severity | Effort | Wow |
 |----------------|------|------|----------------------|----------|--------|-----|
-| conflicting_constructor_and_static_member | 🐛 BUG | Conflicting constructor and static member | Named constructor and static method/field have same name. | ⚠️ MINOR | 🟡 M | ★ L |
-| duplicate_constructor | 🐛 BUG | Duplicate constructor | More than one unnamed or same-named constructor. | ⚠️ MINOR | 🟡 M | ★ L |
-| duplicate_field_name | 🐛 BUG | Duplicate field name | Record literal/type has duplicate field name. | ⚠️ MINOR | 🟡 M | ★ L |
-| field_initializer_redirecting_constructor | 🐛 BUG | Field initializer redirecting constructor | Redirecting constructor initializes a field. | ⚠️ MINOR | 🟡 M | ★ L |
-| illegal_concrete_enum_member | 🐛 BUG | Illegal concrete enum member | Enum/concrete Enum implementer has concrete instance member. | ⚠️ MINOR | 🟡 M | ★ L |
-| invalid_extension_argument_count | 🐛 BUG | Invalid extension argument count | Extension override doesn't have exactly one argument. | ⚠️ MINOR | 🟡 M | ★ L |
-| invalid_field_name | 🐛 BUG | Invalid field name | Record literal/type has invalid field name. | ⚠️ MINOR | 🟡 M | ★ L |
-| invalid_literal_annotation | 🐛 BUG | Invalid literal annotation | literal annotation applied to non–const constructor. | ⚠️ MINOR | 🟡 M | ★ L |
-| invalid_non_virtual_annotation | 🐛 BUG | Invalid non virtual annotation | nonVirtual on wrong declaration or non-concrete member. | ⚠️ MINOR | 🟡 M | ★ L |
-| invalid_super_formal_parameter_location | 🐛 BUG | Invalid super formal parameter location | Super parameter used outside non-redirecting generative constructor. | ⚠️ MINOR | 🟡 M | ★ L |
 | non_constant_map_element | 🐛 BUG | Non constant map element | if or spread element in const map isn't constant. | ⚠️ MINOR | 🟡 M | ★ L |
 | return_in_generator | 🐛 BUG | Return in generator | Generator uses return with value or implicit return. | ⚠️ MINOR | 🟡 M | ★ L |
 | subtype_of_disallowed_type | 🐛 BUG | Subtype of disallowed type | extends/implements/with/on restricted type (bool, int, etc.). | ⚠️ MINOR | 🟡 M | ★ L |

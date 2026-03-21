@@ -11,6 +11,7 @@ export 'architecture/dependency_injection_rules.dart';
 export 'architecture/disposal_rules.dart';
 export 'architecture/lifecycle_rules.dart';
 export 'architecture/structure_rules.dart';
+export 'architecture/compile_time_syntax_rules.dart';
 
 // Commerce
 export 'commerce/iap_rules.dart';
@@ -25,6 +26,7 @@ export 'code_quality/unnecessary_code_rules.dart';
 
 // Config
 export 'config/config_rules.dart';
+export 'config/dart_sdk_3_removal_rules.dart';
 export 'config/migration_rules.dart';
 export 'config/platform_rules.dart';
 
@@ -111,6 +113,7 @@ export 'widget/ui_ux_rules.dart';
 export 'widget/widget_layout_constraints_rules.dart';
 export 'widget/widget_layout_flex_scroll_rules.dart';
 export 'widget/widget_lifecycle_rules.dart';
+export 'widget/flutter_migration_widget_rules.dart';
 export 'widget/widget_patterns_avoid_prefer_rules.dart';
 export 'widget/widget_patterns_require_rules.dart';
 export 'widget/widget_patterns_ux_rules.dart';

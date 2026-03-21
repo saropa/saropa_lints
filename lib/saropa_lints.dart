@@ -709,6 +709,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferCarouselViewRule.new,
   PreferSearchAnchorRule.new,
   PreferTapRegionForDismissRule.new,
+  PreferSuperKeyRule.new,
+  AvoidChipDeleteInkWellCircleBorderRule.new,
 
   // Accessibility rules (NEW)
   AvoidIconButtonsWithoutTooltipRule.new,
@@ -2788,6 +2790,24 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferButtonStyleIconAlignmentRule.new,
   PreferKeyEventRule.new,
   PreferM3TextThemeRule.new,
+  PreferOverflowBarOverButtonBarRule.new,
+
+  // Dart SDK 3.0 removed APIs (migration)
+  AvoidDeprecatedListConstructorRule.new,
+  AvoidRemovedProxyAnnotationRule.new,
+  AvoidRemovedProvisionalAnnotationRule.new,
+  AvoidDeprecatedExpiresGetterRule.new,
+  AvoidRemovedCastErrorRule.new,
+  AvoidRemovedFallThroughErrorRule.new,
+  AvoidRemovedAbstractClassInstantiationErrorRule.new,
+  AvoidRemovedCyclicInitializationErrorRule.new,
+  AvoidRemovedNoSuchMethodErrorDefaultConstructorRule.new,
+  AvoidRemovedBidirectionalIteratorRule.new,
+  AvoidRemovedDeferredLibraryRule.new,
+  AvoidDeprecatedHasNextIteratorRule.new,
+  AvoidRemovedMaxUserTagsConstantRule.new,
+  AvoidRemovedDartDeveloperMetricsRule.new,
+  AvoidDeprecatedNetworkInterfaceListSupportedRule.new,
 
   // v5.1.0 - New lint rules
   AvoidCachedImageWebRule.new,
@@ -2828,6 +2848,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidPlatformSpecificImportsRule.new,
   AvoidSharedPrefsSyncRaceRule.new,
   AvoidMultipleAnimationControllersRule.new,
+  AvoidImplicitAnimationDisposeCastRule.new,
   AvoidFormValidationOnChangeRule.new,
   AvoidStackTraceInProductionRule.new,
   AvoidWebViewCorsIssuesRule.new,
@@ -2888,6 +2909,18 @@ _allRuleFactories = <SaropaLintRule Function()>[
   SecurePubspecUrlsRule.new,
   DependOnReferencedPackagesRule.new,
   UriDoesNotExistRule.new,
+
+  // Additional rules (plan_additional_rules_21_through_30)
+  ConflictingConstructorAndStaticMemberRule.new,
+  DuplicateConstructorRule.new,
+  DuplicateRecordFieldNameRule.new,
+  FieldInitializerRedirectingConstructorRule.new,
+  IllegalConcreteEnumMemberRule.new,
+  InvalidExtensionArgumentCountRule.new,
+  InvalidLiteralAnnotationRule.new,
+  InvalidNonVirtualAnnotationRule.new,
+  InvalidRecordFieldNameRule.new,
+  InvalidSuperFormalParameterLocationRule.new,
 ];
 
 // =============================================================================

@@ -2928,3 +2928,206 @@ class InvalidVisibleOutsideTemplateAnnotationRule extends SaropaLintRule {
     return false;
   }
 }
+
+// -----------------------------------------------------------------------------
+// Record types & extension overrides — compile-time shape (plan batch 21–30).
+//
+// These rules use [addRecordLiteral], [addRecordTypeAnnotation], and
+// [addExtensionOverride] only; they do not scan raw source strings for names.
+// -----------------------------------------------------------------------------
+
+// =============================================================================
+// duplicate_field_name (records)
+// =============================================================================
+
+/// Record literal or record type annotation uses the same field name twice.
+///
+/// **Bad:**
+/// ```dart
+/// typedef T = ({int a, String a});
+/// final x = (a: 1, a: 2);
+/// ```
+class DuplicateRecordFieldNameRule extends SaropaLintRule {
+  DuplicateRecordFieldNameRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'duplicate_field_name',
+    '[duplicate_field_name] Record literal or record type declares the same field name more than once. Duplicate record fields are invalid Dart. {v1}',
+    correctionMessage:
+        'Remove or rename duplicate field names so each name is unique within the record.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    void reportDuplicates(List<(Token nameTok, AstNode reportNode)> fields) {
+      final Map<String, List<(Token, AstNode)>> byName =
+          <String, List<(Token, AstNode)>>{};
+      for (final (Token t, AstNode n) in fields) {
+        final String lex = t.lexeme;
+        byName.putIfAbsent(lex, () => <(Token, AstNode)>[]).add((t, n));
+      }
+      for (final List<(Token, AstNode)> group in byName.values) {
+        if (group.length <= 1) continue;
+        for (final (_, AstNode n) in group) {
+          reporter.atNode(n, code);
+        }
+      }
+    }
+
+    context.addRecordLiteral((RecordLiteral node) {
+      final List<(Token, AstNode)> fields = <(Token, AstNode)>[];
+      for (final Expression e in node.fields) {
+        if (e is NamedExpression) {
+          final SimpleIdentifier id = e.name.label;
+          fields.add((id.token, id));
+        }
+      }
+      reportDuplicates(fields);
+    });
+
+    context.addRecordTypeAnnotation((RecordTypeAnnotation node) {
+      final List<(Token, AstNode)> fields = <(Token, AstNode)>[];
+      for (final RecordTypeAnnotationField p in node.positionalFields) {
+        final Token? n = p.name;
+        if (n != null) fields.add((n, p));
+      }
+      final RecordTypeAnnotationNamedFields? named = node.namedFields;
+      if (named != null) {
+        for (final RecordTypeAnnotationNamedField f in named.fields) {
+          fields.add((f.name, f));
+        }
+      }
+      reportDuplicates(fields);
+    });
+  }
+}
+
+// =============================================================================
+// invalid_field_name (records)
+// =============================================================================
+
+/// Record field label uses a reserved keyword (invalid identifier for the label).
+///
+/// **Note:** Most invalid labels are rejected by the parser before a record
+/// AST is built; this rule covers recovered or keyword-typed identifier tokens.
+class InvalidRecordFieldNameRule extends SaropaLintRule {
+  InvalidRecordFieldNameRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'invalid_field_name',
+    '[invalid_field_name] Record field name is not a valid Dart identifier (for example a reserved keyword). {v1}',
+    correctionMessage: 'Rename the field to a valid Dart identifier.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  static bool _tokenIsReservedKeyword(Token t) => t.type is Keyword;
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addRecordLiteral((RecordLiteral node) {
+      for (final Expression e in node.fields) {
+        if (e is! NamedExpression) continue;
+        final SimpleIdentifier id = e.name.label;
+        if (_tokenIsReservedKeyword(id.token)) {
+          reporter.atNode(id, code);
+        }
+      }
+    });
+
+    context.addRecordTypeAnnotation((RecordTypeAnnotation node) {
+      for (final RecordTypeAnnotationField p in node.positionalFields) {
+        final Token? n = p.name;
+        if (n != null && _tokenIsReservedKeyword(n)) {
+          reporter.atNode(p, code);
+        }
+      }
+      final RecordTypeAnnotationNamedFields? named = node.namedFields;
+      if (named != null) {
+        for (final RecordTypeAnnotationNamedField f in named.fields) {
+          if (_tokenIsReservedKeyword(f.name)) {
+            reporter.atNode(f, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// invalid_extension_argument_count
+// =============================================================================
+
+/// Extension override must pass exactly one argument (the extended value).
+///
+/// **Bad:**
+/// ```dart
+/// extension E on int { void m() {} }
+/// void f() { E().m(); }
+/// ```
+class InvalidExtensionArgumentCountRule extends SaropaLintRule {
+  InvalidExtensionArgumentCountRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'invalid_extension_argument_count',
+    '[invalid_extension_argument_count] An extension override must supply exactly one argument: the receiver value for the extension. The Dart analyzer reports the same issue natively; this rule aligns messaging within saropa_lints. {v1}',
+    correctionMessage:
+        'Pass exactly one expression to the extension override (the object being extended).',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addExtensionOverride((ExtensionOverride node) {
+      final int n = node.argumentList.arguments.length;
+      if (n != 1) {
+        reporter.atNode(node.argumentList, code);
+      }
+    });
+  }
+}

@@ -1,6 +1,37 @@
+# IMPLEMENTED: Additional rules 21–30 (2026-03-20)
+
+## Summary
+
+All ten ROADMAP “additional rules” in the 21–30 batch are **implemented and registered**:
+
+| Rule | Primary source file |
+|------|---------------------|
+| `duplicate_constructor` | `lib/src/rules/architecture/compile_time_syntax_rules.dart` |
+| `conflicting_constructor_and_static_member` | same |
+| `field_initializer_redirecting_constructor` | same |
+| `invalid_super_formal_parameter_location` | same |
+| `illegal_concrete_enum_member` | same |
+| `invalid_literal_annotation` | same (`package:meta` `@literal`) |
+| `invalid_non_virtual_annotation` | same (`package:meta` `@nonVirtual`) |
+| `duplicate_field_name` | `lib/src/rules/data/type_rules.dart` |
+| `invalid_field_name` | same (keyword `Token.type`; rarely seen—parser usually rejects bad labels) |
+| `invalid_extension_argument_count` | same (`ExtensionOverride`; requires `addExtensionOverride` on `SaropaContext`) |
+
+- **Exports:** `lib/src/rules/all_rules.dart` exports `compile_time_syntax_rules.dart`.
+- **Registry:** `lib/saropa_lints.dart` `_allRuleFactories`.
+- **Tier:** Essential (`lib/src/tiers.dart`).
+- **Fixture:** `example/lib/plan_additional_rules_21_30_fixture.dart` (nine `expect_lint` lines; no BAD line for `invalid_field_name`).
+- **Tests:** `test/plan_additional_rules_21_30_test.dart`, `test/compile_time_syntax_rules_test.dart`, `test/type_rules_test.dart` (instantiation).
+
+---
+
+## Original plan (archived)
+
+The following is the pre-implementation specification for traceability.
+
 # Plan: Additional rules 21–30 (ROADMAP)
 
-**Source:** [ROADMAP.md — Additional rules](../../ROADMAP.md#additional-rules). Ordered by developer usefulness (after 11–20).  
+**Source:** ROADMAP.md — Additional rules. Ordered by developer usefulness (after 11–20).  
 **Legend:** 🟢 L / 🟡 M / 🔴 H effort · ★ / ★★ / ★★★ wow
 
 Register each rule in `all_rules.dart` and `tiers.dart`; add ROADMAP entry and fixture only after the rule is implemented and the BAD example triggers the lint.
@@ -145,6 +176,6 @@ Register each rule in `all_rules.dart` and `tiers.dart`; add ROADMAP entry and f
 
 ## Checklist per rule
 
-- [ ] Rule in correct `*_rules.dart`; registered in `all_rules.dart`; tier in `tiers.dart`.
-- [ ] ROADMAP entry; fixture only when BAD triggers; unit test; `/analyze`, `/test`, `/format`.
-- [ ] No quick fix that inserts `// ignore:`.
+- [x] Rule in correct `*_rules.dart`; registered in `all_rules.dart`; tier in `tiers.dart`.
+- [x] ROADMAP entry; fixture only when BAD triggers; unit test; `/analyze`, `/test`, `/format`.
+- [x] No quick fix that inserts `// ignore:`.
