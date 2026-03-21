@@ -16,6 +16,7 @@ import 'package:saropa_lints/src/rules/flow/return_rules.dart';
 import 'package:saropa_lints/src/rules/stylistic/formatting_rules.dart';
 import 'package:saropa_lints/src/rules/stylistic/stylistic_additional_rules.dart';
 import 'package:saropa_lints/src/rules/stylistic/stylistic_rules.dart';
+import 'package:saropa_lints/src/rules/ui/animation_rules.dart';
 import 'package:saropa_lints/src/rules/widget/flutter_migration_widget_rules.dart';
 import 'package:test/test.dart';
 
@@ -302,5 +303,11 @@ void main() {
 
     // Flutter migration widget (1)
     hasFix('PreferSuperKeyRule', () => PreferSuperKeyRule());
+
+    // UI / Animation (1)
+    hasFix(
+      'AvoidImplicitAnimationDisposeCastRule',
+      () => AvoidImplicitAnimationDisposeCastRule(),
+    );
   });
 }

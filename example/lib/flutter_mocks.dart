@@ -464,9 +464,33 @@ abstract class Animation<T> {
 }
 
 class CurvedAnimation implements Animation<double> {
-  CurvedAnimation({required Animation<double> parent, required dynamic curve});
+  CurvedAnimation({required Animation<double> parent, required this.curve});
+  final dynamic curve;
+  void dispose() {}
   @override
   double get value => 0.0;
+}
+
+/// Parent animation placeholder for [ImplicitlyAnimatedWidgetState] mocks.
+class _ImplicitAnimationParent implements Animation<double> {
+  @override
+  double get value => 0.0;
+}
+
+/// Minimal mock of Flutter’s [ImplicitlyAnimatedWidget] / state (implicit_animations.dart).
+abstract class ImplicitlyAnimatedWidget extends StatefulWidget {
+  const ImplicitlyAnimatedWidget({super.key, required this.duration});
+  final Duration duration;
+}
+
+/// Minimal mock of [ImplicitlyAnimatedWidgetState] with an [animation] getter.
+abstract class ImplicitlyAnimatedWidgetState<T extends ImplicitlyAnimatedWidget>
+    extends State<T> with SingleTickerProviderStateMixin<T> {
+  late final CurvedAnimation _implicitCurved = CurvedAnimation(
+    parent: _ImplicitAnimationParent(),
+    curve: Curves.linear,
+  );
+  Animation<double> get animation => _implicitCurved;
 }
 
 /// Axis enum for SizeTransition

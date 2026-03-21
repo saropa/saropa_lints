@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/ui/animation_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 19 Animation lint rules.
+/// Tests for 20 Animation lint rules.
 ///
 /// Test fixtures: example_widgets/lib/animation/*
 void main() {
@@ -113,6 +113,11 @@ void main() {
       'avoid_multiple_animation_controllers',
       () => AvoidMultipleAnimationControllersRule(),
     );
+    testRule(
+      'AvoidImplicitAnimationDisposeCastRule',
+      'avoid_implicit_animation_dispose_cast',
+      () => AvoidImplicitAnimationDisposeCastRule(),
+    );
   });
 
   group('Animation Rules - Fixture Verification', () {
@@ -136,6 +141,7 @@ void main() {
       'avoid_excessive_rebuilds_animation',
       'avoid_clip_during_animation',
       'avoid_multiple_animation_controllers',
+      'avoid_implicit_animation_dispose_cast',
     ];
 
     for (final fixture in fixtures) {
@@ -316,6 +322,16 @@ void main() {
       test('single AnimationController per State should NOT trigger', () {
         // Avoidance pattern not present
         expect('avoid_multiple_animation_controllers passes', isNotNull);
+      });
+    });
+
+    group('avoid_implicit_animation_dispose_cast', () {
+      test('(animation as CurvedAnimation).dispose() SHOULD trigger', () {
+        expect('avoid_implicit_animation_dispose_cast detected', isNotNull);
+      });
+
+      test('super.dispose only or non-dispose cast should NOT trigger', () {
+        expect('avoid_implicit_animation_dispose_cast passes', isNotNull);
       });
     });
   });
