@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 6.0.7)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 6.0.8)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -17,11 +17,11 @@
 #
 # TIER GUIDE
 # ==========
-# - essential      : Critical rules (~345) - prevents crashes, security issues
-# - recommended    : Essential + common mistakes (~850) - default for most teams
-# - professional   : Recommended + architecture/testing (~1590) - enterprise teams
-# - comprehensive  : Professional + thorough coverage (~1640) - quality obsessed
-# - pedantic       : Everything including opinionated rules (~1650) - greenfield projects
+# - essential      : Critical rules (~355) - prevents crashes, security issues
+# - recommended    : Essential + common mistakes (~870) - default for most teams
+# - professional   : Recommended + architecture/testing (~1600) - enterprise teams
+# - comprehensive  : Professional + thorough coverage (~2075) - quality obsessed
+# - pedantic       : Everything including opinionated rules (~1675) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================
@@ -334,6 +334,7 @@ saropa_lints:
     - avoid_undisposed_instances: false
     - require_value_notifier_dispose: false
     - require_animation_controller_dispose: false
+    - avoid_implicit_animation_dispose_cast: false # WARNING - redundant (animation as CurvedAnimation).dispose() in ImplicitlyAnimatedWidgetState (Flutter 3.7+, PR #111849)
     - require_image_disposal: false
     - nullify_after_dispose: false
     - require_media_player_dispose: false
@@ -662,6 +663,21 @@ saropa_lints:
     - prefer_named_imports: false
 
     # =========================================================================
+    # DART LANGUAGE — COMPILE-TIME SHAPE (constructors, records, Enum, meta)
+    # Essential-tier mirrors for analyzer compile errors; see CHANGELOG.
+    # =========================================================================
+    - conflicting_constructor_and_static_member: false
+    - duplicate_constructor: false
+    - duplicate_field_name: false
+    - field_initializer_redirecting_constructor: false
+    - illegal_concrete_enum_member: false
+    - invalid_extension_argument_count: false
+    - invalid_field_name: false
+    - invalid_literal_annotation: false
+    - invalid_non_virtual_annotation: false
+    - invalid_super_formal_parameter_location: false
+
+    # =========================================================================
     # INTERNATIONALIZATION
     # =========================================================================
     - avoid_hardcoded_strings_in_ui: false
@@ -922,6 +938,7 @@ saropa_lints:
     - require_provider_dispose: false
     - prefer_ref_watch_over_read: false
     - avoid_change_notifier_in_widget: false
+    - avoid_chip_delete_inkwell_circle_border: false # INFO - chip deleteIcon InkWell + CircleBorder (v9.11.0)
     - avoid_setstate_in_large_state_class: false
     - require_riverpod_lint: false
     - require_multi_provider: false
@@ -1283,6 +1300,7 @@ saropa_lints:
     - prefer_trailing_commas: false              # Trailing commas in multi-line
     - prefer_no_trailing_commas: false           # Opposite - no trailing commas
     - prefer_super_parameters: false             # super parameters over super.x
+    - prefer_super_key: false                    # INFO - Flutter widget Key? key -> super.key (v9.11.0)
     - prefer_explicit_super_calls: false         # Opposite - explicit super.
     - prefer_initializing_formals: false         # this.x parameters
     - prefer_explicit_field_assignment: false    # Opposite - explicit assignments
@@ -1489,6 +1507,24 @@ saropa_lints:
     - prefer_button_style_icon_alignment: false        # WARNING - iconAlignment→ButtonStyle, deprecated Flutter 3.28
     - prefer_key_event: false                          # WARNING - RawKeyEvent→KeyEvent, deprecated Flutter 3.18
     - prefer_m3_text_theme: false                      # WARNING - TextTheme 2018 names→M3 names, removed Flutter 3.22 (quick fix)
+    - prefer_overflow_bar_over_button_bar: false        # INFO - prefer OverflowBar over ButtonBar (Flutter 3.13+, PR #128437)
+
+    # --- Migration (Dart SDK 3.0 removals) ---
+    - avoid_deprecated_list_constructor: false         # WARNING - List() ctor removed Dart 3.0 (quick fix)
+    - avoid_removed_proxy_annotation: false             # WARNING - @proxy removed Dart 3.0 (quick fix)
+    - avoid_removed_provisional_annotation: false       # WARNING - @Provisional removed Dart 3.0 (quick fix)
+    - avoid_deprecated_expires_getter: false            # WARNING - Deprecated.expires removed (quick fix)
+    - avoid_removed_cast_error: false                   # WARNING - CastError→TypeError Dart 3.0 (quick fix)
+    - avoid_removed_fall_through_error: false           # WARNING - FallThroughError removed Dart 3.0
+    - avoid_removed_abstract_class_instantiation_error: false # WARNING - removed Dart 3.0
+    - avoid_removed_cyclic_initialization_error: false  # WARNING - CyclicInitializationError removed Dart 3.0
+    - avoid_removed_nosuchmethoderror_default_constructor: false # WARNING - use withInvocation Dart 3.0
+    - avoid_removed_bidirectional_iterator: false      # WARNING - interface removed Dart 3.0
+    - avoid_removed_deferred_library: false             # WARNING - use deferred import Dart 3.0
+    - avoid_deprecated_has_next_iterator: false         # WARNING - HasNextIterator deprecated dart:collection (Dart 3.0+)
+    - avoid_removed_max_user_tags_constant: false        # WARNING - UserTag.MAX_USER_TAGS removed; use maxUserTags (quick fix)
+    - avoid_removed_dart_developer_metrics: false       # WARNING - Metrics/Metric/Counter/Gauge removed dart:developer Dart 3.0
+    - avoid_deprecated_network_interface_list_supported: false # WARNING - NetworkInterface.listSupported deprecated dart:io
 
     # =========================================================================
     # V5.1.0 RULES - New lint rules

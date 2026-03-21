@@ -138,6 +138,21 @@ void main() {
       'argument_must_be_native',
       () => ArgumentMustBeNativeRule(),
     );
+    testRule(
+      'DuplicateRecordFieldNameRule',
+      'duplicate_field_name',
+      () => DuplicateRecordFieldNameRule(),
+    );
+    testRule(
+      'InvalidRecordFieldNameRule',
+      'invalid_field_name',
+      () => InvalidRecordFieldNameRule(),
+    );
+    testRule(
+      'InvalidExtensionArgumentCountRule',
+      'invalid_extension_argument_count',
+      () => InvalidExtensionArgumentCountRule(),
+    );
   });
 
   group('Type Rules - Fixture Verification', () {

@@ -80,3 +80,26 @@ saropa_lints:
     - avoid_variable_shadowing: true
     # Explicitly enable documentation rules for testing
     - verify_documented_parameters_exist: true
+    # Compile-time shape rules (plan_additional_rules_21_30 fixture)
+    - duplicate_constructor: true
+    - conflicting_constructor_and_static_member: true
+    - duplicate_field_name: true
+    - field_initializer_redirecting_constructor: true
+    - invalid_super_formal_parameter_location: true
+    - illegal_concrete_enum_member: true
+    - invalid_extension_argument_count: true
+    - invalid_field_name: true
+    - invalid_literal_annotation: true
+    - invalid_non_virtual_annotation: true
+    # Dart SDK 3.0 removal rules (fixtures: dart_sdk_3_removal_*.dart)
+    - avoid_deprecated_list_constructor: true
+    - avoid_removed_proxy_annotation: true
+    - avoid_removed_provisional_annotation: true
+    - avoid_deprecated_expires_getter: true
+    - avoid_removed_cast_error: true
+    - avoid_removed_fall_through_error: true
+    - avoid_removed_abstract_class_instantiation_error: true
+    - avoid_removed_cyclic_initialization_error: true
+    - avoid_removed_nosuchmethoderror_default_constructor: true
+    - avoid_removed_bidirectional_iterator: true
+    - avoid_removed_deferred_library: true

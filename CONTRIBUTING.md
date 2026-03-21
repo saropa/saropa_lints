@@ -52,7 +52,7 @@ dart analyze
 
 ## Configuration Reference
 
-For a complete reference of all available rules, tiers, and configuration options, see [example/analysis_options_template.yaml](./example/analysis_options_template.yaml). It includes all 1184+ rules organized by category with impact levels and tier membership documented.
+For a complete reference of all available rules, tiers, and configuration options, see [example/analysis_options_template.yaml](./example/analysis_options_template.yaml). It lists rules by category with impact levels and tier membership (see template header for approximate tier counts).
 
 ## Adding a New Rule
 

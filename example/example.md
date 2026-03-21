@@ -1,6 +1,6 @@
 # Saropa Lints Example Configuration
 
-This file shows how to configure saropa_lints with all 1673+ rules.
+This file shows how to configure saropa_lints with the full rule set (see [analysis_options_template.yaml](analysis_options_template.yaml) for tier counts).
 
 ## Setup
 
