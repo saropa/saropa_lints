@@ -1,8 +1,14 @@
 /**
- * Collapsible "Sidebar" group and leaf rows for per-section visibility toggles.
+ * Activity-bar section visibility toggles shown under **Overview & options → Sidebar**.
+ *
+ * **Label format:** `{section label} ({count})` when the section count is a finite number;
+ * otherwise the base label only. **Description:** `On` or `Off` (counts are not duplicated
+ * in the description — that was previous UX).
+ *
  */
 
 import * as vscode from 'vscode';
+import { formatSidebarToggleLabel } from '../sidebarToggleLabel';
 import { isDriftSidebarEffectiveVisible } from '../driftAdvisor/driftAdvisorUiState';
 import { defaultSidebarSectionVisible, SIDEBAR_SECTIONS } from '../sidebarSectionVisibilityKeys';
 
@@ -16,11 +22,9 @@ export class OverviewSidebarSectionParent extends vscode.TreeItem {
 }
 
 export class OverviewSidebarToggleItem extends vscode.TreeItem {
-    constructor(readonly sectionKey: string, label: string, on: boolean, count?: number) {
-        super(label, vscode.TreeItemCollapsibleState.None);
-        const state = on ? 'On' : 'Off';
-        this.description =
-            count !== undefined && Number.isFinite(count) ? `${state} · ${count}` : state;
+    constructor(readonly sectionKey: string, baseLabel: string, on: boolean, count?: number) {
+        super(formatSidebarToggleLabel(baseLabel, count), vscode.TreeItemCollapsibleState.None);
+        this.description = on ? 'On' : 'Off';
         this.iconPath = new vscode.ThemeIcon(on ? 'eye' : 'eye-closed');
         this.command = {
             command: 'saropaLints.toggleSidebarSection',
@@ -28,9 +32,9 @@ export class OverviewSidebarToggleItem extends vscode.TreeItem {
             arguments: [sectionKey],
         };
         this.contextValue = 'overviewSidebarToggle';
-        if (count !== undefined && Number.isFinite(count)) {
-            this.tooltip = `${label}: ${count} (click to show or hide in the activity bar)`;
-        }
+        const countHint =
+            count !== undefined && Number.isFinite(count) ? `${count} in this section. ` : '';
+        this.tooltip = `${baseLabel}: ${countHint}Click to show or hide in the activity bar.`;
     }
 }
 

@@ -5,7 +5,7 @@
 
 /** Config key + label shown in Settings and the sidebar-sections picker. */
 export const SIDEBAR_SECTIONS: ReadonlyArray<{ readonly key: string; readonly label: string }> = [
-    { key: 'sidebar.showOverview', label: 'Overview' },
+    { key: 'sidebar.showOverview', label: 'Overview & options' },
     { key: 'sidebar.showIssues', label: 'Violations' },
     { key: 'sidebar.showSummary', label: 'Summary' },
     { key: 'sidebar.showConfig', label: 'Config' },
@@ -31,12 +31,9 @@ export function sidebarSectionContextKey(configKey: string): string {
 
 /** Default visibility when the setting is unset (matches package.json defaults). */
 export function defaultSidebarSectionVisible(configKey: string): boolean {
-    // Core workflow: Overview, Violations, Config stay on. Everything else is opt-in.
-    if (
-        configKey === 'sidebar.showOverview'
-        || configKey === 'sidebar.showIssues'
-        || configKey === 'sidebar.showConfig'
-    ) {
+    // Core workflow: Overview (includes workspace options) and Violations stay on.
+    // Standalone Config is off — the same settings live under Overview & options.
+    if (configKey === 'sidebar.showOverview' || configKey === 'sidebar.showIssues') {
         return true;
     }
     return false;
