@@ -1,7 +1,22 @@
 /**
- * Tree data provider for Saropa Lints Overview (dashboard) view.
- * Shows Health Score as the primary number, then issues, trends, and links.
- * Includes a Sidebar group with toggles for each activity-bar section.
+ * # Overview & options — tree data provider
+ *
+ * Single sidebar view that combines onboarding copy, **workspace options** (embedded
+ * {@link ConfigTreeProvider} root + triage children), **Sidebar** (per-section visibility),
+ * and the **dashboard** (health, violations, trends) when `violations.json` exists.
+ *
+ * ## Behaviour contracts (for reviewers)
+ *
+ * - **Disabled (`saropaLints.enabled` false):** returns no children so `viewsWelcome`
+ *   can show Enable / About / walkthrough (unchanged from prior behaviour).
+ * - **Enabled:** always returns intro rows first so About / Getting Started are never
+ *   hidden when analysis results exist (previously an empty tree + welcome gap).
+ * - **Embedded config:** delegates to the same `ConfigTreeProvider` instance as the
+ *   standalone Config view — `refreshAll` clears triage cache once; no duplicate logic.
+ * - **Recursion:** `getChildren` depth is bounded (root → options → triage groups → rules;
+ *   root → sidebar → leaves). No cycles.
+ * - **Type guard:** {@link isConfigTreeNode} only accepts known `ConfigTreeNode.kind`
+ *   values so arbitrary objects with a `kind` property cannot reach `renderTreeItem`.
  */
 
 import * as vscode from 'vscode';
@@ -9,11 +24,29 @@ import { readViolations, type ViolationsData } from '../violationsReader';
 import { loadHistory, getTrendSummary, getScoreTrendSummary, findPreviousScore, detectScoreRegression } from '../runHistory';
 import { computeHealthScore, formatScoreDelta } from '../healthScore';
 import { getProjectRoot } from '../projectRoot';
+import type { ConfigTreeProvider } from './configTree';
+import type { ConfigTreeNode } from './triageTree';
+import { renderTreeItem } from './triageTree';
+import { OVERVIEW_EMBEDDED_CONFIG_KINDS } from '../overviewEmbeddedConfigKinds';
 import {
     OverviewSidebarSectionParent,
     OverviewSidebarToggleItem,
     buildSidebarToggleItems,
 } from './overviewSidebarTree';
+
+const OVERVIEW_INTRO_TOOLTIP =
+    'Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. '
+    + 'It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.';
+
+/** Collapsible group for tier, triage, and config actions (same content as the standalone Config view). */
+export class OverviewOptionsParent extends vscode.TreeItem {
+    constructor() {
+        super('Workspace options', vscode.TreeItemCollapsibleState.Expanded);
+        this.contextValue = 'overviewOptionsSection';
+        this.iconPath = new vscode.ThemeIcon('settings-gear');
+        this.tooltip = 'Enable state, tier, analysis behavior, detected packages, triage, and config actions';
+    }
+}
 
 /** C1: Format an ISO timestamp as a human-readable relative time. */
 function formatTimeAgo(iso: string): string {
@@ -34,18 +67,36 @@ class OverviewItem extends vscode.TreeItem {
     constructor(
         label: string,
         description: string | undefined,
-        commandId: string,
+        commandId: string | undefined,
         iconId?: string,
         iconColor?: vscode.ThemeColor,
     ) {
         super(label, vscode.TreeItemCollapsibleState.None);
         this.description = description;
-        this.command = { command: commandId, title: label, arguments: [] };
+        if (commandId) {
+            this.command = { command: commandId, title: label, arguments: [] };
+        }
         this.contextValue = 'overviewItem';
         if (iconId) {
             this.iconPath = new vscode.ThemeIcon(iconId, iconColor);
         }
     }
+}
+
+function buildOverviewIntroItems(): OverviewItem[] {
+    const summary = new OverviewItem(
+        'Saropa Lints',
+        'Package + extension for Dart/Flutter',
+        undefined,
+        'info',
+    );
+    summary.tooltip = OVERVIEW_INTRO_TOOLTIP;
+    return [
+        summary,
+        new OverviewItem('Learn more on pub.dev', 'saropa_lints', 'saropaLints.openPubDevSaropaLints', 'link-external'),
+        new OverviewItem('About Saropa Lints', 'Documentation', 'saropaLints.showAbout', 'book'),
+        new OverviewItem('Getting Started', 'Walkthrough', 'saropaLints.openWalkthrough', 'compass'),
+    ];
 }
 
 function healthScoreDescription(delta: string, total: number): string {
@@ -174,7 +225,20 @@ function buildDashboardItems(workspaceState: vscode.Memento, data: ViolationsDat
     return items;
 }
 
-export type OverviewTreeNode = OverviewItem | OverviewSidebarSectionParent | OverviewSidebarToggleItem;
+function isConfigTreeNode(node: OverviewTreeNode): node is ConfigTreeNode {
+    if (typeof node !== 'object' || node === null || !('kind' in node)) {
+        return false;
+    }
+    const k = (node as { kind: unknown }).kind;
+    return typeof k === 'string' && OVERVIEW_EMBEDDED_CONFIG_KINDS.has(k);
+}
+
+export type OverviewTreeNode =
+    | OverviewItem
+    | OverviewOptionsParent
+    | OverviewSidebarSectionParent
+    | OverviewSidebarToggleItem
+    | ConfigTreeNode;
 
 export type SidebarSectionCountGetter = () => ReadonlyMap<string, number | undefined>;
 
@@ -185,6 +249,7 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
     constructor(
         private readonly workspaceState: vscode.Memento,
         private readonly getSectionCounts: SidebarSectionCountGetter = () => new Map(),
+        private readonly configProvider: ConfigTreeProvider,
     ) {}
 
     refresh(): void {
@@ -192,12 +257,21 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
     }
 
     getTreeItem(element: OverviewTreeNode): vscode.TreeItem {
+        if (isConfigTreeNode(element)) {
+            return renderTreeItem(element);
+        }
         return element;
     }
 
     async getChildren(element?: OverviewTreeNode): Promise<OverviewTreeNode[]> {
         const cfg = vscode.workspace.getConfiguration('saropaLints');
 
+        if (element instanceof OverviewOptionsParent) {
+            return this.configProvider.getChildren();
+        }
+        if (element !== undefined && isConfigTreeNode(element)) {
+            return this.configProvider.getChildren(element);
+        }
         if (element instanceof OverviewSidebarSectionParent) {
             return buildSidebarToggleItems(cfg, this.workspaceState, this.getSectionCounts());
         }
@@ -208,14 +282,26 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
         const enabled = cfg.get<boolean>('enabled', false) ?? false;
         if (!enabled) return [];
 
+        const intro = buildOverviewIntroItems();
+        const optionsParent = new OverviewOptionsParent();
         const sidebarParent = new OverviewSidebarSectionParent();
         const root = getProjectRoot();
         const data = root ? readViolations(root) : null;
 
         if (data === null) {
-            return [sidebarParent];
+            return [
+                ...intro,
+                optionsParent,
+                sidebarParent,
+                new OverviewItem(
+                    'No analysis yet',
+                    'Run analysis to populate the dashboard',
+                    'saropaLints.runAnalysis',
+                    'beaker',
+                ),
+            ];
         }
 
-        return [sidebarParent, ...buildDashboardItems(this.workspaceState, data)];
+        return [...intro, optionsParent, sidebarParent, ...buildDashboardItems(this.workspaceState, data)];
     }
 }

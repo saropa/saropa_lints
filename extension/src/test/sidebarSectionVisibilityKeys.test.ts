@@ -22,7 +22,7 @@ describe('sidebarSectionVisibilityKeys', () => {
     it('defaults core sidebar on and secondary panels off', () => {
         assert.strictEqual(defaultSidebarSectionVisible('sidebar.showOverview'), true);
         assert.strictEqual(defaultSidebarSectionVisible('sidebar.showIssues'), true);
-        assert.strictEqual(defaultSidebarSectionVisible('sidebar.showConfig'), true);
+        assert.strictEqual(defaultSidebarSectionVisible('sidebar.showConfig'), false);
         assert.strictEqual(defaultSidebarSectionVisible('sidebar.showPackageDetails'), false);
         assert.strictEqual(defaultSidebarSectionVisible('sidebar.showDriftAdvisor'), false);
         assert.strictEqual(defaultSidebarSectionVisible('sidebar.showSummary'), false);

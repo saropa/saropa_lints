@@ -1,5 +1,48 @@
 import * as assert from 'node:assert';
-import { serializeVibrancyNode } from '../treeSerializers';
+import { serializeOverviewNode, serializeVibrancyNode } from '../treeSerializers';
+
+describe('serializeOverviewNode', () => {
+    it('serializes embedded configSetting nodes', () => {
+        const j = serializeOverviewNode({
+            kind: 'configSetting',
+            label: 'Tier',
+            description: 'recommended',
+        });
+        assert.strictEqual(j?.type, 'configSetting');
+        assert.strictEqual(j?.label, 'Tier');
+    });
+
+    it('serializes overview section parents by contextValue', () => {
+        assert.deepStrictEqual(serializeOverviewNode({ contextValue: 'overviewOptionsSection' }), {
+            type: 'overviewOptionsSection',
+            label: 'Workspace options',
+        });
+        assert.deepStrictEqual(serializeOverviewNode({ contextValue: 'overviewSidebarSection' }), {
+            type: 'overviewSidebarSection',
+            label: 'Sidebar',
+        });
+    });
+
+    it('falls through to TreeItem JSON for toggle-like rows', () => {
+        const j = serializeOverviewNode({
+            label: 'Violations (3)',
+            description: 'On',
+        });
+        assert.strictEqual(j?.type, 'overviewItem');
+        assert.strictEqual(j?.label, 'Violations (3)');
+        assert.strictEqual(j?.description, 'On');
+    });
+
+    it('does not treat unknown kind as config when serializeConfigNode returns null', () => {
+        const j = serializeOverviewNode({
+            kind: 'severity',
+            label: 'High',
+            description: '12',
+        });
+        assert.strictEqual(j?.type, 'overviewItem');
+        assert.strictEqual(j?.label, 'High');
+    });
+});
 
 describe('serializeVibrancyNode', () => {
     it('returns null for non-objects', () => {
