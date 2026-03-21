@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/config/migration_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for 11 Migration lint rules.
+/// Tests for 12 Migration lint rules.
 ///
 /// Rules:
 ///   - avoid_asset_manifest_json (Essential, ERROR)
@@ -17,6 +17,7 @@ import 'package:test/test.dart';
 ///   - prefer_button_style_icon_alignment (Recommended, WARNING)
 ///   - prefer_key_event (Recommended, WARNING)
 ///   - prefer_m3_text_theme (Recommended, WARNING)
+///   - prefer_overflow_bar_over_button_bar (Recommended, INFO)
 ///
 /// Test fixture: example/lib/migration_rules_fixture.dart
 void main() {
@@ -68,6 +69,20 @@ void main() {
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
       expect(rule.code.correctionMessage, contains('TabBarThemeData'));
+    });
+
+    test('PreferOverflowBarOverButtonBarRule instantiates correctly', () {
+      final rule = PreferOverflowBarOverButtonBarRule();
+      expect(
+        rule.code.name.toLowerCase(),
+        'prefer_overflow_bar_over_button_bar',
+      );
+      expect(
+        rule.code.problemMessage,
+        contains('[prefer_overflow_bar_over_button_bar]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(200));
+      expect(rule.code.correctionMessage, isNotNull);
     });
   });
 

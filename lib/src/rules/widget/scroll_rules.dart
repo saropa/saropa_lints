@@ -972,7 +972,7 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
 
 /// Warns when ListView with uniform items doesn't specify itemExtent.
 ///
-/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v4
 ///
 /// When all items have the same height, specifying itemExtent improves
 /// scroll performance by avoiding per-item layout calculations.
@@ -1010,9 +1010,9 @@ class PreferItemExtentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_item_extent',
-    '[prefer_item_extent] ListView without itemExtent recalculates layout on every scroll. When all items have the same height, specifying itemExtent improves scroll performance by avoiding per-item layout calculations. {v3}',
+    '[prefer_item_extent] ListView without itemExtent recalculates layout on every scroll. When all items have the same height, specifying itemExtent improves scroll performance by avoiding per-item layout calculations. If heights differ by index, use itemExtentBuilder (Flutter 3.16+) instead of omitting extent metadata. {v4}',
     correctionMessage:
-        'Add itemExtent parameter if all items have the same height. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+        'Add itemExtent when every row has the same height, or itemExtentBuilder when extents vary by index. Verify with tests.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -1032,19 +1032,21 @@ class PreferItemExtentRule extends SaropaLintRule {
         return;
       }
 
-      // Check if itemExtent or prototypeItem is already specified
+      // Check if itemExtent, prototypeItem, or itemExtentBuilder is specified
       bool hasItemExtent = false;
       bool hasPrototypeItem = false;
+      bool hasItemExtentBuilder = false;
 
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression) {
           final String argName = arg.name.label.name;
           if (argName == 'itemExtent') hasItemExtent = true;
           if (argName == 'prototypeItem') hasPrototypeItem = true;
+          if (argName == 'itemExtentBuilder') hasItemExtentBuilder = true;
         }
       }
 
-      if (!hasItemExtent && !hasPrototypeItem) {
+      if (!hasItemExtent && !hasPrototypeItem && !hasItemExtentBuilder) {
         reporter.atNode(node.constructorName, code);
       }
     });
@@ -1053,7 +1055,7 @@ class PreferItemExtentRule extends SaropaLintRule {
 
 /// Warns when ListView doesn't use prototypeItem for consistent sizing.
 ///
-/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v4
 ///
 /// prototypeItem allows Flutter to determine item sizes from a single
 /// prototype widget, which is more efficient than calculating each item.
@@ -1091,9 +1093,9 @@ class PreferPrototypeItemRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_prototype_item',
-    '[prefer_prototype_item] ListView.builder without prototypeItem measures each child separately. prototypeItem allows Flutter to determine item sizes from a single prototype widget, which is more efficient than calculating each item. {v3}',
+    '[prefer_prototype_item] ListView.builder without prototypeItem measures each child separately. prototypeItem allows Flutter to determine item sizes from a single prototype widget, which is more efficient than calculating each item. When row heights differ by index, prefer itemExtentBuilder over prototypeItem. {v4}',
     correctionMessage:
-        'Add prototypeItem parameter if items have consistent dimensions. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+        'Add prototypeItem if rows share one layout shape, or itemExtentBuilder when each index needs a different extent.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -1107,23 +1109,27 @@ class PreferPrototypeItemRule extends SaropaLintRule {
 
       if (typeName != 'ListView') return;
 
-      // Check if using builder constructor
+      // Check if using builder or separated constructor
       final String? constructorName = node.constructorName.name?.name;
-      if (constructorName != 'builder') return;
+      if (constructorName != 'builder' && constructorName != 'separated') {
+        return;
+      }
 
-      // Check if prototypeItem or itemExtent is already specified
+      // Check if prototypeItem, itemExtent, or itemExtentBuilder is specified
       bool hasPrototypeItem = false;
       bool hasItemExtent = false;
+      bool hasItemExtentBuilder = false;
 
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression) {
           final String argName = arg.name.label.name;
           if (argName == 'prototypeItem') hasPrototypeItem = true;
           if (argName == 'itemExtent') hasItemExtent = true;
+          if (argName == 'itemExtentBuilder') hasItemExtentBuilder = true;
         }
       }
 
-      if (!hasPrototypeItem && !hasItemExtent) {
+      if (!hasPrototypeItem && !hasItemExtent && !hasItemExtentBuilder) {
         reporter.atNode(node.constructorName, code);
       }
     });

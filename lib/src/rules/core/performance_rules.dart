@@ -803,7 +803,7 @@ class _DepthVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when large lists don't specify itemExtent.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
 ///
 /// For lists with many items, specifying itemExtent improves
 /// scrolling performance significantly.
@@ -842,9 +842,9 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_item_extent_for_large_lists',
-    '[require_item_extent_for_large_lists] ListView with many items but no itemExtent forces Flutter to lay out every child widget to calculate scroll extent. This causes expensive initial rendering, prevents efficient jump-to-index operations, and degrades scroll bar accuracy, resulting in slow list initialization and janky scrolling. {v5}',
+    '[require_item_extent_for_large_lists] ListView with many items but no itemExtent, itemExtentBuilder, or prototypeItem forces Flutter to lay out every child widget to calculate scroll extent. This causes expensive initial rendering, prevents efficient jump-to-index operations, and degrades scroll bar accuracy, resulting in slow list initialization and janky scrolling. {v6}',
     correctionMessage:
-        'Add itemExtent for fixed-height items or prototypeItem for consistent sizes to enable O(1) scroll position calculations and smoother scrolling performance.',
+        'Add itemExtent for uniform height, prototypeItem for a representative size, or itemExtentBuilder (Flutter 3.16+) when extents vary by index.',
     severity: DiagnosticSeverity.INFO,
   );
 

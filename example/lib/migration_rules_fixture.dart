@@ -5,6 +5,7 @@
 // ignore_for_file: prefer_context_menu_builder, prefer_pan_axis
 // ignore_for_file: prefer_button_style_icon_alignment, prefer_key_event
 // ignore_for_file: prefer_m3_text_theme
+// ignore_for_file: prefer_overflow_bar_over_button_bar
 // Test fixture for migration rules
 
 import 'flutter_mocks.dart';
@@ -219,4 +220,25 @@ void textThemeGood() {
   // OK: Using M3 'displayLarge' property
   final theme = ThemeData();
   final style = theme.textTheme.displayLarge;
+}
+
+// =============================================================================
+// prefer_overflow_bar_over_button_bar
+// =============================================================================
+
+// LINT: Prefer OverflowBar instead of ButtonBar
+Widget overflowBarBad() {
+  return ButtonBar(
+    children: [
+      TextButton(onPressed: () {}, child: Text('OK')),
+    ],
+  );
+}
+
+Widget overflowBarGood() {
+  return OverflowBar(
+    children: [
+      TextButton(onPressed: () {}, child: Text('OK')),
+    ],
+  );
 }

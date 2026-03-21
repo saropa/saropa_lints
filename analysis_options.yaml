@@ -42,7 +42,7 @@ linter:
 
 plugins:
   saropa_lints:
-    version: "9.9.1"
+    version: "9.10.0"
     # ═══════════════════════════════════════════════════════════════════
     # SAROPA LINTS CONFIGURATION
     # ═══════════════════════════════════════════════════════════════════
@@ -401,7 +401,7 @@ plugins:
       avoid_late_for_nullable: true  # [ERROR] Nullable type declared with late keyword. Since the type already accepts null, the late keyword adds no initialization safety and instead introduces a hidden crash path: accessing the variable before assignment throws LateInitializationError rather than returning null. {v4}
       avoid_layout_builder_in_scrollable: true  # [WARNING] LayoutBuilder inside scrollable causes performance issues. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}
       avoid_listview_children_for_large_lists: true  # [WARNING] ListView with many children loads all items. Use ListView.builder. ListView(children: [..]) builds all children immediately. For lists with more than 20 items, use ListView.builder to improve performance through virtualization. {v2}
-      avoid_listview_without_item_extent: true  # [INFO] ListView.builder should specify itemExtent to improve scroll performance. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}
+      avoid_listview_without_item_extent: true  # [INFO] ListView.builder/separated should specify itemExtent, prototypeItem, or itemExtentBuilder for predictable scroll layout. {v6}
       avoid_manual_date_formatting: true  # [WARNING] Manual date formatting is error-prone, ignores locale, and can produce incorrect or confusing output for international users. This can break compliance, cause user confusion, and lead to support issues in global apps. {v3}
       avoid_map_keys_contains: true  # [INFO] Calling .keys.contains() allocates an iterable of all keys and performs a linear search, while .containsKey() uses the map hash table for O(1) lookup. This wastes memory and CPU cycles on every call. {v5}
       avoid_material2_fallback: true  # [INFO] Explicitly setting useMaterial3: false forces the app back to the deprecated Material 2 design system, which will receive no new component updates or accessibility improvements. Material 2 components may also be removed in future Flutter releases, creating a migration burden. {v3}

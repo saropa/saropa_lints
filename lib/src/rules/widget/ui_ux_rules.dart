@@ -679,7 +679,7 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
 
 /// Warns when ListView.builder lacks itemExtent for uniform items.
 ///
-/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v2
+/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v3
 ///
 /// When all list items have the same height, setting itemExtent
 /// allows Flutter to optimize layout calculations, improving
@@ -740,12 +740,14 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
         return;
       }
 
-      // Check for itemExtent or prototypeItem
+      // Check for itemExtent, prototypeItem, or itemExtentBuilder
       bool hasItemExtent = false;
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression) {
           final String paramName = arg.name.label.name;
-          if (paramName == 'itemExtent' || paramName == 'prototypeItem') {
+          if (paramName == 'itemExtent' ||
+              paramName == 'prototypeItem' ||
+              paramName == 'itemExtentBuilder') {
             hasItemExtent = true;
             break;
           }
