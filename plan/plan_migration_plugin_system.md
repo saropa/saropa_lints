@@ -38,8 +38,8 @@
 | **0** | Lock policy (§7): tier×pack algebra, naming (`rule_packs`), defaults. |
 | **1** | **Dart:** pack registry (`pack_id` → rule codes), `config_loader` reads `rule_packs.enabled`, merge into `register`, tests. **No extension yet.** |
 | **2** | **VS Code extension:** pack rows (§10 Phase 2), **target platforms** summary (Appendix C), toggles → `analysis_options.yaml`, YAML merge tests. |
-| **3** | **Resolver:** `pubspec.lock` / versions per project root for semver-gated pack entries. |
-| **4** | **CLI `init`:** list applicable packs; optional `--enable-pack`. |
+| **3** | **Resolver:** `pubspec.lock` / versions per project root for semver-gated pack entries. **Shipped:** `pubspec_lock_resolver`, `kRulePackDependencyGates`, `collection_compat` example; transitive-only semver UX deferred. |
+| **4** | **CLI `init`:** list applicable packs; optional `--enable-pack`. **Shipped:** `--list-packs`, `--enable-pack` on `dart run saropa_lints:init`; YAML preservation in `generatePluginsYaml`. |
 | **5** | **Bulk** assign rule codes → packs for all `lib/src/rules/packages/*` (script or codegen). |
 | **6** | **SDK / Flutter** packs + map `migration_rules.dart` entries. |
 | **7** | **Optional:** `saropa_lints_api` + second analyzer plugin for private org rules. |
@@ -499,7 +499,13 @@ Canonical **Flutter embedder / build target** identifiers (align with `flutter c
 
 ---
 
-**Implementation note (2026-03-20):** Phase 1–2 vertical slice shipped — `lib/src/config/rule_packs.dart`, `config_loader` merge, VS Code **Rule Packs** webview, `doc/guides/rule_packs.md`. Resolver/lockfile (Phase 3) and bulk tier assignment remain future work.
+**Implementation note (2026-03-20):** Phase 1–2 vertical slice shipped — `lib/src/config/rule_packs.dart`, `config_loader` merge, VS Code **Rule Packs** webview, `doc/guides/rule_packs.md`.
+
+**Implementation note (2026-03-21):** **Phase 3 (resolver foundation)** — `lib/src/config/pubspec_lock_resolver.dart` reads `pubspec.lock` (cached by mtime), `kRulePackDependencyGates` + `collection_compat` example pack, `mergeRulePacksIntoEnabled` takes resolved versions, `loadRulePacksConfigFromProjectRoot` re-merges when project root is known.
+
+**Implementation note (2026-03-21):** **Phase 4 (init / CLI)** — `init --list-packs`, `--enable-pack <id>`, `kRulePackPubspecMarkers` + `parseRulePacksEnabledList`; generated `analysis_options.yaml` embeds `rule_packs.enabled` and preserves it on regen (except `--reset`).
+
+**Implementation note (2026-03-21):** **Phase 5 (bulk pack registry)** — `tool/generate_rule_pack_registry.dart` emits `rule_pack_codes_generated.dart` and `extension/.../rulePackDefinitions.ts` from `lib/src/rules/packages/*_rules.dart`; `rule_packs.dart` merges generated maps with `collection_compat`. `tool/rule_pack_audit.dart` validates extraction (including `applyCompositeRulePacks` for rules listed in multiple packs).
 
 ---
 
