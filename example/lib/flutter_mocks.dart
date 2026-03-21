@@ -1267,7 +1267,12 @@ class InkWell extends Widget {
     super.key,
     Widget? child,
     VoidCallback? onTap,
+    dynamic customBorder,
   });
+}
+
+class CircleBorder {
+  const CircleBorder();
 }
 
 class Hero extends Widget {
@@ -1383,7 +1388,32 @@ class FittedBox extends Widget {
 }
 
 class Chip extends Widget {
-  const Chip({super.key, required Widget label, Widget? avatar});
+  const Chip({
+    super.key,
+    required Widget label,
+    Widget? avatar,
+    Widget? deleteIcon,
+    dynamic onDeleted,
+  });
+}
+
+class RawChip extends Widget {
+  const RawChip({
+    super.key,
+    Widget? label,
+    Widget? deleteIcon,
+    dynamic onDeleted,
+    dynamic onPressed,
+  });
+}
+
+class InputChip extends Widget {
+  const InputChip({
+    super.key,
+    Widget? label,
+    Widget? deleteIcon,
+    dynamic onDeleted,
+  });
 }
 
 class Draggable<T> extends Widget {

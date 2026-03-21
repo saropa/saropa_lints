@@ -16,6 +16,7 @@ import 'package:saropa_lints/src/rules/flow/return_rules.dart';
 import 'package:saropa_lints/src/rules/stylistic/formatting_rules.dart';
 import 'package:saropa_lints/src/rules/stylistic/stylistic_additional_rules.dart';
 import 'package:saropa_lints/src/rules/stylistic/stylistic_rules.dart';
+import 'package:saropa_lints/src/rules/widget/flutter_migration_widget_rules.dart';
 import 'package:test/test.dart';
 
 /// Unit tests that assert quick-fix registration for rules that provide fixes.
@@ -298,5 +299,8 @@ void main() {
 
     // Code quality variables (1)
     hasFix('AvoidUnusedAssignmentRule', () => AvoidUnusedAssignmentRule());
+
+    // Flutter migration widget (1)
+    hasFix('PreferSuperKeyRule', () => PreferSuperKeyRule());
   });
 }
