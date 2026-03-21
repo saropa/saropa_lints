@@ -35,6 +35,7 @@ The extension is the primary setup and configuration surface:
 - **Issues tree** — Violations grouped by severity and file, with Error Lens-style inline annotations
 - **Security Posture** — OWASP Top 10 coverage matrix, compliance export
 - **Triage** — Disable noisy rules from the UI; see estimated score impact before acting
+- **Rule Packs** — Enable stack bundles (Riverpod, Drift, …) from the sidebar; see `doc/guides/rule_packs.md`
 - **File Risk** — Files ranked by violation density; focus on the riskiest first
 - **Trends** — Score progression over time with milestone celebrations
 

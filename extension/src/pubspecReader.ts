@@ -6,6 +6,16 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+/** Flutter embedder folder names (Appendix C, plan_migration_plugin_system.md). */
+export const FLUTTER_EMBEDDER_PLATFORMS = [
+    'android',
+    'ios',
+    'web',
+    'windows',
+    'macos',
+    'linux',
+] as const;
+
 /** Package names saropa_lints knows about (matches lib/src/tiers.dart allPackages). */
 const KNOWN_PACKAGES = [
   'bloc',
@@ -53,7 +63,10 @@ export interface PubspecInfo {
   isFlutter: boolean;
   /** Detected package names (subset of KNOWN_PACKAGES). */
   packages: string[];
-  /** For Flutter: typically ios, android; for Dart-only: []. */
+  /**
+   * Target platforms: embedder folders present under [workspaceRoot] when Flutter app.
+   * Empty for pure Dart packages.
+   */
   platforms: string[];
 }
 
@@ -108,9 +121,25 @@ export function readPubspec(workspaceRoot: string): PubspecInfo {
         seen.add(pkg);
       }
     }
-    const platforms = isFlutter ? ['ios', 'android'] : [];
+    const platforms = isFlutter ? detectEmbedderPlatforms(workspaceRoot) : [];
     return { isFlutter, packages, platforms };
   } catch {
     return { isFlutter: false, packages: [], platforms: [] };
   }
+}
+
+/** Returns embedder platform keys for which a directory exists (e.g. `windows/`). */
+function detectEmbedderPlatforms(workspaceRoot: string): string[] {
+  const found: string[] = [];
+  try {
+    for (const p of FLUTTER_EMBEDDER_PLATFORMS) {
+      const dir = path.join(workspaceRoot, p);
+      if (fs.existsSync(dir) && fs.statSync(dir).isDirectory()) {
+        found.push(p);
+      }
+    }
+  } catch {
+    return found;
+  }
+  return found;
 }

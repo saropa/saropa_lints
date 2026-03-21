@@ -8,6 +8,9 @@
 # For the latest version, see:
 # https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml
 #
+# Optional rule packs (plugins.saropa_lints from init): add rule_packs.enabled
+# with ids like riverpod, drift — see doc/guides/rule_packs.md
+#
 # QUICK START
 # ===========
 # 1. Copy this file to your project as: analysis_options.yaml

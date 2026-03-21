@@ -7,7 +7,8 @@
 /// analysis_options_custom.yaml. Env vars (e.g. SAROPA_LINTS_MAX) override where applicable.
 ///
 /// Populates:
-/// - [SaropaLintRule.enabledRules] (from diagnostics `true` + severity overrides)
+/// - [SaropaLintRule.enabledRules] (diagnostics `true` + severity-implied enables +
+///   rule pack codes from `rule_packs.enabled`, excluding [disabledRules])
 /// - [SaropaLintRule.severityOverrides] and [SaropaLintRule.disabledRules]
 /// - [BaselineManager] (baseline path, enabled)
 /// - [ProgressTracker] (max_issues, file-only output)
@@ -22,10 +23,12 @@ import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import '../banned_usage_config.dart';
 import '../baseline/baseline_config.dart';
 import '../baseline/baseline_manager.dart';
+import '../config/rule_packs.dart';
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 
 /// Loads all plugin configuration from yaml and environment variables.
 /// Order matters: severity overrides first, then diagnostics (enable/disable),
+/// then **rule packs** (adds enabled rule codes; skips [disabledRules]),
 /// then baseline, banned usage, and output (max_issues, file-only).
 /// Safe to call multiple times — static fields are simply overwritten.
 /// Never throws; failures in any step are caught and the rest still run.
@@ -34,6 +37,7 @@ void loadNativePluginConfig() {
     final content = _readProjectFile('analysis_options_custom.yaml');
     _loadSeverityOverrides(content);
     _loadDiagnosticsConfig();
+    _loadRulePacksConfig();
     _loadBaselineConfig(content);
     loadBannedUsageConfig(content);
     _loadOutputConfig(content);
@@ -211,6 +215,40 @@ void _loadDiagnosticsConfig() {
 
   SaropaLintRule.enabledRules = enabled.isEmpty ? null : enabled;
   SaropaLintRule.disabledRules = disabled.isEmpty ? null : disabled;
+}
+
+/// Parses `rule_packs.enabled` under `plugins.saropa_lints` and merges rule
+/// codes via [mergeRulePacksIntoEnabled] (respects [SaropaLintRule.disabledRules]).
+void _loadRulePacksConfig() {
+  final content = _readProjectFile('analysis_options.yaml');
+  if (content == null) return;
+
+  final normalized =
+      content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+  final packIds = _parseRulePackEnabledList(normalized);
+  if (packIds.isEmpty) return;
+
+  final enabled = SaropaLintRule.enabledRules ?? <String>{};
+  mergeRulePacksIntoEnabled(
+    enabled,
+    SaropaLintRule.disabledRules,
+    packIds,
+  );
+  SaropaLintRule.enabledRules = enabled;
+}
+
+/// Extracts pack ids from `rule_packs:` → `enabled:` list under the plugin block.
+List<String> _parseRulePackEnabledList(String content) {
+  final m = RegExp(
+    r'rule_packs:\s*\n\s*enabled:\s*\n((?:\s+-\s+\w+\s*\n)+)',
+    multiLine: true,
+  ).firstMatch(content);
+  if (m == null) return const [];
+  final block = m.group(1)!;
+  return RegExp(r'-\s+(\w+)')
+      .allMatches(block)
+      .map((Match x) => x.group(1)!)
+      .toList();
 }
 
 /// Parse `baseline:` section and initialize [BaselineManager].
