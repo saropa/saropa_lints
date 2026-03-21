@@ -1463,3 +1463,84 @@ class _PreferM3TextThemeFix extends SaropaFixProducer {
     }
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_overflow_bar_over_button_bar
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Flags [ButtonBar] in favor of [OverflowBar].
+///
+/// Since: v9.10.1 | Rule version: v1
+///
+/// Flutter recommends [OverflowBar] for layouts that arrange action buttons in
+/// a row and reflow on overflow (PR #128437, Flutter 3.13.0). [ButtonBar] was
+/// later deprecated (PR #145523); migrating early reduces theme and API drift.
+///
+/// **BAD:**
+/// ```dart
+/// ButtonBar(
+///   children: [TextButton(onPressed: () {}, child: Text('OK'))],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// OverflowBar(
+///   children: [TextButton(onPressed: () {}, child: Text('OK'))],
+/// )
+/// ```
+///
+/// See: https://github.com/flutter/flutter/pull/128437
+class PreferOverflowBarOverButtonBarRule extends SaropaLintRule {
+  PreferOverflowBarOverButtonBarRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config', 'flutter', 'ui'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'ButtonBar'};
+
+  static const LintCode _code = LintCode(
+    'prefer_overflow_bar_over_button_bar',
+    "[prefer_overflow_bar_over_button_bar] Prefer OverflowBar instead of "
+        'ButtonBar for Material action button rows. OverflowBar is the '
+        'supported pattern for horizontal actions that reflow on overflow '
+        '(Flutter 3.13.0, PR #128437); ButtonBar is deprecated (PR #145523). '
+        'Parameter sets differ — map children, alignment, and overflow '
+        'behavior explicitly when migrating. {v1}',
+    correctionMessage:
+        'Replace ButtonBar with OverflowBar and adjust named arguments to '
+        'match OverflowBar (remove ButtonBar-only parameters such as '
+        'buttonPadding where needed).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (context.isLintPluginSource) return;
+
+    // Material `ButtonBar(...)` is an InstanceCreationExpression against the
+    // resolved element; no quick fix — OverflowBar uses a different parameter set.
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'ButtonBar') return;
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}

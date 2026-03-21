@@ -434,22 +434,20 @@ class PreferSliverPrefixRule extends SaropaLintRule {
   }
 }
 
-/// Warns when RichText is used instead of Text.rich.
+/// Warns when a Column is used inside SingleChildScrollView instead of ListView.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
 ///
 /// Example of **bad** code:
 /// ```dart
-/// RichText(
-///   text: TextSpan(text: 'Hello'),
+/// SingleChildScrollView(
+///   child: Column(children: items),
 /// )
 /// ```
 ///
 /// Example of **good** code:
 /// ```dart
-/// Text.rich(
-///   TextSpan(text: 'Hello'),
-/// )
+/// ListView(children: items)
 /// ```
 class PreferUsingListViewRule extends SaropaLintRule {
   PreferUsingListViewRule() : super(code: _code);
@@ -493,37 +491,38 @@ class PreferUsingListViewRule extends SaropaLintRule {
   }
 }
 
-/// Warns when Widget class has public non-final fields or public methods
+/// Warns when ListView.builder or ListView.separated omits scroll extent hints.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
 ///
-/// that could be private.
+/// Prefer `itemExtent` when every row has the same height, `prototypeItem`
+/// when a single widget represents typical sizing, or `itemExtentBuilder`
+/// (Flutter 3.16+, PR #131393) when each index may have a different extent.
 ///
-/// ### Example
-///
-/// #### BAD:
+/// **BAD:**
 /// ```dart
-/// class MyWidget extends StatelessWidget {
-///   String title;  // Should be final
-///   void helper() {}  // Should be private
-/// }
+/// ListView.builder(
+///   itemCount: 100,
+///   itemBuilder: (c, i) => ListTile(title: Text('$i')),
+/// )
 /// ```
 ///
-/// #### GOOD:
+/// **GOOD:**
 /// ```dart
-/// class MyWidget extends StatelessWidget {
-///   final String title;
-///   void _helper() {}
-/// }
+/// ListView.builder(
+///   itemCount: 100,
+///   itemExtentBuilder: (index, _) => index.isEven ? 56.0 : 72.0,
+///   itemBuilder: (c, i) => ListTile(title: Text('$i')),
+/// )
 /// ```
 class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
   AvoidListViewWithoutItemExtentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     'avoid_listview_without_item_extent',
-    '[avoid_listview_without_item_extent] ListView.builder should specify itemExtent to improve scroll performance. This layout configuration can trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v5}',
+    '[avoid_listview_without_item_extent] ListView.builder should specify itemExtent, prototypeItem, or itemExtentBuilder for predictable scroll layout. Omitting all three forces per-child layout measurement, which hurts jump/scrollbar accuracy and large-list performance (Flutter 3.16+ adds itemExtentBuilder for varying per-index heights). {v6}',
     correctionMessage:
-        'Add itemExtent or prototypeItem parameter. Test on multiple screen sizes to verify the layout adapts correctly.',
+        'Add itemExtent for uniform height, prototypeItem for a single representative size, or itemExtentBuilder when each index can have a different extent. Test on multiple screen sizes.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -536,19 +535,22 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
-      if (typeName == 'ListView' && constructorName == 'builder') {
+      if (typeName == 'ListView' &&
+          (constructorName == 'builder' || constructorName == 'separated')) {
         bool hasItemExtent = false;
         bool hasPrototypeItem = false;
+        bool hasItemExtentBuilder = false;
 
         for (final Expression arg in node.argumentList.arguments) {
           if (arg is NamedExpression) {
             final String name = arg.name.label.name;
             if (name == 'itemExtent') hasItemExtent = true;
             if (name == 'prototypeItem') hasPrototypeItem = true;
+            if (name == 'itemExtentBuilder') hasItemExtentBuilder = true;
           }
         }
 
-        if (!hasItemExtent && !hasPrototypeItem) {
+        if (!hasItemExtent && !hasPrototypeItem && !hasItemExtentBuilder) {
           reporter.atNode(node.constructorName, code);
         }
       }

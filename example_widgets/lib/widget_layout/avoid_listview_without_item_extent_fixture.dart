@@ -100,29 +100,62 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_listview_without_item_extent
-// Source: lib\src\rules\widget_layout_rules.dart
+// Test fixture for: avoid_listview_without_item_extent (ListView.builder / .separated)
+//
+// BAD: builder/separated with no itemExtent, prototypeItem, or itemExtentBuilder.
+// GOOD: any of those parameters supplied.
+// OK (false positive guard): plain ListView(children: ...) — rule does not apply.
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-final context = BuildContext();
-
 // BAD: Should trigger avoid_listview_without_item_extent
 // expect_lint: avoid_listview_without_item_extent
-void _bad1295() async {
-  onPressed:
-  () async {
-    await someAsyncWork();
-    ScaffoldMessenger.of(context).showSnackBar();
-  };
+Widget badListViewBuilderNoExtent() {
+  return ListView.builder(
+    itemCount: 3,
+    itemBuilder: (BuildContext c, int i) => Text('$i'),
+  );
 }
 
-// GOOD: Should NOT trigger avoid_listview_without_item_extent
-void _good1295() async {
-  onPressed:
-  () async {
-    final messenger = ScaffoldMessenger.of(context);
-    await someAsyncWork();
-    messenger.showSnackBar();
-  };
+// BAD: separated without extent metadata
+// expect_lint: avoid_listview_without_item_extent
+Widget badListViewSeparatedNoExtent() {
+  return ListView.separated(
+    itemCount: 2,
+    itemBuilder: (BuildContext c, int i) => Text('$i'),
+    separatorBuilder: (BuildContext c, int i) => Divider(),
+  );
+}
+
+// GOOD: itemExtent
+Widget goodListViewBuilderItemExtent() {
+  return ListView.builder(
+    itemCount: 3,
+    itemExtent: 48.0,
+    itemBuilder: (BuildContext c, int i) => Text('$i'),
+  );
+}
+
+// GOOD: itemExtentBuilder (Flutter 3.16+)
+Widget goodListViewBuilderItemExtentBuilder() {
+  return ListView.builder(
+    itemCount: 3,
+    itemExtentBuilder: (int index, dynamic d) =>
+        index.isEven ? 48.0 : 56.0,
+    itemBuilder: (BuildContext c, int i) => Text('$i'),
+  );
+}
+
+// GOOD: prototypeItem
+Widget goodListViewBuilderPrototype() {
+  return ListView.builder(
+    itemCount: 3,
+    prototypeItem: Text('0'),
+    itemBuilder: (BuildContext c, int i) => Text('$i'),
+  );
+}
+
+// OK: Default ListView constructor — not targeted by this rule (no builder/separated).
+Widget goodPlainListViewChildren() {
+  return ListView(children: [Text('a'), Text('b')]);
 }
