@@ -98,6 +98,7 @@
     "dotenv",
     "dryrun",
     "edgeinsets",
+    "embedder",
     "encrypter",
     "EXIF",
     "Expando",

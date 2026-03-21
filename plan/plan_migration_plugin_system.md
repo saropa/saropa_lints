@@ -1,12 +1,15 @@
 # Plan: Migration packs & plugin-style rule modules
 
 **Status:** living architecture plan (expand as we implement).  
-**Audience:** maintainers implementing packs, init UX, and dependency resolution.
+**Audience:** maintainers implementing packs, init UX, dependency resolution, and the VS Code extension.
+
+**Single document:** Packs, pubspec-aware enablement, semver migrations, extension UI, and optional third-party plugins are **one product intent** delivered in **phases** (see [§10](#10-phases-one-roadmap)).
 
 ---
 
 ## Table of contents
 
+0. [Phases at a glance](#0-phases-at-a-glance)
 1. [Executive summary](#1-executive-summary)
 2. [Problem statement](#2-problem-statement)
 3. [Vision: what “done” looks like](#3-vision-what-done-looks-like)
@@ -16,7 +19,7 @@
 7. [Policy decisions (must resolve)](#7-policy-decisions-must-resolve)
 8. [Data model](#8-data-model)
 9. [Configuration schema](#9-configuration-schema)
-10. [Phases, deliverables, exit criteria](#10-phases-deliverables-exit-criteria)
+10. [Phases: one roadmap (detail)](#10-phases-one-roadmap-detail)
 11. [Migrating existing package rules (Drift, Riverpod, …)](#11-migrating-existing-package-rules-drift-riverpod-)
 12. [Testing strategy](#12-testing-strategy)
 13. [Documentation & discoverability](#13-documentation--discoverability)
@@ -24,6 +27,24 @@
 15. [Non-goals](#15-non-goals)
 16. [Appendix A: package rule inventory](#appendix-a-package-rule-inventory)
 17. [Appendix B: glossary](#appendix-b-glossary)
+18. [Appendix C: target platforms](#appendix-c-target-platforms)
+
+---
+
+## 0. Phases at a glance
+
+| Phase | What ships |
+|-------|------------|
+| **0** | Lock policy (§7): tier×pack algebra, naming (`rule_packs`), defaults. |
+| **1** | **Dart:** pack registry (`pack_id` → rule codes), `config_loader` reads `rule_packs.enabled`, merge into `register`, tests. **No extension yet.** |
+| **2** | **VS Code extension:** pack rows (§10 Phase 2), **target platforms** summary (Appendix C), toggles → `analysis_options.yaml`, YAML merge tests. |
+| **3** | **Resolver:** `pubspec.lock` / versions per project root for semver-gated pack entries. |
+| **4** | **CLI `init`:** list applicable packs; optional `--enable-pack`. |
+| **5** | **Bulk** assign rule codes → packs for all `lib/src/rules/packages/*` (script or codegen). |
+| **6** | **SDK / Flutter** packs + map `migration_rules.dart` entries. |
+| **7** | **Optional:** `saropa_lints_api` + second analyzer plugin for private org rules. |
+
+Later sections (architecture, data model, §11 inventory) support **all** phases; implementation order is **0 → 1 → 2** for a vertical slice, then **3–6** as capacity allows.
 
 ---
 
@@ -62,7 +83,7 @@ Today those rules mostly live in **tiers** (`lib/tiers/*.yaml`, `lib/src/tiers.d
 
 1. **Developer** runs `dart run saropa_lints:init` (or a future subcommand) and sees: *“These migration packs match your project: Drift, Riverpod, …”* with short descriptions.
 2. **Developer** enables `pack_drift` (name TBD) and gets **Drift-related rules** without enabling unrelated package rules—either by **expanding diagnostics** for those rule ids or by **pack-level enable** that maps to many rules.
-3. **CI** can pin: `migration_packs: enabled: [drift_2_x]` and rely on **lockfile** so suggestions only apply when versions match.
+3. **CI** can pin: `rule_packs: enabled: [drift_2_x]` and rely on **lockfile** so suggestions only apply when versions match.
 4. **Maintainers** add a new semver migration by: new rule class → register in `all_rules.dart` → add rule id to **pack registry** + optional version predicate—no second analyzer plugin required for v1.
 
 ---
@@ -149,7 +170,7 @@ flowchart LR
 | Area | File(s) | Role |
 |------|---------|------|
 | Plugin entry | `lib/main.dart` | `SaropaLintsPlugin.register` — inject merged enabled rule set. |
-| Config | `lib/src/native/config_loader.dart` | Extend to read `migration_packs` (or equivalent) from `analysis_options.yaml` / custom yaml. |
+| Config | `lib/src/native/config_loader.dart` | Extend to read `rule_packs` from `analysis_options.yaml` / custom yaml. |
 | Rule enablement | `SaropaLintRule.enabledRules`, `disabledRules` | Today: tier + `diagnostics:` + severities. Must merge with **pack enables** without breaking existing users. |
 | Project context | `lib/src/project_context_project_file.dart` | `hasDependency`, `findProjectRoot` — extend or add sibling for **versions**. |
 | File classification | `FileTypeDetector` | Remains for perf; **packs** add pubspec-based gating for stacks that share `FileType.provider`. |
@@ -178,7 +199,7 @@ Decisions below block implementation detail; pick defaults before coding.
 | Mode | Behavior |
 |------|----------|
 | **Suggest (default)** | init/IDE lists matching packs; user confirms. |
-| **Auto-enable** | Opt-in flag: e.g. `migration_packs.auto_enable_matching: true`. |
+| **Auto-enable** | Opt-in flag: e.g. `rule_packs.auto_enable_matching: true`. |
 
 ### 7.3 Direct vs transitive dependencies
 
@@ -233,80 +254,108 @@ Reverse map: `rule_code` → `List<pack_id>` for init UX (“this rule is part o
 plugins:
   saropa_lints:
     version: "9.x.x"
-    migration_packs:
+    rule_packs:
       enabled:
         - drift
+        - riverpod
         - collection_1_19
-      auto_suggest: true        # init lists matches
+      auto_suggest: true        # optional: init lists matches
       auto_enable_matching: false
 ```
 
-Alternatives: `migration_packs.drift: true` flattening—avoid if hundreds of packs exist.
+Use **`rule_packs`** as the canonical key: it covers **library packs** (Drift, Riverpod) and **semver migration** entries (e.g. `collection_1_19`) in one mechanism. (If we ever printed `migration_packs`, treat it as an alias only during a transition.)
 
-**Parsing:** extend `_loadDiagnosticsConfig` pattern: new section reader, merge into static `SaropaMigrationPacksConfig` (new type) consumed by merge logic.
+Alternatives: per-pack booleans — avoid if hundreds of packs exist.
 
-**Backward compatibility:** If `migration_packs` absent, behavior = **today** (tiers only).
+**Parsing:** extend `config_loader` with a new section reader; merge into enabled rules after tier load (order: tier → add rules from enabled packs → apply `diagnostics: false` → severity overrides — document final order).
+
+**Backward compatibility:** If `rule_packs` absent, behavior = **today** (tiers only).
 
 ---
 
-## 10. Phases, deliverables, exit criteria
+## 10. Phases: one roadmap (detail)
+
+Same intent as §0; this section is **deliverables + exit criteria** per phase.
 
 ### Phase 0 — Decisions & design
 
-**Deliverables:** ADR or locked answers for §7; finalized config schema; pack naming convention (`snake_case` ids).
+**Deliverables:** Locked answers for §7; canonical config key **`rule_packs`**; `snake_case` pack ids.
 
 **Exit:** Maintainer sign-off; no code required.
 
-### Phase 1 — Resolver foundation
+### Phase 1 — Pack registry + linter (Dart only)
 
 **Deliverables:**
 
-- Parse `pubspec.lock` (YAML) at `ProjectContext.findProjectRoot(path)` for **resolved** versions of **direct** dependencies.
-- Unit tests: fixture lockfiles → expected versions.
-- Document failure: missing lockfile → “run `dart pub get`” / skip semver migrations.
+- New registry (e.g. `lib/src/config/rule_packs.dart`): `Map<pack_id, Set<rule_code>>`; start with MVP packs (`riverpod`, `drift`, …) and a subset of rules each — grow in Phase 5.
+- **`config_loader.dart`:** read `plugins.saropa_lints.rule_packs.enabled` from `analysis_options.yaml`.
+- **`lib/main.dart` `register`:** merge tier-enabled rules with **all rules from enabled packs** per §7.1 (default: pack **adds** rules).
+- **Tests:** fixture with `rule_packs.enabled: [riverpod]` proves a pack-only rule runs when listed in registry.
 
-**Exit:** `resolvedVersion('collection')` works in tests; cached per project root.
+**Exit:** Hand-edited YAML enables packs without extension.
 
-### Phase 2 — Registry + merge (no UX)
+**Files:** `lib/src/config/rule_packs.dart` (new), `lib/src/native/config_loader.dart`, `lib/main.dart`, `test/…`
+
+### Phase 2 — VS Code extension UI
+
+**Screen requirements (each row = one pack, e.g. Riverpod, Drift):**
+
+| Column / control | Behavior |
+|------------------|----------|
+| **Package / pack label** | Human-readable name (e.g. “Riverpod”) and optional primary pub names (`flutter_riverpod`, …). |
+| **Detected in pubspec** | Clear state: **yes** if any mapped dependency appears in direct `dependencies` / `dev_dependencies`; **no** otherwise (pack still listed if we show all packs, with “not in project” — product choice: default **show all packs** with detected flag, or **only show packs that match** pubspec + always show SDK packs). |
+| **Enabled** | Toggle bound to `rule_packs.enabled` for that `pack_id`. |
+| **Rule count** | Number of rule codes in the pack registry for that `pack_id` (from shared metadata: ship JSON generated from Dart registry or duplicate small map in extension for Phase 2). |
+| **Rules list** | **Link or command** that opens the **list of rule codes** (and ideally titles): e.g. webview, Quick Pick, or dedicated tree; deep link to **ROADMAP** / docs on pub.dev if each rule has a stable anchor. |
+| **Platforms** | Summary of **which target platforms** this Flutter project includes (see [Appendix C](#appendix-c-target-platforms)): e.g. a small table or chip row **android / ios / web / windows / macos / linux** with **present vs absent** derived from `android/`, `ios/`, `web/`, `windows/`, `macos/`, `linux/` under the app package (or equivalent detection). Pure Dart packages may show **“Dart only”** or hide the block. Used for context when enabling platform-specific rule packs later; v1 can be **read-only display**. |
+
+**Other deliverables:**
+
+- Config (or new) sidebar view or webview implementing the table above (reuse `readPubspec`, `package-families.ts`).
+- Toggles write **`rule_packs.enabled`** under `plugins.saropa_lints` without destroying `diagnostics:` / comments (dedicated merge helper, e.g. `rulePackWriter.ts`).
+- Optional command `saropaLints.toggleRulePack` / `saropaLints.showPackRules`; respect `runAnalysisAfterConfigChange`.
+- Extension unit tests for YAML merge; smoke test for row rendering (detected / count / link).
+
+**Exit:** User sees package, detection, toggle, count, and can open the rule list; YAML persists.
+
+**Depends on:** Phase 1 config shape + registry metadata (pack → rule codes + count) stable.
+
+### Phase 3 — Resolver foundation (lockfile / versions)
 
 **Deliverables:**
 
-- `PackRegistry` with **one** pilot pack (e.g. `collection_1_19` or `drift` minimal subset).
-- Merge logic in registration path: **enabled pack rules** ∪ tier rules per §7.1.
-- Tests: enable pack only → expected rule codes registered.
+- Parse `pubspec.lock` at project root (`findProjectRoot`) for **resolved** versions; cache; tests for path deps / missing lockfile.
+- Pack registry gains optional **semver sub-entries** (e.g. only enable `collection_1_19` migrations when `collection >= 1.19.0`).
 
-**Exit:** Analysis runs with pack config in `analysis_options.yaml` in a fixture project.
+**Exit:** `resolvedVersion('collection')` in tests; semver-gated pack entries work.
 
-### Phase 3 — init / menu
-
-**Deliverables:**
-
-- `init` lists **applicable** packs from resolver + registry.
-- Optional: `--enable-pack drift` writes YAML.
-
-**Exit:** Documented user flow in README or ROADMAP.
-
-### Phase 4 — Bulk assign pack ids
+### Phase 4 — init / CLI
 
 **Deliverables:**
 
-- Script or codegen: rule codes from `packages/*` → pack ids (see §11).
-- Gradual rollout: Drift, Riverpod, Hive, …
+- `dart run saropa_lints:init` lists **applicable** packs (from pubspec + registry); optional `--enable-pack <id>`.
 
-**Exit:** Coverage % of package rules assigned; remaining tracked as issues.
+**Exit:** Documented in README / ROADMAP.
 
-### Phase 5 — SDK / Flutter packs
+### Phase 5 — Bulk assign pack ids
 
 **Deliverables:**
 
-- Predicate sources: `environment.sdk`, Flutter version (where reliable).
-- Map existing SDK migration rules from `migration_rules.dart` into packs.
+- Script or codegen: assign **all** rule codes under `lib/src/rules/packages/*` to pack ids (§11, Appendix A).
+
+**Exit:** Coverage % tracked; remaining issues filed.
+
+### Phase 6 — SDK / Flutter packs
+
+**Deliverables:**
+
+- Predicates from `environment.sdk` + Flutter version source; map `migration_rules.dart` into packs where appropriate.
 
 **Exit:** At least one `dart_sdk_*` pack end-to-end.
 
-### Phase 6 — Optional: external API / second plugin
+### Phase 7 — Optional: external API / second analyzer plugin
 
-Only if org customers need private packs without forking saropa_lints.
+Only if org customers need private rules without forking saropa_lints. See §15 non-goals vs product.
 
 ---
 
@@ -342,7 +391,7 @@ Only if org customers need private packs without forking saropa_lints.
 | **Unit** | Lockfile parsing edge cases (path deps, SDK constraint, missing file). |
 | **Unit** | Predicate evaluation: version ranges, direct deps. |
 | **Integration** | Minimal project with `analysis_options.yaml` enabling one pack → only expected diagnostics / registered rules. |
-| **Regression** | No `migration_packs` section → identical behavior to pre-feature for same tier. |
+| **Regression** | No `rule_packs` section → identical behavior to pre-feature for same tier. |
 | **init** | Golden output or substring match for “applicable packs” list. |
 
 ---
@@ -419,4 +468,39 @@ Only if org customers need private packs without forking saropa_lints.
 
 ---
 
-_Document status: expanded architecture plan — revise when Phase 0 decisions are locked._
+## Appendix C: Target platforms
+
+Canonical **Flutter embedder / build target** identifiers (align with `flutter create` templates and `Platform` / `TargetPlatform` usage in tooling). Use these **keys** in UI, pack metadata, and docs.
+
+| Platform key | Typical project signal | Notes |
+|----------------|------------------------|--------|
+| **android** | `android/` directory exists | Mobile; Play Store, Gradle. |
+| **ios** | `ios/` directory exists | Mobile; Xcode, App Store. |
+| **web** | `web/` directory exists | Browser; CanvasKit / HTML renderer. |
+| **windows** | `windows/` directory exists | Desktop; Win32. |
+| **macos** | `macos/` directory exists | Desktop; Cocoa. |
+| **linux** | `linux/` directory exists | Desktop; GTK. |
+
+**Detection (extension / tooling):** For a Flutter app package root, treat a platform as **enabled** if the corresponding subdirectory is present (same heuristic as “this app can build for X”). Monorepos: resolve the **application** `pubspec.yaml` (not every package). **Pure Dart** packages (no Flutter SDK dep): show **Dart only** — no embedder row, or a single row **vm** / **native** if we add script/server targets later.
+
+**UI:** Phase 2 shows a **compact table or chips** (e.g. ✓/— per platform) so users see project shape at a glance. Future: packs or rules may declare **`applies_to_platforms:`** subsets; resolver filters diagnostics—out of scope for Phase 1–2 unless explicitly added in Phase 6.
+
+**Tests:** Fixture projects with subsets of folders → expected platform flags.
+
+---
+
+### Phase 1–2 acceptance (package packs + UI)
+
+- [ ] With `rule_packs.enabled: [riverpod]` and a Riverpod-only rule in the registry, that rule runs even if not in the tier selection (per §7.1 option A).
+- [ ] `diagnostics: rule_x: false` still disables `rule_x` if pack would include it (override order documented).
+- [ ] Extension row shows: **package/pack label**, **detected in pubspec** (yes/no), **enabled** toggle, **rule count**, **navigable list of rules** (link or command); **platform targets table** (Appendix C) for Flutter apps.
+- [ ] Toggle persists in `analysis_options.yaml`; analysis reflects change.
+- [ ] No `rule_packs` key → same behavior as today for existing projects.
+
+---
+
+**Implementation note (2026-03-20):** Phase 1–2 vertical slice shipped — `lib/src/config/rule_packs.dart`, `config_loader` merge, VS Code **Rule Packs** webview, `doc/guides/rule_packs.md`. Resolver/lockfile (Phase 3) and bulk tier assignment remain future work.
+
+---
+
+_Document status: unified plan (packs + resolver + extension + migrations); Phase 0 locks §7._

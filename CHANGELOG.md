@@ -31,7 +31,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 • **VS Code extension** — **Rule Packs** sidebar webview: per-pack row (label, detected in pubspec, enable toggle, rule count, “Rules” opens Quick Pick of rule codes), plus **target platforms** table (android/ios/web/windows/macos/linux) when embedder folders exist. Writes `plugins.saropa_lints.rule_packs.enabled` in `analysis_options.yaml`.
 
-• **Analyzer plugin** — `rule_packs.enabled` under `plugins.saropa_lints` merges the corresponding rule codes from `lib/src/config/rule_packs.dart` into the effective enabled set (after `diagnostics:`).
+• **Analyzer plugin** — `rule_packs.enabled` under `plugins.saropa_lints` merges rule codes from `lib/src/config/rule_packs.dart` via `mergeRulePacksIntoEnabled` (skips codes in `diagnostics`/`severities` disables). Config load order documented in `config_loader.dart`.
 
 • **Lint rules** — **compile-time Dart shape** (ERROR/WARNING, Essential): ten rules aligned with analyzer compile-time diagnostics — `duplicate_constructor`, `conflicting_constructor_and_static_member`, `duplicate_field_name`, `field_initializer_redirecting_constructor`, `invalid_super_formal_parameter_location`, `illegal_concrete_enum_member`, `invalid_extension_argument_count`, `invalid_field_name` (keyword-tokens on record labels when present in AST), `invalid_literal_annotation`, `invalid_non_virtual_annotation`. Implementation: `lib/src/rules/architecture/compile_time_syntax_rules.dart`, record/extension rules in `type_rules.dart`; fixture `example/lib/plan_additional_rules_21_30_fixture.dart`.
 

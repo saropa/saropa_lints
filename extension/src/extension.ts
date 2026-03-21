@@ -34,6 +34,7 @@ import { discoverServer } from './driftAdvisor/discovery';
 import { fetchIssues } from './driftAdvisor/client';
 import { mapIssuesToLocations } from './driftAdvisor/mapper';
 import { DriftAdvisorTreeProvider } from './driftAdvisor/driftAdvisorTree';
+import { RulePacksWebviewProvider } from './rulePacks/rulePacksWebviewProvider';
 import { openRuleExplainPanelForViolation, openRuleExplainPanel } from './views/ruleExplainView';
 import { readViolations, ViolationsData, getViolationsPath as getViolationsFilePath } from './violationsReader';
 import { hasSaropaLintsDep } from './pubspecReader';
@@ -199,11 +200,20 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     showCollapseAll: true,
   });
   context.subscriptions.push(driftAdvisorView);
+
+  const rulePacksWebviewProvider = new RulePacksWebviewProvider(context.extensionUri);
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider('saropaLints.rulePacks', rulePacksWebviewProvider),
+  );
   let driftAdvisorRefreshInProgress = false;
 
   let todosAndHacksSaveDebounce: ReturnType<typeof setTimeout> | undefined;
   context.subscriptions.push(
     vscode.workspace.onDidSaveTextDocument((doc) => {
+      const base = doc.uri.fsPath.replaceAll('\\', '/');
+      if (base.endsWith('/analysis_options.yaml')) {
+        rulePacksWebviewProvider.refresh();
+      }
       const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
       if (!cfg.get<boolean>('autoRefresh', true)) return;
       const folder = vscode.workspace.getWorkspaceFolder(doc.uri);
@@ -266,6 +276,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     suggestionsProvider.refresh();
     securityProvider.refresh();
     fileRiskProvider.refresh();
+    rulePacksWebviewProvider.refresh();
     invalidateCodeLenses();
     updateIssuesBadge(issuesView, issuesProvider);
     updateIssuesViewMessage();
