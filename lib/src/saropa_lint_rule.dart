@@ -15,7 +15,8 @@ import 'package:analyzer/error/error.dart'
 
 import 'baseline/baseline_manager.dart';
 import 'ignore_utils.dart';
-import 'native/config_loader.dart' show loadOutputConfigFromProjectRoot;
+import 'native/config_loader.dart'
+    show loadOutputConfigFromProjectRoot, loadRulePacksConfigFromProjectRoot;
 import 'native/saropa_context.dart';
 import 'native/saropa_fix.dart' show SaropaFixGenerator;
 import 'report/analysis_reporter.dart';
@@ -478,6 +479,7 @@ class ProgressTracker {
         discoverFiles(projectRoot);
         AnalysisReporter.initialize(projectRoot);
         loadOutputConfigFromProjectRoot(projectRoot);
+        loadRulePacksConfigFromProjectRoot(projectRoot);
       }
     }
 

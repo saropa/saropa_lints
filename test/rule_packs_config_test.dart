@@ -5,7 +5,8 @@ void main() {
   group('mergeRulePacksIntoEnabled', () {
     test('adds riverpod pack rules to enabled set', () {
       final enabled = <String>{'some_other_rule'};
-      mergeRulePacksIntoEnabled(enabled, null, ['riverpod']);
+      final added = mergeRulePacksIntoEnabled(enabled, null, ['riverpod']);
+      expect(added, isNotEmpty);
       expect(enabled.contains('require_provider_scope'), isTrue);
       expect(enabled.contains('some_other_rule'), isTrue);
     });
