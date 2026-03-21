@@ -58,6 +58,12 @@ export class DriftAdvisorTreeProvider implements vscode.TreeDataProvider<DriftTr
     return this.server;
   }
 
+  /** Issue count when a server is connected; undefined when not connected. */
+  getIssueCount(): number | undefined {
+    if (this.server === null) return undefined;
+    return this.issues.length;
+  }
+
   private updateDiagnostics(): void {
     this.diagnosticCollection.clear();
     const showInProblems = vscode.workspace.getConfiguration('saropaLints.driftAdvisor').get<boolean>('showInProblems', true);

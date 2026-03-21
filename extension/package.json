@@ -53,64 +53,66 @@
       "saropaLints": [
         {
           "id": "saropaLints.overview",
-          "name": "Overview"
+          "name": "Overview",
+          "when": "saropaLints.sidebar.showOverview"
         },
         {
           "id": "saropaLints.issues",
-          "name": "Issues",
-          "when": "saropaLints.isDartProject"
+          "name": "Violations",
+          "when": "saropaLints.isDartProject && saropaLints.sidebar.showIssues"
         },
         {
           "id": "saropaLints.summary",
           "name": "Summary",
-          "when": "saropaLints.hasViolations"
+          "when": "saropaLints.hasViolations && saropaLints.sidebar.showSummary"
         },
         {
           "id": "saropaLints.config",
           "name": "Config",
-          "when": "saropaLints.enabled"
+          "when": "saropaLints.enabled && saropaLints.sidebar.showConfig"
         },
         {
           "id": "saropaLints.rulePacks",
           "name": "Rule Packs",
           "type": "webview",
-          "when": "saropaLints.isDartProject && saropaLints.enabled"
+          "when": "saropaLints.isDartProject && saropaLints.enabled && saropaLints.sidebar.showRulePacks"
         },
         {
           "id": "saropaLints.suggestions",
           "name": "Suggestions",
-          "when": "saropaLints.hasViolations"
+          "when": "saropaLints.hasViolations && saropaLints.sidebar.showSuggestions"
         },
         {
           "id": "saropaLints.securityPosture",
           "name": "Security Posture",
-          "when": "saropaLints.hasViolations"
+          "when": "saropaLints.hasViolations && saropaLints.sidebar.showSecurityPosture"
         },
         {
           "id": "saropaLints.fileRisk",
           "name": "File Risk",
-          "when": "saropaLints.hasViolations"
+          "when": "saropaLints.hasViolations && saropaLints.sidebar.showFileRisk"
         },
         {
           "id": "saropaLints.packageVibrancy.packages",
           "name": "Package Vibrancy",
           "icon": "$(package)",
-          "when": "saropaLints.isDartProject"
+          "when": "saropaLints.isDartProject && saropaLints.sidebar.showPackageVibrancy"
         },
         {
           "id": "saropaLints.packageVibrancy.details",
           "name": "Package Details",
           "type": "webview",
-          "when": "saropaLints.packageVibrancy.hasResults"
+          "when": "saropaLints.packageVibrancy.hasResults && saropaLints.sidebar.showPackageDetails"
         },
         {
           "id": "saropaLints.todosAndHacks",
-          "name": "TODOs & Hacks"
+          "name": "TODOs & Hacks",
+          "when": "saropaLints.sidebar.showTodosAndHacks"
         },
         {
           "id": "saropaLints.driftAdvisor",
           "name": "Drift Advisor",
-          "when": "saropaLints.isDartProject"
+          "when": "saropaLints.isDartProject && (saropaLints.sidebar.showDriftAdvisor || (saropaLints.driftAdvisor.connected && !saropaLints.driftAdvisor.sidebarSuppressed))"
         }
       ]
     },
@@ -122,7 +124,7 @@
       },
       {
         "view": "saropaLints.issues",
-        "contents": "Saropa Lints is off for this workspace.\n\nEnable it to:\n• Add saropa_lints to your project (pubspec + analysis_options)\n• Run init and analysis from the UI—no terminal commands\n• See issues grouped by impact, rule, and file\n\n[Enable Saropa Lints](command:saropaLints.enable)",
+        "contents": "Saropa Lints is off for this workspace.\n\nEnable it to:\n• Add saropa_lints to your project (pubspec + analysis_options)\n• Run init and analysis from the UI—no terminal commands\n• See violations grouped by impact, rule, and file\n\n[Enable Saropa Lints](command:saropaLints.enable)",
         "when": "saropaLints.isDartProject && !saropaLints.enabled"
       },
       {
@@ -165,15 +167,15 @@
       },
       {
         "command": "saropaLints.focusView",
-        "title": "Saropa Lints: Focus Issues View"
+        "title": "Saropa Lints: Focus Violations View"
       },
       {
         "command": "saropaLints.focusIssues",
-        "title": "Saropa Lints: Show All Issues"
+        "title": "Saropa Lints: Show All Violations"
       },
       {
         "command": "saropaLints.focusIssuesForFile",
-        "title": "Saropa Lints: Show Issues for File"
+        "title": "Saropa Lints: Show Violations for File"
       },
       {
         "command": "saropaLints.focusIssuesForActiveFile",
@@ -181,11 +183,11 @@
       },
       {
         "command": "saropaLints.focusIssuesWithImpactFilter",
-        "title": "Saropa Lints: Show Issues by Impact"
+        "title": "Saropa Lints: Show Violations by Impact"
       },
       {
         "command": "saropaLints.focusIssuesWithSeverityFilter",
-        "title": "Saropa Lints: Show Issues by Severity"
+        "title": "Saropa Lints: Show Violations by Severity"
       },
       {
         "command": "saropaLints.refresh",
@@ -323,11 +325,11 @@
       },
       {
         "command": "saropaLints.focusIssuesForRules",
-        "title": "Show in Issues"
+        "title": "Show in Violations"
       },
       {
         "command": "saropaLints.focusIssuesForOwasp",
-        "title": "Focus Issues for OWASP Category"
+        "title": "Focus Violations for OWASP Category"
       },
       {
         "command": "saropaLints.disableRules",
@@ -1176,12 +1178,83 @@
             "default": 100,
             "minimum": 1,
             "maximum": 1000,
-            "description": "Maximum number of violations shown per file in the Issues tree. Remaining are shown as \"and N more…\"."
+            "description": "Maximum number of violations shown per file in the Violations tree. Remaining are shown as \"and N more…\"."
+          },
+          "saropaLints.violationsGroupBy": {
+            "type": "string",
+            "enum": ["impact", "severity", "file", "rule", "owasp"],
+            "default": "impact",
+            "description": "Default grouping for the Violations tree. \"impact\" lists Critical and High findings first; use the toolbar to change temporarily."
           },
           "saropaLints.checkForUpdates": {
             "type": "boolean",
             "default": true,
             "description": "Periodically check for newer versions of the saropa_lints package and offer to upgrade."
+          }
+        }
+      },
+      {
+        "title": "Sidebar",
+        "properties": {
+          "saropaLints.sidebar.showOverview": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show the Overview section in the Saropa Lints activity bar."
+          },
+          "saropaLints.sidebar.showIssues": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show the Violations view (lint findings from analysis reports)."
+          },
+          "saropaLints.sidebar.showSummary": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show the Summary section (stats). Off by default; use Violations for the main list."
+          },
+          "saropaLints.sidebar.showConfig": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show the Config section."
+          },
+          "saropaLints.sidebar.showRulePacks": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show the Rule Packs webview section."
+          },
+          "saropaLints.sidebar.showSuggestions": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show the Suggestions section."
+          },
+          "saropaLints.sidebar.showSecurityPosture": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show the Security Posture section."
+          },
+          "saropaLints.sidebar.showFileRisk": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show the File Risk section."
+          },
+          "saropaLints.sidebar.showPackageVibrancy": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show the Package Vibrancy tree section."
+          },
+          "saropaLints.sidebar.showPackageDetails": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show the Package Details webview in the sidebar. Off by default; full details remain available via Show Package Details and pubspec hovers."
+          },
+          "saropaLints.sidebar.showTodosAndHacks": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show the TODOs & Hacks section (comment markers; separate from lint violations)."
+          },
+          "saropaLints.sidebar.showDriftAdvisor": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show the Drift Advisor section. Off by default; the section also appears when a Drift Advisor server is detected on the configured port range."
           }
         }
       },
@@ -1662,7 +1735,7 @@
       {
         "id": "saropaLints.gettingStarted",
         "title": "Getting Started with Saropa Lints",
-        "description": "Health Score, Issues, Security Posture, Config, and Trends — all from the sidebar.",
+        "description": "Health Score, Violations, Security Posture, Config, and Trends — all from the sidebar.",
         "steps": [
           {
             "id": "saropaLints.walkthrough.healthScore",
@@ -1677,7 +1750,7 @@
           },
           {
             "id": "saropaLints.walkthrough.issues",
-            "title": "Issues & Inline Annotations",
+            "title": "Violations & Inline Annotations",
             "description": "Violations in a tree grouped by severity and file. **Error Lens-style** annotations show warnings at the end of each line.\n\nFilter by text, severity, impact, or rule. Right-click to suppress noise.\n\n[Run Analysis](command:saropaLints.runAnalysis)",
             "media": {
               "markdown": "media/walkthrough-issues.md"
@@ -1689,7 +1762,7 @@
           {
             "id": "saropaLints.walkthrough.security",
             "title": "Security Posture",
-            "description": "**OWASP Top 10** coverage matrix — Mobile and Web. Each category shows violation and rule counts. Click to filter Issues.\n\nExport a compliance report for audits.\n\n[Export OWASP Report](command:saropaLints.exportOwaspReport)",
+            "description": "**OWASP Top 10** coverage matrix — Mobile and Web. Each category shows violation and rule counts. Click to filter Violations.\n\nExport a compliance report for audits.\n\n[Export OWASP Report](command:saropaLints.exportOwaspReport)",
             "media": {
               "markdown": "media/walkthrough-security.md"
             },
@@ -1741,7 +1814,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run precompile && npm run check-types && node esbuild.js --production",
     "lint": "tsc --noEmit -p ./",
-    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/rulePacks/**/*.test.js\" --timeout 10000"
+    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" --timeout 10000"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

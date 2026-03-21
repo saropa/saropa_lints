@@ -17,7 +17,10 @@
     "src/test/vibrancy/services/review-state.test.ts",
     "src/rulePacks/rulePackDefinitions.ts",
     "src/rulePacks/rulePackYaml.ts",
-    "src/test/rulePacks/**/*.ts"
+    "src/test/rulePacks/**/*.ts",
+    "src/sidebarSectionVisibility.ts",
+    "src/sidebarSectionVisibilityKeys.ts",
+    "src/test/sidebarSectionVisibilityKeys.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

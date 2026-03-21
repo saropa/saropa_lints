@@ -52,11 +52,11 @@ export class SummaryTreeProvider implements vscode.TreeDataProvider<SummaryItem>
     if (!element) {
       const total = s?.totalViolations ?? data.violations.length;
       const items: SummaryItem[] = [
-        // Clickable: opens Issues view with all issues (clears filters).
+        // Clickable: opens Violations view with all findings (clears filters).
         new SummaryItem('Total violations', String(total), vscode.TreeItemCollapsibleState.None, undefined, 'saropaLints.focusIssues'),
         new SummaryItem('Tier', c?.tier ?? '—'),
         new SummaryItem('Files analyzed', s?.filesAnalyzed != null ? String(s.filesAnalyzed) : '—'),
-        new SummaryItem('Files with issues', s?.filesWithIssues != null ? String(s.filesWithIssues) : '—'),
+        new SummaryItem('Files with violations', s?.filesWithIssues != null ? String(s.filesWithIssues) : '—'),
       ];
       if (s?.bySeverity) {
         items.push(

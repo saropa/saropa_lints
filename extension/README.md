@@ -19,7 +19,7 @@ After installing, run **"Saropa Lints: Getting Started"** from the Command Palet
    - Run `dart run saropa_lints:write_config --tier recommended --target <workspace>` (headless)
    - Optionally run `dart analyze`
 4. Run **"Saropa Lints: Getting Started"** from the Command Palette for a guided tour of all features.
-5. Use **Run Analysis** and **Open Config** as needed. Issues appear in the **Issues** view when `reports/.saropa_lints/violations.json` exists (written by the analyzer).
+5. Use **Run Analysis** and **Open Config** as needed. Violations appear in the **Violations** view when `reports/.saropa_lints/violations.json` exists (written by the analyzer).
 
 ## Health Score
 
@@ -31,21 +31,21 @@ A single 0–100 number in the **Overview** and **status bar**, computed from vi
 
 The status bar shows the score with a delta from the last run (e.g. "Saropa: 78 ▲4"). When violations decrease, a celebration message includes the score change.
 
-## Issues view
+## Violations view
 
-The Issues view shows violations in a **tree**: first by **severity** (Error, Warning, Info), then by **project structure** (folders and files). Each file lists violations (capped per file; excess shown as “and N more…”).
+The **Violations** view lists lint findings from your analysis report in a **tree**: first by **severity** (Error, Warning, Info), then by **project structure** (folders and files). Each file lists violations (capped per file; excess shown as “and N more…”).
 
 - **Group by (toolbar):** Change how the tree is organized — by Severity (default), File, Impact, Rule, or OWASP Category. Click the tree icon in the toolbar to switch.
 - **Filters (toolbar):** Filter by text (file path, rule, or message), Filter by type (severity and impact), Filter by rule (multi-select). When active, the view shows “Showing X of Y”.
 - **Suppressions:** Right-click a folder, file, violation, or severity node to hide it from the tree (e.g. “Hide folder”, “Hide rule”). Suppressions are persisted; use **Clear suppressions** in the toolbar to restore all.
-- **Code Lens:** In Dart files that have violations, a lens at the top shows e.g. “Saropa Lints: 3 issues — Show in Saropa”. Click to open the Issues view filtered to that file.
+- **Code Lens:** In Dart files that have violations, a lens at the top shows e.g. “Saropa: 3 violations — Show in Saropa”. Click to open the Violations view filtered to that file.
 - **Context menus:** **Explain rule** (book icon) opens a side tab with full rule details; Apply fix (wrench icon) and Copy message (clipboard icon), then a separator, then hide options: Hide rule from view, Hide rule in this file. On folders/files: Hide folder, Hide file, Copy path; on files: Fix all in file, Show only this file. On severity nodes: Hide this severity.
 - **Explain rule:** Right-click a violation and choose **Explain rule** (or run **Saropa Lints: Explain rule** from the command palette and pick a rule) to open a tab beside your code with the rule’s problem message, how to fix, severity, impact, OWASP mapping (if any), and a link to the ROADMAP.
 - **Violation tooltips:** Show rule name and a “More” link to rule documentation (ROADMAP).
-- **Summary → Issues:** Click **Total violations** in the Summary view to open the Issues view with all issues (clears any active filters). By severity / By impact rows open Issues with the matching filter.
-- **Problems view:** Right-click a problem and choose **Saropa Lints: Show in Saropa Lints** to focus the Issues view filtered to the active file.
+- **Summary → Violations:** Click **Total violations** in the Summary view to open the Violations view with all findings (clears any active filters). By severity / By impact rows open Violations with the matching filter.
+- **Problems view:** Right-click a problem and choose **Saropa Lints: Show in Saropa Lints** to focus the Violations view filtered to the active file.
 
-The **File Risk** view ranks files by weighted violation density (same weights as the Health Score). Files with critical violations appear first with a flame icon. Click a file to filter the Issues view to that file.
+The **File Risk** view ranks files by weighted violation density (same weights as the Health Score). Files with critical violations appear first with a flame icon. Click a file to filter the Violations view to that file.
 
 The **Security Posture** view shows OWASP Mobile and Web Top 10 coverage based on the active rules and violations. Right-click a category to export an OWASP compliance report.
 
@@ -63,7 +63,10 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 | `saropaLints.tier` | `recommended` | Tier used when enabling or re-initializing (essential, recommended, professional, comprehensive, pedantic). |
 | `saropaLints.runAnalysisAfterConfigChange` | `true` | Run `dart analyze` after init when enabling. |
 | `saropaLints.runAnalysisOpenEditorsOnly` | `false` | When true, `Run Analysis` runs `dart/flutter analyze` only for Dart files currently open in VS Code (workspace text documents) under the detected project root (pubspec.yaml directory). |
-| `saropaLints.issuesPageSize` | `100` | Max violations shown per file in the Issues tree (1–1000). Remaining appear as “and N more…”. |
+| `saropaLints.issuesPageSize` | `100` | Max violations shown per file in the Violations tree (1–1000). Remaining appear as “and N more…”. |
+| `saropaLints.violationsGroupBy` | `impact` | Default tree grouping: **impact** lists Critical / High first; use **severity** for Error / Warning / Info. Change anytime from the Violations toolbar. |
+
+**Sidebar defaults:** Only **Overview**, **Violations**, and **Config** show in the activity bar by default. Turn on Summary, Security, File Risk, Package Vibrancy, TODOs, etc. from **Overview → Sidebar** or Settings (`saropaLints.sidebar.show*`).
 
 | **TODOs & Hacks** | | |
 | `saropaLints.todosAndHacks.tags` | `["TODO", "FIXME", "HACK", "XXX", "BUG"]` | Tags to search for in comments (case-sensitive). |
@@ -82,14 +85,14 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 - **Saropa Lints: Run Analysis** — Run `dart analyze` / `flutter analyze`.
 - **Saropa Lints: Initialize / Update Config** — Write analysis_options.yaml with the current tier (uses write_config).
 - **Saropa Lints: Open Config** — Open `analysis_options_custom.yaml` or `analysis_options.yaml`.
-- **Filter by text…** / **Filter by type…** / **Filter by rule…** — Filter the Issues tree (view toolbar).
+- **Filter by text…** / **Filter by type…** / **Filter by rule…** — Filter the Violations tree (view toolbar).
 - **Clear filters** / **Clear suppressions** — Reset filters or hidden items (view toolbar when active).
-- **Saropa Lints: Show All Issues** — Open Issues view and show all issues (clears filters). Used when clicking "Total violations" in Summary.
-- **Saropa Lints: Show in Saropa Lints** — Focus Issues view filtered to the active editor's file (e.g. from Problems view context menu or command palette).
-- **Group by…** — Change how the Issues tree is organized: Severity, File, Impact, Rule, or OWASP Category (view toolbar).
-- **Explain rule** — On a violation in the Issues tree (context menu) or from the command palette (pick a rule): open a side tab with full rule details (message, fix, severity, impact, OWASP, ROADMAP link).
-- **Apply fix** — On a violation in the Issues tree (context menu): run the Dart analyzer's quick fix for that location without opening the file.
-- **Fix all in this file** — On a file in the Issues tree (context menu): run all available quick fixes for that file bottom-up.
+- **Saropa Lints: Show All Violations** — Open the Violations view and show all findings (clears filters). Used when clicking "Total violations" in Summary.
+- **Saropa Lints: Show in Saropa Lints** — Focus the Violations view filtered to the active editor's file (e.g. from Problems view context menu or command palette).
+- **Group by…** — Change how the Violations tree is organized: Severity, File, Impact, Rule, or OWASP Category (view toolbar).
+- **Explain rule** — On a violation in the Violations tree (context menu) or from the command palette (pick a rule): open a side tab with full rule details (message, fix, severity, impact, OWASP, ROADMAP link).
+- **Apply fix** — On a violation in the Violations tree (context menu): run the Dart analyzer's quick fix for that location without opening the file.
+- **Fix all in this file** — On a file in the Violations tree (context menu): run all available quick fixes for that file bottom-up.
 - **TODOs & Hacks: Refresh** — Rescan the workspace for TODO/FIXME/HACK/XXX/BUG markers and refresh the TODOs & Hacks view.
 - **Create Saropa Lints Instructions for AI Agents** — Create `.cursor/rules/saropa_lints_instructions.mdc` in the workspace from the bundled template (Overview title bar or Command Palette). Gives AI agents project guidelines for working on saropa_lints.
 - **TODOs & Hacks: Toggle group by tag / folder** — Switch between grouping by folder→file→line and by tag→file→line (view toolbar).
@@ -100,14 +103,14 @@ On a violation, the two “Hide” options mean:
 
 | Option | Effect |
 |--------|--------|
-| **Hide rule from view** | Hides that rule **everywhere** in the Issues tree (all files). |
+| **Hide rule from view** | Hides that rule **everywhere** in the Violations tree (all files). |
 | **Hide rule in this file** | Hides that rule **only in this file**; the same rule still appears in other files. |
 
 (“Hide this impact” is not shown on violations: it would hide all violations with that impact level, which is confusing from a single violation. Severity nodes still have “Hide this severity”.)
 
-These are **view-only** suppressions: they do not change `analysis_options.yaml` or source code. They are stored in workspace state and only affect what the Issues tree shows.
+These are **view-only** suppressions: they do not change `analysis_options.yaml` or source code. They are stored in workspace state and only affect what the Violations tree shows.
 
-**To undo or manage:** Use **Clear suppressions** in the Issues view toolbar (it appears when any suppressions are active). That clears all hidden folders, files, rules, rule-in-file, severities, and impacts at once. There is no per-item “unhide”;
+**To undo or manage:** Use **Clear suppressions** in the Violations view toolbar (it appears when any suppressions are active). That clears all hidden folders, files, rules, rule-in-file, severities, and impacts at once. There is no per-item “unhide”;
  clearing restores everything. To see or edit raw suppressions you would need to inspect workspace state (e.g. extension storage); the UI only offers Clear suppressions.
 - **Export OWASP Compliance Report** — Generate a markdown report with Mobile/Web Top 10 coverage tables and gap analysis.
 

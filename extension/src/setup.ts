@@ -280,7 +280,7 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
         }
         ok = await runAnalysisForFiles(context, files, { showProgress: false });
         if (!ok) {
-          vscode.window.showWarningMessage('Analysis reported issues (open Dart files only). Check the Issues view.');
+          vscode.window.showWarningMessage('Analysis reported violations (open Dart files only). Check the Violations view.');
         }
         return;
       }

@@ -1,7 +1,7 @@
 /**
  * D6: File Risk tree — files ranked by violation density.
  * Shows the riskiest files first so developers know where to focus.
- * Click a file to filter the Issues view to that file.
+ * Click a file to filter the Violations view to that file.
  */
 
 import * as vscode from 'vscode';
@@ -114,7 +114,7 @@ export class FileRiskTreeProvider implements vscode.TreeDataProvider<FileRiskNod
     if (r.high > 0) parts.push(`${r.high} high`);
     item.tooltip = `${r.filePath}\n${parts.join(', ')}\nRisk score: ${Math.round(r.riskScore)}`;
 
-    // Click → filter Issues view to this file.
+    // Click → filter Violations view to this file.
     item.command = {
       command: 'saropaLints.focusIssuesForFile',
       title: 'Show issues for this file',
