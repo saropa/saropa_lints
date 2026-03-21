@@ -8,10 +8,73 @@
 /// into [SaropaLintRule.enabledRules]. Codes in [SaropaLintRule.disabledRules]
 /// (explicit `false`) are skipped so user opt-out wins over pack opt-in.
 ///
-/// **VS Code:** Keep [kRulePackRuleCodes] in sync with
-/// `extension/src/rulePacks/rulePackDefinitions.ts` (same pack ids and rule
-/// lists) so the Rule Packs webview shows correct counts.
+/// **Semver gates:** Packs listed in [kRulePackDependencyGates] only merge when
+/// [mergeRulePacksIntoEnabled] receives a [resolvedVersions] map and the
+/// resolved version of [RulePackDependencyGate.dependency] satisfies
+/// [RulePackDependencyGate.constraint]. If the lockfile is missing or the
+/// dependency is absent, gated packs do not merge (conservative).
+///
+/// **VS Code / extension:** Regenerate `extension/src/rulePacks/rulePackDefinitions.ts`
+/// with `dart run tool/generate_rule_pack_registry.dart` after changing package rules.
+///
+/// **Maintainers (generated registry):** Rule codes for each package family are emitted
+/// into `rule_pack_codes_generated.dart` from `lib/src/rules/packages/*_rules.dart`.
+/// A rule that must appear in more than one pack (but lives in a single `*_rules.dart`
+/// file) is listed in `kCompositeRulePackIds` in `tool/rule_pack_audit.dart`; the same
+/// tool applies that map when auditing. Run `dart run tool/rule_pack_audit.dart` after
+/// registry or package-rule edits to catch drift before CI.
+///
+/// **Overlapping rules across packs:** [mergeRulePacksIntoEnabled] returns
+/// only codes newly added to [enabled]. Re-merge subtracts that set before
+/// applying the next pack list; if two enabled packs share a rule and it is
+/// removed from one pack only, toggling YAML may require an analyzer restart
+/// for a correct effective set. Prefer disjoint pack membership.
 library;
+
+import 'package:pub_semver/pub_semver.dart';
+
+import 'package:saropa_lints/src/config/rule_pack_codes_generated.dart';
+
+/// Optional semver gate: pack merges only when [dependency] resolves to a
+/// version allowed by [constraint] (pub semver syntax, e.g. `>=1.19.0`).
+class RulePackDependencyGate {
+  const RulePackDependencyGate({
+    required this.dependency,
+    required this.constraint,
+  });
+
+  final String dependency;
+  final String constraint;
+}
+
+/// Packs that require a resolved lockfile version (Phase 3 resolver).
+const Map<String, RulePackDependencyGate> kRulePackDependencyGates = {
+  // Example semver-gated pack: rules apply only when package `collection`
+  // resolves to >=1.19.0 (matches common migration guidance for collection APIs).
+  'collection_compat': RulePackDependencyGate(
+    dependency: 'collection',
+    constraint: '>=1.19.0',
+  ),
+};
+
+/// Returns true when [packId] has no gate, or [resolvedVersions] satisfies the gate.
+bool packPassesDependencyGate(
+  String packId,
+  Map<String, String>? resolvedVersions,
+) {
+  final gate = kRulePackDependencyGates[packId];
+  if (gate == null) return true;
+  if (resolvedVersions == null || resolvedVersions.isEmpty) return false;
+  final raw = resolvedVersions[gate.dependency];
+  if (raw == null || raw.isEmpty) return false;
+  try {
+    final version = Version.parse(raw);
+    final constraint = VersionConstraint.parse(gate.constraint);
+    return constraint.allows(version);
+  } catch (_) {
+    return false;
+  }
+}
 
 /// Returns rule codes for [packId], or empty if unknown.
 Set<String> ruleCodesForPack(String packId) {
@@ -22,108 +85,62 @@ Set<String> ruleCodesForPack(String packId) {
 /// All known pack ids.
 Set<String> get knownRulePackIds => kRulePackRuleCodes.keys.toSet();
 
+/// `pubspec.yaml` dependency keys (any line `  name:`) that suggest a pack.
+/// Keys match [kRulePackRuleCodes]. The `package_specific` pack may use an empty set.
+const Map<String, Set<String>> kRulePackPubspecMarkers = {
+  ...kRulePackPubspecMarkersGenerated,
+  'collection_compat': {'collection'},
+};
+
+/// True when [pubspecYamlContent] declares any [kRulePackPubspecMarkers] entry.
+bool isRulePackSuggestedByPubspec(String packId, String pubspecYamlContent) {
+  final markers = kRulePackPubspecMarkers[packId];
+  if (markers == null) return false;
+  for (final name in markers) {
+    final re = RegExp(r'^\s+' + RegExp.escape(name) + r'\s*:', multiLine: true);
+    if (re.hasMatch(pubspecYamlContent)) return true;
+  }
+  return false;
+}
+
+/// Suggested by pubspec and semver gate passes (or pack has no gate).
+bool isRulePackApplicable(
+  String packId,
+  String pubspecYamlContent,
+  Map<String, String>? lockVersions,
+) {
+  if (!isRulePackSuggestedByPubspec(packId, pubspecYamlContent)) return false;
+  return packPassesDependencyGate(packId, lockVersions);
+}
+
 /// Adds rule codes from [packIds] into [enabled], skipping any code whose
 /// lowercase name appears in [disabled] (diagnostics/severity disables).
 ///
-/// Does not remove existing entries from [enabled]. Idempotent per code.
-void mergeRulePacksIntoEnabled(
+/// Skips packs that fail [packPassesDependencyGate] when a gate exists.
+///
+/// Returns the set of rule codes added from packs (for subtract-before-remerge).
+Set<String> mergeRulePacksIntoEnabled(
   Set<String> enabled,
   Set<String>? disabled,
-  Iterable<String> packIds,
-) {
+  Iterable<String> packIds, {
+  Map<String, String>? resolvedVersions,
+}) {
+  final contributed = <String>{};
   final disabledLc = <String>{
     for (final d in disabled ?? const <String>{}) d.toLowerCase(),
   };
   for (final packId in packIds) {
+    if (!packPassesDependencyGate(packId, resolvedVersions)) continue;
     for (final code in ruleCodesForPack(packId)) {
       if (disabledLc.contains(code.toLowerCase())) continue;
-      enabled.add(code);
+      if (enabled.add(code)) contributed.add(code);
     }
   }
+  return contributed;
 }
 
-/// Canonical registry: pack id → rule codes (subset per family; expand over time).
+/// Canonical registry: pack id → rule codes (generated from `lib/src/rules/packages/`).
 const Map<String, Set<String>> kRulePackRuleCodes = {
-  'riverpod': {
-    'require_provider_scope',
-    'avoid_riverpod_state_mutation',
-    'require_riverpod_error_handling',
-    'avoid_ref_read_inside_build',
-    'avoid_ref_watch_outside_build',
-    'avoid_riverpod_notifier_in_build',
-    'require_riverpod_async_value_guard',
-    'avoid_circular_provider_deps',
-    'avoid_riverpod_string_provider_name',
-    'prefer_riverpod_family_for_params',
-    'require_async_value_order',
-    'avoid_listen_in_async',
-    'avoid_notifier_constructors',
-    'use_ref_read_synchronously',
-    'prefer_consumer_widget',
-    'require_auto_dispose',
-    'avoid_global_riverpod_providers',
-    'prefer_riverpod_select',
-    'require_flutter_riverpod_package',
-    'prefer_riverpod_auto_dispose',
-  },
-  'drift': {
-    'avoid_drift_raw_sql_interpolation',
-    'avoid_drift_enum_index_reorder',
-    'require_drift_database_close',
-    'avoid_drift_update_without_where',
-    'require_await_in_drift_transaction',
-    'require_drift_foreign_key_pragma',
-    'prefer_drift_batch_operations',
-    'require_drift_stream_cancel',
-    'avoid_drift_value_null_vs_absent',
-    'require_drift_equals_value',
-    'require_drift_read_table_or_null',
-    'require_drift_create_all_in_oncreate',
-    'require_drift_onupgrade_handler',
-  },
-  'bloc': {
-    'require_bloc_close',
-    'avoid_bloc_event_mutation',
-    'avoid_duplicate_bloc_event_handlers',
-    'emit_new_bloc_state_instances',
-    'avoid_yield_in_on_event',
-    'require_bloc_manual_dispose',
-    'avoid_bloc_listen_in_build',
-    'avoid_instantiating_in_bloc_value_provider',
-    'avoid_existing_instances_in_bloc_provider',
-  },
-  'provider': {
-    'require_provider_dispose',
-    'avoid_provider_value_rebuild',
-    'avoid_provider_recreate',
-    'avoid_provider_in_widget',
-    'prefer_multi_provider',
-    'avoid_nested_providers',
-  },
-  'hive': {
-    'require_hive_initialization',
-    'require_hive_type_adapter',
-    'require_hive_encryption_key_secure',
-    'avoid_hive_field_index_reuse',
-    'require_hive_adapter_registration_order',
-    'require_hive_nested_object_adapter',
-  },
-  'firebase': {
-    'require_firebase_init_before_use',
-    'require_firebase_reauthentication',
-    'require_firebase_token_refresh',
-    'incorrect_firebase_event_name',
-    'incorrect_firebase_parameter_name',
-  },
-  'getx': {
-    'avoid_getx_context_outside_widget',
-    'require_getx_worker_dispose',
-    'require_getx_permanent_cleanup',
-    'avoid_getx_build_context_bypass',
-  },
-  'isar': {
-    'avoid_isar_enum_field',
-    'require_isar_nullable_field',
-    'avoid_isar_import_with_drift',
-  },
+  ...kRulePackRuleCodesGenerated,
+  'collection_compat': {'avoid_collection_methods_with_unrelated_types'},
 };
