@@ -51,7 +51,7 @@ The **Security Posture** view shows OWASP Mobile and Web Top 10 coverage based o
 
 The **Config** view shows Enabled, Tier, Run analysis after config change, **Detected** (Flutter and packages from `pubspec.yaml`), and actions (Open config, Initialize config, Run analysis).
 
-**TODOs & Hacks** — A Todo-Tree-style sidebar view that lists TODO, FIXME, HACK, XXX, and BUG comment markers by scanning workspace files. No Dart analyzer or violations.json; works in any workspace with supported file types (Dart, YAML, Markdown, TypeScript, JavaScript by default). Tree shows by folder → file → line (or by tag → file → line when "Group by tag" is on). Click a line to open the file at that line. Use the **Refresh** or **Toggle group by tag / folder** buttons in the view toolbar, or **TODOs & Hacks: Refresh** from the command palette. Auto-refresh on save is optional (see settings). Optional custom regex override is supported (see `saropaLints.todosAndHacks.customRegex`).
+**TODOs & Hacks** — A Todo-Tree-style sidebar view that lists TODO, FIXME, HACK, XXX, and BUG comment markers by scanning workspace files. No Dart analyzer or violations.json; works in any workspace with supported file types (Dart, YAML, TypeScript, JavaScript by default). Tree shows by folder → file → line (or by tag → file → line when "Group by tag" is on). Click a line to open the file at that line. Use the **Refresh** or **Toggle group by tag / folder** buttons in the view toolbar, or **TODOs & Hacks: Refresh** from the command palette. Auto-refresh on save is optional (see settings). Optional custom regex override is supported (see `saropaLints.todosAndHacks.customRegex`). Add `**/*.md` to `saropaLints.todosAndHacks.includeGlobs` if you want Markdown scanned too.
 
 The **Logs** view lists analysis reports from `reports/`. Each log shows a parsed hint (e.g. violation counts, init tier). A "Run Analysis" action appears when the latest report is over 1 hour old.
 
@@ -67,7 +67,7 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 
 | **TODOs & Hacks** | | |
 | `saropaLints.todosAndHacks.tags` | `["TODO", "FIXME", "HACK", "XXX", "BUG"]` | Tags to search for in comments (case-sensitive). |
-| `saropaLints.todosAndHacks.includeGlobs` | `["**/*.dart", "**/*.yaml", "**/*.md", "**/*.ts", "**/*.js"]` | Glob patterns for files to scan. |
+| `saropaLints.todosAndHacks.includeGlobs` | `["**/*.dart", "**/*.yaml", "**/*.ts", "**/*.js"]` | Glob patterns for files to scan. |
 | `saropaLints.todosAndHacks.excludeGlobs` | `["**/node_modules/**", "**/.dart_tool/**", "**/build/**", "**/.git/**"]` | Extra exclude patterns (merged with search.exclude). |
 | `saropaLints.todosAndHacks.maxFilesToScan` | `2000` | Maximum number of files to scan; view shows a message when capped. |
 | `saropaLints.todosAndHacks.autoRefresh` | `true` | Refresh the TODOs & Hacks view when a file is saved (debounced). |

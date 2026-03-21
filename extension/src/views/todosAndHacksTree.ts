@@ -1,12 +1,19 @@
 /**
  * Tree data provider for the TODOs & Hacks view.
  * Shows task markers (open tasks, fixmes, hacks, bugs) by folder → file → line, or by tag → file → line.
+ *
+ * Scan scope is driven by `saropaLints.todosAndHacks.includeGlobs` (see `./todosAndHacksDefaults.ts`).
  */
 
 import * as vscode from 'vscode';
 import * as path from 'node:path';
 import { scanWorkspace } from '../services/todosAndHacksScanner';
 import type { TaskMarker, ScanResult } from './todosAndHacksTypes';
+import {
+  DEFAULT_TODOS_AND_HACKS_EXCLUDE_GLOBS,
+  DEFAULT_TODOS_AND_HACKS_INCLUDE_GLOBS,
+  DEFAULT_TODOS_AND_HACKS_TAGS,
+} from './todosAndHacksDefaults';
 
 type TodoTreeNode =
   | { kind: 'folder'; folder: vscode.WorkspaceFolder }
@@ -27,9 +34,9 @@ function getOptions(): {
 } {
   const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
   return {
-    tags: cfg.get<string[]>('tags', ['TODO', 'FIXME', 'HACK', 'XXX', 'BUG']),
-    includeGlobs: cfg.get<string[]>('includeGlobs', ['**/*.dart', '**/*.yaml', '**/*.md', '**/*.ts', '**/*.js']),
-    excludeGlobs: cfg.get<string[]>('excludeGlobs', ['**/node_modules/**', '**/.dart_tool/**', '**/build/**', '**/.git/**']),
+    tags: cfg.get<string[]>('tags', [...DEFAULT_TODOS_AND_HACKS_TAGS]),
+    includeGlobs: cfg.get<string[]>('includeGlobs', [...DEFAULT_TODOS_AND_HACKS_INCLUDE_GLOBS]),
+    excludeGlobs: cfg.get<string[]>('excludeGlobs', [...DEFAULT_TODOS_AND_HACKS_EXCLUDE_GLOBS]),
     maxFilesToScan: cfg.get<number>('maxFilesToScan', 2000),
     groupByTag: cfg.get<boolean>('groupByTag', false),
     customRegex: cfg.get<string>('customRegex') || undefined,
