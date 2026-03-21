@@ -8,7 +8,11 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 
+import '../../fixes/animation/remove_redundant_implicit_animation_dispose_fix.dart';
+import '../../implicit_animation_dispose_cast_ast.dart';
 import '../../saropa_lint_rule.dart';
 import '../../target_matcher_utils.dart';
 
@@ -2122,4 +2126,176 @@ class AvoidMultipleAnimationControllersRule extends SaropaLintRule {
       }
     });
   }
+}
+
+// =============================================================================
+// avoid_implicit_animation_dispose_cast
+// =============================================================================
+
+/// Flags `(animation as CurvedAnimation).dispose()` in [ImplicitlyAnimatedWidgetState] subclasses.
+///
+/// ## Background (Flutter 3.7+)
+///
+/// Framework PR [flutter/flutter#111849](https://github.com/flutter/flutter/pull/111849) changed
+/// **internal** implementation only: the implicit animation field is a [CurvedAnimation], so the
+/// engine disposes it without casting. Public API (`animation` still types as [Animation]) is
+/// unchanged. Some codebases still contain snippets copied from older framework sources that call
+/// `dispose()` on that animation after casting—**the base state already disposes it in
+/// `super.dispose()`**, so this is redundant and can cause double-dispose or confusing lifecycle
+/// ordering.
+///
+/// ## When this rule reports
+///
+/// - The cast target type is exactly `CurvedAnimation` (named type, not heuristic string scan).
+/// - The expression is the `animation` **getter** declared on [ImplicitlyAnimatedWidgetState]
+///   (resolved via the element model, including `this.animation`).
+/// - The cast is the **direct** receiver of `.dispose()` (parentheses around the cast allowed).
+/// - The enclosing class **extends** [ImplicitlyAnimatedWidgetState] (any depth up to Flutter’s
+///   base, e.g. [AnimatedWidgetBaseState] subclasses).
+///
+/// ## When this rule does **not** report (false-positive avoidance)
+///
+/// - `(animation as CurvedAnimation).curve` or any member other than `dispose`.
+/// - Casts in classes that do not inherit [ImplicitlyAnimatedWidgetState].
+/// - A local or field named `animation` that is **not** the framework getter (resolved element).
+///
+/// ## Performance
+///
+/// - [requiredPatterns] includes `as CurvedAnimation` so files without that substring skip the
+///   rule before AST callbacks.
+/// - [applicableFileTypes] is [FileType.widget] to limit analysis to widget-like paths.
+///
+/// Since: v9.10.1 | Rule version: v1
+///
+/// **BAD:**
+/// ```dart
+/// class _MyState extends ImplicitlyAnimatedWidgetState<MyWidget> {
+///   @override
+///   void dispose() {
+///     (animation as CurvedAnimation).dispose();
+///     super.dispose();
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyState extends ImplicitlyAnimatedWidgetState<MyWidget> {
+///   @override
+///   void dispose() {
+///     super.dispose();
+///   }
+/// }
+/// ```
+///
+/// **GOOD:** Cast for APIs on [CurvedAnimation] other than `dispose` is not reported.
+/// ```dart
+/// final curve = (animation as CurvedAnimation).curve;
+/// ```
+class AvoidImplicitAnimationDisposeCastRule extends SaropaLintRule {
+  AvoidImplicitAnimationDisposeCastRule() : super(code: _code);
+
+  /// Double-dispose / wrong lifecycle ordering on framework-owned animation.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui', 'animation'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  @override
+  Set<String>? get requiredPatterns => {'as CurvedAnimation'};
+
+  static const LintCode _code = LintCode(
+    'avoid_implicit_animation_dispose_cast',
+    '[avoid_implicit_animation_dispose_cast] Calling dispose() on '
+        '(animation as CurvedAnimation) in an ImplicitlyAnimatedWidgetState '
+        'subclass is redundant and unsafe. The framework owns that CurvedAnimation '
+        'and disposes it when super.dispose() runs (Flutter 3.7+, PR #111849). '
+        'Remove this call and rely on super.dispose() only. {v1}',
+    correctionMessage:
+        'Delete the line that casts animation to CurvedAnimation and calls dispose(). '
+        'Call super.dispose() (and dispose only your own resources).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveRedundantImplicitAnimationDisposeFix(context: context),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addAsExpression((AsExpression node) {
+      if (!_isCurvedAnimationNamedType(node.type)) return;
+      if (!_isImplicitAnimationGetter(node.expression)) return;
+      if (disposeInvocationForCastAsDisposeTarget(node) == null) return;
+
+      final ClassDeclaration? cls = _enclosingClassDeclaration(node);
+      if (cls == null) return;
+      final ClassElement? classElement = cls.declaredFragment?.element;
+      if (classElement == null) return;
+      if (!_extendsImplicitlyAnimatedWidgetState(classElement)) return;
+
+      reporter.atNode(node);
+    });
+  }
+}
+
+bool _isCurvedAnimationNamedType(TypeAnnotation typeAnnotation) {
+  if (typeAnnotation is! NamedType) return false;
+  return typeAnnotation.name.lexeme == 'CurvedAnimation';
+}
+
+bool _isImplicitAnimationGetter(Expression expression) {
+  final GetterElement? getter = _resolvedAnimationGetter(expression);
+  if (getter == null || getter.name != 'animation') return false;
+  final Element enclosing = getter.enclosingElement;
+  if (enclosing is! ClassElement) return false;
+  return enclosing.name == 'ImplicitlyAnimatedWidgetState';
+}
+
+GetterElement? _resolvedAnimationGetter(Expression expression) {
+  Element? e;
+  if (expression is SimpleIdentifier) {
+    e = expression.element;
+  } else if (expression is PropertyAccess) {
+    e = expression.propertyName.element;
+  } else {
+    return null;
+  }
+  return e is GetterElement ? e : null;
+}
+
+ClassDeclaration? _enclosingClassDeclaration(AstNode node) {
+  for (AstNode? current = node; current != null; current = current.parent) {
+    if (current is ClassDeclaration) return current;
+  }
+  return null;
+}
+
+bool _extendsImplicitlyAnimatedWidgetState(ClassElement classElement) {
+  InterfaceType? type = classElement.thisType;
+  final Set<InterfaceType> seen = <InterfaceType>{};
+  while (type != null && seen.add(type)) {
+    final InterfaceElement element = type.element;
+    if (element is ClassElement &&
+        element.name == 'ImplicitlyAnimatedWidgetState') {
+      return true;
+    }
+    type = type.superclass;
+  }
+  return false;
 }
