@@ -53,18 +53,20 @@ Replace with the recommended alternative API
 
 ## Implementation Checklist
 
-- [ ] Verify the API change in Flutter/Dart SDK source
-- [ ] Determine minimum SDK version requirement
-- [ ] Write detection logic (AST visitor)
-- [ ] Write quick-fix replacement
-- [ ] Create test fixture with bad/good examples
-- [ ] Add unit tests
-- [ ] Register rule in `all_rules.dart`
-- [ ] Add to tier in `tiers.dart`
+- [x] Verify the API change in Flutter/Dart SDK source
+- [x] Determine minimum SDK version requirement
+- [x] Write detection logic (AST visitor)
+- [ ] Write quick-fix replacement (no in-SDK replacement)
+- [x] Create test fixture with bad/good examples
+- [x] Add unit tests
+- [x] Register rule in `all_rules.dart`
+- [x] Add to tier in `tiers.dart`
 - [ ] Update ROADMAP.md
-- [ ] Update CHANGELOG.md
+- [x] Update CHANGELOG.md
+
+**Rule:** `avoid_removed_dart_developer_metrics` (covers `Metrics`, `Metric`, `Counter`, `Gauge` from `dart:developer`) in `lib/src/rules/config/dart_sdk_3_removal_rules.dart`.
 
 ---
 
-**Status:** Not started
+**Status:** Implemented
 **Generated:** From Dart SDK v3.0.0 release notes

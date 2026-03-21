@@ -50,18 +50,22 @@ Replace old API/pattern with the new recommended approach
 
 ## Implementation Checklist
 
-- [ ] Verify the API change in Flutter/Dart SDK source
-- [ ] Determine minimum SDK version requirement
-- [ ] Write detection logic (AST visitor)
-- [ ] Write quick-fix replacement
-- [ ] Create test fixture with bad/good examples
-- [ ] Add unit tests
-- [ ] Register rule in `all_rules.dart`
-- [ ] Add to tier in `tiers.dart`
+- [x] Verify the API change in Flutter/Dart SDK source (release note: use `TypeError` for **CastError** removal; `FallThroughError` is a separate removal — compile-time error in Dart 2.0+)
+- [x] Determine minimum SDK version requirement
+- [x] Write detection logic (AST visitor)
+- [x] Write quick-fix replacement (`CastError` → `TypeError`)
+- [x] Create test fixture with bad/good examples
+- [x] Add unit tests
+- [x] Register rule in `all_rules.dart`
+- [x] Add to tier in `tiers.dart`
 - [ ] Update ROADMAP.md
-- [ ] Update CHANGELOG.md
+- [x] Update CHANGELOG.md
+
+**CastError → TypeError:** `avoid_removed_cast_error` in `lib/src/rules/config/dart_sdk_3_removal_rules.dart`.
+
+**FallThroughError:** `avoid_removed_fall_through_error` (no `TypeError` substitution; remove dead references).
 
 ---
 
-**Status:** Not started
+**Status:** Implemented (pre-existing rules)
 **Generated:** From Dart SDK v3.0.0 release notes

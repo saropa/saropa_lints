@@ -17,12 +17,11 @@
 
 ### What Changed
 
-A better pattern or API is now available. The old approach still works but the new one is preferred.
+Dart SDK 3.0 `dart:js_util` **changelog** (not a generic `Object`/`String` API): the signature of **`callMethod`** was aligned with other helpers so a parameter **now accepts `Object` instead of `String`**. Existing call sites that pass a `String` remain valid (`String` is an `Object`); there is no mechanical migration or deprecation to lint.
 
 ### APIs Involved
 
-- `Object`
-- `String`
+- `dart:js_util` `callMethod` (parameter type widened)
 
 ---
 
@@ -48,9 +47,9 @@ Replace old API/pattern with the new recommended approach
 
 ## Implementation Checklist
 
-- [ ] Verify the API change in Flutter/Dart SDK source
-- [ ] Determine minimum SDK version requirement
-- [ ] Write detection logic (AST visitor)
+- [x] Verify the API change in Flutter/Dart SDK source
+- [x] Determine minimum SDK version requirement — N/A for a dedicated lint (no required code change)
+- [ ] Write detection logic (AST visitor) — **skipped** (no actionable pattern)
 - [ ] Write quick-fix replacement
 - [ ] Create test fixture with bad/good examples
 - [ ] Add unit tests
@@ -61,5 +60,5 @@ Replace old API/pattern with the new recommended approach
 
 ---
 
-**Status:** Not started
+**Status:** No rule (API widening only; string arguments remain valid)
 **Generated:** From Dart SDK v3.0.0 release notes

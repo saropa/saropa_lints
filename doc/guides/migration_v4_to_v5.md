@@ -173,6 +173,10 @@ output: both
 | Rule defaults | All enabled | All disabled (must opt-in) |
 | Dependencies | `custom_lint: ^0.7.0` | None (built-in) |
 
+## Dart SDK 3.0 removed APIs (legacy codebases)
+
+If you still have pre–Dart 3 snippets (or branches) that reference removed or deprecated SDK APIs, the **Recommended** tier includes migration rules in `lib/src/rules/config/dart_sdk_3_removal_rules.dart`: legacy **`dart:core`** (`List()`, `CastError`, annotations, etc.), **`dart:collection`** (`HasNextIterator`), **`dart:developer`** (`UserTag.MAX_USER_TAGS`, removed metrics types), and **`dart:io`** (`NetworkInterface.listSupported`). They use `requiredPatterns` for file-level skipping and element resolution to avoid flagging **your own** types named like the old SDK symbols. Override entries live under **Migration (Dart SDK 3.0 removals)** in [example/analysis_options_template.yaml](../../example/analysis_options_template.yaml).
+
 ## Troubleshooting
 
 ### Rules not appearing?
