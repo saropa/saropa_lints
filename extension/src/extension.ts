@@ -191,21 +191,24 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const driftAdvisorProvider = new DriftAdvisorTreeProvider(driftAdvisorDiagCollection);
 
   const issuesProvider = new IssuesTreeProvider(context.workspaceState);
-  const overviewProvider = new OverviewTreeProvider(context.workspaceState, () =>
-    buildSidebarSectionCountMap({
-      workspaceRoot: getProjectRoot(),
-      saropaEnabled: getConfig().get<boolean>('enabled', false) ?? false,
-      tier: getConfig().get<string>('tier', 'recommended') ?? 'recommended',
-      violations: (() => {
-        const r = getProjectRoot();
-        return r ? readViolations(r) : null;
-      })(),
-      todosMarkerCount: todosAndHacksProvider.getCachedMarkerCount(),
-      driftIssueCount: driftAdvisorProvider.getIssueCount(),
-    }),
-  );
   const summaryProvider = new SummaryTreeProvider();
   const configProvider = new ConfigTreeProvider();
+  const overviewProvider = new OverviewTreeProvider(
+    context.workspaceState,
+    () =>
+      buildSidebarSectionCountMap({
+        workspaceRoot: getProjectRoot(),
+        saropaEnabled: getConfig().get<boolean>('enabled', false) ?? false,
+        tier: getConfig().get<string>('tier', 'recommended') ?? 'recommended',
+        violations: (() => {
+          const r = getProjectRoot();
+          return r ? readViolations(r) : null;
+        })(),
+        todosMarkerCount: todosAndHacksProvider.getCachedMarkerCount(),
+        driftIssueCount: driftAdvisorProvider.getIssueCount(),
+      }),
+    configProvider,
+  );
   const suggestionsProvider = new SuggestionsTreeProvider();
   const securityProvider = new SecurityPostureTreeProvider();
   const fileRiskProvider = new FileRiskTreeProvider();
@@ -236,8 +239,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     treeDataProvider: driftAdvisorProvider,
     showCollapseAll: true,
   });
-  context.subscriptions.push(driftAdvisorView);
+  // Single push keeps disposal batching obvious for static analysis (avoid back-to-back push).
   context.subscriptions.push(
+    driftAdvisorView,
     todosAndHacksProvider.onDidChangeTreeData(() => {
       overviewProvider.refresh();
     }),
@@ -350,13 +354,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   if (vscode.workspace.getConfiguration('saropaLints.driftAdvisor').get<boolean>('integration', false)) {
     void vscode.commands.executeCommand('saropaLints.driftAdvisor.refresh');
   }
-  context.subscriptions.push({
-    dispose: () => {
-      if (driftAdvisorPollTimer) clearInterval(driftAdvisorPollTimer);
-    },
-  });
-
+  // Poll dispose + workspace listeners registered together (one subscription batch).
   context.subscriptions.push(
+    {
+      dispose: () => {
+        if (driftAdvisorPollTimer) clearInterval(driftAdvisorPollTimer);
+      },
+    },
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (!e.affectsConfiguration('saropaLints')) return;
       if (e.affectsConfiguration('saropaLints.violationsGroupBy')) {
@@ -599,6 +603,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
     vscode.commands.registerCommand('saropaLints.showAbout', () => {
       showAboutPanel(context.extensionUri, extVersion);
+    }),
+    vscode.commands.registerCommand('saropaLints.openPubDevSaropaLints', () => {
+      void vscode.env.openExternal(vscode.Uri.parse('https://pub.dev/packages/saropa_lints'));
     }),
     // Creates .cursor/rules/saropa_lints_instructions.mdc from bundled template for AI agent guidelines.
     vscode.commands.registerCommand('saropaLints.createSaropaInstructions', async () => {
@@ -1234,7 +1241,13 @@ function registerCopyAsJsonCommands(
       copyTreeNodesToClipboard(item, selected, serializeFileRiskNode, (n) => fileRiskProvider.getChildren(n as never), 'File Risk'),
     ),
     vscode.commands.registerCommand('saropaLints.overview.copyAsJson', (item: unknown, selected?: unknown[]) =>
-      copyTreeNodesToClipboard(item, selected, serializeOverviewNode, (n) => overviewProvider.getChildren(), 'Overview'),
+      copyTreeNodesToClipboard(
+        item,
+        selected,
+        serializeOverviewNode,
+        (n) => overviewProvider.getChildren(n as never),
+        'Overview & options',
+      ),
     ),
     vscode.commands.registerCommand('saropaLints.suggestions.copyAsJson', (item: unknown, selected?: unknown[]) =>
       copyTreeNodesToClipboard(item, selected, serializeSuggestionNode, (n) => suggestionsProvider.getChildren(), 'Suggestions'),

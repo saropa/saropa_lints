@@ -2,6 +2,17 @@
  * Per-tree-view serializers for the "Copy as JSON" feature.
  * Each serializer converts a view-specific tree node into a uniform JsonNode
  * (without children — the shared utility handles recursion).
+ *
+ * ## Vibrancy package tree (`serializeVibrancyNode`)
+ *
+ * Tree items are untyped `TreeItem`-like objects from the vibrancy providers. This module
+ * maps `contextValue` plus a few payload fields (`result`, `problem`, `children`, …) into
+ * stable JSON for clipboard export. **Dispatch order is significant:** earlier matchers win
+ * (e.g. a node with `children[]` becomes `vibrancyGroup` before family/suggestion fallbacks).
+ *
+ * The vibrancy path is split into small `vibrancyAs*` helpers and a null-coalescing chain
+ * in `serializeVibrancyNode` so static analysis (cognitive complexity) stays low without
+ * changing behavior — each helper encodes one node kind from the UI.
  */
 
 import type { JsonNode } from './copyTreeAsJson';
@@ -230,8 +241,19 @@ export function serializeFileRiskNode(node: unknown): JsonNode | null {
 
 // ─── Overview Tree ────────────────────────────────────────────────────────────
 
-/** Serialize an Overview tree node. Leaf-only — uses TreeItem label/description. */
+/** Serialize an Overview tree node (intro rows, section parents, toggles, embedded config nodes). */
 export function serializeOverviewNode(node: unknown): JsonNode | null {
+    if (node && typeof node === 'object' && 'kind' in node) {
+        const embedded = serializeConfigNode(node);
+        if (embedded) return embedded;
+    }
+    const cv = (node as { contextValue?: string }).contextValue;
+    if (cv === 'overviewOptionsSection') {
+        return { type: 'overviewOptionsSection', label: 'Workspace options' };
+    }
+    if (cv === 'overviewSidebarSection') {
+        return { type: 'overviewSidebarSection', label: 'Sidebar' };
+    }
     return serializeTreeItemNode(node, 'overviewItem');
 }
 
@@ -243,209 +265,236 @@ export function serializeSuggestionNode(node: unknown): JsonNode | null {
 }
 
 // ─── Vibrancy Packages Tree ──────────────────────────────────────────────────
+// Matchers run in `serializeVibrancyNode` top-to-bottom; keep that list aligned with helpers here.
+
+/** Loose shape of vibrancy tree items for JSON copy (mirrors package vibrancy tree nodes). */
+type VibrancyTreeItem = {
+    contextValue?: string;
+    result?: Record<string, unknown>;
+    section?: string;
+    results?: Array<{ package: { name: string } }>;
+    summary?: Record<string, unknown>;
+    analyses?: unknown[];
+    analysis?: Record<string, unknown>;
+    insights?: unknown[];
+    insight?: Record<string, unknown>;
+    budgetResults?: unknown[];
+    budgetResult?: Record<string, unknown>;
+    children?: unknown[];
+    packageName?: string;
+    prereleaseVersion?: string;
+    prereleaseTag?: string | null;
+    url?: string;
+    label?: string | TreeItemLabel;
+    description?: string;
+    split?: Record<string, unknown>;
+    problem?: Record<string, unknown>;
+    action?: Record<string, unknown>;
+    unlocksPackages?: string[];
+};
+
+function vibrancyLabelOf(item: VibrancyTreeItem): string {
+    return typeof item.label === 'string'
+        ? item.label : (item.label as { label: string })?.label ?? '';
+}
+
+function vibrancyDescription(item: VibrancyTreeItem): string | undefined {
+    return typeof item.description === 'string' ? item.description : undefined;
+}
+
+function vibrancyAsPackage(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (!cv.startsWith('vibrancyPackage') || !item.result) return null;
+    return {
+        type: 'vibrancyPackage',
+        label,
+        description: vibrancyDescription(item),
+        data: item.result,
+    };
+}
+
+function vibrancyAsSectionGroup(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (cv !== 'vibrancySectionGroup') return null;
+    return {
+        type: 'vibrancySectionGroup',
+        label,
+        data: {
+            section: item.section,
+            packageCount: item.results?.length ?? 0,
+            packages: item.results?.map(r => r.package.name) ?? [],
+        },
+    };
+}
+
+function vibrancyAsSuppressedGroup(label: string, cv: string): JsonNode | null {
+    if (cv !== 'vibrancySuppressedGroup') return null;
+    return { type: 'vibrancySuppressedGroup', label };
+}
+
+function vibrancyAsDepGraphSummary(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (cv !== 'vibrancyDepGraphSummary') return null;
+    return {
+        type: 'vibrancyDepGraphSummary',
+        label,
+        data: item.summary ? { summary: item.summary } : undefined,
+    };
+}
+
+function vibrancyAsOverridesGroup(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (cv !== 'vibrancyOverridesGroup') return null;
+    return {
+        type: 'vibrancyOverridesGroup',
+        label,
+        data: { overrideCount: item.analyses?.length ?? 0 },
+    };
+}
+
+function vibrancyAsOverride(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (cv !== 'vibrancyOverrideStale' && cv !== 'vibrancyOverrideActive') return null;
+    return {
+        type: 'vibrancyOverride',
+        label,
+        description: vibrancyDescription(item),
+        data: item.analysis ? { analysis: item.analysis } : undefined,
+    };
+}
+
+function vibrancyAsActionItemsGroup(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (cv !== 'vibrancyActionItemsGroup') return null;
+    return {
+        type: 'vibrancyActionItemsGroup',
+        label,
+        data: { insightCount: item.insights?.length ?? 0 },
+    };
+}
+
+function vibrancyAsInsight(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (cv !== 'vibrancyInsight') return null;
+    return {
+        type: 'vibrancyInsight',
+        label,
+        description: vibrancyDescription(item),
+        data: item.insight ? { insight: item.insight } : undefined,
+    };
+}
+
+function vibrancyAsBudgetGroup(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (cv !== 'vibrancyBudgetGroup') return null;
+    return {
+        type: 'vibrancyBudgetGroup',
+        label,
+        data: { budgetCount: item.budgetResults?.length ?? 0 },
+    };
+}
+
+function vibrancyAsBudgetItem(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (cv !== 'vibrancyBudgetItem') return null;
+    return {
+        type: 'vibrancyBudgetItem',
+        label,
+        description: vibrancyDescription(item),
+        data: item.budgetResult ? { budget: item.budgetResult } : undefined,
+    };
+}
+
+function vibrancyAsPrerelease(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (cv !== 'vibrancyPrerelease') return null;
+    return {
+        type: 'vibrancyPrerelease',
+        label,
+        data: {
+            packageName: item.packageName,
+            prereleaseVersion: item.prereleaseVersion,
+            prereleaseTag: item.prereleaseTag,
+        },
+    };
+}
+
+function vibrancyAsDetail(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (cv !== 'vibrancyDetailLink' && item.url === undefined) return null;
+    return {
+        type: 'vibrancyDetail',
+        label,
+        description: vibrancyDescription(item),
+        data: item.url ? { url: item.url } : undefined,
+    };
+}
+
+function vibrancyAsChildrenGroup(item: VibrancyTreeItem, label: string): JsonNode | null {
+    if (!Array.isArray(item.children)) return null;
+    return { type: 'vibrancyGroup', label };
+}
+
+function vibrancyAsFamily(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (cv !== 'vibrancyFamilyConflictGroup' && !item.split) return null;
+    return {
+        type: cv || 'vibrancyFamilySplit',
+        label,
+        data: item.split ? { split: item.split } : undefined,
+    };
+}
+
+function vibrancyAsProblem(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (!cv.startsWith('vibrancyProblem.') || !item.problem) return null;
+    const p = item.problem;
+    return {
+        type: 'vibrancyProblem',
+        label,
+        description: vibrancyDescription(item),
+        data: {
+            problemType: p.type,
+            severity: p.severity,
+            packageName: item.packageName,
+        },
+    };
+}
+
+function vibrancyAsSuggestion(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (!cv.startsWith('vibrancySuggestion.') || !item.action) return null;
+    return {
+        type: 'vibrancyProblemSuggestion',
+        label,
+        data: {
+            action: item.action,
+            unlocksPackages: item.unlocksPackages,
+        },
+    };
+}
+
+function vibrancyFallback(item: VibrancyTreeItem, label: string, cv: string): JsonNode | null {
+    if (!label) return null;
+    return {
+        type: cv || 'vibrancyItem',
+        label,
+        description: vibrancyDescription(item),
+    };
+}
 
 /** Serialize a Vibrancy tree node. Handles all 14+ node types. */
 export function serializeVibrancyNode(node: unknown): JsonNode | null {
-    const item = node as {
-        contextValue?: string;
-        result?: Record<string, unknown>;
-        section?: string;
-        results?: Array<{ package: { name: string } }>;
-        summary?: Record<string, unknown>;
-        analyses?: unknown[];
-        analysis?: Record<string, unknown>;
-        insights?: unknown[];
-        insight?: Record<string, unknown>;
-        budgetResults?: unknown[];
-        budgetResult?: Record<string, unknown>;
-        children?: unknown[];
-        packageName?: string;
-        prereleaseVersion?: string;
-        prereleaseTag?: string | null;
-        url?: string;
-        label?: string | TreeItemLabel;
-        description?: string;
-        split?: Record<string, unknown>;
-        problem?: Record<string, unknown>;
-        action?: Record<string, unknown>;
-        unlocksPackages?: string[];
-    };
+    const item = node as VibrancyTreeItem;
     if (!item || typeof item !== 'object') return null;
-
-    const label = typeof item.label === 'string'
-        ? item.label : (item.label as { label: string })?.label ?? '';
+    const label = vibrancyLabelOf(item);
     const cv = item.contextValue ?? '';
 
-    // PackageItem / SuppressedPackageItem
-    if (cv.startsWith('vibrancyPackage') && item.result) {
-        return {
-            type: 'vibrancyPackage',
-            label,
-            description: typeof item.description === 'string' ? item.description : undefined,
-            data: item.result as Record<string, unknown>,
-        };
-    }
-
-    // SectionGroupItem
-    if (cv === 'vibrancySectionGroup') {
-        return {
-            type: 'vibrancySectionGroup',
-            label,
-            data: {
-                section: item.section,
-                packageCount: item.results?.length ?? 0,
-                packages: item.results?.map(r => r.package.name) ?? [],
-            },
-        };
-    }
-
-    // SuppressedGroupItem
-    if (cv === 'vibrancySuppressedGroup') {
-        return { type: 'vibrancySuppressedGroup', label };
-    }
-
-    // DepGraphSummaryItem
-    if (cv === 'vibrancyDepGraphSummary') {
-        return {
-            type: 'vibrancyDepGraphSummary',
-            label,
-            data: item.summary ? { summary: item.summary } : undefined,
-        };
-    }
-
-    // OverridesGroupItem
-    if (cv === 'vibrancyOverridesGroup') {
-        return {
-            type: 'vibrancyOverridesGroup',
-            label,
-            data: { overrideCount: (item.analyses as unknown[])?.length ?? 0 },
-        };
-    }
-
-    // OverrideItem
-    if (cv === 'vibrancyOverrideStale' || cv === 'vibrancyOverrideActive') {
-        return {
-            type: 'vibrancyOverride',
-            label,
-            description: typeof item.description === 'string' ? item.description : undefined,
-            data: item.analysis ? { analysis: item.analysis } : undefined,
-        };
-    }
-
-    // ActionItemsGroupItem
-    if (cv === 'vibrancyActionItemsGroup') {
-        return {
-            type: 'vibrancyActionItemsGroup',
-            label,
-            data: { insightCount: (item.insights as unknown[])?.length ?? 0 },
-        };
-    }
-
-    // InsightItem
-    if (cv === 'vibrancyInsight') {
-        return {
-            type: 'vibrancyInsight',
-            label,
-            description: typeof item.description === 'string' ? item.description : undefined,
-            data: item.insight ? { insight: item.insight } : undefined,
-        };
-    }
-
-    // BudgetGroupItem
-    if (cv === 'vibrancyBudgetGroup') {
-        return {
-            type: 'vibrancyBudgetGroup',
-            label,
-            data: { budgetCount: (item.budgetResults as unknown[])?.length ?? 0 },
-        };
-    }
-
-    // BudgetItem
-    if (cv === 'vibrancyBudgetItem') {
-        return {
-            type: 'vibrancyBudgetItem',
-            label,
-            description: typeof item.description === 'string' ? item.description : undefined,
-            data: item.budgetResult ? { budget: item.budgetResult } : undefined,
-        };
-    }
-
-    // PrereleaseItem
-    if (cv === 'vibrancyPrerelease') {
-        return {
-            type: 'vibrancyPrerelease',
-            label,
-            data: {
-                packageName: item.packageName,
-                prereleaseVersion: item.prereleaseVersion,
-                prereleaseTag: item.prereleaseTag,
-            },
-        };
-    }
-
-    // DetailItem (with or without URL)
-    if (cv === 'vibrancyDetailLink' || (item.url !== undefined)) {
-        return {
-            type: 'vibrancyDetail',
-            label,
-            description: typeof item.description === 'string' ? item.description : undefined,
-            data: item.url ? { url: item.url } : undefined,
-        };
-    }
-
-    // GroupItem (children container like "Version", "Update", "Community", etc.)
-    if (Array.isArray(item.children)) {
-        return {
-            type: 'vibrancyGroup',
-            label,
-        };
-    }
-
-    // FamilyConflictGroupItem / FamilySplitItem
-    if (cv === 'vibrancyFamilyConflictGroup' || item.split) {
-        return {
-            type: cv || 'vibrancyFamilySplit',
-            label,
-            data: item.split ? { split: item.split } : undefined,
-        };
-    }
-
-    // ProblemItem (contextValue = "vibrancyProblem.{type}") — problem nodes live in the packages tree.
-    if (cv.startsWith('vibrancyProblem.') && item.problem) {
-        return {
-            type: 'vibrancyProblem',
-            label,
-            description: typeof item.description === 'string' ? item.description : undefined,
-            data: {
-                problemType: (item.problem as Record<string, unknown>).type,
-                severity: (item.problem as Record<string, unknown>).severity,
-                packageName: item.packageName,
-            },
-        };
-    }
-
-    // SuggestionItem (contextValue = "vibrancySuggestion.{type}") — action suggestion nodes.
-    if (cv.startsWith('vibrancySuggestion.') && item.action) {
-        return {
-            type: 'vibrancyProblemSuggestion',
-            label,
-            data: {
-                action: item.action as Record<string, unknown>,
-                unlocksPackages: item.unlocksPackages,
-            },
-        };
-    }
-
-    // Fallback for any other vibrancy node
-    if (label) {
-        return {
-            type: cv || 'vibrancyItem',
-            label,
-            description: typeof item.description === 'string' ? item.description : undefined,
-        };
-    }
-
-    return null;
+    return (
+        vibrancyAsPackage(item, label, cv)
+        ?? vibrancyAsSectionGroup(item, label, cv)
+        ?? vibrancyAsSuppressedGroup(label, cv)
+        ?? vibrancyAsDepGraphSummary(item, label, cv)
+        ?? vibrancyAsOverridesGroup(item, label, cv)
+        ?? vibrancyAsOverride(item, label, cv)
+        ?? vibrancyAsActionItemsGroup(item, label, cv)
+        ?? vibrancyAsInsight(item, label, cv)
+        ?? vibrancyAsBudgetGroup(item, label, cv)
+        ?? vibrancyAsBudgetItem(item, label, cv)
+        ?? vibrancyAsPrerelease(item, label, cv)
+        ?? vibrancyAsDetail(item, label, cv)
+        ?? vibrancyAsChildrenGroup(item, label)
+        ?? vibrancyAsFamily(item, label, cv)
+        ?? vibrancyAsProblem(item, label, cv)
+        ?? vibrancyAsSuggestion(item, label, cv)
+        ?? vibrancyFallback(item, label, cv)
+    );
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
