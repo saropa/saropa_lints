@@ -71,6 +71,12 @@
           "when": "saropaLints.enabled"
         },
         {
+          "id": "saropaLints.rulePacks",
+          "name": "Rule Packs",
+          "type": "webview",
+          "when": "saropaLints.isDartProject && saropaLints.enabled"
+        },
+        {
           "id": "saropaLints.suggestions",
           "name": "Suggestions",
           "when": "saropaLints.hasViolations"
@@ -1191,8 +1197,8 @@
           "saropaLints.todosAndHacks.includeGlobs": {
             "type": "array",
             "items": { "type": "string" },
-            "default": ["**/*.dart", "**/*.yaml", "**/*.md", "**/*.ts", "**/*.js"],
-            "description": "Glob patterns for files to scan."
+            "default": ["**/*.dart", "**/*.yaml", "**/*.ts", "**/*.js"],
+            "description": "Glob patterns for files to scan (code and config by default). Add **/*.md to include Markdown docs."
           },
           "saropaLints.todosAndHacks.excludeGlobs": {
             "type": "array",
@@ -1735,7 +1741,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run precompile && npm run check-types && node esbuild.js --production",
     "lint": "tsc --noEmit -p ./",
-    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" --timeout 10000"
+    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/rulePacks/**/*.test.js\" --timeout 10000"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

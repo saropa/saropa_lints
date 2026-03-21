@@ -29,6 +29,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Added
 
+• **VS Code extension** — **Rule Packs** sidebar webview: per-pack row (label, detected in pubspec, enable toggle, rule count, “Rules” opens Quick Pick of rule codes), plus **target platforms** table (android/ios/web/windows/macos/linux) when embedder folders exist. Writes `plugins.saropa_lints.rule_packs.enabled` in `analysis_options.yaml`.
+
+• **Analyzer plugin** — `rule_packs.enabled` under `plugins.saropa_lints` merges the corresponding rule codes from `lib/src/config/rule_packs.dart` into the effective enabled set (after `diagnostics:`).
+
 • **Lint rules** — **compile-time Dart shape** (ERROR/WARNING, Essential): ten rules aligned with analyzer compile-time diagnostics — `duplicate_constructor`, `conflicting_constructor_and_static_member`, `duplicate_field_name`, `field_initializer_redirecting_constructor`, `invalid_super_formal_parameter_location`, `illegal_concrete_enum_member`, `invalid_extension_argument_count`, `invalid_field_name` (keyword-tokens on record labels when present in AST), `invalid_literal_annotation`, `invalid_non_virtual_annotation`. Implementation: `lib/src/rules/architecture/compile_time_syntax_rules.dart`, record/extension rules in `type_rules.dart`; fixture `example/lib/plan_additional_rules_21_30_fixture.dart`.
 
 • **Lint rules** — **Dart SDK 3.0 removed APIs** (WARNING, Recommended): fifteen migration rules with targeted quick fixes where safe — `avoid_deprecated_list_constructor`, `avoid_removed_proxy_annotation`, `avoid_removed_provisional_annotation`, `avoid_deprecated_expires_getter`, `avoid_removed_cast_error`, `avoid_removed_fall_through_error`, `avoid_removed_abstract_class_instantiation_error`, `avoid_removed_cyclic_initialization_error`, `avoid_removed_nosuchmethoderror_default_constructor`, `avoid_removed_bidirectional_iterator`, `avoid_removed_deferred_library`, `avoid_deprecated_has_next_iterator`, `avoid_removed_max_user_tags_constant`, `avoid_removed_dart_developer_metrics`, `avoid_deprecated_network_interface_list_supported`. See `lib/src/rules/config/dart_sdk_3_removal_rules.dart`.
@@ -38,6 +42,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 • **Lint rule** — **prefer_overflow_bar_over_button_bar** (INFO, Recommended): flags `ButtonBar` usage; prefer `OverflowBar` for Material action layouts (Flutter 3.13 guidance, PR #128437).
 
 ### Changed
+
+• **VS Code extension** — **TODOs & Hacks** default `includeGlobs` no longer scans `**/*.md` (Markdown READMEs/plans often match tag words in prose). Defaults remain Dart, YAML, TypeScript, and JavaScript; add `**/*.md` in settings if you want docs included. `package.json` defaults and `todosAndHacksDefaults.ts` stay in sync (unit test).
+
+• **Dart SDK** — `example*` and `self_check` `pubspec.yaml` floors aligned to `>=3.9.0` with the main package ([PACKAGE_VIBRANCY.md](https://github.com/saropa/saropa_lints/blob/main/PACKAGE_VIBRANCY.md) legacy-support baseline), replacing stale lower example constraints.
 
 • **Dart SDK 3.0 migration rules** — `avoid_removed_max_user_tags_constant` and `avoid_removed_dart_developer_metrics` use **high** [LintImpact] (removed APIs are compile failures on Dart 3). File header and rule DartDocs in `dart_sdk_3_removal_rules.dart` expanded for reviewers and false-positive contracts.
 

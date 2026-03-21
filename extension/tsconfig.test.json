@@ -7,13 +7,17 @@
   },
   "include": [
     "src/services/todosAndHacksScannerCore.ts",
+    "src/views/todosAndHacksDefaults.ts",
     "src/test/todosAndHacks/**/*.ts",
     "src/driftAdvisor/types.ts",
     "src/driftAdvisor/discovery.ts",
     "src/driftAdvisor/client.ts",
     "src/test/driftAdvisor/**/*.ts",
     "src/vibrancy/**/*.ts",
-    "src/test/vibrancy/services/review-state.test.ts"
+    "src/test/vibrancy/services/review-state.test.ts",
+    "src/rulePacks/rulePackDefinitions.ts",
+    "src/rulePacks/rulePackYaml.ts",
+    "src/test/rulePacks/**/*.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }
