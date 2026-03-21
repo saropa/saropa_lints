@@ -4,6 +4,8 @@ library;
 import 'dart:developer' as dev;
 import 'dart:io';
 
+import 'package:saropa_lints/src/config/analysis_options_rule_packs.dart';
+import 'package:saropa_lints/src/config/rule_packs.dart';
 import 'package:saropa_lints/src/init/cli_args.dart';
 import 'package:saropa_lints/src/init/config_reader.dart';
 import 'package:saropa_lints/src/init/config_writer.dart';
@@ -14,6 +16,7 @@ import 'package:saropa_lints/src/init/init_post_write.dart';
 import 'package:saropa_lints/src/init/migration.dart';
 import 'package:saropa_lints/src/init/platforms_packages.dart';
 import 'package:saropa_lints/src/init/preflight.dart';
+import 'package:saropa_lints/src/init/rule_packs_init.dart';
 import 'package:saropa_lints/src/init/project_info.dart';
 import 'package:saropa_lints/src/init/rule_metadata.dart';
 import 'package:saropa_lints/src/init/tier_ui.dart';
@@ -122,6 +125,24 @@ Future<void> runInit(List<String> args) async {
       ? Directory(cliArgs.targetDir!).absolute.path
       : Directory.current.path;
 
+  if (cliArgs.listPacksOnly) {
+    printRulePacksInitSummary(targetDir: targetDir);
+    return;
+  }
+
+  if (cliArgs.enablePackIds.isNotEmpty) {
+    for (final String id in cliArgs.enablePackIds) {
+      if (!knownRulePackIds.contains(id)) {
+        stderr.writeln('Unknown rule pack: $id');
+        stderr.writeln(
+          'Valid ids: ${(knownRulePackIds.toList()..sort()).join(', ')}',
+        );
+        exitCode = 1;
+        return;
+      }
+    }
+  }
+
   log.terminal('');
   log.terminal('${InitColors.cyan}SAROPA LINTS${InitColors.reset} v$version');
   log.terminal('${InitColors.dim}Source: $source${InitColors.reset}');
@@ -172,6 +193,8 @@ Future<void> runInit(List<String> args) async {
 
   // Run pre-flight validation checks (non-fatal warnings)
   runPreflightChecks(log, version: version, targetDir: targetDir);
+
+  printRulePacksInitSummary(targetDir: targetDir);
 
   // tiers.dart is the source of truth for all rules
   // A unit test validates that all plugin rules are in tiers.dart
@@ -426,6 +449,13 @@ Future<void> runInit(List<String> args) async {
     packageFilteredRules: packageDisabledRules,
   );
 
+  final List<String> mergedRulePacks = cliArgs.isReset
+      ? mergeRulePackIdsForInit(const [], cliArgs.enablePackIds)
+      : mergeRulePackIdsForInit(
+          parseRulePacksEnabledList(existingContent),
+          cliArgs.enablePackIds,
+        );
+
   // Generate the new plugins section with proper formatting
   final String pluginsYaml = generatePluginsYaml(
     tier: resolvedTier,
@@ -435,6 +465,7 @@ Future<void> runInit(List<String> args) async {
     allRules: allRules,
     platformSettings: platformSettings,
     packageSettings: packageSettings,
+    rulePacksEnabled: mergedRulePacks,
   );
 
   // Replace plugins section in existing content, preserving everything else

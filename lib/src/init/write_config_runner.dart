@@ -6,6 +6,7 @@ library;
 
 import 'dart:io';
 
+import 'package:saropa_lints/src/config/analysis_options_rule_packs.dart';
 import 'package:saropa_lints/src/init/cli_args.dart';
 import 'package:saropa_lints/src/init/config_reader.dart';
 import 'package:saropa_lints/src/init/config_writer.dart';
@@ -166,6 +167,10 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
     userCustomizations = {...userCustomizations, ...permanentOverrides};
   }
 
+  final List<String> preservedRulePacks = options.reset
+      ? const <String>[]
+      : parseRulePacksEnabledList(existingContent);
+
   final version = getPackageVersion();
   final pluginsYaml = generatePluginsYaml(
     tier: resolvedTier,
@@ -175,6 +180,7 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
     allRules: allRules,
     platformSettings: platformSettings,
     packageSettings: packageSettings,
+    rulePacksEnabled: preservedRulePacks,
   );
 
   final newContent = replacePluginsSection(existingContent, pluginsYaml);

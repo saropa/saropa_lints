@@ -31,7 +31,7 @@ const Map<String, String> tierDescriptions = <String, String>{
 
 /// Struct for parsed CLI arguments.
 class CliArgs {
-  const CliArgs({
+  CliArgs({
     required this.isShowHelp,
     required this.isDryRun,
     required this.isReset,
@@ -40,6 +40,8 @@ class CliArgs {
     required this.isFixIgnores,
     required this.outputPath,
     required this.tier,
+    required this.listPacksOnly,
+    required this.enablePackIds,
     this.targetDir,
   });
 
@@ -56,6 +58,12 @@ class CliArgs {
   final bool isFixIgnores;
   final String outputPath;
   final String? tier;
+
+  /// Print applicable rule packs and exit (no YAML write).
+  final bool listPacksOnly;
+
+  /// `--enable-pack <id>` (repeatable); merged into `rule_packs.enabled`.
+  final List<String> enablePackIds;
 
   /// Target project directory. `null` means current working directory.
   final String? targetDir;
@@ -125,6 +133,17 @@ CliArgs parseArguments(List<String> args) {
     }
   }
 
+  final bool listPacksOnly = args.contains('--list-packs');
+  final List<String> enablePackIds = <String>[];
+  for (int i = 0; i < args.length; i++) {
+    if (args[i] == '--enable-pack' &&
+        i + 1 < args.length &&
+        !args[i + 1].startsWith('-')) {
+      enablePackIds.add(args[i + 1]);
+      i++;
+    }
+  }
+
   return CliArgs(
     isShowHelp: showHelp,
     isDryRun: dryRun,
@@ -134,6 +153,8 @@ CliArgs parseArguments(List<String> args) {
     isFixIgnores: fixIgnores,
     outputPath: outputPath,
     tier: requestedTier,
+    listPacksOnly: listPacksOnly,
+    enablePackIds: enablePackIds,
     targetDir: targetDir,
   );
 }

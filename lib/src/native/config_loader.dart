@@ -23,6 +23,8 @@ import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import '../banned_usage_config.dart';
 import '../baseline/baseline_config.dart';
 import '../baseline/baseline_manager.dart';
+import '../config/analysis_options_rule_packs.dart';
+import '../config/pubspec_lock_resolver.dart';
 import '../config/rule_packs.dart';
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 
@@ -217,38 +219,53 @@ void _loadDiagnosticsConfig() {
   SaropaLintRule.disabledRules = disabled.isEmpty ? null : disabled;
 }
 
+/// Rule codes last merged from `rule_packs.enabled` (subtract before re-merge).
+Set<String>? _packContributedCodes;
+
 /// Parses `rule_packs.enabled` under `plugins.saropa_lints` and merges rule
 /// codes via [mergeRulePacksIntoEnabled] (respects [SaropaLintRule.disabledRules]).
+///
+/// Uses [Directory.current] for `analysis_options.yaml` and `pubspec.lock`.
 void _loadRulePacksConfig() {
-  final content = _readProjectFile('analysis_options.yaml');
-  if (content == null) return;
+  _reloadRulePacksFromRoot(Directory.current.path);
+}
+
+/// Re-merges rule packs using [projectRoot] for config and lockfile (Phase 3).
+///
+/// Call when the real project root is known (e.g. first analyzed file). Removes
+/// only rule codes contributed by the previous pack merge so tier/diagnostics
+/// enables are preserved. If the analyzer already registered rules, newly added
+/// pack codes may not run until the next analysis server restart when cwd
+/// differed from [projectRoot] at plugin start.
+void loadRulePacksConfigFromProjectRoot(String projectRoot) {
+  if (projectRoot.isEmpty) return;
+  _reloadRulePacksFromRoot(projectRoot);
+}
+
+void _reloadRulePacksFromRoot(String projectRoot) {
+  final enabled = SaropaLintRule.enabledRules ?? <String>{};
+  if (_packContributedCodes != null) {
+    enabled.removeAll(_packContributedCodes!);
+  }
+
+  final content = _readProjectFile('analysis_options.yaml', projectRoot);
+  if (content == null) {
+    _packContributedCodes = {};
+    SaropaLintRule.enabledRules = enabled.isEmpty ? null : enabled;
+    return;
+  }
 
   final normalized =
       content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
-  final packIds = _parseRulePackEnabledList(normalized);
-  if (packIds.isEmpty) return;
-
-  final enabled = SaropaLintRule.enabledRules ?? <String>{};
-  mergeRulePacksIntoEnabled(
+  final packIds = parseRulePacksEnabledList(normalized);
+  final lockVersions = readResolvedPackageVersions(projectRoot);
+  _packContributedCodes = mergeRulePacksIntoEnabled(
     enabled,
     SaropaLintRule.disabledRules,
     packIds,
+    resolvedVersions: lockVersions,
   );
-  SaropaLintRule.enabledRules = enabled;
-}
-
-/// Extracts pack ids from `rule_packs:` → `enabled:` list under the plugin block.
-List<String> _parseRulePackEnabledList(String content) {
-  final m = RegExp(
-    r'rule_packs:\s*\n\s*enabled:\s*\n((?:\s+-\s+\w+\s*\n)+)',
-    multiLine: true,
-  ).firstMatch(content);
-  if (m == null) return const [];
-  final block = m.group(1)!;
-  return RegExp(r'-\s+(\w+)')
-      .allMatches(block)
-      .map((Match x) => x.group(1)!)
-      .toList();
+  SaropaLintRule.enabledRules = enabled.isEmpty ? null : enabled;
 }
 
 /// Parse `baseline:` section and initialize [BaselineManager].

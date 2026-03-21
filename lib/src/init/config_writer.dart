@@ -21,6 +21,7 @@ String generatePluginsYaml({
   required Set<String> allRules,
   required Map<String, bool> platformSettings,
   required Map<String, bool> packageSettings,
+  List<String> rulePacksEnabled = const [],
 }) {
   final StringBuffer buffer = StringBuffer();
   final customizedRuleNames = userCustomizations.keys.toSet();
@@ -33,6 +34,14 @@ String generatePluginsYaml({
     buffer.writeln('    version: "$packageVersion"');
   } else {
     buffer.writeln('    # version: unknown — run dart pub get to resolve');
+  }
+  if (rulePacksEnabled.isNotEmpty) {
+    final sorted = List<String>.of(rulePacksEnabled)..sort();
+    buffer.writeln('    rule_packs:');
+    buffer.writeln('      enabled:');
+    for (final String id in sorted) {
+      buffer.writeln('        - $id');
+    }
   }
   buffer.writeln(
     '    # ═══════════════════════════════════════════════════════════════════',

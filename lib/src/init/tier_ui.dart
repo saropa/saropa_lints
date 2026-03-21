@@ -25,6 +25,8 @@ Options:
   -t, --tier <tier>     Tier level (1-5 or name, defaults to recommended)
   -o, --output <file>   Output file (default: analysis_options.yaml)
   --target <path>       Target project directory (default: current directory)
+  --list-packs          List applicable rule packs from pubspec.lock, then exit
+  --enable-pack <id>    Add pack to rule_packs.enabled (repeatable); merged with existing
   --stylistic-all       Bulk-enable all stylistic rules
   --no-stylistic        Exclude stylistic rules (default)
   --fix-ignores         Auto-convert v4 ignore comments
@@ -43,6 +45,8 @@ Examples:
   dart run saropa_lints:init --tier professional --target /path/to/project
   dart run saropa_lints:init --tier recommended --stylistic-all
   dart run saropa_lints:init --dry-run --tier recommended
+  dart run saropa_lints:init --list-packs
+  dart run saropa_lints:init --tier recommended --enable-pack riverpod
 
 After generating, run `dart analyze` to verify.
 ''');
