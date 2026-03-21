@@ -5,7 +5,7 @@
 - Warning icon for high-impact files
 - Summary: "Top N files have X% of critical issues"
 
-Click any file to filter the Issues view.
+Click any file to filter the Violations view.
 
 **Trends** — The Overview shows score progression over time (e.g. "62 → 71 → 78 over 2 weeks"). Last 20 analysis snapshots are tracked.
 

@@ -2,7 +2,7 @@
  * D1: Security Posture tree — OWASP Top 10 coverage matrix.
  *
  * Two collapsible parents ("Mobile Top 10", "Web Top 10"), each with
- * category rows showing violation counts. Click filters Issues view
+ * category rows showing violation counts. Click filters Violations view
  * to rules mapped to that OWASP category.
  *
  * OWASP ID contract: violations.json stores OWASP categories as short-form
@@ -84,7 +84,7 @@ class CategoryItem extends vscode.TreeItem {
     );
     this.contextValue = 'securityCategory';
     if (count > 0 && rules.length > 0) {
-      // D1: Click to filter Issues view to rules mapped to this category.
+      // D1: Click to filter Violations view to rules mapped to this category.
       this.command = {
         command: 'saropaLints.focusIssuesForOwasp',
         title: 'Show issues',

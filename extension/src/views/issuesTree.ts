@@ -1,5 +1,5 @@
 /**
- * Tree data provider for Saropa Lints Issues view.
+ * Tree data provider for the Violations view (lint findings from violations.json).
  * Structure: Severity (Error, Warning, Info) → folder path tree → file → violations (capped).
  * Supports text/type filters and suppressions (hide folder, file, rule). Scale-safe for 65k+ issues.
  */
@@ -54,6 +54,14 @@ function getPageSize(): number {
  * across severities and group by the chosen dimension.
  */
 export type GroupByMode = 'severity' | 'file' | 'impact' | 'rule' | 'owasp';
+
+const GROUP_BY_MODES: readonly GroupByMode[] = ['severity', 'file', 'impact', 'rule', 'owasp'];
+
+/** Default grouping for new workspaces: impact surfaces Critical / High first. */
+export function parseViolationsGroupBy(cfg: vscode.WorkspaceConfiguration): GroupByMode {
+  const raw = cfg.get<string>('violationsGroupBy', 'impact') ?? 'impact';
+  return (GROUP_BY_MODES as readonly string[]).includes(raw) ? (raw as GroupByMode) : 'impact';
+}
 
 /** Discriminated union for all node types in the Issues tree. */
 export type IssueTreeNode =
@@ -207,7 +215,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   private impactsToShow = new Set<string>(['critical', 'high', 'medium', 'low', 'opinionated']);
   private rulesToHide = new Set<string>();
   private focusedFile: string | undefined = undefined;
-  private groupBy: GroupByMode = 'severity';
+  private groupBy: GroupByMode;
   private cachedIndex: Map<string, Map<string, Violation[]>> | null = null;
   private totalUnfiltered = 0;
   /** Rules that have quick-fix generators. Null = unknown (older analyzer), treat all as fixable. */
@@ -216,6 +224,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   constructor(workspaceState: vscode.Memento) {
     this.workspaceState = workspaceState;
     this.suppressions = loadSuppressions(workspaceState);
+    this.groupBy = parseViolationsGroupBy(vscode.workspace.getConfiguration('saropaLints'));
   }
 
   hasViolations(): boolean {

@@ -61,6 +61,20 @@ export class TodosAndHacksTreeProvider implements vscode.TreeDataProvider<TodoTr
     this._onDidChangeTreeData.fire();
   }
 
+  /** Total markers from last scan(s), or undefined if TODOs view has not been scanned yet. */
+  getCachedMarkerCount(): number | undefined {
+    if (this.allMarkers !== null) {
+      return this.allMarkers.length;
+    }
+    let total = 0;
+    let any = false;
+    for (const r of this.cacheByFolder.values()) {
+      any = true;
+      total += r.markers.length;
+    }
+    return any ? total : undefined;
+  }
+
   getTreeItem(element: TodoTreeNode): vscode.TreeItem {
     if (element.kind === 'placeholder') {
       const item = new vscode.TreeItem(element.message, vscode.TreeItemCollapsibleState.None);

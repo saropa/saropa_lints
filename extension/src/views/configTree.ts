@@ -4,7 +4,7 @@
  *
  * I1: The triage section shows rules grouped by priority (critical, volume A–D,
  * stylistic) so users can see which rules produce the most violations and
- * navigate to them in the Issues view.
+ * navigate to them in the Violations view.
  */
 
 import * as vscode from 'vscode';

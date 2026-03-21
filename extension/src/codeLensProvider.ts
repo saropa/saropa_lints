@@ -1,6 +1,6 @@
 /**
- * Code Lens provider for Dart files: shows "Saropa Lints: N issues — Show in Saropa"
- * above the first line when the file has violations. Click focuses the Issues view filtered to this file.
+ * Code Lens provider for Dart files: shows violation count and opens the Violations view
+ * for this file. Placed above the first line when the file has violations.
  */
 
 import * as vscode from 'vscode';
@@ -41,10 +41,10 @@ export function registerCodeLensProvider(context: vscode.ExtensionContext): void
       // H4: Show critical count when present.
       const critical = fileViolations.filter((v) => v.impact === 'critical').length;
       const suffix = critical > 0 ? ` (${critical} critical)` : '';
-      const issueText = count === 1 ? '1 issue' : `${count} issues`;
+      const violationText = count === 1 ? '1 violation' : `${count} violations`;
 
       const lens = new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
-        title: `Saropa: ${issueText}${suffix} \u2014 Show in Saropa`,
+        title: `Saropa: ${violationText}${suffix} \u2014 Show in Saropa`,
         command: 'saropaLints.focusIssuesForFile',
         arguments: [relativePath],
       });

@@ -81,8 +81,11 @@ export class RulePacksWebviewProvider implements vscode.WebviewViewProvider {
       const count = def.ruleCodes.length;
       const detLabel = detected ? 'Yes' : 'No';
       const detClass = detected ? 'ok' : 'muted';
+      const gateLine = def.dependencyGate
+        ? `<div class="gate">${escapeHtml(def.dependencyGate.package)} ${escapeHtml(def.dependencyGate.constraint)} in pubspec.lock</div>`
+        : '';
       return `<tr data-pack="${escapeHtml(def.id)}">
-  <td class="pack-name">${escapeHtml(def.label)}</td>
+  <td class="pack-name">${escapeHtml(def.label)}${gateLine}</td>
   <td class="${detClass}">${detLabel}</td>
   <td><label class="switch"><input type="checkbox" data-pack="${escapeHtml(def.id)}" ${enabled ? 'checked' : ''} /><span class="slider"></span></label></td>
   <td class="num">${count}</td>
@@ -162,6 +165,7 @@ a { color: var(--vscode-textLink-foreground); cursor: pointer; }
 .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background: var(--vscode-foreground); border-radius: 50%; opacity: 0.5; transition: .15s; }
 input:checked + .slider:before { transform: translateX(14px); opacity: 1; }
 .plat th { width: 40%; }
+.gate { font-size: 10px; opacity: 0.7; margin-top: 2px; font-weight: normal; }
 </style></head><body>${body}${script}</body></html>`;
   }
 
