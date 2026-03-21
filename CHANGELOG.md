@@ -27,6 +27,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ## [Unreleased]
 
+### Fixed
+
+• **VS Code extension** — Sonar-driven cleanup: batch `context.subscriptions.push` where it was split unnecessarily (`extension.ts`), and refactor vibrancy “Copy as JSON” serialization into small matchers with documented dispatch order (`treeSerializers.ts`). Adds unit tests for `serializeVibrancyNode` (including false-positive guards for partial package/problem/suggestion payloads).
+
 ### Added
 
 • **VS Code extension** — **Rule Packs** sidebar webview: per-pack row (label, detected in pubspec, enable toggle, rule count, “Rules” opens Quick Pick of rule codes), plus **target platforms** table (android/ios/web/windows/macos/linux) when embedder folders exist. Writes `plugins.saropa_lints.rule_packs.enabled` in `analysis_options.yaml`.
@@ -48,6 +52,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 • **Lint rule** — **prefer_overflow_bar_over_button_bar** (INFO, Recommended): flags `ButtonBar` usage; prefer `OverflowBar` for Material action layouts (Flutter 3.13 guidance, PR #128437).
 
 ### Changed
+
+• **VS Code extension** — **Overview & options** sidebar: **Workspace options** embeds the same tree as the standalone Config view; section toggles show counts in the label (e.g. `Package Vibrancy (2)`) with **On**/**Off** in the description; intro links (pub.dev, About, Getting Started) remain visible whenever Saropa is enabled; standalone Config defaults off (`saropaLints.sidebar.showConfig`). Command **Saropa Lints: Open package on pub.dev** (`saropaLints.openPubDevSaropaLints`). Overview **Copy as JSON** recurses through nested children. Unit tests: `sidebarToggleLabel`, `overviewEmbeddedConfigKinds`.
 
 • **Rule packs** — Maintainer workflow documented in `doc/guides/rule_packs.md` (regenerate, composite map, audit). Added `test/rule_pack_registry_test.dart` (composite `avoid_isar_import_with_drift` on drift + isar; `collection_compat` merge) and expanded pubspec-marker false-positive coverage. README badge rule count aligned with `pubspec.yaml` (2105).
 

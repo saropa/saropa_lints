@@ -20,7 +20,14 @@
     "src/test/rulePacks/**/*.ts",
     "src/sidebarSectionVisibility.ts",
     "src/sidebarSectionVisibilityKeys.ts",
-    "src/test/sidebarSectionVisibilityKeys.test.ts"
+    "src/sidebarToggleLabel.ts",
+    "src/overviewEmbeddedConfigKinds.ts",
+    "src/test/sidebarSectionVisibilityKeys.test.ts",
+    "src/test/sidebarToggleLabel.test.ts",
+    "src/test/overviewEmbeddedConfigKinds.test.ts",
+    "src/copyTreeAsJson.ts",
+    "src/treeSerializers.ts",
+    "src/test/treeSerializers.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

@@ -53,7 +53,7 @@
       "saropaLints": [
         {
           "id": "saropaLints.overview",
-          "name": "Overview",
+          "name": "Overview & options",
           "when": "saropaLints.sidebar.showOverview"
         },
         {
@@ -131,11 +131,6 @@
         "view": "saropaLints.overview",
         "contents": "Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.\n\nSaropa Lints is off for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
         "when": "saropaLints.isDartProject && !saropaLints.enabled"
-      },
-      {
-        "view": "saropaLints.overview",
-        "contents": "Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.\n\nNo analysis yet.\n\n[Run Analysis](command:saropaLints.runAnalysis)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
-        "when": "saropaLints.enabled && !saropaLints.hasViolations"
       },
       {
         "view": "saropaLints.issues",
@@ -356,6 +351,11 @@
         "command": "saropaLints.showAbout",
         "title": "About Saropa Lints",
         "icon": "$(info)"
+      },
+      {
+        "command": "saropaLints.openPubDevSaropaLints",
+        "title": "Saropa Lints: Open package on pub.dev",
+        "icon": "$(link-external)"
       },
       {
         "command": "saropaLints.createSaropaInstructions",
@@ -1199,7 +1199,7 @@
           "saropaLints.sidebar.showOverview": {
             "type": "boolean",
             "default": true,
-            "description": "Show the Overview section in the Saropa Lints activity bar."
+            "description": "Show the Overview & options view (intro, workspace options, section toggles, dashboard)."
           },
           "saropaLints.sidebar.showIssues": {
             "type": "boolean",
@@ -1213,8 +1213,8 @@
           },
           "saropaLints.sidebar.showConfig": {
             "type": "boolean",
-            "default": true,
-            "description": "Show the Config section."
+            "default": false,
+            "description": "Show the standalone Config section. Workspace options also appear under Overview & options."
           },
           "saropaLints.sidebar.showRulePacks": {
             "type": "boolean",
@@ -1814,7 +1814,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run precompile && npm run check-types && node esbuild.js --production",
     "lint": "tsc --noEmit -p ./",
-    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" --timeout 10000"
+    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" --timeout 10000"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
