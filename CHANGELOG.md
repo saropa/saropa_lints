@@ -31,6 +31,10 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 • **VS Code extension** — Sonar-driven cleanup: batch `context.subscriptions.push` where it was split unnecessarily (`extension.ts`), and refactor vibrancy “Copy as JSON” serialization into small matchers with documented dispatch order (`treeSerializers.ts`). Adds unit tests for `serializeVibrancyNode` (including false-positive guards for partial package/problem/suggestion payloads).
 
+### Changed
+
+• **VS Code extension** — **Default-on UX:** `saropaLints.enabled` defaults **true**; Overview always shows workspace options and sidebar toggles for Dart projects (no empty tree + “off” welcome). Config and Rule Packs views depend on `saropaLints.isDartProject` + sidebar settings, not on `enabled`. **TODOs & Hacks** workspace scan is opt-in via new `saropaLints.todosAndHacks.workspaceScanEnabled` (default **false**) with command **TODOs & Hacks: Enable workspace scan**. Commands renamed for clarity (**Set Up Project** / **Turn Off Lint Integration**). Sidebar section counts still reflect `violations.json` even when integration is off; Vibrancy package count is supplied by the extension host (`getLatestResults().length`) so `sidebarSectionCounts` stays testable. New modules/tests: `suggestionCounts.ts`, `suggestionCounts.test.ts`, `sidebarSectionCounts.test.ts`.
+
 ### Added
 
 • **Composite analyzer plugin API** — `registerSaropaLintRules(PluginRegistry)` on `package:saropa_lints/saropa_lints.dart` (used by `lib/main.dart`); skips rules via `SaropaLintRule.isDisabled` (canonical name or `configAliases`). Re-export `loadNativePluginConfig`, `loadOutputConfigFromProjectRoot`, `loadRulePacksConfigFromProjectRoot` for meta-plugins. Guide: `doc/guides/composite_analyzer_plugin.md`. Tests: `test/saropa_plugin_registration_test.dart`. Template note: `example/analysis_options_template.yaml`.

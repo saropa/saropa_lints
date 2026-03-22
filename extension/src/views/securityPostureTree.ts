@@ -128,9 +128,6 @@ export class SecurityPostureTreeProvider implements vscode.TreeDataProvider<Secu
     const root = getProjectRoot();
     if (!root) return [];
 
-    const cfg = vscode.workspace.getConfiguration('saropaLints');
-    if (!(cfg.get<boolean>('enabled', false) ?? false)) return [];
-
     const data = readViolations(root);
     if (!data) return [];
 

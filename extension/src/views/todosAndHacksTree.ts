@@ -1,8 +1,19 @@
 /**
- * Tree data provider for the TODOs & Hacks view.
- * Shows task markers (open tasks, fixmes, hacks, bugs) by folder → file → line, or by tag → file → line.
+ * # TODOs & Hacks — tree data provider
  *
- * Scan scope is driven by `saropaLints.todosAndHacks.includeGlobs` (see `./todosAndHacksDefaults.ts`).
+ * Lists task markers (TODO, FIXME, …) as **folder → file → line**, or **tag → file → line**
+ * when `groupByTag` is on. Globs and tags default from `./todosAndHacksDefaults.ts`.
+ *
+ * ## Workspace scan gate
+ *
+ * Scanning many files is CPU/disk heavy. `saropaLints.todosAndHacks.workspaceScanEnabled`
+ * defaults **false**; until the user opts in, the root is a single row that runs
+ * `saropaLints.todosAndHacks.enableWorkspaceScan`. Extension save debounce and “Scanning…”
+ * messages only apply when the gate is on.
+ *
+ * ## Concurrency
+ *
+ * `ensureScanPromise` prevents duplicate full scans when multiple tag nodes expand together.
  */
 
 import * as vscode from 'vscode';
@@ -20,7 +31,8 @@ type TodoTreeNode =
   | { kind: 'file'; folderUri: string; filePath: string; markers: TaskMarker[] }
   | { kind: 'line'; marker: TaskMarker }
   | { kind: 'tag'; tag: string }
-  | { kind: 'placeholder'; message: string };
+  | { kind: 'placeholder'; message: string }
+  | { kind: 'enableWorkspaceScan' };
 
 type Options = ReturnType<typeof getOptions>;
 
@@ -30,6 +42,7 @@ function getOptions(): {
   excludeGlobs: string[];
   maxFilesToScan: number;
   groupByTag: boolean;
+  workspaceScanEnabled: boolean;
   customRegex?: string;
 } {
   const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
@@ -39,6 +52,7 @@ function getOptions(): {
     excludeGlobs: cfg.get<string[]>('excludeGlobs', [...DEFAULT_TODOS_AND_HACKS_EXCLUDE_GLOBS]),
     maxFilesToScan: cfg.get<number>('maxFilesToScan', 2000),
     groupByTag: cfg.get<boolean>('groupByTag', false),
+    workspaceScanEnabled: cfg.get<boolean>('workspaceScanEnabled', false) ?? false,
     customRegex: cfg.get<string>('customRegex') || undefined,
   };
 }
@@ -76,6 +90,19 @@ export class TodosAndHacksTreeProvider implements vscode.TreeDataProvider<TodoTr
   }
 
   getTreeItem(element: TodoTreeNode): vscode.TreeItem {
+    if (element.kind === 'enableWorkspaceScan') {
+      const item = new vscode.TreeItem('Enable workspace scan…', vscode.TreeItemCollapsibleState.None);
+      item.description = 'TODO/FIXME search (resource-intensive)';
+      item.tooltip = 'Turn on to scan files for comment markers (up to saropaLints.todosAndHacks.maxFilesToScan). Off by default.';
+      item.contextValue = 'todosEnableScan';
+      item.command = {
+        command: 'saropaLints.todosAndHacks.enableWorkspaceScan',
+        title: 'Enable workspace scan',
+        arguments: [],
+      };
+      item.iconPath = new vscode.ThemeIcon('search');
+      return item;
+    }
     if (element.kind === 'placeholder') {
       const item = new vscode.TreeItem(element.message, vscode.TreeItemCollapsibleState.None);
       item.contextValue = 'todosPlaceholder';
@@ -137,6 +164,9 @@ export class TodosAndHacksTreeProvider implements vscode.TreeDataProvider<TodoTr
       return [{ kind: 'placeholder', message: 'No workspace folder open' }];
     }
     const options = getOptions();
+    if (element === undefined && !options.workspaceScanEnabled) {
+      return [{ kind: 'enableWorkspaceScan' }];
+    }
     if (element === undefined) return this.getRootChildren(folders, options);
     if (element.kind === 'folder') return this.getFolderChildren(element, options);
     if (element.kind === 'tag') return this.getTagChildren(element, folders, options);

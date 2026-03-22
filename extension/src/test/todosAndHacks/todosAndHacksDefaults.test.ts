@@ -47,5 +47,10 @@ describe('todosAndHacks defaults', () => {
       props['saropaLints.todosAndHacks.excludeGlobs'].default,
       [...DEFAULT_TODOS_AND_HACKS_EXCLUDE_GLOBS],
     );
+    assert.strictEqual(
+      props['saropaLints.todosAndHacks.workspaceScanEnabled'].default,
+      false,
+      'Workspace TODO scan must stay opt-in (resource-intensive)',
+    );
   });
 });

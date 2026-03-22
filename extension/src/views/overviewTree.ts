@@ -7,10 +7,12 @@
  *
  * ## Behaviour contracts (for reviewers)
  *
- * - **Disabled (`saropaLints.enabled` false):** returns no children so `viewsWelcome`
- *   can show Enable / About / walkthrough (unchanged from prior behaviour).
- * - **Enabled:** always returns intro rows first so About / Getting Started are never
- *   hidden when analysis results exist (previously an empty tree + welcome gap).
+ * - **Dart workspace:** always returns intro rows, **Workspace options** (embedded config),
+ *   and **Sidebar** section toggles so users are never stuck on a bare welcome with only
+ *   a single “Enable” affordance. `saropaLints.enabled` defaults **true**; when a user turns
+ *   lint integration **off**, a **Lint integration: Off** row (warning styling) still links
+ *   to **Set Up Project** so onboarding is discoverable without hiding the rest of the tree.
+ * - **Non-Dart:** empty root so `viewsWelcome` can prompt to open a pubspec folder.
  * - **Embedded config:** delegates to the same `ConfigTreeProvider` instance as the
  *   standalone Config view — `refreshAll` clears triage cache once; no duplicate logic.
  * - **Recursion:** `getChildren` depth is bounded (root → options → triage groups → rules;
@@ -44,7 +46,7 @@ export class OverviewOptionsParent extends vscode.TreeItem {
         super('Workspace options', vscode.TreeItemCollapsibleState.Expanded);
         this.contextValue = 'overviewOptionsSection';
         this.iconPath = new vscode.ThemeIcon('settings-gear');
-        this.tooltip = 'Enable state, tier, analysis behavior, detected packages, triage, and config actions';
+        this.tooltip = 'Lint integration, tier, analysis behavior, detected packages, triage, and config actions';
     }
 }
 
@@ -279,18 +281,33 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
             return [];
         }
 
-        const enabled = cfg.get<boolean>('enabled', false) ?? false;
-        if (!enabled) return [];
+        const root = getProjectRoot();
+        if (!root) {
+            return [];
+        }
 
+        const enabled = cfg.get<boolean>('enabled', true) ?? true;
         const intro = buildOverviewIntroItems();
+        const integrationOff: OverviewItem[] = [];
+        if (!enabled) {
+            integrationOff.push(
+                new OverviewItem(
+                    'Lint integration: Off',
+                    'Set up pubspec + analysis_options',
+                    'saropaLints.enable',
+                    'warning',
+                    new vscode.ThemeColor('list.warningForeground'),
+                ),
+            );
+        }
         const optionsParent = new OverviewOptionsParent();
         const sidebarParent = new OverviewSidebarSectionParent();
-        const root = getProjectRoot();
-        const data = root ? readViolations(root) : null;
+        const data = readViolations(root);
 
         if (data === null) {
             return [
                 ...intro,
+                ...integrationOff,
                 optionsParent,
                 sidebarParent,
                 new OverviewItem(
@@ -302,6 +319,6 @@ export class OverviewTreeProvider implements vscode.TreeDataProvider<OverviewTre
             ];
         }
 
-        return [...intro, optionsParent, sidebarParent, ...buildDashboardItems(this.workspaceState, data)];
+        return [...intro, ...integrationOff, optionsParent, sidebarParent, ...buildDashboardItems(this.workspaceState, data)];
     }
 }

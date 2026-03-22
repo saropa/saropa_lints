@@ -10,38 +10,7 @@ import { readViolations, type ViolationsData } from '../violationsReader';
 import { computeHealthScore, estimateScoreWithout } from '../healthScore';
 import { getProjectRoot } from '../projectRoot';
 
-/**
- * Same row count as SuggestionsTreeProvider.getChildren (capped at 8), for Overview sidebar toggles.
- */
-export function countSuggestionItems(data: ViolationsData, root: string, tier: string): number {
-  const byImpact = data.summary?.byImpact;
-  const bySeverity = data.summary?.bySeverity;
-  const total = data.summary?.totalViolations ?? data.violations.length;
-  const critical = byImpact?.critical ?? 0;
-  const high = byImpact?.high ?? 0;
-  const errors = bySeverity?.error ?? 0;
-
-  const labels: string[] = [];
-  if (critical > 0) {
-    labels.push('critical');
-  }
-  if (high > 0 && labels.length < 3) {
-    labels.push('high');
-  }
-  if (errors > 0 && !labels.some((l) => l.includes('error'))) {
-    labels.push('errors');
-  }
-
-  const baselinePath = path.join(root, 'saropa_baseline.json');
-  if (total > 0 && !fs.existsSync(baselinePath)) {
-    labels.push('baseline');
-  }
-  if (tier === 'recommended' && total > 0) {
-    labels.push('tier');
-  }
-  labels.push('run', 'open');
-  return Math.min(labels.length, 8);
-}
+export { countSuggestionItems } from '../suggestionCounts';
 
 class SuggestionItem extends vscode.TreeItem {
   constructor(
@@ -75,12 +44,7 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
   async getChildren(): Promise<SuggestionItem[]> {
     const root = getProjectRoot();
     const items: SuggestionItem[] = [];
-
     const cfg = vscode.workspace.getConfiguration('saropaLints');
-    const enabled = cfg.get<boolean>('enabled', false) ?? false;
-
-    // C5: When disabled, return empty so viewsWelcome "Enable" shows.
-    if (!enabled) return [];
 
     const data = root ? readViolations(root) : null;
     // C5: When no data, return empty so viewsWelcome "Run analysis" shows.
