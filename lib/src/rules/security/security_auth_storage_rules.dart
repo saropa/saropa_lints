@@ -1118,40 +1118,37 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
   }
 }
 
-/// Warns when deep link handlers don't validate parameters.
+/// Warns when common persistence APIs receive arguments that suggest sensitive
+/// data is being written without encryption.
 ///
-/// Since: v2.3.5 | Updated: v4.13.0 | Rule version: v3
+/// Since: v1.7.8 | Updated: v4.13.0 | Rule version: v5
 ///
-/// Deep links can pass arbitrary data to your app. Validate and sanitize
-/// all deep link parameters before using them to prevent injection attacks.
+/// Detection is intentionally lightweight: it visits a small set of methods
+/// (`setString`, `put`, `write`, `writeAsString`, `writeAsBytes`, `insert`) on
+/// receivers that are **not** already named like secure storage (e.g. names
+/// containing `secure` or `encrypt`). It lowercases the **argument list**
+/// source only—never the full invocation—so receiver identifiers such as
+/// `encryptedBox` do not suppress legitimate findings on insecure targets.
+///
+/// **Heuristic — `pin`:** Substring `pin` alone matched inside longer tokens
+/// (for example the `…p-p-i-n…` inside `Mapping` / `OwaspMapping`), producing
+/// false positives on ordinary code. The keyword is therefore matched only when
+/// not immediately preceded by an ASCII letter; delimiters such as `.`, `_`,
+/// `(`, or start-of-argument still allow real `pin` arguments to match.
 ///
 /// **BAD:**
 /// ```dart
-/// void handleDeepLink(Uri uri) {
-///   final userId = uri.queryParameters['user_id'];
-///   fetchUser(userId!); // No validation!
-/// }
-///
-/// void onGenerateRoute(RouteSettings settings) {
-///   final args = settings.arguments as Map<String, dynamic>;
-///   return UserPage(userId: args['id']); // No validation!
-/// }
+/// await prefs.setString('password', value);
+/// await file.writeAsString('pin: $code');
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// void handleDeepLink(Uri uri) {
-///   final userId = uri.queryParameters['user_id'];
-///   if (userId == null || !_isValidUserId(userId)) {
-///     throw InvalidDeepLinkException('Invalid user_id');
-///   }
-///   fetchUser(userId);
-/// }
-///
-/// bool _isValidUserId(String id) {
-///   return RegExp(r'^[a-zA-Z0-9_-]+$').hasMatch(id) && id.length <= 36;
-/// }
+/// await secureStorage.write(key: 'password', value: secret);
+/// await encryptedFile.writeAsBytes(cipherBytes);
 /// ```
+///
+/// Fixture: `example_async/lib/security/require_data_encryption_fixture.dart`.
 class RequireDataEncryptionRule extends SaropaLintRule {
   RequireDataEncryptionRule() : super(code: _code);
 
@@ -1197,13 +1194,16 @@ class RequireDataEncryptionRule extends SaropaLintRule {
     'social_security',
     'bank',
     'account_number',
-    'pin',
     'cvv',
     'auth',
     'credential',
     'private_key',
     'privatekey',
   };
+
+  /// [pin] is matched with a letter lookbehind so substrings like `Mapping`
+  /// (OwaspMapping) do not false-positive on `…p-p-i-n…`.
+  static final RegExp _pinKeywordPattern = RegExp(r'(?<![a-zA-Z])pin');
   static final List<RegExp> _secureStorageTargetPatterns = [
     RegExp(r'\bsecure\b'),
     RegExp(r'\bencrypt\b'),
@@ -1239,6 +1239,10 @@ class RequireDataEncryptionRule extends SaropaLintRule {
       // which includes target/receiver names that may incidentally match).
       final String argsSource = node.argumentList.toSource().toLowerCase();
 
+      if (_pinKeywordPattern.hasMatch(argsSource)) {
+        reporter.atNode(node);
+        return;
+      }
       for (final String keyword in _sensitiveKeywords) {
         if (argsSource.contains(keyword)) {
           reporter.atNode(node);

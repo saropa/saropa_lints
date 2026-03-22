@@ -128,3 +128,26 @@ void _good1010() async {
   final encrypted = await encrypter.encrypt(data);
   await file.writeAsBytes(encrypted);
 }
+
+/// Regression: type names such as [OwaspMapping] contain the substring `pin`
+/// inside `Mapping`; the rule must not flag this call.
+class OwaspMappingFixture1010 {}
+
+class FakeViolationExporter1010 {
+  static void write({
+    required String projectRoot,
+    required String sessionId,
+    required Object data,
+    required Map<String, OwaspMappingFixture1010> owaspLookup,
+  }) {}
+}
+
+// GOOD: Should NOT trigger require_data_encryption (no `pin` token match)
+void _goodOwaspMappingTypeArg1010() {
+  FakeViolationExporter1010.write(
+    projectRoot: '/',
+    sessionId: 's',
+    data: Object(),
+    owaspLookup: const <String, OwaspMappingFixture1010>{},
+  );
+}

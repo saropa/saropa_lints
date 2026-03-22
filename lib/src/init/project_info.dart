@@ -32,10 +32,14 @@ String? getSaropaLintsRootUri() {
   return null;
 }
 
-/// Convert rootUri to absolute file path.
+/// Converts a `package_config.json` [rootUri] to an absolute filesystem path.
+///
+/// For `file://` URIs, uses [Uri.tryParse] so malformed values return null
+/// instead of throwing (see `prefer_try_parse_for_dynamic_data`).
 String? rootUriToPath(String rootUri) {
   if (rootUri.startsWith('file://')) {
-    return Uri.parse(rootUri).toFilePath();
+    final uri = Uri.tryParse(rootUri);
+    return uri?.toFilePath();
   } else if (rootUri.startsWith('../')) {
     final dartToolDir = Directory('.dart_tool').absolute.path;
     return Directory('$dartToolDir/$rootUri').absolute.path;
