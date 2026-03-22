@@ -26,6 +26,8 @@
     "src/test/sidebarToggleLabel.test.ts",
     "src/test/overviewEmbeddedConfigKinds.test.ts",
     "src/copyTreeAsJson.ts",
+    "src/copyTreeAsJsonSelection.ts",
+    "src/test/copyTreeAsJson.test.ts",
     "src/treeSerializers.ts",
     "src/test/treeSerializers.test.ts",
     "src/suggestionCounts.ts",
