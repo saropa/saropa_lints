@@ -57,7 +57,10 @@ void main() {
         enabled.contains('avoid_collection_methods_with_unrelated_types'),
         isTrue,
       );
-      expect(contributed, contains('avoid_collection_methods_with_unrelated_types'));
+      expect(
+        contributed,
+        contains('avoid_collection_methods_with_unrelated_types'),
+      );
     });
 
     test('skips gated pack when resolvedVersions omitted', () {

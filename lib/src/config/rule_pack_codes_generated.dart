@@ -170,10 +170,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'require_firestore_index',
     'require_map_idle_callback',
   },
-  'flame': {
-    'avoid_creating_vector_in_update',
-    'avoid_redundant_async_on_load',
-  },
+  'flame': {'avoid_creating_vector_in_update', 'avoid_redundant_async_on_load'},
   'flutter_hooks': {
     'avoid_conditional_hooks',
     'avoid_hooks_outside_build',
@@ -220,9 +217,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'require_getx_permanent_cleanup',
     'require_getx_worker_dispose',
   },
-  'graphql': {
-    'avoid_graphql_string_queries',
-  },
+  'graphql': {'avoid_graphql_string_queries'},
   'hive': {
     'avoid_hive_binary_storage',
     'avoid_hive_box_name_collision',
@@ -421,7 +416,14 @@ const Map<String, Set<String>> kRulePackPubspecMarkersGenerated = {
   'dio': {'dio'},
   'drift': {'drift', 'drift_dev'},
   'equatable': {'equatable'},
-  'firebase': {'cloud_firestore', 'firebase_analytics', 'firebase_auth', 'firebase_core', 'firebase_messaging', 'firebase_storage'},
+  'firebase': {
+    'cloud_firestore',
+    'firebase_analytics',
+    'firebase_auth',
+    'firebase_core',
+    'firebase_messaging',
+    'firebase_storage',
+  },
   'flame': {'flame'},
   'flutter_hooks': {'flutter_hooks'},
   'geolocator': {'geolocator'},

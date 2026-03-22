@@ -80,21 +80,23 @@ void main() {
       expect(cap.lintRules, isEmpty);
     });
 
-    test('skips rule when disabled only via configAliases (false positive guard)',
-        () {
-      const canonical = 'require_riverpod_lint';
-      const alias = 'require_riverpod_lint_package';
-      SaropaLintRule.enabledRules = {canonical};
-      SaropaLintRule.disabledRules = {alias};
-      expect(
-        getRulesFromRegistry({canonical}).single.isDisabled,
-        isTrue,
-        reason: 'alias in disabledRules must mark rule disabled',
-      );
-      final cap = _CaptureRegistry();
-      registerSaropaLintRules(cap);
-      expect(cap.lintRules, isEmpty);
-    });
+    test(
+      'skips rule when disabled only via configAliases (false positive guard)',
+      () {
+        const canonical = 'require_riverpod_lint';
+        const alias = 'require_riverpod_lint_package';
+        SaropaLintRule.enabledRules = {canonical};
+        SaropaLintRule.disabledRules = {alias};
+        expect(
+          getRulesFromRegistry({canonical}).single.isDisabled,
+          isTrue,
+          reason: 'alias in disabledRules must mark rule disabled',
+        );
+        final cap = _CaptureRegistry();
+        registerSaropaLintRules(cap);
+        expect(cap.lintRules, isEmpty);
+      },
+    );
 
     test('unknown enabled names do not register or throw', () {
       SaropaLintRule.enabledRules = {

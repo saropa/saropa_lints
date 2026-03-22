@@ -73,9 +73,7 @@ void printRulePacksInitSummary({required String targetDir}) {
     final appCol = app
         ? '${InitColors.green}yes${InitColors.reset}'
         : '${InitColors.dim}no${InitColors.reset}';
-    log.terminal(
-      '  ${id.padRight(20)} $pubCol        $semverCol    $appCol',
-    );
+    log.terminal('  ${id.padRight(20)} $pubCol        $semverCol    $appCol');
   }
   log.terminal('');
 }

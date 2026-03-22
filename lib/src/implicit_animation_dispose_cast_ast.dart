@@ -8,7 +8,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 /// [ParenthesizedExpression]), returns that [MethodInvocation]. Uses
 /// [MethodInvocation.realTarget] so detection matches the analyzer’s view of the
 /// invocation target (consistent with cascade / postfix edge cases).
-MethodInvocation? disposeInvocationForCastAsDisposeTarget(AsExpression castNode) {
+MethodInvocation? disposeInvocationForCastAsDisposeTarget(
+  AsExpression castNode,
+) {
   AstNode? outer = castNode.parent;
   if (outer is ParenthesizedExpression) {
     outer = outer.parent;
@@ -20,8 +22,7 @@ MethodInvocation? disposeInvocationForCastAsDisposeTarget(AsExpression castNode)
   final Expression? recv = inv.realTarget;
   if (recv == null) return null;
   if (identical(recv, castNode)) return inv;
-  if (recv is ParenthesizedExpression &&
-      identical(recv.expression, castNode)) {
+  if (recv is ParenthesizedExpression && identical(recv.expression, castNode)) {
     return inv;
   }
   return null;

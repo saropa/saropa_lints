@@ -77,7 +77,9 @@ Map<String, String>? readResolvedPackageVersions(String projectRoot) {
     return null;
   }
   final mtime = file.lastModifiedSync().millisecondsSinceEpoch;
-  if (_cachedRoot == projectRoot && _cachedMtime == mtime && _cachedVersions != null) {
+  if (_cachedRoot == projectRoot &&
+      _cachedMtime == mtime &&
+      _cachedVersions != null) {
     return _cachedVersions;
   }
   try {

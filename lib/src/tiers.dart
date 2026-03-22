@@ -121,6 +121,7 @@ const Set<String> stylisticRules = <String>{
   'avoid_parameter_reassignment',
 
   // === Widget style ===
+  'avoid_chip_delete_inkwell_circle_border',
   'avoid_shrink_wrap_in_scroll',
   'prefer_one_widget_per_file',
   'prefer_widget_methods_over_classes',
@@ -2760,7 +2761,6 @@ const Set<String> professionalOnlyRules = <String>{
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
   // Code style / Web (roadmap detail requirements)
-  'avoid_chip_delete_inkwell_circle_border',
   'avoid_js_rounded_ints',
   'avoid_private_typedef_functions',
   // Import sorting

@@ -21,7 +21,11 @@ void main() {
 
     test('disabled match is case-insensitive', () {
       final enabled = <String>{};
-      mergeRulePacksIntoEnabled(enabled, {'REQUIRE_PROVIDER_SCOPE'}, ['riverpod']);
+      mergeRulePacksIntoEnabled(
+        enabled,
+        {'REQUIRE_PROVIDER_SCOPE'},
+        ['riverpod'],
+      );
       expect(enabled.contains('require_provider_scope'), isFalse);
     });
 
