@@ -283,9 +283,20 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
   );
 
+  /**
+   * Violations (Issues) sidebar tree.
+   *
+   * `canSelectMany` must stay **true** so users can Ctrl/Cmd+click multiple folders/files and run
+   * **Copy as JSON** once; `copyTreeNodesToClipboard` (see `copyTreeAsJson.ts`) takes the full
+   * selection from VS Code’s second command argument. Without this flag, only one row can be
+   * selected and bulk export from the tree is impossible.
+   *
+   * For full-project data at scale, `reports/.saropa_lints/violations.json` remains the source of truth.
+   */
   const issuesView = vscode.window.createTreeView('saropaLints.issues', {
     treeDataProvider: issuesProvider,
     showCollapseAll: true,
+    canSelectMany: true,
   });
   updateIssuesBadge(issuesView, issuesProvider);
 

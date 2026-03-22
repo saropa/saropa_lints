@@ -1,9 +1,22 @@
 /**
- * Shared utility for copying tree nodes (with recursive children) as structured JSON.
- * Used by all tree views in the extension to support "Copy as JSON" context menu actions.
+ * Shared utility for copying tree views to the clipboard as formatted JSON.
+ *
+ * **VS Code command contract:** tree context-menu commands receive `(clickedItem, selectedItems?)`.
+ * When the hosting `TreeView` has `canSelectMany: true` and the user selects multiple rows,
+ * `selectedItems` is a non-empty array and must take precedence over `clickedItem` alone.
+ * The Violations (`saropaLints.issues`) view sets `canSelectMany` in `extension.ts` specifically
+ * so this path is reachable from the UI.
+ *
+ * **Output shape:** one serialized root → a single JSON object; multiple roots → a JSON array.
+ * Each node is serialized recursively (see `serializeNode`) so exporting a file row includes its
+ * violation children as nested `children` when the provider returns them from `getChildren`.
+ *
+ * **Scale:** large selections can produce very large clipboard payloads; direct consumers should
+ * prefer `reports/.saropa_lints/violations.json` for full-repo exports.
  */
 
 import * as vscode from 'vscode';
+import { resolveNodesForJsonExport } from './copyTreeAsJsonSelection';
 
 /** Uniform JSON envelope for any tree node. */
 export interface JsonNode {
@@ -60,10 +73,7 @@ export async function copyTreeNodesToClipboard(
     getChildren: (node: unknown) => unknown[] | Promise<unknown[]>,
     viewLabel: string,
 ): Promise<void> {
-    // Resolve the set of nodes: prefer multi-select array, fall back to single item.
-    const nodes = Array.isArray(selectedItems) && selectedItems.length > 0
-        ? selectedItems
-        : (item ? [item] : []);
+    const nodes = resolveNodesForJsonExport(item, selectedItems);
 
     if (nodes.length === 0) {
         vscode.window.showWarningMessage('No tree item selected.');
