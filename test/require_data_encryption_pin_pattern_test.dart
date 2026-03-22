@@ -35,5 +35,25 @@ void main() {
     test('matches pin at start of argument text (pinCode-style identifiers)', () {
       expect(_pinKeywordPattern.hasMatch('pincode: x'), isTrue);
     });
+
+    // -- Edge-case documentation: accepted trade-offs --
+
+    test('matches pin-prefix words like pineapple (accepted trade-off)', () {
+      // Words starting with "pin" match because no lookahead is used — this is
+      // tolerated so genuine fields like pinCode / pinNumber are caught.
+      expect(_pinKeywordPattern.hasMatch('label: pineapple'), isTrue);
+      expect(_pinKeywordPattern.hasMatch('label: pinball'), isTrue);
+    });
+
+    test('does not match words with pin embedded after a letter', () {
+      // opinion = o-p-i-n → 'pin' at offset 1 is preceded by 'o' (letter).
+      // spinning = …p-p-i-n → preceded by 'p' (letter).
+      expect(_pinKeywordPattern.hasMatch('opinion: value'), isFalse);
+      expect(_pinKeywordPattern.hasMatch('spinning: value'), isFalse);
+    });
+
+    test('matches pin preceded by digit (digit is not a letter)', () {
+      expect(_pinKeywordPattern.hasMatch('code1234pin: x'), isTrue);
+    });
   });
 }
