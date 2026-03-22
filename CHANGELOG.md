@@ -25,11 +25,13 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
-## [Unreleased]
+## [9.11.0]
+
+Unreleased work centers on the composite analyzer plugin hook (`registerSaropaLintRules`), rule packs end-to-end (analyzer merge, CLI init, VS Code Rule Packs webview, generated registry), extension UX that defaults integration on with clearer commands and TODOs workspace scan as opt-in, and a wave of new lints—compile-time shape alignment, Dart 3.0 removed-API migration rules, and targeted Flutter fixes.
 
 ### Fixed
 
-• **VS Code extension** — Sonar-driven cleanup: batch `context.subscriptions.push` where it was split unnecessarily (`extension.ts`), and refactor vibrancy “Copy as JSON” serialization into small matchers with documented dispatch order (`treeSerializers.ts`). Adds unit tests for `serializeVibrancyNode` (including false-positive guards for partial package/problem/suggestion payloads).
+• **VS Code extension** — Code cleanup: batch `context.subscriptions.push` where it was split unnecessarily (`extension.ts`), and refactor vibrancy “Copy as JSON” serialization into small matchers with documented dispatch order (`treeSerializers.ts`). Adds unit tests for `serializeVibrancyNode` (including false-positive guards for partial package/problem/suggestion payloads).
 
 ### Changed
 
