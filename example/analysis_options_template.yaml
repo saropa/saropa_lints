@@ -11,6 +11,10 @@
 # Optional rule packs (plugins.saropa_lints from init): add rule_packs.enabled
 # with ids like riverpod, drift — see doc/guides/rule_packs.md
 #
+# Composite analyzer plugin (Saropa + your org rules in ONE plugin): see
+# doc/guides/composite_analyzer_plugin.md — use registerSaropaLintRules /
+# loadNativePluginConfig from package:saropa_lints/saropa_lints.dart.
+#
 # QUICK START
 # ===========
 # 1. Copy this file to your project as: analysis_options.yaml

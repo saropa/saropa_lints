@@ -92,7 +92,7 @@ Today those rules mostly live in **tiers** (`lib/tiers/*.yaml`, `lib/src/tiers.d
 
 | Term | Meaning |
 |------|---------|
-| **Pack** | Named bundle: `pack_id`, metadata, **predicate** (deps / SDK / Flutter), **set of rule codes**. Lives inside saropa_lints v1 (not necessarily a separate pub package). |
+| **Pack** | Named bundle: `pack_id`, metadata, **predicate** (deps / SDK / Flutter), **set of rule codes**. Implemented **inside** the `saropa_lints` package (registry + YAML). This is **not** a loadable third-party plugin API—packs only reference rule codes that exist in this repo. |
 | **Predicate** | Boolean logic: e.g. `direct_dep('drift')`, `resolved_version('collection', '>=1.19.0')`, `sdk('>=3.4.0')`, `is_flutter_project`. |
 | **Library pack** | Rules for correct/safe use of a library (most of today’s `drift_rules`, etc.). |
 | **Semver migration** | Optional sub-profile inside a pack: rules that only apply when **resolved** version is in range. |
@@ -355,7 +355,36 @@ Same intent as §0; this section is **deliverables + exit criteria** per phase.
 
 ### Phase 7 — Optional: external API / second analyzer plugin
 
-Only if org customers need private rules without forking saropa_lints. See §15 non-goals vs product.
+**Status: registrar shipped; thin API package still optional.** There is **no** separate `saropa_lints_api` package yet. Consumers can depend on `package:saropa_lints` and call **`registerSaropaLintRules`** + **`loadNativePluginConfig`** from a **composite** analyzer plugin (see `doc/guides/composite_analyzer_plugin.md`). There is still **no** second analyzer plugin *shipped by this repo* — orgs author their own meta-plugin package.
+
+**Why org-specific rules (e.g. “use `CommonText` instead of `Text`”) are not a separate “Saropa plugin” today**
+
+- **Rule packs** only enable **existing** `saropa_lints` rule codes from the in-repo registry. They do not load code from another package.
+- The **Dart analyzer allows only one analyzer plugin per analysis context** (merged `analysis_options.yaml`), so a team **cannot** enable `saropa_lints` and a separate custom plugin in the same context under current SDK behavior. See [dart-lang/sdk#50981](https://github.com/dart-lang/sdk/issues/50981) and the discussion there.
+- **Practical options** for private/org diagnostics today: maintain a **git fork** (or private package) of `saropa_lints` with your rules registered like any other rule; use **codemods**, **tests**, or **CI checks** outside the analyzer; or engage **custom rules** via [professional services](https://github.com/saropa/saropa_lints/blob/main/PROFESSIONAL_SERVICES.md) / upstream contributions for generally useful rules.
+
+#### Can we build a supported “inject third-party rules” story?
+
+**Yes.** It does **not** require a second analyzer plugin slot. The viable pattern is a **composite (facade) analyzer plugin** in the consumer repo:
+
+1. Add a small dev_dependency package (e.g. `acme_saropa_plugin`) with `lib/main.dart` exposing the top-level `plugin` required by the analysis server.
+2. That package **depends on** `package:saropa_lints` **and** on `package:acme_custom_rules` (your rules).
+3. Its `Plugin` implementation runs Saropa’s config load + rule registration, then registers additional lint rules (and fixes) on the same `PluginRegistry`.
+
+The analyzed project sets **`plugins.acme_saropa_plugin`** (only one plugin key) — **not** `plugins.saropa_lints` alongside another plugin.
+
+**Work in `saropa_lints` to make this first-class (Phase 7 deliverables):**
+
+| Item | Purpose |
+|------|---------|
+| Export a **public registrar** (`registerSaropaLintRules(PluginRegistry registry)`) refactored out of `lib/main.dart` | **Done** — `package:saropa_lints/saropa_lints.dart`; `lib/main.dart` delegates. |
+| **Document** composite-plugin setup, `analysis_options.yaml` shape, and “restart analysis server” | **Done** — `doc/guides/composite_analyzer_plugin.md`. |
+| **Optional:** `saropa_lints_api` — minimal types / mixins only if we need a stable surface that custom-rule packages depend on **without** depending on all of `saropa_lints` | Reduces version coupling; not strictly required if custom rules live in a package that already depends on `saropa_lints` |
+| **Init / extension (later):** teach `init` or docs to generate or link a template facade when `--with-custom-plugin` or similar | UX |
+
+**Not a good bet without major R&D:** true **runtime** discovery of arbitrary packages from YAML (dynamic `import`) — Dart AOT/analyzer isolates do not offer a supported way to load unknown rule classes by name without codegen or a predeclared dependency edge.
+
+**Conclusion:** Phase 7 is **buildable** as documented API + composite plugin; it is **not** “load any `.dart` file from disk at analysis time.” See §15 non-goals vs product.
 
 ---
 
@@ -506,6 +535,8 @@ Canonical **Flutter embedder / build target** identifiers (align with `flutter c
 **Implementation note (2026-03-21):** **Phase 4 (init / CLI)** — `init --list-packs`, `--enable-pack <id>`, `kRulePackPubspecMarkers` + `parseRulePacksEnabledList`; generated `analysis_options.yaml` embeds `rule_packs.enabled` and preserves it on regen (except `--reset`).
 
 **Implementation note (2026-03-21):** **Phase 5 (bulk pack registry)** — `tool/generate_rule_pack_registry.dart` emits `rule_pack_codes_generated.dart` and `extension/.../rulePackDefinitions.ts` from `lib/src/rules/packages/*_rules.dart`; `rule_packs.dart` merges generated maps with `collection_compat`. `tool/rule_pack_audit.dart` validates extraction (including `applyCompositeRulePacks` for rules listed in multiple packs).
+
+**Implementation note (Phase 7):** **`registerSaropaLintRules`** and **re-exported** `loadNativePluginConfig` / `loadOutputConfigFromProjectRoot` / `loadRulePacksConfigFromProjectRoot` are public on `package:saropa_lints/saropa_lints.dart`; `lib/main.dart` delegates to `registerSaropaLintRules`. Optional **`saropa_lints_api`** (types-only dependency for custom-rule packages) not started.
 
 ---
 

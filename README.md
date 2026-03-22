@@ -1023,6 +1023,9 @@ A: Yes! Use the **Baseline** feature (`dart run saropa_lints:baseline`) to suppr
 **Q: I'm upgrading from v4 — what changed?**
 A: v5 uses the native Dart analyzer plugin system instead of `custom_lint`. Remove `custom_lint` from your dependencies, replace `custom_lint: rules:` with `plugins: saropa_lints: diagnostics:` in your config (or just use a tier preset), and run `dart analyze` instead of `dart run custom_lint`. The init tool handles the config migration automatically.
 
+**Q: Can I add my own lint rules for my app (e.g. require `CommonText` instead of `Text`)?**
+A: [Rule packs](doc/guides/rule_packs.md) only enable rules already shipped in `saropa_lints`; there is no YAML-only “load arbitrary external rules” switch. The analyzer allows **one plugin per context** ([dart-lang/sdk#50981](https://github.com/dart-lang/sdk/issues/50981)), so use a **composite plugin**: one package that depends on `saropa_lints` and your rules, exposes the single `plugin` entrypoint, calls `loadNativePluginConfig` / `registerSaropaLintRules` from `package:saropa_lints/saropa_lints.dart`, then registers your rules. See [Composite analyzer plugin](doc/guides/composite_analyzer_plugin.md). Alternatives: **private fork** of `saropa_lints`, **non-analyzer** enforcement (codemod, CI), or [professional / upstream](PROFESSIONAL_SERVICES.md).
+
 ## Contributing
 
 **We are building the industry standard together.**
@@ -1083,6 +1086,7 @@ Contact: [saropa.com](https://saropa.com) | [services@saropa.com](mailto:service
 | [ROADMAP.md#part-2](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md#part-2-deferred-rules--technical-limitations) | Deferred rules (cross-file, heuristic)        |
 | [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md)                                           | How to contribute rules and report issues     |
 | [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)                                                 | Version history and release notes             |
+| [doc/guides/composite_analyzer_plugin.md](https://github.com/saropa/saropa_lints/blob/main/doc/guides/composite_analyzer_plugin.md) | Saropa + custom rules in one analyzer plugin  |
 | [SECURITY.md](https://github.com/saropa/saropa_lints/blob/main/SECURITY.md)                                                   | Security policy and reporting vulnerabilities |
 | [PROFESSIONAL_SERVICES.md](https://github.com/saropa/saropa_lints/blob/main/PROFESSIONAL_SERVICES.md)                         | Professional services and custom rules        |
 

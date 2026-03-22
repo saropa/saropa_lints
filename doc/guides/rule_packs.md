@@ -68,6 +68,20 @@ After adding, removing, or renaming rules under `lib/src/rules/packages/*_rules.
 The generator also warns when `kPubspecMarkersByPack` in
 `tool/generate_rule_pack_registry.dart` is missing a pack or lists an unused pack id.
 
+## Custom or project-specific rules (e.g. `Text` → `CommonText`)
+
+**Rule packs are not a plugin SDK.** They only turn on **bundles of rules that already ship inside** `package:saropa_lints`. You cannot point a pack at arbitrary code in another package.
+
+For **team-specific** analyzer diagnostics (naming wrappers, banned APIs, migration nags):
+
+- **Composite analyzer plugin** — A single dev_dependency package depends on `saropa_lints` plus your rules and exposes the one `plugin` entry; call `loadNativePluginConfig` in `start`, `registerSaropaLintRules` in `register`, then register your rules. See [composite_analyzer_plugin.md](composite_analyzer_plugin.md).
+- **Private fork or path dependency** — Add rule classes to your fork of `saropa_lints`, register them in `all_rules.dart` / tiers like any maintainer change, and depend on that package from your app. Works today without a facade package.
+- **Not a second native plugin** — The Dart analyzer enforces **one analyzer plugin per analysis context** for merged options, so you generally **cannot** run `saropa_lints` and a separate custom analyzer plugin together in the same project. See [dart-lang/sdk#50981](https://github.com/dart-lang/sdk/issues/50981).
+- **Outside the analyzer** — Codemods (`dart fix` custom transforms, bespoke CLI), CI grep/checks, or code review bots for policies that do not need IDE squiggles.
+
+Optional future work (`saropa_lints_api` / Phase 7 in the architecture plan) is **not shipped**; see [plan/plan_migration_plugin_system.md](../../plan/plan_migration_plugin_system.md) §10 Phase 7.
+
 ## See also
 
+- [composite_analyzer_plugin.md](composite_analyzer_plugin.md) — Saropa + custom rules in one plugin
 - [plan/plan_migration_plugin_system.md](../../plan/plan_migration_plugin_system.md) — full product plan

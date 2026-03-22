@@ -36,6 +36,8 @@ Available tiers: `essential` (1), `recommended` (2), `professional` (3),
 
 - [Migration from v4 to v5](guides/migration_v4_to_v5.md) — custom_lint to native analyzer plugin
 - [Upgrading to v7](guides/upgrading_to_v7.md) — analyzer 10, lowerCaseName config, and breaking changes
+- [Rule packs](guides/rule_packs.md) — optional stack bundles; not a third-party plugin API (see “Custom or project-specific rules” there)
+- [Composite analyzer plugin](guides/composite_analyzer_plugin.md) — one meta-plugin: Saropa + org-specific rules (`registerSaropaLintRules`, `loadNativePluginConfig`)
 
 ## Links
 
