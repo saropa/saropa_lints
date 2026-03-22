@@ -29,29 +29,35 @@ Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter be
 
 **Install the [Saropa Lints VS Code extension](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints)** for the full experience. Also on [Open VSX](https://open-vsx.org/extension/saropa/saropa-lints) (Cursor, VSCodium).
 
+Lint integration defaults **on** for Dart workspaces (`saropaLints.enabled`). Overview, Config, and Rule Packs stay available even when integration is off; turn it off with **Saropa Lints: Turn Off Lint Integration** if you only want the sidebar without analyzer runs.
+
 The extension is the primary setup and configuration surface:
 
 - **Health Score** — 0–100 score in the status bar; green/yellow/red bands
-- **Issues tree** — Violations grouped by severity and file, with Error Lens-style inline annotations
+- **Issues tree** — Violations grouped by severity and file, with Error Lens-style inline annotations; multi-select works with **Copy as JSON**
 - **Security Posture** — OWASP Top 10 coverage matrix, compliance export
 - **Triage** — Disable noisy rules from the UI; see estimated score impact before acting
-- **Rule Packs** — Enable stack bundles (Riverpod, Drift, …) from the sidebar; see `doc/guides/rule_packs.md`
+- **Rule Packs** — Enable stack bundles (Riverpod, Drift, …) from the sidebar webview (per-pack toggles, rule lists, target platforms when embedder folders exist); see [`doc/guides/rule_packs.md`](doc/guides/rule_packs.md)
+- **Package Vibrancy** — Dependency health, alerts, and optional **version-gap** PR/issue triage (enable with `saropaLints.packageVibrancy.enableVersionGap`; a GitHub token improves results)
+- **TODOs & Hacks** — Sidebar scan for TODO/FIXME/HACK-style markers; full-workspace scan is **opt-in** (`saropaLints.todosAndHacks.workspaceScanEnabled`, default off) via **TODOs & Hacks: Enable workspace scan**
 - **File Risk** — Files ranked by violation density; focus on the riskiest first
 - **Trends** — Score progression over time with milestone celebrations
 
-One-click **Enable** sets up `pubspec.yaml`, `analysis_options`, and runs analysis. No terminal commands needed.
+**Set Up Project** wires `pubspec.yaml`, `analysis_options.yaml`, and analysis. No terminal commands required for that path.
 
 ---
 
 ## Quick Start
 
+**Requirements:** Dart SDK `>=3.9.0 <4.0.0` (same constraint as this package’s [`pubspec.yaml`](https://github.com/saropa/saropa_lints/blob/main/pubspec.yaml)).
+
 ### Option A — VS Code extension (recommended)
 
 1. Install [Saropa Lints](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-lints) from the VS Code Marketplace
 2. Open the **Saropa Lints** sidebar (checklist icon in the activity bar)
-3. Click **Enable Saropa Lints**
+3. Run **Saropa Lints: Set Up Project** (or use the equivalent control in the Overview) to add the package and analysis config
 
-The extension adds `saropa_lints` to your project, configures analysis options, and runs analysis. Use the Config view to change tier, disable rules, and manage platforms/packages. Run "Saropa Lints: Getting Started" from the command palette for a guided tour.
+The extension adds `saropa_lints` to your project, configures analysis options, and runs analysis. Use the Config view to change tier, disable rules, and manage platforms/packages. Run **Saropa Lints: Getting Started** from the command palette for a guided tour.
 
 ### Option B — Tier preset (zero-config, no extension)
 
@@ -74,6 +80,9 @@ Available presets: `essential.yaml` · `recommended.yaml` · `professional.yaml`
 ```bash
 dart pub add --dev saropa_lints
 dart run saropa_lints:init --tier recommended
+# Optional: rule packs from pubspec + lockfile (see doc/guides/rule_packs.md)
+dart run saropa_lints:init --list-packs
+dart run saropa_lints:init --tier recommended --enable-pack riverpod --enable-pack drift  # IDs must match packs applicable to your pubspec
 ```
 
 > **Note:** The CLI init is headless-only as of v9 — no interactive prompts. For interactive setup, use the VS Code extension.
@@ -103,7 +112,7 @@ Issues appear in your IDE's Problems panel and in the terminal. Saropa Lints run
 Dart package                    VS Code extension
    │                                  │
    ▼                                  ▼
-analysis_options.yaml  ◄───  Enable / Set Tier / Triage
+analysis_options.yaml  ◄───  Set Up Project / Set Tier / Triage
    │                                  │
    ▼                                  ▼
 dart analyze           ◄───  Run Analysis (from UI)
@@ -113,7 +122,7 @@ violations.json        ───►  Health Score, Issues, Security,
                              File Risk, Trends, Inline Annotations
 ```
 
-The **Dart package** provides 2104+ lint rules via the native analyzer plugin. The **VS Code extension** reads `violations.json` and provides the UI: Health Score, Issues tree, Security Posture, File Risk, and Config/Triage. Optional **Drift Advisor** integration shows index suggestions and data-quality anomalies from a running Drift Advisor server in a dedicated sidebar view and in Problems. Both are published together and versioned in sync.
+The **Dart package** provides **2105** lint rules via the native analyzer plugin. The **VS Code extension** reads `violations.json` and provides the UI: Health Score, Issues tree, Security Posture, File Risk, Config/Triage, and related views. Optional **Drift Advisor** integration shows index suggestions and data-quality anomalies from a running Drift Advisor server in a dedicated sidebar view and in Problems. Both are published together and versioned in sync.
 
 **Rule metadata:** Each rule can expose optional semantics—`RuleType` (bug, vulnerability, code smell, security hotspot), `tags`, MITRE **CWE** IDs, and `RuleStatus` (e.g. beta)—for compliance and future quality gates. Defaults are backward compatible; see [CONTRIBUTING.md](CONTRIBUTING.md) and [bugs/discussion/RULE_METADATA_BULK_STATUS.md](bugs/discussion/RULE_METADATA_BULK_STATUS.md).
 
@@ -284,7 +293,7 @@ The tool is also built to **fix**. Saropa Lints diagnostics are engineered to be
 - [Migrating from solid_lints](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_solid_lints.md)
 - [Using with flutter_lints](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_flutter_lints.md) (complementary setup)
 
-> **Why three options?** The extension (Option A) is the recommended interactive experience. Tier presets (Option B) are great for quick, zero-config setup. The CLI init tool (Option C) gives you explicit `true`/`false` for every rule, ideal for CI/scripting.
+> **Why three options?** The extension (Option A) is the recommended interactive experience (**Set Up Project** and the sidebar). Tier presets (Option B) are great for quick, zero-config setup. The CLI init tool (Option C) gives you explicit `true`/`false` for every rule, ideal for CI/scripting, plus `--list-packs` / `--enable-pack` for rule packs.
 
 ## The 5 Tiers
 
@@ -316,7 +325,7 @@ Stylistic rules are orthogonal to correctness. Your code can be perfectly correc
 
 ### Configuration template
 
-See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 2090+ rules organized by category, tier membership, and examples.
+See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all **2105** rules organized by category, tier membership, and examples.
 
 ### Using a tier
 
@@ -550,14 +559,14 @@ This command:
 
 **Result**: Old violations are hidden, new code is still checked.
 
-#### Three Combinable Baseline Types
+#### Combinable baseline types
 
 | Type           | Config          | Description                      | Best For               |
 | -------------- | --------------- | -------------------------------- | ---------------------- |
 | **File-based** | `baseline.file` | JSON listing specific violations | "Fix nothing yet"      |
 | **Date-based** | `baseline.date` | Git blame - ignore old code      | "Fix gradually by age" |
 
-All three types are combinable - any match suppresses the violation.
+Both types are combinable: any match suppresses the violation.
 
 #### Full Configuration
 
@@ -727,12 +736,13 @@ For faster iteration during development:
 2. **Use `professional` or higher in CI** — thorough checking where speed matters less
 3. **Upgrade tiers gradually** — fix warnings before enabling more rules
 
-The tier you choose has a direct impact on analysis speed:
+The tier you choose has a direct impact on analysis speed (approximate rule counts from `getRulesForTier`; stylistic rules are separate unless you pass `--stylistic-all`):
 
-- `essential`: ~300 rules → **fastest** (memory leaks, security, crashes)
-- `recommended`: ~950 rules → moderate (+ accessibility, performance)
-- `professional`: ~1700 rules → slower (+ architecture, documentation)
-- `comprehensive`/`pedantic`: 1882+ rules → **slowest** (everything)
+- `essential`: ~310 rules → **fastest** (memory leaks, security, crashes)
+- `recommended`: ~930 rules → moderate (+ accessibility, performance)
+- `professional`: ~1740 rules → slower (+ architecture, documentation)
+- `comprehensive`: ~1870 rules → stricter patterns and edge cases
+- `pedantic`: ~1880 rules → **slowest** correctness tier (everything before stylistic)
 
 ## Adoption Strategy
 
@@ -858,7 +868,7 @@ Saropa Lints uses the native Dart analyzer plugin system. Issues appear directly
 
    ```yaml
    dev_dependencies:
-     saropa_lints: ^9.0.0
+     saropa_lints: ^10.0.0
    ```
 
 2. **Configure**: Add to your `analysis_options.yaml`:
@@ -927,7 +937,7 @@ This generates `analysis_options.yaml` with explicit `rule_name: true` for every
 **Option 1: Start smaller** (recommended for existing projects)
 
 ```bash
-# Start with essential tier (~300 critical rules)
+# Start with essential tier (~310 critical rules)
 dart run saropa_lints:init --tier essential
 ```
 
@@ -1152,7 +1162,7 @@ Built with care by the Flutter community. Questions? Ideas? We'd love to hear fr
 
 > "Quality is not an act, it is a habit." — Aristotle
 
-**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 2104+ lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
+**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With **2105** lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
 
 **Keywords:** Flutter linter, Dart static analysis, Flutter code quality, memory leak detection, security scanning, accessibility testing, WCAG compliance, European Accessibility Act, Flutter best practices, Dart analyzer plugin, code review automation, CI/CD linting, Flutter enterprise tools
 

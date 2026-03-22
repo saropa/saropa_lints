@@ -25,7 +25,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 
 ---
 
-## [Unreleased]
+## [10.0.2]
 
 ### Fixed
 
