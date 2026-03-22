@@ -1,7 +1,8 @@
 /**
  * Saropa Lints extension entry point.
- * Master switch (saropaLints.enabled) gates setup and analysis; when on,
- * extension manages pubspec and analysis_options and runs init/analyze.
+ * `saropaLints.enabled` defaults on: upgrade checks and integration state.
+ * Sidebar overview, config, and rule packs stay available for Dart workspaces;
+ * TODOs workspace scan is opt-in via `todosAndHacks.workspaceScanEnabled`.
  */
 
 import * as vscode from 'vscode';
@@ -57,7 +58,12 @@ import { writeRuleOverrides, removeRuleOverrides } from './configWriter';
 import { logReport, logSection, flushReport } from './reportWriter';
 import { generateOwaspReport } from './owaspExport';
 import { getProjectRoot, invalidateProjectRoot } from './projectRoot';
-import { runActivation as runVibrancyActivation, stopFreshnessWatcher, VibrancyStatusData } from './vibrancy/extension-activation';
+import {
+  runActivation as runVibrancyActivation,
+  stopFreshnessWatcher,
+  VibrancyStatusData,
+  getLatestResults,
+} from './vibrancy/extension-activation';
 import { registerSidebarSectionVisibility, updateSidebarSectionVisibility } from './sidebarSectionVisibility';
 import {
   applyDriftSidebarToggle,
@@ -166,7 +172,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   syncDriftSidebarSuppressContext(context.workspaceState);
 
   const cfg = getConfig();
-  let enabled = cfg.get<boolean>('enabled', false) ?? false;
+  let enabled = cfg.get<boolean>('enabled', true) ?? true;
 
   // Auto-enable when saropa_lints is already in pubspec.yaml but the user
   // hasn't explicitly toggled the setting. This avoids the "off by default"
@@ -198,7 +204,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     () =>
       buildSidebarSectionCountMap({
         workspaceRoot: getProjectRoot(),
-        saropaEnabled: getConfig().get<boolean>('enabled', false) ?? false,
         tier: getConfig().get<string>('tier', 'recommended') ?? 'recommended',
         violations: (() => {
           const r = getProjectRoot();
@@ -206,6 +211,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         })(),
         todosMarkerCount: todosAndHacksProvider.getCachedMarkerCount(),
         driftIssueCount: driftAdvisorProvider.getIssueCount(),
+        vibrancyPackageCount: getLatestResults().length,
       }),
     configProvider,
   );
@@ -264,6 +270,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         rulePacksWebviewProvider.refresh();
       }
       const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
+      if (!cfg.get<boolean>('workspaceScanEnabled', false)) return;
       if (!cfg.get<boolean>('autoRefresh', true)) return;
       const folder = vscode.workspace.getWorkspaceFolder(doc.uri);
       if (!folder) return;
@@ -367,9 +374,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         issuesProvider.setGroupBy(parseViolationsGroupBy(vscode.workspace.getConfiguration('saropaLints')));
       }
       const c = getConfig();
-      const en = c.get<boolean>('enabled', false) ?? false;
+      const en = c.get<boolean>('enabled', true) ?? true;
       updateContext(en, issuesProvider.hasViolations());
       refreshAll();
+      if (e.affectsConfiguration('saropaLints.todosAndHacks')) {
+        todosAndHacksProvider.refresh();
+        todosAndHacksView.message = undefined;
+      }
       // Status bars must update when config changes (e.g. tier changed via Settings UI).
       updateAllStatusBars();
       if (e.affectsConfiguration('saropaLints.driftAdvisor')) {
@@ -402,7 +413,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           const { history, appended } = appendSnapshot(context.workspaceState, data);
           refreshAll();
           updateAllStatusBars(data);
-          updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
+          updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
           runCelebrationIfNeeded(root, history, appended);
           return;
         }
@@ -467,7 +478,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       statusBarItem.hide();
       return;
     }
-    const en = getConfig().get<boolean>('enabled', false) ?? false;
+    const en = getConfig().get<boolean>('enabled', true) ?? true;
     const tier = getConfig().get<string>('tier', 'recommended') ?? 'recommended';
     const showVibrancy =
       vscode.workspace.getConfiguration('saropaLints.packageVibrancy').get<boolean>('showInStatusBar', true) &&
@@ -549,7 +560,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (ok) {
         refreshAll();
         updateAllStatusBars();
-        updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
+        updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
         // C7: Focus Overview after analysis to show Health Score delta.
         await vscode.commands.executeCommand('saropaLints.overview.focus');
         // C7: Include score in completion message when available.
@@ -570,7 +581,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         }
         refreshAll();
         updateAllStatusBars();
-        updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
+        updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
       }
     }),
     vscode.commands.registerCommand('saropaLints.openConfig', openConfig),
@@ -685,22 +696,34 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.refresh', () => {
       refreshAll();
       updateAllStatusBars();
-      updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
+      updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
     }),
     vscode.commands.registerCommand('saropaLints.todosAndHacks.refresh', () => {
-      todosAndHacksView.message = 'Scanning…';
+      const tcfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
+      if (tcfg.get<boolean>('workspaceScanEnabled', false)) {
+        todosAndHacksView.message = 'Scanning…';
+      }
       todosAndHacksProvider.refresh();
       void vscode.commands.executeCommand('saropaLints.todosAndHacks.focus');
       setTimeout(() => { todosAndHacksView.message = undefined; }, 4000);
     }),
     vscode.commands.registerCommand('saropaLints.todosAndHacks.toggleGroupByTag', async () => {
       const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
+      const scanOn = cfg.get<boolean>('workspaceScanEnabled', false);
       const current = cfg.get<boolean>('groupByTag', false);
       await cfg.update('groupByTag', !current, vscode.ConfigurationTarget.Workspace);
-      todosAndHacksView.message = 'Scanning…';
+      if (scanOn) {
+        todosAndHacksView.message = 'Scanning…';
+      }
       todosAndHacksProvider.refresh();
       void vscode.commands.executeCommand('saropaLints.todosAndHacks.focus');
       setTimeout(() => { todosAndHacksView.message = undefined; }, 4000);
+    }),
+    vscode.commands.registerCommand('saropaLints.todosAndHacks.enableWorkspaceScan', async () => {
+      const tcfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
+      await tcfg.update('workspaceScanEnabled', true, vscode.ConfigurationTarget.Workspace);
+      todosAndHacksProvider.refresh();
+      void vscode.commands.executeCommand('saropaLints.todosAndHacks.focus');
     }),
     vscode.commands.registerCommand('saropaLints.driftAdvisor.refresh', async () => {
       const cfg = vscode.workspace.getConfiguration('saropaLints.driftAdvisor');
@@ -767,7 +790,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         // runAnalysisAfterConfigChange is on; no duplicate call here.
         refreshAll();
         updateAllStatusBars();
-        updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
+        updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
 
         // Smart tier transition: build notification info from post-tier data.
         // Note: postData may reflect a prior analysis if dart analyze has not yet
@@ -1032,7 +1055,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         if (runAfter) await runAnalysisCommand(context);
         refreshAll();
         updateAllStatusBars();
-        updateContext(getConfig().get<boolean>('enabled', false) ?? false, issuesProvider.hasViolations());
+        updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
         await vscode.commands.executeCommand('saropaLints.overview.focus');
       }),
     ),

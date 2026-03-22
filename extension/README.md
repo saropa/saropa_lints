@@ -1,6 +1,6 @@
 # Saropa Lints — VS Code Extension
 
-Enable and configure [Saropa Lints](https://pub.dev/packages/saropa_lints) from the IDE. No terminal init command: turn the extension **on** and it sets up `pubspec.yaml` and `analysis_options` for you.
+Enable and configure [Saropa Lints](https://pub.dev/packages/saropa_lints) from the IDE. The extension is **on by default** for Dart workspaces: Overview shows workspace options and sidebar toggles immediately. Use **Set Up Project** when you need to add `saropa_lints` to `pubspec.yaml` and write `analysis_options` (no terminal init required).
 
 After installing, run **"Saropa Lints: Getting Started"** from the Command Palette for a guided tour of all features.
 
@@ -12,12 +12,8 @@ After installing, run **"Saropa Lints: Getting Started"** from the Command Palet
 ## Usage
 
 1. Open a Dart/Flutter project.
-2. Open the **Saropa Lints** view (checklist icon in the activity bar).
-3. Click **Enable Saropa Lints**. The extension will:
-   - Add `saropa_lints` to `dev_dependencies`
-   - Run `dart pub get` (or `flutter pub get`)
-   - Run `dart run saropa_lints:write_config --tier recommended --target <workspace>` (headless)
-   - Optionally run `dart analyze`
+2. Open the **Saropa Lints** view (checklist icon in the activity bar). **Overview & options** lists workspace settings, sidebar section toggles, and links (About, Getting Started).
+3. When you are ready to wire the package in, run **Saropa Lints: Set Up Project (pubspec + config)** (or click **Lint integration: Off** if you disabled integration). That will add `saropa_lints` to `dev_dependencies`, run pub get, run `write_config` for your tier, and optionally analyze.
 4. Run **"Saropa Lints: Getting Started"** from the Command Palette for a guided tour of all features.
 5. Use **Run Analysis** and **Open Config** as needed. Violations appear in the **Violations** view when `reports/.saropa_lints/violations.json` exists (written by the analyzer).
 
@@ -51,7 +47,7 @@ The **Security Posture** view shows OWASP Mobile and Web Top 10 coverage based o
 
 The **Config** view shows Enabled, Tier, Run analysis after config change, **Detected** (Flutter and packages from `pubspec.yaml`), and actions (Open config, Initialize config, Run analysis).
 
-**TODOs & Hacks** — A Todo-Tree-style sidebar view that lists TODO, FIXME, HACK, XXX, and BUG comment markers by scanning workspace files. No Dart analyzer or violations.json; works in any workspace with supported file types (Dart, YAML, TypeScript, JavaScript by default). Tree shows by folder → file → line (or by tag → file → line when "Group by tag" is on). Click a line to open the file at that line. Use the **Refresh** or **Toggle group by tag / folder** buttons in the view toolbar, or **TODOs & Hacks: Refresh** from the command palette. Auto-refresh on save is optional (see settings). Optional custom regex override is supported (see `saropaLints.todosAndHacks.customRegex`). Add `**/*.md` to `saropaLints.todosAndHacks.includeGlobs` if you want Markdown scanned too.
+**TODOs & Hacks** — Todo-Tree-style markers (TODO, FIXME, …) **after you opt in** to workspace scanning (`saropaLints.todosAndHacks.workspaceScanEnabled`, default **off** to avoid heavy full-repo I/O). Until then, the view shows **Enable workspace scan…** (or use **TODOs & Hacks: Enable workspace scan**). No `violations.json` required. Default globs: Dart, YAML, TypeScript, JavaScript; add `**/*.md` to `includeGlobs` if you want Markdown. Toolbar: Refresh, Toggle group by tag / folder. Auto-refresh on save respects the same gate. Custom regex: `saropaLints.todosAndHacks.customRegex`.
 
 The **Logs** view lists analysis reports from `reports/`. Each log shows a parsed hint (e.g. violation counts, init tier). A "Run Analysis" action appears when the latest report is over 1 hour old.
 
@@ -59,7 +55,7 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 
 | Setting | Default | Description |
 |--------|--------|-------------|
-| `saropaLints.enabled` | `false` | Master switch. When on, the extension has set up the project and you can run analysis from the UI. |
+| `saropaLints.enabled` | `true` | Lint integration for this workspace (upgrade checks, status-bar treatment). Overview stays usable when off; use **Set Up Project** to add the package and config. |
 | `saropaLints.tier` | `recommended` | Tier used when enabling or re-initializing (essential, recommended, professional, comprehensive, pedantic). |
 | `saropaLints.runAnalysisAfterConfigChange` | `true` | Run `dart analyze` after init when enabling. |
 | `saropaLints.runAnalysisOpenEditorsOnly` | `false` | When true, `Run Analysis` runs `dart/flutter analyze` only for Dart files currently open in VS Code (workspace text documents) under the detected project root (pubspec.yaml directory). |
@@ -69,6 +65,7 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 **Sidebar defaults:** **Overview & options** and **Violations** show in the activity bar by default (workspace options and section toggles live under Overview). Turn on the standalone **Config** view, Summary, Security, File Risk, Package Vibrancy, TODOs, etc. from **Overview & options → Sidebar** or Settings (`saropaLints.sidebar.show*`).
 
 | **TODOs & Hacks** | | |
+| `saropaLints.todosAndHacks.workspaceScanEnabled` | `false` | When **true**, the view scans the workspace for comment markers (resource-intensive). |
 | `saropaLints.todosAndHacks.tags` | `["TODO", "FIXME", "HACK", "XXX", "BUG"]` | Tags to search for in comments (case-sensitive). |
 | `saropaLints.todosAndHacks.includeGlobs` | `["**/*.dart", "**/*.yaml", "**/*.ts", "**/*.js"]` | Glob patterns for files to scan. |
 | `saropaLints.todosAndHacks.excludeGlobs` | `["**/node_modules/**", "**/.dart_tool/**", "**/build/**", "**/.git/**"]` | Extra exclude patterns (merged with search.exclude). |
@@ -80,8 +77,8 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 ## Commands
 
 - **Saropa Lints: Getting Started** — Open the walkthrough with a guided tour of all features.
-- **Saropa Lints: Enable** — Add saropa_lints to the project and run init (and optionally analyze).
-- **Saropa Lints: Disable** — Turn the extension off for this workspace (does not remove files).
+- **Saropa Lints: Set Up Project (pubspec + config)** — Add `saropa_lints` to the project and run init (and optionally analyze).
+- **Saropa Lints: Turn Off Lint Integration** — Disable integration for this workspace (does not remove files).
 - **Saropa Lints: Run Analysis** — Run `dart analyze` / `flutter analyze`.
 - **Saropa Lints: Initialize / Update Config** — Write analysis_options.yaml with the current tier (uses write_config).
 - **Saropa Lints: Open Config** — Open `analysis_options_custom.yaml` or `analysis_options.yaml`.
@@ -93,7 +90,8 @@ The **Logs** view lists analysis reports from `reports/`. Each log shows a parse
 - **Explain rule** — On a violation in the Violations tree (context menu) or from the command palette (pick a rule): open a side tab with full rule details (message, fix, severity, impact, OWASP, ROADMAP link).
 - **Apply fix** — On a violation in the Violations tree (context menu): run the Dart analyzer's quick fix for that location without opening the file.
 - **Fix all in this file** — On a file in the Violations tree (context menu): run all available quick fixes for that file bottom-up.
-- **TODOs & Hacks: Refresh** — Rescan the workspace for TODO/FIXME/HACK/XXX/BUG markers and refresh the TODOs & Hacks view.
+- **TODOs & Hacks: Refresh** — Refresh the TODOs & Hacks view (full rescan only when workspace scan is enabled).
+- **TODOs & Hacks: Enable workspace scan** — Turn on `workspaceScanEnabled` so marker search can run.
 - **Create Saropa Lints Instructions for AI Agents** — Create `.cursor/rules/saropa_lints_instructions.mdc` in the workspace from the bundled template (Overview title bar or Command Palette). Gives AI agents project guidelines for working on saropa_lints.
 - **TODOs & Hacks: Toggle group by tag / folder** — Switch between grouping by folder→file→line and by tag→file→line (view toolbar).
 

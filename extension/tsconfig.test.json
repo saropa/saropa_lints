@@ -27,7 +27,13 @@
     "src/test/overviewEmbeddedConfigKinds.test.ts",
     "src/copyTreeAsJson.ts",
     "src/treeSerializers.ts",
-    "src/test/treeSerializers.test.ts"
+    "src/test/treeSerializers.test.ts",
+    "src/suggestionCounts.ts",
+    "src/sidebarSectionCounts.ts",
+    "src/violationsReader.ts",
+    "src/rulePacks/rulePackYaml.ts",
+    "src/test/suggestionCounts.test.ts",
+    "src/test/sidebarSectionCounts.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

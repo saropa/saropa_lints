@@ -127,9 +127,6 @@ export class FileRiskTreeProvider implements vscode.TreeDataProvider<FileRiskNod
   getChildren(element?: FileRiskNode): FileRiskNode[] {
     if (element) return [];
 
-    const cfg = vscode.workspace.getConfiguration('saropaLints');
-    if (!(cfg.get<boolean>('enabled', false) ?? false)) return [];
-
     const root = getProjectRoot();
     if (!root) return [];
 

@@ -69,13 +69,13 @@
         {
           "id": "saropaLints.config",
           "name": "Config",
-          "when": "saropaLints.enabled && saropaLints.sidebar.showConfig"
+          "when": "saropaLints.isDartProject && saropaLints.sidebar.showConfig"
         },
         {
           "id": "saropaLints.rulePacks",
           "name": "Rule Packs",
           "type": "webview",
-          "when": "saropaLints.isDartProject && saropaLints.enabled && saropaLints.sidebar.showRulePacks"
+          "when": "saropaLints.isDartProject && saropaLints.sidebar.showRulePacks"
         },
         {
           "id": "saropaLints.suggestions",
@@ -124,28 +124,18 @@
       },
       {
         "view": "saropaLints.issues",
-        "contents": "Saropa Lints is off for this workspace.\n\nEnable it to:\n• Add saropa_lints to your project (pubspec + analysis_options)\n• Run init and analysis from the UI—no terminal commands\n• See violations grouped by impact, rule, and file\n\n[Enable Saropa Lints](command:saropaLints.enable)",
-        "when": "saropaLints.isDartProject && !saropaLints.enabled"
-      },
-      {
-        "view": "saropaLints.overview",
-        "contents": "Saropa Lints provides 2050+ Dart and Flutter lint rules for security, accessibility, and performance. It has two components: a pub.dev package with the rules and a VS Code extension for visual analysis and configuration.\n\nSaropa Lints is off for this workspace.\n\n[Enable Saropa Lints](command:saropaLints.enable)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
-        "when": "saropaLints.isDartProject && !saropaLints.enabled"
-      },
-      {
-        "view": "saropaLints.issues",
-        "contents": "No analysis results yet.\n\n[Run Analysis](command:saropaLints.runAnalysis)\n[Open Config](command:saropaLints.openConfig)",
-        "when": "saropaLints.enabled && !saropaLints.hasViolations"
+        "contents": "No analysis results yet.\n\n[Run Analysis](command:saropaLints.runAnalysis)\n[Open Config](command:saropaLints.openConfig)\n[Set up saropa_lints in pubspec](command:saropaLints.enable)",
+        "when": "saropaLints.isDartProject && !saropaLints.hasViolations"
       }
     ],
     "commands": [
       {
         "command": "saropaLints.enable",
-        "title": "Saropa Lints: Enable"
+        "title": "Saropa Lints: Set Up Project (pubspec + config)"
       },
       {
         "command": "saropaLints.disable",
-        "title": "Saropa Lints: Disable"
+        "title": "Saropa Lints: Turn Off Lint Integration"
       },
       {
         "command": "saropaLints.runAnalysis",
@@ -645,6 +635,10 @@
         "icon": "$(list-tree)"
       },
       {
+        "command": "saropaLints.todosAndHacks.enableWorkspaceScan",
+        "title": "TODOs & Hacks: Enable workspace scan"
+      },
+      {
         "command": "saropaLints.driftAdvisor.refresh",
         "title": "Drift Advisor: Refresh",
         "icon": "$(refresh)"
@@ -709,7 +703,7 @@
         },
         {
           "command": "saropaLints.runAnalysis",
-          "when": "view == saropaLints.overview && saropaLints.enabled",
+          "when": "view == saropaLints.overview && saropaLints.isDartProject",
           "group": "navigation"
         },
         {
@@ -1143,8 +1137,8 @@
         "properties": {
           "saropaLints.enabled": {
             "type": "boolean",
-            "default": false,
-            "description": "Enable Saropa Lints for this workspace. When on, the extension sets up pubspec and analysis_options and runs analysis; when off, it does nothing."
+            "default": true,
+            "markdownDescription": "When **on** (default), Saropa Lints runs upgrade checks and treats the workspace as using Saropa lint integration. Turn **off** to pause integration notifications and status-bar score without hiding sidebar options—use **Saropa Lints: Set Up Project** when you need to add `saropa_lints` to pubspec and write `analysis_options`."
           },
           "saropaLints.tier": {
             "type": "string",
@@ -1261,6 +1255,11 @@
       {
         "title": "TODOs & Hacks",
         "properties": {
+          "saropaLints.todosAndHacks.workspaceScanEnabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Allow TODOs & Hacks to scan the workspace for comment markers (TODO, FIXME, …). Off by default because scanning many files is resource-intensive; enable when you use that sidebar."
+          },
           "saropaLints.todosAndHacks.tags": {
             "type": "array",
             "items": { "type": "string" },
@@ -1740,7 +1739,7 @@
           {
             "id": "saropaLints.walkthrough.healthScore",
             "title": "Health Score",
-            "description": "Your project's quality at a glance: a **0–100 score** in the status bar and Overview view.\n\nGreen (80+), yellow (50–79), red (<50). Critical issues penalize heavily.\n\n[Enable Saropa Lints](command:saropaLints.enable)",
+            "description": "Your project's quality at a glance: a **0–100 score** in the status bar and Overview view.\n\nGreen (80+), yellow (50–79), red (<50). Critical issues penalize heavily.\n\n[Run analysis](command:saropaLints.runAnalysis) · [Set up project](command:saropaLints.enable)",
             "media": {
               "markdown": "media/walkthrough-health-score.md"
             },
@@ -1814,7 +1813,7 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run precompile && npm run check-types && node esbuild.js --production",
     "lint": "tsc --noEmit -p ./",
-    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" --timeout 10000"
+    "test": "tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" \"out-test/test/suggestionCounts.test.js\" \"out-test/test/sidebarSectionCounts.test.js\" --timeout 10000"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

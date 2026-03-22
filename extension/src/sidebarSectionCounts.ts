@@ -1,12 +1,18 @@
 /**
  * Per-section counts for Overview → Sidebar toggles so users can see whether
  * a panel is worth enabling before turning it on.
+ *
+ * Violation-derived counts (Issues, Summary, Suggestions, etc.) are filled whenever
+ * `violations` input is non-null — independent of `saropaLints.enabled`, so toggles stay
+ * informative after a user turns “lint integration” off without deleting `violations.json`.
+ *
+ * **Vibrancy:** callers pass `vibrancyPackageCount` (from {@link getLatestResults} in production)
+ * so this module stays free of Vibrancy activation imports and remains easy to unit test.
  */
 
 import type { Violation, ViolationsData } from './violationsReader';
 import { readRulePacksEnabled } from './rulePacks/rulePackYaml';
-import { countSuggestionItems } from './views/suggestionsTree';
-import { getLatestResults } from './vibrancy/extension-activation';
+import { countSuggestionItems } from './suggestionCounts';
 
 function countOwaspMappedViolations(violations: readonly Violation[]): number {
     let n = 0;
@@ -27,11 +33,12 @@ function countFilesWithViolations(violations: readonly Violation[]): number {
 
 export interface SidebarSectionCountInputs {
     readonly workspaceRoot: string | undefined;
-    readonly saropaEnabled: boolean;
     readonly tier: string;
     readonly violations: ViolationsData | null;
     readonly todosMarkerCount: number | undefined;
     readonly driftIssueCount: number | undefined;
+    /** Latest Vibrancy scan size (`getLatestResults().length` in the extension host). */
+    readonly vibrancyPackageCount: number;
 }
 
 /**
@@ -46,13 +53,9 @@ export function buildSidebarSectionCountMap(inputs: SidebarSectionCountInputs): 
 
     m.set('sidebar.showRulePacks', readRulePacksEnabled(root).length);
 
-    const vibrancyPackages = getLatestResults().length;
+    const vibrancyPackages = inputs.vibrancyPackageCount;
     m.set('sidebar.showPackageVibrancy', vibrancyPackages);
     m.set('sidebar.showPackageDetails', vibrancyPackages);
-
-    if (!inputs.saropaEnabled) {
-        return m;
-    }
 
     const data = inputs.violations;
     if (data) {
