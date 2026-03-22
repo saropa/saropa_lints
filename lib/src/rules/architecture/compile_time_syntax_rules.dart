@@ -6,8 +6,8 @@
 ///
 /// ## Why this file exists
 ///
-/// These diagnostics are grouped here (instead of [structure_rules.dart]) so
-/// [structure_rules.dart] stays maintainable. Rules are **syntactic / structural**
+/// These diagnostics are grouped here (instead of `structure_rules.dart`) so
+/// `structure_rules.dart` stays maintainable. Rules are **syntactic / structural**
 /// with minimal heuristic string matching: they use AST node types, the element
 /// model for `Enum` (`implements Enum`, `mixin … on Enum`), and resolved
 /// annotation elements for `literal` / `nonVirtual`.

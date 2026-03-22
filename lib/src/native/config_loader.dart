@@ -255,8 +255,7 @@ void _reloadRulePacksFromRoot(String projectRoot) {
     return;
   }
 
-  final normalized =
-      content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+  final normalized = content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
   final packIds = parseRulePacksEnabledList(normalized);
   final lockVersions = readResolvedPackageVersions(projectRoot);
   _packContributedCodes = mergeRulePacksIntoEnabled(

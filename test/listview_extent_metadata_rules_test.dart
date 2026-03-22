@@ -184,10 +184,7 @@ class _ListViewExtentVisitor extends RecursiveAstVisitor<void> {
     super.visitMethodInvocation(node);
   }
 
-  void _maybeCountListView(
-    ConstructorName constructorName,
-    ArgumentList args,
-  ) {
+  void _maybeCountListView(ConstructorName constructorName, ArgumentList args) {
     final typeName = constructorName.type.name.lexeme;
     final name = constructorName.name?.name;
     if (typeName == 'ListView' && (name == 'builder' || name == 'separated')) {
