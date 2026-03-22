@@ -835,7 +835,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   }
 }
 
-/** D10: Group violations by file into FileItem[], sorted by count desc then name. */
+/** D10: Group violations by file into FileItem[], sorted by count desc then basename (matches tree labels). */
 function buildFileItems(violations: Violation[]): FileItem[] {
   const byFile = new Map<string, Violation[]>();
   for (const v of violations) {
@@ -847,8 +847,14 @@ function buildFileItems(violations: Violation[]): FileItem[] {
   for (const [filePath, list] of byFile) {
     items.push({ kind: 'file', severity: '', filePath, violations: list });
   }
-  // Sort by count descending, then by path ascending as tie-breaker for stable order.
-  items.sort((a, b) => b.violations.length - a.violations.length || a.filePath.localeCompare(b.filePath));
+  // Count desc, then basename asc (primary label), then full path for duplicate basenames.
+  items.sort((a, b) => {
+    const byCount = b.violations.length - a.violations.length;
+    if (byCount !== 0) return byCount;
+    const baseCmp = path.basename(a.filePath).localeCompare(path.basename(b.filePath));
+    if (baseCmp !== 0) return baseCmp;
+    return a.filePath.localeCompare(b.filePath);
+  });
   return items;
 }
 

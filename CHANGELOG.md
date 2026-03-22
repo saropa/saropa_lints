@@ -25,6 +25,14 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 
 ---
 
+## [10.0.1]
+
+### Changed
+
+- Version bump
+
+---
+
 ## [10.0.0]
 
 In this milestone update work centers on the composite analyzer plugin hook (`registerSaropaLintRules`), rule packs end-to-end (analyzer merge, CLI init, VS Code Rule Packs webview, generated registry), extension UX that defaults integration on with clearer commands and TODOs workspace scan as opt-in, and a wave of new lintsâ€”compile-time shape alignment, Dart 3.0 removed-API migration rules, and targeted Flutter fixes.
