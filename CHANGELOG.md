@@ -25,6 +25,15 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **`require_data_encryption`** — The `pin` keyword is matched only when not immediately preceded by an ASCII letter, so identifiers such as `OwaspMapping` (where `Mapping` embeds `…p-i-n…`) no longer false-positive on ordinary `write`/`writeAsString` calls. Regression coverage: `test/require_data_encryption_pin_pattern_test.dart`; fixture: `example_async/lib/security/require_data_encryption_fixture.dart`.
+- **`rootUriToPath`** — `file://` roots use `Uri.tryParse` so invalid URIs return null instead of throwing; satisfies `prefer_try_parse_for_dynamic_data` for package_config paths. Tests: `test/project_info_root_uri_test.dart`.
+
+---
+
 ## [10.0.1]
 
 ### Changed
