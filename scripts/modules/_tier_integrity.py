@@ -104,6 +104,24 @@ TIER_SET_PATTERNS: dict[str, str] = {
 }
 
 
+def _find_lint_rule_class_start(content: str, class_name: str) -> int:
+    """Return byte offset of a lint rule class declaration, or -1.
+
+    ``dart format`` often emits ``class Foo extends Bar`` on one line, but
+    multiline ``class Foo\\n    extends Bar`` is valid and must be recognized
+    when mapping ``_allRuleFactories`` entries to ``LintCode`` names. Missing
+    either shape produces false **phantom rule** audit failures.
+    """
+    same_line = content.find(f"class {class_name} ")
+    if same_line != -1:
+        return same_line
+    multiline = re.search(
+        rf"class {re.escape(class_name)}\s*\n\s+extends\s+",
+        content,
+    )
+    return multiline.start() if multiline else -1
+
+
 def get_registered_rule_names(
     saropa_lints_path: Path,
     rules_dir: Path,
@@ -198,7 +216,7 @@ def get_registered_rule_names(
 
     for class_name in class_names:
         for _fname, content in file_contents.items():
-            class_start = content.find(f"class {class_name} ")
+            class_start = _find_lint_rule_class_start(content, class_name)
             if class_start == -1:
                 continue
 

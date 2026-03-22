@@ -945,7 +945,7 @@ saropa_lints:
     - require_provider_dispose: false
     - prefer_ref_watch_over_read: false
     - avoid_change_notifier_in_widget: false
-    - avoid_chip_delete_inkwell_circle_border: false # INFO - chip deleteIcon InkWell + CircleBorder (v9.11.0)
+    - avoid_chip_delete_inkwell_circle_border: false # INFO - chip deleteIcon InkWell + CircleBorder; Tier: stylistic / flutterStylistic (v9.11.0)
     - avoid_setstate_in_large_state_class: false
     - require_riverpod_lint: false
     - require_multi_provider: false

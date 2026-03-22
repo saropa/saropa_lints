@@ -684,6 +684,9 @@ class AvoidRemovedCyclicInitializationErrorRule extends SaropaLintRule {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Detects the removed default constructor on [NoSuchMethodError] (Dart 3.0).
+///
+/// Keep `class … extends` on one line like sibling rules so publish tier
+/// audits and `dart format` agree on declaration shape.
 class AvoidRemovedNoSuchMethodErrorDefaultConstructorRule
     extends SaropaLintRule {
   AvoidRemovedNoSuchMethodErrorDefaultConstructorRule() : super(code: _code);
