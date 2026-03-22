@@ -35,6 +35,7 @@ library;
 import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, Platform, stderr;
 
+import 'package:analysis_server_plugin/registry.dart' show PluginRegistry;
 import 'package:analyzer/error/error.dart' show DiagnosticCode;
 import 'package:saropa_lints/src/baseline/baseline_config.dart';
 import 'package:saropa_lints/src/baseline/baseline_manager.dart';
@@ -96,6 +97,14 @@ export 'package:saropa_lints/src/project_context.dart'
         RulePriorityQueue,
         SmartContentFilter,
         ViolationBatch;
+
+// Composite plugins: same config load / project-root refresh as this package’s
+// `lib/main.dart`, without importing `src/` paths.
+export 'package:saropa_lints/src/native/config_loader.dart'
+    show
+        loadNativePluginConfig,
+        loadOutputConfigFromProjectRoot,
+        loadRulePacksConfigFromProjectRoot;
 
 /// Analyzer 9: DiagnosticCode has no lowerCaseName; this extension provides it.
 extension DiagnosticCodeLowerCase on DiagnosticCode {
@@ -2984,6 +2993,71 @@ List<SaropaLintRule> getRulesFromRegistry(Set<String> ruleNames) {
   }
 
   return rules;
+}
+
+/// Registers Saropa lint rules and their quick-fix generators on [registry].
+///
+/// ## When to call
+///
+/// Invoke from your analyzer plugin’s `Plugin.register` after
+/// [loadNativePluginConfig] has run (typically from `Plugin.start`). Reads
+/// [SaropaLintRule.enabledRules] and [SaropaLintRule.disabledRules], which that
+/// loader fills from `analysis_options.yaml`, `analysis_options_custom.yaml`,
+/// and environment overrides.
+///
+/// ## Semantics
+///
+/// - If [SaropaLintRule.enabledRules] is null or empty, returns immediately
+///   (no rules registered).
+/// - Builds instances only for known rule names via [getRulesFromRegistry];
+///   unknown names in the enabled set are ignored (no throw).
+/// - Skips a rule when [SaropaLintRule.isDisabled] is true, including when the
+///   user disabled it via a [SaropaLintRule.configAliases] entry in YAML (same
+///   behavior as tier/diagnostic resolution elsewhere).
+/// - Skips rules whose [LintCode] resolves to an empty [LintCode.lowerCaseName].
+/// - Registers each remaining rule and its [SaropaLintRule.fixGenerators] on
+///   [registry]. Failures are logged and swallowed so a bad rule cannot crash
+///   the analysis server isolate.
+///
+/// ## Composite (meta-)plugins
+///
+/// Dart allows **one** analyzer plugin per analysis context. To ship Saropa plus
+/// org-specific rules, create a single dev_dependency package that depends on
+/// `package:saropa_lints`, exposes the top-level `plugin` in `lib/main.dart`,
+/// calls [loadNativePluginConfig] in `start`, calls this function in `register`,
+/// then registers your own rules. Put Saropa’s `version`, `diagnostics`, and
+/// `rule_packs` under your plugin’s YAML key. See
+/// `doc/guides/composite_analyzer_plugin.md`.
+void registerSaropaLintRules(PluginRegistry registry) {
+  try {
+    final enabled = SaropaLintRule.enabledRules;
+    if (enabled == null || enabled.isEmpty) return;
+
+    final rules = getRulesFromRegistry(enabled);
+    if (rules.isEmpty) return;
+
+    for (final rule in rules) {
+      final code = rule.code;
+      if (code.lowerCaseName.isEmpty) continue;
+
+      if (rule.isDisabled) {
+        continue;
+      }
+
+      registry.registerLintRule(rule);
+
+      for (final generator in rule.fixGenerators) {
+        registry.registerFixForRule(code, generator);
+      }
+    }
+  } catch (e, st) {
+    developer.log(
+      'registerSaropaLintRules failed',
+      name: 'saropa_lints',
+      error: e,
+      stackTrace: st,
+    );
+  }
 }
 
 // =============================================================================
