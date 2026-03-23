@@ -1,17 +1,17 @@
-# Migration Candidate #101
+# Plan #102
 
 **Source:** Dart SDK 3.0.0
 **Category:** Deprecation
 **Relevance Score:** 5
-**Detected APIs:** CastError, Removed
+**Detected APIs:** FallThroughError, Removed, The
 
 ---
 
 ## Release Note Entry
 
-> - Removed the deprecated [`CastError`][] error.
+> - Removed the deprecated [`FallThroughError`][] error. The kind of
 >
-> Context: Use [`TypeError`][] instead.
+> Context: fall-through previously throwing this error was made a compile-time
 
 ---
 
@@ -23,8 +23,9 @@ An API has been deprecated. Users still using the old API should migrate to the 
 
 ### APIs Involved
 
-- `CastError`
+- `FallThroughError`
 - `Removed`
+- `The`
 
 ---
 

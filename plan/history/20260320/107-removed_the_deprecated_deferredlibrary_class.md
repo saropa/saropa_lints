@@ -1,17 +1,17 @@
-# Migration Candidate #105
+# Plan #107
 
 **Source:** Dart SDK 3.0.0
 **Category:** Deprecation
 **Relevance Score:** 5
-**Detected APIs:** NoSuchMethodError, Removed
+**Detected APIs:** DeferredLibrary, Removed
 
 ---
 
 ## Release Note Entry
 
-> - Removed the deprecated [`NoSuchMethodError`][] default constructor.
+> - Removed the deprecated [`DeferredLibrary`][] class.
 >
-> Context: Use the [`NoSuchMethodError.withInvocation`][] named constructor instead.
+> Context: Use the [`deferred as`][] import syntax instead.
 
 ---
 
@@ -23,7 +23,7 @@ An API has been deprecated. Users still using the old API should migrate to the 
 
 ### APIs Involved
 
-- `NoSuchMethodError`
+- `DeferredLibrary`
 - `Removed`
 
 ---

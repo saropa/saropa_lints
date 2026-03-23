@@ -1,17 +1,17 @@
-# Migration Candidate #099
+# Plan #017
 
-**Source:** Dart SDK 3.0.0
+**Source:** Flutter SDK 3.29.0
 **Category:** Deprecation
-**Relevance Score:** 5
-**Detected APIs:** proxy, Provisional, Removed
+**Relevance Score:** 7
+**Detected APIs:** ButtonStyleButton.iconAlignment, Deprecate, TahaTesser
 
 ---
 
 ## Release Note Entry
 
-> - Removed the deprecated [`proxy`][] and [`Provisional`][] annotations.
+> Deprecate unused `ButtonStyleButton.iconAlignment` property by @TahaTesser in 160023
 >
-> Context: The original `proxy` annotation has no effect in Dart 2,
+> Context: * Add script to check format of changed dart files by @goderbauer in 160007
 
 ---
 
@@ -23,9 +23,9 @@ An API has been deprecated. Users still using the old API should migrate to the 
 
 ### APIs Involved
 
-- `proxy`
-- `Provisional`
-- `Removed`
+- `ButtonStyleButton.iconAlignment`
+- `Deprecate`
+- `TahaTesser`
 
 ---
 
@@ -66,4 +66,4 @@ Replace with the recommended alternative API
 ---
 
 **Status:** Not started
-**Generated:** From Dart SDK v3.0.0 release notes
+**Generated:** From Flutter SDK v3.29.0 release notes

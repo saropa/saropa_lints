@@ -1,17 +1,48 @@
-# Migration Candidate #102
+# Plan #038
 
-**Source:** Dart SDK 3.0.0
+**Source:** Flutter SDK 3.19.0
 **Category:** Deprecation
 **Relevance Score:** 5
-**Detected APIs:** FallThroughError, Removed, The
+**Detected APIs:** PlatformMenuBar.body, Remove
 
 ---
 
 ## Release Note Entry
 
-> - Removed the deprecated [`FallThroughError`][] error. The kind of
+> Remove deprecated `PlatformMenuBar.body` by @gspencergoog in [138509](https://github.com/flutter/flutter/pull/138509)
 >
-> Context: fall-through previously throwing this error was made a compile-time
+> Context: * Refactor to use Apple system fonts by @MitchellGoodwin in [137275](https://github.com/flutter/flutter/pull/137275)
+
+**PR:** https://github.com/flutter/flutter/pull/138509
+
+## PR Details
+
+**Title:** Remove deprecated `PlatformMenuBar.body`
+**Author:** @gspencergoog
+**Status:** merged
+**Labels:** framework, f: material design, f: cupertino, c: tech-debt, autosubmit
+
+### Description
+
+Part of https://github.com/flutter/flutter/issues/139243
+
+
+
+## Description
+
+
+
+This removes the `PlatformMenuBar.body` attribute and constructor parameter, since its deprecation period has elapsed.
+
+
+
+## Tests
+
+ - No tests were using the deprecated attribute, so no tests were removed.
+
+
+
+#FlutterDeprecations
 
 ---
 
@@ -23,9 +54,8 @@ An API has been deprecated. Users still using the old API should migrate to the 
 
 ### APIs Involved
 
-- `FallThroughError`
-- `Removed`
-- `The`
+- `PlatformMenuBar.body`
+- `Remove`
 
 ---
 
@@ -66,4 +96,4 @@ Replace with the recommended alternative API
 ---
 
 **Status:** Not started
-**Generated:** From Dart SDK v3.0.0 release notes
+**Generated:** From Flutter SDK v3.19.0 release notes

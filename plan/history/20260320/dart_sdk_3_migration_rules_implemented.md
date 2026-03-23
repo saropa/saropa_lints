@@ -4,7 +4,7 @@
 
 Implemented **15** Saropa lint rules for APIs removed or deprecated in **Dart 3.0+** across `dart:core`, `dart:collection`, `dart:developer`, and `dart:io`, consolidated in `lib/src/rules/config/dart_sdk_3_removal_rules.dart`. Rules are **Recommended** tier, use **`requiredPatterns`** for early file skip, and prefer **element resolution** over name-only heuristics where possible.
 
-## Rules (migration candidates #098–#107)
+## Rules (plans #098–#107)
 
 | Plan | Rule names |
 |------|------------|
@@ -19,7 +19,7 @@ Implemented **15** Saropa lint rules for APIs removed or deprecated in **Dart 3.
 | #106 | `avoid_removed_bidirectional_iterator` |
 | #107 | `avoid_removed_deferred_library` |
 
-## Extension (migration candidates #108–#115)
+## Extension (plans #108–#115)
 
 | Plan | Rule / notes |
 |------|----------------|
@@ -31,22 +31,22 @@ Implemented **15** Saropa lint rules for APIs removed or deprecated in **Dart 3.
 | #113 | Covered by `avoid_removed_cast_error` + `avoid_removed_fall_through_error` |
 | #115 | No rule: `dart:js_util` `callMethod` parameter widened (String still valid) |
 
-Summary: `bugs/history/20260320/migration_candidates_108_115_implemented.md`.
+Summary: `plan/history/20260320/108_115_implemented.md`.
 
 ## Source plans (archived from `plan/implementable_only_in_plugin_extension/`)
 
 Moved into this folder:
 
-- `migration-candidate-098-removed_the_deprecated_list_constructor_as_it_wasn_t_null_sa.md`
-- `migration-candidate-099-removed_the_deprecated_proxy_and_provisional_annotations.md`
-- `migration-candidate-100-removed_the_deprecated_deprecated_expires_getter.md`
-- `migration-candidate-101-removed_the_deprecated_casterror_error.md`
-- `migration-candidate-102-removed_the_deprecated_fallthrougherror_error_the_kind_of.md`
-- `migration-candidate-103-removed_the_deprecated_abstractclassinstantiationerror_error.md`
-- `migration-candidate-104-removed_the_deprecated_cyclicinitializationerror_cyclic_depe.md`
-- `migration-candidate-105-removed_the_deprecated_nosuchmethoderror_default_constructor.md`
-- `migration-candidate-106-removed_the_deprecated_bidirectionaliterator_class.md`
-- `migration-candidate-107-removed_the_deprecated_deferredlibrary_class.md`
+- `098-removed_the_deprecated_list_constructor_as_it_wasn_t_null_sa.md`
+- `099-removed_the_deprecated_proxy_and_provisional_annotations.md`
+- `100-removed_the_deprecated_deprecated_expires_getter.md`
+- `101-removed_the_deprecated_casterror_error.md`
+- `102-removed_the_deprecated_fallthrougherror_error_the_kind_of.md`
+- `103-removed_the_deprecated_abstractclassinstantiationerror_error.md`
+- `104-removed_the_deprecated_cyclicinitializationerror_cyclic_depe.md`
+- `105-removed_the_deprecated_nosuchmethoderror_default_constructor.md`
+- `106-removed_the_deprecated_bidirectionaliterator_class.md`
+- `107-removed_the_deprecated_deferredlibrary_class.md`
 
 ## Tests & fixtures
 

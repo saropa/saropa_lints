@@ -1,17 +1,17 @@
-# Migration Candidate #100
+# Plan #103
 
 **Source:** Dart SDK 3.0.0
 **Category:** Deprecation
 **Relevance Score:** 5
-**Detected APIs:** Deprecated.expires, Removed
+**Detected APIs:** AbstractClassInstantiationError, Removed
 
 ---
 
 ## Release Note Entry
 
-> - Removed the deprecated [`Deprecated.expires`][] getter.
+> - Removed the deprecated [`AbstractClassInstantiationError`][] error. It was made
 >
-> Context: Use [`Deprecated.message`][] instead.
+> Context: a compile-time error to call the constructor of an abstract class in Dart 2.0.
 
 ---
 
@@ -23,7 +23,7 @@ An API has been deprecated. Users still using the old API should migrate to the 
 
 ### APIs Involved
 
-- `Deprecated.expires`
+- `AbstractClassInstantiationError`
 - `Removed`
 
 ---

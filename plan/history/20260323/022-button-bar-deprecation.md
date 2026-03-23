@@ -1,6 +1,6 @@
-# Migration candidate #022 (ButtonBar deprecation) — done
+# Plan #022 (ButtonBar deprecation) — done
 
-**Source plan:** `plan/implementable_only_in_plugin_extension/migration-candidate-022-deprecate_buttonbar_buttonbarthemedata_and_themedata_buttonb.md` (removed when complete; this file is the history note).
+**Source plan:** `plan/implementable_only_in_plugin_extension/022-deprecate_buttonbar_buttonbarthemedata_and_themedata_buttonb.md` (removed when complete; this file is the history note).
 
 **Summary:** Extended existing rule **`prefer_overflow_bar_over_button_bar`** to v2 for Flutter [PR #145523](https://github.com/flutter/flutter/pull/145523): `ButtonBarThemeData`, `ThemeData.buttonBarTheme` (constructor, `copyWith`, property reads), plus `MethodInvocation` shapes when the analyzer leaves the callee element unresolved. Quick fix removes `buttonBarTheme:` from `ThemeData` constructors/`copyWith` (Flutter data-driven fix parity).
 

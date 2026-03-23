@@ -1,17 +1,17 @@
-# Migration Candidate #104
+# Plan #099
 
 **Source:** Dart SDK 3.0.0
 **Category:** Deprecation
 **Relevance Score:** 5
-**Detected APIs:** CyclicInitializationError, Removed, Cyclic
+**Detected APIs:** proxy, Provisional, Removed
 
 ---
 
 ## Release Note Entry
 
-> - Removed the deprecated [`CyclicInitializationError`]. Cyclic dependencies are
+> - Removed the deprecated [`proxy`][] and [`Provisional`][] annotations.
 >
-> Context: no longer detected at runtime in null safe code. Such code will fail in other
+> Context: The original `proxy` annotation has no effect in Dart 2,
 
 ---
 
@@ -23,9 +23,9 @@ An API has been deprecated. Users still using the old API should migrate to the 
 
 ### APIs Involved
 
-- `CyclicInitializationError`
+- `proxy`
+- `Provisional`
 - `Removed`
-- `Cyclic`
 
 ---
 

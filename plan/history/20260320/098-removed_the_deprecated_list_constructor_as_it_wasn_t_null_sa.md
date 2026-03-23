@@ -1,17 +1,17 @@
-# Migration Candidate #017
+# Plan #098
 
-**Source:** Flutter SDK 3.29.0
+**Source:** Dart SDK 3.0.0
 **Category:** Deprecation
-**Relevance Score:** 7
-**Detected APIs:** ButtonStyleButton.iconAlignment, Deprecate, TahaTesser
+**Relevance Score:** 5
+**Detected APIs:** List, Removed
 
 ---
 
 ## Release Note Entry
 
-> Deprecate unused `ButtonStyleButton.iconAlignment` property by @TahaTesser in 160023
+> - Removed the deprecated `List` constructor, as it wasn't null safe.
 >
-> Context: * Add script to check format of changed dart files by @goderbauer in 160007
+> Context: Use list literals (e.g. `[]` for an empty list or `<int>[]` for an empty
 
 ---
 
@@ -23,9 +23,8 @@ An API has been deprecated. Users still using the old API should migrate to the 
 
 ### APIs Involved
 
-- `ButtonStyleButton.iconAlignment`
-- `Deprecate`
-- `TahaTesser`
+- `List`
+- `Removed`
 
 ---
 
@@ -66,4 +65,4 @@ Replace with the recommended alternative API
 ---
 
 **Status:** Not started
-**Generated:** From Flutter SDK v3.29.0 release notes
+**Generated:** From Dart SDK v3.0.0 release notes

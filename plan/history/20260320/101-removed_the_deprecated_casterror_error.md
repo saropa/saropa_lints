@@ -1,17 +1,17 @@
-# Migration Candidate #107
+# Plan #101
 
 **Source:** Dart SDK 3.0.0
 **Category:** Deprecation
 **Relevance Score:** 5
-**Detected APIs:** DeferredLibrary, Removed
+**Detected APIs:** CastError, Removed
 
 ---
 
 ## Release Note Entry
 
-> - Removed the deprecated [`DeferredLibrary`][] class.
+> - Removed the deprecated [`CastError`][] error.
 >
-> Context: Use the [`deferred as`][] import syntax instead.
+> Context: Use [`TypeError`][] instead.
 
 ---
 
@@ -23,7 +23,7 @@ An API has been deprecated. Users still using the old API should migrate to the 
 
 ### APIs Involved
 
-- `DeferredLibrary`
+- `CastError`
 - `Removed`
 
 ---
