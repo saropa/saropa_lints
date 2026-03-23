@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:saropa_lints/src/rules/platforms/web_rules.dart';
+import 'package:saropa_lints/src/saropa_lint_rule.dart' show LintImpact;
 import 'package:test/test.dart';
 
-/// Tests for 9 Web lint rules.
+/// Tests for Web lint rules.
 ///
 /// Test fixtures: example_platforms/lib/web/
 void main() {
@@ -63,6 +64,11 @@ void main() {
       'prefer_csrf_protection',
       () => PreferCsrfProtectionRule(),
     );
+    testRule(
+      'PreferScheduleMicrotaskOverWindowPostmessageRule',
+      'prefer_schedule_microtask_over_window_postmessage',
+      () => PreferScheduleMicrotaskOverWindowPostmessageRule(),
+    );
   });
   group('Web Rules - Fixture Verification', () {
     final fixtures = [
@@ -75,6 +81,7 @@ void main() {
       'require_web_renderer_awareness',
       'avoid_js_rounded_ints',
       'prefer_csrf_protection',
+      'prefer_schedule_microtask_over_window_postmessage',
     ];
 
     for (final fixture in fixtures) {
@@ -189,6 +196,20 @@ void main() {
 
       test('path URL strategy should NOT trigger', () {
         expect('path URL strategy', isNotNull);
+      });
+    });
+    group('prefer_schedule_microtask_over_window_postmessage', () {
+      test('problemMessage cites skwasm / postMessage cost', () {
+        final rule = PreferScheduleMicrotaskOverWindowPostmessageRule();
+        final msg = rule.code.problemMessage.toLowerCase();
+        expect(msg, contains('postmessage'));
+        expect(msg, contains('skwasm'));
+      });
+
+      test('impact is low; requiredPatterns include postMessage', () {
+        final rule = PreferScheduleMicrotaskOverWindowPostmessageRule();
+        expect(rule.impact, LintImpact.low);
+        expect(rule.requiredPatterns, contains('postMessage'));
       });
     });
   });

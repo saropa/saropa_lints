@@ -2615,3 +2615,124 @@ class PreferNullAwareMethodCallsRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// return_in_generator
+// =============================================================================
+
+/// Generator (`async*` / `sync*`) must not use `return` with a value.
+///
+/// Since: v10.0.3 | Rule version: v1
+///
+/// **BAD:**
+/// ```dart
+/// Stream<int> f() async* {
+///   return 1;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Stream<int> f() async* {
+///   yield 1;
+/// }
+/// ```
+class ReturnInGeneratorRule extends SaropaLintRule {
+  ReturnInGeneratorRule() : super(code: _code);
+
+  @override
+  Set<String>? get requiredPatterns => const {'async*', 'sync*'};
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'dart-core', 'reliability'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'return_in_generator',
+    '[return_in_generator] Cannot return a value from a generator function (async* or sync*). Use yield or yield* instead. {v1}',
+    correctionMessage:
+        'Replace return <expr> with yield <expr>, or use yield* for another stream/iterable.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addReturnStatement((ReturnStatement node) {
+      if (node.expression == null) return;
+      final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
+      if (body == null || !body.isGenerator) return;
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+// =============================================================================
+// yield_in_non_generator
+// =============================================================================
+
+/// `yield` / `yield*` only allowed in `async*` / `sync*` functions.
+///
+/// Since: v10.0.3 | Rule version: v1
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> f() async {
+///   yield 1;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Stream<int> f() async* {
+///   yield 1;
+/// }
+/// ```
+class YieldInNonGeneratorRule extends SaropaLintRule {
+  YieldInNonGeneratorRule() : super(code: _code);
+
+  @override
+  Set<String>? get requiredPatterns => const {'yield'};
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'dart-core', 'reliability'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'yield_in_non_generator',
+    '[yield_in_non_generator] Yield is only valid inside a generator function (marked with async* or sync*). {v1}',
+    correctionMessage:
+        'Change the function to async* or sync*, or remove the yield statement.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addYieldStatement((YieldStatement node) {
+      final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
+      if (body == null || body.isGenerator) return;
+      reporter.atNode(node, code);
+    });
+  }
+}

@@ -3,6 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/line_info.dart';
 
 import '../../comment_utils.dart';
@@ -5011,4 +5013,202 @@ class DuplicateIgnoreRule extends SaropaLintRule {
   }
 }
 
-/// Quick fix that deletes the commented-out code line.
+// =============================================================================
+// annotate_redeclares
+// =============================================================================
+
+/// Instance member that hides a super-interface member should use `@override`
+/// or a documentation comment explaining intent.
+///
+/// Since: v10.0.3 | Rule version: v1
+///
+/// **BAD:**
+/// ```dart
+/// class B {
+///   void m() {}
+/// }
+/// class C extends B {
+///   void m() {}
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class B {
+///   void m() {}
+/// }
+/// class C extends B {
+///   @override
+///   void m() {}
+/// }
+/// ```
+class AnnotateRedeclaresRule extends SaropaLintRule {
+  AnnotateRedeclaresRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention', 'maintainability'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'annotate_redeclares',
+    '[annotate_redeclares] This member hides an inherited instance member with the same name. Add @override if it is an override, or document why the name is reused intentionally. {v1}',
+    correctionMessage:
+        'Add @override when overriding, or a doc comment that states the redeclaration is intentional.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      final ClassElement? classEl = node.declaredFragment?.element;
+      if (classEl == null) return;
+
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration) {
+          if (member.isStatic || member.externalKeyword != null) continue;
+          final ExecutableElement? el = member.declaredFragment?.element;
+          if (el is! ExecutableElement) continue;
+          if (_annotateRedeclaresHasOverride(member.metadata)) continue;
+          if (member.documentationComment != null) continue;
+          if (!_inheritsExecutableForRedeclare(classEl, el)) continue;
+          reporter.atToken(member.name, code);
+        }
+      }
+    });
+  }
+}
+
+bool _annotateRedeclaresHasOverride(NodeList<Annotation> metadata) {
+  for (final Annotation a in metadata) {
+    if (a.name.name == 'override') return true;
+  }
+  return false;
+}
+
+bool _inheritsExecutableForRedeclare(
+  ClassElement cls,
+  ExecutableElement member,
+) {
+  final String? rawName = member.name;
+  if (rawName == null || rawName.startsWith('_')) return false;
+  if (member is MethodElement && member.isOperator) return false;
+
+  bool conflictsOn(InterfaceType type) {
+    final ExecutableElement? found = _lookupMemberForRedeclare(type, member);
+    return found != null && found.enclosingElement != member.enclosingElement;
+  }
+
+  InterfaceType? sup = cls.supertype;
+  while (sup != null) {
+    if (conflictsOn(sup)) return true;
+    sup = sup.superclass;
+  }
+  for (final InterfaceType mixin in cls.mixins) {
+    if (conflictsOn(mixin)) return true;
+  }
+  for (final InterfaceType iface in cls.interfaces) {
+    if (conflictsOn(iface)) return true;
+  }
+  return false;
+}
+
+ExecutableElement? _lookupMemberForRedeclare(
+  InterfaceType type,
+  ExecutableElement member,
+) {
+  final String? rawName = member.name;
+  if (rawName == null) return null;
+  final String name = rawName;
+  if (member is MethodElement && !member.isOperator) {
+    return type.getMethod(name);
+  }
+  if (member is PropertyAccessorElement) {
+    if (member.kind == ElementKind.GETTER) return type.getGetter(name);
+    if (member.kind == ElementKind.SETTER) return type.getSetter(name);
+  }
+  return null;
+}
+
+// =============================================================================
+// document_ignores
+// =============================================================================
+
+/// `// ignore:` / `// ignore_for_file:` should include an on-line explanation
+/// after the rule list (not only rule names).
+///
+/// Since: v10.0.3 | Rule version: v1
+///
+/// Complements [PreferCommentingAnalyzerIgnoresRule] (preceding comment) by
+/// requiring same-line rationale such as `-- reason` or trailing words.
+///
+/// **BAD:**
+/// ```dart
+/// // ignore: avoid_print
+/// void f() { print('x'); }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // ignore: avoid_print -- CLI tool output
+/// void f() { print('x'); }
+/// ```
+class DocumentIgnoresRule extends SaropaLintRule {
+  DocumentIgnoresRule() : super(code: _code);
+
+  @override
+  Set<String>? get requiredPatterns => const {'ignore:'};
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention', 'documentation'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static final RegExp _bareIgnoreLine = RegExp(
+    r'^\s*//\s*ignore(?:_for_file)?:\s*((?:[^\s,]+)(?:\s*,\s*[^\s,]+)*)\s*$',
+  );
+
+  static const LintCode _code = LintCode(
+    'document_ignores',
+    '[document_ignores] Ignore directive lists only rule names with no explanation. Add a short rationale on the same line (for example after `--`) so future readers know why the ignore exists. {v1}',
+    correctionMessage:
+        'Append an explanation on the same line, e.g. `// ignore: rule_name -- reason here`.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit unit) {
+      final LineInfo? lineInfo = unit.lineInfo;
+      if (lineInfo == null) return;
+      final List<String> lines = context.fileContent.split('\n');
+      for (int i = 0; i < lines.length; i++) {
+        final String line = lines[i];
+        if (_bareIgnoreLine.hasMatch(line.trimRight())) {
+          final int offset = lineInfo.getOffsetOfLine(i + 1);
+          reporter.atOffset(offset: offset, length: line.trimRight().length);
+        }
+      }
+    });
+  }
+}

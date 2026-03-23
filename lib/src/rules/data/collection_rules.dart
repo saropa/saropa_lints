@@ -3440,3 +3440,112 @@ class PreferForElementsToMapFromIterableRule extends SaropaLintRule {
     return expr.body is ExpressionFunctionBody;
   }
 }
+
+// =============================================================================
+// non_constant_map_element
+// =============================================================================
+
+/// `if` or spread element in a const map must be a constant expression.
+///
+/// Since: v10.0.3 | Rule version: v1
+///
+/// Aligns with the analyzer `non_constant_map_element` diagnostic; flags
+/// collection elements in `const {}` maps that are not compile-time constant.
+///
+/// **BAD:**
+/// ```dart
+/// bool flag = true;
+/// void f() {
+///   const m = {if (flag) 1: 2};
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void f() {
+///   const m = {if (true) 1: 2};
+/// }
+/// ```
+class NonConstantMapElementRule extends SaropaLintRule {
+  NonConstantMapElementRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'non_constant_map_element',
+    '[non_constant_map_element] A const map literal contains an if-element or spread whose sub-expressions are not compile-time constants. Remove const from the literal or make the elements constant. {v1}',
+    correctionMessage:
+        'Use only constant conditions and constant spreads inside const map literals, or drop const from the map.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addSetOrMapLiteral((SetOrMapLiteral node) {
+      if (node.constKeyword == null || !node.isMap) return;
+
+      for (final CollectionElement el in node.elements) {
+        if (el is IfElement) {
+          if (!_isEffectivelyConstantCondition(el.expression)) {
+            reporter.atNode(el, code);
+          }
+        } else if (el is SpreadElement) {
+          if (!_isConstCollectionSpread(el.expression)) {
+            reporter.atNode(el, code);
+          }
+        }
+      }
+    });
+  }
+
+  static bool _isEffectivelyConstantCondition(Expression e) {
+    if (e is BooleanLiteral ||
+        e is IntegerLiteral ||
+        e is DoubleLiteral ||
+        e is NullLiteral ||
+        e is SimpleStringLiteral) {
+      return true;
+    }
+    if (e is SimpleIdentifier) {
+      final Element? el = e.element;
+      if (el is VariableElement && el.isConst) return true;
+      if (el is PropertyAccessorElement && el.variable.isConst) return true;
+      return false;
+    }
+    if (e is ParenthesizedExpression) {
+      return _isEffectivelyConstantCondition(e.expression);
+    }
+    if (e is BinaryExpression) {
+      return _isEffectivelyConstantCondition(e.leftOperand) &&
+          _isEffectivelyConstantCondition(e.rightOperand);
+    }
+    if (e is PrefixExpression) {
+      return _isEffectivelyConstantCondition(e.operand);
+    }
+    return false;
+  }
+
+  static bool _isConstCollectionSpread(Expression e) {
+    if (e is ListLiteral && e.constKeyword != null) return true;
+    if (e is SetOrMapLiteral && e.constKeyword != null) return true;
+    if (e is SimpleIdentifier) {
+      final Element? el = e.element;
+      if (el is VariableElement && el.isConst) return true;
+      if (el is PropertyAccessorElement && el.variable.isConst) return true;
+    }
+    return false;
+  }
+}
