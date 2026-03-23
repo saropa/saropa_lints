@@ -1,9 +1,14 @@
 // ignore_for_file: always_specify_types, depend_on_referenced_packages
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/nullability_suffix.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/source_range.dart';
 
+import '../../fixes/config/prefer_dropdown_menu_item_button_opacity_animation_field_fix.dart';
 import '../../fixes/config/replace_asset_manifest_json_fix.dart';
+import '../../fixes/type/remove_null_assertion_fix.dart';
 import '../../saropa_lint_rule.dart';
 import 'flutter_test_window_deprecation_utils.dart';
 import 'migration_rule_source_utils.dart' as migration_src;
@@ -222,6 +227,170 @@ class _PreferDropdownInitialValueFix extends SaropaFixProducer {
         'initialValue',
       );
     });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// prefer_dropdown_menu_item_button_opacity_animation
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Flags redundant `opacityAnimation!` and nullable `CurvedAnimation? opacityAnimation`
+/// on [State] subclasses for [DropdownMenuItemButton].
+///
+/// Since: Unreleased | Rule version: v1
+///
+/// Flutter 3.32 ([PR #164795](https://github.com/flutter/flutter/pull/164795)) makes
+/// `opacityAnimation` on `DropdownMenuItemButton`'s state non-nullable (`late CurvedAnimation`).
+/// Nullable fields and null assertions are legacy patterns from when the animation was typed
+/// as nullable.
+///
+/// Detection uses resolved types (`DropdownMenuItemButton`, `State`, `CurvedAnimation`) so
+/// unrelated identifiers named `opacityAnimation` are not flagged. [requiresFlutterImport] is
+/// false so example fixtures with mocks can be analyzed; the type graph still constrains matches.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyState extends State<DropdownMenuItemButton<String>> {
+///   CurvedAnimation? opacityAnimation;
+///   void tick() {
+///     opacityAnimation!.value;
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyState extends State<DropdownMenuItemButton<String>> {
+///   late CurvedAnimation opacityAnimation;
+///   void tick() {
+///     opacityAnimation.value;
+///   }
+/// }
+/// ```
+///
+/// See: https://github.com/flutter/flutter/pull/164795
+class PreferDropdownMenuItemButtonOpacityAnimationRule extends SaropaLintRule {
+  PreferDropdownMenuItemButtonOpacityAnimationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config', 'flutter', 'material'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => false;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'opacityAnimation'};
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveNullAssertionFix(context: context),
+    ({required CorrectionProducerContext context}) =>
+        PreferDropdownMenuItemButtonOpacityAnimationFieldFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_dropdown_menu_item_button_opacity_animation',
+    '[prefer_dropdown_menu_item_button_opacity_animation] DropdownMenuItemButton state always assigns a non-null opacity animation (Flutter 3.32+, PR #164795). A nullable CurvedAnimation? field or a null assertion on opacityAnimation is a legacy pattern from older Flutter typings — it adds noise, risks runtime throws from !, and hides the guarantee that the animation exists once the state is initialized. Prefer late CurvedAnimation opacityAnimation and use it without !. {v1}',
+    correctionMessage:
+        'For the field: use late CurvedAnimation and drop the ?. For opacityAnimation!, remove the ! operator.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (context.isLintPluginSource) return;
+
+    context.addPostfixExpression((PostfixExpression node) {
+      _reportOpacityAnimationBangIfLegacy(node, reporter);
+    });
+
+    context.addFieldDeclaration((FieldDeclaration node) {
+      if (node.isStatic) return;
+      final AstNode? parent = node.parent;
+      if (parent is! ClassDeclaration) return;
+      final ClassElement? classEl = parent.declaredFragment?.element;
+      if (classEl == null) return;
+      if (!_classElementIsStateForDropdownMenuItemButton(classEl)) return;
+
+      for (final VariableDeclaration v in node.fields.variables) {
+        if (v.name.lexeme != 'opacityAnimation') {
+          continue;
+        }
+        final Element? decl = v.declaredFragment?.element;
+        if (decl is! FieldElement) {
+          continue;
+        }
+        final DartType t = decl.type;
+        if (t.nullabilitySuffix != NullabilitySuffix.question) {
+          continue;
+        }
+        if (t is! InterfaceType || t.element.name != 'CurvedAnimation') {
+          continue;
+        }
+        reporter.atToken(v.name, code);
+      }
+    });
+  }
+}
+
+bool _dartTypeIsOrExtendsDropdownMenuItemButton(DartType? type) {
+  if (type is! InterfaceType) return false;
+  if (type.element.name == 'DropdownMenuItemButton') return true;
+  for (final InterfaceType sup in type.allSupertypes) {
+    if (sup.element.name == 'DropdownMenuItemButton') return true;
+  }
+  return false;
+}
+
+bool _classElementIsStateForDropdownMenuItemButton(ClassElement classElement) {
+  final InterfaceType? supertype = classElement.supertype;
+  if (supertype == null) return false;
+  if (supertype.element.name != 'State') return false;
+  final List<DartType> args = supertype.typeArguments;
+  if (args.isEmpty) return false;
+  return _dartTypeIsOrExtendsDropdownMenuItemButton(args.first);
+}
+
+bool _fieldIsOpacityOnDropdownMenuState(FieldElement element) {
+  if (element.name != 'opacityAnimation') return false;
+  final Element? enc = element.enclosingElement;
+  if (enc is! ClassElement) return false;
+  return _classElementIsStateForDropdownMenuItemButton(enc);
+}
+
+void _reportOpacityAnimationBangIfLegacy(
+  PostfixExpression node,
+  SaropaDiagnosticReporter reporter,
+) {
+  if (node.operator.lexeme != '!') return;
+  final Expression operand = node.operand;
+  if (operand is PropertyAccess) {
+    if (operand.propertyName.name != 'opacityAnimation') return;
+    final Expression? target = operand.realTarget;
+    if (target == null) return;
+    if (!_dartTypeIsOrExtendsDropdownMenuItemButton(target.staticType)) return;
+    reporter.atNode(node);
+    return;
+  }
+  if (operand is SimpleIdentifier) {
+    if (operand.name != 'opacityAnimation') return;
+    final Element? el = operand.element;
+    if (el is! FieldElement) return;
+    if (!_fieldIsOpacityOnDropdownMenuState(el)) return;
+    reporter.atNode(node);
   }
 }
 

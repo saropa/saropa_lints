@@ -24,9 +24,7 @@
 ///
 /// ## Analyzer API
 ///
-/// [SimpleIdentifier] resolution uses [SimpleIdentifier.staticElement] first,
-/// then [SimpleIdentifier.element], matching other rules that support multiple
-/// analyzer versions.
+/// [SimpleIdentifier] resolution uses [SimpleIdentifier.element] (analyzer 9+).
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
