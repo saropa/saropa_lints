@@ -10,6 +10,7 @@ import 'package:analyzer/dart/element/type.dart';
 
 import '../../analyzer_metadata_compat_utils.dart';
 import '../../banned_usage_config.dart' as banned_usage_config;
+import '../../element_identifier_utils.dart';
 import '../../fixes/code_quality/avoid_substring_todo_fix.dart';
 import '../../fixes/code_quality/combine_adjacent_strings_fix.dart';
 import '../../fixes/code_quality/add_set_or_map_type_argument_fix.dart';
@@ -3631,42 +3632,23 @@ class AvoidDeprecatedUsageRule extends SaropaLintRule {
       }
     }
 
-    // Support both analyzer APIs: .element (analyzer 9+) and .staticElement (older).
-    Element? elementFromIdentifier(dynamic id) {
-      if (id == null) return null;
-      try {
-        final e = id.element;
-        if (e is Element) return e;
-      } on Object catch (e, st) {
-        developer.log(
-          'elementFromIdentifier .element failed',
-          name: 'saropa_lints',
-          error: e,
-          stackTrace: st,
-        );
-      }
-      try {
-        final s = id.staticElement;
-        if (s is Element) return s;
-      } on Object catch (e, st) {
-        developer.log(
-          'elementFromIdentifier .staticElement failed',
-          name: 'saropa_lints',
-          error: e,
-          stackTrace: st,
-        );
-      }
-      return null;
-    }
-
     context.addMethodInvocation((MethodInvocation node) {
-      checkElement(elementFromIdentifier(node.methodName), node);
+      checkElement(
+        elementFromAstIdentifier(node.methodName, logFailures: true),
+        node,
+      );
     });
     context.addPropertyAccess((PropertyAccess node) {
-      checkElement(elementFromIdentifier(node.propertyName), node);
+      checkElement(
+        elementFromAstIdentifier(node.propertyName, logFailures: true),
+        node,
+      );
     });
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      checkElement(elementFromIdentifier(node.constructorName), node);
+      checkElement(
+        elementFromAstIdentifier(node.constructorName, logFailures: true),
+        node,
+      );
     });
   }
 }
