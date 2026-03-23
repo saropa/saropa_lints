@@ -30,8 +30,6 @@ ITEMS_FILE = os.path.join(CACHE_DIR, "_high_confidence_items.json")
 OUTPUT_DIR = os.path.join(PROJECT_DIR, "bugs")
 PR_CACHE_FILE = os.path.join(CACHE_DIR, "_pr_details_cache.json")
 
-PREFIX = "migration-candidate"
-
 # Rate limit: GitHub API allows 5000/hour for authenticated users
 GH_API_DELAY = 0.3  # seconds between requests
 
@@ -237,7 +235,7 @@ def generate_report(
     clean_text = re.sub(r'^\*\s*', '', item["text"]).strip()
 
     lines = []
-    lines.append(f"# Migration Candidate #{index:03d}")
+    lines.append(f"# Plan #{index:03d}")
     lines.append("")
     lines.append(f"**Source:** {item['source']} {item['version']}")
     lines.append(f"**Category:** {item['category']}")
@@ -433,7 +431,7 @@ def main():
 
             # Generate filename
             slug = sanitize_filename(item["text"])
-            filename = f"{PREFIX}-{index:03d}-{slug}.md"
+            filename = f"{index:03d}-{slug}.md"
             filepath = os.path.join(OUTPUT_DIR, filename)
 
             # Generate report
