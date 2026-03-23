@@ -1,4 +1,5 @@
 import { VibrancyCategory, KnownIssue, PubDevPackageInfo, VibrancyResult } from '../types';
+import { isTrustedPublisher } from './trusted-publishers';
 
 /** Count results by vibrancy category. */
 export function countByCategory(results: readonly VibrancyResult[]) {
@@ -28,11 +29,18 @@ export function classifyStatus(params: {
     if (params.pubDev?.isDiscontinued) { return 'end-of-life'; }
     if (params.isArchived === true) { return 'end-of-life'; }
 
-    if (params.score >= 70) { return 'vibrant'; }
-    if (params.score >= 40) { return 'quiet'; }
-    if (params.score >= 10) { return 'legacy-locked'; }
-    // Score < 10 with no EOL signals = stale, not dead
-    return 'stale';
+    let category: VibrancyCategory;
+    if (params.score >= 70) { category = 'vibrant'; }
+    else if (params.score >= 40) { category = 'quiet'; }
+    else if (params.score >= 10) { category = 'legacy-locked'; }
+    else { category = 'stale'; }
+
+    // Stable SDK-adjacent packages often score in the "quiet" band because the formula
+    // weights GitHub churn; trusted publishers are not "low activity" risks.
+    if (category === 'quiet' && isTrustedPublisher(params.pubDev?.publisher)) {
+        return 'vibrant';
+    }
+    return category;
 }
 
 /** Map category to ThemeIcon id. */

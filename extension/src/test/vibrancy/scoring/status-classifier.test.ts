@@ -107,6 +107,112 @@ describe('status-classifier', () => {
             });
             assert.strictEqual(cat, 'vibrant');
         });
+
+        it('should upgrade quiet to vibrant for firebase.google.com (trusted publisher)', () => {
+            const cat = classifyStatus({
+                score: 55,
+                knownIssue: null,
+                pubDev: {
+                    name: 'firebase_core', latestVersion: '3.0.0', publishedDate: '',
+                    repositoryUrl: null, isDiscontinued: false, isUnlisted: false,
+                    pubPoints: 140,
+                    publisher: 'firebase.google.com',
+                    license: null,
+                    description: null,
+                    topics: [],
+                },
+            });
+            assert.strictEqual(cat, 'vibrant');
+        });
+
+        it('should upgrade quiet to vibrant for dart.dev (trusted publisher)', () => {
+            const cat = classifyStatus({
+                score: 55,
+                knownIssue: null,
+                pubDev: {
+                    name: 'test', latestVersion: '1.0.0', publishedDate: '',
+                    repositoryUrl: null, isDiscontinued: false, isUnlisted: false,
+                    pubPoints: 140,
+                    publisher: 'dart.dev',
+                    license: null,
+                    description: null,
+                    topics: [],
+                },
+            });
+            assert.strictEqual(cat, 'vibrant');
+        });
+
+        it('should keep quiet when publisher is not trusted', () => {
+            const cat = classifyStatus({
+                score: 55,
+                knownIssue: null,
+                pubDev: {
+                    name: 'foo', latestVersion: '1.0.0', publishedDate: '',
+                    repositoryUrl: null, isDiscontinued: false, isUnlisted: false,
+                    pubPoints: 80,
+                    publisher: 'example.com',
+                    license: null,
+                    description: null,
+                    topics: [],
+                },
+            });
+            assert.strictEqual(cat, 'quiet');
+        });
+
+        it('should not upgrade quiet when publisher id casing does not match (false positive guard)', () => {
+            const cat = classifyStatus({
+                score: 55,
+                knownIssue: null,
+                pubDev: {
+                    name: 'test', latestVersion: '1.0.0', publishedDate: '',
+                    repositoryUrl: null, isDiscontinued: false, isUnlisted: false,
+                    pubPoints: 140,
+                    publisher: 'Dart.dev',
+                    license: null,
+                    description: null,
+                    topics: [],
+                },
+            });
+            assert.strictEqual(cat, 'quiet');
+        });
+
+        it('should not upgrade trusted publisher when package is discontinued (EOL wins)', () => {
+            const cat = classifyStatus({
+                score: 55,
+                knownIssue: null,
+                pubDev: {
+                    name: 'legacy_pkg', latestVersion: '1.0.0', publishedDate: '',
+                    repositoryUrl: null, isDiscontinued: true, isUnlisted: false,
+                    pubPoints: 140,
+                    publisher: 'dart.dev',
+                    license: null,
+                    description: null,
+                    topics: [],
+                },
+            });
+            assert.strictEqual(cat, 'end-of-life');
+        });
+
+        it('should not upgrade trusted publisher when known issue is end_of_life', () => {
+            const cat = classifyStatus({
+                score: 55,
+                knownIssue: {
+                    name: 'dead_pkg', status: 'end_of_life',
+                    reason: 'replaced', as_of: '2024-01-01',
+                    replacement: undefined, migrationNotes: undefined,
+                },
+                pubDev: {
+                    name: 'dead_pkg', latestVersion: '1.0.0', publishedDate: '',
+                    repositoryUrl: null, isDiscontinued: false, isUnlisted: false,
+                    pubPoints: 140,
+                    publisher: 'google.dev',
+                    license: null,
+                    description: null,
+                    topics: [],
+                },
+            });
+            assert.strictEqual(cat, 'end-of-life');
+        });
     });
 
     describe('categoryIcon', () => {

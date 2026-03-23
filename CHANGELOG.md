@@ -25,7 +25,9 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
-## [Unreleased]
+## [10.1.0]
+
+This release focuses on Flutter SDK alignment: new lints for DropdownMenuItemButton opacity typing, default image filter quality, and migrating off deprecated `flutter_test` window APIs, plus a shared helper that resolves identifiers to elements for analyzer-backed detection.
 
 ### Added
 
@@ -37,11 +39,15 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ### Changed
 
+- **Package Vibrancy** — One **trusted publishers** list (`TRUSTED_PUBLISHERS` in `trusted-publishers.ts`: `dart.dev`, `google.dev`, `flutter.dev`, `firebase.google.com`) drives both the publisher trust bonus and upgrading **Quiet** → **Vibrant** when GitHub-weighted scores under-rate stable release trains. Extension `npm test` now includes `vibrancy-calculator.test.ts`; `status-classifier` tests cover EOL overrides and publisher-id casing (no false upgrade).
+
 - **Analyzer identifier → element** — Shared `elementFromAstIdentifier` in [`lib/src/element_identifier_utils.dart`](lib/src/element_identifier_utils.dart) tries `.element` then `.staticElement` with optional `logFailures`. Used by `image_filter_quality_detection` and deprecated-API checks in `code_quality_avoid_rules.dart`. Documented in [CODE_INDEX.md](CODE_INDEX.md). Tests: [`test/element_identifier_utils_test.dart`](test/element_identifier_utils_test.dart).
 
 ---
 
 ## [10.0.2]
+
+This patch wires ten compile-time mirror rules into the public rule list and tiers, updates existing rules for Analyzer 9 element APIs, and fixes a `require_data_encryption` false positive and unsafe `file://` root parsing in project metadata.
 
 ### Fixed
 
