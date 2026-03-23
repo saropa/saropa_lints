@@ -1,4 +1,4 @@
-# Plan: Additional rules 1–10 (ROADMAP) — IMPLEMENTED
+# Plan: Additional rules 1–10 (ROADMAP) — complete
 
 **Source:** [ROADMAP.md — Additional rules](../../ROADMAP.md#additional-rules) (first 10 rows).  
 **Legend:** Effort 🟢 L / 🟡 M · Wow ★ / ★★ / ★★★  

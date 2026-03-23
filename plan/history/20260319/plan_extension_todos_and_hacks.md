@@ -4,7 +4,7 @@
 
 **Scope:** VS Code extension only. No changes to the Dart package or plugin.
 
-**Status:** Fully implemented. See IMPLEMENTED_plan_extension_todos_and_hacks.md in this folder.
+**Status:** Fully implemented. See plan_extension_todos_and_hacks_history.md in this folder.
 
 ---
 

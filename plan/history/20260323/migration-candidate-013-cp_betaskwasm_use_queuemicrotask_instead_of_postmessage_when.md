@@ -1,4 +1,4 @@
-# IMPLEMENTED (2026-03-23)
+# Completed (2026-03-23)
 
 **Lint:** `prefer_schedule_microtask_over_window_postmessage` (Comprehensive tier, INFO).
 

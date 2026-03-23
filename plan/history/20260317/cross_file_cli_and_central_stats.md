@@ -1,4 +1,4 @@
-# Implemented: Cross-File CLI and Central Stats Aggregator (2026-03-17)
+# Completed: Cross-File CLI and Central Stats Aggregator (2026-03-17)
 
 **Plans implemented:** `plan_cross_file_cli_entry_point`, `plan_cross_file_reporter`, `plan_central_stats_aggregator` (from `bugs/plan/`).
 

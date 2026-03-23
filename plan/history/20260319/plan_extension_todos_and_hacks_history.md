@@ -1,4 +1,4 @@
-# Implemented: Extension TODOs & Hacks view (2025-03-19)
+# Completed: Extension TODOs & Hacks view (2025-03-19)
 
 **Plan:** `bugs/plan/plan_extension_todos_and_hacks.md` — fully implemented and moved here.
 

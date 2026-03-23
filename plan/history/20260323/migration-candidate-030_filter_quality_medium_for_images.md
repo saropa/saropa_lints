@@ -1,4 +1,4 @@
-# IMPLEMENTED (2026-03-23)
+# Completed (2026-03-23)
 
 **Lint:** `prefer_image_filter_quality_medium` (Comprehensive tier, INFO).
 

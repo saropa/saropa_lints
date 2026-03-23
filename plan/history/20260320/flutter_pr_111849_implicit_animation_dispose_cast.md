@@ -1,4 +1,4 @@
-# Implemented: Flutter PR #111849 (implicit animation dispose / cast)
+# Completed: Flutter PR #111849 (implicit animation dispose / cast)
 
 **Date:** 2026-03-20  
 **Migration candidates:** `migration-candidate-065`, `migration-candidate-066` (same PR; consolidated into one rule)

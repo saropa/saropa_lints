@@ -1,4 +1,4 @@
-# IMPLEMENTED: Additional rules 21–30 (2026-03-20)
+# Completed: Additional rules 21–30 (2026-03-20)
 
 ## Summary
 
