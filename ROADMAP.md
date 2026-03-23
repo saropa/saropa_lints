@@ -826,7 +826,7 @@ cross_file:
 
 Use as a todo list for implementation candidates. Sorted by **Effort** (L → M → H) then **Wow** (H → M → L).
 
-**Implementation plans** (by developer usefulness): [bugs/plan/](bugs/plan/) — see `plan_additional_rules_1_through_10.md` through `plan_additional_rules_81_through_90.md` for target files, approach, and acceptance criteria per rule. Implemented batch 21–30: [plan/history/20260320/plan_additional_rules_21_through_30.md](plan/history/20260320/plan_additional_rules_21_through_30.md). Implemented batch 31–40: [plan/plan_additional_rules_31_through_40.md](plan/plan_additional_rules_31_through_40.md) (see CHANGELOG).
+**Implementation plans** (by developer usefulness): [bugs/plan/](bugs/plan/) — see `plan_additional_rules_1_through_10.md` through `plan_additional_rules_81_through_90.md` for target files, approach, and acceptance criteria per rule. Implemented batch 21–30: [plan/history/20260320/plan_additional_rules_21_through_30.md](plan/history/20260320/plan_additional_rules_21_through_30.md). Implemented batch 31–40: [plan/history/20260323/plan_additional_rules_31_through_40.md](plan/history/20260323/plan_additional_rules_31_through_40.md) (see CHANGELOG).
 
 **Legend:** 🐛 BUG · 💨 CODE_SMELL · ⚠️ MINOR · 🚨 MAJOR · 🔴 BLOCKER · 🟢 L / 🟡 M / 🔴 H effort · ★ / ★★ / ★★★ wow
 
