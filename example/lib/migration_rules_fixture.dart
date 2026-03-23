@@ -60,11 +60,7 @@ Widget dropdownGood() {
 
 Widget dropdownFalsePositives() {
   // OK: DropdownButton (not DropdownButtonFormField) has 'value' legitimately
-  return DropdownButton<String>(
-    value: 'hello',
-    onChanged: (v) {},
-    items: [],
-  );
+  return DropdownButton<String>(value: 'hello', onChanged: (v) {}, items: []);
 }
 
 // =============================================================================
@@ -73,10 +69,7 @@ Widget dropdownFalsePositives() {
 
 void onPopBad() {
   // LINT: Using deprecated 'onPop' named argument
-  MaterialPageRoute(
-    builder: (context) => const Text('detail'),
-    onPop: () {},
-  );
+  MaterialPageRoute(builder: (context) => const Text('detail'), onPop: () {});
 }
 
 void onPopGood() {
@@ -89,9 +82,7 @@ void onPopGood() {
 
 void onPopFalsePositives() {
   // OK: No onPop parameter at all
-  MaterialPageRoute(
-    builder: (context) => const Text('detail'),
-  );
+  MaterialPageRoute(builder: (context) => const Text('detail'));
 
   // OK: A map literal with 'onPop' key is not a named argument
   final map = {'onPop': true};
@@ -229,16 +220,25 @@ void textThemeGood() {
 // LINT: Prefer OverflowBar instead of ButtonBar
 Widget overflowBarBad() {
   return ButtonBar(
-    children: [
-      TextButton(onPressed: () {}, child: Text('OK')),
-    ],
+    children: [TextButton(onPressed: () {}, child: Text('OK'))],
   );
 }
 
 Widget overflowBarGood() {
   return OverflowBar(
-    children: [
-      TextButton(onPressed: () {}, child: Text('OK')),
-    ],
+    children: [TextButton(onPressed: () {}, child: Text('OK'))],
   );
+}
+
+void overflowBarThemeBad() {
+  // LINT: ThemeData.buttonBarTheme / ButtonBarThemeData deprecated (PR #145523)
+  final _ = ThemeData(buttonBarTheme: const ButtonBarThemeData());
+  final theme = ThemeData();
+  final _copy = theme.copyWith(buttonBarTheme: const ButtonBarThemeData());
+  final _read = theme.buttonBarTheme;
+}
+
+void overflowBarThemeGood() {
+  // OK: No button bar theme; style OverflowBar in place or via parent layout.
+  final _ = ThemeData();
 }

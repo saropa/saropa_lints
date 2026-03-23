@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:saropa_lints/src/rules/config/migration_rules.dart';
+import 'package:saropa_lints/src/tiers.dart';
 import 'package:test/test.dart';
 
-/// Tests for 12 Migration lint rules.
+/// Tests for 13 Migration lint rules.
 ///
 /// Rules:
 ///   - avoid_asset_manifest_json (Essential, ERROR)
@@ -83,6 +84,13 @@ void main() {
       );
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
+      expect(rule.code.problemMessage, contains('{v2}'));
+      expect(rule.code.problemMessage, contains('#145523'));
+      expect(
+        rule.requiredPatterns,
+        containsAll(<String>['ButtonBar', 'buttonBarTheme']),
+      );
+      expect(rule.fixGenerators, hasLength(1));
     });
   });
 
@@ -653,6 +661,67 @@ void main() {
       // Access the rule to verify it instantiates with a complete map.
       // The map is static const, so just verify the rule loads.
       expect(rule.code.problemMessage, contains('13 deprecated names'));
+    });
+  });
+
+  // =========================================================================
+  // avoid_deprecated_flutter_test_window
+  // =========================================================================
+
+  group('avoid_deprecated_flutter_test_window', () {
+    test('AvoidDeprecatedFlutterTestWindowRule instantiates correctly', () {
+      final rule = AvoidDeprecatedFlutterTestWindowRule();
+      expect(
+        rule.code.name.toLowerCase(),
+        'avoid_deprecated_flutter_test_window',
+      );
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_deprecated_flutter_test_window]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(200));
+      expect(rule.code.correctionMessage, isNotNull);
+      expect(rule.code.correctionMessage, contains('platformDispatcher'));
+      expect(rule.code.correctionMessage, contains('view'));
+    });
+
+    test('scopes to flutter_test imports via requiredPatterns', () {
+      final rule = AvoidDeprecatedFlutterTestWindowRule();
+      expect(rule.requiredPatterns, contains('package:flutter_test/'));
+    });
+
+    test('uses element resolution (no name-only heuristics)', () {
+      final rule = AvoidDeprecatedFlutterTestWindowRule();
+      expect(rule.fixGenerators, isEmpty);
+    });
+
+    test('rule metadata is correct', () {
+      final rule = AvoidDeprecatedFlutterTestWindowRule();
+      expect(rule.impact.name, 'medium');
+      expect(rule.cost.name, 'low');
+      expect(rule.tags, contains('config'));
+      expect(rule.tags, contains('flutter'));
+      expect(rule.tags, contains('test'));
+    });
+
+    test(
+      'factory listed in lib/saropa_lints.dart (avoids loading all rules)',
+      () {
+        final content = File('lib/saropa_lints.dart').readAsStringSync();
+        expect(
+          content.contains('AvoidDeprecatedFlutterTestWindowRule.new'),
+          isTrue,
+        );
+      },
+    );
+
+    test('included in recommended tier', () {
+      expect(
+        getRulesForTier(
+          'recommended',
+        ).contains('avoid_deprecated_flutter_test_window'),
+        isTrue,
+      );
     });
   });
 }

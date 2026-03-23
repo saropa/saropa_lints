@@ -5,6 +5,8 @@ import 'package:analyzer/source/source_range.dart';
 
 import '../../fixes/config/replace_asset_manifest_json_fix.dart';
 import '../../saropa_lint_rule.dart';
+import 'flutter_test_window_deprecation_utils.dart';
+import 'migration_rule_source_utils.dart' as migration_src;
 
 // =============================================================================
 // MIGRATION RULES
@@ -535,51 +537,18 @@ class _RemoveIndicatorColorArgFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    // Navigate to the NamedExpression containing this label
     final named = node.thisOrAncestorOfType<NamedExpression>();
     if (named == null) return;
+    if (named.name.label.name != 'indicatorColor') return;
 
-    // Only fix constructor/copyWith args, not property access
-    final parent = named.parent;
-    if (parent is! ArgumentList) return;
-
-    final content = unitResult.content;
-    int start = named.offset;
-    int end = named.end;
-
-    // Remove leading comma + whitespace/newlines if present
-    if (start > 0) {
-      int i = start - 1;
-      while (i >= 0 &&
-          (content[i] == ' ' || content[i] == '\t' || content[i] == '\n')) {
-        i--;
-      }
-      if (i >= 0 && content[i] == ',') {
-        while (i > 0 && (content[i - 1] == ' ' || content[i - 1] == '\t')) {
-          i--;
-        }
-        start = i;
-      }
-    }
-
-    // Remove trailing comma + whitespace if this is the first argument
-    if (end < content.length) {
-      int i = end;
-      while (i < content.length && (content[i] == ' ' || content[i] == '\t')) {
-        i++;
-      }
-      if (i < content.length && content[i] == ',') {
-        i++;
-        while (i < content.length &&
-            (content[i] == ' ' || content[i] == '\t')) {
-          i++;
-        }
-        end = i;
-      }
-    }
+    final range = migration_src.sourceRangeForDeletingNamedArgument(
+      unitResult.content,
+      named,
+    );
+    if (range == null) return;
 
     await builder.addDartFileEdit(file, (b) {
-      b.addDeletion(SourceRange(start, end - start));
+      b.addDeletion(range);
     });
   }
 }
@@ -1468,29 +1437,49 @@ class _PreferM3TextThemeFix extends SaropaFixProducer {
 // prefer_overflow_bar_over_button_bar
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Flags [ButtonBar] in favor of [OverflowBar].
+/// Flags [ButtonBar], [ButtonBarThemeData], and [ThemeData.buttonBarTheme] in
+/// favor of [OverflowBar]-centric layouts (Flutter 3.13 / 3.24 migration).
 ///
-/// Since: v9.10.1 | Rule version: v1
+/// Since: v9.10.1 | Rule version: v2
 ///
-/// Flutter recommends [OverflowBar] for layouts that arrange action buttons in
-/// a row and reflow on overflow (PR #128437, Flutter 3.13.0). [ButtonBar] was
-/// later deprecated (PR #145523); migrating early reduces theme and API drift.
+/// Flutter recommends [OverflowBar] for horizontal action rows (PR #128437).
+/// [ButtonBar], [ButtonBarThemeData], and `ThemeData.buttonBarTheme` were
+/// deprecated in PR #145523 (Flutter 3.24.0).
+///
+/// ## Detection & false-positive guards
+///
+/// * Instance creations use `isMaterialMigrationInstanceCreationTarget` in
+///   `migration_rule_source_utils.dart` (Flutter `package:flutter/...`, null
+///   element, or no same-unit class-like declaration of that name).
+/// * Unresolved `ButtonBar()`, `ButtonBarThemeData()`, or `ThemeData(...)` may
+///   parse as [MethodInvocation] with a null element; those are reported unless
+///   the unit declares a matching type name (for `ThemeData`, only
+///   `buttonBarTheme:` arguments are checked).
+/// * `ThemeData.copyWith(buttonBarTheme:)` and `.buttonBarTheme` use static type
+///   `ThemeData` (same pattern as [PreferTabbarThemeIndicatorColorRule]).
+///
+/// ## Performance
+///
+/// [requiredPatterns]: `ButtonBar` and `buttonBarTheme` for early file skip.
+///
+/// ## Quick fix
+///
+/// Removes `buttonBarTheme:` from [ThemeData] constructors and `copyWith` only.
 ///
 /// **BAD:**
 /// ```dart
-/// ButtonBar(
-///   children: [TextButton(onPressed: () {}, child: Text('OK'))],
-/// )
+/// ButtonBar(children: [])
+/// ThemeData(buttonBarTheme: ButtonBarThemeData())
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// OverflowBar(
-///   children: [TextButton(onPressed: () {}, child: Text('OK'))],
-/// )
+/// OverflowBar(children: [])
+/// ThemeData()
 /// ```
 ///
-/// See: https://github.com/flutter/flutter/pull/128437
+/// See: https://github.com/flutter/flutter/pull/128437,
+/// https://github.com/flutter/flutter/pull/145523
 class PreferOverflowBarOverButtonBarRule extends SaropaLintRule {
   PreferOverflowBarOverButtonBarRule() : super(code: _code);
 
@@ -1510,20 +1499,31 @@ class PreferOverflowBarOverButtonBarRule extends SaropaLintRule {
   bool get requiresFlutterImport => true;
 
   @override
-  Set<String>? get requiredPatterns => const <String>{'ButtonBar'};
+  Set<String>? get requiredPatterns => const <String>{
+    'ButtonBar',
+    'buttonBarTheme',
+  };
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _RemoveThemeDataButtonBarThemeArgFix(context: context),
+  ];
 
   static const LintCode _code = LintCode(
     'prefer_overflow_bar_over_button_bar',
     "[prefer_overflow_bar_over_button_bar] Prefer OverflowBar instead of "
         'ButtonBar for Material action button rows. OverflowBar is the '
         'supported pattern for horizontal actions that reflow on overflow '
-        '(Flutter 3.13.0, PR #128437); ButtonBar is deprecated (PR #145523). '
-        'Parameter sets differ — map children, alignment, and overflow '
-        'behavior explicitly when migrating. {v1}',
+        '(Flutter 3.13.0, PR #128437). ButtonBar, ButtonBarThemeData, and '
+        'ThemeData.buttonBarTheme were deprecated in Flutter 3.24.0 (PR '
+        '#145523). Remove buttonBarTheme from ThemeData and migrate widgets '
+        'to OverflowBar; theme ButtonBarThemeData has no direct replacement — '
+        'apply spacing and alignment on OverflowBar or surrounding layout. {v2}',
     correctionMessage:
-        'Replace ButtonBar with OverflowBar and adjust named arguments to '
-        'match OverflowBar (remove ButtonBar-only parameters such as '
-        'buttonPadding where needed).',
+        'Replace ButtonBar with OverflowBar (adjust parameters). Remove '
+        'buttonBarTheme from ThemeData / copyWith; stop using '
+        'ButtonBarThemeData.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -1534,13 +1534,263 @@ class PreferOverflowBarOverButtonBarRule extends SaropaLintRule {
   ) {
     if (context.isLintPluginSource) return;
 
-    // Material `ButtonBar(...)` is an InstanceCreationExpression against the
-    // resolved element; no quick fix — OverflowBar uses a different parameter set.
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final CompilationUnit unit = node.root as CompilationUnit;
       final typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'ButtonBar') return;
+      if (typeName == 'ButtonBar' || typeName == 'ButtonBarThemeData') {
+        if (!migration_src.isMaterialMigrationInstanceCreationTarget(
+          typeElement: node.constructorName.type.element,
+          typeLexeme: typeName,
+          compilationUnit: unit,
+        )) {
+          return;
+        }
+        reporter.atNode(node.constructorName, code);
+        return;
+      }
+      if (typeName != 'ThemeData') return;
+      if (!migration_src.isMaterialMigrationInstanceCreationTarget(
+        typeElement: node.constructorName.type.element,
+        typeLexeme: typeName,
+        compilationUnit: unit,
+      )) {
+        return;
+      }
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'buttonBarTheme') {
+          reporter.atNode(arg.name, code);
+          return;
+        }
+      }
+    });
 
-      reporter.atNode(node.constructorName, code);
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.target != null) return;
+      if (node.methodName.element != null) return;
+      final String m = node.methodName.name;
+      final CompilationUnit unit = node.root as CompilationUnit;
+      if (m == 'ButtonBar' || m == 'ButtonBarThemeData') {
+        if (migration_src.compilationUnitDeclaresClassLikeName(unit, m)) {
+          return;
+        }
+        reporter.atNode(node.methodName, code);
+        return;
+      }
+      if (m == 'ThemeData') {
+        if (migration_src.compilationUnitDeclaresClassLikeName(
+          unit,
+          'ThemeData',
+        )) {
+          return;
+        }
+        for (final arg in node.argumentList.arguments) {
+          if (arg is NamedExpression &&
+              arg.name.label.name == 'buttonBarTheme') {
+            reporter.atNode(arg.name, code);
+            return;
+          }
+        }
+      }
+    });
+
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'copyWith') return;
+      final targetType = node.realTarget?.staticType;
+      if (targetType == null) return;
+      if (!targetType.getDisplayString().startsWith('ThemeData')) return;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'buttonBarTheme') {
+          reporter.atNode(arg.name, code);
+          return;
+        }
+      }
+    });
+
+    context.addPropertyAccess((PropertyAccess node) {
+      if (node.propertyName.name != 'buttonBarTheme') return;
+      final targetType = node.realTarget.staticType;
+      if (targetType == null) return;
+      if (!targetType.getDisplayString().startsWith('ThemeData')) return;
+      reporter.atNode(node.propertyName, code);
+    });
+
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (node.identifier.name != 'buttonBarTheme') return;
+      final prefixType = node.prefix.staticType;
+      if (prefixType == null) return;
+      if (!prefixType.getDisplayString().startsWith('ThemeData')) return;
+      reporter.atNode(node.identifier, code);
+    });
+  }
+}
+
+/// Removes deprecated `buttonBarTheme:` from [ThemeData] constructors and
+/// `copyWith`, matching Flutter's data-driven fix (PR #145523).
+class _RemoveThemeDataButtonBarThemeArgFix extends SaropaFixProducer {
+  _RemoveThemeDataButtonBarThemeArgFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.removeThemeDataButtonBarThemeArg',
+    80,
+    "Remove 'buttonBarTheme' from ThemeData",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    if (node == null) return;
+
+    final named = node.thisOrAncestorOfType<NamedExpression>();
+    if (named == null) return;
+    if (named.name.label.name != 'buttonBarTheme') return;
+
+    final range = migration_src.sourceRangeForDeletingNamedArgument(
+      unitResult.content,
+      named,
+    );
+    if (range == null) return;
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addDeletion(range);
+    });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// avoid_deprecated_flutter_test_window
+// ─────────────────────────────────────────────────────────────────────────────
+
+void _reportFlutterTestBindingWindowIfDeprecated(
+  SaropaDiagnosticReporter reporter,
+  SimpleIdentifier property,
+) {
+  if (property.name != 'window') return;
+  if (!isFlutterTestSdkTestWidgetsFlutterBindingWindowGetter(
+    property.element,
+  )) {
+    return;
+  }
+  reporter.atNode(property);
+}
+
+/// Flags deprecated [TestWindow] and [TestWidgetsFlutterBinding.window] from
+/// `package:flutter_test`.
+///
+/// ## Context
+///
+/// Flutter 3.10 deprecated these APIs (PR #122824) to prepare for multi-window
+/// support. [TestWindow] combined platform dispatcher and view concerns; the
+/// replacement split is [WidgetTester.platformDispatcher] /
+/// [TestPlatformDispatcher] vs [WidgetTester.view] / [WidgetTester.viewOf].
+///
+/// ## Detection strategy
+///
+/// - **Element resolution only** — no substring heuristics on type names (see
+///   CONTRIBUTING.md, avoiding false positives). [TestWindow] and
+///   [TestWidgetsFlutterBinding.window] must resolve to declarations in
+///   `package:flutter_test`.
+/// - **[requiredPatterns]:** `package:flutter_test/` so non-test files skip the
+///   rule before AST callbacks run.
+/// - **Constructors:** [NamedType] inside a [ConstructorName] is excluded from
+///   the [NamedType] visitor and handled only by [InstanceCreationExpression] to
+///   avoid duplicate diagnostics on `TestWindow(...)`.
+///
+/// ## False-positive guards
+///
+/// - A user-defined `class TestWindow` in the app package is not flagged.
+/// - `.window` on types other than [TestWidgetsFlutterBinding] (e.g.
+///   `dart:ui` [SingletonFlutterWindow]) is not flagged unless the identifier
+///   resolves to that binding's deprecated [GetterElement].
+///
+/// ## Performance
+///
+/// Low cost: narrow `requiredPatterns`, registry callbacks only (`NamedType`,
+/// `InstanceCreationExpression`, `PropertyAccess`, `PrefixedIdentifier`), no
+/// recursion or cross-file work.
+///
+/// ## Quick fix
+///
+/// None — replacements need a [WidgetTester] or binding reference in scope;
+/// automated rewrites would often be wrong.
+///
+/// ## References
+///
+/// - PR: https://github.com/flutter/flutter/pull/122824
+///
+/// Since: v10.0.3 | Rule version: v1
+///
+/// **BAD:**
+/// ```dart
+/// TestWidgetsFlutterBinding.instance!.window.physicalSizeTestValue = size;
+/// TestWindow(window: ui.window);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// tester.view.physicalSize = size;
+/// tester.platformDispatcher.clearDevicePixelRatioTestValue();
+/// ```
+class AvoidDeprecatedFlutterTestWindowRule extends SaropaLintRule {
+  AvoidDeprecatedFlutterTestWindowRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config', 'flutter', 'test'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'package:flutter_test/'};
+
+  static const LintCode _code = LintCode(
+    'avoid_deprecated_flutter_test_window',
+    '[avoid_deprecated_flutter_test_window] TestWindow and '
+        'TestWidgetsFlutterBinding.window were deprecated in Flutter 3.10 '
+        '(PR #122824) for upcoming multi-window support. Use '
+        'WidgetTester.platformDispatcher (or TestPlatformDispatcher) for '
+        'platform-specific test values and WidgetTester.view / '
+        'WidgetTester.viewOf for view-specific values instead of the combined '
+        'TestWindow API. {v1}',
+    correctionMessage:
+        'Prefer tester.platformDispatcher and tester.view (or viewOf) in '
+        'widget tests; avoid TestWindow and binding.window.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (context.isLintPluginSource) return;
+
+    context.addNamedType((NamedType node) {
+      if (node.parent is ConstructorName) return;
+      if (!isFlutterTestSdkTestWindowElement(node.element)) return;
+      reporter.atNode(node);
+    });
+
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final NamedType typeNode = node.constructorName.type;
+      if (!isFlutterTestSdkTestWindowElement(typeNode.element)) return;
+      reporter.atNode(typeNode);
+    });
+
+    context.addPropertyAccess((PropertyAccess node) {
+      _reportFlutterTestBindingWindowIfDeprecated(reporter, node.propertyName);
+    });
+
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      _reportFlutterTestBindingWindowIfDeprecated(reporter, node.identifier);
     });
   }
 }

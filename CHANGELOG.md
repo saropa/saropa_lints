@@ -25,10 +25,20 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **`avoid_deprecated_flutter_test_window`** (Recommended, WARNING) — Flags `package:flutter_test` [TestWindow](https://api.flutter.dev/flutter/flutter_test/TestWindow-class.html) and [TestWidgetsFlutterBinding.window](https://api.flutter.dev/flutter/flutter_test/TestWidgetsFlutterBinding/window.html), deprecated in Flutter 3.10 ([PR #122824](https://github.com/flutter/flutter/pull/122824)); migrate to `WidgetTester.platformDispatcher` and `WidgetTester.view` / `viewOf`. Detection uses resolved elements only. Shared predicates: `lib/src/rules/config/flutter_test_window_deprecation_utils.dart` (unit-tested URI boundary); `example/analysis_options_template.yaml` lists the override.
+
+---
+
 ## [10.0.2]
 
 ### Fixed
 
+- **Plan additional rules 31–40** — The ten compile-time / doc / style mirror rules (`abstract_field_initializer`, `abi_specific_integer_invalid`, `annotate_redeclares`, `deprecated_new_in_comment_reference`, `document_ignores`, `non_constant_map_element`, `return_in_generator`, `subtype_of_disallowed_type`, `undefined_enum_constructor`, `yield_in_non_generator`) were present in source but missing from [`saropa_lints.dart`](lib/saropa_lints.dart) `_allRuleFactories` and from [`essentialRules`](lib/src/tiers.dart); they are now registered so tiers and tooling load them.
+- **`migration_rule_source_utils`** — `CompilationUnit.declaredElement` (removed in analyzer 9) replaced with `declaredFragment?.element.library` for import-prefix checks.
 - **`require_data_encryption`** — The `pin` keyword is matched only when not immediately preceded by an ASCII letter, so identifiers such as `OwaspMapping` (where `Mapping` embeds `…p-i-n…`) no longer false-positive on ordinary `write`/`writeAsString` calls. Regression coverage: `test/require_data_encryption_pin_pattern_test.dart`; fixture: `example_async/lib/security/require_data_encryption_fixture.dart`.
 - **`rootUriToPath`** — `file://` roots use `Uri.tryParse` so invalid URIs return null instead of throwing; satisfies `prefer_try_parse_for_dynamic_data` for package_config paths. Tests: `test/project_info_root_uri_test.dart`.
 

@@ -2,6 +2,7 @@ import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:saropa_lints/src/rules/config/migration_rule_source_utils.dart';
 import 'package:saropa_lints/src/rules/config/migration_rules.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart' show LintImpact;
 import 'package:test/test.dart';
@@ -106,17 +107,30 @@ void f() {
       final rule = PreferOverflowBarOverButtonBarRule();
       expect(rule.impact, LintImpact.low);
       expect(rule.requiresFlutterImport, isTrue);
-      expect(rule.requiredPatterns, contains('ButtonBar'));
+      expect(
+        rule.requiredPatterns,
+        containsAll(<String>['ButtonBar', 'buttonBarTheme']),
+      );
     });
 
-    test('counts ButtonBar instance creations but not comments', () {
-      // Minimal stub: avoid `children: []` parse quirks in some analyzer versions.
+    test('does not count project-local ButtonBar (same-unit declaration)', () {
       expect(
         _countButtonBarCreations('''
 class ButtonBar {
   ButtonBar();
 }
-// ButtonBar( is not a widget
+// ButtonBar( in comment only
+void f() {
+  ButtonBar();
+}
+'''),
+        0,
+      );
+    });
+
+    test('counts ButtonBar when unresolved (ICE or MethodInvocation)', () {
+      expect(
+        _countButtonBarCreations('''
 void f() {
   ButtonBar();
 }
@@ -209,12 +223,20 @@ class _ListViewExtentVisitor extends RecursiveAstVisitor<void> {
   }
 }
 
+/// Mirrors [PreferOverflowBarOverButtonBarRule] `ButtonBar` detection (ICE + MI).
 class _ButtonBarVisitor extends RecursiveAstVisitor<void> {
+  static const typeName = 'ButtonBar';
+
   int count = 0;
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    if (node.constructorName.type.name.lexeme == 'ButtonBar') {
+    if (node.constructorName.type.name.lexeme == typeName &&
+        isMaterialMigrationInstanceCreationTarget(
+          typeElement: node.constructorName.type.element,
+          typeLexeme: typeName,
+          compilationUnit: node.root as CompilationUnit,
+        )) {
       count++;
     }
     super.visitInstanceCreationExpression(node);
@@ -222,10 +244,13 @@ class _ButtonBarVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    // Unresolved or shorthand: `ButtonBar()` parses as MethodInvocation in
-    // some parseString contexts; the plugin sees InstanceCreationExpression
-    // against material.dart.
-    if (node.methodName.name == 'ButtonBar' && node.target == null) {
+    if (node.target == null &&
+        node.methodName.name == typeName &&
+        node.methodName.element == null &&
+        !compilationUnitDeclaresClassLikeName(
+          node.root as CompilationUnit,
+          typeName,
+        )) {
       count++;
     }
     super.visitMethodInvocation(node);
