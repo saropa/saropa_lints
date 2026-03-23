@@ -14,4 +14,4 @@ So they are “not viable” with the **current** plugin/extension surface but a
 
 ## Count
 
-**77** migration-candidate files. These are user-facing API deprecations or “prefer X over Y” patterns that could be implemented as rules or fixes with extended plugin/extension support.
+**77** numbered plan files. These are user-facing API deprecations or “prefer X over Y” patterns that could be implemented as rules or fixes with extended plugin/extension support.
