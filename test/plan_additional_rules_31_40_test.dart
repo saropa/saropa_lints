@@ -4,7 +4,7 @@ import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
 /// Registration, tier, fixture, and false-positive guard tests for
-/// [plan_additional_rules_31_through_40](plan/plan_additional_rules_31_through_40.md).
+/// [plan_additional_rules_31_through_40](plan/history/20260323/plan_additional_rules_31_through_40.md).
 
 /// Mirrors [DocumentIgnoresRule] bare-line detection (keep in sync).
 final RegExp _bareIgnoreLineTest = RegExp(

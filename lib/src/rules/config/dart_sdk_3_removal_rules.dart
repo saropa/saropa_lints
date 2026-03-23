@@ -49,7 +49,7 @@ import '../../saropa_lint_rule.dart';
 // ## Related
 //
 // * Flutter deprecations: `migration_rules.dart`
-// * Plan archive: `bugs/history/20260320/` (migration candidates #098–#107)
+// * Plan archive: `bugs/history/20260320/` (plans #098–#107)
 
 bool _isDartCoreLibrary(LibraryElement? lib) {
   if (lib == null) return false;
