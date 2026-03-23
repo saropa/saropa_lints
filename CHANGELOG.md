@@ -25,9 +25,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language â€
 
 ---
 
-## [10.1.0]
-
-This release focuses on Flutter SDK alignment: new lints for DropdownMenuItemButton opacity typing, default image filter quality, and migrating off deprecated `flutter_test` window APIs, plus a shared helper that resolves identifiers to elements for analyzer-backed detection.
+## [Unreleased]
 
 ### Added
 
@@ -44,8 +42,6 @@ This release focuses on Flutter SDK alignment: new lints for DropdownMenuItemBut
 ---
 
 ## [10.0.2]
-
-This patch wires ten compile-time mirror rules into the public rule list and tiers, updates existing rules for Analyzer 9 element APIs, and fixes a `require_data_encryption` false positive and unsafe `file://` root parsing in project metadata.
 
 ### Fixed
 
