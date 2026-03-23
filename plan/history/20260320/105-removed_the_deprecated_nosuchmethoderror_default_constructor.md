@@ -1,17 +1,17 @@
-# Migration Candidate #103
+# Plan #105
 
 **Source:** Dart SDK 3.0.0
 **Category:** Deprecation
 **Relevance Score:** 5
-**Detected APIs:** AbstractClassInstantiationError, Removed
+**Detected APIs:** NoSuchMethodError, Removed
 
 ---
 
 ## Release Note Entry
 
-> - Removed the deprecated [`AbstractClassInstantiationError`][] error. It was made
+> - Removed the deprecated [`NoSuchMethodError`][] default constructor.
 >
-> Context: a compile-time error to call the constructor of an abstract class in Dart 2.0.
+> Context: Use the [`NoSuchMethodError.withInvocation`][] named constructor instead.
 
 ---
 
@@ -23,7 +23,7 @@ An API has been deprecated. Users still using the old API should migrate to the 
 
 ### APIs Involved
 
-- `AbstractClassInstantiationError`
+- `NoSuchMethodError`
 - `Removed`
 
 ---

@@ -1,4 +1,4 @@
-# Migration candidates #108–#115 (Dart SDK 3.0) — summary
+# Plans #108–#115 (Dart SDK 3.0) — summary
 
 ## Implemented in code
 
@@ -21,4 +21,4 @@
 
 ## Plans
 
-Source specs remain under `plan/implementable_only_in_plugin_extension/migration-candidate-10[8-9]*` and `11[0-5]*` with updated checklists and status.
+Source specs remain under `plan/implementable_only_in_plugin_extension/10[8-9]*` and `11[0-5]*` with updated checklists and status.

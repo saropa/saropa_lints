@@ -1,17 +1,17 @@
-# Migration Candidate #106
+# Plan #104
 
 **Source:** Dart SDK 3.0.0
 **Category:** Deprecation
 **Relevance Score:** 5
-**Detected APIs:** BidirectionalIterator, Removed
+**Detected APIs:** CyclicInitializationError, Removed, Cyclic
 
 ---
 
 ## Release Note Entry
 
-> - Removed the deprecated [`BidirectionalIterator`][] class.
+> - Removed the deprecated [`CyclicInitializationError`]. Cyclic dependencies are
 >
-> Context: Existing bidirectional iterators can still work, they just don't have
+> Context: no longer detected at runtime in null safe code. Such code will fail in other
 
 ---
 
@@ -23,8 +23,9 @@ An API has been deprecated. Users still using the old API should migrate to the 
 
 ### APIs Involved
 
-- `BidirectionalIterator`
+- `CyclicInitializationError`
 - `Removed`
+- `Cyclic`
 
 ---
 

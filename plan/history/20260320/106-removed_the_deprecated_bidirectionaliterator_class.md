@@ -1,17 +1,17 @@
-# Migration Candidate #098
+# Plan #106
 
 **Source:** Dart SDK 3.0.0
 **Category:** Deprecation
 **Relevance Score:** 5
-**Detected APIs:** List, Removed
+**Detected APIs:** BidirectionalIterator, Removed
 
 ---
 
 ## Release Note Entry
 
-> - Removed the deprecated `List` constructor, as it wasn't null safe.
+> - Removed the deprecated [`BidirectionalIterator`][] class.
 >
-> Context: Use list literals (e.g. `[]` for an empty list or `<int>[]` for an empty
+> Context: Existing bidirectional iterators can still work, they just don't have
 
 ---
 
@@ -23,7 +23,7 @@ An API has been deprecated. Users still using the old API should migrate to the 
 
 ### APIs Involved
 
-- `List`
+- `BidirectionalIterator`
 - `Removed`
 
 ---

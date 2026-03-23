@@ -1,7 +1,7 @@
-# Migration candidates #027 and #037 — implemented
+# Plans #027 and #037 — implemented
 
 **Date:** 2026-03-20  
-**Source plans:** `plan/implementable_only_in_plugin_extension/migration-candidate-027-*.md`, `migration-candidate-037-*.md` (moved here as completed).
+**Source plans:** `plan/implementable_only_in_plugin_extension/027-*.md`, `037-*.md` (moved here as completed).
 
 ## Summary
 
@@ -18,4 +18,4 @@
 
 ## Original plan files
 
-Archived next to this note as `migration-candidate-027-*.md` and `migration-candidate-037-*.md`.
+Archived next to this note as `027-*.md` and `037-*.md`.
