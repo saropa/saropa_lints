@@ -14,7 +14,7 @@ Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter be
 
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg?style=flat-square&logo=dart&color=blue)](https://pub.dev/packages/saropa_lints) [![pub points](https://img.shields.io/pub/points/saropa_lints?style=flat-square&logo=dart)](https://pub.dev/packages/saropa_lints/score) [![likes](https://img.shields.io/pub/likes/saropa_lints?style=flat-square&logo=dart&color=red)](https://pub.dev/packages/saropa_lints/score) [![ci](https://img.shields.io/github/actions/workflow/status/saropa/saropa_lints/ci.yml?branch=main&style=flat-square&logo=github&label=build)](https://github.com/saropa/saropa_lints/actions) [![GitHub stars](https://img.shields.io/github/stars/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints) [![GitHub forks](https://img.shields.io/github/forks/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints) [![GitHub issues](https://img.shields.io/github/issues/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints/issues) [![GitHub last commit](https://img.shields.io/github/last-commit/saropa/saropa_lints?style=flat-square&logo=github)](https://github.com/saropa/saropa_lints/commits)
 
-[![Saropa Lints Badge](https://img.shields.io/badge/saropa_lints-2105-blue?style=flat&logo=flutter&logoColor=white&color=435489)](https://pub.dev/packages/saropa_lints) [![Flutter Platform](https://img.shields.io/badge/platform-flutter-02569B.svg?style=flat-square&logo=flutter)](https://flutter.dev/) [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Saropa Lints Badge](https://img.shields.io/badge/saropa_lints-2107-blue?style=flat&logo=flutter&logoColor=white&color=435489)](https://pub.dev/packages/saropa_lints) [![Flutter Platform](https://img.shields.io/badge/platform-flutter-02569B.svg?style=flat-square&logo=flutter)](https://flutter.dev/) [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
 [![Share on X](https://img.shields.io/badge/share%20on-X-000000?style=flat-square&logo=x&logoColor=white)](https://twitter.com/intent/tweet?text=Check%20out%20Saropa%20Lints%3A%20Catch%20memory%20leaks%2C%20security%20vulnerabilities%2C%20and%20runtime%20crashes%20in%20Flutter%21&url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Facebook](https://img.shields.io/badge/share%20on-facebook-1877F2?style=flat-square&logo=facebook&logoColor=white)](https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Bluesky](https://img.shields.io/badge/share%20on-bluesky-0285FF?style=flat-square&logo=bluesky&logoColor=white)](https://bsky.app/intent/compose?text=Check%20out%20Saropa%20Lints%3A%20Catch%20memory%20leaks%2C%20security%20vulnerabilities%2C%20and%20runtime%20crashes%20in%20Flutter%21%20https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on LinkedIn](https://img.shields.io/badge/share%20on-linkedin-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints) [![Share on Reddit](https://img.shields.io/badge/share%20on-reddit-FF4500?style=flat-square&logo=reddit&logoColor=white)](https://www.reddit.com/submit?url=https%3A%2F%2Fpub.dev%2Fpackages%2Fsaropa_lints&title=Saropa%20Lints%20-%20Advanced%20Static%20Analysis)
 
@@ -122,7 +122,7 @@ violations.json        ───►  Health Score, Issues, Security,
                              File Risk, Trends, Inline Annotations
 ```
 
-The **Dart package** provides **2105** lint rules via the native analyzer plugin. The **VS Code extension** reads `violations.json` and provides the UI: Health Score, Issues tree, Security Posture, File Risk, Config/Triage, and related views. Optional **Drift Advisor** integration shows index suggestions and data-quality anomalies from a running Drift Advisor server in a dedicated sidebar view and in Problems. Both are published together and versioned in sync.
+The **Dart package** provides **2107** lint rules via the native analyzer plugin. The **VS Code extension** reads `violations.json` and provides the UI: Health Score, Issues tree, Security Posture, File Risk, Config/Triage, and related views. Optional **Drift Advisor** integration shows index suggestions and data-quality anomalies from a running Drift Advisor server in a dedicated sidebar view and in Problems. Both are published together and versioned in sync.
 
 **Rule metadata:** Each rule can expose optional semantics—`RuleType` (bug, vulnerability, code smell, security hotspot), `tags`, MITRE **CWE** IDs, and `RuleStatus` (e.g. beta)—for compliance and future quality gates. Defaults are backward compatible; see [CONTRIBUTING.md](CONTRIBUTING.md) and [bugs/discussion/RULE_METADATA_BULK_STATUS.md](bugs/discussion/RULE_METADATA_BULK_STATUS.md).
 
@@ -325,7 +325,7 @@ Stylistic rules are orthogonal to correctness. Your code can be perfectly correc
 
 ### Configuration template
 
-See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all **2105** rules organized by category, tier membership, and examples.
+See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all **2118** rules organized by category, tier membership, and examples.
 
 ### Using a tier
 
@@ -1162,7 +1162,7 @@ Built with care by the Flutter community. Questions? Ideas? We'd love to hear fr
 
 > "Quality is not an act, it is a habit." — Aristotle
 
-**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With **2105** lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
+**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With **2107** lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
 
 **Keywords:** Flutter linter, Dart static analysis, Flutter code quality, memory leak detection, security scanning, accessibility testing, WCAG compliance, European Accessibility Act, Flutter best practices, Dart analyzer plugin, code review automation, CI/CD linting, Flutter enterprise tools
 

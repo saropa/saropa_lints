@@ -734,6 +734,17 @@ const Set<String> essentialRules = <String>{
   'invalid_literal_annotation',
   'invalid_non_virtual_annotation',
   'invalid_super_formal_parameter_location',
+  // Additional rules (plan_additional_rules_31_through_40)
+  'abstract_field_initializer',
+  'abi_specific_integer_invalid',
+  'annotate_redeclares',
+  'deprecated_new_in_comment_reference',
+  'document_ignores',
+  'non_constant_map_element',
+  'return_in_generator',
+  'subtype_of_disallowed_type',
+  'undefined_enum_constructor',
+  'yield_in_non_generator',
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -749,6 +760,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_immutable_bloc_state', // state immutability best practice
   // v5.1.0 - Migration rules (Recommended)
   'prefer_dropdown_initial_value', // WARNING - deprecated in Flutter 3.35.0
+  'prefer_dropdown_menu_item_button_opacity_animation', // INFO - Flutter 3.32 PR #164795
   'prefer_on_pop_with_result', // WARNING - deprecated in Flutter 3.35.0
   'prefer_tabbar_theme_indicator_color', // WARNING - deprecated in Flutter 3.32.0
   // v9.10.0 - Migration rules (Recommended)
@@ -2841,6 +2853,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_notifier_over_state',
   'prefer_provider_extensions',
   'prefer_redirecting_superclass_constructor',
+  'prefer_image_filter_quality_medium',
   'prefer_super_key',
   'prefer_factory_before_named',
 

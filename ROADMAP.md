@@ -3,10 +3,10 @@
      Heading regex: "# Roadmap: Aiming for N,NNN"
      Goal regex:    "Goal: NNN rules (NNN implemented, NNN remaining)"
      Goal is rounded up to the nearest 100. -->
-# Roadmap: Aiming for 2,100 Lint Rules
+# Roadmap: Aiming for 2,200 Lint Rules
 <!-- cspell:disable -->
 
-See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2100 rules (2090 implemented, 10 remaining).
+See [CHANGELOG.md](CHANGELOG.md) for implemented rules. Goal: 2200 rules (2107 implemented, 93 remaining).
 
 > **When implementing**: Remove from ROADMAP, add to CHANGELOG, register in `all_rules.dart` + `tiers.dart`. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -826,22 +826,12 @@ cross_file:
 
 Use as a todo list for implementation candidates. Sorted by **Effort** (L → M → H) then **Wow** (H → M → L).
 
-**Implementation plans** (by developer usefulness): [bugs/plan/](bugs/plan/) — see `plan_additional_rules_1_through_10.md` through `plan_additional_rules_81_through_90.md` for target files, approach, and acceptance criteria per rule. Implemented batch 21–30: [plan/history/20260320/IMPLEMENTED_plan_additional_rules_21_through_30.md](plan/history/20260320/IMPLEMENTED_plan_additional_rules_21_through_30.md).
+**Implementation plans** (by developer usefulness): [bugs/plan/](bugs/plan/) — see `plan_additional_rules_1_through_10.md` through `plan_additional_rules_81_through_90.md` for target files, approach, and acceptance criteria per rule. Implemented batch 21–30: [plan/history/20260320/IMPLEMENTED_plan_additional_rules_21_through_30.md](plan/history/20260320/IMPLEMENTED_plan_additional_rules_21_through_30.md). Implemented batch 31–40: [plan/plan_additional_rules_31_through_40.md](plan/plan_additional_rules_31_through_40.md) (see CHANGELOG).
 
 **Legend:** 🐛 BUG · 💨 CODE_SMELL · ⚠️ MINOR · 🚨 MAJOR · 🔴 BLOCKER · 🟢 L / 🟡 M / 🔴 H effort · ★ / ★★ / ★★★ wow
 
 | Rule key | Kind | Name | Checks for (summary) | Severity | Effort | Wow |
 |----------------|------|------|----------------------|----------|--------|-----|
-| non_constant_map_element | 🐛 BUG | Non constant map element | if or spread element in const map isn't constant. | ⚠️ MINOR | 🟡 M | ★ L |
-| return_in_generator | 🐛 BUG | Return in generator | Generator uses return with value or implicit return. | ⚠️ MINOR | 🟡 M | ★ L |
-| subtype_of_disallowed_type | 🐛 BUG | Subtype of disallowed type | extends/implements/with/on restricted type (bool, int, etc.). | ⚠️ MINOR | 🟡 M | ★ L |
-| undefined_enum_constructor | 🐛 BUG | Undefined enum constructor | Enum value constructor doesn't exist. | ⚠️ MINOR | 🟡 M | ★ L |
-| yield_in_non_generator | 🐛 BUG | Yield in non generator | yield/yield* in non–async*/sync* function. | ⚠️ MINOR | 🟡 M | ★ L |
-| abstract_field_initializer | 💨 CODE_SMELL | Abstract field initializer | Abstract field has initializer. | ⚠️ MINOR | 🟡 M | ★ L |
-| annotate_redeclares | 💨 CODE_SMELL | Annotate redeclares | Redeclared members should be annotated. | ⚠️ MINOR | 🟡 M | ★ L |
-| deprecated_new_in_comment_reference | 💨 CODE_SMELL | Deprecated new in comment reference | Doc comment uses new in comment reference. | ⚠️ MINOR | 🟡 M | ★ L |
-| document_ignores | 💨 CODE_SMELL | Document ignores | Ignored diagnostics should be documented. | ⚠️ MINOR | 🟡 M | ★ L |
-| abi_specific_integer_invalid | 🐛 BUG | Abi specific integer invalid | Class extending AbiSpecificInteger doesn't meet requirements. | ⚠️ MINOR | 🔴 H | ★ L |
 | argument_type_not_assignable_to_error_handler | 🐛 BUG | Argument type not assignable to error handler | Future.catchError argument function parameters incompatible. | ⚠️ MINOR | 🔴 H | ★ L |
 | body_might_complete_normally | 🐛 BUG | Body might complete normally | Method/function with non-nullable return type could implicitly return null. | ⚠️ MINOR | 🔴 H | ★ L |
 | const_map_key_not_primitive_equality | 🐛 BUG | Const map key not primitive equality | Const map key class implements == or hashCode. | ⚠️ MINOR | 🔴 H | ★ L |
