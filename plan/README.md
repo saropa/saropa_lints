@@ -2,7 +2,7 @@
 
 Plans in this folder corresponded to the **10 easiest / next-in-line** items marked with ⭐ in [ROADMAP.md](../../ROADMAP.md).
 
-**All 10 plans implemented and moved to history:** [bugs/history/20260317/](../history/20260317/IMPLEMENTED_cross_file_cli_and_central_stats.md).
+**All 10 plans implemented and moved to history:** [bugs/history/20260317/](../history/20260317/cross_file_cli_and_central_stats.md).
 
 | Implemented plan | Section |
 |------------------|---------|
@@ -16,8 +16,8 @@ Plans in this folder corresponded to the **10 easiest / next-in-line** items mar
 | plan_cross_file_baseline | Part 3 Phase 3 |
 | plan_cross_file_ci_exit_codes | Part 3 Phase 3 |
 | plan_cross_file_github_actions | Part 3 Phase 3 |
-| plan_scan_public_api_file_list_tier | Scan public API, file-list, tier override, JSON ([history/20260319](../history/20260319/IMPLEMENTED_plan_scan_public_api_file_list_tier.md)) |
-| plan_additional_rules_21_through_30 | Compile-time shape rules ([history/20260320/IMPLEMENTED_plan_additional_rules_21_through_30.md](history/20260320/IMPLEMENTED_plan_additional_rules_21_through_30.md)) |
+| plan_scan_public_api_file_list_tier | Scan public API, file-list, tier override, JSON ([history/20260319](../history/20260319/plan_scan_public_api_file_list_tier_history.md)) |
+| plan_additional_rules_21_through_30 | Compile-time shape rules ([history/20260320/plan_additional_rules_21_through_30.md](history/20260320/plan_additional_rules_21_through_30.md)) |
 
 ### Current plans
 
@@ -32,6 +32,6 @@ Plans in this folder corresponded to the **10 easiest / next-in-line** items mar
 - **[plan_additional_rules_81_through_90.md](plan_additional_rules_81_through_90.md)** — Reserved for future ROADMAP expansion.
 - **[plan_log_capture_integration.md](plan_log_capture_integration.md)** — Saropa Lints implementation for optional Log Capture integration: extension public API (getViolationsData, getHealthScoreParams, runAnalysis, runAnalysisForFiles, getVersion), runAnalysisForFiles for stack-trace files, consumer manifest (consumer_contract.json), VIOLATION_EXPORT_API update.
 
-All additional-rule plans are ordered by **developer usefulness** (BLOCKER → MAJOR → MINOR; then Wow; then Effort). Batches **1–10**, **11–20**, and **21–30** are implemented (see `plan/history/` IMPLEMENTED docs). Remaining roadmap rows are listed in [ROADMAP.md § Additional rules](../../ROADMAP.md#additional-rules).
+All additional-rule plans are ordered by **developer usefulness** (BLOCKER → MAJOR → MINOR; then Wow; then Effort). Batches **1–10**, **11–20**, and **21–30** are done (see `plan/history/` completion records). Remaining roadmap rows are listed in [ROADMAP.md § Additional rules](../../ROADMAP.md#additional-rules).
 
 See [ROADMAP.md](../../ROADMAP.md) for other planned work.

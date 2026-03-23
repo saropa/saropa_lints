@@ -1,6 +1,6 @@
 # Optional Tighter Integration: saropa_lints ↔ saropa_drift_advisor
 
-**Status:** Plan (saropa_lints extension parts implemented; see IMPLEMENTED_plan_saropa_drift_advisor_integration.md in this folder)  
+**Status:** Plan (saropa_lints extension parts implemented; see plan_saropa_drift_advisor_integration_history.md in this folder)  
 **Last updated:** 2025-03-19
 
 ## Summary

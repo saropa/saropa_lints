@@ -1,6 +1,6 @@
 # Plan: Saropa Lints implementation for Log Capture integration
 
-**Status:** Implemented 2026-03-19 — see [IMPLEMENTED_plan_log_capture_integration.md](IMPLEMENTED_plan_log_capture_integration.md)  
+**Status:** Implemented 2026-03-19 — see [plan_log_capture_integration_history.md](plan_log_capture_integration_history.md)  
 **Last updated:** 2026-03-19  
 **Consumer:** [Saropa Log Capture](https://github.com/saropa/saropa-log-capture); integration design and full plan: `docs/SAROPA_LINTS_INTEGRATION.md` in that repo.
 
@@ -39,4 +39,4 @@ All work is **additive and optional**: Log Capture continues to work with only t
 
 ---
 
-*(Sections 2–9: see git history or IMPLEMENTED doc for full task breakdown and references.)*
+*(Sections 2–9: see git history or the completion record in `plan_log_capture_integration_history.md` for full task breakdown and references.)*

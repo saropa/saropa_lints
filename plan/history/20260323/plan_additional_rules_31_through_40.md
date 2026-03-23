@@ -1,4 +1,4 @@
-# Implemented: plan_additional_rules_31_through_40
+# Completed: plan_additional_rules_31_through_40
 
 **Source plan:** [plan/plan_additional_rules_31_through_40.md](../../plan_additional_rules_31_through_40.md)  
 **Status:** Complete (2026-03-23)

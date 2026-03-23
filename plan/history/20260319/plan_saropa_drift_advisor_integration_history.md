@@ -1,4 +1,4 @@
-# Implemented: Drift Advisor integration (saropa_lints extension) — 2026-03-19
+# Completed: Drift Advisor integration (saropa_lints extension) — 2026-03-19
 
 **Plan:** `bugs/plan/plan_saropa_drift_advisor_integration.md` — saropa_lints extension parts fully implemented; plan moved to this folder.
 

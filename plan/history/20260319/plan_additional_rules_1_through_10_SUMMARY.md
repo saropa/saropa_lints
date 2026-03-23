@@ -1,4 +1,4 @@
-# Plan: Additional rules 1–10 — IMPLEMENTED
+# Plan: Additional rules 1–10 — complete
 
 **Completed:** 2025-03-19
 

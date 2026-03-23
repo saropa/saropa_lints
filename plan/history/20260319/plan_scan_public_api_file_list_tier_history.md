@@ -1,4 +1,4 @@
-# Implemented: Scan Public API, File-List Support, Tier Override
+# Completed: Scan Public API, File-List Support, Tier Override
 
 **Plan:** [plan_scan_public_api_file_list_tier.md](plan_scan_public_api_file_list_tier.md)  
 **Completed:** 2026-03-19

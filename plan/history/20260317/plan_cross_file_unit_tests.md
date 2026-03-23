@@ -1,6 +1,6 @@
 # Plan: Cross-File CLI Unit Tests
 
-**Status:** Implemented. See [IMPLEMENTED_cross_file_cli_and_central_stats.md](IMPLEMENTED_cross_file_cli_and_central_stats.md).
+**Status:** Implemented. See [cross_file_cli_and_central_stats.md](cross_file_cli_and_central_stats.md).
 
 **ROADMAP:** [Part 3: Cross-File Analysis CLI Tool](../../../ROADMAP.md) — Phase 1
 

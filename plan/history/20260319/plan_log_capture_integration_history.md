@@ -1,4 +1,4 @@
-# Implemented: Log Capture integration (extension API + consumer manifest)
+# Completed: Log Capture integration (extension API + consumer manifest)
 
 **Plan:** [plan_log_capture_integration.md](plan_log_capture_integration.md)  
 **Completed:** 2026-03-19

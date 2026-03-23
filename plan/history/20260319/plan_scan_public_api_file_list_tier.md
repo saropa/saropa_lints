@@ -1,6 +1,6 @@
 # Plan: Scan Public API, File-List Support, and Tier Override
 
-**Status:** Implemented (see [IMPLEMENTED_plan_scan_public_api_file_list_tier.md](IMPLEMENTED_plan_scan_public_api_file_list_tier.md))  
+**Status:** Implemented (see [plan_scan_public_api_file_list_tier_history.md](plan_scan_public_api_file_list_tier_history.md))  
 **Last updated:** 2026-03-19  
 **Consumer context:** [saropa_drift_advisor plans/saropa_lints_integration.md](https://github.com/saropa/saropa_drift_advisor/blob/main/plans/saropa_lints_integration.md) (optional tighter integration)
 

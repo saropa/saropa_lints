@@ -1,6 +1,6 @@
 # Plan: Central Stats Aggregator
 
-**Status:** Implemented (2026-03-17). See [IMPLEMENTED_cross_file_cli_and_central_stats.md](IMPLEMENTED_cross_file_cli_and_central_stats.md).
+**Status:** Implemented (2026-03-17). See [cross_file_cli_and_central_stats.md](cross_file_cli_and_central_stats.md).
 
 **ROADMAP:** [Part 2: Deferred Rules & Technical Limitations](../../../ROADMAP.md) — Future Optimizations, Low effort
 
