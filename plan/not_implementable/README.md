@@ -10,4 +10,4 @@ Candidates that **cannot** be implemented as saropa_lints rules. The underlying 
 
 ## Count
 
-**51** migration-candidate files. These are either Dart-Code (IDE/settings/LSP/preview/telemetry), Flutter/Dart repo tooling (CI, build, engine, docs), or Dart VM/runtime (Observatory, pub cache).
+**51** numbered plan files. These are either Dart-Code (IDE/settings/LSP/preview/telemetry), Flutter/Dart repo tooling (CI, build, engine, docs), or Dart VM/runtime (Observatory, pub cache).
