@@ -8,7 +8,7 @@ import {
     calcFlaggedIssuePenalty,
     calcPublisherTrust,
     computeVibrancyScore,
-    MAJOR_PUBLISHERS,
+    TRUSTED_PUBLISHERS,
     RESOLUTION_PUBLISH_RECENCY_CAP,
 } from '../../../vibrancy/scoring/vibrancy-calculator';
 import { GitHubMetrics } from '../../../vibrancy/types';
@@ -250,8 +250,8 @@ describe('vibrancy-calculator', () => {
     });
 
     describe('calcPublisherTrust', () => {
-        it('should return max bonus for major publishers', () => {
-            for (const pub of MAJOR_PUBLISHERS) {
+        it('should return max bonus for trusted publishers', () => {
+            for (const pub of TRUSTED_PUBLISHERS) {
                 assert.strictEqual(calcPublisherTrust(pub), 15);
             }
         });

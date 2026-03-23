@@ -1,4 +1,7 @@
 import { GitHubMetrics } from '../types';
+import { isTrustedPublisher } from './trusted-publishers';
+
+export { TRUSTED_PUBLISHERS, isTrustedPublisher } from './trusted-publishers';
 
 /**
  * Default scoring weights for the vibrancy formula:
@@ -93,19 +96,17 @@ export function calcPopularity(pubPoints: number, stars: number): number {
     return clamp((pointsNorm + starsNorm) / 2);
 }
 
-/** Major trusted publishers (Dart/Google ecosystem). */
-export const MAJOR_PUBLISHERS = new Set([
-    'dart.dev', 'google.dev', 'flutter.dev',
-]);
-
-/** Publisher trust bonus/penalty (−maxBonus/3 to +maxBonus). */
+/**
+ * Publisher trust bonus/penalty (−maxBonus/3 to +maxBonus).
+ * Full bonus when `publisher` is in `TRUSTED_PUBLISHERS` (`trusted-publishers.ts`).
+ */
 export function calcPublisherTrust(
     publisher: string | null,
     maxBonus: number = 15,
 ): number {
     if (maxBonus <= 0) { return 0; }
     if (!publisher) { return -Math.round(maxBonus / 3); }
-    if (MAJOR_PUBLISHERS.has(publisher)) { return maxBonus; }
+    if (isTrustedPublisher(publisher)) { return maxBonus; }
     return Math.round(maxBonus / 3);
 }
 
