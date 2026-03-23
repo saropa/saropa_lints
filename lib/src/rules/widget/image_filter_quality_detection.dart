@@ -7,7 +7,7 @@
 ///
 /// Flutter 3.24 ([PR #148799](https://github.com/flutter/flutter/pull/148799))
 /// changed the default `filterQuality` for `Image`, `RawImage`, `FadeInImage`,
-/// and `DecorationImage` from [FilterQuality.low] to [FilterQuality.medium].
+/// and `DecorationImage` from `FilterQuality.low` to `FilterQuality.medium`.
 /// User code that still passes `filterQuality: FilterQuality.low` is usually
 /// legacy alignment with the old default; this rule nudges toward `medium` or
 /// omission.
@@ -24,11 +24,14 @@
 ///
 /// ## Analyzer API
 ///
-/// [SimpleIdentifier] resolution uses [SimpleIdentifier.element] (analyzer 9+).
+/// [SimpleIdentifier] resolution uses `elementFromAstIdentifier` from
+/// `element_identifier_utils.dart`.
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
+
+import '../../element_identifier_utils.dart';
 
 /// Shared AST / element checks for [PreferImageFilterQualityMediumRule] and its fix.
 abstract final class ImageFilterQualityLowDetection {
@@ -52,15 +55,6 @@ abstract final class ImageFilterQualityLowDetection {
     if (e == null) return false;
     final String u = e.library.uri.toString();
     return u.startsWith('package:flutter/');
-  }
-
-  /// Resolved element for [id] (analyzer 9+: [SimpleIdentifier.element]).
-  static Element? _identifierElement(SimpleIdentifier id) {
-    try {
-      return id.element;
-    } on Object catch (_) {
-      return null;
-    }
   }
 
   /// Whether [typeLexeme] names an image API this rule cares about, and (when
@@ -116,7 +110,7 @@ abstract final class ImageFilterQualityLowDetection {
       return null;
     }
 
-    final Element? targetEl = _identifierElement(target);
+    final Element? targetEl = elementFromAstIdentifier(target);
     if (targetEl is InterfaceElement) {
       if (!matchesImageFamilyType(targetEl, typeName)) return null;
     } else if (targetEl != null) {
@@ -137,7 +131,7 @@ abstract final class ImageFilterQualityLowDetection {
       return null;
     }
 
-    final Element? callee = _identifierElement(node.methodName);
+    final Element? callee = elementFromAstIdentifier(node.methodName);
 
     if (callee is ConstructorElement) {
       final Element? enc = callee.enclosingElement;
@@ -176,11 +170,11 @@ abstract final class ImageFilterQualityLowDetection {
     return null;
   }
 
-  /// True when [expr] is the [FilterQuality.low] enum constant from `dart:ui` or Flutter.
+  /// True when [expr] is the `FilterQuality.low` enum constant from `dart:ui` or Flutter.
   static bool isFilterQualityLowValue(Expression expr) {
     final SimpleIdentifier? lowId = _lowNameIdentifier(expr);
     if (lowId == null) return false;
-    final Element? el = _identifierElement(lowId);
+    final Element? el = elementFromAstIdentifier(lowId);
     if (el is FieldElement && el.name == 'low') {
       final Element? enc = el.enclosingElement;
       if (enc is InterfaceElement && enc.name == 'FilterQuality') {
