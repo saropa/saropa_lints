@@ -3131,3 +3131,208 @@ class InvalidExtensionArgumentCountRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// subtype_of_disallowed_type
+// =============================================================================
+
+/// Class, mixin, or enum must not extend / implement / mix in disallowed types.
+///
+/// Since: v10.0.3 | Rule version: v1
+///
+/// **BAD:**
+/// ```dart
+/// class C extends int {}
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class C extends Object {}
+/// ```
+class SubtypeOfDisallowedTypeRule extends SaropaLintRule {
+  SubtypeOfDisallowedTypeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'subtype_of_disallowed_type',
+    '[subtype_of_disallowed_type] This type cannot be extended, implemented, or used as a mixin constraint (e.g. bool, int, String, Null). Use a valid superclass or interface. {v1}',
+    correctionMessage:
+        'Replace the disallowed type with a proper class, mixin, or enum supertype.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    void checkNamedType(NamedType? typeNode) {
+      if (typeNode == null) return;
+      final DartType? t = typeNode.type;
+      if (t == null) return;
+      if (_isDisallowedPrimitiveOrNull(t)) {
+        reporter.atNode(typeNode, code);
+      }
+    }
+
+    void checkTypes(NodeList<NamedType> types) {
+      for (final NamedType n in types) {
+        checkNamedType(n);
+      }
+    }
+
+    context.addClassDeclaration((ClassDeclaration node) {
+      checkNamedType(node.extendsClause?.superclass);
+      final ImplementsClause? impl = node.implementsClause;
+      if (impl != null) checkTypes(impl.interfaces);
+      final WithClause? withClause = node.withClause;
+      if (withClause != null) checkTypes(withClause.mixinTypes);
+    });
+
+    context.addMixinDeclaration((MixinDeclaration node) {
+      final MixinOnClause? on = node.onClause;
+      if (on != null) checkTypes(on.superclassConstraints);
+      final ImplementsClause? impl = node.implementsClause;
+      if (impl != null) checkTypes(impl.interfaces);
+    });
+
+    context.addEnumDeclaration((EnumDeclaration node) {
+      final ImplementsClause? impl = node.implementsClause;
+      if (impl != null) checkTypes(impl.interfaces);
+    });
+  }
+
+  static bool _isDisallowedPrimitiveOrNull(DartType type) {
+    if (type is VoidType) return true;
+    return type.isDartCoreBool ||
+        type.isDartCoreInt ||
+        type.isDartCoreDouble ||
+        type.isDartCoreNum ||
+        type.isDartCoreString ||
+        type.isDartCoreNull;
+  }
+}
+
+// =============================================================================
+// abi_specific_integer_invalid
+// =============================================================================
+
+/// `dart:ffi` [AbiSpecificInteger] subclass must follow SDK layout rules.
+///
+/// Since: v10.0.3 | Rule version: v1
+///
+/// Requires a single `const` constructor, no other members, no type
+/// parameters, and an `@AbiSpecificIntegerMapping` annotation (mirrors
+/// analyzer `abi_specific_integer_invalid` cases we can detect syntactically).
+///
+/// **BAD:**
+/// ```dart
+/// import 'dart:ffi';
+/// @AbiSpecificIntegerMapping({Abi.macosX64: Int8()})
+/// class Bad extends AbiSpecificInteger {
+///   Bad();
+/// }
+/// ```
+class AbiSpecificIntegerInvalidRule extends SaropaLintRule {
+  AbiSpecificIntegerInvalidRule() : super(code: _code);
+
+  @override
+  Set<String>? get requiredPatterns => const {'AbiSpecificInteger'};
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'native', 'type-safety'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'abi_specific_integer_invalid',
+    '[abi_specific_integer_invalid] A class extending AbiSpecificInteger must be final, have no type parameters, declare exactly one const constructor, no other members, and an AbiSpecificIntegerMapping annotation. {v1}',
+    correctionMessage:
+        'Follow the dart:ffi AbiSpecificInteger requirements (see Dart diagnostic docs).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      final NamedType? supertype = node.extendsClause?.superclass;
+      if (supertype == null) return;
+      final Element? rawSuper = supertype.element;
+      if (rawSuper is! InterfaceElement) return;
+      if (rawSuper.name != 'AbiSpecificInteger' ||
+          rawSuper.library.uri.toString() != 'dart:ffi') {
+        return;
+      }
+
+      final CompilationUnit unit = node.root as CompilationUnit;
+      if (!_compilationUnitImportsDartFfi(unit)) return;
+
+      if (node.typeParameters != null) {
+        reporter.atToken(node.name, code);
+        return;
+      }
+
+      bool hasMapping = false;
+      for (final Annotation a in node.metadata) {
+        if (a.name.name == 'AbiSpecificIntegerMapping') {
+          hasMapping = true;
+          break;
+        }
+      }
+      if (!hasMapping) {
+        reporter.atToken(node.name, code);
+        return;
+      }
+
+      if (node.finalKeyword == null) {
+        reporter.atToken(node.name, code);
+        return;
+      }
+
+      final List<ConstructorDeclaration> ctors = node.members
+          .whereType<ConstructorDeclaration>()
+          .toList();
+      final int otherMembers = node.members
+          .where((ClassMember m) => m is! ConstructorDeclaration)
+          .length;
+
+      if (ctors.length != 1 ||
+          ctors.single.constKeyword == null ||
+          otherMembers != 0) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+
+  static bool _compilationUnitImportsDartFfi(CompilationUnit unit) {
+    for (final Directive d in unit.directives) {
+      if (d is! ImportDirective) continue;
+      final StringLiteral uri = d.uri;
+      if (uri is SimpleStringLiteral && uri.value == 'dart:ffi') {
+        return true;
+      }
+    }
+    return false;
+  }
+}

@@ -617,3 +617,134 @@ class InvalidNonVirtualAnnotationRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// abstract_field_initializer
+// =============================================================================
+
+/// Abstract instance field must not have an initializer (invalid Dart shape).
+///
+/// Since: v10.0.3 | Rule version: v1
+///
+/// Mirrors the analyzer `abstract_field_initializer` diagnostic for tiered
+/// reporting alongside other Saropa compile-time shape rules.
+///
+/// **BAD:**
+/// ```dart
+/// abstract class C {
+///   abstract int x = 0;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// abstract class C {
+///   abstract final int x;
+/// }
+/// ```
+class AbstractFieldInitializerRule extends SaropaLintRule {
+  AbstractFieldInitializerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'architecture', 'reliability'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'abstract_field_initializer',
+    '[abstract_field_initializer] Abstract fields cannot have initializers. Remove the initializer or drop the abstract modifier so the declaration matches valid Dart semantics. {v1}',
+    correctionMessage:
+        'Use an abstract field without an initializer, or a concrete field with an initializer.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addFieldDeclaration((FieldDeclaration node) {
+      if (node.abstractKeyword == null) return;
+      for (final VariableDeclaration v in node.fields.variables) {
+        if (v.initializer != null) {
+          reporter.atToken(v.name, code);
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// undefined_enum_constructor
+// =============================================================================
+
+/// Enum constructor invocation does not resolve (typo or missing constructor).
+///
+/// Since: v10.0.3 | Rule version: v1
+///
+/// **BAD:**
+/// ```dart
+/// enum E { a(1); const E(int x); }
+/// void f() { E.missing(1); }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// enum E { a(1); const E(int x); }
+/// void f() { E.a; }
+/// ```
+class UndefinedEnumConstructorRule extends SaropaLintRule {
+  UndefinedEnumConstructorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'architecture', 'reliability'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'undefined_enum_constructor',
+    '[undefined_enum_constructor] This enum constructor call does not resolve to a declared enum constructor. Fix the name or add the constructor to the enum. {v1}',
+    correctionMessage:
+        'Use an existing enum value or constructor, or declare the missing constructor on the enum.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final NamedType typeNode = node.constructorName.type;
+      final Element? typeEl = typeNode.element;
+      if (typeEl is! EnumElement) return;
+
+      final ConstructorName ctorName = node.constructorName;
+      if (ctorName.name == null) return;
+
+      final Element? ctorEl = ctorName.element;
+      if (ctorEl != null) return;
+
+      final SimpleIdentifier? nameNode = ctorName.name;
+      if (nameNode != null) {
+        reporter.atNode(nameNode, code);
+      } else {
+        reporter.atNode(ctorName, code);
+      }
+    });
+  }
+}

@@ -6,6 +6,7 @@
 // ignore_for_file: prefer_button_style_icon_alignment, prefer_key_event
 // ignore_for_file: prefer_m3_text_theme
 // ignore_for_file: prefer_overflow_bar_over_button_bar
+// ignore_for_file: prefer_dropdown_menu_item_button_opacity_animation
 // Test fixture for migration rules
 
 import 'flutter_mocks.dart';

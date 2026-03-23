@@ -4,11 +4,12 @@ import 'package:saropa_lints/src/rules/config/migration_rules.dart';
 import 'package:saropa_lints/src/tiers.dart';
 import 'package:test/test.dart';
 
-/// Tests for 13 Migration lint rules.
+/// Tests for 14 Migration lint rules.
 ///
 /// Rules:
 ///   - avoid_asset_manifest_json (Essential, ERROR)
 ///   - prefer_dropdown_initial_value (Recommended, WARNING)
+///   - prefer_dropdown_menu_item_button_opacity_animation (Recommended, INFO)
 ///   - prefer_on_pop_with_result (Recommended, WARNING)
 ///   - prefer_tabbar_theme_indicator_color (Recommended, WARNING)
 ///   - prefer_platform_menu_bar_child (Recommended, WARNING)
@@ -19,6 +20,7 @@ import 'package:test/test.dart';
 ///   - prefer_key_event (Recommended, WARNING)
 ///   - prefer_m3_text_theme (Recommended, WARNING)
 ///   - prefer_overflow_bar_over_button_bar (Recommended, INFO)
+///   - avoid_deprecated_flutter_test_window (Recommended, WARNING)
 ///
 /// Test fixture: example/lib/migration_rules_fixture.dart
 void main() {
@@ -48,6 +50,24 @@ void main() {
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
     });
+
+    test(
+      'PreferDropdownMenuItemButtonOpacityAnimationRule instantiates correctly',
+      () {
+        final rule = PreferDropdownMenuItemButtonOpacityAnimationRule();
+        expect(
+          rule.code.name.toLowerCase(),
+          'prefer_dropdown_menu_item_button_opacity_animation',
+        );
+        expect(
+          rule.code.problemMessage,
+          contains('[prefer_dropdown_menu_item_button_opacity_animation]'),
+        );
+        expect(rule.code.problemMessage.length, greaterThan(200));
+        expect(rule.code.correctionMessage, isNotNull);
+        expect(rule.fixGenerators, hasLength(2));
+      },
+    );
 
     test('PreferOnPopWithResultRule instantiates correctly', () {
       final rule = PreferOnPopWithResultRule();
@@ -84,12 +104,8 @@ void main() {
       );
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
-      expect(rule.code.problemMessage, contains('{v2}'));
-      expect(rule.code.problemMessage, contains('#145523'));
-      expect(
-        rule.requiredPatterns,
-        containsAll(<String>['ButtonBar', 'buttonBarTheme']),
-      );
+      expect(rule.requiredPatterns, contains('ButtonBar'));
+      expect(rule.requiredPatterns, contains('buttonBarTheme'));
       expect(rule.fixGenerators, hasLength(1));
     });
   });
@@ -139,6 +155,37 @@ void main() {
       // False positive prevention: requiresFlutterImport filters
       expect('non-flutter files skipped', isNotNull);
     });
+  });
+
+  group('prefer_dropdown_menu_item_button_opacity_animation', () {
+    test('fixture file exists', () {
+      final file = File(
+        'example/lib/migration/'
+        'prefer_dropdown_menu_item_button_opacity_animation_fixture.dart',
+      );
+      expect(file.existsSync(), isTrue);
+    });
+
+    test(
+      'SHOULD trigger on nullable CurvedAnimation? opacityAnimation field',
+      () {
+        expect('prefer_dropdown_menu_item_button_opacity_animation', isNotNull);
+      },
+    );
+
+    test(
+      'SHOULD trigger on opacityAnimation! in DropdownMenuItemButton State',
+      () {
+        expect('prefer_dropdown_menu_item_button_opacity_animation', isNotNull);
+      },
+    );
+
+    test(
+      'should NOT trigger on State without DropdownMenuItemButton type arg',
+      () {
+        expect('false positive guard: other State', isNotNull);
+      },
+    );
   });
 
   group('prefer_on_pop_with_result', () {

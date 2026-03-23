@@ -24,24 +24,24 @@
 
 ### Description
 
-Deprecates `TestWindow`
-
-* Adds `Deprecated` annotations to `TestWindow` and its constructors.
-* Adds `Deprecated` annotations to all properties and methods on `TestWindow` except `noSuchMethod`.
-* Adds `Deprecated` annotation to `TestWidgetsFlutterBinding.window`.
-* Adds `flutter_test` specific deprecation documentation to `TestWidgetsFlutterBinding.window`.
-
-Resolves #121915.
-
-## Pre-launch Checklist
-
-- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.
-- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.
-- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].
-- [x] I signed the [CLA].
-- [x] I listed at least one issue that this PR fixes in the description above.
-- [x] I updated/added relevant documentation (doc comments with `///`).
-- [x] I added new tests to check the change I am making, or this PR is [test-exempt].
+Deprecates `TestWindow`
+
+* Adds `Deprecated` annotations to `TestWindow` and its constructors.
+* Adds `Deprecated` annotations to all properties and methods on `TestWindow` except `noSuchMethod`.
+* Adds `Deprecated` annotation to `TestWidgetsFlutterBinding.window`.
+* Adds `flutter_test` specific deprecation documentation to `TestWidgetsFlutterBinding.window`.
+
+Resolves #121915.
+
+## Pre-launch Checklist
+
+- [x] I read the [Contributor Guide] and followed the process outlined there for submitting PRs.
+- [x] I read the [Tree Hygiene] wiki page, which explains my responsibilities.
+- [x] I read and followed the [Flutter Style Guide], including [Features we expect every widget to implement].
+- [x] I signed the [CLA].
+- [x] I listed at least one issue that this PR fixes in the description above.
+- [x] I updated/added relevant documentation (doc comments with `///`).
+- [x] I added new tests to check the change I am making, or this PR is [test-exempt].
 - [x] All existing and new tests are passing.
 
 ---
@@ -82,18 +82,20 @@ Replace with the recommended alternative API
 
 ## Implementation Checklist
 
-- [ ] Verify the API change in Flutter/Dart SDK source
-- [ ] Determine minimum SDK version requirement
-- [ ] Write detection logic (AST visitor)
-- [ ] Write quick-fix replacement
-- [ ] Create test fixture with bad/good examples
-- [ ] Add unit tests
-- [ ] Register rule in `all_rules.dart`
-- [ ] Add to tier in `tiers.dart`
-- [ ] Update ROADMAP.md
-- [ ] Update CHANGELOG.md
+- [x] Verify the API change in Flutter/Dart SDK source
+- [x] Determine minimum SDK version requirement
+- [x] Write detection logic (AST visitor)
+- [ ] Write quick-fix replacement (deferred — migration is contextual)
+- [ ] Create test fixture with bad/good examples (Dart-only example packages lack `flutter_test` resolution)
+- [x] Add unit tests
+- [x] Register rule in `all_rules.dart`
+- [x] Add to tier in `tiers.dart`
+- [ ] Update ROADMAP.md goal counts (publish script / metrics)
+- [x] Update CHANGELOG.md
 
 ---
 
-**Status:** Not started
+**Status:** Implemented as `avoid_deprecated_flutter_test_window`
+
+**History note:** [bugs/history/20260323/migration-candidate-056-flutter-test-window.md](../../bugs/history/20260323/migration-candidate-056-flutter-test-window.md)
 **Generated:** From Flutter SDK v3.10.0 release notes

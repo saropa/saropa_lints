@@ -1408,3 +1408,122 @@ class UriDoesNotExistInDocImportRule extends SaropaLintRule {
     }
   }
 }
+
+// =============================================================================
+// deprecated_new_in_comment_reference
+// =============================================================================
+
+/// Doc comments should not use deprecated `new` in reference links.
+///
+/// Since: v10.0.3 | Rule version: v1
+///
+/// Dart doc style prefers `[TypeName]` over `[new TypeName]`.
+///
+/// **BAD:**
+/// ```dart
+/// /// See [new Object] for details.
+/// class C {}
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// /// See [Object] for details.
+/// class C {}
+/// ```
+class DeprecatedNewInCommentReferenceRule extends SaropaLintRule {
+  DeprecatedNewInCommentReferenceRule() : super(code: _code);
+
+  @override
+  Set<String>? get requiredPatterns => const {'[new '};
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core', 'documentation'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static final RegExp _newRef = RegExp(r'\[\s*new\s+[\w.]+\s*\]');
+
+  static const LintCode _code = LintCode(
+    'deprecated_new_in_comment_reference',
+    '[deprecated_new_in_comment_reference] Documentation references should not use the deprecated `new` keyword inside `[...]` links. Use `[ClassName]` or `[prefix.ClassName]` instead. {v1}',
+    correctionMessage:
+        'Remove `new` from the doc reference so it uses modern Dart doc link syntax.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit unit) {
+      void checkDoc(Comment? doc) {
+        if (doc == null) return;
+        final String text = doc.tokens.map((Token t) => t.lexeme).join(' ');
+        if (_newRef.hasMatch(text)) {
+          reporter.atNode(doc, code);
+        }
+      }
+
+      checkDoc(_libraryDocFromUnit(unit));
+
+      for (final Declaration decl in unit.declarations) {
+        _walkDeclarationForDoc(decl, checkDoc);
+      }
+    });
+  }
+
+  /// Library doc from a `library` directive when present.
+  static Comment? _libraryDocFromUnit(CompilationUnit unit) {
+    for (final Directive d in unit.directives) {
+      if (d is LibraryDirective) {
+        return d.documentationComment;
+      }
+    }
+    return null;
+  }
+
+  static void _walkDeclarationForDoc(
+    Declaration decl,
+    void Function(Comment?) checkDoc,
+  ) {
+    checkDoc(decl.documentationComment);
+    if (decl is ClassDeclaration) {
+      for (final ClassMember m in decl.members) {
+        if (m is MethodDeclaration) {
+          checkDoc(m.documentationComment);
+        } else if (m is FieldDeclaration) {
+          checkDoc(m.documentationComment);
+        } else if (m is ConstructorDeclaration) {
+          checkDoc(m.documentationComment);
+        }
+      }
+    } else if (decl is MixinDeclaration) {
+      for (final ClassMember m in decl.members) {
+        if (m is MethodDeclaration) checkDoc(m.documentationComment);
+        if (m is FieldDeclaration) checkDoc(m.documentationComment);
+      }
+    } else if (decl is EnumDeclaration) {
+      for (final EnumConstantDeclaration c in decl.constants) {
+        checkDoc(c.documentationComment);
+      }
+      for (final ClassMember m in decl.members) {
+        if (m is MethodDeclaration) checkDoc(m.documentationComment);
+        if (m is FieldDeclaration) checkDoc(m.documentationComment);
+        if (m is ConstructorDeclaration) checkDoc(m.documentationComment);
+      }
+    } else if (decl is ExtensionDeclaration) {
+      for (final ClassMember m in decl.members) {
+        if (m is MethodDeclaration) checkDoc(m.documentationComment);
+        if (m is FieldDeclaration) checkDoc(m.documentationComment);
+      }
+    }
+  }
+}

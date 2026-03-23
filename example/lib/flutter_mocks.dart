@@ -1546,6 +1546,24 @@ class DropdownButtonFormField<T> extends Widget {
   });
 }
 
+/// Mock for Material `DropdownMenuItemButton` (Flutter 3.32+ non-null opacity animation).
+class DropdownMenuItemButton<T> extends StatefulWidget {
+  const DropdownMenuItemButton({super.key, required this.child});
+
+  final Widget child;
+
+  CurvedAnimation? get opacityAnimation => null;
+
+  @override
+  State<DropdownMenuItemButton<T>> createState() =>
+      _DropdownMenuItemButtonState<T>();
+}
+
+class _DropdownMenuItemButtonState<T> extends State<DropdownMenuItemButton<T>> {
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
+
 class DefaultTextStyle extends Widget {
   const DefaultTextStyle({
     super.key,

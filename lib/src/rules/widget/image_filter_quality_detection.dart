@@ -70,11 +70,13 @@ abstract final class ImageFilterQualityLowDetection {
   /// matches; a project-local class named `Image` does not (resolved element
   /// would not be Flutter SDK).
   static bool matchesImageFamilyType(InterfaceElement? cls, String typeLexeme) {
-    if (cls != null) {
-      return _isFlutterSdkInterface(cls) &&
-          _imageFamilyTypes.contains(cls.name);
+    if (!_imageFamilyTypes.contains(typeLexeme)) {
+      return false;
     }
-    return _imageFamilyTypes.contains(typeLexeme);
+    if (cls == null) {
+      return true;
+    }
+    return _isFlutterSdkInterface(cls) && cls.name == typeLexeme;
   }
 
   /// `Image(…)` allows the default constructor and `Image.network` / `.asset` / … factories only.
@@ -103,6 +105,9 @@ abstract final class ImageFilterQualityLowDetection {
     MethodInvocation node,
   ) {
     final Expression? target = node.target;
+    if (target == null) {
+      return _violatingFilterQualityForNullTargetMethodInvocation(node);
+    }
     if (target is! SimpleIdentifier) return null;
     final String typeName = target.name;
     if (typeName == 'Image') {
@@ -118,6 +123,45 @@ abstract final class ImageFilterQualityLowDetection {
       return null;
     }
 
+    return _findFilterQualityLowNamed(node.argumentList.arguments);
+  }
+
+  /// `RawImage(…)`, `Image(…)`, `DecorationImage(…)` often parse as [MethodInvocation]
+  /// with a null [MethodInvocation.target] when the ctor context is missing
+  /// (e.g. [parseString]); real analysis may still use [InstanceCreationExpression].
+  static NamedExpression? _violatingFilterQualityForNullTargetMethodInvocation(
+    MethodInvocation node,
+  ) {
+    final String method = node.methodName.name;
+    if (!_imageFamilyTypes.contains(method)) {
+      return null;
+    }
+
+    final Element? callee = _identifierElement(node.methodName);
+
+    if (callee is ConstructorElement) {
+      final Element? enc = callee.enclosingElement;
+      final InterfaceElement? iface = enc is InterfaceElement ? enc : null;
+      if (iface == null || iface.name != method) {
+        return null;
+      }
+      if (!matchesImageFamilyType(iface, method)) {
+        return null;
+      }
+      final String ctorName = callee.name ?? '';
+      if (method == 'Image' && ctorName.isNotEmpty) {
+        return null;
+      }
+      return _findFilterQualityLowNamed(node.argumentList.arguments);
+    }
+
+    if (callee != null) {
+      return null;
+    }
+
+    if (!matchesImageFamilyType(null, method)) {
+      return null;
+    }
     return _findFilterQualityLowNamed(node.argumentList.arguments);
   }
 

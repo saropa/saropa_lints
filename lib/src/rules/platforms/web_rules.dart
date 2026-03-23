@@ -23,8 +23,10 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/element/element.dart';
 
 import '../../saropa_lint_rule.dart';
+import 'window_postmessage_scheduling_args.dart';
 
 // =============================================================================
 // avoid_platform_channel_on_web
@@ -715,6 +717,133 @@ class AvoidJsRoundedIntsRule extends SaropaLintRule {
       } else {
         reporter.atNode(node);
       }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_schedule_microtask_over_window_postmessage
+// =============================================================================
+
+/// True when [node] is a resolved `Window` / `WindowBase.postMessage` from
+/// `dart:html` (not `Worker.postMessage` or other APIs).
+bool _isDartHtmlWindowPostMessage(MethodInvocation node) {
+  final Element? element = node.methodName.element;
+  if (element is! MethodElement) return false;
+  if (element.library.uri.toString() != 'dart:html') return false;
+  final Element? enclosing = element.enclosingElement;
+  if (enclosing is! ClassElement) return false;
+  final String? name = enclosing.name;
+  return name == 'Window' || name == 'WindowBase';
+}
+
+/// Prefer `scheduleMicrotask` over `window.postMessage('', '*')` for
+/// same-thread deferral on the web.
+///
+/// # Developer guide
+///
+/// ## Background
+///
+/// On the web, `Window.postMessage` is the standard API for cross-document and
+/// cross-origin messaging. Some codebases (and engine internals such as Flutter
+/// skwasm) also used `postMessage` with a trivial payload and wildcard origin
+/// purely to **yield** to the browser event loop. That path is **much slower**
+/// than scheduling a microtask: the engine fix is described in
+/// [flutter#166997](https://github.com/flutter/flutter/pull/166997).
+///
+/// ## What this rule detects
+///
+/// Only calls that resolve to **`dart:html` `Window` or `WindowBase.postMessage`**
+/// with **positional** arguments matching:
+///
+/// - First argument: `null` or an **empty string** literal.
+/// - Second argument: the string literal `'*'`.
+/// - Optional third argument: absent, or an **empty** list literal. A non-empty
+///   list is treated as intentional `MessagePort` usage and is **not** reported.
+///
+/// `Worker.postMessage` and other `postMessage` APIs are excluded by **element
+/// resolution**, not by string heuristics on the receiver expression.
+///
+/// ## What this rule does *not* do
+///
+/// - **No quick fix:** Replacing the call may break code that relies on a
+///   `MessageEvent` on `window.onMessage`. Refactor to call your handler from
+///   `scheduleMicrotask` / `Future.microtask` only when semantics allow.
+/// - **Known false positive:** `iframe.contentWindow?.postMessage('', '*')` can
+///   be legitimate cross-frame signaling; the same cheap pattern is still
+///   slower than a microtask if you only need ordering on one thread—review
+///   intent manually.
+///
+/// ## Performance
+///
+/// [requiredPatterns] includes `postMessage` so the rule can be skipped quickly
+/// when that substring is absent from the file.
+///
+/// Since: v10.0.3 | Rule version: v1
+///
+/// **BAD:**
+/// ```dart
+/// import 'dart:html' as html;
+///
+/// void defer() {
+///   html.window.postMessage('', '*');
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'dart:async';
+///
+/// void defer() {
+///   scheduleMicrotask(() {
+///     // next microtask
+///   });
+/// }
+/// ```
+///
+/// **OK:** Real cross-target messaging (non-wildcard origin, non-empty payload,
+/// or non-empty `MessagePort` list) is not reported.
+class PreferScheduleMicrotaskOverWindowPostmessageRule extends SaropaLintRule {
+  PreferScheduleMicrotaskOverWindowPostmessageRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'platform', 'performance'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'postMessage'};
+
+  static const LintCode _code = LintCode(
+    'prefer_schedule_microtask_over_window_postmessage',
+    '[prefer_schedule_microtask_over_window_postmessage] '
+        'Using window.postMessage with an empty payload and targetOrigin '
+        "'*' is a slow way to defer work on the same thread. "
+        'postMessage is significantly more expensive than a microtask '
+        '(see Flutter skwasm single-threaded fix). {v1}',
+    correctionMessage:
+        'Use scheduleMicrotask from dart:async or Future.microtask when you '
+        'only need same-thread deferral—not a MessageEvent on the window.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'postMessage') return;
+      if (!windowPostMessageArgsLookLikeSchedulingHack(node)) return;
+      if (!_isDartHtmlWindowPostMessage(node)) return;
+      reporter.atNode(node);
     });
   }
 }
