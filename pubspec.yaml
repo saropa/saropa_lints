@@ -46,7 +46,7 @@ dependencies:
   # json2yaml: ^3.0.1 # YAML serialization for CLI tool
 
   # https://pub.dev/packages/path/changelog
-  path: ^1.9.0 # Path manipulation and traversal safety for CLI tools
+  path: ^1.9.1 # Path manipulation and traversal safety for CLI tools
 
   # https://pub.dev/packages/pub_semver/changelog — rule pack semver gates (pubspec.lock)
   pub_semver: ^2.2.0
