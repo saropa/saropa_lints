@@ -114,6 +114,7 @@ export 'widget/widget_layout_constraints_rules.dart';
 export 'widget/widget_layout_flex_scroll_rules.dart';
 export 'widget/widget_lifecycle_rules.dart';
 export 'widget/flutter_migration_widget_rules.dart';
+export 'widget/image_filter_quality_migration_rules.dart';
 export 'widget/widget_patterns_avoid_prefer_rules.dart';
 export 'widget/widget_patterns_require_rules.dart';
 export 'widget/widget_patterns_ux_rules.dart';

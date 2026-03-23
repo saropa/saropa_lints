@@ -1317,6 +1317,7 @@ saropa_lints:
     - prefer_trailing_commas: false              # Trailing commas in multi-line
     - prefer_no_trailing_commas: false           # Opposite - no trailing commas
     - prefer_super_parameters: false             # super parameters over super.x
+    - prefer_image_filter_quality_medium: false   # INFO - Image APIs: FilterQuality.low -> medium / omit (Flutter 3.24+ PR #148799)
     - prefer_super_key: false                    # INFO - Flutter widget Key? key -> super.key (v9.11.0)
     - prefer_explicit_super_calls: false         # Opposite - explicit super.
     - prefer_initializing_formals: false         # this.x parameters
@@ -1516,6 +1517,7 @@ saropa_lints:
     - avoid_asset_manifest_json: false               # ERROR - removed in Flutter 3.38.0, runtime crash (v5.1.0)
     - avoid_deprecated_flutter_test_window: false    # WARNING - TestWindow / TestWidgetsFlutterBinding.window → tester.view (Flutter 3.10, PR #122824)
     - prefer_dropdown_initial_value: false            # WARNING - value→initialValue, Flutter 3.35.0 (v5.1.0, quick fix)
+    - prefer_dropdown_menu_item_button_opacity_animation: false  # INFO - late CurvedAnimation / drop !, Flutter 3.32 PR #164795 (quick fixes)
     - prefer_on_pop_with_result: false                # WARNING - onPop→onPopWithResult, Flutter 3.35.0 (v5.1.0, quick fix)
     - prefer_tabbar_theme_indicator_color: false      # WARNING - indicatorColor→TabBarThemeData, Flutter 3.32.0 (quick fix)
     - prefer_platform_menu_bar_child: false           # WARNING - body→child, removed after Flutter 3.16 (quick fix)

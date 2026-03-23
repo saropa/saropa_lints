@@ -64,3 +64,12 @@ Widget goodChipDeleteNonCircleBorder() {
     ),
   );
 }
+
+// -----------------------------------------------------------------------------
+// prefer_image_filter_quality_medium (Flutter SDK projects)
+// -----------------------------------------------------------------------------
+// Real apps: rule flags package:flutter Image / RawImage / FadeInImage /
+// DecorationImage with filterQuality: FilterQuality.low (Flutter 3.24+ PR
+// #148799). This package mocks Widget types (not package:flutter), so
+// // LINT fixtures would not fire. See test/image_filter_quality_detection_test.dart
+// and lib/src/rules/widget/image_filter_quality_migration_rules.dart.

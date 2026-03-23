@@ -718,6 +718,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferCarouselViewRule.new,
   PreferSearchAnchorRule.new,
   PreferTapRegionForDismissRule.new,
+  PreferImageFilterQualityMediumRule.new,
   PreferSuperKeyRule.new,
   AvoidChipDeleteInkWellCircleBorderRule.new,
 
@@ -2788,6 +2789,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // v5.1.0 - Migration rules (Flutter SDK deprecations)
   AvoidAssetManifestJsonRule.new,
   PreferDropdownInitialValueRule.new,
+  PreferDropdownMenuItemButtonOpacityAnimationRule.new,
   PreferOnPopWithResultRule.new,
   PreferTabbarThemeIndicatorColorRule.new,
 
@@ -2800,6 +2802,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferKeyEventRule.new,
   PreferM3TextThemeRule.new,
   PreferOverflowBarOverButtonBarRule.new,
+  AvoidDeprecatedFlutterTestWindowRule.new,
 
   // Dart SDK 3.0 removed APIs (migration)
   AvoidDeprecatedListConstructorRule.new,
@@ -2930,6 +2933,18 @@ _allRuleFactories = <SaropaLintRule Function()>[
   InvalidNonVirtualAnnotationRule.new,
   InvalidRecordFieldNameRule.new,
   InvalidSuperFormalParameterLocationRule.new,
+
+  // Additional rules (plan_additional_rules_31_through_40)
+  AbstractFieldInitializerRule.new,
+  AbiSpecificIntegerInvalidRule.new,
+  AnnotateRedeclaresRule.new,
+  DeprecatedNewInCommentReferenceRule.new,
+  DocumentIgnoresRule.new,
+  NonConstantMapElementRule.new,
+  ReturnInGeneratorRule.new,
+  SubtypeOfDisallowedTypeRule.new,
+  UndefinedEnumConstructorRule.new,
+  YieldInNonGeneratorRule.new,
 ];
 
 // =============================================================================
