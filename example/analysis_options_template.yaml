@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 6.0.8)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 6.0.9)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -24,11 +24,11 @@
 #
 # TIER GUIDE
 # ==========
-# - essential      : Critical rules (~355) - prevents crashes, security issues
-# - recommended    : Essential + common mistakes (~870) - default for most teams
-# - professional   : Recommended + architecture/testing (~1600) - enterprise teams
-# - comprehensive  : Professional + thorough coverage (~2075) - quality obsessed
-# - pedantic       : Everything including opinionated rules (~1675) - greenfield projects
+# - essential      : Critical rules (~365) - prevents crashes, security issues
+# - recommended    : Essential + common mistakes (~881) - default for most teams
+# - professional   : Recommended + architecture/testing (~1610) - enterprise teams
+# - comprehensive  : Professional + thorough coverage (~2085) - quality obsessed
+# - pedantic       : Everything including opinionated rules (~1685) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================
@@ -88,7 +88,7 @@ analyzer:
 saropa_lints:
   # Choose one tier (required):
   #   - essential      : ~300 rules (critical only)
-  #   - recommended    : ~900 rules (default) ← START HERE
+  #   - recommended    : ~901 rules (default) ← START HERE
   #   - professional   : ~1600 rules (strict)
   #   - comprehensive  : ~2050 rules (very strict)
   #   - pedantic       : ~2050 rules (everything)
@@ -683,6 +683,16 @@ saropa_lints:
     - invalid_literal_annotation: false
     - invalid_non_virtual_annotation: false
     - invalid_super_formal_parameter_location: false
+    - abstract_field_initializer: false
+    - abi_specific_integer_invalid: false
+    - annotate_redeclares: false
+    - deprecated_new_in_comment_reference: false
+    - document_ignores: false
+    - non_constant_map_element: false
+    - return_in_generator: false
+    - subtype_of_disallowed_type: false
+    - undefined_enum_constructor: false
+    - yield_in_non_generator: false
 
     # =========================================================================
     # INTERNATIONALIZATION
@@ -1504,6 +1514,7 @@ saropa_lints:
 
     # --- Migration (Flutter SDK deprecations) ---
     - avoid_asset_manifest_json: false               # ERROR - removed in Flutter 3.38.0, runtime crash (v5.1.0)
+    - avoid_deprecated_flutter_test_window: false    # WARNING - TestWindow / TestWidgetsFlutterBinding.window → tester.view (Flutter 3.10, PR #122824)
     - prefer_dropdown_initial_value: false            # WARNING - value→initialValue, Flutter 3.35.0 (v5.1.0, quick fix)
     - prefer_on_pop_with_result: false                # WARNING - onPop→onPopWithResult, Flutter 3.35.0 (v5.1.0, quick fix)
     - prefer_tabbar_theme_indicator_color: false      # WARNING - indicatorColor→TabBarThemeData, Flutter 3.32.0 (quick fix)

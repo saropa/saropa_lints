@@ -759,7 +759,8 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_button_style_icon_alignment', // WARNING - deprecated in Flutter 3.28
   'prefer_key_event', // WARNING - deprecated in Flutter 3.18
   'prefer_m3_text_theme', // WARNING - removed in Flutter 3.22
-  'prefer_overflow_bar_over_button_bar', // INFO - OverflowBar over ButtonBar (Flutter 3.13+)
+  'prefer_overflow_bar_over_button_bar', // INFO - OverflowBar; drop buttonBar theme (3.13+ / 3.24+)
+  'avoid_deprecated_flutter_test_window', // WARNING - TestWindow / binding.window (Flutter 3.10, PR #122824)
   // Dart SDK 3.0 removed APIs
   'avoid_deprecated_list_constructor',
   'avoid_removed_proxy_annotation',

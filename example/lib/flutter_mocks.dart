@@ -86,8 +86,11 @@ class Center extends Widget {
 }
 
 class ConstrainedBox extends Widget {
-  const ConstrainedBox(
-      {super.key, required dynamic constraints, Widget? child});
+  const ConstrainedBox({
+    super.key,
+    required dynamic constraints,
+    Widget? child,
+  });
 }
 
 class Column extends Widget {
@@ -209,8 +212,11 @@ class GridView extends Widget {
 }
 
 class LimitedBox extends Widget {
-  const LimitedBox(
-      {super.key, double maxHeight = double.infinity, Widget? child});
+  const LimitedBox({
+    super.key,
+    double maxHeight = double.infinity,
+    Widget? child,
+  });
 }
 
 enum MainAxisSize { min, max }
@@ -220,48 +226,61 @@ enum CrossAxisAlignment { start, end, center, stretch, baseline }
 enum TextBaseline { alphabetic, ideographic }
 
 class Text extends Widget {
-  const Text(String data,
-      {super.key,
-      TextStyle? style,
-      int? maxLines,
-      dynamic overflow,
-      dynamic textAlign,
-      dynamic textScaleFactor,
-      dynamic semanticsLabel});
-  const Text.rich(dynamic textSpan,
-      {Key? key, TextStyle? style, int? maxLines, dynamic overflow});
+  const Text(
+    String data, {
+    super.key,
+    TextStyle? style,
+    int? maxLines,
+    dynamic overflow,
+    dynamic textAlign,
+    dynamic textScaleFactor,
+    dynamic semanticsLabel,
+  });
+  const Text.rich(
+    dynamic textSpan, {
+    Key? key,
+    TextStyle? style,
+    int? maxLines,
+    dynamic overflow,
+  });
 }
 
 class Icon extends Widget {
-  const Icon(dynamic icon,
-      {super.key, double? size, dynamic color, String? semanticLabel});
+  const Icon(
+    dynamic icon, {
+    super.key,
+    double? size,
+    dynamic color,
+    String? semanticLabel,
+  });
 }
 
 class Semantics extends Widget {
-  const Semantics(
-      {super.key,
-      String? label,
-      Widget? child,
-      bool? container,
-      bool? excludeSemantics,
-      bool? button,
-      bool? header,
-      bool? image,
-      bool? link,
-      bool? enabled,
-      bool? focused,
-      bool? checked,
-      bool? selected,
-      bool? toggled,
-      bool? hidden,
-      String? hint,
-      String? value,
-      dynamic onTap,
-      dynamic onLongPress,
-      dynamic textDirection,
-      bool? readOnly,
-      bool? liveRegion,
-      String? tooltip});
+  const Semantics({
+    super.key,
+    String? label,
+    Widget? child,
+    bool? container,
+    bool? excludeSemantics,
+    bool? button,
+    bool? header,
+    bool? image,
+    bool? link,
+    bool? enabled,
+    bool? focused,
+    bool? checked,
+    bool? selected,
+    bool? toggled,
+    bool? hidden,
+    String? hint,
+    String? value,
+    dynamic onTap,
+    dynamic onLongPress,
+    dynamic textDirection,
+    bool? readOnly,
+    bool? liveRegion,
+    String? tooltip,
+  });
 }
 
 class MergeSemantics extends Widget {
@@ -352,11 +371,12 @@ class TextFormField extends Widget {
 // ============================================================================
 
 class ListView extends Widget {
-  const ListView(
-      {super.key,
-      List<Widget>? children,
-      dynamic physics,
-      bool shrinkWrap = false});
+  const ListView({
+    super.key,
+    List<Widget>? children,
+    dynamic physics,
+    bool shrinkWrap = false,
+  });
   const ListView.builder({
     super.key,
     int? itemCount,
@@ -389,29 +409,31 @@ class Theme extends Widget {
 }
 
 class Scaffold extends Widget {
-  const Scaffold(
-      {super.key,
-      Widget? body,
-      Widget? appBar,
-      Widget? floatingActionButton,
-      Widget? bottomNavigationBar,
-      Widget? drawer,
-      Widget? endDrawer,
-      dynamic backgroundColor,
-      dynamic resizeToAvoidBottomInset,
-      dynamic bottomSheet});
+  const Scaffold({
+    super.key,
+    Widget? body,
+    Widget? appBar,
+    Widget? floatingActionButton,
+    Widget? bottomNavigationBar,
+    Widget? drawer,
+    Widget? endDrawer,
+    dynamic backgroundColor,
+    dynamic resizeToAvoidBottomInset,
+    dynamic bottomSheet,
+  });
 }
 
 class AppBar extends Widget {
-  const AppBar(
-      {super.key,
-      Widget? title,
-      List<Widget>? actions,
-      Widget? leading,
-      dynamic backgroundColor,
-      dynamic elevation,
-      bool? centerTitle,
-      dynamic bottom});
+  const AppBar({
+    super.key,
+    Widget? title,
+    List<Widget>? actions,
+    Widget? leading,
+    dynamic backgroundColor,
+    dynamic elevation,
+    bool? centerTitle,
+    dynamic bottom,
+  });
 }
 
 class SnackBar extends Widget {
@@ -441,8 +463,12 @@ Future<T?> showDialog<T>({
 }
 
 class AlertDialog extends Widget {
-  const AlertDialog(
-      {super.key, Widget? title, Widget? content, List<Widget>? actions});
+  const AlertDialog({
+    super.key,
+    Widget? title,
+    Widget? content,
+    List<Widget>? actions,
+  });
 }
 
 class SimpleDialog extends Widget {
@@ -485,7 +511,8 @@ abstract class ImplicitlyAnimatedWidget extends StatefulWidget {
 
 /// Minimal mock of [ImplicitlyAnimatedWidgetState] with an [animation] getter.
 abstract class ImplicitlyAnimatedWidgetState<T extends ImplicitlyAnimatedWidget>
-    extends State<T> with SingleTickerProviderStateMixin<T> {
+    extends State<T>
+    with SingleTickerProviderStateMixin<T> {
   late final CurvedAnimation _implicitCurved = CurvedAnimation(
     parent: _ImplicitAnimationParent(),
     curve: Curves.linear,
@@ -703,46 +730,53 @@ void debugPrint(String? message, {int? wrapWidth}) {}
 // ============================================================================
 
 class Image extends Widget {
-  const Image(
-      {super.key,
-      dynamic image,
-      double? width,
-      double? height,
-      dynamic fit,
-      dynamic color,
-      dynamic colorBlendMode,
-      String? semanticLabel,
-      bool excludeFromSemantics = false,
-      dynamic errorBuilder,
-      dynamic loadingBuilder,
-      int? cacheWidth,
-      int? cacheHeight});
-  const Image.network(String url,
-      {Key? key,
-      double? width,
-      double? height,
-      dynamic fit,
-      dynamic errorBuilder,
-      dynamic loadingBuilder,
-      int? cacheWidth,
-      int? cacheHeight,
-      String? semanticLabel,
-      bool excludeFromSemantics = false});
-  const Image.asset(String name,
-      {Key? key,
-      double? width,
-      double? height,
-      dynamic fit,
-      String? semanticLabel,
-      bool excludeFromSemantics = false,
-      int? cacheWidth,
-      int? cacheHeight});
-  const Image.memory(dynamic bytes,
-      {Key? key,
-      double? width,
-      double? height,
-      dynamic fit,
-      String? semanticLabel});
+  const Image({
+    super.key,
+    dynamic image,
+    double? width,
+    double? height,
+    dynamic fit,
+    dynamic color,
+    dynamic colorBlendMode,
+    String? semanticLabel,
+    bool excludeFromSemantics = false,
+    dynamic errorBuilder,
+    dynamic loadingBuilder,
+    int? cacheWidth,
+    int? cacheHeight,
+  });
+  const Image.network(
+    String url, {
+    Key? key,
+    double? width,
+    double? height,
+    dynamic fit,
+    dynamic errorBuilder,
+    dynamic loadingBuilder,
+    int? cacheWidth,
+    int? cacheHeight,
+    String? semanticLabel,
+    bool excludeFromSemantics = false,
+  });
+  const Image.asset(
+    String name, {
+    Key? key,
+    double? width,
+    double? height,
+    dynamic fit,
+    String? semanticLabel,
+    bool excludeFromSemantics = false,
+    int? cacheWidth,
+    int? cacheHeight,
+  });
+  const Image.memory(
+    dynamic bytes, {
+    Key? key,
+    double? width,
+    double? height,
+    dynamic fit,
+    String? semanticLabel,
+  });
 }
 
 class AssetImage {
@@ -750,8 +784,11 @@ class AssetImage {
 }
 
 class DecorationImage {
-  const DecorationImage(
-      {required dynamic image, dynamic fit, dynamic colorFilter});
+  const DecorationImage({
+    required dynamic image,
+    dynamic fit,
+    dynamic colorFilter,
+  });
 }
 
 class ImageProvider {
@@ -812,8 +849,11 @@ class Tab extends Widget {
 // ============================================================================
 
 class PageView extends Widget {
-  const PageView(
-      {super.key, PageController? controller, List<Widget>? children});
+  const PageView({
+    super.key,
+    PageController? controller,
+    List<Widget>? children,
+  });
 }
 
 // ============================================================================
@@ -939,8 +979,12 @@ class Autocomplete<T extends Object> extends Widget {
     super.key,
     required Iterable<T> Function(TextEditingValue) optionsBuilder,
     Widget Function(
-            BuildContext, TextEditingController, FocusNode, VoidCallback)?
-        fieldViewBuilder,
+      BuildContext,
+      TextEditingController,
+      FocusNode,
+      VoidCallback,
+    )?
+    fieldViewBuilder,
   });
 }
 
@@ -972,11 +1016,7 @@ class Provider<T> extends Widget {
     void Function(BuildContext, T)? dispose,
     Widget? child,
   });
-  const Provider.value({
-    super.key,
-    required T value,
-    Widget? child,
-  });
+  const Provider.value({super.key, required T value, Widget? child});
 }
 
 class MultiProvider extends Widget {
@@ -1009,11 +1049,7 @@ class BlocProvider<T extends Bloc<Object, Object>> extends Widget {
     required T Function(BuildContext) create,
     Widget? child,
   });
-  const BlocProvider.value({
-    super.key,
-    required T value,
-    Widget? child,
-  });
+  const BlocProvider.value({super.key, required T value, Widget? child});
 }
 
 class MultiBlocProvider extends Widget {
@@ -1259,8 +1295,12 @@ class InputDecoration {
 }
 
 class CircularProgressIndicator extends Widget {
-  const CircularProgressIndicator(
-      {super.key, double? value, dynamic color, double? strokeWidth});
+  const CircularProgressIndicator({
+    super.key,
+    double? value,
+    dynamic color,
+    double? strokeWidth,
+  });
 }
 
 class TextSpan {
@@ -1273,8 +1313,12 @@ class TextSpan {
 }
 
 class Form extends Widget {
-  const Form(
-      {super.key, Widget? child, dynamic autovalidateMode, dynamic onChanged});
+  const Form({
+    super.key,
+    Widget? child,
+    dynamic autovalidateMode,
+    dynamic onChanged,
+  });
 }
 
 class IconButton extends Widget {
@@ -1678,11 +1722,7 @@ class CachedNetworkImage extends Widget {
 }
 
 class WebView extends Widget {
-  const WebView({
-    super.key,
-    String? initialUrl,
-    dynamic onPageFinished,
-  });
+  const WebView({super.key, String? initialUrl, dynamic onPageFinished});
 }
 
 /// Mock for prefer_webview_sandbox fixture (controller-based WebView API).
@@ -1737,10 +1777,7 @@ class IOSOptions {
 }
 
 class FlutterSecureStorage {
-  const FlutterSecureStorage({
-    AndroidOptions? aOptions,
-    IOSOptions? iOptions,
-  });
+  const FlutterSecureStorage({AndroidOptions? aOptions, IOSOptions? iOptions});
   Future<void> write({required String key, required String? value}) async {}
   Future<String?> read({required String key}) async => null;
 }
@@ -1902,13 +1939,14 @@ class LocationSettings {
 // ── Layout & Container Widgets ──────────────────────────────────────────
 
 class SliverAppBar extends Widget {
-  const SliverAppBar(
-      {super.key,
-      Widget? title,
-      bool? floating,
-      bool? pinned,
-      dynamic expandedHeight,
-      Widget? flexibleSpace});
+  const SliverAppBar({
+    super.key,
+    Widget? title,
+    bool? floating,
+    bool? pinned,
+    dynamic expandedHeight,
+    Widget? flexibleSpace,
+  });
 }
 
 class SliverToBoxAdapter extends Widget {
@@ -1916,8 +1954,11 @@ class SliverToBoxAdapter extends Widget {
 }
 
 class SliverGrid extends Widget {
-  const SliverGrid(
-      {super.key, required dynamic delegate, required dynamic gridDelegate});
+  const SliverGrid({
+    super.key,
+    required dynamic delegate,
+    required dynamic gridDelegate,
+  });
 }
 
 class SliverChildBuilderDelegate {
@@ -1925,10 +1966,11 @@ class SliverChildBuilderDelegate {
 }
 
 class SliverGridDelegateWithFixedCrossAxisCount {
-  const SliverGridDelegateWithFixedCrossAxisCount(
-      {required int crossAxisCount,
-      double? mainAxisSpacing,
-      double? crossAxisSpacing});
+  const SliverGridDelegateWithFixedCrossAxisCount({
+    required int crossAxisCount,
+    double? mainAxisSpacing,
+    double? crossAxisSpacing,
+  });
 }
 
 class AnimatedWidget extends Widget {
@@ -1936,11 +1978,12 @@ class AnimatedWidget extends Widget {
 }
 
 class AnimatedBuilder extends Widget {
-  const AnimatedBuilder(
-      {super.key,
-      required dynamic animation,
-      required dynamic builder,
-      Widget? child});
+  const AnimatedBuilder({
+    super.key,
+    required dynamic animation,
+    required dynamic builder,
+    Widget? child,
+  });
 }
 
 class Tween<T> {
@@ -1984,15 +2027,22 @@ class TextDecoration {
 }
 
 class RichText extends Widget {
-  const RichText(
-      {super.key, required dynamic text, int? maxLines, dynamic overflow});
+  const RichText({
+    super.key,
+    required dynamic text,
+    int? maxLines,
+    dynamic overflow,
+  });
 }
 
 // ── Navigation extras ──────────────────────────────────────────────────
 
 class FocusTraversalOrder extends Widget {
-  const FocusTraversalOrder(
-      {super.key, required dynamic order, required Widget child});
+  const FocusTraversalOrder({
+    super.key,
+    required dynamic order,
+    required Widget child,
+  });
 }
 
 class NumericFocusOrder {
@@ -2000,14 +2050,19 @@ class NumericFocusOrder {
 }
 
 class ShellRoute {
-  const ShellRoute(
-      {dynamic builder, List<dynamic>? routes, dynamic navigatorKey});
+  const ShellRoute({
+    dynamic builder,
+    List<dynamic>? routes,
+    dynamic navigatorKey,
+  });
 }
 
 class StatefulShellRoute {
   const StatefulShellRoute({dynamic builder, List<dynamic>? branches});
-  const StatefulShellRoute.indexedStack(
-      {dynamic builder, List<dynamic>? branches});
+  const StatefulShellRoute.indexedStack({
+    dynamic builder,
+    List<dynamic>? branches,
+  });
 }
 
 class StatefulShellBranch {
@@ -2059,22 +2114,19 @@ Future<T?> showModalBottomSheet<T>({
   required BuildContext context,
   required Widget Function(BuildContext) builder,
   bool isDismissible = true,
-}) async =>
-    null;
+}) async => null;
 
 Future<T?> showDatePicker<T>({
   required BuildContext context,
   required DateTime initialDate,
   required DateTime firstDate,
   required DateTime lastDate,
-}) async =>
-    null;
+}) async => null;
 
 Future<dynamic> showTimePicker({
   required BuildContext context,
   required dynamic initialTime,
-}) async =>
-    null;
+}) async => null;
 
 // ── Platform & System ───────────────────────────────────────────────────
 
@@ -2192,9 +2244,10 @@ class DatabaseReference {
 class FirebaseAuth {
   static FirebaseAuth get instance => FirebaseAuth();
   dynamic get currentUser => null;
-  Future<dynamic> signInWithEmailAndPassword(
-          {required String email, required String password}) async =>
-      null;
+  Future<dynamic> signInWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async => null;
   Future<void> signOut() async {}
 }
 
@@ -2327,13 +2380,22 @@ class Id {
 
 class FlutterLocalNotificationsPlugin {
   Future<void> show(
-      int id, String? title, String? body, dynamic details) async {}
+    int id,
+    String? title,
+    String? body,
+    dynamic details,
+  ) async {}
   Future<bool?> initialize(dynamic initializationSettings) async => true;
 }
 
 class AndroidNotificationDetails {
-  const AndroidNotificationDetails(String channelId, String channelName,
-      {String? channelDescription, dynamic importance, dynamic priority});
+  const AndroidNotificationDetails(
+    String channelId,
+    String channelName, {
+    String? channelDescription,
+    dynamic importance,
+    dynamic priority,
+  });
 }
 
 class DarwinNotificationDetails {
@@ -2357,8 +2419,11 @@ class DarwinInitializationSettings {
 class Workmanager {
   static Workmanager get instance => Workmanager();
   void initialize(dynamic callbackDispatcher) {}
-  void registerPeriodicTask(String uniqueName, String taskName,
-      {Duration? frequency}) {}
+  void registerPeriodicTask(
+    String uniqueName,
+    String taskName, {
+    Duration? frequency,
+  }) {}
   void registerOneOffTask(String uniqueName, String taskName) {}
 }
 
@@ -2369,22 +2434,29 @@ class URLRequest {
 }
 
 class InAppWebViewSettings {
-  InAppWebViewSettings(
-      {bool? javaScriptEnabled, bool? useShouldOverrideUrlLoading});
+  InAppWebViewSettings({
+    bool? javaScriptEnabled,
+    bool? useShouldOverrideUrlLoading,
+  });
 }
 
 // ── Database ────────────────────────────────────────────────────────────
 
-Future<dynamic> openDatabase(String path,
-        {int? version, dynamic onCreate, dynamic onUpgrade}) async =>
-    null;
+Future<dynamic> openDatabase(
+  String path, {
+  int? version,
+  dynamic onCreate,
+  dynamic onUpgrade,
+}) async => null;
 
 class Database {
   Future<List<Map<String, dynamic>>> query(String table) async => [];
   Future<int> insert(String table, Map<String, dynamic> values) async => 0;
-  Future<int> delete(String table,
-          {String? where, List<dynamic>? whereArgs}) async =>
-      0;
+  Future<int> delete(
+    String table, {
+    String? where,
+    List<dynamic>? whereArgs,
+  }) async => 0;
   Future<void> close() async {}
   Future<List<Map<String, dynamic>>> rawQuery(String sql) async => [];
 }
@@ -2398,8 +2470,12 @@ class HiveAesCipher {
 // ── ProxyProvider ───────────────────────────────────────────────────────
 
 class ProxyProvider<T, R> extends Widget {
-  const ProxyProvider(
-      {super.key, required dynamic update, Widget? child, dynamic create});
+  const ProxyProvider({
+    super.key,
+    required dynamic update,
+    Widget? child,
+    dynamic create,
+  });
 }
 
 class ProxyProvider2<T, T2, R> extends Widget {
@@ -2407,8 +2483,11 @@ class ProxyProvider2<T, T2, R> extends Widget {
 }
 
 class Selector<T, S> extends Widget {
-  const Selector(
-      {super.key, required dynamic selector, required dynamic builder});
+  const Selector({
+    super.key,
+    required dynamic selector,
+    required dynamic builder,
+  });
 }
 
 class Consumer<T> extends Widget {
@@ -2429,8 +2508,11 @@ class WidgetRef {
 }
 
 class ProviderScope extends Widget {
-  const ProviderScope(
-      {super.key, required Widget child, List<dynamic>? overrides});
+  const ProviderScope({
+    super.key,
+    required Widget child,
+    List<dynamic>? overrides,
+  });
 }
 
 class ConsumerStatefulWidget extends StatefulWidget {
@@ -2445,11 +2527,11 @@ class AsyncValue<T> {
   bool get hasError => false;
   T? get value => null;
   dynamic get error => null;
-  dynamic when(
-          {required dynamic data,
-          required dynamic error,
-          required dynamic loading}) =>
-      null;
+  dynamic when({
+    required dynamic data,
+    required dynamic error,
+    required dynamic loading,
+  }) => null;
 }
 
 class NotifierProvider<T, S> {
@@ -2489,26 +2571,31 @@ class BlocObserver {
 }
 
 class BlocListener<B, S> extends Widget {
-  const BlocListener(
-      {super.key,
-      required dynamic listener,
-      Widget? child,
-      dynamic bloc,
-      dynamic listenWhen});
+  const BlocListener({
+    super.key,
+    required dynamic listener,
+    Widget? child,
+    dynamic bloc,
+    dynamic listenWhen,
+  });
 }
 
 class BlocSelector<B, S, T> extends Widget {
-  const BlocSelector(
-      {super.key, required dynamic selector, required dynamic builder});
+  const BlocSelector({
+    super.key,
+    required dynamic selector,
+    required dynamic builder,
+  });
 }
 
 class BlocConsumer<B, S> extends Widget {
-  const BlocConsumer(
-      {super.key,
-      required dynamic builder,
-      required dynamic listener,
-      dynamic buildWhen,
-      dynamic listenWhen});
+  const BlocConsumer({
+    super.key,
+    required dynamic builder,
+    required dynamic listener,
+    dynamic buildWhen,
+    dynamic listenWhen,
+  });
 }
 
 class RepositoryProvider<T> extends Widget {
@@ -2516,8 +2603,11 @@ class RepositoryProvider<T> extends Widget {
 }
 
 class MultiRepositoryProvider extends Widget {
-  const MultiRepositoryProvider(
-      {super.key, required List<Widget> providers, required Widget child});
+  const MultiRepositoryProvider({
+    super.key,
+    required List<Widget> providers,
+    required Widget child,
+  });
 }
 
 // ── GetX extras ─────────────────────────────────────────────────────────
@@ -2572,18 +2662,22 @@ extension IntExtension on int {
 // ── Misc Widgets ────────────────────────────────────────────────────────
 
 class Material extends Widget {
-  const Material(
-      {super.key,
-      Widget? child,
-      dynamic color,
-      dynamic elevation,
-      dynamic type,
-      dynamic borderRadius});
+  const Material({
+    super.key,
+    Widget? child,
+    dynamic color,
+    dynamic elevation,
+    dynamic type,
+    dynamic borderRadius,
+  });
 }
 
 class MaterialBanner extends Widget {
-  const MaterialBanner(
-      {super.key, required Widget content, required List<Widget> actions});
+  const MaterialBanner({
+    super.key,
+    required Widget content,
+    required List<Widget> actions,
+  });
 }
 
 class Drawer extends Widget {
@@ -2591,66 +2685,83 @@ class Drawer extends Widget {
 }
 
 class TabBarView extends Widget {
-  const TabBarView(
-      {super.key, required List<Widget> children, TabController? controller});
+  const TabBarView({
+    super.key,
+    required List<Widget> children,
+    TabController? controller,
+  });
 }
 
 class PreferredSize extends Widget {
-  const PreferredSize(
-      {super.key, required dynamic preferredSize, required Widget child});
+  const PreferredSize({
+    super.key,
+    required dynamic preferredSize,
+    required Widget child,
+  });
 }
 
 class BottomSheet extends Widget {
-  const BottomSheet(
-      {super.key, required dynamic onClosing, required dynamic builder});
+  const BottomSheet({
+    super.key,
+    required dynamic onClosing,
+    required dynamic builder,
+  });
 }
 
 class Slider extends Widget {
-  const Slider(
-      {super.key,
-      required double value,
-      required dynamic onChanged,
-      double? min,
-      double? max});
+  const Slider({
+    super.key,
+    required double value,
+    required dynamic onChanged,
+    double? min,
+    double? max,
+  });
 }
 
 class Radio<T> extends Widget {
-  const Radio(
-      {super.key,
-      required T value,
-      required T? groupValue,
-      required dynamic onChanged});
+  const Radio({
+    super.key,
+    required T value,
+    required T? groupValue,
+    required dynamic onChanged,
+  });
 }
 
 class Stepper extends Widget {
-  const Stepper(
-      {super.key,
-      required List<dynamic> steps,
-      int currentStep = 0,
-      dynamic onStepContinue,
-      dynamic onStepCancel,
-      dynamic onStepTapped});
+  const Stepper({
+    super.key,
+    required List<dynamic> steps,
+    int currentStep = 0,
+    dynamic onStepContinue,
+    dynamic onStepCancel,
+    dynamic onStepTapped,
+  });
 }
 
 class Step {
-  const Step(
-      {required Widget title,
-      required Widget content,
-      dynamic state,
-      bool isActive = false});
+  const Step({
+    required Widget title,
+    required Widget content,
+    dynamic state,
+    bool isActive = false,
+  });
 }
 
 class ExpansionTile extends Widget {
-  const ExpansionTile(
-      {super.key,
-      required Widget title,
-      List<Widget>? children,
-      bool? initiallyExpanded});
+  const ExpansionTile({
+    super.key,
+    required Widget title,
+    List<Widget>? children,
+    bool? initiallyExpanded,
+  });
 }
 
 class DataTable extends Widget {
-  const DataTable(
-      {super.key, required List<dynamic> columns, required List<dynamic> rows});
+  const DataTable({
+    super.key,
+    required List<dynamic> columns,
+    required List<dynamic> rows,
+  });
 }
 
 class DataColumn {
@@ -2658,10 +2769,11 @@ class DataColumn {
 }
 
 class DataRow {
-  const DataRow(
-      {required List<dynamic> cells,
-      bool selected = false,
-      dynamic onSelectChanged});
+  const DataRow({
+    required List<dynamic> cells,
+    bool selected = false,
+    dynamic onSelectChanged,
+  });
 }
 
 class DataCell {
@@ -2669,42 +2781,49 @@ class DataCell {
 }
 
 class WillPopScope extends Widget {
-  const WillPopScope(
-      {super.key, required Widget child, required dynamic onWillPop});
+  const WillPopScope({
+    super.key,
+    required Widget child,
+    required dynamic onWillPop,
+  });
 }
 
 class PopScope extends Widget {
-  const PopScope(
-      {super.key,
-      required Widget child,
-      bool canPop = true,
-      dynamic onPopInvoked});
+  const PopScope({
+    super.key,
+    required Widget child,
+    bool canPop = true,
+    dynamic onPopInvoked,
+  });
 }
 
 class AnimatedOpacity extends Widget {
-  const AnimatedOpacity(
-      {super.key,
-      required double opacity,
-      required Duration duration,
-      Widget? child,
-      dynamic curve});
+  const AnimatedOpacity({
+    super.key,
+    required double opacity,
+    required Duration duration,
+    Widget? child,
+    dynamic curve,
+  });
 }
 
 class AnimatedSwitcher extends Widget {
-  const AnimatedSwitcher(
-      {super.key,
-      required Duration duration,
-      Widget? child,
-      dynamic transitionBuilder});
+  const AnimatedSwitcher({
+    super.key,
+    required Duration duration,
+    Widget? child,
+    dynamic transitionBuilder,
+  });
 }
 
 class AnimatedCrossFade extends Widget {
-  const AnimatedCrossFade(
-      {super.key,
-      required Widget firstChild,
-      required Widget secondChild,
-      required dynamic crossFadeState,
-      required Duration duration});
+  const AnimatedCrossFade({
+    super.key,
+    required Widget firstChild,
+    required Widget secondChild,
+    required dynamic crossFadeState,
+    required Duration duration,
+  });
 }
 
 class CrossFadeState {
@@ -2714,17 +2833,21 @@ class CrossFadeState {
 }
 
 class TweenAnimationBuilder<T> extends Widget {
-  const TweenAnimationBuilder(
-      {super.key,
-      required dynamic tween,
-      required Duration duration,
-      required dynamic builder,
-      Widget? child});
+  const TweenAnimationBuilder({
+    super.key,
+    required dynamic tween,
+    required Duration duration,
+    required dynamic builder,
+    Widget? child,
+  });
 }
 
 class NotificationListener<T> extends Widget {
-  const NotificationListener(
-      {super.key, required Widget child, dynamic onNotification});
+  const NotificationListener({
+    super.key,
+    required Widget child,
+    dynamic onNotification,
+  });
 }
 
 class MediaQueryData {
@@ -2783,32 +2906,35 @@ class CustomPainter {
 }
 
 class CustomPaint extends Widget {
-  const CustomPaint(
-      {super.key,
-      dynamic painter,
-      dynamic foregroundPainter,
-      Widget? child,
-      dynamic size});
+  const CustomPaint({
+    super.key,
+    dynamic painter,
+    dynamic foregroundPainter,
+    Widget? child,
+    dynamic size,
+  });
 }
 
 // ── Accessibility extras ────────────────────────────────────────────────
 
 class SemanticsProperties {
-  const SemanticsProperties(
-      {String? label,
-      String? hint,
-      String? value,
-      bool? button,
-      bool? header,
-      bool? image});
+  const SemanticsProperties({
+    String? label,
+    String? hint,
+    String? value,
+    bool? button,
+    bool? header,
+    bool? image,
+  });
 }
 
 // ── Isolate & Compute ───────────────────────────────────────────────────
 
 class Isolate {
   static Future<Isolate> spawn(
-          void Function(dynamic) entryPoint, dynamic message) async =>
-      Isolate._();
+    void Function(dynamic) entryPoint,
+    dynamic message,
+  ) async => Isolate._();
   Isolate._();
   void kill() {}
 }
@@ -2834,8 +2960,12 @@ class Random {
 
 class NumberFormat {
   NumberFormat([String? newPattern, String? locale]);
-  NumberFormat.currency(
-      {String? locale, String? symbol, int? decimalDigits, String? name});
+  NumberFormat.currency({
+    String? locale,
+    String? symbol,
+    int? decimalDigits,
+    String? name,
+  });
   NumberFormat.compact({String? locale});
   String format(dynamic number) => '';
 }
@@ -2857,12 +2987,13 @@ final utf8 = const Utf8Codec();
 // ── Google Maps ─────────────────────────────────────────────────────────
 
 class GoogleMap extends Widget {
-  const GoogleMap(
-      {super.key,
-      required dynamic initialCameraPosition,
-      dynamic onMapCreated,
-      dynamic markers,
-      dynamic polylines});
+  const GoogleMap({
+    super.key,
+    required dynamic initialCameraPosition,
+    dynamic onMapCreated,
+    dynamic markers,
+    dynamic polylines,
+  });
 }
 
 class LatLng {
@@ -2918,9 +3049,12 @@ class Response {
 
 class Query {
   Query(String table);
-  Query where(String field,
-          {dynamic isEqualTo, dynamic isGreaterThan, dynamic isLessThan}) =>
-      this;
+  Query where(
+    String field, {
+    dynamic isEqualTo,
+    dynamic isGreaterThan,
+    dynamic isLessThan,
+  }) => this;
   Future<List<dynamic>> get() async => [];
 }
 
@@ -3015,8 +3149,12 @@ class DataWidget extends Widget {
 }
 
 class MyButton extends Widget {
-  const MyButton(
-      {super.key, VoidCallback? onPressed, Widget? child, String? label});
+  const MyButton({
+    super.key,
+    VoidCallback? onPressed,
+    Widget? child,
+    String? label,
+  });
 }
 
 class UserPage extends Widget {
@@ -3066,8 +3204,10 @@ class FetchEvent {
 
 class Supabase {
   static SupabaseClient get instance => SupabaseClient();
-  static Future<void> initialize(
-      {required String url, required String anonKey}) async {}
+  static Future<void> initialize({
+    required String url,
+    required String anonKey,
+  }) async {}
 }
 
 class SupabaseClient {
@@ -3103,8 +3243,12 @@ class Divider extends Widget {
 }
 
 class LinearProgressIndicator extends Widget {
-  const LinearProgressIndicator(
-      {super.key, double? value, dynamic color, dynamic backgroundColor});
+  const LinearProgressIndicator({
+    super.key,
+    double? value,
+    dynamic color,
+    dynamic backgroundColor,
+  });
 }
 
 class OverflowBar extends Widget {
@@ -3120,12 +3264,13 @@ class CloseButton extends Widget {
 }
 
 class Placeholder extends Widget {
-  const Placeholder(
-      {super.key,
-      dynamic color,
-      double? strokeWidth,
-      double? fallbackWidth,
-      double? fallbackHeight});
+  const Placeholder({
+    super.key,
+    dynamic color,
+    double? strokeWidth,
+    double? fallbackWidth,
+    double? fallbackHeight,
+  });
 }
 
 class InteractiveViewer extends Widget {
@@ -3152,6 +3297,10 @@ class TabBarThemeData {
   const TabBarThemeData({dynamic indicatorColor});
 }
 
+class ButtonBarThemeData {
+  const ButtonBarThemeData({dynamic alignment});
+}
+
 class ThemeData {
   ThemeData({
     dynamic primarySwatch,
@@ -3166,6 +3315,7 @@ class ThemeData {
     dynamic useMaterial3,
     dynamic indicatorColor,
     dynamic tabBarTheme,
+    dynamic buttonBarTheme,
   });
   dynamic get colorScheme => _ColorScheme();
   // Returns TextTheme so migration rules can resolve the static type
@@ -3175,6 +3325,7 @@ class ThemeData {
   dynamic get brightness => null;
   dynamic get indicatorColor => null;
   dynamic get tabBarTheme => null;
+  dynamic get buttonBarTheme => null;
 
   ThemeData copyWith({
     dynamic primaryColor,
@@ -3184,8 +3335,8 @@ class ThemeData {
     dynamic scaffoldBackgroundColor,
     dynamic indicatorColor,
     dynamic tabBarTheme,
-  }) =>
-      ThemeData();
+    dynamic buttonBarTheme,
+  }) => ThemeData();
 }
 
 class _ColorScheme {
@@ -3299,8 +3450,7 @@ class TextTheme {
     dynamic labelLarge,
     dynamic labelMedium,
     dynamic labelSmall,
-  }) =>
-      const TextTheme();
+  }) => const TextTheme();
 }
 
 class _TextTheme extends TextTheme {
@@ -3419,8 +3569,12 @@ class SizedOverflowBox extends Widget {
 }
 
 class OverflowBox extends Widget {
-  const OverflowBox(
-      {super.key, double? maxWidth, double? maxHeight, Widget? child});
+  const OverflowBox({
+    super.key,
+    double? maxWidth,
+    double? maxHeight,
+    Widget? child,
+  });
 }
 
 class AspectRatio extends Widget {
@@ -3428,16 +3582,23 @@ class AspectRatio extends Widget {
 }
 
 class FractionallySizedBox extends Widget {
-  const FractionallySizedBox(
-      {super.key, double? widthFactor, double? heightFactor, Widget? child});
+  const FractionallySizedBox({
+    super.key,
+    double? widthFactor,
+    double? heightFactor,
+    Widget? child,
+  });
 }
 
 class Transform extends Widget {
   const Transform({super.key, required dynamic transform, Widget? child});
   const Transform.rotate({super.key, required double angle, Widget? child});
   const Transform.scale({super.key, required double scale, Widget? child});
-  const Transform.translate(
-      {super.key, required dynamic offset, Widget? child});
+  const Transform.translate({
+    super.key,
+    required dynamic offset,
+    Widget? child,
+  });
 }
 
 class WidgetSpan {
