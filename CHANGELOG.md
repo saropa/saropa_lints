@@ -27,7 +27,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ## [10.1.0]
 
-This release focuses on Flutter SDK alignment: new lints for DropdownMenuItemButton opacity typing, default image filter quality, and migrating off deprecated `flutter_test` window APIs, plus a shared helper that resolves identifiers to elements for analyzer-backed detection.
+This release focuses on Flutter SDK alignment (new migration lints and a shared identifier→element helper) and on the **VS Code extension**: Package Vibrancy now uses a single **trusted publishers** list so first-party and Google-published packages are not mislabeled **Quiet** when GitHub-activity scoring sits in the mid tier.
 
 ### Added
 
@@ -39,7 +39,7 @@ This release focuses on Flutter SDK alignment: new lints for DropdownMenuItemBut
 
 ### Changed
 
-- **Package Vibrancy** — One **trusted publishers** list (`TRUSTED_PUBLISHERS` in `trusted-publishers.ts`: `dart.dev`, `google.dev`, `flutter.dev`, `firebase.google.com`) drives both the publisher trust bonus and upgrading **Quiet** → **Vibrant** when GitHub-weighted scores under-rate stable release trains. Extension `npm test` now includes `vibrancy-calculator.test.ts`; `status-classifier` tests cover EOL overrides and publisher-id casing (no false upgrade).
+- **Package Vibrancy (VS Code extension)** — Introduces [`extension/src/vibrancy/scoring/trusted-publishers.ts`](extension/src/vibrancy/scoring/trusted-publishers.ts): **`TRUSTED_PUBLISHERS`** (`dart.dev`, `google.dev`, `flutter.dev`, `firebase.google.com`) and **`isTrustedPublisher()`**. The same set controls (1) the **`publisherTrustBonus`** scoring bonus and (2) promoting **Quiet** → **Vibrant** when the raw score is in the mid band but the dependency is from a trusted publisher—so pubspec CodeLens and reports match maintainer intent. **EOL still wins:** discontinued packages, known end-of-life entries, and archived GitHub repos are unchanged; publisher IDs are matched case-sensitively (as on pub.dev). **`saropaLints.packageVibrancy.publisherTrustBonus`** setting description updated to describe the trusted list. **Tests:** `npm test` runs [`vibrancy-calculator.test.ts`](extension/src/test/vibrancy/scoring/vibrancy-calculator.test.ts) (trust bonus for every trusted ID) and extended [`status-classifier.test.ts`](extension/src/test/vibrancy/scoring/status-classifier.test.ts) (trusted upgrade, non-trusted quiet, wrong-case publisher, EOL overrides).
 
 - **Analyzer identifier → element** — Shared `elementFromAstIdentifier` in [`lib/src/element_identifier_utils.dart`](lib/src/element_identifier_utils.dart) tries `.element` then `.staticElement` with optional `logFailures`. Used by `image_filter_quality_detection` and deprecated-API checks in `code_quality_avoid_rules.dart`. Documented in [CODE_INDEX.md](CODE_INDEX.md). Tests: [`test/element_identifier_utils_test.dart`](test/element_identifier_utils_test.dart).
 

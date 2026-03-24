@@ -21,10 +21,13 @@ void main() {
       expect(_pinKeywordPattern.hasMatch('named: pin, value: 1'), isTrue);
     });
 
-    test('does not match userpin / camelCase without delimiter (after state)', () {
-      expect(_pinKeywordPattern.hasMatch('userpin: 1'), isFalse);
-      expect(_pinKeywordPattern.hasMatch('mypincode: 1'), isFalse);
-    });
+    test(
+      'does not match userpin / camelCase without delimiter (after state)',
+      () {
+        expect(_pinKeywordPattern.hasMatch('userpin: 1'), isFalse);
+        expect(_pinKeywordPattern.hasMatch('mypincode: 1'), isFalse);
+      },
+    );
 
     test('matches pin after non-letter delimiter', () {
       expect(_pinKeywordPattern.hasMatch(r'x.pin: 1'), isTrue);
@@ -32,9 +35,12 @@ void main() {
       expect(_pinKeywordPattern.hasMatch('(pin)'), isTrue);
     });
 
-    test('matches pin at start of argument text (pinCode-style identifiers)', () {
-      expect(_pinKeywordPattern.hasMatch('pincode: x'), isTrue);
-    });
+    test(
+      'matches pin at start of argument text (pinCode-style identifiers)',
+      () {
+        expect(_pinKeywordPattern.hasMatch('pincode: x'), isTrue);
+      },
+    );
 
     // -- Edge-case documentation: accepted trade-offs --
 
