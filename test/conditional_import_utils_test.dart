@@ -11,18 +11,29 @@ void main() {
       expect(isNativeOnlyConditionalImportTarget(''), isFalse);
     });
 
-    test('returns false for file outside a project (no pubspec)', () {
-      final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
-      try {
-        final libDir = Directory(p.join(dir.path, 'lib'));
-        libDir.createSync(recursive: true);
-        final filePath = p.join(libDir.path, 'some.dart');
-        File(filePath).writeAsStringSync('void main() {}');
-        expect(isNativeOnlyConditionalImportTarget(filePath), isFalse);
-      } finally {
-        dir.deleteSync(recursive: true);
-      }
-    });
+    test(
+      'returns false when file is not a native conditional target (isolated package)',
+      () {
+        final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+        try {
+          // Publish runs tests with TMP under the repo; without a pubspec here,
+          // findProjectRoot would walk up to saropa_lints. A local pubspec keeps
+          // the nearest root this temp package so we only scan its empty lib/.
+          File(p.join(dir.path, 'pubspec.yaml')).writeAsStringSync('''
+name: isolated_cond_import_probe
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+''');
+          final libDir = Directory(p.join(dir.path, 'lib'));
+          libDir.createSync(recursive: true);
+          final filePath = p.join(libDir.path, 'some.dart');
+          File(filePath).writeAsStringSync('void main() {}');
+          expect(isNativeOnlyConditionalImportTarget(filePath), isFalse);
+        } finally {
+          dir.deleteSync(recursive: true);
+        }
+      },
+    );
 
     test(
       'returns true when file is dart.library.io conditional import target',

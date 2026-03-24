@@ -757,17 +757,21 @@ def _run_chain_stack_traces_and_check(
     )
 
 
-_TEST_FAILURE_MARKERS = (
-    " -1: ",  # dart test: "00:09 +7332 -1: test\foo_test.dart: test name"
-    "FAILED",
-    "Some tests failed",
-    "failed",
-    "Error:",
-    "Exception",
+# High-signal lines first; avoid matching every compact line after a failure.
+_TEST_FAILURE_MARKERS_PRIMARY = (
     "Expected:",
     "Actual:",
     "which was",
+    "TestFailure",
+    "FAILED",
+    "Some tests failed",
+    "Error:",
+    "Exception",
     "Bad state",
+)
+# Compact reporter: only useful if primary markers did not capture the real error.
+_TEST_FAILURE_MARKERS_COMPACT = (
+    " -1: ",  # "00:09 +7332 -1: test\\foo_test.dart: test name"
 )
 
 
@@ -780,13 +784,20 @@ def _extract_failure_excerpt(log_path: Path, max_lines: int = 10) -> list[tuple[
     except OSError:
         return []
     lines = text.splitlines()
-    found = []
-    for i, line in enumerate(lines):
-        for marker in _TEST_FAILURE_MARKERS:
-            if marker in line:
-                found.append((i + 1, line.strip()))
-                break
-    return found[:max_lines]
+
+    def _collect(markers: tuple[str, ...]) -> list[tuple[int, str]]:
+        out: list[tuple[int, str]] = []
+        for i, line in enumerate(lines):
+            for marker in markers:
+                if marker in line:
+                    out.append((i + 1, line.strip()))
+                    break
+        return out
+
+    primary = _collect(_TEST_FAILURE_MARKERS_PRIMARY)
+    if primary:
+        return primary[:max_lines]
+    return _collect(_TEST_FAILURE_MARKERS_COMPACT)[:max_lines]
 
 
 def _run_dart_test_to_file(
