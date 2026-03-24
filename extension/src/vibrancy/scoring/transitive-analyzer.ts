@@ -123,7 +123,7 @@ export function flagRiskyTransitives(
             const issues = knownIssues.get(transitive);
             // No version context for transitives — flag if ANY entry is risky
             const risky = issues?.find(
-                i => i.status === 'discontinued' || i.status === 'end-of-life',
+                i => i.status === 'discontinued' || i.status === 'end_of_life',
             );
             if (risky) {
                 flagged.push({
@@ -155,7 +155,7 @@ export function enrichTransitiveInfo(
         for (const transitive of info.transitives) {
             const issues = knownIssues.get(transitive);
             // No version context for transitives — flag if ANY entry is risky
-            if (issues?.some(i => i.status === 'discontinued' || i.status === 'end-of-life')) {
+            if (issues?.some(i => i.status === 'discontinued' || i.status === 'end_of_life')) {
                 flaggedCount++;
             }
             if (sharedSet.has(transitive)) {

@@ -91,7 +91,8 @@ export function calcEngagementLevel(
 
 /** Popularity: pub.dev points + GitHub stars. */
 export function calcPopularity(pubPoints: number, stars: number): number {
-    const pointsNorm = normalize(pubPoints, 150);
+    // pub.dev maximum is 160, not 150
+    const pointsNorm = normalize(pubPoints, 160);
     const starsNorm = normalize(stars, 5000);
     return clamp((pointsNorm + starsNorm) / 2);
 }

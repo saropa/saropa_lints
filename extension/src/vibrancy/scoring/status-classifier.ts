@@ -35,6 +35,14 @@ export function classifyStatus(params: {
     else if (params.score >= 10) { category = 'legacy-locked'; }
     else { category = 'stale'; }
 
+    // Pub points floor: packages with strong pub.dev quality (>= 140/160) cannot be
+    // classified as 'stale'. A quiet, mature package with high pub points is
+    // 'legacy-locked' at worst — not abandoned. Hard EOL signals (known_issues,
+    // discontinued, archived) already returned early above and are unaffected.
+    if (category === 'stale' && (params.pubDev?.pubPoints ?? 0) >= 140) {
+        category = 'legacy-locked';
+    }
+
     // Stable SDK-adjacent packages often score in the "quiet" band because the formula
     // weights GitHub churn; trusted publishers are not "low activity" risks.
     if (category === 'quiet' && isTrustedPublisher(params.pubDev?.publisher)) {
