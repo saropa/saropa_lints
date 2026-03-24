@@ -177,7 +177,7 @@ describe('transitive-analyzer', () => {
             }];
             const sharedDeps = [{ name: 'shared_pkg', usedBy: ['a', 'b'] }];
             const knownIssues = new Map<string, readonly KnownIssue[]>([
-                ['bad_pkg', [{ name: 'bad_pkg', status: 'end-of-life' }]],
+                ['bad_pkg', [{ name: 'bad_pkg', status: 'end_of_life' }]],
             ]);
             const enriched = enrichTransitiveInfo(infos, sharedDeps, knownIssues);
 

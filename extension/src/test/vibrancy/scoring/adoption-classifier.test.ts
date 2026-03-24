@@ -52,7 +52,7 @@ describe('adoption-classifier', () => {
 
         it('should return warning for known end-of-life issue', () => {
             const result = classifyAdoption(makeInput({
-                knownIssueStatus: 'end-of-life',
+                knownIssueStatus: 'end_of_life',
                 knownIssueReason: 'replaced by new_pkg',
             }));
             assert.strictEqual(result.tier, 'warning');
@@ -97,14 +97,14 @@ describe('adoption-classifier', () => {
         it('should prioritize not-found over known issue', () => {
             const result = classifyAdoption(makeInput({
                 exists: false,
-                knownIssueStatus: 'end-of-life',
+                knownIssueStatus: 'end_of_life',
             }));
             assert.strictEqual(result.tier, 'unknown');
         });
 
         it('should show default reason for end-of-life without reason', () => {
             const result = classifyAdoption(makeInput({
-                knownIssueStatus: 'end-of-life',
+                knownIssueStatus: 'end_of_life',
                 knownIssueReason: null,
             }));
             assert.strictEqual(result.tier, 'warning');

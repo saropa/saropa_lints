@@ -36,7 +36,8 @@ export function classifyAdoption(input: AdoptionInput): AdoptionResult {
         };
     }
 
-    if (input.knownIssueStatus === 'end-of-life') {
+    // known_issues.json uses underscored 'end_of_life', not hyphenated
+    if (input.knownIssueStatus === 'end_of_life') {
         const reason = input.knownIssueReason ?? 'end of life';
         return {
             tier: 'warning',

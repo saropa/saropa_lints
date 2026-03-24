@@ -165,6 +165,12 @@ describe('vibrancy-calculator', () => {
         it('should return 0 for zero inputs', () => {
             assert.strictEqual(calcPopularity(0, 0), 0);
         });
+
+        it('should normalize pub points against 160 max (pub.dev maximum)', () => {
+            // 160/160 points = 100, 0 stars = 0, average = 50
+            const score = calcPopularity(160, 0);
+            assert.strictEqual(score, 50);
+        });
     });
 
     describe('computeVibrancyScore', () => {
