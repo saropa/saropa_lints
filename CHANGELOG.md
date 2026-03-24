@@ -27,6 +27,8 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ## [10.1.1]
 
+Package Vibrancy accuracy pass — removes false "End of Life" flags on healthy packages and adds a pub points quality floor so high-scoring packages are never labeled Stale.
+
 ### Fixed
 
 - **(Extension)** 8 packages falsely classified as **End of Life** in `known_issues.json` have been downgraded to `caution` or `active` — `local_auth`, `font_awesome_flutter`, `animations`, `flutter_email_sender`, `flutter_sticky_header`, `flutter_rating_bar`, `workmanager`, `flutter_phone_direct_caller` were contradicted by their own pub.dev scores (135-160/160 points).
