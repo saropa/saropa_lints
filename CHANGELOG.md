@@ -25,6 +25,16 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [Unreleased]
+
+Stream subscription detection improvements — fixes false negatives on rxdart and custom Stream subclasses, and aligns rule description with actual behavior.
+
+### Fixed
+
+- `avoid_stream_subscription_in_field` now detects uncaptured `.listen()` calls on Stream subclasses (e.g. rxdart `MergeStream`, `BehaviorSubject`) that were previously missed by string-based type checking
+- `avoid_stream_subscription_in_field` problem message and correction message now accurately describe the rule's behavior (detecting uncaptured `.listen()` calls) instead of incorrectly claiming it checks `dispose()`
+- Test fixture for `avoid_stream_subscription_in_field` now uses properly-typed `Stream<int>` variables instead of undefined `dynamic` references that bypassed the type check
+
 ## [10.1.1]
 
 Package Vibrancy accuracy pass — removes false "End of Life" flags on healthy packages and adds a pub points quality floor so high-scoring packages are never labeled Stale.

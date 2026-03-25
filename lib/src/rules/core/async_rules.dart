@@ -2919,15 +2919,14 @@ class RequireCompleterErrorHandlingRule extends SaropaLintRule {
   }
 }
 
-/// Warns when stream.listen() is called in a field initializer without
+/// Warns when stream.listen() is called without capturing the returned
+/// StreamSubscription.
 ///
 /// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v4
 ///
-/// storing the subscription for later cancellation.
-///
-/// Stream subscriptions in field initializers are particularly dangerous
-/// because they execute before initState() where cleanup setup typically
-/// happens. The subscription must be stored to be canceled in dispose().
+/// An uncaptured .listen() call means the subscription cannot be canceled
+/// later, causing memory leaks and callbacks that fire after disposal.
+/// Always assign the result to a StreamSubscription variable.
 ///
 /// **BAD:**
 /// ```dart
@@ -2981,9 +2980,21 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_stream_subscription_in_field',
-    '[avoid_stream_subscription_in_field] If a StreamSubscription is stored as a field in a State class but not properly canceled in dispose(), the subscription will continue to receive events even after the widget is removed from the widget tree. This can cause memory leaks, unexpected UI updates, and subtle bugs, especially in dynamic lists or navigation flows where widgets are frequently created and destroyed. Always cancel subscriptions in the correct State object’s dispose() method. See https://docs.flutter.dev/perf/memory#dispose-resources. {v4}',
+    '[avoid_stream_subscription_in_field] Calling .listen() on a Stream '
+        'without capturing the returned StreamSubscription makes it impossible '
+        'to cancel the subscription later. This leads to memory leaks, '
+        'unexpected callbacks after disposal, and subtle bugs in widgets that '
+        'are frequently created and destroyed. The uncaptured subscription '
+        'will continue receiving events indefinitely, even after the widget is '
+        'removed from the tree. Always assign the StreamSubscription to a '
+        'variable so it can be canceled in dispose(). '
+        'See https://docs.flutter.dev/perf/memory#dispose-resources. {v4}',
     correctionMessage:
-        'In every State class that owns a StreamSubscription field, call subscription.cancel() in the dispose() method before calling super.dispose(). This ensures the subscription is cleaned up when the widget is removed, preventing leaks and unwanted callbacks. See https://docs.flutter.dev/perf/memory#dispose-resources for more information.',
+        'Assign the return value of .listen() to a StreamSubscription '
+        'variable (e.g., _subscription = stream.listen(...)). This allows you '
+        'to call _subscription.cancel() in dispose(), preventing leaks. '
+        'See https://docs.flutter.dev/perf/memory#dispose-resources for more '
+        'information.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -3002,6 +3013,19 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
             type.startsWith('StreamSubscription<'));
   }
 
+  /// True if [type] is `Stream` or extends `Stream` from dart:async.
+  ///
+  /// Catches rxdart subclasses (MergeStream, BehaviorSubject, etc.) that
+  /// `getDisplayString().startsWith('Stream')` misses because their display
+  /// names don't start with "Stream".
+  static bool _isStreamOrSubclass(DartType type) {
+    if (type is! InterfaceType) return false;
+    // Exact dart:async Stream match
+    if (type.isDartAsyncStream) return true;
+    // Subclass match — e.g. MergeStream extends Stream
+    return type.allSupertypes.any((DartType t) => t.isDartAsyncStream);
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -3010,15 +3034,15 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'listen') return;
 
-      // Check if the target is a Stream
+      // Check if the target is a Stream or Stream subclass
       final Expression? target = node.target;
       if (target == null) return;
 
       final DartType? type = target.staticType;
       if (type == null) return;
 
-      final String typeName = type.getDisplayString();
-      if (!typeName.startsWith('Stream')) return;
+      // Catches rxdart subclasses (MergeStream, BehaviorSubject, etc.)
+      if (!_isStreamOrSubclass(type)) return;
 
       // Check if this is in a field initializer context
       // Field initializers are problematic because they run before initState
