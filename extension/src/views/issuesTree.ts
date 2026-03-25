@@ -5,8 +5,9 @@
  */
 
 import * as vscode from 'vscode';
+import * as fs from 'fs';
 import * as path from 'path';
-import { normalizePath } from '../pathUtils';
+import { normalizePath, cachedFileExists, clearFileExistsCache } from '../pathUtils';
 import { getRuleDescription, getRuleDocUrl } from '../ruleMetadata';
 import { readViolations, hasViolations, Violation } from '../violationsReader';
 import { computeHealthScore, estimateScoreWithoutViolation } from '../healthScore';
@@ -31,6 +32,12 @@ import { getProjectRoot } from '../projectRoot';
 const SEVERITY_ORDER = ['error', 'warning', 'info'] as const;
 const DEFAULT_PAGE_SIZE = 100;
 const MESSAGE_LABEL_LEN = 56;
+
+const STALE_ICON = new vscode.ThemeIcon(
+  'warning',
+  new vscode.ThemeColor('problemsWarningIcon.foreground'),
+);
+const STALE_LABEL = '(file moved or deleted)';
 
 /** Map a severity string to a colored ThemeIcon matching VS Code's diagnostic palette. */
 function severityThemeIcon(severity: string): vscode.ThemeIcon {
@@ -235,6 +242,8 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   refresh(): void {
     this.cachedIndex = null;
     this.rulesWithFixesSet = null;
+    // Clear file existence cache so moved/deleted files are detected on next render.
+    clearFileExistsCache();
     this._onDidChangeTreeData.fire();
   }
 
@@ -502,17 +511,27 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     }
     if (element.kind === 'file') {
       const base = path.basename(element.filePath);
+      const absPath = path.join(wsRoot, element.filePath);
+      const exists = cachedFileExists(absPath);
       const item = new vscode.TreeItem(
         `${base} (${element.violations.length})`,
+        // Still collapsible so users can see which violations existed.
         vscode.TreeItemCollapsibleState.Collapsed,
       );
-      item.resourceUri = vscode.Uri.file(path.join(wsRoot, element.filePath));
-      item.iconPath = new vscode.ThemeIcon('document');
-      item.description = element.filePath;
-      // D10: When grouped by file/impact/rule/owasp, severity is empty — use generic label.
-      item.tooltip = element.severity
-        ? `${element.filePath} — ${element.violations.length} ${element.severity}(s)`
-        : `${element.filePath} — ${element.violations.length} violation${element.violations.length === 1 ? '' : 's'}`;
+      if (exists) {
+        item.resourceUri = vscode.Uri.file(absPath);
+        item.iconPath = new vscode.ThemeIcon('document');
+        item.description = element.filePath;
+        // D10: When grouped by file/impact/rule/owasp, severity is empty — use generic label.
+        item.tooltip = element.severity
+          ? `${element.filePath} — ${element.violations.length} ${element.severity}(s)`
+          : `${element.filePath} — ${element.violations.length} violation${element.violations.length === 1 ? '' : 's'}`;
+      } else {
+        // File was moved or deleted since last analysis — show warning instead of broken link.
+        item.iconPath = STALE_ICON;
+        item.description = STALE_LABEL;
+        item.tooltip = `File not found: ${element.filePath}\nRe-run analysis to update.`;
+      }
       item.contextValue = 'file';
       item.accessibilityInformation = {
         label: `${base}, ${element.violations.length} issues`,
@@ -522,20 +541,28 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     }
     if (element.kind === 'violation') {
       const v = element.violation;
+      const absPath = path.join(wsRoot, v.file);
+      const exists = cachedFileExists(absPath);
       const item = new vscode.TreeItem(
         violationLabel(v),
         vscode.TreeItemCollapsibleState.None,
       );
-      item.resourceUri = vscode.Uri.file(path.join(wsRoot, v.file));
-      item.command = {
-        command: 'vscode.open',
-        title: 'Open',
-        arguments: [
-          item.resourceUri,
-          { selection: new vscode.Range(v.line - 1, 0, v.line - 1, 0) },
-        ],
-      };
+      if (exists) {
+        item.resourceUri = vscode.Uri.file(absPath);
+        item.command = {
+          command: 'vscode.open',
+          title: 'Open',
+          arguments: [
+            item.resourceUri,
+            { selection: new vscode.Range(v.line - 1, 0, v.line - 1, 0) },
+          ],
+        };
+      }
+      // else: file moved/deleted — no command, so clicking does nothing instead of "file not found".
       const tooltip = new vscode.MarkdownString();
+      if (!exists) {
+        tooltip.appendMarkdown('**File not found** — re-run analysis to update.\n\n---\n\n');
+      }
       tooltip.appendMarkdown((v.message ?? '').replace(/]/g, '\\]'));
       if (v.correction) {
         tooltip.appendMarkdown('\n\n**Fix:** ');
@@ -553,7 +580,8 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       item.tooltip = tooltip;
       // Mark fixable violations so "Apply fix" is enabled; null set = unknown,
       // default to fixable for backward compat with older analyzer output.
-      const hasFix = this.rulesWithFixesSet === null || this.rulesWithFixesSet.has(v.rule);
+      // Stale violations are not fixable — the file no longer exists.
+      const hasFix = exists && (this.rulesWithFixesSet === null || this.rulesWithFixesSet.has(v.rule));
       item.contextValue = hasFix ? 'violationFixable' : 'violation';
       item.accessibilityInformation = {
         label: `Line ${v.line} ${v.rule}, ${(v.message ?? '').slice(0, 40)}`,
@@ -562,18 +590,26 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       return item;
     }
     if (element.kind === 'overflow') {
+      const absPath = path.join(wsRoot, element.filePath);
+      const exists = cachedFileExists(absPath);
       const item = new vscode.TreeItem(
         `and ${element.count} more…`,
         vscode.TreeItemCollapsibleState.None,
       );
-      item.iconPath = new vscode.ThemeIcon('ellipsis');
-      item.tooltip = 'Open file or use Problems view to see all';
-      item.resourceUri = vscode.Uri.file(path.join(wsRoot, element.filePath));
-      item.command = {
-        command: 'vscode.open',
-        title: 'Open file',
-        arguments: [item.resourceUri],
-      };
+      if (exists) {
+        item.iconPath = new vscode.ThemeIcon('ellipsis');
+        item.tooltip = 'Open file or use Problems view to see all';
+        item.resourceUri = vscode.Uri.file(absPath);
+        item.command = {
+          command: 'vscode.open',
+          title: 'Open file',
+          arguments: [item.resourceUri],
+        };
+      } else {
+        // File moved/deleted — don't attempt to open.
+        item.iconPath = STALE_ICON;
+        item.tooltip = `File not found: ${element.filePath}\nRe-run analysis to update.`;
+      }
       item.contextValue = 'overflow';
       return item;
     }
@@ -1045,6 +1081,15 @@ export function registerIssueCommands(
       const fileNode = element as FileItem;
       const root = getProjectRoot();
       if (!root) return;
+
+      // Guard: skip if the source file no longer exists (moved/deleted since last analysis).
+      const absPath = path.join(root, fileNode.filePath);
+      if (!fs.existsSync(absPath)) {
+        void vscode.window.showWarningMessage(
+          `File not found: ${fileNode.filePath}. Re-run analysis to update.`,
+        );
+        return;
+      }
 
       const data = readViolations(root);
       if (!data) return;
