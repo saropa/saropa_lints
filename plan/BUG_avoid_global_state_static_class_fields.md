@@ -3,6 +3,7 @@
 **Rule**: `avoid_global_state`
 **Severity**: False positive / incorrect line reporting
 **Date**: 2026-03-25
+**Status**: Needs reproduction
 **Related**: [BUG_avoid_global_state_const_false_positive.md](BUG_avoid_global_state_const_false_positive.md) — may share a root cause
 
 ## Summary
@@ -10,6 +11,8 @@
 The rule reports violations at lines corresponding to static class fields or class declarations, not top-level variable declarations. The detection logic at lines 462-477 of `structure_rules.dart` only iterates `TopLevelVariableDeclaration` nodes, so static fields inside classes should never be flagged.
 
 ## Affected Files
+
+All paths below are in a consumer project, not in this repo.
 
 ### 1. `lib/utils/event/event_popup_menu_utils.dart` — Line 11
 
