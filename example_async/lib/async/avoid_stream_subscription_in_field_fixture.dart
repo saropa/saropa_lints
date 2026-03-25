@@ -103,35 +103,122 @@
 // Test fixture for: avoid_stream_subscription_in_field
 // Source: lib\src\rules\async_rules.dart
 
-import 'package:saropa_lints_example/flutter_mocks.dart';
+import 'dart:async';
 
-dynamic data;
+import 'package:saropa_lints_example/flutter_mocks.dart'
+    hide StreamSubscription, StreamController;
 
-// BAD: Should trigger avoid_stream_subscription_in_field
-// expect_lint: avoid_stream_subscription_in_field
-class _bad112__MyWidgetState extends State<MyWidget> {
-// Subscription created but never stored - cannot be canceled!
-  final _ = someStream.listen((data) => print(data));
+// ---------------------------------------------------------------------------
+// Test streams with real dart:async types so the rule's type check works.
+// ---------------------------------------------------------------------------
 
-// Or assigned to void
+final Stream<int> testStream = const Stream<int>.empty();
+
+/// Mock Stream subclass simulating rxdart's MergeStream.
+/// The display name "MergeStream" does NOT start with "Stream", which
+/// previously caused the rule to miss these entirely.
+class MergeStream<T> extends Stream<T> {
+  @override
+  StreamSubscription<T> listen(
+    void Function(T event)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) => const Stream<Never>.empty().listen(null) as StreamSubscription<T>;
+}
+
+/// Mock Stream subclass simulating rxdart's BehaviorSubject.
+class BehaviorSubject<T> extends Stream<T> {
+  @override
+  StreamSubscription<T> listen(
+    void Function(T event)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) => const Stream<Never>.empty().listen(null) as StreamSubscription<T>;
+}
+
+final MergeStream<int> mergeStream = MergeStream<int>();
+final BehaviorSubject<int> behaviorSubject = BehaviorSubject<int>();
+
+// ===========================================================================
+// BAD: Bare .listen() on standard Stream — uncaptured subscription
+// ===========================================================================
+
+class _BadBareListenState extends State<MyWidget> {
   void _init() {
-    myStream.listen((data) => doSomething(data)); // Lost reference!
+    // expect_lint: avoid_stream_subscription_in_field
+    testStream.listen((data) => print(data));
   }
 }
 
-// GOOD: Should NOT trigger avoid_stream_subscription_in_field
-class _good112__MyWidgetState extends State<MyWidget> {
-  StreamSubscription<Data>? _subscription;
+// ===========================================================================
+// BAD: Bare .listen() on Stream subclass (MergeStream) — uncaptured
+// ===========================================================================
+
+class _BadMergeStreamState extends State<MyWidget> {
+  void _init() {
+    // expect_lint: avoid_stream_subscription_in_field
+    mergeStream.listen((data) => print(data));
+  }
+}
+
+// ===========================================================================
+// BAD: Bare .listen() on Stream subclass (BehaviorSubject) — uncaptured
+// ===========================================================================
+
+class _BadBehaviorSubjectState extends State<MyWidget> {
+  void _init() {
+    // expect_lint: avoid_stream_subscription_in_field
+    behaviorSubject.listen((data) => print(data));
+  }
+}
+
+// ===========================================================================
+// BAD: Field initializer discards subscription
+// ===========================================================================
+
+class _BadFieldInitState extends State<MyWidget> {
+  // expect_lint: avoid_stream_subscription_in_field
+  final _ = testStream.listen((data) => print(data));
+}
+
+// ===========================================================================
+// GOOD: Listen captured in StreamSubscription variable
+// ===========================================================================
+
+class _GoodCapturedState extends State<MyWidget> {
+  StreamSubscription<int>? _subscription;
 
   @override
   void initState() {
     super.initState();
-    _subscription = myStream.listen((data) => doSomething(data));
+    _subscription = testStream.listen((data) => print(data));
   }
 
   @override
   void dispose() {
     _subscription?.cancel();
+    super.dispose();
+  }
+}
+
+// ===========================================================================
+// GOOD: Stream subclass listen captured in StreamSubscription variable
+// ===========================================================================
+
+class _GoodMergeStreamCapturedState extends State<MyWidget> {
+  StreamSubscription<int>? _rebuildTriggerSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _rebuildTriggerSubscription = mergeStream.listen((data) => print(data));
+  }
+
+  @override
+  void dispose() {
+    _rebuildTriggerSubscription?.cancel();
     super.dispose();
   }
 }
