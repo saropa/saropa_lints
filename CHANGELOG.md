@@ -34,6 +34,8 @@ Stream subscription detection improvements — fixes false negatives on rxdart a
 - `avoid_stream_subscription_in_field` now detects uncaptured `.listen()` calls on Stream subclasses (e.g. rxdart `MergeStream`, `BehaviorSubject`) that were previously missed by string-based type checking
 - `avoid_stream_subscription_in_field` problem message and correction message now accurately describe the rule's behavior (detecting uncaptured `.listen()` calls) instead of incorrectly claiming it checks `dispose()`
 - Test fixture for `avoid_stream_subscription_in_field` now uses properly-typed `Stream<int>` variables instead of undefined `dynamic` references that bypassed the type check
+- **(Extension)** Violations sidebar no longer opens a "file not found" error when source files have been moved or renamed since the last analysis; affected items show a warning icon with "(file moved or deleted)" label
+- **(Extension)** "Fix all in this file" command now shows a user-friendly warning instead of silently failing on moved/deleted files
 
 ## [10.1.1]
 

@@ -37,7 +37,9 @@
     "src/violationsReader.ts",
     "src/rulePacks/rulePackYaml.ts",
     "src/test/suggestionCounts.test.ts",
-    "src/test/sidebarSectionCounts.test.ts"
+    "src/test/sidebarSectionCounts.test.ts",
+    "src/pathUtils.ts",
+    "src/test/pathUtils.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }
