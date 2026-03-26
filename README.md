@@ -740,7 +740,7 @@ The tier you choose has a direct impact on analysis speed (approximate rule coun
 
 - `essential`: ~300 rules → **fastest** (memory leaks, security, crashes)
 - `recommended`: ~950 rules → moderate (+ accessibility, performance)
-- `professional`: ~1700 rules → slower (+ architecture, documentation)
+- `professional`: ~1800 rules → slower (+ architecture, documentation)
 - `comprehensive`: ~1870 rules → stricter patterns and edge cases
 - `pedantic`: ~1880 rules → **slowest** correctness tier (everything before stylistic)
 
