@@ -51,18 +51,9 @@ Replace with the recommended alternative API
 
 ## Implementation Checklist
 
-- [ ] Verify the API change in Flutter/Dart SDK source
-- [ ] Determine minimum SDK version requirement
-- [ ] Write detection logic (AST visitor)
-- [ ] Write quick-fix replacement
-- [ ] Create test fixture with bad/good examples
-- [ ] Add unit tests
-- [ ] Register rule in `all_rules.dart`
-- [ ] Add to tier in `tiers.dart`
-- [ ] Update ROADMAP.md
-- [ ] Update CHANGELOG.md
+Already covered by Plan #112 (`avoid_deprecated_expires_getter`).
 
 ---
 
-**Status:** Not started
+**Status:** Duplicate of #112
 **Generated:** From Dart SDK v3.0.0 release notes

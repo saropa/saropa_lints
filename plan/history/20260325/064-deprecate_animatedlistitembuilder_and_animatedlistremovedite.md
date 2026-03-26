@@ -75,18 +75,20 @@ Replace with the recommended alternative API
 
 ## Implementation Checklist
 
-- [ ] Verify the API change in Flutter/Dart SDK source
-- [ ] Determine minimum SDK version requirement
-- [ ] Write detection logic (AST visitor)
-- [ ] Write quick-fix replacement
-- [ ] Create test fixture with bad/good examples
-- [ ] Add unit tests
-- [ ] Register rule in `all_rules.dart`
-- [ ] Add to tier in `tiers.dart`
+- [x] Verify the API change in Flutter/Dart SDK source
+- [x] Determine minimum SDK version requirement
+- [x] Write detection logic (AST visitor)
+- [x] Write quick-fix replacement
+- [ ] Create test fixture with bad/good examples (requires Flutter SDK for type resolution)
+- [x] Add unit tests
+- [x] Register rule in `all_rules.dart`
+- [x] Add to tier in `tiers.dart`
 - [ ] Update ROADMAP.md
-- [ ] Update CHANGELOG.md
+- [x] Update CHANGELOG.md
+
+**Rule:** `avoid_deprecated_animated_list_typedefs` in `lib/src/rules/config/migration_rules.dart`.
 
 ---
 
-**Status:** Not started
+**Status:** Implemented
 **Generated:** From Flutter SDK v3.7.0 release notes
