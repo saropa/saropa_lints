@@ -1,6 +1,6 @@
-# Truly not implementable
+# Deferred
 
-Candidates that **cannot** be implemented as saropa_lints rules. The underlying change is not about analyzing the user’s Dart/Flutter source code.
+Candidates that **cannot** currently be implemented as saropa_lints rules. The underlying change is not about analyzing the user’s Dart/Flutter source code.
 
 ## Why they are here
 
