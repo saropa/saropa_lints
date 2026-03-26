@@ -94,3 +94,11 @@ Future<void> badListSupported() async {
   // expect_lint: avoid_deprecated_network_interface_list_supported
   await NetworkInterface.listSupported;
 }
+
+// expect_lint: avoid_removed_null_thrown_error
+void badNullThrownError(NullThrownError e) {}
+
+void badNullThrownErrorVar() {
+  // expect_lint: avoid_removed_null_thrown_error
+  NullThrownError? x;
+}

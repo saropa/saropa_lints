@@ -1963,3 +1963,570 @@ class AvoidDeprecatedFlutterTestWindowRule extends SaropaLintRule {
     });
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// avoid_removed_render_object_element_methods
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Flags removed `RenderObjectElement` methods (Flutter 3.0, PR #98616).
+///
+/// **Why:** `insertChildRenderObject`, `moveChildRenderObject`, and
+/// `removeChildRenderObject` were deprecated in Flutter 1.21 (PR #64254) and
+/// removed in Flutter 3.0. The replacements swap the word order:
+/// `insertRenderObjectChild`, `moveRenderObjectChild`,
+/// `removeRenderObjectChild`. Migration is supported by `dart fix`.
+///
+/// **Detection:** [MethodDeclaration] where the method name matches one of the
+/// three removed names and the enclosing class extends `RenderObjectElement`.
+/// Also detects [MethodInvocation] via `super.` calls.
+///
+/// **Quick fix:** renames the method (swaps "Child"↔"RenderObject" order).
+///
+/// **BAD:**
+/// ```dart
+/// class MyElement extends RenderObjectElement {
+///   @override
+///   void insertChildRenderObject(RenderObject child, Object? slot) { ... }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyElement extends RenderObjectElement {
+///   @override
+///   void insertRenderObjectChild(RenderObject child, Object? slot) { ... }
+/// }
+/// ```
+class AvoidRemovedRenderObjectElementMethodsRule extends SaropaLintRule {
+  AvoidRemovedRenderObjectElementMethodsRule() : super(code: _code);
+
+  static const Map<String, String> _renames = {
+    'insertChildRenderObject': 'insertRenderObjectChild',
+    'moveChildRenderObject': 'moveRenderObjectChild',
+    'removeChildRenderObject': 'removeRenderObjectChild',
+  };
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'config'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+    'insertChildRenderObject',
+    'moveChildRenderObject',
+    'removeChildRenderObject',
+  };
+
+  static const LintCode _code = LintCode(
+    'avoid_removed_render_object_element_methods',
+    '[avoid_removed_render_object_element_methods] '
+        'insertChildRenderObject, moveChildRenderObject, and '
+        'removeChildRenderObject were removed from RenderObjectElement in '
+        'Flutter 3.0 (PR #98616, deprecated since Flutter 1.21). Use '
+        'insertRenderObjectChild, moveRenderObjectChild, and '
+        'removeRenderObjectChild instead. Migration is supported by '
+        '`dart fix`. {v1}',
+    correctionMessage:
+        'Rename the method: swap Child↔RenderObject word order '
+        '(e.g. insertChildRenderObject → insertRenderObjectChild).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _RenameRenderObjectElementMethodFix(context: context),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (context.isLintPluginSource) return;
+
+    // Detect override declarations of the removed methods.
+    context.addMethodDeclaration((MethodDeclaration node) {
+      final name = node.name.lexeme;
+      if (!_renames.containsKey(name)) return;
+
+      // Verify enclosing class extends RenderObjectElement via type check.
+      final classDecl = node.parent;
+      if (classDecl is! ClassDeclaration) return;
+      final supertype = classDecl.extendsClause?.superclass;
+      if (supertype == null) return;
+
+      // Check resolved supertype or fall back to name matching.
+      // Resolved: walk supertypes for RenderObjectElement.
+      final supertypeEl = supertype.element;
+      if (supertypeEl is InterfaceElement) {
+        final isROE =
+            supertypeEl.allSupertypes.any(
+              (t) => t.element.name == 'RenderObjectElement',
+            ) ||
+            supertypeEl.name == 'RenderObjectElement';
+        if (!isROE) return;
+      } else {
+        // Unresolved — fall back to name matching on the extends clause.
+        if (supertype.name.lexeme != 'RenderObjectElement') return;
+      }
+
+      reporter.atToken(node.name);
+    });
+
+    // Detect super.insertChildRenderObject(...) etc.
+    context.addMethodInvocation((MethodInvocation node) {
+      final name = node.methodName.name;
+      if (!_renames.containsKey(name)) return;
+      if (node.target is! SuperExpression) return;
+      reporter.atNode(node.methodName);
+    });
+  }
+}
+
+class _RenameRenderObjectElementMethodFix extends SaropaFixProducer {
+  _RenameRenderObjectElementMethodFix({required super.context});
+
+  static const Map<String, String> _renames = {
+    'insertChildRenderObject': 'insertRenderObjectChild',
+    'moveChildRenderObject': 'moveRenderObjectChild',
+    'removeChildRenderObject': 'removeRenderObjectChild',
+  };
+
+  static const FixKind _fixKind = FixKind(
+    'saropa.fix.renameRenderObjectElementMethod',
+    80,
+    'Rename to replacement method',
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+
+    // MethodInvocation (super.foo) → coveringNode is SimpleIdentifier.
+    // MethodDeclaration (override) → coveringNode is MethodDeclaration;
+    // extract the name Token so the fix works for both detection paths.
+    final String name;
+    final int offset;
+    final int length;
+    if (node is SimpleIdentifier) {
+      name = node.name;
+      offset = node.offset;
+      length = node.length;
+    } else if (node is MethodDeclaration) {
+      name = node.name.lexeme;
+      offset = node.name.offset;
+      length = node.name.length;
+    } else {
+      return;
+    }
+
+    final replacement = _renames[name];
+    if (replacement == null) return;
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addSimpleReplacement(SourceRange(offset, length), replacement);
+    });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// avoid_deprecated_animated_list_typedefs
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Flags deprecated `AnimatedListItemBuilder` and
+/// `AnimatedListRemovedItemBuilder` typedefs (Flutter 3.7, PR #113131).
+///
+/// **Why:** These typedefs were renamed to `AnimatedItemBuilder` and
+/// `AnimatedRemovedItemBuilder` for broader applicability (same signature,
+/// new names). No semantic difference — just a rename.
+///
+/// **Detection:** [NamedType] where the identifier matches either deprecated
+/// typedef name and resolves to `package:flutter/` or is unresolved.
+///
+/// **Quick fix:** renames the type reference.
+///
+/// **BAD:**
+/// ```dart
+/// AnimatedListItemBuilder builder = (context, index, animation) { ... };
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// AnimatedItemBuilder builder = (context, index, animation) { ... };
+/// ```
+class AvoidDeprecatedAnimatedListTypedefsRule extends SaropaLintRule {
+  AvoidDeprecatedAnimatedListTypedefsRule() : super(code: _code);
+
+  static const Map<String, String> _renames = {
+    'AnimatedListItemBuilder': 'AnimatedItemBuilder',
+    'AnimatedListRemovedItemBuilder': 'AnimatedRemovedItemBuilder',
+  };
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'config'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+    'AnimatedListItemBuilder',
+    'AnimatedListRemovedItemBuilder',
+  };
+
+  static const LintCode _code = LintCode(
+    'avoid_deprecated_animated_list_typedefs',
+    '[avoid_deprecated_animated_list_typedefs] '
+        'AnimatedListItemBuilder and AnimatedListRemovedItemBuilder were '
+        'deprecated in Flutter 3.7 (PR #113131). Use AnimatedItemBuilder '
+        'and AnimatedRemovedItemBuilder instead — the signatures are '
+        'identical, only the names changed for broader applicability. {v1}',
+    correctionMessage:
+        'Rename AnimatedListItemBuilder → AnimatedItemBuilder and '
+        'AnimatedListRemovedItemBuilder → AnimatedRemovedItemBuilder.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _RenameAnimatedListTypedefFix(context: context),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (context.isLintPluginSource) return;
+
+    context.addNamedType((NamedType node) {
+      final name = node.name.lexeme;
+      if (!_renames.containsKey(name)) return;
+
+      // If resolved, verify it comes from Flutter.
+      final el = node.element;
+      if (el != null) {
+        final uri = el.library?.uri.toString() ?? '';
+        if (!uri.startsWith('package:flutter/')) return;
+      }
+
+      reporter.atNode(node);
+    });
+  }
+}
+
+class _RenameAnimatedListTypedefFix extends SaropaFixProducer {
+  _RenameAnimatedListTypedefFix({required super.context});
+
+  static const Map<String, String> _renames = {
+    'AnimatedListItemBuilder': 'AnimatedItemBuilder',
+    'AnimatedListRemovedItemBuilder': 'AnimatedRemovedItemBuilder',
+  };
+
+  static const FixKind _fixKind = FixKind(
+    'saropa.fix.renameAnimatedListTypedef',
+    80,
+    'Rename to replacement typedef',
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    if (node is! NamedType) return;
+    final replacement = _renames[node.name.lexeme];
+    if (replacement == null) return;
+    final t = node.name;
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addSimpleReplacement(SourceRange(t.offset, t.length), replacement);
+    });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// avoid_deprecated_use_material3_copy_with
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Flags `useMaterial3` parameter in `ThemeData.copyWith()` (Flutter 3.16,
+/// PR #131455).
+///
+/// **Why:** Setting `useMaterial3` to `false` in `ThemeData.copyWith()` does
+/// **not** force Material 2 — it only works when set in the `ThemeData()`
+/// constructor directly. Using it in `copyWith()` is misleading and a common
+/// source of bugs. The parameter was deprecated to prevent misuse.
+///
+/// **Detection:** [MethodInvocation] named `copyWith` on a target whose
+/// static type is `ThemeData`, containing a `useMaterial3` named argument.
+///
+/// **Quick fix:** removes the `useMaterial3` named argument.
+///
+/// **BAD:**
+/// ```dart
+/// theme.copyWith(useMaterial3: false);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ThemeData(useMaterial3: false, ...); // set in constructor, not copyWith
+/// ```
+class AvoidDeprecatedUseMaterial3CopyWithRule extends SaropaLintRule {
+  AvoidDeprecatedUseMaterial3CopyWithRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'config'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'useMaterial3'};
+
+  static const LintCode _code = LintCode(
+    'avoid_deprecated_use_material3_copy_with',
+    '[avoid_deprecated_use_material3_copy_with] The useMaterial3 parameter '
+        'in ThemeData.copyWith() was deprecated in Flutter 3.16 (PR #131455). '
+        'Setting useMaterial3 in copyWith() does not force Material 2 — it '
+        'must be set in the ThemeData() constructor directly. Remove the '
+        'parameter from copyWith() to avoid misleading behavior. {v1}',
+    correctionMessage:
+        "Remove 'useMaterial3' from copyWith() and set it in "
+        'the ThemeData() constructor instead.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _RemoveUseMaterial3CopyWithFix(context: context),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (context.isLintPluginSource) return;
+
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'copyWith') return;
+
+      // Verify the target is ThemeData via static type.
+      final targetType = node.realTarget?.staticType;
+      if (targetType == null) return;
+      final targetEl = targetType.element;
+      if (targetEl?.name != 'ThemeData') return;
+
+      // Check for useMaterial3 named argument.
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'useMaterial3') {
+          reporter.atNode(arg.name);
+          return;
+        }
+      }
+    });
+  }
+}
+
+class _RemoveUseMaterial3CopyWithFix extends SaropaFixProducer {
+  _RemoveUseMaterial3CopyWithFix({required super.context});
+
+  static const FixKind _fixKind = FixKind(
+    'saropa.fix.removeUseMaterial3CopyWith',
+    80,
+    "Remove 'useMaterial3' from copyWith()",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    if (node == null) return;
+
+    // Find the NamedExpression for useMaterial3.
+    final named = node is NamedExpression
+        ? node
+        : node.thisOrAncestorOfType<NamedExpression>();
+    if (named == null || named.name.label.name != 'useMaterial3') return;
+
+    final argList = named.parent;
+    if (argList is! ArgumentList) return;
+
+    final args = argList.arguments;
+    final index = args.indexOf(named);
+    if (index < 0) return;
+
+    int start = named.offset;
+    int end = named.end;
+
+    // Remove surrounding comma and whitespace.
+    if (args.length == 1) {
+      // Only argument — remove it, leave empty parens.
+      start = named.offset;
+      end = named.end;
+    } else if (index < args.length - 1) {
+      // Not the last argument — remove trailing comma + whitespace.
+      end = args[index + 1].offset;
+    } else {
+      // Last argument — remove leading comma + whitespace.
+      start = args[index - 1].end;
+    }
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addSimpleReplacement(SourceRange(start, end - start), '');
+    });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// avoid_deprecated_on_surface_destroyed
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Flags deprecated `SurfaceProducer.onSurfaceDestroyed` (Flutter 3.29,
+/// PR #160937).
+///
+/// **Why:** `onSurfaceDestroyed` was deprecated in favor of
+/// `onSurfaceCleanup`. The new name better reflects the callback's purpose
+/// (cleanup before surface teardown, not notification after destruction).
+///
+/// **Detection:** [PropertyAccess] and [PrefixedIdentifier] where the
+/// property name is `onSurfaceDestroyed` and the target's static type
+/// resolves to `SurfaceProducer`.
+///
+/// **Quick fix:** renames `onSurfaceDestroyed` → `onSurfaceCleanup`.
+///
+/// **BAD:**
+/// ```dart
+/// surfaceProducer.onSurfaceDestroyed = () { ... };
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// surfaceProducer.onSurfaceCleanup = () { ... };
+/// ```
+class AvoidDeprecatedOnSurfaceDestroyedRule extends SaropaLintRule {
+  AvoidDeprecatedOnSurfaceDestroyedRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'config'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresFlutterImport => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'onSurfaceDestroyed'};
+
+  static const LintCode _code = LintCode(
+    'avoid_deprecated_on_surface_destroyed',
+    '[avoid_deprecated_on_surface_destroyed] '
+        'SurfaceProducer.onSurfaceDestroyed was deprecated in Flutter 3.29 '
+        '(PR #160937). Use onSurfaceCleanup instead — the new name better '
+        'reflects the callback semantics (cleanup before teardown, not '
+        'notification after destruction). {v1}',
+    correctionMessage: 'Rename onSurfaceDestroyed to onSurfaceCleanup.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _RenameOnSurfaceDestroyedFix(context: context),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (context.isLintPluginSource) return;
+
+    void checkProperty(SimpleIdentifier prop, DartType? targetType) {
+      if (prop.name != 'onSurfaceDestroyed') return;
+      if (targetType == null) return;
+      final el = targetType.element;
+      if (el?.name != 'SurfaceProducer') return;
+      reporter.atNode(prop);
+    }
+
+    context.addPropertyAccess((PropertyAccess node) {
+      checkProperty(node.propertyName, node.realTarget.staticType);
+    });
+
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      checkProperty(node.identifier, node.prefix.staticType);
+    });
+  }
+}
+
+class _RenameOnSurfaceDestroyedFix extends SaropaFixProducer {
+  _RenameOnSurfaceDestroyedFix({required super.context});
+
+  static const FixKind _fixKind = FixKind(
+    'saropa.fix.renameOnSurfaceDestroyed',
+    80,
+    "Rename to 'onSurfaceCleanup'",
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final node = coveringNode;
+    if (node is! SimpleIdentifier || node.name != 'onSurfaceDestroyed') return;
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addSimpleReplacement(
+        SourceRange(node.offset, node.length),
+        'onSurfaceCleanup',
+      );
+    });
+  }
+}
