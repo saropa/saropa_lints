@@ -1136,6 +1136,85 @@ class AvoidDeprecatedNetworkInterfaceListSupportedRule extends SaropaLintRule {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// avoid_removed_null_thrown_error
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Flags references to the removed [NullThrownError] type (Dart 3.0).
+///
+/// **Why:** `NullThrownError` was removed in Dart 3.0.0. In null-safe code,
+/// `throw (null as dynamic)` produces a [TypeError] instead, because `null`
+/// cannot be down-cast from `dynamic` to `Object`. Code referencing
+/// `NullThrownError` will fail to compile on modern SDKs.
+///
+/// **Detection:** [NamedType] where the identifier is `NullThrownError` and
+/// the element resolves to `dart:core` (or is unresolved — migration code).
+///
+/// **False-positive guard:** a user-defined `NullThrownError` class resolves
+/// to the user's library and is not flagged.
+///
+/// **Quick fix:** renames `NullThrownError` → `TypeError`.
+///
+/// **BAD:**
+/// ```dart
+/// try { ... } on NullThrownError catch (e) { ... }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try { ... } on TypeError catch (e) { ... }
+/// ```
+class AvoidRemovedNullThrownErrorRule extends SaropaLintRule {
+  AvoidRemovedNullThrownErrorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core', 'config'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'NullThrownError'};
+
+  static const LintCode _code = LintCode(
+    'avoid_removed_null_thrown_error',
+    '[avoid_removed_null_thrown_error] NullThrownError was removed in '
+        'Dart 3.0.0. In null-safe Dart, throw-null produces a TypeError '
+        'instead (null cannot be cast from dynamic to Object). Use TypeError '
+        'for catch clauses and type checks. {v1}',
+    correctionMessage: 'Replace NullThrownError with TypeError.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) => _ReplaceTypeNameFix(
+      context: context,
+      from: 'NullThrownError',
+      to: 'TypeError',
+    ),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (context.isLintPluginSource) return;
+
+    context.addNamedType(
+      (NamedType node) =>
+          _reportRemovedCoreType(node, reporter, 'NullThrownError'),
+    );
+  }
+}
+
 class _ReplaceTypeNameFix extends SaropaFixProducer {
   _ReplaceTypeNameFix({
     required super.context,

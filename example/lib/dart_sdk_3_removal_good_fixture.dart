@@ -91,3 +91,11 @@ class HasNextIterator {
 void goodUserHasNextIterator(HasNextIterator h) {
   final _ = h;
 }
+
+// User [NullThrownError] is not dart:core's removed type.
+class NullThrownError implements Error {
+  @override
+  StackTrace? get stackTrace => null;
+}
+
+void goodUserNullThrownError(NullThrownError e) {}

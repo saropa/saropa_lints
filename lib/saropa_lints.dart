@@ -2820,6 +2820,16 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidRemovedMaxUserTagsConstantRule.new,
   AvoidRemovedDartDeveloperMetricsRule.new,
   AvoidDeprecatedNetworkInterfaceListSupportedRule.new,
+  AvoidRemovedNullThrownErrorRule.new,
+
+  // Dart SDK 3.4 deprecated APIs (migration)
+  AvoidDeprecatedFileSystemDeleteEventIsDirectoryRule.new,
+
+  // Flutter deprecation migration rules (various versions)
+  AvoidRemovedRenderObjectElementMethodsRule.new,
+  AvoidDeprecatedAnimatedListTypedefsRule.new,
+  AvoidDeprecatedUseMaterial3CopyWithRule.new,
+  AvoidDeprecatedOnSurfaceDestroyedRule.new,
 
   // v5.1.0 - New lint rules
   AvoidCachedImageWebRule.new,

@@ -789,6 +789,14 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_removed_max_user_tags_constant',
   'avoid_removed_dart_developer_metrics',
   'avoid_deprecated_network_interface_list_supported',
+  'avoid_removed_null_thrown_error',
+  // Dart SDK 3.4 deprecated APIs
+  'avoid_deprecated_file_system_delete_event_is_directory',
+  // Flutter deprecation migrations
+  'avoid_removed_render_object_element_methods',
+  'avoid_deprecated_animated_list_typedefs',
+  'avoid_deprecated_use_material3_copy_with',
+  'avoid_deprecated_on_surface_destroyed',
   // Moved from Essential (style/quality, not crash prevention)
   // 'prefer_list_first' moved to stylisticRules (opinionated)
   // 'prefer_list_last' moved to stylisticRules (opinionated)

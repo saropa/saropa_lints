@@ -30,6 +30,7 @@ void main() {
     'avoid_removed_max_user_tags_constant',
     'avoid_removed_dart_developer_metrics',
     'avoid_deprecated_network_interface_list_supported',
+    'avoid_removed_null_thrown_error',
   };
 
   const rulesWithQuickFixes = <String>{
@@ -39,6 +40,7 @@ void main() {
     'avoid_deprecated_expires_getter',
     'avoid_removed_cast_error',
     'avoid_removed_max_user_tags_constant',
+    'avoid_removed_null_thrown_error',
   };
 
   group('dart_sdk_3_removal fixtures', () {
@@ -98,6 +100,7 @@ void main() {
         expect(content.contains('class Gauge'), isTrue);
         expect(content.contains('class NetworkInterface'), isTrue);
         expect(content.contains('class HasNextIterator'), isTrue);
+        expect(content.contains('class NullThrownError'), isTrue);
       },
     );
   });
@@ -139,6 +142,7 @@ void main() {
       expect(AvoidRemovedDeferredLibraryRule().impact, LintImpact.high);
       expect(AvoidRemovedMaxUserTagsConstantRule().impact, LintImpact.high);
       expect(AvoidRemovedDartDeveloperMetricsRule().impact, LintImpact.high);
+      expect(AvoidRemovedNullThrownErrorRule().impact, LintImpact.high);
     });
 
     test('medium impact for removed error types / BidirectionalIterator', () {
@@ -204,6 +208,7 @@ void main() {
         AvoidDeprecatedNetworkInterfaceListSupportedRule().requiredPatterns,
         isNotNull,
       );
+      expect(AvoidRemovedNullThrownErrorRule().requiredPatterns, isNotNull);
     });
 
     test('List rule pattern targets ctor call, not List.from', () {
@@ -379,6 +384,16 @@ void main() {
         rule.code.problemMessage,
         contains('[avoid_deprecated_network_interface_list_supported]'),
       );
+    });
+
+    test('AvoidRemovedNullThrownErrorRule', () {
+      final rule = AvoidRemovedNullThrownErrorRule();
+      expect(rule.code.name.toLowerCase(), 'avoid_removed_null_thrown_error');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_removed_null_thrown_error]'),
+      );
+      expect(rule.fixGenerators, isNotEmpty);
     });
   });
 }
