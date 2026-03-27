@@ -25,6 +25,14 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [10.2.1]
+
+VS Code extension polish — clearer status bar when lint health and Package Vibrancy are both shown.
+
+### Fixed
+
+- **(Extension)** Unified status bar now uses compact disambiguation for mixed metrics when vibrancy is shown: `Saropa: 90% · V4/10` (prevents confusion between lint `%` and vibrancy `/10` without adding verbose labels)
+
 ## [10.2.0]
 
 Stream subscription detection improvements — fixes false negatives on rxdart and custom Stream subclasses, and aligns rule description with actual behavior.
@@ -45,7 +53,6 @@ Stream subscription detection improvements — fixes false negatives on rxdart a
 - Test fixture for `avoid_stream_subscription_in_field` now uses properly-typed `Stream<int>` variables instead of undefined `dynamic` references that bypassed the type check
 - **(Extension)** Violations sidebar no longer opens a "file not found" error when source files have been moved or renamed since the last analysis; affected items show a warning icon with "(file moved or deleted)" label
 - **(Extension)** "Fix all in this file" command now shows a user-friendly warning instead of silently failing on moved/deleted files
-- **(Extension)** Unified status bar now uses compact disambiguation for mixed metrics when vibrancy is shown: `Saropa: 90% · V4/10` (prevents confusion between lint `%` and vibrancy `/10` without adding verbose labels)
 
 ## [10.1.1]
 
