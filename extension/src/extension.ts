@@ -75,6 +75,7 @@ import { SIDEBAR_SECTION_CONFIG_KEYS, defaultSidebarSectionVisible, sidebarSecti
 import { buildSidebarSectionCountMap } from './sidebarSectionCounts';
 import { copyTreeNodesToClipboard } from './copyTreeAsJson';
 import { checkForUpgrade } from './upgrade-checker';
+import { buildStatusBarLabel } from './statusBarLabel';
 import {
   serializeIssueNode,
   serializeConfigNode,
@@ -495,7 +496,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       vscode.workspace.getConfiguration('saropaLints.packageVibrancy').get<boolean>('showInStatusBar', true) &&
       vibrancyData !== null;
     const vibrancyLabel = showVibrancy ? `${Math.round(vibrancyData!.averageScore / 10)}/10` : null;
-    const trailLabel = vibrancyLabel ?? tier;
 
     if (en) {
       const root = getProjectRoot();
@@ -505,10 +505,23 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         const history = loadHistory(context.workspaceState);
         const prevScore = findPreviousScore(history);
         const delta = prevScore === undefined ? '' : ` ${formatScoreDelta(health.score, prevScore)}`;
-        statusBarItem.text = `$(checklist) Saropa: ${health.score}%${delta} · ${trailLabel}`;
+        const detailLabel = buildStatusBarLabel({
+          hasHealth: true,
+          healthScore: health.score,
+          delta,
+          tier,
+          showVibrancy,
+          vibrancyLabel,
+        });
+        statusBarItem.text = `$(checklist) Saropa: ${detailLabel}`;
         statusBarItem.backgroundColor = statusBarBackgroundForScore(health.score);
       } else {
-        statusBarItem.text = `$(checklist) Saropa Lints · ${trailLabel}`;
+        statusBarItem.text = `$(checklist) ${buildStatusBarLabel({
+          hasHealth: false,
+          tier,
+          showVibrancy,
+          vibrancyLabel,
+        })}`;
         statusBarItem.backgroundColor = undefined;
       }
       statusBarItem.tooltip = buildStatusBarTooltipLines(tier, health, showVibrancy, vibrancyLabel).join('\n');
