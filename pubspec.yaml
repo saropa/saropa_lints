@@ -3,7 +3,7 @@ name: saropa_lints
 description: >-
   2134 custom lint rules with 254 quick fixes for Flutter and Dart.
   Static analysis for security, accessibility, and performance.
-version: 10.2.1
+version: 10.2.2
 license: MIT
 
 # Project links for pub.dev
@@ -33,7 +33,10 @@ executables:
 environment:
   sdk: ">=3.9.0 <4.0.0"
 
-# Runtime dependencies for lint rule implementation (analyzer 9 for Flutter compatibility)
+# Runtime dependencies for lint rule implementation
+# NOTE: analyzer is pinned to ^9.0.0. Upgrading to 10+ requires migrating the
+# entire AST API (ClassDeclaration.members → .body.members, .name → .namePart.typeName,
+# etc.) across ~484 call sites. See analyzer changelog for the full migration guide.
 dependencies:
   analysis_server_plugin: ^0.3.4
   analyzer: ^9.0.0
