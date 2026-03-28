@@ -20,6 +20,7 @@ import {
     calcPopularity,
     calcFlaggedIssuePenalty,
     calcPublisherTrust,
+    calcPubQualityBonus,
     calcPublishRecency,
     computeVibrancyScore,
     ScoringWeights,
@@ -81,6 +82,7 @@ export async function analyzePackage(
         name: dep.name, total: scores.score, category,
         rv: scores.resolutionVelocity, eg: scores.engagementLevel,
         pop: scores.popularity, pt: scores.publisherTrust,
+        pq: scores.pubQualityBonus,
     });
 
     const [updateInfo, archiveSizeBytes] = await Promise.all([
@@ -276,14 +278,15 @@ function computeScores(params: {
         publisher, params.maxPublisherBonus,
     );
 
+    const pubQualityBonus = calcPubQualityBonus(pubPoints);
     const flaggedPenalty = github
         ? calcFlaggedIssuePenalty(github.flaggedIssues?.length ?? 0) : 0;
     const score = computeVibrancyScore(
         { resolutionVelocity, engagementLevel, popularity }, params.weights,
-        flaggedPenalty, publisherTrust,
+        flaggedPenalty, publisherTrust + pubQualityBonus,
     );
     return {
         score, resolutionVelocity, engagementLevel,
-        popularity, publisherTrust,
+        popularity, publisherTrust, pubQualityBonus,
     };
 }

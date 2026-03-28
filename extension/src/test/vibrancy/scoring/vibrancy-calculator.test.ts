@@ -7,6 +7,7 @@ import {
     calcPublishRecency,
     calcFlaggedIssuePenalty,
     calcPublisherTrust,
+    calcPubQualityBonus,
     computeVibrancyScore,
     TRUSTED_PUBLISHERS,
     RESOLUTION_PUBLISH_RECENCY_CAP,
@@ -337,6 +338,60 @@ describe('vibrancy-calculator', () => {
 
         it('should return 0 for negative input', () => {
             assert.strictEqual(calcFlaggedIssuePenalty(-1), 0);
+        });
+    });
+
+    describe('calcPubQualityBonus', () => {
+        it('should return max bonus for perfect pub.dev score', () => {
+            assert.strictEqual(calcPubQualityBonus(160), 10);
+        });
+
+        it('should return 0 for zero pub points', () => {
+            assert.strictEqual(calcPubQualityBonus(0), 0);
+        });
+
+        it('should scale linearly with pub points', () => {
+            assert.strictEqual(calcPubQualityBonus(80), 5);
+        });
+
+        it('should respect custom maxBonus', () => {
+            assert.strictEqual(calcPubQualityBonus(160, 20), 20);
+            assert.strictEqual(calcPubQualityBonus(80, 20), 10);
+        });
+
+        it('should return 0 when maxBonus is 0', () => {
+            assert.strictEqual(calcPubQualityBonus(160, 0), 0);
+        });
+
+        it('should return 0 for negative pub points', () => {
+            assert.strictEqual(calcPubQualityBonus(-10), 0);
+        });
+
+        it('should cap at maxBonus even if pub points exceed 160', () => {
+            // Defensive: pub.dev max is 160, but guard against unexpected data
+            assert.strictEqual(calcPubQualityBonus(200), 10);
+        });
+
+        it('should lift composite score for high-quality packages with no GitHub activity', () => {
+            // Before: 160/160 pub points, no GitHub, verified publisher → near-zero
+            // After:  pub quality bonus (+10) lifts the score meaningfully
+            const params = { resolutionVelocity: 0, engagementLevel: 0, popularity: 50 };
+            const publisherTrust = 5; // verified, non-trusted publisher
+
+            // Without pub quality bonus: 0 + 0 + 5 + 5 = 10
+            const withoutBonus = computeVibrancyScore(
+                params, undefined, 0, publisherTrust,
+            );
+            assert.strictEqual(withoutBonus, 10);
+
+            // With pub quality bonus: 0 + 0 + 5 + 5 + 10 = 20
+            const pubQuality = calcPubQualityBonus(160);
+            const withBonus = computeVibrancyScore(
+                params, undefined, 0, publisherTrust + pubQuality,
+            );
+            assert.strictEqual(withBonus, 20);
+            assert.ok(withBonus > withoutBonus,
+                'pub quality bonus should meaningfully lift scores for well-vetted packages');
         });
     });
 });

@@ -25,6 +25,12 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **(Extension)** Vibrancy scores no longer bottom out near zero for packages with high pub.dev quality but low GitHub activity; a new pub quality bonus (0–10) scales linearly with pub.dev points so that well-vetted "finished" packages score fairly
+
 ## [10.2.1]
 
 VS Code extension polish — clearer status bar when lint health and Package Vibrancy are both shown.

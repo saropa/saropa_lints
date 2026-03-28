@@ -30,13 +30,14 @@ export class ScanLogger {
         readonly name: string; readonly total: number;
         readonly category: string; readonly rv: number;
         readonly eg: number; readonly pop: number;
-        readonly pt?: number;
+        readonly pt?: number; readonly pq?: number;
     }): void {
-        const { name, total, category, rv, eg, pop, pt } = params;
+        const { name, total, category, rv, eg, pop, pt, pq } = params;
         const ptStr = pt !== undefined ? ` pt=${pt}` : '';
+        const pqStr = pq !== undefined ? ` pq=${pq}` : '';
         this.log(
             'SCORE',
-            `${name} → ${total} (${category}) [rv=${rv} eg=${eg} pop=${pop}${ptStr}]`,
+            `${name} → ${total} (${category}) [rv=${rv} eg=${eg} pop=${pop}${ptStr}${pqStr}]`,
         );
     }
 
