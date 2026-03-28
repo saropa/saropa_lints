@@ -6,10 +6,12 @@ export { TRUSTED_PUBLISHERS, isTrustedPublisher } from './trusted-publishers';
 /**
  * Default scoring weights for the vibrancy formula:
  *   V_score = (W_R * Resolution) + (W_E * Engagement) + (W_P * Popularity)
- *           + publisherBonus − penalty
+ *           + publisherBonus + pubQualityBonus − penalty
  *
  * Resolution and Engagement are heavily weighted because active maintainer
- * response matters more than historical star counts. These can be overridden
+ * response matters more than historical star counts. The pubQualityBonus
+ * (0–10) ensures packages with high pub.dev points aren't penalized to
+ * near-zero just because GitHub activity is low. These can be overridden
  * via VS Code settings (saropaLints.packageVibrancy.weights.*).
  */
 
@@ -109,6 +111,23 @@ export function calcPublisherTrust(
     if (!publisher) { return -Math.round(maxBonus / 3); }
     if (isTrustedPublisher(publisher)) { return maxBonus; }
     return Math.round(maxBonus / 3);
+}
+
+/** Maximum pub.dev quality bonus added to the vibrancy score. */
+export const DEFAULT_MAX_PUB_QUALITY_BONUS = 10;
+
+/**
+ * Bonus for high pub.dev quality (0–maxBonus).
+ * Scales linearly with pub.dev points (0–160). Packages that pass pub.dev's
+ * quality checks deserve a score floor even when GitHub activity is low —
+ * a "finished" package with 160/160 points isn't a 0.1/100 risk.
+ */
+export function calcPubQualityBonus(
+    pubPoints: number,
+    maxBonus: number = DEFAULT_MAX_PUB_QUALITY_BONUS,
+): number {
+    if (maxBonus <= 0 || pubPoints <= 0) { return 0; }
+    return Math.min(maxBonus, (pubPoints / 160) * maxBonus);
 }
 
 /** Penalty for flagged high-signal open issues (0–15 points). */
