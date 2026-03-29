@@ -41,6 +41,7 @@ export async function scanPackages(
     cache: CacheService,
     scanConfig: ScanConfig,
     progress: vscode.Progress<{ message?: string; increment?: number }>,
+    signal?: AbortSignal,
 ): Promise<VibrancyResult[]> {
     const results: VibrancyResult[] = new Array(deps.length);
     let completed = 0;
@@ -48,6 +49,7 @@ export async function scanPackages(
 
     async function next(): Promise<void> {
         while (cursor < deps.length) {
+            if (signal?.aborted) { return; } // Stop worker on cancel
             const idx = cursor++;
             const dep = deps[idx];
             scanConfig.logger?.info(`[${idx + 1}/${deps.length}] ${dep.name}`);

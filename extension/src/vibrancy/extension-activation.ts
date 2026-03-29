@@ -102,6 +102,8 @@ let freshnessWatcher: FreshnessWatcher | null = null;
 let stateManager: VibrancyStateManager | null = null;
 let detailViewProvider: DetailViewProvider | null = null;
 let reviewStateService: ReviewStateService | null = null;
+/** Abort controller for the active scan — used to cancel from UI or supersede with a new scan. */
+let activeScanAbort: AbortController | null = null;
 let detailLogger: DetailLogger | null = null;
 let detailChannel: vscode.OutputChannel | null = null;
 let saveTaskRunner: SaveTaskRunner | null = null;
@@ -713,23 +715,40 @@ async function autoScanIfPubspec(targets: ScanTargets): Promise<void> {
 }
 
 async function runScan(targets: ScanTargets): Promise<void> {
-    if (targets.state.isScanning.value) { return; }
+    // Cancel any in-progress scan so this one takes over
+    activeScanAbort?.abort();
+
+    const controller = new AbortController();
+    activeScanAbort = controller;
+
     targets.state.startScanning();
     try {
-        await runScanInner(targets);
+        await runScanInner(targets, controller);
     } finally {
-        targets.state.stopScanning();
+        // Only clear state if we weren't superseded by another scan
+        if (activeScanAbort === controller) {
+            activeScanAbort = null;
+            targets.state.stopScanning();
+        }
     }
 }
 
-async function runScanInner(targets: ScanTargets): Promise<void> {
+async function runScanInner(
+    targets: ScanTargets,
+    controller: AbortController,
+): Promise<void> {
+    const { signal } = controller;
+
     await vscode.window.withProgress(
         {
             location: vscode.ProgressLocation.Notification,
             title: 'Scanning package vibrancy...',
-            cancellable: false,
+            cancellable: true,
         },
-        async (progress) => {
+        async (progress, token) => {
+            // Link VS Code cancel button to our abort controller
+            token.onCancellationRequested(() => controller.abort());
+
             const startTime = Date.now();
             const oldVersions = snapshotVersions(latestResults);
 
@@ -755,10 +774,12 @@ async function runScanInner(targets: ScanTargets): Promise<void> {
             );
             logger.info(`Scan started — ${deps.length} packages`);
 
+            if (signal.aborted) { return; }
             const rawResults = await scanPackages(
-                deps, targets.cache, scanConfig, progress,
+                deps, targets.cache, scanConfig, progress, signal,
             );
 
+            if (signal.aborted) { return; }
             progress.report({ message: 'Scanning imports...' });
             const workspaceRoot = vscode.Uri.joinPath(parsed.yamlUri, '..');
             const imported = await scanDartImports(workspaceRoot);
@@ -771,6 +792,7 @@ async function runScanInner(targets: ScanTargets): Promise<void> {
                     ? { ...r, isUnused: true, alternatives: [] } : r,
             );
 
+            if (signal.aborted) { return; }
             progress.report({ message: 'Analyzing upgrade blockers...' });
             const enrichResult = await enrichWithBlockers(
                 withUnused, workspaceRoot.fsPath, logger,
@@ -778,6 +800,7 @@ async function runScanInner(targets: ScanTargets): Promise<void> {
             let results = enrichResult.results;
             lastReverseDeps = enrichResult.reverseDeps;
 
+            if (signal.aborted) { return; }
             progress.report({ message: 'Analyzing dependency graph...' });
             const depGraph = await fetchDepGraph(workspaceRoot.fsPath);
             let depGraphSummary: import('./types').DepGraphSummary | null = null;
@@ -813,6 +836,7 @@ async function runScanInner(targets: ScanTargets): Promise<void> {
                 );
             }
 
+            if (signal.aborted) { return; }
             progress.report({ message: 'Analyzing overrides...' });
             const overrideAnalyses = await runOverrideAnalysis(
                 parsed.yamlContent,
@@ -829,6 +853,7 @@ async function runScanInner(targets: ScanTargets): Promise<void> {
                 );
             }
 
+            if (signal.aborted) { return; }
             if (getVulnScanEnabled()) {
                 progress.report({ message: 'Scanning for vulnerabilities...' });
                 const vulnQueries = results.map(r => ({
@@ -869,6 +894,9 @@ async function runScanInner(targets: ScanTargets): Promise<void> {
                     logger.info(`Vulnerabilities: ${vulnCount} package(s) affected`);
                 }
             }
+
+            // Don't publish partial results from a cancelled scan
+            if (signal.aborted) { return; }
 
             latestResults = results;
             lastParsedDeps = parsed;

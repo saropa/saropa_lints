@@ -4,8 +4,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Dates are not included in version headers — [pub.dev](https://pub.dev/packages/saropa_lints/changelog) displays publish dates separately.
-
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 8.0.11.
 
@@ -21,11 +19,33 @@ Dates are not included in version headers — [pub.dev](https://pub.dev/packages
 
 **Open VSX Registry** — [open-vsx.org / extension / saropa / saropa-lints](https://open-vsx.org/extension/saropa/saropa-lints)
 
-Each version (and [Unreleased]) has a short commentary line in plain language — what this release is about for humans. Only discuss user-facing features; vary the phrasing.
+<!-- MAINTEANCE NOTES -- IMPORTANT --
+
+    Dates are not included in version headers — [pub.dev](https://pub.dev/packages/saropa_lints/changelog) displays publish dates separately.
+
+    Each version (and [Unreleased]) should open with a short human summary when it helps; only discuss user-facing features.
+
+
+    **Tagged changelog** — Published versions use git tag **`vx.y.z`**; each section below ends its summary line with **[log](url)** to that snapshot (or a standalone **[log](url)** when there is no summary). Compare to [current `main`](https://github.com/saropa/saropa-lints/blob/main/CHANGELOG.md).
+
+    **Published version**: See field "version": "x.y.z" in [package.json](./package.json)
+
+-->
+
+---
+
+## [Unreleased]
+
+### Added
+
+- **Vibrancy scan cancel button** — the progress notification now shows a Cancel button so users can abort a long-running scan
+- **Scan supersede** — starting a new vibrancy scan automatically cancels any in-progress scan instead of silently dropping the request
 
 ---
 
 ## [10.2.2]
+
+Extension vibrancy scoring fix. — [log](https://github.com/saropa/saropa_lints/blob/v10.2.2/CHANGELOG.md)
 
 ### Fixed
 
@@ -33,7 +53,7 @@ Each version (and [Unreleased]) has a short commentary line in plain language �
 
 ## [10.2.1]
 
-VS Code extension polish — clearer status bar when lint health and Package Vibrancy are both shown.
+VS Code extension polish — clearer status bar when lint health and Package Vibrancy are both shown. — [log](https://github.com/saropa/saropa_lints/blob/v10.2.1/CHANGELOG.md)
 
 ### Fixed
 
@@ -41,7 +61,7 @@ VS Code extension polish — clearer status bar when lint health and Package Vib
 
 ## [10.2.0]
 
-Stream subscription detection improvements — fixes false negatives on rxdart and custom Stream subclasses, and aligns rule description with actual behavior.
+Stream subscription detection improvements — fixes false negatives on rxdart and custom Stream subclasses, and aligns rule description with actual behavior. — [log](https://github.com/saropa/saropa_lints/blob/v10.2.0/CHANGELOG.md)
 
 ### Added
 
@@ -62,7 +82,7 @@ Stream subscription detection improvements — fixes false negatives on rxdart a
 
 ## [10.1.1]
 
-Package Vibrancy accuracy pass — removes false "End of Life" flags on healthy packages and adds a pub points quality floor so high-scoring packages are never labeled Stale.
+Package Vibrancy accuracy pass — removes false "End of Life" flags on healthy packages and adds a pub points quality floor so high-scoring packages are never labeled Stale. — [log](https://github.com/saropa/saropa_lints/blob/v10.1.1/CHANGELOG.md)
 
 ### Fixed
 
@@ -75,7 +95,7 @@ Package Vibrancy accuracy pass — removes false "End of Life" flags on healthy 
 
 ## [10.1.0]
 
-This release focuses on Flutter SDK alignment (new migration lints and a shared identifier→element helper) and on the **VS Code extension**: Package Vibrancy now uses a single **trusted publishers** list so first-party and Google-published packages are not mislabeled **Quiet** when GitHub-activity scoring sits in the mid tier.
+This release focuses on Flutter SDK alignment (new migration lints and a shared identifier→element helper) and on the **VS Code extension**: Package Vibrancy now uses a single **trusted publishers** list so first-party and Google-published packages are not mislabeled **Quiet** when GitHub-activity scoring sits in the mid tier. — [log](https://github.com/saropa/saropa_lints/blob/v10.1.0/CHANGELOG.md)
 
 ### Added
 
@@ -95,7 +115,7 @@ This release focuses on Flutter SDK alignment (new migration lints and a shared 
 
 ## [10.0.2]
 
-This patch wires ten compile-time mirror rules into the public rule list and tiers, updates existing rules for Analyzer 9 element APIs, and fixes a `require_data_encryption` false positive and unsafe `file://` root parsing in project metadata.
+This patch wires ten compile-time mirror rules into the public rule list and tiers, updates existing rules for Analyzer 9 element APIs, and fixes a `require_data_encryption` false positive and unsafe `file://` root parsing in project metadata. — [log](https://github.com/saropa/saropa_lints/blob/v10.0.2/CHANGELOG.md)
 
 ### Fixed
 
@@ -108,6 +128,8 @@ This patch wires ten compile-time mirror rules into the public rule list and tie
 
 ## [10.0.1]
 
+Version bump only. — [log](https://github.com/saropa/saropa_lints/blob/v10.0.1/CHANGELOG.md)
+
 ### Changed
 
 - Version bump
@@ -116,7 +138,7 @@ This patch wires ten compile-time mirror rules into the public rule list and tie
 
 ## [10.0.0]
 
-In this milestone update work centers on the composite analyzer plugin hook (`registerSaropaLintRules`), rule packs end-to-end (analyzer merge, CLI init, VS Code Rule Packs webview, generated registry), extension UX that defaults integration on with clearer commands and TODOs workspace scan as opt-in, and a wave of new lints—compile-time shape alignment, Dart 3.0 removed-API migration rules, and targeted Flutter fixes.
+In this milestone update work centers on the composite analyzer plugin hook (`registerSaropaLintRules`), rule packs end-to-end (analyzer merge, CLI init, VS Code Rule Packs webview, generated registry), extension UX that defaults integration on with clearer commands and TODOs workspace scan as opt-in, and a wave of new lints—compile-time shape alignment, Dart 3.0 removed-API migration rules, and targeted Flutter fixes. — [log](https://github.com/saropa/saropa_lints/blob/v10.0.0/CHANGELOG.md)
 
 ### Fixed
 
@@ -175,7 +197,7 @@ In this milestone update work centers on the composite analyzer plugin hook (`re
 
 ## [9.10.0]
 
-This release adds version-gap awareness: see which PRs and issues landed between your pinned version and latest, triage them with a persistent review checklist, and focus your pubspec tooltip on must-know stats with a "View Full Details" link to a full-detail panel.
+This release adds version-gap awareness: see which PRs and issues landed between your pinned version and latest, triage them with a persistent review checklist, and focus your pubspec tooltip on must-know stats with a "View Full Details" link to a full-detail panel. — [log](https://github.com/saropa/saropa_lints/blob/v9.10.0/CHANGELOG.md)
 
 ### Added
 
@@ -196,6 +218,8 @@ This release adds version-gap awareness: see which PRs and issues landed between
 ---
 
 ## [9.9.1]
+
+Flutter deprecation migration rules and ROADMAP additional rules 11–20. — [log](https://github.com/saropa/saropa_lints/blob/v9.9.1/CHANGELOG.md)
 
 ### Added
 
@@ -225,6 +249,8 @@ This release adds version-gap awareness: see which PRs and issues landed between
 - **sort_pub_dependencies** (INFO, Comprehensive): pubspec dependencies not sorted alphabetically.
 
 ## [9.9.0]
+
+Import graph tracking, scan API, TODOs & Hacks view, and new lint rules. — [log](https://github.com/saropa/saropa_lints/blob/v9.9.0/CHANGELOG.md)
 
 ### Fixed
 
@@ -287,7 +313,7 @@ This release adds version-gap awareness: see which PRs and issues landed between
 
 ## [9.8.1]
 
-_Smarter SDK guidance in pubspec and less noise when already on 3.9+._
+_Smarter SDK guidance in pubspec and less noise when already on 3.9+._ — [log](https://github.com/saropa/saropa_lints/blob/v9.8.1/CHANGELOG.md)
 
 ### Added
 
@@ -301,7 +327,7 @@ _Smarter SDK guidance in pubspec and less noise when already on 3.9+._
 
 ## [9.8.0]
 
-_One-line vibrancy summary in pubspec by default and consistent "Package Vibrancy" naming._
+_One-line vibrancy summary in pubspec by default and consistent "Package Vibrancy" naming._ — [log](https://github.com/saropa/saropa_lints/blob/v9.8.0/CHANGELOG.md)
 
 ### Changed
 
