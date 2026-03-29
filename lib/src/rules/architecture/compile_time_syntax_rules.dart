@@ -246,10 +246,10 @@ class DuplicateConstructorRule extends SaropaLintRule {
     }
 
     context.addClassDeclaration(
-      (ClassDeclaration node) => checkMembers(node.members),
+      (ClassDeclaration node) => checkMembers(node.body.members),
     );
     context.addEnumDeclaration(
-      (EnumDeclaration node) => checkMembers(node.members),
+      (EnumDeclaration node) => checkMembers(node.body.members),
     );
   }
 }
@@ -334,8 +334,8 @@ class ConflictingConstructorAndStaticMemberRule extends SaropaLintRule {
       }
     }
 
-    context.addClassDeclaration((ClassDeclaration node) => check(node.members));
-    context.addEnumDeclaration((EnumDeclaration node) => check(node.members));
+    context.addClassDeclaration((ClassDeclaration node) => check(node.body.members));
+    context.addEnumDeclaration((EnumDeclaration node) => check(node.body.members));
   }
 }
 
@@ -479,21 +479,21 @@ class IllegalConcreteEnumMemberRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addEnumDeclaration((EnumDeclaration node) {
-      for (final ClassMember m in node.members) {
+      for (final ClassMember m in node.body.members) {
         _reportIllegalConcreteEnumMember(m, reporter, code);
       }
     });
 
     context.addClassDeclaration((ClassDeclaration node) {
       if (!_classDeclarationImplementsEnum(node)) return;
-      for (final ClassMember m in node.members) {
+      for (final ClassMember m in node.body.members) {
         _reportIllegalConcreteEnumMember(m, reporter, code);
       }
     });
 
     context.addMixinDeclaration((MixinDeclaration node) {
       if (!_mixinOnEnum(node)) return;
-      for (final ClassMember m in node.members) {
+      for (final ClassMember m in node.body.members) {
         _reportIllegalConcreteEnumMember(m, reporter, code);
       }
     });

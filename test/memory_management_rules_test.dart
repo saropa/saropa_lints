@@ -10,7 +10,7 @@ void main() {
   group('Memory Management Rules - Rule Instantiation', () {
     test('AvoidLargeObjectsInStateRule', () {
       final rule = AvoidLargeObjectsInStateRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_large_objects_in_state');
+      expect(rule.code.lowerCaseName, 'avoid_large_objects_in_state');
       expect(
         rule.code.problemMessage,
         contains('[avoid_large_objects_in_state]'),
@@ -20,14 +20,14 @@ void main() {
     });
     test('RequireImageDisposalRule', () {
       final rule = RequireImageDisposalRule();
-      expect(rule.code.name.toLowerCase(), 'require_image_disposal');
+      expect(rule.code.lowerCaseName, 'require_image_disposal');
       expect(rule.code.problemMessage, contains('[require_image_disposal]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidCapturingThisInCallbacksRule', () {
       final rule = AvoidCapturingThisInCallbacksRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_capturing_this_in_callbacks');
+      expect(rule.code.lowerCaseName, 'avoid_capturing_this_in_callbacks');
       expect(
         rule.code.problemMessage,
         contains('[avoid_capturing_this_in_callbacks]'),
@@ -37,7 +37,7 @@ void main() {
     });
     test('RequireCacheEvictionPolicyRule', () {
       final rule = RequireCacheEvictionPolicyRule();
-      expect(rule.code.name.toLowerCase(), 'require_cache_eviction_policy');
+      expect(rule.code.lowerCaseName, 'require_cache_eviction_policy');
       expect(
         rule.code.problemMessage,
         contains('[require_cache_eviction_policy]'),
@@ -47,7 +47,7 @@ void main() {
     });
     test('PreferWeakReferencesForCacheRule', () {
       final rule = PreferWeakReferencesForCacheRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_weak_references_for_cache');
+      expect(rule.code.lowerCaseName, 'prefer_weak_references_for_cache');
       expect(
         rule.code.problemMessage,
         contains('[prefer_weak_references_for_cache]'),
@@ -57,7 +57,7 @@ void main() {
     });
     test('AvoidExpandoCircularReferencesRule', () {
       final rule = AvoidExpandoCircularReferencesRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_expando_circular_references');
+      expect(rule.code.lowerCaseName, 'avoid_expando_circular_references');
       expect(
         rule.code.problemMessage,
         contains('[avoid_expando_circular_references]'),
@@ -67,7 +67,7 @@ void main() {
     });
     test('AvoidLargeIsolateCommunicationRule', () {
       final rule = AvoidLargeIsolateCommunicationRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_large_isolate_communication');
+      expect(rule.code.lowerCaseName, 'avoid_large_isolate_communication');
       expect(
         rule.code.problemMessage,
         contains('[avoid_large_isolate_communication]'),
@@ -77,14 +77,14 @@ void main() {
     });
     test('RequireCacheExpirationRule', () {
       final rule = RequireCacheExpirationRule();
-      expect(rule.code.name.toLowerCase(), 'require_cache_expiration');
+      expect(rule.code.lowerCaseName, 'require_cache_expiration');
       expect(rule.code.problemMessage, contains('[require_cache_expiration]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidUnboundedCacheGrowthRule', () {
       final rule = AvoidUnboundedCacheGrowthRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_unbounded_cache_growth');
+      expect(rule.code.lowerCaseName, 'avoid_unbounded_cache_growth');
       expect(
         rule.code.problemMessage,
         contains('[avoid_unbounded_cache_growth]'),
@@ -94,7 +94,7 @@ void main() {
     });
     test('RequireCacheKeyUniquenessRule', () {
       final rule = RequireCacheKeyUniquenessRule();
-      expect(rule.code.name.toLowerCase(), 'require_cache_key_uniqueness');
+      expect(rule.code.lowerCaseName, 'require_cache_key_uniqueness');
       expect(
         rule.code.problemMessage,
         contains('[require_cache_key_uniqueness]'),
@@ -104,7 +104,7 @@ void main() {
     });
     test('AvoidRetainingDisposedWidgetsRule', () {
       final rule = AvoidRetainingDisposedWidgetsRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_retaining_disposed_widgets');
+      expect(rule.code.lowerCaseName, 'avoid_retaining_disposed_widgets');
       expect(
         rule.code.problemMessage,
         contains('[avoid_retaining_disposed_widgets]'),
@@ -114,7 +114,7 @@ void main() {
     });
     test('AvoidClosureCaptureLeaksRule', () {
       final rule = AvoidClosureCaptureLeaksRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_closure_capture_leaks');
+      expect(rule.code.lowerCaseName, 'avoid_closure_capture_leaks');
       expect(
         rule.code.problemMessage,
         contains('[avoid_closure_capture_leaks]'),
@@ -124,7 +124,7 @@ void main() {
     });
     test('RequireExpandoCleanupRule', () {
       final rule = RequireExpandoCleanupRule();
-      expect(rule.code.name.toLowerCase(), 'require_expando_cleanup');
+      expect(rule.code.lowerCaseName, 'require_expando_cleanup');
       expect(rule.code.problemMessage, contains('[require_expando_cleanup]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);

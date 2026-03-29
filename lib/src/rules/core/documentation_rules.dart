@@ -69,7 +69,7 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Skip private classes
-      if (node.name.lexeme.startsWith('_')) return;
+      if (node.namePart.typeName.lexeme.startsWith('_')) return;
 
       // Check for documentation comment
       if (node.documentationComment == null) {
@@ -89,7 +89,7 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
       // Check if in public class
       final ClassDeclaration? classDecl = node
           .thisOrAncestorOfType<ClassDeclaration>();
-      if (classDecl != null && classDecl.name.lexeme.startsWith('_')) return;
+      if (classDecl != null && classDecl.namePart.typeName.lexeme.startsWith('_')) return;
 
       if (node.documentationComment == null) {
         reporter.atNode(node);
@@ -659,10 +659,10 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Skip private classes
-      if (node.name.lexeme.startsWith('_')) return;
+      if (node.namePart.typeName.lexeme.startsWith('_')) return;
 
       // Only check complex classes
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
       bool isComplexClass = false;
       for (final String suffix in _complexClassSuffixes) {
         if (className.endsWith(suffix)) {
@@ -892,7 +892,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
   Set<String> _extractClassFieldNames(ClassDeclaration? classDecl) {
     if (classDecl == null) return const <String>{};
     final Set<String> names = <String>{};
-    for (final ClassMember member in classDecl.members) {
+    for (final ClassMember member in classDecl.body.members) {
       if (member is FieldDeclaration) {
         for (final VariableDeclaration variable in member.fields.variables) {
           names.add(variable.name.lexeme);
@@ -1049,15 +1049,15 @@ void _visitAllDocComments(
     // Member doc comments inside classes, enums, mixins, extensions
     final NodeList<ClassMember>? members;
     if (declaration is ClassDeclaration) {
-      members = declaration.members;
+      members = declaration.body.members;
     } else if (declaration is EnumDeclaration) {
-      members = declaration.members;
+      members = declaration.body.members;
     } else if (declaration is MixinDeclaration) {
-      members = declaration.members;
+      members = declaration.body.members;
     } else if (declaration is ExtensionDeclaration) {
-      members = declaration.members;
+      members = declaration.body.members;
     } else if (declaration is ExtensionTypeDeclaration) {
-      members = declaration.members;
+      members = declaration.body.members;
     } else {
       members = null;
     }
@@ -1496,7 +1496,7 @@ class DeprecatedNewInCommentReferenceRule extends SaropaLintRule {
   ) {
     checkDoc(decl.documentationComment);
     if (decl is ClassDeclaration) {
-      for (final ClassMember m in decl.members) {
+      for (final ClassMember m in decl.body.members) {
         if (m is MethodDeclaration) {
           checkDoc(m.documentationComment);
         } else if (m is FieldDeclaration) {
@@ -1506,21 +1506,21 @@ class DeprecatedNewInCommentReferenceRule extends SaropaLintRule {
         }
       }
     } else if (decl is MixinDeclaration) {
-      for (final ClassMember m in decl.members) {
+      for (final ClassMember m in decl.body.members) {
         if (m is MethodDeclaration) checkDoc(m.documentationComment);
         if (m is FieldDeclaration) checkDoc(m.documentationComment);
       }
     } else if (decl is EnumDeclaration) {
-      for (final EnumConstantDeclaration c in decl.constants) {
+      for (final EnumConstantDeclaration c in decl.body.constants) {
         checkDoc(c.documentationComment);
       }
-      for (final ClassMember m in decl.members) {
+      for (final ClassMember m in decl.body.members) {
         if (m is MethodDeclaration) checkDoc(m.documentationComment);
         if (m is FieldDeclaration) checkDoc(m.documentationComment);
         if (m is ConstructorDeclaration) checkDoc(m.documentationComment);
       }
     } else if (decl is ExtensionDeclaration) {
-      for (final ClassMember m in decl.members) {
+      for (final ClassMember m in decl.body.members) {
         if (m is MethodDeclaration) checkDoc(m.documentationComment);
         if (m is FieldDeclaration) checkDoc(m.documentationComment);
       }

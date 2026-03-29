@@ -13,7 +13,7 @@ void main() {
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
         final rule = create();
-        expect(rule.code.name.toLowerCase(), codeName);
+        expect(rule.code.lowerCaseName, codeName);
         expect(rule.code.problemMessage, contains('[$codeName]'));
         expect(rule.code.problemMessage.length, greaterThan(50));
         expect(rule.code.correctionMessage, isNotNull);
@@ -548,7 +548,7 @@ void main() {
       });
 
       test('rule name matches expected', () {
-        expect(rule.code.name, 'prefer_sentence_case_comments');
+        expect(rule.code.lowerCaseName, 'prefer_sentence_case_comments');
       });
 
       test('has capitalize quick fix', () {
@@ -561,7 +561,7 @@ void main() {
 
       test('does not conflict with relaxed variant name', () {
         final relaxed = PreferSentenceCaseCommentsRelaxedRule();
-        expect(rule.code.name, isNot(relaxed.code.name));
+        expect(rule.code.lowerCaseName, isNot(relaxed.code.lowerCaseName));
       });
     });
 
@@ -574,7 +574,7 @@ void main() {
       });
 
       test('rule name matches expected', () {
-        expect(rule.code.name, 'prefer_sentence_case_comments_relaxed');
+        expect(rule.code.lowerCaseName, 'prefer_sentence_case_comments_relaxed');
       });
 
       test('has capitalize quick fix', () {
@@ -659,7 +659,7 @@ void main() {
       setUp(() => rule = PreferDocCommentsOverRegularRule());
 
       test('rule metadata is v6', () {
-        expect(rule.code.name, 'prefer_doc_comments_over_regular');
+        expect(rule.code.lowerCaseName, 'prefer_doc_comments_over_regular');
         expect(rule.code.problemMessage, contains('{v6}'));
       });
 

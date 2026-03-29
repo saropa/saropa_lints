@@ -38,9 +38,9 @@ bool compilationUnitDeclaresClassLikeName(
   String typeName,
 ) {
   for (final CompilationUnitMember d in unit.declarations) {
-    if (d is ClassDeclaration && d.name.lexeme == typeName) return true;
+    if (d is ClassDeclaration && d.namePart.typeName.lexeme == typeName) return true;
     if (d is ClassTypeAlias && d.name.lexeme == typeName) return true;
-    if (d is EnumDeclaration && d.name.lexeme == typeName) return true;
+    if (d is EnumDeclaration && d.namePart.typeName.lexeme == typeName) return true;
     if (d is MixinDeclaration && d.name.lexeme == typeName) return true;
   }
   return false;

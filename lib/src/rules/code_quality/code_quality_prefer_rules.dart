@@ -1226,7 +1226,7 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
       final int majorDeclarations = classCount + enumCount + mixinCount;
       if (majorDeclarations > 1 && secondClass != null) {
         // Skip if it looks like a private helper class
-        if (secondClass.name.lexeme.startsWith('_')) return;
+        if (secondClass.namePart.typeName.lexeme.startsWith('_')) return;
 
         // Skip if all classes are abstract final with only static members
         // (pure constant / utility namespaces co-located for discoverability)
@@ -1255,7 +1255,7 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
       if (cls.abstractKeyword == null || cls.finalKeyword == null) {
         return false;
       }
-      for (final ClassMember member in cls.members) {
+      for (final ClassMember member in cls.body.members) {
         if (member is FieldDeclaration && !member.isStatic) return false;
         if (member is MethodDeclaration && !member.isStatic) return false;
       }
@@ -1513,7 +1513,7 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if class has an == operator
       MethodDeclaration? equalityOperator;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration &&
             member.name.lexeme == '==' &&
             member.isOperator) {

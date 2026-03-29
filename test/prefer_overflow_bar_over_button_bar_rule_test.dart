@@ -17,9 +17,7 @@ void main() {
 
   group('PreferOverflowBarOverButtonBarRule', () {
     test('is registered in allSaropaRules', () {
-      final names = allSaropaRules
-          .map((r) => r.code.name.toLowerCase())
-          .toSet();
+      final names = allSaropaRules.map((r) => r.code.lowerCaseName).toSet();
       expect(names.contains(ruleName), isTrue);
     });
 

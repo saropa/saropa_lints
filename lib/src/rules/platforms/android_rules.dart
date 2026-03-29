@@ -302,7 +302,7 @@ class RequireAndroid12SplashRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.name.lexeme.toLowerCase();
+      final String className = node.namePart.typeName.lexeme.toLowerCase();
 
       // Check for splash screen class names
       if (!className.contains('splash')) return;

@@ -35,9 +35,7 @@ void main() {
 
   group('Roadmap detail 9 rules - registration', () {
     test('all 8 new rules are registered in allSaropaRules', () {
-      final names = allSaropaRules
-          .map((r) => r.code.name.toLowerCase())
-          .toSet();
+      final names = allSaropaRules.map((r) => r.code.lowerCaseName).toSet();
       for (final name in allNewRules) {
         expect(
           names.contains(name),
@@ -52,8 +50,7 @@ void main() {
       () {
         final list = allSaropaRules
             .where(
-              (r) =>
-                  r.code.name.toLowerCase() == 'prefer_no_commented_out_code',
+              (r) => r.code.lowerCaseName == 'prefer_no_commented_out_code',
             )
             .toList();
         expect(list.isNotEmpty, isTrue);

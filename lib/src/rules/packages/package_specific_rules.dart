@@ -599,7 +599,7 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
 
       // Check for proper cleanup patterns in dispose
       MethodDeclaration? disposeMethod;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeMethod = member;
           break;
@@ -617,7 +617,7 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
         final keyboardControllerPattern = RegExp(
           r'\bKeyboardVisibilityController\b',
         );
-        for (final ClassMember member in node.members) {
+        for (final ClassMember member in node.body.members) {
           if (member is FieldDeclaration) {
             final String fieldSource = member.toSource();
             if (keyboardControllerPattern.hasMatch(fieldSource)) {
@@ -709,7 +709,7 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
       // Find SpeechToText fields
       final List<String> speechFieldNames = <String>[];
       final speechToTextPattern = RegExp(r'\bSpeechToText\b');
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null && speechToTextPattern.hasMatch(typeName)) {
@@ -725,7 +725,7 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
 
       // Find dispose method
       MethodDeclaration? disposeMethod;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeMethod = member;
           break;
@@ -740,7 +740,7 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
                 isFieldCleanedUp(name, 'cancel', disposeMethod.body));
 
         if (!isStopped) {
-          for (final ClassMember member in node.members) {
+          for (final ClassMember member in node.body.members) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
@@ -962,7 +962,7 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
   static bool _allFieldsHandleObfuscation(ClassDeclaration classDecl) {
     bool hasAnyField = false;
 
-    for (final ClassMember member in classDecl.members) {
+    for (final ClassMember member in classDecl.body.members) {
       if (member is! FieldDeclaration) continue;
 
       for (final Annotation annotation in member.metadata) {

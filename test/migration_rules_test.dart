@@ -34,7 +34,7 @@ void main() {
   group('Migration Rules - Rule Instantiation', () {
     test('AvoidAssetManifestJsonRule instantiates correctly', () {
       final rule = AvoidAssetManifestJsonRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_asset_manifest_json');
+      expect(rule.code.lowerCaseName, 'avoid_asset_manifest_json');
       expect(rule.code.problemMessage, contains('[avoid_asset_manifest_json]'));
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
@@ -42,7 +42,7 @@ void main() {
 
     test('PreferDropdownInitialValueRule instantiates correctly', () {
       final rule = PreferDropdownInitialValueRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_dropdown_initial_value');
+      expect(rule.code.lowerCaseName, 'prefer_dropdown_initial_value');
       expect(
         rule.code.problemMessage,
         contains('[prefer_dropdown_initial_value]'),
@@ -56,7 +56,7 @@ void main() {
       () {
         final rule = PreferDropdownMenuItemButtonOpacityAnimationRule();
         expect(
-          rule.code.name.toLowerCase(),
+          rule.code.lowerCaseName,
           'prefer_dropdown_menu_item_button_opacity_animation',
         );
         expect(
@@ -71,7 +71,7 @@ void main() {
 
     test('PreferOnPopWithResultRule instantiates correctly', () {
       final rule = PreferOnPopWithResultRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_on_pop_with_result');
+      expect(rule.code.lowerCaseName, 'prefer_on_pop_with_result');
       expect(rule.code.problemMessage, contains('[prefer_on_pop_with_result]'));
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
@@ -79,10 +79,7 @@ void main() {
 
     test('PreferTabbarThemeIndicatorColorRule instantiates correctly', () {
       final rule = PreferTabbarThemeIndicatorColorRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'prefer_tabbar_theme_indicator_color',
-      );
+      expect(rule.code.lowerCaseName, 'prefer_tabbar_theme_indicator_color');
       expect(
         rule.code.problemMessage,
         contains('[prefer_tabbar_theme_indicator_color]'),
@@ -94,10 +91,7 @@ void main() {
 
     test('PreferOverflowBarOverButtonBarRule instantiates correctly', () {
       final rule = PreferOverflowBarOverButtonBarRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'prefer_overflow_bar_over_button_bar',
-      );
+      expect(rule.code.lowerCaseName, 'prefer_overflow_bar_over_button_bar');
       expect(
         rule.code.problemMessage,
         contains('[prefer_overflow_bar_over_button_bar]'),
@@ -315,7 +309,7 @@ void main() {
 
     test('PreferPlatformMenuBarChildRule instantiates correctly', () {
       final rule = PreferPlatformMenuBarChildRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_platform_menu_bar_child');
+      expect(rule.code.lowerCaseName, 'prefer_platform_menu_bar_child');
       expect(
         rule.code.problemMessage,
         contains('[prefer_platform_menu_bar_child]'),
@@ -370,7 +364,7 @@ void main() {
 
     test('PreferKeepaliveDisposeRule instantiates correctly', () {
       final rule = PreferKeepaliveDisposeRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_keepalive_dispose');
+      expect(rule.code.lowerCaseName, 'prefer_keepalive_dispose');
       expect(rule.code.problemMessage, contains('[prefer_keepalive_dispose]'));
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
@@ -423,7 +417,7 @@ void main() {
 
     test('PreferContextMenuBuilderRule instantiates correctly', () {
       final rule = PreferContextMenuBuilderRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_context_menu_builder');
+      expect(rule.code.lowerCaseName, 'prefer_context_menu_builder');
       expect(
         rule.code.problemMessage,
         contains('[prefer_context_menu_builder]'),
@@ -472,7 +466,7 @@ void main() {
 
     test('PreferPanAxisRule instantiates correctly', () {
       final rule = PreferPanAxisRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_pan_axis');
+      expect(rule.code.lowerCaseName, 'prefer_pan_axis');
       expect(rule.code.problemMessage, contains('[prefer_pan_axis]'));
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
@@ -521,10 +515,7 @@ void main() {
 
     test('PreferButtonStyleIconAlignmentRule instantiates correctly', () {
       final rule = PreferButtonStyleIconAlignmentRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'prefer_button_style_icon_alignment',
-      );
+      expect(rule.code.lowerCaseName, 'prefer_button_style_icon_alignment');
       expect(
         rule.code.problemMessage,
         contains('[prefer_button_style_icon_alignment]'),
@@ -579,7 +570,7 @@ void main() {
 
     test('PreferKeyEventRule instantiates correctly', () {
       final rule = PreferKeyEventRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_key_event');
+      expect(rule.code.lowerCaseName, 'prefer_key_event');
       expect(rule.code.problemMessage, contains('[prefer_key_event]'));
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
@@ -646,7 +637,7 @@ void main() {
 
     test('PreferM3TextThemeRule instantiates correctly', () {
       final rule = PreferM3TextThemeRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_m3_text_theme');
+      expect(rule.code.lowerCaseName, 'prefer_m3_text_theme');
       expect(rule.code.problemMessage, contains('[prefer_m3_text_theme]'));
       expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
@@ -718,10 +709,7 @@ void main() {
   group('avoid_deprecated_flutter_test_window', () {
     test('AvoidDeprecatedFlutterTestWindowRule instantiates correctly', () {
       final rule = AvoidDeprecatedFlutterTestWindowRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'avoid_deprecated_flutter_test_window',
-      );
+      expect(rule.code.lowerCaseName, 'avoid_deprecated_flutter_test_window');
       expect(
         rule.code.problemMessage,
         contains('[avoid_deprecated_flutter_test_window]'),

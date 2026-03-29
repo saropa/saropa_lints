@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart';
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:test/test.dart';
 
 /// Tests for Dart SDK 3.0 removed-API migration rules.
@@ -221,7 +220,7 @@ void main() {
   group('rule instantiation', () {
     test('AvoidDeprecatedListConstructorRule', () {
       final rule = AvoidDeprecatedListConstructorRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_deprecated_list_constructor');
+      expect(rule.code.lowerCaseName, 'avoid_deprecated_list_constructor');
       expect(
         rule.code.problemMessage,
         contains('[avoid_deprecated_list_constructor]'),
@@ -233,7 +232,7 @@ void main() {
 
     test('AvoidRemovedProxyAnnotationRule', () {
       final rule = AvoidRemovedProxyAnnotationRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_removed_proxy_annotation');
+      expect(rule.code.lowerCaseName, 'avoid_removed_proxy_annotation');
       expect(
         rule.code.problemMessage,
         contains('[avoid_removed_proxy_annotation]'),
@@ -243,10 +242,7 @@ void main() {
 
     test('AvoidRemovedProvisionalAnnotationRule', () {
       final rule = AvoidRemovedProvisionalAnnotationRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'avoid_removed_provisional_annotation',
-      );
+      expect(rule.code.lowerCaseName, 'avoid_removed_provisional_annotation');
       expect(
         rule.code.problemMessage,
         contains('[avoid_removed_provisional_annotation]'),
@@ -256,7 +252,7 @@ void main() {
 
     test('AvoidDeprecatedExpiresGetterRule', () {
       final rule = AvoidDeprecatedExpiresGetterRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_deprecated_expires_getter');
+      expect(rule.code.lowerCaseName, 'avoid_deprecated_expires_getter');
       expect(
         rule.code.problemMessage,
         contains('[avoid_deprecated_expires_getter]'),
@@ -266,14 +262,14 @@ void main() {
 
     test('AvoidRemovedCastErrorRule', () {
       final rule = AvoidRemovedCastErrorRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_removed_cast_error');
+      expect(rule.code.lowerCaseName, 'avoid_removed_cast_error');
       expect(rule.code.problemMessage, contains('[avoid_removed_cast_error]'));
       expect(rule.fixGenerators, isNotEmpty);
     });
 
     test('AvoidRemovedFallThroughErrorRule', () {
       final rule = AvoidRemovedFallThroughErrorRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_removed_fall_through_error');
+      expect(rule.code.lowerCaseName, 'avoid_removed_fall_through_error');
       expect(
         rule.code.problemMessage,
         contains('[avoid_removed_fall_through_error]'),
@@ -283,7 +279,7 @@ void main() {
     test('AvoidRemovedAbstractClassInstantiationErrorRule', () {
       final rule = AvoidRemovedAbstractClassInstantiationErrorRule();
       expect(
-        rule.code.name.toLowerCase(),
+        rule.code.lowerCaseName,
         'avoid_removed_abstract_class_instantiation_error',
       );
       expect(
@@ -295,7 +291,7 @@ void main() {
     test('AvoidRemovedCyclicInitializationErrorRule', () {
       final rule = AvoidRemovedCyclicInitializationErrorRule();
       expect(
-        rule.code.name.toLowerCase(),
+        rule.code.lowerCaseName,
         'avoid_removed_cyclic_initialization_error',
       );
       expect(
@@ -307,7 +303,7 @@ void main() {
     test('AvoidRemovedNoSuchMethodErrorDefaultConstructorRule', () {
       final rule = AvoidRemovedNoSuchMethodErrorDefaultConstructorRule();
       expect(
-        rule.code.name.toLowerCase(),
+        rule.code.lowerCaseName,
         'avoid_removed_nosuchmethoderror_default_constructor',
       );
       expect(
@@ -318,10 +314,7 @@ void main() {
 
     test('AvoidRemovedBidirectionalIteratorRule', () {
       final rule = AvoidRemovedBidirectionalIteratorRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'avoid_removed_bidirectional_iterator',
-      );
+      expect(rule.code.lowerCaseName, 'avoid_removed_bidirectional_iterator');
       expect(
         rule.code.problemMessage,
         contains('[avoid_removed_bidirectional_iterator]'),
@@ -330,7 +323,7 @@ void main() {
 
     test('AvoidRemovedDeferredLibraryRule', () {
       final rule = AvoidRemovedDeferredLibraryRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_removed_deferred_library');
+      expect(rule.code.lowerCaseName, 'avoid_removed_deferred_library');
       expect(
         rule.code.problemMessage,
         contains('[avoid_removed_deferred_library]'),
@@ -339,10 +332,7 @@ void main() {
 
     test('AvoidDeprecatedHasNextIteratorRule', () {
       final rule = AvoidDeprecatedHasNextIteratorRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'avoid_deprecated_has_next_iterator',
-      );
+      expect(rule.code.lowerCaseName, 'avoid_deprecated_has_next_iterator');
       expect(
         rule.code.problemMessage,
         contains('[avoid_deprecated_has_next_iterator]'),
@@ -351,10 +341,7 @@ void main() {
 
     test('AvoidRemovedMaxUserTagsConstantRule', () {
       final rule = AvoidRemovedMaxUserTagsConstantRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'avoid_removed_max_user_tags_constant',
-      );
+      expect(rule.code.lowerCaseName, 'avoid_removed_max_user_tags_constant');
       expect(
         rule.code.problemMessage,
         contains('[avoid_removed_max_user_tags_constant]'),
@@ -364,10 +351,7 @@ void main() {
 
     test('AvoidRemovedDartDeveloperMetricsRule', () {
       final rule = AvoidRemovedDartDeveloperMetricsRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'avoid_removed_dart_developer_metrics',
-      );
+      expect(rule.code.lowerCaseName, 'avoid_removed_dart_developer_metrics');
       expect(
         rule.code.problemMessage,
         contains('[avoid_removed_dart_developer_metrics]'),
@@ -377,7 +361,7 @@ void main() {
     test('AvoidDeprecatedNetworkInterfaceListSupportedRule', () {
       final rule = AvoidDeprecatedNetworkInterfaceListSupportedRule();
       expect(
-        rule.code.name.toLowerCase(),
+        rule.code.lowerCaseName,
         'avoid_deprecated_network_interface_list_supported',
       );
       expect(
@@ -388,7 +372,7 @@ void main() {
 
     test('AvoidRemovedNullThrownErrorRule', () {
       final rule = AvoidRemovedNullThrownErrorRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_removed_null_thrown_error');
+      expect(rule.code.lowerCaseName, 'avoid_removed_null_thrown_error');
       expect(
         rule.code.problemMessage,
         contains('[avoid_removed_null_thrown_error]'),

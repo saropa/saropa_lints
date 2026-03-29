@@ -13,7 +13,7 @@ void main() {
   group('Error Handling Rules - Rule Instantiation', () {
     test('AvoidSwallowingExceptionsRule', () {
       final rule = AvoidSwallowingExceptionsRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_swallowing_exceptions');
+      expect(rule.code.lowerCaseName, 'avoid_swallowing_exceptions');
       expect(
         rule.code.problemMessage,
         contains('[avoid_swallowing_exceptions]'),
@@ -23,35 +23,35 @@ void main() {
     });
     test('AvoidLosingStackTraceRule', () {
       final rule = AvoidLosingStackTraceRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_losing_stack_trace');
+      expect(rule.code.lowerCaseName, 'avoid_losing_stack_trace');
       expect(rule.code.problemMessage, contains('[avoid_losing_stack_trace]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidGenericExceptionsRule', () {
       final rule = AvoidGenericExceptionsRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_generic_exceptions');
+      expect(rule.code.lowerCaseName, 'avoid_generic_exceptions');
       expect(rule.code.problemMessage, contains('[avoid_generic_exceptions]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireErrorContextRule', () {
       final rule = RequireErrorContextRule();
-      expect(rule.code.name.toLowerCase(), 'require_error_context');
+      expect(rule.code.lowerCaseName, 'require_error_context');
       expect(rule.code.problemMessage, contains('[require_error_context]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('PreferResultPatternRule', () {
       final rule = PreferResultPatternRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_result_pattern');
+      expect(rule.code.lowerCaseName, 'prefer_result_pattern');
       expect(rule.code.problemMessage, contains('[prefer_result_pattern]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireAsyncErrorDocumentationRule', () {
       final rule = RequireAsyncErrorDocumentationRule();
-      expect(rule.code.name.toLowerCase(), 'require_async_error_documentation');
+      expect(rule.code.lowerCaseName, 'require_async_error_documentation');
       expect(
         rule.code.problemMessage,
         contains('[require_async_error_documentation]'),
@@ -61,7 +61,7 @@ void main() {
     });
     test('AvoidNestedTryStatementsRule', () {
       final rule = AvoidNestedTryStatementsRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_nested_try_statements');
+      expect(rule.code.lowerCaseName, 'avoid_nested_try_statements');
       expect(
         rule.code.problemMessage,
         contains('[avoid_nested_try_statements]'),
@@ -71,14 +71,14 @@ void main() {
     });
     test('RequireErrorBoundaryRule', () {
       final rule = RequireErrorBoundaryRule();
-      expect(rule.code.name.toLowerCase(), 'require_error_boundary');
+      expect(rule.code.lowerCaseName, 'require_error_boundary');
       expect(rule.code.problemMessage, contains('[require_error_boundary]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidUncaughtFutureErrorsRule', () {
       final rule = AvoidUncaughtFutureErrorsRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_uncaught_future_errors');
+      expect(rule.code.lowerCaseName, 'avoid_uncaught_future_errors');
       expect(
         rule.code.problemMessage,
         contains('[avoid_uncaught_future_errors]'),
@@ -88,14 +88,14 @@ void main() {
     });
     test('AvoidPrintErrorRule', () {
       final rule = AvoidPrintErrorRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_print_error');
+      expect(rule.code.lowerCaseName, 'avoid_print_error');
       expect(rule.code.problemMessage, contains('[avoid_print_error]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireErrorHandlingGracefulRule', () {
       final rule = RequireErrorHandlingGracefulRule();
-      expect(rule.code.name.toLowerCase(), 'require_error_handling_graceful');
+      expect(rule.code.lowerCaseName, 'require_error_handling_graceful');
       expect(
         rule.code.problemMessage,
         contains('[require_error_handling_graceful]'),
@@ -105,14 +105,14 @@ void main() {
     });
     test('AvoidCatchAllRule', () {
       final rule = AvoidCatchAllRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_catch_all');
+      expect(rule.code.lowerCaseName, 'avoid_catch_all');
       expect(rule.code.problemMessage, contains('[avoid_catch_all]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidCatchExceptionAloneRule', () {
       final rule = AvoidCatchExceptionAloneRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_catch_exception_alone');
+      expect(rule.code.lowerCaseName, 'avoid_catch_exception_alone');
       expect(
         rule.code.problemMessage,
         contains('[avoid_catch_exception_alone]'),
@@ -122,7 +122,7 @@ void main() {
     });
     test('AvoidExceptionInConstructorRule', () {
       final rule = AvoidExceptionInConstructorRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_exception_in_constructor');
+      expect(rule.code.lowerCaseName, 'avoid_exception_in_constructor');
       expect(
         rule.code.problemMessage,
         contains('[avoid_exception_in_constructor]'),
@@ -132,7 +132,7 @@ void main() {
     });
     test('RequireCacheKeyDeterminismRule', () {
       final rule = RequireCacheKeyDeterminismRule();
-      expect(rule.code.name.toLowerCase(), 'require_cache_key_determinism');
+      expect(rule.code.lowerCaseName, 'require_cache_key_determinism');
       expect(
         rule.code.problemMessage,
         contains('[require_cache_key_determinism]'),
@@ -143,7 +143,7 @@ void main() {
     test('RequirePermissionPermanentDenialHandlingRule', () {
       final rule = RequirePermissionPermanentDenialHandlingRule();
       expect(
-        rule.code.name.toLowerCase(),
+        rule.code.lowerCaseName,
         'require_permission_permanent_denial_handling',
       );
       expect(
@@ -155,10 +155,7 @@ void main() {
     });
     test('RequireNotificationActionHandlingRule', () {
       final rule = RequireNotificationActionHandlingRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'require_notification_action_handling',
-      );
+      expect(rule.code.lowerCaseName, 'require_notification_action_handling');
       expect(
         rule.code.problemMessage,
         contains('[require_notification_action_handling]'),
@@ -168,24 +165,21 @@ void main() {
     });
     test('RequireFinallyCleanupRule', () {
       final rule = RequireFinallyCleanupRule();
-      expect(rule.code.name.toLowerCase(), 'require_finally_cleanup');
+      expect(rule.code.lowerCaseName, 'require_finally_cleanup');
       expect(rule.code.problemMessage, contains('[require_finally_cleanup]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireErrorLoggingRule', () {
       final rule = RequireErrorLoggingRule();
-      expect(rule.code.name.toLowerCase(), 'require_error_logging');
+      expect(rule.code.lowerCaseName, 'require_error_logging');
       expect(rule.code.problemMessage, contains('[require_error_logging]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireAppStartupErrorHandlingRule', () {
       final rule = RequireAppStartupErrorHandlingRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'require_app_startup_error_handling',
-      );
+      expect(rule.code.lowerCaseName, 'require_app_startup_error_handling');
       expect(
         rule.code.problemMessage,
         contains('[require_app_startup_error_handling]'),
@@ -195,7 +189,7 @@ void main() {
     });
     test('AvoidAssertInProductionRule', () {
       final rule = AvoidAssertInProductionRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_assert_in_production');
+      expect(rule.code.lowerCaseName, 'avoid_assert_in_production');
       expect(
         rule.code.problemMessage,
         contains('[avoid_assert_in_production]'),
@@ -205,7 +199,7 @@ void main() {
     });
     test('HandleThrowingInvocationsRule', () {
       final rule = HandleThrowingInvocationsRule();
-      expect(rule.code.name.toLowerCase(), 'handle_throwing_invocations');
+      expect(rule.code.lowerCaseName, 'handle_throwing_invocations');
       expect(
         rule.code.problemMessage,
         contains('[handle_throwing_invocations]'),

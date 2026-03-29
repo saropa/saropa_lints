@@ -539,7 +539,7 @@ class PreferSingleWidgetPerFileRule extends SaropaLintRule {
       for (final CompilationUnitMember member in node.declarations) {
         if (member is ClassDeclaration) {
           // Check if public (not starting with _)
-          if (member.name.lexeme.startsWith('_')) continue;
+          if (member.namePart.typeName.lexeme.startsWith('_')) continue;
 
           // Check if extends Widget
           final ExtendsClause? extendsClause = member.extendsClause;
@@ -678,7 +678,7 @@ class PreferWidgetPrivateMembersRule extends SaropaLintRule {
       final String superclass = extendsClause.superclass.name.lexeme;
       if (!_widgetBaseClasses.contains(superclass)) return;
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         // Check for non-final public fields
         if (member is FieldDeclaration) {
           if (member.isStatic) continue;
@@ -4686,7 +4686,7 @@ class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
 
       // Check if initialized in initState
       String? initStateBody;
-      for (final member in parent.members) {
+      for (final member in parent.body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'initState') {
           initStateBody = member.body.toSource();
           break;

@@ -11,7 +11,7 @@ void main() {
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
         final rule = create();
-        expect(rule.code.name.toLowerCase(), codeName);
+        expect(rule.code.lowerCaseName, codeName);
         expect(rule.code.problemMessage, contains('[$codeName]'));
         expect(rule.code.problemMessage.length, greaterThan(50));
         expect(rule.code.correctionMessage, isNotNull);
@@ -431,7 +431,7 @@ void main() {
       test('rule instantiation', () {
         final rule = InvalidVisibleOutsideTemplateAnnotationRule();
         expect(
-          rule.code.name.toLowerCase(),
+          rule.code.lowerCaseName,
           'invalid_visible_outside_template_annotation',
         );
         expect(

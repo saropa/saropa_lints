@@ -257,7 +257,7 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
       if (superName != 'State') return;
       // Find RealtimeChannel fields
       final List<String> channelNames = <String>[];
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null && realtimeChannelRegex.hasMatch(typeName)) {
@@ -273,7 +273,7 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
 
       // Find dispose method
       String? disposeBody;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeBody = member.body.toSource();
           break;
@@ -288,7 +288,7 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
                 removeChannelRegex.hasMatch(disposeBody));
 
         if (!isUnsubscribed) {
-          for (final ClassMember member in node.members) {
+          for (final ClassMember member in node.body.members) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {

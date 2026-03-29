@@ -93,12 +93,6 @@ export 'project_context.dart'
         ThrottledAnalysis,
         ViolationBatch;
 
-/// Analyzer 9: LintCode has no lowerCaseName; this extension provides it.
-/// Public so tests and other libraries that import saropa_lint_rule get it.
-extension LintCodeLowerCase on LintCode {
-  String get lowerCaseName => name.toLowerCase();
-}
-
 // =============================================================================
 // RULE TIMING INSTRUMENTATION (Performance Profiling)
 // =============================================================================

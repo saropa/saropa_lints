@@ -372,7 +372,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String name = node.name.lexeme;
+      final String name = node.namePart.typeName.lexeme;
 
       // Skip private classes
       if (name.startsWith('_')) return;
@@ -406,7 +406,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
               !name.endsWith('Builder')) {
             // Allow any name for widgets, but warn if very generic
             if (name.length < 4) {
-              reporter.atToken(node.name, code);
+              reporter.atToken(node.namePart.typeName, code);
             }
           }
         }
@@ -414,7 +414,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
         // State classes should end with State
         if (superName == 'State') {
           if (!name.endsWith('State') && !name.startsWith('_')) {
-            reporter.atToken(node.name, code);
+            reporter.atToken(node.namePart.typeName, code);
           }
         }
       }
@@ -473,7 +473,7 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Collect private field names
       final Set<String> privateFields = <String>{};
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final String name = variable.name.lexeme;
@@ -485,7 +485,7 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
       }
 
       // Check getters
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration && member.isGetter) {
           final String getterName = member.name.lexeme;
 
@@ -1887,10 +1887,10 @@ class PreferMatchFileNameRule extends SaropaLintRule {
       // Only check the first public class
       for (final CompilationUnitMember member in node.declarations) {
         if (member is ClassDeclaration) {
-          final String className = member.name.lexeme;
+          final String className = member.namePart.typeName.lexeme;
           if (className.startsWith('_')) continue;
           if (className != expectedClassName) {
-            reporter.atToken(member.name, code);
+            reporter.atToken(member.namePart.typeName, code);
           }
           return; // Only check the first public class
         }
@@ -2166,9 +2166,9 @@ class PreferBasePrefixRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword == null) return;
-      final String name = node.name.lexeme;
+      final String name = node.namePart.typeName.lexeme;
       if (name.endsWith('Base')) return;
-      reporter.atToken(node.name, code);
+      reporter.atToken(node.namePart.typeName, code);
     });
   }
 }
@@ -2297,9 +2297,9 @@ class PreferIPrefixInterfacesRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword == null) return;
-      final String name = node.name.lexeme;
+      final String name = node.namePart.typeName.lexeme;
       if (name.startsWith('I') && name.length > 1) return;
-      reporter.atToken(node.name, code);
+      reporter.atToken(node.namePart.typeName, code);
     });
   }
 }
@@ -2341,11 +2341,11 @@ class PreferNoIPrefixInterfacesRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword == null) return;
-      final String name = node.name.lexeme;
+      final String name = node.namePart.typeName.lexeme;
       if (!name.startsWith('I') || name.length < 2) return;
       final String second = name[1];
       if (second != second.toUpperCase() && second != '_') return;
-      reporter.atToken(node.name, code);
+      reporter.atToken(node.namePart.typeName, code);
     });
   }
 }
@@ -2389,9 +2389,9 @@ class PreferImplSuffixRule extends SaropaLintRule {
       final clause = node.implementsClause;
       if (clause == null) return;
       if (clause.interfaces.isEmpty) return;
-      final String name = node.name.lexeme;
+      final String name = node.namePart.typeName.lexeme;
       if (name.endsWith('Impl')) return;
-      reporter.atToken(node.name, code);
+      reporter.atToken(node.namePart.typeName, code);
     });
   }
 }
@@ -2529,7 +2529,7 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
     final Set<String> enumNames = <String>{};
 
     context.addEnumDeclaration((EnumDeclaration node) {
-      enumNames.add(node.name.lexeme);
+      enumNames.add(node.namePart.typeName.lexeme);
     });
 
     // Check for extensions on enums
@@ -2763,10 +2763,11 @@ class PreferCorrectPackageNameRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addLibraryDirective((LibraryDirective node) {
-      final LibraryIdentifier? libName = node.name;
+      // LibraryIdentifier replaced by DottedName in analyzer 12
+      final DottedName? libName = node.name;
       if (libName == null) return; // `library;` without name is valid
 
-      final String libraryName = libName.name;
+      final String libraryName = libName.toSource();
       if (libraryName.isEmpty) return;
 
       if (!_validPackageName.hasMatch(libraryName)) {
@@ -3051,13 +3052,13 @@ class PreferNounClassNamesRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       if (node.abstractKeyword != null) return;
-      final name = node.name.lexeme;
+      final name = node.namePart.typeName.lexeme;
       if (name.endsWith('ing') && !_ingAllowlist.contains(name)) {
-        reporter.atToken(node.name);
+        reporter.atToken(node.namePart.typeName);
         return;
       }
       if ((name.endsWith('able') || name.endsWith('ible'))) {
-        reporter.atToken(node.name);
+        reporter.atToken(node.namePart.typeName);
       }
     });
   }

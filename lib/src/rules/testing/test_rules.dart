@@ -222,7 +222,7 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
         if (declaration is FunctionDeclaration) {
           name = declaration.name.lexeme;
         } else if (declaration is ClassDeclaration) {
-          name = declaration.name.lexeme;
+          name = declaration.namePart.typeName.lexeme;
         } else if (declaration is TopLevelVariableDeclaration) {
           for (final VariableDeclaration variable
               in declaration.variables.variables) {
@@ -233,7 +233,7 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
           }
           continue;
         } else if (declaration is EnumDeclaration) {
-          name = declaration.name.lexeme;
+          name = declaration.namePart.typeName.lexeme;
         } else if (declaration is MixinDeclaration) {
           name = declaration.name.lexeme;
         } else if (declaration is ExtensionDeclaration) {

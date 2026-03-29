@@ -188,7 +188,7 @@ class RequireBlocCloseRule extends SaropaLintRule {
       final List<String> blocNames = <String>[];
       final blocGenericPattern = RegExp(r'\bBloc\s*<');
       final cubitGenericPattern = RegExp(r'\bCubit\s*<');
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             // Only check fields with initializers (locally created)
@@ -225,7 +225,7 @@ class RequireBlocCloseRule extends SaropaLintRule {
 
       // Find dispose method body
       MethodDeclaration? disposeMethod;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeMethod = member;
           break;
@@ -241,7 +241,7 @@ class RequireBlocCloseRule extends SaropaLintRule {
 
         if (!isClosed) {
           // Find and report the field declaration
-          for (final ClassMember member in node.members) {
+          for (final ClassMember member in node.body.members) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
@@ -345,7 +345,7 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
 
       // Check if class name ends with 'State' (BLoC convention)
       if (!className.endsWith('State')) return;
@@ -412,7 +412,7 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
       }
 
       if (!hasImmutable && !hasEquatable) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
       }
     });
   }
@@ -496,7 +496,7 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
 
       // If only 1-2 simple events, suggest Cubit
       if (eventCount <= 2) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
       }
     });
   }
@@ -742,11 +742,11 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if this is an event class (naming convention)
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
       if (!className.endsWith('Event')) return;
 
       // Check for mutable fields
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           if (!member.isStatic && !member.fields.isFinal) {
             reporter.atNode(member);
@@ -969,7 +969,7 @@ class RequireInitialStateRule extends SaropaLintRule {
       if (superName != 'Bloc' && superName != 'Cubit') return;
 
       // Check constructors have super with argument
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is ConstructorDeclaration) {
           bool hasSuperWithArg = false;
           for (final ConstructorInitializer init in member.initializers) {
@@ -1047,7 +1047,7 @@ class RequireErrorStateRule extends SaropaLintRule {
     final Set<String> sealedBases = <String>{};
 
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
       if (className.endsWith('State')) {
         stateClasses[className] = node;
         if (node.sealedKeyword != null) {
@@ -1152,7 +1152,7 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
 
       // Check for Bloc fields that are used with .add()
       final Set<String> blocFields = <String>{};
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration field in member.fields.variables) {
             final String fieldType = member.fields.type?.toSource() ?? '';
@@ -1165,7 +1165,7 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
       }
 
       // Check for .add() calls on bloc fields
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration) {
           member.body.visitChildren(
             _BlocAddVisitor(reporter, code, blocFields),
@@ -1247,7 +1247,7 @@ class PreferSealedEventsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
       if (!className.endsWith('Event')) return;
 
       // Check if abstract but not sealed
@@ -2006,7 +2006,7 @@ class AvoidDuplicateBlocEventHandlersRule extends SaropaLintRule {
 
       // Find constructor
       ConstructorDeclaration? constructor;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is ConstructorDeclaration && member.name == null) {
           constructor = member;
           break;
@@ -2117,11 +2117,11 @@ class PreferImmutableBlocEventsRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with Event
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
       if (!className.endsWith('Event')) return;
 
       // Check for mutable fields
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration && !member.isStatic) {
           final VariableDeclarationList fields = member.fields;
           if (!fields.isFinal && !fields.isConst) {
@@ -2192,7 +2192,7 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with State
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
       if (!className.endsWith('State')) return;
 
       // Exclude Flutter's State class by checking for extends StatefulWidget
@@ -2203,7 +2203,7 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
       }
 
       // Check for mutable fields
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration && !member.isStatic) {
           final VariableDeclarationList fields = member.fields;
           if (!fields.isFinal && !fields.isConst) {
@@ -2270,7 +2270,7 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with Event
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
       if (!className.endsWith('Event')) return;
 
       // Check if it's a base class (abstract without extending another Event)
@@ -2346,7 +2346,7 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with State
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
       if (!className.endsWith('State')) return;
 
       // Check if it's a base class (abstract without extending another State)
@@ -2437,7 +2437,7 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
       // Check if this class extends something that ends with Event
       // but this class itself doesn't end with Event
       if (superName.endsWith('Event')) {
-        final String className = node.name.lexeme;
+        final String className = node.namePart.typeName.lexeme;
         if (!className.endsWith('Event')) {
           reporter.atNode(node);
         }
@@ -2514,7 +2514,7 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
       // Check if this class extends something that ends with State (but not Flutter's State)
       // and this class itself doesn't end with State
       if (superName.endsWith('State') && superName != 'State') {
-        final String className = node.name.lexeme;
+        final String className = node.namePart.typeName.lexeme;
         if (!className.endsWith('State')) {
           reporter.atNode(node);
         }
@@ -2725,7 +2725,7 @@ class AvoidBlocPublicFieldsRule extends SaropaLintRule {
       if (superName != 'Bloc' && superName != 'Cubit') return;
 
       // Check for public non-final fields
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           // Skip if private (starts with _)
           for (final VariableDeclaration field in member.fields.variables) {
@@ -2819,7 +2819,7 @@ class AvoidBlocPublicMethodsRule extends SaropaLintRule {
       if (superName != 'Bloc') return;
 
       // Check for public methods
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme;
           // Skip private, allowed, and overrides
@@ -3200,7 +3200,7 @@ class RequireBlocInitialStateRule extends SaropaLintRule {
       if (superName != 'Bloc' && superName != 'Cubit') return;
 
       // Find constructors
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is ConstructorDeclaration) {
           // Check for super initializer
           bool hasSuperInit = false;
@@ -3378,11 +3378,11 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if sealed class ending with State
       if (node.sealedKeyword == null) return;
-      if (!node.name.lexeme.endsWith('State')) return;
+      if (!node.namePart.typeName.lexeme.endsWith('State')) return;
 
       // This is a sealed state class - check file for error subclass
       final fileSource = context.fileContent;
-      final className = node.name.lexeme;
+      final className = node.namePart.typeName.lexeme;
       final baseName = className.replaceAll('State', '');
 
       // Look for error/failure subclass
@@ -3498,7 +3498,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
 
       // Find disposable fields
       final List<String> disposableFields = <String>[];
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null) {
@@ -3534,7 +3534,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
       // Check for close() method
       bool hasCloseMethod = false;
       String? closeBody;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'close') {
           hasCloseMethod = true;
           closeBody = member.body.toSource();
@@ -3544,7 +3544,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
 
       if (!hasCloseMethod) {
         // No close() method at all
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
         return;
       }
 
@@ -3561,7 +3561,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
 
         if (!isCleaned) {
           // Report the specific field that's not cleaned up
-          for (final ClassMember member in node.members) {
+          for (final ClassMember member in node.body.members) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
@@ -3654,7 +3654,7 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
       int eventHandlerCount = 0;
       final Set<String> eventTypes = <String>{};
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is ConstructorDeclaration) {
           final String bodySource = member.body.toSource();
 
@@ -3675,7 +3675,7 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
 
       // If only one event type is handled, suggest Cubit
       if (eventHandlerCount == 1 && eventTypes.length == 1) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
       }
     });
   }
@@ -3959,7 +3959,7 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
       if (!_blocSuperclasses.contains(superclassName)) return;
 
       // Check constructors for BuildContext parameter
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is ConstructorDeclaration) {
           final FormalParameterList? params = member.parameters;
           if (params == null) continue;
@@ -4130,13 +4130,13 @@ class RequireBlocEventSealedRule extends SaropaLintRule {
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if class name ends with Event
-      final name = node.name.lexeme;
+      final name = node.namePart.typeName.lexeme;
       if (!name.endsWith('Event')) return;
 
       // Check if it's abstract but not sealed
       if (node.abstractKeyword != null && node.sealedKeyword == null) {
         // Make sure it looks like a Bloc event (has subclasses pattern)
-        if (node.members.isEmpty || _looksLikeBlocEvent(node)) {
+        if (node.body.members.isEmpty || _looksLikeBlocEvent(node)) {
           reporter.atNode(node);
         }
       }
@@ -4145,10 +4145,10 @@ class RequireBlocEventSealedRule extends SaropaLintRule {
 
   bool _looksLikeBlocEvent(ClassDeclaration node) {
     // Empty body is common for event base classes
-    if (node.members.isEmpty) return true;
+    if (node.body.members.isEmpty) return true;
 
     // Only has constructors
-    return node.members.every((member) => member is ConstructorDeclaration);
+    return node.body.members.every((member) => member is ConstructorDeclaration);
   }
 }
 
@@ -4242,7 +4242,7 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
       if (superName != 'Bloc' && superName != 'Cubit') return;
 
       // Check fields for concrete repository types
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is FieldDeclaration) {
           final type = member.fields.type;
           if (type == null) continue;
@@ -4450,7 +4450,7 @@ class AvoidPassingBlocToBlocRule extends SaropaLintRule {
       if (superName != 'Bloc' && superName != 'Cubit') return;
 
       // Check constructor parameters for Bloc types
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is ConstructorDeclaration) {
           _checkConstructorParams(member, reporter);
         }
@@ -4563,7 +4563,7 @@ class AvoidPassingBuildContextToBlocsRule extends SaropaLintRule {
       if (superName != 'Bloc' && superName != 'Cubit') return;
 
       // Check constructor parameters
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is ConstructorDeclaration) {
           _checkForBuildContext(member, reporter);
         }
@@ -4665,7 +4665,7 @@ class AvoidReturningValueFromCubitMethodsRule extends SaropaLintRule {
       if (superName != 'Cubit') return;
 
       // Check methods
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is MethodDeclaration) {
           _checkMethod(member, reporter);
         }
@@ -4787,7 +4787,7 @@ class RequireBlocRepositoryInjectionRule extends SaropaLintRule {
       if (superName != 'Bloc' && superName != 'Cubit') return;
 
       // Check for repository creation inside constructors or field initializers
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is ConstructorDeclaration) {
           _checkConstructor(member, reporter);
         }
@@ -4915,25 +4915,25 @@ class PreferBlocHydrationRule extends SaropaLintRule {
       if (superName != 'Bloc' && superName != 'Cubit') return;
 
       // Check for SharedPreferences usage
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is FieldDeclaration) {
           final typeName = member.fields.type?.toSource();
           if (typeName == 'SharedPreferences') {
-            reporter.atToken(node.name, code);
+            reporter.atToken(node.namePart.typeName, code);
             return;
           }
         }
       }
 
       // Also check method bodies for SharedPreferences calls
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is MethodDeclaration) {
           bool hasSharedPrefs = false;
           member.body.visitChildren(
             _SharedPrefsUsageVisitor(() => hasSharedPrefs = true),
           );
           if (hasSharedPrefs) {
-            reporter.atToken(node.name, code);
+            reporter.atToken(node.namePart.typeName, code);
             return;
           }
         }
@@ -5108,7 +5108,7 @@ class AvoidOverengineeredBlocStatesRule extends SaropaLintRule {
         <String, List<ClassDeclaration>>{};
 
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
 
       // Check if this is a state base class (abstract class ending in State)
       if (node.abstractKeyword != null && className.endsWith('State')) {

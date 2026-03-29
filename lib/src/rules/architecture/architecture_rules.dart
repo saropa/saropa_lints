@@ -88,7 +88,7 @@ class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
       }
 
       // Check fields for data layer dependencies
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null) {
@@ -190,7 +190,7 @@ class AvoidBusinessLogicInUiRule extends SaropaLintRule {
       }
 
       // Check methods for business logic
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme.toLowerCase();
 
@@ -266,10 +266,10 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
 
       // Check constructor parameters for same-package service dependencies
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is ConstructorDeclaration) {
           for (final FormalParameter param in member.parameters.parameters) {
             String? paramType;
@@ -380,7 +380,7 @@ class AvoidGodClassRule extends SaropaLintRule {
       int fieldCount = 0;
       int methodCount = 0;
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           // Skip static const/final fields — they are compile-time or
           // lazy constants, not instance state indicating a god class.
@@ -642,11 +642,11 @@ class AvoidSingletonPatternRule extends SaropaLintRule {
       bool hasFactoryConstructor = false;
       bool hasPrivateConstructor = false;
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         // Check for static instance field
         if (member is FieldDeclaration && member.isStatic) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName == node.name.lexeme) {
+          if (typeName == node.namePart.typeName.lexeme) {
             hasStaticInstance = true;
           }
         }

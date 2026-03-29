@@ -107,7 +107,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
       // Find Worker fields
       final List<String> workerFields = <String>[];
       final workerListRegex = RegExp(r'\bList\s*<\s*Worker\s*>');
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null &&
@@ -126,7 +126,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
 
       // Find onClose method and check for dispose calls
       MethodDeclaration? onCloseMethod;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'onClose') {
           onCloseMethod = member;
           break;
@@ -140,7 +140,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
             isFieldCleanedUp(fieldName, 'dispose', onCloseMethod.body);
 
         if (!isDisposed) {
-          for (final ClassMember member in node.members) {
+          for (final ClassMember member in node.body.members) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
@@ -834,7 +834,7 @@ class RequireGetxLazyPutRule extends SaropaLintRule {
       }
       if (current is ClassDeclaration) {
         // Check if inside a Bindings class
-        final String className = current.name.lexeme;
+        final String className = current.namePart.typeName.lexeme;
         if (className.endsWith('Binding') || className.endsWith('Module')) {
           return true;
         }
@@ -1033,7 +1033,7 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
         r'\b(' + _disposableTypes.map(RegExp.escape).join(r'|') + r')\b',
       );
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null && disposableTypesRegex.hasMatch(typeName)) {
@@ -1049,7 +1049,7 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
       }
 
       if (hasDisposable && !hasOnClose) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
       }
     });
   }
@@ -1601,7 +1601,7 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
 
       // Find Worker fields
       final List<String> workerFields = <String>[];
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toString();
           if (typeName == 'Worker' || typeName == 'Worker?') {
@@ -1619,7 +1619,7 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
       bool hasOnClose = false;
       final Set<String> disposedFields = <String>{};
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'onClose') {
           hasOnClose = true;
           // Check for dispose calls

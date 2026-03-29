@@ -10,14 +10,14 @@ void main() {
   group('Configuration Rules - Rule Instantiation', () {
     test('AvoidHardcodedConfigRule', () {
       final rule = AvoidHardcodedConfigRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_hardcoded_config');
+      expect(rule.code.lowerCaseName, 'avoid_hardcoded_config');
       expect(rule.code.problemMessage, contains('[avoid_hardcoded_config]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidHardcodedConfigTestRule', () {
       final rule = AvoidHardcodedConfigTestRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_hardcoded_config_test');
+      expect(rule.code.lowerCaseName, 'avoid_hardcoded_config_test');
       expect(
         rule.code.problemMessage,
         contains('[avoid_hardcoded_config_test]'),
@@ -27,14 +27,14 @@ void main() {
     });
     test('AvoidMixedEnvironmentsRule', () {
       final rule = AvoidMixedEnvironmentsRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_mixed_environments');
+      expect(rule.code.lowerCaseName, 'avoid_mixed_environments');
       expect(rule.code.problemMessage, contains('[avoid_mixed_environments]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireFeatureFlagTypeSafetyRule', () {
       final rule = RequireFeatureFlagTypeSafetyRule();
-      expect(rule.code.name.toLowerCase(), 'require_feature_flag_type_safety');
+      expect(rule.code.lowerCaseName, 'require_feature_flag_type_safety');
       expect(
         rule.code.problemMessage,
         contains('[require_feature_flag_type_safety]'),
@@ -44,14 +44,14 @@ void main() {
     });
     test('AvoidStringEnvParsingRule', () {
       final rule = AvoidStringEnvParsingRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_string_env_parsing');
+      expect(rule.code.lowerCaseName, 'avoid_string_env_parsing');
       expect(rule.code.problemMessage, contains('[avoid_string_env_parsing]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidPlatformSpecificImportsRule', () {
       final rule = AvoidPlatformSpecificImportsRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_platform_specific_imports');
+      expect(rule.code.lowerCaseName, 'avoid_platform_specific_imports');
       expect(
         rule.code.problemMessage,
         contains('[avoid_platform_specific_imports]'),
@@ -61,14 +61,14 @@ void main() {
     });
     test('PreferSemverVersionRule', () {
       final rule = PreferSemverVersionRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_semver_version');
+      expect(rule.code.lowerCaseName, 'prefer_semver_version');
       expect(rule.code.problemMessage, contains('[prefer_semver_version]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('PreferCompileTimeConfigRule', () {
       final rule = PreferCompileTimeConfigRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_compile_time_config');
+      expect(rule.code.lowerCaseName, 'prefer_compile_time_config');
       expect(
         rule.code.problemMessage,
         contains('[prefer_compile_time_config]'),
@@ -78,7 +78,7 @@ void main() {
     });
     test('PreferFlavorConfigurationRule', () {
       final rule = PreferFlavorConfigurationRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_flavor_configuration');
+      expect(rule.code.lowerCaseName, 'prefer_flavor_configuration');
       expect(
         rule.code.problemMessage,
         contains('[prefer_flavor_configuration]'),
@@ -88,28 +88,28 @@ void main() {
     });
     test('PackageNamesRule', () {
       final rule = PackageNamesRule();
-      expect(rule.code.name.toLowerCase(), 'package_names');
+      expect(rule.code.lowerCaseName, 'package_names');
       expect(rule.code.problemMessage, contains('[package_names]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('SortPubDependenciesRule', () {
       final rule = SortPubDependenciesRule();
-      expect(rule.code.name.toLowerCase(), 'sort_pub_dependencies');
+      expect(rule.code.lowerCaseName, 'sort_pub_dependencies');
       expect(rule.code.problemMessage, contains('[sort_pub_dependencies]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('SecurePubspecUrlsRule', () {
       final rule = SecurePubspecUrlsRule();
-      expect(rule.code.name.toLowerCase(), 'secure_pubspec_urls');
+      expect(rule.code.lowerCaseName, 'secure_pubspec_urls');
       expect(rule.code.problemMessage, contains('[secure_pubspec_urls]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('DependOnReferencedPackagesRule', () {
       final rule = DependOnReferencedPackagesRule();
-      expect(rule.code.name.toLowerCase(), 'depend_on_referenced_packages');
+      expect(rule.code.lowerCaseName, 'depend_on_referenced_packages');
       expect(
         rule.code.problemMessage,
         contains('[depend_on_referenced_packages]'),

@@ -10,14 +10,14 @@ void main() {
   group('Theming Rules - Rule Instantiation', () {
     test('RequireDarkModeTestingRule', () {
       final rule = RequireDarkModeTestingRule();
-      expect(rule.code.name.toLowerCase(), 'require_dark_mode_testing');
+      expect(rule.code.lowerCaseName, 'require_dark_mode_testing');
       expect(rule.code.problemMessage, contains('[require_dark_mode_testing]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidElevationOpacityInDarkRule', () {
       final rule = AvoidElevationOpacityInDarkRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_elevation_opacity_in_dark');
+      expect(rule.code.lowerCaseName, 'avoid_elevation_opacity_in_dark');
       expect(
         rule.code.problemMessage,
         contains('[avoid_elevation_opacity_in_dark]'),
@@ -27,28 +27,28 @@ void main() {
     });
     test('PreferThemeExtensionsRule', () {
       final rule = PreferThemeExtensionsRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_theme_extensions');
+      expect(rule.code.lowerCaseName, 'prefer_theme_extensions');
       expect(rule.code.problemMessage, contains('[prefer_theme_extensions]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('RequireSemanticColorsRule', () {
       final rule = RequireSemanticColorsRule();
-      expect(rule.code.name.toLowerCase(), 'require_semantic_colors');
+      expect(rule.code.lowerCaseName, 'require_semantic_colors');
       expect(rule.code.problemMessage, contains('[require_semantic_colors]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('PreferDarkModeColorsRule', () {
       final rule = PreferDarkModeColorsRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_dark_mode_colors');
+      expect(rule.code.lowerCaseName, 'prefer_dark_mode_colors');
       expect(rule.code.problemMessage, contains('[prefer_dark_mode_colors]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('PreferHighContrastModeRule', () {
       final rule = PreferHighContrastModeRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_high_contrast_mode');
+      expect(rule.code.lowerCaseName, 'prefer_high_contrast_mode');
       expect(rule.code.problemMessage, contains('[prefer_high_contrast_mode]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);

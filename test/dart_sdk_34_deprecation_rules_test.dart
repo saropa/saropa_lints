@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart';
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:test/test.dart';
 
 /// Tests for Dart SDK 3.4 deprecated-API migration rules.
@@ -95,7 +94,7 @@ void main() {
     test('AvoidDeprecatedFileSystemDeleteEventIsDirectoryRule', () {
       final rule = AvoidDeprecatedFileSystemDeleteEventIsDirectoryRule();
       expect(
-        rule.code.name.toLowerCase(),
+        rule.code.lowerCaseName,
         'avoid_deprecated_file_system_delete_event_is_directory',
       );
       expect(

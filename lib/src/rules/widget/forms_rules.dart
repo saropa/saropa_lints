@@ -972,7 +972,7 @@ class RequireFormRestorationRule extends SaropaLintRule {
       int controllerCount = 0;
       bool hasForm = false;
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null &&
@@ -1495,7 +1495,7 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
         // This handles widgets designed for dialog use, e.g., _DialogContent,
         // _DialogOrganizationAdd, where the class itself is dialog content.
         if (current is ClassDeclaration) {
-          final className = current.name.lexeme;
+          final className = current.namePart.typeName.lexeme;
           if (className.toLowerCase().contains('dialog')) {
             return;
           }

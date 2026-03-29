@@ -15,7 +15,7 @@ void main() {
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
         final rule = create();
-        expect(rule.code.name.toLowerCase(), codeName);
+        expect(rule.code.lowerCaseName, codeName);
         expect(rule.code.problemMessage, contains('[$codeName]'));
         expect(rule.code.problemMessage.length, greaterThan(50));
         expect(rule.code.correctionMessage, isNotNull);
@@ -414,7 +414,7 @@ void main() {
       final rule = PreferDescriptiveVariableNamesRule();
 
       test('rule metadata is v4 with opinionated impact', () {
-        expect(rule.code.name, 'prefer_descriptive_variable_names');
+        expect(rule.code.lowerCaseName, 'prefer_descriptive_variable_names');
         expect(rule.code.problemMessage, contains('{v4}'));
         expect(rule.code.problemMessage, contains('[prefer_descriptive'));
       });

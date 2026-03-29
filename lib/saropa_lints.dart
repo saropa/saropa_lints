@@ -106,11 +106,6 @@ export 'package:saropa_lints/src/native/config_loader.dart'
         loadOutputConfigFromProjectRoot,
         loadRulePacksConfigFromProjectRoot;
 
-/// Analyzer 9: DiagnosticCode has no lowerCaseName; this extension provides it.
-extension DiagnosticCodeLowerCase on DiagnosticCode {
-  String get lowerCaseName => name.toLowerCase();
-}
-
 /// All available Saropa lint rules.
 ///
 /// This getter provides access to all rule instances for tools

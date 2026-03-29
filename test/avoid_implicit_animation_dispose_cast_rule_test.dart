@@ -12,9 +12,7 @@ void main() {
 
   group('AvoidImplicitAnimationDisposeCastRule', () {
     test('is registered in allSaropaRules', () {
-      final names = allSaropaRules
-          .map((r) => r.code.name.toLowerCase())
-          .toSet();
+      final names = allSaropaRules.map((r) => r.code.lowerCaseName).toSet();
       expect(names.contains(ruleName), isTrue);
     });
 
@@ -101,7 +99,7 @@ void main() {
     test('getRulesFromRegistry includes rule when explicitly requested', () {
       final rules = getRulesFromRegistry(<String>{ruleName});
       expect(rules, hasLength(1));
-      expect(rules.single.code.name, ruleName);
+      expect(rules.single.code.lowerCaseName, ruleName);
     });
   });
 }

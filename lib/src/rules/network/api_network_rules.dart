@@ -3288,7 +3288,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
 
       // Find SSE-related fields
       final List<String> sseFields = <String>[];
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
 
@@ -3334,7 +3334,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
 
       // Find dispose method and check for close calls
       String? disposeBody;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           disposeBody = member.body.toSource();
           break;
@@ -3349,7 +3349,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
                 _sseFieldClosePattern(disposeBody, fieldName, 'cancel'));
 
         if (!isClosed) {
-          for (final ClassMember member in node.members) {
+          for (final ClassMember member in node.body.members) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {
@@ -3558,7 +3558,7 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
     if (context.isLintPluginSource) return;
 
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
 
       if (className == 'WebSocketChannel' || className == 'WebSocket') return;
 

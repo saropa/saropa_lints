@@ -22,7 +22,7 @@ void main() {
   group('PreferSuperKeyRule', () {
     test('instantiates with expected metadata', () {
       final rule = PreferSuperKeyRule();
-      expect(rule.code.name.toLowerCase(), 'prefer_super_key');
+      expect(rule.code.lowerCaseName, 'prefer_super_key');
       expect(rule.code.problemMessage, contains('[prefer_super_key]'));
       expect(rule.code.problemMessage.length, greaterThan(80));
       expect(rule.code.correctionMessage, isNotNull);
@@ -35,7 +35,7 @@ void main() {
     test('instantiates with expected metadata', () {
       final rule = AvoidChipDeleteInkWellCircleBorderRule();
       expect(
-        rule.code.name.toLowerCase(),
+        rule.code.lowerCaseName,
         'avoid_chip_delete_inkwell_circle_border',
       );
       expect(

@@ -806,7 +806,7 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
       // Find fields that look like databases
       final List<VariableDeclaration> dbFields = <VariableDeclaration>[];
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is FieldDeclaration) {
           for (final variable in member.fields.variables) {
             final String typeStr =
@@ -827,7 +827,7 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
       // Check for dispose method with close() calls
       bool hasClose = false;
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme;
           if (methodName == 'dispose' || methodName == 'close') {

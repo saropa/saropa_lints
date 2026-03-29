@@ -182,7 +182,7 @@ class ScanRunner {
       try {
         rule.registerNodeProcessors(registry, context);
       } on Object catch (e) {
-        _err('  Skipping ${rule.code.name}: $e');
+        _err('  Skipping ${rule.code.lowerCaseName}: $e');
         continue;
       }
 
@@ -246,7 +246,7 @@ class ScanRunner {
       final loc = unit.lineInfo.getLocation(d.offset);
       diagnostics.add(
         ScanDiagnostic(
-          ruleName: d.diagnosticCode.name,
+          ruleName: d.diagnosticCode.lowerCaseName,
           filePath: filePath,
           line: loc.lineNumber,
           column: loc.columnNumber,
