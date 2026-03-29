@@ -334,8 +334,12 @@ class ConflictingConstructorAndStaticMemberRule extends SaropaLintRule {
       }
     }
 
-    context.addClassDeclaration((ClassDeclaration node) => check(node.body.members));
-    context.addEnumDeclaration((EnumDeclaration node) => check(node.body.members));
+    context.addClassDeclaration(
+      (ClassDeclaration node) => check(node.body.members),
+    );
+    context.addEnumDeclaration(
+      (EnumDeclaration node) => check(node.body.members),
+    );
   }
 }
 

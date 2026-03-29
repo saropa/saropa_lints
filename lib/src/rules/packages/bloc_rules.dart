@@ -4148,7 +4148,9 @@ class RequireBlocEventSealedRule extends SaropaLintRule {
     if (node.body.members.isEmpty) return true;
 
     // Only has constructors
-    return node.body.members.every((member) => member is ConstructorDeclaration);
+    return node.body.members.every(
+      (member) => member is ConstructorDeclaration,
+    );
   }
 }
 
