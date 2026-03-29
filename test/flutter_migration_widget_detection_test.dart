@@ -13,7 +13,7 @@ ClassDeclaration _singleClass(CompilationUnit unit) {
 }
 
 ConstructorDeclaration _firstConstructor(ClassDeclaration cls) {
-  final ctors = cls.members.whereType<ConstructorDeclaration>().toList();
+  final ctors = cls.body.members.whereType<ConstructorDeclaration>().toList();
   expect(ctors, isNotEmpty);
   return ctors.first;
 }

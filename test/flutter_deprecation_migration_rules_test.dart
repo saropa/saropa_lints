@@ -1,5 +1,4 @@
 import 'package:saropa_lints/saropa_lints.dart';
-import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:test/test.dart';
 
 /// Tests for Flutter SDK deprecation migration rules.
@@ -115,7 +114,7 @@ void main() {
     test('AvoidRemovedRenderObjectElementMethodsRule', () {
       final rule = AvoidRemovedRenderObjectElementMethodsRule();
       expect(
-        rule.code.name.toLowerCase(),
+        rule.code.lowerCaseName,
         'avoid_removed_render_object_element_methods',
       );
       expect(
@@ -129,7 +128,7 @@ void main() {
     test('AvoidDeprecatedAnimatedListTypedefsRule', () {
       final rule = AvoidDeprecatedAnimatedListTypedefsRule();
       expect(
-        rule.code.name.toLowerCase(),
+        rule.code.lowerCaseName,
         'avoid_deprecated_animated_list_typedefs',
       );
       expect(
@@ -143,7 +142,7 @@ void main() {
     test('AvoidDeprecatedUseMaterial3CopyWithRule', () {
       final rule = AvoidDeprecatedUseMaterial3CopyWithRule();
       expect(
-        rule.code.name.toLowerCase(),
+        rule.code.lowerCaseName,
         'avoid_deprecated_use_material3_copy_with',
       );
       expect(
@@ -156,10 +155,7 @@ void main() {
 
     test('AvoidDeprecatedOnSurfaceDestroyedRule', () {
       final rule = AvoidDeprecatedOnSurfaceDestroyedRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'avoid_deprecated_on_surface_destroyed',
-      );
+      expect(rule.code.lowerCaseName, 'avoid_deprecated_on_surface_destroyed');
       expect(
         rule.code.problemMessage,
         contains('[avoid_deprecated_on_surface_destroyed]'),

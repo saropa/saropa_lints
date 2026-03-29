@@ -281,7 +281,7 @@ class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
 
       // Find build method
       MethodDeclaration? buildMethod;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
           buildMethod = member;
           break;

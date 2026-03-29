@@ -152,7 +152,7 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
 
       // Check for updateShouldNotify method
       bool hasUpdateShouldNotify = false;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration &&
             member.name.lexeme == 'updateShouldNotify') {
           hasUpdateShouldNotify = true;

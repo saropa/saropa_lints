@@ -186,10 +186,7 @@ void main() {
     test('instantiates with expected metadata', () {
       final PreferImageFilterQualityMediumRule rule =
           PreferImageFilterQualityMediumRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'prefer_image_filter_quality_medium',
-      );
+      expect(rule.code.lowerCaseName, 'prefer_image_filter_quality_medium');
       expect(
         rule.code.problemMessage,
         contains('[prefer_image_filter_quality_medium]'),

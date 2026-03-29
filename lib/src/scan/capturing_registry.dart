@@ -46,6 +46,15 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   @override
   void addAnnotation(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
+  void addAnonymousBlockBody(AbstractAnalysisRule r, AstVisitor v) =>
+      _capture(v);
+  @override
+  void addAnonymousExpressionBody(AbstractAnalysisRule r, AstVisitor v) =>
+      _capture(v);
+  @override
+  void addAnonymousMethodInvocation(AbstractAnalysisRule r, AstVisitor v) =>
+      _capture(v);
+  @override
   void addArgumentList(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addAsExpression(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
@@ -68,6 +77,8 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addBlock(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addBlockClassBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
+  @override
+  void addBlockEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addBlockFunctionBody(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
@@ -155,7 +166,7 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   @override
   void addEmptyStatement(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
-  void addEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
+  void addEmptyEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addEnumConstantArguments(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
@@ -282,9 +293,6 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   @override
   void addLibraryDirective(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
-  void addLibraryIdentifier(AbstractAnalysisRule r, AstVisitor v) =>
-      _capture(v);
-  @override
   void addListLiteral(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addListPattern(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
@@ -365,6 +373,9 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   @override
   void addPrefixExpression(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
+  void addPrimaryConstructorBody(AbstractAnalysisRule r, AstVisitor v) =>
+      _capture(v);
+  @override
   void addPrimaryConstructorDeclaration(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
@@ -401,12 +412,6 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   ) => _capture(v);
   @override
   void addRelationalPattern(AbstractAnalysisRule r, AstVisitor v) =>
-      _capture(v);
-  @override
-  void addRepresentationConstructorName(AbstractAnalysisRule r, AstVisitor v) =>
-      _capture(v);
-  @override
-  void addRepresentationDeclaration(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
   void addRestPatternElement(AbstractAnalysisRule r, AstVisitor v) =>

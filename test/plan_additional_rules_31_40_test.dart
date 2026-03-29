@@ -30,9 +30,7 @@ void main() {
 
   group('Plan 31–40 rules - registration', () {
     test('all rules are registered in allSaropaRules', () {
-      final names = allSaropaRules
-          .map((r) => r.code.name.toLowerCase())
-          .toSet();
+      final names = allSaropaRules.map((r) => r.code.lowerCaseName).toSet();
       for (final name in ruleNames) {
         expect(
           names.contains(name),
@@ -57,7 +55,7 @@ void main() {
       for (final name in ruleNames) {
         final rules = getRulesFromRegistry(<String>{name});
         expect(rules, hasLength(1), reason: name);
-        expect(rules.single.code.name, name);
+        expect(rules.single.code.lowerCaseName, name);
         expect(
           rules.single.code.problemMessage,
           contains('[$name]'),

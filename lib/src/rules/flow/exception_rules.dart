@@ -58,7 +58,7 @@ class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
       }
 
       // Check all field declarations
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           if (member.isStatic) continue;
           if (member.fields.isFinal || member.fields.isConst) continue;
@@ -344,7 +344,7 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.name.lexeme;
+      final String className = node.namePart.typeName.lexeme;
       if (!className.startsWith('_')) return;
 
       // Check if this class extends Exception or Error
@@ -356,7 +356,7 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
           superName == 'Error' ||
           superName.endsWith('Exception') ||
           superName.endsWith('Error')) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
       }
     });
   }

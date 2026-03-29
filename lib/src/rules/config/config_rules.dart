@@ -315,7 +315,7 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
     if (context.isLintPluginSource) return;
 
     context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.name.lexeme.toLowerCase();
+      final String className = node.namePart.typeName.lexeme.toLowerCase();
 
       // Only check config-related classes
       if (!className.contains('config') &&
@@ -328,7 +328,7 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
       bool hasDevIndicator = false;
       ClassMember? firstProdMember;
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final Expression? init = variable.initializer;

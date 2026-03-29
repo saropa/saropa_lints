@@ -377,7 +377,7 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((node) {
-      final members = node.members;
+      final members = node.body.members;
       if (members.length < 2) return;
 
       for (int i = 0; i < members.length - 1; i++) {
@@ -466,7 +466,7 @@ class PreferCompactClassMembersRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((node) {
-      final members = node.members;
+      final members = node.body.members;
       if (members.length < 2) return;
 
       for (int i = 0; i < members.length - 1; i++) {

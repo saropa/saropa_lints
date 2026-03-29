@@ -464,7 +464,7 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
       bool hasWebSocket = false;
       bool hasDisposeClose = false;
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           final String fieldSource = member.toSource();
           if (fieldSource.contains('WebSocket') ||
@@ -575,7 +575,7 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
 
       // Check for cleanup in dispose
       bool hasDispose = false;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           hasDispose = true;
           final String disposeSource = member.body.toSource();
@@ -765,7 +765,7 @@ class RequireCameraDisposeRule extends SaropaLintRule {
       // Find CameraController fields
       final List<String> controllerNames = <String>[];
       MethodDeclaration? disposeMethod;
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null && _cameraControllerType.hasMatch(typeName)) {
@@ -791,7 +791,7 @@ class RequireCameraDisposeRule extends SaropaLintRule {
         );
 
         if (!isDisposed) {
-          for (final ClassMember member in node.members) {
+          for (final ClassMember member in node.body.members) {
             if (member is FieldDeclaration) {
               for (final VariableDeclaration variable
                   in member.fields.variables) {

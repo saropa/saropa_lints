@@ -11,7 +11,7 @@ void main() {
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
         final rule = create();
-        expect(rule.code.name.toLowerCase(), codeName);
+        expect(rule.code.lowerCaseName, codeName);
         expect(rule.code.problemMessage, contains('[$codeName]'));
         expect(rule.code.problemMessage.length, greaterThan(50));
         expect(rule.code.correctionMessage, isNotNull);
@@ -479,7 +479,7 @@ void main() {
         // Named params cannot use _ prefix in Dart (compiler error).
         // Verifies false-positive fix from v5.
         final rule = PreferWildcardForUnusedParamRule();
-        expect(rule.code.name, 'prefer_wildcard_for_unused_param');
+        expect(rule.code.lowerCaseName, 'prefer_wildcard_for_unused_param');
         expect(rule.code.problemMessage, contains('{v5}'));
         expect(rule.code.problemMessage, contains('Named parameters'));
       });

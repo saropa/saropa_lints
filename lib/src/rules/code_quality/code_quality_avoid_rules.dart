@@ -1509,7 +1509,7 @@ class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration classNode) {
       // Collect static field names
       final Set<String> staticFields = <String>{};
-      for (final ClassMember member in classNode.members) {
+      for (final ClassMember member in classNode.body.members) {
         if (member is FieldDeclaration && member.isStatic) {
           for (final VariableDeclaration field in member.fields.variables) {
             staticFields.add(field.name.lexeme);
@@ -1520,7 +1520,7 @@ class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
       if (staticFields.isEmpty) return;
 
       // Check instance methods
-      for (final ClassMember member in classNode.members) {
+      for (final ClassMember member in classNode.body.members) {
         if (member is MethodDeclaration && !member.isStatic) {
           _checkMethodBody(member.body, staticFields, reporter);
         }
@@ -2216,7 +2216,7 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
       bool hasFields = false;
       bool hasToString = false;
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration && !member.isStatic) {
           hasFields = true;
         }
@@ -2226,7 +2226,7 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
       }
 
       if (hasFields && !hasToString) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
       }
     });
   }
@@ -2541,14 +2541,21 @@ class AvoidNestedExtensionTypesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
-      final RepresentationDeclaration representation = node.representation;
+      // Primary constructor's first parameter is the representation field;
+      // may be empty in malformed code during editing
+      final params = node.primaryConstructor.formalParameters.parameters;
+      if (params.isEmpty) return;
+      final param = params.first;
+      if (param is! SimpleFormalParameter) return;
+      final TypeAnnotation? repType = param.type;
+      if (repType == null) return;
 
-      final DartType? fieldType = representation.fieldType.type;
+      final DartType? fieldType = repType.type;
       if (fieldType == null) return;
 
       // Check if the field type is itself an extension type
       if (fieldType.element is ExtensionTypeElement) {
-        reporter.atNode(representation.fieldType, code);
+        reporter.atNode(repType, code);
       }
     });
   }
@@ -2875,7 +2882,7 @@ class AvoidShadowedExtensionMethodsRule extends SaropaLintRule {
       }
 
       // Check extension members
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme;
           if (classMethods.contains(methodName)) {

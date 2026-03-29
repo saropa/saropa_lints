@@ -773,7 +773,7 @@ class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       bool seenMethod = false;
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is MethodDeclaration) {
           seenMethod = true;
         } else if (member is FieldDeclaration && seenMethod) {
@@ -840,7 +840,7 @@ class PreferMethodsBeforeFieldsRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       bool seenField = false;
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is FieldDeclaration) {
           seenField = true;
         } else if (member is MethodDeclaration && seenField) {
@@ -915,7 +915,7 @@ class PreferStaticMembersFirstRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       bool seenInstanceMember = false;
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         final isStatic = _isStaticMember(member);
 
         if (!isStatic) {
@@ -984,7 +984,7 @@ class PreferInstanceMembersFirstRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       bool seenStaticMember = false;
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         final isStatic = _isStaticMember(member);
 
         if (isStatic) {
@@ -1053,7 +1053,7 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       bool seenPrivateMember = false;
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         final isPrivate = _isPrivateMember(member);
 
         if (isPrivate) {
@@ -1122,7 +1122,7 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       bool seenPublicMember = false;
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         final isPrivate = _isPrivateMember(member);
 
         if (!isPrivate) {
@@ -1781,7 +1781,7 @@ class PreferExplicitThisRule extends SaropaLintRule {
 
       // Get all field names in the class
       final fieldNames = <String>{};
-      for (final member in parent.members) {
+      for (final member in parent.body.members) {
         if (member is FieldDeclaration) {
           for (final variable in member.fields.variables) {
             fieldNames.add(variable.name.lexeme);

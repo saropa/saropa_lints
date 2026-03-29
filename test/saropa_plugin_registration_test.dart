@@ -3,7 +3,8 @@ import 'package:analysis_server_plugin/src/correction/fix_generators.dart'
     show ProducerGenerator;
 import 'package:analyzer/analysis_rule/analysis_rule.dart'
     show AbstractAnalysisRule;
-import 'package:analyzer/error/error.dart' show LintCode;
+import 'package:analyzer/error/error.dart' show DiagnosticCode, LintCode;
+import 'package:analyzer/src/lint/config.dart' show RuleConfig;
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
@@ -14,11 +15,17 @@ final class _CaptureRegistry implements PluginRegistry {
       <(LintCode, ProducerGenerator)>[];
 
   @override
+  Iterable<AbstractAnalysisRule> enabled(Map<String, RuleConfig> ruleConfigs) =>
+      lintRules;
+
+  @override
   void registerAssist(ProducerGenerator generator) {}
 
   @override
-  void registerFixForRule(LintCode code, ProducerGenerator generator) {
-    fixes.add((code, generator));
+  void registerFixForRule(DiagnosticCode code, ProducerGenerator generator) {
+    if (code is LintCode) {
+      fixes.add((code, generator));
+    }
   }
 
   @override

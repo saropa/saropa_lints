@@ -10,14 +10,14 @@ void main() {
   group('Context Rules - Rule Instantiation', () {
     test('AvoidStoringContextRule', () {
       final rule = AvoidStoringContextRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_storing_context');
+      expect(rule.code.lowerCaseName, 'avoid_storing_context');
       expect(rule.code.problemMessage, contains('[avoid_storing_context]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidContextAcrossAsyncRule', () {
       final rule = AvoidContextAcrossAsyncRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_context_across_async');
+      expect(rule.code.lowerCaseName, 'avoid_context_across_async');
       expect(
         rule.code.problemMessage,
         contains('[avoid_context_across_async]'),
@@ -27,10 +27,7 @@ void main() {
     });
     test('AvoidContextAfterAwaitInStaticRule', () {
       final rule = AvoidContextAfterAwaitInStaticRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'avoid_context_after_await_in_static',
-      );
+      expect(rule.code.lowerCaseName, 'avoid_context_after_await_in_static');
       expect(
         rule.code.problemMessage,
         contains('[avoid_context_after_await_in_static]'),
@@ -40,7 +37,7 @@ void main() {
     });
     test('AvoidContextInAsyncStaticRule', () {
       final rule = AvoidContextInAsyncStaticRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_context_in_async_static');
+      expect(rule.code.lowerCaseName, 'avoid_context_in_async_static');
       expect(
         rule.code.problemMessage,
         contains('[avoid_context_in_async_static]'),
@@ -50,7 +47,7 @@ void main() {
     });
     test('AvoidContextInStaticMethodsRule', () {
       final rule = AvoidContextInStaticMethodsRule();
-      expect(rule.code.name.toLowerCase(), 'avoid_context_in_static_methods');
+      expect(rule.code.lowerCaseName, 'avoid_context_in_static_methods');
       expect(
         rule.code.problemMessage,
         contains('[avoid_context_in_static_methods]'),
@@ -60,10 +57,7 @@ void main() {
     });
     test('AvoidContextDependencyInCallbackRule', () {
       final rule = AvoidContextDependencyInCallbackRule();
-      expect(
-        rule.code.name.toLowerCase(),
-        'avoid_context_dependency_in_callback',
-      );
+      expect(rule.code.lowerCaseName, 'avoid_context_dependency_in_callback');
       expect(
         rule.code.problemMessage,
         contains('[avoid_context_dependency_in_callback]'),

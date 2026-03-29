@@ -36,6 +36,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Analyzer upgraded from ^9.0.0 to ^12.0.0** — migrated ~500 call sites across 70+ rule files to the new AST API (`ClassDeclaration.body.members`, `ClassNamePart.typeName`, `PrimaryConstructorDeclaration`, `DottedName`, etc.)
+- **Removed analyzer-9 compatibility extensions** — `DiagnosticCodeLowerCase` and `LintCodeLowerCase` shims removed; `lowerCaseName` is now native in analyzer 12
+- **Updated `CapturingRuleVisitorRegistry`** — added 5 new visitor methods and removed 4 obsolete ones to match the analyzer 12 `RuleVisitorRegistry` interface
+- **Updated test registry** — `PluginRegistry` interface changes: `enabled()` method, `DiagnosticCode` parameter on `registerFixForRule`
+
 ### Added
 
 - **Vibrancy scan cancel button** — the progress notification now shows a Cancel button so users can abort a long-running scan

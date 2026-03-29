@@ -201,7 +201,7 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       final root = node.root;
       if (root is CompilationUnit) {
-        _checkMembers(node.members, root, reporter);
+        _checkMembers(node.body.members, root, reporter);
       }
     });
   }
@@ -228,11 +228,10 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
 
       // Should have at least one blank line
       if (currStartLine - prevEndLine < 2) {
-        final Token? nameToken = current.name;
+        // typeName is null for unnamed factory constructors
+        final Token? nameToken = current.name ?? current.typeName?.beginToken;
         if (nameToken != null) {
           reporter.atToken(nameToken);
-        } else {
-          reporter.atNode(current.returnType, code);
         }
       }
     }
@@ -320,21 +319,21 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       final root = node.root;
       if (root is CompilationUnit) {
-        _checkMembers(node.members, root, reporter);
+        _checkMembers(node.body.members, root, reporter);
       }
     });
 
     context.addMixinDeclaration((MixinDeclaration node) {
       final root = node.root;
       if (root is CompilationUnit) {
-        _checkMembers(node.members, root, reporter);
+        _checkMembers(node.body.members, root, reporter);
       }
     });
 
     context.addEnumDeclaration((EnumDeclaration node) {
       final root = node.root;
       if (root is CompilationUnit) {
-        _checkMembers(node.members, root, reporter);
+        _checkMembers(node.body.members, root, reporter);
       }
     });
   }
@@ -1187,7 +1186,7 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       int lastCategory = -1;
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         final int category = _getMemberCategory(member);
 
         if (category < lastCategory) {

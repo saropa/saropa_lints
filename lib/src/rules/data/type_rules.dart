@@ -386,7 +386,7 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
       }
 
       if (!implementsObject) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.primaryConstructor.typeName, code);
       }
     });
   }
@@ -2149,7 +2149,7 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
     }
 
     context.addClassDeclaration((ClassDeclaration node) {
-      checkName(node.name);
+      checkName(node.namePart.typeName);
     });
 
     context.addMixinDeclaration((MixinDeclaration node) {
@@ -2157,11 +2157,11 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
     });
 
     context.addEnumDeclaration((EnumDeclaration node) {
-      checkName(node.name);
+      checkName(node.namePart.typeName);
     });
 
     context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
-      checkName(node.name);
+      checkName(node.primaryConstructor.typeName);
     });
 
     context.addGenericTypeAlias((GenericTypeAlias node) {
@@ -2542,7 +2542,7 @@ class AvoidShadowingTypeParametersRule extends SaropaLintRule {
           .thisOrAncestorOfType<ClassDeclaration>();
       if (enclosingClass == null) return;
 
-      final TypeParameterList? classTypeParams = enclosingClass.typeParameters;
+      final TypeParameterList? classTypeParams = enclosingClass.namePart.typeParameters;
       if (classTypeParams == null) return;
 
       // Build set of class type parameter names
@@ -3288,8 +3288,8 @@ class AbiSpecificIntegerInvalidRule extends SaropaLintRule {
       final CompilationUnit unit = node.root as CompilationUnit;
       if (!_compilationUnitImportsDartFfi(unit)) return;
 
-      if (node.typeParameters != null) {
-        reporter.atToken(node.name, code);
+      if (node.namePart.typeParameters != null) {
+        reporter.atToken(node.namePart.typeName, code);
         return;
       }
 
@@ -3301,26 +3301,26 @@ class AbiSpecificIntegerInvalidRule extends SaropaLintRule {
         }
       }
       if (!hasMapping) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
         return;
       }
 
       if (node.finalKeyword == null) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
         return;
       }
 
-      final List<ConstructorDeclaration> ctors = node.members
+      final List<ConstructorDeclaration> ctors = node.body.members
           .whereType<ConstructorDeclaration>()
           .toList();
-      final int otherMembers = node.members
+      final int otherMembers = node.body.members
           .where((ClassMember m) => m is! ConstructorDeclaration)
           .length;
 
       if (ctors.length != 1 ||
           ctors.single.constKeyword == null ||
           otherMembers != 0) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
       }
     });
   }

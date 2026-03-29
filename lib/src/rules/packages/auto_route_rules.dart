@@ -341,7 +341,7 @@ class RequireAutoRouteGuardResumeRule extends SaropaLintRule {
       if (!isGuard) return;
 
       // Find onNavigation method
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is! MethodDeclaration) continue;
         if (member.name.lexeme != 'onNavigation') continue;
 

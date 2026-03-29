@@ -1199,7 +1199,7 @@ class PreferJsonSerializableRule extends SaropaLintRule {
       if (hasCodegenAnnotation) return;
 
       // Check members
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is ConstructorDeclaration) {
           if (member.factoryKeyword != null &&
               member.name?.lexeme == 'fromJson') {
@@ -1222,7 +1222,7 @@ class PreferJsonSerializableRule extends SaropaLintRule {
 
       // Warn if has manual serialization
       if (hasManualFromJson && hasManualToJson) {
-        reporter.atToken(node.name, code);
+        reporter.atToken(node.namePart.typeName, code);
       }
     });
   }
@@ -1465,7 +1465,7 @@ class PreferJsonCodegenRule extends SaropaLintRule {
       }
       if (hasCodegen) return;
 
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is ConstructorDeclaration &&
             member.factoryKeyword != null &&
             member.name?.lexeme == 'fromJson') {

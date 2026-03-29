@@ -113,7 +113,7 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
       }
 
       // Check each field in the class
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is FieldDeclaration) {
           _checkFieldDeclaration(member, reporter);
         }
@@ -258,7 +258,7 @@ class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Check if class has Id field (suggests Isar usage)
       bool hasIdField = false;
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is FieldDeclaration) {
           final type = member.fields.type;
           if (type is NamedType && type.name.lexeme == 'Id') {
@@ -355,7 +355,7 @@ class RequireIsarIdFieldRule extends SaropaLintRule {
 
       // Check for Id field
       bool hasIdField = false;
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is FieldDeclaration) {
           final type = member.fields.type;
           if (type is NamedType && type.name.lexeme == 'Id') {
@@ -443,7 +443,7 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
       final List<String> isarFields = [];
       MethodDeclaration? disposeMethod;
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is FieldDeclaration) {
           final type = member.fields.type;
           if (type is NamedType && type.name.lexeme == 'Isar') {
@@ -1582,7 +1582,7 @@ class RequireIsarNullableFieldRule extends SaropaLintRule {
       }
       if (!hasCollection) return;
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is FieldDeclaration) {
           // 2. Skip static fields (not persisted by Isar)
           if (member.isStatic) continue;

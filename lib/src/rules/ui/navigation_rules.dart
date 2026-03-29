@@ -3765,7 +3765,7 @@ class RequireAutoRoutePageSuffixRule extends SaropaLintRule {
     if (!ProjectContext.hasDependency(context.filePath, 'auto_route')) return;
 
     context.addClassDeclaration((ClassDeclaration node) {
-      final String name = node.name.lexeme;
+      final String name = node.namePart.typeName.lexeme;
       if (name.endsWith('Page')) return;
       for (final Annotation a in node.metadata) {
         if (a.name.name == 'RoutePage') {

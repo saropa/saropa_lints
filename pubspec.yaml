@@ -34,30 +34,58 @@ environment:
   sdk: ">=3.9.0 <4.0.0"
 
 # Runtime dependencies for lint rule implementation
-# NOTE: analyzer is pinned to ^9.0.0. Upgrading to 10+ requires migrating the
-# entire AST API (ClassDeclaration.members → .body.members, .name → .namePart.typeName,
-# etc.) across ~484 call sites. See analyzer changelog for the full migration guide.
+##################################################################################################
+##########################                                   #####################################
+##########################           DEPENDENCIES            #####################################
+##########################                                   #####################################
+##################################################################################################
 dependencies:
+  # A framework and support code for building plugins for the analysis server.
+  # https://pub.dev/packages/analysis_server_plugin
   analysis_server_plugin: ^0.3.4
-  analyzer: ^9.0.0
-  analyzer_plugin: ^0.13.0
+  # This package provides a library that performs static analysis of Dart code.
+  # https://pub.dev/packages/analyzer
+  analyzer: ^12.0.0
+  # A framework and support code for building plugins for the analysis server.
+  # https://pub.dev/packages/analyzer_plugin
+  analyzer_plugin: ^0.14.7
 
-  # https://pub.dev/packages/collection/changelog
-  collection: ^1.19.0 # Used by bin/saropa_lints.dart, sort_imports_fix, code_quality_control_flow_rules
+  # Collections and utilities functions and classes related to collections.
+  # https://pub.dev/packages/collection
+  collection: ^1.19.1 # Used by bin/saropa_lints.dart, sort_imports_fix, code_quality_control_flow_rules
 
   # # https://pub.dev/packages/json2yaml/changelog
   # json2yaml: ^3.0.1 # YAML serialization for CLI tool
 
-  # https://pub.dev/packages/path/changelog
+  # A string-based path manipulation library. All of the path operations you know...
+  # https://pub.dev/packages/path
   path: ^1.9.1 # Path manipulation and traversal safety for CLI tools
 
   # https://pub.dev/packages/pub_semver/changelog — rule pack semver gates (pubspec.lock)
+  # Versions and version constraints implementing pub's versioning policy. This i...
+  # https://pub.dev/packages/pub_semver
   pub_semver: ^2.2.0
 
   # # https://pub.dev/packages/yaml/changelog
   # yaml: ^3.1.3 # YAML parsing for CLI tool
 
 # Development-only dependencies
+
+#
+#
+#
+#
+#
+#
+#
+#
+#
+##################################################################################################
+##########################                                   #####################################
+##########################         DEV DEPENDENCIES          #####################################
+##########################                                   #####################################
+##################################################################################################
 dev_dependencies:
-  # https://pub.dev/packages/test/changelog
+  # A full featured library for writing and running Dart tests across platforms.
+  # https://pub.dev/packages/test
   test: ^1.31.0 # Unit testing framework

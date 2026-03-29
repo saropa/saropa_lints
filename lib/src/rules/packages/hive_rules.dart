@@ -286,7 +286,7 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
       // Find Box fields
       final List<VariableDeclaration> boxFields = <VariableDeclaration>[];
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is FieldDeclaration) {
           for (final variable in member.fields.variables) {
             final String typeStr = member.fields.type?.toSource() ?? '';
@@ -304,7 +304,7 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
       // Check for dispose method with close() calls
       bool hasClose = false;
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           final String? bodySource = member.body.toSource();
           if (bodySource != null &&
@@ -963,7 +963,7 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
       // Collect all @HiveField indices and their annotations
       final Map<int, List<Annotation>> fieldIndices = <int, List<Annotation>>{};
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is FieldDeclaration) {
           for (final metadata in member.metadata) {
             if (metadata.name.name == 'HiveField') {
@@ -1687,7 +1687,7 @@ class AvoidHiveBinaryStorageRule extends SaropaLintRule {
       if (!isHiveType) return;
 
       // Check fields for binary types
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is FieldDeclaration) {
           final typeName = member.fields.type?.toSource();
           if (typeName != null &&
@@ -1793,7 +1793,7 @@ class RequireHiveMigrationStrategyRule extends SaropaLintRule {
       // Collect all @HiveField indices
       final List<int> indices = <int>[];
 
-      for (final member in node.members) {
+      for (final member in node.body.members) {
         if (member is FieldDeclaration) {
           for (final annotation in member.metadata) {
             if (annotation.name.name == 'HiveField') {
@@ -2204,7 +2204,7 @@ class AvoidHiveTypeModificationRule extends SaropaLintRule {
 
       // Collect all @HiveField indices
       final Map<int, List<FieldDeclaration>> indexToFields = {};
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         if (member is! FieldDeclaration) continue;
         for (final Annotation annotation in member.metadata) {
           if (annotation.name.name != 'HiveField') continue;

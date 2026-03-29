@@ -163,7 +163,7 @@ class PreferConstrainedGenericsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
-      final TypeParameterList? typeParams = node.typeParameters;
+      final TypeParameterList? typeParams = node.namePart.typeParameters;
       if (typeParams == null) return;
 
       for (final TypeParameter param in typeParams.typeParameters) {
@@ -388,7 +388,7 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
       if (!isOuterTypeNullable(onClause.extendedType)) return;
 
       // Check members for null assertions
-      for (final ClassMember member in node.members) {
+      for (final ClassMember member in node.body.members) {
         final String memberSource = member.toSource();
         if (memberSource.contains('this!')) {
           reporter.atNode(member);

@@ -245,7 +245,7 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
 
       if (!implementsException) return;
 
-      final className = node.name.lexeme;
+      final className = node.namePart.typeName.lexeme;
       if (!className.endsWith('Exception') && !className.endsWith('Error')) {
         reporter.atNode(node);
       }
@@ -326,7 +326,7 @@ class PreferErrorSuffixRule extends SaropaLintRule {
 
       if (!implementsException) return;
 
-      final className = node.name.lexeme;
+      final className = node.namePart.typeName.lexeme;
       if (className.endsWith('Exception')) {
         reporter.atNode(node);
       }
