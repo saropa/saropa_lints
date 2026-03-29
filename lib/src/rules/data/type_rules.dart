@@ -2542,7 +2542,8 @@ class AvoidShadowingTypeParametersRule extends SaropaLintRule {
           .thisOrAncestorOfType<ClassDeclaration>();
       if (enclosingClass == null) return;
 
-      final TypeParameterList? classTypeParams = enclosingClass.namePart.typeParameters;
+      final TypeParameterList? classTypeParams =
+          enclosingClass.namePart.typeParameters;
       if (classTypeParams == null) return;
 
       // Build set of class type parameter names

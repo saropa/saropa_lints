@@ -2749,7 +2749,9 @@ class AvoidReferencingSubclassesRule extends SaropaLintRule {
         if (d is ClassDeclaration) {
           final base = d.extendsClause?.superclass.name.lexeme;
           if (base != null) {
-            baseToSubs.putIfAbsent(base, () => <String>{}).add(d.namePart.typeName.lexeme);
+            baseToSubs
+                .putIfAbsent(base, () => <String>{})
+                .add(d.namePart.typeName.lexeme);
           }
         }
       }

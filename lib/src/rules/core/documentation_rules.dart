@@ -89,7 +89,10 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
       // Check if in public class
       final ClassDeclaration? classDecl = node
           .thisOrAncestorOfType<ClassDeclaration>();
-      if (classDecl != null && classDecl.namePart.typeName.lexeme.startsWith('_')) return;
+      if (classDecl != null &&
+          classDecl.namePart.typeName.lexeme.startsWith('_')) {
+        return;
+      }
 
       if (node.documentationComment == null) {
         reporter.atNode(node);

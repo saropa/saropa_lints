@@ -574,7 +574,10 @@ void main() {
       });
 
       test('rule name matches expected', () {
-        expect(rule.code.lowerCaseName, 'prefer_sentence_case_comments_relaxed');
+        expect(
+          rule.code.lowerCaseName,
+          'prefer_sentence_case_comments_relaxed',
+        );
       });
 
       test('has capitalize quick fix', () {
