@@ -51,5 +51,7 @@ export function makeMinimalResult(options: MakeResultOptions = {}): VibrancyResu
         latestPrerelease: null,
         prereleaseTag: null,
         vulnerabilities: [],
+        versionGap: null,
+        overrideGap: null,
     };
 }

@@ -14,6 +14,8 @@
     "src/driftAdvisor/client.ts",
     "src/test/driftAdvisor/**/*.ts",
     "src/vibrancy/**/*.ts",
+    "src/test/vibrancy/register-vscode-mock.ts",
+    "src/test/vibrancy/scan-helpers.test.ts",
     "src/test/vibrancy/services/review-state.test.ts",
     "src/test/vibrancy/scoring/status-classifier.test.ts",
     "src/test/vibrancy/scoring/vibrancy-calculator.test.ts",
