@@ -290,8 +290,10 @@ function buildLicenseCell(r: VibrancyResult): string {
 }
 
 function buildUpdateCell(r: VibrancyResult): string {
+    /* Must match client-side matchesCardFilter 'updates' case in report-script.ts. */
     const hasUpdate = r.updateInfo
-        && r.updateInfo.updateStatus !== 'up-to-date';
+        && r.updateInfo.updateStatus !== 'up-to-date'
+        && r.updateInfo.updateStatus !== 'unknown';
     const name = encodeURIComponent(r.package.name);
     const url = `https://pub.dev/packages/${name}/changelog`;
     if (!hasUpdate) { return '<td>\u2713</td>'; }

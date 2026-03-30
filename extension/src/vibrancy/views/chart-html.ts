@@ -33,6 +33,10 @@ export function buildChartSection(results: VibrancyResult[]): string {
             </div>
         </div>
         <div class="chart-tooltip" id="chart-tooltip"></div>
+        <div class="chart-filter-indicator" id="chart-filter-indicator" style="display:none">
+            <span class="filter-text"></span>
+            <button class="clear-filter-btn" id="clear-chart-filter">&times; Clear</button>
+        </div>
     </section>`;
 }
 
@@ -89,7 +93,7 @@ function prepareChartData(results: VibrancyResult[]): ChartSegment[] {
 
 /** Build horizontal bar chart rows. Bars are normalized so largest = 100%. */
 function buildBarChart(segments: ChartSegment[]): string {
-    const maxPct = Math.max(...segments.map(s => s.percentage));
+    const maxPct = segments.reduce((max, s) => s.percentage > max ? s.percentage : max, 0);
 
     const rows = segments.map(seg => {
         const barWidth = (seg.percentage / maxPct) * 100;

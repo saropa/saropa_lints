@@ -83,10 +83,13 @@ export function getReportStyles(): string {
             border-bottom: 1px solid var(--vscode-widget-border);
         }
         th {
-            cursor: pointer; user-select: none;
             background: var(--vscode-editor-inactiveSelectionBackground);
         }
-        th:hover { background: var(--vscode-list-hoverBackground); }
+        /* Only sortable headers (with data-col) get pointer cursor. */
+        th[data-col] {
+            cursor: pointer; user-select: none;
+        }
+        th[data-col]:hover { background: var(--vscode-list-hoverBackground); }
         tr:hover { background: var(--vscode-list-hoverBackground); }
         .sort-arrow { margin-left: 4px; opacity: 0.6; }
         a {

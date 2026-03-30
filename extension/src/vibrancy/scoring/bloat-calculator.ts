@@ -21,3 +21,9 @@ export function formatSizeMB(bytes: number): string {
     if (mb < 1) { return `${mb.toFixed(2)} MB`; }
     return `${mb.toFixed(1)} MB`;
 }
+
+/** Format bytes as a human-readable KB string with comma grouping. */
+export function formatSizeKB(bytes: number): string {
+    const kb = Math.round(bytes / 1024);
+    return `${kb.toLocaleString('en-US')} KB`;
+}
