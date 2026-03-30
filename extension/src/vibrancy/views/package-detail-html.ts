@@ -132,11 +132,6 @@ function buildCommunitySection(r: VibrancyResult): string {
         }
     }
 
-    if (r.drift) {
-        const behind = r.drift.releasesBehind === 0
-            ? 'Current' : `${r.drift.releasesBehind} Flutter releases behind`;
-        rows.push(row('Drift', `${behind} (${escapeHtml(r.drift.label)})`));
-    }
     if (r.pubDev) {
         rows.push(row('Pub Points', `${r.pubDev.pubPoints}`));
         if (r.pubDev.publisher) {

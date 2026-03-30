@@ -9,8 +9,6 @@ import {
     fetchArchiveSize,
 } from './services/pub-dev-api';
 import { calcBloatRating } from './scoring/bloat-calculator';
-import { calcDrift } from './scoring/drift-calculator';
-import { FlutterRelease } from './services/flutter-releases';
 import { extractGitHubRepo, fetchRepoMetrics } from './services/github-api';
 import { extractRepoSubpath, buildUpdateInfo } from './services/changelog-service';
 import { findKnownIssue, isReplacementPackageName, getReplacementDisplayText } from './scoring/known-issues';
@@ -41,7 +39,6 @@ interface AnalyzeParams {
     readonly weights?: ScoringWeights;
     readonly repoOverrides?: Record<string, string>;
     readonly publisherTrustBonus?: number;
-    readonly flutterReleases?: readonly FlutterRelease[];
     readonly existingPackages?: readonly string[];
 }
 
@@ -61,6 +58,7 @@ export async function analyzePackage(
     ]);
     const pubDev = pubDevResult.info;
     const prereleaseInfo = pubDevResult.prerelease;
+    const installedVersionDate = pubDevResult.versionDates[dep.version] ?? null;
 
     const repoUrl = resolveRepoUrl(dep.name, pubDev?.repositoryUrl, params);
     const { github, repoInfo } = await fetchGitHubData(repoUrl, params);
@@ -100,10 +98,6 @@ export async function analyzePackage(
     const bloatRating = archiveSizeBytes !== null
         ? calcBloatRating(archiveSizeBytes) : null;
 
-    const drift = calcDrift(
-        pubDev?.publishedDate ?? null, params.flutterReleases ?? [],
-    );
-
     const merged = mergeMetrics(metrics, knownIssue, publisher);
     logDataGaps(dep.name, metrics, knownIssue, log);
 
@@ -123,7 +117,7 @@ export async function analyzePackage(
         package: dep, pubDev: pubDevWithPoints, github, knownIssue,
         ...scores, category, updateInfo,
         license: pubDevWithPoints?.license ?? github?.license ?? knownIssue?.license ?? null,
-        drift, archiveSizeBytes, bloatRating, isUnused: false,
+        archiveSizeBytes, bloatRating, installedVersionDate, isUnused: false,
         platforms: merged.platforms,
         verifiedPublisher: merged.verifiedPublisher,
         wasmReady: merged.wasmReady,

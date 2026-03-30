@@ -31,7 +31,10 @@ export interface PackageDependency {
 export interface PubDevPackageInfo {
     readonly name: string;
     readonly latestVersion: string;
+    /** ISO date when the latest version was published. */
     readonly publishedDate: string;
+    /** ISO date when the first version was published (package creation). */
+    readonly createdDate?: string;
     readonly repositoryUrl: string | null;
     readonly isDiscontinued: boolean;
     readonly isUnlisted: boolean;
@@ -134,14 +137,6 @@ export interface UpdateInfo {
     readonly changelog: ChangelogInfo | null;
 }
 
-/** Ecosystem drift relative to Flutter stable releases. */
-export interface DriftInfo {
-    readonly releasesBehind: number;
-    readonly driftScore: number;
-    readonly label: 'current' | 'recent' | 'drifting' | 'stale' | 'abandoned';
-    readonly latestFlutterVersion: string;
-}
-
 /** Transitive dependency info for one direct dependency. */
 export interface TransitiveInfo {
     readonly directDep: string;
@@ -203,7 +198,6 @@ export interface VibrancyResult {
     readonly publisherTrust: number;
     readonly updateInfo: UpdateInfo | null;
     readonly license: string | null;
-    readonly drift: DriftInfo | null;
     readonly archiveSizeBytes: number | null;
     readonly bloatRating: number | null;
     readonly isUnused: boolean;
@@ -220,6 +214,8 @@ export interface VibrancyResult {
     readonly prereleaseTag: string | null;
     /** Security vulnerabilities affecting this package version. */
     readonly vulnerabilities: readonly Vulnerability[];
+    /** ISO date when the installed version was published. */
+    readonly installedVersionDate?: string | null;
     /** PRs/issues between current and latest versions. Fetched on demand. */
     readonly versionGap: VersionGapResult | null;
     /** For overridden packages: PRs/issues from override version to latest. */

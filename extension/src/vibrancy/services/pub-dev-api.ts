@@ -34,6 +34,8 @@ export interface RegistryOptions {
 export interface PackageInfoResult {
     readonly info: PubDevPackageInfo | null;
     readonly prerelease: PrereleaseInfo | null;
+    /** Map of version string to ISO publish date for all known versions. */
+    readonly versionDates: Readonly<Record<string, string>>;
 }
 
 /** Fetch package metadata from a registry. */
@@ -61,11 +63,14 @@ export async function fetchPackageInfoWithPrerelease(
     const infoCacheKey = `${cachePrefix}.info.${name}`;
     const prereleaseCacheKey = `${cachePrefix}.prerelease.${name}`;
 
+    const versionDatesCacheKey = `${cachePrefix}.versionDates.${name}`;
+
     const cachedInfo = cache?.get<PubDevPackageInfo>(infoCacheKey);
     const cachedPrerelease = cache?.get<PrereleaseInfo>(prereleaseCacheKey);
     if (cachedInfo && cachedPrerelease !== undefined) {
         logger?.cacheHit(infoCacheKey);
-        return { info: cachedInfo, prerelease: cachedPrerelease };
+        const cachedDates = cache?.get<Record<string, string>>(versionDatesCacheKey) ?? {};
+        return { info: cachedInfo, prerelease: cachedPrerelease, versionDates: cachedDates };
     }
     logger?.cacheMiss(infoCacheKey);
 
@@ -79,16 +84,33 @@ export async function fetchPackageInfoWithPrerelease(
         const t0 = Date.now();
         const resp = await fetchWithRetry(url, { headers }, logger);
         logger?.apiResponse(resp.status, resp.statusText, Date.now() - t0);
-        if (!resp.ok) { return { info: null, prerelease: null }; }
+        if (!resp.ok) { return { info: null, prerelease: null, versionDates: {} }; }
 
         const json: any = await resp.json();
         const latest = json.latest ?? {};
         const pubspec = latest.pubspec ?? {};
 
+        // Extract version dates map and created date (first version) before
+        // constructing PubDevPackageInfo so createdDate is set at creation.
+        const versionDates: Record<string, string> = {};
+        let createdDate: string | undefined;
+        const versionStrings: string[] = [];
+        if (Array.isArray(json.versions)) {
+            for (const v of json.versions) {
+                if (!v.version) { continue; }
+                versionStrings.push(v.version);
+                if (v.published) {
+                    versionDates[v.version] = v.published;
+                    if (!createdDate) { createdDate = v.published; }
+                }
+            }
+        }
+
         const info: PubDevPackageInfo = {
             name: json.name ?? name,
             latestVersion: latest.version ?? '',
             publishedDate: latest.published ?? '',
+            createdDate,
             repositoryUrl: pubspec.repository ?? pubspec.homepage ?? null,
             isDiscontinued: json.isDiscontinued ?? false,
             isUnlisted: json.isUnlisted ?? false,
@@ -104,22 +126,20 @@ export async function fetchPackageInfoWithPrerelease(
             await cache?.set(`${cachePrefix}.archiveUrl.${name}`, archiveUrl);
         }
 
-        const versions: string[] = Array.isArray(json.versions)
-            ? json.versions.map((v: any) => v.version).filter(Boolean)
-            : [];
-        const prerelease = versions.length > 0
-            ? extractPrereleaseInfo(versions)
+        const prerelease = versionStrings.length > 0
+            ? extractPrereleaseInfo(versionStrings)
             : null;
 
         await cache?.set(infoCacheKey, info);
+        await cache?.set(versionDatesCacheKey, versionDates);
         if (prerelease) {
             await cache?.set(prereleaseCacheKey, prerelease);
         }
 
-        return { info, prerelease };
+        return { info, prerelease, versionDates };
     } catch {
         logger?.error(`Failed to fetch package info for ${name} from ${registryUrl}`);
-        return { info: null, prerelease: null };
+        return { info: null, prerelease: null, versionDates: {} };
     }
 }
 

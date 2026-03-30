@@ -18,7 +18,6 @@ function makeResult(
         package: { name, version: '1.0.0', constraint: '^1.0.0', source: 'hosted', isDirect: true, section: 'dependencies' },
         pubDev: null, github: null, knownIssue: null, score, category,
         resolutionVelocity: 0, engagementLevel: 0, popularity: 0, publisherTrust: 0,
-        updateInfo: null, license: null, drift: null, bloatRating: null,
         archiveSizeBytes: opts.archiveSizeBytes ?? null, isUnused: opts.isUnused ?? false,
         platforms: null, verifiedPublisher: false, wasmReady: null, blocker: null,
         upgradeBlockStatus: 'up-to-date', transitiveInfo: null, alternatives: [],

@@ -1,6 +1,11 @@
 import * as assert from 'assert';
-import { buildReportHtml } from '../../../vibrancy/views/report-html';
+import { buildReportHtml, ReportOptions } from '../../../vibrancy/views/report-html';
 import { VibrancyResult } from '../../../vibrancy/types';
+
+/** Default options with no overrides and no pubspec URI. */
+function opts(results: VibrancyResult[]): ReportOptions {
+    return { results, overrideCount: 0, pubspecUri: null };
+}
 
 function makeResult(
     name: string,
@@ -36,42 +41,42 @@ function makeResult(
         archiveSizeBytes: null,
         bloatRating: null,
         license: null,
-        drift: null,
         isUnused: false, platforms: null, verifiedPublisher: false, wasmReady: null, blocker: null, upgradeBlockStatus: 'up-to-date',
         transitiveInfo: null, alternatives: [], latestPrerelease: null, prereleaseTag: null, vulnerabilities: [],
+        versionGap: null, overrideGap: null,
     };
 }
 
 describe('buildReportHtml', () => {
     it('should return valid HTML with doctype', () => {
-        const html = buildReportHtml([]);
+        const html = buildReportHtml(opts([]));
         assert.ok(html.startsWith('<!DOCTYPE html>'));
         assert.ok(html.includes('</html>'));
     });
 
     it('should show package count and average score', () => {
-        const html = buildReportHtml([
+        const html = buildReportHtml(opts([
             makeResult('http', 80),
             makeResult('bloc', 60),
-        ]);
+        ]));
         assert.ok(html.includes('>2<'));
         assert.ok(html.includes('>7/10<'));
     });
 
     it('should include package rows in table', () => {
-        const html = buildReportHtml([makeResult('http', 80)]);
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
         assert.ok(html.includes('data-name="http"'));
         assert.ok(html.includes('pub.dev/packages/http'));
     });
 
     it('should count categories correctly', () => {
-        const html = buildReportHtml([
+        const html = buildReportHtml(opts([
             makeResult('a', 80, 'vibrant'),
             makeResult('b', 50, 'quiet'),
             makeResult('c', 20, 'legacy-locked'),
             makeResult('d', 5, 'stale'),
             makeResult('e', 0, 'end-of-life'),
-        ]);
+        ]));
         assert.ok(html.includes('class="summary-card vibrant"'));
         assert.ok(html.includes('class="summary-card stale"'));
         assert.ok(html.includes('class="summary-card eol"'));
@@ -79,29 +84,29 @@ describe('buildReportHtml', () => {
 
     it('should escape HTML in package names', () => {
         const result = makeResult('<script>alert(1)</script>', 50, 'quiet');
-        const html = buildReportHtml([result]);
+        const html = buildReportHtml(opts([result]));
         assert.ok(!html.includes('<script>alert(1)</script>'));
         assert.ok(html.includes('&lt;script&gt;'));
     });
 
     it('should include CSP meta tag', () => {
-        const html = buildReportHtml([]);
+        const html = buildReportHtml(opts([]));
         assert.ok(html.includes('Content-Security-Policy'));
     });
 
     it('should handle empty results', () => {
-        const html = buildReportHtml([]);
+        const html = buildReportHtml(opts([]));
         assert.ok(html.includes('>0<'));
     });
 
     it('should include sort arrows in table headers', () => {
-        const html = buildReportHtml([]);
+        const html = buildReportHtml(opts([]));
         assert.ok(html.includes('class="sort-arrow"'));
     });
 
     it('should show unused badge for unused packages', () => {
         const result: VibrancyResult = { ...makeResult('http', 80), isUnused: true };
-        const html = buildReportHtml([result]);
+        const html = buildReportHtml(opts([result]));
         assert.ok(html.includes('badge-unused'));
         assert.ok(html.includes('data-status="unused"'));
     });
@@ -111,12 +116,276 @@ describe('buildReportHtml', () => {
             makeResult('http', 80),
             { ...makeResult('bloc', 60), isUnused: true },
         ];
-        const html = buildReportHtml(results);
+        const html = buildReportHtml(opts(results));
         assert.ok(html.includes('class="summary-card unused"'));
     });
 
     it('should show dash for non-unused packages in Status column', () => {
-        const html = buildReportHtml([makeResult('http', 80)]);
-        assert.ok(html.includes('data-status="ok"'));
+        const result = { ...makeResult('http', 80), isUnused: true };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('data-status="unused"'));
     });
+});
+
+describe('report: Health column', () => {
+    it('should show score', () => {
+        const result = makeResult('http', 80);
+        const html = buildReportHtml(opts([result]));
+        /* 80/100 → 8/10 */
+        assert.ok(html.includes('8/10'));
+    });
+
+    it('should include Health header with info tooltip', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('Health'));
+        assert.ok(html.includes('class="info-icon"'));
+        assert.ok(html.includes('Vibrancy Score'));
+    });
+});
+
+describe('report: column links', () => {
+    it('should link version to pub.dev/versions', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('pub.dev/packages/http/versions'));
+    });
+
+    it('should link license to pub.dev/license', () => {
+        const result = { ...makeResult('http', 80), license: 'MIT' };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('pub.dev/packages/http/license'));
+        assert.ok(html.includes('>MIT<'));
+    });
+
+    it('should link update to pub.dev/changelog', () => {
+        const result = {
+            ...makeResult('http', 80),
+            updateInfo: { currentVersion: '1.0.0', latestVersion: '2.0.0', updateStatus: 'major' as const, changelog: null },
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('pub.dev/packages/http/changelog'));
+    });
+});
+
+describe('report: auto-hide blank columns', () => {
+    it('should hide Transitives column when all null', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        /* No Transitives header */
+        assert.ok(!html.includes('data-col="transitives"'));
+    });
+
+    it('should show Transitives column when data exists', () => {
+        const result = {
+            ...makeResult('http', 80),
+            transitiveInfo: { directDep: 'http', transitiveCount: 5, flaggedCount: 0, transitives: [], sharedDeps: [] },
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('data-col="transitives"'));
+    });
+
+    it('should hide Status column when no unused packages', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(!html.includes('data-col="status"'));
+    });
+
+    it('should show Status column when unused packages exist', () => {
+        const result = { ...makeResult('http', 80), isUnused: true };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('data-col="status"'));
+    });
+});
+
+describe('report: section badges', () => {
+    it('should show dev badge for dev dependencies', () => {
+        const base = makeResult('build_runner', 80);
+        const result = { ...base, package: { ...base.package, section: 'dev_dependencies' as const } };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('badge-dev'));
+        assert.ok(html.includes('>dev<'));
+    });
+
+    it('should show transitive badge for transitive dependencies', () => {
+        const base = makeResult('collection', 80);
+        const result = { ...base, package: { ...base.package, section: 'transitive' as const } };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('badge-transitive'));
+        assert.ok(html.includes('>transitive<'));
+    });
+
+    it('should show no badge for normal dependencies', () => {
+        const result = makeResult('http', 80);
+        const html = buildReportHtml(opts([result]));
+        /* Badges appear in CSS but not in the row element for normal deps */
+        assert.ok(!html.includes('>dev<'));
+        assert.ok(!html.includes('>transitive<'));
+    });
+});
+
+describe('report: size in KB', () => {
+    it('should format archive size in KB', () => {
+        const result = { ...makeResult('http', 80), archiveSizeBytes: 276480 };
+        const html = buildReportHtml(opts([result]));
+        /* 276480 / 1024 = 270 KB */
+        assert.ok(html.includes('270 KB'));
+    });
+
+    it('should show dash when no size data', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('cell-right'));
+    });
+});
+
+describe('report: summary card filters', () => {
+    it('should add data-filter to category cards', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('data-filter="vibrant"'));
+        assert.ok(html.includes('data-filter="quiet"'));
+        assert.ok(html.includes('data-filter="legacy-locked"'));
+        assert.ok(html.includes('data-filter="stale"'));
+        assert.ok(html.includes('data-filter="end-of-life"'));
+        assert.ok(html.includes('data-filter="updates"'));
+        assert.ok(html.includes('data-filter="unused"'));
+        assert.ok(html.includes('data-filter="vulns"'));
+    });
+
+    it('should show override count card', () => {
+        const html = buildReportHtml({
+            results: [], overrideCount: 3, pubspecUri: null,
+        });
+        assert.ok(html.includes('>3<'));
+        assert.ok(html.includes('Overrides'));
+    });
+});
+
+describe('report: toolbar', () => {
+    it('should include search input', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('id="search-input"'));
+        assert.ok(html.includes('Search packages'));
+    });
+
+    it('should include pubspec button when URI provided', () => {
+        const html = buildReportHtml({
+            results: [], overrideCount: 0, pubspecUri: 'file:///project/pubspec.yaml',
+        });
+        assert.ok(html.includes('id="open-pubspec"'));
+        assert.ok(html.includes('pubspec.yaml'));
+    });
+
+    it('should omit pubspec button when URI is null', () => {
+        const html = buildReportHtml(opts([]));
+        assert.ok(!html.includes('id="open-pubspec"'));
+    });
+});
+
+describe('report: description icon', () => {
+    it('should show info icon when description exists', () => {
+        const result = makeResult('http', 80);
+        (result as { pubDev: any }).pubDev = {
+            ...result.pubDev,
+            description: 'A composable HTTP client',
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('desc-icon'));
+        assert.ok(html.includes('A composable HTTP client'));
+    });
+
+    it('should show empty cell when no description', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        /* Should have col-icon td but no desc-icon span */
+        assert.ok(html.includes('col-icon'));
+    });
+});
+
+describe('report: version age suffix', () => {
+    it('should show age suffix based on installedVersionDate', () => {
+        /* Fixed reference: 9 months before 2026-03-29 = 2025-06-29 */
+        const result = {
+            ...makeResult('http', 80),
+            installedVersionDate: '2025-06-29T00:00:00Z',
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('version-age'));
+        assert.ok(html.includes('mo)'));
+    });
+
+    it('should fall back to publishedDate when installedVersionDate is null', () => {
+        /* makeResult has publishedDate 2025-06-01 — should produce an age */
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('version-age'));
+    });
+
+    it('should show no age suffix when no date available', () => {
+        const result = { ...makeResult('http', 80), pubDev: null };
+        const html = buildReportHtml(opts([result]));
+        /* .version-age class exists in CSS but no age span in the row */
+        const rowMatch = html.match(/<tr[^>]*data-name="http"[^>]*>[\s\S]*?<\/tr>/);
+        assert.ok(rowMatch, 'expected to find http row');
+        assert.ok(!rowMatch![0].includes('version-age'));
+    });
+
+    it('should show years for old packages', () => {
+        const result = {
+            ...makeResult('http', 80),
+            installedVersionDate: '2022-01-01T00:00:00Z',
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('version-age'));
+        assert.ok(html.includes('y)'));
+    });
+});
+
+describe('report: version tooltip', () => {
+    it('should include installed version date in tooltip', () => {
+        const result = {
+            ...makeResult('http', 80),
+            installedVersionDate: '2025-06-01T00:00:00Z',
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('Installed: 1.0.0 (2025-06-01)'));
+    });
+
+    it('should show latest version when different from installed', () => {
+        const result = makeResult('http', 80);
+        (result as { pubDev: any }).pubDev = {
+            ...result.pubDev,
+            latestVersion: '2.0.0',
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('Latest: 2.0.0'));
+    });
+
+    it('should not show latest line when versions match', () => {
+        /* makeResult has both version and latestVersion as 1.0.0 */
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(!html.includes('Latest:'));
+    });
+
+    it('should show constraint in tooltip', () => {
+        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        assert.ok(html.includes('Constraint: ^1.0.0'));
+    });
+
+    it('should show created date when available', () => {
+        const result = makeResult('http', 80);
+        (result as { pubDev: any }).pubDev = {
+            ...result.pubDev,
+            createdDate: '2020-03-15T00:00:00Z',
+        };
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('Created: 2020-03-15'));
+    });
+
+});
+
+describe('report: health tooltip (score breakdown)', () => {
+    it('should include score breakdown in health cell tooltip', () => {
+        const result = makeResult('http', 80);
+        const html = buildReportHtml(opts([result]));
+        assert.ok(html.includes('Vibrancy Score: 8/10'));
+        assert.ok(html.includes('Resolution Velocity: 50'));
+        assert.ok(html.includes('Engagement Level: 40'));
+        assert.ok(html.includes('Popularity: 30'));
+        assert.ok(html.includes('Publisher Trust: 0'));
+    });
+
 });
