@@ -1,4 +1,4 @@
-/** Client-side JavaScript for chart interactivity (tooltips, highlights, scroll). */
+/** Client-side JavaScript for chart interactivity (tooltips, highlights, filter). */
 export function getChartScript(): string {
     return `
 (function() {
@@ -83,7 +83,7 @@ export function getChartScript(): string {
         });
     }
 
-    /* --- Bar row hover + click --- */
+    /* --- Bar row hover + click-to-filter --- */
     document.querySelectorAll('.bar-row').forEach(function(row) {
         row.addEventListener('mouseenter', function(e) {
             var label = row.querySelector('.bar-label');
@@ -97,11 +97,14 @@ export function getChartScript(): string {
             clearHighlight();
         });
         row.addEventListener('click', function() {
-            scrollToPackage(row.dataset.package);
+            /* toggleChartFilter is defined in report-script.ts (global scope) */
+            if (typeof toggleChartFilter === 'function') {
+                toggleChartFilter(row.dataset.package);
+            }
         });
     });
 
-    /* --- Donut segment hover + click --- */
+    /* --- Donut segment hover + click-to-filter --- */
     segments.forEach(function(seg) {
         seg.addEventListener('mouseenter', function(e) {
             showTooltip(e, seg.dataset.name, seg.dataset.sizeLabel, seg.dataset.pct);
@@ -113,35 +116,12 @@ export function getChartScript(): string {
             clearHighlight();
         });
         seg.addEventListener('click', function() {
-            scrollToPackage(seg.dataset.package);
+            /* toggleChartFilter is defined in report-script.ts (global scope) */
+            if (typeof toggleChartFilter === 'function') {
+                toggleChartFilter(seg.dataset.package);
+            }
         });
     });
-
-    /* --- Click-to-scroll: smooth scroll to matching table row + flash ---
-     * Uses loop comparison instead of CSS selector construction to
-     * avoid selector injection from unexpected package name characters. */
-    function scrollToPackage(packageName) {
-        if (!packageName) return;
-        var rows = document.querySelectorAll('#pkg-body tr');
-        var row = null;
-        for (var i = 0; i < rows.length; i++) {
-            if (rows[i].dataset.name === packageName) {
-                row = rows[i];
-                break;
-            }
-        }
-        if (!row) return;
-        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        row.style.transition = 'background 0.3s ease';
-        row.style.background =
-            'var(--vscode-list-activeSelectionBackground)';
-        /* Clear both background and transition to avoid interfering
-         * with the row's CSS hover transition rules. */
-        setTimeout(function() {
-            row.style.background = '';
-            row.style.transition = '';
-        }, 1500);
-    }
 
     /* --- Client-side size formatter (mirrors server-side formatSizeMB) --- */
     function fmtBytes(raw) {

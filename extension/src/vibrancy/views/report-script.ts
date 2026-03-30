@@ -1,36 +1,42 @@
-/** Client-side JavaScript for the report webview (sorting + filtering). */
+/** Client-side JavaScript for the report webview (sorting, filtering, search). */
 export function getReportScript(): string {
     return `
-        const vscode = acquireVsCodeApi();
-        let sortCol = 'score';
-        let sortAsc = true;
+        var vscode = acquireVsCodeApi();
+
+        /* ---- Sorting state ---- */
+        var sortCol = 'score';
+        var sortAsc = true;
+
+        /* ---- Filter state (shared across card, chart, and search filters) ---- */
+        var activeCardFilter = null;
+        var chartFilterPackage = null;
+
+        /* ---- Sorting ---- */
 
         function sortTable(col) {
-            if (sortCol === col) {
-                sortAsc = !sortAsc;
-            } else {
-                sortCol = col;
-                sortAsc = true;
-            }
-            const tbody = document.getElementById('pkg-body');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            rows.sort((a, b) => {
-                const av = a.dataset[col] || '';
-                const bv = b.dataset[col] || '';
-                const an = parseFloat(av);
-                const bn = parseFloat(bv);
+            if (sortCol === col) { sortAsc = !sortAsc; }
+            else { sortCol = col; sortAsc = true; }
+            var tbody = document.getElementById('pkg-body');
+            /* Guard: bail if table body is not in the DOM yet. */
+            if (!tbody) { return; }
+            var rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.sort(function(a, b) {
+                var av = a.dataset[col] || '';
+                var bv = b.dataset[col] || '';
+                var an = parseFloat(av);
+                var bn = parseFloat(bv);
                 if (!isNaN(an) && !isNaN(bn)) {
                     return sortAsc ? an - bn : bn - an;
                 }
                 return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
             });
-            rows.forEach(r => tbody.appendChild(r));
+            rows.forEach(function(r) { tbody.appendChild(r); });
             updateArrows();
         }
 
         function updateArrows() {
-            document.querySelectorAll('th[data-col]').forEach(th => {
-                const arrow = th.querySelector('.sort-arrow');
+            document.querySelectorAll('th[data-col]').forEach(function(th) {
+                var arrow = th.querySelector('.sort-arrow');
                 if (th.dataset.col === sortCol) {
                     arrow.textContent = sortAsc ? ' \\u25B2' : ' \\u25BC';
                 } else {
@@ -39,8 +45,125 @@ export function getReportScript(): string {
             });
         }
 
-        document.querySelectorAll('th[data-col]').forEach(th => {
-            th.addEventListener('click', () => sortTable(th.dataset.col));
+        document.querySelectorAll('th[data-col]').forEach(function(th) {
+            th.addEventListener('click', function() { sortTable(th.dataset.col); });
         });
+
+        /* ---- Unified filter engine ---- */
+
+        function applyFilters() {
+            var searchVal = '';
+            var searchEl = document.getElementById('search-input');
+            if (searchEl) { searchVal = searchEl.value.toLowerCase(); }
+            var rows = document.querySelectorAll('#pkg-body tr');
+            rows.forEach(function(row) {
+                var show = matchesAllFilters(row, searchVal);
+                row.style.display = show ? '' : 'none';
+            });
+        }
+
+        function matchesAllFilters(row, searchVal) {
+            if (searchVal && (row.dataset.name || '').toLowerCase().indexOf(searchVal) === -1) {
+                return false;
+            }
+            if (activeCardFilter && !matchesCardFilter(row, activeCardFilter)) {
+                return false;
+            }
+            if (chartFilterPackage && row.dataset.name !== chartFilterPackage) {
+                return false;
+            }
+            return true;
+        }
+
+        function matchesCardFilter(row, filter) {
+            switch (filter) {
+                case 'vibrant': case 'quiet': case 'legacy-locked':
+                case 'stale': case 'end-of-life':
+                    return row.dataset.category === filter;
+                case 'updates':
+                    return row.dataset.update !== 'up-to-date'
+                        && row.dataset.update !== 'unknown';
+                case 'unused':
+                    return row.dataset.status === 'unused';
+                case 'vulns':
+                    return parseInt(row.dataset.vulns, 10) > 0;
+                default:
+                    return true;
+            }
+        }
+
+        /* ---- Summary card click-to-filter ---- */
+
+        function filterByCard(filterValue) {
+            if (activeCardFilter === filterValue) {
+                activeCardFilter = null;
+            } else {
+                activeCardFilter = filterValue;
+            }
+            applyFilters();
+            updateCardStyles();
+        }
+
+        function updateCardStyles() {
+            document.querySelectorAll('.summary-card[data-filter]').forEach(function(card) {
+                card.classList.toggle('card-active', card.dataset.filter === activeCardFilter);
+            });
+        }
+
+        document.querySelectorAll('.summary-card[data-filter]').forEach(function(card) {
+            card.addEventListener('click', function() {
+                filterByCard(card.dataset.filter);
+            });
+        });
+
+        /* ---- Chart filter toggle (called from chart-script.ts) ---- */
+
+        function toggleChartFilter(packageName) {
+            if (!packageName) { return; }
+            if (chartFilterPackage === packageName) {
+                chartFilterPackage = null;
+            } else {
+                chartFilterPackage = packageName;
+            }
+            applyFilters();
+            updateChartFilterIndicator();
+        }
+
+        function updateChartFilterIndicator() {
+            var indicator = document.getElementById('chart-filter-indicator');
+            if (!indicator) { return; }
+            var textEl = indicator.querySelector('.filter-text');
+            if (chartFilterPackage) {
+                if (textEl) { textEl.textContent = 'Filtered: ' + chartFilterPackage; }
+                indicator.style.display = 'flex';
+            } else {
+                indicator.style.display = 'none';
+            }
+        }
+
+        var clearChartBtn = document.getElementById('clear-chart-filter');
+        if (clearChartBtn) {
+            clearChartBtn.addEventListener('click', function() {
+                chartFilterPackage = null;
+                applyFilters();
+                updateChartFilterIndicator();
+            });
+        }
+
+        /* ---- Search box ---- */
+
+        var searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() { applyFilters(); });
+        }
+
+        /* ---- Open pubspec.yaml ---- */
+
+        var pubspecBtn = document.getElementById('open-pubspec');
+        if (pubspecBtn) {
+            pubspecBtn.addEventListener('click', function() {
+                vscode.postMessage({ type: 'openPubspec' });
+            });
+        }
     `;
 }

@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { calcBloatRating, formatSizeMB } from '../../../vibrancy/scoring/bloat-calculator';
+import { calcBloatRating, formatSizeMB, formatSizeKB } from '../../../vibrancy/scoring/bloat-calculator';
 
 describe('bloat-calculator', () => {
     describe('calcBloatRating', () => {
@@ -62,6 +62,27 @@ describe('bloat-calculator', () => {
 
         it('should show one decimal place for large sizes', () => {
             assert.strictEqual(formatSizeMB(52_428_800), '50.0 MB');
+        });
+    });
+
+    describe('formatSizeKB', () => {
+        it('should format bytes as KB with rounding', () => {
+            /* 276480 / 1024 = 270 */
+            assert.strictEqual(formatSizeKB(276_480), '270 KB');
+        });
+
+        it('should use comma grouping for large values', () => {
+            /* 3,670,016 / 1024 = 3,584 */
+            assert.strictEqual(formatSizeKB(3_670_016), '3,584 KB');
+        });
+
+        it('should round to nearest KB', () => {
+            /* 1500 / 1024 ≈ 1.46 → rounds to 1 */
+            assert.strictEqual(formatSizeKB(1_500), '1 KB');
+        });
+
+        it('should return 0 KB for zero bytes', () => {
+            assert.strictEqual(formatSizeKB(0), '0 KB');
         });
     });
 });
