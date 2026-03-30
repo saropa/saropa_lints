@@ -1,10 +1,12 @@
 """
-Version and changelog utilities.
+Version, changelog, and version-prompt utilities.
 
 Reads version/name from pubspec.yaml, validates and displays
-changelog entries for the publish workflow.
+changelog entries, provides cross-platform version prompting,
+and synchronizes version across pubspec and CHANGELOG for the
+publish workflow.
 
-Version:   1.1
+Version:   2.0
 Author:    Saropa
 Copyright: (c) 2025-2026 Saropa
 """
@@ -12,13 +14,20 @@ Copyright: (c) 2025-2026 Saropa
 from __future__ import annotations
 
 import re
+import sys
+import time
 from pathlib import Path
 
 from scripts.modules._utils import (
     Color,
+    ExitCode,
+    exit_with_error,
     print_colored,
+    print_info,
+    print_success,
     print_warning,
 )
+from scripts.modules._git_ops import tag_exists_on_remote
 
 # Semantic version with optional pre-release suffix.
 # Matches: 5.0.0, 5.0.0-beta.1, 5.0.0-rc.2, etc.
@@ -291,3 +300,252 @@ def add_unreleased_section(changelog_path: Path) -> bool:
 
     changelog_path.write_text(content, encoding="utf-8")
     return True
+
+
+# =============================================================================
+# VERSION PROMPTING (cross-platform, with timeout)
+# =============================================================================
+
+# cspell:ignore kbhit getwch
+# Version prompt split into helpers to keep cognitive complexity under limit (SonarQube).
+
+
+def _handle_win_key(
+    ch: str, buffer: list[str], default: str
+) -> tuple[str | None, bool]:
+    """Handle one Windows key; return (value to return or None, raise KeyboardInterrupt)."""
+    if ch in ("\r", "\n"):
+        return ("".join(buffer).strip() or default, False)
+    if ch == "\x08":  # Backspace
+        if buffer:
+            buffer.pop()
+            sys.stdout.write("\b \b")
+            sys.stdout.flush()
+        return (None, False)
+    if ch == "\x03":  # Ctrl+C
+        return (None, True)
+    if ch.isprintable():
+        buffer.append(ch)
+        sys.stdout.write(ch)
+        sys.stdout.flush()
+    return (None, False)
+
+
+def _prompt_version_windows(default: str, timeout: int) -> str:
+    """Windows: editable pre-filled prompt; return buffer or default on Enter/timeout."""
+    import msvcrt
+
+    sys.stdout.write(f"  Version to publish: {default}")
+    sys.stdout.flush()
+    buffer = list(default)
+    start = time.time()
+    while time.time() - start < timeout:
+        if not msvcrt.kbhit():
+            time.sleep(0.05)
+            continue
+        ch = msvcrt.getwch()
+        result, do_raise = _handle_win_key(ch, buffer, default)
+        if do_raise:
+            raise KeyboardInterrupt
+        if result is not None:
+            print()
+            return result
+        time.sleep(0.05)
+    print()
+    return "".join(buffer).strip() or default
+
+
+def _prompt_version_unix(default: str, timeout: int) -> str:
+    """Unix: readline with select-based timeout; [default] in brackets."""
+    import select
+
+    sys.stdout.write(f"  Version to publish [{default}]: ")
+    sys.stdout.flush()
+    ready, _, _ = select.select([sys.stdin], [], [], timeout)
+    if not ready:
+        print()
+        return default
+    user_input = sys.stdin.readline().strip()
+    return user_input if user_input else default
+
+
+def prompt_version(default: str, timeout: int = 30) -> str:
+    """Prompt for publish version with timeout.
+
+    On Windows the default is pre-filled and editable.
+    On Unix it is shown in brackets; press Enter to accept.
+    Returns the default after *timeout* seconds of inactivity.
+    """
+    if sys.platform == "win32":
+        return _prompt_version_windows(default, timeout)
+    return _prompt_version_unix(default, timeout)
+
+
+def prompt_version_until_valid(default_version: str) -> str:
+    """Prompt for version until valid semver; return version string."""
+    while True:
+        version = prompt_version(default_version)
+        if re.match(rf"^{_VERSION_RE}$", version):
+            return version
+        print_warning(
+            f"Invalid version format '{version}'. "
+            f"Use X.Y.Z or X.Y.Z-pre.N"
+        )
+
+
+# =============================================================================
+# VERSION / CHANGELOG SYNCHRONIZATION
+# =============================================================================
+
+
+def apply_version_and_rename_unreleased(
+    pubspec_path: Path,
+    changelog_path: Path,
+    pubspec_version: str,
+    version: str,
+) -> str:
+    """Write version to pubspec and rename [Unreleased] in CHANGELOG; retry on conflict.
+
+    Returns:
+        The version string that was successfully synced.
+    """
+    version_to_sync = version
+    while True:
+        if version_to_sync != pubspec_version:
+            set_version_in_pubspec(pubspec_path, version_to_sync)
+            print_success(f"Updated pubspec.yaml to {version_to_sync}")
+        try:
+            if rename_unreleased_to_version(
+                changelog_path, version_to_sync,
+            ):
+                print_success(
+                    f"Renamed [Unreleased] to [{version_to_sync}] "
+                    f"in CHANGELOG.md"
+                )
+            return version_to_sync
+        except ValueError as exc:
+            suggested = increment_version(version_to_sync)
+            print_warning(str(exc))
+            print_colored(
+                f"  Suggested version: {suggested} (press Enter or edit)",
+                Color.CYAN,
+            )
+            version_to_sync = prompt_version(suggested)
+            if not re.match(rf"^{_VERSION_RE}$", version_to_sync):
+                print_warning(
+                    f"Invalid version format '{version_to_sync}'. "
+                    f"Use X.Y.Z or X.Y.Z-pre.N"
+                )
+
+
+def reconcile_pubspec_changelog_versions(
+    pubspec_path: Path,
+    changelog_path: Path,
+    version_to_sync: str,
+) -> str:
+    """Ensure pubspec and CHANGELOG versions match; exit on failure.
+
+    Returns:
+        The reconciled version string.
+    """
+    changelog_version = get_latest_changelog_version(changelog_path)
+    if changelog_version is None:
+        exit_with_error(
+            "Could not extract version from CHANGELOG.md",
+            ExitCode.CHANGELOG_FAILED,
+        )
+    if version_to_sync == changelog_version:
+        return version_to_sync
+    if parse_version(version_to_sync) < parse_version(changelog_version):
+        print_warning(
+            f"pubspec version ({version_to_sync}) is behind "
+            f"CHANGELOG ({changelog_version}). Updating pubspec..."
+        )
+        set_version_in_pubspec(pubspec_path, changelog_version)
+        print_success(f"Updated pubspec.yaml to {changelog_version}")
+        return changelog_version
+    print_warning(
+        f"pubspec version ({version_to_sync}) is ahead "
+        f"of CHANGELOG ({changelog_version})."
+    )
+    response = (
+        input(
+            f"  Add a [{version_to_sync}] section to "
+            f"CHANGELOG.md? [Y/n] "
+        )
+        .strip()
+        .lower()
+    )
+    if response.startswith("n"):
+        exit_with_error(
+            "Publish canceled — update CHANGELOG.md manually.",
+            ExitCode.CHANGELOG_FAILED,
+        )
+    add_version_section(
+        changelog_path, version_to_sync, "Version bump",
+    )
+    print_success(
+        f"Added [{version_to_sync}] section to CHANGELOG.md"
+    )
+    return version_to_sync
+
+
+def maybe_bump_for_tag_clash(
+    project_dir: Path,
+    pubspec_path: Path,
+    changelog_path: Path,
+    version_to_sync: str,
+) -> str:
+    """If tag v{version} exists on remote, bump version and add CHANGELOG section.
+
+    Returns:
+        The final version string (bumped if tag existed, unchanged otherwise).
+    """
+    tag_name = f"v{version_to_sync}"
+    if not tag_exists_on_remote(project_dir, tag_name):
+        return version_to_sync
+    next_version = increment_version(version_to_sync)
+    print_warning(
+        f"Tag {tag_name} already exists on remote. "
+        f"Version {version_to_sync} has already been published."
+    )
+    print_info(
+        f"Bumping to {next_version} and adding CHANGELOG section."
+    )
+    set_version_in_pubspec(pubspec_path, next_version)
+    add_version_section(
+        changelog_path, next_version, "Release version",
+    )
+    print_success(
+        f"Updated pubspec.yaml to {next_version} and added "
+        f"[{next_version}] to CHANGELOG.md (Release version)."
+    )
+    return next_version
+
+
+def sync_version_with_changelog(
+    project_dir: Path,
+    pubspec_path: Path,
+    changelog_path: Path,
+    pubspec_version: str,
+    version: str,
+) -> str:
+    """Update pubspec/CHANGELOG with chosen version; reconcile; handle tag clash.
+
+    Full version synchronization workflow:
+    1. Apply version and rename [Unreleased] heading
+    2. Reconcile any pubspec/CHANGELOG version mismatch
+    3. Bump if the git tag already exists on remote
+
+    Returns:
+        The final resolved version string.
+    """
+    version_to_sync = apply_version_and_rename_unreleased(
+        pubspec_path, changelog_path, pubspec_version, version,
+    )
+    version_to_sync = reconcile_pubspec_changelog_versions(
+        pubspec_path, changelog_path, version_to_sync,
+    )
+    return maybe_bump_for_tag_clash(
+        project_dir, pubspec_path, changelog_path, version_to_sync,
+    )

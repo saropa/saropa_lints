@@ -1,28 +1,32 @@
 """
-VS Code extension package and publish for saropa_lints.
+VS Code extension package, publish, and store verification for saropa_lints.
 
 Syncs extension version with package version, compiles, packages .vsix,
-and optionally publishes to VS Code Marketplace and Open VSX.
-Steps are sequential by design (compile → package → publish); no parallelism.
+publishes to VS Code Marketplace and Open VSX, and verifies store
+propagation by polling the Marketplace and Open VSX APIs.
 
 Used by the unified publish.py workflow (package and extension are
 intrinsically linked).
 
-Version:   1.0
+Version:   2.0
 Author:    Saropa
 Copyright: (c) 2025-2026 Saropa
 """
 
 from __future__ import annotations
 
+import json
 import os
 import platform
 import re
+import time
+import urllib.request
 from pathlib import Path
 
 from scripts.modules._utils import (
     print_colored,
     print_error,
+    print_header,
     print_info,
     print_success,
     print_warning,
@@ -265,3 +269,148 @@ def publish_extension(project_dir: Path, vsix_path: Path) -> bool:
     if not publish_extension_to_marketplace(project_dir, vsix_path):
         return False
     return publish_extension_to_ovsx(project_dir, vsix_path)
+
+
+# =============================================================================
+# EXTENSION IDENTITY AND STORE VERIFICATION
+# =============================================================================
+
+
+def get_extension_identity(project_dir: Path) -> tuple[str, str]:
+    """Read publisher and name from extension/package.json.
+
+    Returns:
+        (publisher, name) or ('', '') if unavailable.
+    """
+    pkg_json = project_dir / "extension" / "package.json"
+    if not pkg_json.is_file():
+        return ("", "")
+    try:
+        data = json.loads(pkg_json.read_text(encoding="utf-8"))
+        return (data.get("publisher", ""), data.get("name", ""))
+    except (json.JSONDecodeError, OSError):
+        return ("", "")
+
+
+def _fetch_marketplace_latest_version(item_name: str) -> str | None:
+    """Return latest Marketplace version for publisher.extension, or None on lookup failure."""
+    url = (
+        "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery"
+    )
+    payload = {
+        "filters": [
+            {
+                "criteria": [{"filterType": 7, "value": item_name}],
+                "pageNumber": 1,
+                "pageSize": 1,
+                "sortBy": 0,
+                "sortOrder": 0,
+            }
+        ],
+        "assetTypes": [],
+        "flags": 103,
+    }
+    body = json.dumps(payload).encode("utf-8")
+    request = urllib.request.Request(
+        url,
+        data=body,
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/json;api-version=7.2-preview.1",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=15) as response:
+            data = json.loads(response.read().decode("utf-8"))
+        results = data.get("results", [])
+        if not results:
+            return None
+        extensions = results[0].get("extensions", [])
+        if not extensions:
+            return None
+        versions = extensions[0].get("versions", [])
+        if not versions:
+            return None
+        return versions[0].get("version")
+    except (
+        OSError,
+        ValueError,
+        KeyError,
+        TypeError,
+    ):
+        return None
+
+
+def _fetch_open_vsx_latest_version(
+    publisher: str, extension_name: str,
+) -> str | None:
+    """Return latest Open VSX version, or None on lookup failure."""
+    url = f"https://open-vsx.org/api/{publisher}/{extension_name}"
+    try:
+        with urllib.request.urlopen(url, timeout=15) as response:
+            data = json.loads(response.read().decode("utf-8"))
+        version = data.get("version")
+        return version if isinstance(version, str) else None
+    except (
+        OSError,
+        ValueError,
+        KeyError,
+        TypeError,
+    ):
+        return None
+
+
+def verify_extension_store_publication(
+    publisher: str,
+    extension_name: str,
+    expected_version: str,
+    interval_seconds: int = 30,
+    timeout_seconds: int = 600,
+) -> bool:
+    """Poll Marketplace and Open VSX until both report expected version or timeout.
+
+    Checks every *interval_seconds* for up to *timeout_seconds*. Returns True
+    when both stores report *expected_version*, False on timeout.
+    """
+    print_header("FINAL STEP: STORE PUBLICATION VERIFICATION")
+    print_info(
+        "Checking Marketplace and Open VSX every "
+        f"{interval_seconds}s for up to {timeout_seconds // 60} minutes..."
+    )
+    item_name = f"{publisher}.{extension_name}"
+    attempts = (timeout_seconds // interval_seconds) + 1
+
+    last_marketplace = "unknown"
+    last_openvsx = "unknown"
+    for attempt in range(1, attempts + 1):
+        marketplace_version = _fetch_marketplace_latest_version(item_name)
+        open_vsx_version = _fetch_open_vsx_latest_version(
+            publisher, extension_name,
+        )
+        last_marketplace = marketplace_version or "unavailable"
+        last_openvsx = open_vsx_version or "unavailable"
+
+        marketplace_ok = marketplace_version == expected_version
+        open_vsx_ok = open_vsx_version == expected_version
+
+        if marketplace_ok and open_vsx_ok:
+            print_success(
+                f"Store propagation complete: Marketplace={marketplace_version}, "
+                f"Open VSX={open_vsx_version}"
+            )
+            return True
+
+        print_info(
+            f"Attempt {attempt}/{attempts}: Marketplace={last_marketplace}, "
+            f"Open VSX={last_openvsx}"
+        )
+        if attempt < attempts:
+            time.sleep(interval_seconds)
+
+    print_warning(
+        "Store propagation not confirmed within 10 minutes. "
+        f"Last seen versions: Marketplace={last_marketplace}, "
+        f"Open VSX={last_openvsx}."
+    )
+    return False

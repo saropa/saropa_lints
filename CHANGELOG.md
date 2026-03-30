@@ -33,6 +33,15 @@
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+- Modularized `scripts/publish.py` (1,246 → 202 lines) into three focused modules: `_publish_workflow.py` (pipeline orchestration), version prompting/sync into `_version_changelog.py`, and store verification into `_extension_publish.py`
+- Added `scripts/README.md` with architecture diagram, module map, exit codes, and troubleshooting
+
+---
+
 ## [10.4.0]
 
 Vibrancy Report overhaul — auto-hiding blank columns, clickable summary cards and chart segments for filtering, search box, richer version/health tooltips, and pub.dev deep links throughout. — [log](https://github.com/saropa/saropa_lints/blob/v10.4.0/CHANGELOG.md)
