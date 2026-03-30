@@ -110,7 +110,7 @@ void main() {
     });
   });
 
-  group('rule instantiation', () {
+  group('Flutter Deprecation Migration Rules - Rule Instantiation', () {
     test('AvoidRemovedRenderObjectElementMethodsRule', () {
       final rule = AvoidRemovedRenderObjectElementMethodsRule();
       expect(

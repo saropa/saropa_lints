@@ -90,7 +90,7 @@ void main() {
     });
   });
 
-  group('rule instantiation', () {
+  group('Dart Sdk 34 Deprecation Rules - Rule Instantiation', () {
     test('AvoidDeprecatedFileSystemDeleteEventIsDirectoryRule', () {
       final rule = AvoidDeprecatedFileSystemDeleteEventIsDirectoryRule();
       expect(

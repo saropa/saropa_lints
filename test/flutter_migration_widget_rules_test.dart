@@ -19,8 +19,8 @@ void main() {
     });
   });
 
-  group('PreferSuperKeyRule', () {
-    test('instantiates with expected metadata', () {
+  group('Flutter Migration Widget Rules - Rule Instantiation', () {
+    test('PreferSuperKeyRule', () {
       final rule = PreferSuperKeyRule();
       expect(rule.code.lowerCaseName, 'prefer_super_key');
       expect(rule.code.problemMessage, contains('[prefer_super_key]'));
@@ -29,10 +29,8 @@ void main() {
       expect(rule.fixGenerators, isNotEmpty);
       expect(rule.impact, LintImpact.medium);
     });
-  });
 
-  group('AvoidChipDeleteInkWellCircleBorderRule', () {
-    test('instantiates with expected metadata', () {
+    test('AvoidChipDeleteInkWellCircleBorderRule', () {
       final rule = AvoidChipDeleteInkWellCircleBorderRule();
       expect(
         rule.code.lowerCaseName,

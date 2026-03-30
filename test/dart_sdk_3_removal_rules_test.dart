@@ -217,7 +217,7 @@ void main() {
     });
   });
 
-  group('rule instantiation', () {
+  group('Dart Sdk 3 Removal Rules - Rule Instantiation', () {
     test('AvoidDeprecatedListConstructorRule', () {
       final rule = AvoidDeprecatedListConstructorRule();
       expect(rule.code.lowerCaseName, 'avoid_deprecated_list_constructor');
