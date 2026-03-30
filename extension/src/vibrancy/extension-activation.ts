@@ -576,7 +576,11 @@ function registerCommands(
         ),
         vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.showReport',
-            () => VibrancyReportPanel.createOrShow(latestResults),
+            () => VibrancyReportPanel.createOrShow({
+                results: latestResults,
+                overrideCount: lastOverrideAnalyses.length,
+                pubspecUri: lastParsedDeps?.yamlUri?.toString() ?? null,
+            }),
         ),
         vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.clearCache',
@@ -761,13 +765,12 @@ async function runScanInner(
             }
 
             const logger = new ScanLogger();
-            const flutterReleases = await fetchFlutterReleases(
+            // Fetch Flutter releases for SDK diagnostics on file open
+            lastFlutterReleases = await fetchFlutterReleases(
                 targets.cache, logger,
             );
-            // Cache releases for SDK diagnostics on file open
-            lastFlutterReleases = flutterReleases;
             const scanConfig = {
-                ...readScanConfig(), logger, flutterReleases,
+                ...readScanConfig(), logger,
             };
             const deps = parsed.deps.filter(
                 d => !scanConfig.allowSet.has(d.name),

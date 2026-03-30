@@ -31,7 +31,6 @@ describe('FreshnessWatcher', () => {
         publisherTrust: 0,
         updateInfo: null,
         license: null,
-        drift: null,
         archiveSizeBytes: null,
         bloatRating: null,
         isUnused: false,

@@ -41,7 +41,6 @@ function makeResult(overrides: Partial<VibrancyResult> = {}): VibrancyResult {
         archiveSizeBytes: null,
         bloatRating: null,
         license: null,
-        drift: null,
         isUnused: false, platforms: null, verifiedPublisher: false, wasmReady: null, blocker: null, upgradeBlockStatus: 'up-to-date',
         transitiveInfo: null, alternatives: [], latestPrerelease: null, prereleaseTag: null,
         vulnerabilities: [],

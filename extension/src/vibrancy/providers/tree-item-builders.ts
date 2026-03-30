@@ -100,14 +100,6 @@ function buildVersionGroup(result: VibrancyResult): GroupItem {
             '🌐 WASM', result.wasmReady ? 'Ready' : 'Not ready',
         ));
     }
-    if (result.drift) {
-        const d = result.drift;
-        const behind = d.releasesBehind === 0
-            ? 'Current' : `${d.releasesBehind} Flutter releases behind`;
-        items.push(new DetailItem(
-            '🕐 Drift', `${behind} (${d.label})`,
-        ));
-    }
     // Collapse when on latest version — the details are less actionable
     const state = isLatest
         ? vscode.TreeItemCollapsibleState.Collapsed

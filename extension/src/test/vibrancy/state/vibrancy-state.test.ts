@@ -113,7 +113,6 @@ describe('VibrancyStateManager', () => {
             publisherTrust: 0,
             updateInfo: null,
             license: null,
-            drift: null,
             archiveSizeBytes: null,
             bloatRating: null,
             isUnused: false,
@@ -217,7 +216,6 @@ describe('VibrancyStateManager', () => {
                 pubDev: null, github: null, knownIssue: null, score: 50, category: 'vibrant',
                 resolutionVelocity: 0, engagementLevel: 0, popularity: 0, publisherTrust: 0,
                 updateInfo: { currentVersion: '1.0.0', latestVersion: '2.0.0', updateStatus: 'major', changelog: null },
-                license: null, drift: null, archiveSizeBytes: null, bloatRating: null, isUnused: false,
                 platforms: null, verifiedPublisher: false, wasmReady: null, blocker: null,
                 upgradeBlockStatus: 'up-to-date', transitiveInfo: null, alternatives: [], latestPrerelease: null, prereleaseTag: null, vulnerabilities: [],
             }]);

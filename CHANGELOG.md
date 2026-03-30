@@ -34,6 +34,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Vibrancy Report
+
+- **(Extension)** Version column now shows a compact age suffix (e.g. `(4mo)`, `(2y)`) based on installed version publish date
+- **(Extension)** Version column tooltip shows installed version date, latest version (when different), package creation date, and constraint
+- **(Extension)** Health column tooltip shows vibrancy score breakdown: Resolution Velocity, Engagement Level, Popularity, and Publisher Trust
+- **(Extension)** `createdDate` field added to pub.dev metadata (first-ever publish date for the package)
+- **(Extension)** `installedVersionDate` field added to vibrancy results (publish date of the installed version, looked up from the versions API)
+
+---
+
 ## [10.3.0]
 
 ### Changed

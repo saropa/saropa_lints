@@ -19,6 +19,8 @@
     "src/test/vibrancy/services/review-state.test.ts",
     "src/test/vibrancy/scoring/status-classifier.test.ts",
     "src/test/vibrancy/scoring/vibrancy-calculator.test.ts",
+    "src/test/vibrancy/scoring/bloat-calculator.test.ts",
+    "src/test/vibrancy/views/report-html.test.ts",
     "src/rulePacks/rulePackDefinitions.ts",
     "src/rulePacks/rulePackYaml.ts",
     "src/test/rulePacks/**/*.ts",

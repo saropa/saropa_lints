@@ -7,7 +7,6 @@ import { ScoringWeights } from './scoring/vibrancy-calculator';
 import { ReportMetadata } from './services/report-exporter';
 import { CacheService } from './services/cache-service';
 import { ScanLogger } from './services/scan-logger';
-import { FlutterRelease } from './services/flutter-releases';
 import {
     getGithubToken, getAllowlistSet, getScoringWeights,
     getRepoOverrides, getPublisherTrustBonus, getIncludeDevDependencies,
@@ -21,7 +20,6 @@ export interface ScanConfig {
     readonly repoOverrides: Record<string, string>;
     readonly publisherTrustBonus: number;
     readonly logger?: ScanLogger;
-    readonly flutterReleases?: readonly FlutterRelease[];
 }
 
 export function readScanConfig(): ScanConfig {
@@ -59,7 +57,6 @@ export async function scanPackages(
                 weights: scanConfig.weights,
                 repoOverrides: scanConfig.repoOverrides,
                 publisherTrustBonus: scanConfig.publisherTrustBonus,
-                flutterReleases: scanConfig.flutterReleases,
             });
             completed++;
             progress.report({

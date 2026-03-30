@@ -25,7 +25,6 @@ function makeResult(
         publisherTrust: 0,
         updateInfo: null,
         license: null,
-        drift: null,
         archiveSizeBytes: null,
         bloatRating: null,
         isUnused: false, platforms: null, verifiedPublisher: false, wasmReady: null, blocker: null, upgradeBlockStatus: 'up-to-date',

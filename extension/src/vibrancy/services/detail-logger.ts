@@ -180,10 +180,6 @@ export class DetailLogger {
             lines.push(`Platforms: ${result.platforms.join(', ')}`);
         }
 
-        if (result.drift) {
-            lines.push(`Drift: ${result.drift.releasesBehind} releases behind (${result.drift.label})`);
-        }
-
         if (lines.length === 0) {
             return;
         }

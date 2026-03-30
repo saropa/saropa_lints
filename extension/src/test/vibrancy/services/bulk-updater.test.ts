@@ -38,7 +38,6 @@ describe('bulk-updater', () => {
             changelog: null,
         },
         license: 'MIT',
-        drift: null,
         archiveSizeBytes: null,
         bloatRating: null,
         isUnused: false,

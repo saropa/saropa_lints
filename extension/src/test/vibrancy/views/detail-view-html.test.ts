@@ -44,7 +44,6 @@ function makeResult(
         archiveSizeBytes: null,
         bloatRating: null,
         license: 'MIT',
-        drift: null,
         isUnused: false,
         platforms: ['android', 'ios', 'web'],
         verifiedPublisher: true,

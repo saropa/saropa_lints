@@ -201,13 +201,6 @@ function buildCommunitySection(r: VibrancyResult): string {
         parts.push(`<div class="detail-row">✅ ${escapeHtml(r.pubDev.publisher)}</div>`);
     }
 
-    if (r.drift) {
-        const driftLabel = r.drift.label === 'current' ? '✓ Current'
-            : r.drift.label === 'recent' ? '✓ Recent'
-            : `${r.drift.releasesBehind} releases behind (${r.drift.label})`;
-        parts.push(`<div class="detail-row muted">Drift: ${driftLabel}</div>`);
-    }
-
     if (parts.length === 0) {
         return '';
     }

@@ -24,7 +24,6 @@ function makeResult(name: string, score: number): VibrancyResult {
         score, category: score >= 70 ? 'vibrant' : 'end-of-life',
         resolutionVelocity: 0, engagementLevel: 0,
         popularity: 0, publisherTrust: 0,
-        updateInfo: null, license: null, drift: null,
         archiveSizeBytes: null, bloatRating: null,
         isUnused: false, platforms: null,
         verifiedPublisher: false, wasmReady: null, blocker: null, upgradeBlockStatus: 'up-to-date',
