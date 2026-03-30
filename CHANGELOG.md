@@ -1,10 +1,8 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+2100+ custom lint rules with 250+ quick fixes for Flutter and Dart — static analysis for security, accessibility, performance, and library-specific patterns. Includes a VS Code extension with Package Vibrancy scoring.
 
-> **Looking for older changes?** \
+> **Looking for older changes?**
 > See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 9.5.1.
 
 **Package** — [pub.dev / packages / saropa_lints](https://pub.dev/packages/saropa_lints)
@@ -21,10 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- MAINTEANCE NOTES -- IMPORTANT --
 
+    All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),  and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
     Dates are not included in version headers — [pub.dev](https://pub.dev/packages/saropa_lints/changelog) displays publish dates separately.
 
     Each version (and [Unreleased]) should open with a short human summary when it helps; only discuss user-facing features.
-
 
     **Tagged changelog** — Published versions use git tag **`vx.y.z`**; each section below ends its summary line with **[log](url)** to that snapshot (or a standalone **[log](url)** when there is no summary). Compare to [current `main`](https://github.com/saropa/saropa-lints/blob/main/CHANGELOG.md).
 
@@ -34,19 +33,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [10.4.0]
+
+Vibrancy Report overhaul — auto-hiding blank columns, clickable summary cards and chart segments for filtering, search box, richer version/health tooltips, and pub.dev deep links throughout. — [log](https://github.com/saropa/saropa_lints/blob/v10.4.0/CHANGELOG.md)
 
 ### Vibrancy Report
 
-- **(Extension)** Version column now shows a compact age suffix (e.g. `(4mo)`, `(2y)`) based on installed version publish date
-- **(Extension)** Version column tooltip shows installed version date, latest version (when different), package creation date, and constraint
-- **(Extension)** Health column tooltip shows vibrancy score breakdown: Resolution Velocity, Engagement Level, Popularity, and Publisher Trust
-- **(Extension)** `createdDate` field added to pub.dev metadata (first-ever publish date for the package)
-- **(Extension)** `installedVersionDate` field added to vibrancy results (publish date of the installed version, looked up from the versions API)
+- **(Extension)** Auto-hide blank columns: Transitives, Vulns, and Status columns are hidden when all values are empty
+- **(Extension)** Summary cards now toggle table filters on click (vibrant, quiet, stale, updates, unused, vulns)
+- **(Extension)** Chart bars and donut segments toggle a package filter instead of scrolling
+- **(Extension)** Search box added above the table for filtering packages by name
+- **(Extension)** "Open pubspec.yaml" toolbar button sends message to open the file in the editor
+- **(Extension)** Version column links to pub.dev/versions; shows compact age suffix (e.g. `(4mo)`, `(2y)`)
+- **(Extension)** Version column tooltip shows installed version date, latest version, creation date, and constraint
+- **(Extension)** Health column merged from separate Score/Drift; tooltip shows score breakdown (Resolution Velocity, Engagement Level, Popularity, Publisher Trust)
+- **(Extension)** License column links to pub.dev/license; Update column links to pub.dev/changelog
+- **(Extension)** Stars column right-aligned with comma formatting; Size column now shows KB
+- **(Extension)** Section badges (`dev`, `transitive`) shown in Package column
+- **(Extension)** Description info icon column with tooltip on hover
+- **(Extension)** Override count shown in summary cards
+- **(Extension)** `createdDate` field added to pub.dev metadata
+- **(Extension)** `installedVersionDate` field added to vibrancy results
 
 ---
 
 ## [10.3.0]
+
+Analyzer 12 migration — rewrites ~500 call sites across 70+ rule files to the new AST API, adds vibrancy scan cancel/supersede support. — [log](https://github.com/saropa/saropa_lints/blob/v10.3.0/CHANGELOG.md)
 
 ### Changed
 
