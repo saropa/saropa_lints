@@ -49,5 +49,15 @@ void main() {
       'invalid_non_virtual_annotation',
       () => InvalidNonVirtualAnnotationRule(),
     );
+    testRule(
+      'AbstractFieldInitializerRule',
+      'abstract_field_initializer',
+      () => AbstractFieldInitializerRule(),
+    );
+    testRule(
+      'UndefinedEnumConstructorRule',
+      'undefined_enum_constructor',
+      () => UndefinedEnumConstructorRule(),
+    );
   });
 }

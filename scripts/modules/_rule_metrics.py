@@ -230,6 +230,16 @@ def _count_fixtures_for_category(
 _TEST_COUNT_RE = re.compile(r"^\s+test\(", re.MULTILINE)
 _RULE_INSTANTIATION_MARKER = "Rule Instantiation"
 
+# Categories whose rules reference removed SDK APIs or produce compile-time
+# errors, so fixture files cannot exist without breaking compilation.
+# Excluded from the terminal "Lowest fixture coverage" list but still counted
+# in file reports (with a disclaimer).
+_FIXTURE_EXEMPT_CATEGORIES: frozenset[str] = frozenset({
+    "compile_time_syntax",
+    "dart_sdk_3_removal",
+    "dart_sdk_34_deprecation",
+})
+
 
 def _compute_rule_instantiation_stats(
     project_dir: Path, rules_dir: Path,
@@ -407,9 +417,9 @@ def display_test_coverage(project_dir: Path) -> None:
             Color.CYAN,
         )
 
-    # Lowest fixture coverage
+    # Lowest fixture coverage (exclude categories that cannot have fixtures)
     ranked = sorted(
-        category_details,
+        [c for c in category_details if c[0] not in _FIXTURE_EXEMPT_CATEGORIES],
         key=lambda c: c[1] - c[2],
         reverse=True,
     )[:5]
