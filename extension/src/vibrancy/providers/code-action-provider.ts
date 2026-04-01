@@ -31,7 +31,6 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
         for (const diag of context.diagnostics) {
             if (diag.source !== 'Package Vibrancy') { continue; }
             const code = getDiagnosticCode(diag);
-            if (code === 'vibrancy-summary') { continue; }
             if (code === 'sdk-constraint') {
                 actions.push(...this.createSdkConstraintActions(document, diag));
                 continue;

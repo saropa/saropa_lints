@@ -94,10 +94,10 @@ export function getEndOfLifeDiagnostics(): EndOfLifeDiagnosticMode {
 }
 
 /** How many vibrancy issues to show as inline diagnostics in pubspec.yaml. */
-export type InlineDiagnosticsMode = 'summary' | 'critical' | 'all' | 'none';
+export type InlineDiagnosticsMode = 'critical' | 'all' | 'none';
 
 export function getInlineDiagnosticsMode(): InlineDiagnosticsMode {
-    return getConfig().get<InlineDiagnosticsMode>('inlineDiagnostics', 'summary');
+    return getConfig().get<InlineDiagnosticsMode>('inlineDiagnostics', 'critical');
 }
 
 // --- Suppression Settings ---

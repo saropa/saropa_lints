@@ -60,7 +60,7 @@ export class VibrancyDiagnostics {
             if (inlineMode === 'critical') {
                 return category === 'end-of-life';
             }
-            return false; // summary: no per-line health
+            return false;
         };
 
         const showPerLineOther = inlineMode !== 'none';
@@ -143,15 +143,6 @@ export class VibrancyDiagnostics {
             this._addOverrideDiagnostics(content, diagnostics);
         }
         this._addBudgetDiagnostics(results, diagnostics);
-
-        if (inlineMode === 'summary' || inlineMode === 'critical' || inlineMode === 'none') {
-            const counts = countActionableUnhealthy(results, eolSetting);
-            const total = counts.stale + counts.legacy + counts.quiet + counts.eol;
-            if (total > 0) {
-                const summaryDiag = buildSummaryDiagnostic(counts);
-                diagnostics.unshift(summaryDiag);
-            }
-        }
 
         this._collection.set(uri, diagnostics);
     }
@@ -322,43 +313,3 @@ function buildVulnDiagnostic(
     return diag;
 }
 
-/** Count unhealthy packages that would get an inline diagnostic (excludes path/git, respects EOL setting). */
-function countActionableUnhealthy(
-    results: VibrancyResult[],
-    eolSetting: string,
-): { stale: number; legacy: number; quiet: number; eol: number } {
-    let stale = 0, legacy = 0, quiet = 0, eol = 0;
-    for (const r of results) {
-        if (r.category === 'vibrant') continue;
-        if (r.package.source === 'path' || r.package.source === 'git') continue;
-        if (r.category === 'end-of-life' && eolSetting === 'none') continue;
-        switch (r.category) {
-            case 'stale': stale++; break;
-            case 'legacy-locked': legacy++; break;
-            case 'quiet': quiet++; break;
-            case 'end-of-life': eol++; break;
-        }
-    }
-    return { stale, legacy, quiet, eol };
-}
-
-function buildSummaryDiagnostic(
-    counts: { stale: number; legacy: number; quiet: number; eol: number },
-): vscode.Diagnostic {
-    const parts: string[] = [];
-    if (counts.stale > 0) parts.push(`${counts.stale} stale`);
-    if (counts.legacy > 0) parts.push(`${counts.legacy} legacy-locked`);
-    if (counts.quiet > 0) parts.push(`${counts.quiet} quiet`);
-    if (counts.eol > 0) parts.push(`${counts.eol} end-of-life`);
-    const summary = parts.length > 0
-        ? `Package Vibrancy: ${parts.join(', ')} — Open Package Vibrancy view for details.`
-        : 'Package Vibrancy: Open Package Vibrancy view for details.';
-    const diag = new vscode.Diagnostic(
-        new vscode.Range(0, 0, 0, 0),
-        summary,
-        vscode.DiagnosticSeverity.Information,
-    );
-    diag.source = 'Package Vibrancy';
-    diag.code = 'vibrancy-summary';
-    return diag;
-}
