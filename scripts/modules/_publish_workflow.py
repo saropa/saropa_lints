@@ -60,6 +60,7 @@ from scripts.modules._publish_steps import (
     run_pre_publish_audits,
     run_tests,
     validate_changelog,
+    verify_pubdev_publication,
 )
 from scripts.modules._rule_metrics import (
     count_categories,
@@ -664,6 +665,10 @@ def run_full_publish(
             ctx.project_dir, version, ctx.branch, release_notes, timer,
         )
         succeeded = True
+
+        # Verify pub.dev received the new version (non-fatal on timeout)
+        with timer.step("pub.dev verification"):
+            verify_pubdev_publication(ctx.package_name, version)
 
         run_version_bump(
             ctx.project_dir,
