@@ -6,6 +6,7 @@ import { fetchVersionGap } from '../services/github-version-gap';
 import { getVersionGapEnabled, getGithubToken } from '../services/config-service';
 import { CacheService } from '../services/cache-service';
 import { extractGitHubRepo } from '../services/github-api';
+import { openFileAtLine } from './view-actions';
 
 const PANEL_ID = 'saropaPackageDetail';
 
@@ -150,6 +151,12 @@ export class PackageDetailPanel {
                 }
                 break;
 
+            case 'openFile':
+                if (message.path) {
+                    await openFileAtLine(message.path, message.line ?? 1);
+                }
+                break;
+
             case 'upgrade':
                 if (message.name && message.version) {
                     await vscode.commands.executeCommand(
@@ -202,6 +209,8 @@ export class PackageDetailPanel {
 interface PanelMessage {
     readonly type: string;
     readonly url?: string;
+    readonly path?: string;
+    readonly line?: number;
     readonly name?: string;
     readonly version?: string;
     readonly itemNumber?: number;

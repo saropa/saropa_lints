@@ -153,6 +153,8 @@ export function getPackageDetailScript(): string {
             const action = btn.dataset.action;
             if (action === 'openUrl') {
                 vscode.postMessage({ type: 'openUrl', url: btn.dataset.url });
+            } else if (action === 'openFile') {
+                vscode.postMessage({ type: 'openFile', path: btn.dataset.path, line: parseInt(btn.dataset.line, 10) || 1 });
             } else if (action === 'upgrade') {
                 vscode.postMessage({
                     type: 'upgrade',

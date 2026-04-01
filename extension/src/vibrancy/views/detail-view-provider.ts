@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { VibrancyResult } from '../types';
 import { buildDetailViewHtml } from './detail-view-html';
 import { findPubspecYaml, buildVersionEdit } from '../providers/tree-commands';
+import { openFileAtLine } from './view-actions';
 
 /** View ID for the package details webview in the sidebar. */
 export const DETAIL_VIEW_ID = 'saropaLints.packageVibrancy.details';
@@ -61,7 +62,7 @@ export class DetailViewProvider implements vscode.WebviewViewProvider {
         return this._currentResult;
     }
 
-    private async _handleMessage(message: { type: string; package?: string; url?: string }): Promise<void> {
+    private async _handleMessage(message: { type: string; package?: string; url?: string; path?: string; line?: number }): Promise<void> {
         switch (message.type) {
             case 'upgrade':
                 if (message.package) {
@@ -81,6 +82,12 @@ export class DetailViewProvider implements vscode.WebviewViewProvider {
             case 'openUrl':
                 if (message.url) {
                     await vscode.env.openExternal(vscode.Uri.parse(message.url));
+                }
+                break;
+
+            case 'openFile':
+                if (message.path) {
+                    await openFileAtLine(message.path, message.line ?? 1);
                 }
                 break;
 

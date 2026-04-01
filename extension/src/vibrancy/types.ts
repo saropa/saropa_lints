@@ -1,5 +1,6 @@
 import type { VersionGapResult } from './types-extended';
 import type { ReplacementComplexity } from './services/package-code-analyzer';
+import type { PackageUsage } from './services/import-scanner';
 
 /** Status categories for package vibrancy. */
 export type VibrancyCategory = 'vibrant' | 'quiet' | 'legacy-locked' | 'stale' | 'end-of-life';
@@ -202,6 +203,8 @@ export interface VibrancyResult {
     readonly archiveSizeBytes: number | null;
     readonly bloatRating: number | null;
     readonly isUnused: boolean;
+    /** Files that import this package (active + commented-out). Empty array if unused. */
+    readonly fileUsages: readonly PackageUsage[];
     readonly platforms: readonly string[] | null;
     readonly verifiedPublisher: boolean;
     readonly wasmReady: boolean | null;
@@ -303,3 +306,5 @@ export interface RankedComparison {
 /* Re-export all extended types so existing imports from '../types' continue working. */
 export * from './types-extended';
 export type { ReplacementComplexity, ReplacementLevel, PackageCodeMetrics } from './services/package-code-analyzer';
+export type { PackageUsage, PackageUsageMap } from './services/import-scanner';
+export { activeFileUsages } from './services/import-scanner';
