@@ -227,6 +227,8 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   private totalUnfiltered = 0;
   /** Rules that have quick-fix generators. Null = unknown (older analyzer), treat all as fixable. */
   private rulesWithFixesSet: Set<string> | null = null;
+  /** When true, getTreeItem() returns Expanded instead of Collapsed for all collapsible nodes. */
+  private _expandAllOverride = false;
 
   constructor(workspaceState: vscode.Memento) {
     this.workspaceState = workspaceState;
@@ -239,12 +241,36 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     return root ? hasViolations(root) : false;
   }
 
+  /** Expand all collapsible nodes on the next render. Cleared by any subsequent non-expand refresh. */
+  expandAll(): void {
+    this._expandAllOverride = true;
+    // Direct fire — bypasses fireChanged() which would immediately clear the flag.
+    this._onDidChangeTreeData.fire();
+  }
+
+  /** Resolve collapse state: Expanded when expandAll is active, Collapsed otherwise. */
+  private get collapsedOrExpanded(): vscode.TreeItemCollapsibleState {
+    return this._expandAllOverride
+      ? vscode.TreeItemCollapsibleState.Expanded
+      : vscode.TreeItemCollapsibleState.Collapsed;
+  }
+
+  /**
+   * Fire a tree refresh, clearing any pending expand-all override.
+   * Every mutation except expandAll() must use this to prevent the flag from
+   * persisting across unrelated filter/suppression changes.
+   */
+  private fireChanged(): void {
+    this._expandAllOverride = false;
+    this._onDidChangeTreeData.fire();
+  }
+
   refresh(): void {
     this.cachedIndex = null;
     this.rulesWithFixesSet = null;
     // Clear file existence cache so moved/deleted files are detected on next render.
     clearFileExistsCache();
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   getTypeFilterState(): { severitiesToShow: Set<string>; impactsToShow: Set<string> } {
@@ -327,37 +353,37 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   setTextFilter(value: string): void {
     this.textFilter = value;
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   setSeverityFilter(severities: Set<string>): void {
     this.severitiesToShow = new Set(severities);
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   setImpactFilter(impacts: Set<string>): void {
     this.impactsToShow = new Set(impacts);
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   setRulesToHide(rules: Set<string>): void {
     this.rulesToHide = new Set(rules);
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   setFocusedFile(filePath: string): void {
     this.focusedFile = filePath;
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   clearFocusedFile(): void {
     this.focusedFile = undefined;
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   getFocusedFile(): string | undefined {
@@ -371,7 +397,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     this.rulesToHide = new Set();
     this.focusedFile = undefined;
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   /** D10: Current grouping mode. */
@@ -383,56 +409,56 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   setGroupBy(mode: GroupByMode): void {
     this.groupBy = mode;
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   clearSuppressionsAndRefresh(): void {
     this.suppressions = clearSuppressions();
     saveSuppressions(this.workspaceState, this.suppressions);
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   addSuppressionFolder(folderPath: string): void {
     this.suppressions = addHiddenFolder(this.suppressions, folderPath);
     saveSuppressions(this.workspaceState, this.suppressions);
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   addSuppressionFile(filePath: string): void {
     this.suppressions = addHiddenFile(this.suppressions, filePath);
     saveSuppressions(this.workspaceState, this.suppressions);
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   addSuppressionRule(rule: string): void {
     this.suppressions = addHiddenRule(this.suppressions, rule);
     saveSuppressions(this.workspaceState, this.suppressions);
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   addSuppressionRuleInFile(filePath: string, rule: string): void {
     this.suppressions = addHiddenRuleInFile(this.suppressions, filePath, rule);
     saveSuppressions(this.workspaceState, this.suppressions);
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   addSuppressionSeverity(severity: string): void {
     this.suppressions = addHiddenSeverity(this.suppressions, severity);
     saveSuppressions(this.workspaceState, this.suppressions);
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   addSuppressionImpact(impact: string): void {
     this.suppressions = addHiddenImpact(this.suppressions, impact);
     saveSuppressions(this.workspaceState, this.suppressions);
     this.cachedIndex = null;
-    this._onDidChangeTreeData.fire();
+    this.fireChanged();
   }
 
   private getIndex(root: string): Map<string, Map<string, Violation[]>> | null {
@@ -483,7 +509,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       const label = `${element.severity.charAt(0).toUpperCase() + element.severity.slice(1)} (${element.count})`;
       const item = new vscode.TreeItem(
         label,
-        vscode.TreeItemCollapsibleState.Collapsed,
+        this.collapsedOrExpanded,
       );
       item.iconPath = severityThemeIcon(element.severity);
       item.tooltip = `${element.count} ${element.severity}(s)`;
@@ -494,7 +520,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     if (element.kind === 'folder') {
       const item = new vscode.TreeItem(
         element.segmentName,
-        vscode.TreeItemCollapsibleState.Collapsed,
+        this.collapsedOrExpanded,
       );
       // Inherit severity icon+color from parent so folders visually match their severity group.
       item.iconPath = element.severity
@@ -516,7 +542,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
       const item = new vscode.TreeItem(
         `${base} (${element.violations.length})`,
         // Still collapsible so users can see which violations existed.
-        vscode.TreeItemCollapsibleState.Collapsed,
+        this.collapsedOrExpanded,
       );
       if (exists) {
         item.resourceUri = vscode.Uri.file(absPath);
@@ -617,7 +643,7 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     if (element.kind === 'group') {
       const item = new vscode.TreeItem(
         `${element.label} (${element.count})`,
-        vscode.TreeItemCollapsibleState.Collapsed,
+        this.collapsedOrExpanded,
       );
       // D10: Mode-aware icon — reads from element.mode (snapshot at creation) to avoid stale this.groupBy.
       if (element.mode === 'impact') {

@@ -15,6 +15,8 @@
     "src/test/driftAdvisor/**/*.ts",
     "src/vibrancy/**/*.ts",
     "src/test/vibrancy/register-vscode-mock.ts",
+    "src/test/vibrancy/vscode-mock.ts",
+    "src/test/vibrancy/vscode-mock-classes.ts",
     "src/test/vibrancy/test-helpers.ts",
     "src/test/vibrancy/scan-helpers.test.ts",
     "src/test/vibrancy/services/package-code-analyzer.test.ts",
@@ -46,7 +48,16 @@
     "src/test/sidebarSectionCounts.test.ts",
     "src/pathUtils.ts",
     "src/test/pathUtils.test.ts",
-    "src/test/violationsReader.test.ts"
+    "src/test/violationsReader.test.ts",
+    "src/views/issuesTree.ts",
+    "src/views/securityPostureTree.ts",
+    "src/ruleMetadata.ts",
+    "src/healthScore.ts",
+    "src/triageUtils.ts",
+    "src/reportWriter.ts",
+    "src/suppressionsStore.ts",
+    "src/projectRoot.ts",
+    "src/test/views/issuesTree.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

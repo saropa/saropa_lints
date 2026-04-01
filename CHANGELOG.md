@@ -38,6 +38,7 @@
 ### Changed
 
 - **Extension:** "Apply fix" context menu item is now hidden for violations without a quick fix, instead of showing a dead-end "No quick fix available" message
+- **Extension:** Violations tree now auto-expands all levels when navigated to from workspace options, dashboard links, summary counts, or triage groups
 
 ### Fixed
 
